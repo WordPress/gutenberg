@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -82,8 +82,6 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { showInsertionPoint } = useDispatch( blockEditorStore );
-
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
@@ -93,7 +91,6 @@ export default function QuickInserter( {
 			filterValue,
 			onSelect,
 		} );
-		showInsertionPoint( rootClientId, insertionIndex );
 	};
 
 	let maxBlockPatterns = 0;

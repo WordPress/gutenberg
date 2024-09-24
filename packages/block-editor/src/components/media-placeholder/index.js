@@ -323,15 +323,15 @@ export function MediaPlaceholder( {
 
 				if ( isAudio ) {
 					instructions = __(
-						'Upload an audio file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an audio file here, or pick one from your library.'
 					);
 				} else if ( isImage ) {
 					instructions = __(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					);
 				} else if ( isVideo ) {
 					instructions = __(
-						'Upload a video file, pick one from your media library, or add one with a URL.'
+						'Upload or drag a video file here, or pick one from your library.'
 					);
 				}
 			}

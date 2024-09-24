@@ -60,7 +60,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
     >
       <button
         aria-label="Close panel"
-        class="components-button has-icon"
+        class="components-button is-compact has-icon"
         type="button"
       >
         <svg
@@ -252,7 +252,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
     >
       <button
         aria-label="Close panel"
-        class="components-button has-icon"
+        class="components-button is-compact has-icon"
         type="button"
       >
         <svg

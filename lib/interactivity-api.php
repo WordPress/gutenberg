@@ -16,14 +16,14 @@ function gutenberg_reregister_interactivity_script_modules() {
 
 	wp_register_script_module(
 		'@wordpress/interactivity',
-		gutenberg_url( '/build/interactivity/' . ( SCRIPT_DEBUG ? 'debug.min.js' : 'index.min.js' ) ),
+		gutenberg_url( '/build-module/' . ( SCRIPT_DEBUG ? 'interactivity/debug.min.js' : 'interactivity/index.min.js' ) ),
 		array(),
 		$default_version
 	);
 
 	wp_register_script_module(
 		'@wordpress/interactivity-router',
-		gutenberg_url( '/build/interactivity/router.min.js' ),
+		gutenberg_url( '/build-module/interactivity-router/index.min.js' ),
 		array( '@wordpress/interactivity' ),
 		$default_version
 	);

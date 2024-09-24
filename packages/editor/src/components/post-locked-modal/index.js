@@ -257,8 +257,7 @@ export default function PostLockedModal() {
 					>
 						{ ! isTakeover && (
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								variant="tertiary"
 								href={ unlockUrl }
 							>
@@ -266,8 +265,7 @@ export default function PostLockedModal() {
 							</Button>
 						) }
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="primary"
 							href={ allPostsUrl }
 						>

@@ -114,6 +114,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
+		state.editorMode,
 	]
 );
 
@@ -422,9 +423,11 @@ const EMPTY_ARRAY = [];
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state ) => {
 		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		return reusableBlocksSelect
-			? reusableBlocksSelect( select )
-			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+		return (
+			( reusableBlocksSelect
+				? reusableBlocksSelect( select )
+				: state.settings.__experimentalReusableBlocks ) ?? EMPTY_ARRAY
+		);
 	}
 );
 

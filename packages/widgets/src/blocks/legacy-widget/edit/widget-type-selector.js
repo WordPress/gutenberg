@@ -29,7 +29,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 		<SelectControl
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
-			label={ __( 'Select a legacy widget to display:' ) }
+			label={ __( 'Legacy widget' ) }
 			value={ selectedId ?? '' }
 			options={ [
 				{ value: '', label: __( 'Select widget' ) },

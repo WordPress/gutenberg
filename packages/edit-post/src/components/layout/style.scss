@@ -1,6 +1,70 @@
-.edit-post-layout__metaboxes {
-	flex-shrink: 0;
-	clear: both;
+.edit-post-meta-boxes-main {
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	background-color: $white;
+	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
+
+	&:not(details) {
+		padding-top: 23px;
+		max-height: 100%;
+
+		&:not(.has-user-size) {
+			max-height: 50% !important;
+		}
+	}
+
+	// The component renders as a details element in short viewports.
+	&:is(details) {
+		& > summary {
+			cursor: pointer;
+			color: $gray-900;
+			background-color: $white;
+			height: $button-size-compact;
+			line-height: $button-size-compact;
+			font-size: 13px;
+			padding-left: $grid-unit-30;
+			box-shadow: 0 $border-width $gray-300;
+		}
+
+		&[open] > summary {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+	}
+
+	& .components-resizable-box__handle-top {
+		top: 0;
+		box-shadow: 0 $border-width $gray-300;
+	}
+	& .components-resizable-box__side-handle::before {
+		border-radius: 0;
+		top: 0;
+		height: $border-width;
+	}
+	& .components-resizable-box__handle::after {
+		background-color: $gray-300;
+		box-shadow: none;
+		border-radius: 4px;
+		height: $grid-unit-05;
+		top: calc(50% - #{$grid-unit-05} / 2);
+		width: 100px;
+		right: calc(50% - 50px);
+	}
+}
+
+.edit-post-meta-boxes-main__liner {
+	overflow: auto;
+	max-height: 100%;
+	// Keep the contents behind the resize handle or details summary.
+	isolation: isolate;
+}
+
+.has-metaboxes .editor-visual-editor {
+	flex: 1;
+
+	&.is-iframed {
+		isolation: isolate;
+	}
 }
 
 // Adjust the position of the notices

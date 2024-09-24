@@ -3,9 +3,6 @@
  */
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
-import { dispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
 
 export function stripFirstImage( attributes, { shortcode } ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
@@ -138,26 +135,6 @@ const transforms = {
 			// creating a new gallery.
 			type: 'files',
 			isMatch( files ) {
-				// The following check is intended to catch non-image files when dropped together with images.
-				if (
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) === 0
-					) &&
-					files.some(
-						( file ) => file.type.indexOf( 'image/' ) !== 0
-					)
-				) {
-					const { createErrorNotice } = dispatch( noticesStore );
-					createErrorNotice(
-						__(
-							'If uploading to a gallery all files need to be image formats'
-						),
-						{
-							id: 'gallery-transform-invalid-file',
-							type: 'snackbar',
-						}
-					);
-				}
 				return files.every(
 					( file ) => file.type.indexOf( 'image/' ) === 0
 				);

@@ -21,6 +21,7 @@ import { getAuthority } from '@wordpress/url';
  * Internal dependencies
  */
 import WpEmbedPreview from './wp-embed-preview';
+import { Caption } from '../utils/caption';
 
 class EmbedPreview extends Component {
 	constructor() {
@@ -52,8 +53,19 @@ class EmbedPreview extends Component {
 	}
 
 	render() {
-		const { preview, previewable, url, type, className, icon, label } =
-			this.props;
+		const {
+			preview,
+			previewable,
+			url,
+			type,
+			className,
+			icon,
+			label,
+			insertBlocksAfter,
+			attributes,
+			setAttributes,
+			isSelected,
+		} = this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
 
@@ -123,6 +135,14 @@ class EmbedPreview extends Component {
 						</p>
 					</Placeholder>
 				) }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Embed caption text' ) }
+					showToolbarButton={ isSelected }
+				/>
 			</figure>
 		);
 	}

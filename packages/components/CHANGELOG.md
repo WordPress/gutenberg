@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
+-   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
+
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
@@ -10,10 +15,21 @@
 
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 
+### Enhancements
+
+-   `Navigator`: warn if a screen's `path` doesn't follow a URL-like scheme ([#65231](https://github.com/WordPress/gutenberg/pull/65231)).
+-   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+
+### Bug Fixes
+
+-   `DatePicker`: better hover/focus styles ([#65117](https://github.com/WordPress/gutenberg/pull/65117)).
+
 ### Internal
 
+-   `Tabs`: improved performance of the indicator animation ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
+-   `BoxControl`: Fix critical error when null value is passed ([#65287](https://github.com/WordPress/gutenberg/pull/65287)).
 
 ## 28.7.0 (2024-09-05)
 
