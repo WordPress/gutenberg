@@ -103,11 +103,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const { name, clientId, context } = props;
-		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
-		const hasPatternOverridesDefaultBinding =
-			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
-				?.source === 'core/pattern-overrides';
+		const { name, clientId, context, setAttributes } = props;
 		const blockBindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
@@ -196,7 +192,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			sources,
 		] );
 
-		const { setAttributes } = props;
+		const hasParentPattern = !! updatedContext[ 'pattern/overrides' ];
+		const hasPatternOverridesDefaultBinding =
+			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
+				?.source === 'core/pattern-overrides';
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
