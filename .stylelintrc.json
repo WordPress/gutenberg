@@ -1,5 +1,5 @@
 {
-	"extends": "@wordpress/stylelint-config/scss",
+	"extends": "@wordpress/stylelint-config/scss-stylistic",
 	"rules": {
 		"at-rule-empty-line-before": null,
 		"at-rule-no-unknown": null,
@@ -21,7 +21,7 @@
 			}
 		],
 		"font-weight-notation": null,
-		"max-line-length": null,
+		"@stylistic/max-line-length": null,
 		"no-descending-specificity": null,
 		"property-disallowed-list": [
 			[ "order" ],
@@ -34,7 +34,7 @@
 		"value-keyword-case": null,
 		"scss/operator-no-unspaced": null,
 		"scss/selector-no-redundant-nesting-selector": null,
-		"scss/at-import-partial-extension": null,
+		"scss/load-partial-extension": null,
 		"scss/no-global-function-names": null,
 		"scss/comment-no-empty": null,
 		"scss/at-extend-no-missing-placeholder": null,

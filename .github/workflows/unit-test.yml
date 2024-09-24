@@ -135,7 +135,9 @@ jobs:
               uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               with:
                   name: build-assets
-                  path: ./build/
+                  path: |
+                      ./build/
+                      ./build-module/
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
@@ -212,7 +214,6 @@ jobs:
               uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
               with:
                   name: build-assets
-                  path: ./build
 
             - name: Docker debug information
               run: |

@@ -642,6 +642,14 @@ describe( 'Navigator', () => {
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
 	} );
 
+	it( 'should warn if the `path` prop does not follow the required format', () => {
+		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
+	} );
+
 	it( 'should match correctly paths with named arguments', async () => {
 		const user = userEvent.setup();
 
