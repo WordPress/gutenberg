@@ -3006,8 +3006,11 @@ export const getBlockEditingMode = createRegistrySelector(
 				// The rest of the blocks depend on whether they are content blocks or not.
 				// This "flattens" the sections tree.
 				const name = getBlockName( state, clientId );
-				const isContent =
-					select( blocksStore ).hasContentRoleAttribute( name );
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContent = hasContentRoleAttribute( name );
+
 				return isContent ? 'contentOnly' : 'disabled';
 			}
 
@@ -3027,10 +3030,10 @@ export const getBlockEditingMode = createRegistrySelector(
 			// If the parent of the block is contentOnly locked, check whether it's a content block.
 			if ( templateLock === 'contentOnly' ) {
 				const name = getBlockName( state, clientId );
-				const isContent =
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					);
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContent = hasContentRoleAttribute( name );
 				return isContent ? 'contentOnly' : 'disabled';
 			}
 			// Otherwise, check if there's an ancestor that is contentOnly
