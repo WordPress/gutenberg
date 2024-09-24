@@ -75,7 +75,7 @@ This controls whether the alpha channel will be offered when selecting
 custom colors.
 
 -   Required: No
--   Default: `false`
+-   Default: `true`
 
 ### `enableStyle`: `boolean`
 
