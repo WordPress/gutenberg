@@ -59,7 +59,7 @@ const usePatternsState = (
 	const patterns = useMemo(
 		() =>
 			isQuick
-				? patterns
+				? allPatterns
 				: allPatterns
 						.filter( ( { inserter = true } ) => !! inserter )
 						.map( ( pattern ) => {
