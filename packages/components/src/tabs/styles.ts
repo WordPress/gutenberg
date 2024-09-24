@@ -106,7 +106,7 @@ export const Tab = styled( Ariakit.Tab )`
 			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:not( [aria-disabled='true'] ):hover {
+		&:not( [aria-disabled='true'] ):is( :hover, [data-focus-visible] ) {
 			color: ${ COLORS.theme.accent };
 		}
 
