@@ -107,20 +107,22 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 };
 
 // Render all interactive regions contained in the given page.
-const renderRegions = ( page: Page ) => {
-	batch( async () => {
-		populateServerData( page.initialData );
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			if ( navigationMode === 'fullPage' ) {
-				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
-				await updateHead( page.head );
-				const fragment = getRegionRootFragment( document.body );
+const renderRegions = async ( page: Page ) => {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( navigationMode === 'fullPage' ) {
+			// Once this code is tested and more mature, the head should be updated for region based navigation as well.
+			await updateHead( page.head );
+			const fragment = getRegionRootFragment( document.body );
+			batch( () => {
+				populateServerData( page.initialData );
 				render( page.regions.body, fragment );
-			}
+			} );
 		}
-		if ( navigationMode === 'regionBased' ) {
+	}
+	if ( navigationMode === 'regionBased' ) {
+		const attrName = `data-${ directivePrefix }-router-region`;
+		batch( () => {
 			populateServerData( page.initialData );
-			const attrName = `data-${ directivePrefix }-router-region`;
 			document
 				.querySelectorAll( `[${ attrName }]` )
 				.forEach( ( region ) => {
@@ -128,11 +130,11 @@ const renderRegions = ( page: Page ) => {
 					const fragment = getRegionRootFragment( region );
 					render( page.regions[ id ], fragment );
 				} );
-		}
-		if ( page.title ) {
-			document.title = page.title;
-		}
-	} );
+		} );
+	}
+	if ( page.title ) {
+		document.title = page.title;
+	}
 };
 
 /**
@@ -156,7 +158,7 @@ window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
-		renderRegions( page );
+		await renderRegions( page );
 		// Update the URL in the state.
 		state.url = window.location.href;
 	} else {
