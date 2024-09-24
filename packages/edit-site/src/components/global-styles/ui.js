@@ -272,19 +272,6 @@ function GlobalStylesEditorCanvasContainerLink() {
 					goTo( '/' );
 				}
 				break;
-			default:
-				/*
-				 * Example: the user has navigated to "Browse styles" or elsewhere
-				 * and changes the editorCanvasContainerView, e.g., closes the style book.
-				 * The panel should not be affected.
-				 * Exclude revisions panel from this behavior,
-				 * as it should close when the editorCanvasContainerView doesn't correspond.
-				 */
-				if ( path !== '/' && ! isRevisionsOpen ) {
-					return;
-				}
-				goTo( '/' );
-				break;
 		}
 	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
