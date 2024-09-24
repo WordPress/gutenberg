@@ -414,7 +414,8 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 1.5em;
+	font-size: $default-font-size;
+	font-family: $default-font;
 
 	&.is-dragged-over {
 		background: $gray-400;
