@@ -4643,12 +4643,15 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
 				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
 			)
 		).toBe( 'contentOnly' );
+
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
