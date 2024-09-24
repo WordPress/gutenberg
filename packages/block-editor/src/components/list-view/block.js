@@ -535,6 +535,7 @@ function ListViewBlock( {
 			data-block={ clientId }
 			data-expanded={ canEdit ? isExpanded : undefined }
 			ref={ rowRef }
+			onDoubleClick={ toggleExpanded }
 		>
 			<TreeGridCell
 				className="block-editor-list-view-block__contents-cell"
