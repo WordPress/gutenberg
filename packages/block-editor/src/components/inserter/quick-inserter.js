@@ -47,10 +47,11 @@ export default function QuickInserter( {
 		onInsertBlocks,
 		true
 	);
-
 	const [ patterns ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		undefined,
+		true
 	);
 
 	const { setInserterIsOpened, insertionIndex } = useSelect(
