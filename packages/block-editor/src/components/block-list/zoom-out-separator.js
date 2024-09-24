@@ -20,35 +20,29 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-export function ZoomOutSeparator( {
-	clientId,
-	rootClientId = '',
-	position = 'top',
-} ) {
+export function ZoomOutSeparator( { clientId, rootClientId = '' } ) {
 	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
-	const {
-		sectionRootClientId,
-		sectionClientIds,
-		blockInsertionPoint,
-		blockInsertionPointVisible,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockInsertionPoint,
-			getBlockOrder,
-			isBlockInsertionPointVisible,
-			getSectionRootClientId,
-		} = unlock( select( blockEditorStore ) );
+	const { sectionRootClientId, sectionClientIds, isBlockSelected } =
+		useSelect( ( select ) => {
+			const {
+				getBlockInsertionPoint,
+				getBlockOrder,
+				isBlockInsertionPointVisible,
+				getSectionRootClientId,
+				isBlockSelected: _isBlockSelected,
+			} = unlock( select( blockEditorStore ) );
 
-		const root = getSectionRootClientId();
-		const sectionRootClientIds = getBlockOrder( root );
-		return {
-			sectionRootClientId: root,
-			sectionClientIds: sectionRootClientIds,
-			blockOrder: getBlockOrder( root ),
-			blockInsertionPoint: getBlockInsertionPoint(),
-			blockInsertionPointVisible: isBlockInsertionPointVisible(),
-		};
-	}, [] );
+			const root = getSectionRootClientId();
+			const sectionRootClientIds = getBlockOrder( root );
+			return {
+				isBlockSelected: _isBlockSelected,
+				sectionRootClientId: root,
+				sectionClientIds: sectionRootClientIds,
+				blockOrder: getBlockOrder( root ),
+				blockInsertionPoint: getBlockInsertionPoint(),
+				blockInsertionPointVisible: isBlockInsertionPointVisible(),
+			};
+		}, [] );
 
 	const isReducedMotion = useReducedMotion();
 
@@ -67,18 +61,7 @@ export function ZoomOutSeparator( {
 		return null;
 	}
 
-	if ( position === 'top' ) {
-		isVisible =
-			blockInsertionPointVisible &&
-			blockInsertionPoint.index === 0 &&
-			clientId === sectionClientIds[ blockInsertionPoint.index ];
-	}
-
-	if ( position === 'bottom' ) {
-		isVisible =
-			blockInsertionPointVisible &&
-			clientId === sectionClientIds[ blockInsertionPoint.index - 1 ];
-	}
+	isVisible = isBlockSelected( clientId );
 
 	return (
 		<AnimatePresence>

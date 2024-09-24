@@ -233,7 +233,6 @@ function Items( {
 						<ZoomOutSeparator
 							clientId={ clientId }
 							rootClientId={ rootClientId }
-							position="top"
 						/>
 					) }
 					<BlockListBlock
@@ -244,7 +243,6 @@ function Items( {
 						<ZoomOutSeparator
 							clientId={ clientId }
 							rootClientId={ rootClientId }
-							position="bottom"
 						/>
 					) }
 				</AsyncModeProvider>

@@ -12,6 +12,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const ZoomOutToggle = () => {
@@ -27,11 +28,18 @@ const ZoomOutToggle = () => {
 		useDispatch( blockEditorStore )
 	);
 
+	const { setIsInserterOpened } = unlock( useDispatch( editorStore ) );
+
 	const handleZoomOut = () => {
 		if ( isZoomOut ) {
+			setIsInserterOpened( false );
 			resetZoomLevel();
 		} else {
 			setZoomLevel( 50 );
+			setIsInserterOpened( {
+				tab: 'patterns',
+				category: 'all',
+			} );
 		}
 		__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 	};
