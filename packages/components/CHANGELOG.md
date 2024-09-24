@@ -4,6 +4,10 @@
 
 ## 28.8.0 (2024-09-19)
 
+### Enhancements
+
+-   `Tabs`: handle horizontal overflow and large tab lists gracefully ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
+
 ### Bug Fixes
 
 -   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
@@ -19,7 +23,6 @@
 
 ### New Features
 
--   `Tabs`: add overflow behavior ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
 
@@ -61,7 +64,6 @@
 
 ### Enhancements
 
--   `Tabs`: Handle horizontal overflow and large tab lists gracefully ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
 -   `ColorPicker`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
 -   `CustomSelectControl V2`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
 -   `AlignmentMatrixControl.Icon`: rewrite entirely using SVG markup ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
