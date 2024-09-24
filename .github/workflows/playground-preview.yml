@@ -1,0 +1,52 @@
+name: Playground Preview
+
+# Inspired by, but not based on https://github.com/WordPress/gutenberg/blob/b89fb7b6eaf619bde0269e2a7fbf6245822f6cbf/.github/workflows/build-plugin-zip.yml#L153
+
+on:
+    # What and Why pull_request_target?
+    #
+    # The GitHub Actions built in environment variables and Context
+    # of pull_request_target event are different from those of pull_request event.
+    #
+    # For example, the following environment variables and context are different.
+    #
+    # - event_name, GITHUB_EVENT_NAME
+    # - ref, GITHUB_REF
+    # - sha, GITHUB_SHA
+    # - ref_name, GITHUB_REF_NAME
+    #
+    # @source https://dev.to/suzukishunsuke/secure-github-actions-by-pullrequesttarget-641#modify-workflows-for-pullrequesttarget
+
+    pull_request_target:
+        types: [opened, synchronize]
+        paths:
+            - 'lib/**'
+            - 'packages/**'
+            - 'patches/**'
+            - '**.php'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    comment:
+        name: Comment with playground link
+        # needs: zip # Ensure this runs after zip job.
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Add Preview Links comment
+              id: comment-on-pr
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const createPreviewLinks = require('.github/scripts/create-preview-links');
+                      createPreviewLinks(github, context);
