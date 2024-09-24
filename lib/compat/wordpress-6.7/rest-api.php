@@ -115,33 +115,6 @@ function gutenberg_override_default_rest_server() {
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
 
-
-/**
- * Adds user avatar URLs to the REST API response for WordPress version 6.7 and below.
- *
- * This function is used to add avatar URLs for the author of a post in the REST API response.
- * It checks if the function 'add_user_avatar_urls_in_rest_response_6_7' does not already exist,
- * and if not, defines the function.
- *
- * @param object $response The REST API response object.
- * @return object The modified REST API response object with added avatar URLs.
- */
-if ( ! function_exists( 'add_user_avatar_urls_in_rest_response_6_7' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
-	function add_user_avatar_urls_in_rest_response_6_7( $response ) {
-
-		if ( $response->data['author'] ) {
-			$response->data['author_avatar_urls'] = array(
-				'default' => get_avatar_url( $response->data['author'] ),
-				'48'      => add_query_arg( 's', 48, get_avatar_url( $response->data['author'], array( 'size' => 48 ) ) ),
-				'96'      => add_query_arg( 's', 96, get_avatar_url( $response->data['author'], array( 'size' => 96 ) ) ),
-			);
-		}
-
-		return $response;
-	}
-	add_filter( 'rest_prepare_comment', 'add_user_avatar_urls_in_rest_response_6_7', 10, 1 );
-}
-
 /**
  * Updates the comment type in the REST API for WordPress version 6.7.
  *
@@ -163,4 +136,40 @@ if ( ! function_exists( 'update_comment_type_in_rest_api_6_7' ) && gutenberg_is_
 		return $prepared_comment;
 	}
 	add_filter( 'rest_pre_insert_comment', 'update_comment_type_in_rest_api_6_7', 10, 2 );
+}
+
+/**
+ * Updates the comment type for avatars in the WordPress REST API.
+ *
+ * This function adds the 'block_comment' type to the list of comment types
+ * for which avatars should be retrieved in the WordPress REST API.
+ *
+ * @param array $comment_type The array of comment types.
+ * @return array The updated array of comment types.
+ */
+if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
+	function update_get_avatar_comment_type( $comment_type ) {
+		$comment_type[] = 'block_comment';
+		return $comment_type;
+	}
+	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type', 10, 1 );
+}
+
+/**
+ * Updates the comment type filter dropdown options.
+ *
+ * This function is only defined if the 'gutenberg-block-comment' experiment is enabled and the 'update_comment_type_filter_dropdown' function does not already exist.
+ * It returns an array of comment type options for the comment type filter dropdown in the admin area.
+ *
+ * @return array An associative array of comment type options.
+ * The keys are the comment type slugs and the values are the translated names of the comment types.
+ */
+if ( ! function_exists( 'update_comment_type_filter_dropdown' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
+	function update_comment_type_filter_dropdown() {
+		return array(
+			'comment'       => __( 'Comments' ),
+			'block_comment' => __( 'Block Comments' ),
+		);
+	}
+	add_filter( 'admin_comment_types_dropdown', 'update_comment_type_filter_dropdown' );
 }
