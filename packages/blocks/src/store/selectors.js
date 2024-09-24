@@ -828,7 +828,6 @@ export const __experimentalHasContentRoleAttribute = ( ...args ) => {
 	deprecated( '__experimentalHasContentRoleAttribute', {
 		since: '6.7',
 		version: '6.8',
-		alternative: 'hasContentRoleAttribute',
 		hint: 'This is a private selector.',
 	} );
 	return privateHasContentRoleAttribute( ...args );
