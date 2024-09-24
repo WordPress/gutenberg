@@ -417,6 +417,11 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	font-size: $default-font-size;
 	font-family: $default-font;
 
+	.is-zoomed-out & {
+		// Scale the font size based on the zoom level.
+		font-size: calc(#{$default-font-size} * ( 2 - var(--wp-block-editor-iframe-zoom-out-scale)  ));
+	}
+
 	&.is-dragged-over {
 		background: $gray-400;
 	}
