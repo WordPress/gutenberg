@@ -16,6 +16,8 @@ import {
 	getTemplateLock,
 	getClientIdsWithDescendants,
 	isNavigationMode,
+	getBlocksByName,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -612,10 +614,24 @@ export function isZoomOutMode( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string|undefined} The section root client ID or undefined if not set.
+ * @return {string} The section root client ID.
  */
 export function getSectionRootClientId( state ) {
-	return state.settings?.[ sectionRootClientIdKey ];
+	const settingsRootClientId = state.settings?.[ sectionRootClientIdKey ];
+
+	// Specifically check that the setting was not provided to avoid
+	// cases where the provided setting is an empty string to signify
+	// the "root block" of the editor.
+	if ( settingsRootClientId !== undefined ) {
+		return settingsRootClientId;
+	}
+
+	return (
+		getBlocksByName( state, 'core/group' ).find(
+			( clientId ) =>
+				getBlockAttributes( state, clientId )?.tagName === 'main'
+		) ?? ''
+	);
 }
 
 /**
