@@ -16,6 +16,7 @@ import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { sectionRootClientIdKey } from '../private-keys';
+import { lock } from '../../lock-unlock';
 
 const {
 	getBlockName,
@@ -4477,10 +4478,12 @@ describe( 'getBlockEditingMode', () => {
 
 	const hasContentRoleAttribute = jest.fn( () => false );
 
+	const fauxPrivateAPIs = {};
+
+	lock( fauxPrivateAPIs, { hasContentRoleAttribute } );
+
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => ( {
-			hasContentRoleAttribute,
-		} ) ),
+		select: jest.fn( () => fauxPrivateAPIs ),
 	};
 
 	it( 'should return default by default', () => {
