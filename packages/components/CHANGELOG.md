@@ -10,10 +10,6 @@
 
 -   `BorderControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 
-### Bug Fixes
-
--   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
-
 ## 28.8.0 (2024-09-19)
 
 ### Bug Fixes
