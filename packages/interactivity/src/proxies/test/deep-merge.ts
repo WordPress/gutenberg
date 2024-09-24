@@ -413,5 +413,31 @@ describe( 'Interactivity API', () => {
 			// Reading the value directly should also work
 			expect( target.a.b.c.d ).toBe( 'test value' );
 		} );
+
+		it( 'should overwrite values that become objects', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge( target, {
+				message: { content: 'hello', fontStyle: 'italic' },
+			} );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+
+			expect( target.message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+		} );
 	} );
 } );
