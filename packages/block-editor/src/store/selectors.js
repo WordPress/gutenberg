@@ -21,7 +21,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	withRootClientIdOptionKey,
+	isFiltered,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -80,7 +80,9 @@ const EMPTY_ARRAY = [];
  */
 const EMPTY_SET = new Set();
 
-const EMPTY_OBJECT = {};
+const DEFAULT_INSERTER_OPTIONS = {
+	[ isFiltered ]: true,
+};
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -2008,7 +2010,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
+		( state, rootClientId = null, options = DEFAULT_INSERTER_OPTIONS ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2056,56 +2058,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				)
 				.map( buildBlockTypeInserterItem );
 
-			if ( options[ withRootClientIdOptionKey ] ) {
-				blockTypeInserterItems = blockTypeInserterItems.reduce(
-					( accumulator, item ) => {
-						item.rootClientId = rootClientId ?? '';
-
-						while (
-							! canInsertBlockTypeUnmemoized(
-								state,
-								item.name,
-								item.rootClientId
-							)
-						) {
-							if ( ! item.rootClientId ) {
-								let sectionRootClientId;
-								try {
-									sectionRootClientId =
-										getSectionRootClientId( state );
-								} catch ( e ) {}
-								if (
-									sectionRootClientId &&
-									canInsertBlockTypeUnmemoized(
-										state,
-										item.name,
-										sectionRootClientId
-									)
-								) {
-									item.rootClientId = sectionRootClientId;
-								} else {
-									delete item.rootClientId;
-								}
-								break;
-							} else {
-								const parentClientId = getBlockRootClientId(
-									state,
-									item.rootClientId
-								);
-								item.rootClientId = parentClientId;
-							}
-						}
-
-						// We could also add non insertable items and gray them out.
-						if ( item.hasOwnProperty( 'rootClientId' ) ) {
-							accumulator.push( item );
-						}
-
-						return accumulator;
-					},
-					[]
-				);
-			} else {
+			if ( options[ isFiltered ] !== false ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
 					( blockType ) =>
 						canIncludeBlockTypeInInserter(
@@ -2113,6 +2066,17 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							blockType,
 							rootClientId
 						)
+				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems.map(
+					( blockType ) => ( {
+						...blockType,
+						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						),
+					} )
 				);
 			}
 

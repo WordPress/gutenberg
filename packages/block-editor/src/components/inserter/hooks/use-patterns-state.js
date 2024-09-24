@@ -87,7 +87,7 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 				),
 				{
 					type: 'snackbar',
-					id: 'block-pattern-inserted-notice',
+					id: 'inserter-notice',
 				}
 			);
 		},
