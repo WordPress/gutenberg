@@ -387,6 +387,22 @@ export function PaletteEdit( {
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
+	const duplicateSlugs = elements?.length
+		? elements.filter( ( element, index ) => {
+				const slug = element.slug;
+				return (
+					!! slug &&
+					elements.findIndex( ( otherElement, otherIndex ) => {
+						return (
+							otherIndex !== index &&
+							otherElement.slug === slug &&
+							otherElement.slug !== undefined
+						);
+					} ) !== -1
+				);
+		  } )
+		: [];
+
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -615,6 +631,16 @@ export function PaletteEdit( {
 								disableCustomColors
 							/>
 						) ) }
+					{ ! isEditing && duplicateSlugs?.length > 0 && (
+						<p>
+							One of more of your colors have the same name. To
+							ensure your styles do not conflict, make sure they
+							have unique names.{ ' ' }
+							<button onClick={ () => setIsEditing( true ) }>
+								{ __( 'Edit colors now' ) }
+							</button>
+						</p>
+					) }
 				</PaletteEditContents>
 			) }
 			{ ! hasElements && emptyMessage && (

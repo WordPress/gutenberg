@@ -301,6 +301,16 @@ function ColorPanelDropdown( {
 	);
 }
 
+function getUniqueBySlug( data ) {
+	const uniqueData = {};
+
+	for ( const item of data ) {
+		uniqueData[ item.slug ] = item;
+	}
+
+	return Object.values( uniqueData );
+}
+
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
 	value,
@@ -311,6 +321,37 @@ export default function ColorPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	children,
 } ) {
+	/*
+	 * @TODO this is illustrative only. Where the actual implementation
+	 * should be done is up for debate. Possibly in `useSettings`, or even in the
+	 * global styles provider? The idea is to ensure that the custom colors and
+	 * gradients are unique by slug in the UI, however we don't want to mutate the settings.
+	 */
+	if ( !! settings?.color?.palette?.custom?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				palette: {
+					...settings.color.palette,
+					custom: getUniqueBySlug( settings.color.palette.custom ),
+				},
+			},
+		};
+	}
+	if ( !! settings?.color?.gradients?.custom?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				gradients: {
+					...settings.color.gradients,
+					custom: getUniqueBySlug( settings.color.gradients.custom ),
+				},
+			},
+		};
+	}
+
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
