@@ -92,10 +92,6 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		min-height: ${ space(
-			12
-		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
-		height: auto;
 		background: transparent;
 		border: none;
 		box-shadow: none;
@@ -152,11 +148,15 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 	}
 
-	[aria-orientation='vertical'] & {
+	[aria-orientation='horizontal'] & {
 		min-height: ${ space(
-			10
+			12
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+		height: auto;
+	}
 
+	[aria-orientation='vertical'] & {
+		height: ${ space( 10 ) };
 		&[data-active-item] {
 			font-weight: 500;
 			color: ${ COLORS.theme.accent };
