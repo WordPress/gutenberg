@@ -43,9 +43,7 @@ export function useShowBlockTools() {
 			isEmptyDefaultBlock;
 		const isZoomOut = editorMode === 'zoom-out';
 		const _showZoomOutToolbar =
-			isZoomOut &&
-			block?.attributes?.align === 'full' &&
-			! _showEmptyBlockSideInserter;
+			clientId && isZoomOut && ! _showEmptyBlockSideInserter;
 		const _showBlockToolbarPopover =
 			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&

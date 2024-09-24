@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import {
 	forwardRef,
 	useMemo,
@@ -21,6 +22,8 @@ import {
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 import { rectUnion, getVisibleElementBounds } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -74,6 +77,8 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
+	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
+
 	const popoverAnchor = useMemo( () => {
 		if (
 			// popoverDimensionsRecomputeCounter is by definition always equal or greater
@@ -88,6 +93,20 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
+				if ( isZoomOut() ) {
+					const selectedRect =
+						getVisibleElementBounds( selectedElement );
+					const parentRect = getVisibleElementBounds(
+						selectedElement.parentElement
+					);
+					return new window.DOMRectReadOnly(
+						parentRect.left,
+						selectedRect.top,
+						parentRect.right - parentRect.left,
+						selectedRect.bottom - selectedRect.top
+					);
+				}
+
 				return lastSelectedElement
 					? rectUnion(
 							getVisibleElementBounds( selectedElement ),
