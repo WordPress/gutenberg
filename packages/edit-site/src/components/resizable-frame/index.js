@@ -251,10 +251,11 @@ function ResizableFrame( {
 			size={ frameSize }
 			enable={ {
 				top: false,
-				right: false,
 				bottom: false,
 				// Resizing will be disabled until the editor content is loaded.
-				left: isReady,
+				...( isRTL()
+					? { right: isReady, left: false }
+					: { left: isReady, right: false } ),
 				topRight: false,
 				bottomRight: false,
 				bottomLeft: false,
@@ -274,7 +275,7 @@ function ResizableFrame( {
 			onMouseOver={ () => setShouldShowHandle( true ) }
 			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				left: canvasMode === 'view' && (
+				[ isRTL() ? 'right' : 'left' ]: canvasMode === 'view' && (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
 							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }
