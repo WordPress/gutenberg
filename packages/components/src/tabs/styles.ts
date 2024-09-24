@@ -24,7 +24,7 @@ export const TabListWrapper = styled.div`
 
 	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::after {
-			transition-property: transform;
+			transition-property: transform, top;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -73,14 +73,11 @@ export const TabListWrapper = styled.div`
 	}
 	&[aria-orientation='vertical']::after {
 		z-index: -1;
-		top: 0;
+		border-radius: ${ CONFIG.radiusSmall };
+		top: calc( var( --indicator-top ) * 1px );
 		left: 0;
 		width: 100%;
-		height: calc( var( --antialiasing-factor ) * 1px );
-		transform: translateY( calc( var( --indicator-top ) * 1px ) )
-			scaleY(
-				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
-			);
+		height: calc( var( --indicator-height ) * 1px );
 		background-color: ${ COLORS.theme.accent };
 		opacity: 0.04;
 	}
