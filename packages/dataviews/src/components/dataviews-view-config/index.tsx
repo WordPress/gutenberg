@@ -8,6 +8,7 @@ import type { ChangeEvent } from 'react';
  */
 import {
 	Button,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Dropdown,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -27,6 +28,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -54,6 +56,8 @@ const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
 }
+
+const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
 
 function ViewTypeMenu( {
 	defaultLayouts = { list: {}, grid: {}, table: {} },
@@ -510,7 +514,7 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent( {
+function DataviewsViewConfigDropdown( {
 	density,
 	setDensity,
 }: {
@@ -518,25 +522,52 @@ function DataviewsViewConfigContent( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 } ) {
 	const { view } = useContext( DataViewsContext );
+	const popoverId = useInstanceId(
+		_DataViewsViewConfig,
+		'dataviews-view-config-dropdown'
+	);
+
 	return (
-		<VStack className="dataviews-view-config" spacing={ 6 }>
-			<SettingsSection title={ __( 'Appearance' ) }>
-				<HStack expanded className="is-divided-in-two">
-					<SortFieldControl />
-					<SortDirectionControl />
-				</HStack>
-				{ view.type === LAYOUT_GRID && (
-					<DensityPicker
-						density={ density }
-						setDensity={ setDensity }
+		<Dropdown
+			popoverProps={ {
+				...DATAVIEWS_CONFIG_POPOVER_PROPS,
+				id: popoverId,
+			} }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				return (
+					<Button
+						size="compact"
+						icon={ cog }
+						label={ _x( 'View options', 'View is used as a noun' ) }
+						onClick={ onToggle }
+						aria-expanded={ isOpen ? 'true' : 'false' }
+						aria-controls={ popoverId }
 					/>
-				) }
-				<ItemsPerPageControl />
-			</SettingsSection>
-			<SettingsSection title={ __( 'Properties' ) }>
-				<FieldControl />
-			</SettingsSection>
-		</VStack>
+				);
+			} }
+			renderContent={ () => (
+				<DropdownContentWrapper paddingSize="medium">
+					<VStack className="dataviews-view-config" spacing={ 6 }>
+						<SettingsSection title={ __( 'Appearance' ) }>
+							<HStack expanded className="is-divided-in-two">
+								<SortFieldControl />
+								<SortDirectionControl />
+							</HStack>
+							{ view.type === LAYOUT_GRID && (
+								<DensityPicker
+									density={ density }
+									setDensity={ setDensity }
+								/>
+							) }
+							<ItemsPerPageControl />
+						</SettingsSection>
+						<SettingsSection title={ __( 'Properties' ) }>
+							<FieldControl />
+						</SettingsSection>
+					</VStack>
+				</DropdownContentWrapper>
+			) }
+		/>
 	);
 }
 
@@ -552,28 +583,9 @@ function _DataViewsViewConfig( {
 	return (
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-			<Dropdown
-				popoverProps={ { placement: 'bottom-end', offset: 9 } }
-				contentClassName="dataviews-view-config"
-				renderToggle={ ( { onToggle } ) => {
-					return (
-						<Button
-							size="compact"
-							icon={ cog }
-							label={ _x(
-								'View options',
-								'View is used as a noun'
-							) }
-							onClick={ onToggle }
-						/>
-					);
-				} }
-				renderContent={ () => (
-					<DataviewsViewConfigContent
-						density={ density }
-						setDensity={ setDensity }
-					/>
-				) }
+			<DataviewsViewConfigDropdown
+				density={ density }
+				setDensity={ setDensity }
 			/>
 		</>
 	);

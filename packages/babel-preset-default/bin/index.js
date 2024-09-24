@@ -7,13 +7,14 @@ const builder = require( 'core-js-builder' );
 const { minify } = require( 'terser' );
 const { writeFile } = require( 'fs' ).promises;
 
+/**
+ * Internal dependencies
+ */
+const exclusions = require( '../polyfill-exclusions' );
+
 builder( {
 	modules: [ 'es.', 'web.' ],
-	exclude: [
-		// This is an IE-only feature which we don't use, and don't want to polyfill.
-		// @see https://github.com/WordPress/gutenberg/pull/49234
-		'web.immediate',
-	],
+	exclude: exclusions,
 	summary: { console: { size: true, modules: true } },
 	targets: require( '@wordpress/browserslist-config' ),
 	filename: './build/polyfill.js',

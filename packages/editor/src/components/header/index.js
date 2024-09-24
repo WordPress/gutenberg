@@ -47,10 +47,8 @@ function Header( {
 	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
 	title,
+	isEditorIframed,
 } ) {
-	const zoomOutExperimentEnabled =
-		window.__experimentalEnableZoomOutExperiment;
-
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
@@ -146,7 +144,7 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				{ zoomOutExperimentEnabled && <ZoomOutToggle /> }
+				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
