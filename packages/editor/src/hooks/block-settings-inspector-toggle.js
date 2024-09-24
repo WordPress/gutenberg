@@ -48,7 +48,7 @@ const BlockInspectorToggle = () => {
 					enableComplementaryArea( 'core', 'edit-post/block' );
 				} }
 				icon={ isRTL() ? drawerLeft : drawerRight }
-				disabled={ isOpen }
+				aria-disabled={ isOpen }
 			>
 				{ __( 'Open Block settings' ) }
 			</MenuItem>
