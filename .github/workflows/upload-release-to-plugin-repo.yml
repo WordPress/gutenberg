@@ -168,7 +168,9 @@ jobs:
 
         steps:
             - name: Check out Gutenberg trunk from WP.org plugin repo
-              run: svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+              run: |
+                  svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                  svn checkout "$PLUGIN_REPO_URL/tags" --depth=immediates --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
 
             - name: Delete everything
               working-directory: ./trunk
@@ -182,7 +184,7 @@ jobs:
                   unzip gutenberg.zip -d trunk
                   rm gutenberg.zip
 
-            - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
+            - name: Replace the stable tag placeholder with the new version
               env:
                   STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
               run: |
@@ -194,27 +196,16 @@ jobs:
                   name: changelog trunk
                   path: trunk
 
-            - name: Commit the content changes
+            - name: Commit the release
               working-directory: ./trunk
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
-                  svn commit -m "Committing version $VERSION" \
+                  svn cp . "../tags/$VERSION"
+                  svn commit . "../tags/$VERSION" \
+                   -m "Releasing version $VERSION" \
                    --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
-                   --config-option=servers:global:http-timeout=300
-
-            - name: Create the SVN tag
-              working-directory: ./trunk
-              run: |
-                  svn copy "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
-
-            - name: Update the plugin's stable version
-              working-directory: ./trunk
-              run: |
-                  sed -i "s/Stable tag: ${STABLE_VERSION_REGEX}/Stable tag: ${VERSION}/g" ./readme.txt
-                  svn commit -m "Releasing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                   --config-option=servers:global:http-timeout=600
 
     upload-tag:
         name: Publish as tag
