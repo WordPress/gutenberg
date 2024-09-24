@@ -138,12 +138,10 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					)
 				}
 			/>
-			{ ! isMobileViewport && canvas === 'view' && (
+			{ canvas === 'view' && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }
-					onClick={ openStyleBook }
-					onSelect={ openStyleBook }
 					showCloseButton={ false }
 					showTabs={ false }
 				/>
