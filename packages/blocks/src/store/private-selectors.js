@@ -225,8 +225,8 @@ export const hasContentRoleAttribute = ( state, blockTypeName ) => {
 		return false;
 	}
 
-	return Object.entries( blockType.attributes ).some(
-		( [ , { role, __experimentalRole } ] ) => {
+	return Object.values( blockType.attributes ).some(
+		( { role, __experimentalRole } ) => {
 			if ( role === 'content' ) {
 				return true;
 			}
