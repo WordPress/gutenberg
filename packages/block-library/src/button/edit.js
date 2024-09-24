@@ -120,7 +120,6 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 			<ToggleGroupControl
 				label={ __( 'Button width' ) }
 				value={ selectedWidth }
-				hideLabelFromVision
 				onChange={ ( newWidth ) =>
 					setAttributes( { width: newWidth } )
 				}
