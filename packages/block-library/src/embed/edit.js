@@ -251,6 +251,9 @@ const EmbedEdit = ( props ) => {
 		className: classFromPreview,
 	} = getMergedAttributes();
 	const className = clsx( classFromPreview, props.className );
+	blockProps.className = clsx( blockProps.className, className, {
+		'is-type-video': 'video' === type,
+	} );
 
 	return (
 		<>
