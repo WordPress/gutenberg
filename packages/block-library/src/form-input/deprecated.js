@@ -41,7 +41,7 @@ const v2 = {
 			default: 'Label',
 			selector: '.wp-block-form-input__label-content',
 			source: 'html',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		inlineLabel: {
 			type: 'boolean',
@@ -59,7 +59,7 @@ const v2 = {
 			selector: '.wp-block-form-input__input',
 			source: 'attribute',
 			attribute: 'placeholder',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		value: {
 			type: 'string',
@@ -155,7 +155,7 @@ const v1 = {
 			default: 'Label',
 			selector: '.wp-block-form-input__label-content',
 			source: 'html',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		inlineLabel: {
 			type: 'boolean',
@@ -173,7 +173,7 @@ const v1 = {
 			selector: '.wp-block-form-input__input',
 			source: 'attribute',
 			attribute: 'placeholder',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		value: {
 			type: 'string',

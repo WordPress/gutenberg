@@ -21,6 +21,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function VariationsButtons( {
 	className,
@@ -142,18 +143,16 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations, isContentOnly } = useSelect(
 		( select ) => {
-			const {
-				getActiveBlockVariation,
-				getBlockVariations,
-				__experimentalHasContentRoleAttribute,
-			} = select( blocksStore );
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
+
 			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
 
 			const name = blockClientId && getBlockName( blockClientId );
 
-			const isContentBlock =
-				__experimentalHasContentRoleAttribute( name );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
 
 			return {
 				activeBlockVariation: getActiveBlockVariation(

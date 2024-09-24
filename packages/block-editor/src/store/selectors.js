@@ -2467,7 +2467,7 @@ export const __experimentalGetPatternsByBlockTypes = createRegistrySelector(
  * Determines the items that appear in the available pattern transforms list.
  *
  * For now we only handle blocks without InnerBlocks and take into account
- * the `__experimentalRole` property of blocks' attributes for the transformation.
+ * the `role` property of blocks' attributes for the transformation.
  *
  * We return the first set of possible eligible block patterns,
  * by checking the `blockTypes` property. We still have to recurse through
@@ -2489,7 +2489,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
-				 * the `__experimentalRole` property of blocks' attributes for the transformation.
+				 * the `role` property of blocks' attributes for the transformation.
 				 * Note that the blocks have been retrieved through `getBlock`, which doesn't
 				 * return the inner blocks of an inner block controller, so we still need
 				 * to check for this case too.
@@ -2964,10 +2964,10 @@ export const getBlockEditingMode = createRegistrySelector(
 			const templateLock = getTemplateLock( state, rootClientId );
 			if ( templateLock === 'contentOnly' ) {
 				const name = getBlockName( state, clientId );
-				const isContent =
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					);
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContent = hasContentRoleAttribute( name );
 				return isContent ? 'contentOnly' : 'disabled';
 			}
 			const parentMode = getBlockEditingMode( state, rootClientId );
