@@ -99,6 +99,7 @@ export const WithMenuItems: StoryObj< typeof Dropdown > = {
 		...Default.args,
 		renderContent: () => (
 			<>
+				<MenuItem>Standalone Item</MenuItem>
 				<MenuGroup label="Group 1">
 					<MenuItem>Item 1</MenuItem>
 					<MenuItem>Item 2</MenuItem>

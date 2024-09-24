@@ -104,7 +104,7 @@ describe( 'useEntityBlockEditor', () => {
 					source: 'html',
 					selector: 'p',
 					default: '',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 			},
 			title: 'block title',
