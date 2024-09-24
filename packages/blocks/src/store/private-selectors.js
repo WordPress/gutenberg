@@ -219,32 +219,27 @@ export function getBlockBindingsSource( state, sourceName ) {
  * @param {string} blockTypeName Block type name.
  * @return {boolean} Whether block type has content role attribute.
  */
-export const hasContentRoleAttribute = createSelector(
-	( state, blockTypeName ) => {
-		const blockType = getBlockType( state, blockTypeName );
-		if ( ! blockType ) {
+export const hasContentRoleAttribute = ( state, blockTypeName ) => {
+	const blockType = getBlockType( state, blockTypeName );
+	if ( ! blockType ) {
+		return false;
+	}
+
+	return Object.values( blockType.attributes ).some(
+		( { role, __experimentalRole } ) => {
+			if ( role === 'content' ) {
+				return true;
+			}
+			if ( __experimentalRole === 'content' ) {
+				deprecated( '__experimentalRole attribute', {
+					since: '6.7',
+					version: '6.8',
+					alternative: 'role attribute',
+					hint: `Check the block.json of the ${ blockTypeName } block.`,
+				} );
+				return true;
+			}
 			return false;
 		}
-
-		return Object.entries( blockType.attributes ).some(
-			( [ , { role, __experimentalRole } ] ) => {
-				if ( role === 'content' ) {
-					return true;
-				}
-				if ( __experimentalRole === 'content' ) {
-					deprecated( '__experimentalRole attribute', {
-						since: '6.7',
-						version: '6.8',
-						alternative: 'role attribute',
-						hint: `Check the block.json of the ${ blockTypeName } block.`,
-					} );
-					return true;
-				}
-				return false;
-			}
-		);
-	},
-	( state, blockTypeName ) => [
-		state.blockTypes[ blockTypeName ]?.attributes,
-	]
-);
+	);
+};
