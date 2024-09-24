@@ -18,12 +18,19 @@ export type Border = {
 
 export type ColorProps = Pick<
 	ColorPaletteProps,
-	'colors' | 'enableAlpha' | '__experimentalIsRenderedInSidebar'
+	'colors' | '__experimentalIsRenderedInSidebar'
 > & {
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
 	disableCustomColors?: boolean;
+	/**
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
 };
 
 export type LabelProps = {

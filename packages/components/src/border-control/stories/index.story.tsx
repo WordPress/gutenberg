@@ -93,6 +93,9 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
+	enableAlpha: true,
+	enableStyle: true,
+	shouldSanitizeBorder: true,
 };
 
 /**
@@ -135,10 +138,10 @@ WithMultipleOrigins.args = {
 };
 
 /**
- * Allow the alpha channel to be edited on each color.
+ * Prevent the alpha channel from being edited.
  */
-export const WithAlphaEnabled = Template.bind( {} );
-WithAlphaEnabled.args = {
+export const WithAlphaDisabled = Template.bind( {} );
+WithAlphaDisabled.args = {
 	...Default.args,
-	enableAlpha: true,
+	enableAlpha: false,
 };
