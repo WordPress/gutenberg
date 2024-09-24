@@ -20,6 +20,7 @@ export const settings = {
 	edit,
 	save,
 	deprecated,
+	example: {},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
