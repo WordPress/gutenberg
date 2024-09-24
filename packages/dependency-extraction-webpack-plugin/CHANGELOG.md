@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Detection of magic comments is now done before minification.
+
 ### Bug Fixes
 
 -   Fix a bug where cycles in dependent modules could enter infinite recursion ([#65291](https://github.com/WordPress/gutenberg/pull/65291)).
