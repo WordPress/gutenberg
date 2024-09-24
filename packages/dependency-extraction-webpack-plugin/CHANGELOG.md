@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Detection of magic comments is now done before minification.
+-   Detection of magic comments is now done before minification ([#65582](https://github.com/WordPress/gutenberg/pull/65582)).
 
 ### Bug Fixes
 
