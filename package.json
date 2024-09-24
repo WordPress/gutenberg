@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "19.3.0-rc.1",
+	"version": "19.3.0-rc.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -218,7 +218,6 @@
 		"jest-message-util": "29.6.2",
 		"jest-watch-typeahead": "2.2.2",
 		"lerna": "7.1.4",
-		"lighthouse": "12.2.1",
 		"lint-staged": "10.0.2",
 		"make-dir": "3.0.0",
 		"mkdirp": "3.0.1",
