@@ -16,6 +16,7 @@ import {
 	getTemplateLock,
 	getClientIdsWithDescendants,
 	isNavigationMode,
+	getBlockRootClientId,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -636,4 +637,41 @@ export function getZoomLevel( state ) {
  */
 export function isZoomOut( state ) {
 	return getZoomLevel( state ) < 100;
+}
+
+/**
+ * Finds the closest block where the block is allowed to be inserted.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} name     Block name.
+ * @param {string} clientId Default insertion point.
+ *
+ * @return {string} clientID of the closest container when the block name can be inserted.
+ */
+export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
+	// If we're trying to insert at the root level and it's not allowed
+	// Try the section root instead.
+	if ( ! clientId ) {
+		if ( canInsertBlockType( state, name, clientId ) ) {
+			return clientId;
+		}
+
+		const sectionRootClientId = getSectionRootClientId( state );
+		if (
+			sectionRootClientId &&
+			canInsertBlockType( state, name, sectionRootClientId )
+		) {
+			return sectionRootClientId;
+		}
+		return null;
+	}
+
+	// Traverse the block tree up until we find a place where we can insert.
+	let current = clientId;
+	while ( current !== null && ! canInsertBlockType( state, name, current ) ) {
+		const parentClientId = getBlockRootClientId( state, current );
+		current = parentClientId;
+	}
+
+	return current;
 }
