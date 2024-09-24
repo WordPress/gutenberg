@@ -93,7 +93,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( {} );
+const context = createContext< any >( { client: {}, server: {} } );
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -190,9 +190,13 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
-		resolvedStore = store( namespace, undefined, {
-			lock: universalUnlock,
-		} );
+		resolvedStore = store(
+			namespace,
+			{},
+			{
+				lock: universalUnlock,
+			}
+		);
 	}
 	const current = {
 		...resolvedStore,
@@ -253,7 +257,9 @@ const Directives = ( {
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext( context );
+	const { client, server } = useContext( context );
+	scope.context = client;
+	scope.serverContext = server;
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */

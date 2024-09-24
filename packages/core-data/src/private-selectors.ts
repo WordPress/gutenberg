@@ -93,3 +93,15 @@ export function getEntityRecordPermissions(
 ) {
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
+
+/**
+ * Returns the registered post meta fields for a given post type.
+ *
+ * @param state    Data state.
+ * @param postType Post type.
+ *
+ * @return Registered post meta fields.
+ */
+export function getRegisteredPostMeta( state: State, postType: string ) {
+	return state.registeredPostMeta?.[ postType ] ?? {};
+}

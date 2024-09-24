@@ -321,6 +321,7 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'BoxControl',
 						'ComboboxControl',
 						'CustomSelectControl',
 						'DimensionControl',

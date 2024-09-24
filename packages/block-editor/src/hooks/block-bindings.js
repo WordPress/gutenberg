@@ -31,6 +31,8 @@ import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
+const EMPTY_OBJECT = {};
+
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -59,7 +61,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								{ registeredSources[ name ].label }
 							</DropdownMenuV2.GroupLabel>
 						) }
-						{ Object.entries( fields ).map( ( [ key, value ] ) => (
+						{ Object.entries( fields ).map( ( [ key, args ] ) => (
 							<DropdownMenuV2.RadioItem
 								key={ key }
 								onChange={ () =>
@@ -75,10 +77,10 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								checked={ key === currentKey }
 							>
 								<DropdownMenuV2.ItemLabel>
-									{ key }
+									{ args?.label }
 								</DropdownMenuV2.ItemLabel>
 								<DropdownMenuV2.ItemHelpText>
-									{ value }
+									{ args?.value }
 								</DropdownMenuV2.ItemHelpText>
 							</DropdownMenuV2.RadioItem>
 						) ) }
@@ -92,7 +94,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding } ) {
+function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
@@ -108,14 +110,16 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: args?.key || sourceProps?.label || sourceName }
+						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
+						  sourceProps?.label ||
+						  sourceName }
 				</Text>
 			) }
 		</VStack>
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
+function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
@@ -123,6 +127,7 @@ function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
+						fieldsList={ fieldsList }
 					/>
 				</Item>
 			) ) }
@@ -162,6 +167,7 @@ function EditableBlockBindingsPanelItems( {
 									<BlockBindingsAttribute
 										attribute={ attribute }
 										binding={ binding }
+										fieldsList={ fieldsList }
 									/>
 								</Item>
 							}
@@ -182,11 +188,60 @@ function EditableBlockBindingsPanelItems( {
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
-	const { bindings } = metadata || {};
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	// `useSelect` is used purposely here to ensure `getFieldsList`
+	// is updated whenever there are updates in block context.
+	// `source.getFieldsList` may also call a selector via `registry.select`.
+	const _fieldsList = {};
+	const { fieldsList, canUpdateBlockBindings } = useSelect(
+		( select ) => {
+			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+				return EMPTY_OBJECT;
+			}
+			const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+			const registeredSources = getBlockBindingsSources();
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, { getFieldsList, usesContext } ] ) => {
+					if ( getFieldsList ) {
+						// Populate context.
+						const context = {};
+						if ( usesContext?.length ) {
+							for ( const key of usesContext ) {
+								context[ key ] = blockContext[ key ];
+							}
+						}
+						const sourceList = getFieldsList( {
+							registry,
+							context,
+						} );
+						// Only add source if the list is not empty.
+						if ( Object.keys( sourceList || {} ).length ) {
+							_fieldsList[ sourceName ] = { ...sourceList };
+						}
+					}
+				}
+			);
+			return {
+				fieldsList:
+					Object.values( _fieldsList ).length > 0
+						? _fieldsList
+						: EMPTY_OBJECT,
+				canUpdateBlockBindings:
+					select( blockEditorStore ).getSettings()
+						.canUpdateBlockBindings,
+			};
+		},
+		[ blockContext, bindableAttributes, registry ]
+	);
+	// Return early if there are no bindable attributes.
+	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+		return null;
+	}
+	// Filter bindings to only show bindable attributes and remove pattern overrides.
+	const { bindings } = metadata || {};
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
@@ -194,48 +249,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
-		}
-	} );
-
-	const { canUpdateBlockBindings } = useSelect( ( select ) => {
-		return {
-			canUpdateBlockBindings:
-				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
-		};
-	}, [] );
-
-	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-		return null;
-	}
-
-	const fieldsList = {};
-	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
-	const registeredSources = getBlockBindingsSources();
-	Object.entries( registeredSources ).forEach(
-		( [ sourceName, { getFieldsList, usesContext } ] ) => {
-			if ( getFieldsList ) {
-				// Populate context.
-				const context = {};
-				if ( usesContext?.length ) {
-					for ( const key of usesContext ) {
-						context[ key ] = blockContext[ key ];
-					}
-				}
-				const sourceList = getFieldsList( {
-					registry,
-					context,
-				} );
-				// Only add source if the list is not empty.
-				if ( sourceList ) {
-					fieldsList[ sourceName ] = { ...sourceList };
-				}
-			}
-		}
-	);
-	// Remove empty sources.
-	Object.entries( fieldsList ).forEach( ( [ key, value ] ) => {
-		if ( ! Object.keys( value ).length ) {
-			delete fieldsList[ key ];
 		}
 	} );
 
@@ -261,6 +274,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ readOnly ? (
 						<ReadOnlyBlockBindingsPanelItems
 							bindings={ filteredBindings }
+							fieldsList={ fieldsList }
 						/>
 					) : (
 						<EditableBlockBindingsPanelItems

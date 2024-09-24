@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	Button,
 	Spinner,
@@ -27,6 +27,20 @@ export class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSubmit = this.onSubmit.bind( this );
+		this.cancelButtonNode = createRef();
+	}
+
+	componentDidMount() {
+		// This timeout is necessary to make sure the `useEffect` hook of
+		// `useFocusReturn` gets the correct element (the button that opens the
+		// PostPublishPanel) otherwise it will get this button.
+		this.timeoutID = setTimeout( () => {
+			this.cancelButtonNode.current.focus();
+		}, 0 );
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timeoutID );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -85,15 +99,9 @@ export class PostPublishPanel extends Component {
 						/>
 					) : (
 						<>
-							<div className="editor-post-publish-panel__header-publish-button">
-								<PostPublishButton
-									focusOnMount
-									onSubmit={ this.onSubmit }
-									forceIsDirty={ forceIsDirty }
-								/>
-							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
+									ref={ this.cancelButtonNode }
 									accessibleWhenDisabled
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
@@ -102,6 +110,12 @@ export class PostPublishPanel extends Component {
 								>
 									{ __( 'Cancel' ) }
 								</Button>
+							</div>
+							<div className="editor-post-publish-panel__header-publish-button">
+								<PostPublishButton
+									onSubmit={ this.onSubmit }
+									forceIsDirty={ forceIsDirty }
+								/>
 							</div>
 						</>
 					) }

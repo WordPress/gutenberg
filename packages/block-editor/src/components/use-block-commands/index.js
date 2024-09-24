@@ -16,7 +16,6 @@ import {
 	plus as add,
 	group,
 	ungroup,
-	moveTo as move,
 } from '@wordpress/icons';
 
 /**
@@ -125,59 +124,6 @@ export const useTransformCommands = () => {
 	} );
 
 	return { isLoading: false, commands };
-};
-
-const useActionsCommands = () => {
-	const { clientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds } = select( blockEditorStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-
-		return {
-			clientIds: selectedBlockClientIds,
-		};
-	}, [] );
-
-	const { getBlockRootClientId, canMoveBlocks, getBlockCount } =
-		useSelect( blockEditorStore );
-
-	const { setBlockMovingClientId, setNavigationMode, selectBlock } =
-		useDispatch( blockEditorStore );
-
-	if ( ! clientIds || clientIds.length < 1 ) {
-		return { isLoading: false, commands: [] };
-	}
-
-	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-
-	const canMove =
-		canMoveBlocks( clientIds ) && getBlockCount( rootClientId ) !== 1;
-
-	const commands = [];
-
-	if ( canMove ) {
-		commands.push( {
-			name: 'move-to',
-			label: __( 'Move to' ),
-			callback: () => {
-				setNavigationMode( true );
-				selectBlock( clientIds[ 0 ] );
-				setBlockMovingClientId( clientIds[ 0 ] );
-			},
-			icon: move,
-		} );
-	}
-
-	return {
-		isLoading: false,
-		commands: commands.map( ( command ) => ( {
-			...command,
-			name: 'core/block-editor/action-' + command.name,
-			callback: ( { close } ) => {
-				command.callback();
-				close();
-			},
-		} ) ),
-	};
 };
 
 const useQuickActionsCommands = () => {
@@ -343,10 +289,6 @@ export const useBlockCommands = () => {
 	useCommandLoader( {
 		name: 'core/block-editor/blockTransforms',
 		hook: useTransformCommands,
-	} );
-	useCommandLoader( {
-		name: 'core/block-editor/blockActions',
-		hook: useActionsCommands,
 	} );
 	useCommandLoader( {
 		name: 'core/block-editor/blockQuickActions',

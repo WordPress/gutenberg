@@ -13,7 +13,7 @@ import {
 	notAllowed,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -67,6 +67,50 @@ const DEFAULT_POST_BASE = {
 	fields: [ 'title', 'author', 'status' ],
 	layout: defaultLayouts[ LAYOUT_LIST ].layout,
 };
+
+export function useDefaultViewsWithItemCounts( { postType } ) {
+	const defaultViews = useDefaultViews( { postType } );
+	const { records, totalItems } = useEntityRecords( 'postType', postType, {
+		per_page: -1,
+		status: [ 'any', 'trash' ],
+	} );
+
+	return useMemo( () => {
+		if ( ! defaultViews ) {
+			return [];
+		}
+
+		// If there are no records, return the default views with no counts.
+		if ( ! records ) {
+			return defaultViews;
+		}
+
+		const counts = {
+			drafts: records.filter( ( record ) => record.status === 'draft' )
+				.length,
+			future: records.filter( ( record ) => record.status === 'future' )
+				.length,
+			pending: records.filter( ( record ) => record.status === 'pending' )
+				.length,
+			private: records.filter( ( record ) => record.status === 'private' )
+				.length,
+			published: records.filter(
+				( record ) => record.status === 'publish'
+			).length,
+			trash: records.filter( ( record ) => record.status === 'trash' )
+				.length,
+		};
+
+		// All items excluding trashed items as per the default "all" status query.
+		counts.all = totalItems ? totalItems - counts.trash : 0;
+
+		// Filter out views with > 0 item counts.
+		return defaultViews.map( ( _view ) => {
+			_view.count = counts[ _view.slug ];
+			return _view;
+		} );
+	}, [ defaultViews, records, totalItems ] );
+}
 
 export function useDefaultViews( { postType } ) {
 	const labels = useSelect(
