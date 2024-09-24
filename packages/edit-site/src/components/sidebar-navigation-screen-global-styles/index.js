@@ -2,12 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -17,12 +15,10 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
-import SidebarNavigationScreenGlobalStylesContent from './content';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -75,15 +71,11 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { isStyleBookOpened, revisionsCount } = useSelect( ( select ) => {
-		const { getEditorCanvasContainerView } = unlock(
-			select( editSiteStore )
-		);
+	const { revisionsCount } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
@@ -91,7 +83,6 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
 			: undefined;
 		return {
-			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
 			revisionsCount:
 				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
 		};
@@ -114,19 +105,6 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
 	}, [ history, params, openGeneralSidebar, setPreference ] );
-
-	const openStyleBook = useCallback( async () => {
-		await openGlobalStyles();
-		// Open the Style Book once the canvas mode is set to edit,
-		// and the global styles sidebar is open. This ensures that
-		// the Style Book is not prematurely closed.
-		setEditorCanvasContainerView( 'style-book' );
-		setIsListViewOpened( false );
-	}, [
-		openGlobalStyles,
-		setEditorCanvasContainerView,
-		setIsListViewOpened,
-	] );
 
 	const openRevisions = useCallback( async () => {
 		await openGlobalStyles();
@@ -151,7 +129,6 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					'Choose a different style combination for the theme styles.'
 				) }
 				backPath={ backPath }
-				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter
@@ -160,31 +137,8 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 						/>
 					)
 				}
-				actions={
-					<>
-						{ ! isMobileViewport && (
-							<SidebarButton
-								icon={ seen }
-								label={ __( 'Style Book' ) }
-								onClick={ () =>
-									setEditorCanvasContainerView(
-										! isStyleBookOpened
-											? 'style-book'
-											: undefined
-									)
-								}
-								isPressed={ isStyleBookOpened }
-							/>
-						) }
-						<SidebarButton
-							icon={ edit }
-							label={ __( 'Edit styles' ) }
-							onClick={ async () => await openGlobalStyles() }
-						/>
-					</>
-				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && canvas === 'view' && (
+			{ ! isMobileViewport && canvas === 'view' && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }
