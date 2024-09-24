@@ -47,11 +47,8 @@ function Header( {
 	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
 	title,
-	icon,
+	isEditorIframed,
 } ) {
-	const zoomOutExperimentEnabled =
-		window.__experimentalEnableZoomOutExperiment;
-
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
@@ -121,7 +118,7 @@ function Header( {
 					variants={ toolbarVariations }
 					transition={ { type: 'tween' } }
 				>
-					<DocumentBar title={ title } icon={ icon } />
+					<DocumentBar title={ title } />
 				</motion.div>
 			) }
 			<motion.div
@@ -147,7 +144,7 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				{ zoomOutExperimentEnabled && <ZoomOutToggle /> }
+				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />

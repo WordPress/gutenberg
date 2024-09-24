@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "8.7.0",
+	"version": "8.8.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,9 @@
 	},
 	"files": [
 		"build",
-		"index.js"
+		"index.js",
+		"polyfill-exclusions.js",
+		"replace-polyfills.js"
 	],
 	"main": "index.js",
 	"dependencies": {
