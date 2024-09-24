@@ -116,6 +116,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.settings.templateLock,
 		state.blockListSettings,
 		state.editorMode,
+		getSectionRootClientId( state ),
 	]
 );
 
