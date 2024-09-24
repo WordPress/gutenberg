@@ -136,12 +136,3 @@ WithMultipleOrigins.args = {
 	...Default.args,
 	colors: multipleOriginColors,
 };
-
-/**
- * Prevent the alpha channel from being edited.
- */
-export const WithAlphaDisabled = Template.bind( {} );
-WithAlphaDisabled.args = {
-	...Default.args,
-	enableAlpha: false,
-};
