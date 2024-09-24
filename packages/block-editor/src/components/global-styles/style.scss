@@ -37,10 +37,15 @@
 
 // These styles are similar to the color palette.
 .block-editor-global-styles__shadow-indicator {
+	appearance: none;
+	background: none;
 	color: $gray-800;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-small;
 	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+
 	padding: 0;
 
 	height: $button-size-small + 2 * $border-width;
