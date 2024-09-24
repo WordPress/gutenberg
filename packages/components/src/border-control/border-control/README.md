@@ -123,7 +123,7 @@ selected, the border style is also cleared and `undefined` is returned as the
 new border value.
 
 -   Required: No
--   Default: true
+-   Default: `true`
 
 ### `showDropdownHeader`: `boolean`
 
