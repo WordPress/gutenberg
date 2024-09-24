@@ -12,6 +12,7 @@ import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { RichTextData } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -332,7 +333,7 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
  *
  * @return {string[]} The attribute names that have the provided role.
  */
-export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+export function getBlockAttributesNamesByRole( name, role ) {
 	const attributes = getBlockType( name )?.attributes;
 	if ( ! attributes ) {
 		return [];
@@ -341,11 +342,33 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	if ( ! role ) {
 		return attributesNames;
 	}
-	return attributesNames.filter(
-		( attributeName ) =>
-			attributes[ attributeName ]?.__experimentalRole === role
-	);
+
+	return attributesNames.filter( ( attributeName ) => {
+		const attribute = attributes[ attributeName ];
+		if ( attribute?.role === role ) {
+			return true;
+		}
+		if ( attribute?.__experimentalRole === role ) {
+			deprecated( '__experimentalRole attribute', {
+				since: '6.7',
+				version: '6.8',
+				alternative: 'role attribute',
+				hint: `Check the block.json of the ${ name } block.`,
+			} );
+			return true;
+		}
+		return false;
+	} );
 }
+
+export const __experimentalGetBlockAttributesNamesByRole = ( ...args ) => {
+	deprecated( '__experimentalGetBlockAttributesNamesByRole', {
+		since: '6.7',
+		version: '6.8',
+		alternative: 'getBlockAttributesNamesByRole',
+	} );
+	return getBlockAttributesNamesByRole( ...args );
+};
 
 /**
  * Return a new object with the specified keys omitted.

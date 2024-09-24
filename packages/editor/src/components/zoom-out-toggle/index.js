@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -14,8 +15,12 @@ import { square as zoomOutIcon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
 const ZoomOutToggle = () => {
-	const { isZoomOut } = useSelect( ( select ) => ( {
+	const { isZoomOut, showIconLabels } = useSelect( ( select ) => ( {
 		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+		showIconLabels: select( preferencesStore ).get(
+			'core',
+			'showIconLabels'
+		),
 	} ) );
 
 	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
@@ -35,9 +40,10 @@ const ZoomOutToggle = () => {
 		<Button
 			onClick={ handleZoomOut }
 			icon={ zoomOutIcon }
-			label={ __( 'Toggle Zoom Out' ) }
+			label={ __( 'Zoom Out' ) }
 			isPressed={ isZoomOut }
 			size="compact"
+			showTooltip={ ! showIconLabels }
 		/>
 	);
 };

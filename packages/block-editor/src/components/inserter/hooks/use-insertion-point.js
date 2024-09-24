@@ -71,7 +71,11 @@ function useInsertionPoint( {
 	selectBlockOnInsert = true,
 } ) {
 	const registry = useRegistry();
-	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const {
+		getSelectedBlock,
+		getClosestAllowedInsertionPoint,
+		isBlockInsertionPointVisible,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {
@@ -193,21 +197,30 @@ function useInsertionPoint( {
 
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
-			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
-				showInsertionPoint(
-					item.rootClientId,
-					getIndex( {
-						destinationRootClientId,
-						destinationIndex,
-						rootClientId: item.rootClientId,
-						registry,
-					} )
-				);
+			if ( item && ! isBlockInsertionPointVisible() ) {
+				const allowedDestinationRootClientId =
+					getClosestAllowedInsertionPoint(
+						item.name,
+						destinationRootClientId
+					);
+				if ( allowedDestinationRootClientId !== null ) {
+					showInsertionPoint(
+						allowedDestinationRootClientId,
+						getIndex( {
+							destinationRootClientId,
+							destinationIndex,
+							rootClientId: allowedDestinationRootClientId,
+							registry,
+						} )
+					);
+				}
 			} else {
 				hideInsertionPoint();
 			}
 		},
 		[
+			getClosestAllowedInsertionPoint,
+			isBlockInsertionPointVisible,
 			showInsertionPoint,
 			hideInsertionPoint,
 			destinationRootClientId,

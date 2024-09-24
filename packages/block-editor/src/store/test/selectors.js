@@ -16,6 +16,7 @@ import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { sectionRootClientIdKey } from '../private-keys';
+import { lock } from '../../lock-unlock';
 
 const {
 	getBlockName,
@@ -4475,14 +4476,14 @@ describe( 'getBlockEditingMode', () => {
 		},
 	};
 
-	const __experimentalHasContentRoleAttribute = jest.fn( ( name ) => {
-		// consider paragraphs as content blocks.
-		return name === 'core/p';
-	} );
+	const hasContentRoleAttribute = jest.fn( () => false );
+
+	const fauxPrivateAPIs = {};
+
+	lock( fauxPrivateAPIs, { hasContentRoleAttribute } );
+
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => ( {
-			__experimentalHasContentRoleAttribute,
-		} ) ),
+		select: jest.fn( () => fauxPrivateAPIs ),
 	};
 
 	it( 'should return default by default', () => {
@@ -4586,7 +4587,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		hasContentRoleAttribute.mockReturnValueOnce( false );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'disabled' );
@@ -4602,7 +4603,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );
@@ -4642,12 +4643,15 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
 				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
 			)
 		).toBe( 'contentOnly' );
+
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
