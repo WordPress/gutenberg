@@ -22,27 +22,32 @@ import { unlock } from '../../lock-unlock';
 
 export function ZoomOutSeparator( { clientId, rootClientId = '' } ) {
 	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
-	const { sectionRootClientId, sectionClientIds, isBlockSelected } =
-		useSelect( ( select ) => {
-			const {
-				getBlockInsertionPoint,
-				getBlockOrder,
-				isBlockInsertionPointVisible,
-				getSectionRootClientId,
-				isBlockSelected: _isBlockSelected,
-			} = unlock( select( blockEditorStore ) );
+	const {
+		sectionRootClientId,
+		sectionClientIds,
+		isBlockSelected,
+		blockInsertionPoint,
+		blockInsertionPointVisible,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockInsertionPoint,
+			getBlockOrder,
+			isBlockInsertionPointVisible,
+			getSectionRootClientId,
+			isBlockSelected: _isBlockSelected,
+		} = unlock( select( blockEditorStore ) );
 
-			const root = getSectionRootClientId();
-			const sectionRootClientIds = getBlockOrder( root );
-			return {
-				isBlockSelected: _isBlockSelected,
-				sectionRootClientId: root,
-				sectionClientIds: sectionRootClientIds,
-				blockOrder: getBlockOrder( root ),
-				blockInsertionPoint: getBlockInsertionPoint(),
-				blockInsertionPointVisible: isBlockInsertionPointVisible(),
-			};
-		}, [] );
+		const root = getSectionRootClientId();
+		const sectionRootClientIds = getBlockOrder( root );
+		return {
+			isBlockSelected: _isBlockSelected,
+			sectionRootClientId: root,
+			sectionClientIds: sectionRootClientIds,
+			blockOrder: getBlockOrder( root ),
+			blockInsertionPoint: getBlockInsertionPoint(),
+			blockInsertionPointVisible: isBlockInsertionPointVisible(),
+		};
+	}, [] );
 
 	const isReducedMotion = useReducedMotion();
 
@@ -61,7 +66,10 @@ export function ZoomOutSeparator( { clientId, rootClientId = '' } ) {
 		return null;
 	}
 
-	isVisible = isBlockSelected( clientId );
+	isVisible =
+		isBlockSelected( clientId ) ||
+		( blockInsertionPointVisible &&
+			clientId === sectionClientIds[ blockInsertionPoint.index ] );
 
 	return (
 		<AnimatePresence>
