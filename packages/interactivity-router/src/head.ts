@@ -87,22 +87,11 @@ export const fetchHeadAssets = async (
 
 				const headElement = headElements.get( attributeValue );
 				const element = doc.createElement( tagName );
-				element.textContent = headElement.text;
-
+				element.innerText = headElement.text;
 				for ( const attr of headElement.tag.attributes ) {
-					// don't copy the src or href attribute
-					if ( attr.name !== 'src' && attr.name !== 'href' ) {
-						element.setAttribute( attr.name, attr.value );
-					}
+					element.setAttribute( attr.name, attr.value );
 				}
-
 				headTags.push( element );
-
-				// wait for the `load` event to fire before appending the element
-				return new Promise( ( resolve, reject ) => {
-					element.onload = resolve;
-					element.onerror = reject;
-				} );
 			} )
 		);
 	}
