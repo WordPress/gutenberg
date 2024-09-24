@@ -73,6 +73,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	.wp-block-search__input {
 		transition-duration: 300ms;
 		flex-basis: 100%;
+		margin-right: 10px;
 	}
 
 	// !important here to override inline styles on button only deselected view.
