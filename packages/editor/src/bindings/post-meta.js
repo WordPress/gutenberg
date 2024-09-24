@@ -11,10 +11,16 @@ import { unlock } from '../lock-unlock';
 
 function getMetadata( registry, context, registeredFields ) {
 	let metaFields = {};
-	const { type } = registry.select( editorStore ).getCurrentPost();
+	const type = registry.select( editorStore ).getCurrentPostType();
 	const { getEditedEntityRecord } = registry.select( coreDataStore );
 
-	if ( type === 'wp_template' ) {
+	if ( context?.postType && context?.postId ) {
+		metaFields = getEditedEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId
+		).meta;
+	} else if ( type === 'wp_template' ) {
 		// Populate the `metaFields` object with the default values.
 		Object.entries( registeredFields || {} ).forEach(
 			( [ key, props ] ) => {
@@ -23,12 +29,6 @@ function getMetadata( registry, context, registeredFields ) {
 				}
 			}
 		);
-	} else {
-		metaFields = getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		).meta;
 	}
 
 	return metaFields;

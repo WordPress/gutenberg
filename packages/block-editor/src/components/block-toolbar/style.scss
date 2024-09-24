@@ -52,8 +52,17 @@
 
 	> :last-child,
 	> :last-child .components-toolbar-group,
-	> :last-child .components-toolbar {
+	> :last-child .components-toolbar,
+	// If the last toolbar group is empty,
+	// we need to remove the double border from the penultimate one.
+	&:has(> :last-child:empty) > :nth-last-child(2),
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
 		border-right: none;
+	}
+
+	.components-toolbar-group:empty {
+		display: none;
 	}
 }
 
