@@ -191,6 +191,9 @@ export function RichTextWrapper(
 			if ( adjustedValue.length > 0 ) {
 				return {
 					disableBoundBlock: _disableBoundBlock,
+					// Null values will make them fall back to the default behavior.
+					bindingsPlaceholder: null,
+					bindingsLabel: null,
 				};
 			}
 
