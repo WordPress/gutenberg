@@ -256,7 +256,8 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
-											__next40pxDefaultSize
+											// TODO: Switch to `true` (40px size) if possible
+											__next40pxDefaultSize={ false }
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"

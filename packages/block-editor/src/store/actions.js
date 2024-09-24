@@ -1728,24 +1728,23 @@ export const __unstableSetEditorMode =
 	};
 
 /**
- * Set the block moving client ID.
+ * Action that enables or disables the block moving mode.
  *
- * @deprecated
- *
- * @return {Object} Action object.
+ * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
  */
-export function setBlockMovingClientId() {
-	deprecated(
-		'wp.data.dispatch( "core/block-editor" ).setBlockMovingClientId',
-		{
-			since: '6.7',
-			hint: 'Block moving mode feature has been removed',
+export const setBlockMovingClientId =
+	( hasBlockMovingClientId = null ) =>
+	( { dispatch } ) => {
+		dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
+
+		if ( hasBlockMovingClientId ) {
+			speak(
+				__(
+					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
+				)
+			);
 		}
-	);
-	return {
-		type: 'DO_NOTHING',
 	};
-}
 
 /**
  * Action that duplicates a list of blocks.

@@ -857,9 +857,15 @@ _Returns_
 
 ### hasBlockMovingClientId
 
-> **Deprecated**
-
 Returns whether block moving mode is enabled.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `string`: Client Id of moving block.
 
 ### hasDraggedInnerBlock
 
@@ -1655,13 +1661,11 @@ _Returns_
 
 ### setBlockMovingClientId
 
-> **Deprecated**
+Action that enables or disables the block moving mode.
 
-Set the block moving client ID.
+_Parameters_
 
-_Returns_
-
--   `Object`: Action object.
+-   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
 
 ### setBlockVisibility
 

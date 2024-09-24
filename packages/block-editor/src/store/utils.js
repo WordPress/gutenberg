@@ -10,7 +10,6 @@ import { parse as grammarParse } from '@wordpress/block-serialization-default-pa
 import { selectBlockPatternsKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
-import { getSectionRootClientId } from './private-selectors';
 
 export const withRootClientIdOptionKey = Symbol( 'withRootClientId' );
 
@@ -118,7 +117,5 @@ export function getInsertBlockTypeDependants( state, rootClientId ) {
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockEditingModes,
-		state.editorMode,
-		getSectionRootClientId( state ),
 	];
 }

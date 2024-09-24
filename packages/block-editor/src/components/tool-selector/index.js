@@ -18,7 +18,6 @@ import { Icon, edit as editIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const selectIcon = (
 	<SVG
@@ -36,9 +35,7 @@ function ToolSelector( props, ref ) {
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -48,7 +45,7 @@ function ToolSelector( props, ref ) {
 					__next40pxDefaultSize={ false }
 					{ ...props }
 					ref={ ref }
-					icon={ mode === 'navigation' ? editIcon : selectIcon }
+					icon={ mode === 'navigation' ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
@@ -59,11 +56,7 @@ function ToolSelector( props, ref ) {
 			popoverProps={ { placement: 'bottom-start' } }
 			renderContent={ () => (
 				<>
-					<NavigableMenu
-						className="block-editor-tool-selector__menu"
-						role="menu"
-						aria-label={ __( 'Tools' ) }
-					>
+					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
 							value={
 								mode === 'navigation' ? 'navigation' : 'edit'
@@ -74,23 +67,19 @@ function ToolSelector( props, ref ) {
 									value: 'edit',
 									label: (
 										<>
-											{ selectIcon }
-											{ __( 'Design' ) }
+											<Icon icon={ editIcon } />
+											{ __( 'Edit' ) }
 										</>
-									),
-									info: __(
-										'Full control over layout and styling.'
 									),
 								},
 								{
 									value: 'navigation',
 									label: (
 										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
+											{ selectIcon }
+											{ __( 'Select' ) }
 										</>
 									),
-									info: __( 'Focus on content.' ),
 								},
 							] }
 						/>

@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	BoxControl,
+	__experimentalBoxControl as BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,

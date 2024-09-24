@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB } from '@wordpress/keycodes';
+import { TAB, ESCAPE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -21,8 +21,18 @@ export default function useTabNav() {
 
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
+	const { setNavigationMode, setLastFocus } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const isNavigationMode = useSelect(
+		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+
 	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
+
+	// Don't allow tabbing to this element in Navigation mode.
+	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
@@ -46,6 +56,8 @@ export default function useTabNav() {
 					.focus();
 			}
 		} else {
+			setNavigationMode( true );
+
 			const canvasElement =
 				container.current.ownerDocument === event.target.ownerDocument
 					? container.current
@@ -70,7 +82,7 @@ export default function useTabNav() {
 	const before = (
 		<div
 			ref={ focusCaptureBeforeRef }
-			tabIndex="0"
+			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
 		/>
 	);
@@ -78,7 +90,7 @@ export default function useTabNav() {
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
-			tabIndex="0"
+			tabIndex={ focusCaptureTabIndex }
 			onFocus={ onFocusCapture }
 		/>
 	);
@@ -86,6 +98,12 @@ export default function useTabNav() {
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
+				event.preventDefault();
+				setNavigationMode( true );
 				return;
 			}
 
@@ -101,6 +119,20 @@ export default function useTabNav() {
 
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
+
+			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+				// Preserve the behaviour of entering navigation mode when
+				// tabbing into the content without a block selection.
+				// `onFocusCapture` already did this previously, but we need to
+				// do it again here because after clearing block selection,
+				// focus land on the writing flow container and pressing Tab
+				// will no longer send focus through the focus capture element.
+				if ( event.target === node ) {
+					setNavigationMode( true );
+				}
+				return;
+			}
+
 			const nextTabbable = focus.tabbable[ direction ]( event.target );
 
 			// We want to constrain the tabbing to the block and its child blocks.

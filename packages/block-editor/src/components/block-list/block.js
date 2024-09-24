@@ -549,7 +549,6 @@ function BlockListBlockProvider( props ) {
 				getBlockMode,
 				isSelectionEnabled,
 				getTemplateLock,
-				isSectionBlock: _isSectionBlock,
 				getBlockWithoutAttributes,
 				getBlockAttributes,
 				canRemoveBlock,
@@ -572,6 +571,8 @@ function BlockListBlockProvider( props ) {
 				__unstableSelectionHasUnmergeableBlock,
 				isBlockBeingDragged,
 				isDragging,
+				hasBlockMovingClientId,
+				canInsertBlockType,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
@@ -631,6 +632,7 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
+			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
@@ -651,7 +653,7 @@ function BlockListBlockProvider( props ) {
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
-				isSectionBlock: _isSectionBlock( clientId ),
+				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -679,9 +681,11 @@ function BlockListBlockProvider( props ) {
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
-				initialPosition: _isSelected
-					? getSelectedBlocksInitialCaretPosition()
-					: undefined,
+				initialPosition:
+					_isSelected &&
+					( editorMode === 'edit' || editorMode === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
+						? getSelectedBlocksInitialCaretPosition()
+						: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
 				isMultiSelected,
 				isPartiallySelected:
@@ -690,6 +694,13 @@ function BlockListBlockProvider( props ) {
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
+				isBlockMovingMode: !! movingClientId,
+				canInsertMovingBlock:
+					movingClientId &&
+					canInsertBlockType(
+						getBlockName( movingClientId ),
+						rootClientId
+					),
 				isEditingDisabled: blockEditingMode === 'disabled',
 				hasEditableOutline:
 					blockEditingMode !== 'disabled' &&
@@ -734,7 +745,9 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		isSectionBlock,
+		isBlockMovingMode,
+		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
@@ -779,7 +792,9 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		isSectionBlock,
+		isBlockMovingMode,
+		canInsertMovingBlock,
+		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,

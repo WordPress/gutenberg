@@ -36,7 +36,8 @@ function SuggestionListItem( {
 		<Composite.Item
 			render={
 				<Button
-					__next40pxDefaultSize
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					role="option"
 					className={ baseCssClass }
 					onClick={ () =>

@@ -26,9 +26,7 @@
 	},
 	"files": [
 		"build",
-		"index.js",
-		"polyfill-exclusions.js",
-		"replace-polyfills.js"
+		"index.js"
 	],
 	"main": "index.js",
 	"dependencies": {

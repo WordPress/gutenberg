@@ -275,7 +275,6 @@ function ComplementaryArea( {
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"
-							shortcut={ toggleShortcut }
 						/>
 					) }
 				</PinnedItems>

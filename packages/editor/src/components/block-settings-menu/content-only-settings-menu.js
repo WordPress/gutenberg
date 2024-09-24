@@ -17,20 +17,21 @@ import { __, _x } from '@wordpress/i18n';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import usePostContentBlocks from '../provider/use-post-content-blocks';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const postContentBlocks = usePostContentBlocks();
 	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
 		( select ) => {
 			const {
+				getBlockEditingMode,
 				getBlockParentsByBlockName,
 				getSettings,
 				getBlockAttributes,
-				getBlockParents,
 			} = select( blockEditorStore );
-			const { getCurrentTemplateId, getRenderingMode } =
-				select( editorStore );
+			const contentOnly =
+				getBlockEditingMode( clientId ) === 'contentOnly';
+			if ( ! contentOnly ) {
+				return {};
+			}
 			const patternParent = getBlockParentsByBlockName(
 				clientId,
 				'core/block',
@@ -44,20 +45,19 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					'wp_block',
 					getBlockAttributes( patternParent ).ref
 				);
-			} else if (
-				getRenderingMode() === 'template-locked' &&
-				! getBlockParents( clientId ).some( ( parent ) =>
-					postContentBlocks.includes( parent )
-				)
-			) {
-				record = select( coreStore ).getEntityRecord(
-					'postType',
-					'wp_template',
-					getCurrentTemplateId()
+			} else {
+				const { getCurrentTemplateId } = select( editorStore );
+				const templateId = getCurrentTemplateId();
+				const { getContentLockingParent } = unlock(
+					select( blockEditorStore )
 				);
-			}
-			if ( ! record ) {
-				return {};
+				if ( ! getContentLockingParent( clientId ) && templateId ) {
+					record = select( coreStore ).getEntityRecord(
+						'postType',
+						'wp_template',
+						templateId
+					);
+				}
 			}
 			const _canEditTemplates = select( coreStore ).canUser( 'create', {
 				kind: 'postType',
@@ -70,7 +70,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					getSettings().onNavigateToEntityRecord,
 			};
 		},
-		[ clientId, postContentBlocks ]
+		[ clientId ]
 	);
 
 	if ( ! entity ) {

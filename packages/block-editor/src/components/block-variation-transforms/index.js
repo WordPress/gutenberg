@@ -140,30 +140,19 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations, isContentOnly } = useSelect(
+	const { activeBlockVariation, variations } = useSelect(
 		( select ) => {
-			const {
-				getActiveBlockVariation,
-				getBlockVariations,
-				__experimentalHasContentRoleAttribute,
-			} = select( blocksStore );
-			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
+			const { getActiveBlockVariation, getBlockVariations } =
+				select( blocksStore );
+			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
-
 			const name = blockClientId && getBlockName( blockClientId );
-
-			const isContentBlock =
-				__experimentalHasContentRoleAttribute( name );
-
 			return {
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId )
 				),
 				variations: name && getBlockVariations( name, 'transform' ),
-				isContentOnly:
-					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
-					! isContentBlock,
 			};
 		},
 		[ blockClientId ]
@@ -192,7 +181,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	if ( ! variations?.length || isContentOnly ) {
+	// Skip rendering if there are no variations
+	if ( ! variations?.length ) {
 		return null;
 	}
 

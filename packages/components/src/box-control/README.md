@@ -1,14 +1,18 @@
 # BoxControl
 
-A control that lets users set values for top, right, bottom, and left. Can be used as an input control for values like `padding` or `margin`.
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
+BoxControl components let users set values for Top, Right, Bottom, and Left. This can be used as an input control for values like `padding` or `margin`.
 
 ## Usage
 
 ```jsx
 import { useState } from 'react';
-import { BoxControl } from '@wordpress/components';
+import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 
-function Example() {
+const Example = () => {
 	const [ values, setValues ] = useState( {
 		top: '50px',
 		left: '10%',
@@ -22,24 +26,23 @@ function Example() {
 			onChange={ ( nextValues ) => setValues( nextValues ) }
 		/>
 	);
-}
+};
 ```
 
 ## Props
-
 ### `allowReset`: `boolean`
 
 If this property is true, a button to reset the box control is rendered.
 
--   Required: No
--   Default: `true`
+- Required: No
+- Default: `true`
 
 ### `splitOnAxis`: `boolean`
 
 If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
 
--   Required: No
--   Default: `false`
+- Required: No
+- Default: `false`
 
 ### `inputProps`: `object`
 

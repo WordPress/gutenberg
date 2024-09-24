@@ -15,7 +15,6 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -116,7 +115,6 @@ export const getEnabledClientIdsTree = createSelector(
 		state.settings.templateLock,
 		state.blockListSettings,
 		state.editorMode,
-		getSectionRootClientId( state ),
 	]
 );
 
@@ -481,73 +479,18 @@ export const getContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
+			if (
+				getBlockName( state, current ) === 'core/block' ||
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
 				result = current;
 			}
 		}
 		return result;
 	},
-	( state ) => [
-		state.blocks.parents,
-		state.blockListSettings,
-		state.settings.templateLock,
-	]
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
 );
-
-/**
- * Retrieves the client ID of the parent section block.
- *
- * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
- *
- * @return {?string} Client ID of the ancestor block that is content locking the block.
- */
-export const getParentSectionBlock = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( isSectionBlock( state, current ) ) {
-				result = current;
-			}
-		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockListSettings,
-		state.editorMode,
-		state.settings.templateLock,
-		state.blocks.byClientId,
-		getSectionRootClientId( state ),
-	]
-);
-
-/**
- * Retrieves the client ID is a content locking parent
- *
- * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
- *
- * @return {boolean} Whether the block is a content locking parent.
- */
-export function isSectionBlock( state, clientId ) {
-	const sectionRootClientId = getSectionRootClientId( state );
-	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return (
-		getBlockName( state, clientId ) === 'core/block' ||
-		getTemplateLock( state, clientId ) === 'contentOnly' ||
-		( isNavigationMode( state ) && sectionClientIds.includes( clientId ) )
-	);
-}
 
 /**
  * Retrieves the client ID of the block that is content locked but is
@@ -616,24 +559,4 @@ export function isZoomOutMode( state ) {
  */
 export function getSectionRootClientId( state ) {
 	return state.settings?.[ sectionRootClientIdKey ];
-}
-
-/**
- * Returns the zoom out state.
- *
- * @param {Object} state Global application state.
- * @return {boolean} The zoom out state.
- */
-export function getZoomLevel( state ) {
-	return state.zoomLevel;
-}
-
-/**
- * Returns whether the editor is considered zoomed out.
- *
- * @param {Object} state Global application state.
- * @return {boolean} Whether the editor is zoomed.
- */
-export function isZoomOut( state ) {
-	return getZoomLevel( state ) < 100;
 }

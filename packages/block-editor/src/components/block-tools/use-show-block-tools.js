@@ -22,6 +22,7 @@ export function useShowBlockTools() {
 			getBlock,
 			getBlockMode,
 			getSettings,
+			hasMultiSelection,
 			__unstableGetEditorMode,
 			isTyping,
 		} = select( blockEditorStore );
@@ -41,20 +42,29 @@ export function useShowBlockTools() {
 			! isTyping() &&
 			editorMode === 'edit' &&
 			isEmptyDefaultBlock;
+		const maybeShowBreadcrumb =
+			hasSelectedBlock &&
+			! hasMultiSelection() &&
+			editorMode === 'navigation';
+
 		const isZoomOut = editorMode === 'zoom-out';
 		const _showZoomOutToolbar =
 			isZoomOut &&
 			block?.attributes?.align === 'full' &&
-			! _showEmptyBlockSideInserter;
+			! _showEmptyBlockSideInserter &&
+			! maybeShowBreadcrumb;
 		const _showBlockToolbarPopover =
 			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
-			! isEmptyDefaultBlock;
+			! isEmptyDefaultBlock &&
+			! maybeShowBreadcrumb;
 
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
+			showBreadcrumb:
+				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
 			showZoomOutToolbar: _showZoomOutToolbar,
 		};

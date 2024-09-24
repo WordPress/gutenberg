@@ -41,13 +41,13 @@ directive(
 	'test-context',
 	( { context: { Provider }, props: { children } } ) => {
 		executionProof( 'context' );
-		const client = {
+		const value = {
 			[ namespace ]: proxifyState( namespace, {
 				attribute: 'from context',
 				text: 'from context',
 			} ),
 		};
-		return h( Provider, { value: { client } }, children );
+		return h( Provider, { value }, children );
 	},
 	{ priority: 8 }
 );

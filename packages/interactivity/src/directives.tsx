@@ -142,19 +142,14 @@ export default () => {
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
-			const { client: inheritedClient, server: inheritedServer } =
-				useContext( inheritedContext );
+			const inheritedValue = useContext( inheritedContext );
 
 			const ns = defaultEntry!.namespace;
-			const client = useRef( proxifyState( ns, {} ) );
-			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
+			const currentValue = useRef( proxifyState( ns, {} ) );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
-				const result = {
-					client: { ...inheritedClient },
-					server: { ...inheritedServer },
-				};
+				const result = { ...inheritedValue };
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
@@ -164,22 +159,17 @@ export default () => {
 						);
 					}
 					deepMerge(
-						client.current,
+						currentValue.current,
 						deepClone( value ) as object,
 						false
 					);
-					deepMerge( server.current, deepClone( value ) as object );
-					result.client[ namespace ] = proxifyContext(
-						client.current,
-						inheritedClient[ namespace ]
-					);
-					result.server[ namespace ] = proxifyContext(
-						server.current,
-						inheritedServer[ namespace ]
+					result[ namespace ] = proxifyContext(
+						currentValue.current,
+						inheritedValue[ namespace ]
 					);
 				}
 				return result;
-			}, [ defaultEntry, inheritedClient, inheritedServer ] );
+			}, [ defaultEntry, inheritedValue ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
@@ -573,24 +563,17 @@ export default () => {
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const itemContext = proxifyContext(
 					proxifyState( namespace, {} ),
-					inheritedValue.client[ namespace ]
+					inheritedValue[ namespace ]
 				);
 				const mergedContext = {
-					client: {
-						...inheritedValue.client,
-						[ namespace ]: itemContext,
-					},
-					server: { ...inheritedValue.server },
+					...inheritedValue,
+					[ namespace ]: itemContext,
 				};
 
 				// Set the item after proxifying the context.
-				mergedContext.client[ namespace ][ itemProp ] = item;
+				mergedContext[ namespace ][ itemProp ] = item;
 
-				const scope = {
-					...getScope(),
-					context: mergedContext.client,
-					serverContext: mergedContext.server,
-				};
+				const scope = { ...getScope(), context: mergedContext };
 				const key = eachKey
 					? getEvaluate( { scope } )( eachKey[ 0 ] )
 					: item;

@@ -22,7 +22,14 @@
 	flex-direction: column;
 	min-height: 100%;
 
-	&__panel {
+	&__panel,
+	&__navigator-provider {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+	}
+
+	&__navigator-screen {
 		flex: 1;
 	}
 }

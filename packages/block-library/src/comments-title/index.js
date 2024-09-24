@@ -18,7 +18,6 @@ export const settings = {
 	icon,
 	edit,
 	deprecated,
-	example: {},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

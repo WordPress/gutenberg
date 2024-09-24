@@ -38,8 +38,10 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		listViewShortcut,
 		inserterSidebarToggleRef,
 		listViewToggleRef,
+		hasFixedToolbar,
 		showIconLabels,
 	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
 		const {
 			isListViewOpened,
@@ -58,6 +60,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
+			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
@@ -134,7 +137,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && (
+						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }

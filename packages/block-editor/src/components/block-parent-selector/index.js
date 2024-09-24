@@ -14,7 +14,6 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -24,26 +23,24 @@ import { unlock } from '../../lock-unlock';
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { parentClientId, isVisible } = useSelect( ( select ) => {
+	const { firstParentClientId, isVisible } = useSelect( ( select ) => {
 		const {
 			getBlockName,
 			getBlockParents,
 			getSelectedBlockClientId,
 			getBlockEditingMode,
-			getParentSectionBlock,
-		} = unlock( select( blockEditorStore ) );
+		} = select( blockEditorStore );
 		const { hasBlockSupport } = select( blocksStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const parentSection = getParentSectionBlock( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
-		const _parentClientId = parentSection ?? parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( _parentClientId );
+		const _firstParentClientId = parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( _firstParentClientId );
 		const _parentBlockType = getBlockType( parentBlockName );
 		return {
-			parentClientId: _parentClientId,
+			firstParentClientId: _firstParentClientId,
 			isVisible:
-				_parentClientId &&
-				getBlockEditingMode( _parentClientId ) !== 'disabled' &&
+				_firstParentClientId &&
+				getBlockEditingMode( _firstParentClientId ) === 'default' &&
 				hasBlockSupport(
 					_parentBlockType,
 					'__experimentalParentSelector',
@@ -51,7 +48,7 @@ export default function BlockParentSelector() {
 				),
 		};
 	}, [] );
-	const blockInformation = useBlockDisplayInformation( parentClientId );
+	const blockInformation = useBlockDisplayInformation( firstParentClientId );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
@@ -68,13 +65,13 @@ export default function BlockParentSelector() {
 	return (
 		<div
 			className="block-editor-block-parent-selector"
-			key={ parentClientId }
+			key={ firstParentClientId }
 			ref={ nodeRef }
 			{ ...showHoveredOrFocusedGestures }
 		>
 			<ToolbarButton
 				className="block-editor-block-parent-selector__button"
-				onClick={ () => selectBlock( parentClientId ) }
+				onClick={ () => selectBlock( firstParentClientId ) }
 				label={ sprintf(
 					/* translators: %s: Name of the block's parent. */
 					__( 'Select parent block: %s' ),
