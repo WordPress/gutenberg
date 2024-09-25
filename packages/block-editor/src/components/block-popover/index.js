@@ -94,7 +94,7 @@ function BlockPopover(
 		return {
 			getBoundingClientRect() {
 				if ( isZoomOut() ) {
-					const selectedRect =
+					const selectedBlockRect =
 						getVisibleElementBounds( selectedElement );
 					const parentRect = getVisibleElementBounds(
 						selectedElement.parentElement
