@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "7.8.0",
+	"version": "6.8.0",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,20 +20,10 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0",
-		"npm": ">=8.19.2"
+		"node": ">=12"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"exports": {
-		"import": {
-			".": "build-module/index.js",
-			"./wp-module": "build-module/wp-module.js"
-		},
-		"require": {
-			".": "build/index.js"
-		}
-	},
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
