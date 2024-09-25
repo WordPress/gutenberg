@@ -474,7 +474,7 @@ export function getExpandedBlock( state ) {
  * with the provided client ID.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
@@ -493,7 +493,7 @@ export const getContentLockingParent = ( state, clientId ) => {
  * Retrieves the client ID of the parent section block.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
@@ -512,7 +512,7 @@ export const getParentSectionBlock = ( state, clientId ) => {
  * Retrieves the client ID is a content locking parent
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {boolean} Whether the block is a content locking parent.
  */
