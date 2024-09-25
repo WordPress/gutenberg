@@ -184,13 +184,16 @@ export function MediaPreview( { media, onClick, category } ) {
 							} );
 							createSuccessNotice(
 								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar' }
+								{ type: 'snackbar', id: 'inserter-notice' }
 							);
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
 						onError( message ) {
-							createErrorNotice( message, { type: 'snackbar' } );
+							createErrorNotice( message, {
+								type: 'snackbar',
+								id: 'inserter-notice',
+							} );
 							setIsInserting( false );
 						},
 					} );
@@ -281,6 +284,7 @@ export function MediaPreview( { media, onClick, category } ) {
 						onClick( cloneBlock( block ) );
 						createSuccessNotice( __( 'Image inserted.' ), {
 							type: 'snackbar',
+							id: 'inserter-notice',
 						} );
 						setShowExternalUploadModal( false );
 					} }

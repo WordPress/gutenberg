@@ -16,6 +16,7 @@ import {
 	getTemplateLock,
 	getClientIdsWithDescendants,
 	isNavigationMode,
+	getBlockRootClientId,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -116,6 +117,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.settings.templateLock,
 		state.blockListSettings,
 		state.editorMode,
+		getSectionRootClientId( state ),
 	]
 );
 
@@ -635,4 +637,64 @@ export function getZoomLevel( state ) {
  */
 export function isZoomOut( state ) {
 	return getZoomLevel( state ) < 100;
+}
+
+/**
+ * Finds the closest block where the block is allowed to be inserted.
+ *
+ * @param {Object}            state    Editor state.
+ * @param {string[] | string} name     Block name or names.
+ * @param {string}            clientId Default insertion point.
+ *
+ * @return {string} clientID of the closest container when the block name can be inserted.
+ */
+export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
+	const blockNames = Array.isArray( name ) ? name : [ name ];
+	const areBlockNamesAllowedInClientId = ( id ) =>
+		blockNames.every( ( currentName ) =>
+			canInsertBlockType( state, currentName, id )
+		);
+
+	// If we're trying to insert at the root level and it's not allowed
+	// Try the section root instead.
+	if ( ! clientId ) {
+		if ( areBlockNamesAllowedInClientId( clientId ) ) {
+			return clientId;
+		}
+
+		const sectionRootClientId = getSectionRootClientId( state );
+		if (
+			sectionRootClientId &&
+			areBlockNamesAllowedInClientId( sectionRootClientId )
+		) {
+			return sectionRootClientId;
+		}
+		return null;
+	}
+
+	// Traverse the block tree up until we find a place where we can insert.
+	let current = clientId;
+	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
+		const parentClientId = getBlockRootClientId( state, current );
+		current = parentClientId;
+	}
+
+	return current;
+}
+
+export function getClosestAllowedInsertionPointForPattern(
+	state,
+	pattern,
+	clientId
+) {
+	const { allowedBlockTypes } = getSettings( state );
+	const isAllowed = checkAllowListRecursive(
+		getGrammar( pattern ),
+		allowedBlockTypes
+	);
+	if ( ! isAllowed ) {
+		return null;
+	}
+	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
+	return getClosestAllowedInsertionPoint( state, names, clientId );
 }

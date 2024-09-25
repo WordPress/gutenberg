@@ -190,9 +190,13 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
-		resolvedStore = store( namespace, undefined, {
-			lock: universalUnlock,
-		} );
+		resolvedStore = store(
+			namespace,
+			{},
+			{
+				lock: universalUnlock,
+			}
+		);
 	}
 	const current = {
 		...resolvedStore,

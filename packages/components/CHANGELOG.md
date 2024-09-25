@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+-   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+
+### Enhancements
+
+-   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+
 ## 28.8.0 (2024-09-19)
 
 ### Bug Fixes
@@ -15,6 +24,7 @@
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
+-   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### New Features
 
@@ -35,6 +45,7 @@
 -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
 -   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
 -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
+-   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### Bug Fixes
 
