@@ -13,7 +13,6 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
