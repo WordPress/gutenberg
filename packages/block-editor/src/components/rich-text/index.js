@@ -125,6 +125,7 @@ export function RichTextWrapper(
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
+	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -164,7 +165,7 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	const { disableBoundBlock, bindingsPlaceholder } = useSelect(
+	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
 			if (
 				! blockBindings?.[ identifier ] ||
@@ -186,22 +187,56 @@ export function RichTextWrapper(
 					args: relatedBinding.args,
 				} );
 
+			// Don't modify placeholders if value is not empty.
+			if ( adjustedValue.length > 0 ) {
+				return {
+					disableBoundBlock: _disableBoundBlock,
+					// Null values will make them fall back to the default behavior.
+					bindingsPlaceholder: null,
+					bindingsLabel: null,
+				};
+			}
+
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			const fieldsList = blockBindingsSource?.getFieldsList?.( {
+				registry,
+				context: blockContext,
+			} );
+			const bindingKey =
+				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
+				blockBindingsSource?.label;
+
 			const _bindingsPlaceholder = _disableBoundBlock
+				? bindingKey
+				: sprintf(
+						/* translators: %s: connected field label or source label */
+						__( 'Add %s' ),
+						bindingKey
+				  );
+			const _bindingsLabel = _disableBoundBlock
 				? relatedBinding?.args?.key || blockBindingsSource?.label
 				: sprintf(
 						/* translators: %s: source label or key */
-						__( 'Add %s' ),
+						__( 'Empty %s; start writing to edit its value' ),
 						relatedBinding?.args?.key || blockBindingsSource?.label
 				  );
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
 				bindingsPlaceholder:
-					( ! adjustedValue || adjustedValue.length === 0 ) &&
-					_bindingsPlaceholder,
+					blockAttributes?.placeholder || _bindingsPlaceholder,
+				bindingsLabel: _bindingsLabel,
 			};
 		},
-		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
+		[
+			blockBindings,
+			identifier,
+			blockName,
+			blockContext,
+			registry,
+			adjustedValue,
+		]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;
@@ -371,7 +406,6 @@ export function RichTextWrapper(
 		element.focus();
 	}
 
-	const registry = useRegistry();
 	const TagName = tagName;
 	return (
 		<>
@@ -406,7 +440,7 @@ export function RichTextWrapper(
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				aria-label={
-					bindingsPlaceholder || props[ 'aria-label' ] || placeholder
+					bindingsLabel || props[ 'aria-label' ] || placeholder
 				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [

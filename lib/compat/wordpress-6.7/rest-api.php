@@ -114,3 +114,26 @@ function gutenberg_override_default_rest_server() {
 	return 'Gutenberg_REST_Server';
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
+
+
+/**
+ * Filters the arguments for registering a wp_global_styles post type.
+ * Note when syncing to Core: the capabilities should be updates for `wp_global_styles` in the wp-includes/post.php.
+ *
+ * @since 6.7.0
+ *
+ * @param array  $args      Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ * @param string $post_type Post type key.
+ *
+ * @return array Array of arguments for registering a post type.
+ */
+function gutenberg_register_post_type_args_for_wp_global_styles( $args, $post_type ) {
+	if ( 'wp_global_styles' === $post_type ) {
+		$args['capabilities']['read'] = 'edit_posts';
+	}
+
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_register_post_type_args_for_wp_global_styles', 10, 2 );

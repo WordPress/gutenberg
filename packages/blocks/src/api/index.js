@@ -155,6 +155,7 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	getBlockAttributesNamesByRole,
 	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 

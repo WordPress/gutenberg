@@ -433,6 +433,16 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       class="editor-post-publish-panel__header"
     >
       <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary is-compact"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
+      <div
         class="editor-post-publish-panel__header-publish-button"
       >
         <button
@@ -441,16 +451,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
           type="button"
         >
           Submit for Review
-        </button>
-      </div>
-      <div
-        class="editor-post-publish-panel__header-cancel-button"
-      >
-        <button
-          class="components-button is-secondary is-compact"
-          type="button"
-        >
-          Cancel
         </button>
       </div>
     </div>
@@ -586,6 +586,16 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       class="editor-post-publish-panel__header"
     >
       <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary is-compact"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
+      <div
         class="editor-post-publish-panel__header-publish-button"
       >
         <button
@@ -594,16 +604,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
           type="button"
         >
           Submit for Review
-        </button>
-      </div>
-      <div
-        class="editor-post-publish-panel__header-cancel-button"
-      >
-        <button
-          class="components-button is-secondary is-compact"
-          type="button"
-        >
-          Cancel
         </button>
       </div>
     </div>
@@ -783,6 +783,16 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       class="editor-post-publish-panel__header"
     >
       <div
+        class="editor-post-publish-panel__header-cancel-button"
+      >
+        <button
+          class="components-button is-secondary is-compact"
+          type="button"
+        >
+          Cancel
+        </button>
+      </div>
+      <div
         class="editor-post-publish-panel__header-publish-button"
       >
         <button
@@ -791,16 +801,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
           type="button"
         >
           Submit for Review
-        </button>
-      </div>
-      <div
-        class="editor-post-publish-panel__header-cancel-button"
-      >
-        <button
-          class="components-button is-secondary is-compact"
-          type="button"
-        >
-          Cancel
         </button>
       </div>
     </div>

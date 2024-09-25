@@ -100,8 +100,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 			>
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ onClose }
 					>
@@ -110,8 +109,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				</FlexItem>
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ onSubmit }
 					>
@@ -186,13 +184,16 @@ export function MediaPreview( { media, onClick, category } ) {
 							} );
 							createSuccessNotice(
 								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar' }
+								{ type: 'snackbar', id: 'inserter-notice' }
 							);
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
 						onError( message ) {
-							createErrorNotice( message, { type: 'snackbar' } );
+							createErrorNotice( message, {
+								type: 'snackbar',
+								id: 'inserter-notice',
+							} );
 							setIsInserting( false );
 						},
 					} );
@@ -283,6 +284,7 @@ export function MediaPreview( { media, onClick, category } ) {
 						onClick( cloneBlock( block ) );
 						createSuccessNotice( __( 'Image inserted.' ), {
 							type: 'snackbar',
+							id: 'inserter-notice',
 						} );
 						setShowExternalUploadModal( false );
 					} }

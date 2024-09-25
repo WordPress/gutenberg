@@ -44,8 +44,7 @@ export default function InserterSidebar() {
 		>
 			<TagName className="edit-widgets-layout__inserter-panel-header">
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					icon={ close }
 					onClick={ closeInserter }
 					label={ __( 'Close block inserter' ) }
