@@ -23,9 +23,16 @@ import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
 import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Action, Field, View, SupportedLayouts } from '../../types';
+import type {
+	Action,
+	Field,
+	View,
+	SupportedLayouts,
+	ActionContext,
+} from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 import { __ } from '@wordpress/i18n';
+import { pin } from '@wordpress/icons';
 
 type ItemWithId = { id: string };
 
@@ -140,35 +147,40 @@ export default function DataViews< Item >( {
 		( callback: ( items: Item[], context: any ) => void ) => {
 			return [
 				{
-					id: 'pin',
-					label: __( 'Pin' ),
-					callback: ( items: Item[], context: any ) => {
-						items.forEach( ( item ) =>
-							onPinItem( getItemId( item ) )
-						);
-						callback( items, context );
+					id: 'togglePin',
+					label: ( items: Item[] ) => {
+						const itemId = getItemId( items[ 0 ] );
+						return combinedPinnedItems.includes( itemId )
+							? __( 'Unpin' )
+							: __( 'Pin' );
 					},
-				},
-				{
-					id: 'unpin',
-					label: __( 'Unpin' ),
-					callback: ( items: Item[], context: any ) => {
-						items.forEach( ( item ) =>
-							onUnpinItem( getItemId( item ) )
-						);
+					isPrimary: true,
+					icon: pin,
+					callback: (
+						items: Item[],
+						context: ActionContext< Item >
+					) => {
+						items.forEach( ( item ) => {
+							const itemId = getItemId( item );
+							if ( combinedPinnedItems.includes( itemId ) ) {
+								onUnpinItem( itemId );
+							} else {
+								onPinItem( itemId );
+							}
+						} );
 						callback( items, context );
 					},
 				},
 			];
 		},
-		[ getItemId, onPinItem, onUnpinItem ]
+		[ getItemId, onPinItem, onUnpinItem, combinedPinnedItems ]
 	);
 
 	const actionsWithDefaultActions = useMemo( () => {
 		const defaultActions = createDefaultActions(
 			( items, context ) => context.onActionPerformed?.( items )
 		);
-		return [ ...defaultActions, ...actions ];
+		return [ ...defaultActions, ...actions ]; // Combine default and custom actions
 	}, [ actions, createDefaultActions ] );
 
 	return (
