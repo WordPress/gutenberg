@@ -35,7 +35,7 @@ const CarouselNavigation = ( {
 } ) => (
 	<div className="block-editor-block-pattern-setup__navigation">
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			icon={ isRTL() ? chevronRight : chevronLeft }
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
@@ -43,7 +43,7 @@ const CarouselNavigation = ( {
 			accessibleWhenDisabled
 		/>
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			icon={ isRTL() ? chevronLeft : chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
@@ -66,14 +66,14 @@ const SetupToolbar = ( {
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
-				__next40pxDefaultSize
+				size="compact"
 				icon={ stretchFullWidth }
 				label={ __( 'Carousel view' ) }
 				onClick={ () => setViewMode( VIEWMODES.carousel ) }
 				isPressed={ isCarouselView }
 			/>
 			<Button
-				__next40pxDefaultSize
+				size="compact"
 				icon={ grid }
 				label={ __( 'Grid view' ) }
 				onClick={ () => setViewMode( VIEWMODES.grid ) }
