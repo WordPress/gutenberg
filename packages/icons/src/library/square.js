@@ -4,13 +4,11 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const square = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 		<Path
-			fill="none"
-			d="M5.75 12.75V18.25H11.25M12.75 5.75H18.25V11.25"
-			stroke="currentColor"
-			strokeWidth="1.5"
-			strokeLinecap="square"
+			fillRule="evenodd"
+			clipRule="evenodd"
+			d="M17.5 6.5h-4.75V5H19v6.25h-1.5V6.5ZM5 12.75h1.5v4.75h4.75V19H5v-6.25Z"
 		/>
 	</SVG>
 );
