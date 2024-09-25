@@ -12,6 +12,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
@@ -234,8 +235,8 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
-		this.props.onChange( event.target.value );
+	onChange( newValue ) {
+		this.props.onChange( newValue );
 	}
 
 	onFocus() {
@@ -448,7 +449,6 @@ class URLInput extends Component {
 			id: inputId,
 			value,
 			required: true,
-			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
 			onFocus: this.onFocus,
@@ -464,6 +464,7 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			suffix: this.props.suffix,
 		};
 
 		if ( renderControl ) {
@@ -472,7 +473,7 @@ class URLInput extends Component {
 
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<input { ...inputProps } />
+				<InputControl { ...inputProps } __next40pxDefaultSize />
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

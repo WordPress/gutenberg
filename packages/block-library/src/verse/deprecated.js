@@ -46,7 +46,7 @@ const v2 = {
 			selector: 'pre',
 			default: '',
 			__unstablePreserveWhiteSpace: true,
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',
