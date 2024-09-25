@@ -11,6 +11,8 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -42,21 +44,23 @@ const InsertFromURLPopover = ( {
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
-			<input
-				className="block-editor-media-placeholder__url-input-field"
-				type="text"
-				aria-label={ __( 'URL' ) }
+			<InputControl
+				__next40pxDefaultSize
+				label={ __( 'URL' ) }
+				hideLabelFromVision
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
 				value={ src }
-			/>
-			<Button
-				// TODO: Switch to `true` (40px size) if possible
-				__next40pxDefaultSize={ false }
-				className="block-editor-media-placeholder__url-input-submit-button"
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
+				suffix={
+					<InputControlSuffixWrapper variant="control">
+						<Button
+							size="small"
+							icon={ keyboardReturn }
+							label={ __( 'Apply' ) }
+							type="submit"
+						/>
+					</InputControlSuffixWrapper>
+				}
 			/>
 		</form>
 	</URLPopover>
@@ -165,10 +169,6 @@ export function MediaPlaceholder( {
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
-	};
-
-	const onChangeSrc = ( event ) => {
-		setSrc( event.target.value );
 	};
 
 	const onFilesUpload = ( files ) => {
@@ -407,7 +407,7 @@ export function MediaPlaceholder( {
 			onSelectURL && (
 				<URLSelectionUI
 					src={ src }
-					onChangeSrc={ onChangeSrc }
+					onChangeSrc={ setSrc }
 					onSelectURL={ onSelectURL }
 				/>
 			)
