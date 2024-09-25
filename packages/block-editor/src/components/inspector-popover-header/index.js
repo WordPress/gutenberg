@@ -44,7 +44,6 @@ export default function InspectorPopoverHeader( {
 				) ) }
 				{ onClose && (
 					<Button
-						__next40pxDefaultSize
 						size="small"
 						className="block-editor-inspector-popover-header__action"
 						label={ __( 'Close' ) }
