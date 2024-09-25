@@ -42,7 +42,7 @@ export default function QueryContent( {
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
-	const { postType } = context;
+	const { postType, templateSlug } = context;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
@@ -50,15 +50,31 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	const isTemplate = useSelect(
+	const { isTemplate } = useSelect(
 		( select ) => {
-			const currentTemplate =
+			const editorPostType =
 				select( coreStore ).__experimentalGetTemplateForLink()?.type;
-			const isInTemplate = 'wp_template' === currentTemplate;
-			const isInSingularContent = postType !== undefined;
-			return isInTemplate && ! isInSingularContent;
+			const isInTemplate = 'wp_template' === editorPostType;
+			const singularTemplates = [ '404', 'single', 'page', 'wp' ];
+			const typeOfQueryFromSlug = templateSlug.includes( '-' )
+				? templateSlug.split( '-', 1 )[ 0 ]
+				: templateSlug;
+			const queryFromTemplateSlug = templateSlug.includes( '-' )
+				? templateSlug.split( '-' ).slice( 1 ).join( '-' )
+				: '';
+			let typeOfTemplate = templateSlug;
+			if ( queryFromTemplateSlug ) {
+				typeOfTemplate = typeOfQueryFromSlug;
+			}
+			const isSingularTemplate =
+				singularTemplates.includes( typeOfTemplate ) ||
+				postType !== undefined;
+
+			// isTemplate is true if we are in a template and it's
+			// not a singular content template.
+			return { isTemplate: isInTemplate && ! isSingularTemplate };
 		},
-		[ postType ]
+		[ postType, templateSlug ]
 	);
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -110,6 +126,11 @@ export default function QueryContent( {
 		// are not inherited when outside a template (e.g. when in singular content).
 		if ( ! isTemplate && query.inherit ) {
 			newQuery.inherit = false;
+
+			// We need to update the query in the Editor if not on a singular template.
+			if ( postType && query.postType !== postType ) {
+				newQuery.postType = postType;
+			}
 		}
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -117,10 +138,13 @@ export default function QueryContent( {
 		}
 	}, [
 		query.perPage,
+		query.inherit,
+		query.postType,
 		postsPerPage,
 		inherit,
 		isTemplate,
-		query.inherit,
+		templateSlug,
+		postType,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
 	] );
