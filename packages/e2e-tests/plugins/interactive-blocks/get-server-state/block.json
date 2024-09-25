@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "test/get-server-state",
+	"title": "E2E Interactivity tests - getServerState",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

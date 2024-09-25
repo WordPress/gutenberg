@@ -51,7 +51,7 @@ const { BlockInfo } = unlock( blockEditorPrivateApis );
 const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
+	const { attributes, setQuery, setDisplayLayout, isTemplate } = props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
@@ -114,6 +114,7 @@ export default function QueryInspectorControls( props ) {
 		if ( ! hasFormatSupport ) {
 			updateQuery.format = [];
 		}
+
 		setQuery( updateQuery );
 	};
 	const onYearChange = ( value ) => {
@@ -146,20 +147,25 @@ export default function QueryInspectorControls( props ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
+
+	const showInheritControl =
+		isTemplate && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		! inherit && isControlAllowed( allowedControls, 'postType' );
+		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
+		! isTemplate;
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
-		! inherit && isControlAllowed( allowedControls, 'order' );
+		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
+		! isTemplate;
 	const showStickyControl =
-		! inherit &&
-		showSticky &&
-		isControlAllowed( allowedControls, 'sticky' );
+		( ! inherit &&
+			showSticky &&
+			isControlAllowed( allowedControls, 'sticky' ) ) ||
+		( showSticky && ! isTemplate );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||

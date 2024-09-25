@@ -47,10 +47,11 @@ export default function QuickInserter( {
 		onInsertBlocks,
 		true
 	);
-
 	const [ patterns ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		undefined,
+		true
 	);
 
 	const { setInserterIsOpened, insertionIndex } = useSelect(
@@ -138,8 +139,7 @@ export default function QuickInserter( {
 
 			{ setInserterIsOpened && (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					className="block-editor-inserter__quick-inserter-expand"
 					onClick={ onBrowseAll }
 					aria-label={ __(

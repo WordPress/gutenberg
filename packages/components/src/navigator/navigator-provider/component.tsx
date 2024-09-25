@@ -66,7 +66,7 @@ function goTo(
 	options: NavigateOptions = {}
 ) {
 	const { focusSelectors } = state;
-	const currentLocation = { ...state.currentLocation, isInitial: false };
+	const currentLocation = { ...state.currentLocation };
 
 	const {
 		// Default assignments
@@ -114,6 +114,7 @@ function goTo(
 	return {
 		currentLocation: {
 			...restOptions,
+			isInitial: false,
 			path,
 			isBack,
 			hasRestoredFocus: false,
@@ -129,7 +130,7 @@ function goToParent(
 	options: NavigateToParentOptions = {}
 ) {
 	const { screens, focusSelectors } = state;
-	const currentLocation = { ...state.currentLocation, isInitial: false };
+	const currentLocation = { ...state.currentLocation };
 	const currentPath = currentLocation.path;
 	if ( currentPath === undefined ) {
 		return { currentLocation, focusSelectors };
