@@ -31,7 +31,6 @@ export default function InspectorPopoverHeader( {
 				<Spacer />
 				{ actions.map( ( { label, icon, onClick } ) => (
 					<Button
-						__next40pxDefaultSize
 						size="small"
 						key={ label }
 						className="block-editor-inspector-popover-header__action"
