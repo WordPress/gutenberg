@@ -24,11 +24,11 @@ import { unlock } from '../lock-unlock';
  * {
  *     field_1_key: {
  *         label: 'Field 1 Label',
- * 	       value: 'Field 1 Value',
+ *         value: 'Field 1 Value',
  *     },
  *     field_2_key: {
  *         label: 'Field 2 Label',
- * 	       value: 'Field 2 Value',
+ *         value: 'Field 2 Value',
  *     },
  *     ...
  * }
