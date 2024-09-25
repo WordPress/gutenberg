@@ -118,7 +118,7 @@
 			background: $gray-100;
 			padding: 0 $grid-unit-10;
 			min-height: $grid-unit-30;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			display: flex;
 			align-items: center;
 			font-size: 12px;
@@ -162,4 +162,12 @@
 .dataviews-view-grid__card:focus-within .dataviews-selection-checkbox,
 .dataviews-view-grid__card.is-selected .dataviews-selection-checkbox {
 	top: $grid-unit-10;
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.dataviews-view-grid {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
 }

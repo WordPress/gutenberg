@@ -70,7 +70,7 @@ export const buttonView = ( {
 	}
 
 	&:active {
-		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+		background: ${ CONFIG.controlBackgroundColor };
 	}
 
 	${ isDeselectable && deselectable }

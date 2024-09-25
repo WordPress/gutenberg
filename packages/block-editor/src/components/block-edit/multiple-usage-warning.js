@@ -24,8 +24,7 @@ export function MultipleUsageWarning( {
 		<Warning
 			actions={ [
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					key="find-original"
 					variant="secondary"
 					onClick={ () => selectBlock( originalBlockClientId ) }
@@ -33,8 +32,7 @@ export function MultipleUsageWarning( {
 					{ __( 'Find original' ) }
 				</Button>,
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					key="remove"
 					variant="secondary"
 					onClick={ () => onReplace( [] ) }

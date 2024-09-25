@@ -16,7 +16,7 @@ import {
 	Flex,
 	FlexItem,
 	Button,
-	privateApis as componentsPrivateApis,
+	Composite,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -33,7 +33,6 @@ import { isBlobURL } from '@wordpress/blob';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const MAXIMUM_TITLE_LENGTH = 25;
@@ -42,8 +41,6 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 function MediaPreviewOptions( { category, media } ) {
 	if ( ! category.getReportUrl ) {
@@ -103,8 +100,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 			>
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ onClose }
 					>
@@ -113,8 +109,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				</FlexItem>
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ onSubmit }
 					>
@@ -189,13 +184,16 @@ export function MediaPreview( { media, onClick, category } ) {
 							} );
 							createSuccessNotice(
 								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar' }
+								{ type: 'snackbar', id: 'inserter-notice' }
 							);
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
 						onError( message ) {
-							createErrorNotice( message, { type: 'snackbar' } );
+							createErrorNotice( message, {
+								type: 'snackbar',
+								id: 'inserter-notice',
+							} );
 							setIsInserting( false );
 						},
 					} );
@@ -249,7 +247,7 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseLeave={ onMouseLeave }
 						>
 							<Tooltip text={ truncatedTitle || title }>
-								<CompositeItem
+								<Composite.Item
 									render={
 										<div
 											aria-label={ title }
@@ -267,7 +265,7 @@ export function MediaPreview( { media, onClick, category } ) {
 											</div>
 										) }
 									</div>
-								</CompositeItem>
+								</Composite.Item>
 							</Tooltip>
 							{ ! isInserting && (
 								<MediaPreviewOptions
@@ -286,6 +284,7 @@ export function MediaPreview( { media, onClick, category } ) {
 						onClick( cloneBlock( block ) );
 						createSuccessNotice( __( 'Image inserted.' ), {
 							type: 'snackbar',
+							id: 'inserter-notice',
 						} );
 						setShowExternalUploadModal( false );
 					} }

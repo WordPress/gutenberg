@@ -34,6 +34,7 @@ import type {
 } from '../../types';
 import type { SetSelection } from '../../private-types';
 import ColumnHeaderMenu from './column-header-menu';
+import { getVisibleFieldIds } from '../index';
 
 interface TableColumnFieldProps< Item > {
 	primaryField?: NormalizedField< Item >;
@@ -155,7 +156,7 @@ function TableRow< Item >( {
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
 	const isTouchDeviceRef = useRef( false );
-	const columns = view.fields || fields.map( ( f ) => f.id );
+	const columns = getVisibleFieldIds( view, fields );
 
 	return (
 		<tr
@@ -288,7 +289,7 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 
-	const columns = view.fields || fields.map( ( f ) => f.id );
+	const columns = getVisibleFieldIds( view, fields );
 	const hasData = !! data?.length;
 
 	const primaryField = fields.find(

@@ -40,7 +40,9 @@ export {
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {
+	/** @deprecated Import `BoxControl` instead. */
 	default as __experimentalBoxControl,
+	default as BoxControl,
 	applyValueToSides as __experimentalApplyValueToSides,
 } from './box-control';
 export { default as Button } from './button';
@@ -66,6 +68,7 @@ export {
 	CompositeItem as __unstableCompositeItem,
 	useCompositeState as __unstableUseCompositeState,
 } from './composite/legacy';
+export { Composite } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
