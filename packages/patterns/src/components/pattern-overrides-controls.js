@@ -64,13 +64,12 @@ function PatternOverridesControls( {
 	}
 
 	const hasUnsupportedImageAttributes =
-		blockName === 'core/image' &&
-		( !! attributes.caption?.length || !! attributes.href?.length );
+		blockName === 'core/image' && !! attributes.href?.length;
 
 	const helpText =
 		! hasOverrides && hasUnsupportedImageAttributes
 			? __(
-					`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
+					`Overrides currently don't support image links. Remove the link first before enabling overrides.`
 			  )
 			: __(
 					'Allow changes to this block throughout instances of this pattern.'

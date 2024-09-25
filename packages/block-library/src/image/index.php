@@ -22,8 +22,115 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	/*
+	 * Use a private anonymous class until the HTML API provides similar methods.
+	 * TODO: Replace the logic to remove the `figcaption` when HTML API provides its own methods.
+	 *
+	 * @phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
+	 */
+	$p = new class( $content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * THESE METHODS ARE A TEMPORARY SOLUTION NOT TO BE EMULATED.
+		 * IT IS A TEMPORARY SOLUTION THAT JUST WORKS FOR THIS SPECIFIC
+		 * USE CASE UNTIL THE HTML PROCESSOR PROVIDES ITS OWN METHOD.
+		 */
 
+		/**
+		 * Add a new figcaption element after the `img` or `a` tag.
+		 *
+		 * @param string $new_element New figcaption element to append after the tag.
+		 * @return bool Whether the element was properly appended.
+		 */
+		public function append_figcaption_element_after_tag( $new_element ) {
+			$tag_name = $this->get_tag();
+			// Ensure figcaption is only added in the correct place.
+			if ( 'IMG' !== $tag_name && 'A' !== $tag_name ) {
+				return false;
+			}
+			$this->set_bookmark( 'current_tag' );
+			// Visit the closing tag if exists.
+			if ( ! $this->next_tag(
+				array(
+					'tag_name'    => $tag_name,
+					'tag_closers' => 'visit',
+				)
+			) || ! $this->is_tag_closer() ) {
+				$this->seek( 'current_tag' );
+				$this->release_bookmark( 'current_tag' );
+			}
+
+			// Get position of the closer tag.
+			$this->set_bookmark( 'closer_tag' );
+			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+			$after_closer_tag    = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			/*
+			 * There was a bug in the HTML Processor token length fixed after 6.5.
+			 * This check is needed to add compatibility for that.
+			 * It can be removed once 6.5 is not supported anymore.
+			 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+			 */
+			if ( '>' === $this->html[ $after_closer_tag ] ) {
+				++$after_closer_tag;
+			}
+
+			// Append the new element.
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
+			return true;
+		}
+
+		/**
+		 * Remove the current figcaption tag element.
+		 *
+		 * @return bool Whether the element was properly removed.
+		 */
+		public function remove_figcaption_tag_element() {
+			$tag_name = $this->get_tag();
+			// Ensure only figcaption is removed.
+			if ( 'FIGCAPTION' !== $tag_name ) {
+				return false;
+			}
+			// Set position of the opener tag.
+			$this->set_bookmark( 'opener_tag' );
+
+			// Visit the closing tag.
+			if ( ! $this->next_tag(
+				array(
+					'tag_name'    => $tag_name,
+					'tag_closers' => 'visit',
+				)
+			) || ! $this->is_tag_closer() ) {
+				return false;
+			}
+
+			// Set position of the closer tag.
+			$this->set_bookmark( 'closer_tag' );
+
+			// Get position of the tags.
+			$opener_tag_bookmark = $this->bookmarks['opener_tag'];
+			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+			$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			/*
+			 * There was a bug in the HTML Processor token length fixed after 6.5.
+			 * This check is needed to add compatibility for that.
+			 * It can be removed once 6.5 is not supported anymore.
+			 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+			 */
+			if ( '>' === $this->html[ $after_closer_tag ] ) {
+				++$after_closer_tag;
+			}
+			$current_tag_length = $after_closer_tag - $opener_tag_bookmark->start;
+
+			// Remove the current tag.
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
+			return true;
+		}
+	};
+	// @phpcs:enable
+
+	if ( $p->next_tag( 'figure' ) ) {
+		$p->set_bookmark( 'figure' );
+	}
 	if ( ! $p->next_tag( 'img' ) || null === $p->get_attribute( 'src' ) ) {
 		return '';
 	}
@@ -87,6 +194,26 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 */
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
+
+	$p->seek( 'figure' );
+	if ( $p->next_tag( 'figcaption' ) ) {
+		// Remove `<figcaption>` if exists and caption attribute exists but it is empty.
+		if ( isset( $attributes['caption'] ) && strlen( $attributes['caption'] ) === 0 ) {
+			$p->remove_figcaption_tag_element();
+		}
+	} else {
+		// Add caption if it doesn't exist and the caption is not empty.
+		if ( ! empty( $attributes['caption'] ) ) {
+			$p->seek( 'figure' );
+			// Append caption after link or image.
+			if ( ! $p->next_tag( 'a' ) ) {
+				$p->seek( 'figure' );
+				$p->next_tag( 'img' );
+			}
+			$p->append_figcaption_element_after_tag( '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>' );
+		}
+	}
+	$p->release_bookmark( 'figure' );
 
 	return $p->get_updated_html();
 }
