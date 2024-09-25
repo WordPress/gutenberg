@@ -110,6 +110,12 @@
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		white-space: normal;
+		padding-top: 3px;
+		align-self: start;
+	}
+
+	.edit-site-patterns__pattern-lock-icon {
+		align-self: start;
 	}
 }
 
