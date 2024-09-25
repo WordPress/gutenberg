@@ -10,7 +10,7 @@ import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /**
- * Get a list of post meta fields with their values and labels
+ * Gets a list of post meta fields with their values and labels
  * to be consumed in the needed callbacks.
  * If the value is not available based on context, like in templates,
  * it falls back to the default value, label, or key.
