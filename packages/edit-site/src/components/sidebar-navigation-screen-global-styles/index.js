@@ -128,7 +128,9 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					'Choose a different style combination for the theme styles.'
 				) }
 				backPath={ backPath }
-				content={ <MainSidebarNavigationContent isStylesSelected /> }
+				content={
+					<MainSidebarNavigationContent activeItem="styles-navigation-item" />
+				}
 				footer={
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter
