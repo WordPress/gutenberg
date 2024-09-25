@@ -499,6 +499,9 @@ export interface ViewBaseProps< Item > {
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
 	density: number;
+	onPinItem?: ( itemId: string ) => void;
+	onUnpinItem?: ( itemId: string ) => void;
+	pinnedItems: string[];
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

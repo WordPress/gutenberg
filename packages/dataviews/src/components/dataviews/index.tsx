@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,6 +45,9 @@ type DataViewsProps< Item > = {
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	header?: ReactNode;
+	onPinItem?: ( itemId: string ) => void;
+	onUnpinItem?: ( itemId: string ) => void;
+	pinnedItems?: string[];
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -66,6 +69,7 @@ export default function DataViews< Item >( {
 	selection: selectionProperty,
 	onChangeSelection,
 	header,
+	pinnedItems = [],
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const [ density, setDensity ] = useState< number >( 0 );
@@ -73,6 +77,23 @@ export default function DataViews< Item >( {
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
+	const [ pinnedItemsState, setPinnedItemsState ] =
+		useState< string[] >( pinnedItems );
+	const onPinItem = useCallback( ( itemId: string ) => {
+		setPinnedItemsState( ( prev ) => [
+			...new Set( [ ...prev, itemId ] ),
+		] );
+	}, [] );
+	const onUnpinItem = useCallback( ( itemId: string ) => {
+		setPinnedItemsState( ( prev ) =>
+			prev.filter( ( id ) => id !== itemId )
+		);
+	}, [] );
+	const combinedPinnedItems = useMemo(
+		() => [ ...new Set( [ ...pinnedItems, ...pinnedItemsState ] ) ],
+		[ pinnedItems, pinnedItemsState ]
+	);
+
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
@@ -83,6 +104,7 @@ export default function DataViews< Item >( {
 			onChangeSelection( newValue );
 		}
 	}
+
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 	const _selection = useMemo( () => {
 		return selection.filter( ( id ) =>
@@ -95,6 +117,24 @@ export default function DataViews< Item >( {
 		( filters || [] ).some( ( filter ) => filter.isPrimary )
 	);
 
+	// Sort pinned items to the top of the data array
+	const dataWithPinnedItems = useMemo( () => {
+		return [ ...data ].sort( ( a, b ) => {
+			const aId = getItemId( a );
+			const bId = getItemId( b );
+			const aIsPinned = combinedPinnedItems.includes( aId );
+			const bIsPinned = combinedPinnedItems.includes( bId );
+
+			if ( aIsPinned && ! bIsPinned ) {
+				return -1;
+			}
+			if ( ! aIsPinned && bIsPinned ) {
+				return 1;
+			}
+			return 0;
+		} );
+	}, [ data, getItemId, combinedPinnedItems ] );
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -102,7 +142,7 @@ export default function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: dataWithPinnedItems,
 				isLoading,
 				paginationInfo,
 				selection: _selection,
@@ -111,6 +151,9 @@ export default function DataViews< Item >( {
 				setOpenedFilter,
 				getItemId,
 				density,
+				onPinItem,
+				onUnpinItem,
+				pinnedItems: combinedPinnedItems,
 			} }
 		>
 			<div className="dataviews-wrapper">
