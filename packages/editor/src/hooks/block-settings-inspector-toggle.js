@@ -50,7 +50,7 @@ const BlockInspectorToggle = () => {
 				icon={ isRTL() ? drawerLeft : drawerRight }
 				aria-disabled={ isOpen }
 			>
-				{ __( 'Open Block settings' ) }
+				{ __( 'Block settings' ) }
 			</MenuItem>
 		</BlockSettingsMenuFirstItem>
 	);
