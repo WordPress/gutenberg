@@ -1,7 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
-import { apiFetch } from '../core';
+import apiFetch from '..';
 
 /**
  * Apply query arguments to both URL and Path, whichever is present.
@@ -10,40 +15,11 @@ import { apiFetch } from '../core';
  * @param {Record<string, string | number>}    queryArgs
  * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
-const modifyQuery = ( { path, url, ...options }, queryArgs ) => {
-	/** @type {import('../types').APIFetchOptions} */
-	const result = {
-		...options,
-	};
-
-	if ( url ) {
-		try {
-			const u = new URL( url );
-			for ( const [ key, value ] of Object.entries( queryArgs ) ) {
-				u.searchParams.set( key, String( value ) );
-			}
-			console.log( { url, href: u.href } );
-			result.url = u.href;
-		} catch {
-			const u = new URL( url, 'invalid://__placeholder__' );
-			for ( const [ key, value ] of Object.entries( queryArgs ) ) {
-				u.searchParams.set( key, String( value ) );
-			}
-			console.log( { url, pathname: u.pathname } );
-			result.url = u.pathname;
-		}
-	}
-
-	if ( path ) {
-		const u = new URL( path, 'invalid://__placeholder__' );
-		for ( const [ key, value ] of Object.entries( queryArgs ) ) {
-			u.searchParams.set( key, String( value ) );
-		}
-		result.path = u.pathname;
-	}
-
-	return result;
-};
+const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
+	...options,
+	url: url && addQueryArgs( url, queryArgs ),
+	path: path && addQueryArgs( path, queryArgs ),
+} );
 
 /**
  * Duplicates parsing functionality from apiFetch.
@@ -98,7 +74,7 @@ const requestContainsUnboundedQuery = ( options ) => {
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-export const fetchAllMiddleware = async ( options, next ) => {
+const fetchAllMiddleware = async ( options, next ) => {
 	if ( options.parse === false ) {
 		// If a consumer has opted out of parsing, do not apply middleware.
 		return next( options );
@@ -148,3 +124,5 @@ export const fetchAllMiddleware = async ( options, next ) => {
 	}
 	return mergedResults;
 };
+
+export default fetchAllMiddleware;

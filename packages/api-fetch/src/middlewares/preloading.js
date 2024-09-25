@@ -1,15 +1,16 @@
 /**
  * WordPress dependencies
  */
+import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
 
 /**
  * @param {Record<string, any>} preloadedData
  * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
-export function createPreloadingMiddleware( preloadedData ) {
+function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.fromEntries(
 		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
-			path,
+			normalizePath( path ),
 			data,
 		] )
 	);
@@ -18,13 +19,22 @@ export function createPreloadingMiddleware( preloadedData ) {
 		const { parse = true } = options;
 		/** @type {string | void} */
 		let rawPath = options.path;
+		if ( ! rawPath && options.url ) {
+			const { rest_route: pathFromQuery, ...queryArgs } = getQueryArgs(
+				options.url
+			);
+
+			if ( typeof pathFromQuery === 'string' ) {
+				rawPath = addQueryArgs( pathFromQuery, queryArgs );
+			}
+		}
 
 		if ( typeof rawPath !== 'string' ) {
 			return next( options );
 		}
 
 		const method = options.method || 'GET';
-		const path = rawPath;
+		const path = normalizePath( rawPath );
 
 		if ( 'GET' === method && cache[ path ] ) {
 			const cacheData = cache[ path ];
@@ -68,3 +78,5 @@ function prepareResponse( responseData, parse ) {
 			  } )
 	);
 }
+
+export default createPreloadingMiddleware;

@@ -1,7 +1,7 @@
 /**
  * @type {import('../types').APIFetchMiddleware}
  */
-export const namespaceEndpointMiddleware = ( options, next ) => {
+const namespaceAndEndpointMiddleware = ( options, next ) => {
 	let path = options.path;
 	let namespaceTrimmed, endpointTrimmed;
 
@@ -26,3 +26,5 @@ export const namespaceEndpointMiddleware = ( options, next ) => {
 		path,
 	} );
 };
+
+export default namespaceAndEndpointMiddleware;

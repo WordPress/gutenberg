@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-//import { __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ function isMediaUploadRequest( options ) {
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-export const mediaUploadMiddleware = ( options, next ) => {
+const mediaUploadMiddleware = ( options, next ) => {
 	if ( ! isMediaUploadRequest( options ) ) {
 		return next( options );
 	}
@@ -80,8 +80,9 @@ export const mediaUploadMiddleware = ( options, next ) => {
 					if ( options.parse !== false ) {
 						return Promise.reject( {
 							code: 'post_process',
-							message:
-								'Media upload failed. If this is a photo or a large image, please scale it down and try again.',
+							message: __(
+								'Media upload failed. If this is a photo or a large image, please scale it down and try again.'
+							),
 						} );
 					}
 
@@ -94,3 +95,5 @@ export const mediaUploadMiddleware = ( options, next ) => {
 			parseResponseAndNormalizeError( response, options.parse )
 		);
 };
+
+export default mediaUploadMiddleware;
