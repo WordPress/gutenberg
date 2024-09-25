@@ -25,6 +25,7 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
+import { __ } from '@wordpress/i18n';
 
 type ItemWithId = { id: string };
 
@@ -135,13 +136,48 @@ export default function DataViews< Item >( {
 		} );
 	}, [ data, getItemId, combinedPinnedItems ] );
 
+	const createDefaultActions = useCallback(
+		( callback: ( items: Item[], context: any ) => void ) => {
+			return [
+				{
+					id: 'pin',
+					label: __( 'Pin' ),
+					callback: ( items: Item[], context: any ) => {
+						items.forEach( ( item ) =>
+							onPinItem( getItemId( item ) )
+						);
+						callback( items, context );
+					},
+				},
+				{
+					id: 'unpin',
+					label: __( 'Unpin' ),
+					callback: ( items: Item[], context: any ) => {
+						items.forEach( ( item ) =>
+							onUnpinItem( getItemId( item ) )
+						);
+						callback( items, context );
+					},
+				},
+			];
+		},
+		[ getItemId, onPinItem, onUnpinItem ]
+	);
+
+	const actionsWithDefaultActions = useMemo( () => {
+		const defaultActions = createDefaultActions(
+			( items, context ) => context.onActionPerformed?.( items )
+		);
+		return [ ...defaultActions, ...actions ];
+	}, [ actions, createDefaultActions ] );
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
 				view,
 				onChangeView,
 				fields: _fields,
-				actions,
+				actions: actionsWithDefaultActions,
 				data: dataWithPinnedItems,
 				isLoading,
 				paginationInfo,
