@@ -33,7 +33,9 @@ export {
 } from './autocomplete';
 export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
+	/** @deprecated Import `BorderBoxControl` instead. */
 	BorderBoxControl as __experimentalBorderBoxControl,
+	BorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
 	isDefinedBorder as __experimentalIsDefinedBorder,
 	isEmptyBorder as __experimentalIsEmptyBorder,
