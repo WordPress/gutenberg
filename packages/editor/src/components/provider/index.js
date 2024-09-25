@@ -188,24 +188,21 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the slug.
 			if ( post.type === 'wp_template' ) {
-				const [ kind ] = post.slug.split( '-' );
-				switch ( kind ) {
-					case 'page':
-						if ( ! post.is_custom ) {
-							postContext.postType = 'page';
-						}
-						break;
-					case 'single':
-						// Infer the post type from the slug.
-						const postTypesSlugs =
-							postTypes?.map( ( entity ) => entity.slug ) || [];
-						const match = post.slug.match(
-							`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
-						);
-						if ( match ) {
-							postContext.postType = match[ 1 ];
-						}
-						break;
+				const themeSlug = post.slug;
+				if ( themeSlug === 'page' ) {
+					postContext.postType = 'page';
+				} else if ( themeSlug === 'single' ) {
+					postContext.postType = 'post';
+				} else if ( themeSlug.split( '-' )[ 0 ] === 'single' ) {
+					// If the slug is single-{postType}, infer the post type from the slug.
+					const postTypesSlugs =
+						postTypes?.map( ( entity ) => entity.slug ) || [];
+					const match = post.slug.match(
+						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
+					);
+					if ( match ) {
+						postContext.postType = match[ 1 ];
+					}
 				}
 			} else if (
 				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
