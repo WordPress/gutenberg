@@ -26,7 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-
+import { unlock } from '../lock-unlock';
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -741,7 +741,7 @@ export const setIsInserterOpened =
 			value.hasOwnProperty( 'rootClientId' ) &&
 			value.hasOwnProperty( 'insertionIndex' )
 		) {
-			return registry.dispatch( blockEditorStore ).setInsertionPoint( {
+			unlock( registry.dispatch( blockEditorStore ) ).setInsertionPoint( {
 				rootClientId: value.rootClientId,
 				index: value.insertionIndex,
 			} );
