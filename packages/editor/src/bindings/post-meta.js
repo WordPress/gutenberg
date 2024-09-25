@@ -56,7 +56,7 @@ function getPostMetaFields( registry, context ) {
 		// Don't include footnotes or private fields.
 		if ( key !== 'footnotes' && key.charAt( 0 ) !== '_' ) {
 			metaFields[ key ] = {
-				label: registeredFields?.[ key ]?.title || key,
+				label: props.title || key,
 				value:
 					// When using the entity value, an empty string IS a valid value.
 					entityMetaValues?.[ key ] ??
