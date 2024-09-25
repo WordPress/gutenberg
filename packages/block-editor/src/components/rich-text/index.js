@@ -188,7 +188,7 @@ export function RichTextWrapper(
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
-					select,
+					registry,
 					context: blockBindingsContext,
 					args: relatedBinding.args,
 				} );

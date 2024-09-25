@@ -99,14 +99,15 @@ export default {
 				meta: newMeta,
 			} );
 	},
-	canUserEditValue( { select, context, args } ) {
+	canUserEditValue( { registry, context, args } ) {
 		// Lock editing in query loop.
 		if ( context?.query || context?.queryId ) {
 			return false;
 		}
 
 		const postType =
-			context?.postType || select( editorStore ).getCurrentPostType();
+			context?.postType ||
+			registry.select( editorStore ).getCurrentPostType();
 
 		// Check that editing is happening in the post editor and not a template.
 		if ( postType === 'wp_template' ) {
@@ -115,28 +116,31 @@ export default {
 
 		// Check that the custom field is not protected and available in the REST API.
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
-		const fieldValue = select( coreDataStore ).getEntityRecord(
-			'postType',
-			postType,
-			context?.postId
-		)?.meta?.[ args.key ];
+		const fieldValue = registry
+			.select( coreDataStore )
+			.getEntityRecord( 'postType', postType, context?.postId )?.meta?.[
+			args.key
+		];
 
 		if ( fieldValue === undefined ) {
 			return false;
 		}
 		// Check that custom fields metabox is not enabled.
-		const areCustomFieldsEnabled =
-			select( editorStore ).getEditorSettings().enableCustomFields;
+		const areCustomFieldsEnabled = registry
+			.select( editorStore )
+			.getEditorSettings().enableCustomFields;
 		if ( areCustomFieldsEnabled ) {
 			return false;
 		}
 
 		// Check that the user has the capability to edit post meta.
-		const canUserEdit = select( coreDataStore ).canUser( 'update', {
-			kind: 'postType',
-			name: context?.postType,
-			id: context?.postId,
-		} );
+		const canUserEdit = registry
+			.select( coreDataStore )
+			.canUser( 'update', {
+				kind: 'postType',
+				name: context?.postType,
+				id: context?.postId,
+			} );
 		if ( ! canUserEdit ) {
 			return false;
 		}
