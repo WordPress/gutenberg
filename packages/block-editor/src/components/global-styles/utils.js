@@ -613,3 +613,19 @@ export function getResolvedValue( ruleValue, tree ) {
 
 	return resolvedValue;
 }
+
+/**
+ * Returns a unique collection of objects by specific property,
+ * preferring the last occurrence of each property value..
+ *
+ * @param {Array<Object>} collection A collection of items.
+ * @param {string}        property   The property to use for uniqueness.
+ * @return {Array<Object>} The filtered collection.
+ */
+export function getUniqueByProperty( collection, property ) {
+	return Array.from(
+		new Map(
+			collection.map( ( item ) => [ item[ property ], item ] )
+		).values()
+	);
+}
