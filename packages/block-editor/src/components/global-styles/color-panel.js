@@ -351,6 +351,56 @@ export default function ColorPanel( {
 			},
 		};
 	}
+	if ( !! settings?.color?.palette?.theme?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				palette: {
+					...settings.color.palette,
+					theme: getUniqueBySlug( settings.color.palette.theme ),
+				},
+			},
+		};
+	}
+	if ( !! settings?.color?.gradients?.theme?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				gradients: {
+					...settings.color.gradients,
+					theme: getUniqueBySlug( settings.color.gradients.theme ),
+				},
+			},
+		};
+	}
+	if ( !! settings?.color?.palette?.default?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				palette: {
+					...settings.color.palette,
+					default: getUniqueBySlug( settings.color.palette.default ),
+				},
+			},
+		};
+	}
+	if ( !! settings?.color?.gradients?.default?.length ) {
+		settings = {
+			...settings,
+			color: {
+				...settings.color,
+				gradients: {
+					...settings.color.gradients,
+					default: getUniqueBySlug(
+						settings.color.gradients.default
+					),
+				},
+			},
+		};
+	}
 
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
