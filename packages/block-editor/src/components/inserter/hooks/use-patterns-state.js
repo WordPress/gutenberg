@@ -11,33 +11,66 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
+import { getParsedPattern } from '../../../store/utils';
 
 /**
  * Retrieves the block patterns inserter state.
  *
  * @param {Function} onInsert         function called when inserter a list of blocks.
  * @param {string=}  rootClientId     Insertion's root client ID.
- *
  * @param {string}   selectedCategory The selected pattern category.
+ * @param {boolean}  isQuick          For the quick inserter render only allowed patterns.
+ *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
-	const { patternCategories, patterns, userPatternCategories } = useSelect(
+const usePatternsState = (
+	onInsert,
+	rootClientId,
+	selectedCategory,
+	isQuick
+) => {
+	const { patternCategories, allPatterns, userPatternCategories } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
+			const {
+				getAllPatterns,
+				getSettings,
+				__experimentalGetAllowedPatterns,
+			} = unlock( select( blockEditorStore ) );
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
 			} = getSettings();
 			return {
-				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				allPatterns: isQuick
+					? __experimentalGetAllowedPatterns()
+					: getAllPatterns(),
 				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
-		[ rootClientId ]
+		[ isQuick ]
+	);
+	const { getClosestAllowedInsertionPointForPattern } = unlock(
+		useSelect( blockEditorStore )
+	);
+
+	const patterns = useMemo(
+		() =>
+			isQuick
+				? allPatterns
+				: allPatterns
+						.filter( ( { inserter = true } ) => !! inserter )
+						.map( ( pattern ) => {
+							return {
+								...pattern,
+								get blocks() {
+									return getParsedPattern( pattern ).blocks;
+								},
+							};
+						} ),
+		[ isQuick, allPatterns ]
 	);
 
 	const allCategories = useMemo( () => {
@@ -58,6 +91,15 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
 		( pattern, blocks ) => {
+			const destinationRootClientId = isQuick
+				? rootClientId
+				: getClosestAllowedInsertionPointForPattern(
+						pattern,
+						rootClientId
+				  );
+			if ( destinationRootClientId === null ) {
+				return;
+			}
 			const patternBlocks =
 				pattern.type === INSERTER_PATTERN_TYPES.user &&
 				pattern.syncStatus !== 'unsynced'
@@ -77,7 +119,9 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 					}
 					return clonedBlock;
 				} ),
-				pattern.name
+				pattern.name,
+				false,
+				destinationRootClientId
 			);
 			createSuccessNotice(
 				sprintf(
@@ -87,11 +131,18 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 				),
 				{
 					type: 'snackbar',
-					id: 'block-pattern-inserted-notice',
+					id: 'inserter-notice',
 				}
 			);
 		},
-		[ createSuccessNotice, onInsert, selectedCategory ]
+		[
+			createSuccessNotice,
+			onInsert,
+			selectedCategory,
+			rootClientId,
+			getClosestAllowedInsertionPointForPattern,
+			isQuick,
+		]
 	);
 
 	return [ patterns, allCategories, onClickPattern ];
