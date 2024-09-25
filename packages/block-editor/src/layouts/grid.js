@@ -13,6 +13,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -74,7 +75,8 @@ export default {
 		// In the experiment we want to also show column control in Auto mode, and
 		// the minimum width control in Manual mode.
 		const showColumnsControl =
-			window.__experimentalEnableGridInteractivity || layout?.columnCount;
+			window.__experimentalEnableGridInteractivity ||
+			!! layout?.columnCount;
 		const showMinWidthControl =
 			window.__experimentalEnableGridInteractivity ||
 			! layout?.columnCount;
@@ -84,19 +86,21 @@ export default {
 					layout={ layout }
 					onChange={ onChange }
 				/>
-				{ showColumnsControl && (
-					<GridLayoutColumnsAndRowsControl
-						layout={ layout }
-						onChange={ onChange }
-						allowSizingOnChildren={ allowSizingOnChildren }
-					/>
-				) }
-				{ showMinWidthControl && (
-					<GridLayoutMinimumWidthControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				) }
+				<VStack spacing={ 4 }>
+					{ showColumnsControl && (
+						<GridLayoutColumnsAndRowsControl
+							layout={ layout }
+							onChange={ onChange }
+							allowSizingOnChildren={ allowSizingOnChildren }
+						/>
+					) }
+					{ showMinWidthControl && (
+						<GridLayoutMinimumWidthControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					) }
+				</VStack>
 			</>
 		);
 	},
@@ -264,6 +268,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
@@ -316,7 +321,7 @@ function GridLayoutColumnsAndRowsControl( {
 									const defaultNewColumnCount =
 										isManualPlacement ? 1 : undefined;
 									const newColumnCount =
-										value === ''
+										value === '' || value === '0'
 											? defaultNewColumnCount
 											: parseInt( value, 10 );
 									onChange( {
@@ -326,7 +331,7 @@ function GridLayoutColumnsAndRowsControl( {
 								} else {
 									// Don't allow unsetting the column count.
 									const newColumnCount =
-										value === ''
+										value === '' || value === '0'
 											? 1
 											: parseInt( value, 10 );
 									onChange( {
@@ -336,7 +341,7 @@ function GridLayoutColumnsAndRowsControl( {
 								}
 							} }
 							value={ columnCount }
-							min={ 0 }
+							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={
 								! window.__experimentalEnableGridInteractivity ||
@@ -354,7 +359,7 @@ function GridLayoutColumnsAndRowsControl( {
 								onChange={ ( value ) => {
 									// Don't allow unsetting the row count.
 									const newRowCount =
-										value === ''
+										value === '' || value === '0'
 											? 1
 											: parseInt( value, 10 );
 									onChange( {
@@ -363,20 +368,24 @@ function GridLayoutColumnsAndRowsControl( {
 									} );
 								} }
 								value={ rowCount }
-								min={ 0 }
+								min={ 1 }
 								label={ __( 'Rows' ) }
 							/>
 						) : (
 							<RangeControl
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
-								value={ columnCount ?? 0 }
+								value={ columnCount ?? 1 }
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,
-										columnCount: value,
+										columnCount:
+											value === '' || value === '0'
+												? 1
+												: value,
 									} )
 								}
-								min={ 0 }
+								min={ 1 }
 								max={ 16 }
 								withInputField={ false }
 								label={ __( 'Columns' ) }

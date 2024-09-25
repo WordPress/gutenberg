@@ -49,6 +49,8 @@ export default function InspectorControlsTabs( {
 							tabId={ tab.name }
 							render={
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									icon={
 										! showIconLabels ? tab.icon : undefined
 									}

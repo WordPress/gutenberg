@@ -4,12 +4,9 @@
 import {
 	createSlotFill,
 	MenuGroup,
-	MenuItem,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { pipe } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +18,7 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-
+import { ModifyContentLockMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
@@ -96,18 +93,12 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							/>
 						) }
 						{ fills }
-						{ fillProps?.canMove &&
-							! fillProps?.onlyBlock &&
-							! isContentOnly && (
-								<MenuItem
-									onClick={ pipe(
-										fillProps?.onClose,
-										fillProps?.onMoveTo
-									) }
-								>
-									{ __( 'Move to' ) }
-								</MenuItem>
-							) }
+						{ selectedClientIds.length === 1 && (
+							<ModifyContentLockMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ fillProps?.count === 1 && ! isContentOnly && (
 							<BlockModeToggle
 								clientId={ fillProps?.firstBlockClientId }

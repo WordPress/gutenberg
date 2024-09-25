@@ -102,6 +102,19 @@ _Returns_
 
 -   `Object`: All block attributes.
 
+### getBlockAttributesNamesByRole
+
+Filter block attributes by `role` and return their names.
+
+_Parameters_
+
+-   _name_ `string`: Block attribute's name.
+-   _role_ `string`: The role of a block attribute.
+
+_Returns_
+
+-   `string[]`: The attribute names that have the provided role.
+
 ### getBlockContent
 
 Given a block object, returns the Block's Inner HTML markup.

@@ -23,7 +23,7 @@ import {
 } from '../../utils/constants';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import usePatterns from './use-patterns';
+import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsHeader from './header';
 import { useEditPostAction } from '../dataviews-actions';
 import {
@@ -136,6 +136,8 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
+	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
+
 	const templatePartActions = usePostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
 		context: 'list',
@@ -175,7 +177,7 @@ export default function DataviewsPatterns() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ data || EMPTY_ARRAY }
+					data={ dataWithPermissions || EMPTY_ARRAY }
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }

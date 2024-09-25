@@ -143,22 +143,22 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__header"
 							aria-label={ mergedLabels.header }
 							initial={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
 							whileHover={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHover'
 									: 'visible'
 							}
 							animate={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeDisabled'
 									: 'visible'
 							}
 							exit={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}

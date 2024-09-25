@@ -7,7 +7,7 @@
 	z-index: z-index(".components-drop-zone");
 	visibility: hidden;
 	opacity: 0;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
 	&.is-active {
 		opacity: 1;

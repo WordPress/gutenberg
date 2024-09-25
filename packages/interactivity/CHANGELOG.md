@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 6.8.0 (2024-09-19)
+
+### Enhancements
+
+-   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
+-   Refactor internal context proxies implementation ([#64713](https://github.com/WordPress/gutenberg/pull/64713)).
+
+### Bug Fixes
+
+-   Prevent calling `proxifyContext` over an already-proxified context inside `wp-context` ([#65090](https://github.com/WordPress/gutenberg/pull/65090)).
+-   Update iterable signals when `deepMerge()` adds new properties ([#65135](https://github.com/WordPress/gutenberg/pull/65135)).
+
+## 6.7.0 (2024-09-05)
+
+### Enhancements
+
+-   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
+
+### Bug Fixes
+
+-   Fix computeds without scope in Firefox ([#64825](https://github.com/WordPress/gutenberg/pull/64825)).
+
+## 6.6.0 (2024-08-21)
+
+### Bug Fixes
+
+-   Fix context inheritance from namespaces different than the current one ([#64677](https://github.com/WordPress/gutenberg/pull/64677)).
+
 ## 6.5.0 (2024-08-07)
 
 ### Enhancements

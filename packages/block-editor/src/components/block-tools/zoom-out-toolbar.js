@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import { dragHandle, trash } from '@wordpress/icons';
+import { dragHandle, trash, edit } from '@wordpress/icons';
 import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -20,18 +15,23 @@ import BlockDraggable from '../block-draggable';
 import BlockMover from '../block-mover';
 import Shuffle from '../block-toolbar/shuffle';
 import NavigableToolbar from '../navigable-toolbar';
+import { unlock } from '../../lock-unlock';
 
-export default function ZoomOutToolbar( { clientId, rootClientId } ) {
+export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
 				getBlock,
-				hasBlockMovingClientId,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
 				canMoveBlock,
+				getSettings,
 			} = select( blockEditorStore );
+
+			const { __experimentalSetIsInserterOpened: setIsInserterOpened } =
+				getSettings();
+
 			const { getBlockType } = select( blocksStore );
 			const { name } = getBlock( clientId );
 			const blockType = getBlockType( name );
@@ -57,37 +57,35 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			}
 
 			return {
-				blockMovingMode: hasBlockMovingClientId(),
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
+				setIsInserterOpened,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId ]
 	);
 
 	const {
-		blockMovingMode,
 		isBlockTemplatePart,
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
+		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock } = useDispatch( blockEditorStore );
-
-	const classNames = clsx( 'zoom-out-toolbar', {
-		'is-block-moving-mode': !! blockMovingMode,
-	} );
+	const { removeBlock, __unstableSetEditorMode, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
 
 	return (
 		<NavigableToolbar
-			className={ classNames }
+			className="zoom-out-toolbar"
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
@@ -124,6 +122,24 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			{ canMove && canRemove && (
 				<Shuffle clientId={ clientId } as={ ToolbarButton } />
 			) }
+
+			{ ! isBlockTemplatePart && (
+				<ToolbarButton
+					className="zoom-out-toolbar-button"
+					icon={ edit }
+					label={ __( 'Edit' ) }
+					onClick={ () => {
+						// Setting may be undefined.
+						if ( typeof setIsInserterOpened === 'function' ) {
+							setIsInserterOpened( false );
+						}
+						__unstableSetEditorMode( 'edit' );
+						resetZoomLevel();
+						__unstableContentRef.current?.focus();
+					} }
+				/>
+			) }
+
 			{ canRemove && ! isBlockTemplatePart && (
 				<ToolbarButton
 					className="zoom-out-toolbar-button"

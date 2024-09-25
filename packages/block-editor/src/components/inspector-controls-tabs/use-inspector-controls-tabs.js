@@ -32,6 +32,7 @@ function getShowTabs( blockName, tabSettings = {} ) {
 export default function useInspectorControlsTabs( blockName ) {
 	const tabs = [];
 	const {
+		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
 		default: defaultGroup,
@@ -64,8 +65,10 @@ export default function useInspectorControlsTabs( blockName ) {
 	// (i.e. both list view and styles), check only the default and position
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
-	const advancedFills =
-		useSlotFills( InspectorAdvancedControls.slotName ) || [];
+	const advancedFills = [
+		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( useSlotFills( bindingsGroup.Slot.__unstableName ) || [] ),
+	];
 
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),

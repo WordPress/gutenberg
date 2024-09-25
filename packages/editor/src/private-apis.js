@@ -9,7 +9,6 @@ import * as interfaceApis from '@wordpress/interface';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
-import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import BackButton from './components/header/back-button';
 import CreateTemplatePartModal from './components/create-template-part-modal';
 import Editor from './components/editor';
@@ -51,7 +50,6 @@ lock( privateApis, {
 	bootstrapBlockBindingsSourcesFromServer,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
-	useBlockEditorSettings,
 	interfaceStore,
 	...remainingInterfaceApis,
 } );

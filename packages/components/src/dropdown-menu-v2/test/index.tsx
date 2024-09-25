@@ -12,14 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuItem,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
-	DropdownMenuGroup,
-} from '..';
+import { DropdownMenuV2 } from '..';
 
 const delay = ( delayInMs: number ) => {
 	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
@@ -29,18 +22,24 @@ describe( 'DropdownMenu', () => {
 	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
 	it( 'should follow the WAI-ARIA spec', async () => {
 		render(
-			<DropdownMenu trigger={ <button>Open dropdown</button> }>
-				<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				<DropdownMenuSeparator />
-				<DropdownMenu
+			<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+				<DropdownMenuV2.Item>Dropdown menu item</DropdownMenuV2.Item>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2
 					trigger={
-						<DropdownMenuItem>Dropdown submenu</DropdownMenuItem>
+						<DropdownMenuV2.Item>
+							Dropdown submenu
+						</DropdownMenuV2.Item>
 					}
 				>
-					<DropdownMenuItem>Dropdown submenu item 1</DropdownMenuItem>
-					<DropdownMenuItem>Dropdown submenu item 2</DropdownMenuItem>
-				</DropdownMenu>
-			</DropdownMenu>
+					<DropdownMenuV2.Item>
+						Dropdown submenu item 1
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>
+						Dropdown submenu item 2
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
+			</DropdownMenuV2>
 		);
 
 		const toggleButton = screen.getByRole( 'button', {
@@ -95,9 +94,11 @@ describe( 'DropdownMenu', () => {
 	describe( 'pointer and keyboard interactions', () => {
 		it( 'should open and focus the menu when clicking the trigger', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item>
+						Dropdown menu item
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			const toggleButton = screen.getByRole( 'button', {
@@ -116,11 +117,13 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem disabled>First item</DropdownMenuItem>
-					<DropdownMenuItem>Second item</DropdownMenuItem>
-					<DropdownMenuItem>Third item</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item disabled>
+						First item
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Second item</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Third item</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			const toggleButton = screen.getByRole( 'button', {
@@ -146,11 +149,13 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem disabled>First item</DropdownMenuItem>
-					<DropdownMenuItem>Second item</DropdownMenuItem>
-					<DropdownMenuItem>Third item</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item disabled>
+						First item
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Second item</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Third item</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			const toggleButton = screen.getByRole( 'button', {
@@ -176,9 +181,11 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should close when pressing the escape key', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item>
+						Dropdown menu item
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			const trigger = screen.getByRole( 'button', {
@@ -205,12 +212,14 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should close when clicking outside of the content', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
+					<DropdownMenuV2.Item>
+						Dropdown menu item
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
@@ -223,12 +232,14 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should close when clicking on a menu item', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-				</DropdownMenu>
+					<DropdownMenuV2.Item>
+						Dropdown menu item
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
@@ -241,14 +252,14 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem hideOnClick={ false }>
+					<DropdownMenuV2.Item hideOnClick={ false }>
 						Dropdown menu item
-					</DropdownMenuItem>
-				</DropdownMenu>
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
@@ -261,14 +272,14 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should not close when clicking on a disabled menu item', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem disabled>
+					<DropdownMenuV2.Item disabled>
 						Dropdown menu item
-					</DropdownMenuItem>
-				</DropdownMenu>
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
@@ -281,28 +292,34 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
-					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
-					<DropdownMenu
+					<DropdownMenuV2.Item>
+						Dropdown menu item 1
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>
+						Dropdown menu item 2
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2
 						trigger={
-							<DropdownMenuItem>
+							<DropdownMenuV2.Item>
 								Dropdown submenu
-							</DropdownMenuItem>
+							</DropdownMenuV2.Item>
 						}
 					>
-						<DropdownMenuItem>
+						<DropdownMenuV2.Item>
 							Dropdown submenu item 1
-						</DropdownMenuItem>
-						<DropdownMenuItem>
+						</DropdownMenuV2.Item>
+						<DropdownMenuV2.Item>
 							Dropdown submenu item 2
-						</DropdownMenuItem>
-					</DropdownMenu>
-					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
-				</DropdownMenu>
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2>
+					<DropdownMenuV2.Item>
+						Dropdown menu item 3
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// Before hover, submenu items are not rendered
@@ -326,28 +343,34 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
 			render(
-				<DropdownMenu
+				<DropdownMenuV2
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
 				>
-					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
-					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
-					<DropdownMenu
+					<DropdownMenuV2.Item>
+						Dropdown menu item 1
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>
+						Dropdown menu item 2
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2
 						trigger={
-							<DropdownMenuItem>
+							<DropdownMenuV2.Item>
 								Dropdown submenu
-							</DropdownMenuItem>
+							</DropdownMenuV2.Item>
 						}
 					>
-						<DropdownMenuItem>
+						<DropdownMenuV2.Item>
 							Dropdown submenu item 1
-						</DropdownMenuItem>
-						<DropdownMenuItem>
+						</DropdownMenuV2.Item>
+						<DropdownMenuV2.Item>
 							Dropdown submenu item 2
-						</DropdownMenuItem>
-					</DropdownMenu>
-					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
-				</DropdownMenu>
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2>
+					<DropdownMenuV2.Item>
+						Dropdown menu item 3
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// The menu is focused automatically when `defaultOpen` is set.
@@ -450,32 +473,32 @@ describe( 'DropdownMenu', () => {
 			const ControlledRadioGroup = () => {
 				const [ radioValue, setRadioValue ] = useState( 'two' );
 				const onRadioChange: React.ComponentProps<
-					typeof DropdownMenuRadioItem
+					typeof DropdownMenuV2.RadioItem
 				>[ 'onChange' ] = ( e ) => {
 					onRadioValueChangeSpy( e.target.value );
 					setRadioValue( e.target.value );
 				};
 				return (
-					<DropdownMenu trigger={ <button>Open dropdown</button> }>
-						<DropdownMenuGroup>
-							<DropdownMenuRadioItem
+					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+						<DropdownMenuV2.Group>
+							<DropdownMenuV2.RadioItem
 								name="radio-test"
 								value="radio-one"
 								checked={ radioValue === 'radio-one' }
 								onChange={ onRadioChange }
 							>
 								Radio item one
-							</DropdownMenuRadioItem>
-							<DropdownMenuRadioItem
+							</DropdownMenuV2.RadioItem>
+							<DropdownMenuV2.RadioItem
 								name="radio-test"
 								value="radio-two"
 								checked={ radioValue === 'radio-two' }
 								onChange={ onRadioChange }
 							>
 								Radio item two
-							</DropdownMenuRadioItem>
-						</DropdownMenuGroup>
-					</DropdownMenu>
+							</DropdownMenuV2.RadioItem>
+						</DropdownMenuV2.Group>
+					</DropdownMenuV2>
 				);
 			};
 
@@ -533,9 +556,9 @@ describe( 'DropdownMenu', () => {
 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
 			const onRadioValueChangeSpy = jest.fn();
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuGroup>
-						<DropdownMenuRadioItem
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Group>
+						<DropdownMenuV2.RadioItem
 							name="radio-test"
 							value="radio-one"
 							onChange={ ( e ) =>
@@ -543,8 +566,8 @@ describe( 'DropdownMenu', () => {
 							}
 						>
 							Radio item one
-						</DropdownMenuRadioItem>
-						<DropdownMenuRadioItem
+						</DropdownMenuV2.RadioItem>
+						<DropdownMenuV2.RadioItem
 							name="radio-test"
 							value="radio-two"
 							defaultChecked
@@ -553,9 +576,9 @@ describe( 'DropdownMenu', () => {
 							}
 						>
 							Radio item two
-						</DropdownMenuRadioItem>
-					</DropdownMenuGroup>
-				</DropdownMenu>
+						</DropdownMenuV2.RadioItem>
+					</DropdownMenuV2.Group>
+				</DropdownMenuV2>
 			);
 
 			// Open dropdown
@@ -617,8 +640,8 @@ describe( 'DropdownMenu', () => {
 					useState< boolean >();
 
 				return (
-					<DropdownMenu trigger={ <button>Open dropdown</button> }>
-						<DropdownMenuCheckboxItem
+					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+						<DropdownMenuV2.CheckboxItem
 							name="item-one"
 							value="item-one-value"
 							checked={ itemOneChecked }
@@ -632,9 +655,9 @@ describe( 'DropdownMenu', () => {
 							} }
 						>
 							Checkbox item one
-						</DropdownMenuCheckboxItem>
+						</DropdownMenuV2.CheckboxItem>
 
-						<DropdownMenuCheckboxItem
+						<DropdownMenuV2.CheckboxItem
 							name="item-two"
 							value="item-two-value"
 							checked={ itemTwoChecked }
@@ -648,8 +671,8 @@ describe( 'DropdownMenu', () => {
 							} }
 						>
 							Checkbox item two
-						</DropdownMenuCheckboxItem>
-					</DropdownMenu>
+						</DropdownMenuV2.CheckboxItem>
+					</DropdownMenuV2>
 				);
 			};
 
@@ -740,8 +763,8 @@ describe( 'DropdownMenu', () => {
 			const onCheckboxValueChangeSpy = jest.fn();
 
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuCheckboxItem
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.CheckboxItem
 						name="item-one"
 						value="item-one-value"
 						onChange={ ( e ) => {
@@ -753,9 +776,9 @@ describe( 'DropdownMenu', () => {
 						} }
 					>
 						Checkbox item one
-					</DropdownMenuCheckboxItem>
+					</DropdownMenuV2.CheckboxItem>
 
-					<DropdownMenuCheckboxItem
+					<DropdownMenuV2.CheckboxItem
 						name="item-two"
 						value="item-two-value"
 						defaultChecked
@@ -768,8 +791,8 @@ describe( 'DropdownMenu', () => {
 						} }
 					>
 						Checkbox item two
-					</DropdownMenuCheckboxItem>
-				</DropdownMenu>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2>
 			);
 
 			// Open dropdown
@@ -858,9 +881,11 @@ describe( 'DropdownMenu', () => {
 		it( 'should be modal by default', async () => {
 			render(
 				<>
-					<DropdownMenu trigger={ <button>Open dropdown</button> }>
-						<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-					</DropdownMenu>
+					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+						<DropdownMenuV2.Item>
+							Dropdown menu item
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2>
 					<button>Button outside of dropdown</button>
 				</>
 			);
@@ -885,12 +910,14 @@ describe( 'DropdownMenu', () => {
 		it( 'should not be modal when the `modal` prop is set to `false`', async () => {
 			render(
 				<>
-					<DropdownMenu
+					<DropdownMenuV2
 						trigger={ <button>Open dropdown</button> }
 						modal={ false }
 					>
-						<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
-					</DropdownMenu>
+						<DropdownMenuV2.Item>
+							Dropdown menu item
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2>
 					<button>Button outside of dropdown</button>
 				</>
 			);
@@ -922,11 +949,11 @@ describe( 'DropdownMenu', () => {
 	describe( 'items prefix and suffix', () => {
 		it( 'should display a prefix on regular items', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem prefix={ <>Item prefix</> }>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item prefix={ <>Item prefix</> }>
 						Dropdown menu item
-					</DropdownMenuItem>
-				</DropdownMenu>
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu
@@ -946,11 +973,11 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should display a suffix on regular items', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem suffix={ <>Item suffix</> }>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item suffix={ <>Item suffix</> }>
 						Dropdown menu item
-					</DropdownMenuItem>
-				</DropdownMenu>
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu
@@ -970,15 +997,15 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should display a suffix on radio items', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuRadioItem
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.RadioItem
 						name="radio-test"
 						value="radio-one"
 						suffix="Radio suffix"
 					>
 						Radio item one
-					</DropdownMenuRadioItem>
-				</DropdownMenu>
+					</DropdownMenuV2.RadioItem>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu
@@ -998,15 +1025,15 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should display a suffix on checkbox items', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuCheckboxItem
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.CheckboxItem
 						name="checkbox-test"
 						value="checkbox-one"
 						suffix="Checkbox suffix"
 					>
 						Checkbox item one
-					</DropdownMenuCheckboxItem>
-				</DropdownMenu>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu
@@ -1028,10 +1055,10 @@ describe( 'DropdownMenu', () => {
 	describe( 'typeahead', () => {
 		it( 'should highlight matching item', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem>One</DropdownMenuItem>
-					<DropdownMenuItem>Two</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item>One</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Two</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu
@@ -1061,10 +1088,10 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should keep previous focus when no matches are found', async () => {
 			render(
-				<DropdownMenu trigger={ <button>Open dropdown</button> }>
-					<DropdownMenuItem>One</DropdownMenuItem>
-					<DropdownMenuItem>Two</DropdownMenuItem>
-				</DropdownMenu>
+				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+					<DropdownMenuV2.Item>One</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>Two</DropdownMenuV2.Item>
+				</DropdownMenuV2>
 			);
 
 			// Click to open the menu

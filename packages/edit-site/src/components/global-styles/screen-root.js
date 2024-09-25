@@ -53,11 +53,15 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card size="small" className="edit-site-global-styles-screen-root">
+		<Card
+			size="small"
+			className="edit-site-global-styles-screen-root"
+			isRounded={ false }
+		>
 			<CardBody>
 				<VStack spacing={ 4 }>
-					<Card>
-						<CardMedia>
+					<Card className="edit-site-global-styles-screen-root__active-style-tile">
+						<CardMedia className="edit-site-global-styles-screen-root__active-style-tile-preview">
 							<PreviewStyles />
 						</CardMedia>
 					</Card>

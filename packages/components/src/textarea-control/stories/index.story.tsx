@@ -54,4 +54,5 @@ Default.args = {
 	__nextHasNoMarginBottom: true,
 	label: 'Text',
 	help: 'Enter some text',
+	placeholder: 'Placeholder',
 };

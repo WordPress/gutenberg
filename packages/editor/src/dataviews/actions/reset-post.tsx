@@ -114,6 +114,7 @@ const resetPost: Action< Post > = {
 				</Text>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
@@ -122,6 +123,7 @@ const resetPost: Action< Post > = {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );

@@ -114,14 +114,13 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element.
-		if ( ownerDocument.activeElement !== element ) {
-			// If it is not, we can stop listening for selection changes. We
-			// resume listening when the element is focused.
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		const containsSelection =
+			element.contains( anchorNode ) &&
+			element.contains( focusNode ) &&
+			ownerDocument.activeElement.contains( element );
+
+		if ( ! containsSelection ) {
 			return;
 		}
 
@@ -255,5 +254,9 @@ export default ( props ) => ( element ) => {
 		element.removeEventListener( 'compositionstart', onCompositionStart );
 		element.removeEventListener( 'compositionend', onCompositionEnd );
 		element.removeEventListener( 'focus', onFocus );
+		ownerDocument.removeEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
 	};
 };

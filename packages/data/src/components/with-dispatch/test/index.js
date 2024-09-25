@@ -58,7 +58,9 @@ describe( 'withDispatch', () => {
 					} );
 				},
 			};
-		} )( ( props ) => <Button onClick={ props.increment } /> );
+		} )( ( props ) => (
+			<Button __next40pxDefaultSize onClick={ props.increment } />
+		) );
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>

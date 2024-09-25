@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { signal, type Signal } from '@preact/signals';
+import { batch, signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -11,9 +11,11 @@ import {
 	getProxyFromObject,
 	getNamespaceFromProxy,
 	shouldProxy,
+	getObjectFromProxy,
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
+import { isPlainObject } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -32,6 +34,19 @@ const proxyToProps: WeakMap<
 	object,
 	Map< string | symbol, PropSignal >
 > = new WeakMap();
+
+/**
+ *  Checks wether a {@link PropSignal | `PropSignal`} instance exists for the
+ *  given property in the passed proxy.
+ *
+ * @param proxy Proxy of a state object or array.
+ * @param key   The property key.
+ * @return `true` when it exists; false otherwise.
+ */
+export const hasPropSignal = ( proxy: object, key: string ) =>
+	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
+
+const readOnlyProxies = new WeakSet();
 
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
@@ -64,8 +79,11 @@ const getPropSignal = (
 			if ( get ) {
 				prop.setGetter( get );
 			} else {
+				const readOnly = readOnlyProxies.has( proxy );
 				prop.setValue(
-					shouldProxy( value ) ? proxifyState( ns, value ) : value
+					shouldProxy( value )
+						? proxifyState( ns, value, { readOnly } )
+						: value
 				);
 			}
 		}
@@ -135,6 +153,9 @@ const stateHandlers: ProxyHandler< object > = {
 		value: unknown,
 		receiver: object
 	): boolean {
+		if ( readOnlyProxies.has( receiver ) ) {
+			return false;
+		}
 		setNamespace( getNamespaceFromProxy( receiver ) );
 		try {
 			return Reflect.set( target, key, value, receiver );
@@ -148,11 +169,15 @@ const stateHandlers: ProxyHandler< object > = {
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
+		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			return false;
+		}
+
 		const isNew = ! ( key in target );
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const receiver = getProxyFromObject( target );
+			const receiver = getProxyFromObject( target )!;
 			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
@@ -186,10 +211,14 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 
 	deleteProperty( target: object, key: string ): boolean {
+		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			return false;
+		}
+
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getPropSignal( getProxyFromObject( target ), key );
+			const prop = getPropSignal( getProxyFromObject( target )!, key );
 			prop.setValue( undefined );
 
 			if ( objToIterable.has( target ) ) {
@@ -217,8 +246,10 @@ const stateHandlers: ProxyHandler< object > = {
  * Returns the proxy associated with the given state object, creating it if it
  * does not exist.
  *
- * @param namespace The namespace that will be associated to this proxy.
- * @param obj       The object to proxify.
+ * @param namespace        The namespace that will be associated to this proxy.
+ * @param obj              The object to proxify.
+ * @param options          Options.
+ * @param options.readOnly Read-only.
  *
  * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
  *         check if a proxy can be created for a specific object.
@@ -227,8 +258,15 @@ const stateHandlers: ProxyHandler< object > = {
  */
 export const proxifyState = < T extends object >(
 	namespace: string,
-	obj: T
-): T => createProxy( namespace, obj, stateHandlers ) as T;
+	obj: T,
+	options?: { readOnly?: boolean }
+): T => {
+	const proxy = createProxy( namespace, obj, stateHandlers ) as T;
+	if ( options?.readOnly ) {
+		readOnlyProxies.add( proxy );
+	}
+	return proxy;
+};
 
 /**
  * Reads the value of the specified property without subscribing to it.
@@ -248,3 +286,90 @@ export const peek = < T extends object, K extends keyof T >(
 		peeking = false;
 	}
 };
+
+/**
+ * Internal recursive implementation for {@link deepMerge | `deepMerge`}.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
+const deepMergeRecursive = (
+	target: any,
+	source: any,
+	override: boolean = true
+) => {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		let hasNewKeys = false;
+		for ( const key in source ) {
+			const isNew = ! ( key in target );
+			hasNewKeys = hasNewKeys || isNew;
+
+			const desc = Object.getOwnPropertyDescriptor( source, key );
+			if (
+				typeof desc?.get === 'function' ||
+				typeof desc?.set === 'function'
+			) {
+				if ( override || isNew ) {
+					Object.defineProperty( target, key, {
+						...desc,
+						configurable: true,
+						enumerable: true,
+					} );
+
+					const proxy = getProxyFromObject( target );
+					if ( desc?.get && proxy && hasPropSignal( proxy, key ) ) {
+						const propSignal = getPropSignal( proxy, key );
+						propSignal.setGetter( desc.get );
+					}
+				}
+			} else if ( isPlainObject( source[ key ] ) ) {
+				if ( isNew ) {
+					target[ key ] = {};
+				}
+
+				deepMergeRecursive( target[ key ], source[ key ], override );
+			} else if ( override || isNew ) {
+				Object.defineProperty( target, key, desc! );
+
+				const proxy = getProxyFromObject( target );
+				if ( desc?.value && proxy && hasPropSignal( proxy, key ) ) {
+					const propSignal = getPropSignal( proxy, key );
+					propSignal.setValue( desc.value );
+				}
+			}
+		}
+
+		if ( hasNewKeys && objToIterable.has( target ) ) {
+			objToIterable.get( target )!.value++;
+		}
+	}
+};
+
+/**
+ * Recursively update prop values inside the passed `target` and nested plain
+ * objects, using the values present in `source`. References to plain objects
+ * are kept, only updating props containing primitives or arrays. Arrays are
+ * replaced instead of merged or concatenated.
+ *
+ * If the `override` parameter is set to `false`, then all values in `target`
+ * are preserved, and only new properties from `source` are added.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
+export const deepMerge = (
+	target: any,
+	source: any,
+	override: boolean = true
+) =>
+	batch( () =>
+		deepMergeRecursive(
+			getObjectFromProxy( target ) || target,
+			source,
+			override
+		)
+	);

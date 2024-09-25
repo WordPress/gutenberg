@@ -55,11 +55,14 @@ export function normalizeFields< Item >(
 		return {
 			...field,
 			label: field.label || field.id,
+			header: field.header || field.label || field.id,
 			getValue,
 			render,
 			sort,
 			isValid,
 			Edit,
+			enableHiding: field.enableHiding ?? true,
+			enableSorting: field.enableSorting ?? true,
 		};
 	} );
 }

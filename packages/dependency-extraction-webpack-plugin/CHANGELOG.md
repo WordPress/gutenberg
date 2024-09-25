@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix a bug where cycles in dependent modules could enter infinite recursion ([#65291](https://github.com/WordPress/gutenberg/pull/65291)).
+
+## 6.8.0 (2024-09-19)
+
+## 6.7.0 (2024-09-05)
+
+## 6.6.0 (2024-08-21)
+
 ## 6.5.0 (2024-08-07)
 
 ## 6.4.0 (2024-07-24)

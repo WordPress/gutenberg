@@ -22,14 +22,15 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__content {
 	background: $white;
-	box-shadow: $shadow-popover-border-default, $shadow-popover;
-	border-radius: $radius-block-ui;
+	box-shadow: $shadow-popover-border-default, $elevation-medium;
+	border-radius: $radius-medium;
 	box-sizing: border-box;
 	width: min-content;
 
-	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+	// Alternate treatment for popovers that put them at elevation zero with high contrast and smaller radius.
 	.is-alternate & {
 		box-shadow: $shadow-popover-border-default-alternate;
+		border-radius: $radius-small;
 	}
 
 	// A style that gives the popover no visible ui.

@@ -37,7 +37,7 @@ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitleAndIcon,
+	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
@@ -66,13 +66,13 @@ const toggleHomeIconVariants = {
 
 const siteIconVariants = {
 	edit: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 	hover: {
 		clipPath: 'inset( 22% round 2px )',
 	},
 	tap: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 };
 
@@ -204,8 +204,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	);
 
 	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const { title, icon } =
-		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+	const title = getEditorCanvasContainerTitle( editorCanvasView );
 
 	const isReady = ! isLoading;
 	const transition = {
@@ -238,7 +237,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
 					title={ title }
-					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -258,6 +256,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
+											__next40pxDefaultSize
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"

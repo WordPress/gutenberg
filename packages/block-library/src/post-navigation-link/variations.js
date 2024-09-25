@@ -15,6 +15,12 @@ const variations = [
 		icon: next,
 		attributes: { type: 'next' },
 		scope: [ 'inserter', 'transform' ],
+		example: {
+			attributes: {
+				label: 'Next post',
+				arrow: 'arrow',
+			},
+		},
 	},
 	{
 		name: 'post-previous',
@@ -25,6 +31,12 @@ const variations = [
 		icon: previous,
 		attributes: { type: 'previous' },
 		scope: [ 'inserter', 'transform' ],
+		example: {
+			attributes: {
+				label: 'Previous post',
+				arrow: 'arrow',
+			},
+		},
 	},
 ];
 

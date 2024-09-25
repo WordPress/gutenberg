@@ -87,6 +87,7 @@ function BlockMover( {
 				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button
+							__next40pxDefaultSize
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
 							label={ __( 'Drag' ) }
