@@ -55,9 +55,10 @@ function gutenberg_test_block_bindings_registration() {
 		'post',
 		'_protected_field',
 		array(
-			'type'    => 'string',
-			'single'  => true,
-			'default' => 'protected field value',
+			'type'         => 'string',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 'protected field value',
 		)
 	);
 	register_meta(

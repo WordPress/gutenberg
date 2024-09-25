@@ -114,14 +114,9 @@ export default {
 			return false;
 		}
 
-		// Check that the custom field is not protected and available in the REST API.
+		const fieldValue = getPostMetaFields( registry, context )?.[ args.key ]
+			?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
-		const fieldValue = registry
-			.select( coreDataStore )
-			.getEntityRecord( 'postType', postType, context?.postId )?.meta?.[
-			args.key
-		];
-
 		if ( fieldValue === undefined ) {
 			return false;
 		}
