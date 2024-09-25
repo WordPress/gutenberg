@@ -117,11 +117,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	overflow-wrap: break-word;
 
 	pointer-events: auto;
-	user-select: text;
 
 	&.is-editing-disabled {
 		pointer-events: none;
-		user-select: none;
 	}
 
 	&.has-negative-margin {
