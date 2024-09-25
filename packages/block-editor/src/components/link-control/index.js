@@ -421,7 +421,6 @@ function LinkControl( {
 									</InputControlSuffixWrapper>
 								)
 							}
-							props
 						/>
 					</div>
 					{ errorMessage && (
