@@ -188,12 +188,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the slug.
 			if ( post.type === 'wp_template' ) {
-				const themeSlug = post.slug;
-				if ( themeSlug === 'page' ) {
+				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
-				} else if ( themeSlug === 'single' ) {
+				} else if ( post.slug === 'single' ) {
 					postContext.postType = 'post';
-				} else if ( themeSlug.split( '-' )[ 0 ] === 'single' ) {
+				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
 					// If the slug is single-{postType}, infer the post type from the slug.
 					const postTypesSlugs =
 						postTypes?.map( ( entity ) => entity.slug ) || [];
