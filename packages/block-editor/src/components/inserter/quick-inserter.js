@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,7 +19,6 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
@@ -84,16 +83,15 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { setInsertionPoint } = unlock( useDispatch( blockEditorStore ) );
-
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
 		setInserterIsOpened( {
 			filterValue,
 			onSelect,
+			rootClientId,
+			insertionIndex,
 		} );
-		setInsertionPoint( { rootClientId, index: insertionIndex } );
 	};
 
 	let maxBlockPatterns = 0;

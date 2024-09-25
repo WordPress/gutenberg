@@ -724,8 +724,8 @@ export function removeEditorPanel( panelName ) {
  *                                              opened (true) or closed (false).
  *                                              To specify an insertion point,
  *                                              use an object.
- * @param {string}         value.rootClientId   Deprecated. The root client ID to insert at.
- * @param {number}         value.insertionIndex Deprecated. The index to insert at.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
  * @param {string}         value.filterValue    A query to filter the inserter results.
  * @param {Function}       value.onSelect       A callback when an item is selected.
  * @param {string}         value.tab            The tab to open in the inserter.

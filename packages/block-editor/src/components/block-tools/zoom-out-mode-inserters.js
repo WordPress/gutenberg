@@ -51,9 +51,7 @@ function ZoomOutModeInserters() {
 	}, [] );
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { showInsertionPoint, setInsertionPoint } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { showInsertionPoint } = unlock( useDispatch( blockEditorStore ) );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -98,10 +96,8 @@ function ZoomOutModeInserters() {
 							setInserterIsOpened( {
 								tab: 'patterns',
 								category: 'all',
-							} );
-							setInsertionPoint( {
 								rootClientId: sectionRootClientId,
-								index,
+								insertionIndex: index,
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',
