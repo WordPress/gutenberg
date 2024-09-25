@@ -32,8 +32,6 @@
 		@include button-style__focus();
 	}
 
-	// Focus + hover.
-	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&[data-focus-visible] {
 		@include button-style__focus();
 	}
