@@ -10,6 +10,7 @@
 ### Enhancements
 
 -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
 
 ## 28.8.0 (2024-09-19)
 
