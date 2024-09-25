@@ -1,14 +1,17 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-console */
+
 /**
  * Internal dependencies
  */
-import { createNonceMiddleware } from './middlewares/nonce';
-import { createRootURLMiddleware } from './middlewares/root-url';
-import { createPreloadingMiddleware } from './middlewares/preloading';
-import { fetchAllMiddleware } from './middlewares/fetch-all-middleware';
-import { mediaUploadMiddleware } from './middlewares/media-upload';
-import { createThemePreviewMiddleware } from './middlewares/theme-preview';
-import { apiFetch, setFetchHandler } from './core';
-import { registerMiddleware } from './middlewares/singleton';
+import { createNonceMiddleware } from '../middlewares/nonce';
+import { createRootURLMiddleware } from '../middlewares/root-url';
+import { createPreloadingMiddleware } from '../middlewares/preloading';
+import { fetchAllMiddleware } from '../middlewares/fetch-all-middleware';
+import { mediaUploadMiddleware } from '../middlewares/media-upload';
+import { createThemePreviewMiddleware } from '../middlewares/theme-preview';
+import { apiFetch, setFetchHandler } from '../core';
+import { registerMiddleware } from '../middlewares/singleton';
 
 if ( typeof document !== 'undefined' ) {
 	const el = document.getElementById(
@@ -38,7 +41,6 @@ if ( typeof document !== 'undefined' ) {
 			}
 			if ( config.themePreviewPath ) {
 				registerMiddleware(
-					// @ts-expect-error This is wrong, done for testing.
 					createThemePreviewMiddleware( config.themePreviewPath )
 				);
 			}

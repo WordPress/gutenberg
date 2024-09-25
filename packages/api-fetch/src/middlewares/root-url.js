@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import namespaceAndEndpointMiddleware from './namespace-endpoint';
+import { namespaceAndEndpointMiddleware } from './namespace-endpoint';
 
 /**
  * @param {string} rootURL
  * @return {import('../types').APIFetchMiddleware} Root URL middleware.
  */
-const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {
+export const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {
 	return namespaceAndEndpointMiddleware( options, ( optionsWithPath ) => {
 		let url = optionsWithPath.url;
 		let path = optionsWithPath.path;
@@ -40,5 +40,3 @@ const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {
 		} );
 	} );
 };
-
-export default createRootURLMiddleware;

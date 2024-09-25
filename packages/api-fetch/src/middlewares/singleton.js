@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { fetchAllMiddleware } from './fetch-all-middleware';
-import { namespaceEndpointMiddleware } from './namespace-endpoint';
+import { namespaceAndEndpointMiddleware } from './namespace-endpoint';
 import { httpV1Middleware } from './http-v1';
 import { userLocaleMiddleware } from './user-locale';
 
@@ -11,7 +11,7 @@ import { userLocaleMiddleware } from './user-locale';
  */
 export const middlewares = [
 	userLocaleMiddleware,
-	namespaceEndpointMiddleware,
+	namespaceAndEndpointMiddleware,
 	httpV1Middleware,
 	fetchAllMiddleware,
 ];
