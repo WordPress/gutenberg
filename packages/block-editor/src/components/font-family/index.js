@@ -21,8 +21,12 @@ export default function FontFamilyControl( {
 	...props
 } ) {
 	const [ blockLevelFontFamilies ] = useSettings( 'typography.fontFamilies' );
-	if ( ! fontFamilies ) {
-		fontFamilies = blockLevelFontFamilies;
+	if ( ! fontFamilies && blockLevelFontFamilies !== undefined ) {
+		const { theme, custom } = blockLevelFontFamilies;
+		fontFamilies = theme !== undefined ? theme : [];
+		if ( custom !== undefined ) {
+			fontFamilies = [ ...fontFamilies, ...custom ];
+		}
 	}
 
 	if ( ! fontFamilies || fontFamilies.length === 0 ) {
