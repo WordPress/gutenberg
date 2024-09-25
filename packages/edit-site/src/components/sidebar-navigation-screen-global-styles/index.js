@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useViewportMatch } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -19,6 +18,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import { MainSidebarNavigationContent } from '../sidebar-navigation-screen-main';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -71,7 +71,6 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -129,6 +128,7 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					'Choose a different style combination for the theme styles.'
 				) }
 				backPath={ backPath }
+				content={ <MainSidebarNavigationContent isStylesSelected /> }
 				footer={
 					shouldShowGlobalStylesFooter && (
 						<SidebarNavigationScreenDetailsFooter
