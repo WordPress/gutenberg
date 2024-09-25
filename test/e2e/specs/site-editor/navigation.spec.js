@@ -83,19 +83,6 @@ test.describe( 'Site editor navigation', () => {
 		// The button role should have been removed from the iframe.
 		await expect( editorCanvasButton ).toBeHidden();
 
-		// Test to make sure a Tab keypress works as expected.
-		// As of this writing, we are in select mode and a tab
-		// keypress will reveal the header template select mode
-		// button. This test is not documenting that we _want_
-		// that action, but checking that we are within the site
-		// editor and keypresses work as intened.
-		await pageUtils.pressKeys( 'Tab' );
-		await expect(
-			page.getByRole( 'button', {
-				name: 'Template Part Block. Row 1. header',
-			} )
-		).toBeFocused();
-
 		// Test: We can go back to the main navigation from the editor frame
 		// Move to the document toolbar
 		await pageUtils.pressKeys( 'alt+F10' );

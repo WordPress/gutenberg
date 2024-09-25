@@ -37,13 +37,13 @@ export type BoxControlProps = Pick<
 	/**
 	 * Props for the internal `UnitControl` components.
 	 *
-	 * @default `{ min: 0 }`
+	 * @default { min: 0 }
 	 */
 	inputProps?: UnitControlPassthroughProps;
 	/**
 	 * Heading label for the control.
 	 *
-	 * @default `__( 'Box Control' )`
+	 * @default __( 'Box Control' )
 	 */
 	label?: string;
 	/**
@@ -53,7 +53,7 @@ export type BoxControlProps = Pick<
 	/**
 	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
 	 *
-	 * @default `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
+	 * @default { top: undefined, right: undefined, bottom: undefined, left: undefined }
 	 */
 	resetValues?: BoxControlValue;
 	/**
