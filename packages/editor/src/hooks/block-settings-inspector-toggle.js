@@ -11,9 +11,8 @@ import { __, isRTL } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 
 /**
- * Override the default edit UI to include a new block inspector control for
- * assigning a partial syncing controls to supported blocks in the pattern editor.
- * Currently, only the `core/paragraph` block is supported.
+ * Override the default edit UI to include a new block options menu item
+ * to toggle the block's inspector controls open.
  *
  * @param {Component} BlockEdit Original component.
  *
