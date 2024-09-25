@@ -474,69 +474,45 @@ export function getExpandedBlock( state ) {
  * with the provided client ID.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
-				result = current;
-			}
+export const getContentLockingParent = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blockListSettings,
-		state.settings.templateLock,
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID of the parent section block.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getParentSectionBlock = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( isSectionBlock( state, current ) ) {
-				result = current;
-			}
+export const getParentSectionBlock = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( isSectionBlock( state, current ) ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockListSettings,
-		state.editorMode,
-		state.settings.templateLock,
-		state.blocks.byClientId,
-		getSectionRootClientId( state ),
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID is a content locking parent
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {boolean} Whether the block is a content locking parent.
  */
