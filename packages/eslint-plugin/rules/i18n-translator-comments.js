@@ -54,7 +54,9 @@ module.exports = {
 					return;
 				}
 
-				const comments = context.getCommentsBefore( node ).slice();
+				const comments = context.sourceCode
+					.getCommentsBefore( node )
+					.slice();
 
 				let parentNode = parent;
 
@@ -70,7 +72,9 @@ module.exports = {
 					parentNode.type !== 'Program' &&
 					Math.abs( parentNode.loc.start.line - currentLine ) <= 1
 				) {
-					comments.push( ...context.getCommentsBefore( parentNode ) );
+					comments.push(
+						...context.sourceCode.getCommentsBefore( parentNode )
+					);
 					parentNode = parentNode.parent;
 				}
 
