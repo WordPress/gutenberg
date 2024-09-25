@@ -18,9 +18,9 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { titleField } from '../../fields';
-import type { BasePost, CoreDataError } from '../../types';
-import { getItemTitle } from '../utils';
+import { titleField } from '../fields';
+import type { BasePost, CoreDataError } from '../types';
+import { getItemTitle } from './utils';
 
 const fields = [ titleField ];
 const formDuplicateAction = {
