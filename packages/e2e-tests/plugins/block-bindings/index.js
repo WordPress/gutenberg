@@ -7,26 +7,48 @@ const { unlock } =
 const { registerBlockBindingsSource } = unlock( wp.blocks.privateApis );
 const { fieldsList } = window.testingBindings || {};
 
-const testingSource = {
-	name: 'testing/custom-source',
-	label: 'Custom Source',
-	getValues: ( { bindings } ) => {
-		const newValues = {};
-		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			newValues[ attributeName ] = fieldsList[ source.args.key ]?.value;
-		}
-		return newValues;
-	},
-	setValues: ( { bindings } ) => {
-		Object.values( bindings ).forEach( () => {
-			// UPDATE SETTINGS.
-		} );
-	},
-	canUserEditValues: () => true,
-	getFieldsList: () => fieldsList,
+const getValues = ( { bindings } ) => {
+	const newValues = {};
+	for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
+		newValues[ attributeName ] = fieldsList[ source.args.key ]?.value;
+	}
+	return newValues;
+};
+const setValues = ( { bindings } ) => {
+	Object.values( bindings ).forEach( () => {
+		// UPDATE SETTINGS.
+	} );
 };
 
-registerBlockBindingsSource( testingSource );
+registerBlockBindingsSource( {
+	name: 'testing/custom-source',
+	label: 'Custom Source',
+	getValues,
+	setValues,
+	getFieldsList: () => fieldsList,
+} );
+
+registerBlockBindingsSource( {
+	name: 'testing/can-user-edit-false',
+	label: 'Can User Edit: False',
+	getValues,
+	setValues,
+	canUserEditValue: () => false,
+} );
+
+registerBlockBindingsSource( {
+	name: 'testing/can-user-edit-undefined',
+	label: 'Can User Edit: Undefined',
+	getValues,
+	setValues,
+} );
+
+registerBlockBindingsSource( {
+	name: 'testing/set-values-undefined',
+	label: 'Set Values: Undefined',
+	getValues,
+	canUserEditValue: () => true,
+} );
 
 // SERVER SOURCE.
 // CLIENT ONLY SOURCE.

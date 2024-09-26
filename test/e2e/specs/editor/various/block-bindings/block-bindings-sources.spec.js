@@ -260,22 +260,84 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
+	// Utils that will be used in all the scenarios where the block has to lock the controls.
+	async function testParagraphControlsAreLocked( { source, editor, page } ) {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'paragraph default content',
+				metadata: {
+					bindings: {
+						content: {
+							source,
+							args: { key: 'text_field' },
+						},
+					},
+				},
+			},
+		} );
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraphBlock.click();
+
+		// Alignment controls exist.
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Align text' } )
+		).toBeVisible();
+
+		// Format controls don't exist.
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', {
+					name: 'Bold',
+				} )
+		).toBeHidden();
+
+		// Paragraph is not editable.
+		await expect( paragraphBlock ).toHaveAttribute(
+			'contenteditable',
+			'false'
+		);
+	}
+
 	test.describe( 'canUserEditValue returns false', () => {
-		test( 'should lock paragraph editing', async () => {} );
+		test( 'should lock paragraph editing', async ( { editor, page } ) => {
+			await testParagraphControlsAreLocked( {
+				source: 'testing/can-user-edit-false',
+				editor,
+				page,
+			} );
+		} );
 		test( 'should lock heading editing', async () => {} );
 		test( 'should lock button editing and controls', async () => {} );
 		test( 'should lock image editing and controls', async () => {} );
 	} );
 
 	test.describe( 'canUserEditValue not defined', () => {
-		test( 'should lock paragraph editing', async () => {} );
+		test( 'should lock paragraph editing', async ( { editor, page } ) => {
+			await testParagraphControlsAreLocked( {
+				source: 'testing/can-user-edit-undefined',
+				editor,
+				page,
+			} );
+		} );
 		test( 'should lock heading editing', async () => {} );
 		test( 'should lock button editing and controls', async () => {} );
 		test( 'should lock image editing and controls', async () => {} );
 	} );
 
 	test.describe( 'setValues is not defined', () => {
-		test( 'should lock paragraph editing', async () => {} );
+		test( 'should lock paragraph editing', async ( { editor, page } ) => {
+			await testParagraphControlsAreLocked( {
+				source: 'testing/set-values-undefined',
+				editor,
+				page,
+			} );
+		} );
 		test( 'should lock heading editing', async () => {} );
 		test( 'should lock button editing and controls', async () => {} );
 		test( 'should lock image editing and controls', async () => {} );
