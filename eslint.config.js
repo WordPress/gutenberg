@@ -694,4 +694,20 @@ module.exports = [
 			'react/react-in-jsx-scope': 'error',
 		},
 	},
+	{
+		files: [ 'platform-docs/**' ],
+		settings: {
+			react: {
+				pragma: 'React',
+				version: 'detect',
+				flowVersion: '0.92.0',
+			},
+			'import/resolver': require.resolve(
+				'./tools/eslint/import-resolver'
+			),
+		},
+		rules: {
+			'import/no-unresolved': 'off',
+		},
+	},
 ];
