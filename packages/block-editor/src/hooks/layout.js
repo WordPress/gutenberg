@@ -313,25 +313,25 @@ export default {
 	},
 };
 
-function LayoutTypeSwitcher( { key, onChange } ) {
+function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
 			isBlock
-			label={ __( 'Layout Type Select' ) }
+			label={ __( 'Layout type' ) }
 			__nextHasNoMarginBottom
 			hideLabelFromVision
 			isAdaptiveWidth
+			value={ type }
+			onChange={ onChange }
 		>
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
 					<ToggleGroupControlOption
+						key={ name }
 						value={ name }
-						label={ name }
-						onClick={ () => onChange( name ) }
-					>
-						{ label }
-					</ToggleGroupControlOption>
+						label={ label }
+					/>
 				);
 			} ) }
 		</ToggleGroupControl>
