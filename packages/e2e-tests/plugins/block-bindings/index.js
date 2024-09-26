@@ -25,6 +25,15 @@ registerBlockBindingsSource( {
 } );
 
 registerBlockBindingsSource( {
+	name: 'testing/set-values',
+	label: 'Set Values',
+	getValues,
+	setValues,
+	canUserEditValue: () => true,
+	getFieldsList: () => fieldsList,
+} );
+
+registerBlockBindingsSource( {
 	name: 'testing/can-user-edit-false',
 	label: 'Can User Edit: False',
 	getValues,

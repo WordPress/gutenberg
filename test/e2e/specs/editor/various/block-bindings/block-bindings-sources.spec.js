@@ -941,12 +941,216 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'RichText workflows', () => {
-		test( 'should add empty paragraph block when pressing enter in paragraph', async () => {} );
-		test( 'should add empty paragraph block when pressing enter in heading', async () => {} );
-		test( 'should add empty button block when pressing enter in button', async () => {} );
-		test( 'should show placeholder prompt when value is empty and can edit', async () => {} );
-		test( 'should show `getFieldsList` label or the source label when value is empty and cannot edit', async () => {} );
-		test( 'should show placeholder attribute over bindings placeholder', async () => {} );
+		test( 'should add empty paragraph block when pressing enter in paragraph', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/set-values',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			// Select the paragraph and press Enter at the end of it.
+			const paragraph = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await editor.selectBlocks( paragraph );
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+			const [ initialParagraph, newEmptyParagraph ] = await editor.canvas
+				.locator( '[data-type="core/paragraph"]' )
+				.all();
+			await expect( initialParagraph ).toHaveText( 'Text Field Value' );
+			await expect( newEmptyParagraph ).toHaveText( '' );
+			await expect( newEmptyParagraph ).toBeEditable();
+		} );
+		test( 'should add empty paragraph block when pressing enter in heading', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					anchor: 'heading-binding',
+					content: 'heading default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/set-values',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+
+			// Select the heading and press Enter at the end of it.
+			const heading = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			await editor.selectBlocks( heading );
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+			// Can't use `editor.getBlocks` because it doesn't return the meta value shown in the editor.
+			const [ initialHeading, newEmptyParagraph ] = await editor.canvas
+				.locator( '[data-block]' )
+				.all();
+			// First block should be the original block.
+			await expect( initialHeading ).toHaveAttribute(
+				'data-type',
+				'core/heading'
+			);
+			await expect( initialHeading ).toHaveText( 'Text Field Value' );
+			// Second block should be an empty paragraph block.
+			await expect( newEmptyParagraph ).toHaveAttribute(
+				'data-type',
+				'core/paragraph'
+			);
+			await expect( newEmptyParagraph ).toHaveText( '' );
+			await expect( newEmptyParagraph ).toBeEditable();
+		} );
+		test( 'should add empty button block when pressing enter in button', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							anchor: 'button-text-binding',
+							text: 'button default text',
+							url: '#default-url',
+							metadata: {
+								bindings: {
+									text: {
+										source: 'testing/set-values',
+										args: { key: 'text_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.getByRole( 'textbox' )
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+			const [ initialButton, newEmptyButton ] = await editor.canvas
+				.locator( '[data-type="core/button"]' )
+				.all();
+			// First block should be the original block.
+			await expect( initialButton ).toHaveText( 'Text Field Value' );
+			// Second block should be an empty paragraph block.
+			await expect( newEmptyButton ).toHaveText( '' );
+			await expect( newEmptyButton ).toBeEditable();
+		} );
+		test( 'should show placeholder prompt when value is empty and can edit', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/set-values',
+								args: { key: 'empty_field' },
+							},
+						},
+					},
+				},
+			} );
+
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				// Aria-label is changed for empty paragraphs.
+				name: 'Empty empty_field; start writing to edit its value',
+			} );
+
+			await expect( paragraphBlock ).toBeEmpty();
+
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
+				'data-rich-text-placeholder',
+				'Add Empty Field Label'
+			);
+		} );
+		test( 'should show `getFieldsList` label or the source label when value is empty and cannot edit', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/get-fields-list',
+								args: { key: 'empty_field' },
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				// Aria-label is changed for empty paragraphs.
+				name: 'empty_field',
+			} );
+			await expect( paragraphBlock ).toBeEmpty();
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
+				'data-rich-text-placeholder',
+				'Empty Field Label'
+			);
+		} );
+		test( 'should show placeholder attribute over bindings placeholder', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					placeholder: 'My custom placeholder',
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/get-fields-list',
+								args: { key: 'empty_field' },
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				// Aria-label is changed for empty paragraphs.
+				name: 'empty_field',
+			} );
+
+			await expect( paragraphBlock ).toBeEmpty();
+
+			const placeholder = paragraphBlock.locator( 'span' );
+			await expect( placeholder ).toHaveAttribute(
+				'data-rich-text-placeholder',
+				'My custom placeholder'
+			);
+		} );
 	} );
 
 	test( 'should show the label of a source only registered in the server in blocks connected', async () => {} );

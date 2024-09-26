@@ -18,13 +18,17 @@ function gutenberg_test_block_bindings_registration() {
 	$upload_dir  = wp_upload_dir();
 	$testing_url = $upload_dir['url'] . '/1024x768_e2e_test_image_size.jpeg';
 	$fields_list = array(
-		'text_field' => array(
+		'text_field'  => array(
 			'label' => 'Text Field Label',
 			'value' => 'Text Field Value',
 		),
-		'url_field'  => array(
+		'url_field'   => array(
 			'label' => 'URL Field Label',
 			'value' => $testing_url,
+		),
+		'empty_field' => array(
+			'label' => 'Empty Field Label',
+			'value' => '',
 		),
 	);
 
