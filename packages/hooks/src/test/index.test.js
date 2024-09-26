@@ -983,6 +983,40 @@ describe( 'async filter', () => {
 		expect( sqrt ).toHaveBeenCalledTimes( 1 );
 		expect( plus1 ).not.toHaveBeenCalled();
 	} );
+
+	test( 'is correctly tracked by doingFilter and didFilter', async () => {
+		addFilter( 'test.async.filter', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter' ) ).toBe( true );
+			return value;
+		} );
+
+		expect( doingFilter( 'test.async.filter' ) ).toBe( false );
+		expect( didFilter( 'test.async.filter' ) ).toBe( 0 );
+		await applyFiltersAsync( 'test.async.filter', 0 );
+		expect( doingFilter( 'test.async.filter' ) ).toBe( false );
+		expect( didFilter( 'test.async.filter' ) ).toBe( 1 );
+	} );
+
+	test( 'is correctly tracked when multiple filters run at once', async () => {
+		addFilter( 'test.async.filter1', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter1' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			return value;
+		} );
+		addFilter( 'test.async.filter2', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter2' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			return value;
+		} );
+
+		await Promise.all( [
+			applyFiltersAsync( 'test.async.filter1', 0 ),
+			applyFiltersAsync( 'test.async.filter2', 0 ),
+		] );
+	} );
 } );
 
 describe( 'async action', () => {
@@ -1026,5 +1060,36 @@ describe( 'async action', () => {
 			'aborting'
 		);
 		expect( outputs ).toEqual( [] );
+	} );
+
+	test( 'is correctly tracked by doingAction and didAction', async () => {
+		addAction( 'test.async.action', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action' ) ).toBe( true );
+		} );
+
+		expect( doingAction( 'test.async.action' ) ).toBe( false );
+		expect( didAction( 'test.async.action' ) ).toBe( 0 );
+		await doActionAsync( 'test.async.action', 0 );
+		expect( doingAction( 'test.async.action' ) ).toBe( false );
+		expect( didAction( 'test.async.action' ) ).toBe( 1 );
+	} );
+
+	test( 'is correctly tracked when multiple actions run at once', async () => {
+		addAction( 'test.async.action1', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action1' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+		} );
+		addAction( 'test.async.action2', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action2' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+		} );
+
+		await Promise.all( [
+			doActionAsync( 'test.async.action1', 0 ),
+			doActionAsync( 'test.async.action2', 0 ),
+		] );
 	} );
 } );
