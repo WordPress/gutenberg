@@ -13,7 +13,7 @@ import complementaryAreaContext from '../complementary-area-context';
 /**
  * Whether the role supports checked state.
  *
- * @param {HTMLElement['role']} role Role.
+ * @param {import('react').AriaRole} role Role.
  * @return {boolean} Whether the role supports checked state.
  * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
  */
