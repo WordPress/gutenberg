@@ -747,7 +747,7 @@ export const setIsInserterOpened =
 			} );
 		}
 
-		return dispatch( {
+		dispatch( {
 			type: 'SET_IS_INSERTER_OPENED',
 			value,
 		} );
