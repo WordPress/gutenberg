@@ -14,7 +14,7 @@ import {
 	NavigatorButton,
 	NavigatorBackButton,
 	useNavigator,
-} from '..';
+} from '../legacy';
 import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof NavigatorProvider > = {

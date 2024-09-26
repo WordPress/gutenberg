@@ -21,7 +21,7 @@ import {
 	NavigatorBackButton,
 	NavigatorToParentButton,
 	useNavigator,
-} from '..';
+} from '../legacy';
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {

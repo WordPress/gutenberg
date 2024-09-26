@@ -131,7 +131,7 @@ export {
 	NavigatorBackButton as __experimentalNavigatorBackButton,
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 	useNavigator as __experimentalUseNavigator,
-} from './navigator';
+} from './navigator/legacy';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
