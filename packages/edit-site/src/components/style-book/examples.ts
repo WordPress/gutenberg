@@ -10,22 +10,16 @@ import {
 } from '@wordpress/blocks';
 
 /**
- * blockExamples object.
- *
- * @typedef {Object} blockExamples
- *
- * @property {string} name     Block name, e.g., "core/paragraph".
- * @property {string} title    Block title/label.
- * @property {string} category Block category.
- * @property {Object} blocks   Block object.
+ * Internal dependencies
  */
+import type { BlockExample } from './types';
 
 /**
  * Returns a list of examples for registered block types.
  *
- * @return {Array<blockExamples>} An array of block examples.
+ * @return {BlockExample[]} An array of block examples.
  */
-export function getExamples() {
+export function getExamples(): BlockExample[] {
 	const nonHeadingBlockExamples = getBlockTypes()
 		.filter( ( blockType ) => {
 			const { name, example, supports } = blockType;
@@ -41,7 +35,6 @@ export function getExamples() {
 			category: blockType.category,
 			blocks: getBlockFromExample( blockType.name, blockType.example ),
 		} ) );
-
 	const isHeadingBlockRegistered = !! getBlockType( 'core/heading' );
 
 	if ( ! isHeadingBlockRegistered ) {

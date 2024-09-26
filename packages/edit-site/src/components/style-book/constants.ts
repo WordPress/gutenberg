@@ -3,7 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 
-export const STYLE_BOOK_THEME_SUBCATEGORIES = [
+/**
+ * Internal dependencies
+ */
+import type { StyleBookCategory } from './types';
+
+export const STYLE_BOOK_THEME_SUBCATEGORIES: Omit<
+	StyleBookCategory,
+	'subcategories'
+>[] = [
 	{
 		slug: 'site-identity',
 		title: __( 'Site Identity' ),
@@ -53,7 +61,7 @@ export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 	},
 ];
 
-export const STYLE_BOOK_CATEGORIES = [
+export const STYLE_BOOK_CATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'text',
 		title: __( 'Text' ),
