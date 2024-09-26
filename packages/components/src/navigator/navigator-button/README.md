@@ -12,7 +12,7 @@ The component accepts the following props:
 
 ### `attributeName`: `string`
 
-The HTML attribute used to identify the `NavigatorButton`, which is used by `Navigator` to restore focus.
+The HTML attribute used to identify the `Navigator.Button`, which is used by `Navigator` to restore focus.
 
 -   Required: No
 -   Default: `id`
@@ -31,4 +31,4 @@ The path of the screen to navigate to. The value of this prop needs to be [a val
 
 ### Inherited props
 
-`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+`Navigator.Button` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
