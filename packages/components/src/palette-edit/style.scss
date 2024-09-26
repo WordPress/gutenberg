@@ -7,3 +7,15 @@
 		width: 100%;
 	}
 }
+.components-palette-edit__warning {
+	margin: $grid-unit-20 0 $grid-unit-10 0;
+	padding: $grid-unit-10 $grid-unit-15;
+	border-left: 4px solid $alert-yellow;
+	background-color: lighten($alert-yellow, 35%);
+	.components-palette-edit__edit_palette_button {
+		margin-left: $grid-unit-05;
+	}
+}
+.components-palette-edit__name-input.is-duplicate {
+	border: 1px solid $alert-red;
+}

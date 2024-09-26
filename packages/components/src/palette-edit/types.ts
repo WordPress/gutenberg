@@ -109,6 +109,7 @@ export type NameInputProps = {
 	label: string;
 	onChange: ( nextName?: PaletteElement[ 'name' ] ) => void;
 	value: PaletteElement[ 'name' ];
+	className?: string;
 };
 
 export type OptionProps< T extends Color | Gradient > = {
@@ -120,6 +121,7 @@ export type OptionProps< T extends Color | Gradient > = {
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	slugPrefix: string;
+	isDuplicate: boolean;
 };
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
