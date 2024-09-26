@@ -39,7 +39,7 @@ For example:
 
 ### Height and animations
 
-Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
+Due to how `Navigator.Screen` animations work, it is recommended that the `Navigator` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
 
 ## Props
 
