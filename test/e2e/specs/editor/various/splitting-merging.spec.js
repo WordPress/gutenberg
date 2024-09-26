@@ -374,7 +374,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 	} );
 
 	// Fix for https://github.com/WordPress/gutenberg/issues/65174.
-	test( 'should handle unwrapping and merging blocks', async ( {
+	test( 'should handle unwrapping and merging blocks with empty contents', async ( {
 		editor,
 		page,
 	} ) => {
