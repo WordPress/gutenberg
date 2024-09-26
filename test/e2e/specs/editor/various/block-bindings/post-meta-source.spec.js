@@ -44,7 +44,7 @@ test.describe( 'Post Meta source', () => {
 								content: {
 									source: 'core/post-meta',
 									args: {
-										key: 'field_with_label_and_default',
+										key: 'movie_field',
 									},
 								},
 							},
@@ -71,7 +71,7 @@ test.describe( 'Post Meta source', () => {
 								content: {
 									source: 'core/post-meta',
 									args: {
-										key: 'field_with_label_and_default',
+										key: 'movie_field',
 									},
 								},
 							},
@@ -153,7 +153,7 @@ test.describe( 'Post Meta source', () => {
 								content: {
 									source: 'core/post-meta',
 									args: {
-										key: 'field_with_label_and_default',
+										key: 'movie_field',
 									},
 								},
 							},
@@ -208,7 +208,7 @@ test.describe( 'Post Meta source', () => {
 								content: {
 									source: 'core/post-meta',
 									args: {
-										key: 'field_with_label_and_default',
+										key: 'movie_field',
 									},
 								},
 							},
@@ -313,7 +313,6 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
-			await page.pause();
 			// Check the fields registered by other sources are there.
 			const customSourceField = page
 				.getByRole( 'menuitemradio' )
@@ -358,14 +357,195 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Movie CPT post', () => {
 		test.beforeEach( async ( { admin } ) => {
 			// CHECK HOW TO CREATE A MOVIE.
-			await admin.createNewPost( { title: 'Test bindings' } );
+			await admin.createNewPost( {
+				postType: 'movie',
+				title: 'Test bindings',
+			} );
 		} );
 
-		test( 'should show the custom field value of that specific post', async () => {} );
-		test( 'should fall back to the key when custom field is not accessible', async () => {} );
-		test( 'should not show or edit the value of a protected field', async () => {} );
-		test( 'should not show or edit the value of a field with `show_in_rest` set to false', async () => {} );
-		test( 'should be possible to edit the value of the connected custom fields', async () => {} );
-		test( 'should be possible to connect movie fields through the attributes panel', async () => {} );
+		test( 'should show the custom field value of that specific post', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'movie_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText(
+				'Movie field default value'
+			);
+		} );
+		test( 'should fall back to the key when custom field is not accessible', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'unaccessible_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'unaccessible_field' );
+			await expect( paragraphBlock ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+		} );
+		test( 'should not show or edit the value of a protected field', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: '_protected_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( '_protected_field' );
+			await expect( paragraphBlock ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+		} );
+		test( 'should not show or edit the value of a field with `show_in_rest` set to false', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'show_in_rest_false_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText(
+				'show_in_rest_false_field'
+			);
+			await expect( paragraphBlock ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+		} );
+		test( 'should be possible to edit the value of the connected custom fields', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					anchor: 'connected-paragraph',
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'movie_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText(
+				'Movie field default value'
+			);
+			await expect( paragraphBlock ).toHaveAttribute(
+				'contenteditable',
+				'true'
+			);
+			await paragraphBlock.fill( 'new value' );
+			// Check that the paragraph content attribute didn't change.
+			const [ paragraphBlockObject ] = await editor.getBlocks();
+			expect( paragraphBlockObject.attributes.content ).toBe(
+				'fallback content'
+			);
+			// Check the value of the custom field is being updated by visiting the frontend.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-paragraph' )
+			).toHaveText( 'new value' );
+		} );
+		test( 'should be possible to connect movie fields through the attributes panel', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'movie_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			await page
+				.getByRole( 'button', {
+					name: 'content',
+				} )
+				.click();
+			const movieField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'Movie field label' } );
+			await expect( movieField ).toBeVisible();
+		} );
 	} );
 } );

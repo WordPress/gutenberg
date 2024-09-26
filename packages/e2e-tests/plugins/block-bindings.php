@@ -109,7 +109,7 @@ function gutenberg_test_block_bindings_registration() {
 	// Register CPT custom fields.
 	register_meta(
 		'post',
-		'field_with_label_and_default',
+		'movie_field',
 		array(
 			'label'          => 'Movie field label',
 			'default'        => 'Movie field default value',
