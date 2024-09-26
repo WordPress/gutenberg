@@ -56,7 +56,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-values',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -85,7 +85,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-values',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -118,11 +118,11 @@ test.describe( 'Registered sources', () => {
 							metadata: {
 								bindings: {
 									text: {
-										source: 'testing/get-values',
+										source: 'testing/complete-source',
 										args: { key: 'text_field' },
 									},
 									url: {
-										source: 'testing/get-values',
+										source: 'testing/complete-source',
 										args: { key: 'url_field' },
 									},
 								},
@@ -152,11 +152,11 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							url: {
-								source: 'testing/get-values',
+								source: 'testing/complete-source',
 								args: { key: 'url_field' },
 							},
 							alt: {
-								source: 'testing/get-values',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -504,7 +504,7 @@ test.describe( 'Registered sources', () => {
 		} );
 		test( 'setValues is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
-				source: 'testing/set-values-undefined',
+				source: 'testing/complete-source-undefined',
 				editor,
 				page,
 			} );
@@ -896,7 +896,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-fields-list',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -926,7 +926,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-fields-list',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -952,7 +952,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/set-values',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -985,7 +985,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/set-values',
+								source: 'testing/complete-source',
 								args: { key: 'text_field' },
 							},
 						},
@@ -1034,7 +1034,7 @@ test.describe( 'Registered sources', () => {
 							metadata: {
 								bindings: {
 									text: {
-										source: 'testing/set-values',
+										source: 'testing/complete-source',
 										args: { key: 'text_field' },
 									},
 								},
@@ -1071,7 +1071,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/set-values',
+								source: 'testing/complete-source',
 								args: { key: 'empty_field' },
 							},
 						},
@@ -1092,7 +1092,7 @@ test.describe( 'Registered sources', () => {
 				'Add Empty Field Label'
 			);
 		} );
-		test( 'should show `getFieldsList` label or the source label when value is empty and cannot edit', async ( {
+		test( 'should show source label when value is empty, cannot edit, and `getFieldsList` is undefined', async ( {
 			editor,
 		} ) => {
 			await editor.insertBlock( {
@@ -1102,7 +1102,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-fields-list',
+								source: 'testing/can-user-edit-false',
 								args: { key: 'empty_field' },
 							},
 						},
@@ -1117,7 +1117,7 @@ test.describe( 'Registered sources', () => {
 			const placeholder = paragraphBlock.locator( 'span' );
 			await expect( placeholder ).toHaveAttribute(
 				'data-rich-text-placeholder',
-				'Empty Field Label'
+				'Can User Edit: False'
 			);
 		} );
 		test( 'should show placeholder attribute over bindings placeholder', async ( {
@@ -1131,7 +1131,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/get-fields-list',
+								source: 'testing/complete-source',
 								args: { key: 'empty_field' },
 							},
 						},

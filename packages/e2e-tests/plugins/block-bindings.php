@@ -55,9 +55,9 @@ function gutenberg_test_block_bindings_registration() {
 
 	// Register custom block bindings sources.
 	register_block_bindings_source(
-		'testing/get-values',
+		'testing/complete-source',
 		array(
-			'label'              => 'Get Values',
+			'label'              => 'Complete Source',
 			'get_value_callback' => function ( $source_args ) use ( $fields_list ) {
 				if ( ! isset( $source_args['key'] ) || ! isset( $fields_list[ $source_args['key'] ] ) ) {
 					return null;
@@ -137,4 +137,4 @@ function gutenberg_test_block_bindings_registration() {
 		)
 	);
 }
-	add_action( 'init', 'gutenberg_test_block_bindings_registration' );
+add_action( 'init', 'gutenberg_test_block_bindings_registration' );

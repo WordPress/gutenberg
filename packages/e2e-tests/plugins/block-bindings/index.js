@@ -19,14 +19,8 @@ const setValues = () => {
 };
 
 registerBlockBindingsSource( {
-	name: 'testing/get-values',
-	label: 'Get Values',
-	getValues,
-} );
-
-registerBlockBindingsSource( {
-	name: 'testing/set-values',
-	label: 'Set Values',
+	name: 'testing/complete-source',
+	label: 'Complete Source',
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
@@ -53,11 +47,4 @@ registerBlockBindingsSource( {
 	label: 'Set Values: Undefined',
 	getValues,
 	canUserEditValue: () => true,
-} );
-
-registerBlockBindingsSource( {
-	name: 'testing/get-fields-list',
-	label: 'Get Fields List',
-	getValues,
-	getFieldsList: () => fieldsList,
 } );
