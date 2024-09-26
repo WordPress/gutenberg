@@ -18,16 +18,6 @@
 	}
 }
 
-// Make the spacing consistent between controls in the vertical toolbar, only in zoom out.
-.zoom-out-toolbar-popover {
-	.components-accessible-toolbar,
-	.components-toolbar {
-		.components-button {
-			height: 40px;
-		}
-	}
-}
-
 .components-accessible-toolbar,
 .components-toolbar {
 
