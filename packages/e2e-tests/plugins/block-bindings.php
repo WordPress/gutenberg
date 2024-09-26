@@ -85,55 +85,75 @@ function gutenberg_test_block_bindings_registration() {
 		)
 	);
 
-	// Register custom fields.
+	// Register global custom fields.
 	register_meta(
 		'post',
 		'text_custom_field',
 		array(
+			'default'      => 'Value of the text custom field',
 			'show_in_rest' => true,
 			'type'         => 'string',
-			'single'       => true,
-			'default'      => 'Value of the text custom field',
 		)
 	);
 	register_meta(
 		'post',
 		'url_custom_field',
 		array(
+			'default'      => '#url-custom-field',
 			'show_in_rest' => true,
 			'type'         => 'string',
-			'single'       => true,
-			'default'      => '#url-custom-field',
+		)
+	);
+	// Register CPT custom fields.
+	register_meta(
+		'post',
+		'field_with_label_and_default',
+		array(
+			'label'          => 'Field label',
+			'default'        => 'Field default value',
+			'object_subtype' => 'movie',
+			'show_in_rest'   => true,
+			'single'         => true,
+			'type'           => 'string',
 		)
 	);
 	register_meta(
 		'post',
-		'empty_field',
+		'field_with_only_label',
 		array(
-			'show_in_rest' => true,
-			'type'         => 'string',
-			'single'       => true,
-			'default'      => '',
+			'label'          => 'Field label',
+			'object_subtype' => 'movie',
+			'show_in_rest'   => true,
+			'type'           => 'string',
+		)
+	);
+	register_meta(
+		'post',
+		'field_without_label_or_default',
+		array(
+			'object_subtype' => 'movie',
+			'show_in_rest'   => true,
+			'type'           => 'string',
 		)
 	);
 	register_meta(
 		'post',
 		'_protected_field',
 		array(
-			'type'         => 'string',
-			'show_in_rest' => true,
-			'single'       => true,
-			'default'      => 'protected field value',
+			'default'        => 'Protected field value',
+			'object_subtype' => 'movie',
+			'show_in_rest'   => true,
+			'type'           => 'string',
 		)
 	);
 	register_meta(
 		'post',
 		'show_in_rest_false_field',
 		array(
-			'show_in_rest' => false,
-			'type'         => 'string',
-			'single'       => true,
-			'default'      => 'show_in_rest false field value',
+			'default'        => 'show_in_rest false field value',
+			'object_subtype' => 'movie',
+			'show_in_rest'   => false,
+			'type'           => 'string',
 		)
 	);
 }

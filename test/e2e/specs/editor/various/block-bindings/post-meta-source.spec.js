@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -35,14 +31,115 @@ test.describe( 'Post Meta source', () => {
 			await editor.openDocumentSettingsSidebar();
 		} );
 
-		test.describe( 'Block attribues', () => {
-			test( 'should not be possible to edit connected blocks', async () => {} );
-			test( 'should show the default value if it is defined', async () => {} );
-			test( 'should fall back to the field label if the default value is not defined', async () => {} );
-			test( 'should fall back to the field key if the field label is not defined', async () => {} );
+		test.describe( 'Block attributes', () => {
+			test( 'should not be possible to edit connected blocks', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_with_label_and_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+			test( 'should show the default value if it is defined', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_with_label_and_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Field default value'
+				);
+			} );
+			test( 'should fall back to the field label if the default value is not defined', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_with_only_label',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Field default label'
+				);
+			} );
+			test( 'should fall back to the field key if the field label is not defined', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_without_label_or_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'field_without_label_or_default'
+				);
+			} );
 		} );
 
-		test.describe( 'Attribues panel', () => {
+		test.describe( 'Attributes panel', () => {
 			test( 'should show the default value if it is defined', async () => {} );
 			test( 'should fall back to the field label if the default value is not defined', async () => {} );
 			test( 'should fall back to the field key if the field label is not defined', async () => {} );
