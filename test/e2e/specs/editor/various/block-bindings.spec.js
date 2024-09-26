@@ -11,7 +11,9 @@ test.describe( 'Block bindings', () => {
 	let imagePlaceholderSrc;
 	let imageCustomFieldSrc;
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.activateTheme(
+			'gutenberg-test-themes/block-bindings'
+		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
 		const placeholderMedia = await requestUtils.uploadMedia(
@@ -33,7 +35,7 @@ test.describe( 'Block bindings', () => {
 	test.describe( 'Template context', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'emptytheme//index',
+				postId: 'gutenberg-test-themes/block-bindings//single-post',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
