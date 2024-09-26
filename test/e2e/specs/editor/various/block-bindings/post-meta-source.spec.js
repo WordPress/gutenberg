@@ -31,7 +31,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.openDocumentSettingsSidebar();
 		} );
 
-		test.describe( 'Block attributes', () => {
+		test.describe( 'Block attributes values', () => {
 			test( 'should not be possible to edit connected blocks', async ( {
 				editor,
 			} ) => {
@@ -138,9 +138,58 @@ test.describe( 'Post Meta source', () => {
 		} );
 
 		test.describe( 'Attributes panel', () => {
-			test( 'should show the default value if it is defined', async () => {} );
-			test( 'should fall back to the field label if the default value is not defined', async () => {} );
-			test( 'should fall back to the field key if the field label is not defined', async () => {} );
+			test( 'should show the field label if it is defined', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_with_label_and_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const contentBinding = page.getByRole( 'button', {
+					name: 'content',
+				} );
+				await expect( contentBinding ).toContainText( 'Field label' );
+			} );
+			test( 'should fall back to the field key if the field label is not defined', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_without_label_or_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				const contentBinding = page.getByRole( 'button', {
+					name: 'content',
+				} );
+				await expect( contentBinding ).toContainText(
+					'field_without_label_or_default'
+				);
+			} );
 		} );
 
 		test.describe( 'Fields list dropdown', () => {

@@ -121,21 +121,9 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
-		'field_with_only_label_2',
-		array(
-			'label'          => 'Field label',
-			'object_subtype' => 'movie',
-			'show_in_rest'   => true,
-			'single'         => true,
-			'type'           => 'string',
-		)
-	);
-	register_meta(
-		'post',
 		'field_with_only_label',
 		array(
 			'label'          => 'Field label',
-			'default'        => '',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
 			'single'         => true,
