@@ -8,6 +8,24 @@
  */
 
 /**
+ * Registers a custom script for the plugin.
+ */
+function enqueue_block_bindings_plugin_script() {
+	wp_enqueue_script(
+		'gutenberg-test-block-bindings',
+		plugins_url( 'block-bindings/index.js', __FILE__ ),
+		array(
+			'wp-blocks',
+			'wp-private-apis',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
+		true
+	);
+}
+
+add_action( 'init', 'enqueue_block_bindings_plugin_script' );
+
+/**
 * Register custom fields and custom block bindings sources.
 */
 function gutenberg_test_block_bindings_registration() {
