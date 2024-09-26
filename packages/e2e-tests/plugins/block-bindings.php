@@ -111,8 +111,8 @@ function gutenberg_test_block_bindings_registration() {
 		'post',
 		'field_with_label_and_default',
 		array(
-			'label'          => 'Field label',
-			'default'        => 'Field default value',
+			'label'          => 'Movie field label',
+			'default'        => 'Movie field default value',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
 			'single'         => true,
@@ -123,7 +123,7 @@ function gutenberg_test_block_bindings_registration() {
 		'post',
 		'field_with_only_label',
 		array(
-			'label'          => 'Field label',
+			'label'          => 'Field with only label',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
 			'single'         => true,

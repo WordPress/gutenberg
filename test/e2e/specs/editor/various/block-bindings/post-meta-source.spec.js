@@ -82,7 +82,7 @@ test.describe( 'Post Meta source', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					'Field default value'
+					'Movie field default value'
 				);
 			} );
 			test( 'should fall back to the field label if the default value is not defined', async ( {
@@ -107,7 +107,9 @@ test.describe( 'Post Meta source', () => {
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
-				await expect( paragraphBlock ).toHaveText( 'Field label' );
+				await expect( paragraphBlock ).toHaveText(
+					'Field with only label'
+				);
 			} );
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
@@ -161,7 +163,9 @@ test.describe( 'Post Meta source', () => {
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
-				await expect( contentBinding ).toContainText( 'Field label' );
+				await expect( contentBinding ).toContainText(
+					'Movie field label'
+				);
 			} );
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
@@ -193,11 +197,84 @@ test.describe( 'Post Meta source', () => {
 		} );
 
 		test.describe( 'Fields list dropdown', () => {
-			test( 'should show the default value if it is defined', async () => {} );
-			test( 'should not show anything if the default value is not defined', async () => {} );
-			test( 'should include movie fields in UI to connect attributes', async () => {} );
-			test( 'should include global fields in UI to connect attributes', async () => {} );
-			test( 'should not include protected fields', async () => {} );
+			// Insert block and open the dropdown for every test.
+			test.beforeEach( async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_with_label_and_default',
+									},
+								},
+							},
+						},
+					},
+				} );
+				await page
+					.getByRole( 'button', {
+						name: 'content',
+					} )
+					.click();
+			} );
+
+			test( 'should include movie fields in UI to connect attributes', async ( {
+				page,
+			} ) => {
+				const movieField = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'Movie field label' } );
+				await expect( movieField ).toBeVisible();
+			} );
+			test( 'should include global fields in UI to connect attributes', async ( {
+				page,
+			} ) => {
+				const globalField = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'text_custom_field' } );
+				await expect( globalField ).toBeVisible();
+			} );
+			test( 'should not include protected fields', async ( { page } ) => {
+				// Ensure the fields have loaded by checking the field is visible.
+				const globalField = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'text_custom_field' } );
+				await expect( globalField ).toBeVisible();
+				// Check the protected fields are not visible.
+				const protectedField = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: '_protected_field' } );
+				await expect( protectedField ).toBeHidden();
+				const showInRestFalseField = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'show_in_rest_false_field' } );
+				await expect( showInRestFalseField ).toBeHidden();
+			} );
+			test( 'should show the default value if it is defined', async ( {
+				page,
+			} ) => {
+				const fieldButton = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'Movie field label' } );
+				await expect( fieldButton ).toContainText(
+					'Movie field default value'
+				);
+			} );
+			test( 'should not show anything if the default value is not defined', async ( {
+				page,
+			} ) => {
+				const fieldButton = page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'Field with only label' } );
+				// Check it only contains the field label.
+				await expect( fieldButton ).toHaveText(
+					'Field with only label'
+				);
+			} );
 		} );
 	} );
 
