@@ -368,8 +368,8 @@ function MetaBoxesMain( { isLegacy } ) {
 		<Pane aria-label={ paneLabel } { ...paneProps }>
 			{ isShort ? (
 				<button
+					aria-expanded={ isOpen }
 					className="edit-post-meta-boxes-main__presenter"
-					aria-label={ __( 'Expand or collapse meta boxes pane' ) }
 					onClick={ toggle }
 				>
 					{ paneLabel }
