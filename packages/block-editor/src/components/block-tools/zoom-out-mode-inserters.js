@@ -94,10 +94,10 @@ function ZoomOutModeInserters() {
 						isVisible={ isSelected || isHovered }
 						onClick={ () => {
 							setInserterIsOpened( {
-								tab: 'patterns',
-								category: 'all',
 								rootClientId: sectionRootClientId,
 								insertionIndex: index,
+								tab: 'patterns',
+								category: 'all',
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',
