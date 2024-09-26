@@ -32,6 +32,7 @@ import {
 	PinterestIcon,
 	PocketIcon,
 	RedditIcon,
+	SignalIcon,
 	SkypeIcon,
 	SnapchatIcon,
 	SoundCloudIcon,
@@ -240,6 +241,12 @@ const variations = [
 		attributes: { service: 'reddit' },
 		title: 'Reddit',
 		icon: RedditIcon,
+	},
+	{
+		name: 'signal',
+		attributes: { service: 'signal' },
+		title: 'Signal',
+		icon: SignalIcon,
 	},
 	{
 		name: 'skype',
