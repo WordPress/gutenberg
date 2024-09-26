@@ -572,11 +572,8 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: { content: 'test' },
+			attributes: { content: '<strong>test</strong>' },
 		} );
-		await pageUtils.pressKeys( 'primary+a' );
-		await pageUtils.pressKeys( 'primary+b' );
-		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' );
 		await pageUtils.pressKeys( 'shift+ArrowRight' );
