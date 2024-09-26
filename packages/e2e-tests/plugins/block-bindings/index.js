@@ -14,17 +14,14 @@ const getValues = ( { bindings } ) => {
 	}
 	return newValues;
 };
-const setValues = ( { bindings } ) => {
-	Object.values( bindings ).forEach( () => {
-		// UPDATE SETTINGS.
-	} );
+const setValues = () => {
+	// DO NOTHING
 };
 
 registerBlockBindingsSource( {
 	name: 'testing/custom-source',
 	label: 'Custom Source',
 	getValues,
-	setValues,
 	getFieldsList: () => fieldsList,
 } );
 
@@ -49,6 +46,3 @@ registerBlockBindingsSource( {
 	getValues,
 	canUserEditValue: () => true,
 } );
-
-// SERVER SOURCE.
-// CLIENT ONLY SOURCE.
