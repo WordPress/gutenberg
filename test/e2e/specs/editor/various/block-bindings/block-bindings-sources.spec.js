@@ -1153,7 +1153,48 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
-	test( 'should show the label of a source only registered in the server in blocks connected', async () => {} );
-	test( 'should lock editing when connected to an undefined source', async () => {} );
-	test( 'should show an "Invalid source" warning for not registered sources', async () => {} );
+	test( 'should show the label of a source only registered in the server in blocks connected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				metadata: {
+					bindings: {
+						content: {
+							source: 'testing/server-only-source',
+						},
+					},
+				},
+			},
+		} );
+
+		const contentButton = page.getByRole( 'button', {
+			name: 'content',
+		} );
+		await expect( contentButton ).toContainText( 'Server Source' );
+	} );
+	test( 'should show an "Invalid source" warning for not registered sources', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				metadata: {
+					bindings: {
+						content: {
+							source: 'testing/undefined-source',
+						},
+					},
+				},
+			},
+		} );
+
+		const contentButton = page.getByRole( 'button', {
+			name: 'content',
+		} );
+		await expect( contentButton ).toContainText( 'Invalid source' );
+	} );
 } );
