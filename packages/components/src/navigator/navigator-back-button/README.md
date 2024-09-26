@@ -1,6 +1,6 @@
 # `Navigator.BackButton`
 
-The `Navigator.BackButton` component can be used to navigate to a screen and should be used in combination with the [`Navigator`](/packages/components/src/navigator/navigator/README.md), the [`Navigator.Screen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) components, and the `useNavigator` hook.
+The `Navigator.BackButton` component can be used to navigate to a screen and should be used in combination with the [`Navigator`](/packages/components/src/navigator/navigator/README.md), the [`Navigator.Screen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) components.
 
 ## Usage
 

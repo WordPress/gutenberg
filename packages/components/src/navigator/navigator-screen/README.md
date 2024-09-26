@@ -1,6 +1,6 @@
 # `Navigator.Screen`
 
-The `Navigator.Screen` component represents a single view/screen/panel and should be used in combination with the [`Navigator`](/packages/components/src/navigator/navigator/README.md), the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and the [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components, and the `useNavigator` hook.
+The `Navigator.Screen` component represents a single view/screen/panel and should be used in combination with the [`Navigator`](/packages/components/src/navigator/navigator/README.md), the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and the [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components.
 
 ## Usage
 

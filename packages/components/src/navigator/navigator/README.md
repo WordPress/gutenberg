@@ -1,6 +1,6 @@
 # `Navigator`
 
-The `Navigator` component allows rendering nested views/panels/menus (via the [`Navigator.Screen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different views (via the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook).
+The `Navigator` component allows rendering nested views/panels/menus (via the [`Navigator.Screen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between them (via the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components).
 
 ## Usage
 

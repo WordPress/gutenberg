@@ -9,9 +9,8 @@ export { useNavigator } from './use-navigator';
 
 /**
  * The `Navigator` component allows rendering nested views/panels/menus
- * (via the `Navigator.Screen` component) and navigate between these different
- * views (via the `Navigator.Button` and `Navigator.BackButton` components or
- * the `useNavigator` hook).
+ * (via the `Navigator.Screen` component) and navigate between them
+ * (via the `Navigator.Button` and `Navigator.BackButton` components).
  *
  * ```jsx
  * import { Navigator } from '@wordpress/components';
@@ -39,7 +38,7 @@ export const Navigator = Object.assign( TopLevelNavigator, {
 	/**
 	 * The `Navigator.Screen` component represents a single view/screen/panel and
 	 * should be used in combination with the `Navigator`, the `Navigator.Button`
-	 * and the `Navigator.BackButton` components, and the `useNavigator` hook.
+	 * and the `Navigator.BackButton` components.
 	 *
 	 * @example
 	 * ```jsx
@@ -70,7 +69,7 @@ export const Navigator = Object.assign( TopLevelNavigator, {
 	/**
 	 * The `Navigator.Button` component can be used to navigate to a screen and
 	 * should be used in combination with the `Navigator`, the `Navigator.Screen`
-	 * and the `Navigator.BackButton` components, and the `useNavigator` hook.
+	 * and the `Navigator.BackButton` components.
 	 *
 	 * @example
 	 * ```jsx
@@ -101,7 +100,7 @@ export const Navigator = Object.assign( TopLevelNavigator, {
 	/**
 	 * The `Navigator.BackButton` component can be used to navigate to a screen and
 	 * should be used in combination with the `Navigator`, the `Navigator.Screen`
-	 * and the `Navigator.Button` components, and the `useNavigator` hook.
+	 * and the `Navigator.Button` components.
 	 *
 	 * @example
 	 * ```jsx
