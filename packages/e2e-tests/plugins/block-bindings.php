@@ -38,6 +38,18 @@ function gutenberg_test_block_bindings_registration() {
 		)
 	);
 
+	// Register "movie" custom post type.
+	register_post_type(
+		'movie',
+		array(
+			'label'        => 'Movie',
+			'public'       => true,
+			'supports'     => array( 'title', 'editor', 'comments', 'revisions', 'trackbacks', 'author', 'excerpt', 'page-attributes', 'thumbnail', 'custom-fields', 'post-formats' ),
+			'has_archive'  => true,
+			'show_in_rest' => true,
+		)
+	);
+
 	// Register custom fields.
 	register_meta(
 		'post',
