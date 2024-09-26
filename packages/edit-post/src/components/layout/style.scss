@@ -3,7 +3,6 @@
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
 	background-color: $white;
-	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -104,6 +103,11 @@
 	.is-toggle-only:not(.is-open) > & {
 		height: 0;
 	}
+}
+
+// In case the canvas is not iframe’d.
+.edit-post-layout__metaboxes {
+	clear: both;
 }
 
 .has-metaboxes .editor-visual-editor {
