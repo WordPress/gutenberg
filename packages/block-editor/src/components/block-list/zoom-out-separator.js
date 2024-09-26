@@ -114,9 +114,7 @@ export function ZoomOutSeparator( {
 							duration: 0.1,
 						} }
 					>
-						{ isDraggedOver
-							? __( 'Drop pattern.' )
-							: __( 'Insert a pattern here.' ) }
+						{ __( 'Drop pattern.' ) }
 					</motion.div>
 				</motion.div>
 			) }
