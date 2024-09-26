@@ -17,6 +17,8 @@
 	flex-shrink: 0;
 	display: flex;
 	box-shadow: 0 $border-width $gray-300;
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
 	position: relative;
 	z-index: 1;
 
