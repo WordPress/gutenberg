@@ -646,7 +646,7 @@ describe( 'Navigator', () => {
 		render( <Navigator.Screen path="not-valid">Test</Navigator.Screen> );
 
 		expect( console ).toHaveWarnedWith(
-			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
 		);
 	} );
 
@@ -880,7 +880,7 @@ describe( 'Navigator', () => {
 
 			// Rendering `NavigatorToParentButton` logs a deprecation notice
 			expect( console ).toHaveWarnedWith(
-				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.NavigatorBackButton instead.'
+				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.Navigator.BackButton instead.'
 			);
 		} );
 
