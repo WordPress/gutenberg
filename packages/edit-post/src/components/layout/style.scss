@@ -14,7 +14,6 @@
 }
 
 .edit-post-meta-boxes-main__presenter {
-	flex-shrink: 0;
 	display: flex;
 	box-shadow: 0 $border-width $gray-300;
 	// Windows High Contrast mode will show this outline, but not the shadow.
@@ -33,6 +32,7 @@
 	}
 
 	.is-toggle-only > & {
+		flex-shrink: 0;
 		cursor: pointer;
 		height: $button-size-compact;
 		justify-content: space-between;
