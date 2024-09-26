@@ -12,12 +12,13 @@ export const getEditedPostTemplateId = createRegistrySelector(
 			type: postType,
 			slug,
 		} = select( editorStore ).getCurrentPost();
-		const { getSite, getEntityRecords, canUser } = select( coreStore );
+		const { getEntityRecord, getEntityRecords, canUser } =
+			select( coreStore );
 		const siteSettings = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
 		} )
-			? getSite()
+			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		// First check if the current page is set as the posts page.
 		const isPostsPage = +postId === siteSettings?.page_for_posts;
@@ -50,8 +51,11 @@ export const getEditedPostTemplateId = createRegistrySelector(
 		} else {
 			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		}
-		return select( coreStore ).getDefaultTemplateId( {
-			slug: slugToCheck,
-		} );
+
+		if ( postType ) {
+			return select( coreStore ).getDefaultTemplateId( {
+				slug: slugToCheck,
+			} );
+		}
 	}
 );

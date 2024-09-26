@@ -54,12 +54,13 @@ $transition-duration: 0.2s;
 		left: math.div($toggle-thumb-size, 6);
 		width: $toggle-thumb-size;
 		height: $toggle-thumb-size;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		transition:
 			$transition-duration transform ease,
 			$transition-duration background-color ease-out;
 		@include reduce-motion("transition");
 		background-color: $gray-900;
+		box-shadow: $elevation-x-small;
 
 		// Transparent border acts as a fill in Windows High Contrast Mode.
 		border: math.div($toggle-thumb-size, 2) solid transparent;

@@ -13,12 +13,13 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
+import { unlock } from '../../lock-unlock';
 
 export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	const isDistractionFree = useSelect(
@@ -118,19 +119,25 @@ const GridVisualizerGrid = forwardRef(
 function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const gridItems = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( gridClientId ),
+	const gridItemStyles = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockStyles } = unlock(
+				select( blockEditorStore )
+			);
+			const blockOrder = getBlockOrder( gridClientId );
+			return getBlockStyles( blockOrder );
+		},
 		[ gridClientId ]
 	);
 	const occupiedRects = useMemo( () => {
 		const rects = [];
-		for ( const block of gridItems ) {
+		for ( const style of Object.values( gridItemStyles ) ) {
 			const {
 				columnStart,
 				rowStart,
 				columnSpan = 1,
 				rowSpan = 1,
-			} = block.attributes.style?.layout || {};
+			} = style?.layout ?? {};
 			if ( ! columnStart || ! rowStart ) {
 				continue;
 			}
@@ -144,7 +151,7 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 			);
 		}
 		return rects;
-	}, [ gridItems ] );
+	}, [ gridItemStyles ] );
 
 	return range( 1, gridInfo.numRows ).map( ( row ) =>
 		range( 1, gridInfo.numColumns ).map( ( column ) => {
@@ -206,8 +213,12 @@ function useGridVisualizerDropZone(
 	gridInfo,
 	setHighlightedRect
 ) {
-	const { getBlockAttributes, getBlockRootClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getBlockRootClientId,
+		canInsertBlockType,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -221,6 +232,10 @@ function useGridVisualizerDropZone(
 
 	return useDropZoneWithValidation( {
 		validateDrag( srcClientId ) {
+			const blockName = getBlockName( srcClientId );
+			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
+				return false;
+			}
 			const attributes = getBlockAttributes( srcClientId );
 			const rect = new GridRect( {
 				columnStart: column,

@@ -43,6 +43,8 @@ export default function WelcomeGuide( { sidebar } ) {
 					  ) }
 			</p>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="customize-widgets-welcome-guide__button"
 				variant="primary"
 				onClick={ () =>

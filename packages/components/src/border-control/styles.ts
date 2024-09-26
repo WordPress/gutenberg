@@ -16,10 +16,6 @@ import {
 
 import type { Border } from './types';
 
-const labelStyles = css`
-	font-weight: 500;
-`;
-
 const focusBoxShadow = css`
 	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
 `;
@@ -103,7 +99,7 @@ export const colorIndicatorWrapper = (
 	const { style } = border || {};
 
 	return css`
-		border-radius: 9999px;
+		border-radius: ${ CONFIG.radiusFull };
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
 		width: ${ size === '__unstable-large' ? '24px' : '22px' };
@@ -140,7 +136,6 @@ export const borderControlPopoverControls = css`
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
-		${ labelStyles }
 	}
 
 	&& ${ StyledLabel } + button:not( .has-text ) {

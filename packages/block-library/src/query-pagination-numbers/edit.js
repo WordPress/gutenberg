@@ -51,6 +51,7 @@ export default function QueryPaginationNumbersEdit( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Number of links' ) }
 						help={ __(

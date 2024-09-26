@@ -129,6 +129,7 @@ const BlockMoverButton = forwardRef(
 		return (
 			<>
 				<Button
+					__next40pxDefaultSize
 					ref={ ref }
 					className={ clsx(
 						'block-editor-block-mover-button',

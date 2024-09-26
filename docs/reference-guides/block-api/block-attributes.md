@@ -1,6 +1,6 @@
 # Attributes
 
-Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background colour, or a button title.
+Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background color, or a button title.
 
 A block can contain any number of attributes, and these are specified by the `attributes` field - an object where each key is the name of the attribute, and the value is the attribute definition.
 

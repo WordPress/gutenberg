@@ -246,6 +246,8 @@ function FlexLayoutVerticalAlignmentControl( {
 				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
 					return (
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							key={ value }
 							label={ label }
 							icon={ icon }
@@ -325,6 +327,7 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
@@ -370,6 +373,7 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }

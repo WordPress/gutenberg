@@ -12,6 +12,10 @@
 		justify-content: center;
 	}
 
+	.wp-block-embed__placeholder-input {
+		flex: 1 1 auto;
+	}
+
 	// Stops long URLs from breaking out of the no preview available screen
 	.components-placeholder__error {
 		word-break: break-word;

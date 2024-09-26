@@ -17,6 +17,7 @@ import {
 	hasQueryArg,
 	isEmail,
 	isURL,
+	isPhoneNumber,
 	isValidAuthority,
 	isValidFragment,
 	isValidPath,
@@ -69,6 +70,52 @@ describe( 'isEmail', () => {
 		"returns false when given things that don't look like an email: %s",
 		( email ) => {
 			expect( isEmail( email ) ).toBe( false );
+		}
+	);
+} );
+
+describe( 'isPhoneNumber', () => {
+	it.each( [
+		'+1 (555) 123-4567',
+		'(555) 123-4567',
+		'555-123-4567',
+		'5551234567',
+		'+91 987 654 3210',
+		'123-456-7890',
+		'(123) 456-7890',
+		'123 456 7890',
+		'123.456.7890',
+		'+1 123 456 7890',
+		'1234567890',
+		'+44 791 112 3456',
+		'(123) 4567',
+		'+1 (123) 45678901',
+		'12-34-56',
+		'123456789012345',
+		'+12 3456789012345',
+		'tel:+1-123-456-7890',
+	] )(
+		'returns true when given things that look like a phone number: %s',
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( true );
+		}
+	);
+
+	it.each( [
+		'not a phone number',
+		'123',
+		'1234',
+		'12345',
+		'+91 123',
+		'abc-def-ghij',
+		'a123456789b',
+		'12-34-5',
+		'tel:911',
+		'tel:12345',
+	] )(
+		"returns false when given things that don't look like a phone number: %s",
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( false );
 		}
 	);
 } );

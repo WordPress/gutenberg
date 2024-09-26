@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ComboboxControl from '..';
+import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
 const timezones = [
@@ -56,6 +56,10 @@ const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
+
+const ComboboxControl = ( props: ComboboxControlProps ) => {
+	return <_ComboboxControl { ...props } __nextHasNoMarginBottom />;
+};
 
 const ControlledComboboxControl = ( {
 	value: valueProp,
@@ -182,6 +186,46 @@ describe.each( [
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.label );
+	} );
+
+	it( 'calls onFilterValueChange whenever the textbox changes', async () => {
+		const user = userEvent.setup();
+		const onFilterValueChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onFilterValueChange={ onFilterValueChangeSpy }
+			/>
+		);
+
+		const input = getInput( defaultLabelText );
+
+		await user.type( input, 'a' );
+		expect( onFilterValueChangeSpy ).toHaveBeenCalledWith( 'a' );
+	} );
+
+	it( 'clears the textbox value if there is no selected value on blur', async () => {
+		const user = userEvent.setup();
+		const onFilterValueChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onFilterValueChange={ onFilterValueChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.type( input, 'a' );
+		expect( input ).toHaveValue( 'a' );
+
+		// Blur and focus the input.
+		await user.tab();
+		await user.click( input );
+
+		expect( input ).toHaveValue( '' );
+		expect( onFilterValueChangeSpy ).toHaveBeenLastCalledWith( '' );
 	} );
 
 	it( 'should select the correct option from a search', async () => {

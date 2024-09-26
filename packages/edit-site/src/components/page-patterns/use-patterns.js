@@ -5,6 +5,7 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -254,6 +255,38 @@ const selectUserPatterns = createSelector(
 		select( coreStore ).getUserPatternCategories(),
 	]
 );
+
+export function useAugmentPatternsWithPermissions( patterns ) {
+	const idsAndTypes = useMemo(
+		() =>
+			patterns
+				?.filter( ( record ) => record.type !== PATTERN_TYPES.theme )
+				.map( ( record ) => [ record.type, record.id ] ) ?? [],
+		[ patterns ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordPermissions } = unlock(
+				select( coreStore )
+			);
+			return idsAndTypes.reduce( ( acc, [ type, id ] ) => {
+				acc[ id ] = getEntityRecordPermissions( 'postType', type, id );
+				return acc;
+			}, {} );
+		},
+		[ idsAndTypes ]
+	);
+
+	return useMemo(
+		() =>
+			patterns?.map( ( record ) => ( {
+				...record,
+				permissions: permissions?.[ record.id ] ?? {},
+			} ) ) ?? [],
+		[ patterns, permissions ]
+	);
+}
 
 export const usePatterns = (
 	postType,

@@ -139,3 +139,11 @@ Amount by which the `value` is changed when incrementing/decrementing. It is als
 -   Type: `Number | "any"`
 -   Required: No
 -   Default: `1`
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

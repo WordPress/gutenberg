@@ -773,8 +773,8 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * @param {Array}    [source.usesContext]      Array of context needed by the source only in the editor.
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
- * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
  * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
  *
  * @example
  * ```js
@@ -786,7 +786,6 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  *     label: _x( 'My Custom Source', 'block bindings source' ),
  *     getValues: () => getSourceValues(),
  *     setValues: () => updateMyCustomValuesInBatch(),
- *     getPlaceholder: () => 'Placeholder text when the value is undefined',
  *     canUserEditValue: () => true,
  * } );
  * ```
@@ -798,8 +797,8 @@ export const registerBlockBindingsSource = ( source ) => {
 		usesContext,
 		getValues,
 		setValues,
-		getPlaceholder,
 		canUserEditValue,
+		getFieldsList,
 	} = source;
 
 	const existingSource = unlock(
@@ -887,15 +886,16 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Check the `getPlaceholder` property is correct.
-	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
-		warning( 'Block bindings source getPlaceholder must be a function.' );
+	// Check the `canUserEditValue` property is correct.
+	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
+		warning( 'Block bindings source canUserEditValue must be a function.' );
 		return;
 	}
 
-	// Check the `getPlaceholder` property is correct.
-	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
-		warning( 'Block bindings source canUserEditValue must be a function.' );
+	// Check the `getFieldsList` property is correct.
+	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+		// eslint-disable-next-line no-console
+		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}
 

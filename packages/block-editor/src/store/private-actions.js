@@ -367,6 +367,7 @@ export function expandBlock( clientId ) {
 export const modifyContentLockBlock =
 	( clientId ) =>
 	( { select, dispatch } ) => {
+		dispatch.selectBlock( clientId );
 		dispatch.__unstableMarkNextChangeAsNotPersistent();
 		dispatch.updateBlockAttributes( clientId, {
 			templateLock: undefined,
@@ -382,3 +383,26 @@ export const modifyContentLockBlock =
 			focusModeToRevert
 		);
 	};
+
+/**
+ * Sets the zoom level.
+ *
+ * @param {number} zoom the new zoom level
+ * @return {Object} Action object.
+ */
+export function setZoomLevel( zoom = 100 ) {
+	return {
+		type: 'SET_ZOOM_LEVEL',
+		zoom,
+	};
+}
+
+/**
+ * Resets the Zoom state.
+ * @return {Object} Action object.
+ */
+export function resetZoomLevel() {
+	return {
+		type: 'RESET_ZOOM_LEVEL',
+	};
+}

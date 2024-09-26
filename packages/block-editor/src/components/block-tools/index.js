@@ -19,7 +19,6 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -78,7 +77,6 @@ export default function BlockTools( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
-		showBreadcrumb,
 		showBlockToolbarPopover,
 		showZoomOutToolbar,
 	} = useShowBlockTools();
@@ -202,7 +200,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && (
+				{ ! isTyping && ! isZoomOutMode && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
@@ -220,14 +218,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
-					/>
-				) }
-
-				{ showBreadcrumb && (
-					<BlockToolbarBreadcrumb
-						ref={ blockSelectionButtonRef }
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
 					/>
 				) }
 
@@ -251,12 +241,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ window.__experimentalEnableZoomedOutPatternsTab &&
-					isZoomOutMode && (
-						<ZoomOutModeInserters
-							__unstableContentRef={ __unstableContentRef }
-						/>
-					) }
+				{ isZoomOutMode && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

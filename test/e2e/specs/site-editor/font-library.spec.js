@@ -9,15 +9,21 @@ test.describe( 'Font Library', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 		} );
 
-		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor();
-			await editor.canvas.locator( 'body' ).click();
+		test.beforeEach( async ( { admin } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//index',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 		} );
 
 		test( 'should display the "no font installed." message', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -33,7 +39,10 @@ test.describe( 'Font Library', () => {
 		} );
 
 		test( 'should display the "Add fonts" button', async ( { page } ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -49,15 +58,21 @@ test.describe( 'Font Library', () => {
 			await requestUtils.activateTheme( 'twentytwentythree' );
 		} );
 
-		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor();
-			await editor.canvas.locator( 'body' ).click();
+		test.beforeEach( async ( { admin } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'twentytwentythree//index',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 		} );
 
 		test( 'should display the "Manage fonts" button', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -70,7 +85,10 @@ test.describe( 'Font Library', () => {
 		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" button', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -88,7 +106,10 @@ test.describe( 'Font Library', () => {
 		test( 'should show font variant panel when clicking on a font family', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -125,16 +146,22 @@ test.describe( 'Font Library', () => {
 			);
 		} );
 
-		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor();
-			await editor.canvas.locator( 'body' ).click();
+		test.beforeEach( async ( { admin } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//index',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 		} );
 
 		test( 'should allow user to add and remove multiple local font files', async ( {
 			page,
 			editor,
 		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
@@ -202,15 +229,21 @@ test.describe( 'Font Library', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test.beforeEach( async ( { admin, editor } ) => {
-			await admin.visitSiteEditor();
-			await editor.canvas.locator( 'body' ).click();
+		test.beforeEach( async ( { admin } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'twentytwentyfour//home',
+				postType: 'wp_template',
+				canvas: 'edit',
+			} );
 		} );
 
 		test( 'clicking on a font in the global styles sidebar should activate the font in the overlay when switching Theme Style variation', async ( {
 			page,
 		} ) => {
-			await page.getByRole( 'button', { name: /styles/i } ).click();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
 
 			// Click "Browse styles"
 			await page.getByRole( 'button', { name: 'Browse styles' } ).click();

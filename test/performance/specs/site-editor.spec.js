@@ -438,9 +438,7 @@ test.describe( 'Site Editor Performance', () => {
 				await Promise.all(
 					Array.from( { length: perPage }, async ( el, index ) => {
 						return await page
-							.getByRole( 'link', {
-								name: `Page (${ index })`,
-							} )
+							.getByLabel( `Page (${ index })` )
 							.waitFor( { state: 'attached' } );
 					} )
 				);

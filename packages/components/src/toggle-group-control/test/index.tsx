@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl,
+	ToggleGroupControl as _ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -25,6 +25,10 @@ import type { ToggleGroupControlProps } from '../types';
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
+const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
 };
 
 const ControlledToggleGroupControl = ( {
@@ -341,11 +345,9 @@ describe.each( [
 					name: 'R',
 				} );
 
-				await sleep();
 				await press.Tab();
 				expect( rigas ).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 
 				// When in controlled mode, there is an additional "Reset" button.
@@ -372,7 +374,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(
@@ -448,7 +449,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -457,7 +457,6 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -490,7 +489,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(

@@ -28,7 +28,7 @@ function gutenberg_test_block_bindings_registration() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'single'       => true,
-			'default'      => 'Value of the text_custom_field',
+			'default'      => 'Value of the text custom field',
 		)
 	);
 	register_meta(
@@ -43,11 +43,22 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
+		'empty_field',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'single'       => true,
+			'default'      => '',
+		)
+	);
+	register_meta(
+		'post',
 		'_protected_field',
 		array(
-			'type'    => 'string',
-			'single'  => true,
-			'default' => 'protected field value',
+			'type'         => 'string',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 'protected field value',
 		)
 	);
 	register_meta(

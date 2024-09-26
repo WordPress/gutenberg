@@ -6,6 +6,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Icon, page, post } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 const SHOWN_SUGGESTIONS = 10;
 
@@ -46,7 +47,7 @@ function createLinkCompleter() {
 						key="icon"
 						icon={ item.subtype === 'page' ? page : post }
 					/>
-					{ item.title }
+					{ decodeEntities( item.title ) }
 				</>
 			);
 		},

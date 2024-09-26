@@ -8,7 +8,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
@@ -16,12 +16,13 @@ import {
 	Flex,
 	Notice,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { chevronLeft } from '@wordpress/icons';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -31,7 +32,12 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
-import { setUIValuesNeeded } from './utils';
+import {
+	setUIValuesNeeded,
+	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
+	getDisplaySrcFromFontFace,
+} from './utils';
 import { unlock } from '../../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -47,11 +53,13 @@ function InstalledFonts() {
 		isInstalling,
 		saveFontFamilies,
 		getFontFacesActivated,
-		notice,
-		setNotice,
-		fontFamilies,
 	} = useContext( FontLibraryContext );
+
+	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies'
+	);
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const [ notice, setNotice ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
 		undefined,
@@ -61,7 +69,6 @@ function InstalledFonts() {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return __experimentalGetCurrentGlobalStylesId();
 	} );
-
 	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
@@ -112,6 +119,26 @@ function InstalledFonts() {
 		setIsConfirmDeleteOpen( true );
 	};
 
+	const handleUpdate = async () => {
+		setNotice( null );
+		try {
+			await saveFontFamilies( fontFamilies );
+			setNotice( {
+				type: 'success',
+				message: __( 'Font family updated successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: sprintf(
+					/* translators: %s: error message */
+					__( 'There was an error updating the font family. %s' ),
+					error.message
+				),
+			} );
+		}
+	};
+
 	const getFontFacesToDisplay = ( font ) => {
 		if ( ! font ) {
 			return [];
@@ -147,6 +174,55 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
 	}, [] );
+
+	// Get activated fonts count.
+	const activeFontsCount = libraryFontSelected
+		? getFontFacesActivated(
+				libraryFontSelected.slug,
+				libraryFontSelected.source
+		  ).length
+		: 0;
+
+	const selectedFontsCount =
+		libraryFontSelected?.fontFace?.length ??
+		( libraryFontSelected?.fontFamily ? 1 : 0 );
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		activeFontsCount > 0 && activeFontsCount !== selectedFontsCount;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked = activeFontsCount === selectedFontsCount;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const initialFonts =
+			fontFamilies?.[ libraryFontSelected.source ]?.filter(
+				( f ) => f.slug !== libraryFontSelected.slug
+			) ?? [];
+		const newFonts = isSelectAllChecked
+			? initialFonts
+			: [ ...initialFonts, libraryFontSelected ];
+
+		setFontFamilies( {
+			...fontFamilies,
+			[ libraryFontSelected.source ]: newFonts,
+		} );
+
+		if ( libraryFontSelected.fontFace ) {
+			libraryFontSelected.fontFace.forEach( ( face ) => {
+				if ( isSelectAllChecked ) {
+					unloadFontFaceInBrowser( face, 'all' );
+				} else {
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face?.src ),
+						'all'
+					);
+				}
+			} );
+		}
+	};
 
 	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
 	return (
@@ -208,6 +284,7 @@ function InstalledFonts() {
 															font
 														) }
 														onClick={ () => {
+															setNotice( null );
 															handleSetLibraryFontSelected(
 																font
 															);
@@ -248,6 +325,7 @@ function InstalledFonts() {
 															font
 														) }
 														onClick={ () => {
+															setNotice( null );
 															handleSetLibraryFontSelected(
 																font
 															);
@@ -275,11 +353,14 @@ function InstalledFonts() {
 							/>
 
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
-									icon={ chevronLeft }
+								<NavigatorBackButton
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										handleSetLibraryFontSelected( null );
+										setNotice( null );
 									} }
 									label={ __( 'Back' ) }
 								/>
@@ -311,16 +392,40 @@ function InstalledFonts() {
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
+								<CheckboxControl
+									className="font-library-modal__select-all"
+									label={ __( 'Select all' ) }
+									checked={ isSelectAllChecked }
+									onChange={ toggleSelectAll }
+									indeterminate={ isIndeterminate }
+									__nextHasNoMarginBottom
+								/>
 								<Spacer margin={ 8 } />
-								{ getFontFacesToDisplay(
-									libraryFontSelected
-								).map( ( face, i ) => (
-									<LibraryFontVariant
-										font={ libraryFontSelected }
-										face={ face }
-										key={ `face${ i }` }
-									/>
-								) ) }
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="font-library-modal__fonts-list"
+								>
+									{ getFontFacesToDisplay(
+										libraryFontSelected
+									).map( ( face, i ) => (
+										<li
+											key={ `face${ i }` }
+											className="font-library-modal__fonts-list-item"
+										>
+											<LibraryFontVariant
+												font={ libraryFontSelected }
+												face={ face }
+												key={ `face${ i }` }
+											/>
+										</li>
+									) ) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
 						</NavigatorScreen>
 					</NavigatorProvider>
@@ -332,6 +437,7 @@ function InstalledFonts() {
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
+								__next40pxDefaultSize
 								isDestructive
 								variant="tertiary"
 								onClick={ handleUninstallClick }
@@ -340,10 +446,9 @@ function InstalledFonts() {
 							</Button>
 						) }
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
-							onClick={ () => {
-								saveFontFamilies( fontFamilies );
-							} }
+							onClick={ handleUpdate }
 							disabled={ ! fontFamiliesHasChanges }
 							accessibleWhenDisabled
 						>
@@ -381,7 +486,7 @@ function ConfirmDeleteDialog( {
 			setNotice( {
 				type: 'error',
 				message:
-					__( 'There was an error uninstalling the font family. ' ) +
+					__( 'There was an error uninstalling the font family.' ) +
 					error.message,
 			} );
 		}

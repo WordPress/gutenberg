@@ -59,7 +59,6 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Second button' } )
 			).toBeVisible();
 
-			await sleep();
 			await press.Tab();
 
 			expectTooltipToBeHidden();
@@ -145,7 +144,6 @@ describe( 'Tooltip', () => {
 			);
 
 			// Focus the anchor, tooltip should show
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
@@ -153,7 +151,6 @@ describe( 'Tooltip', () => {
 			await waitExpectTooltipToShow();
 
 			// Focus the other button, tooltip should hide
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
@@ -179,13 +176,11 @@ describe( 'Tooltip', () => {
 			expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
 
 			// Focus anchor, tooltip should show
-			await sleep();
 			await press.Tab();
 			expect( anchor ).toHaveFocus();
 			await waitExpectTooltipToShow();
 
 			// Focus another button, tooltip should hide
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', {

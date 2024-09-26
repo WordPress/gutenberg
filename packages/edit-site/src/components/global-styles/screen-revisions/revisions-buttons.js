@@ -162,6 +162,7 @@ function RevisionsButtons( {
 						aria-current={ isSelected }
 					>
 						<Button
+							__next40pxDefaultSize
 							className="edit-site-global-styles-screen-revisions__revision-button"
 							accessibleWhenDisabled
 							disabled={ isSelected }

@@ -1,4 +1,4 @@
-name: Verify Core Backport Changlog
+name: Verify Core Backport Changelog
 
 on:
     pull_request:

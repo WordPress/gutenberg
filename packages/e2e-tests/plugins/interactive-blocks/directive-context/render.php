@@ -212,3 +212,24 @@
 		></span>
 	</div>
 </div>
+
+
+<div
+	data-testid="inheritance from other namespaces"
+	data-wp-interactive="directive-context/parent"
+	data-wp-context='{ "prop": "fromParentNs" }'
+>
+	<div
+		data-wp-interactive="directive-context/child"
+		data-wp-context='{ "prop": "fromChildNs" }'
+	>
+		<span
+			data-testid="parent"
+			data-wp-text="directive-context/parent::context.prop"
+		></span>
+		<span
+			data-testid="child"
+			data-wp-text="directive-context/child::context.prop"
+		></span>
+	</div>
+</div>

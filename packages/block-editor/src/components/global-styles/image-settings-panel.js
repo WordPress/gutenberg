@@ -67,6 +67,7 @@ export default function ImageSettingsPanel( {
 					panelId={ panelId }
 				>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Expand on click' ) }
 						checked={ lightboxChecked }
 						onChange={ onChangeLightbox }

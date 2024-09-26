@@ -8,7 +8,7 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
@@ -28,7 +28,7 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { chevronLeftSmall, plus } from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
 /**
@@ -123,7 +123,7 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 
 			<Button
 				className="link-ui-block-inserter__back"
-				icon={ chevronLeftSmall }
+				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					onBack();
@@ -147,15 +147,18 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
+	const { label, url, opensInNewTab, type, kind } = props.link;
+	const postType = type || 'page';
+
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
+	const permissions = useResourcePermissions( {
+		kind: 'postType',
+		name: postType,
+	} );
 
 	async function handleCreate( pageTitle ) {
-		const postType = props.link.type || 'page';
-
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
 			status: 'draft',
@@ -178,15 +181,6 @@ function UnforwardedLinkUI( props, ref ) {
 			url: page.link,
 			kind: 'post-type',
 		};
-	}
-
-	const { label, url, opensInNewTab, type, kind } = props.link;
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
 	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
@@ -241,7 +235,7 @@ function UnforwardedLinkUI( props, ref ) {
 						hasRichPreviews
 						value={ link }
 						showInitialSuggestions
-						withCreateSuggestion={ userCanCreate }
+						withCreateSuggestion={ permissions.canCreate }
 						createSuggestion={ handleCreate }
 						createSuggestionButtonText={ ( searchTerm ) => {
 							let format;
@@ -316,6 +310,7 @@ const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 	return (
 		<VStack className="link-ui-tools">
 			<Button
+				__next40pxDefaultSize
 				ref={ addBlockButtonRef }
 				icon={ plus }
 				onClick={ ( e ) => {

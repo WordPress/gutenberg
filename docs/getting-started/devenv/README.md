@@ -54,6 +54,7 @@ Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-starte
 This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
 
 - [Local](https://localwp.com/)
+- [WP Studio](https://developer.wordpress.com/studio/)
 - [XAMPP](https://www.apachefriends.org/)
 - [MAMP](https://www.mamp.info/en/mamp/mac/)
 - [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

@@ -32,10 +32,10 @@ import {
 } from '../components/duotone/utils';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings, useStyleOverride } from './utils';
+import { useBlockSettings, usePrivateStyleOverride } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 const EMPTY_ARRAY = [];
 
@@ -251,10 +251,6 @@ function useDuotoneStyles( {
 	const selectors = duotoneSelector.split( ',' );
 
 	const selectorsScoped = selectors.map( ( selectorPart ) => {
-		// Extra .editor-styles-wrapper specificity is needed in the editor
-		// since we're not using inline styles to apply the filter. We need to
-		// override duotone applied by global styles and theme.json.
-
 		// Assuming the selector part is a subclass selector (not a tag name)
 		// so we can prepend the filter id class. If we want to support elements
 		// such as `img` or namespaces, we'll need to add a case for that here.
@@ -265,7 +261,7 @@ function useDuotoneStyles( {
 
 	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
 
-	useStyleOverride(
+	usePrivateStyleOverride(
 		isValidFilter
 			? {
 					css:
@@ -276,7 +272,7 @@ function useDuotoneStyles( {
 			  }
 			: undefined
 	);
-	useStyleOverride(
+	usePrivateStyleOverride(
 		isValidFilter
 			? {
 					assets:

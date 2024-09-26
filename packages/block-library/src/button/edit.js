@@ -48,7 +48,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -190,6 +190,7 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
+	const registry = useRegistry();
 	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
@@ -248,13 +249,13 @@ function ButtonEdit( props ) {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					! blockBindingsSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: metadata?.bindings?.url?.args,
 					} ),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ context, isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -380,6 +381,7 @@ function ButtonEdit( props ) {
 			<InspectorControls group="advanced">
 				{ isLinkTag && (
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Link rel' ) }
 						value={ rel || '' }

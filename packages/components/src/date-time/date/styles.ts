@@ -7,13 +7,13 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import Button from '../../button';
-import { COLORS, CONFIG } from '../../utils';
+import { boxSizingReset, COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { space } from '../../utils/space';
 
 export const Wrapper = styled.div`
-	box-sizing: border-box;
+	${ boxSizingReset }
 `;
 
 export const Navigator = styled( HStack )`
@@ -38,7 +38,7 @@ export const Calendar = styled.div`
 `;
 
 export const DayOfWeek = styled.div`
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 	font-size: ${ CONFIG.fontSize };
 	line-height: ${ CONFIG.fontLineHeightBase };
 
@@ -83,22 +83,41 @@ export const DayButton = styled( Button, {
 		` }
 
 	&&& {
-		border-radius: 100%;
+		border-radius: ${ CONFIG.radiusRound };
 		height: ${ space( 7 ) };
 		width: ${ space( 7 ) };
 
 		${ ( props ) =>
 			props.isSelected &&
 			`
-			background: ${ COLORS.theme.accent };
-			color: ${ COLORS.white };
+				background: ${ COLORS.theme.accent };
+
+				&,
+				&:hover:not(:disabled, [aria-disabled=true]) {
+					color: ${ COLORS.theme.accentInverted };
+				}
+
+				&:focus:not(:disabled),
+				&:focus:not(:disabled) {
+					border: ${ CONFIG.borderWidthFocus } solid currentColor;
+				}
+
+				/* Highlight the selected day for high-contrast mode */
+				&::after {
+					content: '';
+					position: absolute;
+					pointer-events: none;
+					inset: 0;
+					border-radius: inherit;
+					border: 1px solid transparent;
+				}
 			` }
 
 		${ ( props ) =>
 			! props.isSelected &&
 			props.isToday &&
 			`
-			background: ${ COLORS.gray[ 200 ] };
+			background: ${ COLORS.theme.gray[ 200 ] };
 			` }
 	}
 
@@ -106,15 +125,16 @@ export const DayButton = styled( Button, {
 		props.hasEvents &&
 		`
 		::before {
-			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
-			border-radius: 2px;
-			bottom: 2px;
+			border: 2px solid ${
+				props.isSelected
+					? COLORS.theme.accentInverted
+					: COLORS.theme.accent
+			};
+			border-radius: ${ CONFIG.radiusRound };
 			content: " ";
-			height: 4px;
 			left: 50%;
-			margin-left: -2px;
 			position: absolute;
-			width: 4px;
+			transform: translate(-50%, 9px);
 		}
 		` }
 `;
