@@ -260,87 +260,262 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
-	// Utils that will be used in all the scenarios where the block has to lock the controls.
-	async function testParagraphControlsAreLocked( { source, editor, page } ) {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: {
-				content: 'paragraph default content',
-				metadata: {
-					bindings: {
-						content: {
-							source,
-							args: { key: 'text_field' },
+	test.describe( 'should lock editing', () => {
+		// Logic reused accross all the tests that check paragraph editing is locked.
+		async function testParagraphControlsAreLocked( {
+			source,
+			editor,
+			page,
+		} ) {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source,
+								args: { key: 'text_field' },
+							},
 						},
 					},
 				},
-			},
-		} );
-		const paragraphBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Paragraph',
-		} );
-		await paragraphBlock.click();
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphBlock.click();
 
-		// Alignment controls exist.
-		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Align text' } )
-		).toBeVisible();
+			// Alignment controls exist.
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Align text' } )
+			).toBeVisible();
 
-		// Format controls don't exist.
-		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', {
-					name: 'Bold',
-				} )
-		).toBeHidden();
+			// Format controls don't exist.
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', {
+						name: 'Bold',
+					} )
+			).toBeHidden();
 
-		// Paragraph is not editable.
-		await expect( paragraphBlock ).toHaveAttribute(
-			'contenteditable',
-			'false'
-		);
-	}
+			// Paragraph is not editable.
+			await expect( paragraphBlock ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+		}
+		test.describe( 'canUserEditValue returns false', () => {
+			test( 'paragraph', async ( { editor, page } ) => {
+				await testParagraphControlsAreLocked( {
+					source: 'testing/can-user-edit-false',
+					editor,
+					page,
+				} );
+			} );
+			test( 'heading', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/heading',
+					attributes: {
+						content: 'heading default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'text_field' },
+								},
+							},
+						},
+					},
+				} );
+				const headingBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} );
+				await headingBlock.click();
 
-	test.describe( 'canUserEditValue returns false', () => {
-		test( 'should lock paragraph editing', async ( { editor, page } ) => {
-			await testParagraphControlsAreLocked( {
-				source: 'testing/can-user-edit-false',
-				editor,
-				page,
+				// Alignment controls exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
+				).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeHidden();
+
+				// Heading is not editable.
+				await expect( headingBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+			test( 'button', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										text: {
+											source: 'testing/can-user-edit-false',
+											args: { key: 'text_field' },
+										},
+										url: {
+											source: 'testing/can-user-edit-false',
+											args: { key: 'url_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' );
+				await buttonBlock.click();
+
+				// Alignment controls are visible.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Align text' } )
+				).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Bold',
+						} )
+				).toBeHidden();
+
+				// Button is not editable.
+				await expect( buttonBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+
+				// Link controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Link' } )
+				).toBeHidden();
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', { name: 'Unlink' } )
+				).toBeHidden();
+			} );
+			test( 'image', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'url_field' },
+								},
+								alt: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'text_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Replace controls don't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByRole( 'button', {
+							name: 'Replace',
+						} )
+				).toBeHidden();
+
+				// Image placeholder doesn't show the upload button.
+				await expect(
+					imageBlock.getByRole( 'button', { name: 'Upload' } )
+				).toBeHidden();
+
+				// Alt textarea is disabled and with the custom field value.
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Alternative text' )
+				).toHaveAttribute( 'readonly' );
+				const altValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Alternative text' )
+					.inputValue();
+				expect( altValue ).toBe( 'Text Field Value' );
+
+				// Title input is enabled and with the original value.
+				await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByRole( 'button', { name: 'Advanced' } )
+					.click();
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toBeEnabled();
+				const titleValue = await page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+					.inputValue();
+				expect( titleValue ).toBe( 'default title value' );
 			} );
 		} );
-		test( 'should lock heading editing', async () => {} );
-		test( 'should lock button editing and controls', async () => {} );
-		test( 'should lock image editing and controls', async () => {} );
-	} );
-
-	test.describe( 'canUserEditValue not defined', () => {
-		test( 'should lock paragraph editing', async ( { editor, page } ) => {
+		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
+		test( 'canUserEditValue is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/can-user-edit-undefined',
 				editor,
 				page,
 			} );
 		} );
-		test( 'should lock heading editing', async () => {} );
-		test( 'should lock button editing and controls', async () => {} );
-		test( 'should lock image editing and controls', async () => {} );
-	} );
-
-	test.describe( 'setValues is not defined', () => {
-		test( 'should lock paragraph editing', async ( { editor, page } ) => {
+		test( 'setValues is not defined', async ( { editor, page } ) => {
 			await testParagraphControlsAreLocked( {
 				source: 'testing/set-values-undefined',
 				editor,
 				page,
 			} );
 		} );
-		test( 'should lock heading editing', async () => {} );
-		test( 'should lock button editing and controls', async () => {} );
-		test( 'should lock image editing and controls', async () => {} );
+		test( 'source is not defined', async ( { editor, page } ) => {
+			await testParagraphControlsAreLocked( {
+				source: 'testing/undefined-source',
+				editor,
+				page,
+			} );
+		} );
 	} );
 
 	test.describe( 'setValues', () => {
