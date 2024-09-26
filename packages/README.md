@@ -1,6 +1,6 @@
 # Managing Packages
 
-This repository uses [monorepo] to manage WordPress modules and publish them with [lerna] as packages to [npm].
+This repository uses [monorepo](https://monorepo.tools) to manage WordPress modules and publish them with [lerna](https://lerna.js.org/) as packages to [npm](https://www.npmjs.com/).
 
 ## Creating a New Package
 
@@ -70,12 +70,12 @@ Production dependencies are stored in the `dependencies` section of the packageâ
 
 #### Adding New Dependencies
 
-The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/HEAD/commands/add#readme) command from the root of the project.
+The simplest way to add a production dependency to one of the packages is to run a command like the following from the root of the project.
 
 _Example:_
 
 ```bash
-lerna add change-case packages/a11y
+npm install change-case -w packages/a11y
 ```
 
 This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
@@ -238,10 +238,6 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 ```
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
-
-[lerna]: https://lerna.js.org/
-[monorepo]: https://monorepo.tools
-[npm]: https://www.npmjs.com/
 
 ## Optimizing for bundlers
 
