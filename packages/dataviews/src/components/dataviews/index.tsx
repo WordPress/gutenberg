@@ -56,6 +56,7 @@ type DataViewsProps< Item > = {
 	onPinItem?: ( itemId: string ) => void;
 	onUnpinItem?: ( itemId: string ) => void;
 	pinnedItems?: string[];
+	enablePinnedItems?: boolean;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -78,6 +79,7 @@ export default function DataViews< Item >( {
 	onChangeSelection,
 	header,
 	pinnedItems = [],
+	enablePinnedItems = false,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const [ density, setDensity ] = useState< number >( 0 );
@@ -127,6 +129,10 @@ export default function DataViews< Item >( {
 
 	// Sort pinned items to the top of the data array
 	const dataWithPinnedItems = useMemo( () => {
+		if ( ! enablePinnedItems ) {
+			return data;
+		}
+
 		return [ ...data ].sort( ( a, b ) => {
 			const aId = getItemId( a );
 			const bId = getItemId( b );
@@ -141,10 +147,13 @@ export default function DataViews< Item >( {
 			}
 			return 0;
 		} );
-	}, [ data, getItemId, combinedPinnedItems ] );
+	}, [ enablePinnedItems, data, getItemId, combinedPinnedItems ] );
 
 	const createDefaultActions = useCallback(
 		( callback: ( items: Item[], context: any ) => void ) => {
+			if ( ! enablePinnedItems ) {
+				return [];
+			}
 			return [
 				{
 					id: 'togglePin',
@@ -173,15 +182,24 @@ export default function DataViews< Item >( {
 				},
 			];
 		},
-		[ getItemId, onPinItem, onUnpinItem, combinedPinnedItems ]
+		[
+			enablePinnedItems,
+			getItemId,
+			onPinItem,
+			onUnpinItem,
+			combinedPinnedItems,
+		]
 	);
 
 	const actionsWithDefaultActions = useMemo( () => {
+		if ( ! enablePinnedItems ) {
+			return actions;
+		}
 		const defaultActions = createDefaultActions(
 			( items, context ) => context.onActionPerformed?.( items )
 		);
 		return [ ...defaultActions, ...actions ]; // Combine default and custom actions
-	}, [ actions, createDefaultActions ] );
+	}, [ enablePinnedItems, actions, createDefaultActions ] );
 
 	return (
 		<DataViewsContext.Provider
