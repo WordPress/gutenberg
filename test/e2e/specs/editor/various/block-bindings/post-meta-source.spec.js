@@ -281,15 +281,78 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Custom template', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//single-movie',
+				postId: 'gutenberg-test-themes/block-bindings//custom-template',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();
 		} );
 
-		test( 'should not include post meta fields in UI to connect attributes', async () => {} );
-		test( 'should show the key in attributes connected to post meta', async () => {} );
+		test( 'should not include post meta fields in UI to connect attributes', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'text_custom_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			await page
+				.getByRole( 'button', {
+					name: 'content',
+				} )
+				.click();
+			await page.pause();
+			// Check the fields registered by other sources are there.
+			const customSourceField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'Text Field Label' } );
+			await expect( customSourceField ).toBeVisible();
+			// Check the post meta fields are not visible.
+			const globalField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'text_custom_field' } );
+			await expect( globalField ).toBeHidden();
+			const movieField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'Movie field label' } );
+			await expect( movieField ).toBeHidden();
+		} );
+		test( 'should show the key in attributes connected to post meta', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'text_custom_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'text_custom_field' );
+		} );
 	} );
 
 	test.describe( 'Movie CPT post', () => {
