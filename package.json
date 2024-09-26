@@ -387,5 +387,8 @@
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
 		]
-	}
+	},
+	"workspaces": [
+		"packages/*"
+	]
 }
