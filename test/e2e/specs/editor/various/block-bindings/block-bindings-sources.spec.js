@@ -8,18 +8,26 @@ const path = require( 'path' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Registered sources', () => {
-	// let imagePlaceholderSrc;
-	// let imageCustomFieldSrc;
+	let imagePlaceholderSrc;
+	let testingImgSrc;
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme(
 			'gutenberg-test-themes/block-bindings'
 		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
-		// await requestUtils.deleteAllMedia();
-		// const placeholderMedia = await requestUtils.uploadMedia(
-		// 	path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
-		// );
-		// imagePlaceholderSrc = placeholderMedia.source_url;
+		await requestUtils.deleteAllMedia();
+		const placeholderMedia = await requestUtils.uploadMedia(
+			path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
+		);
+		imagePlaceholderSrc = placeholderMedia.source_url;
+
+		const testingImgMedia = await requestUtils.uploadMedia(
+			path.join(
+				'./test/e2e/assets',
+				'1024x768_e2e_test_image_size.jpeg'
+			)
+		);
+		testingImgSrc = testingImgMedia.source_url;
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -37,12 +45,219 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'getValues', () => {
-		test( 'should show the returned value in paragraph content', async () => {} );
-		test( 'should show the returned value in heading content', async () => {} );
-		test( 'should show the returned values in button attributes', async () => {} );
-		test( 'should show the returned values in image attributes', async () => {} );
-		test( 'should fall back to source label when `getValues` is undefined', async () => {} );
-		test( 'should fall back to null when `getValues` is undefined in URL attributes', async () => {} );
+		test( 'should show the returned value in paragraph content', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					anchor: 'connected-paragraph',
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/custom-source',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
+
+			// Check the frontend shows the value of the custom field.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-paragraph' )
+			).toHaveText( 'Text Field Value' );
+		} );
+		test( 'should show the returned value in heading content', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					anchor: 'connected-heading',
+					content: 'heading default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/custom-source',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			const headingBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			await expect( headingBlock ).toHaveText( 'Text Field Value' );
+
+			// Check the frontend shows the value of the custom field.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-heading' )
+			).toHaveText( 'Text Field Value' );
+		} );
+		test( 'should show the returned values in button attributes', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+						attributes: {
+							anchor: 'connected-button',
+							text: 'button default text',
+							url: '#default-url',
+							metadata: {
+								bindings: {
+									text: {
+										source: 'testing/custom-source',
+										args: { key: 'text_field' },
+									},
+									url: {
+										source: 'testing/custom-source',
+										args: { key: 'url_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+
+			// Check the frontend uses the values of the custom fields.
+			const previewPage = await editor.openPreviewPage();
+			const buttonDom = previewPage.locator( '#connected-button a' );
+			await expect( buttonDom ).toHaveText( 'Text Field Value' );
+			await expect( buttonDom ).toHaveAttribute( 'href', testingImgSrc );
+		} );
+		test( 'should show the returned values in image attributes', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					anchor: 'connected-image',
+					url: imagePlaceholderSrc,
+					alt: 'default alt value',
+					title: 'default title value',
+					metadata: {
+						bindings: {
+							url: {
+								source: 'testing/custom-source',
+								args: { key: 'url_field' },
+							},
+							alt: {
+								source: 'testing/custom-source',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			const imageBlockImg = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Image',
+				} )
+				.locator( 'img' );
+			await imageBlockImg.click();
+
+			// Image src is the custom field value.
+			await expect( imageBlockImg ).toHaveAttribute(
+				'src',
+				testingImgSrc
+			);
+
+			// Alt textarea should have the custom field value.
+			const altValue = await page
+				.getByRole( 'tabpanel', { name: 'Settings' } )
+				.getByLabel( 'Alternative text' )
+				.inputValue();
+			expect( altValue ).toBe( 'Text Field Value' );
+
+			// Title input should have the original value.
+			const advancedButton = page
+				.getByRole( 'tabpanel', { name: 'Settings' } )
+				.getByRole( 'button', {
+					name: 'Advanced',
+				} );
+			const isAdvancedPanelOpen =
+				await advancedButton.getAttribute( 'aria-expanded' );
+			if ( isAdvancedPanelOpen === 'false' ) {
+				await advancedButton.click();
+			}
+			const titleValue = await page
+				.getByRole( 'tabpanel', { name: 'Settings' } )
+				.getByLabel( 'Title attribute' )
+				.inputValue();
+			expect( titleValue ).toBe( 'default title value' );
+
+			// Check the frontend uses the values of the custom fields.
+			const previewPage = await editor.openPreviewPage();
+			const imageDom = previewPage.locator( '#connected-image img' );
+			await expect( imageDom ).toHaveAttribute( 'src', testingImgSrc );
+			await expect( imageDom ).toHaveAttribute(
+				'alt',
+				'Text Field Value'
+			);
+			await expect( imageDom ).toHaveAttribute(
+				'title',
+				'default title value'
+			);
+		} );
+		test( 'should fall back to source label when `getValues` is undefined', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'paragraph default content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/server-only-source',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'Server Source' );
+		} );
+		test( 'should fall back to null when `getValues` is undefined in URL attributes', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					metadata: {
+						bindings: {
+							url: {
+								source: 'testing/server-only-source',
+								args: { key: 'url_field' },
+							},
+						},
+					},
+				},
+			} );
+			const imageBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Image',
+			} );
+			await expect(
+				imageBlock.locator( '.components-placeholder__fieldset' )
+			).toHaveText( 'Connected to Server Source' );
+		} );
 	} );
 
 	test.describe( 'canUserEditValue returns false', () => {

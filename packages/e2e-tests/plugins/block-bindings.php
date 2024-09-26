@@ -16,7 +16,7 @@
 function gutenberg_test_block_bindings_registration() {
 	// Define fields list.
 	$upload_dir  = wp_upload_dir();
-	$testing_url = $upload_dir['url'] . '/10x10_e2e_test_image_z9T8jK.png';
+	$testing_url = $upload_dir['url'] . '/1024x768_e2e_test_image_size.jpeg';
 	$fields_list = array(
 		'text_field' => array(
 			'label' => 'Text Field Label',
