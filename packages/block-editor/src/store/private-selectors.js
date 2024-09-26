@@ -674,3 +674,13 @@ export function getClosestAllowedInsertionPointForPattern(
 	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
 	return getClosestAllowedInsertionPoint( state, names, clientId );
 }
+
+/**
+ * Where the point where the next block will be inserted into.
+ *
+ * @param {Object} state
+ * @return {Object} where the insertion point in the block editor is or null if none is set.
+ */
+export function getInsertionPoint( state ) {
+	return state.insertionPoint;
+}
