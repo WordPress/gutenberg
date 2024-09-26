@@ -35,6 +35,13 @@ function ComplementaryAreaToggle( {
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
 			aria-controls={ identifier.replace( '/', ':' ) }
+			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+			aria-checked={
+				props.role === 'menuitemcheckbox' ||
+				props.role === 'menuitemradio'
+					? isSelected
+					: undefined
+			}
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
