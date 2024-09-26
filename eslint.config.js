@@ -192,6 +192,7 @@ module.exports = [
 	...tseslint.config( {
 		extends: [ tseslint.configs.base ],
 		files: [ '**/*.ts', '**/*.tsx' ],
+		ignores: [ '**/*.d.ts' ],
 		rules: {
 			'@typescript-eslint/no-restricted-imports': [
 				'error',
