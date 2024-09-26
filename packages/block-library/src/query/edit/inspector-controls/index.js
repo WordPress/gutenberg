@@ -321,7 +321,7 @@ export default function QueryInspectorControls( props ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Items' ) }
+						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
 					>
 						<PerPageControl
@@ -341,7 +341,7 @@ export default function QueryInspectorControls( props ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Max Pages to Show' ) }
+						label={ __( 'Max pages to show' ) }
 						hasValue={ () => pages > 0 }
 						onDeselect={ () => setQuery( { pages: 0 } ) }
 					>
