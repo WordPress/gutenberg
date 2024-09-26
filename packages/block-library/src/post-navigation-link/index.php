@@ -31,8 +31,8 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
 
-	$support_styles = get_block_core_post_navigation_link_border_and_spacing_attributes( $attributes );
-	$classes .= ! empty( $support_styles['class'] ) ? " {$support_styles['class']}" : '';
+	$support_styles = block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes );
+	$classes       .= ! empty( $support_styles['class'] ) ? " {$support_styles['class']}" : '';
 
 	// Get the wrapper attributes.
 	$wrapper_attributes = get_block_wrapper_attributes(
@@ -138,7 +138,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  * @param array $attributes The block attributes.
  * @return array The border and spacing related classnames and styles for the block.
  */
-function get_block_core_post_navigation_link_border_and_spacing_attributes( $attributes ) {
+function block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes ) {
 	$border_styles = array();
 	$sides         = array( 'top', 'right', 'bottom', 'left' );
 
