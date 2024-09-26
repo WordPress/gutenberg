@@ -191,5 +191,3 @@ export const NavigatorScreen = contextConnect(
 	UnconnectedNavigatorScreen,
 	'NavigatorScreen'
 );
-
-export default NavigatorScreen;

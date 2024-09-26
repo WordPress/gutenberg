@@ -33,5 +33,3 @@ export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
 	'NavigatorToParentButton'
 );
-
-export default NavigatorToParentButton;
