@@ -92,6 +92,7 @@ function gutenberg_test_block_bindings_registration() {
 		array(
 			'default'      => 'Value of the text custom field',
 			'show_in_rest' => true,
+			'single'       => true,
 			'type'         => 'string',
 		)
 	);
@@ -101,6 +102,7 @@ function gutenberg_test_block_bindings_registration() {
 		array(
 			'default'      => '#url-custom-field',
 			'show_in_rest' => true,
+			'single'       => true,
 			'type'         => 'string',
 		)
 	);
@@ -119,11 +121,24 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
-		'field_with_only_label',
+		'field_with_only_label_2',
 		array(
 			'label'          => 'Field label',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
+			'single'         => true,
+			'type'           => 'string',
+		)
+	);
+	register_meta(
+		'post',
+		'field_with_only_label',
+		array(
+			'label'          => 'Field label',
+			'default'        => '',
+			'object_subtype' => 'movie',
+			'show_in_rest'   => true,
+			'single'         => true,
 			'type'           => 'string',
 		)
 	);
@@ -133,6 +148,7 @@ function gutenberg_test_block_bindings_registration() {
 		array(
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
+			'single'         => true,
 			'type'           => 'string',
 		)
 	);
@@ -143,6 +159,7 @@ function gutenberg_test_block_bindings_registration() {
 			'default'        => 'Protected field value',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => true,
+			'single'         => true,
 			'type'           => 'string',
 		)
 	);
@@ -153,6 +170,7 @@ function gutenberg_test_block_bindings_registration() {
 			'default'        => 'show_in_rest false field value',
 			'object_subtype' => 'movie',
 			'show_in_rest'   => false,
+			'single'         => true,
 			'type'           => 'string',
 		)
 	);

@@ -107,9 +107,7 @@ test.describe( 'Post Meta source', () => {
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
-				await expect( paragraphBlock ).toHaveText(
-					'Field default label'
-				);
+				await expect( paragraphBlock ).toHaveText( 'Field label' );
 			} );
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
