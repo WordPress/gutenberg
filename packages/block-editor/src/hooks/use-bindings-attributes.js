@@ -117,7 +117,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// used purposely here to ensure `boundAttributes` is updated whenever
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
-		const updatedContext = { ...context };
+		const updatedContext = {};
 		const boundAttributes = useSelect( () => {
 			if ( ! blockBindings ) {
 				return;
@@ -285,7 +285,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
 					setAttributes={ _setAttributes }
-					context={ updatedContext }
+					context={ { ...context, ...updatedContext } }
 				/>
 			</>
 		);

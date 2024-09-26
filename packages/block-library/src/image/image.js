@@ -17,7 +17,7 @@ import {
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -134,6 +134,7 @@ export default function Image( {
 	const numericWidth = width ? parseInt( width, 10 ) : undefined;
 	const numericHeight = height ? parseInt( height, 10 ) : undefined;
 
+	const registry = useRegistry();
 	const imageRef = useRef();
 	const { allowResize = true } = context;
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
@@ -496,7 +497,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: urlBinding?.args,
 					} ),
@@ -511,7 +512,7 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: altBinding?.args,
 					} ),
@@ -525,7 +526,7 @@ export default function Image( {
 				lockTitleControls:
 					!! titleBinding &&
 					! titleBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: titleBinding?.args,
 					} ),

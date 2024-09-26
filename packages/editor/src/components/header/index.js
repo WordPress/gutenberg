@@ -134,6 +134,9 @@ function Header( {
 					 */
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
+
+				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
+
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
 					disabled={ isNestedEntity }
@@ -143,8 +146,6 @@ function Header( {
 					forceIsAutosaveable={ forceIsDirty }
 				/>
 				<PostViewLink />
-
-				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />

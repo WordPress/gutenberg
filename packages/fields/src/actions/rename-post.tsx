@@ -19,17 +19,16 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_ORIGINS,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
-import { unlock } from '../../lock-unlock';
+
+import { unlock } from '../lock-unlock';
 import {
 	getItemTitle,
 	isTemplateRemovable,
 	isTemplate,
 	isTemplatePart,
+	TEMPLATE_ORIGINS,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
 } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 

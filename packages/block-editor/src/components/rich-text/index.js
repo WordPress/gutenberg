@@ -179,11 +179,17 @@ export function RichTextWrapper(
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
+			const blockBindingsContext = {};
+			if ( blockBindingsSource?.usesContext?.length ) {
+				for ( const key of blockBindingsSource.usesContext ) {
+					blockBindingsContext[ key ] = blockContext[ key ];
+				}
+			}
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
-					select,
-					context: blockContext,
+					registry,
+					context: blockBindingsContext,
 					args: relatedBinding.args,
 				} );
 
@@ -201,7 +207,7 @@ export function RichTextWrapper(
 			const blockAttributes = getBlockAttributes( clientId );
 			const fieldsList = blockBindingsSource?.getFieldsList?.( {
 				registry,
-				context: blockContext,
+				context: blockBindingsContext,
 			} );
 			const bindingKey =
 				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
@@ -391,19 +397,7 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		let element = anchorRef.current;
-
-		if ( ! element ) {
-			return;
-		}
-
-		// Writing flow might be editable, so we should make sure focus goes to
-		// the root editable element.
-		while ( element.parentElement?.isContentEditable ) {
-			element = element.parentElement;
-		}
-
-		element.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;

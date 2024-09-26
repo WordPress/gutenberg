@@ -216,6 +216,15 @@
 		text-align: left;
 		position: relative;
 		white-space: nowrap;
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: inherit;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 400;
+		margin: 0;
+		text-decoration: none;
+		transition: box-shadow 0.1s linear;
 
 		.components-modal__content & {
 			padding-left: 0;

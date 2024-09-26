@@ -125,6 +125,7 @@ export function DatePicker( {
 							)
 						);
 					} }
+					size="compact"
 				/>
 				<NavigatorHeading level={ 3 }>
 					<strong>
@@ -150,6 +151,7 @@ export function DatePicker( {
 							)
 						);
 					} }
+					size="compact"
 				/>
 			</Navigator>
 			<Calendar
