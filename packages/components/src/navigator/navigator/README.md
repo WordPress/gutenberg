@@ -15,7 +15,7 @@ const MyNavigation = () => (
 				Navigate to child screen.
 			</Navigator.Button>
 		</Navigator.Screen>
-		*<Navigator.Screen path="/child">
+		<Navigator.Screen path="/child">
 			<p>This is the child screen.</p>
 			<Navigator.BackButton>Go back</Navigator.BackButton>
 		</Navigator.Screen>
