@@ -15,6 +15,17 @@ import { unlock } from '../../../lock-unlock';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { getParsedPattern } from '../../../store/utils';
 
+function useStartPatterns() {
+	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
+	// and it has no postTypes declared and the current post type is page or if
+	// the current post type is part of the postTypes declared.
+	return useSelect( ( select ) =>
+		select( blockEditorStore ).getPatternsByBlockTypes(
+			'core/post-content'
+		)
+	);
+}
+
 /**
  * Retrieves the block patterns inserter state.
  *
@@ -71,6 +82,29 @@ const usePatternsState = (
 							};
 						} ),
 		[ isQuick, allPatterns ]
+	);
+
+	const starterPatterns = useStartPatterns();
+	const starterPatternsNames = starterPatterns.map(
+		( pattern ) => pattern.name
+	);
+	const newPatterns = useMemo(
+		() =>
+			patterns.map( ( pattern ) => {
+				if ( starterPatternsNames.includes( pattern.name ) ) {
+					// TODO - I'm not sure why we can't just use the pattern?
+					return {
+						...pattern,
+						categories: [
+							...( pattern.categories ?? [] ),
+							'core/content',
+						],
+					};
+				}
+
+				return pattern;
+			} ),
+		[ patterns, starterPatterns ]
 	);
 
 	const allCategories = useMemo( () => {
@@ -145,7 +179,7 @@ const usePatternsState = (
 		]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ newPatterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

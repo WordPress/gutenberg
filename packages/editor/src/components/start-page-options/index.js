@@ -3,13 +3,13 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useAsyncList } from '@wordpress/compose';
+import { useAsyncList, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -118,6 +118,8 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isClosed, setIsClosed ] = useState( false );
+
+	// Select for starter page modal.
 	const shouldEnableModal = useSelect( ( select ) => {
 		const { isEditedPostDirty, isEditedPostEmpty, getCurrentPostType } =
 			select( editorStore );
@@ -136,9 +138,67 @@ export default function StartPageOptions() {
 		);
 	}, [] );
 
-	if ( ! shouldEnableModal || isClosed ) {
-		return null;
+	// Select for starter pattern inserter.
+	const { shouldEnableStartPage, postType, postId } = useSelect(
+		( select ) => {
+			const {
+				isEditedPostDirty,
+				isEditedPostEmpty,
+				getCurrentPostType,
+				getCurrentPostId,
+			} = select( editorStore );
+			const _postType = getCurrentPostType();
+
+			return {
+				shouldEnableStartPage:
+					! isEditedPostDirty() &&
+					isEditedPostEmpty() &&
+					TEMPLATE_POST_TYPE !== _postType,
+				postType: _postType,
+				postId: getCurrentPostId(),
+			};
+		},
+		[]
+	);
+
+	const previousPostType = usePrevious( postType );
+	const previousPostId = usePrevious( postId );
+
+	// Reset the isClosed state when navigating to a new page/post.
+	if (
+		( previousPostType && previousPostType !== postType ) ||
+		( previousPostId && previousPostId !== postId )
+	) {
+		setIsClosed( false );
 	}
 
-	return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
+	// A pattern is a start pattern if it includes 'core/post-content' in its
+	// blockTypes, and it has no postTypes declared and the current post type is
+	// page or if the current post type is part of the postTypes declared.
+	const hasStarterPatterns = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getPatternsByBlockTypes(
+				'core/post-content'
+			).length
+	);
+
+	const { setIsInserterOpened } = useDispatch( editorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
+	const showInserterOnNewPage =
+		shouldEnableStartPage && ! isClosed && hasStarterPatterns;
+
+	if ( showInserterOnNewPage ) {
+		setIsInserterOpened( {
+			tab: 'patterns',
+			category: 'core/content',
+		} );
+		__unstableSetEditorMode( 'zoom-out' );
+	}
+
+	if ( shouldEnableModal && ! isClosed ) {
+		return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
+	}
+
+	return null;
 }
