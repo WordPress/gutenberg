@@ -36,12 +36,12 @@ const meta: Meta< typeof NavigatorProvider > = {
 			return (
 				<>
 					<style>{ `
-					  /* These attributes are a private implementation detail of the
-						  Navigator component. Do not use outside of its source code. */
+					  /* The data-wp-component attribute is a private implementation
+						 * detail of the Navigator component. Do not use outside of
+						 * its source code.
+						 */
 						[data-wp-component="NavigatorProvider"] {
-							height: calc(100vh - 2rem);
-							max-height: 250px;
-
+							height: 250px;
 						}
 						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
 							padding: 8px;
@@ -167,6 +167,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						outline: '1px solid black',
 						outlineOffset: '-1px',
 						marginBlockEnd: '1rem',
+						display: 'contents',
 					} }
 				>
 					<NavigatorScreen path="/">
