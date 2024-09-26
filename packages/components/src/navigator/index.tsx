@@ -10,8 +10,8 @@ export { useNavigator } from './use-navigator';
 /**
  * The `Navigator` component allows rendering nested views/panels/menus
  * (via the `Navigator.Screen` component) and navigate between these different
- * view (via the `Navigator.Button` and `Navigator.BackButton` components or the
- * `useNavigator` hook).
+ * views (via the `Navigator.Button` and `Navigator.BackButton` components or
+ * the `useNavigator` hook).
  *
  * ```jsx
  * import { Navigator } from '@wordpress/components';

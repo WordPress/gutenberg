@@ -11,7 +11,7 @@ export { useNavigator } from './use-navigator';
 /**
  * The `NavigatorProvider` component allows rendering nested views/panels/menus
  * (via the `NavigatorScreen` component and navigate between these different
- * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+ * views (via the `NavigatorButton` and `NavigatorBackButton` components or the
  * `useNavigator` hook).
  *
  * ```jsx
