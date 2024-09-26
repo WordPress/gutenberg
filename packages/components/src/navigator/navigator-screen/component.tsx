@@ -48,7 +48,7 @@ function UnconnectedNavigatorScreen(
 		path,
 		onAnimationEnd: onAnimationEndProp,
 		...otherProps
-	} = useContextSystem( props, 'NavigatorScreen' );
+	} = useContextSystem( props, 'Navigator.Screen' );
 
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
