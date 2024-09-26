@@ -187,6 +187,7 @@ export default function PostNavigationLinkEdit( {
 			<div
 				{ ...blockProps }
 				style={ {
+					...blockProps.style,
 					...borderProps.style,
 					...spacingProps.style,
 				} }

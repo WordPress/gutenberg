@@ -130,13 +130,13 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 }
 
 /**
- * Generates class names and styles to apply the border support styles for
+ * Generates class names and styles to apply the border and spacing support styles for
  * the Post Navigation Link block.
  *
  * @since 6.7.0
  *
  * @param array $attributes The block attributes.
- * @return array The border-related classnames and styles for the block.
+ * @return array The border and spacing related classnames and styles for the block.
  */
 function get_block_core_post_navigation_link_border_and_spacing_attributes( $attributes ) {
 	$border_styles = array();
@@ -178,7 +178,7 @@ function get_block_core_post_navigation_link_border_and_spacing_attributes( $att
 		$padding_style[ $side ] = $attributes['style']['spacing']['padding'][ $side ] ?? null;
 	}
 
-	// Individual padding styles e.g. top, left etc.
+	// Individual margin styles e.g. top, left etc.
 	$margin_style = array();
 	foreach ( $sides as $side ) {
 		$margin_style[ $side ] = $attributes['style']['spacing']['margin'][ $side ] ?? null;
