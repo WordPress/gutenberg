@@ -8,9 +8,27 @@
  */
 
 /**
- * Registers a custom script for the plugin.
+ * Code necessary for testing block bindings:
+ * - Enqueues a custom script to register sources in the client.
+ * - Registers sources in the server.
+ * - Registers a custom post type and custom fields.
  */
-function enqueue_block_bindings_plugin_script() {
+function gutenberg_test_block_bindings_registration() {
+	// Define fields list.
+	$upload_dir  = wp_upload_dir();
+	$testing_url = $upload_dir['url'] . '/10x10_e2e_test_image_z9T8jK.png';
+	$fields_list = array(
+		'text_field' => array(
+			'label' => 'Text Field Label',
+			'value' => 'Text Field Value',
+		),
+		'url_field'  => array(
+			'label' => 'URL Field Label',
+			'value' => $testing_url,
+		),
+	);
+
+	// Enqueue a custom script for the plugin.
 	wp_enqueue_script(
 		'gutenberg-test-block-bindings',
 		plugins_url( 'block-bindings/index.js', __FILE__ ),
@@ -21,17 +39,30 @@ function enqueue_block_bindings_plugin_script() {
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
 		true
 	);
-}
 
-add_action( 'init', 'enqueue_block_bindings_plugin_script' );
+	// Pass data to the script.
+	wp_localize_script(
+		'gutenberg-test-block-bindings',
+		'testingBindings',
+		array(
+			'fieldsList' => $fields_list,
+		)
+	);
 
-/**
-* Register custom fields and custom block bindings sources.
-*/
-function gutenberg_test_block_bindings_registration() {
 	// Register custom block bindings sources.
 	register_block_bindings_source(
-		'core/server-source',
+		'testing/custom-source',
+		array(
+			'label'              => 'Custom Source',
+			'get_value_callback' => function ( $source_args ) use ( $fields_list ) {
+				if ( ! isset( $source_args['key'] ) || ! isset( $fields_list[ $source_args['key'] ] ) ) {
+					return null;
+				}
+				return $fields_list[ $source_args['key'] ]['value']; },
+		)
+	);
+	register_block_bindings_source(
+		'testing/server-only-source',
 		array(
 			'label'              => 'Server Source',
 			'get_value_callback' => function () {},
@@ -102,4 +133,4 @@ function gutenberg_test_block_bindings_registration() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_test_block_bindings_registration' );
+	add_action( 'init', 'gutenberg_test_block_bindings_registration' );
