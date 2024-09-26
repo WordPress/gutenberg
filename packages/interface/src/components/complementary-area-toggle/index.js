@@ -10,6 +10,25 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '../../store';
 import complementaryAreaContext from '../complementary-area-context';
 
+/**
+ * Whether the role supports checked state.
+ *
+ * @param {HTMLElement['role']} role Role.
+ * @return {boolean} Whether the role supports checked state.
+ * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+ */
+function roleSupportsCheckedState( role ) {
+	return [
+		'checkbox',
+		'option',
+		'radio',
+		'switch',
+		'menuitemcheckbox',
+		'menuitemradio',
+		'treeitem',
+	].includes( role );
+}
+
 function ComplementaryAreaToggle( {
 	as = Button,
 	scope,
@@ -37,10 +56,7 @@ function ComplementaryAreaToggle( {
 			aria-controls={ identifier.replace( '/', ':' ) }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
-				props.role === 'menuitemcheckbox' ||
-				props.role === 'menuitemradio'
-					? isSelected
-					: undefined
+				roleSupportsCheckedState( props.role ) ? isSelected : undefined
 			}
 			onClick={ () => {
 				if ( isSelected ) {
