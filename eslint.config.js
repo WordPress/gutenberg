@@ -3,6 +3,7 @@
  */
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const globals = require( 'globals' );
 const comments = require( '@eslint-community/eslint-plugin-eslint-comments/configs' );
 const storybook = require( 'eslint-plugin-storybook' );
 const jestDom = require( 'eslint-plugin-jest-dom' );
@@ -20,6 +21,7 @@ const { version } = require( './package' );
  * WordPress dependencies
  */
 const wordPress = require( '@wordpress/eslint-plugin' );
+const react = require( 'eslint-plugin-react' );
 
 /**
  * Regular expression string matching a SemVer string with equal major/minor to
@@ -160,6 +162,17 @@ const restrictedSyntax = [
 		message:
 			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 	},
+	// @TODO The following rules moved from react-native-editor ESLint config. Need to do check do we have any issue with them.
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
+		message: 'Use ellipsis character (…) in place of three dots',
+	},
+	{
+		selector:
+			'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
+		message: 'Use memize instead of Lodash’s memoize',
+	},
 ];
 
 /** `no-restricted-syntax` rules for components. */
@@ -284,9 +297,53 @@ module.exports = [
 		},
 	},
 	{
+		files: [ 'packages/react-native-editor/**' ],
+		plugins: {
+			react,
+			jest,
+		},
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				...jest.environments.globals.globals,
+				__DEV__: true,
+			},
+		},
+		settings: {
+			react: {
+				pragma: 'React',
+				version: 'detect',
+				flowVersion: '0.92.0',
+			},
+			'import/resolver': require.resolve(
+				'./tools/eslint/import-resolver'
+			),
+		},
+		rules: {
+			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+		},
+	},
+	{
+		files: [ 'packages/react-native-editor/__device-tests__/**' ],
+		languageOptions: {
+			globals: {
+				// Defined in 'jest_ui_test_environment.js'
+				editorPage: true,
+				e2eTestData: true,
+				e2eUtils: true,
+			},
+		},
+		rules: {
+			'jest/expect-expect': 'off',
+		},
+	},
+	{
 		files: [ 'packages/react-native-*/**/*.js' ],
 		settings: {
 			'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
+		},
+		rules: {
+			'import/no-unresolved': 'off',
 		},
 	},
 	{
