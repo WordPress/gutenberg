@@ -65,6 +65,7 @@
 			"clientNavigation": true
 		},
 		"spacing": {
+			"__experimentalSkipSerialization": true,
 			"margin": true,
 			"padding": true,
 			"__experimentalDefaultControls": {
@@ -73,6 +74,7 @@
 			}
 		},
 		"__experimentalBorder": {
+			"__experimentalSkipSerialization": true,
 			"radius": true,
 			"color": true,
 			"width": true,
