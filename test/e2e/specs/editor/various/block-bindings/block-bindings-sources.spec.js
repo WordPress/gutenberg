@@ -56,7 +56,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/custom-source',
+								source: 'testing/get-values',
 								args: { key: 'text_field' },
 							},
 						},
@@ -85,7 +85,7 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							content: {
-								source: 'testing/custom-source',
+								source: 'testing/get-values',
 								args: { key: 'text_field' },
 							},
 						},
@@ -118,11 +118,11 @@ test.describe( 'Registered sources', () => {
 							metadata: {
 								bindings: {
 									text: {
-										source: 'testing/custom-source',
+										source: 'testing/get-values',
 										args: { key: 'text_field' },
 									},
 									url: {
-										source: 'testing/custom-source',
+										source: 'testing/get-values',
 										args: { key: 'url_field' },
 									},
 								},
@@ -152,11 +152,11 @@ test.describe( 'Registered sources', () => {
 					metadata: {
 						bindings: {
 							url: {
-								source: 'testing/custom-source',
+								source: 'testing/get-values',
 								args: { key: 'url_field' },
 							},
 							alt: {
-								source: 'testing/custom-source',
+								source: 'testing/get-values',
 								args: { key: 'text_field' },
 							},
 						},
@@ -754,15 +754,189 @@ test.describe( 'Registered sources', () => {
 	} );
 
 	test.describe( 'getFieldsList', () => {
-		test( 'should show all the available fields in the dropdown UI', async () => {} );
-		test( 'should show the connected values in the attributes panel', async () => {} );
-		test( 'should be possible to connect the paragraph content', async () => {} );
-		test( 'should be possible to connect the heading content', async () => {} );
-		test( 'should be possible to connect the button supported attributes', async () => {
-			// Check the not supported ones are not included.
+		test( 'should be possible to update attribute value through bindings UI', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} )
+				.click();
+			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'Text Field Label' } )
+				.click();
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'Text Field Value' );
 		} );
-		test( 'should be possible to connect the image supported attributes', async () => {
-			// Check the not supported ones are not included.
+		test( 'should be possible to connect the paragraph content', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show content',
+			} );
+			await expect( contentAttribute ).toBeVisible();
+		} );
+		test( 'should be possible to connect the heading content', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/heading',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show content',
+			} );
+			await expect( contentAttribute ).toBeVisible();
+		} );
+		test( 'should be possible to connect the button supported attributes', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{
+						name: 'core/button',
+					},
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.getByRole( 'textbox' )
+				.click();
+			await page
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.getByLabel( 'Attributes options' )
+				.click();
+			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show url',
+			} );
+			await expect( urlAttribute ).toBeVisible();
+			const textAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show text',
+			} );
+			await expect( textAttribute ).toBeVisible();
+			const linkTargetAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show linkTarget',
+			} );
+			await expect( linkTargetAttribute ).toBeVisible();
+			const relAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show rel',
+			} );
+			await expect( relAttribute ).toBeVisible();
+			// Check not supported attributes are not included.
+			const tagNameAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show tagName',
+			} );
+			await expect( tagNameAttribute ).toBeHidden();
+		} );
+		test( 'should be possible to connect the image supported attributes', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+			} );
+			await page
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.getByLabel( 'Attributes options' )
+				.click();
+			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show url',
+			} );
+			await expect( urlAttribute ).toBeVisible();
+			const idAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show id',
+			} );
+			await expect( idAttribute ).toBeVisible();
+			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show title',
+			} );
+			await expect( titleAttribute ).toBeVisible();
+			const altAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show alt',
+			} );
+			await expect( altAttribute ).toBeVisible();
+			// Check not supported attributes are not included.
+			const linkClassAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show linkClass',
+			} );
+			await expect( linkClassAttribute ).toBeHidden();
+		} );
+		test( 'should show all the available fields in the dropdown UI', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'default value',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/get-fields-list',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			await page.getByRole( 'button', { name: 'content' } ).click();
+			const textField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'Text Field Label' } );
+			await expect( textField ).toBeVisible();
+			await expect( textField ).toBeChecked();
+			const urlField = page
+				.getByRole( 'menuitemradio' )
+				.filter( { hasText: 'URL Field Label' } );
+			await expect( urlField ).toBeVisible();
+			await expect( urlField ).not.toBeChecked();
+		} );
+		test( 'should show the connected fields in the attributes panel', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'default value',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'testing/get-fields-list',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				},
+			} );
+			const contentButton = page.getByRole( 'button', {
+				name: 'content',
+			} );
+			await expect( contentButton ).toContainText( 'Text Field Label' );
 		} );
 	} );
 
