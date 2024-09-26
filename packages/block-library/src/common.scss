@@ -31,21 +31,6 @@
 	font-size: var(--wp--preset--font-size--huge);
 }
 
-// Text alignments.
-.has-text-align-center {
-	text-align: center;
-}
-
-.has-text-align-left {
-	/*rtl:ignore*/
-	text-align: left;
-}
-
-.has-text-align-right {
-	/*rtl:ignore*/
-	text-align: right;
-}
-
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;

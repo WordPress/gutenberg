@@ -607,6 +607,22 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	return $preset['size'];
 }
 
+function gutenberg_output_typography_styles() {
+	foreach ( array( 'left', 'center', 'right' ) as $alignment ) {
+		gutenberg_style_engine_get_styles(
+			array(
+				'typography' => array(
+					'textAlign' => $alignment,
+				),
+			),
+			array(
+				'selector' => ".has-text-align-{$alignment}",
+				'context'  => 'block-supports',
+			)
+		);
+	}
+}
+
 // Register the block support.
 WP_Block_Supports::get_instance()->register(
 	'typography',
@@ -620,3 +636,8 @@ if ( function_exists( 'wp_render_typography_support' ) ) {
 	remove_filter( 'render_block', 'wp_render_typography_support' );
 }
 add_filter( 'render_block', 'gutenberg_render_typography_support', 10, 2 );
+
+if ( function_exists( 'wp_output_typography_styles' ) ) {
+	remove_action( 'enqueue_block_assets', 'wp_output_typography_styles' );
+}
+add_filter( 'enqueue_block_assets', 'gutenberg_output_typography_styles', 9 );

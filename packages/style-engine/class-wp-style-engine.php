@@ -273,6 +273,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'lineHeight' ),
 				),
+				'textAlign'       => array(
+					'property_keys' => array(
+						'default' => 'text-align',
+					),
+					'path'          => array( 'typography', 'textAlign' ),
+				),
 				'textColumns'    => array(
 					'property_keys' => array(
 						'default' => 'column-count',
