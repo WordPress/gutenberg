@@ -149,6 +149,74 @@ const restrictedSyntaxComponents = [
 	},
 ];
 
+/** `no-restricted-syntax` rules for components, related to temporary prop migrations. */
+const restrictedSyntaxComponentsTemporary = [
+	// Temporary rules until we're ready to officially deprecate the bottom margins.
+	...[
+		'BaseControl',
+		'CheckboxControl',
+		'ComboboxControl',
+		'DimensionControl',
+		'FocalPointPicker',
+		'RangeControl',
+		'SearchControl',
+		'SelectControl',
+		'TextControl',
+		'TextareaControl',
+		'ToggleControl',
+		'ToggleGroupControl',
+		'TreeSelect',
+	].map( ( componentName ) => ( {
+		selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+		message:
+			componentName +
+			' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+	} ) ),
+	// Temporary rules until we're ready to officially default to the new size.
+	...[
+		'BorderBoxControl',
+		'BorderControl',
+		'BoxControl',
+		'ComboboxControl',
+		'CustomSelectControl',
+		'DimensionControl',
+		'FontAppearanceControl',
+		'FontFamilyControl',
+		'FontSizePicker',
+		'FormTokenField',
+		'InputControl',
+		'LetterSpacingControl',
+		'LineHeightControl',
+		'NumberControl',
+		'RangeControl',
+		'SelectControl',
+		'TextControl',
+		'ToggleGroupControl',
+		'UnitControl',
+	].map( ( componentName ) => ( {
+		// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
+		selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
+		message:
+			componentName +
+			' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+	} ) ),
+	{
+		// Falsy `__next40pxDefaultSize` without a `render` prop.
+		selector:
+			'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+		message:
+			'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+	},
+	// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
+	...[ 'Button' ].map( ( componentName ) => ( {
+		// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
+		selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
+		message:
+			componentName +
+			' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+	} ) ),
+];
+
 module.exports = {
 	root: true,
 	extends: [
@@ -296,70 +364,7 @@ module.exports = {
 					'error',
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
-					// Temporary rules until we're ready to officially deprecate the bottom margins.
-					...[
-						'BaseControl',
-						'CheckboxControl',
-						'ComboboxControl',
-						'DimensionControl',
-						'FocalPointPicker',
-						'RangeControl',
-						'SearchControl',
-						'SelectControl',
-						'TextControl',
-						'TextareaControl',
-						'ToggleControl',
-						'ToggleGroupControl',
-						'TreeSelect',
-					].map( ( componentName ) => ( {
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
-						message:
-							componentName +
-							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
-					} ) ),
-					// Temporary rules until we're ready to officially default to the new size.
-					...[
-						'BorderBoxControl',
-						'BorderControl',
-						'BoxControl',
-						'ComboboxControl',
-						'CustomSelectControl',
-						'DimensionControl',
-						'FontAppearanceControl',
-						'FontFamilyControl',
-						'FontSizePicker',
-						'FormTokenField',
-						'InputControl',
-						'LetterSpacingControl',
-						'LineHeightControl',
-						'NumberControl',
-						'RangeControl',
-						'SelectControl',
-						'TextControl',
-						'ToggleGroupControl',
-						'UnitControl',
-					].map( ( componentName ) => ( {
-						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					} ) ),
-					{
-						// Falsy `__next40pxDefaultSize` without a `render` prop.
-						selector:
-							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
-						message:
-							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					},
-					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'Button' ].map( ( componentName ) => ( {
-						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					} ) ),
+					...restrictedSyntaxComponentsTemporary,
 				],
 			},
 		},
@@ -484,6 +489,7 @@ module.exports = {
 					'error',
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
+					...restrictedSyntaxComponentsTemporary,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
