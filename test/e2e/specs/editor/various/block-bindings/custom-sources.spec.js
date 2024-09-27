@@ -442,6 +442,10 @@ test.describe( 'Registered sources', () => {
 									source: 'testing/can-user-edit-false',
 									args: { key: 'text_field' },
 								},
+								title: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'text_field' },
+								},
 							},
 						},
 					},
@@ -486,12 +490,12 @@ test.describe( 'Registered sources', () => {
 					page
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
-				).toBeEnabled();
+				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( 'default title value' );
+				expect( titleValue ).toBe( 'Text Field Value' );
 			} );
 		} );
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
