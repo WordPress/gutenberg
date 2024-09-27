@@ -99,12 +99,9 @@ function PostAuthorEdit( {
 
 	return (
 		<>
-			<InspectorControls>
+			<InspectorControls __nextNoBaseControlMargin>
 				<PanelBody title={ __( 'Settings' ) }>
-					<VStack
-						spacing={ 4 }
-						className="wp-block-post-author__inspector-settings"
-					>
+					<VStack spacing={ 4 }>
 						{ showAuthorControl &&
 							( ( showCombobox && (
 								<ComboboxControl
