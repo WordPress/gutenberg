@@ -10,6 +10,7 @@
 ### Deprecations
 
 -   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+-   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
 
 ### Enhancements
 
