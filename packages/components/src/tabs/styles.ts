@@ -23,7 +23,7 @@ export const TabListWrapper = styled.div`
 	}
 
 	@media not ( prefers-reduced-motion ) {
-		&.is-animation-enabled::after {
+		&.is-animation-enabled::before {
 			transition-property: transform, top;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
@@ -37,7 +37,7 @@ export const TabListWrapper = styled.div`
 		--direction-origin-x: right;
 		--indicator-start: var( --indicator-right );
 	}
-	&::after {
+	&::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
@@ -52,7 +52,7 @@ export const TabListWrapper = styled.div`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&:not( [aria-orientation='vertical'] ) {
-		&::after {
+		&::before {
 			bottom: 0;
 			height: 0;
 			width: calc( var( --antialiasing-factor ) * 1px );
@@ -71,8 +71,7 @@ export const TabListWrapper = styled.div`
 				${ COLORS.theme.accent };
 		}
 	}
-	&[aria-orientation='vertical']::after {
-		z-index: -1;
+	&[aria-orientation='vertical']::before {
 		border-radius: ${ CONFIG.radiusSmall };
 		top: calc( var( --indicator-top ) * 1px );
 		left: 0;
@@ -117,7 +116,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		// Focus.
-		&::before {
+		&::after {
 			content: '';
 			position: absolute;
 			top: ${ space( 3 ) };
@@ -140,7 +139,7 @@ export const Tab = styled( Ariakit.Tab )`
 			}
 		}
 
-		&:focus-visible::before {
+		&:focus-visible::after {
 			opacity: 1;
 		}
 	}

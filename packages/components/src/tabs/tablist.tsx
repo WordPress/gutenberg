@@ -69,7 +69,7 @@ export const TabList = forwardRef<
 			render={
 				<TabListWrapper
 					onTransitionEnd={ ( event ) => {
-						if ( event.pseudoElement === '::after' ) {
+						if ( event.pseudoElement === '::before' ) {
 							setAnimationEnabled( false );
 						}
 					} }
