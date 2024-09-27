@@ -27,9 +27,9 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element"
+		"@wordpress/compose": "*",
+		"@wordpress/data": "*",
+		"@wordpress/element": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

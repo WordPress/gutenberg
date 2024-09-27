@@ -29,7 +29,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "*"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -32,13 +32,13 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/data": "*",
+		"@wordpress/deprecated": "*",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/icons": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

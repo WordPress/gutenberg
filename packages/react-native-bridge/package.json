@@ -24,7 +24,7 @@
 	"main": "index.js",
 	"react-native": "index",
 	"dependencies": {
-		"@wordpress/react-native-aztec": "file:../react-native-aztec"
+		"@wordpress/react-native-aztec": "*"
 	},
 	"peerDependencies": {
 		"react-native": "*"

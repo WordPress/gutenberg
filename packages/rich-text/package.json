@@ -32,14 +32,14 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/escape-html": "file:../escape-html",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/a11y": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/data": "*",
+		"@wordpress/deprecated": "*",
+		"@wordpress/element": "*",
+		"@wordpress/escape-html": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/keycodes": "*",
 		"memize": "^2.1.0"
 	},
 	"peerDependencies": {

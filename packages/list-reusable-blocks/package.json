@@ -27,12 +27,12 @@
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/blob": "file:../blob",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/api-fetch": "*",
+		"@wordpress/blob": "*",
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
 		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {

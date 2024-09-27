@@ -30,7 +30,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/deprecated": "*"
 	},
 	"publishConfig": {
 		"access": "public"

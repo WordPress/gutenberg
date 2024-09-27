@@ -28,12 +28,12 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/element": "*",
+		"@wordpress/hooks": "*",
+		"@wordpress/icons": "*",
+		"@wordpress/is-shallow-equal": "*",
 		"memize": "^2.0.1"
 	},
 	"peerDependencies": {

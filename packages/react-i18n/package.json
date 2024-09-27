@@ -29,8 +29,8 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
 		"utility-types": "^3.10.0"
 	},
 	"publishConfig": {

@@ -29,9 +29,9 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/api-fetch": "*",
+		"@wordpress/data": "*",
+		"@wordpress/deprecated": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"
