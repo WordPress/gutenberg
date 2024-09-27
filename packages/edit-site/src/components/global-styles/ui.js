@@ -32,7 +32,6 @@ import {
 } from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
-import ScreenTypeset from './screen-typeset';
 import ScreenTypographyElement from './screen-typography-element';
 import FontSize from './font-sizes/font-size';
 import FontSizes from './font-sizes/font-sizes';
@@ -323,10 +322,6 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
 				<FontSize />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/typography/typeset">
-				<ScreenTypeset />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography/text">
