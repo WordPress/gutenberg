@@ -17,6 +17,7 @@
 	}
 
 	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
+	.block-editor-inspector-controls__no-base-control-margin,
 	.components-focal-point-picker-control,
 	.components-query-controls,
 	.components-range-control {
