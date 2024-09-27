@@ -15,8 +15,8 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
-	isNavigationMode,
 	getBlockRootClientId,
+	__unstableGetEditorMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -523,7 +523,10 @@ export function isSectionBlock( state, clientId ) {
 	return (
 		getBlockName( state, clientId ) === 'core/block' ||
 		getTemplateLock( state, clientId ) === 'contentOnly' ||
-		( isNavigationMode( state ) && sectionClientIds.includes( clientId ) )
+		( [ 'navigation', 'zoom-out' ].includes(
+			__unstableGetEditorMode( state )
+		) &&
+			sectionClientIds.includes( clientId ) )
 	);
 }
 
