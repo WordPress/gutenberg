@@ -14,8 +14,13 @@ const getValues = ( { bindings } ) => {
 	}
 	return newValues;
 };
-const setValues = () => {
-	// DO NOTHING
+const setValues = ( { registry, bindings } ) => {
+	Object.values( bindings ).forEach( ( { args, newValue } ) => {
+		// Example of what could be done.
+		registry.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
+			meta: { [ args?.key ]: newValue },
+		} );
+	} );
 };
 
 registerBlockBindingsSource( {
