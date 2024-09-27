@@ -257,6 +257,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				'edit-post-layout__metaboxes',
 				! isLegacy && 'edit-post-meta-boxes-main__liner'
 			) }
+			hidden={ ! isLegacy && ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
@@ -300,7 +301,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	if ( isShort ) {
 		Pane = NavigableRegion;
 		paneProps = {
-			className: clsx( className, 'is-toggle-only', isOpen && 'is-open' ),
+			className: clsx( className, 'is-toggle-only' ),
 		};
 	} else {
 		Pane = ResizableBox;
