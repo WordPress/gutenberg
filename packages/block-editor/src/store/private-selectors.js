@@ -474,69 +474,45 @@ export function getExpandedBlock( state ) {
  * with the provided client ID.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
-				result = current;
-			}
+export const getContentLockingParent = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blockListSettings,
-		state.settings.templateLock,
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID of the parent section block.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getParentSectionBlock = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( isSectionBlock( state, current ) ) {
-				result = current;
-			}
+export const getParentSectionBlock = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( isSectionBlock( state, current ) ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockListSettings,
-		state.editorMode,
-		state.settings.templateLock,
-		state.blocks.byClientId,
-		getSectionRootClientId( state ),
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID is a content locking parent
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {boolean} Whether the block is a content locking parent.
  */
@@ -642,24 +618,30 @@ export function isZoomOut( state ) {
 /**
  * Finds the closest block where the block is allowed to be inserted.
  *
- * @param {Object} state    Editor state.
- * @param {string} name     Block name.
- * @param {string} clientId Default insertion point.
+ * @param {Object}            state    Editor state.
+ * @param {string[] | string} name     Block name or names.
+ * @param {string}            clientId Default insertion point.
  *
  * @return {string} clientID of the closest container when the block name can be inserted.
  */
 export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
+	const blockNames = Array.isArray( name ) ? name : [ name ];
+	const areBlockNamesAllowedInClientId = ( id ) =>
+		blockNames.every( ( currentName ) =>
+			canInsertBlockType( state, currentName, id )
+		);
+
 	// If we're trying to insert at the root level and it's not allowed
 	// Try the section root instead.
 	if ( ! clientId ) {
-		if ( canInsertBlockType( state, name, clientId ) ) {
+		if ( areBlockNamesAllowedInClientId( clientId ) ) {
 			return clientId;
 		}
 
 		const sectionRootClientId = getSectionRootClientId( state );
 		if (
 			sectionRootClientId &&
-			canInsertBlockType( state, name, sectionRootClientId )
+			areBlockNamesAllowedInClientId( sectionRootClientId )
 		) {
 			return sectionRootClientId;
 		}
@@ -668,10 +650,37 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 
 	// Traverse the block tree up until we find a place where we can insert.
 	let current = clientId;
-	while ( current !== null && ! canInsertBlockType( state, name, current ) ) {
+	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
 		const parentClientId = getBlockRootClientId( state, current );
 		current = parentClientId;
 	}
 
 	return current;
+}
+
+export function getClosestAllowedInsertionPointForPattern(
+	state,
+	pattern,
+	clientId
+) {
+	const { allowedBlockTypes } = getSettings( state );
+	const isAllowed = checkAllowListRecursive(
+		getGrammar( pattern ),
+		allowedBlockTypes
+	);
+	if ( ! isAllowed ) {
+		return null;
+	}
+	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
+	return getClosestAllowedInsertionPoint( state, names, clientId );
+}
+
+/**
+ * Where the point where the next block will be inserted into.
+ *
+ * @param {Object} state
+ * @return {Object} where the insertion point in the block editor is or null if none is set.
+ */
+export function getInsertionPoint( state ) {
+	return state.insertionPoint;
 }

@@ -14,7 +14,12 @@
 ### Enhancements
 
 -   `BorderControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+-   `BorderBoxControl`: promote to stable ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
 -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+-   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+-   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
 
 ## 28.8.0 (2024-09-19)
 

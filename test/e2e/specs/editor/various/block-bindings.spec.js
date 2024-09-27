@@ -2390,6 +2390,33 @@ test.describe( 'Block bindings', () => {
 					previewPage.locator( '#image-alt-binding img' )
 				).toHaveAttribute( 'alt', 'new value' );
 			} );
+
+			test( 'should not be possible to edit the value of the protected custom fields', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: '_protected_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
 		} );
 	} );
 

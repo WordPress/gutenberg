@@ -26,7 +26,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-
+import { unlock } from '../lock-unlock';
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -726,15 +726,32 @@ export function removeEditorPanel( panelName ) {
  *                                              use an object.
  * @param {string}         value.rootClientId   The root client ID to insert at.
  * @param {number}         value.insertionIndex The index to insert at.
+ * @param {string}         value.filterValue    A query to filter the inserter results.
+ * @param {Function}       value.onSelect       A callback when an item is selected.
+ * @param {string}         value.tab            The tab to open in the inserter.
+ * @param {string}         value.category       The category to initialize in the inserter.
  *
  * @return {Object} Action object.
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { dispatch, registry } ) => {
+		if (
+			typeof value === 'object' &&
+			value.hasOwnProperty( 'rootClientId' ) &&
+			value.hasOwnProperty( 'insertionIndex' )
+		) {
+			unlock( registry.dispatch( blockEditorStore ) ).setInsertionPoint( {
+				rootClientId: value.rootClientId,
+				index: value.insertionIndex,
+			} );
+		}
+
+		dispatch( {
+			type: 'SET_IS_INSERTER_OPENED',
+			value,
+		} );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.

@@ -58,7 +58,7 @@ When creating a new package, you need to provide at least the following:
     Initial release.
     ```
 
-To ensure your package is recognised, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
+To ensure your package is recognized, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
 
 ## Managing Dependencies
 
@@ -104,7 +104,7 @@ Next, you need to run `npm install` in the root of the project to ensure that `p
 This is the most confusing part of working with [monorepo] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
 
 1.  First, remove the existing dependency as described in the previous section.
-2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+2.  Next, add the same dependency back as described in the first section of this chapter. This time it will get the latest version applied unless you enforce a different version explicitly.
 
 ### Development Dependencies
 
@@ -152,9 +152,9 @@ It's very important to have a good plan for what a new package will include. All
 
 ## Maintaining Changelogs
 
-In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
+When maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
 
-For each pull request, you should always include relevant changes in a "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
+For each pull request, you should always include relevant changes under an "Unreleased" heading at the top of the file. You should add the heading if it doesn't already exist.
 
 _Example:_
 
@@ -200,7 +200,7 @@ Gutenberg uses TypeScript by running the TypeScript compiler (`tsc`) on select p
 These packages benefit from type checking and produced type declarations in the published packages.
 
 To opt-in to TypeScript tooling, packages should include a `tsconfig.json` file in the package root and add an entry to the root `tsconfig.json` references.
-The changes will indicate that the package has opted-in and will be included in the TypeScript build process.
+The changes will indicate that the package has opted in and will be included in the TypeScript build process.
 
 A `tsconfig.json` file should look like the following (comments are not necessary):
 
