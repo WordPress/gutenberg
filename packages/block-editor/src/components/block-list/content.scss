@@ -411,6 +411,18 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	margin-left: -1px;
 	margin-right: -1px;
 	transition: background-color 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $default-font-size;
+	font-family: $default-font;
+	color: $black;
+	font-weight: normal;
+
+	.is-zoomed-out & {
+		// Scale the font size based on the zoom level.
+		font-size: calc(#{$default-font-size} * ( 2 - var(--wp-block-editor-iframe-zoom-out-scale)  ));
+	}
 
 	&.is-dragged-over {
 		background: $gray-400;
