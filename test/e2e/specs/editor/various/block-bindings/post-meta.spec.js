@@ -370,6 +370,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: {
+					anchor: 'connected-paragraph',
 					content: 'fallback content',
 					metadata: {
 						bindings: {
@@ -389,6 +390,11 @@ test.describe( 'Post Meta source', () => {
 			await expect( paragraphBlock ).toHaveText(
 				'Movie field default value'
 			);
+			// Check the frontend shows the value of the custom field.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-paragraph' )
+			).toHaveText( 'Movie field default value' );
 		} );
 		test( 'should fall back to the key when custom field is not accessible', async ( {
 			editor,
