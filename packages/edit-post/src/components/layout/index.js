@@ -257,7 +257,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				'edit-post-layout__metaboxes',
 				! isLegacy && 'edit-post-meta-boxes-main__liner'
 			) }
-			hidden={ ! isLegacy && ! isOpen }
+			hidden={ ! isLegacy && isShort && ! isOpen }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
