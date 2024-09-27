@@ -41,6 +41,10 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		svg {
+			fill: currentColor;
+		}
 	}
 
 	&:not(.is-selected) .block-editor-list-view-block-select-button {
