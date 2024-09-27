@@ -12,7 +12,11 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { applyFilters } from '@wordpress/hooks';
+import {
+	applyFilters,
+	applyFiltersAsync,
+	doActionAsync,
+} from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 
@@ -199,9 +203,9 @@ export const savePost =
 
 		let error = false;
 		try {
-			edits = await applyFilters(
+			edits = await applyFiltersAsync(
 				'editor.preSavePost',
-				Promise.resolve( edits ),
+				edits,
 				options
 			);
 		} catch ( err ) {
@@ -251,11 +255,7 @@ export const savePost =
 
 		if ( ! error ) {
 			try {
-				await applyFilters(
-					'editor.savePost',
-					Promise.resolve(),
-					options
-				);
+				await doActionAsync( 'editor.savePost', options );
 			} catch ( err ) {
 				error = err;
 			}
