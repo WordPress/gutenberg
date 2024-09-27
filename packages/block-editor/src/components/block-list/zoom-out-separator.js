@@ -13,6 +13,7 @@ import {
 import { useReducedMotion } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -103,7 +104,19 @@ export function ZoomOutSeparator( {
 					data-is-insertion-point="true"
 					onDragOver={ () => setIsDraggedOver( true ) }
 					onDragLeave={ () => setIsDraggedOver( false ) }
-				></motion.div>
+				>
+					<motion.div
+						initial={ { opacity: 0 } }
+						animate={ { opacity: 1 } }
+						exit={ { opacity: 0 } }
+						transition={ {
+							type: 'tween',
+							duration: 0.1,
+						} }
+					>
+						{ __( 'Drop pattern.' ) }
+					</motion.div>
+				</motion.div>
 			) }
 		</AnimatePresence>
 	);
