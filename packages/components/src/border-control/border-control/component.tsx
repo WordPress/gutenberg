@@ -56,7 +56,6 @@ const UnconnectedBorderControl = (
 		placeholder,
 		__unstablePopoverProps,
 		previousStyleSelection,
-		showDropdownHeader,
 		size,
 		sliderClassName,
 		value: border,
@@ -91,7 +90,6 @@ const UnconnectedBorderControl = (
 								previousStyleSelection={
 									previousStyleSelection
 								}
-								showDropdownHeader={ showDropdownHeader }
 								__experimentalIsRenderedInSidebar={
 									__experimentalIsRenderedInSidebar
 								}

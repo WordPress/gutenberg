@@ -125,13 +125,6 @@ new border value.
 -   Required: No
 -   Default: `true`
 
-### `showDropdownHeader`: `boolean`
-
-Whether or not to render a header for the border color and style picker
-dropdown. The header includes a label for the color picker and a close button.
-
--   Required: No
-
 ### `size`: `string`
 
 Size of the control.

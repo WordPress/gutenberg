@@ -85,12 +85,6 @@ export type BorderControlProps = ColorProps &
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
-		 * Whether or not to show the header for the border color and style
-		 * picker dropdown. The header includes a label for the color picker
-		 * and a close button.
-		 */
-		showDropdownHeader?: boolean;
-		/**
 		 * Size of the control.
 		 *
 		 * @default 'default'
@@ -145,12 +139,6 @@ export type DropdownProps = ColorProps &
 		 * to a non-zero value.
 		 */
 		previousStyleSelection?: string;
-		/**
-		 * Whether or not to render a header for the border color and style picker
-		 * dropdown. The header includes a label for the color picker and a
-		 * close button.
-		 */
-		showDropdownHeader?: boolean;
 	};
 
 export type StylePickerProps = Omit<
