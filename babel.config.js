@@ -1,4 +1,5 @@
 module.exports = ( api ) => {
+	const isTest = api.env( 'test' );
 	api.cache( true );
 
 	return {
@@ -6,8 +7,8 @@ module.exports = ( api ) => {
 		plugins: [
 			'@emotion/babel-plugin',
 			'babel-plugin-inline-json-import',
-			require.resolve( '@shopify/web-worker/babel' ),
-		],
+			! isTest && require.resolve( '@shopify/web-worker/babel' ),
+		].filter( Boolean ),
 		overrides: [
 			{
 				test: 'packages/block-library/src/index.js',
