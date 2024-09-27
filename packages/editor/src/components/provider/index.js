@@ -224,9 +224,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			shouldRenderTemplate,
 			post.id,
 			post.type,
+			post.slug,
+			postTypesSlugs,
 			rootLevelPost.type,
 			rootLevelPost.slug,
-			postTypes,
 		] );
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
