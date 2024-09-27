@@ -170,6 +170,13 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					isSelected={ () => false }
 					showCloseButton={ false }
 					showTabs={ false }
+					onSelect={ ( blockName ) => {
+						history.push( {
+							path: `/wp_global_styles/blocks/${ encodeURIComponent(
+								blockName
+							) }`,
+						} );
+					} }
 				/>
 			) }
 		</>
