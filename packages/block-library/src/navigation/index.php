@@ -1505,9 +1505,9 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 		return apply_block_hooks_to_content( $mock_navigation_block_markup, $post, 'insert_hooked_blocks' );
 	}
 
-	$hooked_blocks         = get_hooked_blocks();
-	$before_block_visitor  = null;
-	$after_block_visitor   = null;
+	$hooked_blocks        = get_hooked_blocks();
+	$before_block_visitor = null;
+	$after_block_visitor  = null;
 
 	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
 		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
