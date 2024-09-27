@@ -2,12 +2,11 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useMemo, useState } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +22,7 @@ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
 import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
+import { useMergeRefs } from '@wordpress/compose';
 
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
@@ -53,12 +53,26 @@ function UnconnectedToggleGroupControl(
 		value ? activeElement : undefined
 	);
 
-	const [ animationEnabled, setAnimationEnabled ] = useState( false );
+	const controlRef = useRef< HTMLElement >( null );
 	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
+		( [ 'left', 'width', 'height' ] as const ).forEach(
+			( property ) =>
+				controlRef.current?.style.setProperty(
+					`--indicator-${ property }`,
+					String( indicatorPosition[ property ] )
+				)
+		);
 		// Only enable the animation when moving from one element to another.
 		if ( indicatorPosition.element && previousValue ) {
-			setAnimationEnabled( true );
+			controlRef.current?.classList.add( 'is-animation-enabled' );
 		}
+	} );
+	useLayoutEffect( () => {
+		controlRef.current?.addEventListener( 'transitionend', ( event ) => {
+			if ( event.pseudoElement === '::before' ) {
+				controlRef.current?.classList.remove( 'is-animation-enabled' );
+			}
+		} );
 	} );
 
 	const cx = useCx();
@@ -95,25 +109,11 @@ function UnconnectedToggleGroupControl(
 			<MainControl
 				{ ...otherProps }
 				setActiveElement={ setActiveElement }
-				className={ clsx(
-					animationEnabled && 'is-animation-enabled',
-					classes
-				) }
-				style={ {
-					'--indicator-left': indicatorPosition.left,
-					'--indicator-width': indicatorPosition.width,
-					'--indicator-height': indicatorPosition.height,
-					...otherProps.style,
-				} }
-				onTransitionEnd={ ( event ) => {
-					if ( event.pseudoElement === '::before' ) {
-						setAnimationEnabled( false );
-					}
-				} }
+				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ forwardedRef }
+				ref={ useMergeRefs( [ controlRef, forwardedRef ] ) }
 				size={ normalizedSize }
 				value={ value }
 			>
