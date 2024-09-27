@@ -154,7 +154,7 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='vertical'] & {
 		padding-left: ${ space( 3 ) };
 		padding-right: ${ space( 3 ) };
-		height: ${ space( 10 ) };
+		min-height: ${ space( 10 ) };
 		&[data-active-item] {
 			font-weight: 500;
 			color: ${ COLORS.theme.accent };
