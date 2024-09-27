@@ -21,7 +21,7 @@ import {
 	PATTERN_TYPES,
 } from '../../utils/constants';
 
-export function MainSidebarNavigationContent( { activeItem } ) {
+export function MainSidebarNavigationContent() {
 	return (
 		<ItemGroup>
 			<SidebarNavigationItem
@@ -29,7 +29,6 @@ export function MainSidebarNavigationContent( { activeItem } ) {
 				params={ { postType: NAVIGATION_POST_TYPE } }
 				withChevron
 				icon={ navigation }
-				aria-current={ activeItem === 'navigation-navigation-item' }
 			>
 				{ __( 'Navigation' ) }
 			</SidebarNavigationItem>
@@ -38,7 +37,6 @@ export function MainSidebarNavigationContent( { activeItem } ) {
 				className="is-selected"
 				withChevron
 				icon={ styles }
-				aria-current={ activeItem === 'styles-navigation-item' }
 			>
 				{ __( 'Styles' ) }
 			</SidebarNavigationItemGlobalStyles>
@@ -47,7 +45,6 @@ export function MainSidebarNavigationContent( { activeItem } ) {
 				params={ { postType: 'page' } }
 				withChevron
 				icon={ page }
-				aria-current={ activeItem === 'page-navigation-item' }
 			>
 				{ __( 'Pages' ) }
 			</SidebarNavigationItem>
@@ -56,7 +53,6 @@ export function MainSidebarNavigationContent( { activeItem } ) {
 				params={ { postType: TEMPLATE_POST_TYPE } }
 				withChevron
 				icon={ layout }
-				aria-current={ activeItem === 'template-navigation-item' }
 			>
 				{ __( 'Templates' ) }
 			</SidebarNavigationItem>
@@ -65,7 +61,6 @@ export function MainSidebarNavigationContent( { activeItem } ) {
 				params={ { postType: PATTERN_TYPES.user } }
 				withChevron
 				icon={ symbol }
-				aria-current={ activeItem === 'patterns-navigation-item' }
 			>
 				{ __( 'Patterns' ) }
 			</SidebarNavigationItem>
