@@ -308,7 +308,7 @@ const MyNavigation = ( {
 					</CustomNavigatorBackButton>
 				</Navigator.Screen>
 
-				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
+				{ /* A `Navigator.Screen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
 			</Navigator>
 
 			<label htmlFor="test-input-outer">Outer input</label>

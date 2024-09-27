@@ -106,8 +106,8 @@ export type NavigatorScreenProps = {
 	 * segment starts with and is separated by the `/` character.
 	 *
 	 * `Navigator` will treat "back" navigations as going to the parent screen —
-	 * it is therefore responsibility of the consumer of the component to create
-	 * the correct screen hierarchy.
+	 * it is, therefore, the responsibility of the consumer of the component to
+	 * create the correct screen hierarchy.
 	 *
 	 * For example:
 	 *  - `/` is the root of all paths. There should always be a screen with

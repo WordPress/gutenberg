@@ -1,6 +1,6 @@
 # `Navigator`
 
-`Navigator` is a collection components that allow rendering nested views/panels/menus (via the [`Navigator.Screen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between them (via the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components).
+`Navigator` is a collection components that allow rendering nested views/panels/menus (via the `Navigator.Screen` component) and navigate between them (via the `Navigator.Button` and `Navigator.BackButton` components).
 
 ## Usage
 
@@ -27,7 +27,7 @@ const MyNavigation = () => (
 
 `Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
 
-`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+`Navigator` will treat "back" navigations as going to the parent screen — it is, therefore, the responsibility of the consumer of the component to create the correct screen hierarchy.
 
 For example:
 
@@ -72,11 +72,11 @@ The children elements.
 
 ###### `path`: `string`
 
-The screen&quot;s path, matched against the current path stored in the navigator.
+The screen's path, matched against the current path stored in the navigator.
 
 `Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
 
-`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+`Navigator` will treat "back" navigations as going to the parent screen — it is, therefore, the responsibility of the consumer of the component to create the correct screen hierarchy.
 
 For example:
 
@@ -151,13 +151,13 @@ The available options are:
 
 The `goBack` function allows navigating to the parent screen. Parent/child navigation only works if the paths you define are hierarchical (see note above).
 
-When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
+When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
 
 The available options are the same as for the `goTo` method, except for the `isBack` property, which is not available for the `goBack` method.
 
 ###### `location`: `NavigatorLocation`
 
-The `location` object represent the current location, and has a few properties:
+The `location` object represents the current location, and has a few properties:
 
 -   `path`: `string`. The path associated to the location.
 -   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards.
