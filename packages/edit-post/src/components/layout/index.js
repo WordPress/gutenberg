@@ -77,7 +77,7 @@ import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode, NavigableRegion } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -298,14 +298,14 @@ function MetaBoxesMain( { isLegacy } ) {
 	const paneLabel = __( 'Meta Boxes' );
 	let Pane, paneProps;
 	if ( isShort ) {
-		Pane = 'aside';
+		Pane = NavigableRegion;
 		paneProps = {
 			className: clsx( className, 'is-toggle-only', isOpen && 'is-open' ),
 		};
 	} else {
 		Pane = ResizableBox;
 		paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
-			as: 'aside',
+			as: NavigableRegion,
 			ref: metaBoxesMainRef,
 			className: clsx( className, 'is-resizable' ),
 			defaultSize: { height: openHeight },
