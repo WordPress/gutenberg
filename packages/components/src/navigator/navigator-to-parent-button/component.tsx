@@ -23,15 +23,7 @@ function UnconnectedNavigatorToParentButton(
 	return <NavigatorBackButton ref={ forwardedRef } { ...props } />;
 }
 
-/**
- * _Note: this component is deprecated. Please use the `NavigatorBackButton`
- * component instead._
- *
- * @deprecated
- */
 export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
 	'NavigatorToParentButton'
 );
-
-export default NavigatorToParentButton;

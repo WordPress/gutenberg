@@ -172,29 +172,29 @@ const v6Attributes = {
 		selector: 'figure img',
 		attribute: 'alt',
 		default: '',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaId: {
 		type: 'number',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaUrl: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure video,figure img',
 		attribute: 'src',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	href: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure a',
 		attribute: 'href',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaType: {
 		type: 'string',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 };
 

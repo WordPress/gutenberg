@@ -21,7 +21,7 @@ import {
 	NavigatorBackButton,
 	NavigatorToParentButton,
 	useNavigator,
-} from '..';
+} from '../legacy';
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
@@ -640,6 +640,14 @@ describe( 'Navigator', () => {
 		expect(
 			getNavigationButton( 'toInvalidHtmlPathScreen' )
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
+	} );
+
+	it( 'should warn if the `path` prop does not follow the required format', () => {
+		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
 	} );
 
 	it( 'should match correctly paths with named arguments', async () => {

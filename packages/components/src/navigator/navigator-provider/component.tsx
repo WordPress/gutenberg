@@ -21,7 +21,7 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
 import type {
-	NavigatorProviderProps,
+	NavigatorProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
 	NavigateOptions,
@@ -66,7 +66,7 @@ function goTo(
 	options: NavigateOptions = {}
 ) {
 	const { focusSelectors } = state;
-	const currentLocation = { ...state.currentLocation, isInitial: false };
+	const currentLocation = { ...state.currentLocation };
 
 	const {
 		// Default assignments
@@ -114,6 +114,7 @@ function goTo(
 	return {
 		currentLocation: {
 			...restOptions,
+			isInitial: false,
 			path,
 			isBack,
 			hasRestoredFocus: false,
@@ -129,7 +130,7 @@ function goToParent(
 	options: NavigateToParentOptions = {}
 ) {
 	const { screens, focusSelectors } = state;
-	const currentLocation = { ...state.currentLocation, isInitial: false };
+	const currentLocation = { ...state.currentLocation };
 	const currentPath = currentLocation.path;
 	if ( currentPath === undefined ) {
 		return { currentLocation, focusSelectors };
@@ -212,8 +213,8 @@ function routerReducer(
 	};
 }
 
-function UnconnectedNavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+function UnconnectedNavigator(
+	props: WordPressComponentProps< NavigatorProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
@@ -320,9 +321,9 @@ function UnconnectedNavigatorProvider(
  * );
  * ```
  */
-export const NavigatorProvider = contextConnect(
-	UnconnectedNavigatorProvider,
+export const Navigator = contextConnect(
+	UnconnectedNavigator,
 	'NavigatorProvider'
 );
 
-export default NavigatorProvider;
+export default Navigator;

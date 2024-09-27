@@ -216,6 +216,12 @@ module.exports = {
 			},
 		],
 		'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+		'jsdoc/check-tag-names': [
+			'error',
+			{
+				definedTags: [ 'jest-environment' ],
+			},
+		],
 	},
 	overrides: [
 		{
@@ -315,6 +321,7 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'BoxControl',
 						'ComboboxControl',
 						'CustomSelectControl',
 						'DimensionControl',

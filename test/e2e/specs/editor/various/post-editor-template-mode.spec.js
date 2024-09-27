@@ -196,7 +196,7 @@ class PostEditorTemplateMode {
 		);
 
 		const title = this.editorTopBar.getByRole( 'heading', {
-			name: 'Editing template: Single Entries',
+			name: 'Single Entries',
 		} );
 
 		await expect( title ).toBeVisible();

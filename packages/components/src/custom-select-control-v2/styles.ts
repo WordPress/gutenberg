@@ -120,6 +120,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	background-color: ${ COLORS.theme.background };
 	border-radius: ${ CONFIG.radiusSmall };
 	border: 1px solid ${ COLORS.theme.foreground };
+	box-shadow: ${ CONFIG.elevationMedium };
 
 	/* z-index(".components-popover") */
 	z-index: 1000000;

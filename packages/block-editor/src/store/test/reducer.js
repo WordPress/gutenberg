@@ -28,6 +28,7 @@ import {
 	isMultiSelecting,
 	preferences,
 	blocksMode,
+	insertionCue,
 	insertionPoint,
 	template,
 	blockListSettings,
@@ -2378,15 +2379,15 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'insertionPoint', () => {
+	describe( 'insertionCue', () => {
 		it( 'should default to null', () => {
-			const state = insertionPoint( undefined, {} );
+			const state = insertionCue( undefined, {} );
 
 			expect( state ).toBe( null );
 		} );
 
 		it( 'should set insertion point', () => {
-			const state = insertionPoint( null, {
+			const state = insertionCue( null, {
 				type: 'SHOW_INSERTION_POINT',
 				rootClientId: 'clientId1',
 				index: 0,
@@ -2403,7 +2404,7 @@ describe( 'state', () => {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
-			const state = insertionPoint( original, {
+			const state = insertionCue( original, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
@@ -3482,6 +3483,41 @@ describe( 'state', () => {
 					clientId: 'a-different-block',
 				}
 			);
+			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'insertionPoint', () => {
+		it( 'should default to null', () => {
+			const state = insertionPoint( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'should set insertion point', () => {
+			const state = insertionPoint( null, {
+				type: 'SET_INSERTION_POINT',
+				value: {
+					rootClientId: 'clientId1',
+					index: 4,
+				},
+			} );
+
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 4,
+			} );
+		} );
+
+		it( 'should clear the insertion point on block selection', () => {
+			const original = deepFreeze( {
+				rootClientId: 'clientId1',
+				index: 4,
+			} );
+			const state = insertionPoint( original, {
+				type: 'SELECT_BLOCK',
+			} );
+
 			expect( state ).toBe( null );
 		} );
 	} );

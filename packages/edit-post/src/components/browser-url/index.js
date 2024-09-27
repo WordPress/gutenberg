@@ -17,22 +17,6 @@ export function getPostEditURL( postId ) {
 	return addQueryArgs( 'post.php', { post: postId, action: 'edit' } );
 }
 
-/**
- * Returns the Post's Trashed URL.
- *
- * @param {number} postId   Post ID.
- * @param {string} postType Post Type.
- *
- * @return {string} Post trashed URL.
- */
-export function getPostTrashedURL( postId, postType ) {
-	return addQueryArgs( 'edit.php', {
-		trashed: 1,
-		post_type: postType,
-		ids: postId,
-	} );
-}
-
 export class BrowserURL extends Component {
 	constructor() {
 		super( ...arguments );
@@ -43,16 +27,8 @@ export class BrowserURL extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { postId, postStatus, postType, isSavingPost, hasHistory } =
-			this.props;
+		const { postId, postStatus, hasHistory } = this.props;
 		const { historyId } = this.state;
-
-		// Posts are still dirty while saving so wait for saving to finish
-		// to avoid the unsaved changes warning when trashing posts.
-		if ( postStatus === 'trash' && ! isSavingPost ) {
-			this.setTrashURL( postId, postType );
-			return;
-		}
 
 		if (
 			( postId !== prevProps.postId || postId !== historyId ) &&
@@ -62,16 +38,6 @@ export class BrowserURL extends Component {
 		) {
 			this.setBrowserURL( postId );
 		}
-	}
-
-	/**
-	 * Navigates the browser to the post trashed URL to show a notice about the trashed post.
-	 *
-	 * @param {number} postId   Post ID.
-	 * @param {string} postType Post Type.
-	 */
-	setTrashURL( postId, postType ) {
-		window.location.href = getPostTrashedURL( postId, postType );
 	}
 
 	/**
@@ -101,7 +67,7 @@ export class BrowserURL extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost, isSavingPost } = select( editorStore );
+	const { getCurrentPost } = select( editorStore );
 	const post = getCurrentPost();
 	let { id, status, type } = post;
 	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( type );
@@ -112,7 +78,5 @@ export default withSelect( ( select ) => {
 	return {
 		postId: id,
 		postStatus: status,
-		postType: type,
-		isSavingPost: isSavingPost(),
 	};
 } )( BrowserURL );

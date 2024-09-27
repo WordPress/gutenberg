@@ -103,11 +103,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const { name, clientId } = props;
-		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
-		const hasPatternOverridesDefaultBinding =
-			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
-				?.source === 'core/pattern-overrides';
+		const { name, clientId, context, setAttributes } = props;
 		const blockBindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
@@ -121,6 +117,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// used purposely here to ensure `boundAttributes` is updated whenever
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
+		const updatedContext = {};
 		const boundAttributes = useSelect( () => {
 			if ( ! blockBindings ) {
 				return;
@@ -139,6 +136,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					continue;
 				}
 
+				// Populate context.
+				for ( const key of source.usesContext || [] ) {
+					updatedContext[ key ] = blockContext[ key ];
+				}
+
 				blockBindingsBySource.set( source, {
 					...blockBindingsBySource.get( source ),
 					[ attributeName ]: {
@@ -149,27 +151,17 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 			if ( blockBindingsBySource.size ) {
 				for ( const [ source, bindings ] of blockBindingsBySource ) {
-					// Populate context.
-					const context = {};
-
-					if ( source.usesContext?.length ) {
-						for ( const key of source.usesContext ) {
-							context[ key ] = blockContext[ key ];
-						}
-					}
-
 					// Get values in batch if the source supports it.
 					let values = {};
 					if ( ! source.getValues ) {
 						Object.keys( bindings ).forEach( ( attr ) => {
-							// Default to the `key` or the source label when `getValues` doesn't exist
-							values[ attr ] =
-								bindings[ attr ].args?.key || source.label;
+							// Default to the the source label when `getValues` doesn't exist.
+							values[ attr ] = source.label;
 						} );
 					} else {
 						values = source.getValues( {
 							registry,
-							context,
+							context: updatedContext,
 							clientId,
 							bindings,
 						} );
@@ -191,9 +183,19 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ blockBindings, name, clientId, blockContext, registry, sources ] );
+		}, [
+			blockBindings,
+			name,
+			clientId,
+			updatedContext,
+			registry,
+			sources,
+		] );
 
-		const { setAttributes } = props;
+		const hasParentPattern = !! updatedContext[ 'pattern/overrides' ];
+		const hasPatternOverridesDefaultBinding =
+			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
+				?.source === 'core/pattern-overrides';
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
@@ -237,18 +239,9 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							source,
 							bindings,
 						] of blockBindingsBySource ) {
-							// Populate context.
-							const context = {};
-
-							if ( source.usesContext?.length ) {
-								for ( const key of source.usesContext ) {
-									context[ key ] = blockContext[ key ];
-								}
-							}
-
 							source.setValues( {
 								registry,
-								context,
+								context: updatedContext,
 								clientId,
 								bindings,
 							} );
@@ -278,7 +271,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				blockBindings,
 				name,
 				clientId,
-				blockContext,
+				updatedContext,
 				setAttributes,
 				sources,
 				hasPatternOverridesDefaultBinding,
@@ -292,6 +285,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
 					setAttributes={ _setAttributes }
+					context={ { ...context, ...updatedContext } }
 				/>
 			</>
 		);
