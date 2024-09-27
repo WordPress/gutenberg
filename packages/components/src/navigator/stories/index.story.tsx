@@ -43,7 +43,7 @@ const meta: Meta< typeof Navigator > = {
 						[data-wp-component="Navigator"] {
 							height: 250px;
 						}
-						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
+						[data-wp-component="Navigator.Screen"] {
 							padding: 8px;
 						}
 					` }</style>
