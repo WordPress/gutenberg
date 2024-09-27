@@ -7,22 +7,30 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getDisplaySrcFromFontFace, loadFontFaceInBrowser } from './utils';
+import { loadFontFaceInBrowser } from './utils';
 import { store as editorStore } from '../../store';
+import { globalStylesLinksDataKey } from '../../store/private-keys';
+
+function resolveThemeFontFaceSrc( src, _links ) {
+	const firstSrc = Array.isArray( src ) ? src[ 0 ] : src;
+	return _links.find( ( link ) => link.name === firstSrc )?.href || firstSrc;
+}
 
 function useEditorFontsResolver() {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
-	const { currentTheme = {}, fontFamilies = [] } = useSelect( ( select ) => {
+	const { _links = [], fontFamilies = [] } = useSelect( ( select ) => {
+		const { getSettings } = select( editorStore );
+		const _settings = getSettings();
 		return {
-			currentTheme:
-				select( editorStore ).getSettings()?.__experimentalFeatures
-					?.currentTheme,
+			_links: _settings[ globalStylesLinksDataKey ]?.[ 'wp:theme-file' ],
 			fontFamilies:
-				select( editorStore ).getSettings()?.__experimentalFeatures
-					?.typography?.fontFamilies,
+				_settings?.__experimentalFeatures?.typography?.fontFamilies,
 		};
 	}, [] );
+
+	// eslint-disable-next-line no-console
+	console.log( 'fontFamilies', fontFamilies, 'links', _links );
 
 	const fontFaces = useMemo( () => {
 		return Object.values( fontFamilies )
@@ -38,10 +46,7 @@ function useEditorFontsResolver() {
 				return;
 			}
 
-			const src = getDisplaySrcFromFontFace(
-				fontFace.src,
-				currentTheme?.stylesheet_uri
-			);
+			const src = resolveThemeFontFaceSrc( fontFace.src, _links );
 
 			if ( ! src || loadedFontUrls.has( src ) ) {
 				return;
@@ -50,7 +55,7 @@ function useEditorFontsResolver() {
 			loadFontFaceInBrowser( fontFace, src, ownerDocument );
 			setLoadedFontUrls( ( prevUrls ) => new Set( prevUrls ).add( src ) );
 		},
-		[ currentTheme, loadedFontUrls ]
+		[ loadedFontUrls, _links ]
 	);
 
 	return useCallback(
