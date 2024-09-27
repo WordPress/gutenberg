@@ -119,10 +119,6 @@ export const Tab = styled( Ariakit.Tab )`
 		&::after {
 			content: '';
 			position: absolute;
-			top: ${ space( 3 ) };
-			right: ${ space( 3 ) };
-			bottom: ${ space( 3 ) };
-			left: ${ space( 3 ) };
 			pointer-events: none;
 
 			// Draw the indicator.
@@ -149,6 +145,10 @@ export const Tab = styled( Ariakit.Tab )`
 			12
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
 		height: auto;
+
+		&::after {
+			inset: ${ space( 3 ) };
+		}
 	}
 
 	[aria-orientation='vertical'] & {
@@ -159,6 +159,10 @@ export const Tab = styled( Ariakit.Tab )`
 			font-weight: 500;
 			color: ${ COLORS.theme.accent };
 			fill: currentColor;
+		}
+
+		&::after {
+			inset: 0;
 		}
 	}
 `;
