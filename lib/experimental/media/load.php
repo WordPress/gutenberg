@@ -237,15 +237,10 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 
 	ob_start(
 		function ( string $output, ?int $phase ) use ( $coep ): string {
-			// Only send the header when the buffer is not being cleaned.
-			if ( ( $phase & PHP_OUTPUT_HANDLER_CLEAN ) === 0 ) {
-				header( 'Cross-Origin-Opener-Policy: same-origin' );
-				header( "Cross-Origin-Embedder-Policy: $coep" );
+			header( 'Cross-Origin-Opener-Policy: same-origin' );
+			header( "Cross-Origin-Embedder-Policy: $coep" );
 
-				$output = gutenberg_add_crossorigin_attributes( $output );
-			}
-
-			return $output;
+			return gutenberg_add_crossorigin_attributes( $output );
 		}
 	);
 }
