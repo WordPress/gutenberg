@@ -11,18 +11,26 @@ import {
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	BlockList,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	useSettings,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
-import { useMemo, useState, memo, useContext } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	memo,
+	useContext,
+	useEffect,
+} from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
@@ -51,6 +59,83 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
+/**
+ * Retrieves colors, gradients, and duotone filters from Global Styles.
+ * The inclusion of default (Core) palettes is controlled by the relevant
+ * theme.json property e.g. defaultPalette, defaultGradients, defaultDuotone.
+ *
+ * @return {Object} Object containing properties for each type of palette.
+ */
+function useMultiOriginPalettes() {
+	const { colors, gradients } = useMultipleOriginColorsAndGradients();
+
+	// Add duotone filters to the palettes data.
+	// TODO: Might need to include `disableCustomDuotones` setting or whatever to match colors/gradients from useMultipleOriginColorsAndGradients.
+	const [
+		shouldDisplayDefaultDuotones,
+		customDuotones,
+		themeDuotones,
+		defaultDuotones,
+	] = useSettings(
+		'color.defaultDuotone',
+		'color.duotone.custom',
+		'color.duotone.theme',
+		'color.duotone.default'
+	);
+
+	const palettes = useMemo( () => {
+		const result = { colors, gradients, duotones: [] };
+
+		if ( themeDuotones && themeDuotones.length ) {
+			result.duotones.push( {
+				name: _x(
+					'Theme',
+					'Indicates this palette comes from the theme.'
+				),
+				slug: 'theme',
+				duotones: themeDuotones,
+			} );
+		}
+
+		if (
+			shouldDisplayDefaultDuotones &&
+			defaultDuotones &&
+			defaultDuotones.length
+		) {
+			result.duotones.push( {
+				name: _x(
+					'Default',
+					'Indicates this palette comes from WordPress.'
+				),
+				slug: 'default',
+				duotones: defaultDuotones,
+			} );
+		}
+		if ( customDuotones && customDuotones.length ) {
+			result.duotones.push( {
+				name: _x(
+					'Custom',
+					// TODO: Should the follow saying from the theme or user? It currently matches useMultipleOriginColorsAndGradients.
+					'Indicates this palette comes from the theme.'
+				),
+				slug: 'custom',
+				duotones: customDuotones,
+			} );
+		}
+
+		return result;
+	}, [
+		colors,
+		gradients,
+		customDuotones,
+		themeDuotones,
+		defaultDuotones,
+		shouldDisplayDefaultDuotones,
+	] );
+
+	return palettes;
+}
+
 function StyleBook( {
 	enableResizing = true,
 	isSelected,
@@ -64,7 +149,8 @@ function StyleBook( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const [ examples ] = useState( getExamples );
+	const colors = useMultiOriginPalettes();
+	const [ examples, setExamples ] = useState( () => getExamples( colors ) );
 	const tabs = useMemo(
 		() =>
 			getTopLevelStyleBookCategories().filter( ( category ) =>
@@ -74,6 +160,12 @@ function StyleBook( {
 			),
 		[ examples ]
 	);
+
+	// Ensure color examples are kept in sync with Global Styles palette changes.
+	useEffect( () => {
+		setExamples( getExamples( colors ) );
+	}, [ colors ] );
+
 	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
@@ -217,7 +309,6 @@ const StyleBookBody = ( {
 			tabIndex={ 0 }
 			{ ...( onClick ? buttonModeProps : {} ) }
 		>
-			<EditorStyles styles={ settings.styles } />
 			<style>
 				{ STYLE_BOOK_IFRAME_STYLES }
 				{ !! onClick &&
@@ -240,6 +331,7 @@ const StyleBookBody = ( {
 				}
 				isSelected={ isSelected }
 				onSelect={ onSelect }
+				settings={ settings }
 				key={ category }
 			/>
 		</Iframe>
@@ -247,7 +339,15 @@ const StyleBookBody = ( {
 };
 
 const Examples = memo(
-	( { className, examples, category, label, isSelected, onSelect } ) => {
+	( {
+		className,
+		examples,
+		category,
+		label,
+		isSelected,
+		onSelect,
+		settings,
+	} ) => {
 		const categoryDefinition = category
 			? getTopLevelStyleBookCategories().find(
 					( _category ) => _category.slug === category
@@ -273,6 +373,7 @@ const Examples = memo(
 							title={ example.title }
 							blocks={ example.blocks }
 							isSelected={ isSelected( example.name ) }
+							settings={ settings }
 							onClick={ () => {
 								onSelect?.( example.name );
 							} }
@@ -293,6 +394,7 @@ const Examples = memo(
 								examples={ subcategory.examples }
 								isSelected={ isSelected }
 								onSelect={ onSelect }
+								settings={ settings }
 							/>
 						</Composite.Group>
 					) ) }
@@ -301,7 +403,7 @@ const Examples = memo(
 	}
 );
 
-const Subcategory = ( { examples, isSelected, onSelect } ) => {
+const Subcategory = ( { examples, isSelected, onSelect, settings } ) => {
 	return (
 		!! examples?.length &&
 		examples.map( ( example ) => (
@@ -314,24 +416,21 @@ const Subcategory = ( { examples, isSelected, onSelect } ) => {
 				onClick={ () => {
 					onSelect?.( example.name );
 				} }
+				settings={ settings }
 			/>
 		) )
 	);
 };
 
-const Example = ( { id, title, blocks, isSelected, onClick } ) => {
-	const originalSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
-	);
-	const settings = useMemo(
-		() => ( {
-			...originalSettings,
-			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
-		} ),
-		[ originalSettings ]
-	);
+const Example = ( {
+	id,
+	title,
+	blocks,
+	isSelected,
+	onClick,
+	settings: originalSettings,
+} ) => {
+	const settings = { ...originalSettings, focusMode: false };
 
 	// Cache the list of blocks to avoid additional processing when the component is re-rendered.
 	const renderedBlocks = useMemo(
@@ -368,6 +467,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 								value={ renderedBlocks }
 								settings={ settings }
 							>
+								<EditorStyles styles={ settings.styles } />
 								<BlockList renderAppender={ false } />
 							</ExperimentalBlockEditorProvider>
 						</Disabled>

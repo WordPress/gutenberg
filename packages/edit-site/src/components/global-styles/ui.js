@@ -45,6 +45,7 @@ import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
 
 const SLOT_FILL_NAME = 'GlobalStylesMenu';
 const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
@@ -191,6 +192,20 @@ function GlobalStylesStyleBook() {
 				)
 			}
 			onSelect={ ( blockName ) => {
+				if ( blockName === 'duotones' ) {
+					return;
+				}
+
+				if (
+					STYLE_BOOK_COLOR_GROUPS.find(
+						( group ) => group.slug === blockName
+					)
+				) {
+					// Go to color palettes Global Styles.
+					navigator.goTo( '/colors/palette' );
+					return;
+				}
+
 				// Now go to the selected block.
 				navigator.goTo( '/blocks/' + encodeURIComponent( blockName ) );
 			} }

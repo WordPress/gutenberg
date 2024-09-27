@@ -6,7 +6,46 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { StyleBookCategory } from './types';
+import type { StyleBookCategory, StyleBookColorGroup } from './types';
+
+export const STYLE_BOOK_COLOR_GROUPS: StyleBookColorGroup[] = [
+	{
+		slug: 'theme-colors',
+		title: __( 'Theme Colors' ),
+		origin: 'theme',
+		type: 'colors',
+	},
+	{
+		slug: 'custom-colors',
+		title: __( 'Custom Colors' ),
+		origin: 'custom',
+		type: 'colors',
+	},
+	{
+		slug: 'custom-gradients',
+		title: __( 'Custom Gradients' ),
+		origin: 'custom', // User.
+		type: 'gradients',
+	},
+	{
+		slug: 'duotones',
+		title: __( 'Duotones' ),
+		origin: 'theme',
+		type: 'duotones',
+	},
+	{
+		slug: 'default-colors',
+		title: __( 'Default Colors' ),
+		origin: 'default',
+		type: 'colors',
+	},
+	{
+		slug: 'default-gradients',
+		title: __( 'Default Gradients' ),
+		origin: 'default',
+		type: 'gradients',
+	},
+];
 
 export const STYLE_BOOK_THEME_SUBCATEGORIES: Omit<
 	StyleBookCategory,
@@ -74,7 +113,7 @@ export const STYLE_BOOK_CATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'colors',
 		title: __( 'Colors' ),
-		blocks: [ 'custom/colors' ],
+		blocks: [],
 	},
 	{
 		slug: 'theme',
@@ -111,7 +150,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	.is-root-container {
 		display: flow-root;
 	}
-	
+
 	body {
 		position: relative;
 		padding: 32px !important;
@@ -149,7 +188,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
 		flex-direction: row;
 	}
-	
+
 	.edit-site-style-book__subcategory-title,
 	.edit-site-style-book__example-title {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -160,7 +199,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		text-align: left;
 		text-transform: uppercase;
 	}
-	
+
 	.edit-site-style-book__subcategory-title {
 		font-size: 16px;
 		margin-bottom: 40px;
