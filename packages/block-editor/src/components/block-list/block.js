@@ -47,7 +47,7 @@ import { PrivateBlockContext } from './private-block-context';
 
 import { unlock } from '../../lock-unlock';
 
-const { isBlockContentUnmodified } = unlock( blocksPrivateApis );
+const { isUnmodifiedBlockContent } = unlock( blocksPrivateApis );
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -355,7 +355,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					registry.batch( () => {
 						const firstBlock = getBlock( firstClientId );
 						const isFirstBlockContentUnmodified =
-							isBlockContentUnmodified( firstBlock );
+							isUnmodifiedBlockContent( firstBlock );
 						const defaultBlockName = getDefaultBlockName();
 						const replacement = switchToBlockType(
 							firstBlock,

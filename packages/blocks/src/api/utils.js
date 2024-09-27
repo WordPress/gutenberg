@@ -37,7 +37,7 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * @param {*}      value               The attribute's value.
  * @return {boolean} Whether the attribute is unmodified.
  */
-function isAttributeUnmodified( attributeDefinition, value ) {
+function isUnmodifiedAttribute( attributeDefinition, value ) {
 	// Every attribute that has a default must match the default.
 	if ( attributeDefinition.hasOwnProperty( 'default' ) ) {
 		return value === attributeDefinition.default;
@@ -67,7 +67,7 @@ export function isUnmodifiedBlock( block ) {
 		( [ key, definition ] ) => {
 			const value = block.attributes[ key ];
 
-			return isAttributeUnmodified( definition, value );
+			return isUnmodifiedAttribute( definition, value );
 		}
 	);
 }
@@ -95,7 +95,7 @@ export function isUnmodifiedDefaultBlock( block ) {
  * @param {WPBlock} block Block Object
  * @return {boolean} Whether the block content is unmodified.
  */
-export function isBlockContentUnmodified( block ) {
+export function isUnmodifiedBlockContent( block ) {
 	const contentAttributes = getBlockAttributesNamesByRole(
 		block.name,
 		'content'
@@ -109,7 +109,7 @@ export function isBlockContentUnmodified( block ) {
 		const definition = getBlockType( block.name )?.attributes[ key ];
 		const value = block.attributes[ key ];
 
-		return isAttributeUnmodified( definition, value );
+		return isUnmodifiedAttribute( definition, value );
 	} );
 }
 
