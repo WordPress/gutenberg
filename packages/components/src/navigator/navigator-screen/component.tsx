@@ -36,7 +36,7 @@ function UnconnectedNavigatorScreen(
 ) {
 	if ( ! /^\//.test( props.path ) ) {
 		warning(
-			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
 		);
 	}
 
@@ -48,7 +48,7 @@ function UnconnectedNavigatorScreen(
 		path,
 		onAnimationEnd: onAnimationEndProp,
 		...otherProps
-	} = useContextSystem( props, 'NavigatorScreen' );
+	} = useContextSystem( props, 'Navigator.Screen' );
 
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
@@ -155,5 +155,5 @@ function UnconnectedNavigatorScreen(
 
 export const NavigatorScreen = contextConnect(
 	UnconnectedNavigatorScreen,
-	'NavigatorScreen'
+	'Navigator.Screen'
 );
