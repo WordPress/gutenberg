@@ -144,25 +144,29 @@ test.describe( 'Post Meta source', () => {
 				editor,
 				page,
 			} ) => {
+				/**
+				 * Create connection manually until this issue is solved:
+				 * https://github.com/WordPress/gutenberg/pull/65604
+				 *
+				 * Once solved, block with the binding can be directly inserted.
+				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
-					attributes: {
-						content: 'fallback content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'core/post-meta',
-									args: {
-										key: 'movie_field',
-									},
-								},
-							},
-						},
-					},
 				} );
+				await page.getByLabel( 'Attributes options' ).click();
+				await page
+					.getByRole( 'menuitemcheckbox', {
+						name: 'Show content',
+					} )
+					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
+				await contentBinding.click();
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'Movie field label' } )
+					.click();
 				await expect( contentBinding ).toContainText(
 					'Movie field label'
 				);
@@ -171,25 +175,29 @@ test.describe( 'Post Meta source', () => {
 				editor,
 				page,
 			} ) => {
+				/**
+				 * Create connection manually until this issue is solved:
+				 * https://github.com/WordPress/gutenberg/pull/65604
+				 *
+				 * Once solved, block with the binding can be directly inserted.
+				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
-					attributes: {
-						content: 'fallback content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'core/post-meta',
-									args: {
-										key: 'field_without_label_or_default',
-									},
-								},
-							},
-						},
-					},
 				} );
+				await page.getByLabel( 'Attributes options' ).click();
+				await page
+					.getByRole( 'menuitemcheckbox', {
+						name: 'Show content',
+					} )
+					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
+				await contentBinding.click();
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'field_without_label_or_default' } )
+					.click();
 				await expect( contentBinding ).toContainText(
 					'field_without_label_or_default'
 				);
@@ -201,20 +209,13 @@ test.describe( 'Post Meta source', () => {
 			test.beforeEach( async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
-					attributes: {
-						content: 'fallback content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'core/post-meta',
-									args: {
-										key: 'movie_field',
-									},
-								},
-							},
-						},
-					},
 				} );
+				await page.getByLabel( 'Attributes options' ).click();
+				await page
+					.getByRole( 'menuitemcheckbox', {
+						name: 'Show content',
+					} )
+					.click();
 				await page
 					.getByRole( 'button', {
 						name: 'content',
@@ -523,20 +524,13 @@ test.describe( 'Post Meta source', () => {
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
-				attributes: {
-					content: 'fallback content',
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/post-meta',
-								args: {
-									key: 'movie_field',
-								},
-							},
-						},
-					},
-				},
 			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} )
+				.click();
 			await page
 				.getByRole( 'button', {
 					name: 'content',
