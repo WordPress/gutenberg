@@ -13,7 +13,7 @@ The Gutenberg plugin adds editing, customization, and site building to WordPress
 
 Following the introduction of post block editing in December 2018, Gutenberg later introduced full site editing (FSE) in 2021, <a href="https://wordpress.org/news/2022/01/josephine/">which shipped with WordPress 5.9 in early 2022</a>.
 
-### What Does Gutenberg Do ?
+### What Does Gutenberg Do?
 
 Gutenberg is WordPress's “block editor”, and introduces a modular approach to modifying your entire site. Edit individual content blocks on posts or pages. Add and adjust widgets. Even design your site headers, footers, and navigation with full site editing support.
 
