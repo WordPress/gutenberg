@@ -564,7 +564,7 @@ export default function LogoEdit( {
 					iconId={ siteIconId }
 					canUserEdit={ canUserEdit }
 				/>
-				<DropZone onFilesDrop={ onFilesDrop } />
+				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
 			</>
 		);
 	}
