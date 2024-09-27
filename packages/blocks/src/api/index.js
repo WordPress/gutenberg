@@ -8,6 +8,7 @@ import {
 	getBlockBindingsSource,
 	getBlockBindingsSources,
 } from './registration';
+import { isUnmodifiedBlockContent } from './utils';
 
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
@@ -183,4 +184,5 @@ lock( privateApis, {
 	unregisterBlockBindingsSource,
 	getBlockBindingsSource,
 	getBlockBindingsSources,
+	isUnmodifiedBlockContent,
 } );
