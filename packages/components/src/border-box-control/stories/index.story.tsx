@@ -16,7 +16,7 @@ import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components (Experimental)/BorderBoxControl',
+	title: 'Components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
@@ -83,4 +83,5 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Borders',
+	enableStyle: true,
 };

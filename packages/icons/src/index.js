@@ -79,6 +79,7 @@ export { default as drawerLeft } from './library/drawer-left';
 export { default as drawerRight } from './library/drawer-right';
 export { default as download } from './library/download';
 export { default as edit } from './library/edit';
+export { default as envelope } from './library/envelope';
 export { default as external } from './library/external';
 export { default as file } from './library/file';
 export { default as filter } from './library/filter';
