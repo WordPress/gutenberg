@@ -2801,35 +2801,18 @@ export const __unstableGetVisibleBlocks = createSelector(
 );
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
-	// 'disabled' then the overlay is redundant since the block can't be
-	// selected. If the mode is 'contentOnly' then the overlay is redundant
-	// since there will be no controls to interact with once selected.
-	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
-		return false;
-	}
-
 	// If the block editing is locked, the block overlay is always active.
 	if ( ! canEditBlock( state, clientId ) ) {
 		return true;
 	}
 
-	const editorMode = __unstableGetEditorMode( state );
-
-	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'zoom-out' ) {
-		const sectionRootClientId = getSectionRootClientId( state );
-		if ( sectionRootClientId ) {
-			const sectionClientIds = getBlockOrder(
-				state,
-				sectionRootClientId
-			);
-			if ( sectionClientIds?.includes( clientId ) ) {
-				return true;
-			}
-		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
-			return true;
-		}
+	// Section blocks need to be selected first before being able to select their children.
+	if (
+		isSectionBlock( state, clientId ) &&
+		! isBlockSelected( state, clientId ) &&
+		! hasSelectedInnerBlock( state, clientId, true )
+	) {
+		return true;
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
@@ -2913,33 +2896,8 @@ export const getBlockEditingMode = createRegistrySelector(
 				clientId = '';
 			}
 
-			// In zoom-out mode, override the behavior set by
-			// __unstableSetBlockEditingMode to only allow editing the top-level
-			// sections.
 			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'zoom-out' ) {
-				const sectionRootClientId = getSectionRootClientId( state );
-
-				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
-					return sectionRootClientId ? 'disabled' : 'contentOnly';
-				}
-				if ( clientId === sectionRootClientId ) {
-					return 'contentOnly';
-				}
-				const sectionsClientIds = getBlockOrder(
-					state,
-					sectionRootClientId
-				);
-
-				// Sections are always contentOnly.
-				if ( sectionsClientIds?.includes( clientId ) ) {
-					return 'contentOnly';
-				}
-
-				return 'disabled';
-			}
-
-			if ( editorMode === 'navigation' ) {
+			if ( [ 'navigation', 'zoom-out' ].includes( editorMode ) ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				// The root section is "default mode"
