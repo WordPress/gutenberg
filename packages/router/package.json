@@ -27,9 +27,9 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url",
+		"@wordpress/element": "*",
+		"@wordpress/private-apis": "*",
+		"@wordpress/url": "*",
 		"history": "^5.3.0"
 	},
 	"peerDependencies": {

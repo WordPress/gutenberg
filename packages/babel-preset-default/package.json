@@ -38,8 +38,8 @@
 		"@babel/preset-env": "^7.16.0",
 		"@babel/preset-typescript": "^7.16.0",
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/browserslist-config": "file:../browserslist-config",
-		"@wordpress/warning": "file:../warning",
+		"@wordpress/browserslist-config": "*",
+		"@wordpress/warning": "*",
 		"browserslist": "^4.21.10",
 		"core-js": "^3.31.0",
 		"react": "^18.3.0"
