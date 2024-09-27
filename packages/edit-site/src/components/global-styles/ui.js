@@ -292,25 +292,16 @@ function GlobalStylesEditorCanvasContainerLink() {
 	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
 
-function NavigationSync( { path: parentPath, onPathChange, children } ) {
+function useNavigatorSync( parentPath, onPathChange ) {
 	const navigator = useNavigator();
 	const { path: childPath } = navigator.location;
 	const previousParentPath = usePrevious( parentPath );
 	const previousChildPath = usePrevious( childPath );
 	useEffect( () => {
-		console.log({
-			parentPath,
-			previousChildPath,
-			previousParentPath,
-			childPath,
-		});
 		if ( parentPath !== childPath ) {
 			if ( parentPath !== previousParentPath ) {
 				navigator.goTo( parentPath );
-			} else if (
-				childPath !== previousChildPath &&
-				parentPath !== childPath
-			) {
+			} else if ( childPath !== previousChildPath ) {
 				onPathChange( childPath );
 			}
 		}
@@ -322,6 +313,12 @@ function NavigationSync( { path: parentPath, onPathChange, children } ) {
 		childPath,
 		navigator,
 	] );
+}
+
+// This component is used to wrap the hook in order to conditionally execute it
+// when the parent component is used on controlled mode.
+function NavigationSync( { path: parentPath, onPathChange, children } ) {
+	useNavigatorSync( parentPath, onPathChange );
 	return children;
 }
 
