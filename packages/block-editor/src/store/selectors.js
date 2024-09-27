@@ -1547,20 +1547,22 @@ export function getTemplateLock( state, rootClientId ) {
  * it should still be visible in the inserter to be able to add it
  * to a different position.
  *
- * @param {Object}        state     Editor state.
- * @param {string|Object} blockName The block type object, e.g., the response
- *                                  from the block directory; or a string name of
- *                                  an installed block type, e.g.' core/paragraph'.
+ * @param {Object}        state           Editor state.
+ * @param {string|Object} blockNameOrType The block type object, e.g., the response
+ *                                        from the block directory; or a string name of
+ *                                        an installed block type, e.g.' core/paragraph'.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
-const isBlockVisibleInTheInserter = ( state, blockName ) => {
+const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
 	let blockType;
-	if ( blockName && 'object' === typeof blockName ) {
-		blockType = blockName;
-		blockName = blockType.name;
+	let blockName;
+	if ( blockNameOrType && 'object' === typeof blockNameOrType ) {
+		blockType = blockNameOrType;
+		blockName = blockNameOrType.name;
 	} else {
-		blockType = getBlockType( blockName );
+		blockType = getBlockType( blockNameOrType );
+		blockName = blockNameOrType;
 	}
 	if ( ! blockType ) {
 		return false;
@@ -1577,6 +1579,12 @@ const isBlockVisibleInTheInserter = ( state, blockName ) => {
 		return false;
 	}
 
+	// If parent blocks are not visible, child blocks should be hidden too.
+	if ( !! blockType.parent?.length ) {
+		return blockType.parent.some( ( name ) =>
+			isBlockVisibleInTheInserter( state, name )
+		);
+	}
 	return true;
 };
 
@@ -2002,6 +2010,7 @@ const buildBlockTypeItem =
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
+			parent: blockType.parent,
 			variations: inserterVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
