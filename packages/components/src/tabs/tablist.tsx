@@ -53,7 +53,7 @@ export const TabList = forwardRef<
 		}
 	} );
 
-	// Make sure active tab is scrolled into view.
+	// Make sure selected tab is scrolled into view.
 	useLayoutEffect( () => {
 		if ( ! parent || ! selectedTabPosition ) {
 			return;
