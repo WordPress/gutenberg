@@ -36,11 +36,11 @@ export const TabList = forwardRef<
 	const selectOnMove = useStoreState( store, 'selectOnMove' );
 	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement | null >();
+	const refs = useMergeRefs( [ ref, setParent ] );
 	const overflow = useTrackOverflow( parent, {
 		first: items?.at( 0 )?.element,
 		last: items?.at( -1 )?.element,
 	} );
-	const refs = useMergeRefs( [ ref, setParent ] );
 
 	const selectedTabPosition = useTrackElementOffsetRect(
 		store?.item( selectedId )?.element
