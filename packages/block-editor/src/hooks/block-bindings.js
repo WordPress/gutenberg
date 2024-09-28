@@ -15,6 +15,7 @@ import {
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -99,6 +100,11 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
+	const sourceLabel = isSourceInvalid
+		? __( 'Invalid source' )
+		: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
+		  sourceProps?.label ||
+		  sourceName;
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
@@ -108,11 +114,7 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 					variant={ ! isSourceInvalid && 'muted' }
 					isDestructive={ isSourceInvalid }
 				>
-					{ isSourceInvalid
-						? __( 'Invalid source' )
-						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
-						  sourceProps?.label ||
-						  sourceName }
+					{ decodeEntities( sourceLabel ) }
 				</Text>
 			) }
 		</VStack>
