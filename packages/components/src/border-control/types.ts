@@ -85,6 +85,10 @@ export type BorderControlProps = ColorProps &
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
+		 * @deprecated This prop no longer has any effect.
+		 */
+		showDropdownHeader?: boolean;
+		/**
 		 * Size of the control.
 		 *
 		 * @default 'default'
@@ -139,6 +143,10 @@ export type DropdownProps = ColorProps &
 		 * to a non-zero value.
 		 */
 		previousStyleSelection?: string;
+		/**
+		 * @deprecated This prop no longer has any effect.
+		 */
+		showDropdownHeader?: boolean;
 	};
 
 export type StylePickerProps = Omit<
