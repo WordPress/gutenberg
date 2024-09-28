@@ -20,7 +20,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useCallback, useState, useRef } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
 import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -127,6 +127,7 @@ export function MediaPreview( { media, onClick, category } ) {
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
+	const hasInsertedBlock = useRef( false );
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
 		[ media, category.mediaType ]
@@ -134,6 +135,7 @@ export function MediaPreview( { media, onClick, category } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { getSettings } = useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
@@ -180,18 +182,34 @@ export function MediaPreview( { media, onClick, category } ) {
 							if ( isBlobURL( img.url ) ) {
 								return;
 							}
-							onClick( {
-								...clonedBlock,
-								attributes: {
+
+							if ( ! hasInsertedBlock.current ) {
+								// Ensure the block is only inserted once.
+								onClick( {
+									...clonedBlock,
+									attributes: {
+										...clonedBlock.attributes,
+										id: img.id,
+										url: img.url,
+									},
+								} );
+
+								// TODO: Move to a new onSuccess callback as part of #61447.
+								createSuccessNotice(
+									__( 'Image uploaded and inserted.' ),
+									{ type: 'snackbar', id: 'inserter-notice' }
+								);
+
+								hasInsertedBlock.current = true;
+							} else {
+								// For subsequent calls, update the existing block.
+								updateBlockAttributes( clonedBlock.clientId, {
 									...clonedBlock.attributes,
 									id: img.id,
 									url: img.url,
-								},
-							} );
-							createSuccessNotice(
-								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar', id: 'inserter-notice' }
-							);
+								} );
+							}
+
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
@@ -214,6 +232,7 @@ export function MediaPreview( { media, onClick, category } ) {
 			getSettings,
 			onClick,
 			createSuccessNotice,
+			updateBlockAttributes,
 			createErrorNotice,
 		]
 	);
