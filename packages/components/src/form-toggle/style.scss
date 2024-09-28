@@ -60,6 +60,7 @@ $transition-duration: 0.2s;
 			$transition-duration background-color ease-out;
 		@include reduce-motion("transition");
 		background-color: $gray-900;
+		box-shadow: $elevation-x-small;
 
 		// Transparent border acts as a fill in Windows High Contrast Mode.
 		border: math.div($toggle-thumb-size, 2) solid transparent;

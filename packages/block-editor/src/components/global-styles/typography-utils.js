@@ -174,6 +174,10 @@ export function findNearestFontWeight(
 	availableFontWeights,
 	newFontWeightValue
 ) {
+	newFontWeightValue =
+		'number' === typeof newFontWeightValue
+			? newFontWeightValue.toString()
+			: newFontWeightValue;
 	if ( ! newFontWeightValue || typeof newFontWeightValue !== 'string' ) {
 		return '';
 	}
@@ -260,7 +264,7 @@ export function findNearestStyleAndWeight(
 		( { value: fs } ) => fs === fontStyle
 	);
 	const hasFontWeight = fontWeights?.some(
-		( { value: fw } ) => fw === fontWeight
+		( { value: fw } ) => fw?.toString() === fontWeight?.toString()
 	);
 
 	if ( ! hasFontStyle ) {

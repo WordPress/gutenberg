@@ -79,8 +79,7 @@ export default function QueryPlaceholder( {
 			>
 				{ !! hasPatterns && (
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ openPatternSelectionModal }
 					>
@@ -89,8 +88,7 @@ export default function QueryPlaceholder( {
 				) }
 
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ () => {
 						setIsStartingBlank( true );

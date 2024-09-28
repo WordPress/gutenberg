@@ -1,0 +1,18 @@
+{
+	"$schema": "../../../schemas/json/theme.json",
+	"version": 3,
+	"settings": {
+		"appearanceTools": true,
+		"layout": {
+			"contentSize": "840px",
+			"wideSize": "1100px"
+		}
+	},
+	"customTemplates": [
+		{
+			"name": "custom-template",
+			"title": "Custom",
+			"postTypes": [ "post", "movie" ]
+		}
+	]
+}

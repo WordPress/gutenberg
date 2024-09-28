@@ -22,7 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, homeButton } from '@wordpress/icons';
+import { Icon, arrowUpLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +37,7 @@ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitleAndIcon,
+	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
@@ -204,8 +204,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	);
 
 	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const { title, icon } =
-		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+	const title = getEditorCanvasContainerTitle( editorCanvasView );
 
 	const isReady = ! isLoading;
 	const transition = {
@@ -238,7 +237,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
 					title={ title }
-					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -258,8 +256,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
-											// TODO: Switch to `true` (40px size) if possible
-											__next40pxDefaultSize={ false }
+											__next40pxDefaultSize
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"
@@ -294,7 +291,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											) }
 											variants={ toggleHomeIconVariants }
 										>
-											<Icon icon={ homeButton } />
+											<Icon icon={ arrowUpLeft } />
 										</motion.div>
 									</motion.div>
 								)

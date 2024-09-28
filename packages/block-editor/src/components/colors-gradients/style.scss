@@ -73,15 +73,15 @@ $swatch-gap: 12px;
 	// Identify the first visible instance as placeholder items will not have this class.
 	&:nth-child(1 of &) {
 		margin-top: $grid-unit-30;
-		border-top-left-radius: $radius-block-ui;
-		border-top-right-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
+		border-top-right-radius: $radius-small;
 		border-top: 1px solid $gray-300;
 	}
 
 	// Identify the last visible instance as placeholder items will not have this class.
 	&:nth-last-child(1 of &) {
-		border-bottom-left-radius: $radius-block-ui;
-		border-bottom-right-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
 	}
 
 	> div,

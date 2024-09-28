@@ -12,6 +12,7 @@ import {
 	Notice,
 	TextControl,
 	__experimentalHStack as HStack,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
@@ -383,7 +384,7 @@ function LinkControl( {
 								value={ internalControlValue?.title }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
-								size="__unstable-large"
+								__next40pxDefaultSize
 							/>
 						) }
 						<LinkControlSearchInput
@@ -404,20 +405,23 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
+							suffix={
+								showActions ? undefined : (
+									<InputControlSuffixWrapper variant="control">
+										<Button
+											onClick={
+												isDisabled ? noop : handleSubmit
+											}
+											label={ __( 'Submit' ) }
+											icon={ keyboardReturn }
+											className="block-editor-link-control__search-submit"
+											aria-disabled={ isDisabled }
+											size="small"
+										/>
+									</InputControlSuffixWrapper>
+								)
+							}
 						/>
-						{ ! showActions && (
-							<div className="block-editor-link-control__search-enter">
-								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
-									onClick={ isDisabled ? noop : handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									aria-disabled={ isDisabled }
-								/>
-							</div>
-						) }
 					</div>
 					{ errorMessage && (
 						<Notice
@@ -470,16 +474,14 @@ function LinkControl( {
 					className="block-editor-link-control__search-actions"
 				>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ handleCancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
 						className="block-editor-link-control__search-submit"

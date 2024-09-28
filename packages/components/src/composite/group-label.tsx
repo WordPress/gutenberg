@@ -22,7 +22,7 @@ export const CompositeGroupLabel = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeGroupLabel
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>

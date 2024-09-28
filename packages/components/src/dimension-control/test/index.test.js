@@ -31,6 +31,7 @@ describe( 'DimensionControl', () => {
 			const { container } = render(
 				<DimensionControl instanceId={ instanceId } label="Padding" />
 			);
+			expect( console ).toHaveWarned();
 			expect( container ).toMatchSnapshot();
 		} );
 

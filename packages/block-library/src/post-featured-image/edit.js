@@ -308,8 +308,7 @@ export default function PostFeaturedImageEdit( {
 				mediaLibraryButton={ ( { open } ) => {
 					return (
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							icon={ upload }
 							variant="primary"
 							label={ label }

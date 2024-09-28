@@ -2,6 +2,10 @@
 
 DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).
 
+DataViews is data agnostic, it can work with data coming from a static (JSON file) or dynamic source (HTTP Request) — it just requires the data to be an array of objects that have an unique identifier. Consumers are responsible to query the data source appropiately based on the DataViews props:
+
+![DataViews flow](https://developer.wordpress.org/files/2024/09/368600071-20aa078f-7c3d-406d-8dd0-8b764addd22a.png "DataViews flow")
+
 ## Installation
 
 Install the module
@@ -337,7 +341,7 @@ Each "virtual field", has to provide an `id` and `label` (optionally a `header` 
 Additionally, they need to provide:
 
 -   `children`: a list of field's `id` to combine
--   `direction`: how should they be stacked, `vertically` or `horizontally`
+-   `direction`: how should they be stacked, `vertical` or `horizontal`
 
 For example, this is how you'd define a `site` field which is a combination of a `title` and `description` fields, which are not displayed:
 

@@ -17,7 +17,7 @@ import {
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -108,7 +108,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
-	containerWidth,
+	maxContentWidth,
 } ) {
 	const {
 		url = '',
@@ -134,6 +134,7 @@ export default function Image( {
 	const numericWidth = width ? parseInt( width, 10 ) : undefined;
 	const numericHeight = height ? parseInt( height, 10 ) : undefined;
 
+	const registry = useRegistry();
 	const imageRef = useRef();
 	const { allowResize = true } = context;
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
@@ -496,7 +497,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: urlBinding?.args,
 					} ),
@@ -511,7 +512,7 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: altBinding?.args,
 					} ),
@@ -525,7 +526,7 @@ export default function Image( {
 				lockTitleControls:
 					!! titleBinding &&
 					! titleBindingSource?.canUserEditValue?.( {
-						select,
+						registry,
 						context,
 						args: titleBinding?.args,
 					} ),
@@ -555,6 +556,25 @@ export default function Image( {
 	const showCoverControls = isSingleSelected && canInsertCover;
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
+
+	const mediaReplaceFlow = isSingleSelected &&
+		! isEditingImage &&
+		! lockUrlControls && (
+			// For contentOnly mode, put this button in its own area so it has borders around it.
+			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
+					onReset={ () => onSelectImage( undefined ) }
+				/>
+			</BlockControls>
+		);
 
 	const controls = (
 		<>
@@ -590,20 +610,6 @@ export default function Image( {
 							onClick={ switchToCover }
 						/>
 					) }
-				</BlockControls>
-			) }
-			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-						onReset={ () => onSelectImage( undefined ) }
-					/>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (
@@ -934,7 +940,7 @@ export default function Image( {
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
-		const maxContentWidth = containerWidth || maxWidthBuffer;
+		const maxResizeWidth = maxContentWidth || maxWidthBuffer;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
@@ -980,9 +986,9 @@ export default function Image( {
 				} }
 				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
-				maxWidth={ maxContentWidth }
+				maxWidth={ maxResizeWidth }
 				minHeight={ minHeight }
-				maxHeight={ maxContentWidth / ratio }
+				maxHeight={ maxResizeWidth / ratio }
 				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
@@ -996,6 +1002,7 @@ export default function Image( {
 
 					// Clear hardcoded width if the resized width is close to the max-content width.
 					if (
+						maxContentWidth &&
 						// Only do this if the image is bigger than the container to prevent it from being squished.
 						// TODO: Remove this check if the image support setting 100% width.
 						naturalWidth >= maxContentWidth &&
@@ -1029,12 +1036,18 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		// Add all controls if the image attributes are connected.
-		return metadata?.bindings ? controls : sizeControls;
+		return (
+			<>
+				{ mediaReplaceFlow }
+				{ /* Add all controls if the image attributes are connected. */ }
+				{ metadata?.bindings ? controls : sizeControls }
+			</>
+		);
 	}
 
 	return (
 		<>
+			{ mediaReplaceFlow }
 			{ controls }
 			{ img }
 

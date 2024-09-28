@@ -358,9 +358,7 @@ test.describe( 'Widgets Customizer', () => {
 		const legacyWidgetBlock =
 			await widgetsCustomizerPage.addBlock( 'Legacy Widget' );
 		await page
-			.locator(
-				'role=combobox[name="Select a legacy widget to display:"i]'
-			)
+			.locator( 'role=combobox[name="Legacy widget"i]' )
 			.selectOption( 'test_widget' );
 
 		await expect(
@@ -467,16 +465,6 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( paragraphBlock ).toBeVisible();
 
 		await paragraphBlock.focus();
-
-		// Expect pressing the Escape key to enter navigation mode,
-		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'css=.block-editor-block-list__layout.is-navigate-mode'
-			)
-		).toBeVisible();
-		await expect( paragraphBlock ).toBeVisible();
 	} );
 
 	test( 'should move (inner) blocks to another sidebar', async ( {

@@ -163,6 +163,8 @@ export type NormalizedField< Item > = Field< Item > & {
 	Edit: ComponentType< DataFormControlProps< Item > >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	enableHiding: boolean;
+	enableSorting: boolean;
 };
 
 /**

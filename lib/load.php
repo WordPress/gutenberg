@@ -41,6 +41,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
 	// WordPress 6.7 compat.
+	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-posts-controller-6-7.php';
 	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-templates-controller-6-7.php';
 	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-server.php';
 	require __DIR__ . '/compat/wordpress-6.7/rest-api.php';
@@ -109,6 +110,7 @@ require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
 require __DIR__ . '/compat/wordpress-6.7/class-wp-block-templates-registry.php';
 require __DIR__ . '/compat/wordpress-6.7/compat.php';
+require __DIR__ . '/compat/wordpress-6.7/post-formats.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

@@ -3,13 +3,13 @@
  */
 const blocksConfig = require( './tools/webpack/blocks' );
 const developmentConfigs = require( './tools/webpack/development' );
-const interactivity = require( './tools/webpack/interactivity' );
+const scriptModules = require( './tools/webpack/script-modules' );
 const packagesConfig = require( './tools/webpack/packages' );
 const vendorsConfig = require( './tools/webpack/vendors' );
 
 module.exports = [
 	...blocksConfig,
-	interactivity,
+	scriptModules,
 	packagesConfig,
 	...developmentConfigs,
 	...vendorsConfig,

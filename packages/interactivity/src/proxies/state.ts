@@ -46,6 +46,8 @@ const proxyToProps: WeakMap<
 export const hasPropSignal = ( proxy: object, key: string ) =>
 	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
 
+const readOnlyProxies = new WeakSet();
+
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
  * specified prop in the passed proxy.
@@ -77,8 +79,11 @@ const getPropSignal = (
 			if ( get ) {
 				prop.setGetter( get );
 			} else {
+				const readOnly = readOnlyProxies.has( proxy );
 				prop.setValue(
-					shouldProxy( value ) ? proxifyState( ns, value ) : value
+					shouldProxy( value )
+						? proxifyState( ns, value, { readOnly } )
+						: value
 				);
 			}
 		}
@@ -148,6 +153,9 @@ const stateHandlers: ProxyHandler< object > = {
 		value: unknown,
 		receiver: object
 	): boolean {
+		if ( readOnlyProxies.has( receiver ) ) {
+			return false;
+		}
 		setNamespace( getNamespaceFromProxy( receiver ) );
 		try {
 			return Reflect.set( target, key, value, receiver );
@@ -161,6 +169,10 @@ const stateHandlers: ProxyHandler< object > = {
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
+		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			return false;
+		}
+
 		const isNew = ! ( key in target );
 		const result = Reflect.defineProperty( target, key, desc );
 
@@ -199,6 +211,10 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 
 	deleteProperty( target: object, key: string ): boolean {
+		if ( readOnlyProxies.has( getProxyFromObject( target )! ) ) {
+			return false;
+		}
+
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
@@ -230,8 +246,10 @@ const stateHandlers: ProxyHandler< object > = {
  * Returns the proxy associated with the given state object, creating it if it
  * does not exist.
  *
- * @param namespace The namespace that will be associated to this proxy.
- * @param obj       The object to proxify.
+ * @param namespace        The namespace that will be associated to this proxy.
+ * @param obj              The object to proxify.
+ * @param options          Options.
+ * @param options.readOnly Read-only.
  *
  * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
  *         check if a proxy can be created for a specific object.
@@ -240,8 +258,15 @@ const stateHandlers: ProxyHandler< object > = {
  */
 export const proxifyState = < T extends object >(
 	namespace: string,
-	obj: T
-): T => createProxy( namespace, obj, stateHandlers ) as T;
+	obj: T,
+	options?: { readOnly?: boolean }
+): T => {
+	const proxy = createProxy( namespace, obj, stateHandlers ) as T;
+	if ( options?.readOnly ) {
+		readOnlyProxies.add( proxy );
+	}
+	return proxy;
+};
 
 /**
  * Reads the value of the specified property without subscribing to it.
@@ -276,13 +301,17 @@ const deepMergeRecursive = (
 	override: boolean = true
 ) => {
 	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		let hasNewKeys = false;
 		for ( const key in source ) {
+			const isNew = ! ( key in target );
+			hasNewKeys = hasNewKeys || isNew;
+
 			const desc = Object.getOwnPropertyDescriptor( source, key );
 			if (
 				typeof desc?.get === 'function' ||
 				typeof desc?.set === 'function'
 			) {
-				if ( override || ! ( key in target ) ) {
+				if ( override || isNew ) {
 					Object.defineProperty( target, key, {
 						...desc,
 						configurable: true,
@@ -296,12 +325,12 @@ const deepMergeRecursive = (
 					}
 				}
 			} else if ( isPlainObject( source[ key ] ) ) {
-				if ( ! ( key in target ) ) {
+				if ( isNew ) {
 					target[ key ] = {};
 				}
 
 				deepMergeRecursive( target[ key ], source[ key ], override );
-			} else if ( override || ! ( key in target ) ) {
+			} else if ( override || isNew ) {
 				Object.defineProperty( target, key, desc! );
 
 				const proxy = getProxyFromObject( target );
@@ -310,6 +339,10 @@ const deepMergeRecursive = (
 					propSignal.setValue( desc.value );
 				}
 			}
+		}
+
+		if ( hasNewKeys && objToIterable.has( target ) ) {
+			objToIterable.get( target )!.value++;
 		}
 	}
 };
