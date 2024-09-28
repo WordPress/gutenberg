@@ -118,6 +118,7 @@ export const TabListWrapper = styled.div`
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
+		scroll-margin: 24px;
 		flex-grow: 1;
 		flex-shrink: 0;
 		display: inline-flex;

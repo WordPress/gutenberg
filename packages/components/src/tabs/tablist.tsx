@@ -9,7 +9,7 @@ import { useStoreState } from '@ariakit/react';
  */
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useEvent, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,21 +29,24 @@ export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
 >( function TabList( { children, ...otherProps }, ref ) {
-	const context = useTabsContext();
+	const { store } = useTabsContext() ?? {};
 
-	const selectedId = useStoreState( context?.store, 'selectedId' );
-	const selectedElement = context?.store.item( selectedId )?.element;
-	const indicatorPosition = useTrackElementOffsetRect( selectedElement );
-	const activeId = useStoreState( context?.store, 'activeId' );
-	const activeElement = context?.store.item( activeId )?.element;
-	const activeTabPosition = useTrackElementOffsetRect( activeElement );
-	const items = useStoreState( context?.store, 'items' );
+	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement | null >();
 	const overflow = useTrackOverflow( parent, {
 		first: items?.at( 0 )?.element,
 		last: items?.at( -1 )?.element,
 	} );
 	const refs = useMergeRefs( [ ref, setParent ] );
+
+	const selectedId = useStoreState( store, 'selectedId' );
+	const selectedTabPosition = useTrackElementOffsetRect(
+		store?.item( selectedId )?.element
+	);
+	const activeId = useStoreState( store, 'activeId' );
+	const activeTabPosition = useTrackElementOffsetRect(
+		store?.item( activeId )?.element
+	);
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate( selectedId, ( { previousValue } ) => {
@@ -53,15 +56,9 @@ export const TabList = forwardRef<
 	} );
 
 	// Make sure active tab is scrolled into view.
-	useLayoutEffect( () => {
+	const scrollToActiveTab = useEvent( () => {
 		if ( ! parent || ! activeTabPosition ) {
 			return;
-		}
-
-		function scrollTo( left: number ) {
-			if ( parent?.scroll ) {
-				parent.scroll( { left } );
-			}
 		}
 
 		const { scrollLeft: parentScroll } = parent;
@@ -71,26 +68,18 @@ export const TabList = forwardRef<
 		const parentRightEdge = parentScroll + parentWidth;
 		const childRightEdge = childLeft + childWidth;
 		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
-		if ( rightOverflow > 0 ) {
-			return scrollTo( parentScroll + rightOverflow );
-		}
-
 		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
 		if ( leftOverflow > 0 ) {
-			return scrollTo( parentScroll - leftOverflow );
+			parent.scrollLeft = parentScroll - leftOverflow;
+		} else if ( rightOverflow > 0 ) {
+			parent.scrollLeft = parentScroll + rightOverflow;
 		}
-	}, [ activeTabPosition, parent ] );
+	} );
+	useLayoutEffect( () => {
+		scrollToActiveTab();
+	}, [ scrollToActiveTab, selectedTabPosition ] );
 
-	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
-
-	if ( ! context?.store ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
-
-	const { store } = context;
-	const { setActiveId } = store;
-
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
 	const onBlur = () => {
 		if ( ! selectOnMove ) {
 			return;
@@ -101,9 +90,14 @@ export const TabList = forwardRef<
 		// that the selected tab will receive keyboard focus when tabbing back into
 		// the tablist.
 		if ( selectedId !== activeId ) {
-			setActiveId( selectedId );
+			store?.setActiveId( selectedId );
 		}
 	};
+
+	if ( ! store ) {
+		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+		return null;
+	}
 
 	return (
 		<Ariakit.TabList
@@ -122,11 +116,11 @@ export const TabList = forwardRef<
 			tabIndex={ -1 }
 			{ ...otherProps }
 			style={ {
-				'--indicator-top': indicatorPosition.top,
-				'--indicator-right': indicatorPosition.right,
-				'--indicator-left': indicatorPosition.left,
-				'--indicator-width': indicatorPosition.width,
-				'--indicator-height': indicatorPosition.height,
+				'--indicator-top': selectedTabPosition.top,
+				'--indicator-right': selectedTabPosition.right,
+				'--indicator-left': selectedTabPosition.left,
+				'--indicator-width': selectedTabPosition.width,
+				'--indicator-height': selectedTabPosition.height,
 				...otherProps.style,
 			} }
 			className={ clsx(
