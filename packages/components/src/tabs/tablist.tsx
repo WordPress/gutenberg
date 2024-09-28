@@ -9,7 +9,7 @@ import { useStoreState } from '@ariakit/react';
  */
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
-import { useEvent, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,6 +31,9 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
+	const selectedId = useStoreState( store, 'selectedId' );
+	const activeId = useStoreState( store, 'activeId' );
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
 	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement | null >();
 	const overflow = useTrackOverflow( parent, {
@@ -39,13 +42,8 @@ export const TabList = forwardRef<
 	} );
 	const refs = useMergeRefs( [ ref, setParent ] );
 
-	const selectedId = useStoreState( store, 'selectedId' );
 	const selectedTabPosition = useTrackElementOffsetRect(
 		store?.item( selectedId )?.element
-	);
-	const activeId = useStoreState( store, 'activeId' );
-	const activeTabPosition = useTrackElementOffsetRect(
-		store?.item( activeId )?.element
 	);
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
@@ -56,14 +54,14 @@ export const TabList = forwardRef<
 	} );
 
 	// Make sure active tab is scrolled into view.
-	const scrollToActiveTab = useEvent( () => {
-		if ( ! parent || ! activeTabPosition ) {
+	useLayoutEffect( () => {
+		if ( ! parent || ! selectedTabPosition ) {
 			return;
 		}
 
 		const { scrollLeft: parentScroll } = parent;
 		const parentWidth = parent.getBoundingClientRect().width;
-		const { left: childLeft, width: childWidth } = activeTabPosition;
+		const { left: childLeft, width: childWidth } = selectedTabPosition;
 
 		const parentRightEdge = parentScroll + parentWidth;
 		const childRightEdge = childLeft + childWidth;
@@ -74,12 +72,8 @@ export const TabList = forwardRef<
 		} else if ( rightOverflow > 0 ) {
 			parent.scrollLeft = parentScroll + rightOverflow;
 		}
-	} );
-	useLayoutEffect( () => {
-		scrollToActiveTab();
-	}, [ scrollToActiveTab, selectedTabPosition ] );
+	}, [ parent, selectedTabPosition ] );
 
-	const selectOnMove = useStoreState( store, 'selectOnMove' );
 	const onBlur = () => {
 		if ( ! selectOnMove ) {
 			return;
