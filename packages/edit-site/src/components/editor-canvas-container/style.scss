@@ -30,6 +30,6 @@
 	position: absolute;
 	right: $grid-unit-10;
 	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
-	z-index: 1;
+	z-index: 2;
 	background: $white;
 }
