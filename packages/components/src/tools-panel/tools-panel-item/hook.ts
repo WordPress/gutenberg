@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { usePrevious } from '@wordpress/compose';
+import { useEvent, usePrevious } from '@wordpress/compose';
 import {
 	useCallback,
 	useEffect,
@@ -31,8 +31,8 @@ export function useToolsPanelItem(
 		label,
 		panelId,
 		resetAllFilter = noop,
-		onDeselect,
-		onSelect,
+		onDeselect: onDeselectProp,
+		onSelect: onSelectProp,
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanelItem' );
 
@@ -59,6 +59,8 @@ export function useToolsPanelItem(
 	// dependency to the useCallback hook! If needed, we should use a ref.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+	const onDeselect = useEvent( onDeselectProp );
+	const onSelect = useEvent( onSelectProp );
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
