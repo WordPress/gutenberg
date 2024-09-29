@@ -52,7 +52,7 @@ module.exports = {
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
 		/*'storybook-source-link',*/
-		/*'@geometricpanda/storybook-addon-badges',*/
+		'@geometricpanda/storybook-addon-badges',
 		'@storybook/addon-mdx-gfm',
 		'@storybook/addon-webpack5-compiler-babel',
 	],
