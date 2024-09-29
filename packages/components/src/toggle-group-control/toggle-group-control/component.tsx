@@ -87,7 +87,7 @@ function UnconnectedToggleGroupControl(
 
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
 	useSubelementAnimation( value ? selectedElement : undefined, {
-		prefix: 'indicator',
+		prefix: 'selected',
 	} );
 
 	const cx = useCx();
