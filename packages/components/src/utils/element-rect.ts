@@ -47,13 +47,13 @@ export type ElementOffsetRect = {
  * An `ElementOffsetRect` object with all values set to zero.
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
+	element: undefined,
 	top: 0,
 	right: 0,
 	bottom: 0,
 	left: 0,
 	width: 0,
 	height: 0,
-	element: undefined,
 } satisfies ElementOffsetRect;
 
 /**
