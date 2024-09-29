@@ -71,6 +71,16 @@ function ToolSelector( props, ref ) {
 							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
+									value: 'navigation',
+									label: (
+										<>
+											<Icon icon={ editIcon } />
+											{ __( 'Write' ) }
+										</>
+									),
+									info: __( 'Focus on content.' ),
+								},
+								{
 									value: 'edit',
 									label: (
 										<>
@@ -78,19 +88,7 @@ function ToolSelector( props, ref ) {
 											{ __( 'Design' ) }
 										</>
 									),
-									info: __(
-										'Full control over layout and styling.'
-									),
-								},
-								{
-									value: 'navigation',
-									label: (
-										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
-										</>
-									),
-									info: __( 'Focus on content.' ),
+									info: __( 'Edit layout and styles.' ),
 								},
 							] }
 						/>
