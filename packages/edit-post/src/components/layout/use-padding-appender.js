@@ -6,9 +6,14 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
+// Ruleset to add space for the typewriter effect. When typing in the last
+// block, there needs to be room to scroll up.
+const CSS =
+	':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}';
+
 export function usePaddingAppender( enabled ) {
 	const registry = useRegistry();
-	return useRefEffect(
+	const effect = useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
 				if ( event.target !== node ) {
@@ -45,13 +50,12 @@ export function usePaddingAppender( enabled ) {
 					insertDefaultBlock();
 				}
 			}
-			if ( enabled ) {
-				node.addEventListener( 'mousedown', onMouseDown );
-				return () => {
-					node.removeEventListener( 'mousedown', onMouseDown );
-				};
-			}
+			node.addEventListener( 'mousedown', onMouseDown );
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
 		},
-		[ enabled, registry ]
+		[ registry ]
 	);
+	return enabled ? [ effect, CSS ] : [];
 }

@@ -84,7 +84,7 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-function useEditorStyles( withPaddingAppender ) {
+function useEditorStyles( ...additionalStyles ) {
 	const { hasThemeStyleSupport, editorSettings } = useSelect( ( select ) => {
 		return {
 			hasThemeStyleSupport:
@@ -92,6 +92,8 @@ function useEditorStyles( withPaddingAppender ) {
 			editorSettings: select( editorStore ).getEditorSettings(),
 		};
 	}, [] );
+
+	const addedStyles = additionalStyles.join( '\n' );
 
 	// Compute the default styles.
 	return useMemo( () => {
@@ -129,15 +131,8 @@ function useEditorStyles( withPaddingAppender ) {
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a space for the typewriter effect. When typing in the last block,
-		// there needs to be room to scroll up.
-		if ( withPaddingAppender ) {
-			return [
-				...baseStyles,
-				{
-					css: ':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}',
-				},
-			];
+		if ( addedStyles ) {
+			return [ ...baseStyles, { css: addedStyles } ];
 		}
 
 		return baseStyles;
@@ -146,7 +141,7 @@ function useEditorStyles( withPaddingAppender ) {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
-		withPaddingAppender,
+		addedStyles,
 	] );
 }
 
@@ -449,7 +444,9 @@ function Layout( {
 		},
 		[ currentPostType, isEditingTemplate, settings.supportsTemplateMode ]
 	);
-	const paddingAppenderRef = usePaddingAppender( enablePaddingAppender );
+	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
+		enablePaddingAppender
+	);
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
@@ -465,7 +462,7 @@ function Layout( {
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
-	const styles = useEditorStyles( enablePaddingAppender );
+	const styles = useEditorStyles( paddingStyle );
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
 	if ( showIconLabels ) {
