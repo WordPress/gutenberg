@@ -6,7 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +22,44 @@ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
 import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
-import { useMergeRefs } from '@wordpress/compose';
+import { useEvent } from '@wordpress/compose';
+
+function useSubelementAnimation(
+	subelement?: HTMLElement | null,
+	{
+		parent = subelement?.offsetParent as HTMLElement | null | undefined,
+		prefix = 'subelement',
+	}: { parent?: HTMLElement | null | undefined; prefix?: string } = {}
+) {
+	const rect = useTrackElementOffsetRect( subelement );
+
+	const setProperties = useEvent( () => {
+		( Object.keys( rect ) as Array< keyof typeof rect > ).forEach(
+			( property ) =>
+				property !== 'element' &&
+				parent?.style.setProperty(
+					`--${ prefix }-${ property }`,
+					String( rect[ property ] )
+				)
+		);
+	} );
+	useLayoutEffect( () => {
+		setProperties();
+	}, [ rect, setProperties ] );
+	useOnValueUpdate( rect.element, ( { previousValue } ) => {
+		// Only enable the animation when moving from one element to another.
+		if ( rect.element && previousValue ) {
+			parent?.classList.add( 'is-animation-enabled' );
+		}
+	} );
+	useLayoutEffect( () => {
+		parent?.addEventListener( 'transitionend', ( event ) => {
+			if ( event.pseudoElement === '::before' ) {
+				parent?.classList.remove( 'is-animation-enabled' );
+			}
+		} );
+	} );
+}
 
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
@@ -49,32 +86,8 @@ function UnconnectedToggleGroupControl(
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
-	const indicatorPosition = useTrackElementOffsetRect(
-		value ? activeElement : undefined
-	);
-
-	const controlRef = useRef< HTMLElement >( null );
-	useLayoutEffect( () => {
-		( [ 'left', 'width', 'height' ] as const ).forEach(
-			( property ) =>
-				controlRef.current?.style.setProperty(
-					`--indicator-${ property }`,
-					String( indicatorPosition[ property ] )
-				)
-		);
-	}, [ indicatorPosition ] );
-	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
-		// Only enable the animation when moving from one element to another.
-		if ( indicatorPosition.element && previousValue ) {
-			controlRef.current?.classList.add( 'is-animation-enabled' );
-		}
-	} );
-	useLayoutEffect( () => {
-		controlRef.current?.addEventListener( 'transitionend', ( event ) => {
-			if ( event.pseudoElement === '::before' ) {
-				controlRef.current?.classList.remove( 'is-animation-enabled' );
-			}
-		} );
+	useSubelementAnimation( value ? activeElement : undefined, {
+		prefix: 'indicator',
 	} );
 
 	const cx = useCx();
@@ -115,7 +128,7 @@ function UnconnectedToggleGroupControl(
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ useMergeRefs( [ controlRef, forwardedRef ] ) }
+				ref={ forwardedRef }
 				size={ normalizedSize }
 				value={ value }
 			>
