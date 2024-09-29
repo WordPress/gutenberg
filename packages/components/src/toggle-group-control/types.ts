@@ -137,11 +137,11 @@ export type ToggleGroupControlContextProps = {
 	size: ToggleGroupControlProps[ 'size' ];
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
-	setActiveElement: ( element: HTMLElement | undefined ) => void;
+	setSelectedElement: ( element: HTMLElement | undefined ) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
 	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
 > &
-	Pick< ToggleGroupControlContextProps, 'setActiveElement' >;
+	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

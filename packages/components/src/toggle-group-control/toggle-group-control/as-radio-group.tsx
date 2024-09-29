@@ -32,7 +32,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		size,
 		value: valueProp,
 		id: idProp,
-		setActiveElement,
+		setSelectedElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -80,13 +80,13 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 			value: selectedValue,
 			// @ts-expect-error - This is wrong and we should fix it.
 			setValue,
-			setActiveElement,
+			setSelectedElement,
 		} ),
 		[
 			baseId,
 			isAdaptiveWidth,
 			selectedValue,
-			setActiveElement,
+			setSelectedElement,
 			setValue,
 			size,
 		]

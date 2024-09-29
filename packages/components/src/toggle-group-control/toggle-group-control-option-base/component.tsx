@@ -118,7 +118,7 @@ function ToggleGroupControlOptionBase(
 	const labelRef = useRef< HTMLDivElement | null >( null );
 	useLayoutEffect( () => {
 		if ( isPressed && labelRef.current ) {
-			toggleGroupControlContext.setActiveElement( labelRef.current );
+			toggleGroupControlContext.setSelectedElement( labelRef.current );
 		}
 	}, [ isPressed, toggleGroupControlContext ] );
 

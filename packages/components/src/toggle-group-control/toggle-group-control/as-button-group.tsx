@@ -26,7 +26,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		size,
 		value: valueProp,
 		id: idProp,
-		setActiveElement,
+		setSelectedElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -62,7 +62,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			isBlock: ! isAdaptiveWidth,
 			isDeselectable: true,
 			size,
-			setActiveElement,
+			setSelectedElement,
 		} ),
 		[
 			baseId,
@@ -70,7 +70,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 			setSelectedValue,
 			isAdaptiveWidth,
 			size,
-			setActiveElement,
+			setSelectedElement,
 		]
 	);
 

@@ -85,8 +85,8 @@ function UnconnectedToggleGroupControl(
 	const normalizedSize =
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
-	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
-	useSubelementAnimation( value ? activeElement : undefined, {
+	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
+	useSubelementAnimation( value ? selectedElement : undefined, {
 		prefix: 'indicator',
 	} );
 
@@ -123,7 +123,7 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				setActiveElement={ setActiveElement }
+				setSelectedElement={ setSelectedElement }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
