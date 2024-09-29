@@ -50,15 +50,20 @@ export const toggleGroupControl = ( {
 		--antialiasing-factor: 100;
 		border-radius: calc(
 				${ CONFIG.radiusXSmall } /
-					( var( --selected-width ) / var( --antialiasing-factor ) )
+					(
+						var( --selected-width, 0 ) /
+							var( --antialiasing-factor )
+					)
 			) / ${ CONFIG.radiusXSmall };
 		left: -1px; // Correcting for border.
 		width: calc( var( --antialiasing-factor ) * 1px );
-		height: calc( var( --selected-height ) * 1px );
+		height: calc( var( --selected-height, 0 ) * 1px );
 		transform-origin: left top;
-		transform: translateX( calc( var( --selected-left ) * 1px ) )
+		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) )
 			scaleX(
-				calc( var( --selected-width ) / var( --antialiasing-factor ) )
+				calc(
+					var( --selected-width, 0 ) / var( --antialiasing-factor )
+				)
 			);
 	}
 `;
