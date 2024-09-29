@@ -29,7 +29,12 @@ function useSubelementAnimation(
 	{
 		parent = subelement?.offsetParent as HTMLElement | null | undefined,
 		prefix = 'subelement',
-	}: { parent?: HTMLElement | null | undefined; prefix?: string } = {}
+		transitionEndFilter,
+	}: {
+		parent?: HTMLElement | null | undefined;
+		prefix?: string;
+		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
+	} = {}
 ) {
 	const rect = useTrackElementOffsetRect( subelement );
 
@@ -53,12 +58,15 @@ function useSubelementAnimation(
 		}
 	} );
 	useLayoutEffect( () => {
-		parent?.addEventListener( 'transitionend', ( event ) => {
-			if ( event.pseudoElement === '::before' ) {
+		function onTransitionEnd( event: TransitionEvent ) {
+			if ( transitionEndFilter?.( event ) ?? true ) {
 				parent?.classList.remove( 'is-animation-enabled' );
 			}
-		} );
-	}, [ parent ] );
+		}
+		parent?.addEventListener( 'transitionend', onTransitionEnd );
+		return () =>
+			parent?.removeEventListener( 'transitionend', onTransitionEnd );
+	}, [ parent, transitionEndFilter ] );
 }
 
 function UnconnectedToggleGroupControl(
@@ -88,6 +96,7 @@ function UnconnectedToggleGroupControl(
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
 	useSubelementAnimation( value ? selectedElement : undefined, {
 		prefix: 'selected',
+		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
 	} );
 
 	const cx = useCx();
