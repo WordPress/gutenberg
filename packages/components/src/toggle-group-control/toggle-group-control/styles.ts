@@ -29,7 +29,7 @@ export const toggleGroupControl = ( {
 
 	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::before {
-			transition-property: transform;
+			transition-property: transform, border-radius;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
