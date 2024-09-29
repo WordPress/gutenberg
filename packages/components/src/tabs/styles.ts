@@ -9,6 +9,7 @@ import * as Ariakit from '@ariakit/react';
  */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
+import Icon from '../icon';
 
 export const TabListWrapper = styled.div`
 	position: relative;
@@ -93,7 +94,6 @@ export const Tab = styled( Ariakit.Tab )`
 		box-shadow: none;
 		cursor: pointer;
 		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
-		padding: ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 400;
 		text-align: inherit;
@@ -141,6 +141,7 @@ export const Tab = styled( Ariakit.Tab )`
 	}
 
 	[aria-orientation='horizontal'] & {
+		padding: ${ space( 4 ) };
 		min-height: ${ space(
 			12
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
@@ -152,11 +153,11 @@ export const Tab = styled( Ariakit.Tab )`
 	}
 
 	[aria-orientation='vertical'] & {
+		padding: ${ space( 2 ) } ${ space( 3 ) };
 		padding-left: ${ space( 3 ) };
 		padding-right: ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
-		&[data-active-item] {
-			font-weight: 500;
+		&[aria-selected='true'] {
 			color: ${ COLORS.theme.accent };
 			fill: currentColor;
 		}
@@ -164,6 +165,25 @@ export const Tab = styled( Ariakit.Tab )`
 		&::after {
 			inset: 0;
 		}
+	}
+`;
+
+export const TabChildren = styled.span`
+	flex-grow: 1;
+`;
+
+export const TabChevron = styled( Icon )`
+	flex-shrink: 0;
+	margin-inline-end: ${ space( -1 ) };
+	[aria-orientation='horizontal'] & {
+		display: none;
+	}
+	opacity: 0;
+	[role='tab']:is( [aria-selected='true'], [data-active-item], :hover ) & {
+		opacity: 1;
+	}
+	&:dir( rtl ) {
+		rotate: 180deg;
 	}
 `;
 
