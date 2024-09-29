@@ -54,7 +54,7 @@ function UnconnectedToggleGroupControl(
 	);
 
 	const controlRef = useRef< HTMLElement >( null );
-	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
+	useLayoutEffect( () => {
 		( [ 'left', 'width', 'height' ] as const ).forEach(
 			( property ) =>
 				controlRef.current?.style.setProperty(
@@ -62,6 +62,8 @@ function UnconnectedToggleGroupControl(
 					String( indicatorPosition[ property ] )
 				)
 		);
+	}, [ indicatorPosition ] );
+	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
 		// Only enable the animation when moving from one element to another.
 		if ( indicatorPosition.element && previousValue ) {
 			controlRef.current?.classList.add( 'is-animation-enabled' );
