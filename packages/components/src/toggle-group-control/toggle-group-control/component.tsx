@@ -58,7 +58,7 @@ function useSubelementAnimation(
 				parent?.classList.remove( 'is-animation-enabled' );
 			}
 		} );
-	} );
+	}, [ parent ] );
 }
 
 function UnconnectedToggleGroupControl(
