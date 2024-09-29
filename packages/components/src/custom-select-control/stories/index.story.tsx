@@ -17,8 +17,8 @@ const meta: Meta< typeof CustomSelectControl > = {
 	title: 'Components/CustomSelectControl',
 	component: CustomSelectControl,
 	argTypes: {
-		onChange: { control: { type: null } },
-		value: { control: { type: null } },
+		onChange: { control: { type: undefined } },
+		value: { control: { type: undefined } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

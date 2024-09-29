@@ -19,7 +19,7 @@ const meta: Meta< typeof MenuGroup > = {
 	title: 'Components/MenuGroup',
 	component: MenuGroup,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 	},
 	parameters: {
 		controls: { expanded: true },

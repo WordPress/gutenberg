@@ -12,7 +12,7 @@ const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
 	title: 'Components/VisuallyHidden',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 		as: { control: { type: 'text' } },
 	},
 	parameters: {

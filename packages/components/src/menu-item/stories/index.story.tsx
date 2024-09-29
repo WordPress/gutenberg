@@ -19,7 +19,7 @@ const meta: Meta< typeof MenuItem > = {
 	component: MenuItem,
 	title: 'Components/MenuItem',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 		icon: {
 			control: { type: 'select' },
 			options: [ 'check', 'link', 'more' ],

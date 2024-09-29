@@ -21,7 +21,7 @@ const meta: Meta< typeof TreeGrid > = {
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

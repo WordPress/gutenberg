@@ -24,8 +24,8 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
-		onChange: { control: { type: null } },
-		value: { control: { type: null } },
+		onChange: { control: { type: undefined } },
+		value: { control: { type: undefined } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

@@ -22,7 +22,7 @@ const meta: Meta< typeof NumberControl > = {
 		step: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		type: { control: { type: 'text' } },
-		value: { control: null },
+		value: { control: undefined },
 	},
 	parameters: {
 		controls: { expanded: true },

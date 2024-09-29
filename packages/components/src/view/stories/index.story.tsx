@@ -12,7 +12,7 @@ const meta: Meta< typeof View > = {
 	component: View,
 	title: 'Components (Experimental)/View',
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: { type: undefined } },
 		children: { control: { type: 'text' } },
 	},
 	parameters: {

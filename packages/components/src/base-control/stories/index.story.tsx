@@ -13,7 +13,7 @@ const meta: Meta< typeof BaseControl > = {
 	title: 'Components/BaseControl',
 	component: BaseControl,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 	},

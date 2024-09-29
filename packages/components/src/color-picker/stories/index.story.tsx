@@ -12,8 +12,8 @@ const meta: Meta< typeof ColorPicker > = {
 	component: ColorPicker,
 	title: 'Components/ColorPicker',
 	argTypes: {
-		as: { control: { type: null } },
-		color: { control: { type: null } },
+		as: { control: { type: undefined } },
+		color: { control: { type: undefined } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

@@ -12,7 +12,7 @@ const meta: Meta< typeof TabbableContainer > = {
 	title: 'Components/TabbableContainer',
 	component: TabbableContainer,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

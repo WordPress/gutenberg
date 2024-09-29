@@ -13,7 +13,7 @@ const meta: Meta< typeof Surface > = {
 	component: Surface,
 	title: 'Components (Experimental)/Surface',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 		as: { control: { type: 'text' } },
 	},
 	parameters: {

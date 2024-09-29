@@ -19,7 +19,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 	title: 'Components (Experimental)/ConfirmDialog',
 	argTypes: {
 		isOpen: {
-			control: { type: null },
+			control: { type: undefined },
 		},
 	},
 	parameters: {
