@@ -29,7 +29,7 @@ export const toggleGroupControl = ( {
 
 	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::before {
-			transition-property: left, width;
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -40,17 +40,26 @@ export const toggleGroupControl = ( {
 		position: absolute;
 		pointer-events: none;
 		background: ${ COLORS.gray[ 900 ] };
-		border-radius: ${ CONFIG.radiusXSmall };
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 		outline-offset: -3px;
 
-		left: calc(
-			var( --indicator-left ) * 1px - 1px
-		); // Correcting for border.
-		width: calc( var( --indicator-width ) * 1px );
+		/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+		--antialiasing-factor: 100;
+		border-radius: calc(
+				${ CONFIG.radiusXSmall } /
+					( var( --indicator-width ) / var( --antialiasing-factor ) )
+			) / ${ CONFIG.radiusXSmall };
+		left: -1px; // Correcting for border.
+		width: calc( var( --antialiasing-factor ) * 1px );
 		height: calc( var( --indicator-height ) * 1px );
+		transform-origin: left top;
+		transform: translateX( calc( var( --indicator-left ) * 1px ) )
+			scaleX(
+				calc( var( --indicator-width ) / var( --antialiasing-factor ) )
+			);
 	}
 `;
 
