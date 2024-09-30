@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 import { terms } from './fixtures';
-import { getEntitiesInfo, getValueFromObjectPath } from '../utils';
+import {
+	getEntitiesInfo,
+	getValueFromObjectPath,
+	getQueryContext,
+} from '../utils';
 
 describe( 'Query block utils', () => {
 	describe( 'getEntitiesInfo', () => {
@@ -59,6 +63,67 @@ describe( 'Query block utils', () => {
 			const object = { foo: { bar: { baz: 'test' } } };
 			const result = getValueFromObjectPath( object, 'foo.bar.baz' );
 			expect( result ).toBe( 'test' );
+		} );
+	} );
+
+	describe( 'getQueryContext', () => {
+		it( 'should return the correct query context based on template slug and available post types', () => {
+			expect( getQueryContext( '404', undefined ) ).toStrictEqual( {
+				isSingular: true,
+				templateType: '404',
+				postType: '',
+			} );
+			expect( getQueryContext( 'blank', undefined ) ).toStrictEqual( {
+				isSingular: true,
+				templateType: 'blank',
+				postType: '',
+			} );
+			expect( getQueryContext( 'single', 'post' ) ).toStrictEqual( {
+				isSingular: true,
+				templateType: 'single',
+				postType: 'post',
+			} );
+			expect( getQueryContext( 'single-film', undefined ) ).toStrictEqual(
+				{
+					isSingular: true,
+					templateType: 'single',
+					postType: 'film',
+				}
+			);
+			expect( getQueryContext( 'page', 'page' ) ).toStrictEqual( {
+				isSingular: true,
+				templateType: 'page',
+				postType: 'page',
+			} );
+			expect( getQueryContext( 'wp', undefined ) ).toStrictEqual( {
+				isSingular: true,
+				templateType: 'custom',
+				postType: '',
+			} );
+			expect( getQueryContext( 'category', undefined ) ).toStrictEqual( {
+				isSingular: false,
+				templateType: 'category',
+				postType: '',
+			} );
+			expect(
+				getQueryContext( 'category-dog', undefined )
+			).toStrictEqual( {
+				isSingular: false,
+				templateType: 'category',
+				postType: 'dog',
+			} );
+			expect( getQueryContext( 'archive', undefined ) ).toStrictEqual( {
+				isSingular: false,
+				templateType: 'archive',
+				postType: '',
+			} );
+			expect(
+				getQueryContext( 'archive-film', undefined )
+			).toStrictEqual( {
+				isSingular: false,
+				templateType: 'archive',
+				postType: 'film',
+			} );
 		} );
 	} );
 } );

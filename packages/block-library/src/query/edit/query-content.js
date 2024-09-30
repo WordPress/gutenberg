@@ -22,6 +22,7 @@ import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
+import { getQueryContext } from '../utils';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -42,7 +43,8 @@ export default function QueryContent( {
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
-	const { postType, templateSlug } = context;
+	const { templateSlug, postType } = context;
+	const { isSingular } = getQueryContext( templateSlug, postType );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
@@ -50,38 +52,6 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	const isSingularTemplate = useSelect(
-		( select ) => {
-			const editorPostType =
-				select( coreStore ).__experimentalGetTemplateForLink()?.type;
-			const isInTemplate = 'wp_template' === editorPostType;
-			const singularTemplates = [
-				'404',
-				'blank',
-				'single',
-				'page',
-				'wp',
-			];
-			const typeOfQueryFromSlug = templateSlug.includes( '-' )
-				? templateSlug.split( '-', 1 )[ 0 ]
-				: templateSlug;
-			const queryFromTemplateSlug = templateSlug.includes( '-' )
-				? templateSlug.split( '-' ).slice( 1 ).join( '-' )
-				: '';
-			let typeOfTemplate = templateSlug;
-			if ( queryFromTemplateSlug ) {
-				typeOfTemplate = typeOfQueryFromSlug;
-			}
-			const isInSingularTemplate =
-				singularTemplates.includes( typeOfTemplate ) ||
-				postType !== undefined;
-
-			// Returns true if we are in a template and it's
-			// for singular content (e.g. post, page, 404, blank).
-			return isInTemplate && isInSingularTemplate;
-		},
-		[ postType, templateSlug ]
-	);
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, getEntityRecordEdits, canUser } =
@@ -130,11 +100,17 @@ export default function QueryContent( {
 		}
 		// We need to reset the `inherit` value if in a singular template, as queries
 		// are not inherited when in singular content (e.g. post, page, 404, blank).
-		if ( isSingularTemplate && query.inherit ) {
+		if ( isSingular && query.inherit ) {
 			newQuery.inherit = false;
 
 			// We need to update the query in the Editor if a specific post type is set.
-			if ( postType && query.postType !== postType ) {
+			// Unless the post type is `page`, as it usually doesn't make sense to loop
+			// through pages.
+			if (
+				postType &&
+				postType !== 'page' &&
+				query.postType !== postType
+			) {
 				newQuery.postType = postType;
 			}
 		}
@@ -148,8 +124,7 @@ export default function QueryContent( {
 		query.postType,
 		postsPerPage,
 		inherit,
-		isSingularTemplate,
-		templateSlug,
+		isSingular,
 		postType,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
@@ -197,7 +172,7 @@ export default function QueryContent( {
 					setDisplayLayout={ updateDisplayLayout }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isSingularTemplate={ isSingularTemplate }
+					isSingular={ isSingular }
 				/>
 			</InspectorControls>
 			<BlockControls>

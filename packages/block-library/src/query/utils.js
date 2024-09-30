@@ -435,3 +435,33 @@ export const useUnsupportedBlocks = ( clientId ) => {
 		[ clientId ]
 	);
 };
+
+/**
+ * Helper function that returns the query context from the editor based on the
+ * available template slug and post type.
+ *
+ * @param {string} templateSlug Current template slug based on context.
+ * @param {string} postType     Current post type based on context.
+ * @return {Object} An object with isSingular, templateType, and postType properties.
+ */
+export function getQueryContext( templateSlug = '', postType ) {
+	let isSingular = false;
+	let templateType = templateSlug === 'wp' ? 'custom' : templateSlug;
+
+	const singularTemplates = [ '404', 'blank', 'single', 'page', 'custom' ];
+	const templateTypeFromSlug = templateSlug.includes( '-' )
+		? templateSlug.split( '-', 1 )[ 0 ]
+		: templateSlug;
+	const queryFromTemplateSlug = templateSlug.includes( '-' )
+		? templateSlug.split( '-' ).slice( 1 ).join( '-' )
+		: '';
+	if ( queryFromTemplateSlug ) {
+		templateType = templateTypeFromSlug;
+	}
+
+	isSingular =
+		singularTemplates.includes( templateType ) || postType !== undefined;
+	postType = postType ? postType : queryFromTemplateSlug;
+
+	return { isSingular, templateType, postType };
+}
