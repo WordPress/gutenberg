@@ -479,7 +479,11 @@ module.exports = [
 	},
 	...wordPress.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+		files: [
+			'packages/jest*/**/*.js',
+			'**/test/**/*.js',
+			'packages/block-serialization-spec-parser/shared-tests.js',
+		],
 		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 	} ) ),
 	...[

@@ -1,3 +1,4 @@
+// eslint-disable-next-line jest/no-export
 export const jsTester = ( parse ) => () => {
 	describe( 'output structure', () => {
 		test( 'output is an array', () => {
@@ -340,6 +341,7 @@ const makeTest = hasPHP
 	: // eslint-disable-next-line jest/no-disabled-tests, jest/valid-describe-callback, jest/valid-title
 	  ( ...args ) => describe.skip( ...args );
 
+// eslint-disable-next-line jest/no-export
 export const phpTester = ( name, filename ) =>
 	makeTest(
 		name,
