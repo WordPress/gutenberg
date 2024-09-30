@@ -1,7 +1,7 @@
 module.exports = [
 	{
 		plugins: {
-			'@wordpress': require('../plugin'),
+			'@wordpress': require( '../plugin' ),
 		},
 		rules: {
 			'@wordpress/no-unused-vars-before-return': 'error',

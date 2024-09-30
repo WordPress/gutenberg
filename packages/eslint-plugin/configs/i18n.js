@@ -1,6 +1,6 @@
 module.exports = {
 	plugins: {
-		'@wordpress': require('../plugin'),
+		'@wordpress': require( '../plugin' ),
 	},
 	rules: {
 		'@wordpress/valid-sprintf': 'error',
