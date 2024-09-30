@@ -205,7 +205,6 @@ module.exports = [
 	...tseslint.config( {
 		extends: [ tseslint.configs.base ],
 		files: [ '**/*.ts', '**/*.tsx' ],
-		ignores: [ '**/*.d.ts' ],
 		rules: {
 			'@typescript-eslint/no-restricted-imports': [
 				'error',
@@ -280,6 +279,12 @@ module.exports = [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
+		},
+	},
+	{
+		files: [ '**/*.d.ts' ],
+		rules: {
+			'@wordpress/wp-global-usage': 'off',
 		},
 	},
 	{

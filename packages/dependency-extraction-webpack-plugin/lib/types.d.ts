@@ -1,4 +1,7 @@
-import { Compiler } from 'webpack';
+/**
+ * External dependencies
+ */
+import type { Compiler } from 'webpack';
 
 export = DependencyExtractionWebpackPlugin;
 
