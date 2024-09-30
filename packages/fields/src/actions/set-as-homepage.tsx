@@ -13,7 +13,7 @@ import {
 	CheckboxControl,
 	TextControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
+import type { Action, ActionModal } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -24,69 +24,41 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const PAGE_POST_TYPE = 'page';
 
-const setAsHomepage: Action< PostWithPermissions > = {
-	id: 'set-as-homepage',
-	label: __( 'Set as homepage' ),
-	isEligible( post ) {
-		if ( post.status === 'trash' ) {
-			return false;
-		}
+const useSiteSettings = () =>
+	useSelect( ( _select ) => {
+		// @ts-ignore
+		const siteSettings = _select( coreStore ).getEntityRecord(
+			'root',
+			'site'
+		);
+		// @ts-ignore
+		const _pageOnFront = siteSettings?.page_on_front || null;
+		const _currentHomePage =
+			_pageOnFront &&
+			_select( coreStore ).getEntityRecord(
+				'postType',
+				'page',
+				_pageOnFront
+			);
 
-		if ( post.type !== PAGE_POST_TYPE ) {
-			return false;
-		}
-
-		// A front-page tempalte overrides homepage settings, so don't show the action if it's present.
-		const homepageTemplate =
-			select( coreStore ).__experimentalGetTemplateForLink( '/' );
-
-		if ( homepageTemplate && 'front-page' === homepageTemplate.slug ) {
-			return false;
-		}
-
-		// Don't show the action if the page is already set as the homepage.
-		const pageOnFront = select(
-			coreStore
+		return {
+			currentHomePage: _currentHomePage,
 			// @ts-ignore
-		).getEntityRecord( 'root', 'site' )?.page_on_front;
+			pageForPosts: siteSettings?.page_for_posts,
+			// @ts-ignore
+			showOnFront: siteSettings?.show_on_front,
+		};
+	} );
 
-		if ( pageOnFront === post.id ) {
-			return false;
-		}
-
-		return true;
-	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
+	( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const pageTitle = getItemTitle( item );
 		const [ createPageForPosts, setCreatePageForPosts ] = useState( false );
 		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
+		// @ts-ignore
 		const { currentHomePage, pageForPosts, showOnFront } =
-			// @ts-ignore
-			useSelect( ( _select ) => {
-				// @ts-ignore
-				const siteSettings = _select( coreStore ).getEntityRecord(
-					'root',
-					'site'
-				);
-				// @ts-ignore
-				const _pageOnFront = siteSettings?.page_on_front || null;
-				const _currentHomePage =
-					_pageOnFront &&
-					_select( coreStore ).getEntityRecord(
-						'postType',
-						'page',
-						_pageOnFront
-					);
-
-				return {
-					currentHomePage: _currentHomePage,
-					// @ts-ignore
-					pageForPosts: siteSettings?.page_for_posts,
-					// @ts-ignore
-					showOnFront: siteSettings?.show_on_front,
-				};
-			} );
+			useSiteSettings();
 		const currentHomePageTitle = getItemTitle( currentHomePage );
 
 		const { editEntityRecord, saveEditedEntityRecord, saveEntityRecord } =
@@ -195,63 +167,60 @@ const setAsHomepage: Action< PostWithPermissions > = {
 			}
 		}
 
-		let modalBody;
-		let submitAction;
-
-		if ( 'posts' === showOnFront ) {
-			modalBody = (
-				<>
-					<Text>
-						{ sprintf(
-							// translators: %s: title of the page to be set as the homepage.
-							__(
-								'Set "%s" as the site homepage? This will replace the current homepage which is set to display the latest posts.'
-							),
-							pageTitle
-						) }
-					</Text>
-					{ ! pageForPosts && (
-						<>
-							<CheckboxControl
-								__nextHasNoMarginBottom
-								label={ __(
-									'Create a page to display latest posts'
-								) }
-								checked={ createPageForPosts }
-								onChange={ ( value ) =>
-									setCreatePageForPosts( value )
-								}
-							/>
-							{ createPageForPosts && (
-								<TextControl
-									__next40pxDefaultSize
+		const renderModalBody = () => {
+			if ( 'posts' === showOnFront ) {
+				return (
+					<>
+						<Text>
+							{ sprintf(
+								// translators: %s: title of the page to be set as the homepage.
+								__(
+									'Set "%s" as the site homepage? This will replace the current homepage which is set to display latest posts.'
+								),
+								pageTitle
+							) }
+						</Text>
+						{ ! pageForPosts && (
+							<>
+								<CheckboxControl
 									__nextHasNoMarginBottom
-									label={ __( 'Posts page title' ) }
-									value={ postsPageTitle }
+									label={ __(
+										'Create a page to display latest posts'
+									) }
+									checked={ createPageForPosts }
 									onChange={ ( value ) =>
-										setPostsPageTitle( value )
+										setCreatePageForPosts( value )
 									}
 								/>
-							) }
-						</>
-					) }
-				</>
-			);
-			submitAction = onSetPageAsHomepage;
-		} else if ( item.id === pageForPosts ) {
-			modalBody = (
-				<Text>
-					{ sprintf(
-						// translators: %s: title of the current home page.
-						__(
-							'Set the homepage to display the latest posts? This will replace the current home page: "%s"'
-						),
-						currentHomePageTitle
-					) }{ ' ' }
-				</Text>
-			);
-			submitAction = onSetLatestPostsHomepage;
-		} else {
+								{ createPageForPosts && (
+									<TextControl
+										__next40pxDefaultSize
+										__nextHasNoMarginBottom
+										label={ __( 'Posts page title' ) }
+										value={ postsPageTitle }
+										onChange={ ( value ) =>
+											setPostsPageTitle( value )
+										}
+									/>
+								) }
+							</>
+						) }
+					</>
+				);
+			} else if ( item.id === pageForPosts ) {
+				return (
+					<Text>
+						{ sprintf(
+							// translators: %s: title of the current home page.
+							__(
+								'Set the homepage to display latest posts? This will replace the current home page: "%s"'
+							),
+							currentHomePageTitle
+						) }{ ' ' }
+					</Text>
+				);
+			}
+
 			const modalTranslatedString =
 				'publish' !== item.status
 					? // translators: %1$s: title of a unpublished page to be set as the home page. %2$s: title of the current home page.
@@ -263,7 +232,7 @@ const setAsHomepage: Action< PostWithPermissions > = {
 							'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
 					  );
 
-			modalBody = (
+			return (
 				<Text>
 					{ sprintf(
 						modalTranslatedString,
@@ -272,13 +241,17 @@ const setAsHomepage: Action< PostWithPermissions > = {
 					) }{ ' ' }
 				</Text>
 			);
-			submitAction = onSetPageAsHomepage;
-		}
+		};
+
+		const submitAction =
+			showOnFront === 'posts' || item.id !== pageForPosts
+				? onSetPageAsHomepage
+				: onSetLatestPostsHomepage;
 
 		return (
 			<form onSubmit={ submitAction }>
 				<VStack spacing="5">
-					{ modalBody }
+					{ renderModalBody() }
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -303,7 +276,41 @@ const setAsHomepage: Action< PostWithPermissions > = {
 				</VStack>
 			</form>
 		);
+	};
+
+const setAsHomepage: Action< PostWithPermissions > = {
+	id: 'set-as-homepage',
+	label: __( 'Set as homepage' ),
+	isEligible( post ) {
+		if ( post.status === 'trash' ) {
+			return false;
+		}
+
+		if ( post.type !== PAGE_POST_TYPE ) {
+			return false;
+		}
+
+		// A front-page tempalte overrides homepage settings, so don't show the action if it's present.
+		const homepageTemplate =
+			select( coreStore ).__experimentalGetTemplateForLink( '/' );
+
+		if ( homepageTemplate && 'front-page' === homepageTemplate.slug ) {
+			return false;
+		}
+
+		// Don't show the action if the page is already set as the homepage.
+		const pageOnFront = select(
+			coreStore
+			// @ts-ignore
+		).getEntityRecord( 'root', 'site' )?.page_on_front;
+
+		if ( pageOnFront === post.id ) {
+			return false;
+		}
+
+		return true;
 	},
+	RenderModal: SetAsHomepageModal,
 };
 
 export default setAsHomepage;
