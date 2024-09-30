@@ -50,12 +50,18 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	const { isTemplate } = useSelect(
+	const isSingularTemplate = useSelect(
 		( select ) => {
 			const editorPostType =
 				select( coreStore ).__experimentalGetTemplateForLink()?.type;
 			const isInTemplate = 'wp_template' === editorPostType;
-			const singularTemplates = [ '404', 'single', 'page', 'wp' ];
+			const singularTemplates = [
+				'404',
+				'blank',
+				'single',
+				'page',
+				'wp',
+			];
 			const typeOfQueryFromSlug = templateSlug.includes( '-' )
 				? templateSlug.split( '-', 1 )[ 0 ]
 				: templateSlug;
@@ -66,13 +72,13 @@ export default function QueryContent( {
 			if ( queryFromTemplateSlug ) {
 				typeOfTemplate = typeOfQueryFromSlug;
 			}
-			const isSingularTemplate =
+			const isInSingularTemplate =
 				singularTemplates.includes( typeOfTemplate ) ||
 				postType !== undefined;
 
-			// isTemplate is true if we are in a template and it's
-			// not a singular content template.
-			return { isTemplate: isInTemplate && ! isSingularTemplate };
+			// Returns true if we are in a template and it's
+			// for singular content (e.g. post, page, 404, blank).
+			return isInTemplate && isInSingularTemplate;
 		},
 		[ postType, templateSlug ]
 	);
@@ -122,12 +128,12 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-		// We need to reset the `inherit` value if not in a template, as queries
-		// are not inherited when outside a template (e.g. when in singular content).
-		if ( ! isTemplate && query.inherit ) {
+		// We need to reset the `inherit` value if in a singular template, as queries
+		// are not inherited when in singular content (e.g. post, page, 404, blank).
+		if ( isSingularTemplate && query.inherit ) {
 			newQuery.inherit = false;
 
-			// We need to update the query in the Editor if not on a singular template.
+			// We need to update the query in the Editor if a specific post type is set.
 			if ( postType && query.postType !== postType ) {
 				newQuery.postType = postType;
 			}
@@ -142,7 +148,7 @@ export default function QueryContent( {
 		query.postType,
 		postsPerPage,
 		inherit,
-		isTemplate,
+		isSingularTemplate,
 		templateSlug,
 		postType,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -191,7 +197,7 @@ export default function QueryContent( {
 					setDisplayLayout={ updateDisplayLayout }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isTemplate={ isTemplate }
+					isSingularTemplate={ isSingularTemplate }
 				/>
 			</InspectorControls>
 			<BlockControls>
