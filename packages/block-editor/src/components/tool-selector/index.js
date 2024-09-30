@@ -95,7 +95,7 @@ function ToolSelector( props, ref ) {
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
+							'Tools provide different sets of interactions for blocks. Toggle between simplified content tools (Write) and advanced visual editing tools (Design).'
 						) }
 					</div>
 				</>
