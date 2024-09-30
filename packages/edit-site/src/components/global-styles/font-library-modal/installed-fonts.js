@@ -6,10 +6,8 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
-	__experimentalUseNavigator as useNavigator,
+	Navigator,
+	useNavigator,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
@@ -235,12 +233,12 @@ function InstalledFonts() {
 
 			{ ! isResolvingLibrary && (
 				<>
-					<NavigatorProvider
+					<Navigator
 						initialPath={
 							libraryFontSelected ? '/fontFamily' : '/'
 						}
 					>
-						<NavigatorScreen path="/">
+						<Navigator.Screen path="/">
 							<VStack spacing="8">
 								{ notice && (
 									<Notice
@@ -338,9 +336,9 @@ function InstalledFonts() {
 									</VStack>
 								) }
 							</VStack>
-						</NavigatorScreen>
+						</Navigator.Screen>
 
-						<NavigatorScreen path="/fontFamily">
+						<Navigator.Screen path="/fontFamily">
 							<ConfirmDeleteDialog
 								font={ libraryFontSelected }
 								isOpen={ isConfirmDeleteOpen }
@@ -353,7 +351,7 @@ function InstalledFonts() {
 							/>
 
 							<Flex justify="flex-start">
-								<NavigatorBackButton
+								<Navigator.BackButton
 									icon={
 										isRTL() ? chevronRight : chevronLeft
 									}
@@ -427,8 +425,8 @@ function InstalledFonts() {
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
-						</NavigatorScreen>
-					</NavigatorProvider>
+						</Navigator.Screen>
+					</Navigator>
 
 					<HStack
 						justify="flex-end"
