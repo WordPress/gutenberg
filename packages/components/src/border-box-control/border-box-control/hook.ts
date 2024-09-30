@@ -19,7 +19,7 @@ import {
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
-import { maybeWarnDeprecated40pxSize } from '../../utils/deprecated-40px-size';
+import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
 
 import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
@@ -40,7 +40,7 @@ export function useBorderBoxControl(
 		...otherProps
 	} = useContextSystem( props, 'BorderBoxControl' );
 
-	maybeWarnDeprecated40pxSize( {
+	maybeWarnDeprecated36pxSize( {
 		componentName: 'BorderBoxControl',
 		__next40pxDefaultSize,
 		size,

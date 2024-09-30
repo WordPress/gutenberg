@@ -3,7 +3,7 @@
  */
 import deprecated from '@wordpress/deprecated';
 
-export function maybeWarnDeprecated40pxSize( {
+export function maybeWarnDeprecated36pxSize( {
 	componentName,
 	__next40pxDefaultSize,
 	size,
