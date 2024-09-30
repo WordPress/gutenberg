@@ -201,7 +201,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
-				registry.batch( () => {
+				registry.batch( ( select, dispatch ) => {
 					if ( ! blockBindings ) {
 						setAttributes( nextAttributes );
 						return;
