@@ -60,7 +60,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! hasSelection ) {
 		return null;
 	}
 
@@ -72,9 +72,8 @@ function ZoomOutModeInserters() {
 		const nextClientId = blockOrder[ index ];
 
 		const isSelected =
-			hasSelection &&
-			( selectedBlockClientId === previousClientId ||
-				selectedBlockClientId === nextClientId );
+			selectedBlockClientId === previousClientId ||
+			selectedBlockClientId === nextClientId;
 
 		return (
 			<BlockPopoverInbetween
@@ -82,9 +81,8 @@ function ZoomOutModeInserters() {
 				previousClientId={ previousClientId }
 				nextClientId={ nextClientId }
 			>
-				{ ! shouldRenderInsertionPoint && (
+				{ ! shouldRenderInsertionPoint && isSelected && (
 					<ZoomOutModeInserterButton
-						isVisible={ isSelected }
 						onClick={ () => {
 							setInserterIsOpened( {
 								rootClientId: sectionRootClientId,
