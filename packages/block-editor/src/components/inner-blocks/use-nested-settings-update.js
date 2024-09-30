@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
@@ -77,10 +77,7 @@ export default function useNestedSettingsUpdate(
 	// otherwise if the arrays change length but the first elements are equal the comparison,
 	// does not works as expected.
 	const _allowedBlocks = useShallowMemo( allowedBlocks );
-
-	const _prioritizedInserterBlocks = useMemo(
-		() => prioritizedInserterBlocks,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+	const _prioritizedInserterBlocks = useShallowMemo(
 		prioritizedInserterBlocks
 	);
 
