@@ -122,7 +122,7 @@ END;
 		global $wp_query, $wp_the_query;
 
 		// Query block with post template block.
-		$content  = '<!-- wp:query {"query":{"inherit":true}} -->';
+		$content  = '<!-- wp:query {"query":{"inherit":false}} -->';
 		$content .= '<!-- wp:post-template {"align":"wide"} -->';
 		$content .= '<!-- wp:post-title /-->';
 		$content .= '<!-- /wp:post-template -->';

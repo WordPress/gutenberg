@@ -68,7 +68,7 @@ export default function FormatControls( { onChange, query: { format } } ) {
 		.filter( Boolean );
 
 	const suggestions = formats
-		.filter( ( item ) => ! format.includes( item.value ) )
+		.filter( ( item ) => ! normalizedFormats.includes( item.value ) )
 		.map( ( item ) => item.label );
 
 	return (

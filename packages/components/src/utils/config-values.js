@@ -7,18 +7,13 @@ import { COLORS } from './colors-values';
 const CONTROL_HEIGHT = '36px';
 
 const CONTROL_PROPS = {
-	controlSurfaceColor: COLORS.white,
-	controlTextActiveColor: COLORS.theme.accent,
-
 	// These values should be shared with TextControl.
 	controlPaddingX: 12,
 	controlPaddingXSmall: 8,
 	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
 
 	controlBackgroundColor: COLORS.white,
-	controlBoxShadow: 'transparent',
 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
-	controlDestructiveBorderColor: COLORS.alert.red,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
@@ -26,18 +21,9 @@ const CONTROL_PROPS = {
 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
 };
 
-const TOGGLE_GROUP_CONTROL_PROPS = {
-	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
-	toggleGroupControlBorderColor: COLORS.ui.border,
-	toggleGroupControlBackdropBackgroundColor:
-		CONTROL_PROPS.controlSurfaceColor,
-	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
-	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
-};
-
 // Using Object.assign to avoid creating circular references when emitting
 // TypeScript type declarations.
-export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
+export default Object.assign( {}, CONTROL_PROPS, {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',

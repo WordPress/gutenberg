@@ -3,7 +3,6 @@
  */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { ComplementaryArea } from '@wordpress/interface';
 
 /**
@@ -77,12 +76,9 @@ import { store as editorStore } from '../../store';
  * ```
  */
 export default function PluginSidebar( { className, ...props } ) {
-	const { postTitle, shortcut } = useSelect( ( select ) => {
+	const { postTitle } = useSelect( ( select ) => {
 		return {
 			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
-			shortcut: select(
-				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 		};
 	}, [] );
 	return (
@@ -91,7 +87,6 @@ export default function PluginSidebar( { className, ...props } ) {
 			className="editor-sidebar"
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core"
-			toggleShortcut={ shortcut }
 			{ ...props }
 		/>
 	);

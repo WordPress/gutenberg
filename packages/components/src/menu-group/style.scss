@@ -1,5 +1,4 @@
 .components-menu-group + .components-menu-group {
-	margin-top: $grid-unit-10;
 	padding-top: $grid-unit-10;
 	border-top: $border-width solid $gray-900;
 
@@ -8,6 +7,10 @@
 		margin-top: 0;
 		padding-top: 0;
 	}
+}
+
+.components-menu-group:has(> div:empty) {
+	display: none;
 }
 
 .components-menu-group__label {

@@ -25,7 +25,7 @@ import createHooks from './createHooks';
  */
 
 /**
- * @typedef {Record<string, Hook> & {__current: Current[]}} Store
+ * @typedef {Record<string, Hook> & {__current: Set<Current>}} Store
  */
 
 /**
@@ -48,7 +48,9 @@ const {
 	removeAllActions,
 	removeAllFilters,
 	doAction,
+	doActionAsync,
 	applyFilters,
+	applyFiltersAsync,
 	currentAction,
 	currentFilter,
 	doingAction,
@@ -70,7 +72,9 @@ export {
 	removeAllActions,
 	removeAllFilters,
 	doAction,
+	doActionAsync,
 	applyFilters,
+	applyFiltersAsync,
 	currentAction,
 	currentFilter,
 	doingAction,

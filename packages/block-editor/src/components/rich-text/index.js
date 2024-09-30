@@ -165,7 +165,7 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	const { disableBoundBlock, bindingsPlaceholder } = useSelect(
+	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
 			if (
 				! blockBindings?.[ identifier ] ||
@@ -179,18 +179,36 @@ export function RichTextWrapper(
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				registry,
-				context: blockContext,
-			} );
+			const blockBindingsContext = {};
+			if ( blockBindingsSource?.usesContext?.length ) {
+				for ( const key of blockBindingsSource.usesContext ) {
+					blockBindingsContext[ key ] = blockContext[ key ];
+				}
+			}
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
 					select,
-					context: blockContext,
+					context: blockBindingsContext,
 					args: relatedBinding.args,
 				} );
 
+			// Don't modify placeholders if value is not empty.
+			if ( adjustedValue.length > 0 ) {
+				return {
+					disableBoundBlock: _disableBoundBlock,
+					// Null values will make them fall back to the default behavior.
+					bindingsPlaceholder: null,
+					bindingsLabel: null,
+				};
+			}
+
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			const fieldsList = blockBindingsSource?.getFieldsList?.( {
+				select,
+				context: blockBindingsContext,
+			} );
 			const bindingKey =
 				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
 				blockBindingsSource?.label;
@@ -202,22 +220,22 @@ export function RichTextWrapper(
 						__( 'Add %s' ),
 						bindingKey
 				  );
+			const _bindingsLabel = _disableBoundBlock
+				? relatedBinding?.args?.key || blockBindingsSource?.label
+				: sprintf(
+						/* translators: %s: source label or key */
+						__( 'Empty %s; start writing to edit its value' ),
+						relatedBinding?.args?.key || blockBindingsSource?.label
+				  );
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
 				bindingsPlaceholder:
-					( ! adjustedValue || adjustedValue.length === 0 ) &&
-					_bindingsPlaceholder,
+					blockAttributes?.placeholder || _bindingsPlaceholder,
+				bindingsLabel: _bindingsLabel,
 			};
 		},
-		[
-			blockBindings,
-			identifier,
-			blockName,
-			blockContext,
-			registry,
-			adjustedValue,
-		]
+		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;
@@ -372,19 +390,7 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		let element = anchorRef.current;
-
-		if ( ! element ) {
-			return;
-		}
-
-		// Writing flow might be editable, so we should make sure focus goes to
-		// the root editable element.
-		while ( element.parentElement?.isContentEditable ) {
-			element = element.parentElement;
-		}
-
-		element.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;
@@ -421,7 +427,7 @@ export function RichTextWrapper(
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				aria-label={
-					bindingsPlaceholder || props[ 'aria-label' ] || placeholder
+					bindingsLabel || props[ 'aria-label' ] || placeholder
 				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [

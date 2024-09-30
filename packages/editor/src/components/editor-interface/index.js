@@ -32,6 +32,8 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorContentSlotFill from './content-slot-fill';
 
+import { unlock } from '../../lock-unlock';
+
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
@@ -71,12 +73,13 @@ export default function EditorInterface( {
 		nextShortcut,
 		showBlockBreadcrumbs,
 		documentLabel,
-		blockEditorMode,
+		isZoomOut,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
+		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
 
 		return {
 			mode: select( editorStore ).getEditorMode(),
@@ -94,8 +97,7 @@ export default function EditorInterface( {
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			blockEditorMode:
-				select( blockEditorStore ).__unstableGetEditorMode(),
+			isZoomOut: _isZoomOut(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -206,7 +208,7 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				isRichEditingEnabled &&
-				blockEditorMode !== 'zoom-out' &&
+				! isZoomOut &&
 				mode === 'visual' && (
 					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)

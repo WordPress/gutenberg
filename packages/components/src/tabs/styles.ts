@@ -17,10 +17,26 @@ export const TabListWrapper = styled.div`
 	align-items: stretch;
 	flex-direction: row;
 	text-align: center;
+	overflow-x: auto;
 
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 		text-align: start;
+	}
+
+	:where( [aria-orientation='horizontal'] ) {
+		width: fit-content;
+	}
+
+	--direction-factor: 1;
+	--direction-start: left;
+	--direction-end: right;
+	--indicator-start: var( --indicator-left );
+	&:dir( rtl ) {
+		--direction-factor: -1;
+		--direction-start: right;
+		--direction-end: left;
+		--indicator-start: var( --indicator-right );
 	}
 
 	@media not ( prefers-reduced-motion ) {
@@ -42,7 +58,7 @@ export const TabListWrapper = styled.div`
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		transform-origin: var( --direction-origin-x ) top;
+		transform-origin: var( --direction-start ) top;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
@@ -53,6 +69,30 @@ export const TabListWrapper = styled.div`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&:not( [aria-orientation='vertical'] ) {
+		--fade-width: 4rem;
+		--fade-gradient-base: transparent 0%, black var( --fade-width );
+		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
+			transparent 50%;
+		&.is-overflowing-first {
+			mask-image: linear-gradient(
+				to var( --direction-end ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-last {
+			mask-image: linear-gradient(
+				to var( --direction-start ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-first.is-overflowing-last {
+			mask-image: linear-gradient(
+					to right,
+					var( --fade-gradient-composed )
+				),
+				linear-gradient( to left, var( --fade-gradient-composed ) );
+		}
+
 		&::before {
 			bottom: 0;
 			height: 0;
@@ -85,10 +125,14 @@ export const TabListWrapper = styled.div`
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
+		scroll-margin: 24px;
+		flex-grow: 1;
+		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
 		position: relative;
 		border-radius: 0;
+		height: ${ space( 12 ) };
 		background: transparent;
 		border: none;
 		box-shadow: none;
@@ -97,7 +141,6 @@ export const Tab = styled( Ariakit.Tab )`
 		margin-left: 0;
 		font-weight: 400;
 		text-align: inherit;
-		hyphens: auto;
 		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
@@ -184,6 +227,10 @@ export const TabChevron = styled( Icon )`
 	}
 	&:dir( rtl ) {
 		rotate: 180deg;
+	}
+
+	[aria-orientation='horizontal'] & {
+		justify-content: center;
 	}
 `;
 

@@ -75,14 +75,14 @@ const v5 = {
 			source: 'html',
 			selector: 'blockquote',
 			multiline: 'p',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		citation: {
 			type: 'string',
 			source: 'html',
 			selector: 'cite',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',

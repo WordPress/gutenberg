@@ -96,6 +96,9 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 		icon: more,
 		children: ( { onClose } ) => (
 			<>
+				<MenuItem icon={ arrowUp } onClick={ onClose }>
+					Standalone Item
+				</MenuItem>
 				<MenuGroup>
 					<MenuItem icon={ arrowUp } onClick={ onClose }>
 						Move Up
