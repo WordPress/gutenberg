@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { store as blocksStore, createBlock } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -113,7 +113,6 @@ export function ImageEdit( {
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
-	const registry = useRegistry();
 	const containerRef = useRef();
 	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
 	// This won't work for them because the container width changes with the image.
@@ -381,7 +380,7 @@ export function ImageEdit( {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					! blockBindingsSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: metadata?.bindings?.url?.args,
 					} ),
