@@ -124,10 +124,10 @@ describe( 'private selectors', () => {
 			blockEditingModes: new Map( [] ),
 		};
 
-		const __experimentalHasContentRoleAttribute = jest.fn( () => false );
+		const hasContentRoleAttribute = jest.fn( () => false );
 		getBlockEditingMode.registry = {
 			select: jest.fn( () => ( {
-				__experimentalHasContentRoleAttribute,
+				hasContentRoleAttribute,
 			} ) ),
 		};
 
