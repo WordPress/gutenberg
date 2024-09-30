@@ -155,6 +155,7 @@ const UnconnectedBorderControl = (
  *
  * 	return (
  * 		<BorderControl
+ * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Border' ) }
  * 			onChange={ onChange }
