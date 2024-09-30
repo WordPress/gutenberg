@@ -8,7 +8,8 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,33 +21,58 @@ import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
+import { useTrackOverflow } from './use-track-overflow';
+
+const SCROLL_MARGIN = 24;
 
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
 >( function TabList( { children, ...otherProps }, ref ) {
-	const context = useTabsContext();
+	const { store } = useTabsContext() ?? {};
 
-	const tabStoreState = useStoreState( context?.store );
-	const selectedId = tabStoreState?.selectedId;
-	const indicatorPosition = useTrackElementOffsetRect(
-		context?.store.item( selectedId )?.element
+	const selectedId = useStoreState( store, 'selectedId' );
+	const activeId = useStoreState( store, 'activeId' );
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
+	const items = useStoreState( store, 'items' );
+	const [ parent, setParent ] = useState< HTMLElement | null >();
+	const refs = useMergeRefs( [ ref, setParent ] );
+	const overflow = useTrackOverflow( parent, {
+		first: items?.at( 0 )?.element,
+		last: items?.at( -1 )?.element,
+	} );
+
+	const selectedTabPosition = useTrackElementOffsetRect(
+		store?.item( selectedId )?.element
 	);
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
-	useOnValueUpdate(
-		selectedId,
-		( { previousValue } ) => previousValue && setAnimationEnabled( true )
-	);
+	useOnValueUpdate( selectedId, ( { previousValue } ) => {
+		if ( previousValue ) {
+			setAnimationEnabled( true );
+		}
+	} );
 
-	if ( ! context || ! tabStoreState ) {
-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
-		return null;
-	}
+	// Make sure selected tab is scrolled into view.
+	useLayoutEffect( () => {
+		if ( ! parent || ! selectedTabPosition ) {
+			return;
+		}
 
-	const { store } = context;
-	const { activeId, selectOnMove } = tabStoreState;
-	const { setActiveId } = store;
+		const { scrollLeft: parentScroll } = parent;
+		const parentWidth = parent.getBoundingClientRect().width;
+		const { left: childLeft, width: childWidth } = selectedTabPosition;
+
+		const parentRightEdge = parentScroll + parentWidth;
+		const childRightEdge = childLeft + childWidth;
+		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
+		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
+		if ( leftOverflow > 0 ) {
+			parent.scrollLeft = parentScroll - leftOverflow;
+		} else if ( rightOverflow > 0 ) {
+			parent.scrollLeft = parentScroll + rightOverflow;
+		}
+	}, [ parent, selectedTabPosition ] );
 
 	const onBlur = () => {
 		if ( ! selectOnMove ) {
@@ -58,35 +84,43 @@ export const TabList = forwardRef<
 		// that the selected tab will receive keyboard focus when tabbing back into
 		// the tablist.
 		if ( selectedId !== activeId ) {
-			setActiveId( selectedId );
+			store?.setActiveId( selectedId );
 		}
 	};
 
+	if ( ! store ) {
+		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+		return null;
+	}
+
 	return (
 		<Ariakit.TabList
-			ref={ ref }
+			ref={ refs }
 			store={ store }
 			render={
 				<TabListWrapper
 					onTransitionEnd={ ( event ) => {
-						if ( event.pseudoElement === '::after' ) {
+						if ( event.pseudoElement === '::before' ) {
 							setAnimationEnabled( false );
 						}
 					} }
 				/>
 			}
 			onBlur={ onBlur }
+			tabIndex={ -1 }
 			{ ...otherProps }
 			style={ {
-				'--indicator-top': indicatorPosition.top,
-				'--indicator-right': indicatorPosition.right,
-				'--indicator-left': indicatorPosition.left,
-				'--indicator-width': indicatorPosition.width,
-				'--indicator-height': indicatorPosition.height,
+				'--indicator-top': selectedTabPosition.top,
+				'--indicator-right': selectedTabPosition.right,
+				'--indicator-left': selectedTabPosition.left,
+				'--indicator-width': selectedTabPosition.width,
+				'--indicator-height': selectedTabPosition.height,
 				...otherProps.style,
 			} }
 			className={ clsx(
-				animationEnabled ? 'is-animation-enabled' : '',
+				overflow.first && 'is-overflowing-first',
+				overflow.last && 'is-overflowing-last',
+				animationEnabled && 'is-animation-enabled',
 				otherProps.className
 			) }
 		>
