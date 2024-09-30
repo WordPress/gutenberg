@@ -77,7 +77,8 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
+	const { isZoomOut: isZoomOutFn } = unlock( useSelect( blockEditorStore ) );
+	const isZoomOut = isZoomOutFn();
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -93,17 +94,26 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				if ( isZoomOut() ) {
+				// The zoom out view has a verical block toolbar that should always
+				// be on the edge of the canvas. This condition chnages the anchor
+				// of the toolbar to the section instead of the block to cover for blocks
+				// that are not full width.
+				if ( isZoomOut ) {
 					const selectedBlockRect =
 						getVisibleElementBounds( selectedElement );
 					const sectionRootElementRect = getVisibleElementBounds(
 						selectedElement.parentElement
 					);
+					const selectedBlockRectHeight =
+						selectedBlockRect.bottom - selectedBlockRect.top;
+					const sectionRootElementRectWidth =
+						sectionRootElementRect.right -
+						sectionRootElementRect.left;
 					return new window.DOMRectReadOnly(
-						parentRect.left,
-						selectedRect.top,
-						parentRect.right - parentRect.left,
-						selectedRect.bottom - selectedRect.top
+						sectionRootElementRect.left,
+						selectedBlockRect.top,
+						sectionRootElementRectWidth,
+						selectedBlockRectHeight
 					);
 				}
 
@@ -121,6 +131,7 @@ function BlockPopover(
 		lastSelectedElement,
 		selectedElement,
 		popoverDimensionsRecomputeCounter,
+		isZoomOut,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
