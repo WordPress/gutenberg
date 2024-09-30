@@ -526,8 +526,8 @@ registerBlockBindingsSource( {
 	name: 'plugin/my-custom-source',
 	label: _x( 'My Custom Source', 'block bindings source' ),
 	usesContext: [ 'postType' ],
-	getValues: () => getSourceValues(),
-	setValues: () => updateMyCustomValuesInBatch(),
+	getValues: getSourceValues,
+	setValues: updateMyCustomValuesInBatch,
 	canUserEditValue: () => true,
 } );
 ```
