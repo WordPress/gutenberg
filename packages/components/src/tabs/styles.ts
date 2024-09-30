@@ -197,7 +197,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		&::after {
-			inset: 0;
+			inset: 2px;
 		}
 	}
 `;
