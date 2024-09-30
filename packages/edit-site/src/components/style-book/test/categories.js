@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getCategoryExamples } from '../categories';
+import { getExamplesByCategory } from '../categories';
 import { STYLE_BOOK_CATEGORIES } from '../constants';
 
 // Fixtures
@@ -59,12 +59,12 @@ const exampleThemeBlocks = [
 ];
 
 describe( 'utils', () => {
-	describe( 'getCategoryExamples', () => {
+	describe( 'getExamplesByCategory', () => {
 		it( 'returns theme subcategories examples', () => {
 			const themeCategory = STYLE_BOOK_CATEGORIES.find(
 				( category ) => category.slug === 'theme'
 			);
-			const themeCategoryExamples = getCategoryExamples(
+			const themeCategoryExamples = getExamplesByCategory(
 				themeCategory,
 				exampleThemeBlocks
 			);

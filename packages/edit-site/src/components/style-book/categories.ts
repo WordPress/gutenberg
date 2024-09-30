@@ -13,7 +13,7 @@ import type {
  * @param {BlockExample[]}    examples           An array of block examples.
  * @return {CategoryExamples|undefined} An object containing the category examples.
  */
-export function getCategoryExamples(
+export function getExamplesByCategory(
 	categoryDefinition: StyleBookCategory,
 	examples: BlockExample[]
 ): CategoryExamples | undefined {
@@ -24,7 +24,7 @@ export function getCategoryExamples(
 	if ( categoryDefinition?.subcategories?.length ) {
 		return categoryDefinition.subcategories.reduce(
 			( acc, subcategoryDefinition ) => {
-				const subcategoryExamples = getCategoryExamples(
+				const subcategoryExamples = getExamplesByCategory(
 					subcategoryDefinition,
 					examples
 				);

@@ -31,7 +31,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import { STYLE_BOOK_CATEGORIES, STYLE_BOOK_IFRAME_STYLES } from './constants';
-import { getCategoryExamples } from './categories';
+import { getExamplesByCategory } from './categories';
 import { getExamples } from './examples';
 
 const {
@@ -150,7 +150,6 @@ function StyleBook( {
 					</div>
 				) : (
 					<StyleBookBody
-						category={ tabs[ 0 ].slug }
 						examples={ examples }
 						isSelected={ isSelected }
 						onClick={ onClick }
@@ -245,13 +244,15 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
-		const categoryDefinition = STYLE_BOOK_CATEGORIES.find(
-			( _category ) => _category.slug === category
-		);
-		const filteredExamples = getCategoryExamples(
-			categoryDefinition,
-			examples
-		);
+		const categoryDefinition = category
+			? STYLE_BOOK_CATEGORIES.find(
+					( _category ) => _category.slug === category
+			  )
+			: null;
+
+		const filteredExamples = categoryDefinition
+			? getExamplesByCategory( categoryDefinition, examples )
+			: { examples };
 
 		return (
 			<Composite
