@@ -193,7 +193,6 @@ export function MediaPreview( { media, onClick, category } ) {
 									},
 								} );
 
-								// TODO: Move to a new onSuccess callback as part of #61447.
 								createSuccessNotice(
 									__( 'Image uploaded and inserted.' ),
 									{ type: 'snackbar', id: 'inserter-notice' }
