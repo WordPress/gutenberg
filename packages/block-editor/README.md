@@ -839,6 +839,38 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockBindingsUtils
+
+Retrieves the existing utils to update the block `bindings` metadata.
+
+_Usage_
+
+```js
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
+
+updateBlockBindings( {
+	url: {
+		source: 'core/post-meta',
+		args: {
+			key: 'url_custom_field',
+		},
+	},
+	alt: {
+		source: 'core/post-meta',
+		args: {
+			key: 'text_custom_field',
+		},
+	},
+} );
+
+removeAllBlockBindings();
+```
+
+_Returns_
+
+-   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+
 ### useBlockCommands
 
 Undocumented declaration.

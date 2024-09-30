@@ -13,6 +13,43 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
+/**
+ * Contains utils to update the block `bindings` metadata.
+ *
+ * @typedef {Object} WPBlockBindingsUtils
+ *
+ * @property {Function} updateBlockBindings    Updates the value of the bindings connected to block attributes.
+ * @property {Function} removeAllBlockBindings Removes the bindings property of the `metadata` attribute.
+ */
+
+/**
+ * Retrieves the existing utils to update the block `bindings` metadata.
+ *
+ * @return {?WPBlockBindingsUtils} Object containing the block bindings utils.
+ *
+ * @example
+ * ```js
+ * import { useBlockBindingsUtils } from '@wordpress/block-editor'
+ * const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
+ *
+ * updateBlockBindings( {
+ *     url: {
+ *         source: 'core/post-meta',
+ *         args: {
+ *             key: 'url_custom_field',
+ *         },
+ * 	   },
+ *     alt: {
+ *         source: 'core/post-meta',
+ *         args: {
+ *             key: 'text_custom_field',
+ *         },
+ * 	   }
+ * } );
+ *
+ * removeAllBlockBindings();
+ * ```
+ */
 export function useBlockBindingsUtils() {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );

@@ -4,7 +4,7 @@
 import { useState, useId } from '@wordpress/element';
 import {
 	InspectorControls,
-	privateApis as blockEditorPrivateApis,
+	useBlockBindingsUtils,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -17,9 +17,6 @@ import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
-import { unlock } from '../lock-unlock';
-
-const { useBlockBindingsUtils } = unlock( blockEditorPrivateApis );
 
 function PatternOverridesControls( {
 	attributes,
