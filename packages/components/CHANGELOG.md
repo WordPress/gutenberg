@@ -12,6 +12,7 @@
 
 -   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
 -   `BorderBoxControl`: Deprecate 36px default size ([#65752](https://github.com/WordPress/gutenberg/pull/65752)).
+-   `BorderControl`: Deprecate 36px default size ([#65755](https://github.com/WordPress/gutenberg/pull/65755)).
 
 ### Enhancements
 
