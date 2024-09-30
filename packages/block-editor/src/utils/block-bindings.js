@@ -23,7 +23,12 @@ function isObjectEmpty( object ) {
  */
 
 /**
- * Retrieves the existing utils to update the block `bindings` metadata.
+ * Retrieves the existing utils needed to update the block `bindings` metadata.
+ * They can be used to create, modify, or remove connections from the existing block attributes.
+ *
+ * It contains the following utils:
+ * - `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
+ * - `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
  *
  * @return {?WPBlockBindingsUtils} Object containing the block bindings utils.
  *
@@ -32,6 +37,7 @@ function isObjectEmpty( object ) {
  * import { useBlockBindingsUtils } from '@wordpress/block-editor'
  * const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
  *
+ * // Update url and alt attributes.
  * updateBlockBindings( {
  *     url: {
  *         source: 'core/post-meta',
@@ -47,6 +53,10 @@ function isObjectEmpty( object ) {
  * 	   }
  * } );
  *
+ * // Remove binding from url attribute.
+ * updateBlockBindings( { url: undefined } );
+ *
+ * // Remove bindings from all attributes.
  * removeAllBlockBindings();
  * ```
  */
