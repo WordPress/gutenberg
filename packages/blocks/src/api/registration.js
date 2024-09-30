@@ -774,7 +774,6 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
  * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
- * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
  *
  * @example
  * ```js
@@ -784,6 +783,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * registerBlockBindingsSource( {
  *     name: 'plugin/my-custom-source',
  *     label: _x( 'My Custom Source', 'block bindings source' ),
+ *     usesContext: [ 'postType' ],
  *     getValues: () => getSourceValues(),
  *     setValues: () => updateMyCustomValuesInBatch(),
  *     canUserEditValue: () => true,

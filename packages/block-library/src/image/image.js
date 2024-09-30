@@ -34,7 +34,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -476,7 +476,6 @@ export default function Image( {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
