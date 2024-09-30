@@ -22,7 +22,7 @@ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
 import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
-import { useEvent } from '@wordpress/compose';
+import { useEvent, useMergeRefs } from '@wordpress/compose';
 
 function useSubelementAnimation(
 	subelement?: HTMLElement | null,
@@ -94,7 +94,10 @@ function UnconnectedToggleGroupControl(
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
+	const [ controlElement, setControlElement ] = useState< HTMLElement >();
+	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
 	useSubelementAnimation( value ? selectedElement : undefined, {
+		parent: controlElement,
 		prefix: 'selected',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
 	} );
@@ -137,7 +140,7 @@ function UnconnectedToggleGroupControl(
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ forwardedRef }
+				ref={ refs }
 				size={ normalizedSize }
 				value={ value }
 			>
