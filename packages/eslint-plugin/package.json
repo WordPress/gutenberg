@@ -36,7 +36,7 @@
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-import": "^2.3.0",
+		"eslint-plugin-import": "^2.10.0",
 		"eslint-plugin-jest": "^28.8.3",
 		"eslint-plugin-jsdoc": "^50.2.4",
 		"eslint-plugin-jsx-a11y": "^6.10.0",
