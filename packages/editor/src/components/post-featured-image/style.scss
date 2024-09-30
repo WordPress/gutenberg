@@ -5,21 +5,13 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		margin-top: -9px;
-		margin-left: -9px;
+		margin: 0;
+		transform: translate(-50%, -50%);
 	}
 }
 
 .editor-post-featured-image__container {
 	position: relative;
-
-	&:hover,
-	&:focus,
-	&:focus-within {
-		.editor-post-featured-image__actions {
-			opacity: 1;
-		}
-	}
 
 	.components-drop-zone__content {
 		border-radius: $radius-small;
@@ -72,17 +64,10 @@
 }
 
 .editor-post-featured-image__actions {
-	@include reduce-motion("transition");
-	bottom: 0;
-	opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
-	padding: $grid-unit-10;
-	position: absolute;
-	transition: opacity 50ms ease-out;
+	padding: $grid-unit-10 0;
 }
 
 .editor-post-featured-image__action {
-	backdrop-filter: blur(16px) saturate(180%);
-	background: rgba(255, 255, 255, 0.75);
 	flex-grow: 1;
 	justify-content: center;
 }
