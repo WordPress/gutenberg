@@ -268,6 +268,7 @@ export function sortResults( results: SearchResult[], search: string ) {
 
 	const scores = {};
 	for ( const result of results ) {
+		let score = 0;
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
 			const matchingTokens = titleTokens.filter( ( titleToken ) =>
@@ -275,10 +276,17 @@ export function sortResults( results: SearchResult[], search: string ) {
 					titleToken.includes( searchToken )
 				)
 			);
-			scores[ result.id ] = matchingTokens.length / titleTokens.length;
-		} else {
-			scores[ result.id ] = 0;
+			score = matchingTokens.length / titleTokens.length;
 		}
+
+		// Prioritize pages and posts.
+		if (
+			result.kind === 'post-type' &&
+			( result.type === 'post' || result.type === 'page' )
+		) {
+			score += 1;
+		}
+		scores[ result.id ] = score;
 	}
 
 	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
