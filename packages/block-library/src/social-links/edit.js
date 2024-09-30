@@ -25,6 +25,8 @@ import {
 	PanelBody,
 	ToggleControl,
 	ToolbarDropdownMenu,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
@@ -200,6 +202,29 @@ export function SocialLinksEdit( props ) {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleGroupControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Size' ) }
+						value={ size ?? 'has-normal-icon-size' }
+						onChange={ ( entry ) => {
+							setAttributes( {
+								size: entry,
+							} );
+						} }
+						isBlock
+						help={ __( 'Choose the size of the Social Icons.' ) }
+					>
+						{ sizeOptions.map( ( entry ) => {
+							return (
+								<ToggleGroupControlOption
+									key={ entry.value }
+									value={ entry.value }
+									label={ entry.name }
+								/>
+							);
+						} ) }
+					</ToggleGroupControl>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
