@@ -117,7 +117,7 @@ _Returns_
 
 ### getBlockBindingsSource
 
-Returns a registered block bindings source.
+Returns a registered block bindings source by its name.
 
 _Parameters_
 
@@ -845,7 +845,7 @@ _Returns_
 
 ### unregisterBlockBindingsSource
 
-Unregisters a block bindings source
+Unregisters a block bindings source by providing its name.
 
 _Usage_
 

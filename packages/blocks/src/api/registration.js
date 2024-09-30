@@ -903,7 +903,7 @@ export const registerBlockBindingsSource = ( source ) => {
 };
 
 /**
- * Unregisters a block bindings source
+ * Unregisters a block bindings source by providing its name.
  *
  * @param {string} name The name of the block bindings source to unregister.
  *
@@ -924,7 +924,7 @@ export function unregisterBlockBindingsSource( name ) {
 }
 
 /**
- * Returns a registered block bindings source.
+ * Returns a registered block bindings source by its name.
  *
  * @param {string} name Block bindings source name.
  *
