@@ -54,6 +54,10 @@ const { state, actions } = store( 'core/router', {
 
 ```
 
+<div class="callout callout-tip">
+    The core "Query Loop" block is [using this package](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/view.js#L35) to provide the [region based feature](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/index.php#L33)
+</div>
+
 ### Directives:
 
 #### `data-wp-router-region`
