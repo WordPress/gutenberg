@@ -15,6 +15,7 @@ import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
+import anchorReducer from './anchor-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import msListIgnore from './ms-list-ignore';
@@ -48,6 +49,7 @@ function filterInlineHTML( HTML ) {
 		googleDocsUIDRemover,
 		msListIgnore,
 		phrasingContentReducer,
+		anchorReducer,
 		commentRemover,
 	] );
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
@@ -192,6 +194,7 @@ export function pasteHandler( {
 				listReducer,
 				imageCorrector,
 				phrasingContentReducer,
+				anchorReducer,
 				specialCommentConverter,
 				commentRemover,
 				iframeRemover,
