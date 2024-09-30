@@ -135,7 +135,6 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 						}
 						__unstableSetEditorMode( 'edit' );
 						resetZoomLevel();
-						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }
@@ -147,6 +146,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 					label={ __( 'Delete' ) }
 					onClick={ () => {
 						removeBlock( clientId );
+						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }
