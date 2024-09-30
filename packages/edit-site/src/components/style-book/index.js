@@ -122,16 +122,18 @@ function StyleBook( {
 				{ showTabs ? (
 					<div className="edit-site-style-book__tabs">
 						<Tabs>
-							<Tabs.TabList>
-								{ tabs.map( ( tab ) => (
-									<Tabs.Tab
-										tabId={ tab.slug }
-										key={ tab.slug }
-									>
-										{ tab.title }
-									</Tabs.Tab>
-								) ) }
-							</Tabs.TabList>
+							<div className="edit-site-style-book__tablist-container">
+								<Tabs.TabList>
+									{ tabs.map( ( tab ) => (
+										<Tabs.Tab
+											tabId={ tab.slug }
+											key={ tab.slug }
+										>
+											{ tab.title }
+										</Tabs.Tab>
+									) ) }
+								</Tabs.TabList>
+							</div>
 							{ tabs.map( ( tab ) => (
 								<Tabs.TabPanel
 									key={ tab.slug }
