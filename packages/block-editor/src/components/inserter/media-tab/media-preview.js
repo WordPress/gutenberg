@@ -20,7 +20,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useCallback, useState, useRef } from '@wordpress/element';
+import { useMemo, useCallback, useState } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
 import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -127,14 +127,13 @@ export function MediaPreview( { media, onClick, category } ) {
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
-	const hasInsertedBlock = useRef( false );
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
 		[ media, category.mediaType ]
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { getSettings } = useSelect( blockEditorStore );
+	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onMediaInsert = useCallback(
@@ -183,7 +182,7 @@ export function MediaPreview( { media, onClick, category } ) {
 								return;
 							}
 
-							if ( ! hasInsertedBlock.current ) {
+							if ( ! getBlock( clonedBlock.clientId ) ) {
 								// Ensure the block is only inserted once.
 								onClick( {
 									...clonedBlock,
@@ -199,8 +198,6 @@ export function MediaPreview( { media, onClick, category } ) {
 									__( 'Image uploaded and inserted.' ),
 									{ type: 'snackbar', id: 'inserter-notice' }
 								);
-
-								hasInsertedBlock.current = true;
 							} else {
 								// For subsequent calls, update the existing block.
 								updateBlockAttributes( clonedBlock.clientId, {
@@ -234,6 +231,7 @@ export function MediaPreview( { media, onClick, category } ) {
 			createSuccessNotice,
 			updateBlockAttributes,
 			createErrorNotice,
+			getBlock,
 		]
 	);
 
