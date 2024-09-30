@@ -74,6 +74,7 @@ const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 function CoverEdit( {
 	attributes,
 	clientId,
+	blockEditingMode,
 	isSelected,
 	overlayColor,
 	setAttributes,
@@ -278,6 +279,8 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
+	const hasNonContentControls = blockEditingMode === 'default';
+
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
 		return {
@@ -447,7 +450,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ isSelected && (
+				{ hasNonContentControls && isSelected && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
@@ -576,7 +579,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ isSelected && (
+			{ hasNonContentControls && isSelected && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>
