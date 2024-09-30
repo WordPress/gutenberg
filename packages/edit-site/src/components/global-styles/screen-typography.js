@@ -27,7 +27,7 @@ function ScreenTypography() {
 			<ScreenHeader
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Typography styles and the application of those styles on site elements.'
+					'Available fonts, typographic styles, and the application of those styles.'
 				) }
 			/>
 			<div className="edit-site-global-styles-screen">
