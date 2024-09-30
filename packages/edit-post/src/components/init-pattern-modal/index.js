@@ -11,12 +11,11 @@ import {
 	ToggleControl,
 	TextControl,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function InitPatternModal() {
 	const { editPost } = useDispatch( editorStore );
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ title, setTitle ] = useState( '' );
 
@@ -28,14 +27,9 @@ export default function InitPatternModal() {
 			isNewPost: isCleanNewPost(),
 		};
 	}, [] );
-
-	useEffect( () => {
-		if ( isNewPost && postType === 'wp_block' ) {
-			setIsModalOpen( true );
-		}
-		// We only want the modal to open when the page is first loaded.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
+	const [ isModalOpen, setIsModalOpen ] = useState( () =>
+		isNewPost && postType === 'wp_block' ? true : false
+	);
 
 	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
