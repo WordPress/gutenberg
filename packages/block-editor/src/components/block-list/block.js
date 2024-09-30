@@ -25,6 +25,7 @@ import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 	store as blocksStore,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
@@ -45,6 +46,8 @@ import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
 
 import { unlock } from '../../lock-unlock';
+
+const { isUnmodifiedBlockContent } = unlock( blocksPrivateApis );
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -350,12 +353,48 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					removeBlock( _clientId );
 				} else {
 					registry.batch( () => {
+						const firstBlock = getBlock( firstClientId );
+						const isFirstBlockContentUnmodified =
+							isUnmodifiedBlockContent( firstBlock );
+						const defaultBlockName = getDefaultBlockName();
+						const replacement = switchToBlockType(
+							firstBlock,
+							defaultBlockName
+						);
+						const canTransformToDefaultBlock =
+							!! replacement?.length &&
+							replacement.every( ( block ) =>
+								canInsertBlockType( block.name, _clientId )
+							);
+
 						if (
+							isFirstBlockContentUnmodified &&
+							canTransformToDefaultBlock
+						) {
+							// Step 1: If the block is empty and can be transformed to the default block type.
+							replaceBlocks(
+								firstClientId,
+								replacement,
+								changeSelection
+							);
+						} else if (
+							isFirstBlockContentUnmodified &&
+							firstBlock.name === defaultBlockName
+						) {
+							// Step 2: If the block is empty and is already the default block type.
+							removeBlock( firstClientId );
+							const nextBlockClientId =
+								getNextBlockClientId( clientId );
+							if ( nextBlockClientId ) {
+								selectBlock( nextBlockClientId );
+							}
+						} else if (
 							canInsertBlockType(
-								getBlockName( firstClientId ),
+								firstBlock.name,
 								targetRootClientId
 							)
 						) {
+							// Step 3: If the block can be moved up.
 							moveBlocksToPosition(
 								[ firstClientId ],
 								_clientId,
@@ -363,21 +402,17 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								getBlockIndex( _clientId )
 							);
 						} else {
-							const replacement = switchToBlockType(
-								getBlock( firstClientId ),
-								getDefaultBlockName()
-							);
-
-							if (
-								replacement &&
-								replacement.length &&
+							const canLiftAndTransformToDefaultBlock =
+								!! replacement?.length &&
 								replacement.every( ( block ) =>
 									canInsertBlockType(
 										block.name,
 										targetRootClientId
 									)
-								)
-							) {
+								);
+
+							if ( canLiftAndTransformToDefaultBlock ) {
+								// Step 4: If the block can be transformed to the default block type and moved up.
 								insertBlocks(
 									replacement,
 									getBlockIndex( _clientId ),
@@ -386,6 +421,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								);
 								removeBlock( firstClientId, false );
 							} else {
+								// Step 5: Continue the default behavior.
 								switchToDefaultOrRemove();
 							}
 						}

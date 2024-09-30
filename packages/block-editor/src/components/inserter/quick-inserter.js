@@ -87,10 +87,10 @@ export default function QuickInserter( {
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
 		setInserterIsOpened( {
-			rootClientId,
-			insertionIndex,
 			filterValue,
 			onSelect,
+			rootClientId,
+			insertionIndex,
 		} );
 	};
 

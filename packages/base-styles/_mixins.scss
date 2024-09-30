@@ -2,6 +2,74 @@
 @import "./long-content-fade";
 
 /**
+ * Typography
+ */
+
+@mixin _text-heading() {
+	font-family: $font-family-headings;
+	font-weight: $font-weight-medium;
+}
+
+@mixin _text-body() {
+	font-family: $font-family-body;
+	font-weight: $font-weight-regular;
+}
+
+@mixin heading-small() {
+	@include _text-heading();
+	font-size: $font-size-x-small;
+	line-height: $line-height-x-small;
+}
+
+@mixin heading-medium() {
+	@include _text-heading();
+	font-size: $font-size-medium;
+	line-height: $line-height-small;
+}
+
+@mixin heading-large() {
+	@include _text-heading();
+	font-size: $font-size-large;
+	line-height: $line-height-small;
+}
+
+@mixin heading-x-large() {
+	@include _text-heading();
+	font-size: $font-size-x-large;
+	line-height: $line-height-medium;
+}
+
+@mixin heading-2x-large() {
+	@include _text-heading();
+	font-size: $font-size-2x-large;
+	line-height: $font-line-height-2x-large;
+}
+
+@mixin body-small() {
+	@include _text-body();
+	font-size: $font-size-small;
+	line-height: $line-height-x-small;
+}
+
+@mixin body-medium() {
+	@include _text-body();
+	font-size: $font-size-medium;
+	line-height: $line-height-small;
+}
+
+@mixin body-large() {
+	@include _text-body();
+	font-size: $font-size-large;
+	line-height: $line-height-medium;
+}
+
+@mixin body-x-large() {
+	@include _text-body();
+	font-size: $font-size-x-large;
+	line-height: $line-height-x-large;
+}
+
+/**
  * Breakpoint mixins
  */
 

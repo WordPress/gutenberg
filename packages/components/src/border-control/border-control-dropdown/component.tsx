@@ -237,6 +237,7 @@ const BorderControlDropdown = (
 							onReset();
 							onClose();
 						} }
+						__next40pxDefaultSize
 					>
 						{ __( 'Reset' ) }
 					</Button>

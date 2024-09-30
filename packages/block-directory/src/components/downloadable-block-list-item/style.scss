@@ -69,6 +69,11 @@
 		align-items: center;
 		justify-content: center;
 	}
+
+	.is-installing & {
+		// Adding an extra 6px to avoid the UI from jumping when the rating bar gets hidden
+		margin-right: $grid-unit-20 + 6px;
+	}
 }
 
 .block-directory-block-ratings {
