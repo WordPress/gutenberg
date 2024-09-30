@@ -1,7 +1,7 @@
 type Block = {
 	name: string;
 	attributes: Record< string, unknown >;
-	innerBlocks: Block[];
+	innerBlocks?: Block[];
 };
 
 export type StyleBookCategory = {
@@ -16,7 +16,7 @@ export type BlockExample = {
 	name: string;
 	title: string;
 	category: string;
-	blocks: Block;
+	blocks: Block | Block[];
 };
 
 export type CategoryExamples = {
