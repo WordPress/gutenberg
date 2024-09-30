@@ -188,7 +188,7 @@ export function RichTextWrapper(
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
-					registry,
+					select,
 					context: blockBindingsContext,
 					args: relatedBinding.args,
 				} );
@@ -206,7 +206,7 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				registry,
+				select,
 				context: blockBindingsContext,
 			} );
 			const bindingKey =
@@ -235,14 +235,7 @@ export function RichTextWrapper(
 				bindingsLabel: _bindingsLabel,
 			};
 		},
-		[
-			blockBindings,
-			identifier,
-			blockName,
-			blockContext,
-			registry,
-			adjustedValue,
-		]
+		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;

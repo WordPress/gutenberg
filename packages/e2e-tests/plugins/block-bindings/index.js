@@ -14,10 +14,10 @@ const getValues = ( { bindings } ) => {
 	}
 	return newValues;
 };
-const setValues = ( { registry, bindings } ) => {
+const setValues = ( { dispatch, bindings } ) => {
 	Object.values( bindings ).forEach( ( { args, newValue } ) => {
 		// Example of what could be done.
-		registry.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
+		dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
 			meta: { [ args?.key ]: newValue },
 		} );
 	} );
