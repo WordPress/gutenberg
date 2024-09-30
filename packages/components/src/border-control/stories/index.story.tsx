@@ -93,6 +93,7 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Border',
+	__next40pxDefaultSize: true,
 };
 
 /**

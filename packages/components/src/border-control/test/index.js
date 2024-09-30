@@ -31,6 +31,7 @@ function createProps( customProps ) {
 			props.value = newValue;
 		} ),
 		value: defaultBorder,
+		__next40pxDefaultSize: true,
 		...customProps,
 	};
 	return props;

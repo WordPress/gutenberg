@@ -34,6 +34,7 @@ const MyBorderControl = () => {
 
 	return (
 		<BorderControl
+			__next40pxDefaultSize
 			colors={ colors }
 			label={ __( 'Border' ) }
 			onChange={ setBorder }
