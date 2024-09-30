@@ -44,13 +44,13 @@ function isObjectEmpty( object ) {
  *         args: {
  *             key: 'url_custom_field',
  *         },
- * 	   },
+ *     },
  *     alt: {
  *         source: 'core/post-meta',
  *         args: {
  *             key: 'text_custom_field',
  *         },
- * 	   }
+ *     },
  * } );
  *
  * // Remove binding from url attribute.
