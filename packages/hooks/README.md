@@ -41,7 +41,9 @@ One notable difference between the JS and PHP hooks API is that in the JS versio
 -   `removeAllActions( 'hookName' )`
 -   `removeAllFilters( 'hookName' )`
 -   `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`
+-   `doActionAsync( 'hookName', arg1, arg2, moreArgs, finalArg )`
 -   `applyFilters( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
+-   `applyFiltersAsync( 'hookName', content, arg1, arg2, moreArgs, finalArg )`
 -   `doingAction( 'hookName' )`
 -   `doingFilter( 'hookName' )`
 -   `didAction( 'hookName' )`

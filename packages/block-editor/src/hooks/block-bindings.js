@@ -12,7 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -186,7 +186,6 @@ function EditableBlockBindingsPanelItems( {
 }
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
-	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const bindableAttributes = getBindableAttributes( blockName );
@@ -194,7 +193,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// `useSelect` is used purposely here to ensure `getFieldsList`
 	// is updated whenever there are updates in block context.
-	// `source.getFieldsList` may also call a selector via `registry.select`.
+	// `source.getFieldsList` may also call a selector via `select`.
 	const _fieldsList = {};
 	const { fieldsList, canUpdateBlockBindings } = useSelect(
 		( select ) => {
@@ -214,7 +213,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							}
 						}
 						const sourceList = getFieldsList( {
-							registry,
+							select,
 							context,
 						} );
 						// Only add source if the list is not empty.
@@ -234,7 +233,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						.canUpdateBlockBindings,
 			};
 		},
-		[ blockContext, bindableAttributes, registry ]
+		[ blockContext, bindableAttributes ]
 	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
