@@ -1581,8 +1581,13 @@ const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
 
 	// If parent blocks are not visible, child blocks should be hidden too.
 	if ( !! blockType.parent?.length ) {
-		return blockType.parent.some( ( name ) =>
-			isBlockVisibleInTheInserter( state, name )
+		return blockType.parent.some(
+			( name ) =>
+				isBlockVisibleInTheInserter( state, name ) ||
+				// Exception for blocks with post-content parent,
+				// the root level is often consider as "core/post-content".
+				// This exception should only apply to the post editor ideally though.
+				name === 'core/post-content'
 		);
 	}
 	return true;
