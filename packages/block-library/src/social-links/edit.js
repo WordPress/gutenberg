@@ -86,8 +86,13 @@ export function SocialLinksEdit( props ) {
 		} else {
 			setAttributes( { ...backgroundBackupRef.current } );
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ logosOnly ] );
+	}, [
+		customIconBackgroundColor,
+		iconBackgroundColor,
+		iconBackgroundColorValue,
+		logosOnly,
+		setAttributes,
+	] );
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
