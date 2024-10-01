@@ -1542,8 +1542,8 @@ export function getTemplateLock( state, rootClientId ) {
 
 /**
  * Determines if the given block type is visible in the inserter.
- * Note that this is different than whenter a block is allowed to be inserted.
- * In some case, the block is not allowed in a given position but
+ * Note that this is different than whether a block is allowed to be inserted.
+ * In some cases, the block is not allowed in a given position but
  * it should still be visible in the inserter to be able to add it
  * to a different position.
  *
