@@ -10,6 +10,13 @@
 	display: flex;
 	// This animates the appearance of the backdrop.
 	@include animation__fade-in();
+
+	&.is-animating-out {
+		// Note: it's important that the fade-out animation doesn't end after the
+		// modal frame's disappear animation, because the component will be removed
+		// from the DOM when that animation ends.
+		@include animation__fade-out($delay: 80ms);
+	}
 }
 
 // The modal window element.
@@ -25,9 +32,16 @@
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.26s cubic-bezier(0.29, 0, 0, 1);
+	animation-name: components-modal__appear-animation;
+	animation-duration: var(--modal-frame-animation-duration);
 	animation-fill-mode: forwards;
+	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
 	@include reduce-motion("animation");
+
+	.components-modal__screen-overlay.is-animating-out & {
+		animation-name: components-modal__disappear-animation;
+		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
+	}
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
@@ -85,6 +99,19 @@
 	to {
 		opacity: 1;
 		transform: scale(1);
+	}
+}
+
+// Note: this animation is also used in the animationend JS event listener.
+// Make sure that the animation name is kept in sync across the two files.
+@keyframes components-modal__disappear-animation {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.9);
 	}
 }
 

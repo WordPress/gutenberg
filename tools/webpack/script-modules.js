@@ -89,11 +89,11 @@ module.exports = {
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build-module/[name].min.js',
+		filename: '[name].min.js',
 		library: {
 			type: 'module',
 		},
-		path: join( __dirname, '..', '..' ),
+		path: join( __dirname, '..', '..', 'build-module' ),
 		environment: { module: true },
 		module: true,
 		chunkFormat: 'module',
@@ -102,7 +102,13 @@ module.exports = {
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
 	},
-	plugins: [ ...plugins, new DependencyExtractionWebpackPlugin() ],
+	plugins: [
+		...plugins,
+		new DependencyExtractionWebpackPlugin( {
+			combineAssets: true,
+			combinedOutputFile: `./assets.php`,
+		} ),
+	],
 	watchOptions: {
 		ignored: [ '**/node_modules' ],
 		aggregateTimeout: 500,

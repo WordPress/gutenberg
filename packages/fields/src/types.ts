@@ -56,6 +56,7 @@ export interface TemplatePart extends CommonPost {
 	has_theme_file: boolean;
 	id: string;
 	area: string;
+	plugin?: string;
 }
 
 export interface Pattern extends CommonPost {

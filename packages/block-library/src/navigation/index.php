@@ -622,18 +622,7 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
 		if ( static::is_interactive( $attributes, $inner_blocks ) ) {
-			$suffix = wp_scripts_get_suffix();
-			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-				$module_url = gutenberg_url( '/build-module/block-library/navigation/view.min.js' );
-			}
-
-			wp_register_script_module(
-				'@wordpress/block-library/navigation',
-				isset( $module_url ) ? $module_url : includes_url( "blocks/navigation/view{$suffix}.js" ),
-				array( '@wordpress/interactivity' ),
-				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-			);
-			wp_enqueue_script_module( '@wordpress/block-library/navigation' );
+			wp_enqueue_script_module( '@wordpress/block-library/navigation/view' );
 		}
 	}
 
@@ -1510,9 +1499,15 @@ function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
  */
 function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
-	$hooked_blocks         = get_hooked_blocks();
-	$before_block_visitor  = null;
-	$after_block_visitor   = null;
+
+	if ( function_exists( 'apply_block_hooks_to_content' ) ) {
+		$mock_navigation_block_markup = serialize_block( $mock_navigation_block );
+		return apply_block_hooks_to_content( $mock_navigation_block_markup, $post, 'insert_hooked_blocks' );
+	}
+
+	$hooked_blocks        = get_hooked_blocks();
+	$before_block_visitor = null;
+	$after_block_visitor  = null;
 
 	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
 		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );

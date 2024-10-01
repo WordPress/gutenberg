@@ -14,10 +14,7 @@ test.describe( 'Allowed Patterns', () => {
 		);
 	} );
 
-	test( 'should show all patterns when all blocks are allowed', async ( {
-		admin,
-		page,
-	} ) => {
+	test( 'should show all patterns by default', async ( { admin, page } ) => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
@@ -57,7 +54,7 @@ test.describe( 'Allowed Patterns', () => {
 			);
 		} );
 
-		test( 'should show only allowed patterns', async ( {
+		test( 'should show all patterns even if not allowed', async ( {
 			admin,
 			page,
 		} ) => {
@@ -80,7 +77,11 @@ test.describe( 'Allowed Patterns', () => {
 				page
 					.getByRole( 'listbox', { name: 'Block patterns' } )
 					.getByRole( 'option' )
-			).toHaveText( [ 'Test: Single heading' ] );
+			).toHaveText( [
+				'Test: Single heading',
+				'Test: Single paragraph',
+				'Test: Paragraph inside group',
+			] );
 		} );
 	} );
 } );

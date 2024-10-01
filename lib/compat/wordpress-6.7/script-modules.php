@@ -102,3 +102,46 @@ add_action(
 	},
 	20
 );
+
+/**
+ * Prints HTML for the a11y Script Module.
+ *
+ * a11y relies on some DOM elements to use as ARIA live regions.
+ * Ideally, these elements are part of the initial HTML of the page
+ * so that accessibility tools can find them and observe updates.
+ */
+function gutenberg_a11y_script_module_html() {
+	$a11y_module_available = false;
+
+	$get_marked_for_enqueue = new ReflectionMethod( 'WP_Script_Modules', 'get_marked_for_enqueue' );
+	$get_marked_for_enqueue->setAccessible( true );
+	$get_import_map = new ReflectionMethod( 'WP_Script_Modules', 'get_import_map' );
+	$get_import_map->setAccessible( true );
+
+	foreach ( array_keys( $get_marked_for_enqueue->invoke( wp_script_modules() ) ) as $id ) {
+		if ( '@wordpress/a11y' === $id ) {
+			$a11y_module_available = true;
+			break;
+		}
+	}
+	if ( ! $a11y_module_available ) {
+		foreach ( array_keys( $get_import_map->invoke( wp_script_modules() )['imports'] ) as $id ) {
+			if ( '@wordpress/a11y' === $id ) {
+				$a11y_module_available = true;
+				break;
+			}
+		}
+	}
+	if ( ! $a11y_module_available ) {
+		return;
+	}
+	echo '<div style="position:absolute;margin:-1px;padding:0;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);border:0;word-wrap:normal !important;">'
+		. '<p id="a11y-speak-intro-text" class="a11y-speak-intro-text" hidden>' . esc_html__( 'Notifications', 'default' ) . '</p>'
+		. '<div id="a11y-speak-assertive" class="a11y-speak-region" aria-live="assertive" aria-relevant="additions text" aria-atomic="true"></div>'
+		. '<div id="a11y-speak-polite" class="a11y-speak-region" aria-live="polite" aria-relevant="additions text" aria-atomic="true"></div>'
+		. '</div>';
+}
+if ( ! method_exists( 'WP_Script_Modules', 'print_a11y_script_module_html' ) ) {
+	add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
+	add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
+}

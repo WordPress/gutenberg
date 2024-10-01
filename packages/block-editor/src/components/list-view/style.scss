@@ -41,6 +41,15 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		svg {
+			fill: currentColor;
+			// Optimizate for high contrast modes.
+			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+			@media (forced-colors: active) {
+				fill: CanvasText;
+			}
+		}
 	}
 
 	&:not(.is-selected) .block-editor-list-view-block-select-button {
@@ -216,20 +225,15 @@
 		text-align: left;
 		position: relative;
 		white-space: nowrap;
-
-		&.is-dropping-before::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
-			top: -2px;
-			right: 0;
-			left: 0;
-			border-top: 4px solid var(--wp-admin-theme-color);
-		}
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: inherit;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 400;
+		margin: 0;
+		text-decoration: none;
+		transition: box-shadow 0.1s linear;
 
 		.components-modal__content & {
 			padding-left: 0;

@@ -64,8 +64,7 @@ function BlockVariationPicker( {
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="link"
 						onClick={ () => onSelect() }
 					>
