@@ -20,43 +20,75 @@ import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+import type { ElementOffsetRect } from '../../utils/element-rect';
 import { useTrackElementOffsetRect } from '../../utils/element-rect';
 import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
 import { useEvent, useMergeRefs } from '@wordpress/compose';
 
 /**
- * A utility used to animate something (e.g. an indicator for the selected option
- * of a component).
+ * A utility used to animate something in a container component based on the "offset
+ * rect" (position relative to the container and size) of a subelement. For example,
+ * this is useful to render an indicator for the selected option of a component, and
+ * to animate it when the selected option changes.
  *
- * It works by tracking the position and size (i.e., the "rect") of a given subelement,
- * typically the one that corresponds to the selected option, relative to its offset
- * parent. Then it:
+ * Takes in a container element and the up-to-date "offset rect" of the target
+ * subelement, obtained with `useTrackElementOffsetRect`. Then it does the following:
  *
- * - Keeps CSS variables with that information in the parent, so that the animation
- *   can be implemented with them.
- * - Adds a `is-animation-enabled` CSS class when the element changes, so that the
- *   target (e.g. the indicator) can be animated to its new position.
- * - Removes the `is-animation-enabled` class when the animation is done.
+ * - Adds CSS variables with rect information to the container, so that the indicator
+ *   can be rendered and animated with them. These are kept up-to-date, enabling CSS
+ *   transitions on change.
+ * - Sets an attribute (`data-subelement-animated` by default) when the tracked
+ *   element changes, so that the target (e.g. the indicator) can be animated to its
+ *   new size and position.
+ * - Removes the attribute when the animation is done.
+ *
+ * The need for the attribute is due to the fact that the rect might update in
+ * situations other than when the tracked element changes, e.g. the tracked element
+ * might be resized. In such cases, there is no need to animate the indicator, and
+ * the change in size or position of the indicator needs to be reflected immediately.
  */
-function useSubelementAnimation(
-	subelement?: HTMLElement | null,
+function useAnimatedOffsetRect(
+	/**
+	 * The container element.
+	 */
+	container: HTMLElement | undefined,
+	/**
+	 * The rect of the tracked element.
+	 */
+	rect: ElementOffsetRect,
 	{
-		parent = subelement?.offsetParent as HTMLElement | null | undefined,
 		prefix = 'subelement',
+		attribute = `${ prefix }-animated`,
 		transitionEndFilter,
 	}: {
-		parent?: HTMLElement | null | undefined;
+		/**
+		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
+		 * CSS variables will be `--selected-top`, `--selected-left`, etc.
+		 * @default 'subelement'
+		 */
 		prefix?: string;
+		/**
+		 * The name of the data attribute used to indicate that the animation is in
+		 * progress.
+		 * @default `${ prefix }-animated`
+		 */
+		attribute?: string;
+		/**
+		 * A function that is called with the transition event and returns a boolean
+		 * indicating whether the animation should be stopped. The default is to
+		 * always stop the animation.
+		 *
+		 * For example, if the animated element is the `::before` pseudo-element, the
+		 * function can be written as `( event ) => event.pseudoElement === '::before'`.
+		 */
 		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
 	} = {}
 ) {
-	const rect = useTrackElementOffsetRect( subelement );
-
 	const setProperties = useEvent( () => {
 		( Object.keys( rect ) as Array< keyof typeof rect > ).forEach(
 			( property ) =>
 				property !== 'element' &&
-				parent?.style.setProperty(
+				container?.style.setProperty(
 					`--${ prefix }-${ property }`,
 					String( rect[ property ] )
 				)
@@ -68,19 +100,19 @@ function useSubelementAnimation(
 	useOnValueUpdate( rect.element, ( { previousValue } ) => {
 		// Only enable the animation when moving from one element to another.
 		if ( rect.element && previousValue ) {
-			parent?.classList.add( 'is-animation-enabled' );
+			container?.setAttribute( `data-${ attribute }`, '' );
 		}
 	} );
 	useLayoutEffect( () => {
 		function onTransitionEnd( event: TransitionEvent ) {
 			if ( transitionEndFilter?.( event ) ?? true ) {
-				parent?.classList.remove( 'is-animation-enabled' );
+				container?.removeAttribute( `data-${ attribute }` );
 			}
 		}
-		parent?.addEventListener( 'transitionend', onTransitionEnd );
+		container?.addEventListener( 'transitionend', onTransitionEnd );
 		return () =>
-			parent?.removeEventListener( 'transitionend', onTransitionEnd );
-	}, [ parent, transitionEndFilter ] );
+			container?.removeEventListener( 'transitionend', onTransitionEnd );
+	}, [ attribute, container, transitionEndFilter ] );
 }
 
 function UnconnectedToggleGroupControl(
@@ -110,9 +142,12 @@ function UnconnectedToggleGroupControl(
 	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
-	useSubelementAnimation( value ? selectedElement : undefined, {
-		parent: controlElement,
+	const selectedRect = useTrackElementOffsetRect(
+		value ? selectedElement : undefined
+	);
+	useAnimatedOffsetRect( controlElement, selectedRect, {
 		prefix: 'selected',
+		attribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
 	} );
 
