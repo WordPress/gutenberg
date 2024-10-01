@@ -5,7 +5,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalView as View,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
