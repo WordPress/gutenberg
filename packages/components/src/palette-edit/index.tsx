@@ -70,6 +70,32 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 	);
 }
 
+/*
+ * Deduplicates the slugs of the provided elements.
+ */
+export function deduplicateElementSlugs(
+	elements: PaletteElement[] | undefined
+) {
+	if ( ! elements ) {
+		return;
+	}
+	const slugCounts = {};
+	const updatedElements = elements.map( ( element: PaletteElement ) => ( {
+		...element,
+	} ) );
+
+	updatedElements.forEach( ( element, index ) => {
+		const { slug } = element;
+		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+
+		if ( slugCounts[ slug ] > 1 ) {
+			element.slug = `${ slug }-${ index }`;
+		}
+	} );
+
+	return updatedElements;
+}
+
 /**
  * Returns a name and slug for a palette item. The name takes the format "Color + id".
  * To ensure there are no duplicate ids, this function checks all slugs.
@@ -280,7 +306,9 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const debounceOnChange = useDebounce( ( updatedElements ) => {
+		onChange( deduplicateElementSlugs( updatedElements ) );
+	}, 100 );
 
 	return (
 		<VStack spacing={ 3 }>
