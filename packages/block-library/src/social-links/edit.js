@@ -18,20 +18,15 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 const sizeOptions = [
-	{ name: __( 'Small' ), value: 'has-small-icon-size' },
-	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
-	{ name: __( 'Large' ), value: 'has-large-icon-size' },
-	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
+	{ label: __( 'Small' ), value: 'has-small-icon-size' },
+	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
+	{ label: __( 'Large' ), value: 'has-large-icon-size' },
+	{ label: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
 export function SocialLinksEdit( props ) {
@@ -156,29 +151,19 @@ export function SocialLinksEdit( props ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleGroupControl
+					<SelectControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
+						help={ __( 'Choose the size of the Social Icons.' ) }
 						label={ __( 'Size' ) }
-						value={ size ?? 'has-normal-icon-size' }
 						onChange={ ( entry ) => {
 							setAttributes( {
 								size: entry,
 							} );
 						} }
-						isBlock
-						help={ __( 'Choose the size of the Social Icons.' ) }
-					>
-						{ sizeOptions.map( ( entry ) => {
-							return (
-								<ToggleGroupControlOption
-									key={ entry.value }
-									value={ entry.value }
-									label={ entry.name }
-								/>
-							);
-						} ) }
-					</ToggleGroupControl>
+						value={ size ?? 'has-normal-icon-size' }
+						options={ sizeOptions }
+					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
