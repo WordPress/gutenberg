@@ -36,7 +36,6 @@ function FontSize() {
 
 	const {
 		params: { origin, slug },
-		goBack,
 		goTo,
 	} = useNavigator();
 
@@ -127,7 +126,7 @@ function FontSize() {
 		if ( ! fontSize ) {
 			goTo( '/typography/font-sizes/' );
 		}
-	}, [ fontSize, goBack ] );
+	}, [ fontSize, goTo ] );
 
 	// Avoid rendering if the font size is not available.
 	if ( ! fontSize ) {
