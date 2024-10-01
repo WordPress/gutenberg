@@ -8,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { normalizeFields } from '../../normalize-fields';
+import DataFormFieldVisibility from '../../components/dataform-field-visibility';
 import type { DataFormProps, Field } from '../../types';
 
 export default function FormRegular< Item >( {
@@ -32,12 +33,17 @@ export default function FormRegular< Item >( {
 		<VStack spacing={ 4 }>
 			{ visibleFields.map( ( field ) => {
 				return (
-					<field.Edit
+					<DataFormFieldVisibility
 						key={ field.id }
 						data={ data }
 						field={ field }
-						onChange={ onChange }
-					/>
+					>
+						<field.Edit
+							data={ data }
+							field={ field }
+							onChange={ onChange }
+						/>
+					</DataFormFieldVisibility>
 				);
 			} ) }
 		</VStack>

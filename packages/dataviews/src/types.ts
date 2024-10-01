@@ -124,6 +124,16 @@ export type Field< Item > = {
 	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
+	 * Callback used to display the field.
+	 */
+	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Dependency list for triggering isVisible.
+	 */
+	dependencies?: Array< keyof Item >;
+
+	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
