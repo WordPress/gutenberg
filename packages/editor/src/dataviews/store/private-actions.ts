@@ -129,9 +129,6 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			canManageOptions && postTypeConfig.slug === 'page'
-				? setAsHomepage
-				: undefined,
 			restorePost,
 			resetPost,
 			deletePost,
