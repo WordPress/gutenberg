@@ -40,7 +40,11 @@ export {
 	isDefinedBorder as __experimentalIsDefinedBorder,
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
-export { BorderControl as __experimentalBorderControl } from './border-control';
+export {
+	/** @deprecated Import `BorderControl` instead. */
+	BorderControl as __experimentalBorderControl,
+	BorderControl,
+} from './border-control';
 export {
 	/** @deprecated Import `BoxControl` instead. */
 	default as __experimentalBoxControl,
