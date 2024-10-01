@@ -86,6 +86,7 @@ export type BorderControlProps = ColorProps &
 		shouldSanitizeBorder?: boolean;
 		/**
 		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 		/**
@@ -145,6 +146,7 @@ export type DropdownProps = ColorProps &
 		previousStyleSelection?: string;
 		/**
 		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 	};
