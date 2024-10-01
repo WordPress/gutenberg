@@ -44,8 +44,8 @@ function FontFamilies() {
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
-	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
-
+	const activeFonts = [ ...themeFonts, ...customFonts ];
+	const hasFonts = 0 < activeFonts.length;
 	const hasInstalledFonts =
 		hasFonts ||
 		baseFontFamilies?.theme?.length > 0 ||
@@ -61,11 +61,11 @@ function FontFamilies() {
 			) }
 
 			<VStack spacing={ 4 }>
-				{ [ ...themeFonts, ...customFonts ].length > 0 && (
+				{ activeFonts.length > 0 && (
 					<>
 						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 						<ItemGroup size="large" isBordered isSeparated>
-							{ themeFonts.map( ( font ) => (
+							{ activeFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
 									font={ font }
