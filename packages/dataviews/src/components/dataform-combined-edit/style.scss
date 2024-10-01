@@ -1,8 +1,17 @@
 .dataforms-layouts-panel__field-dropdown {
 	.dataforms-combined-edit {
+		border: none;
+		padding: 0;
+
 		&__field:not(:first-child) {
 			border-top: $border-width solid $gray-200;
 			padding-top: $grid-unit-20;
 		}
+	}
+}
+
+.dataforms-combined-edit {
+	&__field {
+		flex: 1 1 auto;
 	}
 }

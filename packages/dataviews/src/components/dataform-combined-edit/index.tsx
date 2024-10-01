@@ -57,7 +57,7 @@ function DataFormCombinedEdit< Item >( {
 	return (
 		<>
 			{ ! hideLabelFromVision && <Header title={ field.label } /> }
-			<Stack spacing={ 4 } className={ className }>
+			<Stack spacing={ 4 } className={ className } as="fieldset">
 				{ children }
 			</Stack>
 		</>

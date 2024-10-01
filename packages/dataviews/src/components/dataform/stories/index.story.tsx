@@ -125,7 +125,13 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 	);
 };
 
-export const CombinedFields = ( { type }: { type: 'panel' | 'regular' } ) => {
+const CombinedFieldsComponent = ( {
+	type = 'regular',
+	combinedFieldDirection = 'vertical',
+}: {
+	type: 'panel' | 'regular';
+	combinedFieldDirection: 'vertical' | 'horizontal';
+} ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
 		order: 2,
@@ -140,7 +146,7 @@ export const CombinedFields = ( { type }: { type: 'panel' | 'regular' } ) => {
 				id: 'status_and_visibility',
 				label: 'Status & Visibility',
 				children: [ 'status', 'password' ],
-				direction: 'vertical',
+				direction: combinedFieldDirection,
 				render: ( { item } ) => item.status,
 			},
 		] as CombinedFormField< any >[],
@@ -162,4 +168,18 @@ export const CombinedFields = ( { type }: { type: 'panel' | 'regular' } ) => {
 			}
 		/>
 	);
+};
+
+export const CombinedFields = {
+	title: 'DataViews/CombinedFields',
+	render: CombinedFieldsComponent,
+	argTypes: {
+		...meta.argTypes,
+		combinedFieldDirection: {
+			control: { type: 'select' },
+			description:
+				'Chooses the direction of the combined field. "vertical" is the default layout.',
+			options: [ 'vertical', 'horizontal' ],
+		},
+	},
 };
