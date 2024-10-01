@@ -44,16 +44,3 @@
 .dataforms-layouts-panel__dropdown-header {
 	margin-bottom: $grid-unit-20;
 }
-
-[class].dataforms-layouts-panel__dropdown-header-action {
-	height: $icon-size;
-
-	&.has-icon {
-		min-width: $icon-size;
-		padding: 0;
-	}
-
-	&:not(.has-icon) {
-		text-decoration: underline;
-	}
-}

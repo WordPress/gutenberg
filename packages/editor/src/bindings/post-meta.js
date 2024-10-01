@@ -15,8 +15,8 @@ import { unlock } from '../lock-unlock';
  * If the value is not available based on context, like in templates,
  * it falls back to the default value, label, or key.
  *
- * @param {Object} registry The registry context exposed through `useRegistry`.
- * @param {Object} context  The context provided.
+ * @param {Object} select  The select function from the data store.
+ * @param {Object} context The context provided.
  * @return {Object} List of post meta fields with their value and label.
  *
  * @example
@@ -34,11 +34,9 @@ import { unlock } from '../lock-unlock';
  * }
  * ```
  */
-function getPostMetaFields( registry, context ) {
-	const { getEditedEntityRecord } = registry.select( coreDataStore );
-	const { getRegisteredPostMeta } = unlock(
-		registry.select( coreDataStore )
-	);
+function getPostMetaFields( select, context ) {
+	const { getEditedEntityRecord } = select( coreDataStore );
+	const { getRegisteredPostMeta } = unlock( select( coreDataStore ) );
 
 	let entityMetaValues;
 	// Try to get the current entity meta values.
@@ -75,8 +73,8 @@ function getPostMetaFields( registry, context ) {
 
 export default {
 	name: 'core/post-meta',
-	getValues( { registry, context, bindings } ) {
-		const metaFields = getPostMetaFields( registry, context );
+	getValues( { select, context, bindings } ) {
+		const metaFields = getPostMetaFields( select, context );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
@@ -88,16 +86,20 @@ export default {
 		}
 		return newValues;
 	},
-	setValues( { registry, context, bindings } ) {
+	setValues( { dispatch, context, bindings } ) {
 		const newMeta = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
 			newMeta[ args.key ] = newValue;
 		} );
-		registry
-			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', context?.postType, context?.postId, {
+
+		dispatch( coreDataStore ).editEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId,
+			{
 				meta: newMeta,
-			} );
+			}
+		);
 	},
 	canUserEditValue( { select, context, args } ) {
 		// Lock editing in query loop.
@@ -113,14 +115,9 @@ export default {
 			return false;
 		}
 
-		// Check that the custom field is not protected and available in the REST API.
+		const fieldValue = getPostMetaFields( select, context )?.[ args.key ]
+			?.value;
 		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
-		const fieldValue = select( coreDataStore ).getEntityRecord(
-			'postType',
-			postType,
-			context?.postId
-		)?.meta?.[ args.key ];
-
 		if ( fieldValue === undefined ) {
 			return false;
 		}
@@ -143,7 +140,7 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { registry, context } ) {
-		return getPostMetaFields( registry, context );
+	getFieldsList( { select, context } ) {
+		return getPostMetaFields( select, context );
 	},
 };

@@ -33,7 +33,9 @@ export {
 } from './autocomplete';
 export { default as BaseControl, useBaseControlProps } from './base-control';
 export {
+	/** @deprecated Import `BorderBoxControl` instead. */
 	BorderBoxControl as __experimentalBorderBoxControl,
+	BorderBoxControl,
 	hasSplitBorders as __experimentalHasSplitBorders,
 	isDefinedBorder as __experimentalIsDefinedBorder,
 	isEmptyBorder as __experimentalIsEmptyBorder,
@@ -128,6 +130,10 @@ export {
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
+} from './navigator/legacy';
+export {
+	Navigator,
+	useNavigator,
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
