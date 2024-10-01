@@ -48,6 +48,7 @@ export const toggleGroupControl = ( {
 		/* Using a large value to avoid antialiasing rounding issues
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 		--antialiasing-factor: 100;
+		/* Adjusting the border radius to match the scaling in the x axis. */
 		border-radius: calc(
 				${ CONFIG.radiusXSmall } /
 					(
