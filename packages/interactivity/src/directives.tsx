@@ -354,19 +354,24 @@ export default () => {
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
-					const currentClass = element.props.class || '';
-					const classFinder = new RegExp(
-						`(^|\\s)${ className }(\\s|$)`,
-						'g'
-					);
+
+					const classProxyElement = document.createElement( 'div' );
+					if ( 'string' === typeof element.props.class ) {
+						classProxyElement.className = element.props.class;
+					}
+
 					if ( ! result ) {
-						element.props.class = currentClass
-							.replace( classFinder, ' ' )
-							.trim();
-					} else if ( ! classFinder.test( currentClass ) ) {
-						element.props.class = currentClass
-							? `${ currentClass } ${ className }`
-							: className;
+						if (
+							classProxyElement.classList.contains( className )
+						) {
+							classProxyElement.classList.remove( className );
+							element.props.class = classProxyElement.className;
+						}
+					} else if (
+						! classProxyElement.classList.contains( className )
+					) {
+						classProxyElement.classList.add( className );
+						element.props.class = classProxyElement.className;
 					}
 
 					useInit( () => {

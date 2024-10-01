@@ -18,16 +18,15 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
+	`^${ fullPrefix }` + // ${fullPrefix} is the expected prefix string: "data-wp-".
 		// Match alphanumeric characters including hyphen-separated
 		// segments. It excludes underscore intentionally to prevent confusion.
 		// E.g., "custom-directive".
-		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
+		'([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)' +
 		// (Optional) Match '--' followed by any alphanumeric charachters. It
 		// excludes underscore intentionally to prevent confusion, but it can
 		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
-	'i' // Case insensitive.
+		'(?:--)?'
 );
 
 // Regular expression for reference parsing. It can contain a namespace before
@@ -141,13 +140,14 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		if ( directives.length ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
-					const directiveMatch = directiveParser.exec( name );
-					if ( directiveMatch === null ) {
+					if ( ! directiveParser.test( name ) ) {
 						warn( `Found malformed directive name: ${ name }.` );
 						return obj;
 					}
-					const prefix = directiveMatch[ 1 ] || '';
-					const suffix = directiveMatch[ 2 ] || 'default';
+
+					const [ prefix, suffix = 'default' ] = name
+						.slice( fullPrefix.length )
+						.split( '--', 2 );
 
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
