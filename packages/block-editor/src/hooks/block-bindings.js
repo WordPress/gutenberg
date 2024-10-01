@@ -211,7 +211,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				return;
 			}
 			const _fieldsList = {};
-			const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
 				( [ sourceName, { getFieldsList, usesContext } ] ) => {

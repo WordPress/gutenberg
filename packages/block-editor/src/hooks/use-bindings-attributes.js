@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSources } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useContext } from '@wordpress/element';
@@ -11,7 +11,6 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import isURLLike from '../components/link-control/is-url-like';
-import { unlock } from '../lock-unlock';
 import BlockContext from '../components/block-context';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -100,9 +99,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
 		const blockContext = useContext( BlockContext );
-		const sources = useSelect( ( select ) =>
-			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
-		);
+		const sources = getBlockBindingsSources();
 		const { name, clientId, context, setAttributes } = props;
 		const { blockBindings, blockBindingsBySource, updatedContext } =
 			useMemo( () => {
@@ -183,53 +180,17 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 								bindings,
 							} );
 						}
-
-						// Populate context.
-						for ( const key of source.usesContext || [] ) {
-							updatedContext[ key ] = blockContext[ key ];
-						}
-
-						blockBindingsBySource.set( source, {
-							...blockBindingsBySource.get( source ),
-							[ attributeName ]: {
-								args: sourceArgs,
-							},
-						} );
-					}
-
-					if ( blockBindingsBySource.size ) {
-						for ( const [
-							source,
-							bindings,
-						] of blockBindingsBySource ) {
-							// Get values in batch if the source supports it.
-							let values = {};
-							if ( ! source.getValues ) {
-								Object.keys( bindings ).forEach( ( attr ) => {
-									// Default to the the source label when `getValues` doesn't exist.
-									values[ attr ] = source.label;
-								} );
+						for ( const [ attributeName, value ] of Object.entries(
+							values
+						) ) {
+							if (
+								attributeName === 'url' &&
+								( ! value || ! isURLLike( value ) )
+							) {
+								// Return null if value is not a valid URL.
+								attributes[ attributeName ] = null;
 							} else {
-								values = source.getValues( {
-									select,
-									context: updatedContext,
-									clientId,
-									bindings,
-								} );
-							}
-							for ( const [
-								attributeName,
-								value,
-							] of Object.entries( values ) ) {
-								if (
-									attributeName === 'url' &&
-									( ! value || ! isURLLike( value ) )
-								) {
-									// Return null if value is not a valid URL.
-									attributes[ attributeName ] = null;
-								} else {
-									attributes[ attributeName ] = value;
-								}
+								attributes[ attributeName ] = value;
 							}
 						}
 					}
