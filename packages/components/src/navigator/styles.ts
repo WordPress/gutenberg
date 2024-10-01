@@ -3,7 +3,7 @@
  */
 import { css, keyframes } from '@emotion/react';
 
-export const navigatorProviderWrapper = css`
+export const navigatorWrapper = css`
 	position: relative;
 	/* Prevents horizontal overflow while animating screen transitions */
 	overflow-x: clip;

@@ -75,9 +75,11 @@ export function getElementOffsetRect(
 	if ( rect.width === 0 || rect.height === 0 ) {
 		return;
 	}
+	const offsetParent = element.offsetParent;
 	const offsetParentRect =
-		element.offsetParent?.getBoundingClientRect() ??
-		NULL_ELEMENT_OFFSET_RECT;
+		offsetParent?.getBoundingClientRect() ?? NULL_ELEMENT_OFFSET_RECT;
+	const offsetParentScrollX = offsetParent?.scrollLeft ?? 0;
+	const offsetParentScrollY = offsetParent?.scrollTop ?? 0;
 
 	// Computed widths and heights have subpixel precision, and are not affected
 	// by distortions.
@@ -93,10 +95,18 @@ export function getElementOffsetRect(
 		// To obtain the adjusted values for the position:
 		// 1. Compute the element's position relative to the offset parent.
 		// 2. Correct for the scale factor.
-		top: ( rect.top - offsetParentRect?.top ) * scaleY,
-		right: ( offsetParentRect?.right - rect.right ) * scaleX,
-		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
-		left: ( rect.left - offsetParentRect?.left ) * scaleX,
+		// 3. Adjust for the scroll position of the offset parent.
+		top:
+			( rect.top - offsetParentRect?.top ) * scaleY + offsetParentScrollY,
+		right:
+			( offsetParentRect?.right - rect.right ) * scaleX -
+			offsetParentScrollX,
+		bottom:
+			( offsetParentRect?.bottom - rect.bottom ) * scaleY -
+			offsetParentScrollY,
+		left:
+			( rect.left - offsetParentRect?.left ) * scaleX +
+			offsetParentScrollX,
 		// Computed dimensions don't need any adjustments.
 		width: computedWidth,
 		height: computedHeight,

@@ -25,7 +25,7 @@ export function useNavigatorButton(
 		as = Button,
 		attributeName = 'id',
 		...otherProps
-	} = useContextSystem( props, 'NavigatorButton' );
+	} = useContextSystem( props, 'Navigator.Button' );
 
 	const escapedPath = escapeAttribute( path );
 

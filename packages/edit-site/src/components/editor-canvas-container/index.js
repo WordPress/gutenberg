@@ -125,7 +125,7 @@ function EditorCanvasContainer( {
 					>
 						{ shouldShowCloseButton && (
 							<Button
-								__next40pxDefaultSize
+								size="compact"
 								className="edit-site-editor-canvas-container__close-button"
 								icon={ closeSmall }
 								label={ closeButtonLabel || __( 'Close' ) }

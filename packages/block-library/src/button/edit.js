@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
-import { unlock } from '../lock-unlock';
 
 /**
  * WordPress dependencies
@@ -45,10 +44,10 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
-	store as blocksStore,
+	getBlockBindingsSource,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -190,7 +189,6 @@ function ButtonEdit( props ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
-	const registry = useRegistry();
 	const ref = useRef();
 	const richTextRef = useRef();
 	const blockProps = useBlockProps( {
@@ -241,15 +239,15 @@ function ButtonEdit( props ) {
 				return {};
 			}
 
-			const blockBindingsSource = unlock(
-				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					! blockBindingsSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: metadata?.bindings?.url?.args,
 					} ),
