@@ -77,8 +77,12 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const { isZoomOut: isZoomOutFn } = unlock( useSelect( blockEditorStore ) );
-	const isZoomOut = isZoomOutFn();
+	const { isZoomOut } = useSelect(
+		( select ) => ( {
+			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+		} ),
+		[]
+	);
 
 	const popoverAnchor = useMemo( () => {
 		if (
