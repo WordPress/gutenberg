@@ -96,6 +96,10 @@ export default function ShadowsEditPanel() {
 	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
 	const [ shadowName, setShadowName ] = useState( selectedShadow.name );
 
+	if ( ! category || ! slug ) {
+		return null;
+	}
+
 	const onShadowChange = ( shadow ) => {
 		setSelectedShadow( { ...selectedShadow, shadow } );
 		const updatedShadows = shadows.map( ( s ) =>

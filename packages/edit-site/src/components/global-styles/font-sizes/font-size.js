@@ -46,6 +46,10 @@ function FontSize() {
 
 	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
 
+	if ( ! origin || ! slug ) {
+		return null;
+	}
+
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
 
