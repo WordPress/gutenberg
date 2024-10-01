@@ -289,7 +289,7 @@ function InserterMenu(
 	);
 
 	const handleZoomOut = ( newSelectedTab ) => {
-		if ( isZoomOutMode && newSelectedTab !== 'patterns' ) {
+		if ( isZoomOutMode && newSelectedTab === 'blocks' ) {
 			resetZoomLevel();
 			__unstableSetEditorMode( 'edit' );
 		} else if ( ! isZoomOutMode && newSelectedTab === 'patterns' ) {
