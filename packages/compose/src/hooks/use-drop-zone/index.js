@@ -197,6 +197,7 @@ export default function useDropZone( {
 				}
 
 				maybeDragEnd( event );
+				onDragLeave( event );
 			}
 
 			function maybeDragEnd( /** @type {MouseEvent} */ event ) {
