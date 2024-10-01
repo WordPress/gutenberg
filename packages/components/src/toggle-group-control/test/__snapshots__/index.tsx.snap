@@ -62,7 +62,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 @media not ( prefers-reduced-motion ) {
   .emotion-8.is-animation-enabled::before {
-    transition-property: left,width;
+    transition-property: transform,border-radius;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
@@ -73,14 +73,40 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   position: absolute;
   pointer-events: none;
   background: #1e1e1e;
-  border-radius: 1px;
   outline: 2px solid transparent;
   outline-offset: -3px;
-  left: calc(
-  			var( --indicator-left ) * 1px - 1px
-  		);
-  width: calc( var( --indicator-width ) * 1px );
-  height: calc( var( --indicator-height ) * 1px );
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {
@@ -259,7 +285,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         data-wp-component="ToggleGroupControl"
         id="toggle-group-control-as-radio-group-11"
         role="radiogroup"
-        style="--indicator-left: 0; --indicator-width: 0; --indicator-height: 0;"
       >
         <div
           class="emotion-10 emotion-11"
@@ -402,7 +427,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 
 @media not ( prefers-reduced-motion ) {
   .emotion-8.is-animation-enabled::before {
-    transition-property: left,width;
+    transition-property: transform,border-radius;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
@@ -413,14 +438,40 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   position: absolute;
   pointer-events: none;
   background: #1e1e1e;
-  border-radius: 1px;
   outline: 2px solid transparent;
   outline-offset: -3px;
-  left: calc(
-  			var( --indicator-left ) * 1px - 1px
-  		);
-  width: calc( var( --indicator-width ) * 1px );
-  height: calc( var( --indicator-height ) * 1px );
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {
@@ -526,7 +577,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         data-wp-component="ToggleGroupControl"
         id="toggle-group-control-as-radio-group-10"
         role="radiogroup"
-        style="--indicator-left: 0; --indicator-width: 0; --indicator-height: 0;"
       >
         <div
           class="emotion-10 emotion-11"
@@ -646,7 +696,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 @media not ( prefers-reduced-motion ) {
   .emotion-8.is-animation-enabled::before {
-    transition-property: left,width;
+    transition-property: transform,border-radius;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
@@ -657,14 +707,40 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   position: absolute;
   pointer-events: none;
   background: #1e1e1e;
-  border-radius: 1px;
   outline: 2px solid transparent;
   outline-offset: -3px;
-  left: calc(
-  			var( --indicator-left ) * 1px - 1px
-  		);
-  width: calc( var( --indicator-width ) * 1px );
-  height: calc( var( --indicator-height ) * 1px );
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {
@@ -843,7 +919,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
         data-wp-component="ToggleGroupControl"
         id="toggle-group-control-as-radio-group-1"
         role="radiogroup"
-        style="--indicator-left: 0; --indicator-width: 0; --indicator-height: 0;"
       >
         <div
           class="emotion-10 emotion-11"
@@ -980,7 +1055,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 
 @media not ( prefers-reduced-motion ) {
   .emotion-8.is-animation-enabled::before {
-    transition-property: left,width;
+    transition-property: transform,border-radius;
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
@@ -991,14 +1066,40 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   position: absolute;
   pointer-events: none;
   background: #1e1e1e;
-  border-radius: 1px;
   outline: 2px solid transparent;
   outline-offset: -3px;
-  left: calc(
-  			var( --indicator-left ) * 1px - 1px
-  		);
-  width: calc( var( --indicator-width ) * 1px );
-  height: calc( var( --indicator-height ) * 1px );
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {
@@ -1104,7 +1205,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
         data-wp-component="ToggleGroupControl"
         id="toggle-group-control-as-radio-group-0"
         role="radiogroup"
-        style="--indicator-left: 0; --indicator-width: 0; --indicator-height: 0;"
       >
         <div
           class="emotion-10 emotion-11"
