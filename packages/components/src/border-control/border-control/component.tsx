@@ -19,7 +19,6 @@ import { useBorderControl } from './hook';
 
 import type { BorderControlProps, LabelProps } from '../types';
 import { Spacer } from '../../spacer';
-import deprecated from '@wordpress/deprecated';
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -67,13 +66,6 @@ const UnconnectedBorderControl = (
 		__experimentalIsRenderedInSidebar,
 		...otherProps
 	} = useBorderControl( props );
-
-	if ( showDropdownHeader !== undefined ) {
-		deprecated( 'wp.components.BorderControl `showDropdownHeader` prop', {
-			since: '6.7',
-			version: '7',
-		} );
-	}
 
 	return (
 		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
