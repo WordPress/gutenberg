@@ -4,6 +4,12 @@
 		"at-rule-empty-line-before": null,
 		"at-rule-no-unknown": null,
 		"comment-empty-line-before": null,
+		"custom-property-pattern": [
+			"^(?!wp-components-color-.*)",
+			{
+				"message": "--wp-components-color-* variables are not ready to be used outside of the components package."
+			}
+		],
 		"declaration-property-value-allowed-list": [
 			{
 				"flex-direction": "/^(?!(row|column)-reverse).*$/"
