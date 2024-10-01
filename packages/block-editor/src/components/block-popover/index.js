@@ -94,9 +94,9 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				// The zoom out view has a verical block toolbar that should always
-				// be on the edge of the canvas. This condition chnages the anchor
-				// of the toolbar to the section instead of the block to cover for blocks
+				// The zoom out view has a vertical block toolbar that should always
+				// be on the edge of the canvas. This condition changes the anchor
+				// of the toolbar to the section instead of the block to handle blocks
 				// that are not full width.
 				if ( isZoomOut ) {
 					const selectedBlockRect =
