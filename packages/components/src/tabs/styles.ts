@@ -213,7 +213,7 @@ export const TabChevron = styled( Icon )`
 		display: none;
 	}
 	opacity: 0;
-	[role='tab']:is( [aria-selected='true'], [data-active-item], :hover ) & {
+	[role='tab']:is( [aria-selected='true'], [data-focus-visible], :hover ) & {
 		opacity: 1;
 	}
 	&:dir( rtl ) {
