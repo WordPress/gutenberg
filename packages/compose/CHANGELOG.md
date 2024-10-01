@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useResizeObserver`: export legacy API at top-level for React Native ([#65588](https://github.com/WordPress/gutenberg/pull/65588)).
+
 ## 7.8.0 (2024-09-19)
 
 ### New Features

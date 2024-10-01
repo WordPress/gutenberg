@@ -11,6 +11,7 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
+	Tooltip,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
@@ -42,8 +43,7 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 				/>
 				<div className="block-editor-global-styles__clear-shadow">
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
 					>
@@ -80,32 +80,31 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Composite.Item
-			role="option"
-			aria-label={ label }
-			aria-selected={ isActive }
-			className={ clsx( 'block-editor-global-styles__shadow__item', {
-				'is-active': isActive,
-			} ) }
-			render={
-				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
-					className={ clsx(
-						'block-editor-global-styles__shadow-indicator',
-						{
-							unset: type === 'unset',
-						}
-					) }
-					onClick={ onSelect }
-					label={ label }
-					style={ { boxShadow: shadow } }
-					showTooltip
-				>
-					{ isActive && <Icon icon={ check } /> }
-				</Button>
-			}
-		/>
+		<Tooltip text={ label }>
+			<Composite.Item
+				role="option"
+				aria-label={ label }
+				aria-selected={ isActive }
+				className={ clsx( 'block-editor-global-styles__shadow__item', {
+					'is-active': isActive,
+				} ) }
+				render={
+					<button
+						className={ clsx(
+							'block-editor-global-styles__shadow-indicator',
+							{
+								unset: type === 'unset',
+							}
+						) }
+						onClick={ onSelect }
+						style={ { boxShadow: shadow } }
+						aria-label={ label }
+					>
+						{ isActive && <Icon icon={ check } /> }
+					</button>
+				}
+			/>
+		</Tooltip>
 	);
 }
 
@@ -143,11 +142,7 @@ function renderShadowToggle() {
 		};
 
 		return (
-			<Button
-				// TODO: Switch to `true` (40px size) if possible
-				__next40pxDefaultSize={ false }
-				{ ...toggleProps }
-			>
+			<Button __next40pxDefaultSize { ...toggleProps }>
 				<HStack justify="flex-start">
 					<Icon
 						className="block-editor-global-styles__toggle-icon"

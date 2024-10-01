@@ -191,8 +191,7 @@ export default function ReusableBlockConvertButton( {
 							/>
 							<HStack justify="right">
 								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -203,8 +202,7 @@ export default function ReusableBlockConvertButton( {
 								</Button>
 
 								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
+									__next40pxDefaultSize
 									variant="primary"
 									type="submit"
 								>

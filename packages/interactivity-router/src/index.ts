@@ -221,11 +221,6 @@ interface Store {
 		navigation: {
 			hasStarted: boolean;
 			hasFinished: boolean;
-			message: string;
-			texts?: {
-				loading?: string;
-				loaded?: string;
-			};
 		};
 	};
 	actions: {
@@ -240,7 +235,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 		navigation: {
 			hasStarted: false,
 			hasFinished: false,
-			message: '',
 		},
 	},
 	actions: {
@@ -403,10 +397,16 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 			} catch {}
 		} else {
 			// Fallback to localized strings from Interactivity API state.
+			// @todo This block is for Core < 6.7.0. Remove when support is dropped.
+
+			// @ts-expect-error
 			if ( state.navigation.texts?.loading ) {
+				// @ts-expect-error
 				navigationTexts.loading = state.navigation.texts.loading;
 			}
+			// @ts-expect-error
 			if ( state.navigation.texts?.loaded ) {
+				// @ts-expect-error
 				navigationTexts.loaded = state.navigation.texts.loaded;
 			}
 		}
@@ -414,19 +414,11 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 
 	const message = navigationTexts[ messageKey ];
 
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		import( '@wordpress/a11y' ).then(
-			( { speak } ) => speak( message ),
-			// Ignore failures to load the a11y module.
-			() => {}
-		);
-	} else {
-		state.navigation.message =
-			// Announce that the page has been loaded. If the message is the
-			// same, we use a no-break space similar to the @wordpress/a11y
-			// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
-			message + ( state.navigation.message === message ? '\u00A0' : '' );
-	}
+	import( '@wordpress/a11y' ).then(
+		( { speak } ) => speak( message ),
+		// Ignore failures to load the a11y module.
+		() => {}
+	);
 }
 
 // Add click and prefetch to all links.

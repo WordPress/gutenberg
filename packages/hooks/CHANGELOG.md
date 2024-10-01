@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- added new `doActionAsync` and `applyFiltersAsync` functions to run hooks in async mode ([#64204](https://github.com/WordPress/gutenberg/pull/64204)).
+
 ## 4.8.0 (2024-09-19)
 
 ## 4.7.0 (2024-09-05)
