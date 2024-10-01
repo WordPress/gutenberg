@@ -129,15 +129,21 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
 export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
+	/** @deprecated Import `Navigator` instead. */
 	NavigatorProvider as __experimentalNavigatorProvider,
+	/** @deprecated Import `Navigator` instead. */
 	NavigatorScreen as __experimentalNavigatorScreen,
+	/** @deprecated Import `Navigator` instead. */
 	NavigatorButton as __experimentalNavigatorButton,
+	/** @deprecated Import `Navigator` instead. */
 	NavigatorBackButton as __experimentalNavigatorBackButton,
+	/** @deprecated Import `Navigator` instead. */
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 } from './navigator/legacy';
 export {
 	Navigator,
 	useNavigator,
+	/** @deprecated Import `Navigator` instead. */
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
