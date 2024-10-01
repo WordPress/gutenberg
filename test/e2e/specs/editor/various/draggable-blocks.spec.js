@@ -355,22 +355,10 @@ test.describe( 'Draggable block', () => {
 			innerBlocks: [
 				{
 					name: 'core/column',
-					innerBlocks: [
-						{
-							name: 'core/paragraph',
-							attributes: { content: '1' },
-						},
-					],
 				},
 				{ name: 'core/column' },
 				{
 					name: 'core/column',
-					innerBlocks: [
-						{
-							name: 'core/paragraph',
-							attributes: { content: '3' },
-						},
-					],
 				},
 			],
 		} );
@@ -432,7 +420,7 @@ test.describe( 'Draggable block', () => {
 
 			const columnAppender = editor.canvas
 				.getByRole( 'document', {
-					name: 'Block: Column',
+					name: 'Block: Column (2 of 3)',
 				} )
 				.getByRole( 'button', {
 					name: 'Add block',

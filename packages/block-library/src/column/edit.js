@@ -50,21 +50,38 @@ function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
+	isSelected,
 } ) {
 	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
+
+	const {
+		columnsIds,
+		hasChildBlocks,
+		rootClientId,
+		isParentSelected,
+		areAllColumnsEmpty,
+	} = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } =
-				select( blockEditorStore );
+			const {
+				getBlockCount,
+				getBlockOrder,
+				getBlockRootClientId,
+				isBlockSelected,
+			} = select( blockEditorStore );
 
 			const rootId = getBlockRootClientId( clientId );
+			const _columnsIds = getBlockOrder( rootId );
 
 			return {
-				hasChildBlocks: getBlockOrder( clientId ).length > 0,
+				hasChildBlocks: getBlockCount( clientId ) > 0,
 				rootClientId: rootId,
-				columnsIds: getBlockOrder( rootId ),
+				columnsIds: _columnsIds,
+				isParentSelected: isBlockSelected( rootId ),
+				areAllColumnsEmpty: _columnsIds.every(
+					( id ) => getBlockCount( id ) === 0
+				),
 			};
 		},
 		[ clientId ]
@@ -103,9 +120,11 @@ function ColumnEdit( {
 		{
 			templateLock,
 			allowedBlocks,
-			renderAppender: hasChildBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
+			renderAppender:
+				( hasChildBlocks || ! ( isParentSelected || isSelected ) ) &&
+				! areAllColumnsEmpty
+					? undefined
+					: InnerBlocks.ButtonBlockAppender,
 		}
 	);
 
