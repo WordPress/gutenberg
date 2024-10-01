@@ -17,7 +17,7 @@ import {
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +32,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -283,7 +284,22 @@ function InserterMenu(
 		showMediaPanel,
 	] );
 
+	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	const handleZoomOut = ( newSelectedTab ) => {
+		if ( isZoomOutMode && newSelectedTab !== 'patterns' ) {
+			resetZoomLevel();
+			__unstableSetEditorMode( 'edit' );
+		} else if ( ! isZoomOutMode && newSelectedTab === 'patterns' ) {
+			setZoomLevel( 50 );
+			__unstableSetEditorMode( 'zoom-out' );
+		}
+	};
+
 	const handleSetSelectedTab = ( value ) => {
+		handleZoomOut( value );
 		// If no longer on patterns tab remove the category setting.
 		if ( value !== 'patterns' ) {
 			setSelectedPatternCategory( null );
