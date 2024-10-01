@@ -1,12 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import DataForm from '../index';
+import type { Field } from '../../../types';
+
+type SamplePost = {
+	title: string;
+	order: number;
+	author: number;
+	status: string;
+	reviewer: string;
+	date: string;
+	birthdate: string;
+	sampleField?: string;
+	password?: string;
+};
 
 const meta = {
 	title: 'DataViews/DataForm',
@@ -18,6 +31,22 @@ const meta = {
 				'Chooses the layout of the form. "regular" is the default layout.',
 			options: [ 'regular', 'panel' ],
 		},
+		sampleFieldType: {
+			name: 'Sample Field Type',
+			control: { type: 'select' },
+			description: 'Chooses the type of the sample field.',
+			options: [ 'text', 'integer', 'datetime' ],
+		},
+		additionalSampleFieldDependency: {
+			name: 'Additional Sample Field Dependency',
+			control: { type: 'select' },
+			description:
+				'Choose an additional dependency of the sample field for visiblity.',
+			options: [ 'order', 'author', 'status' ],
+		},
+	},
+	args: {
+		sampleFieldType: 'text',
 	},
 };
 export default meta;
@@ -74,11 +103,47 @@ const fields = [
 		elements: [
 			{ value: 'draft', label: 'Draft' },
 			{ value: 'published', label: 'Published' },
+			{ value: 'private', label: 'Private' },
 		],
 	},
-];
+	{
+		id: 'password',
+		label: 'Password',
+		type: 'text' as const,
+		isVisible: ( item: SamplePost ) => {
+			return item.status !== 'private';
+		},
+		dependencies: [ 'status' ],
+	},
+] as Field< SamplePost >[];
 
-export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
+export const Default = ( {
+	type,
+	sampleFieldType = 'text',
+	additionalSampleFieldDependency,
+}: {
+	type: 'panel' | 'regular';
+	sampleFieldType: 'text' | 'integer' | 'datetime';
+	additionalSampleFieldDependency?: keyof SamplePost;
+} ) => {
+	const visibileFields = useMemo( () => {
+		const dependencies = [ 'sampleField' ];
+		if ( additionalSampleFieldDependency ) {
+			dependencies.push( additionalSampleFieldDependency );
+		}
+		return [
+			...fields,
+			{
+				id: 'sampleField',
+				label: 'Sample Field',
+				type: sampleFieldType,
+				isVisible: ( item: SamplePost ) => {
+					return item.order < 3 && item.sampleField !== 'hide';
+				},
+				dependencies,
+			},
+		] as Field< SamplePost >[];
+	}, [ sampleFieldType, additionalSampleFieldDependency ] );
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
 		order: 2,
@@ -92,19 +157,21 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 	const form = {
 		fields: [
 			'title',
+			'sampleField',
 			'order',
 			'author',
 			'reviewer',
 			'status',
+			'password',
 			'date',
 			'birthdate',
 		],
 	};
 
 	return (
-		<DataForm
+		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ visibileFields }
 			form={ {
 				...form,
 				type,
