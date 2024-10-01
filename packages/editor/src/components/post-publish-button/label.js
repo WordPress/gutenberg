@@ -76,7 +76,7 @@ export default function PublishButtonLabel() {
 		hasNonPostEntityChanges ||
 		isPublished ||
 		( postStatusHasChanged &&
-			! [ 'future', 'publish' ].includes( postStatus ) ) ||
+			! [ 'future', 'publish', 'private' ].includes( postStatus ) ) ||
 		( ! postStatusHasChanged && postStatus === 'future' )
 	) {
 		return __( 'Save' );
