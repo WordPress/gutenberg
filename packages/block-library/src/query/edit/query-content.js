@@ -22,7 +22,7 @@ import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
-import { getQueryContext } from '../utils';
+import { getQueryContextFromTemplate } from '../utils';
 
 const DEFAULTS_POSTS_PER_PAGE = 3;
 
@@ -44,7 +44,7 @@ export default function QueryContent( {
 		query: { inherit } = {},
 	} = attributes;
 	const { templateSlug, postType } = context;
-	const { isSingular } = getQueryContext( templateSlug, postType );
+	const { isSingular } = getQueryContextFromTemplate( templateSlug );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
@@ -102,17 +102,12 @@ export default function QueryContent( {
 		// are not inherited when in singular content (e.g. post, page, 404, blank).
 		if ( isSingular && query.inherit ) {
 			newQuery.inherit = false;
-
-			// We need to update the query in the Editor if a specific post type is set.
-			// Unless the post type is `page`, as it usually doesn't make sense to loop
-			// through pages.
-			if (
-				postType &&
-				postType !== 'page' &&
-				query.postType !== postType
-			) {
-				newQuery.postType = postType;
-			}
+		}
+		// We need to update the query in the Editor if a specific post type is set.
+		// Unless the post type is `page`, as it usually doesn't make sense to loop
+		// through pages.
+		if ( postType && postType !== 'page' && query.postType !== postType ) {
+			newQuery.postType = postType;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();

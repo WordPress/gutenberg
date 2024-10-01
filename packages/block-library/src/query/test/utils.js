@@ -5,7 +5,7 @@ import { terms } from './fixtures';
 import {
 	getEntitiesInfo,
 	getValueFromObjectPath,
-	getQueryContext,
+	getQueryContextFromTemplate,
 } from '../utils';
 
 describe( 'Query block utils', () => {
@@ -66,63 +66,53 @@ describe( 'Query block utils', () => {
 		} );
 	} );
 
-	describe( 'getQueryContext', () => {
-		it( 'should return the correct query context based on template slug and available post types', () => {
-			expect( getQueryContext( '404', undefined ) ).toStrictEqual( {
+	describe( 'getQueryContextFromTemplate', () => {
+		it( 'should return the correct query context based on template slug', () => {
+			expect( getQueryContextFromTemplate( '404' ) ).toStrictEqual( {
 				isSingular: true,
 				templateType: '404',
-				postType: '',
 			} );
-			expect( getQueryContext( 'blank', undefined ) ).toStrictEqual( {
+			expect( getQueryContextFromTemplate( 'blank' ) ).toStrictEqual( {
 				isSingular: true,
 				templateType: 'blank',
-				postType: '',
 			} );
-			expect( getQueryContext( 'single', 'post' ) ).toStrictEqual( {
+			expect( getQueryContextFromTemplate( 'single' ) ).toStrictEqual( {
 				isSingular: true,
 				templateType: 'single',
-				postType: 'post',
 			} );
-			expect( getQueryContext( 'single-film', undefined ) ).toStrictEqual(
-				{
-					isSingular: true,
-					templateType: 'single',
-					postType: 'film',
-				}
-			);
-			expect( getQueryContext( 'page', 'page' ) ).toStrictEqual( {
+			expect(
+				getQueryContextFromTemplate( 'single-film' )
+			).toStrictEqual( {
+				isSingular: true,
+				templateType: 'single',
+			} );
+			expect( getQueryContextFromTemplate( 'page' ) ).toStrictEqual( {
 				isSingular: true,
 				templateType: 'page',
-				postType: 'page',
 			} );
-			expect( getQueryContext( 'wp', undefined ) ).toStrictEqual( {
+			expect( getQueryContextFromTemplate( 'wp' ) ).toStrictEqual( {
 				isSingular: true,
 				templateType: 'custom',
-				postType: '',
 			} );
-			expect( getQueryContext( 'category', undefined ) ).toStrictEqual( {
+			expect( getQueryContextFromTemplate( 'category' ) ).toStrictEqual( {
 				isSingular: false,
 				templateType: 'category',
-				postType: '',
 			} );
 			expect(
-				getQueryContext( 'category-dog', undefined )
+				getQueryContextFromTemplate( 'category-dog' )
 			).toStrictEqual( {
 				isSingular: false,
 				templateType: 'category',
-				postType: 'dog',
 			} );
-			expect( getQueryContext( 'archive', undefined ) ).toStrictEqual( {
+			expect( getQueryContextFromTemplate( 'archive' ) ).toStrictEqual( {
 				isSingular: false,
 				templateType: 'archive',
-				postType: '',
 			} );
 			expect(
-				getQueryContext( 'archive-film', undefined )
+				getQueryContextFromTemplate( 'archive-film' )
 			).toStrictEqual( {
 				isSingular: false,
 				templateType: 'archive',
-				postType: 'film',
 			} );
 		} );
 	} );
