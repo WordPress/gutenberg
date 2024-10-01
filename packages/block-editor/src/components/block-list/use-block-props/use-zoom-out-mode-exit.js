@@ -13,10 +13,18 @@ import { unlock } from '../../../lock-unlock';
 /**
  * Allows Zoom Out mode to be exited by double clicking in the selected block.
  *
- * @param {string} clientId Block client ID.
+ * @param {Object} props          - The props.
+ * @param {string} props.clientId - The client ID of the block.
  */
-export function useZoomOutModeExit( { editorMode } ) {
-	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
+export function useZoomOutModeExit( { clientId } ) {
+	const {
+		getSettings,
+		isZoomOut,
+		getSectionRootClientId,
+		getBlockOrder,
+		__unstableGetEditorMode,
+	} = unlock( useSelect( blockEditorStore ) );
+
 	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -24,13 +32,33 @@ export function useZoomOutModeExit( { editorMode } ) {
 	return useRefEffect(
 		( node ) => {
 			// In "compose" mode.
-			const composeMode = editorMode === 'zoom-out' && isZoomOut();
+			const composeMode =
+				__unstableGetEditorMode() === 'zoom-out' && isZoomOut();
 
 			if ( ! composeMode ) {
 				return;
 			}
 
+			const sectionsClientIds = getBlockOrder( getSectionRootClientId() );
+
+			const isSectionBlock = sectionsClientIds.includes( clientId );
+
+			// If this is not a section then don't attach the listener because
+			// the event will bubble up to the sections.
+			// This ensures that `node` is the section block.
+			if ( ! isSectionBlock ) {
+				return;
+			}
+
 			function onDoubleClick( event ) {
+				event.stopPropagation();
+
+				// Ignore double click unless it occured directly on the section block itself.
+				// See https://github.com/WordPress/gutenberg/issues/65750.
+				if ( event.target !== node ) {
+					return;
+				}
+
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
 
@@ -52,6 +80,12 @@ export function useZoomOutModeExit( { editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ editorMode, getSettings, __unstableSetEditorMode ]
+		[
+			getSettings,
+			__unstableSetEditorMode,
+			__unstableGetEditorMode,
+			isZoomOut,
+			resetZoomLevel,
+		]
 	);
 }
