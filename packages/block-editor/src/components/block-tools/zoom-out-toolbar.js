@@ -135,6 +135,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 						}
 						__unstableSetEditorMode( 'edit' );
 						resetZoomLevel();
+						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }
