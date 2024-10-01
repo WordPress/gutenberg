@@ -242,7 +242,7 @@ function Iframe( {
 	const isZoomedOut = scale !== 1;
 
 	useEffect( () => {
-		if ( ! isZoomedOut ) {
+		if ( isZoomedOut ) {
 			prevContainerWidthRef.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
