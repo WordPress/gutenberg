@@ -13,6 +13,7 @@
 
 -   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 -   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
+-   `__experimentalNavigator*` components can now be imported as a stable `Navigator`. Similarly, the `__experimentalUseNavigator` hook can be imported as a stable `useNavigator` ([#65802](https://github.com/WordPress/gutenberg/pull/65802)).
 
 ### Enhancements
 
