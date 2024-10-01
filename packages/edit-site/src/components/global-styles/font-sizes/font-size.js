@@ -14,6 +14,7 @@ import {
 	FlexItem,
 	ToggleControl,
 } from '@wordpress/components';
+import { usePrevious } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
@@ -35,10 +36,24 @@ function FontSize() {
 	const [ isRenameDialogOpen, setIsRenameDialogOpen ] = useState( false );
 
 	const {
-		params: { origin, slug },
+		params: { origin: originParam, slug: slugParam },
 		goBack,
 		goTo,
 	} = useNavigator();
+
+	// When the screen animates out, the params become undefined. The following
+	// code retains the previous value around, to avoid the screen from crashing
+	// or removing its contents during the animation.
+	const previousOrigin = usePrevious( originParam );
+	const previousSlug = usePrevious( slugParam );
+	const origin =
+		previousOrigin !== undefined && originParam === undefined
+			? previousOrigin
+			: originParam;
+	const slug =
+		previousSlug !== undefined && slugParam === undefined
+			? previousSlug
+			: slugParam;
 
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
 		'typography.fontSizes'

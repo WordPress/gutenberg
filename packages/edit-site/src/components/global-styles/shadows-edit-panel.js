@@ -27,6 +27,7 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
@@ -73,9 +74,24 @@ const presetShadowMenuItems = [
 
 export default function ShadowsEditPanel() {
 	const {
-		params: { category, slug },
+		params: { category: categoryParam, slug: slugParam },
 		goTo,
 	} = useNavigator();
+
+	// When the screen animates out, the params become undefined. The following
+	// code retains the previous value around, to avoid the screen from crashing
+	// or removing its contents during the animation.
+	const previousCategory = usePrevious( categoryParam );
+	const previousSlug = usePrevious( slugParam );
+	const category =
+		previousCategory !== undefined && categoryParam === undefined
+			? previousCategory
+			: categoryParam;
+	const slug =
+		previousSlug !== undefined && slugParam === undefined
+			? previousSlug
+			: slugParam;
+
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
 	);
