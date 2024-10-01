@@ -39,7 +39,8 @@ test.describe( 'Classic', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
 
-	// Broken upstream in Core.
+	// Reinitiate once this ticket is fixed:
+	// https://core.trac.wordpress.org/ticket/60666
 	// eslint-disable-next-line playwright/no-skipped-test
 	test.skip( 'should insert media, convert to blocks, and undo in one step', async ( {
 		editor,
