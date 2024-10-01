@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	Disabled,
 	Composite,
+	SVG,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -309,6 +310,7 @@ const StyleBookBody = ( {
 			tabIndex={ 0 }
 			{ ...( onClick ? buttonModeProps : {} ) }
 		>
+			<EditorStyles styles={ settings.styles } />
 			<style>
 				{ STYLE_BOOK_IFRAME_STYLES }
 				{ !! onClick &&
@@ -467,14 +469,49 @@ const Example = ( {
 								value={ renderedBlocks }
 								settings={ settings }
 							>
-								<EditorStyles styles={ settings.styles } />
-								<BlockList renderAppender={ false } />
+								<ExampleBlocks />
 							</ExperimentalBlockEditorProvider>
 						</Disabled>
 					</div>
 				</Composite.Item>
 			</div>
 		</div>
+	);
+};
+
+const ExampleBlocks = () => {
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
+	);
+
+	const styles = overrides.filter( ( [ , override ] ) => override?.css );
+	const svgs = overrides
+		.filter( ( [ , override ] ) => override.__unstableType === 'svgs' )
+		.map( ( [ , svg ] ) => svg.assets )
+		.join( '' );
+
+	return (
+		<>
+			{ styles.map( ( [ id, override ] ) => (
+				<style key={ id }>{ override.css }</style>
+			) ) }
+			<SVG
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 0 0"
+				width="0"
+				height="0"
+				role="none"
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					left: '-9999px',
+					overflow: 'hidden',
+				} }
+				dangerouslySetInnerHTML={ { __html: svgs } }
+			/>
+			<BlockList renderAppender={ false } />
+		</>
 	);
 };
 
