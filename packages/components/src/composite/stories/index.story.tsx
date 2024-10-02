@@ -13,6 +13,7 @@ import { useContext, useMemo } from '@wordpress/element';
  */
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
+import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
 	title: 'Components/Composite',
@@ -351,5 +352,52 @@ const Fill = ( { children } ) => {
 				},
 			},
 		},
+	},
+};
+
+/**
+ * Combining the `Tooltip` and `Composite` component has a few caveats.
+ * For example, the following code won't work as expected:
+ *
+ * ```jsx
+ * <Composite.Item
+ *   render={
+ *   <Tooltip text="Tooltip">
+ *     <button>Button</button>
+ *   </Tooltip>
+ * ```
+ *
+ * Take a look at this story's source code to see how to correctly compose
+ * these two components.
+ */
+export const WithTooltips: StoryObj< typeof Composite > = {
+	...Default,
+	args: {
+		...Default.args,
+		children: (
+			<>
+				<Tooltip text="Tooltip one">
+					<Composite.Item render={ <button /> }>
+						Item one
+					</Composite.Item>
+				</Tooltip>
+				<Composite.Item
+					render={ ( props ) => (
+						<Tooltip text="Tooltip two">
+							<button { ...props }>Item two</button>
+						</Tooltip>
+					) }
+				/>
+				<Composite.Item
+					render={ ( props ) => (
+						<Tooltip text="Tooltip three">
+							<button { ...props } />
+						</Tooltip>
+					) }
+				>
+					Item three
+				</Composite.Item>
+			</>
+		),
 	},
 };
