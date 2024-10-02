@@ -8,6 +8,7 @@ module.exports = {
 	...jest.configs[ 'flat/recommended' ],
 	languageOptions: {
 		globals: {
+			...jest.configs[ 'flat/recommended' ].languageOptions.globals,
 			...globals.browser,
 			browser: 'readonly',
 			page: 'readonly',
