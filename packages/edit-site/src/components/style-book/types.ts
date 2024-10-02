@@ -1,4 +1,4 @@
-export type Block = {
+type Block = {
 	name: string;
 	attributes: Record< string, unknown >;
 	innerBlocks?: Block[];
@@ -17,7 +17,8 @@ export type BlockExample = {
 	name: string;
 	title: string;
 	category: string;
-	blocks: Block | Block[];
+	content?: JSX.Element;
+	blocks?: Block | Block[];
 };
 
 export type CategoryExamples = {
@@ -40,8 +41,6 @@ export type Duotone = {
 	colors: string[];
 	slug: string;
 };
-
-export type ColorItem = Color | Gradient | Duotone;
 
 export type ColorOrigin = {
 	name: string;

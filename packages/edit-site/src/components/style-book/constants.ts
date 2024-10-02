@@ -185,6 +185,27 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		outline: 3px solid transparent;
 	}
 
+	.edit-site-style-book__duotone-example > div:first-child {
+		display: flex;
+		aspect-ratio: 16 / 9;
+		grid-row: span 1;
+		grid-column: span 2;
+	}
+	.edit-site-style-book__duotone-example img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.edit-site-style-book__duotone-example > div:not(:first-child) {
+		height: 20px;
+		border: 1px solid #ddd;
+	}
+
+	.edit-site-style-book__color-example {
+		height: 52px;
+		border: 1px solid #ddd;
+	}
+
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
 		flex-direction: row;
 	}
