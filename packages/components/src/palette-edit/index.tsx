@@ -73,16 +73,13 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 /*
  * Deduplicates the slugs of the provided elements.
  */
-export function deduplicateElementSlugs(
-	elements: PaletteElement[] | undefined
-) {
-	if ( ! elements ) {
-		return;
-	}
-	const slugCounts = {};
-	const updatedElements = elements.map( ( element: PaletteElement ) => ( {
+export function deduplicateElementSlugs< T extends PaletteElement >(
+	elements: T[]
+): T[] {
+	const slugCounts: { [ slug: string ]: number } = {};
+	const updatedElements = elements.map( ( element: T ) => ( {
 		...element,
-	} ) );
+	} ) ) as T[];
 
 	updatedElements.forEach( ( element, index ) => {
 		const { slug } = element;
@@ -306,9 +303,11 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce( ( updatedElements ) => {
-		onChange( deduplicateElementSlugs( updatedElements ) );
-	}, 100 );
+	const debounceOnChange = useDebounce(
+		( updatedElements: T[] ) =>
+			onChange( deduplicateElementSlugs( updatedElements ) ),
+		100
+	);
 
 	return (
 		<VStack spacing={ 3 }>
