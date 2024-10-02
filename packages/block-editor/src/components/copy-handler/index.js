@@ -8,6 +8,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import useClipboardHandler from '../writing-flow/use-clipboard-handler';
 
+/* eslint-disable react-hooks/rules-of-hooks */
 /**
  * @deprecated
  */
@@ -19,6 +20,7 @@ export const __unstableUseClipboardHandler = () => {
 	} );
 	return useClipboardHandler();
 };
+/* eslint-enable react-hooks/rules-of-hooks */
 
 /**
  * @deprecated

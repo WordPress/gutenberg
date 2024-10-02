@@ -139,6 +139,7 @@ function VariationsToggleGroupControl( {
 	);
 }
 
+/* eslint-disable react-hooks/rules-of-hooks */
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations, isContentOnly } = useSelect(
@@ -215,5 +216,6 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		/>
 	);
 }
+/* eslint-enable react-hooks/rules-of-hooks */
 
 export default __experimentalBlockVariationTransforms;
