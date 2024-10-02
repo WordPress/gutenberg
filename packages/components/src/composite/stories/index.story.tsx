@@ -377,19 +377,13 @@ export const WithTooltips: StoryObj< typeof Composite > = {
 		children: (
 			<>
 				<Tooltip text="Tooltip one">
-					<Composite.Item render={ <button /> }>
-						Item one
-					</Composite.Item>
+					<Composite.Item>Item one</Composite.Item>
 				</Tooltip>
 				<Tooltip text="Tooltip two">
-					<Composite.Item render={ <button /> }>
-						Item two
-					</Composite.Item>
+					<Composite.Item>Item two</Composite.Item>
 				</Tooltip>
 				<Tooltip text="Tooltip three">
-					<Composite.Item render={ <button /> }>
-						Item three
-					</Composite.Item>
+					<Composite.Item>Item three</Composite.Item>
 				</Tooltip>
 			</>
 		),
