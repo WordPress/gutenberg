@@ -99,6 +99,7 @@ export function DropZoneComponent( {
 			setType( _type );
 		},
 		onDragEnd() {
+			setIsDraggingOverElement( false );
 			setIsDraggingOverDocument( false );
 			setType( undefined );
 		},
