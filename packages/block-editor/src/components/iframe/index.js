@@ -317,15 +317,18 @@ function Iframe( {
 				2 * ( frameSizeIsNumber ? frameSize : parseInt( frameSize ) );
 		}
 		const usedWidth = Math.min( containerWidth, maxWidth ) - frameWidth;
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-scale',
+		const usedScale =
 			scale === 'default'
 				? usedWidth / prevContainerWidthRef.current
-				: scale
+				: scale;
+		const integerFrameSize = Math.round( frameWidth / 2 / usedScale );
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			usedScale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
-			frameSizeIsNumber ? `${ frameSize }px` : frameSize
+			frameWidth !== 0 ? `${ integerFrameSize }px` : frameSize
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-content-height',
