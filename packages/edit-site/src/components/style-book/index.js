@@ -309,6 +309,7 @@ const StyleBookBody = ( {
 			tabIndex={ 0 }
 			{ ...( onClick ? buttonModeProps : {} ) }
 		>
+			<EditorStyles styles={ settings.styles } />
 			<style>
 				{ STYLE_BOOK_IFRAME_STYLES }
 				{ !! onClick &&
@@ -331,7 +332,6 @@ const StyleBookBody = ( {
 				}
 				isSelected={ isSelected }
 				onSelect={ onSelect }
-				settings={ settings }
 				key={ category }
 			/>
 		</Iframe>
@@ -339,15 +339,7 @@ const StyleBookBody = ( {
 };
 
 const Examples = memo(
-	( {
-		className,
-		examples,
-		category,
-		label,
-		isSelected,
-		onSelect,
-		settings,
-	} ) => {
+	( { className, examples, category, label, isSelected, onSelect } ) => {
 		const categoryDefinition = category
 			? getTopLevelStyleBookCategories().find(
 					( _category ) => _category.slug === category
@@ -373,7 +365,6 @@ const Examples = memo(
 							title={ example.title }
 							blocks={ example.blocks }
 							isSelected={ isSelected( example.name ) }
-							settings={ settings }
 							onClick={ () => {
 								onSelect?.( example.name );
 							} }
@@ -394,7 +385,6 @@ const Examples = memo(
 								examples={ subcategory.examples }
 								isSelected={ isSelected }
 								onSelect={ onSelect }
-								settings={ settings }
 							/>
 						</Composite.Group>
 					) ) }
@@ -403,7 +393,7 @@ const Examples = memo(
 	}
 );
 
-const Subcategory = ( { examples, isSelected, onSelect, settings } ) => {
+const Subcategory = ( { examples, isSelected, onSelect } ) => {
 	return (
 		!! examples?.length &&
 		examples.map( ( example ) => (
@@ -416,21 +406,24 @@ const Subcategory = ( { examples, isSelected, onSelect, settings } ) => {
 				onClick={ () => {
 					onSelect?.( example.name );
 				} }
-				settings={ settings }
 			/>
 		) )
 	);
 };
 
-const Example = ( {
-	id,
-	title,
-	blocks,
-	isSelected,
-	onClick,
-	settings: originalSettings,
-} ) => {
-	const settings = { ...originalSettings, focusMode: false };
+const Example = ( { id, title, blocks, isSelected, onClick } ) => {
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
+	const settings = useMemo(
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
+		[ originalSettings ]
+	);
 
 	// Cache the list of blocks to avoid additional processing when the component is re-rendered.
 	const renderedBlocks = useMemo(
@@ -467,7 +460,7 @@ const Example = ( {
 								value={ renderedBlocks }
 								settings={ settings }
 							>
-								<EditorStyles styles={ settings.styles } />
+								<EditorStyles />
 								<BlockList renderAppender={ false } />
 							</ExperimentalBlockEditorProvider>
 						</Disabled>
