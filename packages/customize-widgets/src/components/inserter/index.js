@@ -38,7 +38,6 @@ function Inserter( { setIsOpened } ) {
 				</h2>
 				<Button
 					size="small"
-					className="customize-widgets-layout__inserter-panel-header-close-button"
 					icon={ closeSmall }
 					onClick={ () => setIsOpened( false ) }
 					aria-label={ __( 'Close inserter' ) }

@@ -43,7 +43,6 @@ export default function WelcomeGuide( { sidebar } ) {
 					  ) }
 			</p>
 			<Button
-				className="customize-widgets-welcome-guide__button"
 				size="compact"
 				variant="primary"
 				onClick={ () =>
