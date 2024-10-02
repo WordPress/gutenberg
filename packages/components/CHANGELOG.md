@@ -9,6 +9,7 @@
 -   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
 -   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
 -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
 
 ### Deprecations
 
