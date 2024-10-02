@@ -58,7 +58,7 @@ function useAnimatedOffsetRect(
 	rect: ElementOffsetRect,
 	{
 		prefix = 'subelement',
-		attribute = `${ prefix }-animated`,
+		dataAttribute = `${ prefix }-animated`,
 		transitionEndFilter = () => true,
 	}: {
 		/**
@@ -69,10 +69,13 @@ function useAnimatedOffsetRect(
 		prefix?: string;
 		/**
 		 * The name of the data attribute used to indicate that the animation is in
-		 * progress.
+		 * progress. The `data-` prefix is added automatically.
+		 *
+		 * For example, if `dataAttribute` is `indicator-animated`, the attribute will
+		 * be `data-indicator-animated`.
 		 * @default `${ prefix }-animated`
 		 */
-		attribute?: string;
+		dataAttribute?: string;
 		/**
 		 * A function that is called with the transition event and returns a boolean
 		 * indicating whether the animation should be stopped. The default is a function
@@ -101,19 +104,19 @@ function useAnimatedOffsetRect(
 	useOnValueUpdate( rect.element, ( { previousValue } ) => {
 		// Only enable the animation when moving from one element to another.
 		if ( rect.element && previousValue ) {
-			container?.setAttribute( `data-${ attribute }`, '' );
+			container?.setAttribute( `data-${ dataAttribute }`, '' );
 		}
 	} );
 	useLayoutEffect( () => {
 		function onTransitionEnd( event: TransitionEvent ) {
 			if ( transitionEndFilter( event ) ) {
-				container?.removeAttribute( `data-${ attribute }` );
+				container?.removeAttribute( `data-${ dataAttribute }` );
 			}
 		}
 		container?.addEventListener( 'transitionend', onTransitionEnd );
 		return () =>
 			container?.removeEventListener( 'transitionend', onTransitionEnd );
-	}, [ attribute, container, transitionEndFilter ] );
+	}, [ dataAttribute, container, transitionEndFilter ] );
 }
 
 function UnconnectedToggleGroupControl(
@@ -148,7 +151,7 @@ function UnconnectedToggleGroupControl(
 	);
 	useAnimatedOffsetRect( controlElement, selectedRect, {
 		prefix: 'selected',
-		attribute: 'indicator-animated',
+		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
 	} );
 
