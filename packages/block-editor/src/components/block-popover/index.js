@@ -108,6 +108,7 @@ function BlockPopover(
 			// than 0. This check is only there to satisfy the correctness of the
 			// exhaustive-deps rule for the `useMemo` hook.
 			popoverDimensionsRecomputeCounter < 0 ||
+			! rootSectionElement ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
 		) {
