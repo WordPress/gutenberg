@@ -118,7 +118,6 @@ function getColorExamples( colors: MultiOriginPalettes ): BlockExample[] {
 		);
 
 		if ( palette?.[ group.type ] ) {
-			const rowGap = group.type === 'duotones' ? '16px' : '8px';
 			const example: BlockExample = {
 				name: group.slug,
 				title: group.title,
@@ -134,7 +133,7 @@ function getColorExamples( colors: MultiOriginPalettes ): BlockExample[] {
 							},
 							style: {
 								spacing: {
-									blockGap: { top: rowGap, left: '16px' },
+									blockGap: { top: '8px', left: '16px' },
 								},
 							},
 						},
