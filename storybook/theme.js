@@ -6,10 +6,11 @@ import { create } from '@storybook/theming/create';
 export default create( {
 	base: 'light',
 	brandTitle: 'WordPress Components',
-	brandImage: './wp-org-logo.png',
+	brandImage: './wp-logo@2x.png',
 
 	// Typography
-	fontBase: '"Inter", sans-serif',
+	fontBase:
+		'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
 	fontCode: 'monospace',
 
 	//
