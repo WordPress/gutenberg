@@ -120,8 +120,6 @@ export function DropZoneComponent( {
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
 		[ `is-dragging-${ type }` ]: !! type,
-		// Keeping the following classnames for legacy purposes
-		'has-dragged-out': ! isDraggingOverElement,
 	} );
 
 	return (
