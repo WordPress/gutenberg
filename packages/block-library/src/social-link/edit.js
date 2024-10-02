@@ -189,7 +189,14 @@ const SocialLinkEdit = ( {
 					backgroundColor: iconBackgroundColorValue,
 				} }
 			>
-				<button aria-haspopup="dialog" { ...blockProps }>
+				{ /*
+				 * Disable reason: The `button` ARIA role is redundant but
+				 * blockProps has a role of `document` automatically applied
+				 * which breaks the semantics of this button since it removes
+				 * the information about the popover.
+				 */
+				/* eslint-disable jsx-a11y/no-redundant-roles */ }
+				<button aria-haspopup="dialog" { ...blockProps } role="button">
 					<IconComponent />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
@@ -199,6 +206,7 @@ const SocialLinkEdit = ( {
 						{ socialLinkText }
 					</span>
 				</button>
+				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 				{ isSelected && showURLPopover && (
 					<SocialLinkURLPopover
 						url={ url }
