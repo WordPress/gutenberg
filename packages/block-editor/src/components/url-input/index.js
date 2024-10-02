@@ -540,8 +540,7 @@ class URLInput extends Component {
 				>
 					{ suggestions.map( ( suggestion, index ) => (
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							{ ...buildSuggestionItemProps( suggestion, index ) }
 							key={ suggestion.id }
 							className={ clsx(

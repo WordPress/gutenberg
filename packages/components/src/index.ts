@@ -40,7 +40,11 @@ export {
 	isDefinedBorder as __experimentalIsDefinedBorder,
 	isEmptyBorder as __experimentalIsEmptyBorder,
 } from './border-box-control';
-export { BorderControl as __experimentalBorderControl } from './border-control';
+export {
+	/** @deprecated Import `BorderControl` instead. */
+	BorderControl as __experimentalBorderControl,
+	BorderControl,
+} from './border-control';
 export {
 	/** @deprecated Import `BoxControl` instead. */
 	default as __experimentalBoxControl,
@@ -130,9 +134,12 @@ export {
 	NavigatorButton as __experimentalNavigatorButton,
 	NavigatorBackButton as __experimentalNavigatorBackButton,
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
-	useNavigator as __experimentalUseNavigator,
 } from './navigator/legacy';
-export { Navigator, useNavigator } from './navigator';
+export {
+	Navigator,
+	useNavigator,
+	useNavigator as __experimentalUseNavigator,
+} from './navigator';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';

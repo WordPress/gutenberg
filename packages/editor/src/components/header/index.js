@@ -57,15 +57,18 @@ function Header( {
 		showIconLabels,
 		hasFixedToolbar,
 		isNestedEntity,
+		postType,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
 			getEditorSettings,
+			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
 
 		return {
+			postType: getCurrentPostType(),
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
@@ -74,6 +77,10 @@ function Header( {
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
+
+	const canBeZoomedOut = [ 'post', 'page', 'wp_template' ].includes(
+		postType
+	);
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -135,7 +142,9 @@ function Header( {
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
 
-				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
+				{ canBeZoomedOut && isEditorIframed && isWideViewport && (
+					<ZoomOutToggle />
+				) }
 
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
