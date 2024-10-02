@@ -4760,5 +4760,22 @@ describe( 'getBlockEditingMode', () => {
 				getBlockEditingMode( patternBlockState, 'paragraph-b' )
 			).toBe( 'disabled' );
 		} );
+
+		it( 'should disable all inner blocks of the outer pattern in zoom out mode with the outer pattern in content only mode', () => {
+			const state = {
+				...patternBlockState,
+				editorMode: 'zoom-out',
+			};
+			expect( getBlockEditingMode( state, 'pattern-a' ) ).toBe(
+				'contentOnly'
+			);
+			[ 'paragraph-a', 'paragraph-b', 'heading-a', 'pattern-b' ].forEach(
+				( block ) => {
+					expect( getBlockEditingMode( state, block ) ).toBe(
+						'disabled'
+					);
+				}
+			);
+		} );
 	} );
 } );
