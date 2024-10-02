@@ -20,11 +20,11 @@ export const CompositeTypeahead = forwardRef<
 	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
 >( function CompositeTypeahead( props, ref ) {
 	const context = useCompositeContext();
-	return (
-		<Ariakit.CompositeTypeahead
-			store={ context.store as Ariakit.CompositeStore }
-			{ ...props }
-			ref={ ref }
-		/>
-	);
+
+	// @ts-expect-error The store prop in undocumented and only used by the
+	// legacy compat layer.
+	const storeViaProps = props.store as Ariakit.CompositeStore;
+	const store = storeViaProps ?? ( context.store as Ariakit.CompositeStore );
+
+	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
 } );

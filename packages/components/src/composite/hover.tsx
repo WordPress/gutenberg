@@ -20,11 +20,10 @@ export const CompositeHover = forwardRef<
 	WordPressComponentProps< CompositeHoverProps, 'div', false >
 >( function CompositeHover( props, ref ) {
 	const context = useCompositeContext();
-	return (
-		<Ariakit.CompositeHover
-			store={ context.store as Ariakit.CompositeStore }
-			{ ...props }
-			ref={ ref }
-		/>
-	);
+	// @ts-expect-error The store prop in undocumented and only used by the
+	// legacy compat layer.
+	const storeViaProps = props.store as Ariakit.CompositeStore;
+	const store = storeViaProps ?? ( context.store as Ariakit.CompositeStore );
+
+	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
 } );
