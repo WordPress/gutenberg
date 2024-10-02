@@ -45,15 +45,22 @@ function FontSize() {
 
 	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
 
-	if ( ! origin || ! slug ) {
-		return null;
-	}
-
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
+
+	// Navigate to the font sizes list if the font size is not available.
+	useEffect( () => {
+		if ( ! fontSize ) {
+			goTo( '/typography/font-sizes/', { isBack: true } );
+		}
+	}, [ fontSize, goTo ] );
+
+	if ( ! origin || ! slug || ! fontSize ) {
+		return null;
+	}
 
 	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
 	const isFluid =
@@ -124,18 +131,6 @@ function FontSize() {
 	const toggleRenameDialog = () => {
 		setIsRenameDialogOpen( ! isRenameDialogOpen );
 	};
-
-	// Navigate to the font sizes list if the font size is not available.
-	useEffect( () => {
-		if ( ! fontSize ) {
-			goTo( '/typography/font-sizes/', { isBack: true } );
-		}
-	}, [ fontSize, goTo ] );
-
-	// Avoid rendering if the font size is not available.
-	if ( ! fontSize ) {
-		return null;
-	}
 
 	return (
 		<>
