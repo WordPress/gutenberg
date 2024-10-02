@@ -124,7 +124,7 @@ function FontSize() {
 	// Navigate to the font sizes list if the font size is not available.
 	useEffect( () => {
 		if ( ! fontSize ) {
-			goTo( '/typography/font-sizes/' );
+			goTo( '/typography/font-sizes/', { isBack: true } );
 		}
 	}, [ fontSize, goTo ] );
 
