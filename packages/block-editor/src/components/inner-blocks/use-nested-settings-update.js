@@ -16,12 +16,21 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+// Creates a memoizing caching function that remembers the last value and keeps returning it
+// as long as the new values are shallowly equal. Helps keep dependencies stable.
+function createShallowMemo() {
+	let value;
+	return ( newValue ) => {
+		if ( value === undefined || ! isShallowEqual( value, newValue ) ) {
+			value = newValue;
+		}
+		return value;
+	};
+}
+
 function useShallowMemo( value ) {
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( ! isShallowEqual( prevValue, value ) ) {
-		setPrevValue( value );
-	}
-	return prevValue;
+	const [ memo ] = useState( createShallowMemo );
+	return memo( value );
 }
 
 /**
