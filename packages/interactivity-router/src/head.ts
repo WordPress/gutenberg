@@ -89,6 +89,10 @@ export const fetchHeadAssets = async (
 	await Promise.all(
 		Array.from( stylesheets ).map( async ( tag ) => {
 			const href = tag.getAttribute( 'href' );
+			if ( ! href ) {
+				return;
+			}
+
 			if ( ! headElements.has( href ) ) {
 				try {
 					const response = await fetch( href );
