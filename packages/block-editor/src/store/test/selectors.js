@@ -4668,4 +4668,97 @@ describe( 'getBlockEditingMode', () => {
 			)
 		).toBe( 'disabled' );
 	} );
+
+	describe( 'pattern blocks', () => {
+		const patternBlockState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						'pattern-a': { name: 'core/block' },
+						'pattern-b': { name: 'core/block' },
+						'heading-a': { name: 'core/heading' },
+						'paragraph-a': { name: 'core/paragraph' },
+						'paragraph-b': { name: 'core/paragraph' },
+					} )
+				),
+				order: new Map(
+					Object.entries( {
+						'': [ 'pattern-a' ],
+						'pattern-a': [
+							'heading-a',
+							'paragraph-a',
+							'pattern-b',
+						],
+						'pattern-b': [ 'paragraph-b' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						'paragraph-b': 'pattern-b',
+						'pattern-b': 'pattern-a',
+						'paragraph-a': 'pattern-a',
+						'heading-a': 'pattern-a',
+						'pattern-a': '',
+					} )
+				),
+				blockListSettings: {
+					'pattern-a': {},
+					'pattern-b': {},
+				},
+				attributes: new Map(
+					Object.entries( {
+						'paragraph-a': {
+							metadata: {
+								bindings: {
+									__default: {
+										source: 'core/pattern-overrides',
+									},
+								},
+							},
+						},
+						'paragraph-b': {
+							metadata: {
+								bindings: {
+									__default: {
+										source: 'core/pattern-overrides',
+									},
+								},
+							},
+						},
+					} )
+				),
+			},
+		};
+
+		it( 'should return contentOnly for the outer pattern block', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'pattern-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return contentOnly for blocks with bindings in the outer pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'paragraph-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return disabled for unbound blocks', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'heading-a' )
+			).toBe( 'disabled' );
+		} );
+
+		it( 'should return disabled for the nested pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'pattern-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return disabled for blocks with bindings in the nested pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'paragraph-b' )
+			).toBe( 'disabled' );
+		} );
+	} );
 } );
