@@ -202,7 +202,7 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEqualSetsWithIndex( $expected, $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 
 	public function test_migrate_v2_to_latest() {
@@ -278,6 +278,6 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEqualSetsWithIndex( $expected, $actual );
+		$this->assertEquals( $expected, $actual );
 	}
 }
