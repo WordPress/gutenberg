@@ -59,7 +59,7 @@ function useAnimatedOffsetRect(
 	{
 		prefix = 'subelement',
 		attribute = `${ prefix }-animated`,
-		transitionEndFilter,
+		transitionEndFilter = () => true,
 	}: {
 		/**
 		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
@@ -75,11 +75,12 @@ function useAnimatedOffsetRect(
 		attribute?: string;
 		/**
 		 * A function that is called with the transition event and returns a boolean
-		 * indicating whether the animation should be stopped. The default is to
-		 * always stop the animation.
+		 * indicating whether the animation should be stopped. The default is a function
+		 * that always returns `true`.
 		 *
 		 * For example, if the animated element is the `::before` pseudo-element, the
 		 * function can be written as `( event ) => event.pseudoElement === '::before'`.
+		 * @default () => true
 		 */
 		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
 	} = {}
@@ -105,7 +106,7 @@ function useAnimatedOffsetRect(
 	} );
 	useLayoutEffect( () => {
 		function onTransitionEnd( event: TransitionEvent ) {
-			if ( transitionEndFilter?.( event ) ?? true ) {
+			if ( transitionEndFilter( event ) ) {
 				container?.removeAttribute( `data-${ attribute }` );
 			}
 		}
