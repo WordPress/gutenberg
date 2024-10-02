@@ -310,14 +310,10 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should handle deeply nested properties that are initially undefined and merged with deepMerge', () => {
-				const fallback: any = proxifyContext(
-					proxifyState( 'test', {} ),
-					{}
-				);
-				const context: any = proxifyContext(
-					proxifyState( 'test', {} ),
-					fallback
-				);
+				const fallbackState = proxifyState( 'test', {} );
+				const fallback: any = proxifyContext( fallbackState, {} );
+				const contextState = proxifyState( 'test', {} );
+				const context: any = proxifyContext( contextState, fallback );
 
 				let deepValue: any;
 				const spy = jest.fn( () => {
@@ -330,7 +326,9 @@ describe( 'Interactivity API', () => {
 				expect( deepValue ).toBeUndefined();
 
 				// Use deepMerge to add a deeply nested object to the context
-				deepMerge( context, { a: { b: { c: { d: 'test value' } } } } );
+				deepMerge( contextState, {
+					a: { b: { c: { d: 'test value' } } },
+				} );
 
 				// The effect should be called again
 				expect( spy ).toHaveBeenCalledTimes( 2 );
