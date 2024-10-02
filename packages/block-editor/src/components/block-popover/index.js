@@ -77,12 +77,44 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const { isZoomOut } = useSelect(
-		( select ) => ( {
-			isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
-		} ),
-		[]
-	);
+	const {
+		selectedBlockParentClientIds,
+		isZoomOut,
+		sectionRootClientId,
+		sectionClientIds,
+	} = useSelect( ( select ) => {
+		const {
+			isZoomOut: isZoomOutSelector,
+			getBlockOrder,
+			getSectionRootClientId,
+			getBlockParents,
+			getSelectedBlock,
+		} = unlock( select( blockEditorStore ) );
+
+		const root = getSectionRootClientId();
+		const sectionRootClientIds = getBlockOrder( root );
+		return {
+			sectionRootClientId: root,
+			sectionClientIds: sectionRootClientIds,
+			isZoomOut: isZoomOutSelector(),
+			selectedBlockParentClientIds: getBlockParents( getSelectedBlock() ),
+		};
+	}, [] );
+
+	// These elements are used to position the zoom out view vertical toolbar
+	// correctly, relative to the selected section.
+	const rootSectionElement = useBlockElement( sectionRootClientId );
+	let parentSectionClientId;
+	if ( sectionClientIds.includes( clientId ) ) {
+		parentSectionClientId = clientId;
+	} else {
+		parentSectionClientId =
+			selectedBlockParentClientIds.find( ( parentClientId ) =>
+				sectionClientIds.includes( parentClientId )
+			) ?? clientId;
+	}
+
+	const parentSectionElement = useBlockElement( parentSectionClientId );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -99,25 +131,32 @@ function BlockPopover(
 		return {
 			getBoundingClientRect() {
 				// The zoom out view has a vertical block toolbar that should always
-				// be on the edge of the canvas. This condition changes the anchor
-				// of the toolbar to the section instead of the block to handle blocks
-				// that are not full width.
+				// be on the edge of the canvas, aligned to the top of the currently
+				// selected section. This condition changes the anchor of the toolbar
+				// to the section instead of the block to handle blocksn that are
+				// not full width and nested blocks to keep section height.
 				if ( isZoomOut ) {
-					const selectedBlockRect =
-						getVisibleElementBounds( selectedElement );
-					const sectionRootElementRect = getVisibleElementBounds(
-						selectedElement.parentElement
-					);
-					const selectedBlockRectHeight =
-						selectedBlockRect.bottom - selectedBlockRect.top;
-					const sectionRootElementRectWidth =
-						sectionRootElementRect.right -
-						sectionRootElementRect.left;
+					// Compute the height based on the parent section of the
+					// selected block, because the selected block may be
+					// shorter than the section.
+					const rootSectionElementRect =
+						getVisibleElementBounds( rootSectionElement );
+					const parentSectionElementRect =
+						getVisibleElementBounds( parentSectionElement );
+					const anchorHeight =
+						parentSectionElementRect.bottom -
+						parentSectionElementRect.top;
+
+					// Always use the width of the section root element to make sure
+					// the toolbar is always on the edge of the canvas.
+					const andchorWidth =
+						rootSectionElementRect.right -
+						rootSectionElementRect.left;
 					return new window.DOMRectReadOnly(
-						sectionRootElementRect.left,
-						selectedBlockRect.top,
-						sectionRootElementRectWidth,
-						selectedBlockRectHeight
+						rootSectionElementRect.left,
+						parentSectionElementRect.top,
+						andchorWidth,
+						anchorHeight
 					);
 				}
 
