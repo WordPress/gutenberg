@@ -390,7 +390,7 @@ describe( 'Interactivity API', () => {
 			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
 		} );
 
-		it( 'should handle deeply nested properties that are initially undefined and merged with deepMerge', () => {
+		it( 'should handle deeply nested properties that are initially undefined', () => {
 			const target: any = proxifyState( 'test', {} );
 
 			let deepValue: any;
