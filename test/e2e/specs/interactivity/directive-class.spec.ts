@@ -108,4 +108,17 @@ test.describe( 'data-wp-class', () => {
 		const el = page.getByTestId( 'can use classes with several dashes' );
 		await expect( el ).toHaveClass( 'main-bg----color' );
 	} );
+
+	test( 'can use class names with non-alphanumeric characters', async ( {
+		page,
+	} ) => {
+		const expectedClassName = '#[^+-]$';
+		const el = page.getByTestId( 'class name no-aplhanumeric' );
+		const toggle = page.getByTestId( 'toggle context value' );
+		await expect( el ).not.toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).not.toHaveClass( expectedClassName );
+	} );
 } );

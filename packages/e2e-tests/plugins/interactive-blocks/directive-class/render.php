@@ -85,4 +85,8 @@
 		data-testid="can use classes with several dashes"
 	></div>
 
+	<div
+		data-wp-class--#[^+-]$="context.value"
+		data-testid="class name no-aplhanumeric"
+	></div>
 </div>
