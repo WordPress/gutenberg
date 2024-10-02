@@ -23,8 +23,7 @@ export const CompositeRow = forwardRef<
 
 	// @ts-expect-error The store prop in undocumented and only used by the
 	// legacy compat layer.
-	const storeViaProps = props.store as Ariakit.CompositeStore;
-	const store = storeViaProps ?? ( context.store as Ariakit.CompositeStore );
+	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
 
 	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
 } );
