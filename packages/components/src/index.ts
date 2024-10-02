@@ -131,19 +131,19 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	/** @deprecated Import `Navigator` instead. */
 	NavigatorProvider as __experimentalNavigatorProvider,
-	/** @deprecated Import `Navigator` instead. */
+	/** @deprecated Import `Navigator` and use `Navigator.Screen` instead. */
 	NavigatorScreen as __experimentalNavigatorScreen,
-	/** @deprecated Import `Navigator` instead. */
+	/** @deprecated Import `Navigator` and use `Navigator.Button` instead. */
 	NavigatorButton as __experimentalNavigatorButton,
-	/** @deprecated Import `Navigator` instead. */
+	/** @deprecated Import `Navigator` and use `Navigator.BackButton` instead. */
 	NavigatorBackButton as __experimentalNavigatorBackButton,
-	/** @deprecated Import `Navigator` instead. */
+	/** @deprecated Import `Navigator` and use `Navigator.BackButton` instead. */
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
 } from './navigator/legacy';
 export {
 	Navigator,
 	useNavigator,
-	/** @deprecated Import `Navigator` instead. */
+	/** @deprecated Import `useNavigator` instead. */
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
