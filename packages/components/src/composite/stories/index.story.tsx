@@ -356,19 +356,25 @@ const Fill = ( { children } ) => {
 };
 
 /**
- * Combining the `Tooltip` and `Composite` component has a few caveats.
- * For example, the following code won't work as expected:
+ * Combining the `Tooltip` and `Composite` component has a few caveats. And while there are a few ways to compose these two components, our recommendation is to render `Composite.Item` as a child of `Tooltip`.
  *
  * ```jsx
+ * // 🔴 Does not work
  * <Composite.Item
  *   render={
- *   <Tooltip text="Tooltip">
- *     <button>Button</button>
- *   </Tooltip>
- * ```
+ *     <Tooltip text="Tooltip">
+ *       <button>Item</button>
+ *     </Tooltip>
+ *   }
+ * />
  *
- * Take a look at this story's source code to see how to correctly compose
- * these two components.
+ * // 🟢 Good
+ * <Tooltip text="Tooltip one">
+ *   <Composite.Item>
+ *     Item one
+ *   </Composite.Item>
+ * </Tooltip>
+ * ```
  */
 export const WithTooltips: StoryObj< typeof Composite > = {
 	...Default,
