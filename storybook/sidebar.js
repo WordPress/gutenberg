@@ -6,7 +6,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, useMemo } from 'react';
 import { useStorybookApi } from '@storybook/manager-api';
 import { styled } from '@storybook/theming';
