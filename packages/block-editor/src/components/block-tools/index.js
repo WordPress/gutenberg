@@ -112,37 +112,49 @@ export default function BlockTools( {
 			return;
 		}
 
-		if ( isMatch( 'core/block-editor/move-up', event ) ) {
+		if (
+			isMatch( 'core/block-editor/move-up', event ) ||
+			isMatch( 'core/block-editor/move-down', event )
+		) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				moveBlocksUp( clientIds, rootClientId );
-				moveSpeak(
-					clientIds,
-					'up',
-					getBlockRootClientId,
-					getBlock,
-					getBlockIndex,
-					getBlockOrder,
-					getBlockListSettings
+				const direction = isMatch( 'core/block-editor/move-up', event )
+					? 'up'
+					: 'down';
+				if ( direction === 'up' ) {
+					moveBlocksUp( clientIds, rootClientId );
+				} else {
+					moveBlocksDown( clientIds, rootClientId );
+				}
+				const normalizedClientIds = Array.isArray( clientIds )
+					? clientIds
+					: [ clientIds ];
+				const blocksCount = normalizedClientIds.length;
+				const block = getBlock( normalizedClientIds[ 0 ] );
+				const blockType = block ? getBlockType( block.name ) : null;
+				const firstBlockIndex = getBlockIndex(
+					normalizedClientIds[ 0 ]
 				);
-			}
-		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				moveBlocksDown( clientIds, rootClientId );
-				moveSpeak(
-					clientIds,
-					'down',
-					getBlockRootClientId,
-					getBlock,
-					getBlockIndex,
-					getBlockOrder,
-					getBlockListSettings
+				const blockOrder = getBlockOrder( rootClientId );
+				const lastBlockIndex = getBlockIndex(
+					normalizedClientIds[ normalizedClientIds.length - 1 ]
 				);
+				const isFirstBlock = firstBlockIndex === 0;
+				const isLastBlock = lastBlockIndex === blockOrder.length - 1;
+				const blockSettings = getBlockListSettings( rootClientId );
+				const orientation = blockSettings?.orientation || 'vertical';
+				const description = getBlockMoverDescription(
+					blocksCount,
+					blockType?.title,
+					firstBlockIndex,
+					isFirstBlock,
+					isLastBlock,
+					direction === 'up' ? -1 : 1,
+					orientation
+				);
+				speak( description );
 			}
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -287,40 +299,3 @@ export default function BlockTools( {
 		</div>
 	);
 }
-
-const moveSpeak = (
-	clientIds,
-	direction,
-	getBlockRootClientId,
-	getBlock,
-	getBlockIndex,
-	getBlockOrder,
-	getBlockListSettings
-) => {
-	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-	const normalizedClientIds = Array.isArray( clientIds )
-		? clientIds
-		: [ clientIds ];
-	const blocksCount = normalizedClientIds.length;
-	const block = getBlock( normalizedClientIds[ 0 ] );
-	const blockType = block ? getBlockType( block.name ) : null;
-	const firstBlockIndex = getBlockIndex( normalizedClientIds[ 0 ] );
-	const blockOrder = getBlockOrder( rootClientId );
-	const lastBlockIndex = getBlockIndex(
-		normalizedClientIds[ normalizedClientIds.length - 1 ]
-	);
-	const isFirstBlock = firstBlockIndex === 0;
-	const isLastBlock = lastBlockIndex === blockOrder.length - 1;
-	const blockSettings = getBlockListSettings( rootClientId );
-	const orientation = blockSettings?.orientation || 'vertical';
-	const description = getBlockMoverDescription(
-		blocksCount,
-		blockType?.title,
-		firstBlockIndex,
-		isFirstBlock,
-		isLastBlock,
-		direction === 'up' ? -1 : 1,
-		orientation
-	);
-	speak( description );
-};
