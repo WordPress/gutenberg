@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix an issue where "default" could not be used as a directive suffix ([#65815](https://github.com/WordPress/gutenberg/pull/65815)).
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
