@@ -14,6 +14,40 @@ import type {
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
+interface MediaDetails {
+	width: number;
+	height: number;
+	file: string;
+	filesize: number;
+	sizes: { [ key: string ]: Size };
+	image_meta: ImageMeta;
+	original_image?: string;
+}
+interface ImageMeta {
+	aperture: string;
+	credit: string;
+	camera: string;
+	caption: string;
+	created_timestamp: string;
+	copyright: string;
+	focal_length: string;
+	iso: string;
+	shutter_speed: string;
+	title: string;
+	orientation: string;
+	keywords: any[];
+}
+
+interface Size {
+	file: string;
+	width: number;
+	height: number;
+	filesize?: number;
+	mime_type: string;
+	source_url: string;
+	uncropped?: boolean;
+}
+
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
 		export interface Attachment< C extends Context > {
@@ -124,7 +158,7 @@ declare module './base-entity-records' {
 			/**
 			 * Details about the media file, specific to its type.
 			 */
-			media_details: Record< string, string >;
+			media_details: MediaDetails;
 			/**
 			 * The ID for the associated post of the attachment.
 			 */

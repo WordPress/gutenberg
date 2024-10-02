@@ -23,7 +23,8 @@
 		{ "path": "../blob" },
 		{ "path": "../core-data" },
 		{ "path": "../hooks" },
-		{ "path": "../html-entities" }
+		{ "path": "../html-entities" },
+		{ "path": "../block-editor" }
 	],
 	"include": [ "src" ]
 }
