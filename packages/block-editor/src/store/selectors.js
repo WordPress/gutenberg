@@ -1635,7 +1635,7 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
-	if ( _isSectionBlock ) {
+	if ( _isSectionBlock && ! allowsContentOnlyInsertion ) {
 		return false;
 	}
 
@@ -1784,12 +1784,17 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const templateLock = getTemplateLock( state, rootClientId );
+	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+	const allowsContentOnlyInsertion =
+		templateLock === 'contentOnly' &&
+		!! parentBlockListSettings?.contentOnlyInsertion;
+	if ( templateLock && ! allowsContentOnlyInsertion ) {
 		return false;
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
-	if ( isBlockWithinSection ) {
+	if ( isBlockWithinSection && ! allowsContentOnlyInsertion ) {
 		return false;
 	}
 
