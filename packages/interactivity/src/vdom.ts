@@ -22,7 +22,7 @@ const directiveParser = new RegExp(
 		// Match alphanumeric characters including hyphen-separated
 		// segments. It excludes underscore intentionally to prevent confusion.
 		// E.g., "custom-directive".
-		'([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)' +
+		'(?:[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)' +
 		// (Optional) Match '--' followed by any alphanumeric charachters. It
 		// excludes underscore intentionally to prevent confusion, but it can
 		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
