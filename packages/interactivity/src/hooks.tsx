@@ -23,7 +23,27 @@ import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
+	suffix: string | symbol;
+}
+
+export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
 	suffix: string;
+}
+
+export interface DefaultSuffixDirectiveEntry extends DirectiveEntry {
+	suffix: symbol;
+}
+
+export function isNonDefaultDirectiveSuffix(
+	entry: DirectiveEntry
+): entry is NonDefaultSuffixDirectiveEntry {
+	return typeof entry.suffix === 'string';
+}
+
+export function isDefaultDirectiveSuffix(
+	entry: DirectiveEntry
+): entry is DefaultSuffixDirectiveEntry {
+	return typeof entry.suffix === 'symbol';
 }
 
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
@@ -56,7 +76,7 @@ interface DirectiveArgs {
 	evaluate: Evaluate;
 }
 
-interface DirectiveCallback {
+export interface DirectiveCallback {
 	( args: DirectiveArgs ): VNode< any > | null | void;
 }
 
@@ -107,7 +127,7 @@ const directivePriorities: Record< string, number > = {};
  * directive(
  *   'alert', // Name without the `data-wp-` prefix.
  *   ( { directives: { alert }, element, evaluate } ) => {
- *     const defaultEntry = alert.find( entry => entry.suffix === 'default' );
+ *     const defaultEntry = alert.find( isDefaultDirectiveSuffix );
  *     element.props.onclick = () => { alert( evaluate( defaultEntry ) ); }
  *   }
  * )
@@ -311,9 +331,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 		const props = vnode.props;
 		const directives = props.__directives;
 		if ( directives.key ) {
-			vnode.key = directives.key.find(
-				( { suffix } ) => suffix === 'default'
-			).value;
+			vnode.key = directives.key.find( isDefaultDirectiveSuffix ).value;
 		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
