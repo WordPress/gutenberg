@@ -146,7 +146,7 @@ const directivePriorities: Record< string, number > = {};
  * </div>
  * ```
  * Note that, in the previous example, the directive callback gets the path
- * value (`state.alert`) from the directive entry with suffix `default`. A
+ * value (`state.alert`) from the directive entry with suffix `null`. A
  * custom suffix can also be specified by appending `--` to the directive
  * attribute, followed by the suffix, like in the following HTML snippet:
  *
