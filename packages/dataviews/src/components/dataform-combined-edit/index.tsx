@@ -39,14 +39,13 @@ function DataFormCombinedEdit< Item >( {
 			( childField ): childField is NormalizedField< Item > =>
 				!! childField
 		);
-	const children = visibleChildren.map( ( child, index ) => {
+	const children = visibleChildren.map( ( child ) => {
 		return (
 			<div className="dataforms-combined-edit__field" key={ child.id }>
 				<child.Edit
 					data={ data }
 					field={ child }
 					onChange={ onChange }
-					hideLabelFromVision={ hideLabelFromVision && index === 0 }
 				/>
 			</div>
 		);
