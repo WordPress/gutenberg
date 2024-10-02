@@ -15,7 +15,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,7 +36,6 @@ function FontSize() {
 
 	const {
 		params: { origin, slug },
-		goBack,
 		goTo,
 	} = useNavigator();
 
@@ -54,10 +53,10 @@ function FontSize() {
 
 	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
 	const isFluid =
-		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
+		fontSize?.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 
 	// Whether custom fluid values are used.
-	const isCustomFluid = typeof fontSize.fluid === 'object';
+	const isCustomFluid = typeof fontSize?.fluid === 'object';
 
 	const handleNameChange = ( value ) => {
 		updateFontSize( 'name', value );
@@ -107,9 +106,6 @@ function FontSize() {
 	};
 
 	const handleRemoveFontSize = () => {
-		// Navigate to the font sizes list.
-		goBack();
-
 		const newFontSizes = sizes.filter( ( size ) => size.slug !== slug );
 		setFontSizes( {
 			...fontSizes,
@@ -124,6 +120,18 @@ function FontSize() {
 	const toggleRenameDialog = () => {
 		setIsRenameDialogOpen( ! isRenameDialogOpen );
 	};
+
+	// Navigate to the font sizes list if the font size is not available.
+	useEffect( () => {
+		if ( ! fontSize ) {
+			goTo( '/typography/font-sizes/', { isBack: true } );
+		}
+	}, [ fontSize, goTo ] );
+
+	// Avoid rendering if the font size is not available.
+	if ( ! fontSize ) {
+		return null;
+	}
 
 	return (
 		<>
