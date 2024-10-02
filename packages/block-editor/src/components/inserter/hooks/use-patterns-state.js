@@ -13,7 +13,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
-import { getParsedPattern } from '../../../store/utils';
+import { isFiltered } from '../../../store/utils';
 
 /**
  * Retrieves the block patterns inserter state.
@@ -31,46 +31,32 @@ const usePatternsState = (
 	selectedCategory,
 	isQuick
 ) => {
-	const { patternCategories, allPatterns, userPatternCategories } = useSelect(
+	const options = useMemo(
+		() => ( { [ isFiltered ]: !! isQuick } ),
+		[ isQuick ]
+	);
+	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
-			const {
-				getAllPatterns,
-				getSettings,
-				__experimentalGetAllowedPatterns,
-			} = unlock( select( blockEditorStore ) );
+			const { getSettings, __experimentalGetAllowedPatterns } = unlock(
+				select( blockEditorStore )
+			);
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
 			} = getSettings();
 			return {
-				allPatterns: isQuick
-					? __experimentalGetAllowedPatterns()
-					: getAllPatterns(),
+				patterns: __experimentalGetAllowedPatterns(
+					rootClientId,
+					options
+				),
 				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
-		[ isQuick ]
+		[ rootClientId, options ]
 	);
 	const { getClosestAllowedInsertionPointForPattern } = unlock(
 		useSelect( blockEditorStore )
-	);
-
-	const patterns = useMemo(
-		() =>
-			isQuick
-				? allPatterns
-				: allPatterns
-						.filter( ( { inserter = true } ) => !! inserter )
-						.map( ( pattern ) => {
-							return {
-								...pattern,
-								get blocks() {
-									return getParsedPattern( pattern ).blocks;
-								},
-							};
-						} ),
-		[ isQuick, allPatterns ]
 	);
 
 	const allCategories = useMemo( () => {
