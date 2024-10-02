@@ -14,7 +14,6 @@ import { useContext, useMemo } from '@wordpress/element';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
-import Button from '../../button';
 
 const meta: Meta< typeof Composite > = {
 	title: 'Components/Composite',
@@ -390,9 +389,7 @@ export const WithTooltips: StoryObj< typeof Composite > = {
 					<Composite.Item>Item two</Composite.Item>
 				</Tooltip>
 				<Tooltip text="Tooltip three">
-					<Composite.Item render={ <Button /> }>
-						Item three
-					</Composite.Item>
+					<Composite.Item>Item three</Composite.Item>
 				</Tooltip>
 			</>
 		),
