@@ -322,6 +322,7 @@ module.exports = {
 						'BorderBoxControl',
 						'BorderControl',
 						'BoxControl',
+						'Button',
 						'ComboboxControl',
 						'CustomSelectControl',
 						'DimensionControl',
@@ -352,14 +353,6 @@ module.exports = {
 						message:
 							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					},
-					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'Button' ].map( ( componentName ) => ( {
-						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					} ) ),
 				],
 			},
 		},
