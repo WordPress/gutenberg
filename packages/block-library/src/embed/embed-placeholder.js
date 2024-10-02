@@ -66,16 +66,14 @@ const EmbedPlaceholder = ( {
 						justify="flex-start"
 					>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ tryAgain }
 						>
 							{ _x( 'Try again', 'button label' ) }
 						</Button>{ ' ' }
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ fallback }
 						>

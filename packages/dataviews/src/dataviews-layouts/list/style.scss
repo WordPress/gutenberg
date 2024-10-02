@@ -114,12 +114,12 @@ ul.dataviews-view-list {
 			&::before {
 				position: absolute;
 				content: "";
-				top: calc(var(--wp-admin-border-width-focus) + 1px);
+				top: var(--wp-admin-border-width-focus);
 				right: var(--wp-admin-border-width-focus);
 				bottom: var(--wp-admin-border-width-focus);
 				left: var(--wp-admin-border-width-focus);
 				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				border-radius: $radius-block-ui;
+				border-radius: $radius-small;
 			}
 		}
 		.dataviews-view-list__primary-field {

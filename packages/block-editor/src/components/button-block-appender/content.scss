@@ -8,11 +8,6 @@
 	color: $gray-900;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 
-	// Needs specificity to override button styles.
-	&.components-button.components-button {
-		padding: $grid-unit-15;
-	}
-
 	.is-dark-theme & {
 		color: $light-gray-placeholder;
 		box-shadow: inset 0 0 0 $border-width $light-gray-placeholder;
@@ -52,7 +47,6 @@
 			left: 0;
 			pointer-events: none;
 			border: $border-width dashed currentColor;
-			border-radius: $radius-block-ui;
 		}
 
 		.block-editor-inserter {

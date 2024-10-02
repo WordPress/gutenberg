@@ -6,11 +6,13 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
-	positionCenter,
+	alignNone,
 	stretchWide,
 	justifyLeft,
 	justifyCenter,
@@ -69,58 +71,57 @@ export default {
 			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
-			<>
+			<VStack
+				spacing={ 4 }
+				className="block-editor-hooks__layout-constrained"
+			>
 				{ allowCustomContentAndWideSize && (
 					<>
-						<div className="block-editor-hooks__layout-controls">
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
-									__next40pxDefaultSize={ false }
-									className="block-editor-hooks__layout-controls-unit-input"
-									label={ __( 'Content' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ contentSize || wideSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											contentSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ positionCenter } />
-							</div>
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
-									className="block-editor-hooks__layout-controls-unit-input"
-									label={ __( 'Wide' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ wideSize || contentSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											wideSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ stretchWide } />
-							</div>
-						</div>
-						<p className="block-editor-hooks__layout-controls-helptext">
+						<UnitControl
+							__next40pxDefaultSize
+							label={ __( 'Content width' ) }
+							labelPosition="top"
+							value={ contentSize || wideSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								onChange( {
+									...layout,
+									contentSize: nextWidth,
+								} );
+							} }
+							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ alignNone } />
+								</InputControlPrefixWrapper>
+							}
+						/>
+						<UnitControl
+							__next40pxDefaultSize
+							label={ __( 'Wide width' ) }
+							labelPosition="top"
+							value={ wideSize || contentSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								onChange( {
+									...layout,
+									wideSize: nextWidth,
+								} );
+							} }
+							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ stretchWide } />
+								</InputControlPrefixWrapper>
+							}
+						/>
+						<p className="block-editor-hooks__layout-constrained-helptext">
 							{ __(
 								'Customize the width for all elements that are assigned to the center or wide columns.'
 							) }
@@ -149,7 +150,7 @@ export default {
 						) }
 					</ToggleGroupControl>
 				) }
-			</>
+			</VStack>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls( {

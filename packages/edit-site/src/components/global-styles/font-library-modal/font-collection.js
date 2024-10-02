@@ -13,9 +13,7 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	Navigator,
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
@@ -28,7 +26,7 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
@@ -284,11 +282,11 @@ function FontCollection( { slug } ) {
 
 			{ ! isLoading && (
 				<>
-					<NavigatorProvider
+					<Navigator
 						initialPath="/"
 						className="font-library-modal__tabpanel-layout"
 					>
-						<NavigatorScreen path="/">
+						<Navigator.Screen path="/">
 							<HStack justify="space-between">
 								<VStack>
 									<Heading level={ 2 } size={ 13 }>
@@ -378,12 +376,14 @@ function FontCollection( { slug } ) {
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</div>
-						</NavigatorScreen>
+						</Navigator.Screen>
 
-						<NavigatorScreen path="/fontFamily">
+						<Navigator.Screen path="/fontFamily">
 							<Flex justify="flex-start">
-								<NavigatorBackButton
-									icon={ chevronLeft }
+								<Navigator.BackButton
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										setSelectedFont( null );
@@ -461,8 +461,8 @@ function FontCollection( { slug } ) {
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
 							<Spacer margin={ 16 } />
-						</NavigatorScreen>
-					</NavigatorProvider>
+						</Navigator.Screen>
+					</Navigator>
 
 					{ selectedFont && (
 						<Flex
@@ -470,8 +470,7 @@ function FontCollection( { slug } ) {
 							className="font-library-modal__footer"
 						>
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								variant="primary"
 								onClick={ handleInstall }
 								isBusy={ isInstalling }
@@ -498,7 +497,7 @@ function FontCollection( { slug } ) {
 								disabled={ page === 1 }
 								showTooltip
 								accessibleWhenDisabled
-								icon={ chevronLeft }
+								icon={ isRTL() ? chevronRight : chevronLeft }
 								tooltipPosition="top"
 							/>
 							<HStack
@@ -549,7 +548,7 @@ function FontCollection( { slug } ) {
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
 								accessibleWhenDisabled
-								icon={ chevronRight }
+								icon={ isRTL() ? chevronLeft : chevronRight }
 								tooltipPosition="top"
 							/>
 						</HStack>

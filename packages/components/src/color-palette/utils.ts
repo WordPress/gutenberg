@@ -92,9 +92,7 @@ export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
 ) => {
-	const valueIsSimpleColor = value ? isSimpleCSSColor( value ) : false;
-
-	if ( valueIsSimpleColor || element === null ) {
+	if ( ! value || ! element || isSimpleCSSColor( value ) ) {
 		return value;
 	}
 

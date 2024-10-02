@@ -36,7 +36,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 		 *
 		 * @param string $template_name Template name including namespace.
 		 * @param array  $args          Optional. Array of template arguments.
-		 * @return WP_Block_Template|WP_Error The registered template on success, or false on failure.
+		 * @return WP_Block_Template|WP_Error The registered template on success, or WP_Error on failure.
 		 */
 		public function register( $template_name, $args = array() ) {
 
@@ -100,7 +100,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 		 *
 		 * @since 6.7.0
 		 *
-		 * @return WP_Block_Template[]|false Associative array of `$template_name => $template` pairs.
+		 * @return WP_Block_Template[] Associative array of `$template_name => $template` pairs.
 		 */
 		public function get_all_registered() {
 			return $this->registered_templates;
@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 		 * @since 6.7.0
 		 *
 		 * @param string $template_name Template name including namespace.
-		 * @return WP_Block_Template|null|false The registered template, or null if it is not registered.
+		 * @return WP_Block_Template|null The registered template, or null if it is not registered.
 		 */
 		public function get_registered( $template_name ) {
 			if ( ! $this->is_registered( $template_name ) ) {
@@ -216,7 +216,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 		 * @since 6.7.0
 		 *
 		 * @param string $template_name Template name including namespace.
-		 * @return WP_Block_Template|false The unregistered template on success, or false on failure.
+		 * @return WP_Block_Template|WP_Error The unregistered template on success, or WP_Error on failure.
 		 */
 		public function unregister( $template_name ) {
 			if ( ! $this->is_registered( $template_name ) ) {

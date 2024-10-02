@@ -294,6 +294,31 @@ Used to filter an individual transform result from block transformation. All of 
 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
+The callback function for this filter accepts 4 parameters:
+- `blockAttributes` (`Object`): All block attributes.
+- `blockType` (`Object`): The block type.
+- `innerHTML` (`string`): Raw block content.
+- `attributes` (`object`): Known block attributes (from delimiters).
+
+In the example below, we use the `blocks.getBlockAttributes` filter to lock the position of all paragraph blocks on a page.
+
+```js
+// Our filter function
+function lockParagraphs( blockAttributes, blockType, innerHTML, attributes  ) {
+    if('core/paragraph' === blockType.name) {
+        blockAttributes['lock'] = {move: true}
+    }
+    return blockAttributes;
+}
+
+// Add the filter
+wp.hooks.addFilter(
+    'blocks.getBlockAttributes',
+    'my-plugin/lock-paragraphs',
+    lockParagraphs
+);
+```
+
 ### `editor.BlockEdit`
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.

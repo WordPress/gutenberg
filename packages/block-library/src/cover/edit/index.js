@@ -18,6 +18,7 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -143,7 +144,10 @@ function CoverEdit( {
 				averageBackgroundColor
 			);
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { isDark: newIsDark } );
+			setAttributes( {
+				isDark: newIsDark,
+				isUserOverlayColor: isUserOverlayColor || false,
+			} );
 		} )();
 		// Disable reason: Update the block only when the featured image changes.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -201,6 +205,7 @@ function CoverEdit( {
 			useFeaturedImage: undefined,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
+			isUserOverlayColor: isUserOverlayColor || false,
 		} );
 	};
 
@@ -273,6 +278,9 @@ function CoverEdit( {
 
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
@@ -443,7 +451,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ isSelected && (
+				{ hasNonContentControls && isSelected && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
@@ -572,7 +580,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ isSelected && (
+			{ hasNonContentControls && isSelected && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>

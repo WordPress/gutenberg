@@ -12,6 +12,11 @@
 			"type": "string"
 		}
 	},
+	"example": {
+		"attributes": {
+			"label": "Comments Next Page"
+		}
+	},
 	"usesContext": [ "postId", "comments/paginationArrow" ],
 	"supports": {
 		"reusable": false,

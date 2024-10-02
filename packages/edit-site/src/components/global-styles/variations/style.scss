@@ -1,11 +1,10 @@
 .edit-site-global-styles-variations_item {
 	box-sizing: border-box;
 	// To round the outline in Windows 10 high contrast mode.
-	border-radius: $radius-block-ui;
 	cursor: pointer;
 
 	.edit-site-global-styles-variations_item-preview {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		outline: $border-width solid rgba($black, 0.1);
 		outline-offset: -$border-width;
 		overflow: hidden;
