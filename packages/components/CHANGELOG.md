@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
 -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
 
 ## 28.9.0 (2024-10-03)
