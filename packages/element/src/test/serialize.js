@@ -1,4 +1,5 @@
 /* eslint-disable testing-library/render-result-naming-convention */
+/* eslint-disable react/no-unknown-property */
 
 /**
  * Internal dependencies
@@ -719,3 +720,4 @@ describe( 'renderStyle()', () => {
 } );
 
 /* eslint-enable testing-library/render-result-naming-convention */
+/* eslint-enable react/no-unknown-property */
