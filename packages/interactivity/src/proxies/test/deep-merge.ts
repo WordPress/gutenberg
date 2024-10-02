@@ -439,5 +439,28 @@ describe( 'Interactivity API', () => {
 				fontStyle: 'italic',
 			} );
 		} );
+
+		it( 'should not overwrite values that become objects if `override` is false', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge(
+				target,
+				{ message: { content: 'hello', fontStyle: 'italic' } },
+				false
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+			expect( target.message ).toBe( 'hello' );
+			expect( target.message.content ).toBeUndefined();
+			expect( target.message.fontStyle ).toBeUndefined();
+		} );
 	} );
 } );
