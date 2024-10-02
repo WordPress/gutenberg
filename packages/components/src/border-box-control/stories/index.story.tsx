@@ -84,4 +84,5 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
+	__next40pxDefaultSize: true,
 };

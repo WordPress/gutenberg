@@ -44,6 +44,7 @@ const props = {
 		props.value = newValue;
 	} ),
 	value: undefined,
+	__next40pxDefaultSize: true,
 };
 
 const toggleLabelRegex = /Border color( and style)* picker/;
