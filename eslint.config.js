@@ -202,32 +202,6 @@ module.exports = [
 	...wordPress.configs.recommended,
 	comments.recommended,
 	...storybook.configs[ 'flat/recommended' ], // @TODO check if subdirectory stories do work https://github.com/storybookjs/eslint-plugin-storybook/issues/135#issuecomment-2198331953
-	...tseslint.config( {
-		extends: [ tseslint.configs.base ],
-		files: [ '**/*.ts', '**/*.tsx' ],
-		rules: {
-			'@typescript-eslint/no-restricted-imports': [
-				'error',
-				{
-					paths: [
-						{
-							name: 'react',
-							message:
-								'Please use React API through `@wordpress/element` instead.',
-							allowTypeImports: true,
-						},
-					],
-				},
-			],
-			'@typescript-eslint/consistent-type-imports': [
-				'error',
-				{
-					prefer: 'type-imports',
-					disallowTypeAnnotations: false,
-				},
-			],
-		},
-	} ),
 	{
 		languageOptions: {
 			globals: {
@@ -287,6 +261,34 @@ module.exports = [
 			'@wordpress/wp-global-usage': 'off',
 		},
 	},
+	...tseslint.config( {
+		extends: [ tseslint.configs.base ],
+		files: [ '**/*.ts', '**/*.tsx' ],
+		rules: {
+			'@typescript-eslint/no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: 'react',
+							message:
+								'Please use React API through `@wordpress/element` instead.',
+							allowTypeImports: true,
+						},
+					],
+				},
+			],
+			'@typescript-eslint/consistent-type-imports': [
+				'error',
+				{
+					prefer: 'type-imports',
+					disallowTypeAnnotations: false,
+				},
+			],
+			// TypeScript's compilation already ensures that named imports exist in the referenced module
+			'import/named': 'off',
+		},
+	} ),
 	{
 		files: [
 			'**/*.@(android|ios|native).js',
