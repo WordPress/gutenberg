@@ -145,9 +145,15 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 						return obj;
 					}
 
-					const [ prefix, suffix = 'default' ] = name
-						.slice( fullPrefix.length )
-						.split( '--', 2 );
+					const unPrefixed = name.slice( fullPrefix.length );
+					const splitIndex = unPrefixed.indexOf( '--' );
+					const [ prefix, suffix = 'default' ] =
+						splitIndex === -1
+							? [ unPrefixed ]
+							: [
+									unPrefixed.slice( 0, splitIndex ),
+									unPrefixed.slice( splitIndex + 2 ),
+							  ];
 
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
