@@ -36,6 +36,7 @@ function selector( select ) {
 		isTyping,
 		isSectionBlock,
 		getParentSectionBlock,
+		isDragging,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
@@ -56,6 +57,7 @@ function selector( select ) {
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 		isZoomOutMode: isZoomOut,
+		isDragging: isDragging(),
 	};
 }
 
@@ -254,7 +256,7 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
+				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
 					/>
