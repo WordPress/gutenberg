@@ -37,8 +37,6 @@ const directiveParser = new RegExp(
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
-export const DEFAULT_SUFFIX = Symbol( 'iapi default suffix' );
-
 export const hydratedIslands = new WeakSet();
 
 /**
@@ -151,7 +149,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					return obj;
 				}
 				const prefix = directiveMatch[ 1 ] || '';
-				const suffix = directiveMatch[ 2 ] || DEFAULT_SUFFIX;
+				const suffix = directiveMatch[ 2 ] || null;
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {

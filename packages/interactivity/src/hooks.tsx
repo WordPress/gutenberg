@@ -23,7 +23,7 @@ import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
-	suffix: string | symbol;
+	suffix: string | null;
 }
 
 export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
@@ -31,19 +31,19 @@ export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
 }
 
 export interface DefaultSuffixDirectiveEntry extends DirectiveEntry {
-	suffix: symbol;
+	suffix: null;
 }
 
 export function isNonDefaultDirectiveSuffix(
 	entry: DirectiveEntry
 ): entry is NonDefaultSuffixDirectiveEntry {
-	return typeof entry.suffix === 'string';
+	return entry.suffix !== null;
 }
 
 export function isDefaultDirectiveSuffix(
 	entry: DirectiveEntry
 ): entry is DefaultSuffixDirectiveEntry {
-	return typeof entry.suffix === 'symbol';
+	return entry.suffix === null;
 }
 
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
