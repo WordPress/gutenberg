@@ -325,11 +325,25 @@ const deepMergeRecursive = (
 					}
 				}
 			} else if ( isPlainObject( source[ key ] ) ) {
-				if ( isNew ) {
+				if (
+					isNew ||
+					( override && ! isPlainObject( target[ key ] ) )
+				) {
 					target[ key ] = {};
+					const proxy = getProxyFromObject( target );
+					if ( proxy && hasPropSignal( proxy, key ) ) {
+						const propSignal = getPropSignal( proxy, key );
+						propSignal.setValue( target[ key ] );
+					}
 				}
 
-				deepMergeRecursive( target[ key ], source[ key ], override );
+				if ( isPlainObject( target[ key ] ) ) {
+					deepMergeRecursive(
+						target[ key ],
+						source[ key ],
+						override
+					);
+				}
 			} else if ( override || isNew ) {
 				Object.defineProperty( target, key, desc! );
 
