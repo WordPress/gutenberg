@@ -28,7 +28,7 @@
  * SOFTWARE.
  */
 
-/* eslint eslint-comments/no-unlimited-disable: 0 */
+/* eslint @eslint-community/eslint-comments/no-unlimited-disable: 0 */
 /* eslint-disable */
 // import pako from 'pako';
 import unbrotli from "./unbrotli";
