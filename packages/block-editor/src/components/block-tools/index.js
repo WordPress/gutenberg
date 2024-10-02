@@ -81,6 +81,7 @@ export default function BlockTools( {
 		hasFixedToolbar,
 		isTyping,
 		isZoomOutMode,
+		isDragging,
 	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
