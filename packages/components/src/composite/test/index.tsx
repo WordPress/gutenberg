@@ -69,7 +69,7 @@ function RemoveItemTest( props: ComponentProps< typeof Composite > ) {
 }
 
 describe( 'Composite', () => {
-	it( 'should remain focussable even when there is no elements in the DOM associated with the currently active ID', async () => {
+	it( 'should remain focusable even when there are no elements in the DOM associated with the currently active ID', async () => {
 		await renderAndValidate( <RemoveItemTest /> );
 
 		const toggleButton = screen.getByRole( 'button', {
