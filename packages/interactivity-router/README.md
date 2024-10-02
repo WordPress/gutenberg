@@ -2,7 +2,7 @@
 
 The package `@wordpress/interactivity-router` enables loading content from other pages without a full page reload. Currently, the only supported mode is "region-based". Full "client-side navigation" is still in experimental phase.
 
-The package defines an Interactivity API store with the `core/router` namespace, exposing state and actions like `navigate` and `prefetch` to handle client-side navigation.
+The package defines an Interactivity API store with the `core/router` namespace, exposing state and 2 actions: `navigate` and `prefetch` to handle client-side navigation.
 
 The `@wordpress/interactivity-router` package was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
@@ -12,15 +12,21 @@ The `@wordpress/interactivity-router` package was [introduced in WordPress Core 
 
 ## Usage
 
-The package is intended to be imported dynamically in the `view.js` files of interactive blocks.
+The package is intended to be imported dynamically in the `view.js` files of interactive blocks. This is done in in order to reduce the JS bundle size on the initial page load.
 
 ```js
+/* view.js */
+
 import { store } from '@wordpress/interactivity';
 
-store( 'myblock', {
+// This is how you would typically use the navigate() action in your block.
+store( 'my-namespace/myblock', {
 	actions: {
-		*navigate( e ) {
+		*goToPage( e ) {
 			e.preventDefault();
+
+			// We import the package dynamically to reduce the initial JS bundle size.
+			// Async actions are defined as generators so the import() must be called with `yield`.
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
@@ -30,9 +36,11 @@ store( 'myblock', {
 } );
 ```
 
+Now, you can call `actions.navigate()` in your block's `view.js` file to navigate to a different page or e.g. pass it to a `data-wp-on--click` attribute.
+
 When loaded, this package [adds the following state and actions](https://github.com/WordPress/gutenberg/blob/ed7d78652526270b63976d7a970dba46a2bfcbb0/packages/interactivity-router/src/index.ts#L212) to the `core/router` store:
 
-```
+```js
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
@@ -48,17 +56,16 @@ const { state, actions } = store( 'core/router', {
 	},
 	actions: {
 		*navigate(href, options) {...},
-		prefetch(url, options) {...}
+		prefetch(url, options) {...},
 	}
 })
-
 ```
 
 <div class="callout callout-tip">
-    The core "Query Loop" block is [using this package](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/view.js#L35) to provide the [region based feature](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/index.php#L33)
+    The core "Query Loop" block is [using this package](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/view.js#L35) to provide the [region-based navigation](https://github.com/WordPress/gutenberg/blob/cd701e94ceffea7ef2f423274a2f77025bcfa1a6/packages/block-library/src/query/index.php#L33).
 </div>
 
-### Directives:
+### Directives
 
 #### `data-wp-router-region`
 
@@ -81,32 +88,34 @@ Example:
 
 #### `navigate`
 
-This action navigates to the specified page.
-This function normalizes the passed `href`, fetches the page HTML if needed, and updates any interactive regions whose contents have changed. It also creates a new entry in the browser session history.
+Navigates to the specified page.
+
+This function normalizes the passed `href`, fetches the page HTML if needed, and updates any interactive regions whose contents have changed in the new page. It also creates a new entry in the browser session history.
 
 **Params**
 
-```
+```js
 navigate( href: string, options: NavigateOptions = {} )
 ```
 
 -   `href`: The page `href`.
 -   `options`: Options object.
-    -   `force`: If `true`, it forces re-fetching the URL.
+    -   `force`: If `true`, it forces re-fetching the URL. `navigate()` always caches the page, so if the page has been navigated to before, it will be used. Default is `false`.
     -   `html`: HTML string to be used instead of fetching the requested URL.
-    -   `replace`: If `true`, it replaces the current entry in the browser session history.
+    -   `replace`: If `true`, it replaces the current entry in the browser session history. Default is `false`.
     -   `timeout`: Time until the navigation is aborted, in milliseconds. Default is `10000`.
     -   `loadingAnimation`: Whether an animation should be shown while navigating. Default to `true`.
     -   `screenReaderAnnouncement`: Whether a message for screen readers should be announced while navigating. Default to `true`.
 
 #### `prefetch`
 
-Prefetchs the page with the passed URL.
+Prefetches the page for the passed URL. The page is cached and can be used for navigation.
+
 The function normalizes the URL and stores internally the fetch promise, to avoid triggering a second fetch for an ongoing request.
 
 **Params**
 
-```
+```js
 prefetch( url: string, options: PrefetchOptions = {} )
 ```
 
@@ -126,12 +135,12 @@ Properties under `state.navigation` are meant for loading bar animations.
 Install the module:
 
 ```bash
-npm install @wordpress/interactivity --save
+npm install @wordpress/interactivity-router --save
 ```
 
 This step is only required if you use the Interactivity API outside WordPress.
 
-Within WordPress, the package is already bundled in Core. To ensure it's loaded, add `@wordpress/interactivity` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
+Within WordPress, the package is already bundled in Core. To ensure it's enqueued, add `@wordpress/interactivity-router` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
 
 Furthermore, this package assumes your code will run in an **ES2015+** environment. If you're using an environment with limited or no support for such language features and APIs, you should include the polyfill shipped in [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.
 
