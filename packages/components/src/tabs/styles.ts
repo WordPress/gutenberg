@@ -105,7 +105,14 @@ export const TabListWrapper = styled.div`
 		}
 	}
 	&[aria-orientation='vertical']::before {
-		border-radius: ${ CONFIG.radiusSmall };
+		/* Adjusting the border radius to match the scaling in the y axis. */
+		border-radius: ${ CONFIG.radiusSmall } / calc(
+				${ CONFIG.radiusSmall } /
+					(
+						var( --indicator-height, 0 ) /
+							var( --antialiasing-factor )
+					)
+			);
 		top: 0
 		left: 0;
 		width: 100%;
