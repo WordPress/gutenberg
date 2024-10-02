@@ -77,44 +77,30 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const {
-		selectedBlockParentClientIds,
-		isZoomOut,
-		sectionRootClientId,
-		sectionClientIds,
-	} = useSelect( ( select ) => {
-		const {
-			isZoomOut: isZoomOutSelector,
-			getBlockOrder,
-			getSectionRootClientId,
-			getBlockParents,
-			getSelectedBlock,
-		} = unlock( select( blockEditorStore ) );
+	const { isZoomOut, sectionRootClientId, getParentSectionBlock } = useSelect(
+		( select ) => {
+			const {
+				isZoomOut: isZoomOutSelector,
+				getSectionRootClientId,
+				getParentSectionBlock: getParentSectionBlockFn,
+			} = unlock( select( blockEditorStore ) );
 
-		const root = getSectionRootClientId();
-		const sectionRootClientIds = getBlockOrder( root );
-		return {
-			sectionRootClientId: root,
-			sectionClientIds: sectionRootClientIds,
-			isZoomOut: isZoomOutSelector(),
-			selectedBlockParentClientIds: getBlockParents( getSelectedBlock() ),
-		};
-	}, [] );
+			const root = getSectionRootClientId();
+			return {
+				sectionRootClientId: root,
+				isZoomOut: isZoomOutSelector(),
+				getParentSectionBlock: getParentSectionBlockFn,
+			};
+		},
+		[]
+	);
 
 	// These elements are used to position the zoom out view vertical toolbar
 	// correctly, relative to the selected section.
 	const rootSectionElement = useBlockElement( sectionRootClientId );
-	let parentSectionClientId;
-	if ( sectionClientIds.includes( clientId ) ) {
-		parentSectionClientId = clientId;
-	} else {
-		parentSectionClientId =
-			selectedBlockParentClientIds.find( ( parentClientId ) =>
-				sectionClientIds.includes( parentClientId )
-			) ?? clientId;
-	}
-
-	const parentSectionElement = useBlockElement( parentSectionClientId );
+	const parentSectionElement = useBlockElement(
+		getParentSectionBlock( clientId ) ?? clientId
+	);
 
 	const popoverAnchor = useMemo( () => {
 		if (
