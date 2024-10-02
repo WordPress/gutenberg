@@ -37,6 +37,7 @@ function FontSize() {
 	const {
 		params: { origin, slug },
 		goBack,
+		goTo,
 	} = useNavigator();
 
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
@@ -154,6 +155,7 @@ function FontSize() {
 							__( 'Manage the font size %s.' ),
 							fontSize.name
 						) }
+						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
 					{ origin === 'custom' && (
 						<FlexItem>
