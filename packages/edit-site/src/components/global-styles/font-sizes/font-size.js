@@ -37,7 +37,6 @@ function FontSize() {
 	const {
 		params: { origin, slug },
 		goBack,
-		goTo,
 	} = useNavigator();
 
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
@@ -45,6 +44,10 @@ function FontSize() {
 	);
 
 	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
+
+	if ( ! origin || ! slug ) {
+		return;
+	}
 
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
@@ -151,7 +154,6 @@ function FontSize() {
 							__( 'Manage the font size %s.' ),
 							fontSize.name
 						) }
-						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
 					{ origin === 'custom' && (
 						<FlexItem>
