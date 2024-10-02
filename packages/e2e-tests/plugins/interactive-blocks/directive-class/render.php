@@ -6,7 +6,10 @@
  */
 ?>
 
-<div data-wp-interactive='{"namespace": "directive-class"}'>
+<div
+	data-wp-interactive='{"namespace": "directive-class"}'
+	data-wp-context='{ "value": false }'
+>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"
 		data-testid="toggle trueValue"
@@ -19,6 +22,13 @@
 		data-testid="toggle falseValue"
 	>
 		Toggle falseValue
+	</button>
+
+	<button
+		data-wp-on--click="actions.toggleContextValue"
+		data-testid="toggle context value"
+	>
+		Toggle context value
 	</button>
 
 	<div
@@ -59,19 +69,11 @@
 		data-testid="can toggle class when class attribute is missing"
 	></div>
 
-	<div data-wp-context='{ "falseValue": false }'>
-		<div
-			class="foo"
-			data-wp-class--foo="context.falseValue"
-			data-testid="can use context values"
-		></div>
-		<button
-			data-wp-on--click="actions.toggleContextFalseValue"
-			data-testid="toggle context false value"
-		>
-			Toggle context falseValue
-		</button>
-	</div>
+	<div
+		class="foo"
+		data-wp-class--foo="context.value"
+		data-testid="can use context values"
+	></div>
 
 	<div
 		data-wp-class--block__element--modifier="state.trueValue"

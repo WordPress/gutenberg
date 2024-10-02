@@ -93,9 +93,9 @@ test.describe( 'data-wp-class', () => {
 	test( 'can use context values', async ( { page } ) => {
 		const el = page.getByTestId( 'can use context values' );
 		await expect( el ).toHaveClass( '' );
-		await page.getByTestId( 'toggle context false value' ).click();
+		await page.getByTestId( 'toggle context value' ).click();
 		await expect( el ).toHaveClass( 'foo' );
-		await page.getByTestId( 'toggle context false value' ).click();
+		await page.getByTestId( 'toggle context value' ).click();
 		await expect( el ).toHaveClass( '' );
 	} );
 
