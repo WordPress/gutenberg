@@ -117,11 +117,11 @@ export function DropZoneComponent( {
 			( ( type === 'file' && onFilesDrop ) ||
 				( type === 'html' && onHTMLDrop ) ||
 				( type === 'default' && onDrop ) ),
-		'has-dragged-out': ! isDraggingOverElement,
-		// Keeping the following classnames for legacy purposes
 		'is-dragging-over-document': isDraggingOverDocument,
 		'is-dragging-over-element': isDraggingOverElement,
 		[ `is-dragging-${ type }` ]: !! type,
+		// Keeping the following classnames for legacy purposes
+		'has-dragged-out': ! isDraggingOverElement,
 	} );
 
 	return (
