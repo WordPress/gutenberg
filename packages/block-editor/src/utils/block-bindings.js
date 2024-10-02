@@ -30,6 +30,8 @@ function isObjectEmpty( object ) {
  * - `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
  * - `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
  *
+ * @since 6.7.0 Introduced in WordPress core.
+ *
  * @return {?WPBlockBindingsUtils} Object containing the block bindings utils.
  *
  * @example
