@@ -10,13 +10,12 @@ import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../types';
 
 export default function DateTime< Item >( {
-	data,
+	value,
 	field,
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label } = field;
-	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | null ) => onChange( { [ id ]: newValue } ),

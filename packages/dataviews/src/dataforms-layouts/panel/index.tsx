@@ -120,7 +120,7 @@ function FormField< Item >( {
 							/>
 							<field.Edit
 								key={ field.id }
-								data={ data }
+								value={ field.getValue( { item: data } ) }
 								field={ field }
 								onChange={ onChange }
 								hideLabelFromVision

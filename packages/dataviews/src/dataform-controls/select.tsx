@@ -11,13 +11,12 @@ import { __ } from '@wordpress/i18n';
 import type { DataFormControlProps } from '../types';
 
 export default function Select< Item >( {
-	data,
+	value,
 	field,
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label } = field;
-	const value = field.getValue( { item: data } ) ?? '';
 	const onChangeControl = useCallback(
 		( newValue: any ) =>
 			onChange( {
@@ -41,7 +40,7 @@ export default function Select< Item >( {
 	return (
 		<SelectControl
 			label={ label }
-			value={ value }
+			value={ value ?? '' }
 			options={ elements }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize

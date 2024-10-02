@@ -10,13 +10,12 @@ import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../types';
 
 export default function Integer< Item >( {
-	data,
+	value,
 	field,
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description } = field;
-	const value = field.getValue( { item: data } ) ?? '';
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) =>
 			onChange( {
@@ -29,7 +28,7 @@ export default function Integer< Item >( {
 		<NumberControl
 			label={ label }
 			help={ description }
-			value={ value }
+			value={ value ?? '' }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }

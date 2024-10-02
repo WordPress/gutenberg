@@ -2,13 +2,26 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, Field } from '../../types';
+import type { DataFormProps, Field, NormalizedField } from '../../types';
+
+type MemoizedFieldEditProps< Item > = {
+	value: Item[ keyof Item ];
+	field: NormalizedField< Item >;
+	onChange: Pick< DataFormProps< Item >, 'onChange' >[ 'onChange' ];
+};
+
+const MemoizedFieldEdit = memo(
+	( { field, value, onChange } ) => (
+		<field.Edit value={ value } field={ field } onChange={ onChange } />
+	),
+	( prevProps, nextProps ) => prevProps.value === nextProps.value
+) as < Item >( props: MemoizedFieldEditProps< Item > ) => JSX.Element;
 
 export default function FormRegular< Item >( {
 	data,
@@ -32,9 +45,9 @@ export default function FormRegular< Item >( {
 		<VStack spacing={ 4 }>
 			{ visibleFields.map( ( field ) => {
 				return (
-					<field.Edit
+					<MemoizedFieldEdit
 						key={ field.id }
-						data={ data }
+						value={ field.getValue( { item: data } ) }
 						field={ field }
 						onChange={ onChange }
 					/>
