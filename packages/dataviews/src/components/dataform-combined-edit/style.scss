@@ -1,0 +1,12 @@
+.dataforms-layouts-panel__field-dropdown {
+	.dataforms-combined-edit {
+		border: none;
+		padding: 0;
+	}
+}
+
+.dataforms-combined-edit {
+	&__field {
+		flex: 1 1 auto;
+	}
+}
