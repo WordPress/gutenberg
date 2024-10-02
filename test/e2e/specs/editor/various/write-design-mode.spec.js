@@ -96,7 +96,7 @@ test.describe( 'Write/Design mode', () => {
 		await paragraph.click();
 		await page.keyboard.type( ' something' );
 		expect( await getSelectedBlock() ).toEqual( paragraphClientId );
-		expect( await paragraph.innerHTML() ).toEqual( 'Something something' );
+		await expect( paragraph ).toHaveText( 'Something something' );
 
 		// Check that the inspector still shows the group block with the content panel.
 		await editor.openDocumentSettingsSidebar();

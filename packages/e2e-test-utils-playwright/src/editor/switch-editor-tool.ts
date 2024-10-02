@@ -4,7 +4,7 @@
 import type { Editor } from './index';
 
 /**
- * Clicks a block toolbar button.
+ * Switch the editor tool being used.
  *
  * @param this
  * @param label The text string of the button label.
