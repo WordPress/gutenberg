@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-## Bug Fixes
-
--   Fixed a regression that caused the vertical tabs in the inserter (inside the patterns and media sections) to have a nested scrollbar ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
-
 ## 14.3.0 (2024-09-19)
 
 ## 14.2.0 (2024-09-05)
