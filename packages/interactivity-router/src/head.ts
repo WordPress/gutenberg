@@ -70,7 +70,7 @@ export const fetchHeadAssets = async (
 		'script[type="module"][src]'
 	);
 
-	Array.from( scripts ).forEach( ( script ) => {
+	scripts.forEach( ( script ) => {
 		const src = script.getAttribute( 'src' );
 		if ( ! headElements.has( src ) ) {
 			// add the <link> elements to prefetch the module scripts
