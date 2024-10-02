@@ -1541,6 +1541,59 @@ export function getTemplateLock( state, rootClientId ) {
 }
 
 /**
+ * Determines if the given block type is visible in the inserter.
+ * Note that this is different than whether a block is allowed to be inserted.
+ * In some cases, the block is not allowed in a given position but
+ * it should still be visible in the inserter to be able to add it
+ * to a different position.
+ *
+ * @param {Object}        state           Editor state.
+ * @param {string|Object} blockNameOrType The block type object, e.g., the response
+ *                                        from the block directory; or a string name of
+ *                                        an installed block type, e.g.' core/paragraph'.
+ *
+ * @return {boolean} Whether the given block type is allowed to be inserted.
+ */
+const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
+	let blockType;
+	let blockName;
+	if ( blockNameOrType && 'object' === typeof blockNameOrType ) {
+		blockType = blockNameOrType;
+		blockName = blockNameOrType.name;
+	} else {
+		blockType = getBlockType( blockNameOrType );
+		blockName = blockNameOrType;
+	}
+	if ( ! blockType ) {
+		return false;
+	}
+
+	const { allowedBlockTypes } = getSettings( state );
+
+	const isBlockAllowedInEditor = checkAllowList(
+		allowedBlockTypes,
+		blockName,
+		true
+	);
+	if ( ! isBlockAllowedInEditor ) {
+		return false;
+	}
+
+	// If parent blocks are not visible, child blocks should be hidden too.
+	if ( !! blockType.parent?.length ) {
+		return blockType.parent.some(
+			( name ) =>
+				isBlockVisibleInTheInserter( state, name ) ||
+				// Exception for blocks with post-content parent,
+				// the root level is often consider as "core/post-content".
+				// This exception should only apply to the post editor ideally though.
+				name === 'core/post-content'
+		);
+	}
+	return true;
+};
+
+/**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
  * inside another memoized selector is just a waste of time.
@@ -1558,26 +1611,16 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
+	if ( ! isBlockVisibleInTheInserter( state, blockName ) ) {
+		return false;
+	}
+
 	let blockType;
 	if ( blockName && 'object' === typeof blockName ) {
 		blockType = blockName;
 		blockName = blockType.name;
 	} else {
 		blockType = getBlockType( blockName );
-	}
-	if ( ! blockType ) {
-		return false;
-	}
-
-	const { allowedBlockTypes } = getSettings( state );
-
-	const isBlockAllowedInEditor = checkAllowList(
-		allowedBlockTypes,
-		blockName,
-		true
-	);
-	if ( ! isBlockAllowedInEditor ) {
-		return false;
 	}
 
 	const isLocked = !! getTemplateLock( state, rootClientId );
@@ -1972,6 +2015,7 @@ const buildBlockTypeItem =
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
+			parent: blockType.parent,
 			variations: inserterVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
@@ -2067,16 +2111,18 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
-				blockTypeInserterItems = blockTypeInserterItems.map(
-					( blockType ) => ( {
+				blockTypeInserterItems = blockTypeInserterItems
+					.filter( ( blockType ) =>
+						isBlockVisibleInTheInserter( state, blockType )
+					)
+					.map( ( blockType ) => ( {
 						...blockType,
 						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
 							state,
 							blockType,
 							rootClientId
 						),
-					} )
-				);
+					} ) );
 			}
 
 			const items = blockTypeInserterItems.reduce(
@@ -2348,37 +2394,50 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
  */
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
-		return createSelector( ( state, rootClientId = null ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const { allowedBlockTypes } = getSettings( state );
-			const parsedPatterns = patterns
-				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( pattern ) => {
-					return {
-						...pattern,
-						get blocks() {
-							return getParsedPattern( pattern ).blocks;
-						},
-					};
-				} );
+		return createSelector(
+			(
+				state,
+				rootClientId = null,
+				options = DEFAULT_INSERTER_OPTIONS
+			) => {
+				const { getAllPatterns } = unlock( select( STORE_NAME ) );
+				const patterns = getAllPatterns();
+				const { allowedBlockTypes } = getSettings( state );
+				const parsedPatterns = patterns
+					.filter( ( { inserter = true } ) => !! inserter )
+					.map( ( pattern ) => {
+						return {
+							...pattern,
+							get blocks() {
+								return getParsedPattern( pattern ).blocks;
+							},
+						};
+					} );
 
-			const availableParsedPatterns = parsedPatterns.filter(
-				( pattern ) =>
-					checkAllowListRecursive(
-						getGrammar( pattern ),
-						allowedBlockTypes
-					)
-			);
-			const patternsAllowed = availableParsedPatterns.filter(
-				( pattern ) =>
-					getGrammar( pattern ).every( ( { blockName: name } ) =>
-						canInsertBlockType( state, name, rootClientId )
-					)
-			);
+				const availableParsedPatterns = parsedPatterns.filter(
+					( pattern ) =>
+						checkAllowListRecursive(
+							getGrammar( pattern ),
+							allowedBlockTypes
+						)
+				);
+				const patternsAllowed = availableParsedPatterns.filter(
+					( pattern ) =>
+						getGrammar( pattern ).every( ( { blockName: name } ) =>
+							options[ isFiltered ] !== false
+								? canInsertBlockType(
+										state,
+										name,
+										rootClientId
+								  )
+								: isBlockVisibleInTheInserter( state, name )
+						)
+				);
 
-			return patternsAllowed;
-		}, getAllowedPatternsDependants( select ) );
+				return patternsAllowed;
+			},
+			getAllowedPatternsDependants( select )
+		);
 	}
 );
 
