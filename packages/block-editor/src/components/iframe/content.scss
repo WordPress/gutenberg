@@ -48,6 +48,7 @@
 	$total-frame-height: calc(2 * #{$frame-size});
 	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
 	margin-bottom: calc(-1 * #{$total-height});
+	margin-inline: calc(-1 * #{$frame-size} / #{$scale});
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});

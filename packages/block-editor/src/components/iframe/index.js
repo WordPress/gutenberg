@@ -306,16 +306,26 @@ function Iframe( {
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		const maxWidth = 750;
+		const frameSizeIsNumber = frameSize === 'number';
+		// The added space from `frameSize` has to be accounted for in scale calculation.
+		// This just punts in case `frameSize` can’t be treated as a pixel value. It’d
+		// probably be good to formally type `frameSize` as number and treat it as pixels.
+		// Core usage is pixels only and supporting any unit would be complicated.
+		let frameWidth = 0;
+		if ( frameSizeIsNumber || frameSize.endsWith( 'px' ) ) {
+			frameWidth =
+				2 * ( frameSizeIsNumber ? frameSize : parseInt( frameSize ) );
+		}
+		const usedWidth = Math.min( containerWidth, maxWidth ) - frameWidth;
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) /
-						prevContainerWidthRef.current
+				? usedWidth / prevContainerWidthRef.current
 				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
-			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
+			frameSizeIsNumber ? `${ frameSize }px` : frameSize
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-content-height',
