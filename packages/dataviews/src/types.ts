@@ -124,7 +124,7 @@ export type Field< Item > = {
 	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
-	 * Callback used to display the field.
+	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
 
