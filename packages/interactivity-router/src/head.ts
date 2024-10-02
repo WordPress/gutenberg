@@ -82,7 +82,7 @@ export const fetchHeadAssets = async (
 		}
 	} );
 
-	const stylesheets = doc.querySelectorAll< HTMLScriptElement >(
+	const stylesheets = doc.querySelectorAll< HTMLLinkElement >(
 		'link[rel=stylesheet]'
 	);
 
