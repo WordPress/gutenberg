@@ -465,16 +465,6 @@ test.describe( 'Widgets Customizer', () => {
 		await expect( paragraphBlock ).toBeVisible();
 
 		await paragraphBlock.focus();
-
-		// Expect pressing the Escape key to enter navigation mode,
-		// but not close the editor.
-		await page.keyboard.press( 'Escape' );
-		await expect(
-			page.locator(
-				'css=.block-editor-block-list__layout.is-navigate-mode'
-			)
-		).toBeVisible();
-		await expect( paragraphBlock ).toBeVisible();
 	} );
 
 	test( 'should move (inner) blocks to another sidebar', async ( {

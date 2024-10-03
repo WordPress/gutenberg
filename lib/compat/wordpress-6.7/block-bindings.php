@@ -53,3 +53,35 @@ function gutenberg_add_can_update_block_bindings_editor_setting( $editor_setting
 }
 
 add_filter( 'block_editor_settings_all', 'gutenberg_add_can_update_block_bindings_editor_setting', 10 );
+
+/**
+ * Add `label` to `register_meta`.
+ *
+ * @param array  $args Array of arguments for registering meta.
+ * @return array Modified arguments array including `label`.
+ */
+function gutenberg_update_meta_args_with_label( $args ) {
+	// Don't update schema when label isn't provided.
+	if ( ! isset( $args['label'] ) ) {
+		return $args;
+	}
+
+	$schema = array( 'title' => $args['label'] );
+	if ( ! is_array( $args['show_in_rest'] ) ) {
+		$args['show_in_rest'] = array(
+			'schema' => $schema,
+		);
+		return $args;
+	}
+
+	if ( ! empty( $args['show_in_rest']['schema'] ) ) {
+		$args['show_in_rest']['schema'] = array_merge( $args['show_in_rest']['schema'], $schema );
+	} else {
+		$args['show_in_rest']['schema'] = $schema;
+	}
+
+	return $args;
+}
+
+// Priority must be lower than 10 to ensure the label is not removed.
+add_filter( 'register_meta_args', 'gutenberg_update_meta_args_with_label', 5, 1 );

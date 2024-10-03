@@ -156,20 +156,23 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_exper
 }
 
 /**
- * Updates the comment type filter dropdown options.
+ * Filters the arguments for registering a wp_global_styles post type.
+ * Note when syncing to Core: the capabilities should be updates for `wp_global_styles` in the wp-includes/post.php.
  *
- * This function is only defined if the 'gutenberg-block-comment' experiment is enabled and the 'update_comment_type_filter_dropdown' function does not already exist.
- * It returns an array of comment type options for the comment type filter dropdown in the admin area.
+ * @since 6.7.0
  *
- * @return array An associative array of comment type options.
- * The keys are the comment type slugs and the values are the translated names of the comment types.
+ * @param array  $args      Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ * @param string $post_type Post type key.
+ *
+ * @return array Array of arguments for registering a post type.
  */
-if ( ! function_exists( 'update_comment_type_filter_dropdown' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
-	function update_comment_type_filter_dropdown() {
-		return array(
-			'comment'       => __( 'Comments' ),
-			'block_comment' => __( 'Block Comments' ),
-		);
+function gutenberg_register_post_type_args_for_wp_global_styles( $args, $post_type ) {
+	if ( 'wp_global_styles' === $post_type ) {
+		$args['capabilities']['read'] = 'edit_posts';
 	}
-	add_filter( 'admin_comment_types_dropdown', 'update_comment_type_filter_dropdown' );
+
+	return $args;
 }
+
+add_filter( 'register_post_type_args', 'gutenberg_register_post_type_args_for_wp_global_styles', 10, 2 );

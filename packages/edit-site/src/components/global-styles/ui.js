@@ -32,7 +32,6 @@ import {
 } from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
-import ScreenTypeset from './screen-typeset';
 import ScreenTypographyElement from './screen-typography-element';
 import FontSize from './font-sizes/font-size';
 import FontSizes from './font-sizes/font-sizes';
@@ -272,19 +271,6 @@ function GlobalStylesEditorCanvasContainerLink() {
 					goTo( '/' );
 				}
 				break;
-			default:
-				/*
-				 * Example: the user has navigated to "Browse styles" or elsewhere
-				 * and changes the editorCanvasContainerView, e.g., closes the style book.
-				 * The panel should not be affected.
-				 * Exclude revisions panel from this behavior,
-				 * as it should close when the editorCanvasContainerView doesn't correspond.
-				 */
-				if ( path !== '/' && ! isRevisionsOpen ) {
-					return;
-				}
-				goTo( '/' );
-				break;
 		}
 	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
@@ -323,10 +309,6 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
 				<FontSize />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path="/typography/typeset">
-				<ScreenTypeset />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography/text">

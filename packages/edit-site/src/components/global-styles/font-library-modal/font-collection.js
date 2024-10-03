@@ -472,8 +472,7 @@ function FontCollection( { slug } ) {
 							className="font-library-modal__footer"
 						>
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								variant="primary"
 								onClick={ handleInstall }
 								isBusy={ isInstalling }

@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import SelectControl from '../';
+import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 const meta: Meta< typeof SelectControl > = {
 	title: 'Components/SelectControl',
@@ -64,6 +65,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
+	label: 'Label',
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
 		{ value: 'a', label: 'Option A' },
@@ -76,7 +78,6 @@ export const WithLabelAndHelpText = SelectControlWithState.bind( {} );
 WithLabelAndHelpText.args = {
 	...Default.args,
 	help: 'Help text to explain the select control.',
-	label: 'Value',
 };
 
 /**
@@ -86,6 +87,7 @@ WithLabelAndHelpText.args = {
 export const WithCustomChildren = SelectControlWithState.bind( {} );
 WithCustomChildren.args = {
 	__nextHasNoMarginBottom: true,
+	label: 'Label',
 	children: (
 		<>
 			<option value="option-1">Option 1</option>
@@ -104,8 +106,19 @@ WithCustomChildren.args = {
 	),
 };
 
+/**
+ * By default, the prefix is aligned with the edge of the input border, with no padding.
+ * If you want to apply standard padding in accordance with the size variant, wrap the element in the `<InputControlPrefixWrapper>` component.
+ */
+export const WithPrefix = SelectControlWithState.bind( {} );
+WithPrefix.args = {
+	...Default.args,
+	prefix: <InputControlPrefixWrapper>Prefix:</InputControlPrefixWrapper>,
+};
+
 export const Minimal = SelectControlWithState.bind( {} );
 Minimal.args = {
 	...Default.args,
 	variant: 'minimal',
+	hideLabelFromVision: true,
 };

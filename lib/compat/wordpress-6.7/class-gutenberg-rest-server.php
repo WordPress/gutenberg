@@ -95,17 +95,33 @@ class Gutenberg_REST_Server extends WP_REST_Server {
 					continue;
 				}
 
-				$match = $server->match_request_to_handler( $request );
-				if ( ! is_wp_error( $match ) ) {
-					$response = new WP_REST_Response();
-					$response->set_matched_route( $match[0] );
-					$response->set_matched_handler( $match[1] );
-					$headers = rest_send_allow_header( $response, $server, $request )->get_headers();
+				$matched = $server->match_request_to_handler( $request );
 
-					foreach ( $headers as $name => $value ) {
-						$name                               = WP_REST_Request::canonicalize_header_name( $name );
-						$attributes['targetHints'][ $name ] = array_map( 'trim', explode( ',', $value ) );
-					}
+				if ( is_wp_error( $matched ) ) {
+					$data[ $rel ][] = $attributes;
+					continue;
+				}
+
+				if ( is_wp_error( $request->has_valid_params() ) ) {
+					$data[ $rel ][] = $attributes;
+					continue;
+				}
+
+				if ( is_wp_error( $request->sanitize_params() ) ) {
+					$data[ $rel ][] = $attributes;
+					continue;
+				}
+
+				list( $route, $handler ) = $matched;
+
+				$response = new WP_REST_Response();
+				$response->set_matched_route( $route );
+				$response->set_matched_handler( $handler );
+				$headers = rest_send_allow_header( $response, $server, $request )->get_headers();
+
+				foreach ( $headers as $name => $value ) {
+					$name                               = WP_REST_Request::canonicalize_header_name( $name );
+					$attributes['targetHints'][ $name ] = array_map( 'trim', explode( ',', $value ) );
 				}
 
 				$data[ $rel ][] = $attributes;
