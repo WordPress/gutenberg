@@ -24,9 +24,9 @@ const wpServer = spawn(
 
 // Listen to stdout and wait for the "WordPress is running" message
 wpServer.stdout.on( 'data', ( data ) => {
-	const output = data.toString();
+	const output = data.toString().trim();
 
-	if ( ! output.includes( 'Downloading' ) ) {
+	if ( output && ! output.endsWith( '%' ) ) {
 		// eslint-disable-next-line no-console
 		console.log( output ); // Optional: log the output
 	}
