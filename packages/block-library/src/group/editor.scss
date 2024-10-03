@@ -11,7 +11,7 @@
 
 	user-select: none;
 
-	> * {
+	> *:not(.wp-block-group) {
 		user-select: all;
 	}
 }
