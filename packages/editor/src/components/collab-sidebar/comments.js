@@ -25,7 +25,6 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -240,7 +239,7 @@ export function Comments( {
  */
 function CommentForm( { onSubmit, onCancel, thread } ) {
 	const [ inputComment, setInputComment ] = useState(
-		removep( thread?.content?.rendered ?? '' )
+		thread?.content?.rendered.replace(/<[^>]*>/g, '') ?? ''
 	);
 
 	return (
