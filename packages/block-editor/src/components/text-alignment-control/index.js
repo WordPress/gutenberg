@@ -14,11 +14,10 @@ import {
 	alignJustify,
 } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import SegmentedTextControl from '../segmented-text-control';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 const TEXT_ALIGNMENT_OPTIONS = [
 	{
@@ -75,9 +74,11 @@ export default function TextAlignmentControl( {
 	}
 
 	return (
-		<SegmentedTextControl
+		<ToggleGroupControl
+			isDeselectable
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Text alignment' ) }
-			options={ validOptions }
 			className={ clsx(
 				'block-editor-text-alignment-control',
 				className
@@ -86,6 +87,17 @@ export default function TextAlignmentControl( {
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-		/>
+		>
+			{ validOptions.map( ( option ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ option.value }
+						value={ option.value }
+						icon={ option.icon }
+						label={ option.label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }

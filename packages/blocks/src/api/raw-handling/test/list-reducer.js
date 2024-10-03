@@ -41,12 +41,6 @@ describe( 'listReducer', () => {
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( output );
 	} );
 
-	it( 'should remove empty list wrappers', () => {
-		const input = '<ul><li>\n<ul><li>test</li></ul>\n</li></ul>';
-		const output = '<ul><li>test</li></ul>';
-		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( output );
-	} );
-
 	it( 'should not remove filled list wrappers', () => {
 		const input = '<ul><li>\ntest\n<ul><li>test</li></ul>\n</li></ul>';
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( input );

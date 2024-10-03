@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { usePrevious, useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	privateApis as componentsPrivateApis,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
@@ -22,6 +24,17 @@ function CategoryTabs( {
 	onSelectCategory,
 	children,
 } ) {
+	// Copied from InterfaceSkeleton.
+	const ANIMATION_DURATION = 0.25;
+	const disableMotion = useReducedMotion();
+	const defaultTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
+
+	const previousSelectedCategory = usePrevious( selectedCategory );
+
 	return (
 		<Tabs
 			className="block-editor-inserter__category-tabs"
@@ -62,9 +75,29 @@ function CategoryTabs( {
 					key={ category.name }
 					tabId={ category.name }
 					focusable={ false }
-					className="block-editor-inserter__category-panel"
 				>
-					{ children }
+					<motion.div
+						className="block-editor-inserter__category-panel"
+						initial={
+							! previousSelectedCategory ? 'closed' : 'open'
+						}
+						animate="open"
+						variants={ {
+							open: {
+								transform: 'translateX( 0 )',
+								transitionEnd: {
+									zIndex: '1',
+								},
+							},
+							closed: {
+								transform: 'translateX( -100% )',
+								zIndex: '-1',
+							},
+						} }
+						transition={ defaultTransition }
+					>
+						{ children }
+					</motion.div>
 				</Tabs.TabPanel>
 			) ) }
 		</Tabs>

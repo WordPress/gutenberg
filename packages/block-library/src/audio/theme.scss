@@ -1,4 +1,4 @@
-.wp-block-audio figcaption {
+.wp-block-audio :where(figcaption) {
 	@include caption-style-theme();
 }
 

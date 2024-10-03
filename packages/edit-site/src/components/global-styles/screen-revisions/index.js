@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
 } from '@wordpress/components';
@@ -72,7 +72,6 @@ function ScreenRevisions() {
 	);
 
 	const onCloseRevisions = () => {
-		goTo( '/' ); // Return to global styles main panel.
 		const canvasContainerView =
 			editorCanvasContainerView === 'global-styles-revisions:style-book'
 				? 'style-book'

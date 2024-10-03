@@ -1,11 +1,77 @@
-.editor-visual-editor {
-	flex: 1 0 auto;
-	height: auto;
+$resize-handle-height: $grid-unit-30;
+
+.edit-post-meta-boxes-main {
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	background-color: $white;
+	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
+
+	&:not(details) {
+		padding-top: $resize-handle-height;
+	}
+
+	// The component renders as a details element in short viewports.
+	&:is(details) {
+		& > summary {
+			cursor: pointer;
+			color: $gray-900;
+			background-color: $white;
+			height: $button-size-compact;
+			line-height: $button-size-compact;
+			font-size: 13px;
+			padding-left: $grid-unit-30;
+			box-shadow: 0 $border-width $gray-300;
+		}
+
+		&[open] > summary {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+	}
 }
 
-.edit-post-layout__metaboxes {
-	flex-shrink: 0;
-	clear: both;
+.edit-post-meta-boxes-main__resize-handle {
+	display: flex;
+	// The position is absolute by default inline style of ResizableBox.
+	inset: 0 0 auto 0;
+	height: $resize-handle-height;
+	box-shadow: 0 $border-width $gray-300;
+
+	& > button {
+		appearance: none;
+		cursor: inherit;
+		margin: auto;
+		padding: 0;
+		border: none;
+		outline: none;
+		background-color: $gray-300;
+		width: $grid-unit-80;
+		height: $grid-unit-05;
+		border-radius: $radius-small;
+		transition: width 0.3s ease-out;
+		@include reduce-motion("transition");
+	}
+
+	&:hover > button,
+	> button:focus {
+		background-color: var(--wp-admin-theme-color);
+		width: $grid-unit-80 + $grid-unit-20;
+	}
+}
+
+.edit-post-meta-boxes-main__liner {
+	overflow: auto;
+	max-height: 100%;
+	// Keep the contents behind the resize handle or details summary.
+	isolation: isolate;
+}
+
+.has-metaboxes .editor-visual-editor {
+	flex: 1;
+
+	&.is-iframed {
+		isolation: isolate;
+	}
 }
 
 // Adjust the position of the notices

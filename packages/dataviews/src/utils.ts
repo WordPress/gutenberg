@@ -8,11 +8,9 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 } from './constants';
-import type { AnyItem, NormalizedField } from './types';
+import type { NormalizedField } from './types';
 
-export function sanitizeOperators< Item extends AnyItem >(
-	field: NormalizedField< Item >
-) {
+export function sanitizeOperators< Item >( field: NormalizedField< Item > ) {
 	let operators = field.filterBy?.operators;
 
 	// Assign default values.

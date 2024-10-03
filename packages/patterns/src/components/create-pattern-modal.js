@@ -44,6 +44,8 @@ export default function CreatePatternModal( {
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.onClose }
 			overlayClassName={ className }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<CreatePatternModalContents { ...restProps } />
 		</Modal>
@@ -129,6 +131,7 @@ export function CreatePatternModalContents( {
 					categoryMap={ categoryMap }
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ _x( 'Synced', 'pattern (singular)' ) }
 					help={ __(
 						'Sync this pattern across multiple locations.'

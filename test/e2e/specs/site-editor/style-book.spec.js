@@ -43,9 +43,6 @@ test.describe( 'Style Book', () => {
 		await expect( page.locator( 'role=tab[name="Text"i]' ) ).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Media"i]' ) ).toBeVisible();
 		await expect(
-			page.locator( 'role=tab[name="Design"i]' )
-		).toBeVisible();
-		await expect(
 			page.locator( 'role=tab[name="Widgets"i]' )
 		).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
@@ -174,6 +171,21 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'style book should be visible'
+		).toBeVisible();
+	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+	} ) => {
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Book',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
 		).toBeVisible();
 	} );
 } );

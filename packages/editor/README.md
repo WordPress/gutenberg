@@ -262,6 +262,12 @@ _Usage_
 <DocumentBar />
 ```
 
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.title_ `string`: A title for the document, defaulting to the document or template title currently being edited.
+-   _props.icon_ `IconType`: An icon for the document, no default. (A default icon indicating the document post type is no longer used.)
+
 _Returns_
 
 -   `JSX.Element`: The rendered DocumentBar component.
@@ -322,7 +328,7 @@ _Returns_
 
 ### EditorKeyboardShortcuts
 
-Component handles the keyboard shortcuts for the editor.
+Handles the keyboard shortcuts for the editor.
 
 It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
@@ -526,7 +532,7 @@ _Returns_
 
 ### PageAttributesOrder
 
-Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page. The component is now not used in core but was kept for backward compatibility.
 
 _Returns_
 
@@ -855,6 +861,43 @@ _Parameters_
 _Returns_
 
 -   `Component`: The component to be rendered.
+
+### PluginPreviewMenuItem
+
+Renders a menu item in the Preview dropdown, which can be used as a button or link depending on the props provided. The text within the component appears as the menu item label.
+
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { PluginPreviewMenuItem } from '@wordpress/editor';
+import { external } from '@wordpress/icons';
+
+function onPreviewClick() {
+	// Handle preview action
+}
+
+const ExternalPreviewMenuItem = () => (
+	<PreviewDropdownMenuItem icon={ external } onClick={ onPreviewClick }>
+		{ __( 'Preview in new tab' ) }
+	</PreviewDropdownMenuItem>
+);
+registerPlugin( 'external-preview-menu-item', {
+	render: ExternalPreviewMenuItem,
+} );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.href_ `[string]`: When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
+-   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying MenuItem component.
+
+_Returns_
+
+-   `Component`: The rendered menu item component.
 
 ### PluginSidebar
 
@@ -1289,7 +1332,7 @@ _Returns_
 
 ### PostSticky
 
-Renders the PostSticky component. It provide toggle control for the sticky post feature.
+Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
 
 _Returns_
 
@@ -1358,6 +1401,7 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
+-   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 
@@ -1426,6 +1470,10 @@ Undocumented declaration.
 ### PostTrash
 
 Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Parameters_
+
+-   _An_ `?{onActionPerformed: Object}`: object containing the onActionPerformed function.
 
 _Returns_
 
@@ -1616,9 +1664,9 @@ _Returns_
 
 ### TextEditorGlobalKeyboardShortcuts
 
-Component handles the global keyboard shortcuts for the Text editor.
+Handles the keyboard shortcuts for the editor.
 
-It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo.
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### ThemeSupportCheck
 
@@ -1725,7 +1773,9 @@ _Type_
 
 ### VisualEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### Warning
 

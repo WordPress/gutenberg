@@ -3,7 +3,11 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { Dropdown, Button } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	__experimentalTruncate as Truncate,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
@@ -61,8 +65,13 @@ export default function PostURLPanel() {
 function PostURLToggle( { isOpen, onClick } ) {
 	const { slug, isFrontPage, postLink } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPost } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
 		const _id = getCurrentPostId();
 		return {
 			slug: select( editorStore ).getEditedPostSlug(),
@@ -81,7 +90,9 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ isFrontPage ? postLink : <>/{ decodedSlug }</> }
+			<Truncate numberOfLines={ 1 }>
+				{ isFrontPage ? postLink : `/${ decodedSlug }` }
+			</Truncate>
 		</Button>
 	);
 }

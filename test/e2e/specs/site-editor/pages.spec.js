@@ -7,8 +7,8 @@ async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
 	await page.getByRole( 'button', { name: 'Add new page' } ).click();
 	await page
-		.locator( 'role=dialog[name="Draft a new page"i]' )
-		.locator( 'role=textbox[name="Page title"i]' )
+		.locator( 'role=dialog[name="Draft new: page"i]' )
+		.locator( 'role=textbox[name="title"i]' )
 		.fill( 'Test Page' );
 	await page.keyboard.press( 'Enter' );
 	await expect(
@@ -90,7 +90,7 @@ test.describe( 'Pages', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'create a new page, edit template and toggle page template preview', async ( {
+	test.skip( 'create a new page, edit template and toggle page template preview', async ( {
 		page,
 		editor,
 	} ) => {

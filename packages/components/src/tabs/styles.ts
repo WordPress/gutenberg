@@ -2,13 +2,12 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 
 export const TabListWrapper = styled.div`
@@ -16,47 +15,112 @@ export const TabListWrapper = styled.div`
 	display: flex;
 	align-items: stretch;
 	flex-direction: row;
+	text-align: center;
+	overflow-x: auto;
+
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
+		text-align: start;
 	}
-	@media not ( prefers-reduced-motion: reduce ) {
-		&.is-animation-enabled::after {
-			transition-property: left, top, width, height;
+
+	:where( [aria-orientation='horizontal'] ) {
+		width: fit-content;
+	}
+
+	--direction-factor: 1;
+	--direction-start: left;
+	--direction-end: right;
+	--indicator-start: var( --indicator-left );
+	&:dir( rtl ) {
+		--direction-factor: -1;
+		--direction-start: right;
+		--direction-end: left;
+		--indicator-start: var( --indicator-right );
+	}
+
+	@media not ( prefers-reduced-motion ) {
+		&.is-animation-enabled::before {
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
 	}
-	&::after {
+	&::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
+		transform-origin: var( --direction-start ) top;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
-	&:not( [aria-orientation='vertical'] )::after {
-		left: var( --indicator-left );
-		bottom: 0;
-		width: var( --indicator-width );
-		height: 0;
-		border-bottom: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
-	}
-	&[aria-orientation='vertical']::after {
-		/* Temporarily hidden, context: https://github.com/WordPress/gutenberg/pull/60560#issuecomment-2126670072 */
-		opacity: 0;
 
-		right: 0;
-		top: var( --indicator-top );
-		height: var( --indicator-height );
-		border-right: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
+	/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+	--antialiasing-factor: 100;
+	&:not( [aria-orientation='vertical'] ) {
+		--fade-width: 4rem;
+		--fade-gradient-base: transparent 0%, black var( --fade-width );
+		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
+			transparent 50%;
+		&.is-overflowing-first {
+			mask-image: linear-gradient(
+				to var( --direction-end ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-last {
+			mask-image: linear-gradient(
+				to var( --direction-start ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-first.is-overflowing-last {
+			mask-image: linear-gradient(
+					to right,
+					var( --fade-gradient-composed )
+				),
+				linear-gradient( to left, var( --fade-gradient-composed ) );
+		}
+
+		&::before {
+			bottom: 0;
+			height: 0;
+			width: calc( var( --antialiasing-factor ) * 1px );
+			transform: translateX(
+					calc(
+						var( --indicator-start ) * var( --direction-factor ) *
+							1px
+					)
+				)
+				scaleX(
+					calc(
+						var( --indicator-width ) / var( --antialiasing-factor )
+					)
+				);
+			border-bottom: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+		}
+	}
+	&[aria-orientation='vertical']::before {
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: calc( var( --antialiasing-factor ) * 1px );
+		transform: translateY( calc( var( --indicator-top ) * 1px ) )
+			scaleY(
+				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
+			);
+		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
+		scroll-margin: 24px;
+		flex-grow: 1;
+		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
 		position: relative;
@@ -66,16 +130,19 @@ export const Tab = styled( Ariakit.Tab )`
 		border: none;
 		box-shadow: none;
 		cursor: pointer;
-		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
+		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
+		padding: ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 500;
+		text-align: inherit;
+		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
 			cursor: default;
-			opacity: 0.3;
+			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:hover {
+		&:not( [aria-disabled='true'] ):hover {
 			color: ${ COLORS.theme.accent };
 		}
 
@@ -86,7 +153,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		// Focus.
-		&::before {
+		&::after {
 			content: '';
 			position: absolute;
 			top: ${ space( 3 ) };
@@ -96,9 +163,10 @@ export const Tab = styled( Ariakit.Tab )`
 			pointer-events: none;
 
 			// Draw the indicator.
-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			// Outline works for Windows high contrast mode as well.
+			outline: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
-			border-radius: 2px;
+			border-radius: ${ CONFIG.radiusSmall };
 
 			// Animation
 			opacity: 0;
@@ -108,12 +176,19 @@ export const Tab = styled( Ariakit.Tab )`
 			}
 		}
 
-		&:focus-visible::before {
+		&:focus-visible::after {
 			opacity: 1;
-
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
 		}
+	}
+
+	[aria-orientation='vertical'] & {
+		min-height: ${ space(
+			10
+		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+	}
+
+	[aria-orientation='horizontal'] & {
+		justify-content: center;
 	}
 `;
 
@@ -124,7 +199,6 @@ export const TabPanel = styled( Ariakit.TabPanel )`
 	}
 
 	&:focus-visible {
-		border-radius: 2px;
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			${ COLORS.theme.accent };
 		// Windows high contrast mode.

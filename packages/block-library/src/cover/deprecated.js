@@ -400,8 +400,9 @@ const v12 = {
 	supports: v12BlockSupports,
 	isEligible( attributes ) {
 		return (
-			attributes.customOverlayColor !== undefined ||
-			attributes.overlayColor !== undefined
+			( attributes.customOverlayColor !== undefined ||
+				attributes.overlayColor !== undefined ) &&
+			attributes.isUserOverlayColor === undefined
 		);
 	},
 	migrate( attributes ) {

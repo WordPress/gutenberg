@@ -27,13 +27,13 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
@@ -97,7 +97,7 @@ export function useHasButtonPanel( settings ) {
 	);
 }
 
-export function useHasBackgroundPanel( settings ) {
+export function useHasBackgroundColorPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -116,6 +116,7 @@ function ColorToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -131,7 +132,7 @@ function ColorToolsPanel( {
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -238,7 +239,7 @@ function ColorPanelDropdown( {
 					};
 
 					return (
-						<Button { ...toggleProps }>
+						<Button __next40pxDefaultSize { ...toggleProps }>
 							<LabeledColorIndicators
 								indicators={ indicators }
 								label={ label }
@@ -342,7 +343,7 @@ export default function ColorPanel( {
 	};
 
 	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );

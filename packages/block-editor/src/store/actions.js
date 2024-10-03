@@ -34,8 +34,6 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { STORE_NAME } from './constants';
-import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -209,6 +207,21 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
+		clientId,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified client ID has been hovered.
+ *
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object} Action object.
+ */
+export function hoverBlock( clientId ) {
+	return {
+		type: 'HOVER_BLOCK',
 		clientId,
 	};
 }
@@ -1655,24 +1668,32 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
+	( { dispatch, select } ) => {
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			const { sectionRootClientId } = unlock(
-				registry.select( STORE_NAME ).getSettings()
-			);
+
+			const sectionRootClientId = select.getSectionRootClientId();
+
 			if ( firstSelectedClientId ) {
 				let sectionClientId;
 
 				if ( sectionRootClientId ) {
 					const sectionClientIds =
 						select.getBlockOrder( sectionRootClientId );
-					sectionClientId = select
-						.getBlockParents( firstSelectedClientId )
-						.find( ( parent ) =>
-							sectionClientIds.includes( parent )
-						);
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
 				} else {
 					sectionClientId = select.getBlockHierarchyRootClientId(
 						firstSelectedClientId
@@ -1707,23 +1728,24 @@ export const __unstableSetEditorMode =
 	};
 
 /**
- * Action that enables or disables the block moving mode.
+ * Set the block moving client ID.
  *
- * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
+ * @deprecated
+ *
+ * @return {Object} Action object.
  */
-export const setBlockMovingClientId =
-	( hasBlockMovingClientId = null ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
-
-		if ( hasBlockMovingClientId ) {
-			speak(
-				__(
-					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
-				)
-			);
+export function setBlockMovingClientId() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).setBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
 		}
+	);
+	return {
+		type: 'DO_NOTHING',
 	};
+}
 
 /**
  * Action that duplicates a list of blocks.

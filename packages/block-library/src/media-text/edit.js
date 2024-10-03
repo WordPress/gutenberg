@@ -46,7 +46,7 @@ import {
 	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -213,11 +213,11 @@ function MediaTextEdit( {
 		[ isSelected, mediaId ]
 	);
 
-	const refMediaContainer = useRef();
+	const refMedia = useRef();
 	const imperativeFocalPointPreview = ( value ) => {
-		const { style } = refMediaContainer.current.resizable;
+		const { style } = refMedia.current;
 		const { x, y } = value;
-		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+		style.objectPosition = `${ x * 100 }% ${ y * 100 }%`;
 	};
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
@@ -243,7 +243,7 @@ function MediaTextEdit( {
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
 	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 	const gridTemplateColumns =
@@ -276,6 +276,7 @@ function MediaTextEdit( {
 			mediaSizeSlug: newMediaSizeSlug,
 		} );
 	};
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
@@ -290,7 +291,7 @@ function MediaTextEdit( {
 					mediaSizeSlug: undefined,
 				} );
 			} }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<ToolsPanelItem
 				label={ __( 'Media width' ) }
@@ -359,7 +360,6 @@ function MediaTextEdit( {
 					>
 						<FocalPointPicker
 							__nextHasNoMarginBottom
-							__next40pxDefaultSize
 							label={ __( 'Focal point' ) }
 							url={
 								useFeaturedImage && featuredImageURL
@@ -480,7 +480,7 @@ function MediaTextEdit( {
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
-					ref={ refMediaContainer }
+					refMedia={ refMedia }
 					enableResize={ blockEditingMode === 'default' }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					{ ...{

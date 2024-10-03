@@ -30,7 +30,7 @@ const { EditorContentSlotFill, ResizableEditor } = unlock( editorPrivateApis );
  *
  * @param {string} view Editor canvas container view.
  *
- * @return {string} Translated string corresponding to value of view. Default is ''.
+ * @return {Object} Translated string for the view title and associated icon, both defaulting to ''.
  */
 function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
@@ -125,6 +125,7 @@ function EditorCanvasContainer( {
 					>
 						{ shouldShowCloseButton && (
 							<Button
+								size="compact"
 								className="edit-site-editor-canvas-container__close-button"
 								icon={ closeSmall }
 								label={ closeButtonLabel || __( 'Close' ) }
@@ -138,6 +139,7 @@ function EditorCanvasContainer( {
 		</EditorContentSlotFill.Fill>
 	);
 }
+
 function useHasEditorCanvasContainer() {
 	const fills = useSlotFills( EditorContentSlotFill.privateKey );
 	return !! fills?.length;

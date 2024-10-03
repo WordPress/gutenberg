@@ -401,7 +401,15 @@ function getTypeAnnotation( typeAnnotation ) {
  *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
+	if ( babelTypes.isTSDeclareFunction( token ) ) {
+		return token;
+	}
+
 	if ( babelTypes.isFunctionDeclaration( token ) ) {
+		return token;
+	}
+
+	if ( babelTypes.isFunctionExpression( token ) ) {
 		return token;
 	}
 
@@ -433,7 +441,7 @@ function unwrapWrappedSelectors( token ) {
 
 /**
  * @param {ASTNode} token
- * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
+ * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration | babelTypes.FunctionExpression} The function token.
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
@@ -517,8 +525,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
-	// Otherwise find the corresponding parameter token for the documented parameter.
-	let paramToken = functionToken.params[ paramIndex ];
+	let paramToken = functionToken?.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.

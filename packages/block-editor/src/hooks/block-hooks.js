@@ -3,18 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment, useMemo } from '@wordpress/element';
-import {
-	__experimentalHStack as HStack,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockIcon, InspectorControls } from '../components';
+import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
@@ -43,25 +39,12 @@ function BlockHooksControlPure( {
 		[ blockTypes, name, ignoredHookedBlocks ]
 	);
 
-	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
-		( select ) => {
-			const { getBlocks, getBlockIndex, getBlockRootClientId } =
-				select( blockEditorStore );
-
-			return {
-				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlocks( clientId )?.length,
-				rootClientId: getBlockRootClientId( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
 	const hookedBlockClientIds = useSelect(
 		( select ) => {
-			const { getBlocks, getGlobalBlockCount } =
+			const { getBlocks, getBlockRootClientId, getGlobalBlockCount } =
 				select( blockEditorStore );
 
+			const rootClientId = getBlockRootClientId( clientId );
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
 				( clientIds, block ) => {
 					// If the block doesn't exist anywhere in the block tree,
@@ -127,9 +110,11 @@ function BlockHooksControlPure( {
 
 			return EMPTY_OBJECT;
 		},
-		[ hookedBlocksForCurrentBlock, name, clientId, rootClientId ]
+		[ hookedBlocksForCurrentBlock, name, clientId ]
 	);
 
+	const { getBlockIndex, getBlockCount, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	if ( ! hookedBlocksForCurrentBlock.length ) {
@@ -150,6 +135,10 @@ function BlockHooksControlPure( {
 	);
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
+		const blockIndex = getBlockIndex( clientId );
+		const innerBlocksLength = getBlockCount( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
+
 		switch ( relativePosition ) {
 			case 'before':
 			case 'after':
@@ -208,16 +197,10 @@ function BlockHooksControlPure( {
 
 								return (
 									<ToggleControl
+										__nextHasNoMarginBottom
 										checked={ checked }
 										key={ block.title }
-										label={
-											<HStack justify="flex-start">
-												<BlockIcon
-													icon={ block.icon }
-												/>
-												<span>{ block.title }</span>
-											</HStack>
-										}
+										label={ block.title }
 										onChange={ () => {
 											if ( ! checked ) {
 												// Create and insert block.

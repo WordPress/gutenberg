@@ -81,7 +81,7 @@ test.describe( 'Site editor url navigation', () => {
 			.getByRole( 'region', {
 				name: 'Patterns content',
 			} )
-			.getByLabel( 'header', { exact: true } )
+			.getByText( 'header', { exact: true } )
 			.click();
 		await expect(
 			page.getByRole( 'region', { name: 'Editor content' } )

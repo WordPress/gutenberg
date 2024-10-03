@@ -668,7 +668,12 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByRole( 'tab', { name: 'Test' } ).click();
+				// This is the WP v6.5 and older locator.
+				const oldLocator = page.getByRole( 'button', { name: 'Test' } );
+				// This is the WP v6.6 and newer locator.
+				const newLocator = page.getByRole( 'tab', { name: 'Test' } );
+
+				await oldLocator.or( newLocator ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {

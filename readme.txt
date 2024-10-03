@@ -1,6 +1,6 @@
 === Gutenberg ===
 Contributors: matveb, joen, karmatosed
-Tested up to: 6.5
+Tested up to: 6.6
 Stable tag: V.V.V
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -55,7 +55,7 @@ To report a security issue, please visit the [WordPress HackerOne](https://hacke
 
 = Do I have to use the Gutenberg plugin to get access to these features? =
 
-Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/documentation/article/wordpress-block-editor/">WordPress Editor</a>. You are likely already benefitting from stable features!
+Not necessarily. Each version of WordPress after 5.0 has included features from the Gutenberg plugin, which are known collectively as the <a href="https://wordpress.org/documentation/article/wordpress-block-editor/">WordPress Editor</a>. You are likely already benefiting from stable features!
 
 But if you want cutting edge beta features, including more experimental items, you will need to use the plugin. You can <a href="https://wordpress.org/news/2021/04/become-an-early-adopter-with-the-gutenberg-plugin/">read more here</a> to help decide whether the plugin is right for you.
 

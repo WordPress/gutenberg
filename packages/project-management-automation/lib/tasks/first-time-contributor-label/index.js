@@ -4,7 +4,7 @@
 const debug = require( '../../debug' );
 
 /** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
+/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
 
 /**
  * Assigns the first-time contributor label to PRs.

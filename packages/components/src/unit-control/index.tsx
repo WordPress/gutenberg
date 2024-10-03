@@ -167,11 +167,12 @@ function UnforwardedUnitControl(
 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 			props.onKeyDown?.( event );
-			// Unless the meta key was pressed (to avoid interfering with
-			// shortcuts, e.g. pastes), moves focus to the unit select if a key
+			// Unless the meta or ctrl key was pressed (to avoid interfering with
+			// shortcuts, e.g. pastes), move focus to the unit select if a key
 			// matches the first character of a unit.
 			if (
 				! event.metaKey &&
+				! event.ctrlKey &&
 				reFirstCharacterOfUnits.test( event.key )
 			) {
 				refInputSuffix.current?.focus();

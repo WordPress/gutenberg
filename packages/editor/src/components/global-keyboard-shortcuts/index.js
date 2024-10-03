@@ -12,7 +12,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 
 /**
- * Component handles the keyboard shortcuts for the editor.
+ * Handles the keyboard shortcuts for the editor.
  *
  * It provides functionality for various keyboard shortcuts such as toggling editor mode,
  * toggling distraction-free mode, undo/redo, saving the post, toggling list view,

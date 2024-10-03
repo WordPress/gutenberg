@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -49,15 +49,15 @@ function Tabs( {
 
 	const isControlled = selectedTabId !== undefined;
 
-	const { items, selectedId, activeId } = store.useState();
+	const { items, selectedId, activeId } = useStoreState( store );
 	const { setSelectedId, setActiveId } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
 	// variables are undefined during the initial render.
-	const tabsHavePopulated = useRef( false );
+	const tabsHavePopulatedRef = useRef( false );
 	if ( items.length > 0 ) {
-		tabsHavePopulated.current = true;
+		tabsHavePopulatedRef.current = true;
 	}
 
 	const selectedTab = items.find( ( item ) => item.id === selectedId );
@@ -94,7 +94,7 @@ function Tabs( {
 
 			if ( firstEnabledTab ) {
 				setSelectedId( firstEnabledTab.id );
-			} else if ( tabsHavePopulated.current ) {
+			} else if ( tabsHavePopulatedRef.current ) {
 				setSelectedId( null );
 			}
 		}
@@ -148,7 +148,11 @@ function Tabs( {
 
 		// Once the tabs have populated, if the `selectedTabId` still can't be
 		// found, clear the selection.
-		if ( tabsHavePopulated.current && !! selectedTabId && ! selectedTab ) {
+		if (
+			tabsHavePopulatedRef.current &&
+			!! selectedTabId &&
+			! selectedTab
+		) {
 			setSelectedId( null );
 		}
 	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );

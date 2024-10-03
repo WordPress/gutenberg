@@ -10,29 +10,27 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import Layout from '../layout';
-import Page from '../page';
+import useLayoutAreas from './router';
 import { unlock } from '../../lock-unlock';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 const { GlobalStylesProvider } = unlock( editorPrivateApis );
 
-const defaultRoute = {
-	key: 'index',
-	areas: {
-		sidebar: 'Empty Sidebar',
-		content: <Page>Welcome to Posts</Page>,
-		preview: undefined,
-		mobile: <Page>Welcome to Posts</Page>,
-	},
-};
+function PostsLayout() {
+	// This ensures the edited entity id and type are initialized properly.
+	useInitEditedEntityFromURL();
+	const route = useLayoutAreas();
+	return <Layout route={ route } />;
+}
 
 export default function PostsApp() {
 	return (
 		<GlobalStylesProvider>
 			<UnsavedChangesWarning />
 			<RouterProvider>
-				<Layout route={ defaultRoute } />
+				<PostsLayout />
 			</RouterProvider>
 		</GlobalStylesProvider>
 	);

@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"checkJs": false
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -19,11 +20,13 @@
 		{ "path": "../deprecated" },
 		{ "path": "../dom" },
 		{ "path": "../element" },
+		{ "path": "../fields" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },
 		{ "path": "../private-apis" },
@@ -32,5 +35,5 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
 	],
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	"include": [ "src" ]
 }

@@ -148,6 +148,30 @@ describe( 'block serializer', () => {
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
+
+		it( 'should ingore local attributes', () => {
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						blob: {
+							type: 'string',
+							role: 'local',
+						},
+						url: {
+							type: 'string',
+						},
+					},
+				},
+				{
+					blob: 'blob://false-url.com',
+					url: 'http://real-url.com',
+				}
+			);
+
+			expect( attributes ).toEqual( {
+				url: 'http://real-url.com',
+			} );
+		} );
 	} );
 
 	describe( 'serializeAttributes()', () => {

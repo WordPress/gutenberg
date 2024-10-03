@@ -21,18 +21,19 @@ import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 
-const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
-
 export default function SiteTitleEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { level, textAlign, isLink, linkTarget } = attributes;
+	const { level, levelOptions, textAlign, isLink, linkTarget } = attributes;
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', 'settings' );
+		const canEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 
@@ -94,8 +95,8 @@ export default function SiteTitleEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					options={ HEADING_LEVELS }
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

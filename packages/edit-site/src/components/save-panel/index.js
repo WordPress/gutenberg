@@ -150,12 +150,13 @@ export default function SavePanel() {
 				} ) }
 			>
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup="dialog"
 					disabled={ disabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>

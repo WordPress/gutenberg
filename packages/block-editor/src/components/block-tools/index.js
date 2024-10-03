@@ -19,12 +19,13 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
+import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+import getEditorRegion from '../../utils/get-editor-region';
 
 function selector( select ) {
 	const {
@@ -33,7 +34,8 @@ function selector( select ) {
 		getSettings,
 		__unstableGetEditorMode,
 		isTyping,
-	} = select( blockEditorStore );
+		isDragging,
+	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -45,6 +47,7 @@ function selector( select ) {
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 		isZoomOutMode: editorMode === 'zoom-out',
+		isDragging: isDragging(),
 	};
 }
 
@@ -62,10 +65,9 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
-		selector,
-		[]
-	);
+	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
+		useSelect( selector, [] );
+
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -76,11 +78,12 @@ export default function BlockTools( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
-		showBreadcrumb,
 		showBlockToolbarPopover,
+		showZoomOutToolbar,
 	} = useShowBlockTools();
 
 	const {
+		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
 		replaceBlocks,
@@ -91,6 +94,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
+
+	const blockSelectionButtonRef = useRef();
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
@@ -152,6 +157,13 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
+			} else if (
+				clientIds.length === 1 &&
+				event.target === blockSelectionButtonRef?.current
+			) {
+				event.preventDefault();
+				clearSelectedBlock();
+				getEditorRegion( __unstableContentRef.current )?.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
@@ -182,7 +194,6 @@ export default function BlockTools( {
 			}
 		}
 	}
-
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
@@ -190,7 +201,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && (
+				{ ! isTyping && ! isZoomOutMode && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
@@ -211,8 +222,8 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showBreadcrumb && (
-					<BlockToolbarBreadcrumb
+				{ showZoomOutToolbar && (
+					<ZoomOutPopover
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
@@ -231,12 +242,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ window.__experimentalEnableZoomedOutPatternsTab &&
-					isZoomOutMode && (
-						<ZoomOutModeInserters
-							__unstableContentRef={ __unstableContentRef }
-						/>
-					) }
+				{ isZoomOutMode && ! isDragging && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

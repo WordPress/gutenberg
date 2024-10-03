@@ -2,22 +2,23 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+
 /**
  * Internal dependencies
  */
-
-import { DEFAULT_VIEWS } from './default-views';
+import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
 import DataViewItem from './dataview-item';
 import CustomDataViewsList from './custom-dataviews-list';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function DataViewsSidebarContent() {
 	const {
 		params: { postType, activeView = 'all', isCustom = 'false' },
 	} = useLocation();
+	const defaultViews = useDefaultViews( { postType } );
 	if ( ! postType ) {
 		return null;
 	}
@@ -26,7 +27,7 @@ export default function DataViewsSidebarContent() {
 	return (
 		<>
 			<ItemGroup>
-				{ DEFAULT_VIEWS[ postType ].map( ( dataview ) => {
+				{ defaultViews.map( ( dataview ) => {
 					return (
 						<DataViewItem
 							key={ dataview.slug }

@@ -13,7 +13,6 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
-import { __, _n } from '@wordpress/i18n';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,
@@ -73,6 +72,9 @@ const getNodeText = ( node: React.ReactNode ): string => {
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
+// Used for generating the instance ID
+const AUTOCOMPLETE_HOOK_REFERENCE = {};
+
 export function useAutocomplete( {
 	record,
 	onChange,
@@ -80,7 +82,7 @@ export function useAutocomplete( {
 	completers,
 	contentRef,
 }: UseAutocompleteProps ) {
-	const instanceId = useInstanceId( useAutocomplete );
+	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 
 	const [ filteredOptions, setFilteredOptions ] = useState<

@@ -103,7 +103,7 @@ Render a user interface to select multiple users from a list.
 ```jsx
 <SelectControl
 	multiple
-	label={ __( 'Select some users:' ) }
+	label={ __( 'User' ) }
 	value={ this.state.users } // e.g: value = [ 'a', 'c' ]
 	onChange={ ( users ) => {
 		this.setState( { users } );
@@ -126,7 +126,7 @@ const [ item, setItem ] = useState( '' );
 // ...
 
 <SelectControl
-    label={ __( 'Select an item:' ) }
+    label={ __( 'My dinosaur' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
     __nextHasNoMarginBottom
@@ -190,7 +190,7 @@ In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl`
 
 #### options
 
-An array of objects containing the following properties:
+An array of objects containing the following properties, as well as any other `option` element attributes:
 
 -   `label`: (string) The label to be shown to the user.
 -   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
@@ -213,6 +213,29 @@ If multiple is false the value received is a single value with the new selected 
 
 -   Type: `function`
 -   Required: Yes
+
+#### value
+
+The value of the selected option. If `multiple` is true, the `value` should be an array with the values of the selected options.
+
+-   Type: `String|String[]`
+-   Required: No
+
+#### variant
+
+The style variant of the control.
+
+-   Type: `'default' | 'minimal'`
+-   Required: No
+-   Default: `'default'`
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ### __nextHasNoMarginBottom
 

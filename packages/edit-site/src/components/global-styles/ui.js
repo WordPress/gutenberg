@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalUseNavigator as useNavigator,
+	Navigator,
+	useNavigator,
 	createSlotFill,
 	DropdownMenu,
 	MenuGroup,
@@ -33,8 +32,11 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import FontSize from './font-sizes/font-size';
+import FontSizes from './font-sizes/font-sizes';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
@@ -121,7 +123,7 @@ function GlobalStylesActionMenu() {
 
 function GlobalStylesNavigationScreen( { className, ...props } ) {
 	return (
-		<NavigatorScreen
+		<Navigator.Screen
 			className={ [
 				'edit-site-global-styles-sidebar__navigator-screen',
 				className,
@@ -268,19 +270,6 @@ function GlobalStylesEditorCanvasContainerLink() {
 					goTo( '/' );
 				}
 				break;
-			default:
-				/*
-				 * Example: the user has navigated to "Browse styles" or elsewhere
-				 * and changes the editorCanvasContainerView, e.g., closes the style book.
-				 * The panel should not be affected.
-				 * Exclude revisions panel from this behavior,
-				 * as it should close when the editorCanvasContainerView doesn't correspond.
-				 */
-				if ( path !== '/' && ! isRevisionsOpen ) {
-					return;
-				}
-				goTo( '/' );
-				break;
 		}
 	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
@@ -293,7 +282,7 @@ function GlobalStylesUI() {
 		[]
 	);
 	return (
-		<NavigatorProvider
+		<Navigator
 			className="edit-site-global-styles-sidebar__navigator-provider"
 			initialPath="/"
 		>
@@ -311,6 +300,14 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/typography">
 				<ScreenTypography />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/">
+				<FontSizes />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
+				<FontSize />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography/text">
@@ -357,6 +354,10 @@ function GlobalStylesUI() {
 				<ScreenRevisions />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path="/background">
+				<ScreenBackground />
+			</GlobalStylesNavigationScreen>
+
 			{ blocks.map( ( block ) => (
 				<GlobalStylesNavigationScreen
 					key={ 'menu-block-' + block.name }
@@ -383,7 +384,7 @@ function GlobalStylesUI() {
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />
-		</NavigatorProvider>
+		</Navigator>
 	);
 }
 export { GlobalStylesMenuSlot };

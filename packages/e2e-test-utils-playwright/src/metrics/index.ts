@@ -332,17 +332,17 @@ export class Metrics {
 				window.__reportVitals__( JSON.stringify( measurement ) );
 
 			window.addEventListener( 'DOMContentLoaded', () => {
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onCLS( reportVitals );
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onFCP( reportVitals );
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onFID( reportVitals );
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onINP( reportVitals );
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onLCP( reportVitals );
-				// @ts-ignore
+				// @ts-expect-error This is valid but web-vitals does not register the global types.
 				window.webVitals.onTTFB( reportVitals );
 			} );
 		} );
@@ -368,6 +368,7 @@ export class Metrics {
 		this.webVitals = {};
 
 		const hasScript = await this.page.evaluate(
+			// @ts-expect-error This is valid but web-vitals does not register the global types.
 			() => typeof window.webVitals !== 'undefined'
 		);
 

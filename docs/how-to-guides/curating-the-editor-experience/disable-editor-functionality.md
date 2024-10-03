@@ -87,3 +87,21 @@ add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access', 
 ```
 
 This code prevents all users from accessing the Code Editor. You could also add [capability](https://wordpress.org/documentation/article/roles-and-capabilities/) checks to disable access for specific users.
+
+## Disable formatting options for RichText blocks
+
+Blocks that support [RichText](https://developer.wordpress.org/block-editor/reference-guides/richtext/) come with the default formatting options provided by WordPress.
+
+Formatting options need to be disabled with JavaScript using `unregisterFormatType`. The code below will globally disable the Inline Image, Language, Keyboard Input, Subscript, and Superscript options.
+
+```js
+wp.domReady( () => {
+	wp.richText.unregisterFormatType( 'core/image' );
+	wp.richText.unregisterFormatType( 'core/language' );
+	wp.richText.unregisterFormatType( 'core/keyboard' );
+	wp.richText.unregisterFormatType( 'core/subscript' );
+	wp.richText.unregisterFormatType( 'core/superscript' );
+});
+```
+
+This JavaScript should be enqueued much like the block variation example above.

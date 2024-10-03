@@ -34,6 +34,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/fields',
 ];
 
 // PHP files in packages that have to be copied during build.
@@ -102,6 +103,13 @@ const exportDefaultPackages = [
 	'warning',
 ];
 
+const copiedVendors = {
+	'react.js': 'react/umd/react.development.js',
+	'react.min.js': 'react/umd/react.production.min.js',
+	'react-dom.js': 'react-dom/umd/react-dom.development.js',
+	'react-dom.min.js': 'react-dom/umd/react-dom.production.min.js',
+};
+
 module.exports = {
 	...baseConfig,
 	name: 'packages',
@@ -138,7 +146,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages
 				.map( ( packageName ) => ( {
@@ -148,7 +156,13 @@ module.exports = {
 					transform: stylesTransform,
 					noErrorOnMissing: true,
 				} ) )
-				.concat( bundledPackagesPhpConfig ),
+				.concat( bundledPackagesPhpConfig )
+				.concat(
+					Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
+						from: `node_modules/${ from }`,
+						to: `build/vendors/${ to }`,
+					} ) )
+				),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,

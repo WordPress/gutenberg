@@ -19,7 +19,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { DEFAULT_VIEWS } from './default-views';
+import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -29,6 +29,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ title, setTitle ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const defaultViews = useDefaultViews( { postType: type } );
 	return (
 		<form
 			onSubmit={ async ( event ) => {
@@ -60,9 +61,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 						title,
 						status: 'publish',
 						wp_dataviews_type: dataViewTaxonomyId,
-						content: JSON.stringify(
-							DEFAULT_VIEWS[ type ][ 0 ].view
-						),
+						content: JSON.stringify( defaultViews[ 0 ].view ),
 					}
 				);
 				const {
@@ -79,6 +78,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -88,6 +88,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 				/>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => {
 							setIsAdding( false );
@@ -97,6 +98,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 					</Button>
 
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSaving }

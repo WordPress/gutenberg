@@ -559,7 +559,7 @@ const v6 = {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'src',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		alt: {
 			type: 'string',
@@ -567,27 +567,27 @@ const v6 = {
 			selector: 'img',
 			attribute: 'alt',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		caption: {
 			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		title: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'title',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		href: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'figure > a',
 			attribute: 'href',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		rel: {
 			type: 'string',
@@ -603,7 +603,7 @@ const v6 = {
 		},
 		id: {
 			type: 'number',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		width: {
 			type: 'number',
@@ -762,7 +762,7 @@ const v7 = {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'src',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		alt: {
 			type: 'string',
@@ -770,27 +770,27 @@ const v7 = {
 			selector: 'img',
 			attribute: 'alt',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		caption: {
 			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		title: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'title',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		href: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'figure > a',
 			attribute: 'href',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		rel: {
 			type: 'string',
@@ -806,7 +806,7 @@ const v7 = {
 		},
 		id: {
 			type: 'number',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		width: {
 			type: 'number',
@@ -962,7 +962,7 @@ const v8 = {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'src',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		alt: {
 			type: 'string',
@@ -970,27 +970,27 @@ const v8 = {
 			selector: 'img',
 			attribute: 'alt',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		caption: {
 			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		title: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'title',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		href: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'figure > a',
 			attribute: 'href',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		rel: {
 			type: 'string',
@@ -1006,7 +1006,7 @@ const v8 = {
 		},
 		id: {
 			type: 'number',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		width: {
 			type: 'string',

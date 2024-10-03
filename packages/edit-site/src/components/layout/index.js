@@ -34,16 +34,16 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import SiteHub from '../site-hub';
+import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
-import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useIsSiteEditorLoading } from './hooks';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
+import SavePanel from '../save-panel';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -81,7 +81,6 @@ export default function Layout( { route } ) {
 	} );
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
-	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
@@ -113,7 +112,6 @@ export default function Layout( { route } ) {
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
-			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
@@ -163,6 +161,7 @@ export default function Layout( { route } ) {
 											{ areas.sidebar }
 										</SidebarContent>
 										<SaveHub />
+										<SavePanel />
 									</motion.div>
 								) }
 							</AnimatePresence>
@@ -173,6 +172,16 @@ export default function Layout( { route } ) {
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
+							{ canvasMode !== 'edit' && (
+								<SidebarContent routeKey={ routeKey }>
+									<SiteHubMobile
+										ref={ toggleRef }
+										isTransparent={
+											isResizableFrameOversized
+										}
+									/>
+								</SidebarContent>
+							) }
 							{ areas.mobile }
 						</div>
 					) }
@@ -189,6 +198,17 @@ export default function Layout( { route } ) {
 								{ areas.content }
 							</div>
 						) }
+
+					{ ! isMobileViewport && areas.edit && (
+						<div
+							className="edit-site-layout__area"
+							style={ {
+								maxWidth: widths?.edit,
+							} }
+						>
+							{ areas.edit }
+						</div>
+					) }
 
 					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">
@@ -236,8 +256,6 @@ export default function Layout( { route } ) {
 						</div>
 					) }
 				</div>
-
-				<SavePanel />
 			</div>
 		</>
 	);

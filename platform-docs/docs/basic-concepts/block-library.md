@@ -6,7 +6,7 @@ sidebar_position: 4
 
 The block editor relies on a registry of block types to render and edit blocks. The `@wordpress/block-library` package provides a set of core blocks that you can register in your application.
 
-## Registring all block types
+## Registering all block types
 
 Registering blocks requires both loading the JavaScript code that makes the block type available for use and including the corresponding stylesheets.
 

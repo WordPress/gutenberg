@@ -29,6 +29,7 @@ const results = {
 	listViewOpen: [],
 	navigate: [],
 	loadPatterns: [],
+	loadPages: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -221,15 +222,11 @@ test.describe( 'Site Editor Performance', () => {
 				// If it's there, switch to the list layout before running the test.
 				// See https://github.com/WordPress/gutenberg/pull/59792
 				const isDataViewsUI = await page
-					.getByRole( 'button', { name: 'View options' } )
+					.getByRole( 'button', { name: 'Layout' } )
 					.isVisible();
 				if ( isDataViewsUI ) {
 					await page
-						.getByRole( 'button', { name: 'View options' } )
-						.click();
-					await page
-						.getByRole( 'menuitem' )
-						.filter( { has: page.getByText( 'Layout' ) } )
+						.getByRole( 'button', { name: 'Layout' } )
 						.click();
 					await page
 						.getByRole( 'menuitemradio' )
@@ -295,22 +292,54 @@ test.describe( 'Site Editor Performance', () => {
 				} );
 				await editor.openDocumentSettingsSidebar();
 
+				/*
+				 * https://github.com/WordPress/gutenberg/pull/55091 updated the HTML by
+				 * removing the replace template button in sidebar-edit-mode/template-panel/replace-template-button.js
+				 * with a "transform into" list. https://github.com/WordPress/gutenberg/pull/59259 made these tests
+				 * compatible with the new UI, however, the performance tests compare previous versions of the UI.
+				 *
+				 * The following code is a workaround to test the performance of the new UI.
+				 * `actionsButtonElement` is used to check if the old UI is present.
+				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
+				 * Once the performance tests are updated to compare compatible versions this code can be removed.
+				 */
+				// eslint-disable-next-line no-restricted-syntax
+				const isActionsButtonVisible = await page
+					.locator(
+						'.edit-site-template-card__actions button[aria-label="Actions"]'
+					)
+					.isVisible();
+
+				if ( isActionsButtonVisible ) {
+					await page
+						.getByRole( 'button', {
+							name: 'Actions',
+						} )
+						.click();
+				}
+
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				const startTime = performance.now();
 
-				await page
-					.getByRole( 'button', { name: 'Design' } )
-					.or(
-						// Locator for backward compatibility with the old UI.
-						// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
-						page.getByRole( 'button', {
-							name: 'Transform into:',
-						} )
-					)
-					.click();
+				if ( isActionsButtonVisible ) {
+					await page
+						.getByRole( 'menuitem', { name: 'Replace template' } )
+						.click();
+				} else {
+					await page
+						.getByRole( 'button', { name: 'Design' } )
+						.or(
+							// Locator for backward compatibility with the old UI.
+							// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
+							page.getByRole( 'button', {
+								name: 'Transform into:',
+							} )
+						)
+						.click();
+				}
 
 				const patterns = [
 					'Blogging home template',
@@ -349,6 +378,74 @@ test.describe( 'Site Editor Performance', () => {
 				results.loadPatterns.push( endTime - startTime );
 
 				await page.keyboard.press( 'Escape' );
+			}
+		} );
+	} );
+
+	test.describe( 'Loading Pages', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		const perPage = 20;
+
+		test( 'Run the test', async ( { page, admin, requestUtils } ) => {
+			await Promise.all(
+				Array.from( { length: perPage }, async ( el, index ) => {
+					const { id } = await requestUtils.createPage( {
+						status: 'publish',
+						title: `Page (${ index })`,
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+			// Check if we're dealing with the old URL structure.
+			const path = new URL( page.url() ).searchParams.get( 'path' );
+
+			const samples = 10;
+			for ( let i = 1; i <= samples; i++ ) {
+				// Start from the trash view, then navigate to all pages, so we
+				// test item loading rather than site editor load as a whole.
+				// For some reason `visiSiteEditor` does not work with these
+				// parameters.
+				await admin.visitAdminPage(
+					path
+						? 'site-editor.php?path=%2Fpage&layout=table&activeView=trash'
+						: 'site-editor.php?postType=page&layout=table&activeView=trash'
+				);
+
+				const startTime = performance.now();
+
+				await page.getByRole( 'button', { name: 'All Pages' } ).click();
+
+				// Wait for all pages to be rendered.
+				await Promise.all(
+					Array.from( { length: perPage }, async ( el, index ) => {
+						return await page
+							.getByLabel( `Page (${ index })` )
+							.waitFor( { state: 'attached' } );
+					} )
+				);
+
+				const endTime = performance.now();
+
+				results.loadPages.push( endTime - startTime );
 			}
 		} );
 	} );

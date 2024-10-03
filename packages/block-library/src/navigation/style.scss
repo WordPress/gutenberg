@@ -76,15 +76,10 @@ $navigation-icon-size: 24px;
 		}
 	}
 
-	&:where(:not([class*="has-text-decoration"])) {
-		a {
-			text-decoration: none;
-
-			&:focus,
-			&:active {
-				text-decoration: none;
-			}
-		}
+	& :where(a),
+	& :where(a:focus),
+	& :where(a:active) {
+		text-decoration: none;
 	}
 
 	// Submenu indicator.
@@ -300,6 +295,7 @@ button.wp-block-navigation-item__content {
 	color: currentColor;
 	font-size: inherit;
 	font-family: inherit;
+	letter-spacing: inherit;
 	line-height: inherit;
 	font-style: inherit;
 	font-weight: inherit;

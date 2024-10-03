@@ -11,6 +11,8 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -42,46 +44,60 @@ const InsertFromURLPopover = ( {
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
-			<input
-				className="block-editor-media-placeholder__url-input-field"
-				type="text"
-				aria-label={ __( 'URL' ) }
+			<InputControl
+				__next40pxDefaultSize
+				label={ __( 'URL' ) }
+				hideLabelFromVision
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
 				value={ src }
-			/>
-			<Button
-				className="block-editor-media-placeholder__url-input-submit-button"
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
+				suffix={
+					<InputControlSuffixWrapper variant="control">
+						<Button
+							size="small"
+							icon={ keyboardReturn }
+							label={ __( 'Apply' ) }
+							type="submit"
+						/>
+					</InputControlSuffixWrapper>
+				}
 			/>
 		</form>
 	</URLPopover>
 );
 
-const URLSelectionUI = ( {
-	isURLInputVisible,
-	src,
-	onChangeSrc,
-	onSubmitSrc,
-	openURLInput,
-	closeURLInput,
-} ) => {
+const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
+
+	const openURLInput = () => {
+		setIsURLInputVisible( true );
+	};
+	const closeURLInput = () => {
+		setIsURLInputVisible( false );
+		popoverAnchor?.focus();
+	};
+
+	const onSubmitSrc = ( event ) => {
+		event.preventDefault();
+		if ( src && onSelectURL ) {
+			onSelectURL( src );
+			closeURLInput();
+		}
+	};
 
 	return (
-		<div
-			className="block-editor-media-placeholder__url-input-container"
-			ref={ setPopoverAnchor }
-		>
+		<div className="block-editor-media-placeholder__url-input-container">
 			<Button
+				__next40pxDefaultSize
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
 				variant="secondary"
+				aria-haspopup="dialog"
+				ref={ setPopoverAnchor }
 			>
 				{ __( 'Insert from URL' ) }
 			</Button>
@@ -138,7 +154,6 @@ export function MediaPlaceholder( {
 		return getSettings().mediaUpload;
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
-	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
@@ -155,27 +170,11 @@ export function MediaPlaceholder( {
 		);
 	};
 
-	const onChangeSrc = ( event ) => {
-		setSrc( event.target.value );
-	};
-
-	const openURLInput = () => {
-		setIsURLInputVisible( true );
-	};
-	const closeURLInput = () => {
-		setIsURLInputVisible( false );
-	};
-
-	const onSubmitSrc = ( event ) => {
-		event.preventDefault();
-		if ( src && onSelectURL ) {
-			onSelectURL( src );
-			closeURLInput();
-		}
-	};
-
 	const onFilesUpload = ( files ) => {
-		if ( ! handleUpload ) {
+		if (
+			! handleUpload ||
+			( typeof handleUpload === 'function' && ! handleUpload( files ) )
+		) {
 			return onSelect( files );
 		}
 		onFilesPreUpload( files );
@@ -323,15 +322,15 @@ export function MediaPlaceholder( {
 
 				if ( isAudio ) {
 					instructions = __(
-						'Upload an audio file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an audio file here, or pick one from your library.'
 					);
 				} else if ( isImage ) {
 					instructions = __(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					);
 				} else if ( isVideo ) {
 					instructions = __(
-						'Upload a video file, pick one from your media library, or add one with a URL.'
+						'Upload or drag a video file here, or pick one from your library.'
 					);
 				}
 			}
@@ -389,6 +388,7 @@ export function MediaPlaceholder( {
 		return (
 			onCancel && (
 				<Button
+					__next40pxDefaultSize
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
 					variant="link"
@@ -404,12 +404,9 @@ export function MediaPlaceholder( {
 		return (
 			onSelectURL && (
 				<URLSelectionUI
-					isURLInputVisible={ isURLInputVisible }
 					src={ src }
-					onChangeSrc={ onChangeSrc }
-					onSubmitSrc={ onSubmitSrc }
-					openURLInput={ openURLInput }
-					closeURLInput={ closeURLInput }
+					onChangeSrc={ setSrc }
+					onSelectURL={ onSelectURL }
 				/>
 			)
 		);
@@ -420,6 +417,7 @@ export function MediaPlaceholder( {
 			onToggleFeaturedImage && (
 				<div className="block-editor-media-placeholder__url-input-container">
 					<Button
+						__next40pxDefaultSize
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
 						variant="secondary"
@@ -435,6 +433,7 @@ export function MediaPlaceholder( {
 		const defaultButton = ( { open } ) => {
 			return (
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ () => {
 						open();
@@ -474,6 +473,7 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
+										__next40pxDefaultSize
 										variant="primary"
 										className={ clsx(
 											'block-editor-media-placeholder__button',
@@ -501,17 +501,23 @@ export function MediaPlaceholder( {
 				<>
 					{ renderDropZone() }
 					<FormFileUpload
-						variant="primary"
-						className={ clsx(
-							'block-editor-media-placeholder__button',
-							'block-editor-media-placeholder__upload-button'
+						render={ ( { openFileDialog } ) => (
+							<Button
+								__next40pxDefaultSize
+								onClick={ openFileDialog }
+								variant="primary"
+								className={ clsx(
+									'block-editor-media-placeholder__button',
+									'block-editor-media-placeholder__upload-button'
+								) }
+							>
+								{ __( 'Upload' ) }
+							</Button>
 						) }
 						onChange={ onUpload }
 						accept={ accept }
 						multiple={ !! multiple }
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
+					/>
 					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
 					{ renderFeaturedImageToggle() }

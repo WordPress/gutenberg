@@ -306,14 +306,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * They're added separately because padding might only be set on one side.
 			 */
 			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
+				// Add unit if 0.
+				if ( '0' === $padding_right ) {
+					$padding_right = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
 			}
 			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
+				// Add unit if 0.
+				if ( '0' === $padding_left ) {
+					$padding_left = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
@@ -466,29 +474,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['columnCount'] ) ) {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
-				);
-			}
-		} else {
-			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
-
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'container-type'        => 'inline-size',
-				),
-			);
-		}
-
+		// Deal with block gap first so it can be used for responsive computation.
+		$responsive_gap_value = '1.2rem';
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -506,14 +493,53 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value = trim( $combined_gap_value );
+			$gap_value            = trim( $combined_gap_value );
+			$responsive_gap_value = $gap_value;
+		}
 
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
+			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
 				);
 			}
+		} elseif ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
+				);
+			}
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+		}
+
+		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'gap' => $gap_value ),
+			);
 		}
 	}
 
@@ -628,10 +654,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 			$column_span_number  = floatval( $column_span );
 			$column_start_number = floatval( $column_start );
-			$highest_number      = max( $column_span_number, $column_start_number );
 			$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 			$parent_column_value = floatval( $parent_column_width );
 			$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+			$num_cols_to_break_at = 2;
+			if ( $column_span_number && $column_start_number ) {
+				$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
+			} elseif ( $column_span_number ) {
+				$num_cols_to_break_at = $column_span_number;
+			} else {
+				$num_cols_to_break_at = $column_start_number;
+			}
 
 			/*
 			 * If there is no unit, the width has somehow been mangled so we reset both unit and value
@@ -653,17 +687,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			 * A default gap value is used for this computation because custom gap values may not be
 			 * viable to use in the computation of the container query value.
 			 */
-			$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
-			$container_query_value = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
-			$container_query_value = $container_query_value . $parent_column_unit;
+			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
+			$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
+			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
+			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			$grid_column_value = $column_span ? '1/-1' : 'auto';
+			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
 
 			$child_layout_styles[] = array(
 				'rules_group'  => "@container (max-width: $container_query_value )",
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
 					'grid-column' => $grid_column_value,
+					'grid-row'    => 'auto',
 				),
 			);
 		}
@@ -983,27 +1019,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
-		if ( method_exists( $processor, 'class_list' ) ) {
-			foreach ( $processor->class_list() as $class_name ) {
-				if ( str_contains( $class_name, 'layout' ) ) {
-					array_push( $layout_classes, $class_name );
-					$processor->remove_class( $class_name );
-				}
-			}
-		} else {
-			/*
-			* The class_list method was only added in 6.4 so this needs a temporary fallback.
-			* This fallback should be removed when the minimum supported version is 6.4.
-			*/
-			$classes = $processor->get_attribute( 'class' );
-			if ( $classes ) {
-				$classes = explode( ' ', $classes );
-				foreach ( $classes as $class_name ) {
-					if ( str_contains( $class_name, 'is-layout-' ) ) {
-						array_push( $layout_classes, $class_name );
-						$processor->remove_class( $class_name );
-					}
-				}
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_contains( $class_name, 'layout' ) ) {
+				array_push( $layout_classes, $class_name );
+				$processor->remove_class( $class_name );
 			}
 		}
 	}

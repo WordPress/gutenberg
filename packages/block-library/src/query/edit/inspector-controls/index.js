@@ -6,11 +6,14 @@ import {
 	TextControl,
 	SelectControl,
 	RangeControl,
-	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
@@ -23,9 +26,12 @@ import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
+import FormatControls from './format-controls';
 import StickyControl from './sticky-control';
-import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
+import PerPageControl from './per-page-control';
+import OffsetControl from './offset-controls';
+import PagesControl from './pages-control';
 import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
@@ -34,27 +40,34 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
-		props;
-	const { query, displayLayout, enhancedPagination } = attributes;
+	const { attributes, setQuery, setDisplayLayout, isTemplate } = props;
+	const { query, displayLayout } = attributes;
 	const {
 		order,
 		orderBy,
 		author: authorIds,
+		pages,
 		postType,
+		perPage,
+		offset,
 		sticky,
 		inherit,
 		taxQuery,
 		parents,
+		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
-	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const {
+		postTypesTaxonomiesMap,
+		postTypesSelectOptions,
+		postTypeFormatSupportMap,
+	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
@@ -83,6 +96,14 @@ export default function QueryInspectorControls( props ) {
 		}
 		// We need to reset `parents` because they are tied to each post type.
 		updateQuery.parents = [];
+		// Post types can register post format support with `add_post_type_support`.
+		// But we need to reset the `format` property when switching to post types
+		// that do not support post formats.
+		const hasFormatSupport = postTypeFormatSupportMap[ newValue ];
+		if ( ! hasFormatSupport ) {
+			updateQuery.format = [];
+		}
+
 		setQuery( updateQuery );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
@@ -98,16 +119,25 @@ export default function QueryInspectorControls( props ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
+
+	const showInheritControl =
+		isTemplate && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		! inherit && isControlAllowed( allowedControls, 'postType' );
+		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
+		! isTemplate;
+	const postTypeControlLabel = __( 'Post type' );
+	const postTypeControlHelp = __(
+		'Select the type of content to display: posts, pages, or custom post types.'
+	);
 	const showColumnsControl = false;
 	const showOrderControl =
-		! inherit && isControlAllowed( allowedControls, 'order' );
+		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
+		! isTemplate;
 	const showStickyControl =
-		! inherit &&
-		showSticky &&
-		isControlAllowed( allowedControls, 'sticky' );
+		( ! inherit &&
+			showSticky &&
+			isControlAllowed( allowedControls, 'sticky' ) ) ||
+		( showSticky && ! isTemplate );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
@@ -123,11 +153,47 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
+	const postTypeHasFormatSupport = postTypeFormatSupportMap[ postType ];
+	const showFormatControl = useSelect(
+		( select ) => {
+			// Check if the post type supports post formats and if the control is allowed.
+			if (
+				! postTypeHasFormatSupport ||
+				! isControlAllowed( allowedControls, 'format' )
+			) {
+				return false;
+			}
+
+			const themeSupports = select( coreStore ).getThemeSupports();
+
+			// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
+			// and in this case the control should not be shown since the user has no other formats to choose from.
+			return (
+				themeSupports.formats &&
+				themeSupports.formats.length > 0 &&
+				themeSupports.formats.some( ( type ) => type !== 'standard' )
+			);
+		},
+		[ allowedControls, postTypeHasFormatSupport ]
+	);
+
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
 		showSearchControl ||
-		showParentControl;
+		showParentControl ||
+		showFormatControl;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const showPostCountControl = isControlAllowed(
+		allowedControls,
+		'postCount'
+	);
+	const showOffSetControl = isControlAllowed( allowedControls, 'offset' );
+	const showPagesControl = isControlAllowed( allowedControls, 'pages' );
+
+	const showDisplayPanel =
+		showPostCountControl || showOffSetControl || showPagesControl;
 
 	return (
 		<>
@@ -139,34 +205,71 @@ export default function QueryInspectorControls( props ) {
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
-						<ToggleControl
+						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Inherit query from template' ) }
-							help={ __(
-								'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-							) }
-							checked={ !! inherit }
-							onChange={ ( value ) =>
-								setQuery( { inherit: !! value } )
+							label={ __( 'Query type' ) }
+							isBlock
+							onChange={ ( value ) => {
+								setQuery( { inherit: !! value } );
+							} }
+							help={
+								inherit
+									? __(
+											'Display a list of posts or custom post types based on the current template.'
+									  )
+									: __(
+											'Display a list of posts or custom post types based on specific criteria.'
+									  )
 							}
-						/>
+							value={ !! inherit }
+						>
+							<ToggleGroupControlOption
+								value
+								label={ __( 'Default' ) }
+							/>
+							<ToggleGroupControlOption
+								value={ false }
+								label={ __( 'Custom' ) }
+							/>
+						</ToggleGroupControl>
 					) }
-					{ showPostTypeControl && (
-						<SelectControl
-							__nextHasNoMarginBottom
-							options={ postTypesSelectOptions }
-							value={ postType }
-							label={ __( 'Post type' ) }
-							onChange={ onPostTypeChange }
-							help={ __(
-								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-							) }
-						/>
-					) }
+					{ showPostTypeControl &&
+						( postTypesSelectOptions.length > 2 ? (
+							<SelectControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								options={ postTypesSelectOptions }
+								value={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							/>
+						) : (
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								isBlock
+								value={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							>
+								{ postTypesSelectOptions.map( ( option ) => (
+									<ToggleGroupControlOption
+										key={ option.value }
+										value={ option.value }
+										label={ option.label }
+									/>
+								) ) }
+							</ToggleGroupControl>
+						) ) }
+
 					{ showColumnsControl && (
 						<>
 							<RangeControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ displayLayout.columns }
 								onChange={ ( value ) =>
@@ -203,16 +306,52 @@ export default function QueryInspectorControls( props ) {
 							}
 						/>
 					) }
-					<EnhancedPaginationControl
-						enhancedPagination={ enhancedPagination }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
 				</PanelBody>
+			) }
+			{ ! inherit && showDisplayPanel && (
+				<ToolsPanel
+					className="block-library-query-toolspanel__display"
+					label={ __( 'Display' ) }
+					resetAll={ () => {
+						setQuery( {
+							offset: 0,
+							pages: 0,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Items per page' ) }
+						hasValue={ () => perPage > 0 }
+					>
+						<PerPageControl
+							perPage={ perPage }
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Offset' ) }
+						hasValue={ () => offset > 0 }
+						onDeselect={ () => setQuery( { offset: 0 } ) }
+					>
+						<OffsetControl
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Max pages to show' ) }
+						hasValue={ () => pages > 0 }
+						onDeselect={ () => setQuery( { pages: 0 } ) }
+					>
+						<PagesControl pages={ pages } onChange={ setQuery } />
+					</ToolsPanelItem>
+				</ToolsPanel>
 			) }
 			{ ! inherit && showFiltersPanel && (
 				<ToolsPanel
-					className="block-library-query-toolspanel__filters"
+					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
 					label={ __( 'Filters' ) }
 					resetAll={ () => {
 						setQuery( {
@@ -220,10 +359,11 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
+							format: [],
 						} );
 						setQuerySearch( '' );
 					} }
-					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ showTaxControl && (
 						<ToolsPanelItem
@@ -261,6 +401,7 @@ export default function QueryInspectorControls( props ) {
 						>
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ setQuerySearch }
@@ -277,6 +418,18 @@ export default function QueryInspectorControls( props ) {
 								parents={ parents }
 								postType={ postType }
 								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showFormatControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! format?.length }
+							label={ __( 'Formats' ) }
+							onDeselect={ () => setQuery( { format: [] } ) }
+						>
+							<FormatControls
+								onChange={ setQuery }
+								query={ query }
 							/>
 						</ToolsPanelItem>
 					) }

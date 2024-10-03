@@ -11,21 +11,22 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import cloneDeep from '../../utils/clone-deep';
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
+	blockEditorPrivateApis
+);
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 /**
- * Removes all instances of a property from an object.
+ * Removes all instances of properties from an object.
  *
- * @param {Object} object   The object to remove the property from.
- * @param {string} property The property to remove.
+ * @param {Object}   object     The object to remove the properties from.
+ * @param {string[]} properties The properties to remove.
  * @return {Object} The modified object.
  */
-export function removePropertyFromObject( object, property ) {
-	if ( ! property || typeof property !== 'string' ) {
+export function removePropertiesFromObject( object, properties ) {
+	if ( ! properties?.length ) {
 		return object;
 	}
 
@@ -38,26 +39,42 @@ export function removePropertyFromObject( object, property ) {
 	}
 
 	for ( const key in object ) {
-		if ( key === property ) {
+		if ( properties.includes( key ) ) {
 			delete object[ key ];
 		} else if ( typeof object[ key ] === 'object' ) {
-			removePropertyFromObject( object[ key ], property );
+			removePropertiesFromObject( object[ key ], properties );
 		}
 	}
 	return object;
 }
 
 /**
- * Fetches the current theme style variations that contain only the specified property
+ * Checks whether a style variation is empty.
+ *
+ * @param {Object} variation          A style variation object.
+ * @param {string} variation.title    The title of the variation.
+ * @param {Object} variation.settings The settings of the variation.
+ * @param {Object} variation.styles   The styles of the variation.
+ * @return {boolean} Whether the variation is empty.
+ */
+function hasThemeVariation( { title, settings, styles } ) {
+	return (
+		title === __( 'Default' ) || // Always preserve the default variation.
+		Object.keys( settings ).length > 0 ||
+		Object.keys( styles ).length > 0
+	);
+}
+
+/**
+ * Fetches the current theme style variations that contain only the specified properties
  * and merges them with the user config.
  *
- * @param {Object} props          Object of hook args.
- * @param {string} props.property The property to filter by.
+ * @param {string[]} properties The properties to filter by.
  * @return {Object[]|*} The merged object.
  */
-export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
-	property,
-} ) {
+export function useCurrentMergeThemeStyleVariationsWithUserConfig(
+	properties = []
+) {
 	const { variationsFromTheme } = useSelect( ( select ) => {
 		const _variationsFromTheme =
 			select(
@@ -70,55 +87,67 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );
 
+	const propertiesAsString = properties.toString();
+
 	return useMemo( () => {
-		const clonedUserVariation = cloneDeep( userVariation );
+		const clonedUserVariation = structuredClone( userVariation );
 
 		// Get user variation and remove the settings for the given property.
-		const userVariationWithoutProperty = removePropertyFromObject(
+		const userVariationWithoutProperties = removePropertiesFromObject(
 			clonedUserVariation,
-			property
+			properties
 		);
-		userVariationWithoutProperty.title = __( 'Default' );
+		userVariationWithoutProperties.title = __( 'Default' );
 
-		const variationsWithSinglePropertyAndBase = variationsFromTheme
+		const variationsWithPropertiesAndBase = variationsFromTheme
 			.filter( ( variation ) => {
-				return isVariationWithSingleProperty( variation, property );
+				return isVariationWithProperties( variation, properties );
 			} )
 			.map( ( variation ) => {
 				return mergeBaseAndUserConfigs(
-					userVariationWithoutProperty,
+					userVariationWithoutProperties,
 					variation
 				);
 			} );
 
-		return [
-			userVariationWithoutProperty,
-			...variationsWithSinglePropertyAndBase,
+		const variationsByProperties = [
+			userVariationWithoutProperties,
+			...variationsWithPropertiesAndBase,
 		];
-	}, [ property, userVariation, variationsFromTheme ] );
+
+		/*
+		 * Filter out variations with no settings or styles.
+		 */
+		return variationsByProperties?.length
+			? variationsByProperties.filter( hasThemeVariation )
+			: [];
+	}, [ propertiesAsString, userVariation, variationsFromTheme ] );
 }
 
 /**
- * Returns a new object, with properties specified in `property`,
+ * Returns a new object, with properties specified in `properties` array.,
  * maintain the original object tree structure.
- * The function is recursive, so it will perform a deep search for the given property.
- * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the property is `test`.
+ * The function is recursive, so it will perform a deep search for the given properties.
+ * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the properties are  `[ 'test' ]`.
  *
- * @param {Object} object   The object to filter
- * @param {Object} property The property to filter by
+ * @param {Object}   object     The object to filter
+ * @param {string[]} properties The properties to filter by
  * @return {Object} The merged object.
  */
-export const filterObjectByProperty = ( object, property ) => {
-	if ( ! object ) {
+export const filterObjectByProperties = ( object, properties ) => {
+	if ( ! object || ! properties?.length ) {
 		return {};
 	}
 
 	const newObject = {};
 	Object.keys( object ).forEach( ( key ) => {
-		if ( key === property ) {
+		if ( properties.includes( key ) ) {
 			newObject[ key ] = object[ key ];
 		} else if ( typeof object[ key ] === 'object' ) {
-			const newFilter = filterObjectByProperty( object[ key ], property );
+			const newFilter = filterObjectByProperties(
+				object[ key ],
+				properties
+			);
 			if ( Object.keys( newFilter ).length ) {
 				newObject[ key ] = newFilter;
 			}
@@ -128,23 +157,18 @@ export const filterObjectByProperty = ( object, property ) => {
 };
 
 /**
- * Compares a style variation to the same variation filtered by a single property.
- * Returns true if the variation contains only the property specified.
+ * Compares a style variation to the same variation filtered by the specified properties.
+ * Returns true if the variation contains only the properties specified.
  *
- * @param {Object} variation The variation to compare.
- * @param {string} property  The property to compare.
- * @return {boolean} Whether the variation contains only a single property.
+ * @param {Object}   variation  The variation to compare.
+ * @param {string[]} properties The properties to compare.
+ * @return {boolean} Whether the variation contains only the specified properties.
  */
-export function isVariationWithSingleProperty( variation, property ) {
-	const variationWithProperty = filterObjectByProperty(
-		cloneDeep( variation ),
-		property
+export function isVariationWithProperties( variation, properties ) {
+	const variationWithProperties = filterObjectByProperties(
+		structuredClone( variation ),
+		properties
 	);
 
-	return (
-		JSON.stringify( variationWithProperty?.styles ) ===
-			JSON.stringify( variation?.styles ) &&
-		JSON.stringify( variationWithProperty?.settings ) ===
-			JSON.stringify( variation?.settings )
-	);
+	return areGlobalStyleConfigsEqual( variationWithProperties, variation );
 }

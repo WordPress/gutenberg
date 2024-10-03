@@ -17,41 +17,44 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-import { store as editorStore } from '../../store';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	kebabCase,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2, kebabCase } = unlock( componentsPrivateApis );
 
-export default function PostActions( { onActionPerformed, buttonProps } ) {
+export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _postType = getCurrentPostType();
+	const { item, permissions } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecordPermissions } =
+				unlock( select( coreStore ) );
+			return {
+				item: getEditedEntityRecord( 'postType', postType, postId ),
+				permissions: getEntityRecordPermissions(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
+		[ postId, postType ]
+	);
+	const itemWithPermissions = useMemo( () => {
 		return {
-			item: getEditedEntityRecord(
-				'postType',
-				_postType,
-				getCurrentPostId()
-			),
-			postType: _postType,
+			...item,
+			permissions,
 		};
-	}, [] );
+	}, [ item, permissions ] );
 	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
-			return ! action.isEligible || action.isEligible( item );
+			return (
+				! action.isEligible || action.isEligible( itemWithPermissions )
+			);
 		} );
-	}, [ allActions, item ] );
+	}, [ allActions, itemWithPermissions ] );
 
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			open={ isActionsMenuOpen }
 			trigger={
 				<Button
@@ -59,12 +62,11 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={ ! actions.length }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					className="editor-all-actions-button"
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
 					}
-					{ ...buttonProps }
 				/>
 			}
 			onOpenChange={ setIsActionsMenuOpen }
@@ -72,12 +74,12 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		>
 			<ActionsDropdownMenuGroup
 				actions={ actions }
-				item={ item }
+				item={ itemWithPermissions }
 				onClose={ () => {
 					setIsActionsMenuOpen( false );
 				} }
 			/>
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 }
 
@@ -91,12 +93,12 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<DropdownMenuItem
+		<DropdownMenuV2.Item
 			onClick={ onClick }
 			hideOnClick={ ! action.RenderModal }
 		>
-			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
-		</DropdownMenuItem>
+			<DropdownMenuV2.ItemLabel>{ label }</DropdownMenuV2.ItemLabel>
+		</DropdownMenuV2.Item>
 	);
 }
 
@@ -123,6 +125,8 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenderModal
 						items={ [ item ] }
@@ -141,7 +145,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 // With an added onClose prop.
 function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 	return (
-		<DropdownMenuGroup>
+		<DropdownMenuV2.Group>
 			{ actions.map( ( action ) => {
 				if ( action.RenderModal ) {
 					return (
@@ -163,6 +167,6 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 					/>
 				);
 			} ) }
-		</DropdownMenuGroup>
+		</DropdownMenuV2.Group>
 	);
 }

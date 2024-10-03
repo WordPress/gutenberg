@@ -27,7 +27,7 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
-const authorizedPostTypes = [ 'page' ];
+const authorizedPostTypes = [ 'page', 'post' ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
 	const {
@@ -37,10 +37,9 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		url,
 		frontPageTemplateId,
 	} = useSelect( ( select ) => {
-		const { getSite, getUnstableBase, getEntityRecords } =
-			select( coreDataStore );
-		const siteData = getSite();
-		const base = getUnstableBase();
+		const { getEntityRecord, getEntityRecords } = select( coreDataStore );
+		const siteData = getEntityRecord( 'root', 'site' );
+		const base = getEntityRecord( 'root', '__unstableBase' );
 		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
@@ -87,6 +86,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypesWithoutParentTemplate.includes( postType ) &&
 				postId
 			) {
+				return undefined;
+			}
+
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
 				return undefined;
 			}
 
@@ -213,7 +217,8 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
 		}
-
+		// TODO: for post types lists we should probably not render the front page, but maybe a placeholder
+		// with a message like "Select a page" or something similar.
 		if ( homepageId ) {
 			return { postType: 'page', postId: homepageId };
 		}

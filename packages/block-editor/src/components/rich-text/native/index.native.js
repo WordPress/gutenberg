@@ -316,6 +316,23 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
 			event.nativeEvent.text
 		);
+
+		const { __unstableInputRule } = this.props;
+		const currentValuePosition = {
+			end: this.isIOS ? this.selectionEnd : this.selectionEnd + 1,
+			start: this.isIOS ? this.selectionStart : this.selectionStart + 1,
+		};
+
+		if (
+			__unstableInputRule &&
+			__unstableInputRule( {
+				...currentValuePosition,
+				...this.formatToValue( contentWithoutRootTag ),
+			} )
+		) {
+			return;
+		}
+
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
 		if ( contentWithoutRootTag === this.value?.toString() ) {
 			return;
