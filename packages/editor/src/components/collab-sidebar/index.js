@@ -83,7 +83,7 @@ export default function CollabSidebar() {
 
 	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
-		const sanitisedComment = comment.replace( /<[^>]*>/g, '' );
+		const sanitisedComment = comment;
 
 		const args = {
 			post: postId,
@@ -144,7 +144,7 @@ export default function CollabSidebar() {
 	};
 
 	const onEditComment = async ( commentId, comment ) => {
-		const editedComment = comment.replace( /<[^>]*>/g, '' );
+		const editedComment = comment;
 
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			id: commentId,
