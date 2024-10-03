@@ -2425,7 +2425,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 0,
 				},
@@ -2466,7 +2466,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2504,7 +2504,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			const insertionPoint1 = getBlockInsertionPoint( state );
@@ -2546,7 +2546,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2588,7 +2588,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2630,7 +2630,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2643,7 +2643,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
@@ -2651,7 +2651,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if assigned insertion point', () => {
 			const state = {
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 5,
 				},

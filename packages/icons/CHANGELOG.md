@@ -9,6 +9,7 @@
 -   Add new `envelope` icon.
 
 -   Add new `bell` and `bell-unread` icons.
+-   Add new `arrowUpLeft` and `arrowDownRight` icons.
 
 ## 10.7.0 (2024-09-05)
 

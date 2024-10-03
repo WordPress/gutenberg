@@ -44,8 +44,7 @@ function ToolSelector( props, ref ) {
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					size="compact"
 					{ ...props }
 					ref={ ref }
 					icon={ mode === 'navigation' ? editIcon : selectIcon }
@@ -71,6 +70,16 @@ function ToolSelector( props, ref ) {
 							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
+									value: 'navigation',
+									label: (
+										<>
+											<Icon icon={ editIcon } />
+											{ __( 'Write' ) }
+										</>
+									),
+									info: __( 'Focus on content.' ),
+								},
+								{
 									value: 'edit',
 									label: (
 										<>
@@ -78,26 +87,14 @@ function ToolSelector( props, ref ) {
 											{ __( 'Design' ) }
 										</>
 									),
-									info: __(
-										'Full control over layout and styling.'
-									),
-								},
-								{
-									value: 'navigation',
-									label: (
-										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
-										</>
-									),
-									info: __( 'Focus on content.' ),
+									info: __( 'Edit layout and styles.' ),
 								},
 							] }
 						/>
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
+							'Tools provide different sets of interactions for blocks. Toggle between simplified content tools (Write) and advanced visual editing tools (Design).'
 						) }
 					</div>
 				</>

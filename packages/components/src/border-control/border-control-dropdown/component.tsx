@@ -7,7 +7,6 @@ import type { CSSProperties } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,12 +16,10 @@ import Button from '../../button';
 import ColorIndicator from '../../color-indicator';
 import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
-import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
-import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 import type { ColorObject } from '../../color-palette/types';
@@ -149,7 +146,6 @@ const BorderControlDropdown = (
 		popoverContentClassName,
 		popoverControlsClassName,
 		resetButtonClassName,
-		showDropdownHeader,
 		size,
 		__unstablePopoverProps,
 		...otherProps
@@ -197,17 +193,6 @@ const BorderControlDropdown = (
 		<>
 			<DropdownContentWrapper paddingSize="medium">
 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
-					{ showDropdownHeader ? (
-						<HStack>
-							<StyledLabel>{ __( 'Border color' ) }</StyledLabel>
-							<Button
-								size="small"
-								label={ __( 'Close border color' ) }
-								icon={ closeSmall }
-								onClick={ onClose }
-							/>
-						</HStack>
-					) : undefined }
 					<ColorPalette
 						className={ popoverContentClassName }
 						value={ color }
@@ -237,6 +222,7 @@ const BorderControlDropdown = (
 							onReset();
 							onClose();
 						} }
+						__next40pxDefaultSize
 					>
 						{ __( 'Reset' ) }
 					</Button>

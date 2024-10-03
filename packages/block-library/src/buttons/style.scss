@@ -2,6 +2,8 @@
 $blocks-block__margin: 0.5em;
 
 .wp-block-buttons {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	&.is-vertical {
 		flex-direction: column;
