@@ -283,6 +283,11 @@
 		background: none;
 		border: none;
 	}
+
+	// Make the spacing consistent between controls.
+	.components-button {
+		height: $button-size-next-default-40px;
+	}
 }
 
 .block-editor-block-tools__zoom-out-mode-inserter-button {
