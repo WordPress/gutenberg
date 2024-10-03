@@ -25,7 +25,6 @@ import {
 } from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
-import { useNavModeExit } from './use-nav-mode-exit';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
@@ -86,7 +85,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		name,
 		blockApiVersion,
 		blockTitle,
-		editorMode,
 		isSelected,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -98,13 +96,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		isBlockMovingMode,
-		canInsertMovingBlock,
 		isEditingDisabled,
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
-		templateLock,
+		isSectionBlock,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -116,15 +112,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
-		useNavModeExit( clientId ),
-		useZoomOutModeExit( { editorMode } ),
+		useZoomOutModeExit(),
 		useIsHovered( { clientId } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
 		useFlashEditableBlocks( {
 			clientId,
-			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+			isEnabled: isSectionBlock,
 		} ),
 		useScrollIntoView( { isSelected } ),
 	] );
@@ -182,8 +177,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
-				'is-block-moving-mode': isBlockMovingMode,
-				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,

@@ -19,7 +19,6 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
@@ -35,7 +34,8 @@ function selector( select ) {
 		getSettings,
 		__unstableGetEditorMode,
 		isTyping,
-	} = select( blockEditorStore );
+		isDragging,
+	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -47,6 +47,7 @@ function selector( select ) {
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 		isZoomOutMode: editorMode === 'zoom-out',
+		isDragging: isDragging(),
 	};
 }
 
@@ -64,10 +65,9 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
-		selector,
-		[]
-	);
+	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
+		useSelect( selector, [] );
+
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -78,7 +78,6 @@ export default function BlockTools( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
-		showBreadcrumb,
 		showBlockToolbarPopover,
 		showZoomOutToolbar,
 	} = useShowBlockTools();
@@ -223,14 +222,6 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showBreadcrumb && (
-					<BlockToolbarBreadcrumb
-						ref={ blockSelectionButtonRef }
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
-					/>
-				) }
-
 				{ showZoomOutToolbar && (
 					<ZoomOutPopover
 						__unstableContentRef={ __unstableContentRef }
@@ -251,7 +242,7 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
+				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
 					/>
