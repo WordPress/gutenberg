@@ -83,11 +83,9 @@ export default function CollabSidebar() {
 
 	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
-		const sanitisedComment = comment;
-
 		const args = {
 			post: postId,
-			content: sanitisedComment,
+			content: comment,
 			comment_type: 'block_comment',
 			comment_approved: 0,
 		};
@@ -144,11 +142,9 @@ export default function CollabSidebar() {
 	};
 
 	const onEditComment = async ( commentId, comment ) => {
-		const editedComment = comment;
-
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			id: commentId,
-			content: editedComment,
+			content: comment,
 		} );
 
 		if ( savedRecord ) {
