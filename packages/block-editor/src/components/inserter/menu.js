@@ -114,9 +114,9 @@ function InserterMenu(
 	);
 
 	const onInsertPattern = useCallback(
-		( blocks, patternName ) => {
+		( blocks, patternName, ...args ) => {
 			onToggleInsertionPoint( false );
-			onInsertBlocks( blocks, { patternName } );
+			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
 		},
 		[ onInsertBlocks, onSelect ]

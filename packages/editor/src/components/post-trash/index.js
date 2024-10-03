@@ -6,7 +6,7 @@ import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -18,9 +18,11 @@ import PostTrashCheck from './check';
 /**
  * Displays the Post Trash Button and Confirm Dialog in the Editor.
  *
+ * @param {?{onActionPerformed: Object}} An object containing the onActionPerformed function.
  * @return {JSX.Element|null} The rendered PostTrash component.
  */
-export default function PostTrash() {
+export default function PostTrash( { onActionPerformed } ) {
+	const registry = useRegistry();
 	const { isNew, isDeleting, postId, title } = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
@@ -37,11 +39,16 @@ export default function PostTrash() {
 		return null;
 	}
 
-	const handleConfirm = () => {
+	const handleConfirm = async () => {
 		setShowConfirmDialog( false );
-		trashPost();
+		await trashPost();
+		const item = await registry
+			.resolveSelect( editorStore )
+			.getCurrentPost();
+		// After the post is trashed, we want to trigger the onActionPerformed callback, so the user is redirect
+		// to the post view depending on if the user is on post editor or site editor.
+		onActionPerformed?.( 'move-to-trash', [ item ] );
 	};
-
 	return (
 		<PostTrashCheck>
 			<Button

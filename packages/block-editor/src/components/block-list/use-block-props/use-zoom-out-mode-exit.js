@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -16,20 +16,33 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
-	const { __unstableSetEditorMode } = unlock(
+	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	return useRefEffect(
 		( node ) => {
-			if ( editorMode !== 'zoom-out' ) {
+			// In "compose" mode.
+			const composeMode = editorMode === 'zoom-out' && isZoomOut();
+
+			if ( ! composeMode ) {
 				return;
 			}
 
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
+
+					const { __experimentalSetIsInserterOpened } = getSettings();
+
+					if (
+						typeof __experimentalSetIsInserterOpened === 'function'
+					) {
+						__experimentalSetIsInserterOpened( false );
+					}
 					__unstableSetEditorMode( 'edit' );
+					resetZoomLevel();
 				}
 			}
 
@@ -39,6 +52,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ editorMode, __unstableSetEditorMode ]
+		[ editorMode, getSettings, __unstableSetEditorMode ]
 	);
 }

@@ -16,56 +16,116 @@ export const TabListWrapper = styled.div`
 	align-items: stretch;
 	flex-direction: row;
 	text-align: center;
+	overflow-x: auto;
 
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 		text-align: start;
 	}
 
-	@media not ( prefers-reduced-motion: reduce ) {
-		&.is-animation-enabled::after {
-			transition-property: left, top, width, height;
+	:where( [aria-orientation='horizontal'] ) {
+		width: fit-content;
+	}
+
+	--direction-factor: 1;
+	--direction-start: left;
+	--direction-end: right;
+	--indicator-start: var( --indicator-left );
+	&:dir( rtl ) {
+		--direction-factor: -1;
+		--direction-start: right;
+		--direction-end: left;
+		--indicator-start: var( --indicator-right );
+	}
+
+	@media not ( prefers-reduced-motion ) {
+		&.is-animation-enabled::before {
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
 	}
-	&::after {
+	&::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
+		transform-origin: var( --direction-start ) top;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
-	&:not( [aria-orientation='vertical'] )::after {
-		bottom: 0;
-		left: var( --indicator-left );
-		width: var( --indicator-width );
-		height: 0;
-		border-bottom: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
+
+	/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+	--antialiasing-factor: 100;
+	&:not( [aria-orientation='vertical'] ) {
+		--fade-width: 4rem;
+		--fade-gradient-base: transparent 0%, black var( --fade-width );
+		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
+			transparent 50%;
+		&.is-overflowing-first {
+			mask-image: linear-gradient(
+				to var( --direction-end ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-last {
+			mask-image: linear-gradient(
+				to var( --direction-start ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-first.is-overflowing-last {
+			mask-image: linear-gradient(
+					to right,
+					var( --fade-gradient-composed )
+				),
+				linear-gradient( to left, var( --fade-gradient-composed ) );
+		}
+
+		&::before {
+			bottom: 0;
+			height: 0;
+			width: calc( var( --antialiasing-factor ) * 1px );
+			transform: translateX(
+					calc(
+						var( --indicator-start ) * var( --direction-factor ) *
+							1px
+					)
+				)
+				scaleX(
+					calc(
+						var( --indicator-width ) / var( --antialiasing-factor )
+					)
+				);
+			border-bottom: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+		}
 	}
-	&[aria-orientation='vertical']::after {
-		z-index: -1;
+	&[aria-orientation='vertical']::before {
+		top: 0;
 		left: 0;
 		width: 100%;
-		top: var( --indicator-top );
-		height: var( --indicator-height );
+		height: calc( var( --antialiasing-factor ) * 1px );
+		transform: translateY( calc( var( --indicator-top ) * 1px ) )
+			scaleY(
+				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
+			);
 		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
+		scroll-margin: 24px;
+		flex-grow: 1;
+		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		min-height: ${ space(
-			12
-		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
-		height: auto;
+		height: ${ space( 12 ) };
 		background: transparent;
 		border: none;
 		box-shadow: none;
@@ -75,7 +135,6 @@ export const Tab = styled( Ariakit.Tab )`
 		margin-left: 0;
 		font-weight: 500;
 		text-align: inherit;
-		hyphens: auto;
 		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
@@ -94,7 +153,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		// Focus.
-		&::before {
+		&::after {
 			content: '';
 			position: absolute;
 			top: ${ space( 3 ) };
@@ -117,7 +176,7 @@ export const Tab = styled( Ariakit.Tab )`
 			}
 		}
 
-		&:focus-visible::before {
+		&:focus-visible::after {
 			opacity: 1;
 		}
 	}
@@ -126,6 +185,10 @@ export const Tab = styled( Ariakit.Tab )`
 		min-height: ${ space(
 			10
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+	}
+
+	[aria-orientation='horizontal'] & {
+		justify-content: center;
 	}
 `;
 

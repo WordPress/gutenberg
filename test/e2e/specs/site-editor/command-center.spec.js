@@ -28,10 +28,12 @@ test.describe( 'Site editor command palette', () => {
 		await page.keyboard.type( 'new page' );
 		await page.getByRole( 'option', { name: 'Add new page' } ).click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/post-new.php?post_type=page'
+			/\/wp-admin\/site-editor.php\?postId=(\d+)&postType=page&canvas=edit/
 		);
 		await expect(
-			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+			editor.canvas
+				.getByLabel( 'Block: Title' )
+				.locator( '[data-rich-text-placeholder="No title"]' )
 		).toBeVisible();
 	} );
 
@@ -47,7 +49,7 @@ test.describe( 'Site editor command palette', () => {
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'heading', { level: 1 } )
-		).toHaveText( 'Index' );
+		).toContainText( 'Index' );
 	} );
 
 	test( 'Open the command palette and navigate to Customize CSS', async ( {

@@ -26,15 +26,20 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
 
-const EMPTY_BLOCKS_LIST = [];
 const EMPTY_OBJECT = {};
 
 function __experimentalReusableBlocksSelect( select ) {
-	return (
-		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
-			per_page: -1,
-		} ) ?? EMPTY_BLOCKS_LIST
-	);
+	const { getEntityRecords, hasFinishedResolution } = select( coreStore );
+	const reusableBlocks = getEntityRecords( 'postType', 'wp_block', {
+		per_page: -1,
+	} );
+	return hasFinishedResolution( 'getEntityRecords', [
+		'postType',
+		'wp_block',
+		{ per_page: -1 },
+	] )
+		? reusableBlocks
+		: undefined;
 }
 
 const BLOCK_EDITOR_SETTINGS = [
