@@ -26,6 +26,30 @@ import useEntityId from './use-entity-id';
  * 							  object from REST API containing more
  * 							  information like `raw`, `rendered` and
  * 							  `protected` props.
+ *
+ * @example
+ * ```js
+ * import { useEntityProp } from '@wordpress/core-data';
+ * import { TextControl } from '@wordpress/components';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ * const [ meta, setMeta ] = useEntityProp( 'postType', 'post', 'meta', 1234 );
+ *
+ * return (
+ * 	<TextControl
+ * 		label={ __( 'Meta Value' ) }
+ * 		value={ meta?.key }
+ * 			onChange={ ( newValue ) => {
+ * 				setMeta( {
+ * 					...meta,
+ * 					key: newValue,
+ * 				} );
+ * 			} }
+ * 		/>
+ * 	);
+ * };
+ * ```
  */
 export default function useEntityProp( kind, name, prop, _id ) {
 	const providerId = useEntityId( kind, name );

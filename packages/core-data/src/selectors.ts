@@ -140,6 +140,33 @@ const EMPTY_OBJECT = {};
  * @param state Data state.
  * @param url   URL the preview would be for.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { embedPreview, isRequestingEmbedPreview } = useSelect(
+ *         ( select ) => {
+ *             return {
+ *                 embedPreview: select( coreDataStore ).getEmbedPreview(
+ *                     'https://twitter.com/wordpress'
+ *                 ),
+ *                 isRequestingEmbedPreview: select(
+ *                     coreDataStore
+ *                 ).isRequestingEmbedPreview( 'https://twitter.com/wordpress' ),
+ *             };
+ *         }
+ *     );
+ *
+ *     return ! isRequestingEmbedPreview && embedPreview ? (
+ *         <div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+ *         ) : (
+ *         <div>{ __( 'Loading Tweets…' ) }</div>
+ *     );
+ * };
+ * ```
+ *
  * @return Whether a request is in progress for an embed preview.
  */
 export const isRequestingEmbedPreview = createRegistrySelector(
@@ -181,6 +208,25 @@ export function getAuthors(
  * Returns the current user.
  *
  * @param state Data state.
+ *
+ * @example
+ * ```jsx
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const currentUser = useSelect( ( select ) =>
+ *         select( coreDataStore ).getCurrentUser()
+ *     );
+ *
+ *     return currentUser ? (
+ *         <div>{ sprintf( __( 'Hello, %s!' ), currentUser.name ) }</div>
+ *         ) : (
+ *         <div>{ __( 'Loading User information…' ) }</div>
+ *     );
+ * };
+ * ```
  *
  * @return Current user object.
  */
@@ -338,6 +384,40 @@ export interface GetEntityRecord {
  * @param key   Record's key
  * @param query Optional query. If requesting specific
  *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
+ *
+ * @example
+ * ```jsx
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const { postData, termData } = useSelect( ( select ) => {
+ *         return {
+ *             postData: select( coreDataStore ).getEntityRecord(
+ *                 postType',
+ *                 'post',
+ *                 1
+ *             ),
+ *             termData: select( coreDataStore ).getEntityRecord(
+ *                 'taxonomy',
+ *                 'category',
+ *                 1
+ *             ),
+ *         };
+ *     } );
+ *
+ *     return postData && termData ? (
+ *         <div>
+ *             { sprintf( __( 'Post Title:, %s' ), postData?.title.rendered ) }
+ *             <br />
+ *             { sprintf( __( 'Term Name: %s' ), termData?.name ) }
+ *         </div>
+ *     ) : (
+ *         <div>{ __( 'Loading…' ) }</div>
+ *     ;
+ * };
+ * ```
  *
  * @return Record.
  */
@@ -551,6 +631,30 @@ export interface GetEntityRecords {
  * @param name  Entity name.
  * @param query Optional terms query. If requesting specific
  *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available for "List [Entity kind]s".
+ *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const posts = useSelect( ( select ) =>
+ *         select( coreDataStore ).getEntityRecords( 'postType', 'post', {
+ *             per_page: 5,
+ *         } )
+ *     );
+ *
+ *     return posts ? (
+ *         <ul>
+ *             { posts.map( ( post ) => {
+ *                 return <li key={ post?.id }>{ post?.title.rendered }</li>;
+ *             } ) }
+ *         </ul>
+ *     ) : (
+ *         <div>{ __( 'Loading…' ) }</div>
+ *     );
+ * };
+ * ```
  *
  * @return Records.
  */
@@ -1065,6 +1169,30 @@ export function hasRedo( state: State ): boolean {
  *
  * @param state Data state.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const currentTheme = useSelect( ( select ) =>
+ *         select( coreDataStore ).getCurrentTheme()
+ *     );
+ *
+ *     return currentTheme ? (
+ *         <div>
+ *             { sprintf(
+ *                 __( 'Current Theme: %s' ),
+ *                     currentTheme?.name.rendered
+ *             ) }
+ *         </div>
+ *             ) : (
+ *         <div>{ __( 'Loading theme information…' ) }</div>
+ *         );
+ * };
+ * ```
+ *
  * @return The current theme.
  */
 export function getCurrentTheme( state: State ): any {
@@ -1101,6 +1229,26 @@ export function getThemeSupports( state: State ): any {
  *
  * @param state Data state.
  * @param url   Embedded URL.
+ *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const embedPreview = useSelect( ( select ) =>
+ *         select( coreDataStore ).getEmbedPreview(
+ *             'https://twitter.com/wordpress'
+ *         )
+ *     );
+ *
+ *     return embedPreview ? (
+ *         <div dangerouslySetInnerHTML={ { __html: embedPreview.html } } />
+ *     ) : (
+ *     <div>{ __( 'Loading Tweets…' ) }</div>
+ *     );
+ * };
+ * ```
  *
  * @return Undefined if the preview has not been fetched, otherwise, the preview fetched from the embed preview API.
  */
@@ -1144,6 +1292,25 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
  *                 or REST base as a string - `media`.
  * @param id       Optional ID of the rest resource to check.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const canUpdatePost = useSelect( ( select ) =>
+ *         select( coreDataStore ).canUser( 'create', 'media' )
+ *     );
+ *
+ *     return canUpdatePost ? (
+ *         <div>{ __( 'This user can upload media' ) }</div>
+ *     ) : (
+ *         <div>{ __( 'This user cannot upload media' ) }</div>
+ *     );
+ * };
+ * ```
+ *
  * @return Whether or not the user can perform the action,
  *                             or `undefined` if the OPTIONS request is still being made.
  */
@@ -1175,6 +1342,25 @@ export function canUser(
  * @param kind     Entity kind.
  * @param name     Entity name.
  * @param recordId Record's id.
+ *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const canEdit = useSelect( ( select ) =>
+ *         select( coreDataStore ).canUserEditEntityRecord( 'postType', 'post', 1 )
+ *     );
+ *
+ *     return canEdit ? (
+ *         <div>{ __( 'This user can edit post ID 1' ) }</div>
+ *     ) : (
+ *         <div>{ __( 'This user cannot edit post ID 1' ) }</div>
+ *     );
+ * };
+ *```
  * @return Whether or not the user can edit,
  * or `undefined` if the OPTIONS request is still being made.
  */
@@ -1202,6 +1388,30 @@ export function canUserEditEntityRecord(
  * @param postType The type of the parent post.
  * @param postId   The id of the parent post.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const postId = 1;
+ *     const autosaves = useSelect( ( select ) =>
+ *         select( coreDataStore ).getAutosaves( 'post', postId )
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             { autosaves?.map( ( autosave ) => (
+ *                 <li key={ autosave.ID }>
+ *                     { sprintf( 'Date: %s', autosave.date ) }
+ *                 </li>
+ *             ) ) }
+ *         </ul>
+ *     );
+ * };
+ *```
+ *
  * @return An array of autosaves for the post, or undefined if there is none.
  */
 export function getAutosaves(
@@ -1219,6 +1429,27 @@ export function getAutosaves(
  * @param postType The type of the parent post.
  * @param postId   The id of the parent post.
  * @param authorId The id of the author.
+ *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf, __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const postId = 1;
+ *     const userId = 1;
+ *     const autosave = useSelect( ( select ) =>
+ *         select( coreDataStore ).getAutosave( 'post', postId, userId )
+ *     );
+ *
+ *     return autosave ? (
+ *         <div>{ sprintf( 'Last autosave: %s', autosave.date ) }</div>
+ *     ) : (
+ *         <div>{ __( 'There is no Autosave for this post and this user' ) }</div>
+ *     ;
+ * };
+ * ```
  *
  * @return The autosave for the post and author.
  */
@@ -1355,6 +1586,27 @@ export function __experimentalGetCurrentThemeGlobalStylesVariations(
  *
  * @param state Data state.
  *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const blockPatterns = useSelect( ( select ) =>
+ *         select( coreDataStore ).getBlockPatterns()
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             { blockPatterns?.map( ( pattern ) => (
+ *                 <li key={ pattern.name }>{ pattern.title }</li>
+ *             ) ) }
+ *         </ul>
+ *     );
+ * };
+ * ```
+ *
  * @return Block pattern list.
  */
 export function getBlockPatterns( state: State ): Array< any > {
@@ -1365,6 +1617,27 @@ export function getBlockPatterns( state: State ): Array< any > {
  * Retrieve the list of registered block pattern categories.
  *
  * @param state Data state.
+ *
+ * @example
+ * ```js
+ * import { store as coreDataStore } from '@wordpress/core-data';
+ * import { useSelect } from '@wordpress/data';
+ * import { __ } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const blockPatternCategories = useSelect( ( select ) =>
+ *         select( coreDataStore ).getBlockPatternCategories()
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             { blockPatternCategories?.map( ( pattern ) => (
+ *                 <li key={ pattern.name }>{ pattern.label }</li>
+ *             ) ) }
+ *     </ul>
+ *     );
+ * };
+ * ```
  *
  * @return Block pattern category list.
  */
