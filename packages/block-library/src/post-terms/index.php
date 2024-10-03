@@ -60,7 +60,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 	);
 
 	if ( is_wp_error( $post_terms ) ) {
-		return false;
+		return '';
 	}
 
 	return $post_terms;
