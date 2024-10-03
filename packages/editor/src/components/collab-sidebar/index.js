@@ -9,7 +9,6 @@ import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -84,11 +83,9 @@ export default function CollabSidebar() {
 
 	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
-		const sanitisedComment = removep( comment );
-
 		const args = {
 			post: postId,
-			content: sanitisedComment,
+			content: comment,
 			comment_type: 'block_comment',
 			comment_approved: 0,
 		};
@@ -145,11 +142,9 @@ export default function CollabSidebar() {
 	};
 
 	const onEditComment = async ( commentId, comment ) => {
-		const editedComment = removep( comment );
-
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			id: commentId,
-			content: editedComment,
+			content: comment,
 		} );
 
 		if ( savedRecord ) {
