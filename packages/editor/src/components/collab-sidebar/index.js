@@ -146,8 +146,6 @@ export default function CollabSidebar() {
 	const onEditComment = async ( commentId, comment ) => {
 		const editedComment = comment.replace(/<[^>]*>/g, '');
 
-		console.log( 'Edited comment:', editedComment );
-
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			id: commentId,
 			content: editedComment,
