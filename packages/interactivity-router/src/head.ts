@@ -66,6 +66,9 @@ export const fetchHeadAssets = async (
 ): Promise< HTMLElement[] > => {
 	const headTags = [];
 
+	// We only want to fetch module scripts because regular scripts (without
+	// `async` or `defer` attributes) can depend on the execution of other scripts.
+	// Scripts found in the head are blocking and must be executed in order.
 	const scripts = doc.querySelectorAll< HTMLScriptElement >(
 		'script[type="module"][src]'
 	);
