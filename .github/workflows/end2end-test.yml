@@ -48,6 +48,7 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
+                  DEBUG=pw:api \
                   WP_BASE_URL=http://127.0.0.1:9400/ \
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- \
                   npm run test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
