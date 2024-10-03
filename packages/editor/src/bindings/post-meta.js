@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,42 +35,56 @@ import { unlock } from '../lock-unlock';
  * }
  * ```
  */
-function getPostMetaFields( select, context ) {
-	const { getEditedEntityRecord } = select( coreDataStore );
-	const { getRegisteredPostMeta } = unlock( select( coreDataStore ) );
+const getPostMetaFields = createSelector(
+	( select, context ) => {
+		const { getEditedEntityRecord } = select( coreDataStore );
+		const { getRegisteredPostMeta } = unlock( select( coreDataStore ) );
 
-	let entityMetaValues;
-	// Try to get the current entity meta values.
-	if ( context?.postType && context?.postId ) {
-		entityMetaValues = getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		).meta;
-	}
-
-	const registeredFields = getRegisteredPostMeta( context?.postType );
-	const metaFields = {};
-	Object.entries( registeredFields || {} ).forEach( ( [ key, props ] ) => {
-		// Don't include footnotes or private fields.
-		if ( key !== 'footnotes' && key.charAt( 0 ) !== '_' ) {
-			metaFields[ key ] = {
-				label: props.title || key,
-				value:
-					// When using the entity value, an empty string IS a valid value.
-					entityMetaValues?.[ key ] ??
-					// When using the default, an empty string IS NOT a valid value.
-					( props.default || undefined ),
-			};
+		let entityMetaValues;
+		// Try to get the current entity meta values.
+		if ( context?.postType && context?.postId ) {
+			entityMetaValues = getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta;
 		}
-	} );
 
-	if ( ! Object.keys( metaFields || {} ).length ) {
-		return null;
-	}
+		const registeredFields = getRegisteredPostMeta( context?.postType );
+		const metaFields = {};
+		Object.entries( registeredFields || {} ).forEach(
+			( [ key, props ] ) => {
+				// Don't include footnotes or private fields.
+				if ( key !== 'footnotes' && key.charAt( 0 ) !== '_' ) {
+					metaFields[ key ] = {
+						label: props.title || key,
+						value:
+							// When using the entity value, an empty string IS a valid value.
+							entityMetaValues?.[ key ] ??
+							// When using the default, an empty string IS NOT a valid value.
+							( props.default || undefined ),
+					};
+				}
+			}
+		);
 
-	return metaFields;
-}
+		if ( ! Object.keys( metaFields || {} ).length ) {
+			return null;
+		}
+
+		return metaFields;
+	},
+	( select, context ) => [
+		select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			context.postType,
+			context.postId
+		).meta,
+		unlock( select( coreDataStore ) ).getRegisteredPostMeta(
+			context.postType
+		),
+	]
+);
 
 export default {
 	name: 'core/post-meta',

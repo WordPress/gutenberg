@@ -205,6 +205,8 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	 * whenever there are updates in block context.
 	 * `source.getFieldsList` may also call a selector via `registry.select`.
 	 */
+	// A constant object needs to be used to avoid unnecessary re-renders.
+	const context = {};
 	const fieldsList = useSelect(
 		( select ) => {
 			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
@@ -216,26 +218,24 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				( [ sourceName, { getFieldsList, usesContext } ] ) => {
 					if ( getFieldsList ) {
 						// Populate context.
-						const context = {};
 						if ( usesContext?.length ) {
 							for ( const key of usesContext ) {
 								context[ key ] = blockContext[ key ];
 							}
 						}
-						const sourceList = getFieldsList( {
+						_fieldsList[ sourceName ] = getFieldsList( {
 							select,
 							context,
 						} );
-						// Only add source if the list is not empty.
-						if ( Object.keys( sourceList || {} ).length ) {
-							_fieldsList[ sourceName ] = { ...sourceList };
-						}
+
+						// Clean `context` variable for next iterations.
+						Object.keys( context ).forEach( ( key ) => {
+							delete context[ key ];
+						} );
 					}
 				}
 			);
-			return (
-				Object.values( _fieldsList ).length > 0 && { ..._fieldsList }
-			);
+			return _fieldsList;
 		},
 		[ blockContext, bindableAttributes ]
 	);
@@ -252,6 +252,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
+		}
+	} );
+
+	// Remove empty sources from the list of fields.
+	Object.entries( fieldsList || {} ).forEach( ( [ key, value ] ) => {
+		if ( ! Object.keys( value || {} ).length ) {
+			delete fieldsList[ key ];
 		}
 	} );
 
