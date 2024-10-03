@@ -344,7 +344,7 @@ module.exports = {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
 						message:
 							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+							' should have the `__next40pxDefaultSize` prop when using the default size.',
 					} ) ),
 					{
 						// Falsy `__next40pxDefaultSize` without a `render` prop.
