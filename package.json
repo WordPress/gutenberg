@@ -172,6 +172,7 @@
 		"@wordpress/report-flaky-tests": "file:packages/report-flaky-tests",
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
+		"@wp-playground/cli": "0.9.45",
 		"ajv": "8.7.1",
 		"appium": "2.0.0",
 		"babel-jest": "29.7.0",
