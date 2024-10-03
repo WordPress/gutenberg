@@ -58,7 +58,7 @@ function Header( {
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasFixedToolbar,
-		isBlockSelected,
+		hasBlockSelection,
 		isNestedEntity,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
@@ -75,7 +75,7 @@ function Header( {
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
-			isBlockSelected:
+			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			isNestedEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -90,7 +90,7 @@ function Header( {
 		useState( true );
 
 	const hasCenter =
-		( ! isBlockSelected || isBlockToolsCollapsed ) &&
+		( ! hasBlockSelection || isBlockToolsCollapsed ) &&
 		! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 	/*
