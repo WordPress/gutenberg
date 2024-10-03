@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.9.0 (2024-10-03)
+
 ### Bug Fixes
 
 -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
