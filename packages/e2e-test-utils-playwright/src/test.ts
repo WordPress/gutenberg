@@ -144,6 +144,24 @@ const test = base.extend<
 	page: async ( { page }, use ) => {
 		page.on( 'console', observeConsoleLogging );
 
+		await expect
+			.poll(
+				async () => {
+					const response = await page.request.get( '/' );
+					const html = await response.text();
+
+					return html.includes(
+						'Error establishing a database connection'
+					);
+				},
+				{
+					message: 'ensure database is connected',
+					timeout: 10000,
+					intervals: [ 2000 ],
+				}
+			)
+			.toBeFalsy();
+
 		await use( page );
 
 		// Clear local storage after each test.
