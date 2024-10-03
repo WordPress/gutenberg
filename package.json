@@ -271,6 +271,7 @@
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
 		"build:analyze-bundles": "npm run build -- --webpack-bundle-analyzer",
+		"build:blocks-manifest": "wp-scripts build-blocks-manifest",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && ( tsc --build || ( echo 'tsc failed. Try cleaning up first: `npm run clean:package-types`'; exit 1 ) ) && node ./bin/packages/check-build-type-declaration-files.js",
 		"prebuild:packages": "npm run clean:packages && lerna run build",
 		"build:packages": "npm run --silent build:package-types && node ./bin/packages/build.js",
