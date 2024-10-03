@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade eslint-plugin-jsdoc to v50 ([#tbd](https://github.com/WordPress/gutenberg/pull/tbd)).
+
 ## 21.2.0 (2024-10-03)
 
 ## 21.1.0 (2024-09-19)
