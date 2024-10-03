@@ -31,16 +31,6 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
 
-	$support_styles = block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes );
-	$classes       .= ! empty( $support_styles['class'] ) ? " {$support_styles['class']}" : '';
-
-	// Get the wrapper attributes.
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => $classes,
-			'style' => $support_styles['style'],
-		)
-	);
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
@@ -121,6 +111,17 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	} else {
 		$content = $get_link_function( $format, $link );
 	}
+
+	$support_styles = block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes );
+	$classes       .= ! empty( $support_styles['class'] ) ? " {$support_styles['class']}" : '';
+
+	// Get the wrapper attributes.
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+			'style' => ! empty( $content ) && $support_styles['style'] ? $support_styles['style'] : '',
+		)
+	);
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
