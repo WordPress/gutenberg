@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -54,7 +53,6 @@ function Header( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
-		postType,
 		isTextEditor,
 		isPublishSidebarOpened,
 		showIconLabels,
