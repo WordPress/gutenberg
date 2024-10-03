@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { createBrowserHistory } from 'history';
-import type { BrowserHistory } from 'history';
+import { createBrowserHistory, type BrowserHistory } from 'history';
 
 /**
  * WordPress dependencies
  */
 import { buildQueryString } from '@wordpress/url';
 
-export type EnhancedHistory = BrowserHistory & {
+export interface EnhancedHistory extends BrowserHistory {
 	getLocationWithParams: () => Location;
-};
+}
+
 const history = createBrowserHistory();
 
 const originalHistoryPush = history.push;

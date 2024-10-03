@@ -5,6 +5,7 @@
 		"rootDir": "src",
 		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ],
+		"allowJs": false,
 		"checkJs": false
 	},
 	"references": [
