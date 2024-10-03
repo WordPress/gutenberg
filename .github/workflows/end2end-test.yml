@@ -51,8 +51,7 @@ jobs:
                       --mount=./packages/e2e-tests/mu-plugins:/wordpress/wp-content/mu-plugins \
                       --mount=./packages/e2e-tests/plugins:/wordpress/wp-content/plugins/gutenberg-test-plugins \
                       --blueprint=./test/e2e/playground.blueprint.json \
-                      &
-
+                      & while ! (jobs -p | xargs -r tail -n 0 -f 2>/dev/null | grep -q "WordPress is running"); do sleep 1; done
             - name: Run the tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
