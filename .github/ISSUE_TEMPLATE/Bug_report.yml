@@ -1,6 +1,7 @@
 name: Bug report
 description: Report a bug with the WordPress block editor or Gutenberg plugin
 labels: ['[Type] Bug']
+type: 'Bug'
 body:
     - type: markdown
       attributes:
