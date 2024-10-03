@@ -239,7 +239,7 @@ export function Comments( {
  */
 function CommentForm( { onSubmit, onCancel, thread } ) {
 	const [ inputComment, setInputComment ] = useState(
-		thread?.content?.rendered.replace(/<[^>]*>/g, '') ?? ''
+		thread?.content?.rendered.replace( /<[^>]*>/g, '' ) ?? ''
 	);
 
 	return (
