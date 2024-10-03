@@ -23,6 +23,7 @@ export default function useTabNav() {
 		hasMultiSelection,
 		getSelectedBlockClientId,
 		getBlockCount,
+		getBlockOrder,
 		getLastFocus,
 		getSectionRootClientId,
 		isZoomOut,
@@ -54,9 +55,21 @@ export default function useTabNav() {
 		}
 		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
 		else if ( __unstableGetEditorMode() === 'zoom-out' && isZoomOut() ) {
-			container.current
-				.querySelector( `[data-block="${ getSectionRootClientId() }"]` )
-				.focus();
+			const sectionRootClientId = getSectionRootClientId();
+			const sectionBlocks = getBlockOrder( sectionRootClientId );
+
+			// If we have section within the section root, focus the first one.
+			if ( sectionBlocks.length ) {
+				container.current
+					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
+					.focus();
+			}
+			// If we don't have any section blocks, focus the section root.
+			else {
+				container.current
+					.querySelector( `[data-block="${ sectionRootClientId }"]` )
+					.focus();
+			}
 		} else {
 			const canvasElement =
 				container.current.ownerDocument === event.target.ownerDocument
