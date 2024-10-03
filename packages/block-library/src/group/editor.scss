@@ -8,6 +8,12 @@
 		left: 0;
 		right: 0;
 	}
+
+	user-select: none;
+
+	> * {
+		user-select: all;
+	}
 }
 
 // Place block list appender in the same place content will appear.
