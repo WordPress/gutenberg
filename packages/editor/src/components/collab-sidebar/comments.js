@@ -110,7 +110,7 @@ export function Comments( {
 							) }
 						{ ( ! actionState ||
 							'edit' !== actionState?.action ) && (
-							<>{ thread?.content?.raw }</>
+							<RawHTML>{ thread?.content?.raw }</RawHTML>
 						) }
 					</VStack>
 				</HStack>
