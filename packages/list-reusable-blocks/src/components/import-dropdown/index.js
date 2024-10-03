@@ -17,8 +17,8 @@ function ImportDropdown( { onUpload } ) {
 			contentClassName="list-reusable-blocks-import-dropdown__content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					size="compact"
+					className="list-reusable-blocks-import-dropdown__button"
 					aria-expanded={ isOpen }
 					onClick={ onToggle }
 					variant="primary"

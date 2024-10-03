@@ -645,7 +645,7 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const themeGlobalStyles = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 			currentTheme.stylesheet,
@@ -658,7 +658,7 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 			currentTheme.stylesheet,
@@ -755,7 +755,7 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch, select, registry } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -764,9 +764,13 @@ export const getNavigationFallbackId =
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallbackId( fallback?.id );
+		registry.batch( () => {
+			dispatch.receiveNavigationFallbackId( fallback?.id );
 
-		if ( record ) {
+			if ( ! record ) {
+				return;
+			}
+
 			// If the fallback is already in the store, don't invalidate navigation queries.
 			// Otherwise, invalidate the cache for the scenario where there were no Navigation
 			// posts in the state and the fallback created one.
@@ -790,7 +794,7 @@ export const getNavigationFallbackId =
 				'wp_navigation',
 				fallback.id,
 			] );
-		}
+		} );
 	};
 
 export const getDefaultTemplateId =
@@ -817,7 +821,7 @@ export const getDefaultTemplateId =
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -884,32 +888,36 @@ export const getRevisions =
 				} );
 			}
 
-			dispatch.receiveRevisions(
-				kind,
-				name,
-				recordKey,
-				records,
-				query,
-				false,
-				meta
-			);
+			registry.batch( () => {
+				dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getRevision` selector in addition to `getRevisions`.
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [
-						kind,
-						name,
-						recordKey,
-						record[ key ],
-					] );
+				// When requesting all fields, the list of results can be used to
+				// resolve the `getRevision` selector in addition to `getRevisions`.
+				if ( ! query?._fields && ! query.context ) {
+					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [
+							kind,
+							name,
+							recordKey,
+							record[ key ],
+						] );
 
-				dispatch.startResolutions( 'getRevision', resolutionsArgs );
-				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
-			}
+					dispatch.finishResolutions(
+						'getRevision',
+						resolutionsArgs
+					);
+				}
+			} );
 		}
 	};
 
@@ -974,5 +982,36 @@ export const getRevision =
 
 		if ( record ) {
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
+		}
+	};
+
+/**
+ * Requests a specific post type options from the REST API.
+ *
+ * @param {string} postType Post type slug.
+ */
+export const getRegisteredPostMeta =
+	( postType ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		let options;
+		try {
+			const {
+				rest_namespace: restNamespace = 'wp/v2',
+				rest_base: restBase,
+			} = ( await resolveSelect.getPostType( postType ) ) || {};
+			options = await apiFetch( {
+				path: `${ restNamespace }/${ restBase }/?context=edit`,
+				method: 'OPTIONS',
+			} );
+		} catch ( error ) {
+			// Do nothing if the request comes back with an API error.
+			return;
+		}
+
+		if ( options ) {
+			dispatch.receiveRegisteredPostMeta(
+				postType,
+				options?.schema?.properties?.meta?.properties
+			);
 		}
 	};

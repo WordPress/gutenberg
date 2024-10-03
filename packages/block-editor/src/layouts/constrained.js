@@ -7,6 +7,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -70,12 +71,14 @@ export default {
 			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
-			<>
+			<VStack
+				spacing={ 4 }
+				className="block-editor-hooks__layout-constrained"
+			>
 				{ allowCustomContentAndWideSize && (
-					<div className="block-editor-hooks__layout-controls-units">
+					<>
 						<UnitControl
 							__next40pxDefaultSize
-							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Content width' ) }
 							labelPosition="top"
 							value={ contentSize || wideSize || '' }
@@ -98,7 +101,6 @@ export default {
 						/>
 						<UnitControl
 							__next40pxDefaultSize
-							className="block-editor-hooks__layout-controls-unit-input"
 							label={ __( 'Wide width' ) }
 							labelPosition="top"
 							value={ wideSize || contentSize || '' }
@@ -119,12 +121,12 @@ export default {
 								</InputControlPrefixWrapper>
 							}
 						/>
-						<p className="block-editor-hooks__layout-controls-helptext">
+						<p className="block-editor-hooks__layout-constrained-helptext">
 							{ __(
 								'Customize the width for all elements that are assigned to the center or wide columns.'
 							) }
 						</p>
-					</div>
+					</>
 				) }
 				{ allowJustification && (
 					<ToggleGroupControl
@@ -148,7 +150,7 @@ export default {
 						) }
 					</ToggleGroupControl>
 				) }
-			</>
+			</VStack>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls( {

@@ -10,7 +10,6 @@ if ( ! function_exists( 'wp_register_block_template' ) ) {
 	 * Register a template.
 	 *
 	 * @param string       $template_name  Template name in the form of `plugin_uri//template_name`.
-	 * @param array|string $args           Object type or array of object types with which the taxonomy should be associated.
 	 * @param array|string $args           {
 	 *     @type string        $title                 Optional. Title of the template as it will be shown in the Site Editor
 	 *                                                and other UI elements.
@@ -33,7 +32,8 @@ if ( ! function_exists( 'wp_unregister_block_template' ) ) {
 	 * Unregister a template.
 	 *
 	 * @param string $template_name Template name in the form of `plugin_uri//template_name`.
-	 * @return true|WP_Error True on success, WP_Error on failure or if the template doesn't exist.
+	 * @return WP_Block_Template|WP_Error The unregistered template object on success, WP_Error object on failure or if
+	 *                                    the template doesn't exist.
 	 */
 	function wp_unregister_block_template( $template_name ) {
 		return WP_Block_Templates_Registry::get_instance()->unregister( $template_name );

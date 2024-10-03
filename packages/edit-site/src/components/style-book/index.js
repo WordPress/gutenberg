@@ -13,13 +13,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	getCategories,
-	getBlockType,
-	getBlockTypes,
-	getBlockFromExample,
-	createBlock,
-} from '@wordpress/blocks';
-import {
 	BlockList,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -37,6 +30,12 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
+import { STYLE_BOOK_IFRAME_STYLES } from './constants';
+import {
+	getExamplesByCategory,
+	getTopLevelStyleBookCategories,
+} from './categories';
+import { getExamples } from './examples';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -48,124 +47,8 @@ const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-// The content area of the Style Book is rendered within an iframe so that global styles
-// are applied to elements within the entire content area. To support elements that are
-// not part of the block previews, such as headings and layout for the block previews,
-// additional CSS rules need to be passed into the iframe. These are hard-coded below.
-// Note that button styles are unset, and then focus rules from the `Button` component are
-// applied to the `button` element, targeted via `.edit-site-style-book__example`.
-// This is to ensure that browser default styles for buttons are not applied to the previews.
-const STYLE_BOOK_IFRAME_STYLES = `
-	.edit-site-style-book__examples {
-		max-width: 900px;
-		margin: 0 auto;
-	}
-
-	.edit-site-style-book__example {
-		border-radius: 2px;
-		cursor: pointer;
-		display: flex;
-		flex-direction: column;
-		gap: 40px;
-		margin-bottom: 40px;
-		padding: 16px;
-		width: 100%;
-		box-sizing: border-box;
-		scroll-margin-top: 32px;
-		scroll-margin-bottom: 32px;
-	}
-
-	.edit-site-style-book__example.is-selected {
-		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-	}
-
-	.edit-site-style-book__example:focus:not(:disabled) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
-		outline: 3px solid transparent;
-	}
-
-	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
-		flex-direction: row;
-	}
-
-	.edit-site-style-book__example-title {
-		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-		font-size: 11px;
-		font-weight: 500;
-		line-height: normal;
-		margin: 0;
-		text-align: left;
-		text-transform: uppercase;
-	}
-
-	.edit-site-style-book__examples.is-wide .edit-site-style-book__example-title {
-		text-align: right;
-		width: 120px;
-	}
-
-	.edit-site-style-book__example-preview {
-		width: 100%;
-	}
-
-	.edit-site-style-book__example-preview .block-editor-block-list__insertion-point,
-	.edit-site-style-book__example-preview .block-list-appender {
-		display: none;
-	}
-
-	.edit-site-style-book__example-preview .is-root-container > .wp-block:first-child {
-		margin-top: 0;
-	}
-	.edit-site-style-book__example-preview .is-root-container > .wp-block:last-child {
-		margin-bottom: 0;
-	}
-`;
-
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
-}
-
-function getExamples() {
-	const nonHeadingBlockExamples = getBlockTypes()
-		.filter( ( blockType ) => {
-			const { name, example, supports } = blockType;
-			return (
-				name !== 'core/heading' &&
-				!! example &&
-				supports.inserter !== false
-			);
-		} )
-		.map( ( blockType ) => ( {
-			name: blockType.name,
-			title: blockType.title,
-			category: blockType.category,
-			blocks: getBlockFromExample( blockType.name, blockType.example ),
-		} ) );
-
-	const isHeadingBlockRegistered = !! getBlockType( 'core/heading' );
-
-	if ( ! isHeadingBlockRegistered ) {
-		return nonHeadingBlockExamples;
-	}
-
-	// Use our own example for the Heading block so that we can show multiple
-	// heading levels.
-	const headingsExample = {
-		name: 'core/heading',
-		title: __( 'Headings' ),
-		category: 'text',
-		blocks: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) => {
-			return createBlock( 'core/heading', {
-				content: sprintf(
-					// translators: %d: heading level e.g: "1", "2", "3"
-					__( 'Heading %d' ),
-					level
-				),
-				level,
-			} );
-		} ),
-	};
-
-	return [ headingsExample, ...nonHeadingBlockExamples ];
 }
 
 function StyleBook( {
@@ -184,17 +67,11 @@ function StyleBook( {
 	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
-			getCategories()
-				.filter( ( category ) =>
-					examples.some(
-						( example ) => example.category === category.slug
-					)
+			getTopLevelStyleBookCategories().filter( ( category ) =>
+				examples.some(
+					( example ) => example.category === category.slug
 				)
-				.map( ( category ) => ( {
-					name: category.slug,
-					title: category.title,
-					icon: category.icon,
-				} ) ),
+			),
 		[ examples ]
 	);
 	const { base: baseConfig } = useContext( GlobalStylesContext );
@@ -245,24 +122,26 @@ function StyleBook( {
 				{ showTabs ? (
 					<div className="edit-site-style-book__tabs">
 						<Tabs>
-							<Tabs.TabList>
-								{ tabs.map( ( tab ) => (
-									<Tabs.Tab
-										tabId={ tab.name }
-										key={ tab.name }
-									>
-										{ tab.title }
-									</Tabs.Tab>
-								) ) }
-							</Tabs.TabList>
+							<div className="edit-site-style-book__tablist-container">
+								<Tabs.TabList>
+									{ tabs.map( ( tab ) => (
+										<Tabs.Tab
+											tabId={ tab.slug }
+											key={ tab.slug }
+										>
+											{ tab.title }
+										</Tabs.Tab>
+									) ) }
+								</Tabs.TabList>
+							</div>
 							{ tabs.map( ( tab ) => (
 								<Tabs.TabPanel
-									key={ tab.name }
-									tabId={ tab.name }
+									key={ tab.slug }
+									tabId={ tab.slug }
 									focusable={ false }
 								>
 									<StyleBookBody
-										category={ tab.name }
+										category={ tab.slug }
 										examples={ examples }
 										isSelected={ isSelected }
 										onSelect={ onSelect }
@@ -329,10 +208,6 @@ const StyleBookBody = ( {
 		readonly: true,
 	};
 
-	const buttonModeStyles = onClick
-		? 'body { cursor: pointer; } body * { pointer-events: none; }'
-		: '';
-
 	return (
 		<Iframe
 			className={ clsx( 'edit-site-style-book__iframe', {
@@ -345,14 +220,9 @@ const StyleBookBody = ( {
 		>
 			<EditorStyles styles={ settings.styles } />
 			<style>
-				{
-					// Forming a "block formatting context" to prevent margin collapsing.
-					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-					`.is-root-container { display: flow-root; }
-						body { position: relative; padding: 32px !important; }` +
-						STYLE_BOOK_IFRAME_STYLES +
-						buttonModeStyles
-				}
+				{ STYLE_BOOK_IFRAME_STYLES }
+				{ !! onClick &&
+					'body { cursor: pointer; } body * { pointer-events: none; }' }
 			</style>
 			<Examples
 				className={ clsx( 'edit-site-style-book__examples', {
@@ -379,6 +249,16 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
+		const categoryDefinition = category
+			? getTopLevelStyleBookCategories().find(
+					( _category ) => _category.slug === category
+			  )
+			: null;
+
+		const filteredExamples = categoryDefinition
+			? getExamplesByCategory( categoryDefinition, examples )
+			: { examples };
+
 		return (
 			<Composite
 				orientation="vertical"
@@ -386,11 +266,8 @@ const Examples = memo(
 				aria-label={ label }
 				role="grid"
 			>
-				{ examples
-					.filter( ( example ) =>
-						category ? example.category === category : true
-					)
-					.map( ( example ) => (
+				{ !! filteredExamples?.examples?.length &&
+					filteredExamples.examples.map( ( example ) => (
 						<Example
 							key={ example.name }
 							id={ `example-${ example.name }` }
@@ -402,10 +279,46 @@ const Examples = memo(
 							} }
 						/>
 					) ) }
+				{ !! filteredExamples?.subcategories?.length &&
+					filteredExamples.subcategories.map( ( subcategory ) => (
+						<Composite.Group
+							className="edit-site-style-book__subcategory"
+							key={ `subcategory-${ subcategory.slug }` }
+						>
+							<Composite.GroupLabel>
+								<h2 className="edit-site-style-book__subcategory-title">
+									{ subcategory.title }
+								</h2>
+							</Composite.GroupLabel>
+							<Subcategory
+								examples={ subcategory.examples }
+								isSelected={ isSelected }
+								onSelect={ onSelect }
+							/>
+						</Composite.Group>
+					) ) }
 			</Composite>
 		);
 	}
 );
+
+const Subcategory = ( { examples, isSelected, onSelect } ) => {
+	return (
+		!! examples?.length &&
+		examples.map( ( example ) => (
+			<Example
+				key={ example.name }
+				id={ `example-${ example.name }` }
+				title={ example.title }
+				blocks={ example.blocks }
+				isSelected={ isSelected( example.name ) }
+				onClick={ () => {
+					onSelect?.( example.name );
+				} }
+			/>
+		) )
+	);
+};
 
 const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(

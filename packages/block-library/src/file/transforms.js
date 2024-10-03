@@ -24,12 +24,32 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							blob: blobURL,
-							fileName: file.name,
-						} )
-					);
+					if ( file.type.startsWith( 'video/' ) ) {
+						blocks.push(
+							createBlock( 'core/video', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'image/' ) ) {
+						blocks.push(
+							createBlock( 'core/image', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'audio/' ) ) {
+						blocks.push(
+							createBlock( 'core/audio', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else {
+						blocks.push(
+							createBlock( 'core/file', {
+								blob: blobURL,
+								fileName: file.name,
+							} )
+						);
+					}
 				} );
 
 				return blocks;

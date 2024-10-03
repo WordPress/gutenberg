@@ -195,14 +195,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		( select ) => {
 			const {
 				getBlockName,
-				isBlockSelected,
-				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
 				getTemplateLock,
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getBlockSettings,
-				isDragging,
 				getSectionRootClientId,
 			} = unlock( select( blockEditorStore ) );
 			let _isDropZoneDisabled;
@@ -213,8 +210,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
-			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation';
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
@@ -236,12 +231,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					'__experimentalExposeControlsToChildren',
 					false
 				),
-				hasOverlay:
-					blockName !== 'core/template' &&
-					! isBlockSelected( clientId ) &&
-					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough &&
-					! isDragging(),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
@@ -254,7 +243,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	);
 	const {
 		__experimentalCaptureToolbars,
-		hasOverlay,
 		name,
 		blockType,
 		parentLock,
@@ -299,10 +287,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
-			__unstableDisableLayoutClassNames ? '' : layoutClassNames,
-			{
-				'has-overlay': hasOverlay,
-			}
+			__unstableDisableLayoutClassNames ? '' : layoutClassNames
 		),
 		children: clientId ? (
 			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />

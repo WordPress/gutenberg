@@ -21,6 +21,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function VariationsButtons( {
 	className,
@@ -35,8 +36,8 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
+					size="compact"
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
@@ -140,19 +141,28 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations } = useSelect(
+	const { activeBlockVariation, variations, isContentOnly } = useSelect(
 		( select ) => {
 			const { getActiveBlockVariation, getBlockVariations } =
 				select( blocksStore );
-			const { getBlockName, getBlockAttributes } =
+
+			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
+
 			const name = blockClientId && getBlockName( blockClientId );
+
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
+
 			return {
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId )
 				),
 				variations: name && getBlockVariations( name, 'transform' ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
 			};
 		},
 		[ blockClientId ]
@@ -181,8 +191,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	// Skip rendering if there are no variations
-	if ( ! variations?.length ) {
+	if ( ! variations?.length || isContentOnly ) {
 		return null;
 	}
 

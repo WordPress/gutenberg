@@ -10,6 +10,7 @@ import { useStoreState } from '@ariakit/react';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -65,6 +66,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		defaultValue,
 		value,
 		setValue: wrappedOnChangeProp,
+		rtl: isRTL(),
 	} );
 
 	const selectedValue = useStoreState( radio, 'value' );

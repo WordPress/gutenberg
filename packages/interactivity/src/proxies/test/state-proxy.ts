@@ -9,7 +9,7 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxifyState, peek } from '../';
+import { proxifyState, peek, deepMerge } from '../';
 import { setScope, resetScope, getContext, getElement } from '../../scopes';
 import { setNamespace, resetNamespace } from '../../namespaces';
 
@@ -1263,6 +1263,203 @@ describe( 'Interactivity API', () => {
 				state[ key ] = true;
 				expect( state[ key ] ).toBe( true );
 				expect( x ).toBe( undefined );
+			} );
+		} );
+
+		describe( 'read-only', () => {
+			it( "should not allow modifying a prop's value", () => {
+				const readOnlyState = proxifyState(
+					'test',
+					{ prop: 'value', nested: { prop: 'value' } },
+					{ readOnly: true }
+				);
+
+				expect( () => {
+					readOnlyState.prop = 'new value';
+				} ).toThrow();
+				expect( () => {
+					readOnlyState.nested.prop = 'new value';
+				} ).toThrow();
+			} );
+
+			it( 'should not allow modifying a prop descriptor', () => {
+				const readOnlyState = proxifyState(
+					'test',
+					{ prop: 'value', nested: { prop: 'value' } },
+					{ readOnly: true }
+				);
+
+				expect( () => {
+					Object.defineProperty( readOnlyState, 'prop', {
+						get: () => 'value from getter',
+						writable: true,
+						enumerable: false,
+					} );
+				} ).toThrow();
+				expect( () => {
+					Object.defineProperty( readOnlyState.nested, 'prop', {
+						get: () => 'value from getter',
+						writable: true,
+						enumerable: false,
+					} );
+				} ).toThrow();
+			} );
+
+			it( 'should not allow adding new props', () => {
+				const readOnlyState = proxifyState< any >(
+					'test',
+					{ prop: 'value', nested: { prop: 'value' } },
+					{ readOnly: true }
+				);
+
+				expect( () => {
+					readOnlyState.newProp = 'value';
+				} ).toThrow();
+				expect( () => {
+					readOnlyState.nested.newProp = 'value';
+				} ).toThrow();
+			} );
+
+			it( 'should not allow removing props', () => {
+				const readOnlyState = proxifyState< any >(
+					'test',
+					{ prop: 'value', nested: { prop: 'value' } },
+					{ readOnly: true }
+				);
+
+				expect( () => {
+					delete readOnlyState.prop;
+				} ).toThrow();
+				expect( () => {
+					delete readOnlyState.nested.prop;
+				} ).toThrow();
+			} );
+
+			it( 'should not allow adding items to an array', () => {
+				const readOnlyState = proxifyState(
+					'test',
+					{ array: [ 1, 2, 3 ], nested: { array: [ 1, 2, 3 ] } },
+					{ readOnly: true }
+				);
+
+				expect( () => readOnlyState.array.push( 4 ) ).toThrow();
+				expect( () => readOnlyState.nested.array.push( 4 ) ).toThrow();
+			} );
+
+			it( 'should not allow removing items from an array', () => {
+				const readOnlyState = proxifyState(
+					'test',
+					{ array: [ 1, 2, 3 ], nested: { array: [ 1, 2, 3 ] } },
+					{ readOnly: true }
+				);
+
+				expect( () => readOnlyState.array.pop() ).toThrow();
+				expect( () => readOnlyState.nested.array.pop() ).toThrow();
+			} );
+
+			it( 'should allow subscribing to prop changes', () => {
+				const readOnlyState = proxifyState(
+					'test',
+					{
+						prop: 'value',
+						nested: { prop: 'value' },
+					},
+					{ readOnly: true }
+				);
+
+				const spy1 = jest.fn( () => readOnlyState.prop );
+				const spy2 = jest.fn( () => readOnlyState.nested.prop );
+
+				effect( spy1 );
+				effect( spy2 );
+				expect( spy1 ).toHaveBeenCalledTimes( 1 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( 'value' );
+				expect( spy2 ).toHaveLastReturnedWith( 'value' );
+
+				deepMerge( readOnlyState, { prop: 'new value' } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( 'new value' );
+				expect( spy2 ).toHaveLastReturnedWith( 'value' );
+
+				deepMerge( readOnlyState, { nested: { prop: 'new value' } } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 2 );
+				expect( spy1 ).toHaveLastReturnedWith( 'new value' );
+				expect( spy2 ).toHaveLastReturnedWith( 'new value' );
+			} );
+
+			it( 'should allow subscribing to new props', () => {
+				const readOnlyState = proxifyState< any >(
+					'test',
+					{
+						prop: 'value',
+						nested: { prop: 'value' },
+					},
+					{ readOnly: true }
+				);
+
+				const spy1 = jest.fn( () => readOnlyState.newProp );
+				const spy2 = jest.fn( () => readOnlyState.nested.newProp );
+
+				effect( spy1 );
+				effect( spy2 );
+				expect( spy1 ).toHaveBeenCalledTimes( 1 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( undefined );
+				expect( spy2 ).toHaveLastReturnedWith( undefined );
+
+				deepMerge( readOnlyState, { newProp: 'value' } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( 'value' );
+				expect( spy2 ).toHaveLastReturnedWith( undefined );
+
+				deepMerge( readOnlyState, { nested: { newProp: 'value' } } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 2 );
+				expect( spy1 ).toHaveLastReturnedWith( 'value' );
+				expect( spy2 ).toHaveLastReturnedWith( 'value' );
+			} );
+
+			it( 'should allow subscribing to array changes', () => {
+				const readOnlyState = proxifyState< any >(
+					'test',
+					{
+						array: [ 1, 2, 3 ],
+						nested: { array: [ 1, 2, 3 ] },
+					},
+					{ readOnly: true }
+				);
+
+				const spy1 = jest.fn( () => readOnlyState.array[ 0 ] );
+				const spy2 = jest.fn( () => readOnlyState.nested.array[ 0 ] );
+
+				effect( spy1 );
+				effect( spy2 );
+				expect( spy1 ).toHaveBeenCalledTimes( 1 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( 1 );
+				expect( spy2 ).toHaveLastReturnedWith( 1 );
+
+				deepMerge( readOnlyState, { array: [ 4, 5, 6 ] } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 1 );
+				expect( spy1 ).toHaveLastReturnedWith( 4 );
+				expect( spy2 ).toHaveLastReturnedWith( 1 );
+
+				deepMerge( readOnlyState, { nested: { array: [] } } );
+
+				expect( spy1 ).toHaveBeenCalledTimes( 2 );
+				expect( spy2 ).toHaveBeenCalledTimes( 2 );
+				expect( spy1 ).toHaveLastReturnedWith( 4 );
+				expect( spy2 ).toHaveLastReturnedWith( undefined );
 			} );
 		} );
 	} );

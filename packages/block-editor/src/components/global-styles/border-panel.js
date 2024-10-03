@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBorderBoxControl as BorderBoxControl,
+	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,

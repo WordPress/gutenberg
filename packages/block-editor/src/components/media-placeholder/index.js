@@ -11,6 +11,8 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -42,21 +44,23 @@ const InsertFromURLPopover = ( {
 			className="block-editor-media-placeholder__url-input-form"
 			onSubmit={ onSubmit }
 		>
-			<input
-				className="block-editor-media-placeholder__url-input-field"
-				type="text"
-				aria-label={ __( 'URL' ) }
+			<InputControl
+				__next40pxDefaultSize
+				label={ __( 'URL' ) }
+				hideLabelFromVision
 				placeholder={ __( 'Paste or type URL' ) }
 				onChange={ onChange }
 				value={ src }
-			/>
-			<Button
-				// TODO: Switch to `true` (40px size) if possible
-				__next40pxDefaultSize={ false }
-				className="block-editor-media-placeholder__url-input-submit-button"
-				icon={ keyboardReturn }
-				label={ __( 'Apply' ) }
-				type="submit"
+				suffix={
+					<InputControlSuffixWrapper variant="control">
+						<Button
+							size="small"
+							icon={ keyboardReturn }
+							label={ __( 'Apply' ) }
+							type="submit"
+						/>
+					</InputControlSuffixWrapper>
+				}
 			/>
 		</form>
 	</URLPopover>
@@ -87,8 +91,7 @@ const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
 	return (
 		<div className="block-editor-media-placeholder__url-input-container">
 			<Button
-				// TODO: Switch to `true` (40px size) if possible
-				__next40pxDefaultSize={ false }
+				__next40pxDefaultSize
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
@@ -165,10 +168,6 @@ export function MediaPlaceholder( {
 			( allowedType ) =>
 				allowedType === 'image' || allowedType.startsWith( 'image/' )
 		);
-	};
-
-	const onChangeSrc = ( event ) => {
-		setSrc( event.target.value );
 	};
 
 	const onFilesUpload = ( files ) => {
@@ -389,8 +388,7 @@ export function MediaPlaceholder( {
 		return (
 			onCancel && (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
 					variant="link"
@@ -407,7 +405,7 @@ export function MediaPlaceholder( {
 			onSelectURL && (
 				<URLSelectionUI
 					src={ src }
-					onChangeSrc={ onChangeSrc }
+					onChangeSrc={ setSrc }
 					onSelectURL={ onSelectURL }
 				/>
 			)
@@ -419,8 +417,7 @@ export function MediaPlaceholder( {
 			onToggleFeaturedImage && (
 				<div className="block-editor-media-placeholder__url-input-container">
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
 						variant="secondary"
@@ -436,8 +433,7 @@ export function MediaPlaceholder( {
 		const defaultButton = ( { open } ) => {
 			return (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ () => {
 						open();
@@ -477,8 +473,7 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
-										// TODO: Switch to `true` (40px size) if possible
-										__next40pxDefaultSize={ false }
+										__next40pxDefaultSize
 										variant="primary"
 										className={ clsx(
 											'block-editor-media-placeholder__button',
@@ -508,8 +503,7 @@ export function MediaPlaceholder( {
 					<FormFileUpload
 						render={ ( { openFileDialog } ) => (
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								onClick={ openFileDialog }
 								variant="primary"
 								className={ clsx(
