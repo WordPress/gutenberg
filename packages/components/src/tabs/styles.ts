@@ -206,6 +206,7 @@ export const Tab = styled( Ariakit.Tab )`
 		padding-inline: ${ space( 4 ) };
 		height: ${ space( 12 ) };
 		text-align: center;
+		scroll-margin: 24px;
 
 		&::after {
 			content: '';
@@ -217,7 +218,6 @@ export const Tab = styled( Ariakit.Tab )`
 		padding: ${ space( 2 ) } ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
 		text-align: start;
-		scroll-margin: 24px;
 
 		&[aria-selected='true'] {
 			color: ${ COLORS.theme.accent };
