@@ -226,7 +226,7 @@ export const Tab = styled( Ariakit.Tab )`
 	}
 	[aria-orientation='vertical'][data-select-on-move='false'] &::after {
 		content: '';
-		inset: 2px;
+		inset: var( --wp-admin-border-width-focus );
 	}
 `;
 
