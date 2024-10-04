@@ -155,7 +155,8 @@ export const Tab = styled( Ariakit.Tab )`
 			outline: none;
 		}
 
-		// Focus.
+		// Focus indicator.
+		position: relative;
 		&::after {
 			content: '';
 			position: absolute;
