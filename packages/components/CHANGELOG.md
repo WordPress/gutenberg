@@ -4,7 +4,9 @@
 
 ### Enhancements
 
--   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+
+## 28.9.0 (2024-10-03)
 
 ### Bug Fixes
 
@@ -14,6 +16,10 @@
 -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
 -   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
 -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+
+### Enhancements
+
+-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
 
 ## 28.8.0 (2024-09-19)
 
