@@ -89,7 +89,7 @@ export default function PostURL( { onClose } ) {
 					<p className="editor-post-url__intro">
 						{ createInterpolateElement(
 							__(
-								'<span>Customize the last part of the URL.</span> <a>Learn more.</a>'
+								'<span>Customize the last part of the Permalink.</span> <a>Learn more.</a>'
 							),
 							{
 								span: <span id={ postUrlSlugDescriptionId } />,
