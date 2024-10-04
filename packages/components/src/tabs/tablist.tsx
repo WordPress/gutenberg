@@ -32,7 +32,7 @@ const DEFAULT_SCROLL_MARGIN = 24;
  * The scroll is updated initially and whenever the rect changes.
  */
 function useScrollRectIntoView(
-	parent: HTMLElement | null | undefined,
+	parent: HTMLElement | undefined,
 	rect: ElementOffsetRect,
 	{ margin = DEFAULT_SCROLL_MARGIN } = {}
 ) {
