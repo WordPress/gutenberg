@@ -130,8 +130,8 @@ export const TabListWrapper = styled.div`
 				transparent 96%
 			);
 		}
-		box-sizing: border-box;
 		&[data-select-on-move='true']:has( [data-focus-visible] )::before {
+			box-sizing: border-box;
 			border: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
 			/* Adjusting the border width to match the scaling in the y axis. */
