@@ -186,7 +186,7 @@ export const Tab = styled( Ariakit.Tab )`
 	}
 
 	[aria-orientation='horizontal'] & {
-		padding: ${ space( 4 ) };
+		padding-inline: ${ space( 4 ) };
 		height: ${ space( 12 ) };
 
 		&::after {
