@@ -201,4 +201,9 @@
 		background: none;
 		border: none;
 	}
+
+	// Make the spacing consistent between controls.
+	.zoom-out-toolbar-button {
+		height: $button-size-next-default-40px;
+	}
 }
