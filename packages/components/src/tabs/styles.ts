@@ -128,14 +128,16 @@ export const TabListWrapper = styled.div`
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
-		flex: 1 0 auto;
-		white-space: nowrap;
-		display: flex;
-		align-items: center;
+		/* Resets */
 		border-radius: 0;
 		background: transparent;
 		border: none;
 		box-shadow: none;
+
+		flex: 1 0 auto;
+		white-space: nowrap;
+		display: flex;
+		align-items: center;
 		cursor: pointer;
 		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
 		margin-left: 0;
