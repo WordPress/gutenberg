@@ -57,7 +57,10 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
 	return '';
 };
 
-export const Wrapper = styled.div< WrapperProps >`
+export const Wrapper = styled( 'div', {
+	shouldForwardProp: ( prop: string ) =>
+		! [ 'color', '__nextHasNoMarginBottom', 'marks' ].includes( prop ),
+} )< WrapperProps >`
 	display: block;
 	flex: 1;
 	position: relative;
