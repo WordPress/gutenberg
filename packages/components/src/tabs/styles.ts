@@ -229,10 +229,6 @@ export const TabChevron = styled( Icon )`
 	&:dir( rtl ) {
 		rotate: 180deg;
 	}
-
-	[aria-orientation='horizontal'] & {
-		justify-content: center;
-	}
 `;
 
 export const TabPanel = styled( Ariakit.TabPanel )`
