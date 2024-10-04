@@ -42,6 +42,7 @@ export const TabListWrapper = styled.div`
 			transition-timing-function: ease-out;
 		}
 	}
+	position: relative;
 	&::before {
 		content: '';
 		position: absolute;
