@@ -130,7 +130,7 @@ export const TabListWrapper = styled.div`
 				transparent 96%
 			);
 		}
-		&[data-select-on-move='true']:has( :focus-visible )::before {
+		&[data-select-on-move='true']:has( [data-focus-visible] )::before {
 			box-sizing: border-box;
 			border: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
@@ -197,7 +197,7 @@ export const Tab = styled( Ariakit.Tab )`
 			}
 		}
 
-		&:focus-visible::after {
+		&[data-focus-visible]::after {
 			opacity: 1;
 		}
 	}
@@ -266,7 +266,7 @@ export const TabPanel = styled( Ariakit.TabPanel )`
 		outline: none;
 	}
 
-	&:focus-visible {
+	&[data-focus-visible] {
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			${ COLORS.theme.accent };
 		// Windows high contrast mode.
