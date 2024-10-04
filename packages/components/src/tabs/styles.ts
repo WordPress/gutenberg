@@ -132,7 +132,6 @@ export const Tab = styled( Ariakit.Tab )`
 		white-space: nowrap;
 		display: flex;
 		align-items: center;
-		position: relative;
 		border-radius: 0;
 		background: transparent;
 		border: none;
