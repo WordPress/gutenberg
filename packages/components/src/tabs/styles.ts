@@ -196,7 +196,6 @@ export const Tab = styled( Ariakit.Tab )`
 
 	[aria-orientation='vertical'] & {
 		padding: ${ space( 2 ) } ${ space( 3 ) };
-		padding-inline: ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
 		&[aria-selected='true'] {
 			color: ${ COLORS.theme.accent };
