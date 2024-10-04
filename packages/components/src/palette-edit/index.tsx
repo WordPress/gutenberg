@@ -74,22 +74,21 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  */
 export function deduplicateElementSlugs< T extends PaletteElement >(
 	elements: T[]
-): T[] {
+) {
 	const slugCounts: { [ slug: string ]: number } = {};
-	const updatedElements = elements.map( ( element: T ) => ( {
-		...element,
-	} ) ) as T[];
 
-	updatedElements.forEach( ( element, index ) => {
+	return elements.map( ( element, index ) => {
+		let newSlug: string | undefined;
+
 		const { slug } = element;
 		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
 
 		if ( slugCounts[ slug ] > 1 ) {
-			element.slug = `${ slug }-${ index }`;
+			newSlug = `${ slug }-${ index }`;
 		}
-	} );
 
-	return updatedElements;
+		return { ...element, slug: newSlug ?? slug };
+	} );
 }
 
 /**
