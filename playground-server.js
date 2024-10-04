@@ -27,7 +27,7 @@ const wpServer = spawn(
 wpServer.stdout.on( 'data', ( data ) => {
 	const output = data.toString().trim();
 
-	if ( output && ! output.endsWith( '%' ) ) {
+	if ( output && ! output.includes( '%' ) ) {
 		// eslint-disable-next-line no-console
 		console.log( output ); // Optional: log the output
 	}
