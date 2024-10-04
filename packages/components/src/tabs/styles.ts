@@ -12,16 +12,13 @@ import { space } from '../utils/space';
 import Icon from '../icon';
 
 export const TabListWrapper = styled.div`
-	position: relative;
+  position: relative;
 	display: flex;
 	align-items: stretch;
-	flex-direction: row;
-	text-align: center;
 	overflow-x: auto;
 
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
-		text-align: start;
 	}
 
 	:where( [aria-orientation='horizontal'] ) {
