@@ -187,10 +187,7 @@ export const Tab = styled( Ariakit.Tab )`
 
 	[aria-orientation='horizontal'] & {
 		padding: ${ space( 4 ) };
-		min-height: ${ space(
-			12
-		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
-		height: auto;
+		height: ${ space( 12 ) };
 
 		&::after {
 			inset: ${ space( 3 ) };
