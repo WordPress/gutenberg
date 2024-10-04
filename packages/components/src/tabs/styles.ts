@@ -244,6 +244,17 @@ export const TabChevron = styled( Icon )`
 	[role='tab']:is( [aria-selected='true'], [data-focus-visible], :hover ) & {
 		opacity: 1;
 	}
+	@media not ( prefers-reduced-motion ) {
+		[data-select-on-move='true']
+			[role='tab']:is(
+				[aria-selected='true'],
+				[data-focus-visible],
+				:hover
+			)
+			& {
+			transition: opacity 0.3s ease-in;
+		}
+	}
 	&:dir( rtl ) {
 		rotate: 180deg;
 	}
