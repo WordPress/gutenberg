@@ -49,7 +49,6 @@ import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,
-	Gradient,
 	NameInputProps,
 	OptionProps,
 	PaletteEditListViewProps,
@@ -132,7 +131,7 @@ export function getNameAndSlugForPosition(
 	};
 }
 
-function ColorPickerPopover< T extends Color | Gradient >( {
+function ColorPickerPopover< T extends PaletteElement >( {
 	isGradient,
 	element,
 	onChange,
@@ -190,7 +189,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	);
 }
 
-function Option< T extends Color | Gradient >( {
+function Option< T extends PaletteElement >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
@@ -288,7 +287,7 @@ function Option< T extends Color | Gradient >( {
 	);
 }
 
-function PaletteEditListView< T extends Color | Gradient >( {
+function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
