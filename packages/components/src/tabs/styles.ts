@@ -251,11 +251,7 @@ export const TabChevron = styled( Icon )`
 	// indicator that's being animated at the same time.
 	@media not ( prefers-reduced-motion ) {
 		[data-select-on-move='true']
-			[role='tab']:is(
-				[aria-selected='true'],
-				[data-focus-visible],
-				:hover
-			)
+			[role='tab']:is( [aria-selected='true'],  )
 			& {
 			transition: opacity 0.3s ease-in;
 		}
