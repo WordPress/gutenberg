@@ -12,7 +12,6 @@ import { space } from '../utils/space';
 import Icon from '../icon';
 
 export const TabListWrapper = styled.div`
-  position: relative;
 	display: flex;
 	align-items: stretch;
 	overflow-x: auto;
@@ -150,7 +149,6 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		&:focus:not( :disabled ) {
-			position: relative;
 			box-shadow: none;
 			outline: none;
 		}
