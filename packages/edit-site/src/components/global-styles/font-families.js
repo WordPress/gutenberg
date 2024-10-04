@@ -25,6 +25,19 @@ import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
+/**
+ * Maps the fonts with the source, if available.
+ *
+ * @param {Array}  fonts  The fonts to map.
+ * @param {string} source The source of the fonts.
+ * @return {Array} The mapped fonts.
+ */
+function mapFontsWithSource( fonts, source ) {
+	return fonts
+		? fonts.map( ( f ) => setUIValuesNeeded( f, { source } ) )
+		: [];
+}
+
 function FontFamilies() {
 	const { baseCustomFonts, modalTabOpen, setModalTabOpen } =
 		useContext( FontLibraryContext );
@@ -34,16 +47,8 @@ function FontFamilies() {
 		undefined,
 		'base'
 	);
-	const themeFonts = fontFamilies?.theme
-		? fontFamilies.theme.map( ( f ) =>
-				setUIValuesNeeded( f, { source: 'theme' } )
-		  )
-		: [];
-	const customFonts = fontFamilies?.custom
-		? fontFamilies.custom.map( ( f ) =>
-				setUIValuesNeeded( f, { source: 'custom' } )
-		  )
-		: [];
+	const themeFonts = mapFontsWithSource( fontFamilies?.theme, 'theme' );
+	const customFonts = mapFontsWithSource( fontFamilies?.custom, 'custom' );
 	const activeFonts = [ ...themeFonts, ...customFonts ].sort( ( a, b ) =>
 		a.name.localeCompare( b.name )
 	);
