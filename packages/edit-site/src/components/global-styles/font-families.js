@@ -35,16 +35,18 @@ function FontFamilies() {
 		'base'
 	);
 	const themeFonts = fontFamilies?.theme
-		? fontFamilies.theme
-				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		? fontFamilies.theme.map( ( f ) =>
+				setUIValuesNeeded( f, { source: 'theme' } )
+		  )
 		: [];
 	const customFonts = fontFamilies?.custom
-		? fontFamilies.custom
-				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
-				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		? fontFamilies.custom.map( ( f ) =>
+				setUIValuesNeeded( f, { source: 'custom' } )
+		  )
 		: [];
-	const activeFonts = [ ...themeFonts, ...customFonts ];
+	const activeFonts = [ ...themeFonts, ...customFonts ].sort( ( a, b ) =>
+		a.name.localeCompare( b.name )
+	);
 	const hasFonts = 0 < activeFonts.length;
 	const hasInstalledFonts =
 		hasFonts ||
