@@ -28,7 +28,7 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { onNavigateToEntityRecord, templateId, editorMode } = useSelect(
+	const { onNavigateToEntityRecord, templateId, isZoomOut } = useSelect(
 		( select ) => {
 			const { getEditorSettings, getCurrentTemplateId } =
 				select( editorStore );
@@ -38,7 +38,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 				onNavigateToEntityRecord:
 					getEditorSettings().onNavigateToEntityRecord,
 				templateId: getCurrentTemplateId(),
-				editorMode: 'zoom-out' === __unstableGetEditorMode(),
+				isZoomOut: 'zoom-out' === __unstableGetEditorMode(),
 			};
 		},
 		[]
@@ -63,8 +63,8 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 				return;
 			}
 
-			if ( editorMode ) {
-				__unstableSetEditorMode( editorMode ? 'edit' : 'zoom-out' );
+			if ( isZoomOut ) {
+				__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 				return;
 			}
 
@@ -82,7 +82,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		return () => {
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ contentRef, canEditTemplate, editorMode ] );
+	}, [ contentRef, canEditTemplate, isZoomOut ] );
 
 	if ( ! canEditTemplate ) {
 		return null;
