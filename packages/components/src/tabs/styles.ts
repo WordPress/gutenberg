@@ -57,7 +57,7 @@ export const TabListWrapper = styled.div`
 	/* Using a large value to avoid antialiasing rounding issues
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
-	&:not( [aria-orientation='vertical'] ) {
+	&[aria-orientation='horizontal'] {
 		--fade-width: 4rem;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
 		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
