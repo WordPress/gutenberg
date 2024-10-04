@@ -3,18 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment, useMemo } from '@wordpress/element';
-import {
-	__experimentalHStack as HStack,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockIcon, InspectorControls } from '../components';
+import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
@@ -201,16 +197,10 @@ function BlockHooksControlPure( {
 
 								return (
 									<ToggleControl
+										__nextHasNoMarginBottom
 										checked={ checked }
 										key={ block.title }
-										label={
-											<HStack justify="flex-start">
-												<BlockIcon
-													icon={ block.icon }
-												/>
-												<span>{ block.title }</span>
-											</HStack>
-										}
+										label={ block.title }
 										onChange={ () => {
 											if ( ! checked ) {
 												// Create and insert block.

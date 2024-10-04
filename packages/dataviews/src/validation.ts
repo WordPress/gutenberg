@@ -7,10 +7,10 @@ import type { Field, Form } from './types';
 export function isItemValid< Item >(
 	item: Item,
 	fields: Field< Item >[],
-	form: Form
+	form: Form< Item >
 ): boolean {
 	const _fields = normalizeFields(
-		fields.filter( ( { id } ) => !! form.visibleFields?.includes( id ) )
+		fields.filter( ( { id } ) => !! form.fields?.includes( id ) )
 	);
 	return _fields.every( ( field ) => {
 		return field.isValid( item, { elements: field.elements } );

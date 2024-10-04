@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, rtl } from '../../utils';
+import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
@@ -108,10 +108,10 @@ const sizePaddings = ( {
 	selectSize = 'default',
 }: SelectProps ) => {
 	const padding = {
-		default: 16,
-		small: 8,
-		compact: 8,
-		'__unstable-large': 16,
+		default: CONFIG.controlPaddingX,
+		small: CONFIG.controlPaddingXSmall,
+		compact: CONFIG.controlPaddingXSmall,
+		'__unstable-large': CONFIG.controlPaddingX,
 	};
 
 	if ( ! __next40pxDefaultSize ) {

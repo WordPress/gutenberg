@@ -767,15 +767,15 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * behavior. Once registered, the source is available to be connected
  * to the supported block attributes.
  *
+ * @since 6.7.0 Introduced in WordPress core.
+ *
  * @param {Object}   source                    Properties of the source to be registered.
  * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   [source.label]            Human-readable label.
- * @param {Array}    [source.usesContext]      Array of context needed by the source only in the editor.
- * @param {Function} [source.getValues]        Function to get the values from the source.
- * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
- * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
- * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
- * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
+ * @param {string}   [source.label]            Human-readable label. Optional when it is defined in the server.
+ * @param {Array}    [source.usesContext]      Optional array of context needed by the source only in the editor.
+ * @param {Function} [source.getValues]        Optional function to get the values from the source.
+ * @param {Function} [source.setValues]        Optional function to update multiple values connected to the source.
+ * @param {Function} [source.canUserEditValue] Optional function to determine if the user can edit the value.
  *
  * @example
  * ```js
@@ -785,9 +785,9 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * registerBlockBindingsSource( {
  *     name: 'plugin/my-custom-source',
  *     label: _x( 'My Custom Source', 'block bindings source' ),
- *     getValues: () => getSourceValues(),
- *     setValues: () => updateMyCustomValuesInBatch(),
- *     getPlaceholder: () => 'Placeholder text when the value is undefined',
+ *     usesContext: [ 'postType' ],
+ *     getValues: getSourceValues,
+ *     setValues: updateMyCustomValuesInBatch,
  *     canUserEditValue: () => true,
  * } );
  * ```
@@ -799,7 +799,6 @@ export const registerBlockBindingsSource = ( source ) => {
 		usesContext,
 		getValues,
 		setValues,
-		getPlaceholder,
 		canUserEditValue,
 		getFieldsList,
 	} = source;
@@ -889,13 +888,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Check the `getPlaceholder` property is correct.
-	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
-		warning( 'Block bindings source getPlaceholder must be a function.' );
-		return;
-	}
-
-	// Check the `getPlaceholder` property is correct.
+	// Check the `canUserEditValue` property is correct.
 	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
 		warning( 'Block bindings source canUserEditValue must be a function.' );
 		return;
@@ -912,7 +905,9 @@ export const registerBlockBindingsSource = ( source ) => {
 };
 
 /**
- * Unregisters a block bindings source
+ * Unregisters a block bindings source by providing its name.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @param {string} name The name of the block bindings source to unregister.
  *
@@ -933,7 +928,9 @@ export function unregisterBlockBindingsSource( name ) {
 }
 
 /**
- * Returns a registered block bindings source.
+ * Returns a registered block bindings source by its name.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @param {string} name Block bindings source name.
  *
@@ -945,6 +942,8 @@ export function getBlockBindingsSource( name ) {
 
 /**
  * Returns all registered block bindings sources.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @return {Array} Block bindings sources.
  */

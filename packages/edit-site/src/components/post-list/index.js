@@ -93,18 +93,22 @@ function useView( postType ) {
 		[ activeView, isCustom ]
 	);
 	const [ view, setView ] = useState( () => {
+		let initialView;
 		if ( isCustom === 'true' ) {
-			return (
-				getCustomView( editedEntityRecord ) ?? {
-					type: layout ?? LAYOUT_LIST,
-				}
-			);
-		}
-		return (
-			getDefaultView( defaultViews, activeView ) ?? {
+			initialView = getCustomView( editedEntityRecord ) ?? {
 				type: layout ?? LAYOUT_LIST,
-			}
-		);
+			};
+		} else {
+			initialView = getDefaultView( defaultViews, activeView ) ?? {
+				type: layout ?? LAYOUT_LIST,
+			};
+		}
+
+		const type = layout ?? initialView.type;
+		return {
+			...initialView,
+			type,
+		};
 	} );
 
 	const setViewWithUrlUpdate = useCallback(
@@ -146,8 +150,7 @@ function useView( postType ) {
 		} ) );
 	}, [ layout ] );
 
-	// When activeView or isCustom URL parameters change,
-	// reset the view & update the layout URL param to match the view's type.
+	// When activeView or isCustom URL parameters change, reset the view.
 	useEffect( () => {
 		let newView;
 		if ( isCustom === 'true' ) {
@@ -157,9 +160,13 @@ function useView( postType ) {
 		}
 
 		if ( newView ) {
-			setViewWithUrlUpdate( newView );
+			const type = layout ?? newView.type;
+			setView( {
+				...newView,
+				type,
+			} );
 		}
-	}, [ activeView, isCustom, defaultViews, editedEntityRecord ] );
+	}, [ activeView, isCustom, layout, defaultViews, editedEntityRecord ] );
 
 	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
 }
@@ -172,9 +179,15 @@ function getItemId( item ) {
 
 export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
+	const defaultViews = useDefaultViews( { postType } );
 	const history = useHistory();
 	const location = useLocation();
-	const { postId, quickEdit = false } = location.params;
+	const {
+		postId,
+		quickEdit = false,
+		isCustom,
+		activeView = 'all',
+	} = location.params;
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -190,7 +203,26 @@ export default function PostList( { postType } ) {
 		[ history ]
 	);
 
-	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
+	const getActiveViewFilters = ( views, match ) => {
+		const found = views.find( ( { slug } ) => slug === match );
+		return found?.filters ?? [];
+	};
+
+	const { isLoading: isLoadingFields, fields: _fields } = usePostFields(
+		view.type
+	);
+	const fields = useMemo( () => {
+		const activeViewFilters = getActiveViewFilters(
+			defaultViews,
+			activeView
+		).map( ( { field } ) => field );
+		return _fields.map( ( field ) => ( {
+			...field,
+			elements: activeViewFilters.includes( field.id )
+				? []
+				: field.elements,
+		} ) );
+	}, [ _fields, defaultViews, activeView ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
@@ -213,6 +245,32 @@ export default function PostList( { postType } ) {
 				filters.author_exclude = filter.value;
 			}
 		} );
+
+		// The bundled views want data filtered without displaying the filter.
+		const activeViewFilters = getActiveViewFilters(
+			defaultViews,
+			activeView
+		);
+		activeViewFilters.forEach( ( filter ) => {
+			if (
+				filter.field === 'status' &&
+				filter.operator === OPERATOR_IS_ANY
+			) {
+				filters.status = filter.value;
+			}
+			if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_IS_ANY
+			) {
+				filters.author = filter.value;
+			} else if (
+				filter.field === 'author' &&
+				filter.operator === OPERATOR_IS_NONE
+			) {
+				filters.author_exclude = filter.value;
+			}
+		} );
+
 		// We want to provide a different default item for the status filter
 		// than the REST API provides.
 		if ( ! filters.status || filters.status === '' ) {
@@ -228,7 +286,7 @@ export default function PostList( { postType } ) {
 			search: view.search,
 			...filters,
 		};
-	}, [ view ] );
+	}, [ view, activeView, defaultViews ] );
 	const {
 		records,
 		isResolving: isLoadingData,
@@ -334,6 +392,7 @@ export default function PostList( { postType } ) {
 			}
 		>
 			<DataViews
+				key={ activeView + isCustom }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
@@ -353,11 +412,7 @@ export default function PostList( { postType } ) {
 							size="compact"
 							isPressed={ quickEdit }
 							icon={ drawerRight }
-							label={
-								! quickEdit
-									? __( 'Show quick edit sidebar' )
-									: __( 'Close quick edit sidebar' )
-							}
+							label={ __( 'Toggle details panel' ) }
 							onClick={ () => {
 								history.push( {
 									...location.params,

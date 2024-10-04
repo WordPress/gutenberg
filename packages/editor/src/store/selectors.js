@@ -181,7 +181,6 @@ export const getCurrentPost = createRegistrySelector(
  *
  *```js
  * const currentPostType = wp.data.select( 'core/editor' ).getCurrentPostType();
- *
  *```
  * @return {string} Post type.
  */
@@ -325,15 +324,16 @@ const getNestedEditedPostProperty = createSelector(
  * @example
  *
  *```js
- * const getFeaturedMediaUrl = useSelect( ( select ) => {
- *     const getFeaturedMediaId =
- *         select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- *     const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ * 	// Get specific media size based on the featured media ID
+ * 	// Note: change sizes?.large for any registered size
+ * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
+ * 		const getFeaturedMediaId =
+ * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+ * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
  *
- *     // change sizes?.large for any registered size
- *     return (
- *         getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
- *     );
+ * 		return (
+ * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 		);
  * }, [] );
  *```
  *
@@ -1297,9 +1297,15 @@ export function getRenderingMode( state ) {
  *
  * @return {string} Device type.
  */
-export function getDeviceType( state ) {
-	return state.deviceType;
-}
+export const getDeviceType = createRegistrySelector(
+	( select ) => ( state ) => {
+		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
+		if ( editorMode === 'zoom-out' ) {
+			return 'Desktop';
+		}
+		return state.deviceType;
+	}
+);
 
 /**
  * Returns true if the list view is opened.

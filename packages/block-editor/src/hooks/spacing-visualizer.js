@@ -36,16 +36,16 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 		);
 	}, [ blockElement, value ] );
 
-	const previousValue = useRef( value );
+	const previousValueRef = useRef( value );
 	const [ isActive, setIsActive ] = useState( false );
 
 	useEffect( () => {
-		if ( isShallowEqual( value, previousValue.current ) || forceShow ) {
+		if ( isShallowEqual( value, previousValueRef.current ) || forceShow ) {
 			return;
 		}
 
 		setIsActive( true );
-		previousValue.current = value;
+		previousValueRef.current = value;
 
 		const timeout = setTimeout( () => {
 			setIsActive( false );

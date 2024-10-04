@@ -27,9 +27,7 @@ test.describe( 'deferred store', () => {
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
 
-	// There is a known issue for deferred getters right now.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'Ensure that a state getter can be subscribed to before it is initialized', async ( {
+	test( 'Ensure that a state getter can be subscribed to before it is initialized', async ( {
 		page,
 	} ) => {
 		const resultInput = page.getByTestId( 'result-getter' );

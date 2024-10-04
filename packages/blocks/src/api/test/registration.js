@@ -1630,19 +1630,6 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		// Check the `getPlaceholder` callback is correct.
-		it( 'should reject invalid getPlaceholder callback', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				getPlaceholder: 'should be a function',
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Block bindings source getPlaceholder must be a function.'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
 		// Check the `canUserEditValue` callback is correct.
 		it( 'should reject invalid canUserEditValue callback', () => {
 			registerBlockBindingsSource( {
@@ -1676,7 +1663,6 @@ describe( 'blocks', () => {
 				usesContext: [ 'postId' ],
 				getValues: () => 'value',
 				setValues: () => 'new values',
-				getPlaceholder: () => 'placeholder',
 				canUserEditValue: () => true,
 				getFieldsList: () => {
 					return { field: 'value' };
@@ -1701,7 +1687,6 @@ describe( 'blocks', () => {
 			expect( source.usesContext ).toBeUndefined();
 			expect( source.getValues ).toBeUndefined();
 			expect( source.setValues ).toBeUndefined();
-			expect( source.getPlaceholder ).toBeUndefined();
 			expect( source.canUserEditValue ).toBeUndefined();
 			expect( source.getFieldsList ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
@@ -1726,7 +1711,6 @@ describe( 'blocks', () => {
 			const clientOnlyProperties = {
 				getValues: () => 'values',
 				setValues: () => 'new values',
-				getPlaceholder: () => 'placeholder',
 				canUserEditValue: () => true,
 			};
 			registerBlockBindingsSource( {

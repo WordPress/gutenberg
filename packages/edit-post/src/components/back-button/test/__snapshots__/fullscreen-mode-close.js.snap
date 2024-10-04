@@ -5,7 +5,7 @@ exports[`FullscreenModeClose when in full screen mode should display a default s
   <div>
     <a
       aria-label="Back"
-      class="components-button edit-post-fullscreen-mode-close"
+      class="components-button edit-post-fullscreen-mode-close is-next-40px-default-size"
       href="edit.php?"
     >
       <svg

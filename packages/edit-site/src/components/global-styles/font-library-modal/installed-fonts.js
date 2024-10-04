@@ -6,10 +6,8 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
-	__experimentalUseNavigator as useNavigator,
+	Navigator,
+	useNavigator,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
@@ -21,8 +19,8 @@ import {
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { chevronLeft } from '@wordpress/icons';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -130,9 +128,11 @@ function InstalledFonts() {
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
-				message:
-					__( 'There was an error updating the font family. ' ) +
-					error.message,
+				message: sprintf(
+					/* translators: %s: error message */
+					__( 'There was an error updating the font family. %s' ),
+					error.message
+				),
 			} );
 		}
 	};
@@ -233,12 +233,12 @@ function InstalledFonts() {
 
 			{ ! isResolvingLibrary && (
 				<>
-					<NavigatorProvider
+					<Navigator
 						initialPath={
 							libraryFontSelected ? '/fontFamily' : '/'
 						}
 					>
-						<NavigatorScreen path="/">
+						<Navigator.Screen path="/">
 							<VStack spacing="8">
 								{ notice && (
 									<Notice
@@ -336,9 +336,9 @@ function InstalledFonts() {
 									</VStack>
 								) }
 							</VStack>
-						</NavigatorScreen>
+						</Navigator.Screen>
 
-						<NavigatorScreen path="/fontFamily">
+						<Navigator.Screen path="/fontFamily">
 							<ConfirmDeleteDialog
 								font={ libraryFontSelected }
 								isOpen={ isConfirmDeleteOpen }
@@ -351,8 +351,10 @@ function InstalledFonts() {
 							/>
 
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
-									icon={ chevronLeft }
+								<Navigator.BackButton
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										handleSetLibraryFontSelected( null );
@@ -397,18 +399,34 @@ function InstalledFonts() {
 									__nextHasNoMarginBottom
 								/>
 								<Spacer margin={ 8 } />
-								{ getFontFacesToDisplay(
-									libraryFontSelected
-								).map( ( face, i ) => (
-									<LibraryFontVariant
-										font={ libraryFontSelected }
-										face={ face }
-										key={ `face${ i }` }
-									/>
-								) ) }
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="font-library-modal__fonts-list"
+								>
+									{ getFontFacesToDisplay(
+										libraryFontSelected
+									).map( ( face, i ) => (
+										<li
+											key={ `face${ i }` }
+											className="font-library-modal__fonts-list-item"
+										>
+											<LibraryFontVariant
+												font={ libraryFontSelected }
+												face={ face }
+												key={ `face${ i }` }
+											/>
+										</li>
+									) ) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
-						</NavigatorScreen>
-					</NavigatorProvider>
+						</Navigator.Screen>
+					</Navigator>
 
 					<HStack
 						justify="flex-end"
@@ -417,6 +435,7 @@ function InstalledFonts() {
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
+								__next40pxDefaultSize
 								isDestructive
 								variant="tertiary"
 								onClick={ handleUninstallClick }
@@ -425,6 +444,7 @@ function InstalledFonts() {
 							</Button>
 						) }
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							onClick={ handleUpdate }
 							disabled={ ! fontFamiliesHasChanges }
@@ -464,7 +484,7 @@ function ConfirmDeleteDialog( {
 			setNotice( {
 				type: 'error',
 				message:
-					__( 'There was an error uninstalling the font family. ' ) +
+					__( 'There was an error uninstalling the font family.' ) +
 					error.message,
 			} );
 		}

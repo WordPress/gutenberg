@@ -293,12 +293,13 @@ Returns a single attribute of the post being edited, preferring the unsaved edit
 _Usage_
 
 ```js
+// Get specific media size based on the featured media ID
+// Note: change sizes?.large for any registered size
 const getFeaturedMediaUrl = useSelect( ( select ) => {
 	const getFeaturedMediaId =
 		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
 	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
 
-	// change sizes?.large for any registered size
 	return (
 		getMedia?.media_details?.sizes?.large?.source_url ||
 		getMedia?.source_url ||
@@ -1180,639 +1181,528 @@ Returns an action object used in signalling that attributes of the post have bee
 _Usage_
 
 ```js
-// Update the post title :
+// Update the post title
 wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
 ```
 
 ```js
+// Get specific media size based on the featured media ID
+// Note: change sizes?.large for any registered size
 const getFeaturedMediaUrl = useSelect( ( select ) => {
-    const getFeaturedMediaId =
-        select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-    const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+	const getFeaturedMediaId =
+		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
 
-    // change sizes?.large for any registered size
-    return (
-        getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
-    );
-}, [
+	return (
+		getMedia?.media_details?.sizes?.large?.source_url ||
+		getMedia?.source_url ||
+		''
+	);
+}, [] );
+```
 
-@return {Object} Action object
+_Parameters_
 
-*Parameters*
+-   _edits_ `Object`: Post attributes to edit.
+-   _options_ `Object`: Options for the edit.
 
-- *edits* `Object`: Post attributes to edit.
-- *options* `Object`: Options for the edit.
+_Returns_
 
-# enablePublishSidebar
+-   `Object`: Action object
+
+### enablePublishSidebar
 
 Enable the publish sidebar.
 
+### enterFormattedText
 
-# enterFormattedText
+_Related_
 
+-   enterFormattedText in core/block-editor store.
 
+### exitFormattedText
 
+_Related_
 
-*Related*
+-   exitFormattedText in core/block-editor store.
 
-- enterFormattedText in core/block-editor store.
+### hideInsertionPoint
 
-# exitFormattedText
+_Related_
 
+-   hideInsertionPoint in core/block-editor store.
 
+### insertBlock
 
+_Related_
 
-*Related*
+-   insertBlock in core/block-editor store.
 
-- exitFormattedText in core/block-editor store.
+### insertBlocks
 
-# hideInsertionPoint
+_Related_
 
+-   insertBlocks in core/block-editor store.
 
+### insertDefaultBlock
 
+_Related_
 
-*Related*
+-   insertDefaultBlock in core/block-editor store.
 
-- hideInsertionPoint in core/block-editor store.
-
-# insertBlock
-
-
-
-
-*Related*
-
-- insertBlock in core/block-editor store.
-
-# insertBlocks
-
-
-
-
-*Related*
-
-- insertBlocks in core/block-editor store.
-
-# insertDefaultBlock
-
-
-
-
-*Related*
-
-- insertDefaultBlock in core/block-editor store.
-
-# lockPostAutosaving
+### lockPostAutosaving
 
 Action that locks post autosaving.
 
+_Usage_
 
-*Usage*
-```
+    // Lock post autosaving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
 
-// Lock post autosaving with the lock key `mylock`:
-wp.data.dispatch( 'core/editor' ).lockPostAutosaving( 'mylock' );
+_Parameters_
 
-    *Parameters*
+-   _lockName_ `string`: The lock name.
 
-    - *lockName* `string`: The lock name.
+_Returns_
 
-    *Returns*
+-   `Object`: Action object
 
-    - `Object`: Action object
+### lockPostSaving
 
-    # lockPostSaving
+Action that locks post saving.
 
-    Action that locks post saving.
+_Usage_
 
+    const { subscribe } = wp.data;
 
-    *Usage*
+    const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
 
-const { subscribe } = wp.data;
+    // Only allow publishing posts that are set to a future date.
+    if ( 'publish' !== initialPostStatus ) {
 
-const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+    	// Track locking.
+    	let locked = false;
 
-// Only allow publishing posts that are set to a future date.
-if ( 'publish' !== initialPostStatus ) {
+    	// Watch for the publish event.
+    	let unssubscribe = subscribe( () => {
+    		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+    		if ( 'publish' !== currentPostStatus ) {
 
-    // Track locking.
-    let locked = false;
-
-    // Watch for the publish event.
-    let unssubscribe = subscribe( () => {
-    	const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
-    	if ( 'publish' !== currentPostStatus ) {
-
-    		// Compare the post date to the current date, lock the post if the date isn't in the future.
-    		const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
-    		const currentDate = new Date();
-    		if ( postDate.getTime() <= currentDate.getTime() ) {
-    			if ( ! locked ) {
-    				locked = true;
-    				wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
-    			}
-    		} else {
-    			if ( locked ) {
-    				locked = false;
-    				wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+    			// Compare the post date to the current date, lock the post if the date isn't in the future.
+    			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+    			const currentDate = new Date();
+    			if ( postDate.getTime() <= currentDate.getTime() ) {
+    				if ( ! locked ) {
+    					locked = true;
+    					wp.data.dispatch( 'core/editor' ).lockPostSaving( 'futurelock' );
+    				}
+    			} else {
+    				if ( locked ) {
+    					locked = false;
+    					wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'futurelock' );
+    				}
     			}
     		}
-    	}
-    } );
+    	} );
+    }
 
-}
+_Parameters_
 
-    *Parameters*
+-   _lockName_ `string`: The lock name.
 
-    - *lockName* `string`: The lock name.
+_Returns_
 
-    *Returns*
+-   `Object`: Action object
 
-    - `Object`: Action object
+### mergeBlocks
 
-    # mergeBlocks
+_Related_
 
+-   mergeBlocks in core/block-editor store.
 
+### moveBlocksDown
 
+_Related_
 
-    *Related*
+-   moveBlocksDown in core/block-editor store.
 
-    - mergeBlocks in core/block-editor store.
+### moveBlocksUp
 
-    # moveBlocksDown
+_Related_
 
+-   moveBlocksUp in core/block-editor store.
 
+### moveBlockToPosition
 
+_Related_
 
-    *Related*
+-   moveBlockToPosition in core/block-editor store.
 
-    - moveBlocksDown in core/block-editor store.
+### multiSelect
 
-    # moveBlocksUp
+_Related_
 
+-   multiSelect in core/block-editor store.
 
+### openPublishSidebar
 
+Returns an action object used in signalling that the user opened the publish sidebar.
 
-    *Related*
+_Returns_
 
-    - moveBlocksUp in core/block-editor store.
+-   `Object`: Action object
 
-    # moveBlockToPosition
+### receiveBlocks
 
+_Related_
 
+-   receiveBlocks in core/block-editor store.
 
+### redo
 
-    *Related*
+Action that restores last popped state in undo history.
 
-    - moveBlockToPosition in core/block-editor store.
+### refreshPost
 
-    # multiSelect
+> **Deprecated** Since WordPress 6.0.
 
+Action for refreshing the current post.
 
+### removeBlock
 
+_Related_
 
-    *Related*
+-   removeBlock in core/block-editor store.
 
-    - multiSelect in core/block-editor store.
+### removeBlocks
 
-    # openPublishSidebar
+_Related_
 
-    Returns an action object used in signalling that the user opened the publish sidebar.
+-   removeBlocks in core/block-editor store.
 
+### removeEditorPanel
 
-    *Returns*
+Returns an action object used to remove a panel from the editor.
 
-    - `Object`: Action object
+_Parameters_
 
-    # receiveBlocks
+-   _panelName_ `string`: A string that identifies the panel to remove.
 
+_Returns_
 
+-   `Object`: Action object.
 
+### replaceBlock
 
-    *Related*
+_Related_
 
-    - receiveBlocks in core/block-editor store.
+-   replaceBlock in core/block-editor store.
 
-    # redo
+### replaceBlocks
 
-    Action that restores last popped state in undo history.
+_Related_
 
+-   replaceBlocks in core/block-editor store.
 
-    # refreshPost
+### resetBlocks
 
-    > **Deprecated** Since WordPress 6.0.
+_Related_
 
-    Action for refreshing the current post.
+-   resetBlocks in core/block-editor store.
 
+### resetEditorBlocks
 
-    # removeBlock
+Returns an action object used to signal that the blocks have been updated.
 
+_Parameters_
 
+-   _blocks_ `Array`: Block Array.
+-   _options_ `?Object`: Optional options.
 
+### resetPost
 
-    *Related*
+> **Deprecated** Since WordPress 6.0.
 
-    - removeBlock in core/block-editor store.
+Returns an action object used in signalling that the latest version of the post has been received, either by initialization or save.
 
-    # removeBlocks
+### savePost
 
+Action for saving the current post in the editor.
 
+_Parameters_
 
+-   _options_ `Object`:
 
-    *Related*
+### selectBlock
 
-    - removeBlocks in core/block-editor store.
+_Related_
 
-    # removeEditorPanel
+-   selectBlock in core/block-editor store.
 
-    Returns an action object used to remove a panel from the editor.
+### setDeviceType
 
+Action that changes the width of the editing canvas.
 
-    *Parameters*
+_Parameters_
 
-    - *panelName* `string`: A string that identifies the panel to remove.
+-   _deviceType_ `string`:
 
-    *Returns*
+_Returns_
 
-    - `Object`: Action object.
+-   `Object`: Action object.
 
-    # replaceBlock
+### setEditedPost
 
+Returns an action that sets the current post Type and post ID.
 
+_Parameters_
 
+-   _postType_ `string`: Post Type.
+-   _postId_ `string`: Post ID.
 
-    *Related*
+_Returns_
 
-    - replaceBlock in core/block-editor store.
+-   `Object`: Action object.
 
-    # replaceBlocks
+### setIsInserterOpened
 
+Returns an action object used to open/close the inserter.
 
+_Parameters_
 
+-   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+-   _value.filterValue_ `string`: A query to filter the inserter results.
+-   _value.onSelect_ `Function`: A callback when an item is selected.
+-   _value.tab_ `string`: The tab to open in the inserter.
+-   _value.category_ `string`: The category to initialize in the inserter.
 
-    *Related*
+_Returns_
 
-    - replaceBlocks in core/block-editor store.
+-   `Object`: Action object.
 
-    # resetBlocks
+### setIsListViewOpened
 
+Returns an action object used to open/close the list view.
 
+_Parameters_
 
+-   _isOpen_ `boolean`: A boolean representing whether the list view should be opened or closed.
 
-    *Related*
+_Returns_
 
-    - resetBlocks in core/block-editor store.
+-   `Object`: Action object.
 
-    # resetEditorBlocks
+### setRenderingMode
 
-    Returns an action object used to signal that the blocks have been updated.
+Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
 
+-   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+-   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
 
-    *Parameters*
+_Parameters_
 
-    - *blocks* `Array`: Block Array.
-    - *options* `?Object`: Optional options.
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
-    # resetPost
+### setTemplateValidity
 
-    > **Deprecated** Since WordPress 6.0.
+_Related_
 
-    Returns an action object used in signalling that the latest version of the post has been received, either by initialization or save.
+-   setTemplateValidity in core/block-editor store.
 
+### setupEditor
 
-    # savePost
+Returns an action generator used in signalling that editor has initialized with the specified post object and editor settings.
 
-    Action for saving the current post in the editor.
+_Parameters_
 
+-   _post_ `Object`: Post object.
+-   _edits_ `Object`: Initial edited attributes object.
+-   _template_ `Array?`: Block Template.
 
-    *Parameters*
+### setupEditorState
 
-    - *options* `Object`:
+> **Deprecated**
 
-    # selectBlock
+Setup the editor state.
 
+_Parameters_
 
+-   _post_ `Object`: Post object.
 
+### showInsertionPoint
 
-    *Related*
+_Related_
 
-    - selectBlock in core/block-editor store.
+-   showInsertionPoint in core/block-editor store.
 
-    # setDeviceType
+### startMultiSelect
 
-    Action that changes the width of the editing canvas.
+_Related_
 
+-   startMultiSelect in core/block-editor store.
 
-    *Parameters*
+### startTyping
 
-    - *deviceType* `string`:
+_Related_
 
-    *Returns*
+-   startTyping in core/block-editor store.
 
-    - `Object`: Action object.
+### stopMultiSelect
 
-    # setEditedPost
+_Related_
 
-    Returns an action that sets the current post Type and post ID.
+-   stopMultiSelect in core/block-editor store.
 
+### stopTyping
 
-    *Parameters*
+_Related_
 
-    - *postType* `string`: Post Type.
-    - *postId* `string`: Post ID.
+-   stopTyping in core/block-editor store.
 
-    *Returns*
+### switchEditorMode
 
-    - `Object`: Action object.
+Triggers an action used to switch editor mode.
 
-    # setIsInserterOpened
+_Parameters_
 
-    Returns an action object used to open/close the inserter.
+-   _mode_ `string`: The editor mode.
 
+### synchronizeTemplate
 
-    *Parameters*
+_Related_
 
-    - *value* `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
-    - *value.rootClientId* `string`: The root client ID to insert at.
-    - *value.insertionIndex* `number`: The index to insert at.
+-   synchronizeTemplate in core/block-editor store.
 
-    *Returns*
+### toggleBlockMode
 
-    - `Object`: Action object.
+_Related_
 
-    # setIsListViewOpened
+-   toggleBlockMode in core/block-editor store.
 
-    Returns an action object used to open/close the list view.
+### toggleDistractionFree
 
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
-    *Parameters*
+### toggleEditorPanelEnabled
 
-    - *isOpen* `boolean`: A boolean representing whether the list view should be opened or closed.
+Returns an action object used to enable or disable a panel in the editor.
 
-    *Returns*
+_Parameters_
 
-    - `Object`: Action object.
+-   _panelName_ `string`: A string that identifies the panel to enable or disable.
 
-    # setRenderingMode
+_Returns_
 
-    Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+-   `Object`: Action object.
 
-    -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
-    -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+### toggleEditorPanelOpened
 
+Opens a closed panel and closes an open panel.
 
-    *Parameters*
+_Parameters_
 
-    - *mode* `string`: Mode (one of 'post-only' or 'template-locked').
+-   _panelName_ `string`: A string that identifies the panel to open or close.
 
-    # setTemplateValidity
+### togglePublishSidebar
 
+Returns an action object used in signalling that the user toggles the publish sidebar.
 
+_Returns_
 
+-   `Object`: Action object
 
-    *Related*
+### toggleSelection
 
-    - setTemplateValidity in core/block-editor store.
+_Related_
 
-    # setupEditor
+-   toggleSelection in core/block-editor store.
 
-    Returns an action generator used in signalling that editor has initialized with the specified post object and editor settings.
+### trashPost
 
+Action for trashing the current post in the editor.
 
-    *Parameters*
+### undo
 
-    - *post* `Object`: Post object.
-    - *edits* `Object`: Initial edited attributes object.
-    - *template* `Array?`: Block Template.
+Action that pops a record from undo history and undoes the edit.
 
-    # setupEditorState
+### unlockPostAutosaving
 
-    > **Deprecated**
+Action that unlocks post autosaving.
 
-    Setup the editor state.
+_Usage_
 
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
 
-    *Parameters*
+_Parameters_
 
-    - *post* `Object`: Post object.
+-   _lockName_ `string`: The lock name.
 
-    # showInsertionPoint
+_Returns_
 
+-   `Object`: Action object
 
+### unlockPostSaving
 
+Action that unlocks post saving.
 
-    *Related*
+_Usage_
 
-    - showInsertionPoint in core/block-editor store.
+    // Unlock post saving with the lock key `mylock`:
+    wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
 
-    # startMultiSelect
+_Parameters_
 
+-   _lockName_ `string`: The lock name.
 
+_Returns_
 
+-   `Object`: Action object
 
-    *Related*
+### updateBlock
 
-    - startMultiSelect in core/block-editor store.
+_Related_
 
-    # startTyping
+-   updateBlock in core/block-editor store.
 
+### updateBlockAttributes
 
+_Related_
 
+-   updateBlockAttributes in core/block-editor store.
 
-    *Related*
+### updateBlockListSettings
 
-    - startTyping in core/block-editor store.
+_Related_
 
-    # stopMultiSelect
+-   updateBlockListSettings in core/block-editor store.
 
+### updateEditorSettings
 
+Undocumented declaration.
 
+### updatePost
 
-    *Related*
+> **Deprecated** since Gutenberg 9.7.0.
 
-    - stopMultiSelect in core/block-editor store.
+Returns an action object used in signalling that a patch of updates for the latest version of the post have been received.
 
-    # stopTyping
+_Returns_
 
+-   `Object`: Action object.
 
+### updatePostLock
 
+Action that locks the editor.
 
-    *Related*
+_Parameters_
 
-    - stopTyping in core/block-editor store.
+-   _lock_ `Object`: Details about the post lock status, user, and nonce.
 
-    # switchEditorMode
+_Returns_
 
-    Triggers an action used to switch editor mode.
-
-
-    *Parameters*
-
-    - *mode* `string`: The editor mode.
-
-    # synchronizeTemplate
-
-
-
-
-    *Related*
-
-    - synchronizeTemplate in core/block-editor store.
-
-    # toggleBlockMode
-
-
-
-
-    *Related*
-
-    - toggleBlockMode in core/block-editor store.
-
-    # toggleDistractionFree
-
-    Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
-
-
-    # toggleEditorPanelEnabled
-
-    Returns an action object used to enable or disable a panel in the editor.
-
-
-    *Parameters*
-
-    - *panelName* `string`: A string that identifies the panel to enable or disable.
-
-    *Returns*
-
-    - `Object`: Action object.
-
-    # toggleEditorPanelOpened
-
-    Opens a closed panel and closes an open panel.
-
-
-    *Parameters*
-
-    - *panelName* `string`: A string that identifies the panel to open or close.
-
-    # togglePublishSidebar
-
-    Returns an action object used in signalling that the user toggles the publish sidebar.
-
-
-    *Returns*
-
-    - `Object`: Action object
-
-    # toggleSelection
-
-
-
-
-    *Related*
-
-    - toggleSelection in core/block-editor store.
-
-    # trashPost
-
-    Action for trashing the current post in the editor.
-
-
-    # undo
-
-    Action that pops a record from undo history and undoes the edit.
-
-
-    # unlockPostAutosaving
-
-    Action that unlocks post autosaving.
-
-
-    *Usage*
-
-// Unlock post saving with the lock key `mylock`:
-wp.data.dispatch( 'core/editor' ).unlockPostAutosaving( 'mylock' );
-
-    *Parameters*
-
-    - *lockName* `string`: The lock name.
-
-    *Returns*
-
-    - `Object`: Action object
-
-    # unlockPostSaving
-
-    Action that unlocks post saving.
-
-
-    *Usage*
-
-// Unlock post saving with the lock key `mylock`:
-wp.data.dispatch( 'core/editor' ).unlockPostSaving( 'mylock' );
-
-    *Parameters*
-
-    - *lockName* `string`: The lock name.
-
-    *Returns*
-
-    - `Object`: Action object
-
-    # updateBlock
-
-
-
-
-    *Related*
-
-    - updateBlock in core/block-editor store.
-
-    # updateBlockAttributes
-
-
-
-
-    *Related*
-
-    - updateBlockAttributes in core/block-editor store.
-
-    # updateBlockListSettings
-
-
-
-
-    *Related*
-
-    - updateBlockListSettings in core/block-editor store.
-
-    # updateEditorSettings
-
-    Undocumented declaration.
-
-
-    # updatePost
-
-    > **Deprecated** since Gutenberg 9.7.0.
-
-    Returns an action object used in signalling that a patch of updates for the latest version of the post have been received.
-
-
-    *Returns*
-
-    - `Object`: Action object.
-
-    # updatePostLock
-
-    Action that locks the editor.
-
-
-    *Parameters*
-
-    - *lock* `Object`: Details about the post lock status, user, and nonce.
-
-    *Returns*
-
-    - `Object`: Action object.
+-   `Object`: Action object.
 
 <!-- END TOKEN(Autogenerated actions|../../../packages/editor/src/store/actions.js) -->

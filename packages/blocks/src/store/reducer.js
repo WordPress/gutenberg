@@ -393,6 +393,13 @@ function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			// Only open this API in Gutenberg and for `core/post-meta` for the moment.
+			let getFieldsList;
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				getFieldsList = action.getFieldsList;
+			} else if ( action.name === 'core/post-meta' ) {
+				getFieldsList = action.getFieldsList;
+			}
 			return {
 				...state,
 				[ action.name ]: {
@@ -404,9 +411,10 @@ export function blockBindingsSources( state = {}, action ) {
 					),
 					getValues: action.getValues,
 					setValues: action.setValues,
-					getPlaceholder: action.getPlaceholder,
-					canUserEditValue: action.canUserEditValue,
-					getFieldsList: action.getFieldsList,
+					// Only set `canUserEditValue` if `setValues` is also defined.
+					canUserEditValue:
+						action.setValues && action.canUserEditValue,
+					getFieldsList,
 				},
 			};
 		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':

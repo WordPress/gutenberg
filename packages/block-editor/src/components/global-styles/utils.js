@@ -7,6 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
+import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -305,9 +306,8 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
  */
 export function getValueFromVariable( features, blockName, variable ) {
 	if ( ! variable || typeof variable !== 'string' ) {
-		if ( variable?.ref && typeof variable?.ref === 'string' ) {
-			const refPath = variable.ref.split( '.' );
-			variable = getValueFromObjectPath( features, refPath );
+		if ( typeof variable?.ref === 'string' ) {
+			variable = getValueFromObjectPath( features, variable.ref );
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! variable || !! variable?.ref ) {
@@ -527,34 +527,6 @@ export function getBlockStyleVariationSelector( variation, blockSelector ) {
 }
 
 /**
- * Converts style preset values `var:` to CSS custom var values.
- * TODO: Export and use the style engine util: getCSSVarFromStyleValue().
- *
- * Example:
- *
- * compileStyleValue( 'var:preset|color|primary' ) // returns 'var(--wp--color-primary)'
- *
- * @param {string} uncompiledValue A block style value.
- * @return {string} The compiled, or original value.
- */
-export function compileStyleValue( uncompiledValue ) {
-	const VARIABLE_REFERENCE_PREFIX = 'var:';
-	if (
-		'string' === typeof uncompiledValue &&
-		uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX )
-	) {
-		const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-		const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
-
-/**
  * Looks up a theme file URI based on a relative path.
  *
  * @param {string}        file          A relative path.
@@ -589,10 +561,14 @@ export function getResolvedRefValue( ruleValue, tree ) {
 		return ruleValue;
 	}
 
+	/*
+	 * Where the rule value is an object with a 'ref' property pointing
+	 * to a path, this converts that path into the value at that path.
+	 * For example: { "ref": "style.color.background" } => "#fff".
+	 */
 	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
-		const refPath = ruleValue.ref.split( '.' );
-		const resolvedRuleValue = compileStyleValue(
-			getValueFromObjectPath( tree, refPath )
+		const resolvedRuleValue = getCSSValueFromRawStyle(
+			getValueFromObjectPath( tree, ruleValue.ref )
 		);
 
 		/*
@@ -603,7 +579,7 @@ export function getResolvedRefValue( ruleValue, tree ) {
 			return undefined;
 		}
 
-		if ( ! resolvedRuleValue ) {
+		if ( resolvedRuleValue === undefined ) {
 			return ruleValue;
 		}
 

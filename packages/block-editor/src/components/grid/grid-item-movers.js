@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
 	ToolbarButton,
@@ -57,7 +57,7 @@ export function GridItemMovers( {
 			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
 				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
 					<GridItemMover
-						icon={ chevronLeft }
+						icon={ isRTL() ? chevronRight : chevronLeft }
 						label={ __( 'Move left' ) }
 						description={ __( 'Move left' ) }
 						isDisabled={ columnStart <= 1 }
@@ -126,7 +126,7 @@ export function GridItemMovers( {
 				</div>
 				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-right">
 					<GridItemMover
-						icon={ chevronRight }
+						icon={ isRTL() ? chevronLeft : chevronRight }
 						label={ __( 'Move right' ) }
 						description={ __( 'Move right' ) }
 						isDisabled={ columnCount && columnEnd >= columnCount }

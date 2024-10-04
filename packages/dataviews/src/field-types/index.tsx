@@ -4,6 +4,7 @@
 import type { FieldType, SortDirection, ValidationContext } from '../types';
 import { default as integer } from './integer';
 import { default as text } from './text';
+import { default as datetime } from './datetime';
 
 /**
  *
@@ -18,6 +19,10 @@ export default function getFieldTypeDefinition( type?: FieldType ) {
 
 	if ( 'text' === type ) {
 		return text;
+	}
+
+	if ( 'datetime' === type ) {
+		return datetime;
 	}
 
 	return {

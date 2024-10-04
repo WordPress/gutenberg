@@ -169,14 +169,14 @@ const html = `
 <div
 	data-wp-interactive="directive-each"
 	data-wp-router-region="navigation-updated list"
-	data-wp-context='{ "list": [ "alpha", "beta", "gamma", "delta" ] }'
+	data-wp-context='{ "a": 1, "b": 2, "c": 3, "d": 4 }'
 	data-testid="navigation-updated list"
 >
 	<button
 		data-testid="navigate"
 		data-wp-on--click="actions.navigate"
 	>Navigate</button>
-	<template data-wp-each="context.list">
+	<template data-wp-each="state.list">
 		<p data-wp-text="context.item" data-testid="item"></p>
 	</template>
 	<p data-testid="item" data-wp-each-child>alpha</p>
@@ -187,6 +187,12 @@ const html = `
 `;
 
 store( 'directive-each', {
+	state: {
+		get list() {
+			const ctx = getContext();
+			return Object.keys( ctx ).sort();
+		},
+	},
 	actions: {
 		*navigate() {
 			const { actions } = yield import(

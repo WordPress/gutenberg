@@ -28,6 +28,7 @@ export default function SkipToSelectedBlock() {
 
 	return selectedBlockClientId ? (
 		<Button
+			__next40pxDefaultSize
 			variant="secondary"
 			className="block-editor-skip-to-selected-block"
 			onClick={ onClick }

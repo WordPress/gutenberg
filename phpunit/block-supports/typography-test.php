@@ -351,7 +351,11 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'font_size'       => array(
 					'size' => null,
 				),
-				'settings'        => null,
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
 				'expected_output' => null,
 			),
 
@@ -425,8 +429,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns already clamped value'              => array(
 				'font_size'       => array(
-					'size'  => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
-					'fluid' => false,
+					'size' => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 				),
 				'settings'        => array(
 					'typography' => array(
@@ -438,8 +441,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 
 			'returns value with unsupported unit'        => array(
 				'font_size'       => array(
-					'size'  => '1000%',
-					'fluid' => false,
+					'size' => '1000%',
 				),
 				'settings'        => array(
 					'typography' => array(
@@ -768,6 +770,33 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => 'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
+			),
+
+			// Individual preset settings override global settings.
+			'should convert individual preset size to fluid if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => true,
+				),
+				'settings'        => array(
+					'typography' => array(),
+				),
+				'expected_output' => 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.234), 17px)',
+			),
+			'should use individual preset settings if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => array(
+						'min' => '16px',
+						'max' => '26px',
+					),
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => false,
+					),
+				),
+				'expected_output' => 'clamp(16px, 1rem + ((1vw - 3.2px) * 0.781), 26px)',
 			),
 		);
 	}

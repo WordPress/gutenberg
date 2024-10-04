@@ -22,9 +22,9 @@
 }
 
 .block-editor-iframe__html {
+	border: 0 solid $gray-300;
 	transform-origin: top center;
-	transition: transform 0.3s;
-	@include reduce-motion("transition");
+	@include editor-canvas-resize-animation;
 }
 
 .block-editor-iframe__html.is-zoomed-out {

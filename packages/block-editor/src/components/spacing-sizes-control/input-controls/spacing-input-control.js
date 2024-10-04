@@ -9,7 +9,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	privateApis as componentsPrivateApis,
+	CustomSelectControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -31,11 +31,6 @@ import {
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from '../utils';
-import { unlock } from '../../../lock-unlock';
-
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
@@ -193,10 +188,12 @@ export default function SpacingInputControl( {
 		name: size.name,
 	} ) );
 
-	const marks = spacingSizes.map( ( _newValue, index ) => ( {
-		value: index,
-		label: undefined,
-	} ) );
+	const marks = spacingSizes
+		.slice( 1, spacingSizes.length - 1 )
+		.map( ( _newValue, index ) => ( {
+			value: index + 1,
+			label: undefined,
+		} ) );
 
 	const sideLabel =
 		ALL_SIDES.includes( side ) && showSideInLabel ? LABELS[ side ] : '';
@@ -252,6 +249,7 @@ export default function SpacingInputControl( {
 						} }
 					/>
 					<RangeControl
+						__next40pxDefaultSize
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
 						onFocus={ onMouseOver }
@@ -273,6 +271,7 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					__next40pxDefaultSize
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					className="spacing-sizes-control__range-control"

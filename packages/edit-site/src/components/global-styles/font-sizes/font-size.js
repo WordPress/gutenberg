@@ -5,7 +5,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalView as View,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -15,23 +15,20 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import ScreenHeader from '../header';
 import FontSizePreview from './font-size-preview';
 import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
 import RenameFontSizeDialog from './rename-font-size-dialog';
 import SizeControl from '../size-control';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontSize() {
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
@@ -39,7 +36,6 @@ function FontSize() {
 
 	const {
 		params: { origin, slug },
-		goBack,
 		goTo,
 	} = useNavigator();
 
@@ -47,17 +43,31 @@ function FontSize() {
 		'typography.fontSizes'
 	);
 
+	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
+
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
 
-	// Whether fluid is true or an object, set it to true, otherwise false.
-	const isFluid = !! fontSize.fluid ?? false;
+	// Navigate to the font sizes list if the font size is not available.
+	useEffect( () => {
+		if ( ! fontSize ) {
+			goTo( '/typography/font-sizes/', { isBack: true } );
+		}
+	}, [ fontSize, goTo ] );
+
+	if ( ! origin || ! slug || ! fontSize ) {
+		return null;
+	}
+
+	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
+	const isFluid =
+		fontSize?.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 
 	// Whether custom fluid values are used.
-	const isCustomFluid = typeof fontSize.fluid === 'object';
+	const isCustomFluid = typeof fontSize?.fluid === 'object';
 
 	const handleNameChange = ( value ) => {
 		updateFontSize( 'name', value );
@@ -107,9 +117,6 @@ function FontSize() {
 	};
 
 	const handleRemoveFontSize = () => {
-		// Navigate to the font sizes list.
-		goBack();
-
 		const newFontSizes = sizes.filter( ( size ) => size.slug !== slug );
 		setFontSizes( {
 			...fontSizes,
@@ -160,7 +167,7 @@ function FontSize() {
 								marginBottom={ 0 }
 								paddingX={ 4 }
 							>
-								<DropdownMenu
+								<DropdownMenuV2
 									trigger={
 										<Button
 											size="small"
@@ -169,21 +176,21 @@ function FontSize() {
 										/>
 									}
 								>
-									<DropdownMenuItem
+									<DropdownMenuV2.Item
 										onClick={ toggleRenameDialog }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Rename' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-									<DropdownMenuItem
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+									<DropdownMenuV2.Item
 										onClick={ toggleDeleteConfirm }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Delete' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-								</DropdownMenu>
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+								</DropdownMenuV2>
 							</Spacer>
 						</FlexItem>
 					) }

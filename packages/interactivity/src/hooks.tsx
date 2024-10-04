@@ -12,13 +12,14 @@ import {
 	type ComponentChildren,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context, RefObject } from 'preact';
+import type { VNode, Context } from 'preact';
 
 /**
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
 import { warn } from './utils';
+import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -56,7 +57,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | null | void;
+	( args: DirectiveArgs ): VNode< any > | null | void;
 }
 
 interface DirectiveOptions {
@@ -69,14 +70,7 @@ interface DirectiveOptions {
 	priority?: number;
 }
 
-interface Scope {
-	evaluate: Evaluate;
-	context: object;
-	ref: RefObject< HTMLElement >;
-	attributes: createElement.JSX.HTMLAttributes;
-}
-
-interface Evaluate {
+export interface Evaluate {
 	( entry: DirectiveEntry, ...args: any[] ): any;
 }
 
@@ -99,86 +93,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( {} );
-
-// Wrap the element props to prevent modifications.
-const immutableMap = new WeakMap();
-const immutableError = () => {
-	throw new Error(
-		'Please use `data-wp-bind` to modify the attributes of an element.'
-	);
-};
-const immutableHandlers: ProxyHandler< object > = {
-	get( target, key, receiver ) {
-		const value = Reflect.get( target, key, receiver );
-		return !! value && typeof value === 'object'
-			? deepImmutable( value )
-			: value;
-	},
-	set: immutableError,
-	deleteProperty: immutableError,
-};
-const deepImmutable = < T extends object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) ) {
-		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
-	}
-	return immutableMap.get( target );
-};
-
-// Store stacks for the current scope and the default namespaces and export APIs
-// to interact with them.
-const scopeStack: Scope[] = [];
-const namespaceStack: string[] = [];
-
-/**
- * Retrieves the context inherited by the element evaluating a function from the
- * store. The returned value depends on the element and the namespace where the
- * function calling `getContext()` exists.
- *
- * @param namespace Store namespace. By default, the namespace where the calling
- *                  function exists is used.
- * @return The context content.
- */
-export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || getNamespace() ];
-
-/**
- * Retrieves a representation of the element where a function from the store
- * is being evalutated. Such representation is read-only, and contains a
- * reference to the DOM element, its props and a local reactive state.
- *
- * @return Element representation.
- */
-export const getElement = () => {
-	if ( ! getScope() ) {
-		throw Error(
-			'Cannot call `getElement()` outside getters and actions used by directives.'
-		);
-	}
-	const { ref, attributes } = getScope();
-	return Object.freeze( {
-		ref: ref.current,
-		attributes: deepImmutable( attributes ),
-	} );
-};
-
-export const getScope = () => scopeStack.slice( -1 )[ 0 ];
-
-export const setScope = ( scope: Scope ) => {
-	scopeStack.push( scope );
-};
-export const resetScope = () => {
-	scopeStack.pop();
-};
-
-export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
-
-export const setNamespace = ( namespace: string ) => {
-	namespaceStack.push( namespace );
-};
-export const resetNamespace = () => {
-	namespaceStack.pop();
-};
+const context = createContext< any >( { client: {}, server: {} } );
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -275,9 +190,13 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
-		resolvedStore = store( namespace, undefined, {
-			lock: universalUnlock,
-		} );
+		resolvedStore = store(
+			namespace,
+			{},
+			{
+				lock: universalUnlock,
+			}
+		);
 	}
 	const current = {
 		...resolvedStore,
@@ -338,7 +257,9 @@ const Directives = ( {
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext( context );
+	const { client, server } = useContext( context );
+	scope.context = client;
+	scope.serverContext = server;
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */

@@ -62,7 +62,7 @@ const BlockDraggable = ( {
 		[ clientIds ]
 	);
 
-	const isDragging = useRef( false );
+	const isDraggingRef = useRef( false );
 	const [ startScrolling, scrollOnDragOver, stopScrolling ] =
 		useScrollWhenDragging();
 
@@ -75,7 +75,7 @@ const BlockDraggable = ( {
 	// Stop dragging blocks if the block draggable is unmounted.
 	useEffect( () => {
 		return () => {
-			if ( isDragging.current ) {
+			if ( isDraggingRef.current ) {
 				stopDraggingBlocks();
 			}
 		};
@@ -193,7 +193,7 @@ const BlockDraggable = ( {
 				// frame to enable dragging.
 				window.requestAnimationFrame( () => {
 					startDraggingBlocks( clientIds );
-					isDragging.current = true;
+					isDraggingRef.current = true;
 
 					startScrolling( event );
 
@@ -205,7 +205,7 @@ const BlockDraggable = ( {
 			onDragOver={ scrollOnDragOver }
 			onDragEnd={ () => {
 				stopDraggingBlocks();
-				isDragging.current = false;
+				isDraggingRef.current = false;
 
 				stopScrolling();
 
