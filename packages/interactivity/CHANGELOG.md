@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Correctly handle lazily added, deeply nested properties with `deepMerge()` ([#65465](https://github.com/WordPress/gutenberg/pull/65465)).
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements
