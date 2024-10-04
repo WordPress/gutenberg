@@ -8,6 +8,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -24,7 +25,9 @@ export function useShowBlockTools() {
 			getSettings,
 			__unstableGetEditorMode,
 			isTyping,
-		} = select( blockEditorStore );
+			getBlockOrder,
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -42,8 +45,14 @@ export function useShowBlockTools() {
 			editorMode === 'edit' &&
 			isEmptyDefaultBlock;
 		const isZoomOut = editorMode === 'zoom-out';
+		const isSectionSelected = getBlockOrder(
+			getSectionRootClientId()
+		).includes( clientId );
 		const _showZoomOutToolbar =
-			clientId && isZoomOut && ! _showEmptyBlockSideInserter;
+			clientId &&
+			isZoomOut &&
+			! _showEmptyBlockSideInserter &&
+			isSectionSelected;
 		const _showBlockToolbarPopover =
 			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&
