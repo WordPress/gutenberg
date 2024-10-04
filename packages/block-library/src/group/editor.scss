@@ -8,12 +8,14 @@
 		left: 0;
 		right: 0;
 	}
+}
 
+:where(.wp-block-group:not(.has-child-selected) > *) {
+	user-select: initial;
+}
+
+:where(.wp-block-group:not(.has-child-selected)) {
 	user-select: none;
-
-	> *:not(.wp-block-group) {
-		user-select: initial;
-	}
 }
 
 // Place block list appender in the same place content will appear.
