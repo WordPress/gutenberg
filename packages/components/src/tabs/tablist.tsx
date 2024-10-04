@@ -24,11 +24,17 @@ import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
 
-const SCROLL_MARGIN = 24;
+const DEFAULT_SCROLL_MARGIN = 24;
 
-function useScrollSubelementIntoView(
+/**
+ * Scrolls a given parent element so that a given rect is visible.
+ *
+ * The scroll is updated initially and whenever the rect changes.
+ */
+function useScrollRectIntoView(
 	parent: HTMLElement | null | undefined,
-	rect: ElementOffsetRect
+	rect: ElementOffsetRect,
+	{ margin = DEFAULT_SCROLL_MARGIN } = {}
 ) {
 	useLayoutEffect( () => {
 		if ( ! parent || ! rect ) {
@@ -41,14 +47,14 @@ function useScrollSubelementIntoView(
 
 		const parentRightEdge = parentScroll + parentWidth;
 		const childRightEdge = childLeft + childWidth;
-		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
-		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
+		const rightOverflow = childRightEdge + margin - parentRightEdge;
+		const leftOverflow = parentScroll - ( childLeft - margin );
 		if ( leftOverflow > 0 ) {
 			parent.scrollLeft = parentScroll - leftOverflow;
 		} else if ( rightOverflow > 0 ) {
 			parent.scrollLeft = parentScroll + rightOverflow;
 		}
-	}, [ parent, rect ] );
+	}, [ margin, parent, rect ] );
 }
 
 export const TabList = forwardRef<
@@ -81,7 +87,7 @@ export const TabList = forwardRef<
 	} );
 
 	// Make sure selected tab is scrolled into view.
-	useScrollSubelementIntoView( parent, selectedRect );
+	useScrollRectIntoView( parent, selectedRect );
 
 	const onBlur = () => {
 		if ( ! selectOnMove ) {
