@@ -86,16 +86,15 @@ function BlockPopover(
 		const {
 			isZoomOut: isZoomOutSelector,
 			getSectionRootClientId,
-			getParentSectionBlock: getParentSectionBlockFn,
-			getBlockOrder: getBlockOrderFn,
+			getParentSectionBlock: getParentSectionBlockSelector,
+			getBlockOrder: getBlockOrderSelector,
 		} = unlock( select( blockEditorStore ) );
 
-		const root = getSectionRootClientId();
 		return {
-			sectionRootClientId: root,
+			sectionRootClientId: getSectionRootClientId(),
 			isZoomOut: isZoomOutSelector(),
-			getParentSectionBlock: getParentSectionBlockFn,
-			getBlockOrder: getBlockOrderFn,
+			getParentSectionBlock: getParentSectionBlockSelector,
+			getBlockOrder: getBlockOrderSelector,
 		};
 	}, [] );
 
