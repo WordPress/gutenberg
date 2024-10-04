@@ -73,6 +73,7 @@ export function initializePostsDashboard( id, settings ) {
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
+		welcomeGuideZoomOut: true,
 	} );
 
 	dispatch( editSiteStore ).updateSettings( settings );

@@ -80,6 +80,7 @@ export function initializeEditor( id, settings ) {
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
+		welcomeGuideZoomOut: true,
 	} );
 
 	if ( window.__experimentalMediaProcessing ) {

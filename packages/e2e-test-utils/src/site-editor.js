@@ -33,6 +33,10 @@ export async function disableSiteEditorWelcomeGuide() {
 		window.wp.data
 			.dispatch( 'core/preferences' )
 			.set( 'core/edit-site', 'welcomeGuideTemplate', false );
+
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core', 'welcomeGuideZoomOut', false );
 	} );
 }
 

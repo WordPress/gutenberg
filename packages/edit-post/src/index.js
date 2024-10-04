@@ -72,6 +72,7 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
+		welcomeGuideZoomOut: true,
 	} );
 
 	if ( window.__experimentalMediaProcessing ) {

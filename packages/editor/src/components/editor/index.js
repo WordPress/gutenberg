@@ -13,6 +13,7 @@ import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
+import WelcomeGuide from '../welcome-guide';
 
 function Editor( {
 	postType,
@@ -71,6 +72,7 @@ function Editor( {
 					initialEdits={ initialEdits }
 					useSubRegistry={ false }
 				>
+					<WelcomeGuide />
 					<EditorInterface { ...props }>
 						{ extraContent }
 					</EditorInterface>
