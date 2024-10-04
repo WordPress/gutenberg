@@ -77,14 +77,14 @@ export function deduplicateElementSlugs< T extends PaletteElement >(
 ) {
 	const slugCounts: { [ slug: string ]: number } = {};
 
-	return elements.map( ( element, index ) => {
+	return elements.map( ( element ) => {
 		let newSlug: string | undefined;
 
 		const { slug } = element;
 		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
 
 		if ( slugCounts[ slug ] > 1 ) {
-			newSlug = `${ slug }-${ index }`;
+			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
 		}
 
 		return { ...element, slug: newSlug ?? slug };
