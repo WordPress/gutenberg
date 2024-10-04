@@ -108,6 +108,7 @@ export const TabList = forwardRef<
 			}
 			onBlur={ onBlur }
 			tabIndex={ -1 }
+			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			style={ {
 				'--indicator-top': selectedTabPosition.top,

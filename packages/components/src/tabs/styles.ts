@@ -101,26 +101,46 @@ export const TabListWrapper = styled.div`
 				${ COLORS.theme.accent };
 		}
 	}
-	&[aria-orientation='vertical']::before {
-		/* Adjusting the border radius to match the scaling in the y axis. */
-		border-radius: ${ CONFIG.radiusSmall } /
-			calc(
-				${ CONFIG.radiusSmall } /
+	&[aria-orientation='vertical'] {
+		&::before {
+			/* Adjusting the border radius to match the scaling in the y axis. */
+			border-radius: ${ CONFIG.radiusSmall } /
+				calc(
+					${ CONFIG.radiusSmall } /
+						(
+							var( --indicator-height, 0 ) /
+								var( --antialiasing-factor )
+						)
+				);
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: calc( var( --antialiasing-factor ) * 1px );
+			transform: translateY( calc( var( --indicator-top ) * 1px ) )
+				scaleY(
+					calc(
+						var( --indicator-height ) / var( --antialiasing-factor )
+					)
+				);
+			background-color: color-mix(
+				in srgb,
+				${ COLORS.theme.accent },
+				transparent 96%
+			);
+		}
+		&[data-select-on-move='true']:has( :focus-visible )::before {
+			box-sizing: border-box;
+			border: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+			/* Adjusting the border width to match the scaling in the y axis. */
+			border-block-width: calc(
+				var( --wp-admin-border-width-focus, 1px ) /
 					(
 						var( --indicator-height, 0 ) /
 							var( --antialiasing-factor )
 					)
 			);
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: calc( var( --antialiasing-factor ) * 1px );
-		transform: translateY( calc( var( --indicator-top ) * 1px ) )
-			scaleY(
-				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
-			);
-		background-color: ${ COLORS.theme.accent };
-		opacity: 0.04;
+		}
 	}
 `;
 
@@ -158,7 +178,6 @@ export const Tab = styled( Ariakit.Tab )`
 		// Focus indicator.
 		position: relative;
 		&::after {
-			content: '';
 			position: absolute;
 			pointer-events: none;
 
@@ -187,6 +206,7 @@ export const Tab = styled( Ariakit.Tab )`
 		text-align: center;
 
 		&::after {
+			content: '';
 			inset: ${ space( 3 ) };
 		}
 	}
@@ -201,10 +221,10 @@ export const Tab = styled( Ariakit.Tab )`
 			color: ${ COLORS.theme.accent };
 			fill: currentColor;
 		}
-
-		&::after {
-			inset: 2px;
-		}
+	}
+	[aria-orientation='vertical'][data-select-on-move='false'] &::after {
+		content: '';
+		inset: 2px;
 	}
 `;
 
