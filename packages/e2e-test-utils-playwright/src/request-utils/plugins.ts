@@ -77,7 +77,7 @@ async function activatePlugin( this: RequestUtils, slug: string ) {
 	const plugin = getPluginFromMap( slug, pluginsMap );
 
 	await this.rest( {
-		method: 'POST',
+		method: 'PUT',
 		path: `/wp/v2/plugins/${ plugin }`,
 		data: { status: 'active' },
 	} );
