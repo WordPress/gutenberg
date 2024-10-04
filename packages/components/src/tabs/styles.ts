@@ -244,6 +244,9 @@ export const TabChevron = styled( Icon )`
 	[role='tab']:is( [aria-selected='true'], [data-focus-visible], :hover ) & {
 		opacity: 1;
 	}
+	// The chevron is transitioned into existence when selectOnMove is enabled,
+	// because otherwise it looks jarring, as it shows up outside of the focus
+	// indicator that's being animated at the same time.
 	@media not ( prefers-reduced-motion ) {
 		[data-select-on-move='true']
 			[role='tab']:is(
