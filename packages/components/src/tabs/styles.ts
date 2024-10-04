@@ -27,17 +27,17 @@ export const TabListWrapper = styled.div`
 	--direction-factor: 1;
 	--direction-start: left;
 	--direction-end: right;
-	--indicator-start: var( --indicator-left );
+	--selected-start: var( --selected-left, 0 );
 	&:dir( rtl ) {
 		--direction-factor: -1;
 		--direction-start: right;
 		--direction-end: left;
-		--indicator-start: var( --indicator-right );
+		--selected-start: var( --selected-right, 0 );
 	}
 
 	@media not ( prefers-reduced-motion ) {
-		&.is-animation-enabled::before {
-			transition-property: transform, border-radius;
+		&[data-indicator-animated]::before {
+			transition-property: transform, border-radius, border-block;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -88,13 +88,14 @@ export const TabListWrapper = styled.div`
 			width: calc( var( --antialiasing-factor ) * 1px );
 			transform: translateX(
 					calc(
-						var( --indicator-start ) * var( --direction-factor ) *
+						var( --selected-start ) * var( --direction-factor ) *
 							1px
 					)
 				)
 				scaleX(
 					calc(
-						var( --indicator-width ) / var( --antialiasing-factor )
+						var( --selected-width, 0 ) /
+							var( --antialiasing-factor )
 					)
 				);
 			border-bottom: var( --wp-admin-border-width-focus ) solid
@@ -108,7 +109,7 @@ export const TabListWrapper = styled.div`
 				calc(
 					${ CONFIG.radiusSmall } /
 						(
-							var( --indicator-height, 0 ) /
+							var( --selected-height, 0 ) /
 								var( --antialiasing-factor )
 						)
 				);
@@ -116,10 +117,11 @@ export const TabListWrapper = styled.div`
 			left: 0;
 			width: 100%;
 			height: calc( var( --antialiasing-factor ) * 1px );
-			transform: translateY( calc( var( --indicator-top ) * 1px ) )
+			transform: translateY( calc( var( --selected-top, 0 ) * 1px ) )
 				scaleY(
 					calc(
-						var( --indicator-height ) / var( --antialiasing-factor )
+						var( --selected-height, 0 ) /
+							var( --antialiasing-factor )
 					)
 				);
 			background-color: color-mix(
@@ -136,7 +138,7 @@ export const TabListWrapper = styled.div`
 			border-block-width: calc(
 				var( --wp-admin-border-width-focus, 1px ) /
 					(
-						var( --indicator-height, 0 ) /
+						var( --selected-height, 0 ) /
 							var( --antialiasing-factor )
 					)
 			);

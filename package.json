@@ -267,7 +267,7 @@
 		"worker-farm": "1.7.0"
 	},
 	"overrides": {
-		"jsdom": "22.1.0"
+		"jsdom": "25.0.1"
 	},
 	"scripts": {
 		"build": "npm run build:packages && wp-scripts build",
