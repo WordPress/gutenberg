@@ -84,6 +84,7 @@ describe( 'rendererPath', () => {
 			removeBlockSupportAttributes( {
 				backgroundColor: 'foreground',
 				borderColor: 'foreground',
+				boxShadow: 'sharp',
 				fontFamily: 'system-font',
 				fontSize: 'small',
 				gradient: 'vivid-cyan-blue-to-vivid-purple',
@@ -107,6 +108,7 @@ describe( 'rendererPath', () => {
 							},
 						},
 					},
+					shadow: 'var:preset|shadow|sharp',
 					spacing: {
 						margin: {
 							top: '10px',
