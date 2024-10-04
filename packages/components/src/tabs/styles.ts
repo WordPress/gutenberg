@@ -183,6 +183,7 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='horizontal'] & {
 		padding-inline: ${ space( 4 ) };
 		height: ${ space( 12 ) };
+		text-align: center;
 
 		&::after {
 			inset: ${ space( 3 ) };
@@ -192,6 +193,7 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='vertical'] & {
 		padding: ${ space( 2 ) } ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
+		text-align: start;
 		scroll-margin: 24px;
 
 		&[aria-selected='true'] {
