@@ -139,7 +139,7 @@ export const Tab = styled( Ariakit.Tab )`
 		display: flex;
 		align-items: center;
 		cursor: pointer;
-		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
+		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
 		margin-left: 0;
 		font-weight: 400;
 		color: ${ COLORS.theme.foreground };
