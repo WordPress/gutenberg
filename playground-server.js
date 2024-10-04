@@ -8,6 +8,7 @@ const wpServer = spawn(
 	[
 		'@wp-playground/cli',
 		'server',
+		'--php=7.4',
 		'--wp=nightly',
 		'--mount=./:/wordpress/wp-content/plugins/gutenberg',
 		'--mount=./test/emptytheme:/wordpress/wp-content/themes/emptytheme',
