@@ -128,7 +128,6 @@ export const TabListWrapper = styled.div`
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
-		scroll-margin: 24px;
 		flex: 1 0 auto;
 		white-space: nowrap;
 		display: inline-flex;
@@ -197,6 +196,8 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='vertical'] & {
 		padding: ${ space( 2 ) } ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
+		scroll-margin: 24px;
+
 		&[aria-selected='true'] {
 			color: ${ COLORS.theme.accent };
 			fill: currentColor;
