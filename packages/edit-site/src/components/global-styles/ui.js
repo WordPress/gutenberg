@@ -335,7 +335,10 @@ function GlobalStylesUI( { path, onPathChange } ) {
 			className="edit-site-global-styles-sidebar__navigator-provider"
 			initialPath="/"
 		>
-			<WrapperComponent path={ path } onPathChange={ onPathChange }>
+			<WrapperComponent
+				path={ path }
+				onPathChange={ onPathChange }
+			></WrapperComponent>
 			<GlobalStylesNavigationScreen path="/">
 				<ScreenRoot />
 			</GlobalStylesNavigationScreen>
@@ -423,9 +426,7 @@ function GlobalStylesUI( { path, onPathChange } ) {
 				<ContextScreens
 					key={ 'screens-block-' + block.name }
 					name={ block.name }
-						parentMenu={
-							'/blocks/' + encodeURIComponent( block.name )
-						}
+					parentMenu={ '/blocks/' + encodeURIComponent( block.name ) }
 				/>
 			) ) }
 
@@ -436,12 +437,7 @@ function GlobalStylesUI( { path, onPathChange } ) {
 			<GlobalStylesActionMenu />
 			<GlobalStylesBlockLink />
 			<GlobalStylesEditorCanvasContainerLink />
-<<<<<<< HEAD
 		</Navigator>
-=======
-			</WrapperComponent>
-		</NavigatorProvider>
->>>>>>> 08de320868a (Add path sync mechanism and sylebook block selection)
 	);
 }
 export { GlobalStylesMenuSlot };
