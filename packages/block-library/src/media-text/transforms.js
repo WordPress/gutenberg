@@ -3,6 +3,25 @@
  */
 import { createBlock } from '@wordpress/blocks';
 
+function unwrap(
+	{ mediaType, mediaPosition, mediaAlt, mediaId, mediaUrl, anchor },
+	innerBlocks
+) {
+	const output = [ ...innerBlocks ];
+	if ( mediaType ) {
+		const action = mediaPosition === 'right' ? 'push' : 'unshift';
+		output[ action ](
+			createBlock( `core/${ mediaType }`, {
+				alt: mediaAlt,
+				id: mediaId,
+				url: mediaUrl,
+				anchor,
+			} )
+		);
+	}
+	return output;
+}
+
 const transforms = {
 	from: [
 		{
@@ -101,31 +120,20 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			isMatch: ( { mediaType, mediaUrl } ) => {
-				return ! mediaUrl || mediaType === 'image';
-			},
-			transform: ( { mediaAlt, mediaId, mediaUrl, anchor } ) => {
-				return createBlock( 'core/image', {
-					alt: mediaAlt,
-					id: mediaId,
-					url: mediaUrl,
-					anchor,
-				} );
-			},
+			isMatch: ( { mediaType } ) => mediaType === 'image',
+			transform: unwrap,
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			isMatch: ( { mediaType, mediaUrl } ) => {
-				return ! mediaUrl || mediaType === 'video';
-			},
-			transform: ( { mediaId, mediaUrl, anchor } ) => {
-				return createBlock( 'core/video', {
-					id: mediaId,
-					src: mediaUrl,
-					anchor,
-				} );
-			},
+			isMatch: ( { mediaType } ) => mediaType === 'video',
+			transform: unwrap,
+		},
+		{
+			type: 'block',
+			// To do: ideally this should be '*', and quote should also use '*'.
+			blocks: [ 'core/paragraph' ],
+			transform: unwrap,
 		},
 		{
 			type: 'block',
