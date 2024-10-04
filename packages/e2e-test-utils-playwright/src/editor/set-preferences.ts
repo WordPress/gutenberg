@@ -4,6 +4,7 @@
 import type { Editor } from './index';
 
 type PreferencesContext =
+	| 'core'
 	| 'core/edit-post'
 	| 'core/edit-site'
 	| 'core/customize-widgets';

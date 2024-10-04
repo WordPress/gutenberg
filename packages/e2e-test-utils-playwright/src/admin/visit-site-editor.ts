@@ -71,5 +71,8 @@ export async function visitSiteEditor(
 			welcomeGuidePage: false,
 			welcomeGuideTemplate: false,
 		} );
+		await this.editor.setPreferences( 'core', {
+			welcomeGuideZoomOut: false,
+		} );
 	}
 }
