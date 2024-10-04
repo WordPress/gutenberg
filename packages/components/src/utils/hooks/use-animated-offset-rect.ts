@@ -44,8 +44,8 @@ export function useAnimatedOffsetRect(
 	rect: ElementOffsetRect,
 	{
 		prefix = 'subelement',
-		attribute = `${ prefix }-animated`,
-		transitionEndFilter,
+		dataAttribute = `${ prefix }-animated`,
+		transitionEndFilter = () => true,
 	}: {
 		/**
 		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
@@ -55,17 +55,21 @@ export function useAnimatedOffsetRect(
 		prefix?: string;
 		/**
 		 * The name of the data attribute used to indicate that the animation is in
-		 * progress.
+		 * progress. The `data-` prefix is added automatically.
+		 *
+		 * For example, if `dataAttribute` is `indicator-animated`, the attribute will
+		 * be `data-indicator-animated`.
 		 * @default `${ prefix }-animated`
 		 */
-		attribute?: string;
+		dataAttribute?: string;
 		/**
 		 * A function that is called with the transition event and returns a boolean
-		 * indicating whether the animation should be stopped. The default is to
-		 * always stop the animation.
+		 * indicating whether the animation should be stopped. The default is a function
+		 * that always returns `true`.
 		 *
 		 * For example, if the animated element is the `::before` pseudo-element, the
 		 * function can be written as `( event ) => event.pseudoElement === '::before'`.
+		 * @default () => true
 		 */
 		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
 	} = {}
@@ -86,18 +90,18 @@ export function useAnimatedOffsetRect(
 	useOnValueUpdate( rect.element, ( { previousValue } ) => {
 		// Only enable the animation when moving from one element to another.
 		if ( rect.element && previousValue ) {
-			container?.setAttribute( `data-${ attribute }`, '' );
+			container?.setAttribute( `data-${ dataAttribute }`, '' );
 		}
 	} );
 	useLayoutEffect( () => {
 		function onTransitionEnd( event: TransitionEvent ) {
-			if ( transitionEndFilter?.( event ) ?? true ) {
-				container?.removeAttribute( `data-${ attribute }` );
+			if ( transitionEndFilter( event ) ) {
+				container?.removeAttribute( `data-${ dataAttribute }` );
 			}
 		}
 		container?.addEventListener( 'transitionend', onTransitionEnd );
 		return () =>
 			container?.removeEventListener( 'transitionend', onTransitionEnd );
-	}, [ attribute, container, transitionEndFilter ] );
+	}, [ dataAttribute, container, transitionEndFilter ] );
 }
 /* eslint-enable jsdoc/require-param */

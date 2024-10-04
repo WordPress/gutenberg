@@ -76,7 +76,7 @@ export const TabList = forwardRef<
 	// Size, position, and animate the indicator.
 	useAnimatedOffsetRect( parent, selectedRect, {
 		prefix: 'selected',
-		attribute: 'indicator-animated',
+		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
 	} );
 
