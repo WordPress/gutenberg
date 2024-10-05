@@ -14,13 +14,6 @@
 	display: flex;
 }
 
-.block-editor-iframe__scale-container.is-zoomed-out {
-	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
-	width: $prev-container-width;
-	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
-}
-
 .block-editor-iframe__html {
 	border: 0 solid $gray-300;
 	transform-origin: top center;
@@ -34,13 +27,12 @@
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
 
-	transform: scale(#{$scale});
 
 	background-color: $gray-300;
 
 	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
 	// layout, so we use border matching the background instead of margins.
-	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
+	border: calc(#{$frame-size}) solid $gray-300;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
