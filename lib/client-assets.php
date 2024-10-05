@@ -598,6 +598,25 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array( 'react' ),
 		'18'
 	);
+
+	wp_register_script_module(
+		'@wordpress/vips/vips',
+		gutenberg_url( 'build/vendors/vips.wasm' ),
+		array(),
+		'vips-version-not-this-string'
+	);
+	wp_register_script_module(
+		'@wordpress/vips/vips-heif',
+		gutenberg_url( 'build/vendors/vips-heif.wasm' ),
+		array(),
+		'vips-version-not-this-string'
+	);
+	wp_register_script_module(
+		'@wordpress/vips/vips-jxl',
+		gutenberg_url( 'build/vendors/vips-jxl.wasm' ),
+		array(),
+		'vips-version-not-this-string'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 

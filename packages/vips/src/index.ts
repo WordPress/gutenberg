@@ -3,17 +3,17 @@
  */
 import Vips from 'wasm-vips';
 
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
-import VipsModule from 'wasm-vips/vips.wasm';
-
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
-import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-// @ts-expect-error
-// eslint-disable-next-line import/no-unresolved
-import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
+//// @ts-expect-error
+//// eslint-disable-next-line import/no-unresolved
+//import VipsModule from 'wasm-vips/vips.wasm';
+//
+//// @ts-expect-error
+//// eslint-disable-next-line import/no-unresolved
+//import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+//
+//// @ts-expect-error
+//// eslint-disable-next-line import/no-unresolved
+//import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
 /**
  * Internal dependencies
@@ -68,14 +68,14 @@ async function getVips(): Promise< typeof Vips > {
 	vipsInstance = await Vips( {
 		locateFile: ( fileName: string ) => {
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				fileName = VipsModule;
+				fileName = '@wordpress/vips/vips';
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				fileName = VipsHeifModule;
+				fileName = '@wordpress/vips/vips-heif';
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				fileName = VipsJxlModule;
+				fileName = '@wordpress/vips/vips-jxl';
 			}
 
-			return location + fileName;
+			return fileName;
 		},
 		preRun: ( module: EmscriptenModule ) => {
 			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
