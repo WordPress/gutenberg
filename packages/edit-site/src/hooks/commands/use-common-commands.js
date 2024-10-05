@@ -18,6 +18,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -171,10 +172,12 @@ function useGlobalStylesOpenCssCommands() {
 		unlock( useDispatch( editSiteStore ) );
 	const { params } = useLocation();
 	const history = useHistory();
-	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
+	const { canEditCSS, isBlockBasedTheme } = useSelect( ( select ) => {
+		const {
+			getEntityRecord,
+			__experimentalGetCurrentGlobalStylesId,
+			getCurrentTheme,
+		} = select( coreStore );
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 		const globalStyles = globalStylesId
 			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
@@ -182,6 +185,7 @@ function useGlobalStylesOpenCssCommands() {
 
 		return {
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
+			isBlockBasedTheme: getCurrentTheme().is_block_theme,
 		};
 	}, [] );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
@@ -198,17 +202,24 @@ function useGlobalStylesOpenCssCommands() {
 				icon: brush,
 				callback: ( { close } ) => {
 					close();
-					if ( ! params.postId ) {
-						history.push( {
-							path: '/wp_global_styles',
-							canvas: 'edit',
+					if ( isBlockBasedTheme ) {
+						if ( ! params.postId ) {
+							history.push( {
+								path: '/wp_global_styles',
+								canvas: 'edit',
+							} );
+						}
+						if ( params.postId && getCanvasMode() !== 'edit' ) {
+							setCanvasMode( 'edit' );
+						}
+						openGeneralSidebar( 'edit-site/global-styles' );
+						setEditorCanvasContainerView( 'global-styles-css' );
+					} else {
+						const targetUrl = addQueryArgs( 'customize.php', {
+							'autofocus[section]': 'custom_css',
 						} );
+						document.location = targetUrl;
 					}
-					if ( params.postId && getCanvasMode() !== 'edit' ) {
-						setCanvasMode( 'edit' );
-					}
-					openGeneralSidebar( 'edit-site/global-styles' );
-					setEditorCanvasContainerView( 'global-styles-css' );
 				},
 			},
 		];
@@ -220,6 +231,7 @@ function useGlobalStylesOpenCssCommands() {
 		getCanvasMode,
 		setCanvasMode,
 		params.postId,
+		isBlockBasedTheme,
 	] );
 	return {
 		isLoading: false,
