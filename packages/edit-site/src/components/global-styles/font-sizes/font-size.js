@@ -197,7 +197,11 @@ function FontSize() {
 				</HStack>
 
 				<View>
-					<Spacer paddingX={ 4 }>
+					<Spacer
+						paddingX={ 4 }
+						marginBottom={ 0 }
+						paddingBottom={ 6 }
+					>
 						<VStack spacing={ 4 }>
 							<FlexItem>
 								<FontSizePreview fontSize={ fontSize } />
