@@ -37,6 +37,10 @@
 -   `Navigator`: stabilize APIs ([#64613](https://github.com/WordPress/gutenberg/pull/64613)).
 -   `ToggleGroupControl`: indicator animation is now more lightweight and performant ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
 
+### Internal
+
+-   Update `re-resizable` dependency to 6.10.0 ([#65637](https://github.com/WordPress/gutenberg/pull/65637)).
+
 ## 28.8.0 (2024-09-19)
 
 ### Bug Fixes

@@ -87,6 +87,17 @@ const HANDLE_STYLES = {
 	bottomLeft: HANDLE_STYLES_OVERRIDES,
 };
 
+const DEFAULT_ENABLE = {
+	top: false,
+	right: false,
+	bottom: false,
+	left: false,
+	topRight: false,
+	bottomRight: false,
+	bottomLeft: false,
+	topLeft: false,
+};
+
 type ResizableBoxProps = ResizableProps & {
 	children: ReactNode;
 	showHandle?: boolean;
@@ -101,6 +112,7 @@ function UnforwardedResizableBox(
 		showHandle = true,
 		__experimentalShowTooltip: showTooltip = false,
 		__experimentalTooltipProps: tooltipProps = {},
+		enable,
 		...props
 	}: ResizableBoxProps,
 	ref: ForwardedRef< Resizable >
@@ -115,6 +127,7 @@ function UnforwardedResizableBox(
 			handleClasses={ HANDLE_CLASSES }
 			handleStyles={ HANDLE_STYLES }
 			ref={ ref }
+			enable={ { ...DEFAULT_ENABLE, ...enable } }
 			{ ...props }
 		>
 			{ children }
