@@ -9,5 +9,9 @@
 		font-family: inherit;
 		overflow-wrap: break-word;
 		white-space: pre-wrap;
+		/*!rtl:begin:ignore*/
+		direction: ltr;
+		text-align: left;
+		/*!rtl:end:ignore*/
 	}
 }
