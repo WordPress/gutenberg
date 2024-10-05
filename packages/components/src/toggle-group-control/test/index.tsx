@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { press, click, hover, sleep } from '@ariakit/test';
 
 /**
@@ -160,6 +161,16 @@ describe.each( [
 		await click( screen.getByRole( 'radio', { name: 'R' } ) );
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
+	} );
+
+	it( 'should not set a value on focus', async () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+
+		await userEvent.tab();
+		const radio = screen.getByRole( 'radio', { name: 'R' } );
+		expect( radio ).not.toBeChecked();
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
