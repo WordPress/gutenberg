@@ -26,6 +26,8 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
+				"after": "",
+				"before": "",
 				"parents": [],
 				"format": []
 			}
