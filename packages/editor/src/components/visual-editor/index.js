@@ -359,7 +359,9 @@ function VisualEditor( {
 		// Dsiable resizing in zoomed-out mode.
 		! isZoomedOut;
 	const shouldIframe =
-		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
+		! disableIframe ||
+		[ 'Tablet', 'Mobile' ].includes( deviceType ) ||
+		PATTERN_POST_TYPE === postType;
 
 	const iframeStyles = useMemo( () => {
 		return [
