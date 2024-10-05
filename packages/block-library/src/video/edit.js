@@ -24,6 +24,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -58,6 +59,7 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const borderProps = useBorderProps( attributes );
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -136,13 +138,17 @@ function VideoEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className={ clsx( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSingleSelected,
+				} ) }
 				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
 				instructions={ __(
 					'Upload a video file, pick one from your media library, or add one with a URL.'
 				) }
+				style={ ! isSingleSelected ? borderProps.style : {} }
 			>
 				{ content }
 			</Placeholder>
@@ -280,9 +286,11 @@ function VideoEdit( {
             */ }
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
+						className={ borderProps.className }
 						controls={ controls }
 						poster={ poster }
 						src={ src || temporaryURL }
+						style={ borderProps.style }
 						ref={ videoPlayer }
 					>
 						<Tracks tracks={ tracks } />
