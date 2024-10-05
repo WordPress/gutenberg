@@ -286,6 +286,7 @@ class WP_Block_Parser {
 		 */
 		if ( $is_closer && ( $is_void || $has_attrs ) ) {
 			// we can ignore them since they don't hurt anything.
+			return array();
 		}
 
 		if ( $is_void ) {
