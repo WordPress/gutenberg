@@ -35,9 +35,9 @@ const meta: Meta< typeof Composite > = {
 		'Composite.Context': Composite.Context,
 	},
 	argTypes: {
-		children: { control: { type: null } },
-		render: { control: { type: null } },
-		setActiveId: { control: { type: null } },
+		children: { control: { type: undefined } },
+		render: { control: { type: undefined } },
+		setActiveId: { control: { type: undefined } },
 		focusLoop: {
 			control: 'select',
 			options: [ true, false, 'horizontal', 'vertical', 'both' ],

@@ -18,7 +18,7 @@ export default {
 			control: 'check',
 			options: [ 'left', 'center', 'right', 'justify' ],
 		},
-		value: { control: { type: null } },
+		value: { control: { type: undefined } },
 	},
 };
 

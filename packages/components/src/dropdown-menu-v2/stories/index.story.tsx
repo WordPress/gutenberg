@@ -45,8 +45,8 @@ const meta: Meta< typeof DropdownMenuV2 > = {
 		ItemHelpText: DropdownMenuV2.ItemHelpText,
 	},
 	argTypes: {
-		children: { control: { type: null } },
-		trigger: { control: { type: null } },
+		children: { control: { type: undefined } },
+		trigger: { control: { type: undefined } },
 	},
 	tags: [ 'status-private' ],
 	parameters: {

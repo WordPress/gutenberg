@@ -20,7 +20,7 @@ const meta: Meta< typeof BorderBoxControl > = {
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: { type: undefined } },
 	},
 	parameters: {
 		controls: { expanded: true },

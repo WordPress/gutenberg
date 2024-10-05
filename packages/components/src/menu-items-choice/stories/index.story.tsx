@@ -20,7 +20,7 @@ const meta: Meta< typeof MenuItemsChoice > = {
 	argTypes: {
 		onHover: { action: 'onHover' },
 		onSelect: { action: 'onSelect' },
-		value: { control: { type: null } },
+		value: { control: { type: undefined } },
 	},
 	parameters: {
 		controls: {

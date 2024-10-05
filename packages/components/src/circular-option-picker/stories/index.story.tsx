@@ -31,8 +31,8 @@ const meta: Meta< typeof CircularOptionPicker > = {
 			CircularOptionPicker.DropdownLinkAction,
 	},
 	argTypes: {
-		actions: { control: { type: null } },
-		options: { control: { type: null } },
+		actions: { control: { type: undefined } },
+		options: { control: { type: undefined } },
 		children: { control: { type: 'text' } },
 	},
 	parameters: {

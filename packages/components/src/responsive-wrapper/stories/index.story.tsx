@@ -12,7 +12,7 @@ const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
 	title: 'Components/ResponsiveWrapper',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 	},
 	parameters: {
 		controls: { expanded: true },

@@ -18,17 +18,17 @@ const meta: Meta< typeof Snackbar > = {
 	title: 'Components/Snackbar',
 	component: Snackbar,
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: { type: undefined } },
 		onRemove: {
 			action: 'onRemove',
-			control: { type: null },
+			control: { type: undefined },
 		},
 		onDismiss: {
 			action: 'onDismiss',
-			control: { type: null },
+			control: { type: undefined },
 		},
 		listRef: {
-			control: { type: null },
+			control: { type: undefined },
 		},
 	},
 	parameters: {

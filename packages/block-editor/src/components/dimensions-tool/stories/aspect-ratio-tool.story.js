@@ -16,7 +16,7 @@ export default {
 	title: 'BlockEditor (Private APIs)/DimensionsTool/AspectRatioTool',
 	component: AspectRatioTool,
 	argTypes: {
-		panelId: { control: { type: null } },
+		panelId: { control: { type: undefined } },
 		onChange: { action: 'changed' },
 	},
 };

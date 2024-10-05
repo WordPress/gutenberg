@@ -16,7 +16,7 @@ const meta: Meta< typeof ZStack > = {
 	title: 'Components (Experimental)/ZStack',
 	argTypes: {
 		as: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: { type: undefined } },
 	},
 	parameters: {
 		controls: {
