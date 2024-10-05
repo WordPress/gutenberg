@@ -180,10 +180,10 @@ test.describe( 'Block Visibility', () => {
 			} )
 			.getByRole( 'group' );
 
-		expect(
-			await blockCategories.count(),
+		await expect(
+			blockCategories,
 			'Only one category should be visible'
-		).toBe( 1 );
+		).toHaveCount( 1 );
 
 		await expect(
 			blockCategories.first().getByRole( 'checkbox', { name: 'Text' } ),
@@ -194,10 +194,10 @@ test.describe( 'Block Visibility', () => {
 			.first()
 			.getByRole( 'list' );
 
-		expect(
-			await textCategoryBlocksList.getByRole( 'checkbox' ).count(),
+		await expect(
+			textCategoryBlocksList.getByRole( 'checkbox' ),
 			'Only one block should be visible'
-		).toBe( 1 );
+		).toHaveCount( 1 );
 
 		await expect(
 			textCategoryBlocksList.getByRole( 'checkbox', { name: 'Verse' } ),
