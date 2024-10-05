@@ -58,6 +58,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		// Prevent unintended text wrapping.
 		flex-shrink: 0;
 		max-width: 100%;
+		margin-left: 1rem;
 	}
 
 	// Ensure minimum input field width in small viewports.
