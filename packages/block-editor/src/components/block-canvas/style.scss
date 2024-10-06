@@ -16,10 +16,9 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	$max-width: 750px; // This is also hardcoded as ZOOM_OUT_MAX_WIDTH in the iframe component and needs to be manually kept in sync.
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$inset: var(--wp-block-editor-iframe-zoom-out-inset);
-	inset-block: $inset 0;
 	transform: scale(#{$scale});
 	flex-basis: calc((100% - #{$inset} * 2) / #{$scale});
-	height: calc((100% - #{$inset} * 2) / #{$scale});
+	height: calc(100% / #{$scale});
 	$inset-max-width: "(#{$max-width} - #{$inset} * 2)";
 	max-width: calc(#{$inset-max-width} / #{$scale});
 }
