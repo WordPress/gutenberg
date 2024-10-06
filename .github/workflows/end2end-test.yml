@@ -51,7 +51,7 @@ jobs:
               run: |
                   WP_BASE_URL=http://127.0.0.1:9400/ \
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- \
-                  npm run test:e2e -- editor/blocks/buttons.spec.js editor/blocks/code.spec
+                  npm run test:e2e -- editor/blocks/buttons.spec.js editor/blocks/code.spec.js editor/blocks/classic.spec.js
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
