@@ -417,7 +417,6 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
-				tabIndex="0"
 				role="group"
 				aria-label={ groupLabel }
 			>
