@@ -15,6 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 	Placeholder,
+	ToggleControl,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -128,6 +129,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		isFeatureImage,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -792,6 +794,18 @@ export default function Image( {
 							options={ imageSizeOptions }
 						/>
 					) }
+				</ToolsPanel>
+				<ToolsPanel style={ { display: 'flex' } }>
+					<ToggleControl
+						label={ __( 'Set this image as feature image' ) }
+						checked={ isFeatureImage }
+						onChange={ () =>
+							setAttributes( {
+								isFeatureImage: ! isFeatureImage,
+							} )
+						}
+						__nextHasNoMarginBottom
+					/>
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">

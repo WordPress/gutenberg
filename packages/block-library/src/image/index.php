@@ -28,6 +28,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// If feature image is not set for post and isFeatureImage is true then set this image as feature image.
+	if ( isset( $attributes['isFeatureImage'] ) && $attributes['isFeatureImage'] ) {
+		$post_id = get_the_ID();
+		if ( $post_id ) {
+			$has_thumbnail = has_post_thumbnail( $post_id );
+			if ( ! $has_thumbnail ) {
+				set_post_thumbnail( $post_id, $attributes['id'] );
+			}
+		}
+	}
+
 	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
 	// Ensure the `wp-image-id` classname on the image block supports block bindings.
