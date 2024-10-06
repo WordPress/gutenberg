@@ -215,32 +215,12 @@ function Iframe( {
 
 	const isZoomedOut = scale !== 1;
 	const priorContainerWidth = useRef();
-	const isScaleFinal = useRef( false );
-	useEffect(
-		() => {
-			if ( isZoomedOut ) {
-				priorContainerWidth.current = containerWidth;
-				return () => {
-					isScaleFinal.current = false;
-					if ( iframeDocument && iframeDocument.defaultView ) {
-						const { documentElement, defaultView } = iframeDocument;
-						documentElement.classList.remove( 'is-zoomed-out' );
-						documentElement.style.removeProperty(
-							'--wp-block-editor-iframe-zoom-out-scale'
-						);
-						defaultView.frameElement.style.removeProperty(
-							'--wp-block-editor-iframe-zoom-out-scale'
-						);
-						defaultView.frameElement.style.removeProperty(
-							'--wp-block-editor-iframe-zoom-out-inset'
-						);
-					}
-				};
-			}
-		},
-		// containerWidth omitted so that its value is read once when zoom out engages.
-		[ isZoomedOut, iframeDocument ]
-	);
+
+	useEffect( () => {
+		if ( ! isZoomedOut ) {
+			priorContainerWidth.current = containerWidth;
+		}
+	}, [ containerWidth, isZoomedOut ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
@@ -277,7 +257,7 @@ function Iframe( {
 	useEffect( () => cleanup, [ cleanup ] );
 
 	useEffect( () => {
-		if ( ! iframeDocument || ! isZoomedOut || isScaleFinal.current ) {
+		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
 		const frameInlineWidth = frameSize * 2;
@@ -300,6 +280,19 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-inset',
 			`${ frameSize }px`
 		);
+
+		return () => {
+			documentElement.classList.remove( 'is-zoomed-out' );
+			documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			defaultView.frameElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			defaultView.frameElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inset'
+			);
+		};
 	}, [ containerWidth, frameSize, iframeDocument, isZoomedOut ] );
 
 	const { marginLeft, marginRight, ...styleWithoutInlineMargins } =
@@ -359,12 +352,6 @@ function Iframe( {
 							event.currentTarget
 						);
 					}
-				} }
-				onTransitionEnd={ ( event ) => {
-					if ( event.propertyName === 'transform' && isZoomedOut ) {
-						isScaleFinal.current = true;
-					}
-					props.onTransitionEnd?.( event );
 				} }
 			>
 				{ iframeDocument &&
