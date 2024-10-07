@@ -1,0 +1,37 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"siteOptions": {
+		"blogname": "Gutenberg E2E Tests"
+	},
+	"steps": [
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "wordpress.org/themes",
+				"slug": "twentytwenty"
+			}
+		},
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "wordpress.org/themes",
+				"slug": "twentytwentyone"
+			}
+		},
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "wordpress.org/themes",
+				"slug": "twentytwentythree"
+			}
+		},
+		{
+			"step": "activateTheme",
+			"themeFolderName": "twentytwentyone"
+		},
+		{
+			"step": "activatePlugin",
+			"pluginPath": "gutenberg/gutenberg.php"
+		}
+	]
+}
