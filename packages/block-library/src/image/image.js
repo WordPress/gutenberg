@@ -15,10 +15,9 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 	Placeholder,
-	ToggleControl,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, dispatch, select } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -141,6 +140,7 @@ export default function Image( {
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
 	const image = useSelect(
+		// eslint-disable-next-line no-shadow
 		( select ) =>
 			id && isSingleSelected
 				? select( coreStore ).getMedia( id, { context: 'view' } )
@@ -149,6 +149,7 @@ export default function Image( {
 	);
 
 	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
+		// eslint-disable-next-line no-shadow
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
@@ -474,6 +475,7 @@ export default function Image( {
 		lockTitleControlsMessage,
 		lockCaption = false,
 	} = useSelect(
+		// eslint-disable-next-line no-shadow
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
@@ -795,18 +797,6 @@ export default function Image( {
 						/>
 					) }
 				</ToolsPanel>
-				<ToolsPanel style={ { display: 'flex' } }>
-					<ToggleControl
-						label={ __( 'Set this image as feature image' ) }
-						checked={ isFeatureImage }
-						onChange={ () =>
-							setAttributes( {
-								isFeatureImage: ! isFeatureImage,
-							} )
-						}
-						__nextHasNoMarginBottom
-					/>
-				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
@@ -1057,10 +1047,45 @@ export default function Image( {
 		);
 	}
 
+	const setAttributeForFeatureImage = ( value ) => {
+		const isPostHasFeatureImage =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+		if ( isPostHasFeatureImage ) {
+			// dispatch notice that post already has feature image
+			createErrorNotice( __( 'Post already has a featured image.' ), {
+				type: 'snackbar',
+			} );
+			return;
+		}
+
+		// set post featured image as current image.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		dispatch( 'core/editor' ).editPost( { featured_media: attributes.id } );
+
+		setAttributes( { isFeatureImage: ! value } );
+	};
+
+	const makeFeatureImageFormatControl = (
+		<BlockControls>
+			<ToolbarGroup>
+				<ToolbarButton
+					icon="format-image"
+					label={ __( 'Make Feature Image' ) }
+					onClick={ () =>
+						setAttributeForFeatureImage( isFeatureImage )
+					}
+					isPressed={ isFeatureImage }
+				/>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+
 	return (
 		<>
 			{ mediaReplaceFlow }
 			{ controls }
+			{ makeFeatureImageFormatControl }
 			{ img }
 
 			<Caption
