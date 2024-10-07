@@ -27,9 +27,15 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;
 	$default_label      = __( 'Next Page' );
-	$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
-	$label              = $show_label ? $label_text : '';
-	$pagination_arrow   = get_query_pagination_arrow( $block, true );
+	// Allowed HTML tags for the label text.
+	$allowed_tags = array(
+		'span' => array(),
+	);
+	// Add the global allowed attributes to the allowed <span> tag.
+	$allowed_html     = array_map( '_wp_add_global_attributes', $allowed_tags );
+	$label_text       = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? wp_kses( $attributes['label'], $allowed_html ) : $default_label;
+	$label            = $show_label ? $label_text : '';
+	$pagination_arrow = get_query_pagination_arrow( $block, true );
 
 	if ( ! $label ) {
 		$wrapper_attributes .= ' aria-label="' . $label_text . '"';
