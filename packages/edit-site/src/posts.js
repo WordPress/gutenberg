@@ -8,7 +8,9 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
+import { init } from '@wordpress/editor';
 import { createRoot, StrictMode } from '@wordpress/element';
+import { addAction } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -20,10 +22,6 @@ import {
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-
-/**
- * Internal dependencies
- */
 import PostsApp from './components/posts-app';
 
 /**
@@ -37,20 +35,6 @@ export function initializePostsDashboard( id, settings ) {
 	}
 	const target = document.getElementById( id );
 	const root = createRoot( target );
-
-	dispatch( blocksStore ).reapplyBlockTypeFilters();
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( { name } ) => name !== 'core/freeform'
-	);
-	registerCoreBlocks( coreBlocks );
-	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
-	registerLegacyWidgetBlock( { inserter: false } );
-	registerWidgetGroupBlock( { inserter: false } );
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: true,
-		} );
-	}
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
@@ -80,6 +64,23 @@ export function initializePostsDashboard( id, settings ) {
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	addAction( 'editor.init', 'core/edit-site/init-posts', () => {
+		const coreBlocks = __experimentalGetCoreBlocks().filter(
+			( { name } ) => name !== 'core/freeform'
+		);
+		registerCoreBlocks( coreBlocks );
+		dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
+		registerLegacyWidgetBlock( { inserter: false } );
+		registerWidgetGroupBlock( { inserter: false } );
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: true,
+			} );
+		}
+	} );
+
+	init( settings );
 
 	root.render(
 		<StrictMode>

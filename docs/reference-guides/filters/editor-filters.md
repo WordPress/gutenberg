@@ -12,8 +12,8 @@ One of the most common ways to modify the Editor is through the [`block_editor_s
 
 The `block_editor_settings_all` hook passes two parameters to the callback function:
 
-- `$settings` – An array of configurable settings for the Editor.
-- `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
+-   `$settings` – An array of configurable settings for the Editor.
+-   `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
 
 The following example modifies the maximum upload file size. Add this to a plugin or your theme's `functions.php` file to test it.
 
@@ -129,6 +129,20 @@ function example_disable_tabs_for_my_custom_block( $settings ) {
 }
 ```
 
+## Editor Initialization
+
+There is an `editor.init` action fired when the editor gets initialized. This action is useful for adding custom JavaScript code to the Editor. Here's an example:
+
+```js
+import { addAction } from '@wordpress/hooks';
+
+addAction( 'editor.init', 'my-plugin/custom-editor-init', () => {
+	registerBlockType( 'my-plugin/my-custom-block', {
+		// Block code here.
+	} );
+} );
+```
+
 ## Block Directory
 
 The Block Directory allows users to install new block plugins directly in the Editor from the WordPress.org [Plugin Directory](https://wordpress.org/plugins/browse/block/). You can disable this functionality by removing the action that enqueues it, which is `wp_enqueue_editor_block_directory_assets`. To do so, use [`remove_action`](https://developer.wordpress.org/reference/functions/remove_action/) like this:
@@ -239,9 +253,9 @@ addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
 	( error ) => {
-		// Error is the exception's error object. 
+		// Error is the exception's error object.
 		// You can console.log it or send it to an external error-tracking tool.
-		console.log ( error );
+		console.log( error );
 	}
 );
 ```

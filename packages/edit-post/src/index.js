@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -9,12 +8,14 @@ import {
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
+import { addAction } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import {
+	init,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -25,11 +26,8 @@ import {
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const {
-	BackButton: __experimentalMainDashboardButton,
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} = unlock( editorPrivateApis );
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -81,8 +79,6 @@ export function initializeEditor(
 		} );
 	}
 
-	dispatch( blocksStore ).reapplyBlockTypeFilters();
-
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
 	// This behavior is disabled for small viewports.
@@ -92,17 +88,6 @@ export function initializeEditor(
 		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
 		dispatch( editorStore ).setIsListViewOpened( true );
-	}
-
-	registerCoreBlocks();
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
-	registerCoreBlockBindingsSources();
-	registerLegacyWidgetBlock( { inserter: false } );
-	registerWidgetGroupBlock( { inserter: false } );
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
-		} );
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
@@ -148,6 +133,19 @@ export function initializeEditor(
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	addAction( 'editor.init', 'core/edit-post/init', () => {
+		registerCoreBlocks();
+		registerLegacyWidgetBlock( { inserter: false } );
+		registerWidgetGroupBlock( { inserter: false } );
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
+			} );
+		}
+	} );
+
+	init( settings );
 
 	root.render(
 		<StrictMode>
