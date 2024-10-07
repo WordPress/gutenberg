@@ -20,9 +20,9 @@ function render_block_core_cover( $attributes, $content ) {
 		return $content;
 	}
 
-	if ( isset( $attributes['focalPoint'] ) ) {
-		$object_position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
-	}
+	$object_position = isset( $attributes['focalPoint'] )
+		? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%'
+		: null;
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
@@ -30,9 +30,9 @@ function render_block_core_cover( $attributes, $content ) {
 			'data-object-fit' => 'cover',
 		);
 
-		if ( isset( $object_position ) ) {
+		if ( $object_position ) {
 			$attr['data-object-position'] = $object_position;
-			$attr['style']                = 'object-position: ' . $object_position . ';';
+			$attr['style']                = 'object-position:' . $object_position . ';';
 		}
 
 		$image = get_the_post_thumbnail( null, 'post-thumbnail', $attr );
@@ -62,11 +62,7 @@ function render_block_core_cover( $attributes, $content ) {
 			$processor->add_class( 'is-repeated' );
 		}
 
-		$background_position = '50% 50%';
-		if ( isset( $object_position ) ) {
-			$background_position = $object_position;
-		}
-		$styles = 'background-position:' . $background_position . ';';
+		$styles = 'background-position:' . ( $object_position ?? '50% 50%' ) . ';';
 		if ( $current_featured_image ) {
 			$styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 		}
