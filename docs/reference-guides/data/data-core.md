@@ -786,7 +786,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the edited entity record.
 -   _name_ `string`: Name of the edited entity record.
--   _recordId_ `number|string`: Record ID of the edited entity record.
+-   _recordId_ `number|string=`: Record ID of the edited entity record.
 -   _edits_ `Object`: The edits.
 -   _options_ `Object`: Options for the edit.
 -   _options.undoIgnore_ `[boolean]`: Whether to ignore the edit in undo history or not.
@@ -888,7 +888,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
--   _recordId_ `Object`: ID of the record.
+-   _recordId_ `Object=`: ID of the record.
 -   _options_ `Object=`: Saving options.
 
 ### saveEntityRecord

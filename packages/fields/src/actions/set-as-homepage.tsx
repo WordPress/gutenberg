@@ -86,7 +86,6 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 				}
 
 				// Save new home page settings.
-				// @ts-ignore
 				await editEntityRecord( 'root', 'site', undefined, {
 					page_for_posts: newPage?.id,
 					page_on_front: item.id,
@@ -107,7 +106,6 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 					);
 				}
 
-				// @ts-ignore
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
 					page_for_posts: newPage?.id,
 					page_on_front: item.id,
@@ -133,14 +131,12 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 			event.preventDefault();
 
 			try {
-				// @ts-ignore
 				await editEntityRecord( 'root', 'site', undefined, {
 					show_on_front: 'posts',
 				} );
 
 				closeModal?.();
 
-				// @ts-ignore
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
 					show_on_front: 'posts',
 				} );
