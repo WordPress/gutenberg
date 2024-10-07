@@ -118,7 +118,7 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 					show_on_front: 'page',
 				} );
 
-				createSuccessNotice( __( 'Page set as homepage' ), {
+				createSuccessNotice( __( 'Homepage updated' ), {
 					type: 'snackbar',
 				} );
 
