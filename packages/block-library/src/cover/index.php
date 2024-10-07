@@ -62,9 +62,9 @@ function render_block_core_cover( $attributes, $content ) {
 			$processor->set_attribute( 'aria-label', $current_caption );
 		}
 
-		$styles = 'background-image: url(' . esc_url( $current_featured_image ) . ');';
-		if ( isset( $object_position ) ) {
-			$styles .= 'background-position: ' . $object_position . ';';
+		$styles = 'background-position:' . isset( $object_position ) ? $object_position : '50% 50%' . ';';
+		if ( $current_featured_image ) {
+			$styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 		}
 		$processor->set_attribute( 'style', $styles );
 
