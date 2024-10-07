@@ -42,6 +42,8 @@ function BlockPattern( {
 	showTitle = true,
 	showTooltip,
 	category,
+	isActive, // new prop to manage active state
+	setActivePattern, // function to set the active pattern
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
@@ -77,8 +79,13 @@ function BlockPattern( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className="block-editor-block-patterns-list__list-item"
-					draggable={ draggable }
+					className={clsx(
+						'block-editor-block-patterns-list__list-item',
+						{ 'is-active': isActive } // Apply 'is-active' class if this pattern is active
+					)}
+					role="button" // Add role to make it behave like a button
+					tabIndex={0}  // Make the element focusable by keyboard
+					draggable={draggable}
 					onDragStart={ ( event ) => {
 						setIsDragging( true );
 						if ( onDragStart ) {
@@ -92,6 +99,20 @@ function BlockPattern( {
 							onDragEnd( event );
 						}
 					} }
+					onClick={() => {
+						setActivePattern(id); // Set active pattern when clicked
+						onClick(pattern, blocks);
+						onHover?.(null);
+					}}
+					onKeyDown={(event) => {
+						// Simulate button click with Enter or Space key press
+						if (event.key === 'Enter' || event.key === ' ') {
+							event.preventDefault(); // Prevent default behavior for spacebar
+							setActivePattern(id);
+							onClick(pattern, blocks);
+							onHover?.(null);
+						}
+					}}
 				>
 					<WithToolTip
 						showTooltip={
@@ -122,7 +143,8 @@ function BlockPattern( {
 								/>
 							}
 							id={ id }
-							onClick={ () => {
+							onClick={() => {
+								setActivePattern(id); // Set active pattern when clicked
 								onClick( pattern, blocks );
 								onHover?.( null );
 							} }
@@ -199,23 +221,44 @@ function BlockPatternsList(
 	},
 	ref
 ) {
-	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
+	const [activePattern, setActivePattern] = useState(null); // State to track active pattern
 
 	useEffect( () => {
 		// Reset the active composite item whenever the available patterns change,
 		// to make sure that Composite widget can receive focus correctly when its
 		// composite items change. The first composite item will receive focus.
-		const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
-			shownPatterns.includes( pattern )
-		)?.name;
-		setActiveCompositeId( firstCompositeItemId );
-	}, [ shownPatterns, blockPatterns ] );
+		if (typeof window !== 'undefined' && window.localStorage) {
+			// eslint-disable-next-line no-undef
+			const storedPatternName = localStorage.getItem('savedPattern');
 
+			if (storedPatternName && shownPatterns.some(pattern => pattern.name === storedPatternName)) {
+				// If there's a saved pattern and it exists in shownPatterns, set it as active
+				setActivePattern(storedPatternName);
+			} else {
+				const firstCompositeItemId = blockPatterns.find((pattern) =>
+					shownPatterns.includes(pattern)
+				)?.name;
+
+				if (firstCompositeItemId) {
+					setActivePattern(firstCompositeItemId);
+				}
+			}
+		}
+	}, [ shownPatterns, blockPatterns ] );
+	const handleClickPattern = (pattern) => {
+		// Check if we are in a browser environment and localStorage is available
+		if (typeof window !== 'undefined' && window.localStorage) {
+			// eslint-disable-next-line no-undef
+			localStorage.setItem('savedPattern', pattern.name); // Save the selected pattern in localStorage
+		}
+		setActivePattern(pattern.name); // Set the clicked pattern as active
+		onClickPattern(pattern); // Original onClick logic
+	};
 	return (
 		<Composite
 			orientation={ orientation }
-			activeId={ activeCompositeId }
-			setActiveId={ setActiveCompositeId }
+			activeId={ activePattern }
+			setActiveId={ setActivePattern }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
@@ -228,12 +271,14 @@ function BlockPatternsList(
 						key={ pattern.name }
 						id={ pattern.name }
 						pattern={ pattern }
-						onClick={ onClickPattern }
+						onClick={ handleClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
 						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
 						category={ category }
+						isActive={activePattern === pattern.name} // Highlight the active pattern
+						setActivePattern={setActivePattern} // Function to set the active pattern
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />
