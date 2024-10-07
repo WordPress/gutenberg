@@ -355,11 +355,17 @@ export default () => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
 
+					// Create a temporary div element to manipulate class names
 					const classProxyElement = document.createElement( 'div' );
+
+					// If the element already has a class, set it on the proxy element
+					// so we can manipulate it.
 					if ( 'string' === typeof element.props.class ) {
 						classProxyElement.className = element.props.class;
 					}
 
+					// If the result is false it means we need to remove the class from
+					// the element.
 					if ( ! result ) {
 						if (
 							classProxyElement.classList.contains( className )
@@ -368,6 +374,8 @@ export default () => {
 							element.props.class = classProxyElement.className;
 						}
 					} else if (
+						// Otherwise, if the result is true and the class is not already
+						// on the element, add it.
 						! classProxyElement.classList.contains( className )
 					) {
 						classProxyElement.classList.add( className );
