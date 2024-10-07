@@ -62,7 +62,11 @@ function render_block_core_cover( $attributes, $content ) {
 			$processor->add_class( 'is-repeated' );
 		}
 
-		$styles = 'background-position:' . isset( $object_position ) ? $object_position : '50% 50%' . ';';
+		$background_position = '50% 50%';
+		if ( isset( $object_position ) ) {
+			$background_position = $object_position;
+		}
+		$styles = 'background-position:' . $background_position . ';';
 		if ( $current_featured_image ) {
 			$styles .= 'background-image:url(' . esc_url( $current_featured_image ) . ');';
 		}
