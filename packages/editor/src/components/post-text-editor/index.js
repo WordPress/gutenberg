@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import Textarea from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/components';
+import { TextareaControl, VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -62,13 +57,13 @@ export default function PostTextEditor() {
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
-			<Textarea
+			<TextareaControl
 				autoComplete="off"
 				dir="auto"
 				value={ value }
-				onChange={ ( event ) => {
+				onChange={ ( newContent ) => {
 					editEntityRecord( 'postType', type, id, {
-						content: event.target.value,
+						content: newContent,
 						blocks: undefined,
 						selection: undefined,
 					} );
@@ -76,6 +71,7 @@ export default function PostTextEditor() {
 				className="editor-post-text-editor"
 				id={ `post-content-${ instanceId }` }
 				placeholder={ __( 'Start writing with text or HTML' ) }
+				__nextHasNoMarginBottom
 			/>
 		</>
 	);
