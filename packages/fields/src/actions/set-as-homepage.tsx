@@ -26,7 +26,6 @@ const PAGE_POST_TYPE = 'page';
 
 const useSiteSettings = () =>
 	useSelect( ( _select ) => {
-		// @ts-ignore
 		const siteSettings = _select( coreStore ).getEntityRecord(
 			'root',
 			'site'
@@ -56,7 +55,6 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 		const pageTitle = getItemTitle( item );
 		const [ createPageForPosts, setCreatePageForPosts ] = useState( false );
 		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
-		// @ts-ignore
 		const { currentHomePage, pageForPosts, showOnFront } =
 			useSiteSettings();
 		const currentHomePageTitle = getItemTitle( currentHomePage );
@@ -144,6 +142,7 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 
 				closeModal?.();
 
+				// @ts-ignore
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
 					show_on_front: 'posts',
 				} );
