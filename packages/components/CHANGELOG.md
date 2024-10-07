@@ -6,6 +6,10 @@
 
 -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
 
+### Enhancements
+
+-   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+
 ## 28.9.0 (2024-10-03)
 
 ### Bug Fixes

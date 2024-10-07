@@ -115,6 +115,7 @@ export const TabList = forwardRef<
 			render={ <TabListWrapper /> }
 			onBlur={ onBlur }
 			tabIndex={ -1 }
+			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
 				overflow.first && 'is-overflowing-first',
