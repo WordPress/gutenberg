@@ -838,30 +838,30 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param 
+	 * @param
 	 * @return array An array of resolved paths.
 	 */
 	private static function get_resolved_fonts_theme_uris( $theme_json_data ) {
 		$resolved_theme_uris = array();
 
-		if ( !empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
+		if ( ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
 
 			$font_families = ( $theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array() )
 				+ ( $theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array() )
 				+ ( $theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array() );
 
 			foreach ( $font_families as $font_family ) {
-				if ( !empty( $font_family['fontFace'] ) ) {
+				if ( ! empty( $font_family['fontFace'] ) ) {
 					foreach ( $font_family['fontFace'] as $font_face ) {
-						if ( !empty( $font_face['src'] ) ) {
-							$sources = is_string( $font_face['src'] ) 
+						if ( ! empty( $font_face['src'] ) ) {
+							$sources = is_string( $font_face['src'] )
 								? array( $font_face['src'] )
 								: $font_face['src'];
 							foreach ( $sources as $source ) {
 								if ( str_starts_with( $source, 'file:' ) ) {
 									$resolved_theme_uris[] = array(
-										'name' => $source,
-										'href' => sanitize_url( get_theme_file_uri( str_replace( 'file:./', '', $source ) ) ),
+										'name'   => $source,
+										'href'   => sanitize_url( get_theme_file_uri( str_replace( 'file:./', '', $source ) ) ),
 										'target' => "typography.fontFamilies.{$font_family['slug']}.fontFace.src",
 									);
 								}
