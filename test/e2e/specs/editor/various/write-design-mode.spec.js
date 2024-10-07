@@ -104,6 +104,9 @@ test.describe( 'Write/Design mode', () => {
 			name: 'Editor settings',
 		} );
 		await expect(
+			// Ideally we should be using CSS selectors
+			// but in this case there's no easy role/label
+			// to retrieve the "selected block title"
 			editorSettings.locator( '.block-editor-block-card__title' )
 		).toHaveText( 'Group' );
 		await expect(
