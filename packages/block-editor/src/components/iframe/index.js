@@ -122,7 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const prevContainerWidthRef = useRef();
+	const fullScaleContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -243,7 +243,7 @@ function Iframe( {
 
 	useEffect( () => {
 		if ( ! isZoomedOut ) {
-			prevContainerWidthRef.current = containerWidth;
+			fullScaleContainerWidthRef.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
@@ -306,12 +306,16 @@ function Iframe( {
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		const maxWidth = 750;
+		let canvasScale = 0.9;
+
+		// If the scaled canvas will be larger than our maxWidth, scale the canvas to be the size of the maxWidth
+		if ( containerWidth * canvasScale > maxWidth ) {
+			canvasScale = maxWidth / containerWidth;
+		}
+
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) /
-						prevContainerWidthRef.current
-				: scale
+			scale === 'default' ? canvasScale : scale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
