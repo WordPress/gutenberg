@@ -251,9 +251,6 @@ const EmbedEdit = ( props ) => {
 		className: classFromPreview,
 	} = getMergedAttributes();
 	const className = clsx( classFromPreview, props.className );
-	blockProps.className = clsx( blockProps.className, className, {
-		'is-type-video': 'video' === type,
-	} );
 
 	return (
 		<>
@@ -265,7 +262,12 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<figure { ...blockProps }>
+			<figure
+				{ ...blockProps }
+				className={ clsx( blockProps.className, className, {
+					'is-type-video': 'video' === type,
+				} ) }
+			>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
