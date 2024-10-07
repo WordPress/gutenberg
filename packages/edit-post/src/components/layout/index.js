@@ -202,7 +202,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
 		);
-		const actualize = () => {
+		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
 			let nextMax = fullHeight;
 			for ( const element of noticeLists ) {
@@ -211,7 +211,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			const nextMin = resizeHandle.offsetHeight;
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
-		const observer = new window.ResizeObserver( actualize );
+		const observer = new window.ResizeObserver( deriveConstraints );
 		observer.observe( container );
 		for ( const element of noticeLists ) {
 			observer.observe( element );
@@ -223,7 +223,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorHelpId = useId();
 
 	const [ isUntouched, setIsUntouched ] = useState( true );
-	const actualizeHeight = ( candidateHeight, isPersistent, isInstant ) => {
+	const applyHeight = ( candidateHeight, isPersistent, isInstant ) => {
 		const nextHeight = Math.min( max, Math.max( min, candidateHeight ) );
 		if ( isPersistent ) {
 			setPreference(
@@ -291,7 +291,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			const pane = metaBoxesMainRef.current.resizable;
 			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
 			const nextHeight = delta + fromHeight;
-			actualizeHeight( nextHeight, true, true );
+			applyHeight( nextHeight, true, true );
 			event.preventDefault();
 		}
 	};
@@ -354,14 +354,14 @@ function MetaBoxesMain( { isLegacy } ) {
 				if ( isAutoHeight ) {
 					// Sets the starting height to avoid visual jumps in height and
 					// aria-valuenow being `NaN` for the first (few) resize events.
-					actualizeHeight( elementRef.offsetHeight, false, true );
+					applyHeight( elementRef.offsetHeight, false, true );
 					setIsUntouched( false );
 				}
 			},
 			onResize: () =>
-				actualizeHeight( metaBoxesMainRef.current.state.height ),
+				applyHeight( metaBoxesMainRef.current.state.height ),
 			onResizeStop: () =>
-				actualizeHeight( metaBoxesMainRef.current.state.height, true ),
+				applyHeight( metaBoxesMainRef.current.state.height, true ),
 		} );
 	}
 
