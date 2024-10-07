@@ -39,6 +39,7 @@ module.exports = {
 			{
 				environment: {
 					enableTreatRefLikeIdentifiersAsRefs: true,
+					validateRefAccessDuringRender: false,
 				},
 			},
 		],
