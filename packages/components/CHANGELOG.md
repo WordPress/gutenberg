@@ -4,12 +4,21 @@
 
 ### Bug Fixes
 
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+-   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+-   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+
+## 28.9.0 (2024-10-03)
+
+### Bug Fixes
+
 -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
 -   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
 -   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
 -   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
 -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
--   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798))
+-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+-   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
 
 ### Deprecations
 

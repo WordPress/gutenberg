@@ -28,7 +28,7 @@ export const toggleGroupControl = ( {
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
 
 	@media not ( prefers-reduced-motion ) {
-		&.is-animation-enabled::before {
+		&[data-indicator-animated]::before {
 			transition-property: transform, border-radius;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;

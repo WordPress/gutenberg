@@ -91,14 +91,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		}
 	}
 
-	// Ensure an accurate partial text selection.
-	// To do this, we disable text selection on the main container, then re-enable it only on the
-	// elements that actually get selected.
-	// To keep in mind: user-select is currently inherited to all nodes inside.
-	.has-multi-selection & {
-		user-select: none;
-	}
-
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;
@@ -117,11 +109,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	overflow-wrap: break-word;
 
 	pointer-events: auto;
-	user-select: text;
 
 	&.is-editing-disabled {
 		pointer-events: none;
-		user-select: none;
 	}
 
 	&.has-negative-margin {
