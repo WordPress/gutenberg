@@ -21,6 +21,13 @@
 	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
 }
 
+// Avoid collapsing margins causing a layout shift when invoking zooming.
+.block-editor-iframe__body,
+.editor-visual-editor__post-title-wrapper {
+	border-top: 0.1em solid transparent;
+	border-bottom: 0.1em solid transparent;
+}
+
 .block-editor-iframe__html {
 	border: 0 solid $gray-300;
 	transform-origin: top center;
