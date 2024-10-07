@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { press, click, hover, sleep } from '@ariakit/test';
 
 /**
@@ -168,8 +167,11 @@ describe.each( [
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
 
-		await userEvent.tab();
 		const radio = screen.getByRole( 'radio', { name: 'R' } );
+		expect( radio ).not.toBeChecked();
+
+		await press.Tab();
+		expect( radio ).toHaveFocus();
 		expect( radio ).not.toBeChecked();
 	} );
 
