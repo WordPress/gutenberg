@@ -39,7 +39,7 @@
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.2",
-		"eslint-plugin-jest": "^27.2.3",
+		"eslint-plugin-jest": "^28.8.3",
 		"eslint-plugin-jsdoc": "^46.4.6",
 		"eslint-plugin-jsx-a11y": "^6.5.1",
 		"eslint-plugin-playwright": "^0.15.3",
