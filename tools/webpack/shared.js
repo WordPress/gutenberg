@@ -75,7 +75,7 @@ const plugins = [
 		'globalThis.SCRIPT_DEBUG': JSON.stringify( mode === 'development' ),
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
-];
+].filter( Boolean );
 
 const stylesTransform = ( content ) => {
 	return postcss( [
