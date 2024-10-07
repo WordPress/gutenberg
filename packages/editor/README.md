@@ -452,6 +452,10 @@ _Returns_
 
 -   `Object`: The corresponding icon.
 
+### init
+
+Undocumented declaration.
+
 ### InnerBlocks
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InnerBlocks` instead.

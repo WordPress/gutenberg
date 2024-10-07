@@ -5,11 +5,12 @@ import {
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	setFreeformContentHandlerName,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { init } from '@wordpress/editor';
 import { StrictMode, createRoot } from '@wordpress/element';
+import { addAction } from '@wordpress/hooks';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -53,16 +54,6 @@ export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
-	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
-		return ! (
-			disabledBlocks.includes( block.name ) ||
-			block.name.startsWith( 'core/post' ) ||
-			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
-		);
-	} );
-
 	dispatch( preferencesStore ).setDefaults( 'core/edit-widgets', {
 		fixedToolbar: false,
 		welcomeGuide: true,
@@ -70,26 +61,38 @@ export function initializeEditor( id, settings ) {
 		themeStyles: true,
 	} );
 
-	dispatch( blocksStore ).reapplyBlockTypeFilters();
-	registerCoreBlocks( coreBlocks );
-	registerLegacyWidgetBlock();
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
-		} );
-	}
-	registerLegacyWidgetVariations( settings );
-	registerBlock( widgetArea );
-	registerWidgetGroupBlock();
-
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
 
-	// As we are unregistering `core/freeform` to avoid the Classic block, we must
-	// replace it with something as the default freeform content handler. Failure to
-	// do this will result in errors in the default block parser.
-	// see: https://github.com/WordPress/gutenberg/issues/33097
-	setFreeformContentHandlerName( 'core/html' );
+	addAction( 'editor.init', 'core/edit-widgets/init', () => {
+		const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
+			return ! (
+				disabledBlocks.includes( block.name ) ||
+				block.name.startsWith( 'core/post' ) ||
+				block.name.startsWith( 'core/query' ) ||
+				block.name.startsWith( 'core/site' ) ||
+				block.name.startsWith( 'core/navigation' )
+			);
+		} );
+		registerCoreBlocks( coreBlocks );
+		registerLegacyWidgetBlock();
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+			} );
+		}
+		registerLegacyWidgetVariations( settings );
+		registerBlock( widgetArea );
+		registerWidgetGroupBlock();
+
+		// As we are unregistering `core/freeform` to avoid the Classic block, we must
+		// replace it with something as the default freeform content handler. Failure to
+		// do this will result in errors in the default block parser.
+		// see: https://github.com/WordPress/gutenberg/issues/33097
+		setFreeformContentHandlerName( 'core/html' );
+	} );
+
+	init( settings );
 
 	root.render(
 		<StrictMode>

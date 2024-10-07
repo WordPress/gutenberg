@@ -12,11 +12,10 @@ import {
 	registerLegacyWidgetVariations,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import {
-	setFreeformContentHandlerName,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { setFreeformContentHandlerName } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
+import { init } from '@wordpress/editor';
+import { addAction } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -49,31 +48,32 @@ export function initialize( editorName, blockEditorSettings ) {
 		welcomeGuide: true,
 	} );
 
-	dispatch( blocksStore ).reapplyBlockTypeFilters();
-	const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
-		return ! (
-			DISABLED_BLOCKS.includes( block.name ) ||
-			block.name.startsWith( 'core/post' ) ||
-			block.name.startsWith( 'core/query' ) ||
-			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
-		);
-	} );
-	registerCoreBlocks( coreBlocks );
-	registerLegacyWidgetBlock();
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		__experimentalRegisterExperimentalCoreBlocks( {
-			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+	addAction( 'editor.init', 'core/customize-widgets/init', () => {
+		const coreBlocks = __experimentalGetCoreBlocks().filter( ( block ) => {
+			return ! (
+				DISABLED_BLOCKS.includes( block.name ) ||
+				block.name.startsWith( 'core/post' ) ||
+				block.name.startsWith( 'core/query' ) ||
+				block.name.startsWith( 'core/site' ) ||
+				block.name.startsWith( 'core/navigation' )
+			);
 		} );
-	}
-	registerLegacyWidgetVariations( blockEditorSettings );
-	registerWidgetGroupBlock();
+		registerCoreBlocks( coreBlocks );
+		registerLegacyWidgetBlock();
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
+			} );
+		}
+		registerLegacyWidgetVariations( blockEditorSettings );
+		registerWidgetGroupBlock();
 
-	// As we are unregistering `core/freeform` to avoid the Classic block, we must
-	// replace it with something as the default freeform content handler. Failure to
-	// do this will result in errors in the default block parser.
-	// see: https://github.com/WordPress/gutenberg/issues/33097
-	setFreeformContentHandlerName( 'core/html' );
+		// As we are unregistering `core/freeform` to avoid the Classic block, we must
+		// replace it with something as the default freeform content handler. Failure to
+		// do this will result in errors in the default block parser.
+		// see: https://github.com/WordPress/gutenberg/issues/33097
+		setFreeformContentHandlerName( 'core/html' );
+	} );
 
 	const SidebarControl = getSidebarControl( blockEditorSettings );
 
@@ -90,6 +90,8 @@ export function initialize( editorName, blockEditorSettings ) {
 				sidebarControls.push( control );
 			}
 		} );
+
+		init( blockEditorSettings );
 
 		createRoot( container ).render(
 			<StrictMode>
