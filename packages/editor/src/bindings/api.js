@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	privateApis as blocksPrivateApis,
 	store as blocksStore,
+	registerBlockBindingsSource,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 
@@ -25,7 +25,6 @@ import { unlock } from '../lock-unlock';
  * ```
  */
 export function registerCoreBlockBindingsSources() {
-	const { registerBlockBindingsSource } = unlock( blocksPrivateApis );
 	registerBlockBindingsSource( patternOverrides );
 	registerBlockBindingsSource( postMeta );
 }

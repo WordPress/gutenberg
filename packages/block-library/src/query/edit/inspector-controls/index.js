@@ -211,7 +211,7 @@ export default function QueryInspectorControls( props ) {
 							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
-								setQuery( { inherit: !! value } );
+								setQuery( { inherit: value === 'default' } );
 							} }
 							help={
 								inherit
@@ -222,14 +222,14 @@ export default function QueryInspectorControls( props ) {
 											'Display a list of posts or custom post types based on specific criteria.'
 									  )
 							}
-							value={ !! inherit }
+							value={ !! inherit ? 'default' : 'custom' }
 						>
 							<ToggleGroupControlOption
-								value
+								value="default"
 								label={ __( 'Default' ) }
 							/>
 							<ToggleGroupControlOption
-								value={ false }
+								value="custom"
 								label={ __( 'Custom' ) }
 							/>
 						</ToggleGroupControl>

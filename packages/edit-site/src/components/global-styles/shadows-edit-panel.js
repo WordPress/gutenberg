@@ -15,7 +15,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -95,6 +95,10 @@ export default function ShadowsEditPanel() {
 		useState( false );
 	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
 	const [ shadowName, setShadowName ] = useState( selectedShadow.name );
+
+	if ( ! category || ! slug ) {
+		return null;
+	}
 
 	const onShadowChange = ( shadow ) => {
 		setSelectedShadow( { ...selectedShadow, shadow } );

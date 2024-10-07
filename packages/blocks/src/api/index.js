@@ -2,12 +2,6 @@
  * Internal dependencies
  */
 import { lock } from '../lock-unlock';
-import {
-	registerBlockBindingsSource,
-	unregisterBlockBindingsSource,
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-} from './registration';
 import { isUnmodifiedBlockContent } from './utils';
 
 // The blocktype is the most important concept within the block API. It defines
@@ -147,6 +141,10 @@ export {
 	unregisterBlockStyle,
 	registerBlockVariation,
 	unregisterBlockVariation,
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
+	getBlockBindingsSource,
+	getBlockBindingsSources,
 } from './registration';
 export {
 	isUnmodifiedBlock,
@@ -179,10 +177,4 @@ export {
 } from './constants';
 
 export const privateApis = {};
-lock( privateApis, {
-	registerBlockBindingsSource,
-	unregisterBlockBindingsSource,
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-	isUnmodifiedBlockContent,
-} );
+lock( privateApis, { isUnmodifiedBlockContent } );
