@@ -20,15 +20,15 @@ if ( ! function_exists( 'wp_register_block_template' ) ) {
 	 *     @type string[]      $post_types            Optional. Array of post types to which the template should be available.
 	 *     @type string        $plugin                Uri of the plugin that registers the template.
 	 *     @type string        $type                  Optional. Type of the template. Either 'wp_template' or 'wp_template_part'.
-     *                                                Defaults to 'wp_template'.
+	 *                                                Defaults to 'wp_template'.
 	 * }
 	 * @return WP_Block_Template|WP_Error The registered template object on success, WP_Error object on failure.
 	 */
 	function wp_register_block_template( $template_name, $args = array() ) {
 		// Set default type to 'wp_template' if not provided.
-        if ( ! isset( $args['type'] ) ) {
-            $args['type'] = 'wp_template';
-        }
+		if ( ! isset( $args['type'] ) ) {
+			$args['type'] = 'wp_template';
+		}
 
 		return WP_Block_Templates_Registry::get_instance()->register( $template_name, $args );
 	}
