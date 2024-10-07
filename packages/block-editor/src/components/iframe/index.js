@@ -306,7 +306,7 @@ function Iframe( {
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		const maxWidth = 750;
-		const frameSizeIsNumber = frameSize === 'number';
+		const frameSizeIsNumber = typeof frameSize === 'number';
 		// The added space from `frameSize` has to be accounted for in scale calculation.
 		// This just punts in case `frameSize` can’t be treated as a pixel value. It’d
 		// probably be good to formally type `frameSize` as number and treat it as pixels.
