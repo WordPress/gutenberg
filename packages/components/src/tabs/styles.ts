@@ -195,7 +195,7 @@ export const Tab = styled( Ariakit.Tab )`
 			opacity: 0;
 
 			@media not ( prefers-reduced-motion ) {
-				transition: opacity 0.1s linear;
+				transition: opacity 0.15s 0.15s linear;
 			}
 		}
 
