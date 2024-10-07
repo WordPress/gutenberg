@@ -307,10 +307,10 @@ function Iframe( {
 
 		const maxWidth = 750;
 		const frameSizeIsNumber = typeof frameSize === 'number';
-		// The added space from `frameSize` has to be accounted for in scale calculation.
-		// This just punts in case `frameSize` can’t be treated as a pixel value. It’d
-		// probably be good to formally type `frameSize` as number and treat it as pixels.
-		// Core usage is pixels only and supporting any unit would be complicated.
+		// The added space from `frameSize` has to be factored in for accurate scale calculation,
+		// but if `frameSize` can’t be treated as a pixel value it’s left out. Accounting for other
+		// units (e.g. rem or %) would be complicated. Usage in core is pixels only. If we can
+		// formally type `frameSize` as number (of pixels) the conditionals here can be obviated.
 		let frameWidth = 0;
 		if ( frameSizeIsNumber || frameSize.endsWith( 'px' ) ) {
 			frameWidth =
