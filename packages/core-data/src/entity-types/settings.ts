@@ -90,6 +90,10 @@ declare module './base-entity-records' {
 			 * Site icon.
 			 */
 			site_icon: number;
+			/**
+			 * The ID of the page that should display posts.
+			 */
+			page_for_posts: number;
 		}
 	}
 }
