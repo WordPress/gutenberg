@@ -7,6 +7,10 @@
 -   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
 -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
 
+### Enhancements
+
+-   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+
 ## 28.9.0 (2024-10-03)
 
 ### Bug Fixes
@@ -26,7 +30,6 @@
 
 ### Enhancements
 
--   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
 -   `Tabs`: handle horizontal overflow and large tab lists gracefully ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
 -   `BorderControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 -   `BorderBoxControl`: promote to stable ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
