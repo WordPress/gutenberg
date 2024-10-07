@@ -149,8 +149,10 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					const splitIndex = unPrefixed.indexOf( '--' );
 					const [ prefix, suffix = 'default' ] =
 						splitIndex === -1
-							? [ unPrefixed ]
-							: [
+							? // If '--' is not found, set 'prefix' to 'unPrefixed'
+							  [ unPrefixed ]
+							: // Otherwise, split 'unPrefixed' into 'prefix' and 'suffix'
+							  [
 									unPrefixed.slice( 0, splitIndex ),
 									unPrefixed.slice( splitIndex + 2 ),
 							  ];
