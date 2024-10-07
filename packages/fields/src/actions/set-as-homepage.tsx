@@ -3,6 +3,7 @@
  */
 import { select, useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Settings, Post } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
@@ -26,11 +27,10 @@ const PAGE_POST_TYPE = 'page';
 
 const useSiteSettings = () =>
 	useSelect( ( _select ) => {
-		const siteSettings = _select( coreStore ).getEntityRecord(
+		const siteSettings = _select( coreStore ).getEntityRecord< Settings >(
 			'root',
 			'site'
 		);
-		// @ts-ignore
 		const _pageOnFront = siteSettings?.page_on_front || null;
 		const _currentHomePage =
 			_pageOnFront &&
@@ -42,9 +42,7 @@ const useSiteSettings = () =>
 
 		return {
 			currentHomePage: _currentHomePage,
-			// @ts-ignore
 			pageForPosts: siteSettings?.page_for_posts,
-			// @ts-ignore
 			showOnFront: siteSettings?.show_on_front,
 		};
 	} );
@@ -57,7 +55,7 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
 		const { currentHomePage, pageForPosts, showOnFront } =
 			useSiteSettings();
-		const currentHomePageTitle = getItemTitle( currentHomePage );
+		const currentHomePageTitle = getItemTitle( currentHomePage as Post );
 
 		const { editEntityRecord, saveEditedEntityRecord, saveEntityRecord } =
 			useDispatch( coreStore );
@@ -289,7 +287,7 @@ const setAsHomepage: Action< PostWithPermissions > = {
 			return false;
 		}
 
-		// A front-page tempalte overrides homepage settings, so don't show the action if it's present.
+		// A front-page template overrides homepage settings, so don't show the action if it's present.
 		const homepageTemplate =
 			select( coreStore ).__experimentalGetTemplateForLink( '/' );
 
@@ -298,10 +296,10 @@ const setAsHomepage: Action< PostWithPermissions > = {
 		}
 
 		// Don't show the action if the page is already set as the homepage.
-		const pageOnFront = select(
-			coreStore
-			// @ts-ignore
-		).getEntityRecord( 'root', 'site' )?.page_on_front;
+		const pageOnFront = select( coreStore ).getEntityRecord< Settings >(
+			'root',
+			'site'
+		)?.page_on_front;
 
 		if ( pageOnFront === post.id ) {
 			return false;
