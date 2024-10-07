@@ -71,3 +71,10 @@
 		}
 	}
 }
+// Solution for "Add "selected" styling to active elements in the design selector."
+// https: //github.com/WordPress/gutenberg/issues/65127
+.block-editor-block-patterns-list__list-item.is-active {
+	border: 2px solid #007cba;
+	/* Custom styles for active item */
+	background-color: #eaf5ff;
+}
