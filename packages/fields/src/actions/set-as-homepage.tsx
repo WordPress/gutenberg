@@ -282,7 +282,7 @@ const setAsHomepage: Action< PostWithPermissions > = {
 	id: 'set-as-homepage',
 	label: __( 'Set as homepage' ),
 	isEligible( post ) {
-		if ( post.status === 'trash' ) {
+		if ( post.status !== 'publish' ) {
 			return false;
 		}
 
