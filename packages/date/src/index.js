@@ -279,11 +279,11 @@ const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
 /**
  * Map of PHP formats to Moment.js formats.
  *
- * These are used internally by {@link wp.date.format}, and are either
+ * These are used internally by {@link wp.date.format} and {@link wp.date.createMomentDate}, and are either
  * a string representing the corresponding Moment.js format code, or a
  * function which returns the formatted string.
  *
- * This should only be used through {@link wp.date.format}, not
+ * This should only be used through {@link wp.date.format} and {@link wp.date.createMomentDate}, not
  * directly.
  */
 const formatMap = {
@@ -442,19 +442,17 @@ const formatMap = {
 };
 
 /**
- * Formats a date. Does not alter the date's timezone.
+ * Creates a Moment.js date format from a PHP-style date format.
  *
- * @param {string}                             dateFormat PHP-style formatting string.
- *                                                        See php.net/date.
- * @param {Moment | Date | string | undefined} dateValue  Date object or string,
- *                                                        parsable by moment.js.
+ * @param {Moment} momentDate Moment.js date object
+ * @param {string} dateFormat PHP-style formatting string.
+ *                            See php.net/date.
  *
- * @return {string} Formatted date.
+ * @return {string[]} date format recognizable by Moment.js.
  */
-export function format( dateFormat, dateValue = new Date() ) {
+function createMomentDateFormat( momentDate, dateFormat ) {
 	let i, char;
 	const newFormat = [];
-	const momentDate = momentLib( dateValue );
 	for ( i = 0; i < dateFormat.length; i++ ) {
 		char = dateFormat[ i ];
 		// Is this an escape?
@@ -478,9 +476,42 @@ export function format( dateFormat, dateValue = new Date() ) {
 			newFormat.push( '[' + char + ']' );
 		}
 	}
+	return newFormat;
+}
+
+/**
+ * Formats a date. Does not alter the date's timezone.
+ *
+ * @param {string}                             dateFormat PHP-style formatting string.
+ *                                                        See php.net/date.
+ * @param {Moment | Date | string | undefined} dateValue  Date object or string,
+ *                                                        parsable by moment.js.
+ *
+ * @return {string} Formatted date.
+ */
+export function format( dateFormat, dateValue = new Date() ) {
+	const momentDate = momentLib( dateValue );
+	const newFormat = createMomentDateFormat( momentDate, dateFormat );
 	// Join with [] between to separate characters, and replace
 	// unneeded separators with static text.
 	return momentDate.format( newFormat.join( '[]' ) );
+}
+
+/**
+ * Creates a Moment.js date format from a PHP-style date format.
+ *
+ * @param {string} dateString date string
+ * @param {string} dateFormat PHP-style formatting string.
+ *                            See php.net/date.
+ *
+ * @return {Moment} date format recognizable by Moment.js.
+ */
+export function createMomentDate( dateString, dateFormat ) {
+	const newFormat = createMomentDateFormat(
+		momentLib( dateString ),
+		dateFormat
+	);
+	return momentLib( dateString, newFormat.join( '[]' ) );
 }
 
 /**

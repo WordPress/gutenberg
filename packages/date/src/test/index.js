@@ -11,6 +11,7 @@ import {
 	isInTheFuture,
 	setSettings,
 	humanTimeDiff,
+	createMomentDate,
 } from '../';
 
 describe( 'isInTheFuture', () => {
@@ -658,5 +659,16 @@ describe( 'Moment.js Localization', () => {
 
 			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
 		} );
+	} );
+} );
+
+describe( 'Function createMomentDate', () => {
+	it( 'should create a moment date using the provided date format', () => {
+		const momentDate = createMomentDate(
+			'2024 年 4 月 24 日 09:48',
+			'Y 年 n 月 j 日 H:i'
+		);
+		expect( console ).toHaveWarned(); // moment throws a warning that value provided is not in a recognized RFC2822 or ISO format.
+		expect( momentDate.isValid() ).toBe( true );
 	} );
 } );
