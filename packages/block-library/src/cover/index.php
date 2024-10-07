@@ -48,18 +48,18 @@ function render_block_core_cover( $attributes, $content ) {
 		$processor = new WP_HTML_Tag_Processor( '<div></div>' );
 		$processor->next_tag();
 
+		$current_caption = get_the_post_thumbnail_caption();
+		if ( $current_caption ) {
+			$processor->set_attribute( 'role', 'img' );
+			$processor->set_attribute( 'aria-label', $current_caption );
+		}
+
 		$processor->add_class( 'wp-block-cover__image-background' );
 		if ( $attributes['hasParallax'] ) {
 			$processor->add_class( 'has-parallax' );
 		}
 		if ( $attributes['isRepeated'] ) {
 			$processor->add_class( 'is-repeated' );
-		}
-
-		$current_caption = get_the_post_thumbnail_caption();
-		if ( $current_caption ) {
-			$processor->set_attribute( 'role', 'img' );
-			$processor->set_attribute( 'aria-label', $current_caption );
 		}
 
 		$styles = 'background-position:' . isset( $object_position ) ? $object_position : '50% 50%' . ';';
