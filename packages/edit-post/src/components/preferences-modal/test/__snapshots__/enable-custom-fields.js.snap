@@ -97,7 +97,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
       A page reload is required for this change. Make sure your content is saved before reloading.
     </p>
     <button
-      class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+      class="components-button is-next-40px-default-size is-secondary"
       type="button"
     >
       Show & Reload Page
@@ -300,7 +300,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
       A page reload is required for this change. Make sure your content is saved before reloading.
     </p>
     <button
-      class="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+      class="components-button is-next-40px-default-size is-secondary"
       type="button"
     >
       Hide & Reload Page

@@ -67,7 +67,7 @@ function UnforwardedSearchControl(
 ) {
 	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
 	// Work with the design team (@WordPress/gutenberg-design) if you need this feature.
-	delete restProps.disabled;
+	const { disabled, ...filteredRestProps } = restProps;
 
 	const searchRef = useRef< HTMLInputElement >( null );
 	const instanceId = useInstanceId(
@@ -117,7 +117,7 @@ function UnforwardedSearchControl(
 						/>
 					</SuffixItemWrapper>
 				}
-				{ ...restProps }
+				{ ...filteredRestProps }
 			/>
 		</ContextSystemProvider>
 	);

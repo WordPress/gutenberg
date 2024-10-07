@@ -522,6 +522,12 @@
 		"parent": "core-concepts"
 	},
 	{
+		"title": "Using TypeScript",
+		"slug": "using-typescript",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/using-typescript.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
@@ -1092,33 +1098,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorBackButton",
-		"slug": "navigator-back-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorButton",
-		"slug": "navigator-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorProvider",
-		"slug": "navigator-provider",
-		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorScreen",
-		"slug": "navigator-screen",
-		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorToParentButton",
-		"slug": "navigator-to-parent-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"title": "Navigator",
+		"slug": "navigator",
+		"markdown_source": "../packages/components/src/navigator/README.md",
 		"parent": "components"
 	},
 	{

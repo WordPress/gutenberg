@@ -421,7 +421,6 @@ function LinkControl( {
 									</InputControlSuffixWrapper>
 								)
 							}
-							props
 						/>
 					</div>
 					{ errorMessage && (
@@ -475,16 +474,14 @@ function LinkControl( {
 					className="block-editor-link-control__search-actions"
 				>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ handleCancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
 						className="block-editor-link-control__search-submit"

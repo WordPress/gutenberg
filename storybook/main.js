@@ -41,6 +41,7 @@ module.exports = {
 		disableTelemetry: true,
 	},
 	stories,
+	staticDirs: [ './static' ],
 	addons: [
 		{
 			name: '@storybook/addon-docs',

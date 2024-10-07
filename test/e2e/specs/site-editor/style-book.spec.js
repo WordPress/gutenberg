@@ -43,9 +43,6 @@ test.describe( 'Style Book', () => {
 		await expect( page.locator( 'role=tab[name="Text"i]' ) ).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Media"i]' ) ).toBeVisible();
 		await expect(
-			page.locator( 'role=tab[name="Design"i]' )
-		).toBeVisible();
-		await expect(
 			page.locator( 'role=tab[name="Widgets"i]' )
 		).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Theme"i]' ) ).toBeVisible();
