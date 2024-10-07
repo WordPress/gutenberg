@@ -265,7 +265,7 @@ const EmbedEdit = ( props ) => {
 			<figure
 				{ ...blockProps }
 				className={ clsx( blockProps.className, className, {
-					'is-type-video': 'video' === type,
+					[ `is-type-${ type }` ]: type,
 					[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 					[ `wp-block-embed-${ providerNameSlug }` ]:
 						providerNameSlug,
