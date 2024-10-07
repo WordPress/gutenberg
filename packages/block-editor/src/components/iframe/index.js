@@ -325,14 +325,6 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-inner-height',
 			`${ iframeWindowInnerHeight }px`
 		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-container-width',
-			`${ containerWidth }px`
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidthRef.current }px`
-		);
 
 		return () => {
 			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
@@ -348,12 +340,6 @@ function Iframe( {
 			);
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-inner-height'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-container-width'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-prev-container-width'
 			);
 		};
 	}, [
@@ -452,12 +438,6 @@ function Iframe( {
 					'block-editor-iframe__scale-container',
 					isZoomedOut && 'is-zoomed-out'
 				) }
-				style={ {
-					'--wp-block-editor-iframe-zoom-out-container-width':
-						isZoomedOut && `${ containerWidth }px`,
-					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ prevContainerWidthRef.current }px`,
-				} }
 			>
 				{ iframe }
 			</div>
