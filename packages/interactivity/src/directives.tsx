@@ -356,19 +356,21 @@ export default () => {
 	directive(
 		'class',
 		( { directives: { class: classNames }, element, evaluate } ) => {
+			// Create a temporary div element to manipulate class names
+			const classProxyElement = document.createElement( 'div' );
+
 			classNames
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
 
-					// Create a temporary div element to manipulate class names
-					const classProxyElement = document.createElement( 'div' );
-
 					// If the element already has a class, set it on the proxy element
 					// so we can manipulate it.
 					if ( 'string' === typeof element.props.class ) {
 						classProxyElement.className = element.props.class;
+					} else {
+						classProxyElement.removeAttribute( 'class' );
 					}
 
 					// If the result is false it means we need to remove the class from
