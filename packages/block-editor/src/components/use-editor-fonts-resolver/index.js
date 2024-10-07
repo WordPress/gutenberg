@@ -8,7 +8,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { loadFontFaceInBrowser } from './utils';
-import { store as editorStore } from '../../store';
+import { store as blockEditorStore } from '../../store';
 import { globalStylesLinksDataKey } from '../../store/private-keys';
 
 function resolveThemeFontFaceSrc( src, _links ) {
@@ -20,7 +20,7 @@ function useEditorFontsResolver() {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
 	const { _links = [], fontFamilies = [] } = useSelect( ( select ) => {
-		const { getSettings } = select( editorStore );
+		const { getSettings } = select( blockEditorStore );
 		const _settings = getSettings();
 		return {
 			_links: _settings[ globalStylesLinksDataKey ]?.[ 'wp:theme-file' ],
