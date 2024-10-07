@@ -155,7 +155,11 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ onClose }
+					>
 						{ __( 'Skip' ) }
 					</Button>
 				</FlexItem>

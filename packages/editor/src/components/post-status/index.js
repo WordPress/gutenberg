@@ -5,7 +5,6 @@ import {
 	Button,
 	CheckboxControl,
 	Dropdown,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
@@ -49,59 +48,29 @@ const postStatusesInfo = {
 
 export const STATUS_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Draft' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Not ready to publish.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Draft' ),
 		value: 'draft',
+		description: __( 'Not ready to publish.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Pending' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Waiting for review before publishing.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Pending' ),
 		value: 'pending',
+		description: __( 'Waiting for review before publishing.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Private' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Only visible to site admins and editors.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Private' ),
 		value: 'private',
+		description: __( 'Only visible to site admins and editors.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Scheduled' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Publish automatically on a chosen date.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Scheduled' ),
 		value: 'future',
+		description: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Published' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visible to everyone.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Published' ),
 		value: 'publish',
+		description: __( 'Visible to everyone.' ),
 	},
 ];
 
@@ -202,17 +171,19 @@ export default function PostStatus() {
 					contentClassName="editor-change-status__content"
 					popoverProps={ popoverProps }
 					focusOnMount
-					renderToggle={ ( { onToggle } ) => (
+					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
+							className="editor-post-status__toggle"
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
 							icon={ postStatusesInfo[ status ]?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
-								__( 'Change post status: %s' ),
+								__( 'Change status: %s' ),
 								postStatusesInfo[ status ]?.label
 							) }
+							aria-expanded={ isOpen }
 						>
 							{ postStatusesInfo[ status ]?.label }
 						</Button>
@@ -285,6 +256,7 @@ export default function PostStatus() {
 														id={ passwordInputId }
 														__next40pxDefaultSize
 														__nextHasNoMarginBottom
+														maxLength={ 255 }
 													/>
 												</div>
 											) }

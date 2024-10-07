@@ -24,6 +24,7 @@ export function MultipleUsageWarning( {
 		<Warning
 			actions={ [
 				<Button
+					__next40pxDefaultSize
 					key="find-original"
 					variant="secondary"
 					onClick={ () => selectBlock( originalBlockClientId ) }
@@ -31,6 +32,7 @@ export function MultipleUsageWarning( {
 					{ __( 'Find original' ) }
 				</Button>,
 				<Button
+					__next40pxDefaultSize
 					key="remove"
 					variant="secondary"
 					onClick={ () => onReplace( [] ) }

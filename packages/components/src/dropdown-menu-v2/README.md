@@ -1,11 +1,10 @@
-# `DropdownMenu` (v2)
+# `DropdownMenuV2`
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`DropdownMenu` displays a menu to the user (such as a set of actions or functions) triggered by a button.
-
+`DropdownMenuV2` displays a menu to the user (such as a set of actions or functions) triggered by a button.
 
 ## Design guidelines
 
@@ -46,7 +45,7 @@ This component is still highly experimental, and it's not normally accessible to
 
 The component exposes a set of components that are meant to be used in combination with each other in order to implement a `DropdownMenu` correctly.
 
-### `DropdownMenu`
+### `DropdownMenuV2`
 
 The root component, used to specify the menu's trigger and its contents.
 
@@ -58,62 +57,62 @@ The component accepts the following props:
 
 The trigger button
 
-- Required: yes
+-   Required: yes
 
 ##### `children`: `React.ReactNode`
 
 The contents of the dropdown
 
-- Required: yes
+-   Required: yes
 
 ##### `defaultOpen`: `boolean`
 
 The open state of the dropdown menu when it is initially rendered. Use when not wanting to control its open state.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
 ##### `open`: `boolean`
 
 The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`.
 
-- Required: no
+-   Required: no
 
 ##### `onOpenChange`: `(open: boolean) => void`
 
 Event handler called when the open state of the dropdown menu changes.
 
-- Required: no
+-   Required: no
 
 ##### `modal`: `boolean`
 
 The modality of the dropdown menu. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
 
-- Required: no
-- Default: `true`
+-   Required: no
+-   Default: `true`
 
 ##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
 
 The placement of the dropdown menu popover.
 
-- Required: no
-- Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
+-   Required: no
+-   Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
 
 ##### `gutter`: `number`
 
 The distance in pixels from the trigger.
 
-- Required: no
-- Default: `8` for root-level menus, `16` for nested menus
+-   Required: no
+-   Default: `8` for root-level menus, `16` for nested menus
 
 ##### `shift`: `number`
 
 The skidding of the popover along the anchor element. Can be set to negative values to make the popover shift to the opposite side.
 
-- Required: no
-- Default: `0` for root-level menus, `-8` for nested menus
+-   Required: no
+-   Default: `0` for root-level menus, `-8` for nested menus
 
-### `DropdownMenuItem`
+### `DropdownMenuV2.Item`
 
 Used to render a menu item.
 
@@ -125,35 +124,35 @@ The component accepts the following props:
 
 The contents of the item
 
-- Required: yes
+-   Required: yes
 
 ##### `prefix`: `React.ReactNode`
 
 The contents of the item's prefix.
 
-- Required: no
+-   Required: no
 
 ##### `suffix`: `React.ReactNode`
 
 The contents of the item's suffix.
 
-- Required: no
+-   Required: no
 
 ##### `hideOnClick`: `boolean`
 
 Whether to hide the dropdown menu when the menu item is clicked.
 
-- Required: no
-- Default: `true`
+-   Required: no
+-   Default: `true`
 
 ##### `disabled`: `boolean`
 
 Determines if the element is disabled.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
-### `DropdownMenuCheckboxItem`
+### `DropdownMenuV2.CheckboxItem`
 
 Used to render a checkbox item.
 
@@ -165,61 +164,61 @@ The component accepts the following props:
 
 The contents of the item
 
-- Required: yes
+-   Required: yes
 
 ##### `suffix`: `React.ReactNode`
 
 The contents of the item's suffix.
 
-- Required: no
+-   Required: no
 
 ##### `hideOnClick`: `boolean`
 
 Whether to hide the dropdown menu when the menu item is clicked.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
 ##### `disabled`: `boolean`
 
 Determines if the element is disabled.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
 ##### `name`: `string`
 
 The checkbox item's name.
 
-- Required: yes
+-   Required: yes
 
 ##### `value`: `string`
 
 The checkbox item's value, useful when using multiple checkbox items
- associated to the same `name`.
+associated to the same `name`.
 
-- Required: no
+-   Required: no
 
 ##### `checked`: `boolean`
 
 The checkbox item's value, useful when using multiple checkbox items
- associated to the same `name`.
+associated to the same `name`.
 
-- Required: no
+-   Required: no
 
 ##### `defaultChecked`: `boolean`
 
 The checked state of the checkbox menu item when it is initially rendered. Use when not wanting to control its checked state.
 
-- Required: no
+-   Required: no
 
 ##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
 
 Event handler called when the checked state of the checkbox menu item changes.
 
-- Required: no
+-   Required: no
 
-### `DropdownMenuRadioItem`
+### `DropdownMenuV2.RadioItem`
 
 Used to render a radio item.
 
@@ -231,60 +230,60 @@ The component accepts the following props:
 
 The contents of the item
 
-- Required: yes
+-   Required: yes
 
 ##### `suffix`: `React.ReactNode`
 
 The contents of the item's suffix.
 
-- Required: no
+-   Required: no
 
 ##### `hideOnClick`: `boolean`
 
 Whether to hide the dropdown menu when the menu item is clicked.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
 ##### `disabled`: `boolean`
 
 Determines if the element is disabled.
 
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
 ##### `name`: `string`
 
 The radio item's name.
 
-- Required: yes
+-   Required: yes
 
 ##### `value`: `string | number`
 
 The radio item's value.
 
-- Required: yes
+-   Required: yes
 
 ##### `checked`: `boolean`
 
 The checkbox item's value, useful when using multiple checkbox items
- associated to the same `name`.
+associated to the same `name`.
 
-- Required: no
+-   Required: no
 
 ##### `defaultChecked`: `boolean`
 
 The checked state of the radio menu item when it is initially rendered. Use when not wanting to control its checked state.
 
-- Required: no
+-   Required: no
 
 ##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
 
 Event handler called when the checked radio menu item changes.
 
-- Required: no
+-   Required: no
 
-### `DropdownMenuItemLabel`
+### `DropdownMenuV2.ItemLabel`
 
 Used to render the menu item's label.
 
@@ -296,9 +295,9 @@ The component accepts the following props:
 
 The label contents.
 
-- Required: yes
+-   Required: yes
 
-### `DropdownMenuItemHelpText`
+### `DropdownMenuV2.ItemHelpText`
 
 Used to render the menu item's help text.
 
@@ -310,9 +309,9 @@ The component accepts the following props:
 
 The help text contents.
 
-- Required: yes
+-   Required: yes
 
-### `DropdownMenuGroup`
+### `DropdownMenuV2.Group`
 
 Used to group menu items.
 
@@ -324,8 +323,22 @@ The component accepts the following props:
 
 The contents of the group.
 
-- Required: yes
+-   Required: yes
 
-### `DropdownMenuSeparatorProps`
+### `DropdownMenuV2.GroupLabel`
+
+Used to render a group label. The label text should be kept as short as possible.
+
+#### Props
+
+The component accepts the following props:
+
+##### `children`: `React.ReactNode`
+
+The contents of the group label.
+
+-   Required: yes
+
+### `DropdownMenuV2.Separator`
 
 Used to render a visual separator.

@@ -31,6 +31,7 @@ export type ComboboxControlProps = Pick<
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
@@ -81,4 +82,8 @@ export type ComboboxControlProps = Pick<
 	 * The current value of the control.
 	 */
 	value?: string | null;
+	/**
+	 * If passed, the combobox input will show a placeholder string if no values are present.
+	 */
+	placeholder?: string;
 };

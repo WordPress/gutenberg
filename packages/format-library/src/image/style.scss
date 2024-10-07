@@ -1,15 +1,8 @@
 .block-editor-format-toolbar__image-popover {
 	z-index: z-index(".block-editor-format-toolbar__image-popover");
 
-	.block-editor-format-toolbar__image-container-value {
-		margin: $grid-unit-10 - $border-width;
-		min-width: 150px;
-		max-width: 500px;
-	}
-
-	.block-editor-format-toolbar__image-container-button {
-		height: $grid-unit-10 * 4 - ($border-width * 2);
-		margin-bottom: $grid-unit-10;
-		margin-right: $grid-unit-10;
+	.block-editor-format-toolbar__image-container-content {
+		width: 260px;
+		padding: $grid-unit-20;
 	}
 }

@@ -26,59 +26,56 @@ import {
 	GLOBAL_POST_TYPES,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import PostActions from '../post-actions';
 
-export default function PostCardPanel( { actions } ) {
+export default function PostCardPanel( {
+	postType,
+	postId,
+	onActionPerformed,
+} ) {
 	const { isFrontPage, isPostsPage, title, icon, isSync } = useSelect(
 		( select ) => {
-			const {
-				getEditedPostAttribute,
-				getCurrentPostType,
-				getCurrentPostId,
-				__experimentalGetTemplateInfo,
-			} = select( editorStore );
-			const { canUser } = select( coreStore );
-			const { getEditedEntityRecord } = select( coreStore );
+			const { __experimentalGetTemplateInfo } = select( editorStore );
+			const { canUser, getEditedEntityRecord } = select( coreStore );
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
 			} )
 				? getEditedEntityRecord( 'root', 'site' )
 				: undefined;
-			const _type = getCurrentPostType();
-			const _id = getCurrentPostId();
-			const _record = getEditedEntityRecord( 'postType', _type, _id );
+			const _record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
 			const _templateInfo =
 				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-					_type
+					postType
 				) && __experimentalGetTemplateInfo( _record );
 			let _isSync = false;
-			if ( GLOBAL_POST_TYPES.includes( _type ) ) {
-				if ( PATTERN_POST_TYPE === _type ) {
+			if ( GLOBAL_POST_TYPES.includes( postType ) ) {
+				if ( PATTERN_POST_TYPE === postType ) {
 					// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
 					const currentSyncStatus =
-						getEditedPostAttribute( 'meta' )
-							?.wp_pattern_sync_status === 'unsynced'
+						_record?.meta?.wp_pattern_sync_status === 'unsynced'
 							? 'unsynced'
-							: getEditedPostAttribute(
-									'wp_pattern_sync_status'
-							  );
+							: _record?.wp_pattern_sync_status;
 					_isSync = currentSyncStatus !== 'unsynced';
 				} else {
 					_isSync = true;
 				}
 			}
 			return {
-				title:
-					_templateInfo?.title || getEditedPostAttribute( 'title' ),
-				icon: unlock( select( editorStore ) ).getPostIcon( _type, {
+				title: _templateInfo?.title || _record?.title,
+				icon: unlock( select( editorStore ) ).getPostIcon( postType, {
 					area: _record?.area,
 				} ),
 				isSync: _isSync,
-				isFrontPage: siteSettings?.page_on_front === _id,
-				isPostsPage: siteSettings?.page_for_posts === _id,
+				isFrontPage: siteSettings?.page_on_front === postId,
+				isPostsPage: siteSettings?.page_for_posts === postId,
 			};
 		},
-		[]
+		[ postId, postType ]
 	);
 	return (
 		<div className="editor-post-card-panel">
@@ -101,10 +98,10 @@ export default function PostCardPanel( { actions } ) {
 					as="h2"
 					lineHeight="20px"
 				>
-					{ title ? decodeEntities( title ) : __( 'No Title' ) }
+					{ title ? decodeEntities( title ) : __( 'No title' ) }
 					{ isFrontPage && (
 						<span className="editor-post-card-panel__title-badge">
-							{ __( 'Front Page' ) }
+							{ __( 'Homepage' ) }
 						</span>
 					) }
 					{ isPostsPage && (
@@ -113,7 +110,11 @@ export default function PostCardPanel( { actions } ) {
 						</span>
 					) }
 				</Text>
-				{ actions }
+				<PostActions
+					postType={ postType }
+					postId={ postId }
+					onActionPerformed={ onActionPerformed }
+				/>
 			</HStack>
 		</div>
 	);

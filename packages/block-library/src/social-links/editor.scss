@@ -1,10 +1,9 @@
 // Editor specific styles for Social Links.
-.wp-block-social-links {
-	div.block-editor-url-input {
-		display: inline-block;
-		margin-left: $grid-unit-10;
-	}
+.wp-block-social-links div.block-editor-url-input {
+	display: inline-block;
+	margin-left: $grid-unit-10;
 }
+
 
 // Prevent toolbar from jumping when selecting / hovering a link.
 .wp-social-link:hover {
@@ -97,4 +96,15 @@
 .wp-social-link.wp-social-link__is-incomplete:hover,
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
+}
+
+.wp-block-social-links .block-list-appender {
+	position: static; // display inline.
+
+	.block-editor-button-block-appender {
+		height: 1.5em;
+		width: 1.5em;
+		font-size: inherit;
+		padding: 0;
+	}
 }

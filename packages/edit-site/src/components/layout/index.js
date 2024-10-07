@@ -81,7 +81,6 @@ export default function Layout( { route } ) {
 	} );
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
-	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
@@ -113,7 +112,6 @@ export default function Layout( { route } ) {
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
-			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
@@ -200,6 +198,17 @@ export default function Layout( { route } ) {
 								{ areas.content }
 							</div>
 						) }
+
+					{ ! isMobileViewport && areas.edit && (
+						<div
+							className="edit-site-layout__area"
+							style={ {
+								maxWidth: widths?.edit,
+							} }
+						>
+							{ areas.edit }
+						</div>
+					) }
 
 					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">

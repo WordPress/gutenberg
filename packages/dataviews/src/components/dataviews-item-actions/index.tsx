@@ -23,13 +23,7 @@ import { useRegistry } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	kebabCase,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2, kebabCase } = unlock( componentsPrivateApis );
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -91,12 +85,12 @@ function DropdownMenuItemTrigger< Item >( {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<DropdownMenuItem
+		<DropdownMenuV2.Item
 			onClick={ onClick }
 			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
-			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
-		</DropdownMenuItem>
+			<DropdownMenuV2.ItemLabel>{ label }</DropdownMenuV2.ItemLabel>
+		</DropdownMenuV2.Item>
 	);
 }
 
@@ -158,7 +152,7 @@ export function ActionsDropdownMenuGroup< Item >( {
 }: ActionsDropdownMenuGroupProps< Item > ) {
 	const registry = useRegistry();
 	return (
-		<DropdownMenuGroup>
+		<DropdownMenuV2.Group>
 			{ actions.map( ( action ) => {
 				if ( 'RenderModal' in action ) {
 					return (
@@ -181,7 +175,7 @@ export function ActionsDropdownMenuGroup< Item >( {
 					/>
 				);
 			} ) }
-		</DropdownMenuGroup>
+		</DropdownMenuV2.Group>
 	);
 }
 
@@ -251,7 +245,7 @@ function CompactItemActions< Item >( {
 	actions,
 }: CompactItemActionsProps< Item > ) {
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			trigger={
 				<Button
 					size="compact"
@@ -265,6 +259,6 @@ function CompactItemActions< Item >( {
 			placement="bottom-end"
 		>
 			<ActionsDropdownMenuGroup actions={ actions } item={ item } />
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 }

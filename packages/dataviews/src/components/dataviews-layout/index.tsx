@@ -12,7 +12,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import { VIEW_LAYOUTS } from '../../layouts';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { ViewBaseProps } from '../../types';
 
 export default function DataViewsLayout() {
@@ -27,6 +27,7 @@ export default function DataViewsLayout() {
 		selection,
 		onChangeSelection,
 		setOpenedFilter,
+		density,
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
@@ -44,6 +45,7 @@ export default function DataViewsLayout() {
 			selection={ selection }
 			setOpenedFilter={ setOpenedFilter }
 			view={ view }
+			density={ density }
 		/>
 	);
 }

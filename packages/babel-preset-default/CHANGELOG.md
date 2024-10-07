@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 8.9.0 (2024-10-03)
+
+### Bug Fixes
+
+-   Fix a bug in 8.8.1 due to missing files in the published package ([#65481](https://github.com/WordPress/gutenberg/pull/65481)).
+
+## 8.8.0 (2024-09-19)
+
+### Internal
+
+-   Added `addPolyfillComments` option. When used, it will automatically add magic comments to mark files that need `wp-polyfill` ([#65292](https://github.com/WordPress/gutenberg/pull/65292)).
+
+## 8.7.0 (2024-09-05)
+
+## 8.6.0 (2024-08-21)
+
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
 ## 8.3.0 (2024-07-10)
 
 ## 8.2.0 (2024-06-26)

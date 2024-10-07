@@ -1,15 +1,15 @@
 {
 	"title": "JSON schema for WordPress wp-env configuration files",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/"
 		},
 		"wpEnvProperties": {
+			"type": "object",
 			"properties": {
 				"core": {
 					"description": "The WordPress installation to use. If null is specified, wp-env will use the latest production release of WordPress.",
-					"default": null,
 					"oneOf": [
 						{
 							"type": "string"
@@ -17,11 +17,11 @@
 						{
 							"type": "null"
 						}
-					]
+					],
+					"default": null
 				},
 				"phpVersion": {
 					"description": "The PHP version to use. If null is specified, wp-env will use the default version used with production release of WordPress.",
-					"default": null,
 					"oneOf": [
 						{
 							"type": "string"
@@ -29,48 +29,60 @@
 						{
 							"type": "null"
 						}
-					]
+					],
+					"default": null
 				},
 				"plugins": {
 					"description": "A list of plugins to install and activate in the environment.",
-					"default": [],
 					"type": "array",
 					"items": {
 						"type": "string"
-					}
+					},
+					"default": []
 				},
 				"themes": {
 					"description": "A list of themes to install in the environment.",
-					"default": [],
 					"type": "array",
 					"items": {
 						"type": "string"
-					}
+					},
+					"default": []
 				},
 				"port": {
 					"description": "The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.",
-					"default": 8888,
-					"type": "integer"
+					"type": "integer",
+					"default": 8888
 				},
 				"config": {
 					"description": "Mapping of wp-config.php constants to their desired values.",
-					"default": {},
-					"type": "object"
+					"type": "object",
+					"default": {}
 				},
 				"mappings": {
 					"description": "Mapping of WordPress directories to local directories to be mounted in the WordPress instance.",
-					"default": {},
-					"type": "object"
+					"type": "object",
+					"default": {}
 				}
 			}
+		},
+		"wpEnvPropertyNames": {
+			"enum": [
+				"core",
+				"phpVersion",
+				"plugins",
+				"themes",
+				"port",
+				"config",
+				"mappings"
+			]
 		}
 	},
-	"type": "object",
 	"allOf": [
 		{
 			"$ref": "#/definitions/wpEnvProperties"
 		},
 		{
+			"type": "object",
 			"properties": {
 				"$schema": {
 					"type": "string"
@@ -78,43 +90,35 @@
 				"env": {
 					"description": "The key env is available to override any of the above options on an individual-environment basis.",
 					"type": "object",
-					"default": {},
 					"patternProperties": {
 						"[a-zA-Z]": {
-							"type": "object",
 							"allOf": [
 								{ "$ref": "#/definitions/wpEnvProperties" },
 								{
-									"properties": {
-										"core": {},
-										"phpVersion": {},
-										"plugins": {},
-										"themes": {},
-										"port": {},
-										"config": {},
-										"mappings": {}
-									},
-									"additionalProperties": false
+									"type": "object",
+									"propertyNames": {
+										"$ref": "#/definitions/wpEnvPropertyNames"
+									}
 								}
 							]
 						}
-					}
+					},
+					"default": {}
 				}
 			}
 		},
 		{
-			"properties": {
-				"$schema": {},
-				"core": {},
-				"phpVersion": {},
-				"plugins": {},
-				"themes": {},
-				"port": {},
-				"config": {},
-				"mappings": {},
-				"env": {}
-			},
-			"additionalProperties": false
+			"type": "object",
+			"propertyNames": {
+				"anyOf": [
+					{
+						"$ref": "#/definitions/wpEnvPropertyNames"
+					},
+					{
+						"enum": [ "$schema", "env" ]
+					}
+				]
+			}
 		}
 	]
 }

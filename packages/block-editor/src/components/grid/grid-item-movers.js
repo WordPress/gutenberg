@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
 	ToolbarButton,
@@ -55,28 +55,29 @@ export function GridItemMovers( {
 	return (
 		<BlockControls group="parent">
 			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
-				<GridItemMover
-					className="is-left-button"
-					icon={ chevronLeft }
-					label={ __( 'Move left' ) }
-					description={ __( 'Move left' ) }
-					isDisabled={ columnStart <= 1 }
-					onClick={ () => {
-						onChange( {
-							columnStart: columnStart - 1,
-						} );
-						__unstableMarkNextChangeAsNotPersistent();
-						moveBlocksToPosition(
-							[ blockClientId ],
-							gridClientId,
-							gridClientId,
-							getNumberOfBlocksBeforeCell(
-								columnStart - 1,
-								rowStart
-							)
-						);
-					} }
-				/>
+				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
+					<GridItemMover
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						label={ __( 'Move left' ) }
+						description={ __( 'Move left' ) }
+						isDisabled={ columnStart <= 1 }
+						onClick={ () => {
+							onChange( {
+								columnStart: columnStart - 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart - 1,
+									rowStart
+								)
+							);
+						} }
+					/>
+				</div>
 				<div className="block-editor-grid-item-mover__move-vertical-button-container">
 					<GridItemMover
 						className="is-up-button"
@@ -123,28 +124,29 @@ export function GridItemMovers( {
 						} }
 					/>
 				</div>
-				<GridItemMover
-					className="is-right-button"
-					icon={ chevronRight }
-					label={ __( 'Move right' ) }
-					description={ __( 'Move right' ) }
-					isDisabled={ columnCount && columnEnd >= columnCount }
-					onClick={ () => {
-						onChange( {
-							columnStart: columnStart + 1,
-						} );
-						__unstableMarkNextChangeAsNotPersistent();
-						moveBlocksToPosition(
-							[ blockClientId ],
-							gridClientId,
-							gridClientId,
-							getNumberOfBlocksBeforeCell(
-								columnStart + 1,
-								rowStart
-							)
-						);
-					} }
-				/>
+				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-right">
+					<GridItemMover
+						icon={ isRTL() ? chevronLeft : chevronRight }
+						label={ __( 'Move right' ) }
+						description={ __( 'Move right' ) }
+						isDisabled={ columnCount && columnEnd >= columnCount }
+						onClick={ () => {
+							onChange( {
+								columnStart: columnStart + 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart + 1,
+									rowStart
+								)
+							);
+						} }
+					/>
+				</div>
 			</ToolbarGroup>
 		</BlockControls>
 	);

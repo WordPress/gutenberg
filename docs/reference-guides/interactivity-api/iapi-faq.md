@@ -66,7 +66,7 @@ To summarize, using the Interactivity API rather than just using React comes wit
 
 - If you use React, your interactive blocks must generate the same markup on the client as they do on the server in PHP. Using the Interactivity API, there is no such requirement as directives are added to server-rendered HTML.
 - The Interactivity API is PHP-friendlier. It works out of the box with WordPress hooks or other server functionalities such as internationalization. For example, with React, you can’t know which hooks are applied on the server, and their modifications would be overwritten after hydration.
-- All the benefits of [using a standard](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/what-is-interactivity-api#why-a-standard).
+- All the benefits of [using a standard](/docs/reference-guides/interactivity-api/iapi-about.md#why-a-standard).
 
 
 ## What are the benefits of Interactivity API over just using jQuery or vanilla JavaScript?

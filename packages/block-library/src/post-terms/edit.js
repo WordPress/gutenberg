@@ -83,6 +83,7 @@ export default function PostTermsEdit( {
 			</BlockControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Separator' ) }

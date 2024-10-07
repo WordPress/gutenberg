@@ -67,30 +67,44 @@ function ScreenTypographyElement( { element } ) {
 					>
 						<ToggleGroupControlOption
 							value="heading"
+							showTooltip
+							aria-label={ __( 'All headings' ) }
 							label={ _x( 'All', 'heading levels' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h1"
+							showTooltip
+							aria-label={ __( 'Heading 1' ) }
 							label={ __( 'H1' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h2"
+							showTooltip
+							aria-label={ __( 'Heading 2' ) }
 							label={ __( 'H2' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h3"
+							showTooltip
+							aria-label={ __( 'Heading 3' ) }
 							label={ __( 'H3' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h4"
+							showTooltip
+							aria-label={ __( 'Heading 4' ) }
 							label={ __( 'H4' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h5"
+							showTooltip
+							aria-label={ __( 'Heading 5' ) }
 							label={ __( 'H5' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h6"
+							showTooltip
+							aria-label={ __( 'Heading 6' ) }
 							label={ __( 'H6' ) }
 						/>
 					</ToggleGroupControl>

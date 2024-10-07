@@ -144,20 +144,20 @@ function useAutosavePurge() {
 			[]
 		);
 
-	const lastIsDirty = useRef( isDirty );
-	const lastIsAutosaving = useRef( isAutosaving );
+	const lastIsDirtyRef = useRef( isDirty );
+	const lastIsAutosavingRef = useRef( isAutosaving );
 
 	useEffect( () => {
 		if (
 			! didError &&
-			( ( lastIsAutosaving.current && ! isAutosaving ) ||
-				( lastIsDirty.current && ! isDirty ) )
+			( ( lastIsAutosavingRef.current && ! isAutosaving ) ||
+				( lastIsDirtyRef.current && ! isDirty ) )
 		) {
 			localAutosaveClear( postId, isEditedPostNew );
 		}
 
-		lastIsDirty.current = isDirty;
-		lastIsAutosaving.current = isAutosaving;
+		lastIsDirtyRef.current = isDirty;
+		lastIsAutosavingRef.current = isAutosaving;
 	}, [ isDirty, isAutosaving, didError ] );
 
 	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.

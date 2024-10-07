@@ -11,10 +11,8 @@
 	}
 
 	.components-base-control {
-		margin-bottom: #{ $grid-unit-30 };
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
+		&:where(:not(:last-child)) {
+			margin-bottom: $grid-unit-20;
 		}
 	}
 
@@ -51,4 +49,6 @@
 
 .block-editor-block-inspector__tab-item {
 	flex: 1 1 0px;
+	display: flex;
+	justify-content: center;
 }

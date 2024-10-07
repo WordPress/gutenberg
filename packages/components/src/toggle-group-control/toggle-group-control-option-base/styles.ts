@@ -37,7 +37,7 @@ export const buttonView = ( {
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusXSmall };
 	color: ${ COLORS.gray[ 700 ] };
 	fill: currentColor;
 	cursor: pointer;
@@ -70,7 +70,7 @@ export const buttonView = ( {
 	}
 
 	&:active {
-		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+		background: ${ CONFIG.controlBackgroundColor };
 	}
 
 	${ isDeselectable && deselectable }
@@ -119,14 +119,3 @@ const isIconStyles = ( {
 		padding-right: 0;
 	`;
 };
-
-export const backdropView = css`
-	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-	outline-offset: -3px;
-`;

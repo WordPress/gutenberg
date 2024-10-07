@@ -177,6 +177,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
+						__next40pxDefaultSize
 						variant="link"
 						onClick={ () => {
 							onNavigateToEntityRecord( {

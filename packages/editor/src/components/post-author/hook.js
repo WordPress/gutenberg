@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -46,17 +47,24 @@ export function useAuthorsQuery( search ) {
 			( { value } ) => postAuthor?.id === value
 		);
 
+		let currentAuthor = [];
 		if ( foundAuthor < 0 && postAuthor ) {
-			return [
+			currentAuthor = [
 				{
 					value: postAuthor.id,
 					label: decodeEntities( postAuthor.name ),
 				},
-				...fetchedAuthors,
+			];
+		} else if ( foundAuthor < 0 && ! postAuthor ) {
+			currentAuthor = [
+				{
+					value: 0,
+					label: __( '(No author)' ),
+				},
 			];
 		}
 
-		return fetchedAuthors;
+		return [ ...currentAuthor, ...fetchedAuthors ];
 	}, [ authors, postAuthor ] );
 
 	return { authorId, authorOptions, postAuthor };

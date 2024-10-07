@@ -18,14 +18,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
-const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
-
 export default function SiteTaglineEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { textAlign, level } = attributes;
+	const { textAlign, level, levelOptions } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -82,8 +80,8 @@ export default function SiteTaglineEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					options={ HEADING_LEVELS }
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

@@ -346,6 +346,17 @@ describe( 'getFontStylesAndWeights', () => {
 			{
 				fontFamily: 'Piazzolla',
 				fontStyle: 'normal',
+				fontWeight: 600,
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7JxwXL31AHfAAy5.woff2',
+			},
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'normal',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7JxwXL31AHfAAy5.woff2',
+			},
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'normal',
 				fontWeight: '900',
 				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7JxwXL31AHfAAy5.woff2',
 			},
@@ -379,6 +390,10 @@ describe( 'getFontStylesAndWeights', () => {
 					value: '400',
 				},
 				{
+					name: 'Semi Bold',
+					value: '600',
+				},
+				{
 					name: 'Black',
 					value: '900',
 				},
@@ -394,6 +409,14 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'normal',
 						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-600',
+					name: 'Semi Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '600',
 					},
 				},
 				{
@@ -418,6 +441,14 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'italic',
 						fontWeight: '400',
+					},
+				},
+				{
+					key: 'italic-600',
+					name: 'Semi Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '600',
 					},
 				},
 				{
@@ -449,6 +480,123 @@ describe( 'getFontStylesAndWeights', () => {
 				fontStyle: 'normal',
 				fontWeight: '400',
 				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7LYxnL31AHfAAy5.woff2',
+			},
+		];
+		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
+			fontStyles: [
+				{
+					name: 'Regular',
+					value: 'normal',
+				},
+				{
+					name: 'Italic',
+					value: 'italic',
+				},
+			],
+			fontWeights: [
+				{
+					name: 'Regular',
+					value: '400',
+				},
+				{
+					name: 'Bold',
+					value: '700',
+				},
+			],
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-400',
+					name: 'Regular',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-400',
+					name: 'Regular Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'italic-700',
+					name: 'Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '700',
+					},
+				},
+			],
+			isSystemFont: false,
+			isVariableFont: false,
+		} );
+	} );
+
+	it( 'should return available styles and weights for a font without fontWeight', () => {
+		const fontFamilyFaces = [
+			{
+				fontFamily: 'AR One Sans',
+				fontStyle: 'normal',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/AROneSans-VariableFont_ARRRwght.ttf',
+			},
+		];
+		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
+			fontStyles: [
+				{
+					name: 'Regular',
+					value: 'normal',
+				},
+				{
+					name: 'Italic',
+					value: 'italic',
+				},
+			],
+			fontWeights: [
+				{
+					name: 'Bold',
+					value: '700',
+				},
+			],
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-700',
+					name: 'Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '700',
+					},
+				},
+			],
+			isSystemFont: false,
+			isVariableFont: false,
+		} );
+	} );
+
+	it( 'should return available styles and weights for a font with numeric fontWeight', () => {
+		const fontFamilyFaces = [
+			{
+				fontFamily: 'AR One Sans',
+				fontStyle: 'normal',
+				fontWeight: 400,
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/AROneSans-VariableFont_ARRRwght.ttf',
 			},
 		];
 		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {

@@ -22,6 +22,7 @@ import {
 	PanelBody,
 	PanelRow,
 	TextControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
@@ -58,7 +59,6 @@ const SocialLinkURLPopover = ( {
 			>
 				<div className="block-editor-url-input">
 					<URLInput
-						__nextHasNoMarginBottom
 						value={ url }
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
@@ -79,13 +79,18 @@ const SocialLinkURLPopover = ( {
 							}
 							removeBlock( clientId );
 						} }
+						suffix={
+							<InputControlSuffixWrapper variant="control">
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
+									size="small"
+								/>
+							</InputControlSuffixWrapper>
+						}
 					/>
 				</div>
-				<Button
-					icon={ keyboardReturn }
-					label={ __( 'Apply' ) }
-					type="submit"
-				/>
 			</form>
 		</URLPopover>
 	);
@@ -140,6 +145,7 @@ const SocialLinkEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
@@ -156,6 +162,7 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }

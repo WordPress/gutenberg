@@ -46,37 +46,12 @@
 }
 
 // Even when the block switcher does not have any transformations, it still serves as a block indicator.
-.components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	opacity: 1;
+.components-button.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] {
+	color: $gray-900;
 
 	// Since it's not clickable, though, don't show a hover state.
-	&,
-	.block-editor-block-icon.has-colors {
+	&:hover {
 		color: $gray-900;
-	}
-}
-
-// Style this the same as the block buttons in the library.
-// Needs specificity to override the icon button.
-.block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
-.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
-.block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
-.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
-	.block-editor-block-icon {
-		height: 100%;
-		position: relative;
-		margin: 0 auto;
-		display: flex;
-		align-items: center;
-		min-width: 100%;
-	}
-
-	// Position the focus style correctly.
-	&::before {
-		top: $grid-unit-10;
-		right: $grid-unit-10;
-		bottom: $grid-unit-10;
-		left: $grid-unit-10;
 	}
 }
 
@@ -100,7 +75,7 @@
 		width: 300px;
 		border: $border-width solid $gray-900;
 		background: $white;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-medium;
 		outline: none;
 		box-shadow: none;
 		overflow: auto;
@@ -162,7 +137,7 @@
 
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			transition: all 0.05s ease-in-out;
 			position: relative;
 			border: $border-width solid transparent;

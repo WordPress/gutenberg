@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+## 10.9.0 (2024-10-03)
+
+## 10.8.0 (2024-09-19)
+
+### New Features
+
+-   Add new `envelope` icon.
+
+-   Add new `bell` and `bell-unread` icons.
+-   Add new `arrowUpLeft` and `arrowDownRight` icons.
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
+### New Features
+
+-   Add new `send` icon.
+
+## 10.4.0 (2024-07-24)
+
 ## 10.3.0 (2024-07-10)
 
 ## 10.2.0 (2024-06-26)

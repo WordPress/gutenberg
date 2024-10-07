@@ -25,9 +25,9 @@ import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
 
 function UploadFonts() {
-	const { installFonts, notice, setNotice } =
-		useContext( FontLibraryContext );
+	const { installFonts } = useContext( FontLibraryContext );
 	const [ isUploading, setIsUploading ] = useState( false );
+	const [ notice, setNotice ] = useState( false );
 
 	const handleDropZone = ( files ) => {
 		handleFilesUpload( files );
@@ -230,6 +230,7 @@ function UploadFonts() {
 						onChange={ onFilesUpload }
 						render={ ( { openFileDialog } ) => (
 							<Button
+								__next40pxDefaultSize
 								className="font-library-modal__upload-area"
 								onClick={ openFileDialog }
 							>
