@@ -128,7 +128,7 @@ function BlockPopover(
 				// The zoom out view has a vertical block toolbar that should always
 				// be on the edge of the canvas, aligned to the top of the currently
 				// selected section. This condition changes the anchor of the toolbar
-				// to the section instead of the block to handle blocksn that are
+				// to the section instead of the block to handle blocks that are
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
 					// Compute the height based on the parent section of the
