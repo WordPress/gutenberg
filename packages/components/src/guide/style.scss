@@ -40,6 +40,7 @@
 		justify-content: space-between;
 		margin-top: -$header-height;
 		min-height: 100%;
+		max-width: 400px;
 	}
 
 	&__page {
@@ -50,6 +51,22 @@
 
 		@include break-small() {
 			min-height: $image-height;
+		}
+
+		h1 {
+			margin: $grid-unit-20 0 $grid-unit-20 0;
+			padding: 0 $grid-unit-40;
+		}
+
+		p {
+			margin: 0 0 $grid-unit-30 0;
+			padding: 0 $grid-unit-40;
+		}
+
+		img {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
 		}
 	}
 
