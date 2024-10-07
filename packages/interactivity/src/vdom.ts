@@ -7,6 +7,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
  */
 import { directivePrefix as p } from './constants';
 import { warn } from './utils';
+import { type DirectiveEntry } from './hooks';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -138,35 +139,34 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		}
 
 		if ( directives.length ) {
-			props.__directives = directives.reduce(
-				( obj, [ name, ns, value ] ) => {
-					if ( ! directiveParser.test( name ) ) {
-						warn( `Found malformed directive name: ${ name }.` );
-						return obj;
-					}
-
-					const unPrefixed = name.slice( fullPrefix.length );
-					const splitIndex = unPrefixed.indexOf( '--' );
-					const [ prefix, suffix = 'default' ] =
-						splitIndex === -1
-							? // If '--' is not found, set 'prefix' to 'unPrefixed'
-							  [ unPrefixed ]
-							: // Otherwise, split 'unPrefixed' into 'prefix' and 'suffix'
-							  [
-									unPrefixed.slice( 0, splitIndex ),
-									unPrefixed.slice( splitIndex + 2 ),
-							  ];
-
-					obj[ prefix ] = obj[ prefix ] || [];
-					obj[ prefix ].push( {
-						namespace: ns ?? currentNamespace(),
-						value,
-						suffix,
-					} );
+			props.__directives = directives.reduce<
+				Record< string, Array< DirectiveEntry > >
+			>( ( obj, [ name, ns, value ] ) => {
+				if ( ! directiveParser.test( name ) ) {
+					warn( `Found malformed directive name: ${ name }.` );
 					return obj;
-				},
-				{}
-			);
+				}
+
+				const unprefixedDirective = name.slice( fullPrefix.length );
+				const splitIndex = unprefixedDirective.indexOf( '--' );
+				const [ prefix, suffix = null ] =
+					splitIndex === -1
+						? // If '--' is not found, prefix is the same as the unprefixed directive
+						  [ unprefixedDirective ]
+						: // Otherwise, split the unprefixed directive at "--" into `prefix` and `suffix`
+						  [
+								unprefixedDirective.slice( 0, splitIndex ),
+								unprefixedDirective.slice( splitIndex + 2 ),
+						  ];
+
+				obj[ prefix ] = obj[ prefix ] || [];
+				obj[ prefix ].push( {
+					namespace: ns ?? currentNamespace()!,
+					value: value as DirectiveEntry[ 'value' ],
+					suffix,
+				} );
+				return obj;
+			}, {} );
 		}
 
 		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334

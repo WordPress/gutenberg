@@ -881,6 +881,10 @@ _Returns_
 
 -   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
 
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### useBlockCommands
 
 Undocumented declaration.

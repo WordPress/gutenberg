@@ -86,6 +86,11 @@
 	></div>
 
 	<div
+		data-wp-class--default="context.value"
+		data-testid="class name default"
+	></div>
+
+	<div
 		data-wp-class--#[^+-]$="context.value"
 		data-testid="class name no-aplhanumeric"
 	></div>

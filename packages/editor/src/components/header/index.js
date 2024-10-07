@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -52,12 +53,13 @@ function Header( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
+		postType,
 		isTextEditor,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasFixedToolbar,
+		hasBlockSelection,
 		isNestedEntity,
-		postType,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -73,6 +75,8 @@ function Header( {
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			isNestedEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
@@ -85,7 +89,9 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
+	const hasCenter =
+		( ! hasBlockSelection || isBlockToolsCollapsed ) &&
+		! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 	/*
 	 * The edit-post-header classname is only kept for backward compatability

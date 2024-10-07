@@ -92,10 +92,11 @@ test.describe( 'data-wp-class', () => {
 
 	test( 'can use context values', async ( { page } ) => {
 		const el = page.getByTestId( 'can use context values' );
+		const toggle = page.getByTestId( 'toggle context value' );
 		await expect( el ).toHaveClass( '' );
-		await page.getByTestId( 'toggle context value' ).click();
+		await toggle.click();
 		await expect( el ).toHaveClass( 'foo' );
-		await page.getByTestId( 'toggle context value' ).click();
+		await toggle.click();
 		await expect( el ).toHaveClass( '' );
 	} );
 
@@ -107,6 +108,16 @@ test.describe( 'data-wp-class', () => {
 	test( 'can use classes with several dashes', async ( { page } ) => {
 		const el = page.getByTestId( 'can use classes with several dashes' );
 		await expect( el ).toHaveClass( 'main-bg----color' );
+	} );
+
+	test( 'can use "default" as a class name', async ( { page } ) => {
+		const el = page.getByTestId( 'class name default' );
+		const toggle = page.getByTestId( 'toggle context value' );
+		await expect( el ).not.toHaveClass( 'default' );
+		await toggle.click();
+		await expect( el ).toHaveClass( 'default' );
+		await toggle.click();
+		await expect( el ).not.toHaveClass( 'default' );
 	} );
 
 	test( 'can use class names with non-alphanumeric characters', async ( {

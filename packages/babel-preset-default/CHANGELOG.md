@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.9.0 (2024-10-03)
+
 ### Bug Fixes
 
 -   Fix a bug in 8.8.1 due to missing files in the published package ([#65481](https://github.com/WordPress/gutenberg/pull/65481)).
