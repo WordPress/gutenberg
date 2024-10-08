@@ -66,24 +66,17 @@ function BlockBindingsPanelDropdown( { attribute, binding } ) {
 						}
 					}
 
-					const SourceComponent = render;
-					const ChildComponent = (
-						<SourceComponent
-							context={ context }
-							binding={ binding }
-							attribute={ attribute }
-						/>
-					);
-
-					// Check if the ChildComponent renders something that is valid and not null.
+					// Render the source component first to be able to check if it is null.
 					// TODO: Look for a better way to do this.
-					const renderedChild = ChildComponent.type(
-						ChildComponent.props
-					);
+					const SourceComponent = render( {
+						context,
+						attribute,
+						binding,
+					} );
 
 					return (
 						<>
-							{ renderedChild && (
+							{ SourceComponent && (
 								<DropdownMenuV2
 									key={ sourceName }
 									// TODO: Review mobile version.
@@ -98,7 +91,7 @@ function BlockBindingsPanelDropdown( { attribute, binding } ) {
 										</DropdownMenuV2.Item>
 									}
 								>
-									{ cloneElement( ChildComponent ) }
+									{ cloneElement( SourceComponent ) }
 								</DropdownMenuV2>
 							) }
 						</>
