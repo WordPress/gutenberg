@@ -4,11 +4,12 @@
 
 ### Enhancements
 
-- Update `cloudUpload` icon to improve visibility of the up arrow.
+-   Update `cloudUpload` icon to improve visibility of the up arrow.
 
 ### New Features
 
-- Add new `cloudDownload` icon.
+-   Add new `cloudDownload` icon.
+-   Update `unseen` icon to be a strike-through eye, rather than a closed eye, to match provide consistency. ([#65914](https://github.com/WordPress/gutenberg/pull/65914)).
 
 ## 10.9.0 (2024-10-03)
 
