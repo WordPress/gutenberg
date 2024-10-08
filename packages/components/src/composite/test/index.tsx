@@ -65,13 +65,19 @@ describe( 'Composite', () => {
 		);
 
 		await press.Tab();
-		expect( screen.getByText( 'Before' ) ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Before' } )
+		).toHaveFocus();
 		await press.Tab();
-		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Item 1' } )
+		).toHaveFocus();
 		await press.Tab();
-		expect( screen.getByText( 'After' ) ).toHaveFocus();
+		expect( screen.getByRole( 'button', { name: 'After' } ) ).toHaveFocus();
 		await press.ShiftTab();
-		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Item 1' } )
+		).toHaveFocus();
 	} );
 
 	test( 'Excludes disabled items', async () => {
