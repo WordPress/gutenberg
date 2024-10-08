@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_register_block_template' ) ) {
+if ( ! function_exists( 'register_block_template' ) ) {
 	/**
 	 * Register a template.
 	 *
@@ -22,7 +22,7 @@ if ( ! function_exists( 'wp_register_block_template' ) ) {
 	 * }
 	 * @return WP_Block_Template|WP_Error The registered template object on success, WP_Error object on failure.
 	 */
-	function wp_register_block_template( $template_name, $args = array() ) {
+	function register_block_template( $template_name, $args = array() ) {
 		return WP_Block_Templates_Registry::get_instance()->register( $template_name, $args );
 	}
 }

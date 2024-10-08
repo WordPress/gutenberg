@@ -32,7 +32,7 @@ class Gutenberg_REST_Templates_Controller_6_7_Test extends WP_Test_REST_Controll
 			'post_types'  => array( 'post', 'page' ),
 		);
 
-		wp_register_block_template( $template_name, $args );
+		register_block_template( $template_name, $args );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/test-plugin//test-template' );
 		$response = rest_get_server()->dispatch( $request );

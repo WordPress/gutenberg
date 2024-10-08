@@ -11,7 +11,7 @@ class Tests_Block_Template extends WP_UnitTestCase {
 	public function test_get_block_templates_from_registry() {
 		$template_name = 'test-plugin//test-template';
 
-		wp_register_block_template( $template_name );
+		register_block_template( $template_name );
 
 		$templates = get_block_templates();
 
@@ -26,7 +26,7 @@ class Tests_Block_Template extends WP_UnitTestCase {
 			'title' => 'Test Template',
 		);
 
-		wp_register_block_template( $template_name, $args );
+		register_block_template( $template_name, $args );
 
 		$template = get_block_template( 'block-theme//test-template' );
 

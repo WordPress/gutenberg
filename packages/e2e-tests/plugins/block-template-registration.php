@@ -11,7 +11,7 @@ add_action(
 	'init',
 	function () {
 		// Custom template used by most tests.
-		wp_register_block_template(
+		register_block_template(
 			'gutenberg//plugin-template',
 			array(
 				'title'       => 'Plugin Template',
@@ -28,7 +28,7 @@ add_action(
 		);
 
 		// Custom template overridden by the theme.
-		wp_register_block_template(
+		register_block_template(
 			'gutenberg//custom-template',
 			array(
 				'title'       => 'Custom Template (overridden by the theme)',
@@ -39,7 +39,7 @@ add_action(
 		);
 
 		// Custom template used to test unregistration.
-		wp_register_block_template(
+		register_block_template(
 			'gutenberg//plugin-unregistered-template',
 			array(
 				'title'       => 'Plugin Unregistered Template',
@@ -50,7 +50,7 @@ add_action(
 		wp_unregister_block_template( 'gutenberg//plugin-unregistered-template' );
 
 		// Custom template used to test overriding default WP templates.
-		wp_register_block_template(
+		register_block_template(
 			'gutenberg//page',
 			array(
 				'title'       => 'Plugin Page Template',
@@ -60,7 +60,7 @@ add_action(
 		);
 
 		// Custom template used to test overriding default WP templates which can be created by the user.
-		wp_register_block_template(
+		register_block_template(
 			'gutenberg//author-admin',
 			array(
 				'title'       => 'Plugin Author Template',
