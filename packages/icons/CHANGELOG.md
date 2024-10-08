@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Update `cloudUpload` icon to improve visibility of the up arrow.
+
+### New Features
+
+- Add new `cloudDownload` icon.
+
 ## 10.9.0 (2024-10-03)
 
 ## 10.8.0 (2024-09-19)
