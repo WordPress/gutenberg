@@ -321,10 +321,7 @@ async function addPageContent( editor, page ) {
 		'role=button[name="Toggle block inserter"i]'
 	);
 	await inserterButton.click();
-	await page.type(
-		'role=searchbox[name="Search for blocks and patterns"i]',
-		'Group'
-	);
+	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
 	await page.click(
 		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
 	);
