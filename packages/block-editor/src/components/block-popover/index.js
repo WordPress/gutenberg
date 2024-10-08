@@ -115,7 +115,6 @@ function BlockPopover(
 			// than 0. This check is only there to satisfy the correctness of the
 			// exhaustive-deps rule for the `useMemo` hook.
 			popoverDimensionsRecomputeCounter < 0 ||
-			( isZoomOut && ! rootSectionElement ) ||
 			( isZoomOut && ! parentSectionElement ) ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
@@ -125,17 +124,26 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
+				let postRootElement;
 				// The zoom out view has a vertical block toolbar that should always
 				// be on the edge of the canvas, aligned to the top of the currently
 				// selected section. This condition changes the anchor of the toolbar
 				// to the section instead of the block to handle blocks that are
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
+					// if the rootSectionElement is undefined then we need to recurse up the DOM tree
+					// to find the element with  wp-block-post-content classname
+					if ( ! rootSectionElement ) {
+						postRootElement =
+							selectedElement.closest( '.is-root-container' );
+					}
+
 					// Compute the height based on the parent section of the
 					// selected block, because the selected block may be
 					// shorter than the section.
-					const rootSectionElementRect =
-						getVisibleElementBounds( rootSectionElement );
+					const rootSectionElementRect = getVisibleElementBounds(
+						rootSectionElement || postRootElement
+					);
 					const parentSectionElementRect =
 						getVisibleElementBounds( parentSectionElement );
 					const anchorHeight =
