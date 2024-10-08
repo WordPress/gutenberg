@@ -35,7 +35,7 @@ For example, if you'd like to use a new language feature proposal which has not 
 ```json
 {
 	"presets": [ "@wordpress/babel-preset-default" ],
-	"plugins": [ "@babel/plugin-proposal-class-properties" ]
+	"plugins": [ "@babel/plugin-transform-class-properties" ]
 }
 ```
 
