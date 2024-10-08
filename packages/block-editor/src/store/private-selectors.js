@@ -693,12 +693,18 @@ export function getInsertionPoint( state ) {
  *
  * @return {number} The number of parent pattern blocks.
  */
-export function getParentPatternCount( state, clientId ) {
-	const parents = getBlockParents( state, clientId );
-	return parents.reduce( ( count, parent ) => {
-		if ( getBlockName( state, parent ) === 'core/block' ) {
-			return count + 1;
-		}
-		return count;
-	}, 0 );
-}
+export const getParentPatternCount = createSelector(
+	( state, clientId ) => {
+		const parents = getBlockParents( state, clientId );
+		return parents.reduce( ( count, parent ) => {
+			if ( getBlockName( state, parent ) === 'core/block' ) {
+				return count + 1;
+			}
+			return count;
+		}, 0 );
+	},
+	( state, clientId ) => [
+		state.blocks.parents.get( clientId ),
+		state.blocks.byClientId.get( clientId ),
+	]
+);
