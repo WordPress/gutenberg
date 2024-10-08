@@ -800,7 +800,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		getValues,
 		setValues,
 		canUserEditValue,
-		getFieldsList,
+		render,
 	} = source;
 
 	const existingSource = unlock(
@@ -894,10 +894,10 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Check the `getFieldsList` property is correct.
-	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+	// Check the `render` property is correct.
+	if ( render && typeof render !== 'function' ) {
 		// eslint-disable-next-line no-console
-		warning( 'Block bindings source getFieldsList must be a function.' );
+		warning( 'Block bindings source render must be a function.' );
 		return;
 	}
 
