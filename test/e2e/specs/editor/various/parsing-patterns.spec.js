@@ -37,7 +37,7 @@ test.describe( 'Parsing patterns', () => {
 			} );
 		} );
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'whitespace'
 		);
 		await page

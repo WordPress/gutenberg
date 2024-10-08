@@ -37,7 +37,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Restore tests setup cache
-              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
               with:
                   path: |
                       ~/.appium
@@ -50,7 +50,7 @@ jobs:
               uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
 
             - name: AVD cache
-              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
               id: avd-cache
               with:
                   path: |

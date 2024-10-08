@@ -123,7 +123,14 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 	test( 'should make the modal content focusable when it is scrollable', async ( {
 		page,
 		pageUtils,
+		browserName,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			browserName === 'webkit',
+			'Known bug with focus order in Safari.'
+		);
+
 		// Note: this test depends on a particular viewport height to determine whether or not
 		// the modal content is scrollable. If this tests fails and needs to be debugged locally,
 		// double-check the viewport height when running locally versus in CI. Additionally,

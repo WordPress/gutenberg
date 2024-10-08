@@ -11,7 +11,6 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -43,8 +42,6 @@ function Interface( { blockEditorSettings } ) {
 		hasSidebarEnabled,
 		isInserterOpened,
 		isListViewOpened,
-		previousShortcut,
-		nextShortcut,
 	} = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
@@ -56,14 +53,6 @@ function Interface( { blockEditorSettings } ) {
 				'core/edit-widgets',
 				'showBlockBreadcrumbs'
 			),
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations(
-				'core/edit-widgets/previous-region'
-			),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-widgets/next-region' ),
 		} ),
 		[]
 	);
@@ -112,10 +101,6 @@ function Interface( { blockEditorSettings } ) {
 					</div>
 				)
 			}
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
 		/>
 	);
 }

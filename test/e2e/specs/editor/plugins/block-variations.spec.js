@@ -28,7 +28,7 @@ test.describe( 'Block variations', () => {
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Quote' );
 
@@ -69,7 +69,7 @@ test.describe( 'Block variations', () => {
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Paragraph' );
 
