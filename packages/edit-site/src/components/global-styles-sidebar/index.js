@@ -86,21 +86,17 @@ export default function GlobalStylesSidebar() {
 	}, [ shouldClearCanvasContainerView ] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
-	const { goTo } = useNavigator();
 
 	const toggleRevisions = () => {
 		setIsListViewOpened( false );
 		if ( isRevisionsStyleBookOpened ) {
-			goTo( '/' );
 			setEditorCanvasContainerView( 'style-book' );
 			return;
 		}
 		if ( isRevisionsOpened ) {
-			goTo( '/' );
 			setEditorCanvasContainerView( undefined );
 			return;
 		}
-		goTo( '/revisions' );
 
 		if ( isStyleBookOpened ) {
 			setEditorCanvasContainerView(

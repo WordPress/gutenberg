@@ -70,10 +70,8 @@ function GlobalStylesActionMenu() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { goTo } = useNavigator();
 	const loadCustomCSS = () => {
 		setEditorCanvasContainerView( 'global-styles-css' );
-		goTo( '/css' );
 	};
 
 	return (
