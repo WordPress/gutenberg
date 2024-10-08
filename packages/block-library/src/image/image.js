@@ -15,6 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 	Placeholder,
+	MenuItem,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch, dispatch, select } from '@wordpress/data';
@@ -29,6 +30,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
+	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -1047,45 +1049,70 @@ export default function Image( {
 		);
 	}
 
+	/**
+	 * Set attribute to make post featured image.
+	 *
+	 * @param {boolean} value - current value of isFeatureImage.
+	 *
+	 * @return {void} - Success notice for setting featured image.
+	 */
 	const setAttributeForFeatureImage = ( value ) => {
-		const isPostHasFeatureImage =
+		const currentFeatureImage =
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-		if ( isPostHasFeatureImage ) {
-			// dispatch notice that post already has feature image
-			createErrorNotice( __( 'Post already has a featured image.' ), {
-				type: 'snackbar',
-			} );
+
+		if ( currentFeatureImage === attributes.id ) {
+			// dispatch notice that featured image is set.
+			createSuccessNotice(
+				__( 'Current Image is Feature Image Already.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 			return;
 		}
-
 		// set post featured image as current image.
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		dispatch( 'core/editor' ).editPost( { featured_media: attributes.id } );
 
+		// dispatch notice that featured image is set.
+		createSuccessNotice( __( 'Featured image set.' ), {
+			type: 'snackbar',
+		} );
+
 		setAttributes( { isFeatureImage: ! value } );
 	};
 
-	const makeFeatureImageFormatControl = (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon="format-image"
-					label={ __( 'Make Feature Image' ) }
-					onClick={ () =>
-						setAttributeForFeatureImage( isFeatureImage )
-					}
-					isPressed={ isFeatureImage }
-				/>
-			</ToolbarGroup>
-		</BlockControls>
+	/**
+	 * Block settings menu control to make image feature image.
+	 *
+	 * @param {Object} props                   - Props for block settings menu control.
+	 * @param {Object} props.selectedClientIds - Selected client ids.
+	 * @return {void} - Make image feature control.
+	 */
+	const featureImageSettingsControl = (
+		<BlockSettingsMenuControls>
+			{ ( { selectedClientIds } ) =>
+				( selectedClientIds.length === 1 &&
+					clientId === selectedClientIds[ 0 ] && (
+						<MenuItem
+							onClick={ () =>
+								setAttributeForFeatureImage( isFeatureImage )
+							}
+						>
+							{ __( 'Make Feature Image' ) }
+						</MenuItem>
+					) ) ||
+				null
+			}
+		</BlockSettingsMenuControls>
 	);
 
 	return (
 		<>
 			{ mediaReplaceFlow }
 			{ controls }
-			{ makeFeatureImageFormatControl }
+			{ featureImageSettingsControl }
 			{ img }
 
 			<Caption
