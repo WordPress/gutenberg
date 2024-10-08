@@ -1,13 +1,18 @@
 /**
  * WordPress dependencies
  */
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 /**
  * Gets a list of post meta fields with their values and labels
@@ -140,7 +145,40 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context );
+	render: function PostMetaComponent( { context, attribute, binding } ) {
+		const { updateBlockBindings } = useBlockBindingsUtils();
+		// TODO: Fix useSelect warning.
+		const fields = useSelect( ( select ) => {
+			return getPostMetaFields( select, context );
+		} );
+		const currentKey = binding?.args?.key;
+
+		return (
+			<DropdownMenuV2.Group>
+				{ Object.entries( fields ).map( ( [ key, args ] ) => (
+					<DropdownMenuV2.RadioItem
+						key={ key }
+						onChange={ () =>
+							updateBlockBindings( {
+								[ attribute ]: {
+									source: 'core/post-meta',
+									args: { key },
+								},
+							} )
+						}
+						name={ attribute + '-binding' }
+						value={ key }
+						checked={ key === currentKey }
+					>
+						<DropdownMenuV2.ItemLabel>
+							{ args?.label }
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							{ args?.value }
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+				) ) }
+			</DropdownMenuV2.Group>
+		);
 	},
 };
