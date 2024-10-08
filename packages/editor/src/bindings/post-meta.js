@@ -161,6 +161,7 @@ export default {
 						onChange={ () =>
 							updateBlockBindings( {
 								[ attribute ]: {
+									label: fields[ key ].label,
 									source: 'core/post-meta',
 									args: { key },
 								},
