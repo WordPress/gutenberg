@@ -81,7 +81,7 @@ export default function ShadowsEditPanel() {
 	);
 
 	useEffect( () => {
-		const currentShadow = shadows?.find(
+		const hasCurrentShadow = shadows?.some(
 			( shadow ) => shadow.slug === slug
 		);
 		// If the shadow being edited doesn't exist anymore in the global styles setting, navigate back
@@ -92,7 +92,7 @@ export default function ShadowsEditPanel() {
 		//
 		// The check on the slug is necessary to prevent a double back navigation when the user triggers
 		// a backward navigation by interacting with the screen's UI.
-		if ( !! slug && ! currentShadow ) {
+		if ( !! slug && ! hasCurrentShadow ) {
 			goBack();
 		}
 	}, [ shadows, slug, goBack ] );
