@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancements
+### Bug Fixes
 
 -   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
 
