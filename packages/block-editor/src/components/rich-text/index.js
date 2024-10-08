@@ -203,20 +203,15 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				select,
-				context: blockBindingsContext,
-			} );
-			const bindingKey =
-				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				blockBindingsSource?.label;
+			const bindingLabel =
+				relatedBinding?.label ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
-				? bindingKey
+				? bindingLabel
 				: sprintf(
 						/* translators: %s: connected field label or source label */
 						__( 'Add %s' ),
-						bindingKey
+						bindingLabel
 				  );
 			const _bindingsLabel = _disableBoundBlock
 				? relatedBinding?.args?.key || blockBindingsSource?.label
