@@ -17,12 +17,16 @@ test.describe( 'Zoom Out', () => {
 		await editor.canvas.locator( 'body' ).click();
 	} );
 
-	test( 'Entering zoomed out mode zooms the canvas', async ( { page } ) => {
+	test( 'Entering zoomed out mode zooms the canvas', async ( {
+		page,
+		editor,
+	} ) => {
 		await page.getByLabel( 'Zoom Out' ).click();
-		await expect(
-			page
-				.canvas
-				.locator( 'html' )
-		).toHaveCSS( 'transform', 'matrix(0.75, 0, 0, 0.75, 0, 0)' );
+		const frame = editor.canvas.locator( 'html' );
+		await expect( frame ).toHaveCSS(
+			'transform',
+			'matrix(0.75, 0, 0, 0.75, 0, 0)'
+		);
+		await page.pause();
 	} );
 } );
