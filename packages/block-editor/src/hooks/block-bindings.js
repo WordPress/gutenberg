@@ -96,8 +96,8 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
-	const { source: sourceName, args } = binding || {};
+function BlockBindingsAttribute( { attribute, binding } ) {
+	const { source: sourceName, label: bindingLabel } = binding || {};
 	const sourceProps = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
 	return (
@@ -111,16 +111,14 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
-						  sourceProps?.label ||
-						  sourceName }
+						: bindingLabel || sourceProps?.label || sourceName }
 				</Text>
 			) }
 		</VStack>
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
+function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
@@ -128,7 +126,6 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						fieldsList={ fieldsList }
 					/>
 				</Item>
 			) ) }
@@ -168,7 +165,6 @@ function EditableBlockBindingsPanelItems( {
 									<BlockBindingsAttribute
 										attribute={ attribute }
 										binding={ binding }
-										fieldsList={ fieldsList }
 									/>
 								</Item>
 							}
