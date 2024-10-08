@@ -19,4 +19,10 @@
 	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
 	}
+
+	// Add focus-visible styles
+	button[data-focus-visible="true"] & {
+		background: #1e90ff;
+		padding: 2px;
+	}
 }
