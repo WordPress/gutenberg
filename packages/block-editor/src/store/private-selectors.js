@@ -703,8 +703,8 @@ export const getParentPatternCount = createSelector(
 			return count;
 		}, 0 );
 	},
-	( state, clientId ) => [
-		state.blocks.parents.get( clientId ),
-		state.blocks.byClientId.get( clientId ),
-	]
+	// While the selector also calls `getBlockName` for each parent,
+	// the memoization assumes that a block's name cannot change without
+	// its clientId also changing.
+	( state, clientId ) => [ state.blocks.parents.get( clientId ) ]
 );
