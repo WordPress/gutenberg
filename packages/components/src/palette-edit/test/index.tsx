@@ -7,7 +7,10 @@ import { click, type, press } from '@ariakit/test';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameAndSlugForPosition } from '..';
+import PaletteEdit, {
+	getNameAndSlugForPosition,
+	deduplicateElementSlugs,
+} from '..';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
@@ -94,6 +97,52 @@ describe( 'getNameAndSlugForPosition', () => {
 			name: 'Color 151',
 			slug: 'test-color-151',
 		} );
+	} );
+} );
+
+describe( 'deduplicateElementSlugs', () => {
+	it( 'should not change the slugs if they are unique', () => {
+		const elements: PaletteElement[] = [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-2',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		];
+
+		expect( deduplicateElementSlugs( elements ) ).toEqual( elements );
+	} );
+	it( 'should change the slugs if they are not unique', () => {
+		const elements: PaletteElement[] = [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-1',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		];
+
+		expect( deduplicateElementSlugs( elements ) ).toEqual( [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-1-1',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		] );
 	} );
 } );
 
