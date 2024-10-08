@@ -358,6 +358,10 @@ function VisualEditor( {
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
 		! isZoomedOut;
+	const shouldIframe =
+		! disableIframe ||
+		[ 'Tablet', 'Mobile' ].includes( deviceType ) ||
+		PATTERN_POST_TYPE === postType;
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -382,7 +386,7 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': ! disableIframe,
+					'is-iframed': shouldIframe,
 				}
 			) }
 		>
@@ -393,7 +397,7 @@ function VisualEditor( {
 				}
 			>
 				<BlockCanvas
-					shouldIframe={ ! disableIframe }
+					shouldIframe={ shouldIframe }
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
