@@ -4,16 +4,17 @@
 
 .edit-site-styes .edit-site-page-content {
 	.edit-site-global-styles-sidebar__navigator-provider {
-		padding-left: $grid-unit-60;
-		padding-right: $grid-unit-60;
+		padding-top: $grid-unit-15;
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
 		@container (max-width: 430px) {
 			padding-left: $grid-unit-15;
 			padding-right: $grid-unit-15;
 		}
 	}
 	.edit-site-page-header {
-		padding-left: $grid-unit-70;
-		padding-right: $grid-unit-70;
+		padding-left: $grid-unit-50;
+		padding-right: $grid-unit-50;
 		@container (max-width: 430px) {
 			padding-left: $grid-unit-30;
 			padding-right: $grid-unit-30;

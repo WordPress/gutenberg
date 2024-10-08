@@ -34,8 +34,6 @@ export function MainSidebarNavigationContent() {
 			</SidebarNavigationItem>
 			<SidebarNavigationItemGlobalStyles
 				uid="styles-navigation-item"
-				className="is-selected"
-				withChevron
 				icon={ styles }
 			>
 				{ __( 'Styles' ) }
