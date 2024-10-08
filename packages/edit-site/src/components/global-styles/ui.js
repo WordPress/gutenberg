@@ -253,7 +253,9 @@ function GlobalStylesEditorCanvasContainerLink() {
 		switch ( editorCanvasContainerView ) {
 			case 'global-styles-revisions':
 			case 'global-styles-revisions:style-book':
-				goTo( '/revisions' );
+				if ( ! isRevisionsOpen ) {
+					goTo( '/revisions' );
+				}
 				break;
 			case 'global-styles-css':
 				goTo( '/css' );
@@ -267,7 +269,14 @@ function GlobalStylesEditorCanvasContainerLink() {
 				 * browsing global styles panel.
 				 */
 				if ( isRevisionsOpen ) {
-					goTo( '/' );
+					goTo( '/', { isBack: true } );
+				}
+				break;
+			default:
+				// In general, if the revision screen is in view but the
+				// `editorCanvasContainerView` is not a revision view, close it.
+				if ( isRevisionsOpen ) {
+					goTo( '/', { isBack: true } );
 				}
 				break;
 		}
