@@ -40,6 +40,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	getParentPatternCount,
 } from './private-selectors';
 
 /**
@@ -2970,6 +2971,43 @@ export const getBlockEditingMode = createRegistrySelector(
 			// rootClientId, but the default rootClientId is actually `''`.
 			if ( clientId === null ) {
 				clientId = '';
+			}
+
+			// Handle pattern blocks (core/block) and the content of those blocks.
+			const parentPatternCount = getParentPatternCount( state, clientId );
+
+			// Make the outer pattern block content only mode.
+			if (
+				getBlockName( state, clientId ) === 'core/block' &&
+				parentPatternCount === 0
+			) {
+				return 'contentOnly';
+			}
+
+			if ( parentPatternCount > 0 ) {
+				// Disable nested patterns.
+				if ( parentPatternCount > 1 ) {
+					return 'disabled';
+				}
+
+				// Disable pattern content editing in zoom-out mode.
+				const _isZoomOut =
+					__unstableGetEditorMode( state ) === 'zoom-out';
+				if ( _isZoomOut ) {
+					return 'disabled';
+				}
+
+				// If the block has a binding of any kind, allow content only editing.
+				const attributes = getBlockAttributes( state, clientId );
+				if (
+					Object.keys( attributes?.metadata?.bindings ?? {} )
+						?.length > 0
+				) {
+					return 'contentOnly';
+				}
+
+				// Otherwise, the block is part of the pattern source and should not be editable.
+				return 'disabled';
 			}
 
 			// In zoom-out mode, override the behavior set by
