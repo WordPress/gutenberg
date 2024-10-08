@@ -22,7 +22,7 @@ import {
 	useDisabled,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -130,6 +131,9 @@ function Iframe( {
 		useResizeObserver();
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
+	const { resetZoomLevel, __unstableSetEditorMode } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -298,8 +302,15 @@ function Iframe( {
 		const _src = URL.createObjectURL(
 			new window.Blob( [ html ], { type: 'text/html' } )
 		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
+		return [
+			_src,
+			() => {
+				URL.revokeObjectURL( _src );
+				resetZoomLevel();
+				__unstableSetEditorMode( 'edit' );
+			},
+		];
+	}, [ html, resetZoomLevel, __unstableSetEditorMode ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
 
