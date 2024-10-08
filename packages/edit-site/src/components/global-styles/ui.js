@@ -302,7 +302,7 @@ function GlobalStylesUI() {
 				<ScreenTypography />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path="/typography/font-sizes/">
+			<GlobalStylesNavigationScreen path="/typography/font-sizes">
 				<FontSizes />
 			</GlobalStylesNavigationScreen>
 
