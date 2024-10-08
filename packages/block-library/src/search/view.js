@@ -19,7 +19,7 @@ const updateURL = async ( value, name ) => {
 		}
 	}
 
-	await actions.navigate( `${ window.location.pathname }${ url.search }` );
+	actions.navigate( `${ window.location.pathname }${ url.search }` );
 };
 
 const { state, actions } = store(
