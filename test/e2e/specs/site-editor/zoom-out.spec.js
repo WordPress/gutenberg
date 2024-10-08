@@ -21,7 +21,7 @@ test.describe( 'Zoom Out', () => {
 		await page.getByLabel( 'Zoom Out' ).click();
 		await expect(
 			page
-				.frameLocator( 'iframe[name="editor-canvas"]' )
+				.canvas
 				.locator( 'html' )
 		).toHaveCSS( 'transform', 'matrix(0.75, 0, 0, 0.75, 0, 0)' );
 	} );
