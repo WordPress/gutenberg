@@ -3,16 +3,19 @@
  */
 import { select, useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { Settings, Post } from '@wordpress/core-data';
+import type { Settings, Page } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
+	TextControl,
+	SelectControl,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	CheckboxControl,
-	TextControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import type { Action, ActionModal } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
@@ -51,11 +54,13 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 	( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const pageTitle = getItemTitle( item );
-		const [ createPageForPosts, setCreatePageForPosts ] = useState( false );
+		const pageId = item.id;
+		const [ postsPageOption, setPostsPageOption ] = useState( 'none' );
+		const [ existingPageId, setExistingPageId ] = useState( 0 );
 		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
 		const { currentHomePage, pageForPosts, showOnFront } =
 			useSiteSettings();
-		const currentHomePageTitle = getItemTitle( currentHomePage as Post );
+		const currentHomePageTitle = getItemTitle( currentHomePage as Page );
 
 		const { editEntityRecord, saveEditedEntityRecord, saveEntityRecord } =
 			useDispatch( coreStore );
@@ -65,24 +70,20 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 		async function onSetPageAsHomepage( event: React.FormEvent ) {
 			event.preventDefault();
 
-			let publishItem = false;
-			let newPage;
+			let newPage = {} as Page;
 
 			try {
 				// Create a new page for posts, if that action was selected.
-				if ( createPageForPosts ) {
+				if ( postsPageOption === 'create-new' ) {
 					newPage = await saveEntityRecord( 'postType', 'page', {
 						title: postsPageTitle,
 						status: 'publish',
 					} );
 				}
 
-				// Publish the page to become the homepage, if needed.
-				if ( 'publish' !== item.status ) {
-					await editEntityRecord( 'postType', item.type, item.id, {
-						status: 'publish',
-					} );
-					publishItem = true;
+				// Set the existing page ID as the new page, if that action was selected.
+				if ( postsPageOption === 'choose-existing' ) {
+					newPage.id = existingPageId;
 				}
 
 				// Save new home page settings.
@@ -93,18 +94,6 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 				} );
 
 				closeModal?.();
-
-				// Persist changes.
-				if ( publishItem ) {
-					await saveEditedEntityRecord(
-						'postType',
-						item.type,
-						item.id,
-						{
-							status: 'publish',
-						}
-					);
-				}
 
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
 					page_for_posts: newPage?.id,
@@ -132,12 +121,16 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 
 			try {
 				await editEntityRecord( 'root', 'site', undefined, {
+					page_for_posts: 0,
+					page_on_front: 0,
 					show_on_front: 'posts',
 				} );
 
 				closeModal?.();
 
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
+					page_for_posts: 0,
+					page_on_front: 0,
 					show_on_front: 'posts',
 				} );
 
@@ -160,6 +153,31 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 			}
 		}
 
+		const listOfPages = useSelect( ( _select ) => {
+			const pages: Page[] | null = _select( coreStore ).getEntityRecords(
+				'postType',
+				'page'
+			);
+
+			if ( ! pages ) {
+				return [];
+			}
+
+			const formattedListOfPages = Object.values( pages )
+				.map( ( page ) => ( {
+					value: page.id.toString(),
+					label: getItemTitle( page as Page ),
+				} ) )
+				.filter( ( page ) => page.value !== pageId );
+
+			// Set the first page as the default selected page.
+			if ( formattedListOfPages && existingPageId === 0 ) {
+				setExistingPageId( Number( formattedListOfPages[ 0 ].value ) );
+			}
+
+			return formattedListOfPages;
+		} );
+
 		const renderModalBody = () => {
 			if ( 'posts' === showOnFront ) {
 				return (
@@ -175,17 +193,35 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 						</Text>
 						{ ! pageForPosts && (
 							<>
-								<CheckboxControl
+								<ToggleGroupControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
-									label={ __(
-										'Create a page to display latest posts'
+									label={ __( 'Posts Page' ) }
+									isBlock
+									onChange={ ( value ) => {
+										setPostsPageOption(
+											value?.toString() || 'none'
+										);
+									} }
+									help={ __(
+										'Select how you want to create or select the page to display latest posts.'
 									) }
-									checked={ createPageForPosts }
-									onChange={ ( value ) =>
-										setCreatePageForPosts( value )
-									}
-								/>
-								{ createPageForPosts && (
+									value={ postsPageOption || 'none' }
+								>
+									<ToggleGroupControlOption
+										value="none"
+										label={ __( 'None' ) }
+									/>
+									<ToggleGroupControlOption
+										value="create-new"
+										label={ __( 'Create new' ) }
+									/>
+									<ToggleGroupControlOption
+										value="choose-existing"
+										label={ __( 'Choose existing' ) }
+									/>
+								</ToggleGroupControl>
+								{ postsPageOption === 'create-new' && (
 									<TextControl
 										__next40pxDefaultSize
 										__nextHasNoMarginBottom
@@ -195,6 +231,28 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 											setPostsPageTitle( value )
 										}
 									/>
+								) }
+								{ postsPageOption === 'choose-existing' && (
+									<>
+										{ listOfPages.length < 1 ? (
+											<Spinner />
+										) : (
+											<SelectControl
+												label={ __(
+													'Select Posts Page'
+												) }
+												value={ existingPageId.toString() }
+												options={ listOfPages }
+												onChange={ ( value ) =>
+													setExistingPageId(
+														Number( value )
+													)
+												}
+												__next40pxDefaultSize
+												__nextHasNoMarginBottom
+											/>
+										) }
+									</>
 								) }
 							</>
 						) }
@@ -215,15 +273,10 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 			}
 
 			const modalTranslatedString =
-				'publish' !== item.status
-					? // translators: %1$s: title of a unpublished page to be set as the home page. %2$s: title of the current home page.
-					  __(
-							'The page "%1$s" is not published. Set it as the site homepage? This will publish the page and replace the current homepage: "%2$s"'
-					  )
-					: // translators: %1$s: title of page to be set as the home page. %2$s: title of the current home page.
-					  __(
-							'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
-					  );
+				// translators: %1$s: title of page to be set as the home page. %2$s: title of the current home page.
+				__(
+					'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
+				);
 
 			return (
 				<Text>
