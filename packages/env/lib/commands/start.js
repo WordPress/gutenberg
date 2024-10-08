@@ -43,11 +43,12 @@ const CONFIG_CACHE_KEY = 'config_checksum';
  * Starts the development server.
  *
  * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.update  If true, update sources.
- * @param {string}  options.xdebug  The Xdebug mode to set.
- * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}  options.spinner            A CLI spinner which indicates progress.
+ * @param {boolean} options.update             If true, update sources.
+ * @param {string}  options.xdebug             The Xdebug mode to set.
+ * @param {boolean} options.scripts            Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean} options.debug              True if debug mode is enabled.
+ * @param {boolean} options.disablePortMapping True if the container ports should not be exposed to the host.
  */
 module.exports = async function start( {
 	spinner,
@@ -55,6 +56,7 @@ module.exports = async function start( {
 	xdebug,
 	scripts,
 	debug,
+	disablePortMapping,
 } ) {
 	spinner.text = 'Reading configuration.';
 	await checkForLegacyInstall( spinner );
@@ -63,6 +65,7 @@ module.exports = async function start( {
 		spinner,
 		debug,
 		xdebug,
+		disablePortMapping,
 		writeChanges: true,
 	} );
 

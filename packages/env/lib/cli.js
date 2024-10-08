@@ -144,6 +144,12 @@ module.exports = function cli() {
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
 			} );
+			args.option( 'disable-port-mapping', {
+				type: 'boolean',
+				describe:
+					'Do not expose container ports to the host. This is useful when you are running multiple instances of wp-env and intend to access them via a reverse proxy sidecar. The WordPress instance will listen on the default port 80 within the Docker network.',
+				default: false,
+			} );
 		},
 		withSpinner( env.start )
 	);

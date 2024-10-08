@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a --disable-port-mapping option to `wp-env start` that removes the port mappings from wp-env containers. 
+
 ## 10.9.0 (2024-10-03)
 
 ## 10.8.0 (2024-09-19)
