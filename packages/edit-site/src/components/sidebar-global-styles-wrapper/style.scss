@@ -1,9 +1,14 @@
-.edit-site-page-content .edit-site-global-styles-sidebar__navigator-screen {
-	overflow-y: auto;
-}
-
 .edit-site-styes .edit-site-page-content {
+	.edit-site-global-styles-screen-root {
+		& > div > hr {
+			display: none;
+		}
+	}
 	.edit-site-global-styles-sidebar__navigator-provider {
+		.components-tools-panel {
+			border-top: none;
+		}
+		overflow-y: auto;
 		padding-top: $grid-unit-15;
 		padding-left: $grid-unit-50;
 		padding-right: $grid-unit-50;
