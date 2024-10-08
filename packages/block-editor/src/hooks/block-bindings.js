@@ -50,55 +50,56 @@ const useToolsPanelDropdownMenuProps = () => {
 function BlockBindingsPanelDropdown( { attribute, binding } ) {
 	const blockContext = useContext( BlockContext );
 	const registeredSources = getBlockBindingsSources();
-	return (
-		<>
-			{ Object.entries( registeredSources ).map(
-				( [ sourceName, { render, usesContext } ] ) => {
-					// Don't add source to dropdown if the source doesn't have a render.
-					if ( ! render ) {
-						return null;
-					}
-
-					const context = {};
-					if ( usesContext?.length ) {
-						for ( const key of usesContext ) {
-							context[ key ] = blockContext[ key ];
-						}
-					}
-
-					// Render the source component first to be able to check if it is null.
-					// TODO: Look for a better way to do this.
-					const SourceComponent = render( {
-						context,
-						attribute,
-						binding,
-					} );
-
-					return (
-						<>
-							{ SourceComponent && (
-								<DropdownMenuV2
-									key={ sourceName }
-									// TODO: Review mobile version.
-									placement="left-start"
-									gutter={ 8 }
-									trigger={
-										<DropdownMenuV2.Item>
-											{
-												registeredSources[ sourceName ]
-													.label
-											}
-										</DropdownMenuV2.Item>
-									}
-								>
-									{ cloneElement( SourceComponent ) }
-								</DropdownMenuV2>
-							) }
-						</>
-					);
+	// Get a new object with the rendered components to check if they are null.
+	const sourcesComponents = Object.entries( registeredSources ).reduce(
+		( acc, [ name, { render, usesContext } ] ) => {
+			const context = {};
+			if ( usesContext?.length ) {
+				for ( const key of usesContext ) {
+					context[ key ] = blockContext[ key ];
 				}
-			) }
-		</>
+			}
+
+			if ( render ) {
+				const SourceComponent = render( {
+					context,
+					attribute,
+					binding,
+				} );
+				// Only add the component if it's not null.
+				if ( SourceComponent ) {
+					acc[ name ] = SourceComponent;
+				}
+			}
+
+			return acc;
+		},
+		{}
+	);
+
+	// Return null if there are no components to render.
+	if ( Object.keys( sourcesComponents ).length === 0 ) {
+		return null;
+	}
+
+	return Object.entries( sourcesComponents ).map(
+		( [ sourceName, SourceComponent ] ) => {
+			return (
+				<DropdownMenuV2
+					key={ sourceName }
+					// TODO: Review mobile version.
+					placement="left-start"
+					gutter={ 8 }
+					trigger={
+						<DropdownMenuV2.Item>
+							{ registeredSources[ sourceName ].label }
+						</DropdownMenuV2.Item>
+					}
+				>
+					{ cloneElement( SourceComponent ) }
+				</DropdownMenuV2>
+			);
+		}
 	);
 }
 
@@ -146,6 +147,30 @@ function EditableBlockBindingsPanelItems( { attributes, bindings } ) {
 		<>
 			{ attributes.map( ( attribute ) => {
 				const binding = bindings[ attribute ];
+				// Check if the DropdownComponent renders something that is valid and not null.
+				// TODO: Look for a better way to do this.
+				const DropdownComponent = (
+					<BlockBindingsPanelDropdown
+						attribute={ attribute }
+						binding={ binding }
+					/>
+				);
+				const renderedDropdown = DropdownComponent.type(
+					DropdownComponent.props
+				);
+
+				// Return a non-dropdown item if the dropdown component is null.
+				if ( ! renderedDropdown ) {
+					return (
+						<Item key={ attribute }>
+							<BlockBindingsAttribute
+								attribute={ attribute }
+								binding={ binding }
+							/>
+						</Item>
+					);
+				}
+
 				return (
 					<ToolsPanelItem
 						key={ attribute }
@@ -171,10 +196,7 @@ function EditableBlockBindingsPanelItems( { attributes, bindings } ) {
 								</Item>
 							}
 						>
-							<BlockBindingsPanelDropdown
-								attribute={ attribute }
-								binding={ binding }
-							/>
+							{ cloneElement( DropdownComponent ) }
 						</DropdownMenuV2>
 					</ToolsPanelItem>
 				);
