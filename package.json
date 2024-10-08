@@ -258,11 +258,11 @@
 		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
 		"terser": "5.32.0",
-		"terser-webpack-plugin": "5.3.9",
+		"terser-webpack-plugin": "5.3.10",
 		"typescript": "5.5.3",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
-		"webpack": "5.88.2",
+		"webpack": "5.95.0",
 		"webpack-bundle-analyzer": "4.9.1",
 		"worker-farm": "1.7.0"
 	},
