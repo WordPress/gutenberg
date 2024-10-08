@@ -54,7 +54,7 @@ const createEntrypoints = () => {
 	/*
 	 * Returns an array of paths to block view files within the `@wordpress/block-library` package.
 	 * These paths can be matched by the regex `blockViewRegex` in order to extract
-	 * the block's filename.
+	 * the block's filename. All blocks were migrated to script modules but the Form block.
 	 *
 	 * Returns an empty array if no files were found.
 	 */
