@@ -27,8 +27,8 @@ export default function InitPatternModal() {
 			isNewPost: isCleanNewPost(),
 		};
 	}, [] );
-	const [ isModalOpen, setIsModalOpen ] = useState( () =>
-		isNewPost && postType === 'wp_block' ? true : false
+	const [ isModalOpen, setIsModalOpen ] = useState(
+		() => isNewPost && postType === 'wp_block'
 	);
 
 	if ( postType !== 'wp_block' || ! isNewPost ) {
