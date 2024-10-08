@@ -44,12 +44,22 @@ export function modalize( modalElement?: HTMLDivElement ) {
  * @return Whether the element should not be hidden from screen-readers.
  */
 export function elementShouldBeHidden( element: Element ) {
+	// If the element has the 'hidden' attribute, it should already be hidden from assistive tech
+	if ( element.hasAttribute( 'hidden' ) ) {
+		return false;
+	}
+
+	// Check for role or aria attributes
 	const role = element.getAttribute( 'role' );
+
+	// Elements to skip applying aria-hidden
 	return ! (
-		element.tagName === 'SCRIPT' ||
-		element.hasAttribute( 'aria-hidden' ) ||
-		element.hasAttribute( 'aria-live' ) ||
-		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
+		(
+			element.tagName === 'SCRIPT' || // Skip <script> tags
+			element.hasAttribute( 'aria-hidden' ) || // Skip elements already marked as aria-hidden
+			element.hasAttribute( 'aria-live' ) || // Skip live regions
+			( role && LIVE_REGION_ARIA_ROLES.has( role ) )
+		) // Skip elements with live region roles
 	);
 }
 
