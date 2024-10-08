@@ -132,4 +132,15 @@ test.describe( 'data-wp-class', () => {
 		await toggle.click();
 		await expect( el ).not.toHaveClass( expectedClassName );
 	} );
+
+	test( 'can use class name with HTML entities', async ( { page } ) => {
+		const expectedClassName = 'class-name-attribute="foo bar"';
+		const el = page.getByTestId( 'class name HTML entities' );
+		const toggle = page.getByTestId( 'toggle context value' );
+		await expect( el ).not.toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).not.toHaveClass( expectedClassName );
+	} );
 } );

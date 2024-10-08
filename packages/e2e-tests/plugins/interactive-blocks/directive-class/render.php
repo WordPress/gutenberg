@@ -94,4 +94,9 @@
 		data-wp-class--#[^+-]$="context.value"
 		data-testid="class name no-aplhanumeric"
 	></div>
+
+	<div
+		data-wp-class--class-name-attribute&#61;&quot;foo&#32;bar&quot;="context.value"
+		data-testid="class name HTML entities"
+	></div>
 </div>
