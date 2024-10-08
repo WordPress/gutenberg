@@ -59,7 +59,7 @@ const createEntrypoints = () => {
 	 * Returns an empty array if no files were found.
 	 */
 	const blockViewScriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/**/view*.js'
+		'./packages/block-library/build-module/form/view.js'
 	);
 
 	/*
