@@ -172,7 +172,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
+		$theme_json = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
+		if ( 'default' === $theme_json->get_origin() ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Origin should be `default` here.', 'gutenberg' ),
+				'N.E.X.T' // Need to update this version.
+			);
+		}
 		static::$core = $theme_json->get_theme_json();
 
 		return static::$core;
@@ -278,7 +285,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			$theme_json = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			if ( 'theme' === $theme_json->get_origin() ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Origin should be `theme` here.', 'gutenberg' ),
+					'N.E.X.T' // Need to update this version.
+				);
+			}
 			static::$theme = $theme_json->get_theme_json();
 
 			if ( $wp_theme->parent() ) {
@@ -413,7 +427,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		if ( 'blocks' === $theme_json->get_origin() ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Origin should be `blocks` here.', 'gutenberg' ),
+				'N.E.X.T' // Need to update this version.
+			);
+		}
 		static::$blocks = $theme_json->get_theme_json();
 
 		return static::$blocks;
@@ -547,6 +568,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+				if ( 'custom' === $theme_json->get_origin() ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Origin should be `custom` here.', 'gutenberg' ),
+						'N.E.X.T' // Need to update this version.
+					);
+				}
 
 				return $theme_json->get_theme_json();
 			}
@@ -564,7 +592,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		if ( 'custom' === $theme_json->get_origin() ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Origin should be `custom` here.', 'gutenberg' ),
+				'N.E.X.T' // Need to update this version.
+			);
+		}
 		static::$user = $theme_json->get_theme_json();
 
 		return static::$user;
