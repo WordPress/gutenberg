@@ -7,7 +7,6 @@ ul.dataviews-view-list {
 
 	li {
 		margin: 0;
-		cursor: pointer;
 		border-top: 1px solid $gray-100;
 
 		.dataviews-view-list__item-wrapper {
@@ -84,12 +83,14 @@ ul.dataviews-view-list {
 
 	.dataviews-view-list__item {
 		position: absolute;
+		z-index: 1;
 		inset: 0;
 		scroll-margin: $grid-unit-10 0;
 		appearance: none;
 		border: none;
 		background: none;
 		padding: 0;
+		cursor: pointer;
 
 		&:focus-visible {
 			outline: none;
