@@ -172,33 +172,32 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
 
 /**
- * Modifies the static `core/query` block on the server for instant search.
+ * Filters the query arguments for the Query Loop block to support instant search functionality.
  *
- * @since 6.5.0
+ * This function modifies the query arguments if enhanced pagination is enabled and a search query
+ * parameter is present in the GET request. It adds the search term to the query, enabling
+ * instant search within the Query Loop block.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      The block instance.
+ * @since 6.8.0
  *
- * @return string Returns the modified output of the query block.
+ * @param array    	$query The original query arguments.
+ * @param WP_Block 	$block The block instance.
+ * @return array 		The modified query arguments.
  */
+function block_core_query_instant_search_filter( $query, $block ) {
 
-function block_core_query_instant_search_filter( $pre_render, $parsed_block ) {
-	if ( 'core/query' === $parsed_block['blockName'] && array_key_exists( 'enhancedPagination', $parsed_block['attrs'] ) && true === $parsed_block['attrs']['enhancedPagination'] ) {
-		add_filter(
-			'query_loop_block_query_vars',
-			function ( $query ) {
-
-				if ( isset( $_GET['search'] ) && ! empty( $_GET['search'] ) ) {
-					$query['s'] = $_GET['search'];
-				}
-
-				return $query;
-			}
-		);
+	// if the enhancedPagination is false or not set, return the query as is
+	if ( empty( $block->context['enhancedPagination'] ) ) {
+		return $query;
 	}
 
-	return $pre_render;
+	// if the search query param is set, add it to the query
+	if ( isset( $_GET['search'] ) && ! empty( $_GET['search'] ) ) {
+		$query['s'] = $_GET['search'];
+	}
+
+	return $query;
 }
 
-add_filter( 'pre_render_block', 'block_core_query_instant_search_filter', 10, 3 );
+
+add_filter( 'query_loop_block_query_vars', 'block_core_query_instant_search_filter', 10, 3 );
