@@ -10,6 +10,8 @@
     -   Use `populateInitialData()` with state from the server.
     -   Wait for the `load` event of the script element before evaluating it.
 
+## 2.9.0 (2024-10-03)
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)

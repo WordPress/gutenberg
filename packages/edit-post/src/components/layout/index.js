@@ -47,6 +47,7 @@ import {
 	SlotFillProvider,
 	Tooltip,
 	VisuallyHidden,
+	__unstableUseNavigateRegions as useNavigateRegions,
 } from '@wordpress/components';
 import {
 	useMediaQuery,
@@ -398,7 +399,7 @@ function Layout( {
 	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
-		currentPost,
+		currentPost: { postId: currentPostId, postType: currentPostType },
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
 	} = useNavigateToEntityRecord(
@@ -406,6 +407,7 @@ function Layout( {
 		initialPostType,
 		'post-only'
 	);
+	const isEditingTemplate = currentPostType === 'wp_template';
 	const {
 		mode,
 		isFullscreenActive,
@@ -415,7 +417,6 @@ function Layout( {
 		isDistractionFree,
 		showMetaBoxes,
 		hasHistory,
-		isEditingTemplate,
 		isWelcomeGuideVisible,
 		templateId,
 	} = useSelect(
@@ -428,7 +429,7 @@ function Layout( {
 
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
-				getPostType( currentPost.postType )?.viewable ?? false;
+				getPostType( currentPostType )?.viewable ?? false;
 			const canViewTemplate = canUser( 'read', {
 				kind: 'postType',
 				name: 'wp_template',
@@ -444,21 +445,19 @@ function Layout( {
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				showMetaBoxes:
+					! DESIGN_POST_TYPES.includes( currentPostType ) &&
 					select( editorStore ).getRenderingMode() === 'post-only',
-				isEditingTemplate:
-					select( editorStore ).getCurrentPostType() ===
-					'wp_template',
 				isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 				templateId:
 					supportsTemplateMode &&
 					isViewable &&
 					canViewTemplate &&
-					currentPost.postType !== 'wp_template'
+					! isEditingTemplate
 						? getEditedPostTemplateId()
 						: null,
 			};
 		},
-		[ settings.supportsTemplateMode, currentPost.postType ]
+		[ currentPostType, isEditingTemplate, settings.supportsTemplateMode ]
 	);
 
 	// Set the right context for the command palette
@@ -483,6 +482,8 @@ function Layout( {
 	} else {
 		document.body.classList.remove( 'show-icon-labels' );
 	}
+
+	const navigateRegionsProps = useNavigateRegions();
 
 	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
 		'has-metaboxes': hasActiveMetaboxes,
@@ -568,48 +569,54 @@ function Layout( {
 		<SlotFillProvider>
 			<ErrorBoundary>
 				<CommandMenu />
-				<WelcomeGuide postType={ currentPost.postType } />
-				<Editor
-					settings={ editorSettings }
-					initialEdits={ initialEdits }
-					postType={ currentPost.postType }
-					postId={ currentPost.postId }
-					templateId={ templateId }
-					className={ className }
-					styles={ styles }
-					forceIsDirty={ hasActiveMetaboxes }
-					contentRef={ paddingAppenderRef }
-					disableIframe={ ! shouldIframe }
-					// We should auto-focus the canvas (title) on load.
-					// eslint-disable-next-line jsx-a11y/no-autofocus
-					autoFocus={ ! isWelcomeGuideVisible }
-					onActionPerformed={ onActionPerformed }
-					extraSidebarPanels={
-						! isEditingTemplate && <MetaBoxes location="side" />
-					}
-					extraContent={
-						! isDistractionFree &&
-						showMetaBoxes && (
-							<MetaBoxesMain isLegacy={ ! shouldIframe } />
-						)
-					}
+				<WelcomeGuide postType={ currentPostType } />
+				<div
+					className={ navigateRegionsProps.className }
+					{ ...navigateRegionsProps }
+					ref={ navigateRegionsProps.ref }
 				>
-					<PostLockedModal />
-					<EditorInitialization />
-					<FullscreenMode isActive={ isFullscreenActive } />
-					<BrowserURL hasHistory={ hasHistory } />
-					<UnsavedChangesWarning />
-					<AutosaveMonitor />
-					<LocalAutosaveMonitor />
-					<EditPostKeyboardShortcuts />
-					<EditorKeyboardShortcutsRegister />
-					<BlockKeyboardShortcuts />
-					<InitPatternModal />
-					<PluginArea onError={ onPluginAreaError } />
-					<PostEditorMoreMenu />
-					{ backButton }
-					<EditorSnackbars />
-				</Editor>
+					<Editor
+						settings={ editorSettings }
+						initialEdits={ initialEdits }
+						postType={ currentPostType }
+						postId={ currentPostId }
+						templateId={ templateId }
+						className={ className }
+						styles={ styles }
+						forceIsDirty={ hasActiveMetaboxes }
+						contentRef={ paddingAppenderRef }
+						disableIframe={ ! shouldIframe }
+						// We should auto-focus the canvas (title) on load.
+						// eslint-disable-next-line jsx-a11y/no-autofocus
+						autoFocus={ ! isWelcomeGuideVisible }
+						onActionPerformed={ onActionPerformed }
+						extraSidebarPanels={
+							showMetaBoxes && <MetaBoxes location="side" />
+						}
+						extraContent={
+							! isDistractionFree &&
+							showMetaBoxes && (
+								<MetaBoxesMain isLegacy={ ! shouldIframe } />
+							)
+						}
+					>
+						<PostLockedModal />
+						<EditorInitialization />
+						<FullscreenMode isActive={ isFullscreenActive } />
+						<BrowserURL hasHistory={ hasHistory } />
+						<UnsavedChangesWarning />
+						<AutosaveMonitor />
+						<LocalAutosaveMonitor />
+						<EditPostKeyboardShortcuts />
+						<EditorKeyboardShortcutsRegister />
+						<BlockKeyboardShortcuts />
+						<InitPatternModal />
+						<PluginArea onError={ onPluginAreaError } />
+						<PostEditorMoreMenu />
+						{ backButton }
+						<EditorSnackbars />
+					</Editor>
+				</div>
 			</ErrorBoundary>
 		</SlotFillProvider>
 	);

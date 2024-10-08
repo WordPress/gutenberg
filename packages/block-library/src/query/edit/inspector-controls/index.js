@@ -211,7 +211,7 @@ export default function QueryInspectorControls( props ) {
 							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
-								setQuery( { inherit: !! value } );
+								setQuery( { inherit: value === 'default' } );
 							} }
 							help={
 								inherit
@@ -222,14 +222,14 @@ export default function QueryInspectorControls( props ) {
 											'Display a list of posts or custom post types based on specific criteria.'
 									  )
 							}
-							value={ !! inherit }
+							value={ !! inherit ? 'default' : 'custom' }
 						>
 							<ToggleGroupControlOption
-								value
+								value="default"
 								label={ __( 'Default' ) }
 							/>
 							<ToggleGroupControlOption
-								value={ false }
+								value="custom"
 								label={ __( 'Custom' ) }
 							/>
 						</ToggleGroupControl>
@@ -321,7 +321,7 @@ export default function QueryInspectorControls( props ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Items' ) }
+						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
 					>
 						<PerPageControl
@@ -341,7 +341,7 @@ export default function QueryInspectorControls( props ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Max Pages to Show' ) }
+						label={ __( 'Max pages to show' ) }
 						hasValue={ () => pages > 0 }
 						onDeselect={ () => setQuery( { pages: 0 } ) }
 					>

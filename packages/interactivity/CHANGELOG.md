@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix an issue where "default" could not be used as a directive suffix ([#65815](https://github.com/WordPress/gutenberg/pull/65815)).
+-   Correctly handle lazily added, deeply nested properties with `deepMerge()` ([#65465](https://github.com/WordPress/gutenberg/pull/65465)).
+
+## 6.9.0 (2024-10-03)
+
 ## 6.8.0 (2024-09-19)
 
 ### Enhancements

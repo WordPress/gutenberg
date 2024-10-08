@@ -155,7 +155,7 @@ describe( 'block serializer', () => {
 					attributes: {
 						blob: {
 							type: 'string',
-							__experimentalRole: 'local',
+							role: 'local',
 						},
 						url: {
 							type: 'string',

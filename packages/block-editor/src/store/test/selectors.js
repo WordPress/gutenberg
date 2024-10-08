@@ -16,6 +16,7 @@ import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { sectionRootClientIdKey } from '../private-keys';
+import { lock } from '../../lock-unlock';
 
 const {
 	getBlockName,
@@ -2424,7 +2425,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 0,
 				},
@@ -2465,7 +2466,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2503,7 +2504,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			const insertionPoint1 = getBlockInsertionPoint( state );
@@ -2545,7 +2546,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2587,7 +2588,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2629,7 +2630,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2642,7 +2643,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
@@ -2650,7 +2651,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if assigned insertion point', () => {
 			const state = {
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 5,
 				},
@@ -3078,7 +3079,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
@@ -4475,14 +4476,14 @@ describe( 'getBlockEditingMode', () => {
 		},
 	};
 
-	const __experimentalHasContentRoleAttribute = jest.fn( ( name ) => {
-		// consider paragraphs as content blocks.
-		return name === 'core/p';
-	} );
+	const hasContentRoleAttribute = jest.fn( () => false );
+
+	const fauxPrivateAPIs = {};
+
+	lock( fauxPrivateAPIs, { hasContentRoleAttribute } );
+
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => ( {
-			__experimentalHasContentRoleAttribute,
-		} ) ),
+		select: jest.fn( () => fauxPrivateAPIs ),
 	};
 
 	it( 'should return default by default', () => {
@@ -4586,7 +4587,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		hasContentRoleAttribute.mockReturnValueOnce( false );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'disabled' );
@@ -4602,7 +4603,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );
@@ -4642,12 +4643,15 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
 				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
 			)
 		).toBe( 'contentOnly' );
+
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
@@ -4663,5 +4667,115 @@ describe( 'getBlockEditingMode', () => {
 				'9b9c5c3f-2e46-4f02-9e14-9fed515b958s'
 			)
 		).toBe( 'disabled' );
+	} );
+
+	describe( 'pattern blocks', () => {
+		const patternBlockState = {
+			settings: {},
+			blocks: {
+				byClientId: new Map(
+					Object.entries( {
+						'pattern-a': { name: 'core/block' },
+						'pattern-b': { name: 'core/block' },
+						'heading-a': { name: 'core/heading' },
+						'paragraph-a': { name: 'core/paragraph' },
+						'paragraph-b': { name: 'core/paragraph' },
+					} )
+				),
+				order: new Map(
+					Object.entries( {
+						'': [ 'pattern-a' ],
+						'pattern-a': [
+							'heading-a',
+							'paragraph-a',
+							'pattern-b',
+						],
+						'pattern-b': [ 'paragraph-b' ],
+					} )
+				),
+				parents: new Map(
+					Object.entries( {
+						'paragraph-b': 'pattern-b',
+						'pattern-b': 'pattern-a',
+						'paragraph-a': 'pattern-a',
+						'heading-a': 'pattern-a',
+						'pattern-a': '',
+					} )
+				),
+				blockListSettings: {
+					'pattern-a': {},
+					'pattern-b': {},
+				},
+				attributes: new Map(
+					Object.entries( {
+						'paragraph-a': {
+							metadata: {
+								bindings: {
+									__default: {
+										source: 'core/pattern-overrides',
+									},
+								},
+							},
+						},
+						'paragraph-b': {
+							metadata: {
+								bindings: {
+									__default: {
+										source: 'core/pattern-overrides',
+									},
+								},
+							},
+						},
+					} )
+				),
+			},
+		};
+
+		it( 'should return contentOnly for the outer pattern block', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'pattern-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return contentOnly for blocks with bindings in the outer pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'paragraph-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return disabled for unbound blocks', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'heading-a' )
+			).toBe( 'disabled' );
+		} );
+
+		it( 'should return disabled for the nested pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'pattern-a' )
+			).toBe( 'contentOnly' );
+		} );
+
+		it( 'should return disabled for blocks with bindings in the nested pattern', () => {
+			expect(
+				getBlockEditingMode( patternBlockState, 'paragraph-b' )
+			).toBe( 'disabled' );
+		} );
+
+		it( 'should disable all inner blocks of the outer pattern in zoom out mode with the outer pattern in content only mode', () => {
+			const state = {
+				...patternBlockState,
+				editorMode: 'zoom-out',
+			};
+			expect( getBlockEditingMode( state, 'pattern-a' ) ).toBe(
+				'contentOnly'
+			);
+			[ 'paragraph-a', 'paragraph-b', 'heading-a', 'pattern-b' ].forEach(
+				( block ) => {
+					expect( getBlockEditingMode( state, block ) ).toBe(
+						'disabled'
+					);
+				}
+			);
+		} );
 	} );
 } );

@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -53,39 +53,50 @@ function Header( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
+		postType,
 		isTextEditor,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasFixedToolbar,
+		hasBlockSelection,
 		isNestedEntity,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
 			getEditorMode,
 			getEditorSettings,
+			getCurrentPostType,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
+			postType: getCurrentPostType(),
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			hasBlockSelection:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			isNestedEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
+
+	const canBeZoomedOut = [ 'post', 'page', 'wp_template' ].includes(
+		postType
+	);
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
+	const hasCenter =
+		( ! hasBlockSelection || isBlockToolsCollapsed ) &&
+		! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
-
-	// The edit-post-header classname is only kept for backward compatibilty
-	// as some plugins might be relying on its presence.
+	/*
+	 * The edit-post-header classname is only kept for backward compatability
+	 * as some plugins might be relying on its presence.
+	 */
 	return (
 		<div className="editor-header edit-post-header">
 			{ hasBackButton && (
@@ -127,13 +138,20 @@ function Header( {
 				className="editor-header__settings"
 			>
 				{ ! customSaveButton && ! isPublishSidebarOpened && (
-					// This button isn't completely hidden by the publish sidebar.
-					// We can't hide the whole toolbar when the publish sidebar is open because
-					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-					// We track that DOM node to return focus to the PostPublishButtonOrToggle
-					// when the publish sidebar has been closed.
+					/*
+					 * This button isn't completely hidden by the publish sidebar.
+					 * We can't hide the whole toolbar when the publish sidebar is open because
+					 * we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					 * We track that DOM node to return focus to the PostPublishButtonOrToggle
+					 * when the publish sidebar has been closed.
+					 */
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
+
+				{ canBeZoomedOut && isEditorIframed && isWideViewport && (
+					<ZoomOutToggle />
+				) }
+
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
 					disabled={ isNestedEntity }
@@ -143,8 +161,6 @@ function Header( {
 					forceIsAutosaveable={ forceIsDirty }
 				/>
 				<PostViewLink />
-
-				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
