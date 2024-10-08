@@ -328,7 +328,9 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
-			frameWidth !== 0 ? `${ integerFrameSize }px` : frameSize
+			frameWidth !== 0
+				? `${ integerFrameSize }px`
+				: `calc( ${ frameSize } / ${ usedScale } )`
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-content-height',
