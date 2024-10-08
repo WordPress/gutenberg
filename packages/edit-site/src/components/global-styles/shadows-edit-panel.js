@@ -79,18 +79,23 @@ export default function ShadowsEditPanel() {
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
 	);
-	const currentShadow = shadows?.find( ( shadow ) => shadow.slug === slug );
 
 	useEffect( () => {
+		const currentShadow = shadows?.find(
+			( shadow ) => shadow.slug === slug
+		);
 		// If the shadow being edited doesn't exist anymore in the global styles setting, navigate back
 		// to prevent the user from editing a non-existent shadow entry.
 		// This can happen, for example:
 		// - when the user deletes the shadow
 		// - when the user resets the styles while editing a custom shadow
-		if ( ! currentShadow ) {
+		//
+		// The check on the slug is necessary to prevent a double back navigation when the user triggers
+		// a backward navigation by interacting with the screen's UI.
+		if ( !! slug && ! currentShadow ) {
 			goBack();
 		}
-	}, [ currentShadow, goBack ] );
+	}, [ shadows, slug, goBack ] );
 
 	const [ baseShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`,
