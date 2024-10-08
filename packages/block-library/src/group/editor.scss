@@ -12,13 +12,13 @@
 
 // Reset user select, but the next rule should take precedence for nested
 // groups.
-:where([contenteditable]:not([contenteditable="true"]) .wp-block-group > *) {
+:where([data-has-multi-selection]:not([contenteditable="true"]) .wp-block-group > *) {
 	user-select: initial;
 }
 
 // When we are not multi-selecting, prevent children from capturing the
 // selection, which happens when the group is flex and children inlined.
-:where([contenteditable]:not([contenteditable="true"]) .wp-block-group) {
+:where([data-has-multi-selection]:not([contenteditable="true"]) .wp-block-group) {
 	user-select: none;
 }
 

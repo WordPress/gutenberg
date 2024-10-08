@@ -24,7 +24,7 @@
 // hack a progressive enhancement.
 /* stylelint-disable -- Stylelint is disabled to allow the hack to work. */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
-_::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
+_::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .block-editor-block-list__layout::selection {
 	background-color: transparent;
 }
 /* stylelint-enable */
