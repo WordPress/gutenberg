@@ -168,7 +168,9 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 					value: page.id.toString(),
 					label: getItemTitle( page as Page ),
 				} ) )
-				.filter( ( page ) => page.value !== pageId );
+				.filter(
+					( page ) => Number( page.value ) !== Number( pageId )
+				);
 
 			// Set the first page as the default selected page.
 			if ( formattedListOfPages && existingPageId === 0 ) {
