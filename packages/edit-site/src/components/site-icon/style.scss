@@ -7,6 +7,11 @@
 		// Make the WordPress icon not so big in full canvas.
 		padding: $grid-unit-15;
 	}
+
+	// Add focus-visible styles
+	button[data-focus-visible="true"] & {
+		border: 2px solid #1e90ff;
+	}
 }
 
 .edit-site-site-icon__image {
@@ -22,7 +27,6 @@
 
 	// Add focus-visible styles
 	button[data-focus-visible="true"] & {
-		background: #1e90ff;
-		padding: 2px;
+		border: 2px solid #1e90ff;
 	}
 }
