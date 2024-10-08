@@ -84,26 +84,27 @@ export default function PostDateEdit( {
 	const dateLabel =
 		displayType === 'date' ? __( 'Post Date' ) : __( 'Post Modified Date' );
 
-	let postDate = date ? (
+	const formattedDate =
+		format === 'human-diff'
+			? humanTimeDiff( date )
+			: dateI18n( format || siteFormat, date );
+
+	const postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
-			{ format === 'human-diff'
-				? humanTimeDiff( date )
-				: dateI18n( format || siteFormat, date ) }
+			{ isLink ? (
+				<a
+					href="#post-date-pseudo-link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ formattedDate }
+				</a>
+			) : (
+				formattedDate
+			) }
 		</time>
 	) : (
 		dateLabel
 	);
-
-	if ( isLink && date ) {
-		postDate = (
-			<a
-				href="#post-date-pseudo-link"
-				onClick={ ( event ) => event.preventDefault() }
-			>
-				{ postDate }
-			</a>
-		);
-	}
 
 	return (
 		<>
