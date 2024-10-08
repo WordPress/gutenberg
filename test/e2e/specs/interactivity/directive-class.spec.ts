@@ -134,7 +134,7 @@ test.describe( 'data-wp-class', () => {
 	} );
 
 	test( 'can use class name with HTML entities', async ( { page } ) => {
-		const expectedClassName = 'class-name-attribute="foo bar"';
+		const expectedClassName = 'class-name-attribute="FOO bar"';
 		const el = page.getByTestId( 'class name HTML entities' );
 		const toggle = page.getByTestId( 'toggle context value' );
 		await expect( el ).not.toHaveClass( expectedClassName );
