@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improvements to the experimental full-page navigation ([#64067](https://github.com/WordPress/gutenberg/pull/64067)):
+    -   Remove the `src` attributes from prefetched script tags.
+    -   Use `.textContent` instead of `.innerText` to set `<script>` contents.
+    -   Use `populateInitialData()` with state from the server.
+    -   Wait for the `load` event of the script element before evaluating it.
+
 ## 2.8.0 (2024-09-19)
 
 ## 2.7.0 (2024-09-05)
