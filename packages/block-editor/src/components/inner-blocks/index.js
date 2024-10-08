@@ -75,6 +75,7 @@ function UncontrolledInnerBlocks( props ) {
 		blockType,
 		parentLock,
 		defaultLayout,
+		contentOnlyInsertion,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -89,7 +90,8 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout
+		layout,
+		contentOnlyInsertion
 	);
 
 	useInnerBlockTemplateSync(
