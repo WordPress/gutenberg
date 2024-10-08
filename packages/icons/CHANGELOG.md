@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Update `unseen` icon to be a strike-through eye, rather than a closed eye, to match provide consistency. ([#65914](https://github.com/WordPress/gutenberg/pull/65914)).
+
 ## 10.9.0 (2024-10-03)
 
 ## 10.8.0 (2024-09-19)
