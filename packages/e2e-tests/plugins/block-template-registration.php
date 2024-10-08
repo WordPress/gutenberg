@@ -47,7 +47,7 @@ add_action(
 				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template that is also unregistered.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
-		wp_unregister_block_template( 'gutenberg//plugin-unregistered-template' );
+		unregister_block_template( 'gutenberg//plugin-unregistered-template' );
 
 		// Custom template used to test overriding default WP templates.
 		register_block_template(

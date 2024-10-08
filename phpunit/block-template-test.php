@@ -17,7 +17,7 @@ class Tests_Block_Template extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( $template_name, $templates );
 
-		wp_unregister_block_template( $template_name );
+		unregister_block_template( $template_name );
 	}
 
 	public function test_get_block_template_from_registry() {
@@ -32,6 +32,6 @@ class Tests_Block_Template extends WP_UnitTestCase {
 
 		$this->assertEquals( 'Test Template', $template->title );
 
-		wp_unregister_block_template( $template_name );
+		unregister_block_template( $template_name );
 	}
 }
