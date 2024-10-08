@@ -22,11 +22,18 @@ test.describe( 'Zoom Out', () => {
 		editor,
 	} ) => {
 		await page.getByLabel( 'Zoom Out' ).click();
-		const frame = editor.canvas.locator( 'html' );
-		await expect( frame ).toHaveCSS(
+		const iframe = page.locator( 'iframe[name="editor-canvas"]' );
+		const html = editor.canvas.locator( 'html' );
+
+		//Check that the html is scaled
+		await expect( html ).toHaveCSS(
 			'transform',
 			'matrix(0.75, 0, 0, 0.75, 0, 0)'
 		);
-		await page.pause();
+		const iframeRect = await iframe.boundingBox();
+		const htmlRect = await html.boundingBox();
+
+		//Check that the iframe is larger than the html
+		expect( iframeRect.width ).toBeGreaterThan( htmlRect.width );
 	} );
 } );
