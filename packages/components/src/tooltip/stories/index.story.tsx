@@ -40,7 +40,8 @@ const meta: Meta< typeof Tooltip > = {
 		( Story ) => {
 			return (
 				<>
-					<p id="test-description">Button's description</p>
+					{ /* eslint-disable-next-line no-restricted-syntax */ }
+					<p id="test-description">Button description</p>
 					<Story />
 				</>
 			);
