@@ -6,6 +6,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Homepage Settings via Editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
+		await requestUtils.createPage( {
+			title: 'Homepage',
+			status: 'publish',
+		} );
 	} );
 
 	test.beforeEach( async ( { admin, page } ) => {
@@ -13,12 +17,23 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllPages(),
+			requestUtils.updateSiteSettings( {
+				show_on_front: 'posts',
+				page_on_front: 0,
+				page_for_posts: 0,
+			} ),
+		] );
+	} );
+
 	test( 'should show "Set as homepage" action on published pages', async ( {
 		page,
 	} ) => {
 		const samplePage = page
 			.getByRole( 'gridcell' )
-			.getByLabel( 'Sample Page' );
+			.getByLabel( 'Homepage' );
 		const samplePageRow = page
 			.getByRole( 'row' )
 			.filter( { has: samplePage } );
