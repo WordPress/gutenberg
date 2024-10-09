@@ -47,16 +47,14 @@ describe( 'useBlockBindingsUtils', () => {
 				},
 			},
 		} );
-		await dispatch( blockEditorStore ).insertBlocks( block );
+		await dispatch( blockEditorStore ).resetBlocks( [ block ] );
 		clientId = block.clientId;
 	} );
 
-	// Clean up after each test by removing all blocks
-	afterEach( () => {
-		dispatch( blockEditorStore ).resetBlocks( [] );
-	} );
-
 	afterAll( () => {
+		// Remove blocks after all tests.
+		dispatch( blockEditorStore ).resetBlocks( [] );
+
 		// Clean up registered blocks
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
