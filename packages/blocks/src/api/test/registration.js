@@ -1656,6 +1656,19 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		// Check the `getBindingLabel` callback is correct.
+		it( 'should reject invalid getBindingLabel callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getBindingLabel: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getBindingLabel must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
 		// Check correct sources are registered as expected.
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
@@ -1667,6 +1680,7 @@ describe( 'blocks', () => {
 				render: () => {
 					return <div>Test</div>;
 				},
+				getBindingLabel: () => 'Label',
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
