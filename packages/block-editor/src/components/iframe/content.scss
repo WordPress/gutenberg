@@ -3,9 +3,16 @@
 }
 
 .block-editor-iframe__html {
-	border: 0 solid $gray-300;
 	transform-origin: top center;
 	@include editor-canvas-resize-animation;
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		height: 0;
+		background-color: $gray-300;
+		@include editor-canvas-resize-animation;
+	}
 }
 
 .block-editor-iframe__html.is-zoomed-out {
@@ -19,14 +26,17 @@
 
 	background-color: $gray-300;
 
-	padding: calc(#{$frame-size} / #{$scale}) 0;
-
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
 	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
 	$total-frame-height: calc(2 * #{$frame-size});
 	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
 	margin-bottom: calc(-1 * #{$total-height});
+
+	&::before,
+	&::after {
+		height: calc(#{$frame-size} / #{$scale});
+	}
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
