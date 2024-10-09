@@ -180,8 +180,16 @@ function BlockPopoverInbetween( {
 		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( previousElement, { attributes: true } );
 
+		const zoomedOutObserver = new window.MutationObserver(
+			forcePopoverRecompute
+		);
+		zoomedOutObserver.observe( previousElement.closest( 'html' ), {
+			attributes: true,
+		} );
+
 		return () => {
 			observer.disconnect();
+			zoomedOutObserver.disconnect();
 		};
 	}, [ previousElement ] );
 
@@ -192,8 +200,16 @@ function BlockPopoverInbetween( {
 		const observer = new window.MutationObserver( forcePopoverRecompute );
 		observer.observe( nextElement, { attributes: true } );
 
+		const zoomedOutObserver = new window.MutationObserver(
+			forcePopoverRecompute
+		);
+		zoomedOutObserver.observe( nextElement.closest( 'html' ), {
+			attributes: true,
+		} );
+
 		return () => {
 			observer.disconnect();
+			zoomedOutObserver.disconnect();
 		};
 	}, [ nextElement ] );
 

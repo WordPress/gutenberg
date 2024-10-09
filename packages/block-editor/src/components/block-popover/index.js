@@ -69,8 +69,16 @@ function BlockPopover(
 		);
 		observer.observe( selectedElement, { attributes: true } );
 
+		const zoomedOutObserver = new window.MutationObserver(
+			forceRecomputePopoverDimensions
+		);
+		zoomedOutObserver.observe( selectedElement.closest( 'html' ), {
+			attributes: true,
+		} );
+
 		return () => {
 			observer.disconnect();
+			zoomedOutObserver.disconnect();
 		};
 	}, [ selectedElement ] );
 
