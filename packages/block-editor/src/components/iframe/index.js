@@ -20,6 +20,7 @@ import {
 	useMergeRefs,
 	useRefEffect,
 	useDisabled,
+	usePrevious,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -370,6 +371,29 @@ function Iframe( {
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+
+	const previousScale = usePrevious( scale );
+
+	// Scroll based on the new scale
+	useEffect( () => {
+		if ( ! iframeDocument || isZoomedOut ) {
+			return;
+		}
+
+		const maxWidth = 750;
+		const previousScaleNumber =
+			previousScale === 'default'
+				? Math.min( containerWidth, maxWidth ) /
+				  prevContainerWidthRef.current
+				: previousScale;
+
+		const { documentElement } = iframeDocument;
+		const { scrollTop, scrollLeft } = documentElement;
+		const delta = 1 + scale - previousScaleNumber;
+
+		documentElement.scrollTop = delta * scrollTop;
+		documentElement.scrollLeft = delta * scrollLeft;
+	}, [ scale, previousScale, iframeDocument, isZoomedOut, containerWidth ] );
 
 	const iframe = (
 		<>
