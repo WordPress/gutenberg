@@ -132,7 +132,7 @@ function BlockPopover(
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
 					// If the rootSectionElement is undefined then recurse up the DOM tree
-					// to find the element with ` is-root-container` classname.
+					// to find the element with `is-root-container` classname.
 					// This can then be used as the anchor point.
 					// FIXME: we should not rely on classnames to find the
 					// root section element
