@@ -51,15 +51,27 @@ test.describe( 'Zoom Out', () => {
 	} ) => {
 		await page.getByLabel( 'Zoom Out' ).click();
 
-		//Click on the first pattern of the theme
-		await editor.canvas
+		const firstPattern = editor.canvas
 			.locator( 'div' )
 			.filter( { hasText: 'A commitment to innovation' } )
-			.nth( 1 )
-			.click();
+			.nth( 1 );
 
-		await expect(
-			page.getByRole( 'toolbar', { name: 'Block tools' } )
-		).toBeVisible();
+		//Click on the first pattern of the theme
+		await firstPattern.click();
+
+		const toolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+
+		await expect( toolbar ).toBeVisible();
+
+		const toolbarRect = await toolbar.boundingBox();
+		const firstPatternRect = await firstPattern.boundingBox();
+
+		//Check that the toolbar is vertically aligned to the pattern and to the left
+		expect( toolbarRect.y ).toEqual( firstPatternRect.y );
+		expect( toolbarRect.x + toolbarRect.width ).toEqual(
+			firstPatternRect.x
+		);
 	} );
 } );
