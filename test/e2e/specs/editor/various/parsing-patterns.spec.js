@@ -15,7 +15,7 @@ test.describe( 'Parsing patterns', () => {
 			innerBlocks: [ { name: 'core/button', attributes: { text: 'a' } } ],
 		} );
 		await page.keyboard.press( 'ArrowDown' );
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		await page.evaluate( () => {

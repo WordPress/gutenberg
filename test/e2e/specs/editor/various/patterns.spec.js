@@ -63,7 +63,7 @@ test.describe( 'Unsynced pattern', () => {
 
 		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page
 			.getByRole( 'tab', {
 				name: 'Patterns',
@@ -166,7 +166,7 @@ test.describe( 'Synced pattern', () => {
 		).toBe( true );
 
 		// Check that the new pattern is available in the inserter.
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page
 			.getByRole( 'tab', {
 				name: 'Patterns',
@@ -495,9 +495,7 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
 		await page
 			.getByRole( 'searchbox', {
 				name: 'Search',

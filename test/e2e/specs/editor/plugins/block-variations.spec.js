@@ -21,9 +21,7 @@ test.describe( 'Block variations', () => {
 	test( 'Search for the overridden default Quote block', async ( {
 		page,
 	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
 
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
@@ -62,9 +60,7 @@ test.describe( 'Block variations', () => {
 	test( 'Search for the Paragraph block with 2 additional variations', async ( {
 		page,
 	} ) => {
-		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
 
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
