@@ -886,7 +886,7 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 };
 
 const getFontFaceDeclarations = ( tree ) => {
-	const fonts = tree?.settings?.typography?.fontFamilies ?? [];
+	const fonts = tree?.settings?.typography?.fontFamilies;
 	let ruleset = '';
 
 	if ( ! fonts ) {
