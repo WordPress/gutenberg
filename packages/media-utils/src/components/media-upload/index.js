@@ -71,16 +71,16 @@ const getFeaturedImageMediaFrame = () => {
 };
 
 /**
- * Prepares the Single Image toolbars and frames.
+ * Prepares the default frame for selecting a single media item.
  *
  * @return {window.wp.media.view.MediaFrame.Select} The default media workflow.
  */
-const getSingleImageMediaFrame = () => {
+const getSingleMediaFrame = () => {
 	const { wp } = window;
 
 	// Extend the default Select frame, and use the same `createStates` method as in core,
 	// but with the addition of `filterable: 'uploaded'` to the Library state, so that
-	// the user can filter the media library by uploaded images.
+	// the user can filter the media library by uploaded media.
 	return wp.media.view.MediaFrame.Select.extend( {
 		/**
 		 * Create the default states on the frame.
@@ -369,7 +369,7 @@ class MediaUpload extends Component {
 	 *
 	 * @return {void}
 	 */
-	buildAndSetSingleImageFrame() {
+	buildAndSetSingleMediaFrame() {
 		const { wp } = window;
 		const {
 			allowedTypes,
@@ -391,7 +391,7 @@ class MediaUpload extends Component {
 			this.frame.remove();
 		}
 
-		const singleImageFrame = getSingleImageMediaFrame();
+		const singleImageFrame = getSingleMediaFrame();
 		const attachments = getAttachmentsCollection( value );
 		const selection = new wp.media.model.Selection( attachments.models, {
 			props: attachments.props.toJSON(),
@@ -513,7 +513,7 @@ class MediaUpload extends Component {
 		if ( gallery ) {
 			this.buildAndSetGalleryFrame();
 		} else {
-			this.buildAndSetSingleImageFrame();
+			this.buildAndSetSingleMediaFrame();
 		}
 
 		if ( modalClass ) {
