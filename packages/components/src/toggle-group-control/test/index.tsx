@@ -162,6 +162,19 @@ describe.each( [
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
 	} );
 
+	it( 'should not set a value on focus', async () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+
+		const radio = screen.getByRole( 'radio', { name: 'R' } );
+		expect( radio ).not.toBeChecked();
+
+		await press.Tab();
+		expect( radio ).toHaveFocus();
+		expect( radio ).not.toBeChecked();
+	} );
+
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
 		render(
 			<Component label="Test Toggle Group Control">

@@ -131,6 +131,7 @@ export type ToggleGroupControlProps = Pick<
 };
 
 export type ToggleGroupControlContextProps = {
+	activeItemIsNotFirstItem?: () => boolean;
 	isDeselectable?: boolean;
 	baseId: string;
 	isBlock: ToggleGroupControlProps[ 'isBlock' ];
