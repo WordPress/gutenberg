@@ -132,7 +132,9 @@ function BlockPopover(
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
 					// if the rootSectionElement is undefined then we need to recurse up the DOM tree
-					// to find the element with  wp-block-post-content classname
+					// to find the element with ` is-root-container` classname
+					// FIXME: we should not rely on classnames to find the
+					// root section element
 					if ( ! rootSectionElement ) {
 						postRootElement =
 							selectedElement.closest( '.is-root-container' );
