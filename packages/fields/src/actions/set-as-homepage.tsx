@@ -206,7 +206,7 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 										);
 									} }
 									help={ __(
-										'Select how you want to create or select the page to display latest posts.'
+										'Choose whether to continue displaying latest posts by selecting a page.'
 									) }
 									value={ postsPageOption || 'none' }
 								>
