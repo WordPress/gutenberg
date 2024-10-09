@@ -36,6 +36,16 @@ const meta: Meta< typeof Tooltip > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
+	decorators: [
+		( Story ) => {
+			return (
+				<>
+					<p id="test-description">Button's description</p>
+					<Story />
+				</>
+			);
+		},
+	],
 };
 export default meta;
 
@@ -73,4 +83,20 @@ Nested.args = {
 		</Tooltip>
 	),
 	text: 'Outer tooltip text',
+};
+
+export const AlreadyWithDescription: StoryFn< typeof Tooltip > = Template.bind(
+	{}
+);
+AlreadyWithDescription.args = {
+	children: (
+		<button aria-describedby="test-description">Tooltip Anchor</button>
+	),
+	text: 'Tooltip Text',
+};
+
+export const SameLabel: StoryFn< typeof Tooltip > = Template.bind( {} );
+SameLabel.args = {
+	children: <button aria-label="Button label">Tooltip Anchor</button>,
+	text: 'Button label',
 };
