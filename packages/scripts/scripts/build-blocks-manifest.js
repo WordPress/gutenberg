@@ -20,9 +20,18 @@ const defaultOutputFile = path.join( 'build', 'blocks-manifest.php' );
 const inputDir = getArgFromCLI( '--input' ) || defaultInputDir;
 const outputFile = getArgFromCLI( '--output' ) || defaultOutputFile;
 
+const resolvedInputDir = path.resolve( process.cwd(), inputDir );
+if ( ! fs.existsSync( resolvedInputDir ) ) {
+	const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
+	process.stdout.write(
+		`${ ERROR } Input directory "${ inputDir }" does not exist.\n`
+	);
+	process.exit( 1 );
+}
+
 // Find all block.json files
 const blockJsonFiles = glob( './**/block.json', {
-	cwd: path.resolve( process.cwd(), inputDir ),
+	cwd: resolvedInputDir,
 	absolute: true,
 } );
 
@@ -35,10 +44,11 @@ blockJsonFiles.forEach( ( file ) => {
 } );
 
 if ( Object.keys( blocks ).length === 0 ) {
-	const WARNING = chalk.reset.inverse.bold.yellow( ' WARNING ' );
+	const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 	process.stdout.write(
-		`${ WARNING } No block.json files were found in path: ${ inputDir }. Generated file will be empty.\n`
+		`${ ERROR } No block.json files were found in path: ${ inputDir }.\n`
 	);
+	process.exit( 1 );
 }
 
 // Generate PHP content

@@ -111,12 +111,3 @@ return array(
 );
 "
 `;
-
-exports[`build-blocks-manifest script should handle empty input directory 1`] = `
-"<?php
-// This file is generated. Do not modify it manually.
-return array(
-	
-);
-"
-`;

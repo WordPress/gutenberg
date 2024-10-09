@@ -43,27 +43,59 @@ describe( 'build-blocks-manifest script', () => {
 		expect( generatedContent ).toMatchSnapshot();
 	} );
 
-	it( 'should handle empty input directory', () => {
+	it( 'should error on empty input directory', () => {
 		const emptyInputDir = path.join( fixturesPath, 'empty-input' );
 		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
 
-		// Run the build-blocks-manifest script with empty input
 		const scriptPath = path.resolve(
 			__dirname,
 			'..',
 			'build-blocks-manifest.js'
 		);
-		const result = execSync(
-			`node ${ scriptPath } --input=${ emptyInputDir } --output=${ outputFile }`,
-			{ encoding: 'utf8' }
+		let error;
+		try {
+			execSync(
+				`node ${ scriptPath } --input=${ emptyInputDir } --output=${ outputFile }`,
+				{ encoding: 'utf8' }
+			);
+		} catch ( e ) {
+			error = e;
+		}
+
+		// Check that an error was thrown.
+		expect( error ).toBeDefined();
+		expect( error.stdout ).toContain(
+			`No block.json files were found in path`
 		);
 
-		// Check if warning message is displayed
-		expect( result ).toContain( 'WARNING' );
-		expect( result ).toContain( 'No block.json files were found' );
+		// Ensure that the output file was not created
+		expect( fs.existsSync( outputFile ) ).toBe( false );
+	} );
 
-		// Read the generated file, compare with expected output
-		const generatedContent = fs.readFileSync( outputFile, 'utf8' );
-		expect( generatedContent ).toMatchSnapshot();
+	it( 'should error on missing input directory', () => {
+		const nonExistentInputDir = path.join( fixturesPath, 'missing-input' );
+		const outputFile = path.join( outputPath, 'empty-blocks-manifest.php' );
+
+		const scriptPath = path.resolve(
+			__dirname,
+			'..',
+			'build-blocks-manifest.js'
+		);
+		let error;
+		try {
+			execSync(
+				`node ${ scriptPath } --input=${ nonExistentInputDir } --output=${ outputFile }`,
+				{ encoding: 'utf8' }
+			);
+		} catch ( e ) {
+			error = e;
+		}
+
+		// Check that an error was thrown.
+		expect( error ).toBeDefined();
+		expect( error.stdout ).toContain( `does not exist` );
+
+		// Ensure that the output file was not created
+		expect( fs.existsSync( outputFile ) ).toBe( false );
 	} );
 } );
