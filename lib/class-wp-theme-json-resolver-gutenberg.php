@@ -831,7 +831,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $variations;
 	}
 
-	
+
 	/**
 	 * Resolves relative paths in theme.json styles to theme absolute paths
 	 * and returns them in an array that can be embedded
