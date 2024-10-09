@@ -3,7 +3,6 @@
  */
 const globals = require( 'globals' );
 const importPlugin = require( 'eslint-plugin-import' );
-const { fixupPluginRules } = require( '@eslint/compat' );
 
 // Exclude bundled WordPress packages from the list.
 const wpPackagesRegExp = '^@wordpress/(?!(icons|interface|style-engine))';
@@ -15,7 +14,7 @@ const config = [
 	...require( './esnext.js' ),
 	require( './i18n.js' ),
 	{
-		plugins: { import: fixupPluginRules( importPlugin ) },
+		plugins: { import: importPlugin },
 		languageOptions: {
 			globals: {
 				...globals.node,
