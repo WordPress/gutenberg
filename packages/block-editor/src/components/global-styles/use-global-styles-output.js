@@ -886,14 +886,14 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 };
 
 const getFontFaceDeclarations = ( tree ) => {
-	const fonts = tree?.settings?.typography?.fontFamilies;
+	const fonts = tree?.settings?.typography?.fontFamilies ?? [];
 	let ruleset = '';
 
 	if ( ! fonts ) {
 		return ruleset;
 	}
 
-	const themeFileURIs = tree?._links[ 'wp:theme-file' ] ?? [];
+	const themeFileURIs = tree?._links?.[ 'wp:theme-file' ] ?? [];
 
 	// Iterate over main origins (theme, custom, default)
 	for ( const origin in fonts ) {
