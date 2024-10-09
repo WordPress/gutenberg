@@ -35,6 +35,10 @@ const { state, actions } = store(
 			},
 			get isSearchInputVisible() {
 				const ctx = getContext();
+
+				// `ctx.isSearchInputVisible` is a client-side-only context value, so
+				// if it's not set, it means that it's an initial page load, so we need
+				// to return the value of `ctx.isSearchInputInitiallyVisible`.
 				if ( typeof ctx.isSearchInputVisible === 'undefined' ) {
 					return ctx.isSearchInputInitiallyVisible;
 				}
