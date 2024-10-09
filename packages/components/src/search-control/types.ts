@@ -40,6 +40,8 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	 *
 	 * Use this if you want the button to trigger your own logic to close the search field entirely,
 	 * rather than just clearing the input value.
+	 *
+	 * @deprecated
 	 */
 	onClose?: () => void;
 	/** @ignore */

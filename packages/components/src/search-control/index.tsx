@@ -10,6 +10,7 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -29,6 +30,14 @@ function SuffixItem( {
 }: SuffixItemProps ) {
 	if ( ! onClose && ! value ) {
 		return <Icon icon={ search } />;
+	}
+
+	if ( onClose ) {
+		deprecated( 'onClose function prop', {
+			since: '6.7',
+			version: '',
+			plugin: 'wp.components.SearchControl',
+		} );
 	}
 
 	const onReset = () => {
