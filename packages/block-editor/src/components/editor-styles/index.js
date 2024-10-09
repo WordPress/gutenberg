@@ -63,7 +63,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 				body.classList.add( 'is-dark-theme' );
 			}
 		},
-		[ scope ]
+		[ styles, scope ]
 	);
 }
 
@@ -105,7 +105,6 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 			<style
 				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
 			/>
-
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
