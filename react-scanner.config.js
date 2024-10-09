@@ -19,8 +19,11 @@ module.exports = {
 		'typings',
 		'vendor',
 	],
-	// Filter out any non-component React elements
-	importedFrom: /.*/,
+	/*
+	 * Filter out any non-component React elements and consider only imports of
+	 * `@wordpress/components` outside of the package.
+	 */
+	importedFrom: '@wordpress/components',
 	// Merge experimental and unstable stats into the canonical component name
 	getComponentName: ( { imported, local } ) => {
 		return ( imported || local )
