@@ -52,6 +52,8 @@ Default.args = {
 };
 
 /**
+ * _Note: this prop is deprecated._
+ *
  * When an `onClose` callback is provided, the search control will render a close button
  * that will trigger the given callback.
  *
