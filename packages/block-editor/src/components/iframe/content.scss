@@ -25,6 +25,10 @@
 	border: 0 solid $gray-300;
 	transform-origin: top center;
 	@include editor-canvas-resize-animation;
+
+	// Applying flex here prevents the body element, and title inside, from margin-collapse.
+	display: flex;
+	flex-direction: column;
 }
 
 .block-editor-iframe__html.is-zoomed-out {
@@ -51,8 +55,6 @@
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
-		display: flex;
-		flex-direction: column;
 
 		> .is-root-container:not(.wp-block-post-content) {
 			flex: 1;
