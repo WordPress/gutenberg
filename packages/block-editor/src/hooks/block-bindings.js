@@ -120,7 +120,7 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 				context[ key ] = blockContext[ key ];
 			}
 		}
-		const _bindingsLabel = sourceProps?.getBindingLabel( {
+		const _bindingsLabel = sourceProps?.getBindingLabel?.( {
 			select,
 			context,
 			attribute,
