@@ -72,13 +72,14 @@ describe( 'SearchControl', () => {
 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '' );
 		} );
 
-		it( 'should should render a Close button (instead of Reset) when onClose function is provided', async () => {
+		it( 'should render a Close button (instead of Reset) when onClose function is provided', async () => {
 			const onChangeSpy = jest.fn();
 			const onCloseSpy = jest.fn();
 			render(
 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
 			);
 
+			expect( console ).toHaveWarned();
 			expect(
 				screen.queryByRole( 'button', { name: 'Close search' } )
 			).toBeVisible();
