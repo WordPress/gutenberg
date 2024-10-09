@@ -18,7 +18,6 @@ import { useSelect } from '@wordpress/data';
 import transformStyles from '../../utils/transform-styles';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useEditorFontsResolver from '../use-editor-fonts-resolver';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -64,7 +63,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 				body.classList.add( 'is-dark-theme' );
 			}
 		},
-		[ styles, scope ]
+		[ scope ]
 	);
 }
 
@@ -106,8 +105,6 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 			<style
 				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
 			/>
-
-			<style ref={ useEditorFontsResolver() } />
 
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
