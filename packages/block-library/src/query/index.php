@@ -170,34 +170,3 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 }
 
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
-
-/**
- * Filters the query arguments for the Query Loop block to support instant search functionality.
- *
- * This function modifies the query arguments if enhanced pagination is enabled and a search query
- * parameter is present in the GET request. It adds the search term to the query, enabling
- * instant search within the Query Loop block.
- *
- * @since 6.8.0
- *
- * @param array    	$query The original query arguments.
- * @param WP_Block 	$block The block instance.
- * @return array 		The modified query arguments.
- */
-function block_core_query_instant_search_filter( $query, $block ) {
-
-	// if the enhancedPagination is false or not set, return the query as is
-	if ( empty( $block->context['enhancedPagination'] ) ) {
-		return $query;
-	}
-
-	// if the search query param is set, add it to the query
-	if ( isset( $_GET['search'] ) && ! empty( $_GET['search'] ) ) {
-		$query['s'] = $_GET['search'];
-	}
-
-	return $query;
-}
-
-
-add_filter( 'query_loop_block_query_vars', 'block_core_query_instant_search_filter', 10, 3 );

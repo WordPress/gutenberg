@@ -67,9 +67,25 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		} else {
 			$query = $wp_query;
 		}
+
+		// Add search parameter if enhanced pagination is on and search query exists
+		if ( $enhanced_pagination && isset( $_GET['search'] ) && ! empty( $_GET['search'] ) ) {
+			$query->set( 's', $_GET['search'] );
+		}
+
+		error_log( 'inherited query' );
 	} else {
+
 		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+
+		// Add search parameter if enhanced pagination is on and search query exists
+		if ( $enhanced_pagination && isset( $_GET['search'] ) && ! empty( $_GET['search'] ) ) {
+			$query_args['s'] = $_GET['search'];
+		}
+
+		error_log( 'regular query' );
+
+		$query = new WP_Query( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {
