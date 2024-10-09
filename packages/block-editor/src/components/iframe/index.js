@@ -309,7 +309,8 @@ function Iframe( {
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) /
+				? ( Math.min( containerWidth, maxWidth ) -
+						parseInt( frameSize ) * 2 ) /
 						prevContainerWidthRef.current
 				: scale
 		);
