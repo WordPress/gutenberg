@@ -21,8 +21,14 @@
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
+	$max-width: 750px;
 
 	transform: scale(#{$scale});
+
+	&.is-default-scale {
+		transform: scale( calc( ( min( #{$container-width}, #{$max-width} ) - 2 * #{$frame-size} ) / #{$prev-container-width} ) );
+	}
 
 	background-color: $gray-300;
 

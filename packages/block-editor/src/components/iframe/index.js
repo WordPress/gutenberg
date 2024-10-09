@@ -305,14 +305,13 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		const maxWidth = 750;
+		if ( scale === 'default' ) {
+			iframeDocument.documentElement.classList.add( 'is-default-scale' );
+		}
+
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
-				? ( Math.min( containerWidth, maxWidth ) -
-						parseInt( frameSize ) * 2 ) /
-						prevContainerWidthRef.current
-				: scale
+			scale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
@@ -355,6 +354,9 @@ function Iframe( {
 			);
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-prev-container-width'
+			);
+			iframeDocument.documentElement.classList.remove(
+				'is-default-scale'
 			);
 		};
 	}, [
