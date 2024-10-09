@@ -4,7 +4,6 @@
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -16,18 +15,12 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 const { useGlobalStylesOutput } = unlock( blockEditorPrivateApis );
 
 function useGlobalStylesRenderer() {
-	const { postType, currentTheme } = useSelect( ( select ) => {
-		return {
-			postType: select( editSiteStore ).getEditedPostType(),
-			currentTheme: select( coreDataStore ).getCurrentTheme(),
-		};
+	const postType = useSelect( ( select ) => {
+		return select( editSiteStore ).getEditedPostType();
 	} );
 	const [ styles, settings ] = useGlobalStylesOutput(
 		postType !== TEMPLATE_POST_TYPE
 	);
-
-	settings.currentTheme = currentTheme;
-
 	const { getSettings } = useSelect( editSiteStore );
 	const { updateSettings } = useDispatch( editSiteStore );
 
