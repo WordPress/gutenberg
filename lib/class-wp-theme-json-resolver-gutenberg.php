@@ -832,59 +832,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Resolves relative paths in theme.json typography to theme absolute paths
-	 * and returns them in an array that can be embedded
-	 * as the value of `_link` object in REST API responses.
-	 *
-	 * @since 6.6.0
-	 *
-	 * @param
-	 * @return array An array of resolved paths.
-	 */
-	private static function get_resolved_fonts_theme_uris( $theme_json_data ) {
-		$resolved_theme_uris = array();
-
-		if ( ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
-
-			$font_families = array_merge(
-				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
-				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
-				$theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array()
-			);
-
-			foreach ( $font_families as $font_family ) {
-				if ( ! empty( $font_family['fontFace'] ) ) {
-					foreach ( $font_family['fontFace'] as $font_face ) {
-						if ( ! empty( $font_face['src'] ) ) {
-							$sources = is_string( $font_face['src'] )
-								? array( $font_face['src'] )
-								: $font_face['src'];
-							foreach ( $sources as $source ) {
-								if ( str_starts_with( $source, 'file:' ) ) {
-									$resolved_theme_uris[] = array(
-										'name'   => $source,
-										'href'   => sanitize_url( get_theme_file_uri( str_replace( 'file:./', '', $source ) ) ),
-										'target' => "typography.fontFamilies.{$font_family['slug']}.fontFace.src",
-									);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return $resolved_theme_uris;
-	}
-
-
-	/**
 	 * Resolves relative paths in theme.json styles to theme absolute paths
 	 * and returns them in an array that can be embedded
 	 * as the value of `_link` object in REST API responses.
 	 *
 	 * @since 6.6.0
 	 * @since 6.7.0 Added support for resolving block styles.
+	 * @since 6.7.0 Added support for resolving font faces URIs.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
@@ -898,14 +852,37 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$theme_json_data = $theme_json->get_raw_data();
 
-		// Add font URIs.
-		$resolved_theme_uris = array_merge(
-			$resolved_theme_uris,
-			static::get_resolved_fonts_theme_uris( $theme_json_data )
-		);
-
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
 		$placeholder = 'file:./';
+
+		// Add font URIs.
+		if ( ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
+			$font_families = array_merge(
+				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array()
+			);
+			foreach ( $font_families as $font_family ) {
+				if ( ! empty( $font_family['fontFace'] ) ) {
+					foreach ( $font_family['fontFace'] as $font_face ) {
+						if ( ! empty( $font_face['src'] ) ) {
+							$sources = is_string( $font_face['src'] )
+								? array( $font_face['src'] )
+								: $font_face['src'];
+							foreach ( $sources as $source ) {
+								if ( str_starts_with( $source, $placeholder ) ) {
+									$resolved_theme_uris[] = array(
+										'name'   => $source,
+										'href'   => sanitize_url( get_theme_file_uri( str_replace( $placeholder, '', $source ) ) ),
+										'target' => "typography.fontFamilies.{$font_family['slug']}.fontFace.src",
+									);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 
 		// Top level styles.
 		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
