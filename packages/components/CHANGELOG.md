@@ -2,12 +2,7 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `Tooltip`: add `aria-describedby` to the anchor only if not redundant ([#65989](https://github.com/WordPress/gutenberg/pull/65989)).
--   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
-
-## 28.9.0 (2024-10-03)
+## 28.8.6 (2024-10-14)
 
 ### Bug Fixes
 
@@ -18,9 +13,9 @@
 -   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
 -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
 -   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
-
-### Enhancements
-
+-   `Tooltip`: add `aria-describedby` to the anchor only if not redundant ([#65989](https://github.com/WordPress/gutenberg/pull/65989)).
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+-   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
 -   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
 
 ## 28.8.0 (2024-09-19)

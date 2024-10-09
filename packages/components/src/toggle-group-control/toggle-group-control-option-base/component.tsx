@@ -83,7 +83,6 @@ function ToggleGroupControlOptionBase(
 		value,
 		children,
 		showTooltip = false,
-		onFocus: onFocusProp,
 		disabled,
 		...otherButtonProps
 	} = buttonProps;
@@ -134,7 +133,6 @@ function ToggleGroupControlOptionBase(
 					<button
 						{ ...commonProps }
 						disabled={ disabled }
-						onFocus={ onFocusProp }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
@@ -144,19 +142,17 @@ function ToggleGroupControlOptionBase(
 				) : (
 					<Ariakit.Radio
 						disabled={ disabled }
-						render={
-							<button
-								type="button"
-								{ ...commonProps }
-								onFocus={ ( event ) => {
-									onFocusProp?.( event );
-									if ( event.defaultPrevented ) {
-										return;
-									}
-									toggleGroupControlContext.setValue( value );
-								} }
-							/>
-						}
+						onFocusVisible={ () => {
+							// Conditions ensure that the first visible focus to a radio group
+							// without a selected option will not automatically select the option.
+							if (
+								toggleGroupControlContext.value !== null ||
+								toggleGroupControlContext.activeItemIsNotFirstItem?.()
+							) {
+								toggleGroupControlContext.setValue( value );
+							}
+						} }
+						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
