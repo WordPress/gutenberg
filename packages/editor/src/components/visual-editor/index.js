@@ -341,7 +341,7 @@ function VisualEditor( {
 		isZoomedOut && ! isTabletViewport
 			? {
 					scale: 'default',
-					frameSize: '48px',
+					frameSize: 48,
 			  }
 			: {};
 

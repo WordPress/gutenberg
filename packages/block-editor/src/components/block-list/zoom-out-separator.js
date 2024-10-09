@@ -101,10 +101,11 @@ export function ZoomOutSeparator( {
 		<AnimatePresence>
 			{ isVisible && (
 				<motion.div
-					as="button"
 					layout={ ! isReducedMotion }
 					initial={ { height: 0 } }
-					animate={ { height: '120px' } }
+					animate={ {
+						height: 'calc(60px / var(--wp-block-editor-iframe-zoom-out-scale)',
+					} }
 					exit={ { height: 0 } }
 					transition={ {
 						type: 'tween',
@@ -123,11 +124,20 @@ export function ZoomOutSeparator( {
 				>
 					<motion.div
 						initial={ { opacity: 0 } }
-						animate={ { opacity: 1 } }
+						animate={
+							isDraggedOver
+								? {
+										opacity: 0,
+										scale: isReducedMotion ? 1 : 0,
+										transition: { duration: 0.2, delay: 0 },
+								  }
+								: { opacity: 1 }
+						}
 						exit={ { opacity: 0 } }
 						transition={ {
 							type: 'tween',
 							duration: 0.1,
+							delay: 0.1,
 						} }
 					>
 						{ __( 'Drop pattern.' ) }

@@ -36,11 +36,6 @@
 	@include reduce-motion("animation");
 }
 
-@mixin editor-canvas-resize-animation() {
-	transition: all 0.5s cubic-bezier(0.65, 0, 0.45, 1);
-	@include reduce-motion("transition");
-}
-
 // Deprecated
 @mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
 	@warn "The `edit-post__fade-in-animation` mixin is deprecated. Use `animation__fade-in` instead.";
