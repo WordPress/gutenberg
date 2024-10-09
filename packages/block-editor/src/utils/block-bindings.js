@@ -150,10 +150,11 @@ export function useBlockBindingsUtils() {
 	 * Component to list the fields that can be connected.
 	 * This allows other sources to reuse the UI created for "Post Meta".
 	 *
-	 * @param {Object} props           Props needed to render the component.
-	 * @param {Object} props.fields    List of fields to include in the dropdown. Each field is an object with a label and a value.
-	 * @param {string} props.attribute Attribute that is being updated.
-	 * @param {Object} [props.binding] Optional object containing the current binding for that attribute if exist.
+	 * @param {Object} props                  Props needed to render the component.
+	 * @param {Object} props.fields           List of fields to include in the dropdown. Each field is an object with a label and a value.
+	 * @param {string} props.source           Name of the source that triggers the component.
+	 * @param {string} props.attribute        Attribute that is being updated.
+	 * @param {Object} [props.currentBinding] Optional object containing the current binding for that attribute if it exists.
 	 *
 	 * @example
 	 * ```js
@@ -178,8 +179,9 @@ export function useBlockBindingsUtils() {
 	 *         return (
 	 *             <FieldsList
 	 *                 fields={ fields }
+	 *                 source="core/custom-source"
 	 *                 attribute={ attribute }
-	 *                 binding={ binding }
+	 *                 currentBinding={ binding }
 	 *             />
 	 *         );
 	 *     } );
@@ -188,7 +190,7 @@ export function useBlockBindingsUtils() {
 	 *
 	 * @return {Function} Component to list the fields that can be connected.
 	 */
-	const FieldsList = ( { fields, attribute, binding } ) => {
+	const FieldsList = ( { fields, source, attribute, currentBinding } ) => {
 		if ( ! Object.keys( fields || {} ).length ) {
 			return null;
 		}
@@ -201,15 +203,14 @@ export function useBlockBindingsUtils() {
 						onChange={ () =>
 							updateBlockBindings( {
 								[ attribute ]: {
-									label: fields[ key ].label,
-									source: 'core/post-meta',
+									source,
 									args: { key },
 								},
 							} )
 						}
 						name={ attribute + '-binding' }
 						value={ key }
-						checked={ key === binding?.args?.key }
+						checked={ key === currentBinding?.args?.key }
 					>
 						<DropdownMenuV2.ItemLabel>
 							{ args?.label }

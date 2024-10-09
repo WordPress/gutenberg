@@ -168,8 +168,9 @@ export default {
 		return (
 			<FieldsList
 				fields={ fields }
+				source="core/post-meta"
 				attribute={ attribute }
-				binding={ binding }
+				currentBinding={ binding }
 			/>
 		);
 	},
