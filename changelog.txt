@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 19.4.0-rc.1 =
-
+= 19.4.0 =
 
 ## Changelog
 
@@ -43,6 +42,7 @@
 - Storybook: Allow for case-agnostic filtering of icons. ([65780](https://github.com/WordPress/gutenberg/pull/65780))
 - ToggleGroupControl: Improve animation. ([65175](https://github.com/WordPress/gutenberg/pull/65175))
 - Tabs: Tweak sizing and overflow behavior of TabList. ([64371](https://github.com/WordPress/gutenberg/pull/64371))
+- Tabs: Unify vertical tabs styles. ([65387](https://github.com/WordPress/gutenberg/pull/65387))
 
 #### Zoom Out
 - Add prompt to zoom out separator. ([65392](https://github.com/WordPress/gutenberg/pull/65392))
