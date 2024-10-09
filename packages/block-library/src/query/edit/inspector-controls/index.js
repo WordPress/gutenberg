@@ -123,21 +123,23 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl =
 		isTemplate && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
-		! isTemplate;
+		! inherit &&
+		! isTemplate &&
+		isControlAllowed( allowedControls, 'postType' );
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
-		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
-		! isTemplate;
+		! inherit &&
+		! isTemplate &&
+		isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
-		( ! inherit &&
-			showSticky &&
-			isControlAllowed( allowedControls, 'sticky' ) ) ||
-		( showSticky && ! isTemplate );
+		! inherit &&
+		! isTemplate &&
+		showSticky &&
+		isControlAllowed( allowedControls, 'sticky' );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
