@@ -20,7 +20,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;

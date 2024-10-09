@@ -17,6 +17,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -26,6 +27,7 @@ import CustomizeWidgets from './components/customize-widgets';
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
 import './filters';
+import { unlock } from './lock-unlock';
 
 const { wp } = window;
 
@@ -36,6 +38,11 @@ const DISABLED_BLOCKS = [
 	'core/template-part',
 ];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
+
+const {
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes the widgets block editor in the customizer.
@@ -60,6 +67,10 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
+	bootstrapBlockBindingsSourcesFromServer(
+		blockEditorSettings?.blockBindingsSources
+	);
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

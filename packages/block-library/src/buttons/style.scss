@@ -2,6 +2,8 @@
 $blocks-block__margin: 0.5em;
 
 .wp-block-buttons {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	&.is-vertical {
 		flex-direction: column;
@@ -55,14 +57,14 @@ $blocks-block__margin: 0.5em;
 	//
 	// This back compat rule is ignored if the user decides to use the
 	// newer justification options on the button block, hence the :not.
-	/* stylelint-disable indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
+	/* stylelint-disable @stylistic/indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
 	&:not(
 		.is-content-justification-space-between,
 		.is-content-justification-right,
 		.is-content-justification-left,
 		.is-content-justification-center
 	) .wp-block-button.aligncenter {
-	/* stylelint-enable indentation */
+	/* stylelint-enable @stylistic/indentation */
 		margin-left: auto;
 		margin-right: auto;
 		width: 100%;

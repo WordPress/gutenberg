@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RadioControl,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -16,29 +15,17 @@ import { store as editorStore } from '../../store';
 
 const COMMENT_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Open' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visitors can add new comments and replies.' ) }
-				</Text>
-			</>
-		),
+		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
 		value: 'open',
+		description: __( 'Visitors can add new comments and replies.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Closed' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visitors cannot add new comments or replies.' ) }
-				</Text>
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Existing comments remain visible.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Closed' ),
 		value: 'closed',
+		description: [
+			__( 'Visitors cannot add new comments or replies.' ),
+			__( 'Existing comments remain visible.' ),
+		].join( ' ' ),
 	},
 ];
 

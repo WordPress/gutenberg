@@ -287,11 +287,9 @@ function useGlobalStylesOpenRevisionsCommands() {
 
 export function useCommonCommands() {
 	const homeUrl = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-
-		return getUnstableBase()?.home;
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
 	}, [] );
 
 	useCommand( {

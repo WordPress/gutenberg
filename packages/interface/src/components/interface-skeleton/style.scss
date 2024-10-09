@@ -122,7 +122,7 @@ html.interface-interface-skeleton__html-container {
 	overflow: hidden;
 
 	@include break-medium() {
-		box-shadow: -$border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: -$border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
@@ -132,7 +132,7 @@ html.interface-interface-skeleton__html-container {
 	right: 0;
 
 	@include break-medium() {
-		box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: $border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }

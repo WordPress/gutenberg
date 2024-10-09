@@ -8,8 +8,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
-+     class="components-scrollable components-card__body components-card-body css-vpf7zs-PolymorphicDiv-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium e19lxcc00"
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-scrollable components-card__body components-card-body css-26nv7r-PolymorphicDiv-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -25,8 +25,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
-+     class="components-card__body components-card-body css-4zm8r0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
+-     class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++     class="components-card__body components-card-body css-1j7lja1-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -42,8 +42,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__footer components-card-footer css-1l4bmbt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__footer components-card-footer css-8pv7rj-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+-     class="components-flex components-card__footer components-card-footer css-19sc0cg-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++     class="components-flex components-card__footer components-card-footer css-14budie-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -59,8 +59,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__footer components-card-footer css-1l4bmbt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__footer components-card-footer css-1hguscv-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-     class="components-flex components-card__footer components-card-footer css-19sc0cg-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++     class="components-flex components-card__footer components-card-footer css-2io175-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -76,8 +76,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-flex components-card__header components-card-header css-1tfuk0d-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
-+     class="components-flex components-card__header components-card-header css-10qs2ur-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+-     class="components-flex components-card__header components-card-header css-1qwshfy-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
++     class="components-flex components-card__header components-card-header css-1bzc8bz-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
     >
@@ -96,16 +96,16 @@ Snapshot Diff:
         class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
       >
         <div
--         class="components-flex components-card__header components-card-header css-1tfuk0d-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
-+         class="components-flex components-card__header components-card-header css-d1c2bv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
+-         class="components-flex components-card__header components-card-header css-1qwshfy-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
++         class="components-flex components-card__header components-card-header css-1t2zg3y-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
         >
           Header
         </div>
         <div
--         class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
-+         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+-         class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
++         class="components-card__body components-card-body css-e0vrqx-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardBody"
         >
@@ -122,7 +122,7 @@ Snapshot Diff:
   Array [
     Object {
       "background-color": "#fff",
--     "border-radius": "calc(2px - 1px)",
+-     "border-radius": "calc(8px - 1px)",
       "box-shadow": "0 0 0 1px rgba(0, 0, 0, 0.1)",
       "color": "#1e1e1e",
       "outline": "none",
@@ -141,24 +141,24 @@ Snapshot Diff:
         class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
       >
         <div
--         class="components-flex components-card__header components-card-header css-1xfrxuu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
-+         class="components-flex components-card__header components-card-header css-1mitrbv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+-         class="components-flex components-card__header components-card-header css-ubn8f6-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
++         class="components-flex components-card__header components-card-header css-1t1rswf-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
         >
           Header
         </div>
         <div
--         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
-+         class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+-         class="components-card__body components-card-body css-e0vrqx-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
++         class="components-card__body components-card-body css-12jqy32-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardBody"
         >
           Body
         </div>
         <div
--         class="components-flex components-card__footer components-card-footer css-8o7z5w-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
-+         class="components-flex components-card__footer components-card-footer css-1umuqb4-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
+-         class="components-flex components-card__footer components-card-footer css-167csgt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
++         class="components-flex components-card__footer components-card-footer css-1kcgqsk-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -174,8 +174,8 @@ Snapshot Diff:
 @@ -1,30 +1,30 @@
   <div>
     <div
--     class="components-surface components-card css-5ubhkm-PolymorphicDiv-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
-+     class="components-surface components-card css-1lc0qq8-PolymorphicDiv-Surface-getBorders-primary-Card-rounded e19lxcc00"
+-     class="components-surface components-card css-1hs39fv-PolymorphicDiv-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
++     class="components-surface components-card css-1c6nh8q-PolymorphicDiv-Surface-getBorders-primary-Card-rounded e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="Card"
     >
@@ -183,24 +183,24 @@ Snapshot Diff:
         class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
       >
         <div
--         class="components-flex components-card__header components-card-header css-1xfrxuu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
-+         class="components-flex components-card__header components-card-header css-1mitrbv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+-         class="components-flex components-card__header components-card-header css-ubn8f6-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
++         class="components-flex components-card__header components-card-header css-1t1rswf-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardHeader"
         >
           Header
         </div>
         <div
--         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
-+         class="components-card__body components-card-body css-1djcdvu-PolymorphicDiv-Body-borderRadius-small e19lxcc00"
+-         class="components-card__body components-card-body css-e0vrqx-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
++         class="components-card__body components-card-body css-hms9n9-PolymorphicDiv-Body-borderRadius-small e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardBody"
         >
           Body
         </div>
         <div
--         class="components-flex components-card__footer components-card-footer css-8o7z5w-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
-+         class="components-flex components-card__footer components-card-footer css-1awxp6o-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
+-         class="components-flex components-card__footer components-card-footer css-167csgt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
++         class="components-flex components-card__footer components-card-footer css-18yn3ff-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="CardFooter"
         >
@@ -215,7 +215,7 @@ exports[`Card Card component should render correctly 1`] = `
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
-  border-radius: calc(2px - 1px);
+  border-radius: calc(8px - 1px);
 }
 
 .emotion-2 {
@@ -254,13 +254,13 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-4:first-of-type {
-  border-top-left-radius: calc(2px - 1px);
-  border-top-right-radius: calc(2px - 1px);
+  border-top-left-radius: calc(8px - 1px);
+  border-top-right-radius: calc(8px - 1px);
 }
 
 .emotion-4:last-of-type {
-  border-bottom-left-radius: calc(2px - 1px);
-  border-bottom-right-radius: calc(2px - 1px);
+  border-bottom-left-radius: calc(8px - 1px);
+  border-bottom-right-radius: calc(8px - 1px);
 }
 
 .emotion-6 {
@@ -271,13 +271,13 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-6:first-of-type {
-  border-top-left-radius: calc(2px - 1px);
-  border-top-right-radius: calc(2px - 1px);
+  border-top-left-radius: calc(8px - 1px);
+  border-top-right-radius: calc(8px - 1px);
 }
 
 .emotion-6:last-of-type {
-  border-bottom-left-radius: calc(2px - 1px);
-  border-bottom-right-radius: calc(2px - 1px);
+  border-bottom-left-radius: calc(8px - 1px);
+  border-bottom-right-radius: calc(8px - 1px);
 }
 
 .emotion-10 {
@@ -306,13 +306,13 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-14:first-of-type {
-  border-top-left-radius: calc(2px - 1px);
-  border-top-right-radius: calc(2px - 1px);
+  border-top-left-radius: calc(8px - 1px);
+  border-top-right-radius: calc(8px - 1px);
 }
 
 .emotion-14:last-of-type {
-  border-bottom-left-radius: calc(2px - 1px);
-  border-bottom-right-radius: calc(2px - 1px);
+  border-bottom-left-radius: calc(8px - 1px);
+  border-bottom-right-radius: calc(8px - 1px);
 }
 
 .emotion-16 {
@@ -347,13 +347,13 @@ exports[`Card Card component should render correctly 1`] = `
 }
 
 .emotion-16:first-of-type {
-  border-top-left-radius: calc(2px - 1px);
-  border-top-right-radius: calc(2px - 1px);
+  border-top-left-radius: calc(8px - 1px);
+  border-top-right-radius: calc(8px - 1px);
 }
 
 .emotion-16:last-of-type {
-  border-bottom-left-radius: calc(2px - 1px);
-  border-bottom-right-radius: calc(2px - 1px);
+  border-bottom-left-radius: calc(8px - 1px);
+  border-bottom-right-radius: calc(8px - 1px);
 }
 
 .emotion-18 {
@@ -370,7 +370,7 @@ exports[`Card Card component should render correctly 1`] = `
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -469,15 +469,15 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
--       class="components-elevation css-1dd80bh-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
-+       class="components-elevation css-1jg41yu-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
+-       class="components-elevation css-a91pvj-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
++       class="components-elevation css-1q4cuxd-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Elevation"
       />
       <div
         aria-hidden="true"
--       class="components-elevation css-iuptql-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
-+       class="components-elevation css-1jg41yu-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
+-       class="components-elevation css-5u83fl-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
++       class="components-elevation css-1q4cuxd-PolymorphicDiv-Elevation-sx-Base-sx-Base-elevationClassName e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Elevation"
       />
@@ -497,7 +497,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   position: relative;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
-  border-radius: calc(2px - 1px);
+  border-radius: calc(8px - 1px);
 }
 
 .emotion-2 {
@@ -518,7 +518,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -542,7 +542,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: 8px;
 }
 
 @media not ( prefers-reduced-motion ) {

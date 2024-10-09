@@ -14,7 +14,6 @@ import type { Icon } from '@wordpress/icons';
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../context';
-import type { CompositeStore } from '../composite/v2';
 
 type CommonCircularOptionPickerProps = {
 	/**
@@ -123,8 +122,8 @@ export type OptionProps = Omit<
 	>;
 };
 
-export type CircularOptionPickerCompositeStore = CompositeStore;
 export type CircularOptionPickerContextProps = {
 	baseId?: string;
-	compositeStore?: CircularOptionPickerCompositeStore;
+	activeId?: string | null | undefined;
+	setActiveId?: ( newId: string | null | undefined ) => void;
 };

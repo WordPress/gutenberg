@@ -40,7 +40,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	const canEditTemplate = useSelect(
 		( select ) =>
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+			!! select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+		[]
 	);
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
@@ -51,7 +55,10 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 				return;
 			}
 
-			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+			if (
+				! event.target.classList.contains( 'is-root-container' ) ||
+				event.target.dataset?.type === 'core/template-part'
+			) {
 				return;
 			}
 			setIsDialogOpen( true );

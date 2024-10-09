@@ -13,8 +13,8 @@
 	.components-form-token-field__suggestions-list:not(:empty) {
 		position: absolute;
 		border: $border-width solid var(--wp-admin-theme-color);
-		border-bottom-left-radius: $radius-block-ui;
-		border-bottom-right-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;

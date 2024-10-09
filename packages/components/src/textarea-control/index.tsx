@@ -35,6 +35,7 @@ function UnforwardedTextareaControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="TextareaControl"
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -69,6 +70,7 @@ function UnforwardedTextareaControl(
  *
  *   return (
  *     <TextareaControl
+ *       __nextHasNoMarginBottom
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }

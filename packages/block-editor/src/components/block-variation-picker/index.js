@@ -63,7 +63,11 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button variant="link" onClick={ () => onSelect() }>
+					<Button
+						__next40pxDefaultSize
+						variant="link"
+						onClick={ () => onSelect() }
+					>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>

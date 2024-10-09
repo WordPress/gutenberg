@@ -1,19 +1,7 @@
-// Allow the position to be easily overridden to e.g. fixed.
-
-@mixin region-selection-outline {
-	outline: 4px solid $components-color-accent;
-	outline-offset: -4px;
-}
+$regionOutlineRatio: 2;
 
 @mixin region-selection-focus {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	content: "";
-	pointer-events: none;
-	@include region-selection-outline;
+	@include selected-block-focus( $regionOutlineRatio );
 	z-index: z-index(".is-focusing-regions {region} :focus::after");
 }
 
@@ -46,6 +34,6 @@
 	.interface-interface-skeleton__actions .editor-layout__toggle-publish-panel,
 	.interface-interface-skeleton__actions .editor-layout__toggle-entities-saved-states-panel,
 	.editor-post-publish-panel {
-		@include region-selection-outline;
+		@include selected-block-outline( $regionOutlineRatio );
 	}
 }

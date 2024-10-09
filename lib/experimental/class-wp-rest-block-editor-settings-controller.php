@@ -93,8 +93,12 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 					break;
 			}
 
+			add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
 			$settings       = get_block_editor_settings( array(), $editor_context );
+
+			remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 
 			return rest_ensure_response( $settings );
 		}

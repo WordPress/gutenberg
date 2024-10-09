@@ -98,7 +98,7 @@ function PatternOverridesToolbarIndicator( { clientIds } ) {
 						</>
 					}
 					toggleProps={ {
-						describedBy: blockDescription,
+						description: blockDescription,
 						...toggleProps,
 					} }
 					menuProps={ {

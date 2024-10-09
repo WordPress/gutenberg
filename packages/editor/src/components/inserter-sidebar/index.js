@@ -24,22 +24,26 @@ export default function InserterSidebar() {
 	const {
 		blockSectionRootClientId,
 		inserterSidebarToggleRef,
-		insertionPoint,
+		inserter,
 		showMostUsedBlocks,
 		sidebarIsOpened,
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
-			getInsertionPoint,
+			getInserter,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
-		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
-			select( blockEditorStore );
+		const {
+			getBlockRootClientId,
+			__unstableGetEditorMode,
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings() );
+				const sectionRootClientId = getSectionRootClientId();
+
 				if ( sectionRootClientId ) {
 					return sectionRootClientId;
 				}
@@ -48,7 +52,7 @@ export default function InserterSidebar() {
 		};
 		return {
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
-			insertionPoint: getInsertionPoint(),
+			inserter: getInserter(),
 			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 			blockSectionRootClientId: getBlockSectionRootClientId(),
 			sidebarIsOpened: !! (
@@ -84,13 +88,11 @@ export default function InserterSidebar() {
 				showMostUsedBlocks={ showMostUsedBlocks }
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
-				rootClientId={
-					blockSectionRootClientId ?? insertionPoint.rootClientId
-				}
-				__experimentalInsertionIndex={ insertionPoint.insertionIndex }
-				__experimentalInitialTab={ insertionPoint.tab }
-				__experimentalInitialCategory={ insertionPoint.category }
-				__experimentalFilterValue={ insertionPoint.filterValue }
+				rootClientId={ blockSectionRootClientId }
+				onSelect={ inserter.onSelect }
+				__experimentalInitialTab={ inserter.tab }
+				__experimentalInitialCategory={ inserter.category }
+				__experimentalFilterValue={ inserter.filterValue }
 				onPatternCategorySelection={
 					sidebarIsOpened
 						? () => disableComplementaryArea( 'core' )

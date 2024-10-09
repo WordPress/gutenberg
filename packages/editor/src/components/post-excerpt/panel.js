@@ -148,7 +148,8 @@ function PrivateExcerpt() {
 						isPattern ||
 						( template &&
 							template.source === TEMPLATE_ORIGINS.custom &&
-							! template.has_theme_file ) ),
+							! template.has_theme_file &&
+							template.is_custom ) ),
 			};
 		}, [] );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -173,7 +174,7 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate>
+		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
 			{ decodeEntities( excerpt ) }
 		</Text>
 	);
@@ -197,7 +198,7 @@ function PrivateExcerpt() {
 				ref={ setPopoverAnchor }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
-						className="editor-post-excerpt__dropdown__trigger"
+						__next40pxDefaultSize
 						onClick={ onToggle }
 						variant="link"
 					>

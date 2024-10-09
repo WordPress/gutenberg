@@ -8,3 +8,8 @@
 	color: $gray-700;
 	min-width: 280px;
 }
+
+.block-editor-tool-selector__menu .components-menu-item__info {
+	margin-left: $grid-unit-30 + $grid-unit-15; // icon size + margin
+	text-align: left;
+}

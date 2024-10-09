@@ -23,7 +23,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
@@ -73,6 +73,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		displayPreview,
 		previewHeight,
 	} = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const { media } = useSelect(
 		( select ) => ( {
 			media:
@@ -88,7 +89,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		useDispatch( blockEditorStore );
 
 	useUploadMediaFromBlobURL( {
-		url: href,
+		url: temporaryURL,
 		onChange: onSelectFile,
 		onError: onUploadError,
 	} );
@@ -108,6 +109,22 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function onSelectFile( newMedia ) {
 		if ( ! newMedia || ! newMedia.url ) {
+			// Reset attributes.
+			setAttributes( {
+				href: undefined,
+				fileName: undefined,
+				textLinkHref: undefined,
+				id: undefined,
+				fileId: undefined,
+				displayPreview: undefined,
+				previewHeight: undefined,
+			} );
+			setTemporaryURL();
+			return;
+		}
+
+		if ( isBlobURL( newMedia.url ) ) {
+			setTemporaryURL( newMedia.url );
 			return;
 		}
 
@@ -120,7 +137,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			displayPreview: isPdf ? true : undefined,
 			previewHeight: isPdf ? 600 : undefined,
 			fileId: `wp-block-file--media-${ clientId }`,
+			blob: undefined,
 		} );
+		setTemporaryURL();
 	}
 
 	function onUploadError( message ) {
@@ -166,16 +185,16 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const blockProps = useBlockProps( {
 		className: clsx(
-			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
+			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
-				'is-transient': isBlobURL( href ),
+				'is-transient': !! temporaryURL,
 			}
 		),
 	} );
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
-	if ( ! href ) {
+	if ( ! href && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -197,7 +216,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	return (
 		<>
 			<FileBlockInspector
-				hrefs={ { href, textLinkHref, attachmentPage } }
+				hrefs={ {
+					href: href || temporaryURL,
+					textLinkHref,
+					attachmentPage,
+				} }
 				{ ...{
 					openInNewWindow: !! textLinkTarget,
 					showDownloadButton,
@@ -217,6 +240,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					accept="*"
 					onSelect={ onSelectFile }
 					onError={ onUploadError }
+					onReset={ () => onSelectFile( undefined ) }
 				/>
 				<ClipboardToolbarButton
 					text={ href }

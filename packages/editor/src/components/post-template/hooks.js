@@ -23,8 +23,14 @@ export function useAllowSwitchingTemplates() {
 	const { postType, postId } = useEditedPostContext();
 	return useSelect(
 		( select ) => {
-			const { getEntityRecord, getEntityRecords } = select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
+			const { canUser, getEntityRecord, getEntityRecords } =
+				select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
 			const templates = getEntityRecords( 'postType', 'wp_template', {
 				per_page: -1,
 			} );

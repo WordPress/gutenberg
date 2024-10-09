@@ -32,8 +32,15 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 		return getBlockFromExample( name, example );
 	}, [ name, blockExample, variation ] );
 
-	const viewportWidth = blockExample?.viewportWidth ?? null;
-	const previewHeight = 150;
+	const viewportWidth = blockExample?.viewportWidth ?? 500;
+	// Same as height of InserterPreviewPanel.
+	const previewHeight = 144;
+	const sidebarWidth = 235;
+	const scale = sidebarWidth / viewportWidth;
+	const minHeight =
+		scale !== 0 && scale < 1 && previewHeight
+			? previewHeight / scale
+			: previewHeight;
 
 	if ( ! blockExample ) {
 		return null;
@@ -49,16 +56,22 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 					minHeight={ previewHeight }
-					additionalStyles={ [
-						{
-							css: `
+					additionalStyles={
+						//We want this CSS to be in sync with the one in InserterPreviewPanel.
+						[
+							{
+								css: `
 								body{
-									min-height:${ previewHeight }px;
-									display:flex;align-items:center;justify-content:center;
+									padding: 24px;
+									min-height:${ Math.round( minHeight ) }px;
+									display:flex;
+									align-items:center;
 								}
+								.is-root-container { width: 100%; }
 							`,
-						},
-					] }
+							},
+						]
+					}
 				/>
 			</div>
 		</Spacer>

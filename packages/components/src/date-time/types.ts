@@ -17,10 +17,25 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
+	 * The order of day, month, and year. This prop overrides the time format
+	 * determined by `is12Hour` prop.
+	 *
+	 * @default 'dmy'
+	 */
+	dateOrder?: 'dmy' | 'mdy' | 'ymd';
+
+	/**
 	 * The function called when a new time has been selected. It is passed the
 	 * time as an argument.
 	 */
 	onChange?: ( time: string ) => void;
+
+	/**
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
 };
 
 export type TimeInputValue = {
@@ -60,6 +75,11 @@ export type TimeInputProps = {
 	 * The props to pass down to the minutes input.
 	 */
 	minutesProps?: React.ComponentProps< typeof MinutesInput >;
+
+	/**
+	 * The label for the time input.
+	 */
+	label?: string;
 
 	/**
 	 * The function is called when a new time has been selected.
@@ -117,7 +137,10 @@ export type DatePickerProps = {
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
-	Omit< TimePickerProps, 'currentTime' | 'onChange' > & {
+	Omit<
+		TimePickerProps,
+		'currentTime' | 'onChange' | 'hideLabelFromVision'
+	> & {
 		/**
 		 * The function called when a new date or time has been selected. It is
 		 * passed the date and time as an argument.

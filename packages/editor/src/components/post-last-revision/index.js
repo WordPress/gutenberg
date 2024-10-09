@@ -36,6 +36,7 @@ function PostLastRevision() {
 	return (
 		<PostLastRevisionCheck>
 			<Button
+				__next40pxDefaultSize
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ) }
@@ -64,6 +65,7 @@ export function PrivatePostLastRevision() {
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
 					variant="tertiary"
+					size="compact"
 				/>
 			</PostPanelRow>
 		</PostLastRevisionCheck>

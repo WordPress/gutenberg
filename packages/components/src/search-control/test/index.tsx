@@ -23,6 +23,7 @@ function ControlledSearchControl( {
 	return (
 		<SearchControl
 			{ ...restProps }
+			__nextHasNoMarginBottom
 			value={ value }
 			onChange={ ( ...args ) => {
 				setValue( ...args );

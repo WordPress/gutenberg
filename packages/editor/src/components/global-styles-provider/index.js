@@ -23,27 +23,61 @@ const { GlobalStylesContext, cleanEmptyObject } = unlock(
 
 export function mergeBaseAndUserConfigs( base, user ) {
 	return deepmerge( base, user, {
-		// We only pass as arrays the presets,
-		// in which case we want the new array of values
-		// to override the old array (no merging).
+		/*
+		 * We only pass as arrays the presets,
+		 * in which case we want the new array of values
+		 * to override the old array (no merging).
+		 */
 		isMergeableObject: isPlainObject,
+		/*
+		 * Exceptions to the above rule.
+		 * Background images should be replaced, not merged,
+		 * as they themselves are specific object definitions for the style.
+		 */
+		customMerge: ( key ) => {
+			if ( key === 'backgroundImage' ) {
+				return ( baseConfig, userConfig ) => userConfig;
+			}
+			return undefined;
+		},
 	} );
 }
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEntityRecord,
+				getEditedEntityRecord,
+				hasFinishedResolution,
+				canUser,
+			} = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
+
+			let record;
+			const userCanEditGlobalStyles = canUser( 'update', {
+				kind: 'root',
+				name: 'globalStyles',
+				id: _globalStylesId,
+			} );
+
+			if ( _globalStylesId ) {
+				if ( userCanEditGlobalStyles ) {
+					record = getEditedEntityRecord(
 						'root',
 						'globalStyles',
 						_globalStylesId
-				  )
-				: undefined;
+					);
+				} else {
+					record = getEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId,
+						{ context: 'view' }
+					);
+				}
+			}
 
 			let hasResolved = false;
 			if (
@@ -51,13 +85,22 @@ function useGlobalStylesUserConfig() {
 					'__experimentalGetCurrentGlobalStylesId'
 				)
 			) {
-				hasResolved = _globalStylesId
-					? hasFinishedResolution( 'getEditedEntityRecord', [
-							'root',
-							'globalStyles',
-							_globalStylesId,
-					  ] )
-					: true;
+				if ( _globalStylesId ) {
+					hasResolved = userCanEditGlobalStyles
+						? hasFinishedResolution( 'getEditedEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+						  ] )
+						: hasFinishedResolution( 'getEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+								{ context: 'view' },
+						  ] );
+				} else {
+					hasResolved = true;
+				}
 			}
 
 			return {
@@ -125,12 +168,11 @@ function useGlobalStylesUserConfig() {
 }
 
 function useGlobalStylesBaseConfig() {
-	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
-	}, [] );
-
+	const baseConfig = useSelect(
+		( select ) =>
+			select( coreStore ).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		[]
+	);
 	return [ !! baseConfig, baseConfig ];
 }
 

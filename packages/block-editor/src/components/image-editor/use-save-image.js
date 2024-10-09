@@ -54,6 +54,13 @@ export default function useSaveImage( {
 			} );
 		}
 
+		if ( modifiers.length === 0 ) {
+			// No changes to apply.
+			setIsInProgress( false );
+			onFinishEditing();
+			return;
+		}
+
 		apiFetch( {
 			path: `/wp/v2/media/${ id }/edit`,
 			method: 'POST',

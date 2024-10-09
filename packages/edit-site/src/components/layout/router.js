@@ -9,7 +9,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import Editor from '../editor';
-import PostsList from '../posts-app/posts-list';
+import PostList from '../post-list';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
@@ -26,6 +26,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
+import { PostEdit } from '../post-edit';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -74,13 +75,15 @@ function useRedirectOldPaths() {
 
 export default function useLayoutAreas() {
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params;
+	const { postType, postId, path, layout, isCustom, canvas, quickEdit } =
+		params;
 	const hasEditCanvasMode = canvas === 'edit';
 	useRedirectOldPaths();
 
 	// Page list
 	if ( postType === 'page' ) {
 		const isListLayout = layout === 'list' || ! layout;
+		const showQuickEdit = quickEdit && ! isListLayout;
 		return {
 			key: 'pages',
 			areas: {
@@ -91,16 +94,21 @@ export default function useLayoutAreas() {
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
-				content: <PostsList postType={ postType } />,
-				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
+				content: <PostList postType={ postType } />,
+				preview: ! showQuickEdit &&
+					( isListLayout || hasEditCanvasMode ) && <Editor />,
 				mobile: hasEditCanvasMode ? (
 					<Editor />
 				) : (
-					<PostsList postType={ postType } />
+					<PostList postType={ postType } />
+				),
+				edit: showQuickEdit && (
+					<PostEdit postType={ postType } postId={ postId } />
 				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
+				edit: showQuickEdit ? 380 : undefined,
 			},
 		};
 	}
