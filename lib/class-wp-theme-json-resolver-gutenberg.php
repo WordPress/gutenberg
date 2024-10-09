@@ -846,9 +846,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		if ( ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
 
-			$font_families = ( $theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array() )
-				+ ( $theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array() )
-				+ ( $theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array() );
+			$font_families = array_merge(
+				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array()
+			);
 
 			foreach ( $font_families as $font_family ) {
 				if ( ! empty( $font_family['fontFace'] ) ) {
