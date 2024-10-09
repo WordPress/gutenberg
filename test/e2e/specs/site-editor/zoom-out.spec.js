@@ -44,4 +44,22 @@ test.describe( 'Zoom Out', () => {
 		expect( htmlRect.y + paddingTop ).toBeGreaterThan( iframeRect.y );
 		expect( htmlRect.x ).toBeGreaterThan( iframeRect.x );
 	} );
+
+	test( 'When in zoom out, a vertical toolbar appears for sections', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.getByLabel( 'Zoom Out' ).click();
+
+		//Click on the first pattern of the theme
+		await editor.canvas
+			.locator( 'div' )
+			.filter( { hasText: 'A commitment to innovation' } )
+			.nth( 1 )
+			.click();
+
+		await expect(
+			page.getByRole( 'toolbar', { name: 'Block tools' } )
+		).toBeVisible();
+	} );
 } );
