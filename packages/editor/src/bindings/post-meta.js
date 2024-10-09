@@ -165,6 +165,10 @@ export default {
 			[ context ]
 		);
 
+		if ( ! fields ) {
+			return null;
+		}
+
 		return (
 			<FieldsList
 				fields={ fields }
