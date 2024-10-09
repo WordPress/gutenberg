@@ -111,6 +111,10 @@ ul.dataviews-view-list {
 		min-height: $grid-unit-30;
 		line-height: $grid-unit-30;
 		overflow: hidden;
+		// The field should be in front of the main button in case it has a link/button.
+		&:has(a, button) {
+			z-index: 1;
+		}
 	}
 
 	.dataviews-view-list__media-wrapper {
