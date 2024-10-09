@@ -61,17 +61,6 @@
 		width: 44px;
 	}
 
-	&.is-loading::before {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		background: transparent;
-		z-index: z-index(".edit-post-meta-boxes-area.is-loading::before");
-	}
-
 	.components-spinner {
 		position: absolute;
 		top: 10px;
