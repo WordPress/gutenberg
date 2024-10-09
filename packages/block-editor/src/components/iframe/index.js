@@ -386,6 +386,7 @@ function Iframe( {
 				style={ {
 					...props.style,
 					height: props.style?.height,
+					border: 0,
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
