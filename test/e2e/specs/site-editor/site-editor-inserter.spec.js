@@ -44,6 +44,7 @@ test.describe( 'Site Editor Inserter', () => {
 	} ) => {
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Block Inserter',
+			exact: true,
 		} );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',

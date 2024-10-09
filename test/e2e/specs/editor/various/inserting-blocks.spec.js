@@ -390,6 +390,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const inserterButton = page.getByRole( 'button', {
 			name: 'Block Inserter',
+			exact: true,
 		} );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
@@ -503,7 +504,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await editor.selectBlocks( paragraphBlock );
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
@@ -624,7 +625,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page.getByRole( 'option', { name: 'More', exact: true } ).click();
 
@@ -646,7 +647,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
@@ -674,7 +675,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Block Inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Media' } )

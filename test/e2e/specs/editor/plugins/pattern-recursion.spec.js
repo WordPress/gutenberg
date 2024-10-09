@@ -60,7 +60,9 @@ test.describe( 'Preventing Pattern Recursion (server)', () => {
 		editor,
 	} ) => {
 		// Click the Block Inserter button
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 		// Click the Patterns tab
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		// Click the Uncategorized tab

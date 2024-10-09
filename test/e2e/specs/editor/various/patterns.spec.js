@@ -495,7 +495,9 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 		await page
 			.getByRole( 'searchbox', {
 				name: 'Search',

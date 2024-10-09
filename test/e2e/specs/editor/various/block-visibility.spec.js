@@ -42,7 +42,9 @@ test.describe( 'Block Visibility', () => {
 			} )
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
@@ -57,7 +59,9 @@ test.describe( 'Block Visibility', () => {
 			'Heading block should not be visible'
 		).toBeHidden();
 
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 
 		// Show heading block again.
 		await BlockVisibilityUtils.openBlockVisibilityManager();
@@ -79,7 +83,9 @@ test.describe( 'Block Visibility', () => {
 			} )
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
@@ -111,7 +117,9 @@ test.describe( 'Block Visibility', () => {
 			} )
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 
 		await expect(
 			page
@@ -120,7 +128,9 @@ test.describe( 'Block Visibility', () => {
 			'Media category should not be visible'
 		).toBeHidden();
 
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 
 		// Show Media category blocks again.
 		await BlockVisibilityUtils.openBlockVisibilityManager();
@@ -142,7 +152,9 @@ test.describe( 'Block Visibility', () => {
 			} )
 			.getByRole( 'button', { name: 'Close' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 
 		await expect(
 			page

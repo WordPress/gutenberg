@@ -20,7 +20,9 @@ test.describe( 'Allowed Blocks Filter', () => {
 		page,
 	} ) => {
 		// The paragraph block is available.
-		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
 
 		const searchbox = page
 			.getByRole( 'region', { name: 'Block Library' } )

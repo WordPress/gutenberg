@@ -370,6 +370,7 @@ test.describe( 'Post Editor Performance', () => {
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Block Inserter',
+				exact: true,
 			} );
 
 			const samples = 10;
@@ -426,6 +427,7 @@ test.describe( 'Post Editor Performance', () => {
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Block Inserter',
+				exact: true,
 			} );
 			// Open Inserter.
 			await globalInserterToggle.click();
@@ -485,6 +487,7 @@ test.describe( 'Post Editor Performance', () => {
 
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Block Inserter',
+				exact: true,
 			} );
 			const paragraphBlockItem = page.locator(
 				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
@@ -537,6 +540,7 @@ test.describe( 'Post Editor Performance', () => {
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Block Inserter',
+				exact: true,
 			} );
 
 			const testPatterns = [

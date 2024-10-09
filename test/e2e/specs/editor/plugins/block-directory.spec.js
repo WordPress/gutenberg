@@ -122,7 +122,7 @@ test.describe( 'Block Directory', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -209,7 +209,7 @@ test.describe( 'Block Directory', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {

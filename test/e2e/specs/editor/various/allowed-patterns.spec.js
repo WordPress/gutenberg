@@ -18,7 +18,7 @@ test.describe( 'Allowed Patterns', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Block Inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
@@ -61,7 +61,7 @@ test.describe( 'Allowed Patterns', () => {
 			await admin.createNewPost();
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Block Inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 
 			await page

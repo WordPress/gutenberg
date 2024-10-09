@@ -115,7 +115,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Block Inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 		).toBeDisabled();
 
 		// Go back to the visual editor.
