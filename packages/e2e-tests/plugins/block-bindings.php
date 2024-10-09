@@ -38,7 +38,8 @@ function gutenberg_test_block_bindings_registration() {
 		plugins_url( 'block-bindings/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-private-apis',
+			'wp-block-editor',
+			'wp-element',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
 		true
@@ -49,7 +50,7 @@ function gutenberg_test_block_bindings_registration() {
 		'gutenberg-test-block-bindings',
 		'testingBindings',
 		array(
-			'fieldsList' => $fields_list,
+			'fields' => $fields_list,
 		)
 	);
 

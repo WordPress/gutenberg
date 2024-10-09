@@ -1,10 +1,12 @@
 const { registerBlockBindingsSource } = wp.blocks;
-const { fieldsList } = window.testingBindings || {};
+const { useBlockBindingsUtils } = wp.blockEditor;
+const { createElement } = wp.element;
+const { fields } = window.testingBindings || {};
 
 const getValues = ( { bindings } ) => {
 	const newValues = {};
 	for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-		newValues[ attributeName ] = fieldsList[ source.args.key ]?.value;
+		newValues[ attributeName ] = fields[ source.args.key ]?.value;
 	}
 	return newValues;
 };
@@ -23,7 +25,18 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	getFieldsList: () => fieldsList,
+	render: function TestingComponent( { attribute, binding } ) {
+		const { FieldsList } = useBlockBindingsUtils();
+		return createElement( FieldsList, {
+			fields,
+			source: 'testing/complete-source',
+			attribute,
+			currentBinding: binding,
+		} );
+	},
+	getBindingLabel: ( { binding } ) => {
+		return fields[ binding?.args?.key ]?.label;
+	},
 } );
 
 registerBlockBindingsSource( {
