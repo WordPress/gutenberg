@@ -50,6 +50,7 @@ export { default as chevronUpDown } from './library/chevron-up-down';
 export { default as classic } from './library/classic';
 export { default as close } from './library/close';
 export { default as closeSmall } from './library/close-small';
+export { default as cloudDownload } from './library/cloud-download';
 export { default as cloudUpload } from './library/cloud-upload';
 export { default as cloud } from './library/cloud';
 export { default as code } from './library/code';

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -58,7 +57,6 @@ const LinkControlSearchInput = forwardRef(
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
 
-		const instanceId = useInstanceId( LinkControlSearchInput );
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 
 		/**
@@ -76,7 +74,6 @@ const LinkControlSearchInput = forwardRef(
 		const handleRenderSuggestions = ( props ) =>
 			renderSuggestions( {
 				...props,
-				instanceId,
 				withCreateSuggestion,
 				createSuggestionButtonText,
 				suggestionsQuery,
@@ -116,16 +113,18 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
+		const inputLabel = placeholder ?? __( 'Search or type URL' );
+
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
-					label={ __( 'Link' ) }
+					label={ inputLabel }
 					hideLabelFromVision={ hideLabelFromVision }
 					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type URL' ) }
+					placeholder={ inputLabel }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}

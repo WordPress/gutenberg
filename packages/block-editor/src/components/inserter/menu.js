@@ -32,6 +32,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
+import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -76,6 +77,10 @@ function InserterMenu(
 		}
 	}
 	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
+
+	const shouldUseZoomOut =
+		selectedTab === 'patterns' || selectedTab === 'media';
+	useZoomOut( shouldUseZoomOut );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -163,7 +168,7 @@ function InserterMenu(
 						setFilterValue( value );
 					} }
 					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 				{ !! delayedFilterValue && (

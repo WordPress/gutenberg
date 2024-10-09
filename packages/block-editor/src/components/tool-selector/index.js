@@ -44,8 +44,7 @@ function ToolSelector( props, ref ) {
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					size="compact"
 					{ ...props }
 					ref={ ref }
 					icon={ mode === 'navigation' ? editIcon : selectIcon }
@@ -79,6 +78,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Focus on content.' ),
+									'aria-label': __( 'Write' ),
 								},
 								{
 									value: 'edit',
@@ -89,6 +89,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Edit layout and styles.' ),
+									'aria-label': __( 'Design' ),
 								},
 							] }
 						/>
