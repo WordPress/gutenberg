@@ -28,7 +28,6 @@ import { ActionItem } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
-import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
@@ -46,7 +45,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			};
 		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { resetZoomLevel } = useDispatch( blockEditorStore );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );

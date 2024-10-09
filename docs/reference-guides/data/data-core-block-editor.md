@@ -1624,6 +1624,14 @@ _Returns_
 
 -   `Object`: Action object.
 
+### resetZoomLevel
+
+Resets the Zoom state.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### selectBlock
 
 Returns an action object used in signalling that the block with the specified client ID has been selected, optionally accepting a position value reflecting its selection directionality. An initialPosition of -1 reflects a reverse selection.
@@ -1728,6 +1736,18 @@ Action that resets the template validity.
 _Parameters_
 
 -   _isValid_ `boolean`: template validity flag.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### setZoomLevel
+
+Sets the zoom level.
+
+_Parameters_
+
+-   _zoom_ `number`: the new zoom level
 
 _Returns_
 
