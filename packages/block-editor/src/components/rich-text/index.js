@@ -204,7 +204,12 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			const bindingLabel =
-				relatedBinding?.label ?? blockBindingsSource?.label;
+				blockBindingsSource?.getBindingLabel?.( {
+					select,
+					context: blockBindingsContext,
+					attribute: identifier,
+					binding: relatedBinding,
+				} ) ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingLabel
@@ -228,7 +233,14 @@ export function RichTextWrapper(
 				bindingsLabel: _bindingsLabel,
 			};
 		},
-		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
+		[
+			blockBindings,
+			identifier,
+			clientId,
+			blockName,
+			blockContext,
+			adjustedValue,
+		]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;

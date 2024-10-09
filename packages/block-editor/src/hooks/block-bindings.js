@@ -104,9 +104,30 @@ function BlockBindingsPanelDropdown( { attribute, binding } ) {
 }
 
 function BlockBindingsAttribute( { attribute, binding } ) {
-	const { source: sourceName, label: bindingLabel } = binding || {};
+	const blockContext = useContext( BlockContext );
+	const { source: sourceName } = binding || {};
 	const sourceProps = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
+	const bindingLabel = useSelect( ( select ) => {
+		if ( isSourceInvalid ) {
+			return;
+		}
+		// TODO: Explore if it makes sense to get the context in the parent component.
+		const { usesContext } = sourceProps;
+		const context = {};
+		if ( usesContext?.length ) {
+			for ( const key of usesContext ) {
+				context[ key ] = blockContext[ key ];
+			}
+		}
+		const _bindingsLabel = sourceProps?.getBindingLabel( {
+			select,
+			context,
+			attribute,
+			binding,
+		} );
+		return _bindingsLabel || sourceProps?.label || sourceName;
+	} );
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
@@ -116,9 +137,7 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 					variant={ ! isSourceInvalid && 'muted' }
 					isDestructive={ isSourceInvalid }
 				>
-					{ isSourceInvalid
-						? __( 'Invalid source' )
-						: bindingLabel || sourceProps?.label || sourceName }
+					{ isSourceInvalid ? __( 'Invalid source' ) : bindingLabel }
 				</Text>
 			) }
 		</VStack>

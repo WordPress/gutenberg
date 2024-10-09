@@ -173,4 +173,8 @@ export default {
 			/>
 		);
 	},
+	getBindingLabel( { select, context, binding } ) {
+		const metaFields = getPostMetaFields( select, context );
+		return metaFields?.[ binding.args.key ]?.label || binding.args.key;
+	},
 };

@@ -408,6 +408,7 @@ export function blockBindingsSources( state = {}, action ) {
 					canUserEditValue:
 						action.setValues && action.canUserEditValue,
 					render: action.render,
+					getBindingLabel: action.getBindingLabel,
 				},
 			};
 		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
