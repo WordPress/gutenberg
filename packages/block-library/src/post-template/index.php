@@ -64,8 +64,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		 */
 		if ( in_the_loop() ) {
 			$query = clone $wp_query;
-			$query_args = $wp_query->query_vars;
 			$query->rewind_posts();
+			$query_args = $wp_query->query_vars;
 
 			// Add search parameter if it exists.
 			if ( $enhanced_pagination && ! empty( $search_query ) ) {
