@@ -1,4 +1,5 @@
 {
+	"$schema": "../../schemas/docs-manifest.json",
 	"displayName": "AlignmentMatrixControl",
 	"filePath": "./index.tsx",
 	"subcomponents": [
