@@ -36,7 +36,7 @@ function ToolSelector( props, ref ) {
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode } = unlock(
+	const { resetZoomLevel, __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -63,7 +63,10 @@ function ToolSelector( props, ref ) {
 							value={
 								mode === 'navigation' ? 'navigation' : 'edit'
 							}
-							onSelect={ __unstableSetEditorMode }
+							onSelect={ ( newMode ) => {
+								resetZoomLevel();
+								__unstableSetEditorMode( newMode );
+							} }
 							choices={ [
 								{
 									value: 'edit',
