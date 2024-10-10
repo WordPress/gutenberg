@@ -22,7 +22,7 @@ export function buildTermsTree( flatTerms ) {
 	// All terms should have a `parent` because we're about to index them by it.
 	if (
 		flatTermsWithParentAndChildren.some(
-			( { parent } ) => parent === undefined
+			( { parent } ) => parent === undefined || parent === null
 		)
 	) {
 		return flatTermsWithParentAndChildren;
