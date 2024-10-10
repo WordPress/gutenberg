@@ -70,7 +70,7 @@ export default function Layout( { route } ) {
 		useState( false );
 	const { key: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+		triggerAnimationOnChange: canvasMode,
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
