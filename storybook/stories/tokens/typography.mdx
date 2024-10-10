@@ -3,21 +3,21 @@ import { Meta, Typeset } from '@storybook/addon-docs/blocks';
 <Meta title="Tokens/Typography" name="page" />
  
 export const typography = {
-  type: {
-    primary: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
-  },
-  weight: {
-    regular: '400',
-    medium: '500',
-  },
-  size: {
-    s1: 11,
-    s2: 12,
-    s3: 13,
-    s4: 15,
-    s5: 20,
-    s6: 32,
-  },
+	type: {
+		primary: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
+	},
+	weight: {
+		regular: '400',
+		medium: '500',
+	},
+	size: {
+		s1: 11,
+		s2: 12,
+		s3: 13,
+		s4: 15,
+		s5: 20,
+		s6: 32,
+	},
 };
  
 export const SampleTextHeading = 'Code is Poetry.';
@@ -35,96 +35,96 @@ They are defined as sass mixins and can be used like so:
 
 ```
 .my-component {
-  @include heading-large();
+	@include heading-large();
 }
 ```
 
 ### Headings
 
 <Typeset
-  fontSizes={[
-    Number(typography.size.s6),
-    Number(typography.size.s5),
-    Number(typography.size.s4),
-    Number(typography.size.s3),
-    Number(typography.size.s2),
-    Number(typography.size.s1),
-  ]}
-  fontWeight={typography.weight.medium}
-  sampleText={SampleTextHeading}
-  fontFamily={typography.type.primary}
+	fontSizes={[
+		Number(typography.size.s6),
+		Number(typography.size.s5),
+		Number(typography.size.s4),
+		Number(typography.size.s3),
+		Number(typography.size.s2),
+		Number(typography.size.s1),
+	]}
+	fontWeight={typography.weight.medium}
+	sampleText={SampleTextHeading}
+	fontFamily={typography.type.primary}
 />
 
 <table>
-  <thead>
-    <tr>
-      <th>Style</th>
-      <th>Primitives</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>heading-2x-large</td>
-      <td>`$font-family-headings`, `font-weight-medium`, `font-size-2x-large`, `line-height-2x-large`</td>
-    </tr>
-    <tr>
-      <td>heading-x-large</td>
-      <td>`$font-family-headings`, `font-weight-medium`, `font-size-x-large`, `line-height-medium`</td>
-    </tr>
-    <tr>
-      <td>heading-large</td>
-      <td>`$font-family-headings`, `font-weight-medium`, `font-size-large`, `line-height-small`</td>
-    </tr>
-    <tr>
-      <td>heading-medium</td>
-      <td>`$font-family-headings`, `font-weight-medium`, `font-size-medium`, `line-height-small`</td>
-    </tr>
-    <tr>
-      <td>heading-small</td>
-      <td>`$font-family-headings`, `font-weight-medium`, `font-size-x-small`, `line-height-x-small`</td>
-    </tr>
-  </tbody>
+	<thead>
+		<tr>
+			<th>Style</th>
+			<th>Primitives</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>heading-2x-large</td>
+			<td>`$font-family-headings`, `font-weight-medium`, `font-size-2x-large`, `line-height-2x-large`</td>
+		</tr>
+		<tr>
+			<td>heading-x-large</td>
+			<td>`$font-family-headings`, `font-weight-medium`, `font-size-x-large`, `line-height-medium`</td>
+		</tr>
+		<tr>
+			<td>heading-large</td>
+			<td>`$font-family-headings`, `font-weight-medium`, `font-size-large`, `line-height-small`</td>
+		</tr>
+		<tr>
+			<td>heading-medium</td>
+			<td>`$font-family-headings`, `font-weight-medium`, `font-size-medium`, `line-height-small`</td>
+		</tr>
+		<tr>
+			<td>heading-small</td>
+			<td>`$font-family-headings`, `font-weight-medium`, `font-size-x-small`, `line-height-x-small`</td>
+		</tr>
+	</tbody>
 </table>
 
 ### Body
 
 <Typeset
-  fontSizes={[
-    Number(typography.size.s5),
-    Number(typography.size.s4),
-    Number(typography.size.s3),
-    Number(typography.size.s2),
-  ]}
-  fontWeight={typography.weight.regular}
-  sampleText={SampleTextParagraph}
-  fontFamily={typography.type.primary}
+	fontSizes={[
+		Number(typography.size.s5),
+		Number(typography.size.s4),
+		Number(typography.size.s3),
+		Number(typography.size.s2),
+	]}
+	fontWeight={typography.weight.regular}
+	sampleText={SampleTextParagraph}
+	fontFamily={typography.type.primary}
 />
 
 <table>
-  <thead>
-    <tr>
-      <th>Style</th>
-      <th>Primitives</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>body-x-large</td>
-      <td>`$font-family-body`, `font-weight-regular`, `font-size-x-large`, `line-height-x-large`</td>
-    </tr>
-    <tr>
-      <td>body-large</td>
-      <td>`$font-family-body`, `font-weight-regular`, `font-size-large`, `line-height-medium`</td>
-    </tr>
-    <tr>
-      <td>body-medium</td>
-      <td>`$font-family-body`, `font-weight-regular`, `font-size-medium`, `line-height-small`</td>
-    </tr>
-    <tr>
-      <td>body-small</td>
-      <td>`$font-family-body`, `font-weight-regular`, `font-size-small`, `line-height-x-small`</td>
-    </tr>
-  </tbody>
+	<thead>
+		<tr>
+			<th>Style</th>
+			<th>Primitives</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>body-x-large</td>
+			<td>`$font-family-body`, `font-weight-regular`, `font-size-x-large`, `line-height-x-large`</td>
+		</tr>
+		<tr>
+			<td>body-large</td>
+			<td>`$font-family-body`, `font-weight-regular`, `font-size-large`, `line-height-medium`</td>
+		</tr>
+		<tr>
+			<td>body-medium</td>
+			<td>`$font-family-body`, `font-weight-regular`, `font-size-medium`, `line-height-small`</td>
+		</tr>
+		<tr>
+			<td>body-small</td>
+			<td>`$font-family-body`, `font-weight-regular`, `font-size-small`, `line-height-x-small`</td>
+		</tr>
+	</tbody>
 </table>
 
 ## Primitive tokens
@@ -171,8 +171,8 @@ Generally use of semantic tokens is encouraged, but it is possible to create ad 
 
 ```
 .my-type-style {
-  font-family: $font-family-headings;
-  line-height: $font-line-height-x-small;
-  font-weight: $font-weight-regular;
+	font-family: $font-family-headings;
+	line-height: $font-line-height-x-small;
+	font-weight: $font-weight-regular;
 }
 ```
