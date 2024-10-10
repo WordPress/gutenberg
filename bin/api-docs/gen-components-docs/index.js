@@ -46,7 +46,7 @@ manifests.forEach( ( manifestPath ) => {
 		displayName: manifest.displayName,
 	} );
 
-	const subcomponentTypeDocs = manifest.subcomponents.map(
+	const subcomponentTypeDocs = manifest.subcomponents?.map(
 		( subcomponent ) => {
 			const docs = getTypeDocsForComponent( {
 				manifestPath,
