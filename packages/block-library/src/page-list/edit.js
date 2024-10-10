@@ -73,9 +73,8 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status="info" isDismissible={ false }>
-					{ __( 'Page List: Cannot retrieve Pages.' ) }
-				</Notice>
+				{ /* non breaking space as a placeholder */ }
+				{ '\u00A0' }
 			</div>
 		);
 	}
