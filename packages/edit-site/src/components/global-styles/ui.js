@@ -258,6 +258,14 @@ function GlobalStylesEditorCanvasContainerLink() {
 			case 'global-styles-css':
 				goTo( '/css' );
 				break;
+			// The stand-alone style book is open
+			// and the revisions panel is open,
+			// close the revisions panel.
+			// Otherwise keep the style book open while
+			// browsing global styles panel.
+			//
+			// Falling through as it matches the default scenario.
+			case 'style-book':
 			default:
 				// In general, if the revision screen is in view but the
 				// `editorCanvasContainerView` is not a revision view, close it.
