@@ -9,6 +9,10 @@
 -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
 -   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
 
+### Deprecations
+
+-   `SearchControl`: Soft deprecate `onClose` prop ([#65988](https://github.com/WordPress/gutenberg/pull/65988)).
+
 ### Enhancements
 
 -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
