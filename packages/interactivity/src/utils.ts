@@ -49,19 +49,17 @@ const afterNextFrame = ( callback: () => void ) => {
  * @return Promise
  */
 export const splitTask = () => {
+	if (
+		'scheduler' in window &&
+		typeof window.scheduler === 'object' &&
+		null !== window.scheduler &&
+		'yield' in window.scheduler &&
+		typeof window.scheduler.yield === 'function'
+	) {
+		return window.scheduler.yield();
+	}
 	return new Promise( async ( resolve ) => {
-		if (
-			'scheduler' in window &&
-			typeof window.scheduler === 'object' &&
-			null !== window.scheduler &&
-			'yield' in window.scheduler &&
-			typeof window.scheduler.yield === 'function'
-		) {
-			await window.scheduler.yield();
-			resolve( undefined );
-		} else {
-			setTimeout( resolve, 0 );
-		}
+		setTimeout( resolve, 0 );
 	} );
 };
 
