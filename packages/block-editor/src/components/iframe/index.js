@@ -100,7 +100,6 @@ function useBubbleEvents( iframeDocument ) {
 		};
 	} );
 }
-
 function Iframe( {
 	contentRef,
 	children,
@@ -321,7 +320,7 @@ function Iframe( {
 		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
-			`${ frameSize }px`
+			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-content-height',
