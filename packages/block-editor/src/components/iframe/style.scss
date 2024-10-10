@@ -1,0 +1,17 @@
+.block-editor-iframe__container {
+	width: 100%;
+	height: 100%;
+	overflow-x: hidden;
+}
+
+.block-editor-iframe__scale-container {
+	height: 100%;
+}
+
+.block-editor-iframe__scale-container.is-zoomed-out {
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
+	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
+	width: $prev-container-width;
+	// This is to offset the movement of the iframe when we open sidebars
+	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
+}
