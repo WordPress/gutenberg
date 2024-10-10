@@ -25,7 +25,7 @@ interface Flusher {
 declare global {
 	interface Window {
 		scheduler: {
-			readonly yield: () => void;
+			readonly yield: () => Promise<void>;
 		};
 	}
 }
