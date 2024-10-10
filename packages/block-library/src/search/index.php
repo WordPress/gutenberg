@@ -81,7 +81,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
-		if ( $is_expandable_searchfield || $enhanced_pagination) {
+		if ( $is_expandable_searchfield || $enhanced_pagination ) {
 			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 
 		}
