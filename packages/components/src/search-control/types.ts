@@ -42,6 +42,7 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
 	 * rather than just clearing the input value.
 	 *
 	 * @deprecated
+	 * @ignore
 	 */
 	onClose?: () => void;
 	/** @ignore */

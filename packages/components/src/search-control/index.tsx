@@ -33,10 +33,8 @@ function SuffixItem( {
 	}
 
 	if ( onClose ) {
-		deprecated( 'onClose function prop', {
-			since: '6.7',
-			version: '',
-			plugin: 'wp.components.SearchControl',
+		deprecated( '`onClose` prop in wp.components.SearchControl', {
+			since: '6.8',
 		} );
 	}
 
