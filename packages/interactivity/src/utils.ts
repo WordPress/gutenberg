@@ -62,7 +62,7 @@ export const splitTask =
 	null !== window.scheduler &&
 	'yield' in window.scheduler &&
 	typeof window.scheduler.yield === 'function'
-		? window.scheduler.yield
+		? window.scheduler.yield.bind( window.scheduler )
 		: () => {
 				return new Promise( async ( resolve ) => {
 					setTimeout( resolve, 0 );
