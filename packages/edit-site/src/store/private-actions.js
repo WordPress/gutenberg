@@ -93,3 +93,10 @@ export const setEditorCanvasContainerView =
 			view,
 		} );
 	};
+
+export function registerRoute( route ) {
+	return {
+		type: 'REGISTER_ROUTE',
+		route,
+	};
+}

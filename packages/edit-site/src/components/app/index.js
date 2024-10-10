@@ -22,6 +22,7 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import useLayoutAreas from '../layout/router';
 import useSetCommandContext from '../../hooks/commands/use-set-command-context';
+import { useRegisterSiteEditorRoutes } from '../site-editor-routes';
 
 const { RouterProvider } = unlock( routerPrivateApis );
 const { GlobalStylesProvider } = unlock( editorPrivateApis );
@@ -32,6 +33,7 @@ function AppLayout() {
 	useEditModeCommands();
 	useCommonCommands();
 	useSetCommandContext();
+	useRegisterSiteEditorRoutes();
 	const route = useLayoutAreas();
 
 	return <Layout route={ route } />;
