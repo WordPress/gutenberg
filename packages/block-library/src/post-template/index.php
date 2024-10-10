@@ -53,7 +53,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$search_query        = empty( $_GET['search'] ) ? '' : sanitize_text_field( $_GET['search'] );
 
 	// Check if the Instant Search experiment is enabled.
-	$gutenberg_experiments 	= get_option( 'gutenberg-experiments' );
+	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
 	$instant_search_enabled = isset( $gutenberg_experiments['gutenberg-search-query-block'] ) && $gutenberg_experiments['gutenberg-search-query-block'];
 
 	// Use global query if needed.
