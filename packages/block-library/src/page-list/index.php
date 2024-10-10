@@ -266,11 +266,30 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$is_nested      = $attributes['isNested'];
 
 	$all_pages = get_pages(
-		array(
-			'sort_column' => 'menu_order,post_title',
-			'order'       => 'asc',
+		/**
+		 * Filters the arguments for the `core/page-list` get_poges() Query.
+		 *
+		 * @see get_pages()
+		 *
+		 * @since 6.8.0
+		 *
+		 * @param array    $args       An array of arguments to query the pages array.
+		 * @param array    $attributes The block attributes.
+		 * @param WP_Block $block      The parsed block.
+		 */
+		apply_filters(
+			'block_core_page_list_get_pages_args',
+			array(
+				'sort_column' => 'menu_order,post_title',
+				'order'       => 'asc',
+			),
+			$attributes,
+			$block
 		)
 	);
+
+	// If the get_pages() function returns false, set it to an empty array.
+	$all_pages = is_array( $all_pages ) ? $all_pages : array();
 
 	// If there are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {
