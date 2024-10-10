@@ -1,27 +1,4 @@
 /**
- * Determines whether a given file type is supported by vips.
- *
- * @param type Mime type.
- * @return Whether the file type is supported.
- */
-export function isFileTypeSupported(
-	type: string
-): type is
-	| 'image/jpeg'
-	| 'image/png'
-	| 'image/webp'
-	| 'image/avif'
-	| 'image/gif' {
-	return [
-		'image/jpeg',
-		'image/png',
-		'image/webp',
-		'image/avif',
-		'image/gif',
-	].includes( type );
-}
-
-/**
  * Determines whether a given file type supports a quality setting,
  *
  * @todo Make this smarter.
