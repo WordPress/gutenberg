@@ -72,7 +72,6 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 				$query_args['s'] = $search_query;
 			}
 			$query->query( $query_args );
-
 		} else {
 			// The query has not been run yet, modify the global query.
 			if ( $enhanced_pagination && ! empty( $search_query ) ) {
