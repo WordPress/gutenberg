@@ -18,7 +18,14 @@ import {
 	splitTask,
 	isPlainObject,
 } from './utils';
-import { directive, getEvaluate, type DirectiveEntry } from './hooks';
+import {
+	directive,
+	getEvaluate,
+	isDefaultDirectiveSuffix,
+	isNonDefaultDirectiveSuffix,
+	type DirectiveCallback,
+	type DirectiveEntry,
+} from './hooks';
 import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 
@@ -86,11 +93,13 @@ const cssStringToObject = (
  *
  * @param type 'window' or 'document'
  */
-const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
+const getGlobalEventDirective = (
+	type: 'window' | 'document'
+): DirectiveCallback => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry: DirectiveEntry ) => {
+			.filter( isNonDefaultDirectiveSuffix )
+			.forEach( ( entry ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = ( event: Event ) => evaluate( entry, event );
@@ -108,11 +117,13 @@ const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
  *
  * @param type 'window' or 'document'
  */
-const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
+const getGlobalAsyncEventDirective = (
+	type: 'window' | 'document'
+): DirectiveCallback => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-async-${ type }` ]
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry: DirectiveEntry ) => {
+			.filter( isNonDefaultDirectiveSuffix )
+			.forEach( ( entry ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
@@ -139,17 +150,20 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const defaultEntry = context.find(
-				( { suffix } ) => suffix === 'default'
-			);
-			const inheritedValue = useContext( inheritedContext );
+			const defaultEntry = context.find( isDefaultDirectiveSuffix );
+			const { client: inheritedClient, server: inheritedServer } =
+				useContext( inheritedContext );
 
 			const ns = defaultEntry!.namespace;
-			const currentValue = useRef( proxifyState( ns, {} ) );
+			const client = useRef( proxifyState( ns, {} ) );
+			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
-				const result = { ...inheritedValue };
+				const result = {
+					client: { ...inheritedClient },
+					server: { ...inheritedServer },
+				};
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
@@ -159,17 +173,22 @@ export default () => {
 						);
 					}
 					deepMerge(
-						currentValue.current,
+						client.current,
 						deepClone( value ) as object,
 						false
 					);
-					result[ namespace ] = proxifyContext(
-						currentValue.current,
-						inheritedValue[ namespace ]
+					deepMerge( server.current, deepClone( value ) as object );
+					result.client[ namespace ] = proxifyContext(
+						client.current,
+						inheritedClient[ namespace ]
+					);
+					result.server[ namespace ] = proxifyContext(
+						server.current,
+						inheritedServer[ namespace ]
 					);
 				}
 				return result;
-			}, [ defaultEntry, inheritedValue ] );
+			}, [ defaultEntry, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
@@ -246,15 +265,13 @@ export default () => {
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
-		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
-			( entry ) => {
-				const event = entry.suffix.split( '--' )[ 0 ];
-				if ( ! events.has( event ) ) {
-					events.set( event, new Set< DirectiveEntry >() );
-				}
-				events.get( event )!.add( entry );
+		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const event = entry.suffix.split( '--' )[ 0 ];
+			if ( ! events.has( event ) ) {
+				events.set( event, new Set< DirectiveEntry >() );
 			}
-		);
+			events.get( event )!.add( entry );
+		} );
 
 		events.forEach( ( entries, eventType ) => {
 			const existingHandler = element.props[ `on${ eventType }` ];
@@ -298,7 +315,7 @@ export default () => {
 		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
 			const events = new Map< string, Set< DirectiveEntry > >();
 			onAsync
-				.filter( ( { suffix } ) => suffix !== 'default' )
+				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					const event = entry.suffix.split( '--' )[ 0 ];
 					if ( ! events.has( event ) ) {
@@ -340,7 +357,7 @@ export default () => {
 		'class',
 		( { directives: { class: classNames }, element, evaluate } ) => {
 			classNames
-				.filter( ( { suffix } ) => suffix !== 'default' )
+				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
@@ -381,119 +398,112 @@ export default () => {
 
 	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
-		style
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry ) => {
-				const styleProp = entry.suffix;
-				const result = evaluate( entry );
-				element.props.style = element.props.style || {};
-				if ( typeof element.props.style === 'string' ) {
-					element.props.style = cssStringToObject(
-						element.props.style
-					);
-				}
-				if ( ! result ) {
-					delete element.props.style[ styleProp ];
-				} else {
-					element.props.style[ styleProp ] = result;
-				}
+		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const styleProp = entry.suffix;
+			const result = evaluate( entry );
+			element.props.style = element.props.style || {};
+			if ( typeof element.props.style === 'string' ) {
+				element.props.style = cssStringToObject( element.props.style );
+			}
+			if ( ! result ) {
+				delete element.props.style[ styleProp ];
+			} else {
+				element.props.style[ styleProp ] = result;
+			}
 
-				useInit( () => {
-					/*
-					 * This seems necessary because Preact doesn't change the styles on
-					 * the hydration, so we have to do it manually. It doesn't need deps
-					 * because it only needs to do it the first time.
-					 */
-					if ( ! result ) {
-						(
-							element.ref as RefObject< HTMLElement >
-						 ).current!.style.removeProperty( styleProp );
-					} else {
-						(
-							element.ref as RefObject< HTMLElement >
-						 ).current!.style[ styleProp ] = result;
-					}
-				} );
+			useInit( () => {
+				/*
+				 * This seems necessary because Preact doesn't change the styles on
+				 * the hydration, so we have to do it manually. It doesn't need deps
+				 * because it only needs to do it the first time.
+				 */
+				if ( ! result ) {
+					(
+						element.ref as RefObject< HTMLElement >
+					 ).current!.style.removeProperty( styleProp );
+				} else {
+					( element.ref as RefObject< HTMLElement > ).current!.style[
+						styleProp
+					] = result;
+				}
 			} );
+		} );
 	} );
 
 	// data-wp-bind--[attribute]
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
-		bind.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
-			( entry ) => {
-				const attribute = entry.suffix;
-				const result = evaluate( entry );
-				element.props[ attribute ] = result;
+		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const attribute = entry.suffix;
+			const result = evaluate( entry );
+			element.props[ attribute ] = result;
+
+			/*
+			 * This is necessary because Preact doesn't change the attributes on the
+			 * hydration, so we have to do it manually. It only needs to do it the
+			 * first time. After that, Preact will handle the changes.
+			 */
+			useInit( () => {
+				const el = ( element.ref as RefObject< HTMLElement > ).current!;
 
 				/*
-				 * This is necessary because Preact doesn't change the attributes on the
-				 * hydration, so we have to do it manually. It only needs to do it the
-				 * first time. After that, Preact will handle the changes.
+				 * We set the value directly to the corresponding HTMLElement instance
+				 * property excluding the following special cases. We follow Preact's
+				 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 				 */
-				useInit( () => {
-					const el = ( element.ref as RefObject< HTMLElement > )
-						.current!;
-
+				if ( attribute === 'style' ) {
+					if ( typeof result === 'string' ) {
+						el.style.cssText = result;
+					}
+					return;
+				} else if (
+					attribute !== 'width' &&
+					attribute !== 'height' &&
+					attribute !== 'href' &&
+					attribute !== 'list' &&
+					attribute !== 'form' &&
 					/*
-					 * We set the value directly to the corresponding HTMLElement instance
-					 * property excluding the following special cases. We follow Preact's
-					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+					 * The value for `tabindex` follows the parsing rules for an
+					 * integer. If that fails, or if the attribute isn't present, then
+					 * the browsers should "follow platform conventions to determine if
+					 * the element should be considered as a focusable area",
+					 * practically meaning that most elements get a default of `-1` (not
+					 * focusable), but several also get a default of `0` (focusable in
+					 * order after all elements with a positive `tabindex` value).
+					 *
+					 * @see https://html.spec.whatwg.org/#tabindex-value
 					 */
-					if ( attribute === 'style' ) {
-						if ( typeof result === 'string' ) {
-							el.style.cssText = result;
-						}
+					attribute !== 'tabIndex' &&
+					attribute !== 'download' &&
+					attribute !== 'rowSpan' &&
+					attribute !== 'colSpan' &&
+					attribute !== 'role' &&
+					attribute in el
+				) {
+					try {
+						el[ attribute ] =
+							result === null || result === undefined
+								? ''
+								: result;
 						return;
-					} else if (
-						attribute !== 'width' &&
-						attribute !== 'height' &&
-						attribute !== 'href' &&
-						attribute !== 'list' &&
-						attribute !== 'form' &&
-						/*
-						 * The value for `tabindex` follows the parsing rules for an
-						 * integer. If that fails, or if the attribute isn't present, then
-						 * the browsers should "follow platform conventions to determine if
-						 * the element should be considered as a focusable area",
-						 * practically meaning that most elements get a default of `-1` (not
-						 * focusable), but several also get a default of `0` (focusable in
-						 * order after all elements with a positive `tabindex` value).
-						 *
-						 * @see https://html.spec.whatwg.org/#tabindex-value
-						 */
-						attribute !== 'tabIndex' &&
-						attribute !== 'download' &&
-						attribute !== 'rowSpan' &&
-						attribute !== 'colSpan' &&
-						attribute !== 'role' &&
-						attribute in el
-					) {
-						try {
-							el[ attribute ] =
-								result === null || result === undefined
-									? ''
-									: result;
-							return;
-						} catch ( err ) {}
-					}
-					/*
-					 * aria- and data- attributes have no boolean representation.
-					 * A `false` value is different from the attribute not being
-					 * present, so we can't remove it.
-					 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
-					 */
-					if (
-						result !== null &&
-						result !== undefined &&
-						( result !== false || attribute[ 4 ] === '-' )
-					) {
-						el.setAttribute( attribute, result );
-					} else {
-						el.removeAttribute( attribute );
-					}
-				} );
-			}
-		);
+					} catch ( err ) {}
+				}
+				/*
+				 * aria- and data- attributes have no boolean representation.
+				 * A `false` value is different from the attribute not being
+				 * present, so we can't remove it.
+				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+				 */
+				if (
+					result !== null &&
+					result !== undefined &&
+					( result !== false || attribute[ 4 ] === '-' )
+				) {
+					el.setAttribute( attribute, result );
+				} else {
+					el.removeAttribute( attribute );
+				}
+			} );
+		} );
 	} );
 
 	// data-wp-ignore
@@ -518,7 +528,7 @@ export default () => {
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
-		const entry = text.find( ( { suffix } ) => suffix === 'default' );
+		const entry = text.find( isDefaultDirectiveSuffix );
 		if ( ! entry ) {
 			element.props.children = null;
 			return;
@@ -555,25 +565,33 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 
 			const [ entry ] = each;
-			const { namespace, suffix } = entry;
+			const { namespace } = entry;
 
 			const list = evaluate( entry );
+			const itemProp = isNonDefaultDirectiveSuffix( entry )
+				? kebabToCamelCase( entry.suffix )
+				: 'item';
 			return list.map( ( item ) => {
-				const itemProp =
-					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const itemContext = proxifyContext(
 					proxifyState( namespace, {} ),
-					inheritedValue[ namespace ]
+					inheritedValue.client[ namespace ]
 				);
 				const mergedContext = {
-					...inheritedValue,
-					[ namespace ]: itemContext,
+					client: {
+						...inheritedValue.client,
+						[ namespace ]: itemContext,
+					},
+					server: { ...inheritedValue.server },
 				};
 
 				// Set the item after proxifying the context.
-				mergedContext[ namespace ][ itemProp ] = item;
+				mergedContext.client[ namespace ][ itemProp ] = item;
 
-				const scope = { ...getScope(), context: mergedContext };
+				const scope = {
+					...getScope(),
+					context: mergedContext.client,
+					serverContext: mergedContext.server,
+				};
 				const key = eachKey
 					? getEvaluate( { scope } )( eachKey[ 0 ] )
 					: item;

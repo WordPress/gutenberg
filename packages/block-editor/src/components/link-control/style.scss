@@ -72,32 +72,10 @@ $block-editor-link-control-number-of-actions: 1;
 		color: $gray-900;
 	}
 
-	input[type="text"],
-	// Specificity overide of URLInput defaults.
-	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
-		@include input-control;
-		display: block;
-		border: $border-width solid $gray-600;
-		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
-		margin: 0;
-		padding: $grid-unit-10 $button-size-next-default-40px $grid-unit-10 $grid-unit-20;
-		position: relative;
-		width: 100%;
-
-		.has-actions & {
-			padding-right: $grid-unit-20;
-		}
-	}
 }
 
 .block-editor-link-control__search-error {
 	margin: -$grid-unit-20 * 0.5 $grid-unit-20 $grid-unit-20; // negative margin to bring the error a bit closer to the button
-}
-
-.block-editor-link-control__search-enter {
-	position: absolute;
-	right: 19px; // specific to place the button properly.
-	top: 3px;
 }
 
 .block-editor-link-control__search-actions {

@@ -373,6 +373,103 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		);
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/65174.
+	test( 'should handle unwrapping and merging blocks with empty contents', async ( {
+		editor,
+		page,
+	} ) => {
+		const emptyAlignedParagraph = {
+			name: 'core/paragraph',
+			attributes: { content: '', align: 'center', dropCap: false },
+			innerBlocks: [],
+		};
+		const emptyAlignedHeading = {
+			name: 'core/heading',
+			attributes: { content: '', textAlign: 'center', level: 2 },
+			innerBlocks: [],
+		};
+		const headingWithContent = {
+			name: 'core/heading',
+			attributes: { content: 'heading', level: 2 },
+			innerBlocks: [],
+		};
+		const placeholderBlock = { name: 'core/separator' };
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				emptyAlignedParagraph,
+				emptyAlignedHeading,
+				headingWithContent,
+				placeholderBlock,
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.focus();
+
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Remove the default empty block' )
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedHeading,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+
+		// Move the caret to the beginning of the empty heading block.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll(
+				editor.getBlocks,
+				'Convert the non-default empty block to a default block'
+			)
+			.toEqual( [
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						emptyAlignedParagraph,
+						headingWithContent,
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+		await page.keyboard.press( 'Backspace' );
+		await expect.poll( editor.getBlocks ).toEqual( [
+			{
+				name: 'core/group',
+				attributes: { tagName: 'div' },
+				innerBlocks: [
+					headingWithContent,
+					expect.objectContaining( placeholderBlock ),
+				],
+			},
+		] );
+
+		// Move the caret to the beginning of the "heading" heading block.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks, 'Lift the non-empty non-default block' )
+			.toEqual( [
+				headingWithContent,
+				{
+					name: 'core/group',
+					attributes: { tagName: 'div' },
+					innerBlocks: [
+						expect.objectContaining( placeholderBlock ),
+					],
+				},
+			] );
+	} );
+
 	test.describe( 'test restore selection when merge produces more than one block', () => {
 		const snap1 = [
 			{

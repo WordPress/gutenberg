@@ -133,7 +133,7 @@ $footer-height: 70px;
 	padding-bottom: $grid-unit-20;
 }
 
-.font-library-modal__tablist {
+.font-library-modal__tablist-container {
 	position: sticky;
 	top: 0;
 	border-bottom: 1px solid $gray-300;
@@ -141,6 +141,10 @@ $footer-height: 70px;
 	margin: 0 #{$grid-unit-40 * -1};
 	padding: 0 $grid-unit-20;
 	z-index: 1;
+
+	[role="tablist"] {
+		margin-bottom: -1px;
+	}
 }
 
 

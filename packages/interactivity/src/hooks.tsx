@@ -23,7 +23,27 @@ import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
+	suffix: string | null;
+}
+
+export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
 	suffix: string;
+}
+
+export interface DefaultSuffixDirectiveEntry extends DirectiveEntry {
+	suffix: null;
+}
+
+export function isNonDefaultDirectiveSuffix(
+	entry: DirectiveEntry
+): entry is NonDefaultSuffixDirectiveEntry {
+	return entry.suffix !== null;
+}
+
+export function isDefaultDirectiveSuffix(
+	entry: DirectiveEntry
+): entry is DefaultSuffixDirectiveEntry {
+	return entry.suffix === null;
 }
 
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
@@ -56,7 +76,7 @@ interface DirectiveArgs {
 	evaluate: Evaluate;
 }
 
-interface DirectiveCallback {
+export interface DirectiveCallback {
 	( args: DirectiveArgs ): VNode< any > | null | void;
 }
 
@@ -93,7 +113,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( {} );
+const context = createContext< any >( { client: {}, server: {} } );
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -107,7 +127,7 @@ const directivePriorities: Record< string, number > = {};
  * directive(
  *   'alert', // Name without the `data-wp-` prefix.
  *   ( { directives: { alert }, element, evaluate } ) => {
- *     const defaultEntry = alert.find( entry => entry.suffix === 'default' );
+ *     const defaultEntry = alert.find( isDefaultDirectiveSuffix );
  *     element.props.onclick = () => { alert( evaluate( defaultEntry ) ); }
  *   }
  * )
@@ -126,7 +146,7 @@ const directivePriorities: Record< string, number > = {};
  * </div>
  * ```
  * Note that, in the previous example, the directive callback gets the path
- * value (`state.alert`) from the directive entry with suffix `default`. A
+ * value (`state.alert`) from the directive entry with suffix `null`. A
  * custom suffix can also be specified by appending `--` to the directive
  * attribute, followed by the suffix, like in the following HTML snippet:
  *
@@ -190,9 +210,13 @@ const resolve = ( path: string, namespace: string ) => {
 	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
-		resolvedStore = store( namespace, undefined, {
-			lock: universalUnlock,
-		} );
+		resolvedStore = store(
+			namespace,
+			{},
+			{
+				lock: universalUnlock,
+			}
+		);
 	}
 	const current = {
 		...resolvedStore,
@@ -253,7 +277,9 @@ const Directives = ( {
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext( context );
+	const { client, server } = useContext( context );
+	scope.context = client;
+	scope.serverContext = server;
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */
@@ -305,9 +331,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 		const props = vnode.props;
 		const directives = props.__directives;
 		if ( directives.key ) {
-			vnode.key = directives.key.find(
-				( { suffix } ) => suffix === 'default'
-			).value;
+			vnode.key = directives.key.find( isDefaultDirectiveSuffix ).value;
 		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );

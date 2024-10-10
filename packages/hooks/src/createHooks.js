@@ -20,11 +20,11 @@ export class _Hooks {
 	constructor() {
 		/** @type {import('.').Store} actions */
 		this.actions = Object.create( null );
-		this.actions.__current = [];
+		this.actions.__current = new Set();
 
 		/** @type {import('.').Store} filters */
 		this.filters = Object.create( null );
-		this.filters.__current = [];
+		this.filters.__current = new Set();
 
 		this.addAction = createAddHook( this, 'actions' );
 		this.addFilter = createAddHook( this, 'filters' );
@@ -34,8 +34,10 @@ export class _Hooks {
 		this.hasFilter = createHasHook( this, 'filters' );
 		this.removeAllActions = createRemoveHook( this, 'actions', true );
 		this.removeAllFilters = createRemoveHook( this, 'filters', true );
-		this.doAction = createRunHook( this, 'actions' );
-		this.applyFilters = createRunHook( this, 'filters', true );
+		this.doAction = createRunHook( this, 'actions', false, false );
+		this.doActionAsync = createRunHook( this, 'actions', false, true );
+		this.applyFilters = createRunHook( this, 'filters', true, false );
+		this.applyFiltersAsync = createRunHook( this, 'filters', true, true );
 		this.currentAction = createCurrentHook( this, 'actions' );
 		this.currentFilter = createCurrentHook( this, 'filters' );
 		this.doingAction = createDoingHook( this, 'actions' );

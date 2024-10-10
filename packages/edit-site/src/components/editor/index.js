@@ -22,7 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, homeButton } from '@wordpress/icons';
+import { Icon, arrowUpLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -230,7 +230,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						'show-icon-labels': showIconLabels,
 					} ) }
 					styles={ styles }
-					enableRegionNavigation={ false }
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
@@ -256,8 +255,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
-											// TODO: Switch to `true` (40px size) if possible
-											__next40pxDefaultSize={ false }
+											__next40pxDefaultSize
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"
@@ -292,7 +290,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											) }
 											variants={ toggleHomeIconVariants }
 										>
-											<Icon icon={ homeButton } />
+											<Icon icon={ arrowUpLeft } />
 										</motion.div>
 									</motion.div>
 								)

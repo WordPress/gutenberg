@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ForwardedRef, KeyboardEvent, RefObject, UIEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -38,10 +37,11 @@ import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
+import { useModalExitAnimation } from './use-modal-exit-animation';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
-	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
 >;
 const ModalContext = createContext< Dismissers >( new Set() );
 
@@ -50,7 +50,7 @@ const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		bodyOpenClassName = 'modal-open',
@@ -70,7 +70,7 @@ function UnforwardedModal(
 		closeButtonLabel,
 		children,
 		style,
-		overlayClassName,
+		overlayClassName: overlayClassnameProp,
 		className,
 		contentLabel,
 		onKeyDown,
@@ -184,6 +184,9 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
+	const { closeModal, frameRef, frameStyle, overlayClassname } =
+		useModalExitAnimation();
+
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
 		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
@@ -200,21 +203,21 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
-	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+	function handleEscapeKeyDown(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
 		if (
 			shouldCloseOnEsc &&
 			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			if ( onRequestClose ) {
-				onRequestClose( event );
-			}
+			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
 
 	const onContentContainerScroll = useCallback(
-		( e: UIEvent< HTMLDivElement > ) => {
+		( e: React.UIEvent< HTMLDivElement > ) => {
 			const scrollY = e?.currentTarget?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
@@ -248,7 +251,7 @@ function UnforwardedModal(
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
 			if ( button === 0 && isSameTarget ) {
-				onRequestClose();
+				closeModal().then( () => onRequestClose() );
 			}
 		},
 	};
@@ -259,7 +262,8 @@ function UnforwardedModal(
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ clsx(
 				'components-modal__screen-overlay',
-				overlayClassName
+				overlayClassname,
+				overlayClassnameProp
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
@@ -271,8 +275,12 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ style }
+					style={ {
+						...frameStyle,
+						...style,
+					} }
 					ref={ useMergeRefs( [
+						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
 						focusOnMount !== 'firstContentElement'
@@ -331,7 +339,13 @@ function UnforwardedModal(
 										/>
 										<Button
 											size="small"
-											onClick={ onRequestClose }
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) =>
+												closeModal().then( () =>
+													onRequestClose( event )
+												)
+											}
 											icon={ close }
 											label={
 												closeButtonLabel ||

@@ -16,7 +16,6 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getSelectionRoot } from './utils';
 
 /**
  * Handles input for selections across blocks.
@@ -50,24 +49,7 @@ export default function useInput() {
 			// DOM. This will cause React errors (and the DOM should only be
 			// altered in a controlled fashion).
 			if ( node.contentEditable === 'true' ) {
-				const selection = node.ownerDocument.defaultView.getSelection();
-				const range = selection.rangeCount
-					? selection.getRangeAt( 0 )
-					: null;
-				const root = getSelectionRoot( node.ownerDocument );
-
-				// If selection is contained within a nested editable, allow
-				// input. We need to ensure that selection is maintained.
-				if ( root ) {
-					node.contentEditable = false;
-					root.focus();
-					selection.removeAllRanges();
-					if ( range ) {
-						selection.addRange( range );
-					}
-				} else {
-					event.preventDefault();
-				}
+				event.preventDefault();
 			}
 		}
 
@@ -77,23 +59,6 @@ export default function useInput() {
 			}
 
 			if ( ! hasMultiSelection() ) {
-				const { ownerDocument } = node;
-				if ( node === ownerDocument.activeElement ) {
-					if ( event.key === 'End' || event.key === 'Home' ) {
-						const selectionRoot = getSelectionRoot( ownerDocument );
-						const selection =
-							ownerDocument.defaultView.getSelection();
-						selection.selectAllChildren( selectionRoot );
-						const method =
-							event.key === 'End'
-								? 'collapseToEnd'
-								: 'collapseToStart';
-						selection[ method ]();
-						event.preventDefault();
-						return;
-					}
-				}
-
 				if ( event.keyCode === ENTER ) {
 					if ( event.shiftKey || __unstableIsFullySelected() ) {
 						return;

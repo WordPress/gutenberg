@@ -3,7 +3,7 @@
  */
 import { _n, sprintf, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalText as Text,
 	Button,
 	Flex,

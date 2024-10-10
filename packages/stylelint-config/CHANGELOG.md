@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 23.1.0 (2024-10-03)
+
+## 23.0.0 (2024-09-19)
+
 ### Breaking Changes
 
 -   Updated `stylelint` peer dependency requirement to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
