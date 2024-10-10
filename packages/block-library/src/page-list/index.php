@@ -278,7 +278,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		 * @param WP_Block $block      The parsed block.
 		 */
 		apply_filters(
-			'block_core_page_list_get_pages_args',
+			'block_core_page_list_pages_query_args',
 			array(
 				'sort_column' => 'menu_order,post_title',
 				'order'       => 'asc',
