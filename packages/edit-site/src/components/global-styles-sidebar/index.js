@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	FlexItem,
-	FlexBlock,
-	Flex,
-	Button,
-	useNavigator,
-} from '@wordpress/components';
+import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -86,21 +80,17 @@ export default function GlobalStylesSidebar() {
 	}, [ shouldClearCanvasContainerView ] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
-	const { goTo } = useNavigator();
 
 	const toggleRevisions = () => {
 		setIsListViewOpened( false );
 		if ( isRevisionsStyleBookOpened ) {
-			goTo( '/' );
 			setEditorCanvasContainerView( 'style-book' );
 			return;
 		}
 		if ( isRevisionsOpened ) {
-			goTo( '/' );
 			setEditorCanvasContainerView( undefined );
 			return;
 		}
-		goTo( '/revisions' );
 
 		if ( isStyleBookOpened ) {
 			setEditorCanvasContainerView(
