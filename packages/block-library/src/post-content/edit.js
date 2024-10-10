@@ -25,6 +25,7 @@ import { useMemo } from '@wordpress/element';
 import { useCanEditEntity } from '../utils/hooks';
 
 function ReadOnlyContent( {
+	parentLayout,
 	layoutClassNames,
 	userCanEdit,
 	postType,
@@ -43,6 +44,7 @@ function ReadOnlyContent( {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: blockProps,
+		layout: parentLayout,
 	} );
 
 	if ( userCanEdit ) {
@@ -120,6 +122,7 @@ function Content( props ) {
 		<EditableContent { ...props } />
 	) : (
 		<ReadOnlyContent
+			parentLayout={ props.parentLayout }
 			layoutClassNames={ layoutClassNames }
 			userCanEdit={ userCanEdit }
 			postType={ postType }
@@ -165,6 +168,7 @@ function RecursionError() {
 export default function PostContentEdit( {
 	context,
 	__unstableLayoutClassNames: layoutClassNames,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const { postId: contextPostId, postType: contextPostType } = context;
 	const hasAlreadyRendered = useHasRecursion( contextPostId );
@@ -178,6 +182,7 @@ export default function PostContentEdit( {
 			{ contextPostId && contextPostType ? (
 				<Content
 					context={ context }
+					parentLayout={ parentLayout }
 					layoutClassNames={ layoutClassNames }
 				/>
 			) : (
