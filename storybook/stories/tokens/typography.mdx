@@ -31,9 +31,9 @@ This document outlines the various tokens relating to typography in the WordPres
 
 Semantic tokens compose primitive tokens to create reusable type styles enhancing consistency across the software.
 
-They are defined as sass mixins and can be used like so:
+They are defined as SASS mixins and can be used like so:
 
-```
+```css
 .my-component {
 	@include heading-large();
 }
@@ -129,10 +129,10 @@ They are defined as sass mixins and can be used like so:
 
 ## Primitive tokens
  
-Primitive tokens are organised into 4 sets relating to `size`, `line-height`, `weight`, and `family`, defined as sass variables.
+Primitive tokens are organized into 4 sets relating to `size`, `line-height`, `weight`, and `family`, defined as SASS variables.
 
 ### Size
-```
+```css
 $font-size-x-small: 11px;
 $font-size-small: 12px;
 $font-size-medium: 13px;
@@ -143,7 +143,7 @@ $font-size-2x-large: 32px;
 
 ### Line-height
 
-```
+```css
 $font-line-height-x-small: 16px;
 $font-line-height-small: 20px;
 $font-line-height-medium: 24px;
@@ -154,14 +154,14 @@ $font-line-height-2x-large: 40px;
 
 ### Weight
 
-```
+```css
 $font-weight-regular: 400;
 $font-weight-medium: 500;
 ```
 
 ### Families
 
-```
+```css
 $font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 $font-family-body: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 $font-family-mono: Menlo, Consolas, monaco, monospace;
@@ -169,7 +169,7 @@ $font-family-mono: Menlo, Consolas, monaco, monospace;
 
 Generally use of semantic tokens is encouraged, but it is possible to create ad hoc styles by referencing primitives, for example:
 
-```
+```css
 .my-type-style {
 	font-family: $font-family-headings;
 	line-height: $font-line-height-x-small;
