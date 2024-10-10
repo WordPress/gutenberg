@@ -79,7 +79,9 @@ describe( 'SearchControl', () => {
 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
 			);
 
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith(
+				'`onClose` prop in wp.components.SearchControl is deprecated since version 6.8.'
+			);
 			expect(
 				screen.queryByRole( 'button', { name: 'Close search' } )
 			).toBeVisible();
