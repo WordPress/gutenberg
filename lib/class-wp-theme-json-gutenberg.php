@@ -2719,6 +2719,8 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * An internal method to get the block nodes from a theme.json file.
 	 *
+	 * @since 6.1.0
+	 *
 	 * @param array $theme_json The theme.json converted to an array.
 	 * @param array $selectors  Optional list of selectors per block.
 	 * @param array $options {
@@ -2729,7 +2731,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * }
 	 * @return array The block nodes in theme.json.
 	 */
-
 	private static function get_block_nodes( $theme_json, $selectors = array(), $options = array() ) {
 		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$nodes     = array();
