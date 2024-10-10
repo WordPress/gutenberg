@@ -89,8 +89,6 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			$query_args['s'] = $search_query;
 		}
 
-		error_log( 'regular query' );
-
 		$query = new WP_Query( $query_args );
 	}
 
