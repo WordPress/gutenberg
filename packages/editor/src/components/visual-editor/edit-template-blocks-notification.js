@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -12,7 +11,6 @@ import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/compone
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Component that:
@@ -29,24 +27,16 @@ import { unlock } from '../../lock-unlock';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { isZoomOut, onNavigateToEntityRecord, templateId } = useSelect(
-		( select ) => {
-			const { getEditorSettings, getCurrentTemplateId } =
-				select( editorStore );
+	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
+		const { getEditorSettings, getCurrentTemplateId } =
+			select( editorStore );
 
-			return {
-				isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
-				onNavigateToEntityRecord:
-					getEditorSettings().onNavigateToEntityRecord,
-				templateId: getCurrentTemplateId(),
-			};
-		},
-		[]
-	);
-
-	const { resetZoomLevel, __unstableSetEditorMode } = unlock(
-		useDispatch( blockEditorStore )
-	);
+		return {
+			onNavigateToEntityRecord:
+				getEditorSettings().onNavigateToEntityRecord,
+			templateId: getCurrentTemplateId(),
+		};
+	}, [] );
 
 	const canEditTemplate = useSelect(
 		( select ) =>
@@ -61,14 +51,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	useEffect( () => {
 		const handleDblClick = ( event ) => {
-			// If the editor is zoomed out, reset the zoom level and switch to
-			// edit mode. The dialog will not be shown in this case.
-			if ( isZoomOut ) {
-				resetZoomLevel();
-				__unstableSetEditorMode( 'edit' );
-				return;
-			}
-
 			if ( ! canEditTemplate ) {
 				return;
 			}
@@ -79,7 +61,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			) {
 				return;
 			}
-			setIsDialogOpen( true );
+
+			if ( ! event.defaultPrevented ) {
+				event.preventDefault();
+				setIsDialogOpen( true );
+			}
 		};
 
 		const canvas = contentRef.current;
@@ -87,13 +73,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		return () => {
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [
-		contentRef,
-		canEditTemplate,
-		isZoomOut,
-		resetZoomLevel,
-		__unstableSetEditorMode,
-	] );
+	}, [ contentRef, canEditTemplate ] );
 
 	if ( ! canEditTemplate ) {
 		return null;
