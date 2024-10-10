@@ -344,10 +344,6 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-container-width',
 			`${ containerWidth }px`
 		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidthRef.current }px`
-		);
 
 		return () => {
 			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
@@ -366,9 +362,6 @@ function Iframe( {
 			);
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-container-width'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-prev-container-width'
 			);
 		};
 	}, [
