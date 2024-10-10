@@ -202,6 +202,7 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
+						isZoomOutMode={ isZoomOutMode }
 					/>
 				) }
 

@@ -20,6 +20,7 @@ import { PrivateBlockToolbar } from '../block-toolbar';
 export default function BlockToolbarPopover( {
 	clientId,
 	isTyping,
+	isZoomOutMode,
 	__unstableContentRef,
 } ) {
 	const { capturingClientId, isInsertionPointVisible, lastClientId } =
@@ -78,6 +79,7 @@ export default function BlockToolbarPopover( {
 						initialToolbarItemIndexRef.current = index;
 					} }
 					variant="toolbar"
+					isZoomOutMode={ isZoomOutMode }
 				/>
 			</BlockPopover>
 		)
