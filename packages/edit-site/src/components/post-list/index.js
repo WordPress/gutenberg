@@ -294,6 +294,16 @@ export default function PostList( { postType } ) {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
+	const pinnedItems = useMemo( () => {
+		return records
+			?.filter( ( record ) =>
+				fields
+					.find( ( f ) => f.id === 'is-pinned' )
+					?.getValue( { item: record } )
+			)
+			.map( ( record ) => getItemId( record ) );
+	}, [ records, fields ] );
+
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
 		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
@@ -404,6 +414,7 @@ export default function PostList( { postType } ) {
 				onChangeSelection={ onChangeSelection }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
+				pinnedItems={ pinnedItems }
 				header={
 					window.__experimentalQuickEditDataViews &&
 					view.type !== LAYOUT_LIST &&
