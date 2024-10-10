@@ -23,5 +23,5 @@ function UnconnectedNavigatorBackButton(
 
 export const NavigatorBackButton = contextConnect(
 	UnconnectedNavigatorBackButton,
-	'NavigatorBackButton'
+	'Navigator.BackButton'
 );

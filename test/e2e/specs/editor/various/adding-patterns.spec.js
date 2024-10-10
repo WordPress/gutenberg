@@ -13,7 +13,7 @@ test.describe( 'adding patterns', () => {
 
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'Standard'
 		);
 

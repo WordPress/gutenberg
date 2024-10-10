@@ -12,7 +12,11 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { applyFilters } from '@wordpress/hooks';
+import {
+	applyFilters,
+	applyFiltersAsync,
+	doActionAsync,
+} from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { __ } from '@wordpress/i18n';
 
@@ -155,6 +159,29 @@ export function setEditedPost( postType, postId ) {
  *
  * @param {Object} edits   Post attributes to edit.
  * @param {Object} options Options for the edit.
+ *
+ * @example
+ * ```js
+ * // Update the post title
+ * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
+ * ```
+ *
+ * @example
+ *```js
+ * 	// Get specific media size based on the featured media ID
+ * 	// Note: change sizes?.large for any registered size
+ * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
+ * 		const getFeaturedMediaId =
+ * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+ * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ *
+ * 		return (
+ * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 		);
+ * }, [] );
+ * ```
+ *
+ * @return {Object} Action object
  */
 export const editPost =
 	( edits, options ) =>
@@ -184,7 +211,7 @@ export const savePost =
 		}
 
 		const previousRecord = select.getCurrentPost();
-		const edits = {
+		let edits = {
 			id: previousRecord.id,
 			...registry
 				.select( coreStore )
@@ -199,9 +226,9 @@ export const savePost =
 
 		let error = false;
 		try {
-			error = await applyFilters(
-				'editor.__unstablePreSavePost',
-				Promise.resolve( false ),
+			edits = await applyFiltersAsync(
+				'editor.preSavePost',
+				edits,
 				options
 			);
 		} catch ( err ) {
@@ -236,14 +263,25 @@ export const savePost =
 				);
 		}
 
+		// Run the hook with legacy unstable name for backward compatibility
 		if ( ! error ) {
-			await applyFilters(
-				'editor.__unstableSavePost',
-				Promise.resolve(),
-				options
-			).catch( ( err ) => {
+			try {
+				await applyFilters(
+					'editor.__unstableSavePost',
+					Promise.resolve(),
+					options
+				);
+			} catch ( err ) {
 				error = err;
-			} );
+			}
+		}
+
+		if ( ! error ) {
+			try {
+				await doActionAsync( 'editor.savePost', options );
+			} catch ( err ) {
+				error = err;
+			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 

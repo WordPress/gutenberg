@@ -40,7 +40,7 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 				__nextHasNoMarginBottom
 				onChange={ setSearchValue }
 				value={ searchValue }
-				label={ __( 'Search for patterns' ) }
+				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
 		</div>

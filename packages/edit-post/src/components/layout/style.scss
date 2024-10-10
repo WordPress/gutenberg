@@ -1,69 +1,109 @@
-$resize-handle-height: $grid-unit-30;
-
 .edit-post-meta-boxes-main {
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
 	background-color: $white;
-	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
 
-	&:not(details) {
-		padding-top: $resize-handle-height;
+	&.is-resizable {
+		padding-block-start: $grid-unit-30;
+	}
+}
+
+.edit-post-meta-boxes-main__presenter {
+	display: flex;
+	box-shadow: 0 $border-width $gray-300;
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
+	position: relative;
+	z-index: 1;
+
+	// Button style reset for both toggle or resizable.
+	.is-toggle-only > &,
+	.is-resizable.edit-post-meta-boxes-main & > button {
+		appearance: none;
+		padding: 0;
+		border: none;
+		outline: none;
+		background-color: transparent;
 	}
 
-	// The component renders as a details element in short viewports.
-	&:is(details) {
-		& > summary {
-			cursor: pointer;
-			color: $gray-900;
-			background-color: $white;
-			height: $button-size-compact;
-			line-height: $button-size-compact;
-			font-size: 13px;
-			padding-left: $grid-unit-30;
-			box-shadow: 0 $border-width $gray-300;
+	.is-toggle-only > & {
+		flex-shrink: 0;
+		cursor: pointer;
+		height: $button-size-compact;
+		justify-content: space-between;
+		align-items: center;
+		padding-inline: $grid-unit-30 $grid-unit-15;
+
+		&:is(:hover, :focus-visible) {
+			color: var(--wp-admin-theme-color);
+		}
+		&:focus-visible::after {
+			content: "";
+			position: absolute;
+			inset: var(--wp-admin-border-width-focus);
+			@include button-style__focus();
+		}
+		> svg {
+			fill: currentColor;
+		}
+	}
+
+	.is-resizable.edit-post-meta-boxes-main & {
+		inset: 0 0 auto;
+
+		> button {
+			cursor: inherit;
+			width: $grid-unit-80;
+			height: $grid-unit-30;
+			margin: auto;
+
+			&::before {
+				content: "";
+				background-color: $gray-300;
+				// Windows High Contrast mode will show this outline, but not the background-color.
+				outline: 2px solid transparent;
+				outline-offset: -2px;
+				position: absolute;
+				inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+				transform: translateX(-50%);
+				width: inherit;
+				height: $grid-unit-05;
+				border-radius: $radius-small;
+				transition: width 0.3s ease-out;
+				@include reduce-motion("transition");
+			}
 		}
 
-		&[open] > summary {
-			position: sticky;
-			top: 0;
-			z-index: 1;
+		&:is(:hover, :focus-within) > button::before {
+			background-color: var(--wp-admin-theme-color);
+			width: $grid-unit-80 + $grid-unit-20;
 		}
 	}
 }
 
-.edit-post-meta-boxes-main__resize-handle {
-	display: flex;
-	// The position is absolute by default inline style of ResizableBox.
-	inset: 0 0 auto 0;
-	height: $resize-handle-height;
-	box-shadow: 0 $border-width $gray-300;
+@media (pointer: coarse) {
+	.is-resizable.edit-post-meta-boxes-main {
+		padding-block-start: $button-size-compact;
 
-	& > button {
-		appearance: none;
-		cursor: inherit;
-		margin: auto;
-		padding: 0;
-		border: none;
-		outline: none;
-		background-color: $gray-300;
-		width: $grid-unit-80;
-		height: $grid-unit-05;
-		border-radius: $radius-small;
-		transition: width 0.3s ease-out;
-		@include reduce-motion("transition");
-	}
-
-	&:hover > button,
-	> button:focus {
-		background-color: var(--wp-admin-theme-color);
-		width: $grid-unit-80 + $grid-unit-20;
+		.edit-post-meta-boxes-main__presenter > button {
+			height: $button-size-compact;
+		}
 	}
 }
 
 .edit-post-meta-boxes-main__liner {
 	overflow: auto;
-	max-height: 100%;
 	// Keep the contents behind the resize handle or details summary.
 	isolation: isolate;
+}
+
+// In case the canvas is not iframe’d.
+.edit-post-layout__metaboxes {
+	clear: both;
 }
 
 .has-metaboxes .editor-visual-editor {

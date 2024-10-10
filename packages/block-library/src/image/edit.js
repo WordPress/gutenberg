@@ -7,9 +7,9 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
-import { store as blocksStore, createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -28,7 +28,6 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
@@ -113,7 +112,6 @@ export function ImageEdit( {
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
-	const registry = useRegistry();
 	const containerRef = useRef();
 	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
 	// This won't work for them because the container width changes with the image.
@@ -373,15 +371,15 @@ export function ImageEdit( {
 				return {};
 			}
 
-			const blockBindingsSource = unlock(
-				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					! blockBindingsSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: metadata?.bindings?.url?.args,
 					} ),

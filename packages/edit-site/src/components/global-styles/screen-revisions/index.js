@@ -3,7 +3,6 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalUseNavigator as useNavigator,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Spinner,
 } from '@wordpress/components';
@@ -33,7 +32,6 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 const PAGE_SIZE = 10;
 
 function ScreenRevisions() {
-	const { goTo } = useNavigator();
 	const { user: currentEditorGlobalStyles, setUserConfig } =
 		useContext( GlobalStylesContext );
 	const { blocks, editorCanvasContainerView } = useSelect(
@@ -71,8 +69,9 @@ function ScreenRevisions() {
 		currentEditorGlobalStyles
 	);
 
+	// The actual code that triggers the revisions screen to navigate back
+	// to the home screen in in `packages/edit-site/src/components/global-styles/ui.js`.
 	const onCloseRevisions = () => {
-		goTo( '/' ); // Return to global styles main panel.
 		const canvasContainerView =
 			editorCanvasContainerView === 'global-styles-revisions:style-book'
 				? 'style-book'
@@ -85,15 +84,6 @@ function ScreenRevisions() {
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
 	};
-
-	useEffect( () => {
-		if (
-			! editorCanvasContainerView ||
-			! editorCanvasContainerView.startsWith( 'global-styles-revisions' )
-		) {
-			goTo( '/' ); // Return to global styles main panel.
-		}
-	}, [ editorCanvasContainerView ] );
 
 	useEffect( () => {
 		if ( ! isLoading && revisions.length ) {

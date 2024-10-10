@@ -500,7 +500,7 @@ test.describe( 'Synced pattern', () => {
 			.click();
 		await page
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Awesome empty' );
 

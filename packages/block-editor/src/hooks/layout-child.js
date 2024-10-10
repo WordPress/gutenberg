@@ -17,6 +17,9 @@ import {
 	GridItemMovers,
 } from '../components/grid';
 
+// Used for generating the instance ID
+const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
+
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
@@ -32,7 +35,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	} = layout;
 	const parentLayout = useLayout() || {};
 	const { columnCount, minimumColumnWidth } = parentLayout;
-	const id = useInstanceId( useBlockPropsChildLayoutStyles );
+	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
 	const selector = `.wp-container-content-${ id }`;
 
 	// Check that the grid layout attributes are of the correct type, so that we don't accidentally

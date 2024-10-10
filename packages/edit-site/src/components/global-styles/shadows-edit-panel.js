@@ -15,7 +15,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -35,7 +35,7 @@ import {
 	reset,
 	moreVertical,
 } from '@wordpress/icons';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -73,12 +73,30 @@ const presetShadowMenuItems = [
 
 export default function ShadowsEditPanel() {
 	const {
+		goBack,
 		params: { category, slug },
-		goTo,
 	} = useNavigator();
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
 	);
+
+	useEffect( () => {
+		const hasCurrentShadow = shadows?.some(
+			( shadow ) => shadow.slug === slug
+		);
+		// If the shadow being edited doesn't exist anymore in the global styles setting, navigate back
+		// to prevent the user from editing a non-existent shadow entry.
+		// This can happen, for example:
+		// - when the user deletes the shadow
+		// - when the user resets the styles while editing a custom shadow
+		//
+		// The check on the slug is necessary to prevent a double back navigation when the user triggers
+		// a backward navigation by interacting with the screen's UI.
+		if ( !! slug && ! hasCurrentShadow ) {
+			goBack();
+		}
+	}, [ shadows, slug, goBack ] );
+
 	const [ baseShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`,
 		undefined,
@@ -95,6 +113,10 @@ export default function ShadowsEditPanel() {
 		useState( false );
 	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
 	const [ shadowName, setShadowName ] = useState( selectedShadow.name );
+
+	if ( ! category || ! slug ) {
+		return null;
+	}
 
 	const onShadowChange = ( shadow ) => {
 		setSelectedShadow( { ...selectedShadow, shadow } );
@@ -119,9 +141,7 @@ export default function ShadowsEditPanel() {
 	};
 
 	const handleShadowDelete = () => {
-		const updatedShadows = shadows.filter( ( s ) => s.slug !== slug );
-		setShadows( updatedShadows );
-		goTo( `/shadows` );
+		setShadows( shadows.filter( ( s ) => s.slug !== slug ) );
 	};
 
 	const handleShadowRename = ( newName ) => {

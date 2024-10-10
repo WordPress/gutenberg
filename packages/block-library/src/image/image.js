@@ -17,7 +17,7 @@ import {
 	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -34,7 +34,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -134,7 +134,6 @@ export default function Image( {
 	const numericWidth = width ? parseInt( width, 10 ) : undefined;
 	const numericHeight = height ? parseInt( height, 10 ) : undefined;
 
-	const registry = useRegistry();
 	const imageRef = useRef();
 	const { allowResize = true } = context;
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
@@ -477,7 +476,6 @@ export default function Image( {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -497,7 +495,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: urlBinding?.args,
 					} ),
@@ -512,7 +510,7 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: altBinding?.args,
 					} ),
@@ -526,7 +524,7 @@ export default function Image( {
 				lockTitleControls:
 					!! titleBinding &&
 					! titleBindingSource?.canUserEditValue?.( {
-						registry,
+						select,
 						context,
 						args: titleBinding?.args,
 					} ),
