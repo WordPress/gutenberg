@@ -37,6 +37,11 @@ test.describe( 'Zoom Out', () => {
 		expect( iframeRect.width ).toBeGreaterThan( htmlRect.width );
 
 		// Check that the zoomed out content has a frame around it.
+		const paddingTop = await html.evaluate( ( element ) => {
+			const paddingValue = window.getComputedStyle( element ).paddingTop;
+			return parseFloat( paddingValue );
+		} );
+		expect( htmlRect.y + paddingTop ).toBeGreaterThan( iframeRect.y );
 		expect( htmlRect.x ).toBeGreaterThan( iframeRect.x );
 	} );
 } );
