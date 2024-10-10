@@ -196,8 +196,8 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
  */
 function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
 	$rules .= "\n# BEGIN Gutenberg client-side media processing experiment\n" .
-	          "AddType application/wasm wasm\n" .
-	          "# END Gutenberg client-side media processing experiment\n";
+				"AddType application/wasm wasm\n" .
+				"# END Gutenberg client-side media processing experiment\n";
 
 	return $rules;
 }
@@ -254,7 +254,7 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	$coep = $is_safari ? 'require-corp' : 'credentialless';
 
 	ob_start(
-		function ( string $output, ?int $phase ) use ( $coep ): string {
+		function ( string $output ) use ( $coep ): string {
 			header( 'Cross-Origin-Opener-Policy: same-origin' );
 			header( "Cross-Origin-Embedder-Policy: $coep" );
 
