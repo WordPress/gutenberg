@@ -22,6 +22,14 @@ interface Flusher {
 	readonly dispose: () => void;
 }
 
+declare global {
+	interface Window {
+		scheduler: {
+			readonly yield: () => void;
+		};
+	}
+}
+
 /**
  * Executes a callback function after the next frame is rendered.
  *
@@ -48,20 +56,20 @@ const afterNextFrame = ( callback: () => void ) => {
  *
  * @return Promise
  */
-export const splitTask = () => {
-	if (
-		'scheduler' in window &&
-		typeof window.scheduler === 'object' &&
-		null !== window.scheduler &&
-		'yield' in window.scheduler &&
-		typeof window.scheduler.yield === 'function'
-	) {
-		return window.scheduler.yield();
-	}
-	return new Promise( async ( resolve ) => {
-		setTimeout( resolve, 0 );
-	} );
-};
+export const splitTask =
+	'scheduler' in window &&
+	typeof window.scheduler === 'object' &&
+	null !== window.scheduler &&
+	'yield' in window.scheduler &&
+	typeof window.scheduler.yield === 'function'
+		? () => {
+				return window.scheduler.yield();
+		  }
+		: () => {
+				return new Promise( async ( resolve ) => {
+					setTimeout( resolve, 0 );
+				} );
+		  };
 
 /**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
