@@ -4,6 +4,8 @@
 import { Card, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useZoomOut } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -14,7 +16,9 @@ import SidebarNavigationScreenGlobalStylesContent from '../sidebar-navigation-sc
 function ScreenStyleVariations() {
 	// Move to zoom out mode when this component is mounted
 	// and back to the previous mode when unmounted.
+	const { setDeviceType } = useDispatch( editorStore );
 	useZoomOut();
+	setDeviceType( 'desktop' );
 
 	return (
 		<>
