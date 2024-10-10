@@ -281,11 +281,33 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 }
 
 /*
+ * Makes a font face filename based on the font face properties.
+ */
+function makeFileNameFromFontFace( fontFace ) {
+	const properties = [
+		'fontFamily',
+		'fontStyle',
+		'fontWeight',
+		'unicodeRange',
+	];
+	let name = properties.reduce( ( acc, property ) => {
+		if ( fontFace?.[ property ] ) {
+			acc += `${ fontFace[ property ] }-`;
+		}
+		return acc;
+	}, '' );
+	// Remove the last dash
+	name = name.slice( 0, -1 );
+	// Slugify the name
+	return kebabCase( name );
+}
+
+/*
  * Downloads a font face asset from a URL to the client and returns a File object.
  */
-export async function downloadFontFaceAssets( src ) {
+export async function downloadFontFaceAssets( fontFace ) {
 	// Normalize to an array, since `src` could be a string or array.
-	src = Array.isArray( src ) ? src : [ src ];
+	const src = Array.isArray( fontFace.src ) ? fontFace.src : [ fontFace.src ];
 
 	const files = await Promise.all(
 		src.map( async ( url ) => {
@@ -299,7 +321,9 @@ export async function downloadFontFaceAssets( src ) {
 					return response.blob();
 				} )
 				.then( ( blob ) => {
-					const filename = url.split( '/' ).pop();
+					const name = makeFileNameFromFontFace( fontFace );
+					const extension = url.split( '.' ).pop();
+					const filename = `${ name }.${ extension }`;
 					const file = new File( [ blob ], filename, {
 						type: blob.type,
 					} );
@@ -307,7 +331,6 @@ export async function downloadFontFaceAssets( src ) {
 				} );
 		} )
 	);
-
 	// If we only have one file return it (not the array).  Otherwise return all of them in the array.
 	return files.length === 1 ? files[ 0 ] : files;
 }
