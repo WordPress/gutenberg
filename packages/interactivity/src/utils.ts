@@ -57,11 +57,7 @@ const afterNextFrame = ( callback: () => void ) => {
  * @return Promise
  */
 export const splitTask =
-	'scheduler' in window &&
-	typeof window.scheduler === 'object' &&
-	null !== window.scheduler &&
-	'yield' in window.scheduler &&
-	typeof window.scheduler.yield === 'function'
+	typeof window.scheduler?.yield === 'function'
 		? window.scheduler.yield.bind( window.scheduler )
 		: () => {
 				return new Promise( ( resolve ) => {
