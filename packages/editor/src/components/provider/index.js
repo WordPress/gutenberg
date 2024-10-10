@@ -10,7 +10,7 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import {
-	BlockEditorProvider,
+	// BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -392,7 +392,7 @@ export function EditorProvider( props ) {
 	return (
 		<ExperimentalEditorProvider
 			{ ...props }
-			BlockEditorProviderComponent={ BlockEditorProvider }
+			// BlockEditorProviderComponent={ BlockEditorProvider }
 		>
 			{ props.children }
 		</ExperimentalEditorProvider>
