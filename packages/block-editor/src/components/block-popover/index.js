@@ -132,13 +132,14 @@ function BlockPopover(
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
 					// If the rootSectionElement is undefined then recurse up the DOM tree
-					// to find the element with `is-root-container` classname.
+					// to find the element with `block-editor-iframe__body` classname.
 					// This can then be used as the anchor point.
 					// FIXME: we should not rely on classnames to find the
 					// root section element
 					if ( ! rootSectionElement ) {
-						postRootElement =
-							selectedElement.closest( '.is-root-container' );
+						postRootElement = selectedElement.closest(
+							'.block-editor-iframe__body'
+						);
 					}
 
 					// Compute the height based on the parent section of the
@@ -176,11 +177,14 @@ function BlockPopover(
 			contextElement: selectedElement,
 		};
 	}, [
-		bottomClientId,
-		lastSelectedElement,
-		selectedElement,
 		popoverDimensionsRecomputeCounter,
 		isZoomOut,
+		parentSectionElement,
+		selectedElement,
+		bottomClientId,
+		lastSelectedElement,
+		isSectionSelected,
+		rootSectionElement,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
