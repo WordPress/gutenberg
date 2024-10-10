@@ -27,8 +27,10 @@
 	@include editor-canvas-resize-animation;
 
 	// Applying flex here prevents the body element, and title inside, from margin-collapse.
-	display: flex;
-	flex-direction: column;
+	body {
+		display: flex;
+		flex-direction: column;
+	}
 }
 
 .block-editor-iframe__html.is-zoomed-out {
