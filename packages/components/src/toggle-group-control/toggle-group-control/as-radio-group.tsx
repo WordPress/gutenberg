@@ -3,12 +3,14 @@
  */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,6 +33,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		size,
 		value: valueProp,
 		id: idProp,
+		setSelectedElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -64,21 +67,34 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		defaultValue,
 		value,
 		setValue: wrappedOnChangeProp,
+		rtl: isRTL(),
 	} );
 
-	const selectedValue = radio.useState( 'value' );
+	const selectedValue = useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
 
 	const groupContextValue = useMemo(
-		() =>
-			( {
-				baseId,
-				isBlock: ! isAdaptiveWidth,
-				size,
-				value: selectedValue,
-				setValue,
-			} ) as ToggleGroupControlContextProps,
-		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
+		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
+			baseId,
+			isBlock: ! isAdaptiveWidth,
+			size,
+			// @ts-expect-error - This is wrong and we should fix it.
+			value: selectedValue,
+			// @ts-expect-error - This is wrong and we should fix it.
+			setValue,
+			setSelectedElement,
+		} ),
+		[
+			baseId,
+			isAdaptiveWidth,
+			radio,
+			selectedValue,
+			setSelectedElement,
+			setValue,
+			size,
+		]
 	);
 
 	return (

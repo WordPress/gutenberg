@@ -39,11 +39,10 @@
 	&::after {
 		content: "";
 		display: flex;
-		flex: 1 0 $grid-unit-60;
+		flex: 1 0 $button-size-next-default-40px;
 		pointer-events: none;
-		min-height: $grid-unit-60 - $border-width - $border-width;
+		min-height: $button-size-next-default-40px - $border-width - $border-width;
 		border: $border-width dashed currentColor;
-		@include placeholder-style();
 	}
 
 	// Let the parent be selectable in the placeholder area.

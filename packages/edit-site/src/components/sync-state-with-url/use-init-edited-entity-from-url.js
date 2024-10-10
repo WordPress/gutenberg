@@ -37,10 +37,9 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		url,
 		frontPageTemplateId,
 	} = useSelect( ( select ) => {
-		const { getSite, getUnstableBase, getEntityRecords } =
-			select( coreDataStore );
-		const siteData = getSite();
-		const base = getUnstableBase();
+		const { getEntityRecord, getEntityRecords } = select( coreDataStore );
+		const siteData = getEntityRecord( 'root', 'site' );
+		const base = getEntityRecord( 'root', '__unstableBase' );
 		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
@@ -87,6 +86,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypesWithoutParentTemplate.includes( postType ) &&
 				postId
 			) {
+				return undefined;
+			}
+
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
 				return undefined;
 			}
 

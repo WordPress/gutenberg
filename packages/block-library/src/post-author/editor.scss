@@ -1,0 +1,7 @@
+.wp-block-post-author__inspector-settings {
+	// Counteract the margin added by the block inspector.
+	.components-base-control,
+	.components-base-control:last-child {
+		margin-bottom: 0;
+	}
+}

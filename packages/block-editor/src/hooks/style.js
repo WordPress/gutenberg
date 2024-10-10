@@ -381,10 +381,7 @@ function useBlockProps( { name, style } ) {
 		useBlockProps
 	) }`;
 
-	// The .editor-styles-wrapper selector is required on elements styles. As it is
-	// added to all other editor styles, not providing it causes reset and global
-	// styles to override element styles because of higher specificity.
-	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
+	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
 	const styles = useMemo( () => {

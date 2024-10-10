@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl,
+	ToggleGroupControl as _ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -25,6 +25,10 @@ import type { ToggleGroupControlProps } from '../types';
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
+const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
 };
 
 const ControlledToggleGroupControl = ( {
@@ -156,6 +160,19 @@ describe.each( [
 		await click( screen.getByRole( 'radio', { name: 'R' } ) );
 
 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
+	} );
+
+	it( 'should not set a value on focus', async () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+
+		const radio = screen.getByRole( 'radio', { name: 'R' } );
+		expect( radio ).not.toBeChecked();
+
+		await press.Tab();
+		expect( radio ).toHaveFocus();
+		expect( radio ).not.toBeChecked();
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
@@ -341,11 +358,9 @@ describe.each( [
 					name: 'R',
 				} );
 
-				await sleep();
 				await press.Tab();
 				expect( rigas ).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 
 				// When in controlled mode, there is an additional "Reset" button.
@@ -372,7 +387,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(
@@ -448,7 +462,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -457,7 +470,6 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -490,7 +502,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(

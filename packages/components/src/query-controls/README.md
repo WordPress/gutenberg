@@ -240,3 +240,10 @@ The selected category for the `categoriesList` prop.
 
 -   Required: No
 -   Platform: Web
+
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

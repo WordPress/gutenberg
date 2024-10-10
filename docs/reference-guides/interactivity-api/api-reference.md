@@ -55,7 +55,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive="myPlugin"
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -66,7 +66,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -84,7 +84,7 @@ It provides a **local** state available to a specific HTML node and its children
 The `wp-context` directive accepts a stringified JSON as a value.
 
 ```php
-//render.php
+// render.php
 <div data-wp-context='{ "post": { "id": <?php echo $post->ID; ?> } }' >
   <button data-wp-on--click="actions.logId" >
     Click Me!
@@ -110,13 +110,13 @@ store( "myPlugin", {
 Different contexts can be defined at different levels, and deeper levels will merge their own context with any parent one:
 
 ```html
-<div data-wp-context="{ foo: 'bar' }">
+<div data-wp-context='{ "foo": "bar" }'>
   <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
 
-  <div data-wp-context="{ bar: 'baz' }">
+  <div data-wp-context='{ "bar": "baz" }'>
     <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
 
-    <div data-wp-context="{ foo: 'bob' }">
+    <div data-wp-context='{ "foo": "bob" }'>
       <span data-wp-text="context.foo"><!-- Will output: "bob" --></span>
     </div>
 
@@ -356,8 +356,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-async`
 
-This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread
-to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
+This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
 
 ### `wp-on-window`
 
@@ -369,8 +368,7 @@ This directive allows you to attach global window events like `resize`, `copy`, 
 
 [List of supported window events.](https://developer.mozilla.org/en-US/docs/Web/API/Window#events)
 
-The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize`
-or `data-wp-on-window--languagechange`).
+The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize` or `data-wp-on-window--languagechange`).
 
 ```php
 <div data-wp-on-window--resize="callbacks.logWidth"></div>
@@ -406,8 +404,7 @@ This directive allows you to attach global document events like `scroll`, `mouse
 
 [List of supported document events.](https://developer.mozilla.org/en-US/docs/Web/API/Document#events)
 
-The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown`
-or `data-wp-on-document--selectionchange`).
+The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown` or `data-wp-on-document--selectionchange`).
 
 ```php
 <div data-wp-on-document--keydown="callbacks.logKeydown"></div>
@@ -501,7 +498,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
 
 ```html
 <div data-wp-init="callbacks.logTimeInit">
-  <p>Hi!</>
+  <p>Hi!</p>
 </div>
 ```
 
@@ -520,6 +517,8 @@ Here's another example with several `wp-init` directives on the same DOM element
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
+import { store, getElement } from '@wordpress/interactivity';
+
 store( "myPlugin", {
   callbacks: {
     logTimeInit: () => console.log( `Init at ` + new Date() ),
@@ -776,7 +775,7 @@ Actions are just regular JavaScript functions. Usually triggered by the `data-wp
 ```ts
 const { state, actions } = store("myPlugin", {
   actions: {
-    selectItem: (id?: number) => {
+    selectItem: ( id ) => {
       const context = getContext();
       // `id` is optional here, so this action can be used in a directive.
       state.selected = id || context.id;
@@ -882,10 +881,10 @@ const { state } = store( "myPlugin", {
       GBP: 0.85,
     },
     get amountInUSD() {
-      return state.currencyExchange[ 'USD' ] * state.amount,
+      return state.currencyExchange[ 'USD' ] * state.amount;
     },
     get amountInGBP() {
-      return state.currencyExchange[ 'GBP' ] * state.amount,
+      return state.currencyExchange[ 'GBP' ] * state.amount;
     },
   },
 } );
@@ -965,7 +964,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 *In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
-The `store` method used to set the store in javascript can be imported from `@wordpress/interactivity`.
+The `store` method used to set the store in JavaScript can be imported from `@wordpress/interactivity`.
 
 ```js
 // store
@@ -1111,7 +1110,7 @@ store( "myPlugin", {
   actions: {
     log: () => {
       const element = getElement();
-			 // Logs "false"
+			 // Logs attributes
       console.log('element attributes => ', element.attributes)
     },
   },
@@ -1122,7 +1121,7 @@ The code will log:
 
 ```json
 {
-	"data-wp-on--click": 'actions.increaseCounter',
+	"data-wp-on--click": 'actions.log',
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
@@ -1147,12 +1146,13 @@ store('mySliderPlugin', {
 				3_000
 			);
 		},
+  },
 })
 ```
 
 ## Server functions
 
-The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
+The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's send to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
 
 ### wp_interactivity_config
 
@@ -1181,6 +1181,53 @@ This config can be retrieved on the client:
 const { showLikeButton } = getConfig();
 ```
 
+### wp_interactivity_state
+
+`wp_interactivity_state` allows the initialization of the global state on the server, which will be used to process the directives on the server and then will be merged with any global state defined in the client.
+
+Initializing the global state on the server also allows you to use many critical WordPress APIs, including [AJAX](https://developer.wordpress.org/plugins/javascript/ajax/), or [nonces](https://developer.wordpress.org/plugins/javascript/enqueuing/#nonce).
+
+The `wp_interactivity_state` function receives two arguments, a string with the namespace that will be used as a reference and an associative array containing the values.
+
+Here is an example of passing the WP Admin AJAX endpoint with a nonce.
+
+```php
+// render.php
+
+wp_interactivity_state(
+	'myPlugin',
+	array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
+	),
+);
+```
+
+```js
+// view.js
+
+const { state } = store( 'myPlugin', {
+	actions: {
+		*doSomething() {
+			try {
+				const formData = new FormData();
+				formData.append( 'action', 'do_something' );
+				formData.append( '_ajax_nonce', state.nonce );
+
+				const data = yield fetch( state.ajaxUrl, {
+					method: 'POST',
+					body: formData,
+				} ).then( ( response ) => response.json() );
+					console.log( 'Server data!', data );
+				} catch ( e ) {
+					// Something went wrong!
+				}
+			},
+		},
+	}
+);
+```
+
 ### wp_interactivity_process_directives
 
 `wp_interactivity_process_directives` returns the updated HTML after the directives have been processed.
@@ -1198,7 +1245,7 @@ echo $processed_html;
 
 will output:
 ```html
-<div data-wp-text="create-block::state.greeting">Hello, World!</div>
+<div data-wp-text="myPlugin::state.greeting">Hello, World!</div>
 ```
 
 ### wp_interactivity_data_wp_context

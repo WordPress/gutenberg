@@ -37,8 +37,9 @@
 
 .components-site-icon {
 	border: none;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	margin-right: $grid-unit-15;
+	flex-shrink: 0;
 
 	// Same size as in the Site menu.
 	height: 36px;
@@ -54,6 +55,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	word-break: break-word;
 }
 
 .editor-post-publish-panel__header-publish-button,
@@ -66,12 +68,12 @@
 }
 
 .editor-post-publish-panel__header-publish-button {
-	padding-right: $grid-unit-05;
+	padding-left: $grid-unit-05;
 	justify-content: center;
 }
 
 .editor-post-publish-panel__header-cancel-button {
-	padding-left: $grid-unit-05;
+	padding-right: $grid-unit-05;
 }
 
 .editor-post-publish-panel__header-published {

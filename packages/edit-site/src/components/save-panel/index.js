@@ -150,6 +150,7 @@ export default function SavePanel() {
 				} ) }
 			>
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }

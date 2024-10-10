@@ -40,7 +40,12 @@ export function getCompatibilityStyles() {
 			// Don't try to add the reset styles, which were removed as a dependency
 			// from `edit-blocks` for the iframe since we don't need to reset admin
 			// styles.
-			if ( ownerNode.id === 'wp-reset-editor-styles-css' ) {
+			if (
+				[
+					'wp-reset-editor-styles-css',
+					'wp-reset-editor-styles-rtl-css',
+				].includes( ownerNode.id )
+			) {
 				return accumulator;
 			}
 

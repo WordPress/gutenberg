@@ -87,6 +87,7 @@ function Palette( { name } ) {
 			{ window.__experimentalEnableColorRandomizer &&
 				themeColors?.length > 0 && (
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						icon={ shuffle }
 						onClick={ randomizeThemeColors }

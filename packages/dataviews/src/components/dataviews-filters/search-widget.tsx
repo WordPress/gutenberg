@@ -8,27 +8,17 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import {
-	VisuallyHidden,
-	Icon,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { VisuallyHidden, Icon, Composite } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import type { Filter, NormalizedFilter, View } from '../../types';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 interface SearchWidgetProps {
 	view: View;
@@ -84,22 +74,37 @@ const getNewValue = (
 	return [ value ];
 };
 
+function generateFilterElementCompositeItemId(
+	prefix: string,
+	filterElementValue: string
+) {
+	return `${ prefix }-${ filterElementValue }`;
+}
+
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
-	const compositeStore = useCompositeStore( {
-		virtualFocus: true,
-		focusLoop: true,
-		// When we have no or just one operator, we can set the first item as active.
-		// We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
-		// so the first item is not selected, since the focus is on the operators control.
-		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
-	} );
+	const baseId = useInstanceId( ListBox, 'dataviews-filter-list-box' );
+
+	const [ activeCompositeId, setActiveCompositeId ] = useState<
+		string | null | undefined
+	>(
+		// When there are one or less operators, the first item is set as active
+		// (by setting the initial `activeId` to `undefined`).
+		// With 2 or more operators, the focus is moved on the operators control
+		// (by setting the initial `activeId` to `null`), meaning that there won't
+		// be an active item initially. Focus is then managed via the
+		// `onFocusVisible` callback.
+		filter.operators?.length === 1 ? undefined : null
+	);
 	const currentFilter = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
 	return (
 		<Composite
-			store={ compositeStore }
+			virtualFocus
+			focusLoop
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
 			role="listbox"
 			className="dataviews-filters__search-widget-listbox"
 			aria-label={ sprintf(
@@ -108,18 +113,28 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 				filter.name
 			) }
 			onFocusVisible={ () => {
-				if ( ! compositeStore.getState().activeId ) {
-					compositeStore.move( compositeStore.first() );
+				// `onFocusVisible` needs the `Composite` component to be focusable,
+				// which is implicitly achieved via the `virtualFocus` prop.
+				if ( ! activeCompositeId && filter.elements.length ) {
+					setActiveCompositeId(
+						generateFilterElementCompositeItemId(
+							baseId,
+							filter.elements[ 0 ].value
+						)
+					);
 				}
 			} }
-			render={ <Ariakit.CompositeTypeahead store={ compositeStore } /> }
+			render={ <Composite.Typeahead /> }
 		>
 			{ filter.elements.map( ( element ) => (
-				<Ariakit.CompositeHover
-					store={ compositeStore }
+				<Composite.Hover
 					key={ element.value }
 					render={
-						<CompositeItem
+						<Composite.Item
+							id={ generateFilterElementCompositeItemId(
+								baseId,
+								element.value
+							) }
 							render={
 								<div
 									aria-label={ element.label }
@@ -184,15 +199,8 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 								<Icon icon={ check } />
 							) }
 					</span>
-					<span>
-						{ element.label }
-						{ !! element.description && (
-							<span className="dataviews-filters__search-widget-listitem-description">
-								{ element.description }
-							</span>
-						) }
-					</span>
-				</Ariakit.CompositeHover>
+					<span>{ element.label }</span>
+				</Composite.Hover>
 			) ) }
 		</Composite>
 	);
@@ -213,7 +221,6 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
-			resetValueOnSelect={ false }
 			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter
@@ -273,6 +280,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 				{ matches.map( ( element ) => {
 					return (
 						<Ariakit.ComboboxItem
+							resetValueOnSelect={ false }
 							key={ element.value }
 							value={ element.value }
 							className="dataviews-filters__search-widget-listitem"

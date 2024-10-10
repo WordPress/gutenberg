@@ -30,7 +30,7 @@ const v1ToV5ImageFillStyles = ( url, focalPoint ) => {
 		: {};
 };
 
-const v6ImageFillStyles = ( url, focalPoint ) => {
+const v6ToV7ImageFillStyles = ( url, focalPoint ) => {
 	return url
 		? {
 				backgroundImage: `url(${ url })`,
@@ -172,29 +172,43 @@ const v6Attributes = {
 		selector: 'figure img',
 		attribute: 'alt',
 		default: '',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaId: {
 		type: 'number',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaUrl: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure video,figure img',
 		attribute: 'src',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	href: {
 		type: 'string',
 		source: 'attribute',
 		selector: 'figure a',
 		attribute: 'href',
-		__experimentalRole: 'content',
+		role: 'content',
 	},
 	mediaType: {
 		type: 'string',
-		__experimentalRole: 'content',
+		role: 'content',
+	},
+};
+
+const v7Attributes = {
+	...v6Attributes,
+	align: {
+		type: 'string',
+		// v7 changed the default for the `align` attribute.
+		default: 'none',
+	},
+	// New attribute.
+	useFeaturedImage: {
+		type: 'boolean',
+		default: false,
 	},
 };
 
@@ -234,6 +248,148 @@ const v6Supports = {
 		__experimentalDefaultControls: {
 			fontSize: true,
 		},
+	},
+};
+
+const v7Supports = {
+	...v6Supports,
+	__experimentalBorder: {
+		color: true,
+		radius: true,
+		style: true,
+		width: true,
+		__experimentalDefaultControls: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
+	},
+	color: {
+		gradients: true,
+		heading: true,
+		link: true,
+		__experimentalDefaultControls: {
+			background: true,
+			text: true,
+		},
+	},
+	interactivity: {
+		clientNavigation: true,
+	},
+};
+
+// Version with 'none' as the default alignment.
+// See: https://github.com/WordPress/gutenberg/pull/64981
+const v7 = {
+	attributes: v7Attributes,
+	supports: v7Supports,
+	usesContext: [ 'postId', 'postType' ],
+	save( { attributes } ) {
+		const {
+			isStackedOnMobile,
+			mediaAlt,
+			mediaPosition,
+			mediaType,
+			mediaUrl,
+			mediaWidth,
+			mediaId,
+			verticalAlignment,
+			imageFill,
+			focalPoint,
+			linkClass,
+			href,
+			linkTarget,
+			rel,
+		} = attributes;
+		const mediaSizeSlug =
+			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+		const newRel = ! rel ? undefined : rel;
+
+		const imageClasses = clsx( {
+			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+		} );
+
+		let image = mediaUrl ? (
+			<img
+				src={ mediaUrl }
+				alt={ mediaAlt }
+				className={ imageClasses || null }
+			/>
+		) : null;
+
+		if ( href ) {
+			image = (
+				<a
+					className={ linkClass }
+					href={ href }
+					target={ linkTarget }
+					rel={ newRel }
+				>
+					{ image }
+				</a>
+			);
+		}
+
+		const mediaTypeRenders = {
+			image: () => image,
+			video: () => <video controls src={ mediaUrl } />,
+		};
+		const className = clsx( {
+			'has-media-on-the-right': 'right' === mediaPosition,
+			'is-stacked-on-mobile': isStackedOnMobile,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]:
+				verticalAlignment,
+			'is-image-fill': imageFill,
+		} );
+		const backgroundStyles = imageFill
+			? v6ToV7ImageFillStyles( mediaUrl, focalPoint )
+			: {};
+
+		let gridTemplateColumns;
+		if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
+			gridTemplateColumns =
+				'right' === mediaPosition
+					? `auto ${ mediaWidth }%`
+					: `${ mediaWidth }% auto`;
+		}
+		const style = {
+			gridTemplateColumns,
+		};
+
+		if ( 'right' === mediaPosition ) {
+			return (
+				<div { ...useBlockProps.save( { className, style } ) }>
+					<div
+						{ ...useInnerBlocksProps.save( {
+							className: 'wp-block-media-text__content',
+						} ) }
+					/>
+					<figure
+						className="wp-block-media-text__media"
+						style={ backgroundStyles }
+					>
+						{ ( mediaTypeRenders[ mediaType ] || noop )() }
+					</figure>
+				</div>
+			);
+		}
+		return (
+			<div { ...useBlockProps.save( { className, style } ) }>
+				<figure
+					className="wp-block-media-text__media"
+					style={ backgroundStyles }
+				>
+					{ ( mediaTypeRenders[ mediaType ] || noop )() }
+				</figure>
+				<div
+					{ ...useInnerBlocksProps.save( {
+						className: 'wp-block-media-text__content',
+					} ) }
+				/>
+			</div>
+		);
 	},
 };
 
@@ -301,7 +457,7 @@ const v6 = {
 			'is-image-fill': imageFill,
 		} );
 		const backgroundStyles = imageFill
-			? v6ImageFillStyles( mediaUrl, focalPoint )
+			? v6ToV7ImageFillStyles( mediaUrl, focalPoint )
 			: {};
 
 		let gridTemplateColumns;
@@ -902,4 +1058,4 @@ const v1 = {
 	},
 };
 
-export default [ v6, v5, v4, v3, v2, v1 ];
+export default [ v7, v6, v5, v4, v3, v2, v1 ];

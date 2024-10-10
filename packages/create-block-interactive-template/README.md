@@ -1,6 +1,6 @@
 # Create Block Interactive Template
 
-This is a template for [`@wordpress/create-block`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md) to create interactive blocks
+This is a template for [`@wordpress/create-block`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md) to create interactive blocks.
 
 ## Usage
 

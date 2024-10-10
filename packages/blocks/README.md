@@ -102,6 +102,47 @@ _Returns_
 
 -   `Object`: All block attributes.
 
+### getBlockAttributesNamesByRole
+
+Filter block attributes by `role` and return their names.
+
+_Parameters_
+
+-   _name_ `string`: Block attribute's name.
+-   _role_ `string`: The role of a block attribute.
+
+_Returns_
+
+-   `string[]`: The attribute names that have the provided role.
+
+### getBlockBindingsSource
+
+Returns a registered block bindings source by its name.
+
+_Parameters_
+
+-   _name_ `string`: Block bindings source name.
+
+_Returns_
+
+-   `?Object`: Block bindings source.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
+### getBlockBindingsSources
+
+Returns all registered block bindings sources.
+
+_Returns_
+
+-   `Array`: Block bindings sources.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### getBlockContent
 
 Given a block object, returns the Block's Inner HTML markup.
@@ -479,6 +520,40 @@ _Returns_
 
 -   `Array`: A list of blocks.
 
+### registerBlockBindingsSource
+
+Registers a new block bindings source with an object defining its behavior. Once registered, the source is available to be connected to the supported block attributes.
+
+_Usage_
+
+```js
+import { _x } from '@wordpress/i18n';
+import { registerBlockBindingsSource } from '@wordpress/blocks';
+
+registerBlockBindingsSource( {
+	name: 'plugin/my-custom-source',
+	label: _x( 'My Custom Source', 'block bindings source' ),
+	usesContext: [ 'postType' ],
+	getValues: getSourceValues,
+	setValues: updateMyCustomValuesInBatch,
+	canUserEditValue: () => true,
+} );
+```
+
+_Parameters_
+
+-   _source_ `Object`: Properties of the source to be registered.
+-   _source.name_ `string`: The unique and machine-readable name.
+-   _source.label_ `[string]`: Human-readable label. Optional when it is defined in the server.
+-   _source.usesContext_ `[Array]`: Optional array of context needed by the source only in the editor.
+-   _source.getValues_ `[Function]`: Optional function to get the values from the source.
+-   _source.setValues_ `[Function]`: Optional function to update multiple values connected to the source.
+-   _source.canUserEditValue_ `[Function]`: Optional function to determine if the user can edit the value.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### registerBlockCollection
 
 Registers a new block collection to group blocks in the same namespace in the inserter.
@@ -779,6 +854,26 @@ _Parameters_
 _Returns_
 
 -   `Array`: Updated Block list.
+
+### unregisterBlockBindingsSource
+
+Unregisters a block bindings source by providing its name.
+
+_Usage_
+
+```js
+import { unregisterBlockBindingsSource } from '@wordpress/blocks';
+
+unregisterBlockBindingsSource( 'plugin/my-custom-source' );
+```
+
+_Parameters_
+
+-   _name_ `string`: The name of the block bindings source to unregister.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
 
 ### unregisterBlockStyle
 

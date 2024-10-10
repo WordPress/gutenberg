@@ -10,6 +10,7 @@ import clsx from 'clsx';
  */
 import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -23,27 +24,7 @@ import { HStack } from '../h-stack';
 import { useCx } from '../utils';
 import { space } from '../utils/space';
 
-/**
- * ToggleControl is used to generate a toggle user interface.
- *
- * ```jsx
- * import { ToggleControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const MyToggleControl = () => {
- *   const [ value, setValue ] = useState( false );
- *
- *   return (
- *     <ToggleControl
- *       label="Fixed Background"
- *       checked={ value }
- *       onChange={ () => setValue( ( state ) => ! state ) }
- *     />
- *   );
- * };
- * ```
- */
-export function ToggleControl(
+function UnforwardedToggleControl(
 	{
 		__nextHasNoMarginBottom,
 		label,
@@ -67,6 +48,14 @@ export function ToggleControl(
 		className,
 		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
 	);
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.ToggleControl', {
+			since: '6.7',
+			version: '7.0',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
 
 	let describedBy, helpLabel;
 	if ( help ) {
@@ -121,4 +110,27 @@ export function ToggleControl(
 	);
 }
 
-export default forwardRef( ToggleControl );
+/**
+ * ToggleControl is used to generate a toggle user interface.
+ *
+ * ```jsx
+ * import { ToggleControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyToggleControl = () => {
+ *   const [ value, setValue ] = useState( false );
+ *
+ *   return (
+ *     <ToggleControl
+ *       __nextHasNoMarginBottom
+ *       label="Fixed Background"
+ *       checked={ value }
+ *       onChange={ () => setValue( ( state ) => ! state ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const ToggleControl = forwardRef( UnforwardedToggleControl );
+
+export default ToggleControl;

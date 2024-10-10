@@ -17,7 +17,9 @@ import type { ColorCopyButtonProps } from './types';
 export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 	const { color, colorType } = props;
 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
-	const copyTimer = useRef< ReturnType< typeof setTimeout > | undefined >();
+	const copyTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>();
 	const copyRef = useCopyToClipboard< HTMLDivElement >(
 		() => {
 			switch ( colorType ) {
@@ -34,21 +36,21 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 			}
 		},
 		() => {
-			if ( copyTimer.current ) {
-				clearTimeout( copyTimer.current );
+			if ( copyTimerRef.current ) {
+				clearTimeout( copyTimerRef.current );
 			}
 			setCopiedColor( color.toHex() );
-			copyTimer.current = setTimeout( () => {
+			copyTimerRef.current = setTimeout( () => {
 				setCopiedColor( null );
-				copyTimer.current = undefined;
+				copyTimerRef.current = undefined;
 			}, 3000 );
 		}
 	);
 	useEffect( () => {
-		// Clear copyTimer on component unmount.
+		// Clear copyTimerRef on component unmount.
 		return () => {
-			if ( copyTimer.current ) {
-				clearTimeout( copyTimer.current );
+			if ( copyTimerRef.current ) {
+				clearTimeout( copyTimerRef.current );
 			}
 		};
 	}, [] );

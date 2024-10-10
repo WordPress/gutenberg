@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
@@ -121,7 +122,9 @@ const UnforwardedTabPanel = (
 		defaultSelectedId: prependInstanceId( initialTabName ),
 	} );
 
-	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
+	const selectedTabName = extractTabName(
+		useStoreState( tabStore, 'selectedId' )
+	);
 
 	const setTabStoreSelectedId = useCallback(
 		( tabName: string ) => {

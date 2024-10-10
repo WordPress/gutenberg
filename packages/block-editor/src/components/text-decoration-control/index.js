@@ -8,11 +8,10 @@ import clsx from 'clsx';
  */
 import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import SegmentedTextControl from '../segmented-text-control';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 const TEXT_DECORATIONS = [
 	{
@@ -48,9 +47,11 @@ export default function TextDecorationControl( {
 	className,
 } ) {
 	return (
-		<SegmentedTextControl
+		<ToggleGroupControl
+			isDeselectable
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Decoration' ) }
-			options={ TEXT_DECORATIONS }
 			className={ clsx(
 				'block-editor-text-decoration-control',
 				className
@@ -59,6 +60,17 @@ export default function TextDecorationControl( {
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-		/>
+		>
+			{ TEXT_DECORATIONS.map( ( option ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ option.value }
+						value={ option.value }
+						icon={ option.icon }
+						label={ option.label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }

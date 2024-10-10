@@ -35,7 +35,7 @@ export const muted = css`
 export const highlighterText = css`
 	mark {
 		background: ${ COLORS.alert.yellow };
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusSmall };
 		box-shadow:
 			0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,
 			0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;

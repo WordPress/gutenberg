@@ -158,7 +158,7 @@ test.describe( 'Cover', () => {
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		const defaultHeightValue = await coverBlockEditorSettings
-			.getByLabel( 'Minimum height of cover' )
+			.getByLabel( 'Minimum height' )
 			.inputValue();
 		expect( defaultHeightValue ).toBeFalsy();
 

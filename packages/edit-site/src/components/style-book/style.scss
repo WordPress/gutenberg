@@ -3,13 +3,13 @@
 	// This is useful when the style book is used to fill a frame.
 	height: 100%;
 	&.is-button {
-		border-radius: $radius-block-ui * 4;
+		border-radius: $radius-large;
 	}
 }
 
 .edit-site-style-book__iframe {
 	&.is-button {
-		border-radius: $radius-block-ui * 4;
+		border-radius: $radius-large;
 	}
 	&.is-focused {
 		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
@@ -17,12 +17,16 @@
 	}
 }
 
-.edit-site-style-book__tabs {
-	[role="tablist"] {
-		background: $white;
-		color: $gray-900;
-	}
+.edit-site-style-book__tablist-container {
+	background: $white;
+	width: 100%;
+	padding-right: 56px;
+	display: flex;
+	position: absolute;
+	z-index: 1;
+}
 
+.edit-site-style-book__tabs {
 	[role="tabpanel"] {
 		bottom: 0;
 		left: 0;

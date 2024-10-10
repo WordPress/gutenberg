@@ -15,7 +15,7 @@
  *
  * @see WP_REST_Controller
  */
-class Gutenberg_REST_Global_Styles_Revisions_Controller_6_6 extends Gutenberg_REST_Global_Styles_Revisions_Controller_6_5 {
+class Gutenberg_REST_Global_Styles_Revisions_Controller_6_6 extends WP_REST_Global_Styles_Revisions_Controller {
 	/**
 	 * Prepares the revision for the REST response.
 	 *

@@ -169,6 +169,7 @@ export default function ReusableBlockConvertButton( {
 					>
 						<VStack spacing="5">
 							<TextControl
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Name' ) }
 								value={ title }
@@ -176,6 +177,7 @@ export default function ReusableBlockConvertButton( {
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
@@ -189,6 +191,7 @@ export default function ReusableBlockConvertButton( {
 							/>
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -198,7 +201,11 @@ export default function ReusableBlockConvertButton( {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Create' ) }
 								</Button>
 							</HStack>
