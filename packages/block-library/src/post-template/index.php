@@ -68,14 +68,14 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			$query->rewind_posts();
 
 			// Add search parameter if it exists.
-			if ( ! empty( $search_query ) ) {
+			if ( $enhanced_pagination && ! empty( $search_query ) ) {
 				$query_args['s'] = $search_query;
 			}
 			$query->query( $query_args );
 
 		} else {
 			// The query has not been run yet, modify the global query.
-			if ( ! empty( $search_query ) ) {
+			if ( $enhanced_pagination && ! empty( $search_query ) ) {
 				$wp_query->set( 's', $search_query );
 			}
 			$query = $wp_query;
