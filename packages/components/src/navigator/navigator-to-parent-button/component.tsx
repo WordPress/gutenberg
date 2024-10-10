@@ -17,21 +17,16 @@ function UnconnectedNavigatorToParentButton(
 ) {
 	deprecated( 'wp.components.NavigatorToParentButton', {
 		since: '6.7',
-		alternative: 'wp.components.NavigatorBackButton',
+		alternative: 'wp.components.Navigator.BackButton',
 	} );
 
 	return <NavigatorBackButton ref={ forwardedRef } { ...props } />;
 }
 
 /**
- * _Note: this component is deprecated. Please use the `NavigatorBackButton`
- * component instead._
- *
  * @deprecated
  */
 export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
-	'NavigatorToParentButton'
+	'Navigator.ToParentButton'
 );
-
-export default NavigatorToParentButton;

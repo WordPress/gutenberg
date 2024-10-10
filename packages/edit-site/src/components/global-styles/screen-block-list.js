@@ -174,7 +174,7 @@ function ScreenBlockList() {
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }
-				label={ __( 'Search for blocks' ) }
+				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
 			<MemoizedBlockList filterValue={ deferredFilterValue } />

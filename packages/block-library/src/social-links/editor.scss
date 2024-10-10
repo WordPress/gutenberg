@@ -101,19 +101,10 @@
 .wp-block-social-links .block-list-appender {
 	position: static; // display inline.
 
-	.block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-10 - 2px;
-	}
-}
-
-.wp-block-social-links {
-	&.has-small-icon-size .block-editor-button-block-appender.components-button.components-button {
+	.block-editor-button-block-appender {
+		height: 1.5em;
+		width: 1.5em;
+		font-size: inherit;
 		padding: 0;
-	}
-	&.has-large-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-20 - 2px;
-	}
-	&.has-huge-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-30 - 1px;
 	}
 }

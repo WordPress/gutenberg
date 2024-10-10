@@ -3,7 +3,7 @@
  */
 import { _n, sprintf, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalText as Text,
 	Button,
 	Flex,
@@ -28,8 +28,7 @@ function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 
 	return (
 		<Button
-			// TODO: Switch to `true` (40px size) if possible
-			__next40pxDefaultSize={ false }
+			__next40pxDefaultSize
 			onClick={ () => {
 				onClick();
 				if ( navigatorPath ) {

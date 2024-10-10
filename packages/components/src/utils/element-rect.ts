@@ -3,16 +3,16 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
-/**
- * Internal dependencies
- */
-import { useEvent } from './hooks/use-event';
+import { useEvent, useResizeObserver } from '@wordpress/compose';
 
 /**
  * The position and dimensions of an element, relative to its offset parent.
  */
 export type ElementOffsetRect = {
+	/**
+	 * The element the rect belongs to.
+	 */
+	element: HTMLElement | undefined;
 	/**
 	 * The distance from the top edge of the offset parent to the top edge of
 	 * the element.
@@ -47,6 +47,7 @@ export type ElementOffsetRect = {
  * An `ElementOffsetRect` object with all values set to zero.
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
+	element: undefined,
 	top: 0,
 	right: 0,
 	bottom: 0,
@@ -79,9 +80,11 @@ export function getElementOffsetRect(
 	if ( rect.width === 0 || rect.height === 0 ) {
 		return;
 	}
+	const offsetParent = element.offsetParent;
 	const offsetParentRect =
-		element.offsetParent?.getBoundingClientRect() ??
-		NULL_ELEMENT_OFFSET_RECT;
+		offsetParent?.getBoundingClientRect() ?? NULL_ELEMENT_OFFSET_RECT;
+	const offsetParentScrollX = offsetParent?.scrollLeft ?? 0;
+	const offsetParentScrollY = offsetParent?.scrollTop ?? 0;
 
 	// Computed widths and heights have subpixel precision, and are not affected
 	// by distortions.
@@ -94,13 +97,22 @@ export function getElementOffsetRect(
 	const scaleY = computedHeight / rect.height;
 
 	return {
+		element,
 		// To obtain the adjusted values for the position:
 		// 1. Compute the element's position relative to the offset parent.
 		// 2. Correct for the scale factor.
-		top: ( rect.top - offsetParentRect?.top ) * scaleY,
-		right: ( offsetParentRect?.right - rect.right ) * scaleX,
-		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
-		left: ( rect.left - offsetParentRect?.left ) * scaleX,
+		// 3. Adjust for the scroll position of the offset parent.
+		top:
+			( rect.top - offsetParentRect?.top ) * scaleY + offsetParentScrollY,
+		right:
+			( offsetParentRect?.right - rect.right ) * scaleX -
+			offsetParentScrollX,
+		bottom:
+			( offsetParentRect?.bottom - rect.bottom ) * scaleY -
+			offsetParentScrollY,
+		left:
+			( rect.left - offsetParentRect?.left ) * scaleX +
+			offsetParentScrollX,
 		// Computed dimensions don't need any adjustments.
 		width: computedWidth,
 		height: computedHeight,
@@ -112,6 +124,9 @@ const POLL_RATE = 100;
 /**
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
+ *
+ * When no element is provided (`null` or `undefined`), the hook will return
+ * a "null" rect, in which all values are `0` and `element` is `undefined`.
  *
  * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
  * documentation for more details). When that happens, this hook will attempt
@@ -149,10 +164,12 @@ export function useTrackElementOffsetRect(
 		}
 	} );
 
-	useLayoutEffect(
-		() => setElement( targetElement ),
-		[ setElement, targetElement ]
-	);
+	useLayoutEffect( () => {
+		setElement( targetElement );
+		if ( ! targetElement ) {
+			setIndicatorPosition( NULL_ELEMENT_OFFSET_RECT );
+		}
+	}, [ setElement, targetElement ] );
 
 	return indicatorPosition;
 }

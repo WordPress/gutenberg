@@ -21,7 +21,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	withRootClientIdOptionKey,
+	isFiltered,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -38,6 +38,8 @@ import {
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
 } from './private-selectors';
 
 /**
@@ -78,7 +80,9 @@ const EMPTY_ARRAY = [];
  */
 const EMPTY_SET = new Set();
 
-const EMPTY_OBJECT = {};
+const DEFAULT_INSERTER_OPTIONS = {
+	[ isFiltered ]: true,
+};
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -1450,8 +1454,7 @@ export function isCaretWithinFormattedText() {
 }
 
 /**
- * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last index.
+ * Returns the location of the insertion cue. Defaults to the last index.
  *
  * @param {Object} state Editor state.
  *
@@ -1462,11 +1465,11 @@ export const getBlockInsertionPoint = createSelector(
 		let rootClientId, index;
 
 		const {
-			insertionPoint,
+			insertionCue,
 			selection: { selectionEnd },
 		} = state;
-		if ( insertionPoint !== null ) {
-			return insertionPoint;
+		if ( insertionCue !== null ) {
+			return insertionCue;
 		}
 
 		const { clientId } = selectionEnd;
@@ -1481,7 +1484,7 @@ export const getBlockInsertionPoint = createSelector(
 		return { rootClientId, index };
 	},
 	( state ) => [
-		state.insertionPoint,
+		state.insertionCue,
 		state.selection.selectionEnd.clientId,
 		state.blocks.parents,
 		state.blocks.order,
@@ -1489,14 +1492,14 @@ export const getBlockInsertionPoint = createSelector(
 );
 
 /**
- * Returns true if we should show the block insertion point.
+ * Returns true if the block insertion point is visible.
  *
  * @param {Object} state Global application state.
  *
  * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.insertionPoint !== null;
+	return state.insertionCue !== null;
 }
 
 /**
@@ -1538,6 +1541,59 @@ export function getTemplateLock( state, rootClientId ) {
 }
 
 /**
+ * Determines if the given block type is visible in the inserter.
+ * Note that this is different than whether a block is allowed to be inserted.
+ * In some cases, the block is not allowed in a given position but
+ * it should still be visible in the inserter to be able to add it
+ * to a different position.
+ *
+ * @param {Object}        state           Editor state.
+ * @param {string|Object} blockNameOrType The block type object, e.g., the response
+ *                                        from the block directory; or a string name of
+ *                                        an installed block type, e.g.' core/paragraph'.
+ *
+ * @return {boolean} Whether the given block type is allowed to be inserted.
+ */
+const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
+	let blockType;
+	let blockName;
+	if ( blockNameOrType && 'object' === typeof blockNameOrType ) {
+		blockType = blockNameOrType;
+		blockName = blockNameOrType.name;
+	} else {
+		blockType = getBlockType( blockNameOrType );
+		blockName = blockNameOrType;
+	}
+	if ( ! blockType ) {
+		return false;
+	}
+
+	const { allowedBlockTypes } = getSettings( state );
+
+	const isBlockAllowedInEditor = checkAllowList(
+		allowedBlockTypes,
+		blockName,
+		true
+	);
+	if ( ! isBlockAllowedInEditor ) {
+		return false;
+	}
+
+	// If parent blocks are not visible, child blocks should be hidden too.
+	if ( !! blockType.parent?.length ) {
+		return blockType.parent.some(
+			( name ) =>
+				isBlockVisibleInTheInserter( state, name ) ||
+				// Exception for blocks with post-content parent,
+				// the root level is often consider as "core/post-content".
+				// This exception should only apply to the post editor ideally though.
+				name === 'core/post-content'
+		);
+	}
+	return true;
+};
+
+/**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
  * inside another memoized selector is just a waste of time.
@@ -1555,6 +1611,10 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
+	if ( ! isBlockVisibleInTheInserter( state, blockName ) ) {
+		return false;
+	}
+
 	let blockType;
 	if ( blockName && 'object' === typeof blockName ) {
 		blockType = blockName;
@@ -1562,23 +1622,14 @@ const canInsertBlockTypeUnmemoized = (
 	} else {
 		blockType = getBlockType( blockName );
 	}
-	if ( ! blockType ) {
-		return false;
-	}
-
-	const { allowedBlockTypes } = getSettings( state );
-
-	const isBlockAllowedInEditor = checkAllowList(
-		allowedBlockTypes,
-		blockName,
-		true
-	);
-	if ( ! isBlockAllowedInEditor ) {
-		return false;
-	}
 
 	const isLocked = !! getTemplateLock( state, rootClientId );
 	if ( isLocked ) {
+		return false;
+	}
+
+	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+	if ( _isSectionBlock ) {
 		return false;
 	}
 
@@ -1730,6 +1781,11 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	if ( isBlockWithinSection ) {
 		return false;
 	}
 
@@ -1959,6 +2015,7 @@ const buildBlockTypeItem =
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
+			parent: blockType.parent,
 			variations: inserterVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
@@ -1996,7 +2053,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
+		( state, rootClientId = null, options = DEFAULT_INSERTER_OPTIONS ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2044,56 +2101,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				)
 				.map( buildBlockTypeInserterItem );
 
-			if ( options[ withRootClientIdOptionKey ] ) {
-				blockTypeInserterItems = blockTypeInserterItems.reduce(
-					( accumulator, item ) => {
-						item.rootClientId = rootClientId ?? '';
-
-						while (
-							! canInsertBlockTypeUnmemoized(
-								state,
-								item.name,
-								item.rootClientId
-							)
-						) {
-							if ( ! item.rootClientId ) {
-								let sectionRootClientId;
-								try {
-									sectionRootClientId =
-										getSectionRootClientId( state );
-								} catch ( e ) {}
-								if (
-									sectionRootClientId &&
-									canInsertBlockTypeUnmemoized(
-										state,
-										item.name,
-										sectionRootClientId
-									)
-								) {
-									item.rootClientId = sectionRootClientId;
-								} else {
-									delete item.rootClientId;
-								}
-								break;
-							} else {
-								const parentClientId = getBlockRootClientId(
-									state,
-									item.rootClientId
-								);
-								item.rootClientId = parentClientId;
-							}
-						}
-
-						// We could also add non insertable items and gray them out.
-						if ( item.hasOwnProperty( 'rootClientId' ) ) {
-							accumulator.push( item );
-						}
-
-						return accumulator;
-					},
-					[]
-				);
-			} else {
+			if ( options[ isFiltered ] !== false ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
 					( blockType ) =>
 						canIncludeBlockTypeInInserter(
@@ -2102,6 +2110,19 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							rootClientId
 						)
 				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems
+					.filter( ( blockType ) =>
+						isBlockVisibleInTheInserter( state, blockType )
+					)
+					.map( ( blockType ) => ( {
+						...blockType,
+						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						),
+					} ) );
 			}
 
 			const items = blockTypeInserterItems.reduce(
@@ -2373,37 +2394,50 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
  */
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
-		return createSelector( ( state, rootClientId = null ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const { allowedBlockTypes } = getSettings( state );
-			const parsedPatterns = patterns
-				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( pattern ) => {
-					return {
-						...pattern,
-						get blocks() {
-							return getParsedPattern( pattern ).blocks;
-						},
-					};
-				} );
+		return createSelector(
+			(
+				state,
+				rootClientId = null,
+				options = DEFAULT_INSERTER_OPTIONS
+			) => {
+				const { getAllPatterns } = unlock( select( STORE_NAME ) );
+				const patterns = getAllPatterns();
+				const { allowedBlockTypes } = getSettings( state );
+				const parsedPatterns = patterns
+					.filter( ( { inserter = true } ) => !! inserter )
+					.map( ( pattern ) => {
+						return {
+							...pattern,
+							get blocks() {
+								return getParsedPattern( pattern ).blocks;
+							},
+						};
+					} );
 
-			const availableParsedPatterns = parsedPatterns.filter(
-				( pattern ) =>
-					checkAllowListRecursive(
-						getGrammar( pattern ),
-						allowedBlockTypes
-					)
-			);
-			const patternsAllowed = availableParsedPatterns.filter(
-				( pattern ) =>
-					getGrammar( pattern ).every( ( { blockName: name } ) =>
-						canInsertBlockType( state, name, rootClientId )
-					)
-			);
+				const availableParsedPatterns = parsedPatterns.filter(
+					( pattern ) =>
+						checkAllowListRecursive(
+							getGrammar( pattern ),
+							allowedBlockTypes
+						)
+				);
+				const patternsAllowed = availableParsedPatterns.filter(
+					( pattern ) =>
+						getGrammar( pattern ).every( ( { blockName: name } ) =>
+							options[ isFiltered ] !== false
+								? canInsertBlockType(
+										state,
+										name,
+										rootClientId
+								  )
+								: isBlockVisibleInTheInserter( state, name )
+						)
+				);
 
-			return patternsAllowed;
-		}, getAllowedPatternsDependants( select ) );
+				return patternsAllowed;
+			},
+			getAllowedPatternsDependants( select )
+		);
 	}
 );
 
@@ -2467,7 +2501,7 @@ export const __experimentalGetPatternsByBlockTypes = createRegistrySelector(
  * Determines the items that appear in the available pattern transforms list.
  *
  * For now we only handle blocks without InnerBlocks and take into account
- * the `__experimentalRole` property of blocks' attributes for the transformation.
+ * the `role` property of blocks' attributes for the transformation.
  *
  * We return the first set of possible eligible block patterns,
  * by checking the `blockTypes` property. We still have to recurse through
@@ -2489,7 +2523,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
-				 * the `__experimentalRole` property of blocks' attributes for the transformation.
+				 * the `role` property of blocks' attributes for the transformation.
 				 * Note that the blocks have been retrieved through `getBlock`, which doesn't
 				 * return the inner blocks of an inner block controller, so we still need
 				 * to check for this case too.
@@ -2674,12 +2708,17 @@ export function __unstableGetEditorMode( state ) {
 /**
  * Returns whether block moving mode is enabled.
  *
- * @param {Object} state Editor state.
- *
- * @return {string} Client Id of moving block.
+ * @deprecated
  */
-export function hasBlockMovingClientId( state ) {
-	return state.hasBlockMovingClientId;
+export function hasBlockMovingClientId() {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).hasBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
+		}
+	);
+	return false;
 }
 
 /**
@@ -2862,11 +2901,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		'__experimentalDisableBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+	const shouldEnableIfUnselected = blockSupportDisable
+		? false
+		: areInnerBlocksControlled( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&
@@ -2884,6 +2921,14 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 		parent = state.blocks.parents.get( parent );
 	}
 	return false;
+}
+
+function isWithinBlock( state, clientId, parentClientId ) {
+	let parent = state.blocks.parents.get( clientId );
+	while ( !! parent && parent !== parentClientId ) {
+		parent = state.blocks.parents.get( parent );
+	}
+	return parent === parentClientId;
 }
 
 /**
@@ -2926,6 +2971,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( clientId === null ) {
 				clientId = '';
 			}
+
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
@@ -2943,28 +2989,76 @@ export const getBlockEditingMode = createRegistrySelector(
 					state,
 					sectionRootClientId
 				);
-				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return 'disabled';
+
+				// Sections are always contentOnly.
+				if ( sectionsClientIds?.includes( clientId ) ) {
+					return 'contentOnly';
 				}
+
+				return 'disabled';
 			}
 
+			if ( editorMode === 'navigation' ) {
+				const sectionRootClientId = getSectionRootClientId( state );
+
+				// The root section is "default mode"
+				if ( clientId === sectionRootClientId ) {
+					return 'default';
+				}
+
+				// Sections should always be contentOnly in navigation mode.
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( sectionsClientIds.includes( clientId ) ) {
+					return 'contentOnly';
+				}
+
+				// Blocks outside sections should be disabled.
+				const isWithinSectionRoot = isWithinBlock(
+					state,
+					clientId,
+					sectionRootClientId
+				);
+				if ( ! isWithinSectionRoot ) {
+					return 'disabled';
+				}
+
+				// The rest of the blocks depend on whether they are content blocks or not.
+				// This "flattens" the sections tree.
+				const name = getBlockName( state, clientId );
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContent = hasContentRoleAttribute( name );
+
+				return isContent ? 'contentOnly' : 'disabled';
+			}
+
+			// In normal mode, consider that an explicitely set editing mode takes over.
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
 			}
+
+			// In normal mode, top level is default mode.
 			if ( ! clientId ) {
 				return 'default';
 			}
+
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
+			// If the parent of the block is contentOnly locked, check whether it's a content block.
 			if ( templateLock === 'contentOnly' ) {
 				const name = getBlockName( state, clientId );
-				const isContent =
-					select( blocksStore ).__experimentalHasContentRoleAttribute(
-						name
-					);
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContent = hasContentRoleAttribute( name );
 				return isContent ? 'contentOnly' : 'disabled';
 			}
+			// Otherwise, check if there's an ancestor that is contentOnly
 			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}

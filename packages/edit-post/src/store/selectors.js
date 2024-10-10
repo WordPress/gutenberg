@@ -379,7 +379,6 @@ export const isMetaBoxLocationVisible = createRegistrySelector(
 			isMetaBoxLocationActive( state, location ) &&
 			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 				return select( editorStore ).isEditorPanelEnabled(
-					state,
 					`meta-box-${ id }`
 				);
 			} )
@@ -507,7 +506,7 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
 				version: '6.7',
 			}
 		);
-		return unlock( select( editorStore ) ).getInsertionPoint();
+		return unlock( select( editorStore ) ).getInserter();
 	}
 );
 
