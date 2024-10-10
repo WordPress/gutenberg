@@ -158,7 +158,7 @@ export function PatternsFilter( {
 								value={ patternSyncFilter }
 							/>
 						</MenuGroup>
-						<div className="block-editor-tool-selector__help">
+						<div className="block-editor-inserter__patterns-category-filters__help">
 							{ createInterpolateElement(
 								__(
 									'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
