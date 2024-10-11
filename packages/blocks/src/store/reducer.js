@@ -417,22 +417,6 @@ export function blockBindingsSources( state = {}, action ) {
 					getFieldsList,
 				},
 			};
-		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
-			return {
-				...state,
-				[ action.name ]: {
-					/*
-					 * Keep the exisitng properties in case the source has been registered
-					 * in the client before bootstrapping.
-					 */
-					...state[ action.name ],
-					label: action.label,
-					usesContext: getMergedUsesContext(
-						state[ action.name ]?.usesContext,
-						action.usesContext
-					),
-				},
-			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
 			return omit( state, action.name );
 	}
