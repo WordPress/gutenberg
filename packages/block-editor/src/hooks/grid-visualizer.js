@@ -10,26 +10,41 @@ import { useSelect } from '@wordpress/data';
  */
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 function GridLayoutSync( props ) {
 	useGridLayoutSync( props );
 }
 
 function GridTools( { clientId, layout } ) {
-	const { isSelected, isDragging } = useSelect( ( select ) => {
-		const { isBlockSelected, isDraggingBlocks } =
-			select( blockEditorStore );
+	const isVisible = useSelect(
+		( select ) => {
+			const {
+				isBlockSelected,
+				isDraggingBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 
-		return {
-			isSelected: isBlockSelected( clientId ),
-			isDragging: isDraggingBlocks(),
-		};
-	} );
+			// These calls are purposely ordered from least expensive to most expensive.
+			// Hides the visualizer in cases where the user is not or cannot interact with it.
+			if (
+				( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
+				getTemplateLock( clientId ) ||
+				getBlockEditingMode( clientId ) !== 'default'
+			) {
+				return false;
+			}
+
+			return true;
+		},
+		[ clientId ]
+	);
 
 	return (
 		<>
 			<GridLayoutSync clientId={ clientId } />
-			{ ( isSelected || isDragging ) && (
+			{ isVisible && (
 				<GridVisualizer clientId={ clientId } parentLayout={ layout } />
 			) }
 		</>
