@@ -16,30 +16,24 @@ function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
 		hasSelection,
-		insertionPoint,
 		blockOrder,
-		blockInsertionPointVisible,
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
-			getInsertionPoint,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
 			getSectionRootClientId,
-			isBlockInsertionPointVisible,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
 
 		return {
 			hasSelection: !! getSelectionStart().clientId,
-			insertionPoint: getInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
-			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
@@ -64,41 +58,32 @@ function ZoomOutModeInserters() {
 		return null;
 	}
 
-	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		const shouldRenderInsertionPoint =
-			blockInsertionPointVisible && insertionPoint?.index === index;
+	const previousClientId = selectedBlockClientId;
+	const index = blockOrder.findIndex(
+		( clientId ) => selectedBlockClientId === clientId
+	);
+	const nextClientId = blockOrder[ index + 1 ];
 
-		const previousClientId = clientId;
-		const nextClientId = blockOrder[ index ];
-
-		const isSelected =
-			selectedBlockClientId === previousClientId ||
-			selectedBlockClientId === nextClientId;
-
-		return (
-			<BlockPopoverInbetween
-				key={ index }
-				previousClientId={ previousClientId }
-				nextClientId={ nextClientId }
-			>
-				{ ! shouldRenderInsertionPoint && isSelected && (
-					<ZoomOutModeInserterButton
-						onClick={ () => {
-							setInserterIsOpened( {
-								rootClientId: sectionRootClientId,
-								insertionIndex: index,
-								tab: 'patterns',
-								category: 'all',
-							} );
-							showInsertionPoint( sectionRootClientId, index, {
-								operation: 'insert',
-							} );
-						} }
-					/>
-				) }
-			</BlockPopoverInbetween>
-		);
-	} );
+	return (
+		<BlockPopoverInbetween
+			previousClientId={ previousClientId }
+			nextClientId={ nextClientId }
+		>
+			<ZoomOutModeInserterButton
+				onClick={ () => {
+					setInserterIsOpened( {
+						rootClientId: sectionRootClientId,
+						insertionIndex: index,
+						tab: 'patterns',
+						category: 'all',
+					} );
+					showInsertionPoint( sectionRootClientId, index, {
+						operation: 'insert',
+					} );
+				} }
+			/>
+		</BlockPopoverInbetween>
+	);
 }
 
 export default ZoomOutModeInserters;
