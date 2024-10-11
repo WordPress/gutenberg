@@ -306,11 +306,13 @@ function Iframe( {
 			_src,
 			() => {
 				URL.revokeObjectURL( _src );
-				resetZoomLevel();
-				__unstableSetEditorMode( 'edit' );
+				if ( isZoomedOut ) {
+					resetZoomLevel();
+					__unstableSetEditorMode( 'edit' );
+				}
 			},
 		];
-	}, [ html, resetZoomLevel, __unstableSetEditorMode ] );
+	}, [ html, resetZoomLevel, __unstableSetEditorMode, isZoomedOut ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
 
