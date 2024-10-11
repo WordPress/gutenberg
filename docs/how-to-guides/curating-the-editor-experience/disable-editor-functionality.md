@@ -8,7 +8,7 @@ There might be times when you don’t want access to a block at all to be availa
 
 ## Curate heading levels
 
-Core WordPress blocks that feature a heading level dropdown include support for the `levelOptions` attribute. This includes the Heading, Site Title, Site Tagline, Query Title, Post Title, and Comments Title blocks. The `levelOptions` attribute accepts an array of numbers corresponding to heading levels, where `1` represents H1, `2` represents H2, and so on.
+Core WordPress blocks with a heading level dropdown include support for the `levelOptions` attribute. This applies to the Heading, Site Title, Site Tagline, Query Title, Post Title, and Comments Title blocks. The `levelOptions` attribute accepts an array of numbers corresponding to heading levels, where `1` represents H1, `2` represents H2, and so on.
 
 This attribute allows you to specify which heading levels should appear in the dropdown UI, providing a lightweight curation method that does not require block deprecations. Any existing heading levels are preserved in the markup, while `levelOptions` only affects the UI display.
 
