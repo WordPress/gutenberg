@@ -29,6 +29,7 @@ describe( 'getEntityRecord', () => {
 		},
 	];
 	const registry = { batch: ( callback ) => callback() };
+	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	let dispatch;
 	beforeEach( async () => {
@@ -43,9 +44,6 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'yields with requested post type', async () => {
-		// Provide entities
-		dispatch.mockReturnValueOnce( ENTITIES );
-
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
 
@@ -53,7 +51,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry } );
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -84,8 +82,6 @@ describe( 'getEntityRecord', () => {
 		const select = {
 			hasEntityRecords: jest.fn( () => {} ),
 		};
-		// Provide entities
-		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
@@ -95,7 +91,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, select, registry } );
+		)( { dispatch, select, registry, resolveSelect } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -141,6 +137,7 @@ describe( 'getEntityRecords', () => {
 		},
 	];
 	const registry = { batch: ( callback ) => callback() };
+	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	beforeEach( async () => {
 		triggerFetch.mockReset();
@@ -152,13 +149,14 @@ describe( 'getEntityRecords', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -183,13 +181,14 @@ describe( 'getEntityRecords', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -216,13 +215,14 @@ describe( 'getEntityRecords', () => {
 			__unstableReleaseStoreLock: jest.fn(),
 			finishResolutions,
 		} );
-		// Provide entities
-		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -290,6 +290,7 @@ describe( 'canUser', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
+	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
 
 	let dispatch, registry;
 	beforeEach( async () => {
@@ -303,7 +304,6 @@ describe( 'canUser', () => {
 			receiveUserPermission: jest.fn(),
 			finishResolution: jest.fn(),
 		} );
-		dispatch.mockReturnValue( ENTITIES );
 		triggerFetch.mockReset();
 	} );
 
@@ -312,10 +312,14 @@ describe( 'canUser', () => {
 			Promise.reject( { status: 404 } )
 		);
 
-		await canUser( 'create', 'media' )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'media'
+		)( { dispatch, registry, resolveSelect } );
 		await canUser( 'create', { kind: 'root', name: 'media' } )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -332,6 +336,7 @@ describe( 'canUser', () => {
 			canUser( 'create', { name: 'wp_block' } )( {
 				dispatch,
 				registry,
+				resolveSelect,
 			} )
 		).rejects.toThrow( 'The entity resource object is not valid.' );
 	} );
@@ -341,7 +346,10 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'media' )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'media'
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -363,6 +371,7 @@ describe( 'canUser', () => {
 		await canUser( 'create', { kind: 'root', name: 'media' } )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -382,7 +391,10 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'media' )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'media'
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -404,6 +416,7 @@ describe( 'canUser', () => {
 		await canUser( 'create', { kind: 'root', name: 'media' } )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -423,7 +436,11 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'blocks', 123 )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'blocks',
+			123
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -449,6 +466,7 @@ describe( 'canUser', () => {
 		} )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -475,8 +493,14 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'blocks' )( { dispatch, registry } );
-		await canUser( 'read', 'blocks' )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'read',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
@@ -508,6 +532,7 @@ describe( 'canUser', () => {
 		} )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 		await canUser( 'read', {
 			kind: 'postType',
@@ -515,6 +540,7 @@ describe( 'canUser', () => {
 		} )( {
 			dispatch,
 			registry,
+			resolveSelect,
 		} );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
@@ -541,10 +567,22 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'blocks' )( { dispatch, registry } );
-		await canUser( 'read', 'blocks' )( { dispatch, registry } );
-		await canUser( 'update', 'blocks' )( { dispatch, registry } );
-		await canUser( 'delete', 'blocks' )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'read',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'update',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'delete',
+			'blocks'
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'create/blocks',
@@ -576,10 +614,26 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', 'blocks', 123 )( { dispatch, registry } );
-		await canUser( 'read', 'blocks', 123 )( { dispatch, registry } );
-		await canUser( 'update', 'blocks', 123 )( { dispatch, registry } );
-		await canUser( 'delete', 'blocks', 123 )( { dispatch, registry } );
+		await canUser(
+			'create',
+			'blocks',
+			123
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'read',
+			'blocks',
+			123
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'update',
+			'blocks',
+			123
+		)( { dispatch, registry, resolveSelect } );
+		await canUser(
+			'delete',
+			'blocks',
+			123
+		)( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
@@ -617,22 +671,22 @@ describe( 'canUser', () => {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, registry } );
+		} )( { dispatch, registry, resolveSelect } );
 		await canUser( 'read', {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, registry } );
+		} )( { dispatch, registry, resolveSelect } );
 		await canUser( 'update', {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, registry } );
+		} )( { dispatch, registry, resolveSelect } );
 		await canUser( 'delete', {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, registry } );
+		} )( { dispatch, registry, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
