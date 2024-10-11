@@ -78,7 +78,7 @@ export default function DataviewsPatterns() {
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const previousCategoryId = usePrevious( categoryId );
-	const previouspostType = usePrevious( type );
+	const previousPostType = usePrevious( type );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
@@ -122,10 +122,10 @@ export default function DataviewsPatterns() {
 
 	// Reset the page number when the category changes.
 	useEffect( () => {
-		if ( previousCategoryId !== categoryId || previouspostType !== type ) {
+		if ( previousCategoryId !== categoryId || previousPostType !== type ) {
 			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
-	}, [ categoryId, previousCategoryId, previouspostType, type ] );
+	}, [ categoryId, previousCategoryId, previousPostType, type ] );
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
 		// However, the author filter in template parts is done client-side.
