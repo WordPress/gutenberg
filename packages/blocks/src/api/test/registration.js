@@ -1513,10 +1513,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should not override label from the server', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/server',
 				label: 'Server label',
 			} );
@@ -1543,10 +1541,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should add usesContext when only defined in the server', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
@@ -1562,10 +1558,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should add usesContext when only defined in the client', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 			} );
@@ -1581,10 +1575,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should merge usesContext from server and client without duplicates', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
@@ -1720,10 +1712,8 @@ describe( 'blocks', () => {
 				...clientOnlyProperties,
 			} );
 
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/custom-source',
 				label: 'Server Label',
 				usesContext: [ 'postId', 'serverContext' ],
