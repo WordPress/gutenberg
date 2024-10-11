@@ -5,7 +5,7 @@
 	"properties": {
 		"displayName": {
 			"type": "string",
-			"description": "The `displayName` of the component, as determined in code."
+			"description": "The `displayName` of the component, as determined in code. Used to identify the component in the specified source file."
 		},
 		"filePath": {
 			"type": "string",
@@ -19,7 +19,7 @@
 				"properties": {
 					"displayName": {
 						"type": "string",
-						"description": "The `displayName` of the subcomponent, as determined in code."
+						"description": "The `displayName` of the subcomponent, as determined in code. Used to identify the component in the specified source file."
 					},
 					"preferredDisplayName": {
 						"type": "string",
