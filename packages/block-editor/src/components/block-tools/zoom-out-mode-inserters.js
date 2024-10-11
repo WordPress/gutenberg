@@ -22,7 +22,6 @@ function ZoomOutModeInserters() {
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
-		hoveredBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
@@ -30,7 +29,6 @@ function ZoomOutModeInserters() {
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getHoveredBlockClientId,
 			getSectionRootClientId,
 			isBlockInsertionPointVisible,
 		} = unlock( select( blockEditorStore ) );
@@ -46,7 +44,6 @@ function ZoomOutModeInserters() {
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
-			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
 
@@ -63,7 +60,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! hasSelection ) {
 		return null;
 	}
 
@@ -75,13 +72,8 @@ function ZoomOutModeInserters() {
 		const nextClientId = blockOrder[ index ];
 
 		const isSelected =
-			hasSelection &&
-			( selectedBlockClientId === previousClientId ||
-				selectedBlockClientId === nextClientId );
-
-		const isHovered =
-			hoveredBlockClientId === previousClientId ||
-			hoveredBlockClientId === nextClientId;
+			selectedBlockClientId === previousClientId ||
+			selectedBlockClientId === nextClientId;
 
 		return (
 			<BlockPopoverInbetween
@@ -89,9 +81,8 @@ function ZoomOutModeInserters() {
 				previousClientId={ previousClientId }
 				nextClientId={ nextClientId }
 			>
-				{ ! shouldRenderInsertionPoint && (
+				{ ! shouldRenderInsertionPoint && isSelected && (
 					<ZoomOutModeInserterButton
-						isVisible={ isSelected || isHovered }
 						onClick={ () => {
 							setInserterIsOpened( {
 								rootClientId: sectionRootClientId,

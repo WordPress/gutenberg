@@ -1,10 +1,4 @@
-const { unlock } =
-	wp.privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-		'@wordpress/blocks'
-	);
-
-const { registerBlockBindingsSource } = unlock( wp.blocks.privateApis );
+const { registerBlockBindingsSource } = wp.blocks;
 const { fieldsList } = window.testingBindings || {};
 
 const getValues = ( { bindings } ) => {
@@ -14,10 +8,10 @@ const getValues = ( { bindings } ) => {
 	}
 	return newValues;
 };
-const setValues = ( { registry, bindings } ) => {
+const setValues = ( { dispatch, bindings } ) => {
 	Object.values( bindings ).forEach( ( { args, newValue } ) => {
 		// Example of what could be done.
-		registry.dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
+		dispatch( 'core' ).editEntityRecord( 'postType', 'post', 1, {
 			meta: { [ args?.key ]: newValue },
 		} );
 	} );
