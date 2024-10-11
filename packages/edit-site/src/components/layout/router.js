@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
@@ -61,24 +61,26 @@ function useRedirectOldPaths() {
 	}, [ history, params ] );
 }
 
-export default function useLayoutAreas() {
+export default function useActiveRoute() {
 	const { params } = useLocation();
 	useRedirectOldPaths();
 	const routes = useSelect( ( select ) => {
 		return unlock( select( editSiteStore ) ).getRoutes();
 	}, [] );
-	const matchedRoute = routes.find( ( route ) => route.match( params ) );
-	if ( ! matchedRoute ) {
-		return {
-			key: 404,
-			areas: {},
-			widths: {},
-		};
-	}
+	return useMemo( () => {
+		const matchedRoute = routes.find( ( route ) => route.match( params ) );
+		if ( ! matchedRoute ) {
+			return {
+				key: 404,
+				areas: {},
+				widths: {},
+			};
+		}
 
-	return {
-		key: matchedRoute.name,
-		areas: matchedRoute.areas,
-		widths: matchedRoute.widths,
-	};
+		return {
+			key: matchedRoute.name,
+			areas: matchedRoute.areas,
+			widths: matchedRoute.widths,
+		};
+	}, [ routes, params ] );
 }
