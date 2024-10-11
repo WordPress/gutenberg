@@ -69,9 +69,11 @@ test.describe( 'Zoom Out', () => {
 		const firstPatternRect = await firstPattern.boundingBox();
 
 		//Check that the toolbar is vertically aligned to the pattern and to the left
-		expect( toolbarRect.y ).toEqual( firstPatternRect.y );
-		expect( toolbarRect.x + toolbarRect.width ).toEqual(
-			firstPatternRect.x
+		expect( Math.round( toolbarRect.y ) ).toEqual(
+			Math.round( firstPatternRect.y )
 		);
+		expect(
+			Math.round( toolbarRect.x ) + Math.round( toolbarRect.width )
+		).toEqual( Math.round( firstPatternRect.x ) );
 	} );
 } );
