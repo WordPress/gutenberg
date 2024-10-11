@@ -329,7 +329,7 @@ test.describe( 'Block Grouping', () => {
 			await editor.clickBlockToolbarButton( 'Align' );
 			await alignOptions
 				.getByRole( 'menuitemradio', {
-					name: 'Wide width',
+					name: 'Maximum wide width',
 				} )
 				.click();
 

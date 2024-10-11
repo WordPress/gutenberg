@@ -444,7 +444,7 @@
 									"default": true
 								},
 								"allowInheriting": {
-									"description": "For the `flow` layout type only, determines display of the `Inner blocks use content width` toggle.",
+									"description": "For the `flow` layout type only, determines display of the `Customize nested blocks width` toggle.",
 									"type": "boolean",
 									"default": true
 								},

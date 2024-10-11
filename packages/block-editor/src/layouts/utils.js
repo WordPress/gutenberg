@@ -81,16 +81,16 @@ export function getBlockGapCSS(
  */
 export function getAlignmentsInfo( layout ) {
 	const { contentSize, wideSize, type = 'default' } = layout;
-	const alignmentInfo = {};
+	const alignmentInfo = { none: {}, wide: {} };
 	const sizeRegex =
 		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
 	if ( sizeRegex.test( contentSize ) && type === 'constrained' ) {
-		// translators: %s: container size (i.e. 600px etc)
-		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );
+		// translators: %s: Container width (i.e. 600px etc.).
+		alignmentInfo.none.width = sprintf( __( 'Max %s wide' ), contentSize );
 	}
 	if ( sizeRegex.test( wideSize ) ) {
-		// translators: %s: container size (i.e. 600px etc)
-		alignmentInfo.wide = sprintf( __( 'Max %s wide' ), wideSize );
+		// translators: %s: Container width (i.e. 600px etc.).
+		alignmentInfo.wide.width = sprintf( __( 'Max %s wide' ), wideSize );
 	}
 	return alignmentInfo;
 }

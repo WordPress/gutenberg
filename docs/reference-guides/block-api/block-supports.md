@@ -747,7 +747,7 @@ Determines display of layout controls in the block sidebar. If set to false, lay
 -   Type: `boolean`
 -   Default value: `true`
 
-For the `flow` layout type only, determines display of the "Inner blocks use content width" toggle.
+For the `flow` layout type only, determines display of the "Customize nested blocks width" toggle.
 
 ### layout.allowSizingOnChildren
 

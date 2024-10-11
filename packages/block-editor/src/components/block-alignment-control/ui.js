@@ -70,11 +70,20 @@ function BlockAlignmentUI( {
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
 								{ enabledControls.map(
-									( { name: controlName, info } ) => {
-										const { icon, title } =
+									( { name: controlName, widthInfo } ) => {
+										const { icon, title, widthTitle } =
 											BLOCK_ALIGNMENTS_CONTROLS[
 												controlName
 											];
+
+										// When the 'None' alignment also sets
+										// the `contentSize` width we want to
+										// communicate it's a width.
+										const alignmentOrWidthTitle =
+											controlName === 'none' && widthInfo
+												? widthTitle
+												: title;
+
 										// If no value is provided, mark as selected the `none` option.
 										const isSelected =
 											controlName === value ||
@@ -99,9 +108,9 @@ function BlockAlignmentUI( {
 													onClose();
 												} }
 												role="menuitemradio"
-												info={ info }
+												info={ widthInfo }
 											>
-												{ title }
+												{ alignmentOrWidthTitle }
 											</MenuItem>
 										);
 									}

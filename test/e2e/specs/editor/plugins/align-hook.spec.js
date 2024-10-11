@@ -8,7 +8,7 @@ const alignLabels = {
 	left: 'Align left',
 	center: 'Align center',
 	right: 'Align right',
-	wide: 'Wide width',
+	wide: 'Maximum wide width',
 	full: 'Full width',
 };
 
