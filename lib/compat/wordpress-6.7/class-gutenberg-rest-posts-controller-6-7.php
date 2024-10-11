@@ -154,6 +154,13 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			}
 		}
 
+		if (
+			isset( $registered['search_semantics'], $request['search_semantics'] )
+			&& 'exact' === $request['search_semantics']
+		) {
+			$args['exact'] = true;
+		}
+
 		$args = $this->prepare_tax_query( $args, $request );
 
 		if ( ! empty( $request['format'] ) ) {
@@ -394,6 +401,12 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 				'type'        => 'integer',
 			);
 		}
+
+		$query_params['search_semantics'] = array(
+			'description' => __( 'How to interpret the search input.' ),
+			'type'        => 'string',
+			'enum'        => array( 'exact' ),
+		);
 
 		$query_params['offset'] = array(
 			'description' => __( 'Offset the result set by a specific number of items.' ),
