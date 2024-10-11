@@ -16,6 +16,12 @@ export const STYLE_BOOK_COLOR_GROUPS: StyleBookColorGroup[] = [
 		type: 'colors',
 	},
 	{
+		slug: 'theme-gradients',
+		title: __( 'Theme Gradients' ),
+		origin: 'theme',
+		type: 'gradients',
+	},
+	{
 		slug: 'custom-colors',
 		title: __( 'Custom Colors' ),
 		origin: 'custom',
