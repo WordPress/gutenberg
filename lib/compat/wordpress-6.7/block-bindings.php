@@ -6,6 +6,30 @@
  */
 
 /**
+ * Bootstrap the block bindings sources registered in the server.
+ */
+function gutenberg_bootstrap_server_block_bindings_sources() {
+	$registered_sources = get_all_registered_block_bindings_sources();
+	if ( ! empty( $registered_sources ) ) {
+		$filtered_sources = array();
+		foreach ( $registered_sources as $source ) {
+			$filtered_sources[] = array(
+				'name'        => $source->name,
+				'label'       => $source->label,
+				'usesContext' => $source->uses_context,
+			);
+		}
+		$script = sprintf( 'for ( const source of %s ) { wp.blocks.registerBlockBindingsSource( source ); }', wp_json_encode( $filtered_sources ) );
+		wp_add_inline_script(
+			'wp-blocks',
+			$script
+		);
+	}
+}
+
+add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_server_block_bindings_sources', 5 );
+
+/**
  * Initialize `canUpdateBlockBindings` editor setting if it doesn't exist. By default, it is `true` only for admin users.
  *
  * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
