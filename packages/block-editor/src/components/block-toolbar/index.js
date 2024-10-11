@@ -16,7 +16,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import Shuffle from './shuffle';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -67,6 +68,7 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		hasParentPattern,
 		hasContentOnlyLocking,
+		showShuffleButton,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -79,6 +81,7 @@ export function PrivateBlockToolbar( {
 			getBlockParentsByBlockName,
 			getTemplateLock,
 			getParentSectionBlock,
+			isZoomOutMode,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -119,6 +122,7 @@ export function PrivateBlockToolbar( {
 			shouldShowVisualToolbar: isValid && isVisual,
 			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
 			showParentSelector:
+				! isZoomOutMode() &&
 				parentBlockType &&
 				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
@@ -130,6 +134,7 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
+			showShuffleButton: isZoomOutMode(),
 		};
 	}, [] );
 
@@ -205,6 +210,12 @@ export function PrivateBlockToolbar( {
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar && <BlockGroupToolbar /> }
+				{ showShuffleButton && (
+					<Shuffle
+						clientId={ blockClientIds[ 0 ] }
+						as={ ToolbarButton }
+					/>
+				) }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot
