@@ -73,6 +73,30 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 
+// Custom hook for managing responsive menu state.
+function useResponsiveMenu( navRef ) {
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
+		useState( false );
+
+	useEffect( () => {
+		if ( ! navRef.current ) {
+			return;
+		}
+
+		const htmlElement = navRef.current.closest( 'html' );
+
+		// Add a `has-modal-open` class to the <html> when the responsive
+		// menu is open. This reproduces the same behavior of the frontend.
+		if ( isResponsiveMenuOpen ) {
+			htmlElement.classList.add( 'has-modal-open' );
+		} else {
+			htmlElement.classList.remove( 'has-modal-open' );
+		}
+	}, [ navRef, isResponsiveMenuOpen ] );
+
+	return [ isResponsiveMenuOpen, setResponsiveMenuVisibility ];
+}
+
 function ColorTools( {
 	textColor,
 	setTextColor,
@@ -284,8 +308,10 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
+	const navRef = useRef();
+
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
-		useState( false );
+		useResponsiveMenu( navRef );
 
 	const [ overlayMenuPreview, setOverlayMenuPreview ] = useState( false );
 
@@ -366,8 +392,6 @@ function Navigation( {
 		navigationFallbackId,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
-
-	const navRef = useRef();
 
 	// The standard HTML5 tag for the block wrapper.
 	const TagName = 'nav';
