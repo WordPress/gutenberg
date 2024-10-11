@@ -16,7 +16,8 @@
 	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	// Apply an X translation to center the scaled content within the available space.
-	transform: scale(#{$scale}) translateX(calc(( #{$prev-container-width} - #{ $container-width }) / 2 / #{$scale}));
+	transform: translateX(calc(( #{$prev-container-width} - #{ $container-width }) / 2 / #{$scale}));
+	scale: #{$scale};
 	background-color: $gray-300;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
