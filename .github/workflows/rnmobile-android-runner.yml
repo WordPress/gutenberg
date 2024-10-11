@@ -23,7 +23,7 @@ jobs:
 
         steps:
             - name: checkout
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -37,7 +37,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Restore tests setup cache
-              uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
+              uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
               with:
                   path: |
                       ~/.appium
@@ -50,7 +50,7 @@ jobs:
               uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # v4.1.0
 
             - name: AVD cache
-              uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
+              uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
               id: avd-cache
               with:
                   path: |
