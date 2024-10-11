@@ -52,8 +52,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	if (
 		gutenberg_has_border_feature_support( $block_type, 'radius' ) &&
 		isset( $block_attributes['style']['border']['radius'] ) &&
-		(! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'radius' ) ||
-		! wp_should_skip_block_supports_serialization( $block_type, 'border', 'radius' ))
+		( ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'radius' ) ||
+		! wp_should_skip_block_supports_serialization( $block_type, 'border', 'radius' ) )
 	) {
 		$border_radius = $block_attributes['style']['border']['radius'];
 
@@ -107,7 +107,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
 			$border                       = $block_attributes['style']['border'][ $side ] ?? null;
 			$border_side_values           = array(
-				'width' => isset( $border['width'] ) && ! wp_should_skip_block_supports_serialization( $block_type, 'border', 'width' )  ? $border['width'] : null,
+				'width' => isset( $border['width'] ) && ! wp_should_skip_block_supports_serialization( $block_type, 'border', 'width' ) ? $border['width'] : null,
 				'color' => isset( $border['color'] ) && ! wp_should_skip_block_supports_serialization( $block_type, 'border', 'color' ) ? $border['color'] : null,
 				'style' => isset( $border['style'] ) && ! wp_should_skip_block_supports_serialization( $block_type, 'border', 'style' ) ? $border['style'] : null,
 			);
