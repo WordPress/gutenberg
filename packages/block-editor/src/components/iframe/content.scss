@@ -5,7 +5,8 @@
 
 .block-editor-iframe__html {
 	transform-origin: top center;
-	@include editor-canvas-resize-animation;
+	transition: all 0.4s cubic-bezier(0.46, 0.03, 0.52, 0.96), transform 0s;
+	@include reduce-motion("transition");
 }
 
 .block-editor-iframe__html.is-zoomed-out {

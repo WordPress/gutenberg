@@ -319,10 +319,7 @@ function Iframe( {
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						Math.max(
-							initialContainerWidth.current,
-							containerWidth
-						)
+						initialContainerWidth.current
 				: scale
 		);
 
