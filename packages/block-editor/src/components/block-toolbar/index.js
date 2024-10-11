@@ -184,7 +184,7 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! isMultiToolbar && isLargeViewport && (
+				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
