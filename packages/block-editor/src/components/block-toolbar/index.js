@@ -211,10 +211,12 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar && <BlockGroupToolbar /> }
 				{ showShuffleButton && (
-					<Shuffle
-						clientId={ blockClientIds[ 0 ] }
-						as={ ToolbarButton }
-					/>
+					<ToolbarGroup>
+						<Shuffle
+							clientId={ blockClientIds[ 0 ] }
+							as={ ToolbarButton }
+						/>
+					</ToolbarGroup>
 				) }
 				{ shouldShowVisualToolbar && (
 					<>
