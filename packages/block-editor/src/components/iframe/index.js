@@ -306,6 +306,9 @@ function Iframe( {
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		const maxWidth = 750;
+		// Note: When we initialize the zoom out when the canvas is smaller,
+		// reflow happens when the canvas area becomes larger
+
 		// This scaling calculation has to happen within the JS because CSS calc() can
 		// only divide and multiply by a unitless value. I.e. calc( 100px / 2 ) is valid
 		// but calc( 100px / 2px ) is not.
