@@ -14,8 +14,9 @@ import ScreenHeader from './header';
 import SidebarNavigationScreenGlobalStylesContent from '../sidebar-navigation-screen-global-styles/content';
 
 function ScreenStyleVariations() {
-	// Move to zoom out mode when this component is mounted
-	// and back to the previous mode when unmounted.
+	// Style Variations should only be previewed in with
+	// - a "zoomed out" editor
+	// - "Desktop" device preview
 	const { setDeviceType } = useDispatch( editorStore );
 	useZoomOut();
 	setDeviceType( 'desktop' );
