@@ -312,12 +312,17 @@ function Iframe( {
 		// This scaling calculation has to happen within the JS because CSS calc() can
 		// only divide and multiply by a unitless value. I.e. calc( 100px / 2 ) is valid
 		// but calc( 100px / 2px ) is not.
+		// Use the max of the container width and intial container width to account for when we
+		// scale from a smaller container to a larger one.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						initialContainerWidth.current
+						Math.max(
+							initialContainerWidth.current,
+							containerWidth
+						)
 				: scale
 		);
 
