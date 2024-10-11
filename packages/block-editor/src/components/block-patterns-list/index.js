@@ -114,6 +114,7 @@ function BlockPattern( {
 							render={
 								<div
 									role="option"
+									tabIndex={0}
 									aria-label={ pattern.title }
 									aria-describedby={
 										pattern.description
@@ -210,6 +211,7 @@ function BlockPatternsList(
 	},
 	ref
 ) {
+	const [activeCompositeId, setActiveCompositeId] = useState(undefined);
 	const [ activePattern, setActivePattern ] = useState( null ); // State to track active pattern
 
 	useEffect( () => {
@@ -251,8 +253,10 @@ function BlockPatternsList(
 	return (
 		<Composite
 			orientation={ orientation }
-			activeId={ activePattern }
-			setActiveId={ setActivePattern }
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
+			selectedId={ activePattern }
+			setSelectedId={ setActivePattern }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
