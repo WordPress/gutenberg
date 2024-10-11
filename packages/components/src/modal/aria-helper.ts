@@ -45,16 +45,12 @@ export function modalize( modalElement?: HTMLDivElement ) {
  */
 export function elementShouldBeHidden( element: Element ) {
 	const role = element.getAttribute( 'role' );
-
-	// Combine the conditions into a single return statement
 	return ! (
-		(
-			element.tagName === 'SCRIPT' || // Skip <script> tags
-			element.hasAttribute( 'hidden' ) || // Skip elements with 'hidden' attribute
-			element.hasAttribute( 'aria-hidden' ) || // Skip elements marked as aria-hidden
-			element.hasAttribute( 'aria-live' ) || // Skip live regions
-			( role && LIVE_REGION_ARIA_ROLES.has( role ) )
-		) // Skip elements with live region roles
+		element.tagName === 'SCRIPT' ||
+		element.hasAttribute( 'hidden' ) ||
+		element.hasAttribute( 'aria-hidden' ) ||
+		element.hasAttribute( 'aria-live' ) ||
+		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
 	);
 }
 
