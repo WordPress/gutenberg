@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Bug Fixes
-
+-   `Modal` : Modal dialog small improvement for elementShouldBeHidden - PR ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
 -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
 -   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
 
