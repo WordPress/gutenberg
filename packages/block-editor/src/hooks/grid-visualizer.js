@@ -10,7 +10,6 @@ import { useSelect } from '@wordpress/data';
  */
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
-import { unlock } from '../lock-unlock';
 
 function GridLayoutSync( props ) {
 	useGridLayoutSync( props );
@@ -24,7 +23,7 @@ function GridTools( { clientId, layout } ) {
 				isDraggingBlocks,
 				getTemplateLock,
 				getBlockEditingMode,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.

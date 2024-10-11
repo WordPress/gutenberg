@@ -16,7 +16,7 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
-import { unlock } from '../lock-unlock';
+
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
 
@@ -205,7 +205,7 @@ function GridTools( {
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getTemplateLock,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( clientId );
 
