@@ -122,7 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const prevContainerWidthRef = useRef();
+	const initialContainerWidth = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -243,7 +243,7 @@ function Iframe( {
 
 	useEffect( () => {
 		if ( ! isZoomedOut ) {
-			prevContainerWidthRef.current = containerWidth;
+			initialContainerWidth.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
@@ -314,7 +314,7 @@ function Iframe( {
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						prevContainerWidthRef.current
+						initialContainerWidth.current
 				: scale
 		);
 
@@ -336,8 +336,8 @@ function Iframe( {
 			`${ containerWidth }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidthRef.current }px`
+			'--wp-block-editor-iframe-zoom-out-outer-container-width',
+			`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
 		);
 
 		return () => {
@@ -359,7 +359,7 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-container-width'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-prev-container-width'
+				'--wp-block-editor-iframe-zoom-out-outer-container-width'
 			);
 		};
 	}, [
@@ -462,8 +462,12 @@ function Iframe( {
 				style={ {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,
-					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ prevContainerWidthRef.current }px`,
+					'--wp-block-editor-iframe-zoom-out-outer-container-width':
+						isZoomedOut &&
+						`${ Math.max(
+							initialContainerWidth.current,
+							containerWidth
+						) }px`,
 				} }
 			>
 				{ iframe }

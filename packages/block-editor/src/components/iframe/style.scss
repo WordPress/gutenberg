@@ -9,8 +9,8 @@
 }
 
 .block-editor-iframe__scale-container.is-zoomed-out {
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
-	width: $prev-container-width;
+	$outer-container-width: var(--wp-block-editor-iframe-zoom-out-outer-container-width, 100vw);
+	width: $outer-container-width;
 	// Position the iframe so that it is always aligned with the right side so that
 	// the scrollbar is always visible on the right side
 	position: absolute;

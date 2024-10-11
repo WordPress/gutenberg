@@ -13,10 +13,10 @@
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
+	$outer-container-width: var(--wp-block-editor-iframe-zoom-out-outer-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	// Apply an X translation to center the scaled content within the available space.
-	transform: translateX(calc(( #{$prev-container-width} - #{ $container-width }) / 2 / #{$scale}));
+	transform: translateX(calc(( #{$outer-container-width} - #{ $container-width }) / 2 / #{$scale}));
 	scale: #{$scale};
 	background-color: $gray-300;
 
