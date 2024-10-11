@@ -157,34 +157,40 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 		$args = $this->prepare_tax_query( $args, $request );
 
 		if ( ! empty( $request['format'] ) ) {
-			$formats   = $request['format'];
-			$tax_query = array( 'relation' => 'OR' );
+			$formats = $request['format'];
+			/*
+			 * The relation needs to be set to `OR` since the request can contain
+			 * two separate conditions. The user may be querying for items that have
+			 * either the `standard` format or a specific format.
+			 */
+			$formats_query = array( 'relation' => 'OR' );
 
-			// The default post format, 'standard', is not stored in the database.
-			// If 'standard' is part of the request, the query needs to exclude all post items that
-			// have a format assigned.
+			/*
+			 * The default post format, `standard`, is not stored in the database.
+			 * If `standard` is part of the request, the query needs to exclude all post items that
+			 * have a format assigned.
+			 */
 			if ( in_array( 'standard', $formats, true ) ) {
-				$tax_query[] = array(
+				$formats_query[] = array(
 					'taxonomy' => 'post_format',
 					'field'    => 'slug',
-					'terms'    => array(),
 					'operator' => 'NOT EXISTS',
 				);
-				// Remove the standard format, since it cannot be queried.
+				// Remove the `standard` format, since it cannot be queried.
 				unset( $formats[ array_search( 'standard', $formats, true ) ] );
 			}
 
-			// Add any remaining formats to the tax query.
+			// Add any remaining formats to the formats query.
 			if ( ! empty( $formats ) ) {
-				// Add the post-format- prefix.
+				// Add the `post-format-` prefix.
 				$terms = array_map(
 					static function ( $format ) {
-						return 'post-format-' . $format;
+						return "post-format-$format";
 					},
 					$formats
 				);
 
-				$tax_query[] = array(
+				$formats_query[] = array(
 					'taxonomy' => 'post_format',
 					'field'    => 'slug',
 					'terms'    => $terms,
@@ -192,14 +198,14 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 				);
 			}
 
-			// Enable filtering by both post formats and other taxonomies by combining them with AND.
+			// Enable filtering by both post formats and other taxonomies by combining them with `AND`.
 			if ( isset( $args['tax_query'] ) ) {
 				$args['tax_query'][] = array(
 					'relation' => 'AND',
-					$tax_query,
+					$formats_query,
 				);
 			} else {
-				$args['tax_query'] = $tax_query;
+				$args['tax_query'] = $formats_query;
 			}
 		}
 
