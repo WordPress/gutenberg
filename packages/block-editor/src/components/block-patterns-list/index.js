@@ -221,9 +221,8 @@ function BlockPatternsList(
 			aria-label={ label }
 			ref={ ref }
 		>
-			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
+			{ shownPatterns.map( ( pattern ) => {
+				return (
 					<BlockPattern
 						key={ pattern.name }
 						id={ pattern.name }
@@ -235,10 +234,11 @@ function BlockPatternsList(
 						showTooltip={ showTitlesAsTooltip }
 						category={ category }
 					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
+			{ shownPatterns.length < blockPatterns.length && (
+				<BlockPatternPlaceholder />
+			) }
 			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
