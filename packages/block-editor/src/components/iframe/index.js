@@ -463,8 +463,6 @@ function Iframe( {
 					isZoomedOut && 'is-zoomed-out'
 				) }
 				style={ {
-					'--wp-block-editor-iframe-zoom-out-container-width':
-						isZoomedOut && `${ containerWidth }px`,
 					'--wp-block-editor-iframe-zoom-out-outer-container-width':
 						isZoomedOut &&
 						`${ Math.max(
