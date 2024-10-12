@@ -1787,22 +1787,6 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
- * Reducer returning which mode is enabled.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function editorMode( state = 'edit', action ) {
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return action.mode;
-	}
-
-	return state;
-}
-
-/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -2117,7 +2101,6 @@ const combinedReducers = combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	lastFocus,
-	editorMode,
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,

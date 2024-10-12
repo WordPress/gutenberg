@@ -16,6 +16,7 @@ import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -2691,7 +2692,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
-	return state.editorMode === 'navigation';
+	return __unstableGetEditorMode( state ) === 'navigation';
 }
 
 /**
@@ -2701,9 +2702,11 @@ export function isNavigationMode( state ) {
  *
  * @return {string} the editor mode.
  */
-export function __unstableGetEditorMode( state ) {
-	return state.editorMode;
-}
+export const __unstableGetEditorMode = createRegistrySelector(
+	( select ) => () => {
+		return select( preferencesStore ).get( 'core', 'editorTool' );
+	}
+);
 
 /**
  * Returns whether block moving mode is enabled.
