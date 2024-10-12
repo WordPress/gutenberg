@@ -836,7 +836,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param array  $variations An array of style variations.
 		 * @param string $directory  The directory to get the style variations from.
-		 * @param string $scope 	 The scope or type of style variation to retrieve e.g. theme, block etc.
+		 * @param string $scope 		 The scope or type of style variation to retrieve e.g. theme, block etc.
 		 */
 		return apply_filters( 'wp_theme_json_style_variations', $variations, $directory, $scope );
 	}
