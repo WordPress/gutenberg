@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, createRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -11,14 +11,12 @@ import { compose } from '@wordpress/compose';
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
 export class PostPublishButton extends Component {
 	constructor( props ) {
 		super( props );
-		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
 		this.closeEntitiesSavedStates =
@@ -29,41 +27,16 @@ export class PostPublishButton extends Component {
 		};
 	}
 
-	componentDidMount() {
-		if ( this.props.focusOnMount ) {
-			// This timeout is necessary to make sure the `useEffect` hook of
-			// `useFocusReturn` gets the correct element (the button that opens the
-			// PostPublishPanel) otherwise it will get this button.
-			this.timeoutID = setTimeout( () => {
-				this.buttonNode.current.focus();
-			}, 0 );
-		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.timeoutID );
-	}
-
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const {
-				hasNonPostEntityChanges,
-				hasPostMetaChanges,
-				setEntitiesSavedStatesCallback,
-				isPublished,
-			} = this.props;
+			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
+				this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
-			//
-			// TODO: Explore how to manage `hasPostMetaChanges` and pre-publish workflow properly.
-			if (
-				( hasNonPostEntityChanges ||
-					( hasPostMetaChanges && isPublished ) ) &&
-				setEntitiesSavedStatesCallback
-			) {
+			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
@@ -193,7 +166,6 @@ export class PostPublishButton extends Component {
 		return (
 			<>
 				<Button
-					ref={ this.buttonNode }
 					{ ...componentProps }
 					className={ `${ componentProps.className } editor-post-publish-button__button` }
 					size="compact"
@@ -226,8 +198,7 @@ export default compose( [
 			isSavingNonPostEntityChanges,
 			getEditedPostAttribute,
 			getPostEdits,
-			hasPostMetaChanges,
-		} = unlock( select( editorStore ) );
+		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
@@ -244,7 +215,6 @@ export default compose( [
 			postStatus: getEditedPostAttribute( 'status' ),
 			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
-			hasPostMetaChanges: hasPostMetaChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),

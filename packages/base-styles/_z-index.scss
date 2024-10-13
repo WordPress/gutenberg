@@ -8,7 +8,6 @@ $z-layers: (
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
-	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
 	".editor-text-editor__toolbar": 1,
 
@@ -32,12 +31,10 @@ $z-layers: (
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
 	".edit-widgets-header": 30,
-	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block.
 	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
-	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
-	".block-library-cover__padding-visualizer": 2, // BoxControl visualizer needs to be +1 higher than .wp-block-cover.has-background-dim::before
-	".wp-block-cover__image-background": 0, // Image background inside cover block.
-	".wp-block-cover__video-background": 0, // Video background inside cover block.
+	".wp-block-cover.has-background-dim::before": 0, // Overlay area inside block cover need to be higher than the video background.
+	".wp-block-cover__image-background": -1, // Image background inside cover block.
+	".wp-block-cover__video-background": -1, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
 	// Fixed position appender:
@@ -69,10 +66,6 @@ $z-layers: (
 	".block-editor-format-toolbar__image-popover": 160000 - 10,
 	// Below the media library backdrop (.media-modal-backdrop), which has a z-index of 159900.
 	".block-editor-global-styles-background-panel__popover": 159900 - 10,
-
-	// Small screen inner blocks overlay must be displayed above drop zone,
-	// settings menu, and movers.
-	".block-editor-block-list__layout.has-overlay::after": 60,
 
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 61,
@@ -193,7 +186,6 @@ $z-layers: (
 	// Site editor layout
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
@@ -207,8 +199,11 @@ $z-layers: (
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
-	// Ensure quick actions toolbar appear above pagination
-	".dataviews-bulk-actions": 2,
+	// Ensure selection checkbox stays above the preview field.
+	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
+
+	// Ensure footer stays above the preview field.
+	".dataviews-footer": 2,
 );
 
 @function z-index( $key ) {

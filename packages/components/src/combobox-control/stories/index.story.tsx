@@ -76,6 +76,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	allowReset: false,
 	label: 'Select a country',
 	options: countryOptions,
@@ -135,8 +136,7 @@ const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
 } ) );
 
 WithDisabledOptions.args = {
-	allowReset: false,
-	label: 'Select a country',
+	...Default.args,
 	options: optionsWithDisabledOptions,
 };
 
@@ -148,8 +148,7 @@ WithDisabledOptions.args = {
 export const NotExpandOnFocus = Template.bind( {} );
 
 NotExpandOnFocus.args = {
-	allowReset: false,
-	label: 'Select a country',
+	...Default.args,
 	options: countryOptions,
 	expandOnFocus: false,
 };

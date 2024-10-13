@@ -7,11 +7,15 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import Picker from '..';
+import _Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
 type Log = { name: string; args: unknown[] };
 type EventLogger = ( name: string, args: unknown[] ) => void;
+
+const Picker = ( props: React.ComponentProps< typeof _Picker > ) => {
+	return <_Picker { ...props } __nextHasNoMarginBottom />;
+};
 
 const props: FocalPointPickerProps = {
 	onChange: jest.fn(),

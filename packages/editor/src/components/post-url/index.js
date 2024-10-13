@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -11,6 +11,7 @@ import {
 	Button,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -83,14 +84,20 @@ export default function PostURL( { onClose } ) {
 			<VStack spacing={ 3 }>
 				{ isEditable && (
 					<div>
-						{ __( 'Customize the last part of the URL. ' ) }
-						<ExternalLink
-							href={ __(
-								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-							) }
-						>
-							{ __( 'Learn more.' ) }
-						</ExternalLink>
+						{ createInterpolateElement(
+							__(
+								'Customize the last part of the URL. <a>Learn more.</a>'
+							),
+							{
+								a: (
+									<ExternalLink
+										href={ __(
+											'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+										) }
+									/>
+								),
+							}
+						) }
 					</div>
 				) }
 				<div>
@@ -103,11 +110,14 @@ export default function PostURL( { onClose } ) {
 								</InputControlPrefixWrapper>
 							}
 							suffix={
-								<Button
-									icon={ copySmall }
-									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
-								/>
+								<InputControlSuffixWrapper variant="control">
+									<Button
+										icon={ copySmall }
+										ref={ copyButtonRef }
+										size="small"
+										label="Copy"
+									/>
+								</InputControlSuffixWrapper>
 							}
 							label={ __( 'Link' ) }
 							hideLabelFromVision

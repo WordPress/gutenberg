@@ -76,7 +76,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'Heading'
 		);
 
@@ -139,7 +139,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'Heading'
 		);
 
@@ -194,10 +194,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 
@@ -286,7 +286,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 		await page.hover(
@@ -350,10 +350,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 
@@ -596,7 +596,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.first()
 			.fill( 'Verse' );
@@ -606,7 +606,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			page
 				.getByRole( 'region', { name: 'Block Library' } )
 				.getByRole( 'searchbox', {
-					name: 'Search for blocks and patterns',
+					name: 'Search',
 				} )
 				.first()
 		).toHaveValue( 'Verse' );

@@ -5,19 +5,30 @@
  * tab stop for the whole Composite element. This means that it can behave as
  * a roving tabindex or aria-activedescendant container.
  *
+ * This file aims at providing components that are as close as possible to the
+ * original `reakit`-based implementation (which was removed from the codebase),
+ * although it is recommended that consumers of the package switch to the stable,
+ * un-prefixed, `ariakit`-based version of `Composite`.
+ *
  * @see https://ariakit.org/components/composite
  */
+
+/**
+ * External dependencies
+ */
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import * as Current from '../current';
-import { useInstanceId } from '@wordpress/compose';
+import { Composite as Current } from '..';
 
 type Orientation = 'horizontal' | 'vertical';
 
@@ -73,7 +84,7 @@ export interface LegacyStateOptions {
 
 type Component = React.FunctionComponent< any >;
 
-type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
+type CompositeStore = ReturnType< typeof Ariakit.useCompositeStore >;
 type CompositeStoreState = { store: CompositeStore };
 export type CompositeState = CompositeStoreState &
 	Required< Pick< LegacyStateOptions, 'baseId' > >;
@@ -93,9 +104,9 @@ type CompositeComponent< C extends Component > = (
 ) => React.ReactElement;
 type CompositeComponentProps = CompositeState &
 	(
-		| ComponentProps< typeof Current.CompositeGroup >
-		| ComponentProps< typeof Current.CompositeItem >
-		| ComponentProps< typeof Current.CompositeRow >
+		| ComponentProps< typeof Current.Group >
+		| ComponentProps< typeof Current.Item >
+		| ComponentProps< typeof Current.Row >
 	);
 
 function mapLegacyStatePropsToComponentProps(
@@ -113,12 +124,31 @@ function mapLegacyStatePropsToComponentProps(
 	return legacyProps;
 }
 
+const LEGACY_TO_NEW_DISPLAY_NAME = {
+	__unstableComposite: 'Composite',
+	__unstableCompositeGroup: 'Composite.Group or Composite.Row',
+	__unstableCompositeItem: 'Composite.Item',
+	__unstableUseCompositeState: 'Composite',
+};
+
 function proxyComposite< C extends Component >(
 	ProxiedComponent: C | React.ForwardRefExoticComponent< C >,
 	propMap: Record< string, string > = {}
 ): CompositeComponent< C > {
-	const displayName = ProxiedComponent.displayName;
+	const displayName = ProxiedComponent.displayName ?? '';
+
 	const Component = ( legacyProps: CompositeStateProps ) => {
+		deprecated( `wp.components.${ displayName }`, {
+			since: '6.7',
+			alternative: LEGACY_TO_NEW_DISPLAY_NAME.hasOwnProperty(
+				displayName
+			)
+				? LEGACY_TO_NEW_DISPLAY_NAME[
+						displayName as keyof typeof LEGACY_TO_NEW_DISPLAY_NAME
+				  ]
+				: undefined,
+		} );
+
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
 		const props = rest as ComponentProps< C >;
@@ -143,27 +173,60 @@ function proxyComposite< C extends Component >(
 // `CompositeRow`, but this has been split into two different
 // components. We handle that difference by checking on the
 // provided role, and returning the appropriate component.
-const unproxiedCompositeGroup = forwardRef<
+const UnproxiedCompositeGroup = forwardRef<
 	any,
-	React.ComponentPropsWithoutRef<
-		typeof Current.CompositeGroup | typeof Current.CompositeRow
-	>
+	React.ComponentPropsWithoutRef< typeof Current.Group | typeof Current.Row >
 >( ( { role, ...props }, ref ) => {
-	const Component =
-		role === 'row' ? Current.CompositeRow : Current.CompositeGroup;
+	const Component = role === 'row' ? Current.Row : Current.Group;
 	return <Component ref={ ref } role={ role } { ...props } />;
 } );
-unproxiedCompositeGroup.displayName = 'CompositeGroup';
 
-export const Composite = proxyComposite( Current.Composite, { baseId: 'id' } );
-export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
-export const CompositeItem = proxyComposite( Current.CompositeItem, {
-	focusable: 'accessibleWhenDisabled',
-} );
+/**
+ * _Note: please use the `Composite` component instead._
+ *
+ * @deprecated
+ */
+export const Composite = proxyComposite(
+	Object.assign( Current, { displayName: '__unstableComposite' } ),
+	{ baseId: 'id' }
+);
+/**
+ * _Note: please use the `Composite.Row` or `Composite.Group` components instead._
+ *
+ * @deprecated
+ */
+export const CompositeGroup = proxyComposite(
+	Object.assign( UnproxiedCompositeGroup, {
+		displayName: '__unstableCompositeGroup',
+	} )
+);
+/**
+ * _Note: please use the `Composite.Item` component instead._
+ *
+ * @deprecated
+ */
+export const CompositeItem = proxyComposite(
+	Object.assign( Current.Item, {
+		displayName: '__unstableCompositeItem',
+	} ),
+	{
+		focusable: 'accessibleWhenDisabled',
+	}
+);
 
+/**
+ * _Note: please use the `Composite` component instead._
+ *
+ * @deprecated
+ */
 export function useCompositeState(
 	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
+	deprecated( `wp.components.__unstableUseCompositeState`, {
+		since: '6.7',
+		alternative: LEGACY_TO_NEW_DISPLAY_NAME.__unstableUseCompositeState,
+	} );
+
 	const {
 		baseId,
 		currentId: defaultActiveId,
@@ -178,7 +241,7 @@ export function useCompositeState(
 
 	return {
 		baseId: useInstanceId( Composite, 'composite', baseId ),
-		store: Current.useCompositeStore( {
+		store: Ariakit.useCompositeStore( {
 			defaultActiveId,
 			rtl,
 			orientation,

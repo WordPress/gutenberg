@@ -17,20 +17,7 @@
  * @return string The block content.
  */
 function render_block_core_button( $attributes, $content ) {
-	/*
-	 * The current Gutenberg plugin supports WordPress 6.4, but the next_token()
-	 * method does not exist in WordPress 6.4. Therefore, if Gutenberg is used
-	 * as a plugin, use the Gutenberg class that has the `next_token()` method.
-	 *
-	 * TODO: After the Gutenberg plugin drops support for WordPress 6.4, this
-	 * conditional statement will be removed and the core class `WP_HTML_Tag_Processor`
-	 * should be used.
-	 */
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && class_exists( 'Gutenberg_HTML_Tag_Processor_6_5' ) ) {
-		$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
-	} else {
-		$p = new WP_HTML_Tag_Processor( $content );
-	}
+	$p = new WP_HTML_Tag_Processor( $content );
 
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a

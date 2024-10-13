@@ -1,19 +1,38 @@
+.components-radio-control {
+	border: 0;
+	margin: 0;
+	padding: 0;
+
+	font-family: $default-font;
+	font-size: $default-font-size;
+}
+
+.components-radio-control__group-wrapper.has-help {
+	margin-block-end: $grid-unit-15;
+}
+
 .components-radio-control__option {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto minmax(0, max-content);
+	column-gap: $grid-unit-10;
 	align-items: center;
 }
 
 .components-radio-control__input[type="radio"] {
+	grid-column: 1;
+	grid-row: 1;
+
 	@include radio-control;
 
 	display: inline-flex;
-	margin: 0 $grid-unit-10 0 0;
+	margin: 0;
 	padding: 0;
 	appearance: none;
 	cursor: pointer;
 
 	&:focus {
-		box-shadow: 0 0 0 ($border-width * 2) $components-color-background, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) $components-color-accent;
+		@include button-style-outset__focus(var(--wp-admin-theme-color));
 	}
 
 	&:checked {
@@ -22,11 +41,32 @@
 
 		&::before {
 			content: "";
-			border-radius: 50%;
+			border-radius: $radius-round;
 		}
 	}
 }
 
 .components-radio-control__label {
+	grid-column: 2;
+	grid-row: 1;
+
 	cursor: pointer;
+	line-height: $radio-input-size-sm;
+
+	@include break-small() {
+		line-height: $radio-input-size;
+	}
+}
+
+.components-radio-control__option-description {
+	grid-column: 2;
+	grid-row: 2;
+
+	padding-block-start: $grid-unit-05;
+
+	// Override the top margin of the StyledHelp component from BaseControl.
+	// TODO: we should tweak the StyledHelp component to not have a top margin.
+	&.components-radio-control__option-description {
+		margin-top: 0;
+	}
 }

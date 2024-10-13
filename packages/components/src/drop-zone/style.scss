@@ -7,7 +7,7 @@
 	z-index: z-index(".components-drop-zone");
 	visibility: hidden;
 	opacity: 0;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
 	&.is-active {
 		opacity: 1;
@@ -42,7 +42,7 @@
 		transform: scale(0.9);
 	}
 
-	&.is-active:not(.has-dragged-out) {
+	&.is-active.is-dragging-over-element {
 		.components-drop-zone__content {
 			opacity: 1;
 

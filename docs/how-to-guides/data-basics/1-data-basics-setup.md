@@ -10,7 +10,7 @@ We'll do all the development inside of a WordPress plugin. Let's start by creati
 
 -   my-first-gutenberg-app.php – to create a new admin page
 -   src/index.js – for our JavaScript application
--   style.css – for the minimal stylesheet
+-   src/style.css – for the minimal stylesheet
 -   package.json – for the build process
 
 Go ahead and create these files using the following snippets:
@@ -36,7 +36,7 @@ window.addEventListener(
 );
 ```
 
-**style.css:**
+**src/style.css:**
 
 ```css
 .toplevel_page_my-first-gutenberg-app #wpcontent {
@@ -149,7 +149,7 @@ function load_custom_wp_admin_scripts( $hook ) {
 	// Load our style.css.
 	wp_register_style(
 		'my-first-gutenberg-app',
-		plugins_url( 'style.css', __FILE__ ),
+		plugins_url( 'build/style-index.css', __FILE__ ),
 		array(),
 		$asset_file['version']
 	);

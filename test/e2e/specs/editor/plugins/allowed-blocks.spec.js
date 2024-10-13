@@ -27,7 +27,7 @@ test.describe( 'Allowed Blocks Filter', () => {
 		const searchbox = page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} );
 
 		await searchbox.fill( 'Paragraph' );

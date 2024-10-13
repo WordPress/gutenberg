@@ -84,7 +84,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean | undefined`: Whether the given block is allowed to be moved.
+-   `boolean`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -262,7 +262,7 @@ _Returns_
 
 ### getBlockInsertionPoint
 
-Returns the insertion point, the index at which the new inserted block would be placed. Defaults to the last index.
+Returns the location of the insertion cue. Defaults to the last index.
 
 _Parameters_
 
@@ -412,7 +412,7 @@ Returns all blocks that match a blockName. Results include nested blocks.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+-   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
 
 _Returns_
 
@@ -561,6 +561,18 @@ _Parameters_
 _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
+
+### getHoveredBlockClientId
+
+Returns the currently hovered block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -845,15 +857,9 @@ _Returns_
 
 ### hasBlockMovingClientId
 
+> **Deprecated**
+
 Returns whether block moving mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `string`: Client Id of moving block.
 
 ### hasDraggedInnerBlock
 
@@ -976,7 +982,7 @@ _Returns_
 
 ### isBlockInsertionPointVisible
 
-Returns true if we should show the block insertion point.
+Returns true if the block insertion point is visible.
 
 _Parameters_
 
@@ -1256,6 +1262,18 @@ _Parameters_
 ### hideInsertionPoint
 
 Action that hides the insertion point.
+
+### hoverBlock
+
+Returns an action object used in signalling that the block with the specified client ID has been hovered.
+
+_Parameters_
+
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### insertAfterBlock
 
@@ -1637,11 +1655,13 @@ _Returns_
 
 ### setBlockMovingClientId
 
-Action that enables or disables the block moving mode.
+> **Deprecated**
 
-_Parameters_
+Set the block moving client ID.
 
--   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
+_Returns_
+
+-   `Object`: Action object.
 
 ### setBlockVisibility
 

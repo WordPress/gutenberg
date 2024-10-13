@@ -160,6 +160,7 @@ function PostFeaturedImage( {
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
+									__next40pxDefaultSize
 									ref={ toggleRef }
 									className={
 										! featuredImageId
@@ -170,13 +171,18 @@ function PostFeaturedImage( {
 									aria-label={
 										! featuredImageId
 											? null
-											: __( 'Edit or replace the image' )
+											: __(
+													'Edit or replace the featured image'
+											  )
 									}
 									aria-describedby={
 										! featuredImageId
 											? null
 											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
+									aria-haspopup="dialog"
+									disabled={ isLoading }
+									accessibleWhenDisabled
 								>
 									{ !! featuredImageId && media && (
 										<img
@@ -195,12 +201,15 @@ function PostFeaturedImage( {
 								{ !! featuredImageId && (
 									<HStack className="editor-post-featured-image__actions">
 										<Button
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ open }
+											aria-haspopup="dialog"
 										>
 											{ __( 'Replace' ) }
 										</Button>
 										<Button
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ () => {
 												onRemoveImage();

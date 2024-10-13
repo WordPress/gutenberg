@@ -26,18 +26,37 @@ describe( 'ColorPalette: Utils', () => {
 	} );
 
 	describe( 'normalizeColorValue', () => {
-		test( 'should return the value as is if the color value is not a CSS variable', () => {
+		test( 'should return the value if the value argument is not a CSS variable', () => {
 			const element = document.createElement( 'div' );
 			expect( normalizeColorValue( '#ff0000', element ) ).toBe(
 				'#ff0000'
 			);
 		} );
-		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
+		test( 'should return the background color computed from an element if the value argument is a CSS variable', () => {
 			const element = document.createElement( 'div' );
 			element.style.backgroundColor = '#ff0000';
 			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
 				'#ff0000'
 			);
+		} );
+		test( 'should return the background color computed from an element if the value argument is a color mix', () => {
+			const element = document.createElement( 'div' );
+			element.style.backgroundColor = '#ff0000';
+			expect(
+				normalizeColorValue(
+					'color-mix(in oklab, #a71e14, white)',
+					element
+				)
+			).toBe( '#ff0000' );
+		} );
+		test( 'should return the value if the value argument is undefined', () => {
+			const element = document.createElement( 'div' );
+			expect( normalizeColorValue( undefined, element ) ).toBe(
+				undefined
+			);
+		} );
+		test( 'should return the value if the element argument is null', () => {
+			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
 		} );
 	} );
 } );

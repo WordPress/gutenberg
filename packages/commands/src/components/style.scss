@@ -30,10 +30,10 @@
 	.components-button {
 		height: $grid-unit-70;
 		width: $grid-unit-70;
-		border: 1px solid $gray-600;
+		border: $border-width solid $gray-600;
 		border-right: 0;
 		justify-content: center;
-		border-radius: $radius-block-ui 0 0 $radius-block-ui;
+		border-radius: $radius-small 0 0 $radius-small;
 
 		& + [cmdk-input] {
 			border-top-left-radius: 0;
@@ -68,7 +68,7 @@
 	}
 
 	[cmdk-item] {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		cursor: pointer;
 		display: flex;
 		align-items: center;

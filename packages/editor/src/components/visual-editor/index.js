@@ -34,7 +34,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
-import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_POST_TYPE,
@@ -48,6 +48,7 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -107,6 +108,7 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -127,8 +129,7 @@ function VisualEditor( {
 			getRenderingMode,
 			getDeviceType,
 		} = select( editorStore );
-		const { getPostType, canUser, getEditedEntityRecord } =
-			select( coreStore );
+		const { getPostType, getEditedEntityRecord } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
@@ -142,7 +143,6 @@ function VisualEditor( {
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
-		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
@@ -159,9 +159,7 @@ function VisualEditor( {
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
-				postTypeObject?.viewable &&
-				supportsTemplateMode &&
-				canEditTemplate
+				postTypeObject?.viewable && supportsTemplateMode
 					? template
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
@@ -177,17 +175,19 @@ function VisualEditor( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
-		isZoomOutMode,
+		isZoomedOut,
 	} = useSelect( ( select ) => {
-		const { getSettings, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { getSettings, isZoomOut: _isZoomOut } = unlock(
+			select( blockEditorStore )
+		);
+
 		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isZoomedOut: _isZoomOut(),
 		};
 	}, [] );
 
@@ -336,14 +336,16 @@ function VisualEditor( {
 		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useZoomOutModeExit(),
 	] );
 
-	const zoomOutProps = isZoomOutMode
-		? {
-				scale: 'default',
-				frameSize: '20px',
-		  }
-		: {};
+	const zoomOutProps =
+		isZoomedOut && ! isTabletViewport
+			? {
+					scale: 'default',
+					frameSize: '40px',
+			  }
+			: {};
 
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
@@ -357,7 +359,7 @@ function VisualEditor( {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
-		! isZoomOutMode;
+		! isZoomedOut;
 	const shouldIframe =
 		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
 

@@ -15,7 +15,13 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	getUserPermissionCacheKey,
+	getUserPermissionsFromAllowHeader,
+	ALLOWED_RESOURCE_ACTIONS,
+} from './utils';
 import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
@@ -58,12 +64,12 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -149,7 +155,7 @@ export const getEntityRecord =
 					}
 				);
 
-				if ( query !== undefined ) {
+				if ( query !== undefined && query._fields ) {
 					query = { ...query, include: [ key ] };
 
 					// The resolution cache won't consider query as reusable based on the
@@ -165,8 +171,39 @@ export const getEntityRecord =
 					}
 				}
 
-				const record = await apiFetch( { path } );
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				const response = await apiFetch( { path, parse: false } );
+				const record = await response.json();
+				const permissions = getUserPermissionsFromAllowHeader(
+					response.headers?.get( 'allow' )
+				);
+
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+					receiveUserPermissionArgs[
+						getUserPermissionCacheKey( action, {
+							kind,
+							name,
+							id: key,
+						} )
+					] = permissions[ action ];
+
+					canUserResolutionsArgs.push( [
+						action,
+						{ kind, name, id: key },
+					] );
+				}
+
+				registry.batch( () => {
+					dispatch.receiveEntityRecords( kind, name, record, query );
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				} );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -198,7 +235,7 @@ export const getEntityRecords =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -244,6 +281,10 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
 			}
 
 			// If we request fields but the result doesn't contain the fields,
@@ -272,25 +313,55 @@ export const getEntityRecords =
 					meta
 				);
 
-				// When requesting all fields, the list of results can be used to
-				// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+				// When requesting all fields, the list of results can be used to resolve
+				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
+				// See https://github.com/WordPress/gutenberg/pull/64504
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-					dispatch( {
-						type: 'START_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
-					dispatch( {
-						type: 'FINISH_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
+					const targetHints = records
+						.filter( ( record ) => record?.[ key ] )
+						.map( ( record ) => ( {
+							id: record[ key ],
+							permissions: getUserPermissionsFromAllowHeader(
+								record?._links?.self?.[ 0 ].targetHints.allow
+							),
+						} ) );
+
+					const canUserResolutionsArgs = [];
+					const receiveUserPermissionArgs = {};
+					for ( const targetHint of targetHints ) {
+						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+							canUserResolutionsArgs.push( [
+								action,
+								{ kind, name, id: targetHint.id },
+							] );
+
+							receiveUserPermissionArgs[
+								getUserPermissionCacheKey( action, {
+									kind,
+									name,
+									id: targetHint.id,
+								} )
+							] = targetHint.permissions[ action ];
+						}
+					}
+
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						resolutionsArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -352,25 +423,47 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                  'delete'.
- * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id              ID of the rest resource to check.
+ * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                        'delete'.
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                                        or REST base as a string - `media`.
+ * @param {?string}       id              ID of the rest resource to check.
  */
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		const resourcePath = id ? `${ resource }/${ id }` : resource;
-		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
-
-		if ( ! retrievedActions.includes( requestedAction ) ) {
+		if ( ! ALLOWED_RESOURCE_ACTIONS.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
+		let resourcePath = null;
+		if ( typeof resource === 'object' ) {
+			if ( ! resource.kind || ! resource.name ) {
+				throw new Error( 'The entity resource object is not valid.' );
+			}
+
+			const configs = await dispatch(
+				getOrLoadEntitiesConfig( resource.kind, resource.name )
+			);
+			const entityConfig = configs.find(
+				( config ) =>
+					config.name === resource.name &&
+					config.kind === resource.kind
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+
+			resourcePath =
+				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
+		} else {
+			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
+
 		// Prevent resolving the same resource twice.
-		for ( const relatedAction of retrievedActions ) {
+		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
 			if ( relatedAction === requestedAction ) {
 				continue;
 			}
@@ -387,7 +480,7 @@ export const canUser =
 		let response;
 		try {
 			response = await apiFetch( {
-				path: `/wp/v2/${ resourcePath }`,
+				path: resourcePath,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -398,51 +491,41 @@ export const canUser =
 		}
 
 		// Optional chaining operator is used here because the API requests don't
-		// return the expected result in the native version. Instead, API requests
+		// return the expected result in the React native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
-		const allowHeader = response.headers?.get( 'allow' );
-		const allowedMethods = allowHeader?.allow || allowHeader || '';
+		const permissions = getUserPermissionsFromAllowHeader(
+			response.headers?.get( 'allow' )
+		);
+		registry.batch( () => {
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				const key = getUserPermissionCacheKey( action, resource, id );
 
-		const permissions = {};
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
-		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-			permissions[ actionName ] = allowedMethods.includes( methodName );
-		}
+				dispatch.receiveUserPermission( key, permissions[ action ] );
 
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+				// Mark related action resolutions as finished.
+				if ( action !== requestedAction ) {
+					dispatch.finishResolution( 'canUser', [
+						action,
+						resource,
+						id,
+					] );
+				}
+			}
+		} );
 	};
 
 /**
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {string} recordId Record's id.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record's id.
  */
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-		if ( ! entityConfig ) {
-			return;
-		}
-
-		const resource = entityConfig.__unstable_rest_base;
-		await dispatch( canUser( 'update', resource, recordId ) );
+		await dispatch( canUser( 'update', { kind, name, id: recordId } ) );
 	};
 
 /**
@@ -562,7 +645,7 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const themeGlobalStyles = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 			currentTheme.stylesheet,
@@ -575,7 +658,7 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 			currentTheme.stylesheet,
@@ -672,7 +755,7 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch, select, registry } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -681,9 +764,13 @@ export const getNavigationFallbackId =
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallbackId( fallback?.id );
+		registry.batch( () => {
+			dispatch.receiveNavigationFallbackId( fallback?.id );
 
-		if ( record ) {
+			if ( ! record ) {
+				return;
+			}
+
 			// If the fallback is already in the store, don't invalidate navigation queries.
 			// Otherwise, invalidate the cache for the scenario where there were no Navigation
 			// posts in the state and the fallback created one.
@@ -707,7 +794,7 @@ export const getNavigationFallbackId =
 				'wp_navigation',
 				fallback.id,
 			] );
-		}
+		} );
 	};
 
 export const getDefaultTemplateId =
@@ -734,13 +821,13 @@ export const getDefaultTemplateId =
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -801,40 +888,36 @@ export const getRevisions =
 				} );
 			}
 
-			dispatch.receiveRevisions(
-				kind,
-				name,
-				recordKey,
-				records,
-				query,
-				false,
-				meta
-			);
+			registry.batch( () => {
+				dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getRevision` selector in addition to `getRevisions`.
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [
-						kind,
-						name,
-						recordKey,
-						record[ key ],
-					] );
+				// When requesting all fields, the list of results can be used to
+				// resolve the `getRevision` selector in addition to `getRevisions`.
+				if ( ! query?._fields && ! query.context ) {
+					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [
+							kind,
+							name,
+							recordKey,
+							record[ key ],
+						] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
-			}
+					dispatch.finishResolutions(
+						'getRevision',
+						resolutionsArgs
+					);
+				}
+			} );
 		}
 	};
 
@@ -865,7 +948,7 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -899,5 +982,36 @@ export const getRevision =
 
 		if ( record ) {
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
+		}
+	};
+
+/**
+ * Requests a specific post type options from the REST API.
+ *
+ * @param {string} postType Post type slug.
+ */
+export const getRegisteredPostMeta =
+	( postType ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		let options;
+		try {
+			const {
+				rest_namespace: restNamespace = 'wp/v2',
+				rest_base: restBase,
+			} = ( await resolveSelect.getPostType( postType ) ) || {};
+			options = await apiFetch( {
+				path: `${ restNamespace }/${ restBase }/?context=edit`,
+				method: 'OPTIONS',
+			} );
+		} catch ( error ) {
+			// Do nothing if the request comes back with an API error.
+			return;
+		}
+
+		if ( options ) {
+			dispatch.receiveRegisteredPostMeta(
+				postType,
+				options?.schema?.properties?.meta?.properties
+			);
 		}
 	};

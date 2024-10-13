@@ -11,8 +11,8 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
-	Button,
-	ButtonGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	PanelBody,
 	privateApis as componentsPrivateApis,
@@ -233,7 +233,6 @@ function LayoutPanelPure( {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
@@ -316,19 +315,26 @@ export default {
 
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
-		<ButtonGroup>
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Layout type' ) }
+			__nextHasNoMarginBottom
+			hideLabelFromVision
+			isAdaptiveWidth
+			value={ type }
+			onChange={ onChange }
+		>
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
-					<Button
+					<ToggleGroupControlOption
 						key={ name }
-						isPressed={ type === name }
-						onClick={ () => onChange( name ) }
-					>
-						{ label }
-					</Button>
+						value={ name }
+						label={ label }
+					/>
 				);
 			} ) }
-		</ButtonGroup>
+		</ToggleGroupControl>
 	);
 }
 

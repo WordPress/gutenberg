@@ -28,7 +28,7 @@ import {
 	ToggleControl,
 	PanelBody,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
@@ -128,6 +128,10 @@ export default function PostDateEdit( {
 											siteTimeFormat
 										) }
 										onClose={ onClose }
+										dateOrder={
+											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+											_x( 'dmy', 'date order' )
+										}
 									/>
 								) }
 								renderToggle={ ( { isOpen, onToggle } ) => {

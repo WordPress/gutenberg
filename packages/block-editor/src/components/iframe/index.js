@@ -122,7 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const prevContainerWidth = useRef();
+	const prevContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -243,7 +243,7 @@ function Iframe( {
 
 	useEffect( () => {
 		if ( ! isZoomedOut ) {
-			prevContainerWidth.current = containerWidth;
+			prevContainerWidthRef.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
@@ -305,14 +305,20 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		const maxWidth = 800;
+		const maxWidth = 750;
+		// This scaling calculation has to happen within the JS because CSS calc() can
+		// only divide and multiply by a unitless value. I.e. calc( 100px / 2 ) is valid
+		// but calc( 100px / 2px ) is not.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) /
-						prevContainerWidth.current
+				? ( Math.min( containerWidth, maxWidth ) -
+						parseInt( frameSize ) * 2 ) /
+						prevContainerWidthRef.current
 				: scale
 		);
+
+		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
 			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
@@ -331,7 +337,7 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidth.current }px`
+			`${ prevContainerWidthRef.current }px`
 		);
 
 		return () => {
@@ -378,10 +384,9 @@ function Iframe( {
 			<iframe
 				{ ...props }
 				style={ {
-					border: 0,
 					...props.style,
 					height: props.style?.height,
-					transition: 'all .3s',
+					border: 0,
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
@@ -458,7 +463,7 @@ function Iframe( {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,
 					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ prevContainerWidth.current }px`,
+						isZoomedOut && `${ prevContainerWidthRef.current }px`,
 				} }
 			>
 				{ iframe }

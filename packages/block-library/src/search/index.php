@@ -81,20 +81,8 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
-
-		if ( $is_expandable_searchfield || $enhanced_pagination ) {
-			$suffix = wp_scripts_get_suffix();
-			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-				$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
-			}
-
-			wp_register_script_module(
-				'@wordpress/block-library/search',
-				isset( $module_url ) ? $module_url : includes_url( "blocks/search/view{$suffix}.js" ),
-				array( '@wordpress/interactivity' ),
-				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-			);
-			wp_enqueue_script_module( '@wordpress/block-library/search' );
+		if ( $is_expandable_searchfield ) {
+			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 
 		}
 		if ( $is_expandable_searchfield ) {

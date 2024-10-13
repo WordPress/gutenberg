@@ -93,10 +93,10 @@ export function Navigation( {
 	};
 
 	// Used to prevent the sliding animation on mount
-	const isMounted = useRef( false );
+	const isMountedRef = useRef( false );
 	useEffect( () => {
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
+		if ( ! isMountedRef.current ) {
+			isMountedRef.current = true;
 		}
 	}, [] );
 
@@ -130,7 +130,7 @@ export function Navigation( {
 					animateClassName
 						? clsx( {
 								[ animateClassName ]:
-									isMounted.current && slideOrigin,
+									isMountedRef.current && slideOrigin,
 						  } )
 						: undefined
 				}

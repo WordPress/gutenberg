@@ -29,9 +29,10 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -121,6 +122,51 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	);
 }
 
+function ReusableBlockControl( {
+	recordId,
+	canOverrideBlocks,
+	hasContent,
+	handleEditOriginal,
+	resetContent,
+} ) {
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: recordId,
+			} ),
+		[ recordId ]
+	);
+
+	return (
+		<>
+			{ canUserEdit && !! handleEditOriginal && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ handleEditOriginal }>
+							{ __( 'Edit original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
+			{ canOverrideBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+		</>
+	);
+}
+
 function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
@@ -143,35 +189,25 @@ function ReusableBlockEdit( {
 
 	const {
 		innerBlocks,
-		userCanEdit,
 		onNavigateToEntityRecord,
 		editingMode,
 		hasPatternOverridesSource,
 	} = useSelect(
 		( select ) => {
-			const { canUser } = select( coreStore );
-			const {
-				getBlocks,
-				getSettings,
-				getBlockEditingMode: _getBlockEditingMode,
-			} = select( blockEditorStore );
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const canEdit = canUser( 'update', 'blocks', ref );
-
+			const { getBlocks, getSettings, getBlockEditingMode } =
+				select( blockEditorStore );
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: getBlocks( patternClientId ),
-				userCanEdit: canEdit,
-				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
-				editingMode: _getBlockEditingMode( patternClientId ),
+				editingMode: getBlockEditingMode( patternClientId ),
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
 				),
 			};
 		},
-		[ patternClientId, ref ]
+		[ patternClientId ]
 	);
 
 	// Sync the editing mode of the pattern block with the inner blocks.
@@ -207,14 +243,15 @@ function ReusableBlockEdit( {
 		),
 	} );
 
-	// Use `blocks` variable until `innerBlocks` is populated, which has the proper clientIds.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'all',
 		layout,
-		value: innerBlocks.length > 0 ? innerBlocks : blocks,
+		value: blocks,
 		onInput: NOOP,
 		onChange: NOOP,
-		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const handleEditOriginal = () => {
@@ -252,28 +289,18 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ userCanEdit && onNavigateToEntityRecord && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-
-			{ canOverrideBlocks && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! content }
-							__experimentalIsFocusable
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
+			{ hasResolved && ! isMissing && (
+				<ReusableBlockControl
+					recordId={ ref }
+					canOverrideBlocks={ canOverrideBlocks }
+					hasContent={ !! content }
+					handleEditOriginal={
+						onNavigateToEntityRecord
+							? handleEditOriginal
+							: undefined
+					}
+					resetContent={ resetContent }
+				/>
 			) }
 
 			{ children === null ? (

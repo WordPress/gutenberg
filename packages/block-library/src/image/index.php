@@ -24,16 +24,37 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$p = new WP_HTML_Tag_Processor( $content );
 
-	if ( ! $p->next_tag( 'img' ) || null === $p->get_attribute( 'src' ) ) {
+	if ( ! $p->next_tag( 'img' ) || ! $p->get_attribute( 'src' ) ) {
 		return '';
 	}
 
+	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
+
+	// Ensure the `wp-image-id` classname on the image block supports block bindings.
+	if ( $has_id_binding ) {
+		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
+		// probably overridden by block bindings. Update it to the correct value.
+		// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
+		$id                       = $attributes['id'];
+		$image_classnames         = $p->get_attribute( 'class' );
+		$class_with_binding_value = "wp-image-$id";
+		if ( is_string( $image_classnames ) && ! str_contains( $image_classnames, $class_with_binding_value ) ) {
+			$image_classnames = preg_replace( '/wp-image-(\d+)/', $class_with_binding_value, $image_classnames );
+			$p->set_attribute( 'class', $image_classnames );
+		}
+	}
+
+	// For backwards compatibility, the data-id html attribute is only set for
+	// image blocks nested in a gallery. Detect if the image is in a gallery by
+	// checking the data-id attribute.
+	// See the `block_core_gallery_data_id_backcompatibility` function.
 	if ( isset( $attributes['data-id'] ) ) {
-		// Adds the data-id="$id" attribute to the img element to provide backwards
-		// compatibility for the Gallery Block, which now wraps Image Blocks within
-		// innerBlocks. The data-id attribute is added in a core/gallery
-		// `render_block_data` hook.
-		$p->set_attribute( 'data-id', $attributes['data-id'] );
+		// If there's a binding for the `id`, the `id` attribute is used for the
+		// value, since `data-id` does not support block bindings.
+		// Else the `data-id` is used for backwards compatibility, since
+		// third parties may be filtering its value.
+		$data_id = $has_id_binding ? $attributes['id'] : $attributes['data-id'];
+		$p->set_attribute( 'data-id', $data_id );
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
@@ -49,19 +70,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		isset( $lightbox_settings['enabled'] ) &&
 		true === $lightbox_settings['enabled']
 	) {
-		$suffix = wp_scripts_get_suffix();
-		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-			$module_url = gutenberg_url( '/build/interactivity/image.min.js' );
-		}
-
-		wp_register_script_module(
-			'@wordpress/block-library/image',
-			isset( $module_url ) ? $module_url : includes_url( "blocks/image/view{$suffix}.js" ),
-			array( '@wordpress/interactivity' ),
-			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-		);
-
-		wp_enqueue_script_module( '@wordpress/block-library/image' );
+		wp_enqueue_script_module( '@wordpress/block-library/image/view' );
 
 		/*
 		 * This render needs to happen in a filter with priority 15 to ensure that
@@ -164,22 +173,37 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$p->seek( 'figure' );
 	$figure_class_names = $p->get_attribute( 'class' );
 	$figure_styles      = $p->get_attribute( 'style' );
+
+	// Create unique id and set the image metadata in the state.
+	$unique_image_id = uniqid();
+
+	wp_interactivity_state(
+		'core/image',
+		array(
+			'metadata' => array(
+				$unique_image_id => array(
+					'uploadedSrc'      => $img_uploaded_src,
+					'figureClassNames' => $figure_class_names,
+					'figureStyles'     => $figure_styles,
+					'imgClassNames'    => $img_class_names,
+					'imgStyles'        => $img_styles,
+					'targetWidth'      => $img_width,
+					'targetHeight'     => $img_height,
+					'scaleAttr'        => $block['attrs']['scale'] ?? false,
+					'ariaLabel'        => $aria_label,
+					'alt'              => $alt,
+				),
+			),
+		)
+	);
+
 	$p->add_class( 'wp-lightbox-container' );
 	$p->set_attribute( 'data-wp-interactive', 'core/image' );
 	$p->set_attribute(
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'uploadedSrc'      => $img_uploaded_src,
-				'figureClassNames' => $figure_class_names,
-				'figureStyles'     => $figure_styles,
-				'imgClassNames'    => $img_class_names,
-				'imgStyles'        => $img_styles,
-				'targetWidth'      => $img_width,
-				'targetHeight'     => $img_height,
-				'scaleAttr'        => $block['attrs']['scale'] ?? false,
-				'ariaLabel'        => $aria_label,
-				'alt'              => $alt,
+				'imageId' => $unique_image_id,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
@@ -194,6 +218,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.
 	$p->set_attribute( 'data-wp-on-async--click', 'actions.showLightbox' );
+	$p->set_attribute( 'data-wp-class--hide', 'state.isContentHidden' );
+	$p->set_attribute( 'data-wp-class--show', 'state.isContentVisible' );
 
 	$body_content = $p->get_updated_html();
 
@@ -210,8 +236,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on-async--click="actions.showLightbox"
-			data-wp-style--right="context.imageButtonRight"
-			data-wp-style--top="context.imageButtonTop"
+			data-wp-style--right="state.imageButtonRight"
+			data-wp-style--top="state.imageButtonTop"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
 				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
@@ -267,15 +293,15 @@ function block_core_image_print_lightbox_overlay() {
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>
 				</button>
 				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.currentImage.figureStyles">
+					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.currentImage.currentSrc">
 					</figure>
 				</div>
 				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.currentImage.figureStyles">
+					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.enlargedSrc">
 					</figure>
 				</div>

@@ -207,7 +207,7 @@ test.describe( 'Widgets screen', () => {
 		await inBetweenInserterButton.click();
 
 		const inserterSearchBox = page.getByRole( 'searchbox', {
-			name: 'Search for blocks and patterns',
+			name: 'Search',
 		} );
 		await expect( inserterSearchBox ).toBeFocused();
 
@@ -704,7 +704,7 @@ class WidgetsScreen {
 
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( blockName );
 

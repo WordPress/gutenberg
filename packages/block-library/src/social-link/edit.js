@@ -6,11 +6,15 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { DELETE, BACKSPACE } from '@wordpress/keycodes';
+import { useDispatch } from '@wordpress/data';
+
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
@@ -18,6 +22,7 @@ import {
 	PanelBody,
 	PanelRow,
 	TextControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
@@ -32,22 +37,28 @@ const SocialLinkURLPopover = ( {
 	setAttributes,
 	setPopover,
 	popoverAnchor,
+	clientId,
 } ) => {
+	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
-			onClose={ () => setPopover( false ) }
+			aria-label={ __( 'Edit social link' ) }
+			onClose={ () => {
+				setPopover( false );
+				popoverAnchor?.focus();
+			} }
 		>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					setPopover( false );
+					popoverAnchor?.focus();
 				} }
 			>
 				<div className="block-editor-url-input">
 					<URLInput
-						__nextHasNoMarginBottom
 						value={ url }
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
@@ -56,13 +67,30 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
+						onKeyDown={ ( event ) => {
+							if (
+								!! url ||
+								event.defaultPrevented ||
+								! [ BACKSPACE, DELETE ].includes(
+									event.keyCode
+								)
+							) {
+								return;
+							}
+							removeBlock( clientId );
+						} }
+						suffix={
+							<InputControlSuffixWrapper variant="control">
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
+									size="small"
+								/>
+							</InputControlSuffixWrapper>
+						}
 					/>
 				</div>
-				<Button
-					icon={ keyboardReturn }
-					label={ __( 'Apply' ) }
-					type="submit"
-				/>
 			</form>
 		</URLPopover>
 	);
@@ -73,6 +101,7 @@ const SocialLinkEdit = ( {
 	context,
 	isSelected,
 	setAttributes,
+	clientId,
 } ) => {
 	const { url, service, label = '', rel } = attributes;
 	const {
@@ -116,6 +145,7 @@ const SocialLinkEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
@@ -132,6 +162,7 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
@@ -143,6 +174,7 @@ const SocialLinkEdit = ( {
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
+					aria-haspopup="dialog"
 				>
 					<IconComponent />
 					<span
@@ -159,6 +191,7 @@ const SocialLinkEdit = ( {
 						setAttributes={ setAttributes }
 						setPopover={ setPopover }
 						popoverAnchor={ popoverAnchor }
+						clientId={ clientId }
 					/>
 				) }
 			</li>

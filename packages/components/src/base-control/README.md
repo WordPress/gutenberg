@@ -15,7 +15,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
 			<textarea { ...controlProps }>
 			  { children }
 			</textarea>
@@ -53,7 +53,7 @@ If true, the label will only be visible to screen readers.
 
 ### help
 
-Additional description for the control. The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+Additional description for the control. Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
 -   Type: `ReactNode`
 -   Required: No
@@ -92,7 +92,10 @@ It should only be used in cases where the children being rendered inside BaseCon
 import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
-	<BaseControl help="This button is already accessibly labeled.">
+	<BaseControl
+		__nextHasNoMarginBottom
+		help="This button is already accessibly labeled."
+	>
 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
 		<Button>Select an author</Button>
 	</BaseControl>

@@ -63,6 +63,11 @@ const mediaUploadMiddleware = ( options, next ) => {
 
 	return next( { ...options, parse: false } )
 		.catch( ( response ) => {
+			// `response` could actually be an error thrown by `defaultFetchHandler`.
+			if ( ! response.headers ) {
+				return Promise.reject( response );
+			}
+
 			const attachmentId = response.headers.get(
 				'x-wp-upload-attachment-id'
 			);

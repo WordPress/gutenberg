@@ -5,14 +5,14 @@
 	"title": "List",
 	"category": "text",
 	"allowedBlocks": [ "core/list-item" ],
-	"description": "Create a bulleted or numbered list.",
+	"description": "An organized collection of items displayed in a specific order.",
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
 			"default": false,
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"values": {
 			"type": "string",
@@ -21,7 +21,7 @@
 			"multiline": "li",
 			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"type": {
 			"type": "string"
@@ -39,6 +39,12 @@
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -74,6 +80,9 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)"
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"
