@@ -1049,6 +1049,8 @@ store( "myPlugin/private", { /* store part */ }, { lock: PRIVATE_LOCK } );
 Apart from the store function, there are also some methods that allows the developer to access data on their store functions.
 
   - getContext()
+	- getServerContext()
+	- getServerState()
   - getElement()
 
 #### getContext()
@@ -1082,6 +1084,64 @@ store( "myPlugin", {
       const myPluginContext = getContext("myPlugin");
       // Logs "false"
       console.log('myPlugin isOpen => ', myPluginContext.isOpen);
+    },
+  },
+});
+```
+
+#### getServerContext()
+
+This function is analogous to `getContext()`, but with 2 key differences:
+
+1. Whenever [`actions.navigate()`](packages/interactivity-router/README.md) is called, the object returned by `getServerContext()` is updated. This is useful when you want to update the context of a block based on **new** context coming from the page loaded via `actions.navigate()`.
+2. The object returned by `getServerContext()` is read-only.
+
+The server context cannot be directly used in directives, but you can use callbacks to subscribe to its changes.
+
+```js
+const serverContext = getServerContext('namespace');
+```
+
+- `namespace` (optional): A string that matches the namespace of an interactive region. If not provided, it retrieves the server context of the current interactive region.
+
+Example usage:
+
+```js
+store('myPlugin', {
+  callbacks: {
+    updateServerContext() {
+      const context = getContext();
+      const serverContext = getServerContext();
+      // Override some property with the new value that came from the server.
+      context.overridableProp = serverContext.overridableProp;
+    },
+  },
+});
+```
+
+#### getServerState()
+
+Retrieves the server state an interactive region.
+
+This function is serves the same purpose as `getServerContext()`, but it returns the **state** instead of the **context**.
+
+The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](packages/interactivity-router/README.md), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
+
+```js
+const serverState = getServerState('namespace');
+```
+
+- `namespace` (optional): A string that matches the namespace of an interactive region. If not provided, it retrieves the server state of the current interactive region.
+
+Example usage:
+
+```js
+const { state } = store('myStore', {
+  callbacks: {
+    updateServerState() {
+      const serverState = getServerState();
+      // Override some property with the new value that came from the server.
+      state.overridableProp = serverState.overridableProp;
     },
   },
 });
