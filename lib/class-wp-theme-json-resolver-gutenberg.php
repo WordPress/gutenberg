@@ -838,8 +838,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * as the value of `_link` object in REST API responses.
 	 *
 	 * @since 6.6.0
-	 * @since 6.7.0 Added support for resolving block styles.
-	 * @since 6.7.0 Added support for resolving font faces URIs.
+	 * @since 6.7.0 Added support for resolving block style and font face URIs.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
