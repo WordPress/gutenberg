@@ -172,14 +172,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getRenderingMode,
 					__unstableIsEditorReady,
 				} = select( editorStore );
-				const { getPostTypes } = select( coreStore );
+				const { getEntitiesConfig } = select( coreStore );
 
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
 					mode: getRenderingMode(),
 					selection: getEditorSelection(),
-					postTypes: getPostTypes( { per_page: -1 } ),
+					postTypes: getEntitiesConfig( 'postType' ),
 				};
 			}, [] );
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
