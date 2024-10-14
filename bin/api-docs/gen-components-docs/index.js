@@ -30,9 +30,17 @@ function getTypeDocsForComponent( {
 		componentFilePath
 	);
 
-	return docgen
+	const typeDocs = docgen
 		.parse( resolvedPath, OPTIONS )
 		.find( ( obj ) => obj.displayName === displayName );
+
+	if ( typeof typeDocs === 'undefined' ) {
+		throw new Error(
+			`react-docgen-typescript could not generate type docs for ${ displayName } in ${ resolvedPath }`
+		);
+	}
+
+	return typeDocs;
 }
 
 const manifests = glob.sync( 'packages/components/src/**/docs-manifest.json' );
