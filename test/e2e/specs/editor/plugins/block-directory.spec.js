@@ -135,7 +135,7 @@ test.describe( 'Block Directory', () => {
 		 */
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( '@$@@Dsdsdfw2$@' );
 
@@ -226,7 +226,7 @@ test.describe( 'Block Directory', () => {
 
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( MOCK_BLOCK1.title );
 

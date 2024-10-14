@@ -21,7 +21,6 @@ import { getAuthority } from '@wordpress/url';
  * Internal dependencies
  */
 import WpEmbedPreview from './wp-embed-preview';
-import { Caption } from '../utils/caption';
 
 export default function EmbedPreview( {
 	preview,
@@ -32,9 +31,6 @@ export default function EmbedPreview( {
 	className,
 	icon,
 	label,
-	insertBlocksAfter,
-	attributes,
-	setAttributes,
 } ) {
 	const [ interactive, setInteractive ] = useState( false );
 
@@ -96,11 +92,7 @@ export default function EmbedPreview( {
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 	return (
-		<figure
-			className={ clsx( className, 'wp-block-embed', {
-				'is-type-video': 'video' === type,
-			} ) }
-		>
+		<>
 			{ previewable ? (
 				embedWrapper
 			) : (
@@ -122,14 +114,6 @@ export default function EmbedPreview( {
 					</p>
 				</Placeholder>
 			) }
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Embed caption text' ) }
-				showToolbarButton={ isSelected }
-			/>
-		</figure>
+		</>
 	);
 }

@@ -877,6 +877,10 @@ updateBlockBindings( { url: undefined } );
 removeAllBlockBindings();
 ```
 
+_Parameters_
+
+-   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+
 _Returns_
 
 -   `?WPBlockBindingsUtils`: Object containing the block bindings utils.

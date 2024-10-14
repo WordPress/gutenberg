@@ -107,9 +107,16 @@ function UnforwardedTooltip(
 	// TODO: this is a temporary workaround to minimize the effects of the
 	// Ariakit upgrade. Ariakit doesn't pass the `aria-describedby` prop to
 	// the tooltip anchor anymore since 0.4.0, so we need to add it manually.
+	// The `aria-describedby` attribute is added only if the anchor doesn't have
+	// one already, and if the tooltip text is not the same as the anchor's
+	// `aria-label`
 	// See: https://github.com/WordPress/gutenberg/pull/64066
+	// See: https://github.com/WordPress/gutenberg/pull/65989
 	function addDescribedById( element: React.ReactElement ) {
-		return describedById && mounted
+		return describedById &&
+			mounted &&
+			element.props[ 'aria-describedby' ] === undefined &&
+			element.props[ 'aria-label' ] !== text
 			? cloneElement( element, { 'aria-describedby': describedById } )
 			: element;
 	}

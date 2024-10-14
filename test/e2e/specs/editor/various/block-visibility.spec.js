@@ -48,7 +48,7 @@ test.describe( 'Block Visibility', () => {
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Heading' );
 
@@ -89,7 +89,7 @@ test.describe( 'Block Visibility', () => {
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Heading' );
 

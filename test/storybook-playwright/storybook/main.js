@@ -7,6 +7,7 @@ const config = {
 	...baseConfig,
 	addons: [ '@storybook/addon-toolbars' ],
 	docs: undefined,
+	staticDirs: undefined,
 	stories: [
 		'../../../packages/components/src/**/stories/e2e/*.story.@(js|tsx|mdx)',
 	],

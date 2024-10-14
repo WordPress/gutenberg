@@ -133,7 +133,7 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $components-color-accent;
+		box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
 		outline: 1px solid transparent; // Shown in high contrast mode.
 		white-space: nowrap;
 		color: $components-color-accent;
@@ -147,6 +147,10 @@
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
 			box-shadow: inset 0 0 0 $border-width $gray-300;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 	}
 
