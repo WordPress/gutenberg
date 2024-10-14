@@ -75,14 +75,14 @@ function BlockPattern( {
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
 			blocks={ patternBlocks }
-			pattern={pattern}
+			pattern={ pattern }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
 					className={ clsx(
 						'block-editor-block-patterns-list__list-item',
 						{ 'is-selected': isSelected } // Apply 'is-selected' class if this pattern is active
-					)}
+					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
 						setIsDragging( true );
@@ -101,7 +101,6 @@ function BlockPattern( {
 						onClick( pattern, blocks );
 						onHover?.( null );
 					} }
-					
 				>
 					<WithToolTip
 						showTooltip={
@@ -114,7 +113,7 @@ function BlockPattern( {
 							render={
 								<div
 									role="option"
-									tabIndex={0}
+									tabIndex={ 0 }
 									aria-label={ pattern.title }
 									aria-describedby={
 										pattern.description
@@ -144,7 +143,7 @@ function BlockPattern( {
 								}
 								onHover?.( pattern );
 							} }
-							onMouseLeave={() => onHover?.(null)}
+							onMouseLeave={ () => onHover?.( null ) }
 						>
 							<BlockPreview
 								blocks={ blocks }
@@ -211,42 +210,21 @@ function BlockPatternsList(
 	},
 	ref
 ) {
-	const [activeCompositeId, setActiveCompositeId] = useState(undefined);
+	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
 	const [ activePattern, setActivePattern ] = useState( null ); // State to track active pattern
 
 	useEffect( () => {
 		// Reset the active composite item whenever the available patterns change,
 		// to make sure that Composite widget can receive focus correctly when its
 		// composite items change. The first composite item will receive focus.
-		if (typeof window !== 'undefined' && window.sessionStorage ) {
-			// eslint-disable-next-line no-undef
-			const storedPatternName = sessionStorage.getItem( 'savedPattern' );
 
-			if (
-				storedPatternName &&
-				shownPatterns.some(
-					( pattern ) => pattern.name === storedPatternName
-				)
-			) {
-				// If there's a saved pattern and it exists in shownPatterns, set it as active
-				setActivePattern( storedPatternName );
-			} else {
-				const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
-					shownPatterns.includes( pattern )
-				)?.name;
+		const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
+			shownPatterns.includes( pattern )
+		)?.name;
 
-				if ( firstCompositeItemId ) {
-					setActivePattern( firstCompositeItemId );
-				}
-			}
-		}
+		setActiveCompositeId( firstCompositeItemId );
 	}, [ shownPatterns, blockPatterns ] );
 	const handleClickPattern = ( pattern ) => {
-		// Check if we are in a browser environment and sessionStorage is available
-		if (typeof window !== 'undefined' && window.sessionStorage ) {
-			// eslint-disable-next-line no-undef
-			sessionStorage.setItem('savedPattern', pattern.name); // Save the selected pattern in sessionStorage
-		}
 		setActivePattern( pattern.name ); // Set the clicked pattern as active
 		onClickPattern( pattern ); // Original onClick logic
 	};
