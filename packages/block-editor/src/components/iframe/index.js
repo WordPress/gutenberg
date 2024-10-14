@@ -336,8 +336,10 @@ function Iframe( {
 		}
 
 		const maxWidth = 750;
-		// Note: When we initialize the zoom out when the canvas is smaller,
-		// reflow happens when the canvas area becomes larger
+		// Note: When we initialize the zoom out when the canvas is smaller (sidebars open),
+		// initialContainerWidth will be smaller than the full page, and reflow will happen
+		// when the canvas area becomes larger due to sidebars closing. This is a known but
+		// minor divergence for now.
 
 		// This scaling calculation has to happen within the JS because CSS calc() can
 		// only divide and multiply by a unitless value. I.e. calc( 100px / 2 ) is valid
@@ -347,7 +349,10 @@ function Iframe( {
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						initialContainerWidth.current
+						Math.max(
+							initialContainerWidth.current,
+							containerWidth
+						)
 				: scale
 		);
 
@@ -372,6 +377,11 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-outer-container-width',
 			`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
 		);
+
+		// iframeDocument.documentElement.style.setProperty(
+		// 	'--wp-block-editor-iframe-zoom-out-outer-container-width',
+		// 	`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
+		// );
 
 		return () => {
 			iframeDocument.documentElement.style.removeProperty(
