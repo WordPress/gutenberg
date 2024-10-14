@@ -46,17 +46,11 @@
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"lineHeight": true,
-			"fontFamily": true,
 			"__experimentalFontStyle": true,
-    		"fontStyle": true,
 			"__experimentalFontWeight": true,
-			"fontWeight": true,
 			"__experimentalLetterSpacing": true,
-			"letterSpacing": true,
 			"__experimentalTextTransform": true,
-			"textTransform": true,
 			"__experimentalTextDecoration": true,
-			"textDecoration": true,
 			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
