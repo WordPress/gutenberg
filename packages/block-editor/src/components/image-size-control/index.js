@@ -40,26 +40,14 @@ export default function ImageSizeControl( {
 	 * @param {number} scale The scale to update the dimensions for.
 	 */
 	const handleUpdateDimensions = ( scale ) => {
-		/**
-		 * Check if scale is deselected from toggle group control option.
-		 */
 		if ( undefined === scale ) {
-			/**
-			 * Update dimensions to default.
-			 */
 			updateDimensions();
 			return;
 		}
 
-		/**
-		 * Calculate scaled width and height.
-		 */
 		const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
 		const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
 
-		/**
-		 * Update dimensions.
-		 */
 		updateDimensions( scaledHeight, scaledWidth );
 	};
 
@@ -67,11 +55,13 @@ export default function ImageSizeControl( {
 	 * Handler for adding the value to toggle group control.
 	 */
 	const addSelectedScaleValue = () => {
-		/**
-		 * Calculate scale size based on current width and image width.
-		 */
 		const scaleSize = Math.round( currentWidth * ( 100 / imageWidth ) );
-		return scaleSize;
+
+		if ( IMAGE_SIZE_PRESETS.includes( scaleSize ) ) {
+			return scaleSize;
+		}
+
+		return undefined;
 	};
 
 	return (
@@ -114,12 +104,9 @@ export default function ImageSizeControl( {
 					<ToggleGroupControl
 						label={ __( 'Image size presets' ) }
 						hideLabelFromVision
-						onChange={ ( scale ) =>
-							handleUpdateDimensions( scale )
-						}
+						onChange={ handleUpdateDimensions }
 						value={ addSelectedScaleValue() }
 						isBlock
-						isDeselectable
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					>
