@@ -8,12 +8,7 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import {
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
