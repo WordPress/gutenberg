@@ -65,41 +65,6 @@ function Tabs( {
 		// Ariakit internally refers to disabled tabs as `dimmed`.
 		return ! item.dimmed;
 	} );
-	const initialTab = items.find(
-		( item ) => item.id === `${ instanceId }-${ defaultTabId }`
-	);
-
-	// Handle the currently selected tab becoming disabled.
-	useLayoutEffect( () => {
-		if ( ! selectedTab?.dimmed ) {
-			return;
-		}
-
-		// In controlled mode, we trust that disabling tabs is done
-		// intentionally, and don't select a new tab automatically.
-		if ( isControlled ) {
-			setSelectedId( null );
-			return;
-		}
-
-		// If the currently selected tab becomes disabled, fall back to the
-		// `defaultTabId` if possible. Otherwise select the first
-		// enabled tab (if there is one).
-		if ( initialTab && ! initialTab.dimmed ) {
-			setSelectedId( initialTab.id );
-			return;
-		}
-
-		if ( firstEnabledTab ) {
-			setSelectedId( firstEnabledTab.id );
-		}
-	}, [
-		firstEnabledTab,
-		initialTab,
-		isControlled,
-		selectedTab?.dimmed,
-		setSelectedId,
-	] );
 
 	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
 	useLayoutEffect( () => {
