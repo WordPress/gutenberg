@@ -77,12 +77,7 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const {
-		isZoomOut,
-		sectionRootClientId,
-		parentSectionBlock,
-		isSectionSelected,
-	} = useSelect(
+	const { isZoomOut, parentSectionBlock, isSectionSelected } = useSelect(
 		( select ) => {
 			const {
 				isZoomOut: isZoomOutSelector,
@@ -92,7 +87,6 @@ function BlockPopover(
 			} = unlock( select( blockEditorStore ) );
 
 			return {
-				sectionRootClientId: getSectionRootClientId(),
 				isZoomOut: isZoomOutSelector(),
 				parentSectionBlock:
 					getParentSectionBlock( clientId ) ?? clientId,
@@ -104,9 +98,8 @@ function BlockPopover(
 		[ clientId ]
 	);
 
-	// These elements are used to position the zoom out view vertical toolbar
+	// This element is used to position the zoom out view vertical toolbar
 	// correctly, relative to the selected section.
-	const rootSectionElement = useBlockElement( sectionRootClientId );
 	const parentSectionElement = useBlockElement( parentSectionBlock );
 
 	const popoverAnchor = useMemo( () => {
@@ -124,30 +117,22 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				let postRootElement;
+				// The popover should be positioned relative to the root element of the canvas.
+				// FIXME: This should not be accessed by classname.
+				const rootSectionElement = selectedElement.closest(
+					'.block-editor-iframe__body'
+				);
 				// The zoom out view has a vertical block toolbar that should always
 				// be on the edge of the canvas, aligned to the top of the currently
 				// selected section. This condition changes the anchor of the toolbar
 				// to the section instead of the block to handle blocks that are
 				// not full width and nested blocks to keep section height.
 				if ( isZoomOut && isSectionSelected ) {
-					// If the rootSectionElement is undefined then recurse up the DOM tree
-					// to find the element with `block-editor-iframe__body` classname.
-					// This can then be used as the anchor point.
-					// FIXME: we should not rely on classnames to find the
-					// root section element
-					if ( ! rootSectionElement ) {
-						postRootElement = selectedElement.closest(
-							'.block-editor-iframe__body'
-						);
-					}
-
 					// Compute the height based on the parent section of the
 					// selected block, because the selected block may be
 					// shorter than the section.
-					const rootSectionElementRect = getVisibleElementBounds(
-						rootSectionElement || postRootElement
-					);
+					const rootSectionElementRect =
+						getVisibleElementBounds( rootSectionElement );
 					const parentSectionElementRect =
 						getVisibleElementBounds( parentSectionElement );
 					const anchorHeight =
@@ -156,13 +141,11 @@ function BlockPopover(
 
 					// Always use the width of the section root element to make sure
 					// the toolbar is always on the edge of the canvas.
-					const andchorWidth =
-						rootSectionElementRect.right -
-						rootSectionElementRect.left;
+					const anchorWidth = rootSectionElementRect.width;
 					return new window.DOMRectReadOnly(
 						rootSectionElementRect.left,
 						parentSectionElementRect.top,
-						andchorWidth,
+						anchorWidth,
 						anchorHeight
 					);
 				}
@@ -184,7 +167,6 @@ function BlockPopover(
 		bottomClientId,
 		lastSelectedElement,
 		isSectionSelected,
-		rootSectionElement,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
