@@ -13,7 +13,7 @@ import { symbolFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
+import { CreateTemplatePartModal } from '@wordpress/fields';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );

@@ -22,12 +22,8 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import {
-	getItemTitle,
-	isTemplateOrTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_POST_TYPE,
-} from './utils';
+import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../constants';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (

@@ -22,6 +22,7 @@
 		{ "path": "../dataviews" },
 		{ "path": "../blob" },
 		{ "path": "../core-data" },
+		{ "path": "../block-editor" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" }
 	],

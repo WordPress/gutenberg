@@ -12,10 +12,10 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
-import { CreateTemplatePartModalContents } from '../../components/create-template-part-modal';
-import { getItemTitle } from './utils';
+import { TEMPLATE_PART_POST_TYPE } from '../constants';
 import type { TemplatePart } from '../types';
+import { CreateTemplatePartModalContents } from '../components/create-template-part-modal';
+import { getItemTitle } from './utils';
 
 const duplicateTemplatePart: Action< TemplatePart > = {
 	id: 'duplicate-template-part',
@@ -61,7 +61,7 @@ const duplicateTemplatePart: Action< TemplatePart > = {
 				onCreate={ onTemplatePartSuccess }
 				onError={ closeModal }
 				confirmLabel={ _x( 'Duplicate', 'action label' ) }
-				closeModal={ closeModal }
+				closeModal={ closeModal ?? ( () => void 0 ) }
 			/>
 		);
 	},

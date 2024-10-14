@@ -26,10 +26,12 @@ import {
 	isTemplateRemovable,
 	isTemplate,
 	isTemplatePart,
+} from './utils';
+import {
 	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
-} from './utils';
+} from '../constants';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 // Patterns.
