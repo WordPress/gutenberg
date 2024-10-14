@@ -32,7 +32,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -70,7 +70,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -121,7 +121,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+            - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -173,7 +173,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -278,7 +278,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -296,7 +296,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@2cdf405574d6ef1f33a1d12acccd3ae82f47b3f2 # v4.1.0
+              uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -348,7 +348,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
