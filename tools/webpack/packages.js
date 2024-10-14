@@ -88,9 +88,43 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
+const NOT_WP_SCRIPTS = [
+	'@wordpress/babel-plugin-import-jsx-pragma',
+	'@wordpress/babel-plugin-makepot',
+	'@wordpress/babel-preset-default',
+	'@wordpress/base-styles',
+	'@wordpress/browserslist-config',
+	'@wordpress/create-block',
+	'@wordpress/create-block-interactive-template',
+	'@wordpress/create-block-tutorial-template',
+	'@wordpress/dependency-extraction-webpack-plugin',
+	'@wordpress/docgen',
+	'@wordpress/e2e-test-utils',
+	'@wordpress/e2e-test-utils-playwright',
+	'@wordpress/e2e-tests',
+	'@wordpress/env',
+	'@wordpress/eslint-plugin',
+	'@wordpress/jest-console',
+	'@wordpress/jest-preset-default',
+	'@wordpress/jest-puppeteer-axe',
+	'@wordpress/lazy-import',
+	'@wordpress/npm-package-json-lint-config',
+	'@wordpress/postcss-plugins-preset',
+	'@wordpress/postcss-themes',
+	'@wordpress/prettier-config',
+	'@wordpress/project-management-automation',
+	'@wordpress/readable-js-assets-webpack-plugin',
+	'@wordpress/report-flaky-tests',
+	'@wordpress/scripts',
+	'@wordpress/stylelint-config',
+];
+
 const gutenbergPackages = packageDirs.filter(
 	( packageDir ) =>
 		! BUNDLED_PACKAGES.includes(
+			`${ WORDPRESS_NAMESPACE }${ packageDir }`
+		) &&
+		! NOT_WP_SCRIPTS.includes(
 			`${ WORDPRESS_NAMESPACE }${ packageDir }`
 		) &&
 		! packageDir.startsWith( 'react-native' ) &&
