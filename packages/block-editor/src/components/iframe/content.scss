@@ -1,5 +1,6 @@
 .block-editor-iframe__body {
 	position: relative;
+	border: 0.01px solid transparent;
 }
 
 .block-editor-iframe__html {
@@ -32,8 +33,6 @@
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
-		display: flex;
-		flex-direction: column;
 
 		> .is-root-container:not(.wp-block-post-content) {
 			flex: 1;
