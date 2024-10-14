@@ -201,7 +201,7 @@ module.exports = [
 	},
 	...wordPress.configs.recommended,
 	comments.recommended,
-	...storybook.configs[ 'flat/recommended' ], // @TODO check if subdirectory stories do work https://github.com/storybookjs/eslint-plugin-storybook/issues/135#issuecomment-2198331953
+	...storybook.configs[ 'flat/recommended' ],
 	...tseslint.config( {
 		extends: [ tseslint.configs.base ],
 		files: [ '**/*.ts', '**/*.tsx' ],
