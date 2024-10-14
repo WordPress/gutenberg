@@ -117,12 +117,6 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				// The popover should be positioned relative to the root element of the canvas. The canvas is the container of
-				// content in zoom out mode.
-				// FIXME: This should not be accessed by classname.
-				const canvasElement = selectedElement.closest(
-					'.block-editor-iframe__body'
-				);
 				// The zoom out view has a vertical block toolbar that should always
 				// be on the edge of the canvas, aligned to the top of the currently
 				// selected section. This condition changes the anchor of the toolbar
@@ -132,8 +126,9 @@ function BlockPopover(
 					// Compute the height based on the parent section of the
 					// selected block, because the selected block may be
 					// shorter than the section.
-					const canvasElementRect =
-						getVisibleElementBounds( canvasElement );
+					const canvasElementRect = getVisibleElementBounds(
+						__unstableContentRef.current
+					);
 					const parentSectionElementRect =
 						getVisibleElementBounds( parentSectionElement );
 					const anchorHeight =
@@ -168,6 +163,7 @@ function BlockPopover(
 		bottomClientId,
 		lastSelectedElement,
 		isSectionSelected,
+		__unstableContentRef,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
