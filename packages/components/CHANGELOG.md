@@ -16,6 +16,7 @@
 -   `SearchControl`: Soft deprecate `onClose` prop ([#65988](https://github.com/WordPress/gutenberg/pull/65988)).
 
 ### Enhancements
+
 -   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
 -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
 
