@@ -69,45 +69,6 @@ function Tabs( {
 		( item ) => item.id === `${ instanceId }-${ defaultTabId }`
 	);
 
-	// Handle selecting the initial tab.
-	useLayoutEffect( () => {
-		if ( isControlled ) {
-			return;
-		}
-
-		// Wait for the denoted initial tab to be declared before making a
-		// selection. This ensures that if a tab is declared lazily it can
-		// still receive initial selection, as well as ensuring no tab is
-		// selected if an invalid `defaultTabId` is provided.
-		if ( defaultTabId && ! initialTab ) {
-			return;
-		}
-
-		// If the currently selected tab is missing (i.e. removed from the DOM),
-		// fall back to the initial tab or the first enabled tab if there is
-		// one. Otherwise, no tab should be selected.
-		if ( ! items.find( ( item ) => item.id === selectedId ) ) {
-			if ( initialTab && ! initialTab.dimmed ) {
-				setSelectedId( initialTab?.id );
-				return;
-			}
-
-			if ( firstEnabledTab ) {
-				setSelectedId( firstEnabledTab.id );
-			} else if ( tabsHavePopulatedRef.current ) {
-				setSelectedId( null );
-			}
-		}
-	}, [
-		firstEnabledTab,
-		initialTab,
-		defaultTabId,
-		isControlled,
-		items,
-		selectedId,
-		setSelectedId,
-	] );
-
 	// Handle the currently selected tab becoming disabled.
 	useLayoutEffect( () => {
 		if ( ! selectedTab?.dimmed ) {
