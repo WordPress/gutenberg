@@ -63,6 +63,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				{ ...innerBlocksProps }
 				open={ hasSelection || showContent }
 			>
+				{ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */ }
 				<summary onClick={ ( event ) => event.preventDefault() }>
 					<RichText
 						identifier="summary"
