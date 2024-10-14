@@ -50,6 +50,11 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$search_query        = empty( $_GET['search'] ) ? '' : sanitize_text_field( $_GET['search'] );
+
+	// Check if the Instant Search experiment is enabled.
+	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
+	$instant_search_enabled = isset( $gutenberg_experiments['gutenberg-search-query-block'] ) && $gutenberg_experiments['gutenberg-search-query-block'];
 
 	// Use global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
@@ -64,12 +69,29 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		if ( in_the_loop() ) {
 			$query = clone $wp_query;
 			$query->rewind_posts();
+			$query_args = $wp_query->query_vars;
+
+			// Add search parameter if it exists.
+			if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
+				$query_args['s'] = $search_query;
+			}
+			$query->query( $query_args );
 		} else {
+			// The query has not been run yet, modify the global query.
+			if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
+				$wp_query->set( 's', $search_query );
+			}
 			$query = $wp_query;
 		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+
+		// Add search parameter if enhanced pagination is on and search query exists
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
+			$query_args['s'] = $search_query;
+		}
+
+		$query = new WP_Query( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {

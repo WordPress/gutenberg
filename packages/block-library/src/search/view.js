@@ -7,21 +7,6 @@ const isEmpty = ( obj ) =>
 	[ Object, Array ].includes( ( obj || {} ).constructor ) &&
 	! Object.entries( obj || {} ).length;
 
-const updateURL = async ( value, name ) => {
-	const url = new URL( window.location );
-	const { actions } = await import( '@wordpress/interactivity-router' );
-
-	if ( 's' === name ) {
-		if ( ! isEmpty( value ) ) {
-			url.searchParams.set( 'search', value );
-		} else {
-			url.searchParams.delete( 'search' );
-		}
-	}
-
-	await actions.navigate( `${ window.location.pathname }${ url.search }` );
-};
-
 const { state, actions } = store(
 	'core/search',
 	{
@@ -50,6 +35,10 @@ const { state, actions } = store(
 			},
 			get isSearchInputVisible() {
 				const ctx = getContext();
+
+				// `ctx.isSearchInputVisible` is a client-side-only context value, so
+				// if it's not set, it means that it's an initial page load, so we need
+				// to return the value of `ctx.isSearchInputInitiallyVisible`.
 				if ( typeof ctx.isSearchInputVisible === 'undefined' ) {
 					return ctx.isSearchInputInitiallyVisible;
 				}
@@ -101,12 +90,24 @@ const { state, actions } = store(
 					return;
 				}
 
+				const url = new URL( window.location );
+
 				if ( 's' === name ) {
 					state.search = value;
+					if ( ! isEmpty( value ) ) {
+						url.searchParams.set( 'search', value );
+					} else {
+						url.searchParams.delete( 'search' );
+					}
 				}
 
-				// If not, navigate to the new URL.
-				yield updateURL( value, name );
+				const { actions: routerActions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+
+				routerActions.navigate(
+					`${ window.location.pathname }${ url.search }`
+				);
 			},
 		},
 	},
