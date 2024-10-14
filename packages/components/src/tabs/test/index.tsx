@@ -729,6 +729,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
+			// Shouldn't this just stay on the same tab?
 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
 				const mockOnSelect = jest.fn();
 
@@ -767,7 +768,7 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 
-			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
+			it( 'should keep the currently selected tab even if it becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = await render(
@@ -782,6 +783,8 @@ describe( 'Tabs', () => {
 
 				await click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+
+				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
@@ -804,7 +807,8 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			} );
 
 			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
@@ -944,7 +948,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should select first enabled tab when the tab associated to `defaultTabId` is disabled', async () => {
+			it( 'should select the tab associated to `defaultTabId` even if the tab is disabled', async () => {
 				const TABS_ONLY_GAMMA_ENABLED = TABS.map( ( tabObj ) =>
 					tabObj.tabId !== 'gamma'
 						? {
@@ -965,7 +969,7 @@ describe( 'Tabs', () => {
 
 				// As alpha (first tab), and beta (the initial tab), are both
 				// disabled the first enabled tab should be gamma.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Re-enable all tabs
 				await rerender(
@@ -974,10 +978,10 @@ describe( 'Tabs', () => {
 
 				// Even if the initial tab becomes enabled again, the selected tab doesn't
 				// change.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
+			it( 'should keep the currently tab as selected even when it becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
@@ -1007,21 +1011,19 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
-				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 
 				// Re-enable all tabs
 				await rerender(
 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-				expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
-				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			} );
 
-			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
+			it( 'should select the tab associated to `defaultTabId` even when disabled', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = await render(
@@ -1055,9 +1057,7 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
-				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Re-enable all tabs
 				await rerender(
@@ -1070,8 +1070,8 @@ describe( 'Tabs', () => {
 
 				// Confirm that alpha is still selected, and that onSelect has
 				// not been called again.
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-				expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				expect( mockOnSelect ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );
@@ -1159,7 +1159,7 @@ describe( 'Tabs', () => {
 		} );
 
 		describe( 'Disabled tab', () => {
-			it( 'should not have a selected tab if `selectedTabId` refers to a disabled tab', async () => {
+			it( 'should `selectedTabId` refers to a disabled tab', async () => {
 				const TABS_WITH_DELTA_WITH_BETA_DISABLED = TABS_WITH_DELTA.map(
 					( tabObj ) =>
 						tabObj.tabId === 'beta'
@@ -1180,20 +1180,9 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				await waitFor( () => {
-					expect(
-						screen.queryByRole( 'tab', { selected: true } )
-					).not.toBeInTheDocument();
-				} );
-
-				// Despite the beta tab not being selected, the matching tabpanel
-				// is selected?
-				expect(
-					screen.getByRole( 'tabpanel', { name: 'Beta' } )
-				).toBeVisible();
+				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
-			it( 'should not have a selected tab when the selected tab becomes disabled', async () => {
+			it( 'should keep the currently selected tab as selected even when it becomes disabled', async () => {
 				const { rerender } = await render(
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
@@ -1218,33 +1207,15 @@ describe( 'Tabs', () => {
 						selectedTabId="beta"
 					/>
 				);
-				// No tab should be selected i.e. it doesn't fall back to first tab.
-				// `waitFor` is needed here to prevent testing library from
-				// throwing a 'not wrapped in `act()`' error.
-				await waitFor( () => {
-					expect(
-						screen.queryByRole( 'tab', { selected: true } )
-					).not.toBeInTheDocument();
-				} );
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
+
+				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// re-enable all tabs
 				await rerender(
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
-				// If the previously selected tab is reenabled, it should not
-				// be reselected.
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-				// No tabpanel should be rendered either
-				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
+				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 		} );
 		describe( 'When `selectedId` is changed by the controlling component', () => {
