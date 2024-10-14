@@ -264,6 +264,16 @@ describe( 'Tabs', () => {
 				/>
 			);
 
+			// No tab should be selected i.e. it doesn't fall back to first tab.
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'tab', { selected: true } )
+				).not.toBeInTheDocument()
+			);
+
+			// No tabpanel should be rendered either
+			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )
@@ -649,39 +659,20 @@ describe( 'Tabs', () => {
 					await screen.findByRole( 'tabpanel', { name: 'Alpha' } )
 				).toBeInTheDocument();
 			} );
-			it( 'should fall back to first enabled tab if the active tab is removed', async () => {
+			it( 'should not have a selected tab if the currently selected tab is removed', async () => {
 				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS } />
 				);
 
+				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+				expect( await getSelectedTab() ).not.toHaveFocus();
+
+				// Tab to focus the tablist. Make sure Alpha is focused.
+				await press.Tab();
+				expect( await getSelectedTab() ).toHaveFocus();
+
 				// Remove first item from `TABS` array
 				await rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
-				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
-			} );
-			it( 'should not load any tab if the active tab is removed and there are no enabled tabs', async () => {
-				const TABS_WITH_BETA_GAMMA_DISABLED = TABS.map( ( tabObj ) =>
-					tabObj.tabId !== 'alpha'
-						? {
-								...tabObj,
-								tab: {
-									...tabObj.tab,
-									disabled: true,
-								},
-						  }
-						: tabObj
-				);
-
-				const { rerender } = await render(
-					<UncontrolledTabs tabs={ TABS_WITH_BETA_GAMMA_DISABLED } />
-				);
-				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
-
-				// Remove alpha
-				await rerender(
-					<UncontrolledTabs
-						tabs={ TABS_WITH_BETA_GAMMA_DISABLED.slice( 1 ) }
-					/>
-				);
 
 				// No tab should be selected i.e. it doesn't fall back to first tab.
 				await waitFor( () =>
@@ -763,7 +754,17 @@ describe( 'Tabs', () => {
 					/>
 				);
 
-				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+				// No tab should be selected i.e. it doesn't fall back to first tab.
+				await waitFor( () =>
+					expect(
+						screen.queryByRole( 'tab', { selected: true } )
+					).not.toBeInTheDocument()
+				);
+
+				// No tabpanel should be rendered either
+				expect(
+					screen.queryByRole( 'tabpanel' )
+				).not.toBeInTheDocument();
 			} );
 
 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
