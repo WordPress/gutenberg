@@ -162,7 +162,6 @@ const restrictedSyntax = [
 		message:
 			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 	},
-	// @TODO The following rules moved from react-native-editor ESLint config. Need to do check do we have any issue with them.
 	{
 		selector:
 			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
