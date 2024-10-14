@@ -2,13 +2,12 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -53,37 +52,10 @@ export const Tabs = Object.assign(
 			rtl: isRTL(),
 		} );
 
-		const isControlled = selectedTabId !== undefined;
-
-		const { items, activeId } = useStoreState( store );
+		const { items, activeId } = Ariakit.useStoreState( store );
 		const { setActiveId } = store;
 
-		// Keep track of whether tabs have been populated. This is used to prevent
-		// certain effects from firing too early while tab data and relevant
-		// variables are undefined during the initial render.
-		const tabsHavePopulatedRef = useRef( false );
-		if ( items.length > 0 ) {
-			tabsHavePopulatedRef.current = true;
-		}
-
-		const firstEnabledTab = items.find( ( item ) => {
-			// Ariakit internally refers to disabled tabs as `dimmed`.
-			return ! item.dimmed;
-		} );
-
 		useEffect( () => {
-			// If there is no active tab, fallback to place focus on the first enabled tab
-			// so there is always an active element
-			if ( selectedTabId === null && ! activeId && firstEnabledTab?.id ) {
-				setActiveId( firstEnabledTab.id );
-			}
-		}, [ selectedTabId, activeId, firstEnabledTab?.id, setActiveId ] );
-
-		useEffect( () => {
-			if ( ! isControlled ) {
-				return;
-			}
-
 			requestAnimationFrame( () => {
 				const focusedElement =
 					items?.[ 0 ]?.element?.ownerDocument.activeElement;
@@ -103,7 +75,7 @@ export const Tabs = Object.assign(
 					setActiveId( focusedElement.id );
 				}
 			} );
-		}, [ activeId, isControlled, items, setActiveId ] );
+		}, [ activeId, items, setActiveId ] );
 
 		const contextValue = useMemo(
 			() => ( {
