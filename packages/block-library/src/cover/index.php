@@ -57,6 +57,7 @@ function render_block_core_cover( $attributes, $content ) {
 		}
 
 		$processor->add_class( 'wp-block-cover__image-background' );
+		$processor->add_class( 'wp-image-' . $current_thumbnail_id );
 		if ( $attributes['hasParallax'] ) {
 			$processor->add_class( 'has-parallax' );
 		}
