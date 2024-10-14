@@ -708,5 +708,5 @@ export const getParentPatternCount = createSelector(
 	// a block can't generally change its name/type without changing
 	// its clientId, so depending only on the client ids returned by
 	// `getBlockParents` is sufficient.
-	( state, clientId ) => [ getBlockParents( state, clientId ) ]
+	( state ) => [ state.blocks.parents ]
 );

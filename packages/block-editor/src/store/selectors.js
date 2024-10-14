@@ -42,6 +42,7 @@ import {
 	getParentSectionBlock,
 	getParentPatternCount,
 } from './private-selectors';
+import { sectionRootClientIdKey } from './private-keys';
 
 /**
  * A block selection object.
@@ -2964,8 +2965,8 @@ function isWithinBlock( state, clientId, parentClientId ) {
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
-export const getBlockEditingMode = createRegistrySelector(
-	( select ) =>
+export const getBlockEditingMode = createRegistrySelector( ( select ) =>
+	createSelector(
 		( state, clientId = '' ) => {
 			// Some selectors that call this provide `null` as the default
 			// rootClientId, but the default rootClientId is actually `''`.
@@ -3099,7 +3100,18 @@ export const getBlockEditingMode = createRegistrySelector(
 			// Otherwise, check if there's an ancestor that is contentOnly
 			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
+		},
+		( state, clientId ) => {
+			const rootClientId = state.blocks.parents[ clientId ];
+			return [
+				state.blocks.parents,
+				state.blocks.byClientId,
+				state.editorMode,
+				state.settings?.[ sectionRootClientIdKey ],
+				state.blockListSettings?.[ rootClientId ]?.templateLock,
+			];
 		}
+	)
 );
 
 /**
