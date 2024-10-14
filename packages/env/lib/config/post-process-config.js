@@ -10,10 +10,6 @@ const { ValidationError } = require( './validate-config' );
  * External dependencies
  */
 const fs = require( 'fs' );
-
-/**
- * External dependencies
- */
 const devcert = require( 'devcert' );
 
 /**
