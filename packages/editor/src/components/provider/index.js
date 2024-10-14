@@ -4,11 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import {
-	EntityProvider,
-	useEntityBlockEditor,
-	store as coreStore,
-} from '@wordpress/core-data';
+import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
@@ -52,6 +48,7 @@ const noop = () => {};
  */
 const NON_CONTEXTUAL_POST_TYPES = [
 	'wp_block',
+	'wp_template',
 	'wp_navigation',
 	'wp_template_part',
 ];
@@ -164,52 +161,32 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
-		const { editorSettings, selection, isReady, mode, postTypes } =
-			useSelect( ( select ) => {
+		const { editorSettings, selection, isReady, mode } = useSelect(
+			( select ) => {
 				const {
 					getEditorSettings,
 					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
 				} = select( editorStore );
-				const { getPostTypes } = select( coreStore );
 
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
 					mode: getRenderingMode(),
 					selection: getEditorSelection(),
-					postTypes: getPostTypes( { per_page: -1 } ),
 				};
-			}, [] );
+			},
+			[]
+		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
-			const postContext = {};
-			// If it is a template, try to inherit the post type from the slug.
-			if ( post.type === 'wp_template' ) {
-				if ( post.slug === 'page' ) {
-					postContext.postType = 'page';
-				} else if ( post.slug === 'single' ) {
-					postContext.postType = 'post';
-				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
-					// If the slug is single-{postType}, infer the post type from the slug.
-					const postTypesSlugs =
-						postTypes?.map( ( entity ) => entity.slug ) || [];
-					const match = post.slug.match(
-						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
-					);
-					if ( match ) {
-						postContext.postType = match[ 1 ];
-					}
-				}
-			} else if (
+			const postContext =
 				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
 				shouldRenderTemplate
-			) {
-				postContext.postId = post.id;
-				postContext.postType = post.type;
-			}
+					? { postId: post.id, postType: post.type }
+					: {};
 
 			return {
 				...postContext,
@@ -224,7 +201,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			post.type,
 			rootLevelPost.type,
 			rootLevelPost.slug,
-			postTypes,
 		] );
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
