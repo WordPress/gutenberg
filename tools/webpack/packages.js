@@ -88,23 +88,14 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
-/** @type {Array<string>} */
-const gutenbergScripts = [];
-for ( const packageDir of packageDirs ) {
-	const packageJson = require(
-		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
-	);
-
-	if ( ! packageJson.wpScript ) {
-		continue;
-	}
-
-	if ( BUNDLED_PACKAGES.includes( packageJson.name ) ) {
-		continue;
-	}
-
-	gutenbergScripts.push( packageDir );
-}
+const gutenbergPackages = packageDirs.filter(
+	( packageDir ) =>
+		! BUNDLED_PACKAGES.includes(
+			`${ WORDPRESS_NAMESPACE }${ packageDir }`
+		) &&
+		! packageDir.startsWith( 'react-native' ) &&
+		! packageDir.startsWith( 'interactivity' )
+);
 
 const exportDefaultPackages = [
 	'api-fetch',
