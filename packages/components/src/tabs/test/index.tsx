@@ -1118,6 +1118,8 @@ describe( 'Tabs', () => {
 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
 
+			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+
 			// Remove beta
 			await rerender(
 				<ControlledTabs
@@ -1136,6 +1138,7 @@ describe( 'Tabs', () => {
 					screen.queryByRole( 'tab', { selected: true } )
 				).not.toBeInTheDocument()
 			);
+
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 
@@ -1146,9 +1149,11 @@ describe( 'Tabs', () => {
 
 			// No tab should be selected i.e. it doesn't reselect the previously
 			// removed tab.
-			expect(
-				screen.queryByRole( 'tab', { selected: true } )
-			).not.toBeInTheDocument();
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'tab', { selected: true } )
+				).not.toBeInTheDocument();
+			} );
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
