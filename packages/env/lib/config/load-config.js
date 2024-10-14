@@ -54,7 +54,7 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	// Make sure to perform any additional post-processing that
 	// may be needed before the config object is ready for
 	// consumption elsewhere in the tool.
-	config = postProcessConfig( config );
+	config = await postProcessConfig( config );
 
 	return {
 		name: path.basename( configDirectoryPath ),
@@ -68,6 +68,9 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
+		https: config.https,
+		sslCertPath: config.sslCertPath,
+		sslKeyPath: config.sslKeyPath,
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
 	};
