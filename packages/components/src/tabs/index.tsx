@@ -49,8 +49,8 @@ function Tabs( {
 
 	const isControlled = selectedTabId !== undefined;
 
-	const { items, selectedId, activeId } = useStoreState( store );
-	const { setSelectedId, setActiveId } = store;
+	const { items, activeId } = useStoreState( store );
+	const { setActiveId } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent
 	// certain effects from firing too early while tab data and relevant
@@ -60,28 +60,10 @@ function Tabs( {
 		tabsHavePopulatedRef.current = true;
 	}
 
-	const selectedTab = items.find( ( item ) => item.id === selectedId );
 	const firstEnabledTab = items.find( ( item ) => {
 		// Ariakit internally refers to disabled tabs as `dimmed`.
 		return ! item.dimmed;
 	} );
-
-	// Clear `selectedId` if the active tab is removed from the DOM in controlled mode.
-	useLayoutEffect( () => {
-		if ( ! isControlled ) {
-			return;
-		}
-
-		// Once the tabs have populated, if the `selectedTabId` still can't be
-		// found, clear the selection.
-		if (
-			tabsHavePopulatedRef.current &&
-			!! selectedTabId &&
-			! selectedTab
-		) {
-			setSelectedId( null );
-		}
-	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );
 
 	useEffect( () => {
 		// If there is no active tab, fallback to place focus on the first enabled tab
