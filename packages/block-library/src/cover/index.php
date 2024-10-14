@@ -45,13 +45,15 @@ function render_block_core_cover( $attributes, $content ) {
 			return $content;
 		}
 
+		$current_thumbnail_id = get_post_thumbnail_id();
+
 		$processor = new WP_HTML_Tag_Processor( '<div></div>' );
 		$processor->next_tag();
 
-		$current_caption = get_the_post_thumbnail_caption();
-		if ( $current_caption ) {
+		$current_alt = trim( strip_tags( get_post_meta( $current_thumbnail_id, '_wp_attachment_image_alt', true ) ) );
+		if ( $current_alt ) {
 			$processor->set_attribute( 'role', 'img' );
-			$processor->set_attribute( 'aria-label', $current_caption );
+			$processor->set_attribute( 'aria-label', $current_alt );
 		}
 
 		$processor->add_class( 'wp-block-cover__image-background' );
