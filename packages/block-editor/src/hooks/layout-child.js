@@ -279,7 +279,7 @@ function GridTools( {
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
 	edit: ChildLayoutControlsPure,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'style.layout' ],
 	hasSupport() {
 		return true;
 	},

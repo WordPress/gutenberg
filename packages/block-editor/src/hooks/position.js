@@ -304,7 +304,7 @@ export default {
 		return <PositionPanelPure { ...props } />;
 	},
 	useBlockProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'style.position' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},

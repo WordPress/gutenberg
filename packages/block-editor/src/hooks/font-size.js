@@ -207,7 +207,7 @@ function useBlockProps( { name, fontSize, style } ) {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'fontSize', 'style' ],
+	attributeKeys: [ 'fontSize', 'style.typography.fontSize' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},

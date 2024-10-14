@@ -178,7 +178,7 @@ export default {
 	shareWithChildBlocks: true,
 	edit: DuotonePanelPure,
 	useBlockProps,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'style.color.duotone' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, 'filter.duotone' );
 	},

@@ -403,7 +403,14 @@ function useBlockProps( {
 export default {
 	useBlockProps,
 	addSaveProps,
-	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
+	attributeKeys: [
+		'backgroundColor',
+		'textColor',
+		'gradient',
+		'style.color',
+		'style.background',
+		'elements.link.color',
+	],
 	hasSupport: hasColorSupport,
 };
 

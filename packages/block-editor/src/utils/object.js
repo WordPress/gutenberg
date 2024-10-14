@@ -10,7 +10,7 @@
  */
 export function setImmutably( object, path, value ) {
 	// Normalize path
-	path = Array.isArray( path ) ? [ ...path ] : [ path ];
+	path = Array.isArray( path ) ? [ ...path ] : path.split( '.' );
 
 	// Shallowly clone the base of the object
 	object = Array.isArray( object ) ? [ ...object ] : { ...object };

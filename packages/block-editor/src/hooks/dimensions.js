@@ -156,7 +156,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'style' ],
+	attributeKeys: [ 'minHeight', 'style.dimensions' ],
 	hasSupport( name ) {
 		return hasDimensionsSupport( name, 'aspectRatio' );
 	},
