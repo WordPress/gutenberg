@@ -36,6 +36,14 @@ test.describe( 'Parsing patterns', () => {
 				],
 			} );
 		} );
+
+		// Exit zoom out mode and select the inner buttons block to ensure
+		// the correct insertion point is selected.
+		await page.getByRole( 'button', { name: 'Zoom Out' } ).click();
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Button"i]' )
+		);
+
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'whitespace'
@@ -43,7 +51,7 @@ test.describe( 'Parsing patterns', () => {
 		await page
 			.locator( 'role=option[name="Pattern with top-level whitespace"i]' )
 			.click();
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/buttons',
 				innerBlocks: [
