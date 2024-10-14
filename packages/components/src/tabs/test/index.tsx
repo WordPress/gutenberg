@@ -1186,10 +1186,12 @@ describe( 'Tabs', () => {
 						screen.queryByRole( 'tab', { selected: true } )
 					).not.toBeInTheDocument();
 				} );
-				// No tabpanel should be rendered either
+
+				// Despite the beta tab not being selected, the matching tabpanel
+				// is selected?
 				expect(
-					screen.queryByRole( 'tabpanel' )
-				).not.toBeInTheDocument();
+					screen.getByRole( 'tabpanel', { name: 'Beta' } )
+				).toBeVisible();
 			} );
 			it( 'should not have a selected tab when the selected tab becomes disabled', async () => {
 				const { rerender } = await render(
