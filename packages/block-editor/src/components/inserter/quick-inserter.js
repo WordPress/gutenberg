@@ -87,10 +87,10 @@ export default function QuickInserter( {
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
 		setInserterIsOpened( {
-			rootClientId,
-			insertionIndex,
 			filterValue,
 			onSelect,
+			rootClientId,
+			insertionIndex,
 		} );
 	};
 
@@ -116,7 +116,7 @@ export default function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
-					label={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 			) }

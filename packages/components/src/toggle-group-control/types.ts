@@ -131,15 +131,18 @@ export type ToggleGroupControlProps = Pick<
 };
 
 export type ToggleGroupControlContextProps = {
+	activeItemIsNotFirstItem?: () => boolean;
 	isDeselectable?: boolean;
 	baseId: string;
 	isBlock: ToggleGroupControlProps[ 'isBlock' ];
 	size: ToggleGroupControlProps[ 'size' ];
 	value: ToggleGroupControlProps[ 'value' ];
 	setValue: ( newValue: string | number | undefined ) => void;
+	setSelectedElement: ( element: HTMLElement | undefined ) => void;
 };
 
 export type ToggleGroupControlMainControlProps = Pick<
 	ToggleGroupControlProps,
 	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
->;
+> &
+	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;

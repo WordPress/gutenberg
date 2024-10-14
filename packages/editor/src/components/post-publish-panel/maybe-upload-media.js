@@ -98,8 +98,8 @@ function Image( { clientId, alt, url } ) {
 			animate={ { opacity: 1 } }
 			exit={ { opacity: 0, scale: 0 } }
 			style={ {
-				width: '36px',
-				height: '36px',
+				width: '32px',
+				height: '32px',
 				objectFit: 'cover',
 				borderRadius: '2px',
 				cursor: 'pointer',
@@ -256,7 +256,7 @@ export default function MaybeUploadMediaPanel() {
 					<Spinner />
 				) : (
 					<Button
-						__next40pxDefaultSize
+						size="compact"
 						variant="primary"
 						onClick={ uploadImages }
 					>

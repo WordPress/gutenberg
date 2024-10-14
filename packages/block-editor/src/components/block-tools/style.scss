@@ -201,12 +201,9 @@
 		background: none;
 		border: none;
 	}
-}
 
-.block-editor-block-tools__zoom-out-mode-inserter-button {
-	visibility: hidden;
-
-	&.is-visible {
-		visibility: visible;
+	// Make the spacing consistent between controls.
+	.zoom-out-toolbar-button {
+		height: $button-size-next-default-40px;
 	}
 }

@@ -60,6 +60,55 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   outline-offset: -2px;
 }
 
+@media not ( prefers-reduced-motion ) {
+  .emotion-8[data-indicator-animated]::before {
+    transition-property: transform,border-radius;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+}
+
+.emotion-8::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background: #1e1e1e;
+  outline: 2px solid transparent;
+  outline-offset: -3px;
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+}
+
 .emotion-10 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -150,17 +199,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   line-height: 1;
 }
 
-.emotion-15 {
-  background: #1e1e1e;
-  border-radius: 1px;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  outline: 2px solid transparent;
-  outline-offset: -3px;
-}
-
-.emotion-18 {
+.emotion-17 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -204,22 +243,22 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-18 {
+  .emotion-17 {
     -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
     transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-18::-moz-focus-inner {
+.emotion-17::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-18[disabled] {
+.emotion-17[disabled] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-18:active {
+.emotion-17:active {
   background: #fff;
 }
 
@@ -244,7 +283,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-11"
+        id="toggle-group-control-as-radio-group-12"
         role="radiogroup"
       >
         <div
@@ -258,7 +297,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-11-30"
+            id="toggle-group-control-as-radio-group-12-32"
             role="radio"
             type="button"
             value="uppercase"
@@ -280,12 +319,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
               </svg>
             </div>
           </button>
-          <div>
-            <div
-              class="emotion-15"
-              role="presentation"
-            />
-          </div>
         </div>
         <div
           class="emotion-10 emotion-11"
@@ -293,11 +326,11 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
           <button
             aria-checked="false"
             aria-label="Lowercase"
-            class="emotion-18 components-toggle-group-control-option-base"
+            class="emotion-17 components-toggle-group-control-option-base"
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-11-31"
+            id="toggle-group-control-as-radio-group-12-33"
             role="radio"
             type="button"
             value="lowercase"
@@ -392,6 +425,55 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   outline-offset: -2px;
 }
 
+@media not ( prefers-reduced-motion ) {
+  .emotion-8[data-indicator-animated]::before {
+    transition-property: transform,border-radius;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+}
+
+.emotion-8::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background: #1e1e1e;
+  outline: 2px solid transparent;
+  outline-offset: -3px;
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+}
+
 .emotion-10 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -493,7 +575,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-10"
+        id="toggle-group-control-as-radio-group-11"
         role="radiogroup"
       >
         <div
@@ -506,7 +588,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-10-28"
+            id="toggle-group-control-as-radio-group-11-30"
             role="radio"
             type="button"
             value="rigas"
@@ -528,7 +610,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-10-29"
+            id="toggle-group-control-as-radio-group-11-31"
             role="radio"
             type="button"
             value="jack"
@@ -610,6 +692,55 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   z-index: 1;
   outline: 2px solid transparent;
   outline-offset: -2px;
+}
+
+@media not ( prefers-reduced-motion ) {
+  .emotion-8[data-indicator-animated]::before {
+    transition-property: transform,border-radius;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+}
+
+.emotion-8::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background: #1e1e1e;
+  outline: 2px solid transparent;
+  outline-offset: -3px;
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {
@@ -702,17 +833,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   line-height: 1;
 }
 
-.emotion-15 {
-  background: #1e1e1e;
-  border-radius: 1px;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  outline: 2px solid transparent;
-  outline-offset: -3px;
-}
-
-.emotion-18 {
+.emotion-17 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -756,22 +877,22 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 @media not ( prefers-reduced-motion ) {
-  .emotion-18 {
+  .emotion-17 {
     -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
     transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
-.emotion-18::-moz-focus-inner {
+.emotion-17::-moz-focus-inner {
   border: 0;
 }
 
-.emotion-18[disabled] {
+.emotion-17[disabled] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-18:active {
+.emotion-17:active {
   background: #fff;
 }
 
@@ -832,12 +953,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
               </svg>
             </div>
           </button>
-          <div>
-            <div
-              class="emotion-15"
-              role="presentation"
-            />
-          </div>
         </div>
         <div
           class="emotion-10 emotion-11"
@@ -845,7 +960,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
           <button
             aria-checked="false"
             aria-label="Lowercase"
-            class="emotion-18 components-toggle-group-control-option-base"
+            class="emotion-17 components-toggle-group-control-option-base"
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
@@ -936,6 +1051,55 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   z-index: 1;
   outline: 2px solid transparent;
   outline-offset: -2px;
+}
+
+@media not ( prefers-reduced-motion ) {
+  .emotion-8[data-indicator-animated]::before {
+    transition-property: transform,border-radius;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-out;
+  }
+}
+
+.emotion-8::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  background: #1e1e1e;
+  outline: 2px solid transparent;
+  outline-offset: -3px;
+  --antialiasing-factor: 100;
+  border-radius: calc(
+  				1px /
+  					(
+  						var( --selected-width, 0 ) /
+  							var( --antialiasing-factor )
+  					)
+  			)/1px;
+  left: -1px;
+  width: calc( var( --antialiasing-factor ) * 1px );
+  height: calc( var( --selected-height, 0 ) * 1px );
+  transform-origin: left top;
+  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
+  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
+  				calc(
+  					var( --selected-width, 0 ) / var( --antialiasing-factor )
+  				)
+  			);
 }
 
 .emotion-10 {

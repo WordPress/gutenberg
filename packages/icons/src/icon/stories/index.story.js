@@ -47,7 +47,7 @@ const LibraryExample = () => {
 	const filteredIcons = filter.length
 		? Object.fromEntries(
 				Object.entries( availableIcons ).filter( ( [ name ] ) =>
-					name.includes( filter )
+					name.toLowerCase().includes( filter.toLowerCase() )
 				)
 		  )
 		: availableIcons;
