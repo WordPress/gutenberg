@@ -684,3 +684,29 @@ export function getClosestAllowedInsertionPointForPattern(
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;
 }
+
+/**
+ * Retrieves the number of parent pattern blocks.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {number} The number of parent pattern blocks.
+ */
+export const getParentPatternCount = createSelector(
+	( state, clientId ) => {
+		const parents = getBlockParents( state, clientId );
+		return parents.reduce( ( count, parent ) => {
+			if ( getBlockName( state, parent ) === 'core/block' ) {
+				return count + 1;
+			}
+			return count;
+		}, 0 );
+	},
+	// Recompute this whenever the block's parents change.
+	// While this selector does also call `getBlockName` internally,
+	// a block can't generally change its name/type without changing
+	// its clientId, so depending only on the client ids returned by
+	// `getBlockParents` is sufficient.
+	( state ) => [ state.blocks.parents ]
+);
