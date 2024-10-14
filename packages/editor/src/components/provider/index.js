@@ -195,7 +195,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
 					// If the slug is single-{postType}, infer the post type from the slug.
 					const postTypesSlugs =
-						postTypes?.map( ( entity ) => entity.name ) || [];
+						postTypes?.map( ( entity ) => entity.slug ) || [];
 					const match = post.slug.match(
 						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
 					);
