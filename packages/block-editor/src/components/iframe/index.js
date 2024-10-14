@@ -298,12 +298,42 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
+	const zoomOutAnimationClassnameRef = useRef( null );
+	const handleZoomOutAnimationClassname = () => {
+		clearTimeout( zoomOutAnimationClassnameRef.current );
+
+		iframeDocument.documentElement.classList.add( 'zoom-out-animation' );
+
+		zoomOutAnimationClassnameRef.current = setTimeout( () => {
+			iframeDocument.documentElement.classList.remove(
+				'zoom-out-animation'
+			);
+		}, 400 ); // 400ms should match the animation speed used in components/iframe/content.scss
+	};
+
+	// Toggle zoom out CSS Classes only when zoom out mode changes. We could add these into the useEffect
+	// that controls settings the CSS variables, but then we would need to do more work to ensure we're
+	// only toggling these when the zoom out mode changes, as that useEffect is also triggered by a large
+	// number of dependencies.
 	useEffect( () => {
 		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
 
+		handleZoomOutAnimationClassname();
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
+
+		return () => {
+			handleZoomOutAnimationClassname();
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+		};
+	}, [ iframeDocument, isZoomedOut ] );
+
+	// Calculate the scaling and CSS variables for the zoom out canvas
+	useEffect( () => {
+		if ( ! iframeDocument || ! isZoomedOut ) {
+			return;
+		}
 
 		const maxWidth = 750;
 		// Note: When we initialize the zoom out when the canvas is smaller,
@@ -344,8 +374,6 @@ function Iframe( {
 		);
 
 		return () => {
-			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
-
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-scale'
 			);
