@@ -226,6 +226,72 @@ test.describe( 'Cover', () => {
 		await expect( overlay ).toHaveCSS( 'background-color', 'rgb(0, 0, 0)' );
 		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
+
+	test( 'z-index of Navigation block inside a Cover block is higher than the other cover inner blocks', async ( {
+		editor,
+		page,
+		coverBlockUtils,
+	} ) => {
+		// Insert a Cover block
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		// Choose a color swatch to transform the placeholder block into
+		// a functioning block.
+		await coverBlock
+			.getByRole( 'option', {
+				name: 'Color: Black',
+			} )
+			.click();
+
+		// Insert a Navigation block inside the Cover block
+		await editor.selectBlocks( coverBlock );
+		await coverBlock.getByRole( 'button', { name: 'Add block' } ).click();
+		await page.keyboard.type( 'Navigation' );
+		const blockResults = page.getByRole( 'listbox', {
+			name: 'Blocks',
+		} );
+		const blockResultOptions = blockResults.getByRole( 'option' );
+		await blockResultOptions.nth( 0 ).click();
+
+		// Insert a second Cover block.
+		await editor.insertBlock( { name: 'core/cover' } );
+		const secondCoverBlock = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Cover',
+			} )
+			.last();
+
+		// Choose a color swatch to transform the placeholder block into
+		// a functioning block.
+		await secondCoverBlock
+			.getByRole( 'option', {
+				name: 'Color: Black',
+			} )
+			.click();
+
+		// Set the viewport to a small screen where the menu will become a modal and open it.
+		await page.setViewportSize( { width: 375, height: 1000 } );
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await editor.selectBlocks( navigationBlock );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Open menu' } )
+			.click();
+
+		const menuZIndex = await coverBlockUtils.calculateZIndexContext(
+			coverBlock.locator( '.wp-block-navigation__responsive-container' )
+		);
+
+		const innerBlocksZIndex = await coverBlockUtils.calculateZIndexContext(
+			secondCoverBlock.locator( '.wp-block-cover__inner-container' )
+		);
+
+		expect( menuZIndex ).toBeGreaterThan( innerBlocksZIndex );
+	} );
 } );
 
 class CoverBlockUtils {
@@ -254,5 +320,28 @@ class CoverBlockUtils {
 		await locator.setInputFiles( tmpFileName );
 
 		return filename;
+	}
+
+	async calculateZIndexContext( element ) {
+		const zIndexResult = await element.evaluate( ( el ) => {
+			let zIndex = 0;
+			let currentElement = el;
+
+			while ( currentElement ) {
+				const computedStyle = window.getComputedStyle( currentElement );
+				const zIndexValue = parseInt( computedStyle.zIndex, 10 );
+
+				// If the element creates a new stacking context
+				if ( ! isNaN( zIndexValue ) ) {
+					zIndex = zIndexValue;
+				}
+
+				currentElement = currentElement.parentElement; // Move up the DOM tree
+			}
+
+			return zIndex;
+		} );
+
+		return zIndexResult;
 	}
 }
