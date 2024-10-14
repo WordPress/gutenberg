@@ -75,6 +75,8 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 
 	const groupContextValue = useMemo(
 		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
 			baseId,
 			isBlock: ! isAdaptiveWidth,
 			size,
@@ -87,6 +89,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		[
 			baseId,
 			isAdaptiveWidth,
+			radio,
 			selectedValue,
 			setSelectedElement,
 			setValue,

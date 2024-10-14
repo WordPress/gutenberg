@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade preact libraries [#66008](https://github.com/WordPress/gutenberg/pull/66008).
+
 ### Bug Fixes
 
 -   Fix an issue where "default" could not be used as a directive suffix ([#65815](https://github.com/WordPress/gutenberg/pull/65815)).

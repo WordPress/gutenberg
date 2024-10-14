@@ -48,6 +48,7 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -335,13 +336,14 @@ function VisualEditor( {
 		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useZoomOutModeExit(),
 	] );
 
 	const zoomOutProps =
 		isZoomedOut && ! isTabletViewport
 			? {
 					scale: 'default',
-					frameSize: '48px',
+					frameSize: '40px',
 			  }
 			: {};
 
