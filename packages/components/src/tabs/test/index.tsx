@@ -729,8 +729,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 
-			// Shouldn't this just stay on the same tab?
-			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
+			it( 'should not have any selected tabs if the currently selected tab is removed, even if a tab is matching the defaultTabId', async () => {
 				const mockOnSelect = jest.fn();
 
 				const { rerender } = await render(
@@ -1113,7 +1112,7 @@ describe( 'Tabs', () => {
 			// No tabpanel should be rendered either
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
-		it( 'should not have a selected tab if the active tab is removed', async () => {
+		it( 'should not have a selected tab if the active tab is removed, but should select a tab that gets added if it matches the selectedTabId', async () => {
 			const { rerender } = await render(
 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
@@ -1147,15 +1146,7 @@ describe( 'Tabs', () => {
 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
 
-			// No tab should be selected i.e. it doesn't reselect the previously
-			// removed tab.
-			await waitFor( () => {
-				expect(
-					screen.queryByRole( 'tab', { selected: true } )
-				).not.toBeInTheDocument();
-			} );
-			// No tabpanel should be rendered either
-			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
 		describe( 'Disabled tab', () => {
