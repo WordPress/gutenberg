@@ -61,7 +61,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			) {
 				return;
 			}
-			setIsDialogOpen( true );
+
+			if ( ! event.defaultPrevented ) {
+				event.preventDefault();
+				setIsDialogOpen( true );
+			}
 		};
 
 		const canvas = contentRef.current;

@@ -32,7 +32,7 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
-		"@babel/core": "^7.16.0",
+		"@babel/core": "7.25.7",
 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
 		"@svgr/webpack": "^8.0.1",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
@@ -46,8 +46,8 @@
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/stylelint-config": "file:../stylelint-config",
 		"adm-zip": "^0.5.9",
-		"babel-jest": "^29.6.2",
-		"babel-loader": "^8.2.3",
+		"babel-jest": "29.7.0",
+		"babel-loader": "9.2.1",
 		"browserslist": "^4.21.10",
 		"chalk": "^4.0.0",
 		"check-node-version": "^4.1.0",
@@ -86,9 +86,9 @@
 		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
 		"stylelint": "^16.8.2",
-		"terser-webpack-plugin": "^5.3.9",
+		"terser-webpack-plugin": "^5.3.10",
 		"url-loader": "^4.1.1",
-		"webpack": "^5.88.2",
+		"webpack": "^5.95.0",
 		"webpack-bundle-analyzer": "^4.9.1",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^4.15.1"

@@ -32,7 +32,7 @@ test.describe( 'Global styles sidebar', () => {
 			.click();
 
 		await page
-			.getByRole( 'searchbox', { name: 'Search for blocks' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'heading' );
 
 		// Matches both Heading and Table of Contents blocks.

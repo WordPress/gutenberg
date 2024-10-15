@@ -28,7 +28,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@babel/runtime": "7.25.7",
 		"@types/simple-peer": "^9.11.5",
 		"@wordpress/url": "file:../url",
 		"import-locals": "^2.0.0",
