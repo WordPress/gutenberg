@@ -92,6 +92,13 @@ await Promise.all(
 			'./README.md'
 		);
 
-		return fs.writeFile( outputFile, docs );
+		try {
+			console.log( `Writing docs to ${ outputFile }` );
+			return fs.writeFile( outputFile, docs );
+		} catch ( e ) {
+			throw new Error(
+				`Error writing docs to ${ outputFile }: ${ e.message }`
+			);
+		}
 	} )
 );
