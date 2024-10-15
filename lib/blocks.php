@@ -576,7 +576,6 @@ function gutenberg_denied_block_types( $allowed_blocks, $editor_context ) {
             $allowed_blocks = array_diff( $allowed_blocks, $denied_blocks );
         }
     }
-    // Default: return the $allowed_blocks as is
     return array_values($allowed_blocks);
 }
 
