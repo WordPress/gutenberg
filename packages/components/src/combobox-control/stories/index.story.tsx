@@ -125,6 +125,39 @@ WithCustomRenderItem.args = {
 };
 
 /**
+ * The message displayed when no suggestions are found can be customized by
+ * passing a React element to the `__experimentalRenderNoSuggestionsFound` prop.
+ */
+export const WithCustomNoSuggestionFound = Template.bind( {} );
+WithCustomNoSuggestionFound.args = {
+	...Default.args,
+	label: 'Select an author',
+	options: [
+		{
+			value: 'parsley',
+			label: 'Parsley Montana',
+			age: 48,
+			country: 'Germany',
+		},
+		{
+			value: 'cabbage',
+			label: 'Cabbage New York',
+			age: 44,
+			country: 'France',
+		},
+		{
+			value: 'jake',
+			label: 'Jake Weary',
+			age: 41,
+			country: 'United Kingdom',
+		},
+	],
+	__experimentalRenderNoSuggestionsFound: (
+		<div>No authors found. Please try a different search term.</div>
+	),
+};
+
+/**
  * You can disable options in the list
  * by setting the `disabled` property to true
  * for individual items in the option object.
