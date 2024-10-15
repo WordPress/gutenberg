@@ -19,6 +19,7 @@
 
 -   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
 -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+-   `ComboboxControl`: add `__experimentalRenderNoSuggestionsFound` to allow rendering no suggestion found custom component ([#66142](https://github.com/WordPress/gutenberg/pull/66142)) 
 
 ## 28.9.0 (2024-10-03)
 
