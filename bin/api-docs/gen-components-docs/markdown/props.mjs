@@ -1,7 +1,8 @@
 function renderPropType( type ) {
+	const MAX_ENUM_VALUES = 10;
+
 	switch ( type.name ) {
 		case 'enum': {
-			const MAX_ENUM_VALUES = 10;
 			const string = type.value
 				.slice( 0, MAX_ENUM_VALUES )
 				.map( ( { value } ) => value )
@@ -26,7 +27,7 @@ export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
 		.flatMap( ( key ) => {
 			const prop = props[ key ];
 
-			if ( prop.description.includes( '@ignore' ) ) {
+			if ( prop.description?.includes( '@ignore' ) ) {
 				return null;
 			}
 
