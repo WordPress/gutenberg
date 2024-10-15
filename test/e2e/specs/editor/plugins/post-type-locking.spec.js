@@ -208,7 +208,10 @@ test.describe( 'Post-type locking', () => {
 			await expect(
 				page
 					.getByRole( 'toolbar', { name: 'Document tools' } )
-					.getByRole( 'button', { name: 'Toggle block inserter' } )
+					.getByRole( 'button', {
+						name: 'Block Inserter',
+						exact: true,
+					} )
 			).toBeEnabled();
 
 			await editor.insertBlock( { name: 'core/list' } );

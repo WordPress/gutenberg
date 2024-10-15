@@ -56,7 +56,7 @@ test.describe( 'Widgets screen', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
@@ -698,7 +698,7 @@ class WidgetsScreen {
 		if ( await blockLibrary.isHidden() ) {
 			await this.#page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 		}
 

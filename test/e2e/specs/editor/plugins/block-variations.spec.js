@@ -22,7 +22,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
@@ -63,7 +63,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
