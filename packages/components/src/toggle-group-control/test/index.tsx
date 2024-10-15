@@ -175,6 +175,32 @@ describe.each( [
 		expect( radio ).not.toBeChecked();
 	} );
 
+	if ( mode === 'controlled' ) {
+		it( 'should not set a value on focus, after the value is reset', async () => {
+			render(
+				<Component label="Test Toggle Group Control" value="jack">
+					{ options }
+				</Component>
+			);
+
+			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+
+			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+
+			await press.ShiftTab();
+			expect(
+				screen.getByRole( 'radio', { name: 'R' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'radio', { name: 'J' } )
+			).not.toBeChecked();
+		} );
+	}
+
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
 		render(
 			<Component label="Test Toggle Group Control">
