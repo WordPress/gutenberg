@@ -112,9 +112,13 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ refs }
 			store={ store }
-			render={ <TabListWrapper /> }
+			render={ ( props ) => (
+				<TabListWrapper
+					{ ...props }
+					tabIndex={ props.tabIndex ?? -1 }
+				/>
+			) }
 			onBlur={ onBlur }
-			tabIndex={ -1 }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(

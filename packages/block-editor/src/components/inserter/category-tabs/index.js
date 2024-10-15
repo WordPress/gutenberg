@@ -6,6 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
 } from '@wordpress/components';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,11 +32,23 @@ function CategoryTabs( {
 
 	const previousSelectedCategory = usePrevious( selectedCategory );
 
+	const selectedTabId = selectedCategory ? selectedCategory.name : null;
+	const [ activeTabId, setActiveId ] = useState();
+	const firstTabId = categories?.[ 0 ]?.name;
+	useEffect( () => {
+		// If there is no active tab, make the first tab the active tab, so that
+		// when focus is moved to the tablist, the first tab will be focused
+		// despite not being selected
+		if ( selectedTabId === null && ! activeTabId && firstTabId ) {
+			setActiveId( firstTabId );
+		}
+	}, [ selectedTabId, activeTabId, firstTabId, setActiveId ] );
+
 	return (
 		<Tabs
 			className="block-editor-inserter__category-tabs"
 			selectOnMove={ false }
-			selectedTabId={ selectedCategory ? selectedCategory.name : null }
+			selectedTabId={ selectedTabId }
 			orientation="vertical"
 			onSelect={ ( categoryId ) => {
 				// Pass the full category object
@@ -45,6 +58,8 @@ function CategoryTabs( {
 					)
 				);
 			} }
+			activeTabId={ activeTabId }
+			onActiveTabIdChange={ setActiveId }
 		>
 			<Tabs.TabList className="block-editor-inserter__category-tablist">
 				{ categories.map( ( category ) => (

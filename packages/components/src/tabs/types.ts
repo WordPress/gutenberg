@@ -65,6 +65,27 @@ export type TabsProps = {
 	 * When in controlled mode, the `null` value will result in no tab being selected.
 	 */
 	selectedTabId?: string | null;
+	/**
+	 * The current active tab `id`. The active tab is the tab element within the
+	 * tablist widget that has DOM focus.
+	 * - `null` represents the tablist (ie. the base composite element). Users
+	 *   will be able to navigate out of it using arrow keys.
+	 * - If `activeId` is initially set to `null`, the base composite element
+	 *   itself will have focus and users will be able to navigate to it using
+	 *   arrow keys.
+	 */
+	activeTabId?: Ariakit.TabStoreProps[ 'activeId' ];
+	/**
+	 * The tab id that should be active by default when the composite widget is
+	 * rendered. If `null`, the tablist element itself will have focus
+	 * and users will be able to navigate to it using arrow keys. If `undefined`,
+	 * the first enabled item will be focused.
+	 */
+	defaultActiveTabId?: Ariakit.CompositeStoreProps[ 'defaultActiveId' ];
+	/**
+	 * A callback that gets called when the `activeId` state changes.
+	 */
+	onActiveTabIdChange?: Ariakit.TabStoreProps[ 'setActiveId' ];
 };
 
 export type TabListProps = {

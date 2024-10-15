@@ -234,6 +234,9 @@ export const Tab = styled( Ariakit.Tab )`
 
 export const TabChildren = styled.span`
 	flex-grow: 1;
+
+	display: flex;
+	align-items: center;
 `;
 
 export const TabChevron = styled( Icon )`
