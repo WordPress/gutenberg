@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+const babelParser = require( '@babel/eslint-parser' );
+/**
  * Internal dependencies
  */
 const { hasBabelConfig } = require( '../utils' );
@@ -26,10 +30,12 @@ if ( ! hasBabelConfig() ) {
 	eslintConfig.forEach( ( config ) => {
 		config.languageOptions = {
 			...config?.languageOptions,
+			parser: babelParser,
 			parserOptions: {
 				...config?.languageOptions?.parserOptions,
 				requireConfigFile: false,
 				babelOptions: {
+					configFile: false,
 					presets: [
 						require.resolve( '@wordpress/babel-preset-default' ),
 					],

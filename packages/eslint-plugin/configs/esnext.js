@@ -3,6 +3,7 @@
  */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
 const ESLintParser = require( '@babel/eslint-parser' );
+const babelParser = require( '@babel/eslint-parser' );
 
 const config = {
 	languageOptions: {
@@ -56,11 +57,18 @@ const config = {
 // https://github.com/davidtheclark/cosmiconfig/issues/246.
 const result = cosmiconfigSync( 'babel' ).search();
 if ( ! result || ! result.filepath ) {
-	config.languageOptions.parserOptions = {
-		...config.languageOptions.parserOptions,
-		configFile: false,
-		babelOptions: {
-			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+	config.languageOptions = {
+		...config?.languageOptions,
+		parser: babelParser,
+		parserOptions: {
+			...config?.languageOptions?.parserOptions,
+			requireConfigFile: false,
+			babelOptions: {
+				configFile: false,
+				presets: [
+					require.resolve( '@wordpress/babel-preset-default' ),
+				],
+			},
 		},
 	};
 }
