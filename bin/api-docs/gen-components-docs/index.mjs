@@ -45,13 +45,21 @@ function getTypeDocsForComponent( {
 	return typeDocs;
 }
 
+async function parseManifest( manifestPath ) {
+	try {
+		return JSON.parse( await fs.readFile( manifestPath, 'utf8' ) );
+	} catch ( e ) {
+		throw new Error(
+			`Error parsing docs manifest at ${ manifestPath }: ${ e.message }`
+		);
+	}
+}
+
 const manifests = glob.sync( MANIFEST_GLOB );
 
 await Promise.all(
 	manifests.map( async ( manifestPath ) => {
-		const manifest = JSON.parse(
-			await fs.readFile( manifestPath, 'utf8' )
-		);
+		const manifest = await parseManifest( manifestPath );
 
 		const typeDocs = getTypeDocsForComponent( {
 			manifestPath,
