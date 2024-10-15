@@ -69,9 +69,14 @@ export default function CollabSidebar() {
 		return getSelectedBlockClientId();
 	}, [] );
 
-	const blockDetails = useSelect( ( select ) => {
-		return clientId ? select( blockEditorStore ).getBlock( clientId ) : null;
-	}, [clientId] );
+	const blockDetails = useSelect(
+		( select ) => {
+			return clientId
+				? select( blockEditorStore ).getBlock( clientId )
+				: null;
+		},
+		[ clientId ]
+	);
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -93,10 +98,14 @@ export default function CollabSidebar() {
 		// Create a new object, conditionally including the parent property
 		const updatedArgs = {
 			...args,
-			...(parentCommentId ? { parent: parentCommentId } : {}),
+			...( parentCommentId ? { parent: parentCommentId } : {} ),
 		};
 
-		const savedRecord = await saveEntityRecord( 'root', 'comment', updatedArgs );
+		const savedRecord = await saveEntityRecord(
+			'root',
+			'comment',
+			updatedArgs
+		);
 
 		if ( savedRecord ) {
 			// If it's a main comment, update the block attributes with the comment id.

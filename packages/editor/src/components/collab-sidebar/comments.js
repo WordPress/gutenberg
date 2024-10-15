@@ -269,10 +269,7 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 							? _x( 'Update', 'verb' )
 							: _x( 'Reply', 'Add reply comment' ) }
 					</Button>
-					<Button
-						__next40pxDefaultSize
-						onClick={ onCancel }
-					>
+					<Button __next40pxDefaultSize onClick={ onCancel }>
 						{ _x( 'Cancel', 'Cancel comment edit' ) }
 					</Button>
 				</HStack>
@@ -312,10 +309,7 @@ function ConfirmNotice( { confirmMessage, confirmAction, discardAction } ) {
 				>
 					{ __( 'Yes' ) }
 				</Button>
-				<Button
-					__next40pxDefaultSize
-					onClick={ discardAction }
-				>
+				<Button __next40pxDefaultSize onClick={ discardAction }>
 					{ __( 'No' ) }
 				</Button>
 			</HStack>
