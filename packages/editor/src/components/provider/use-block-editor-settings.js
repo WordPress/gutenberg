@@ -86,6 +86,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'widgetTypesToHideFromLegacyWidgetBlock',
 	'__unstableHasCustomAppender',
 	'__unstableIsPreviewMode',
+	'isPreviewMode', // TODO: Reorder this when removing __unstableIsPreviewMode.
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
 ];
