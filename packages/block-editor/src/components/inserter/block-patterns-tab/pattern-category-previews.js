@@ -24,6 +24,7 @@ import { useSelect } from '@wordpress/data';
  */
 import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternsList from '../../block-patterns-list';
+import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
 import { usePatternCategories } from './use-pattern-categories';
@@ -183,7 +184,6 @@ export function PatternCategoryPreviews( {
 					) }
 					<BlockPatternsList
 						ref={ scrollContainerRef }
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
 						blockPatterns={ pagingProps.categoryPatterns }
 						onClickPattern={ onClickPattern }
 						onHover={ onHover }
@@ -193,8 +193,15 @@ export function PatternCategoryPreviews( {
 						isDraggable
 						showTitlesAsTooltip={ showTitlesAsTooltip }
 						patternFilter={ patternSourceFilter }
-						pagingProps={ pagingProps }
 					/>
+					{ pagingProps && (
+						<VStack
+							spacing={ 2 }
+							className="block-editor-inserter__patterns-category-panel-footer"
+						>
+							<BlockPatternsPaging { ...pagingProps } />
+						</VStack>
+					) }
 				</>
 			) }
 		</>

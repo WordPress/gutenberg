@@ -249,7 +249,8 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel-header {
+.block-editor-inserter__patterns-category-panel-header,
+.block-editor-inserter__patterns-category-panel-footer {
 	padding: $grid-unit-10 0;
 	@include break-medium {
 		padding: $grid-unit-10 $grid-unit-30;
