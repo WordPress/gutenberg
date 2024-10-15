@@ -21,6 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import InspectorBlockInfoFill from '../inspector-block-info/inspector-block-info';
 
 function BlockCard( { title, icon, description, blockType, className, name } ) {
 	if ( blockType ) {
@@ -80,6 +81,9 @@ function BlockCard( { title, icon, description, blockType, className, name } ) {
 						{ description }
 					</Text>
 				) }
+				<div className="block-editor-block-card__description-extender">
+					<InspectorBlockInfoFill.Slot />
+				</div>
 			</VStack>
 		</div>
 	);

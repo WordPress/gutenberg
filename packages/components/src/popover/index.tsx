@@ -105,6 +105,16 @@ const getPopoverFallbackContainer = () => {
 		document.body.append( container );
 	}
 
+	// Select the element with class 'block-editor-block-card__description-extender' inside the container
+	const descriptionExtender = container.querySelector(
+		'.block-editor-block-card__description-extender'
+	);
+
+	// If found, remove the element
+	if ( descriptionExtender ) {
+		descriptionExtender.remove();
+	}
+
 	return container;
 };
 
