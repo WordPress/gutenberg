@@ -165,26 +165,29 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		__unstableTemplate: template,
 	} ) => {
 		const { editorSettings, selection, isReady, mode, postTypes } =
-			useSelect( ( select ) => {
-				const {
-					getEditorSettings,
-					getEditorSelection,
-					getRenderingMode,
-					__unstableIsEditorReady,
-				} = select( editorStore );
-				const { getEntitiesConfig } = select( coreStore );
+			useSelect(
+				( select ) => {
+					const {
+						getEditorSettings,
+						getEditorSelection,
+						getRenderingMode,
+						__unstableIsEditorReady,
+					} = select( editorStore );
+					const { getEntitiesConfig } = select( coreStore );
 
-				return {
-					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady(),
-					mode: getRenderingMode(),
-					selection: getEditorSelection(),
-					postTypes:
-						post.type === 'wp_template'
-							? getEntitiesConfig( 'postType' )
-							: null,
-				};
-			}, [] );
+					return {
+						editorSettings: getEditorSettings(),
+						isReady: __unstableIsEditorReady(),
+						mode: getRenderingMode(),
+						selection: getEditorSelection(),
+						postTypes:
+							post.type === 'wp_template'
+								? getEntitiesConfig( 'postType' )
+								: null,
+					};
+				},
+				[ post.type ]
+			);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
