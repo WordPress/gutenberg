@@ -19,7 +19,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
 		...generateMarkdownPropsJson( typeDocs.props ),
 	];
 
-	const subcomponentDocsJson = subcomponentTypeDocs
+	const subcomponentDocsJson = subcomponentTypeDocs?.length
 		? [
 				{ h2: 'Subcomponents' },
 				...subcomponentTypeDocs.flatMap( ( subcomponentTypeDoc ) => [

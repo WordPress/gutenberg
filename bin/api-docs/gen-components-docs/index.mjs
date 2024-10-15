@@ -67,21 +67,21 @@ await Promise.all(
 			displayName: manifest.displayName,
 		} );
 
-		const subcomponentTypeDocs = ! manifest.subcomponents
-			? undefined
-			: manifest.subcomponents.map( ( subcomponent ) => {
-					const docs = getTypeDocsForComponent( {
-						manifestPath,
-						componentFilePath: subcomponent.filePath,
-						displayName: subcomponent.displayName,
-					} );
+		const subcomponentTypeDocs = manifest.subcomponents?.map(
+			( subcomponent ) => {
+				const docs = getTypeDocsForComponent( {
+					manifestPath,
+					componentFilePath: subcomponent.filePath,
+					displayName: subcomponent.displayName,
+				} );
 
-					if ( subcomponent.preferredDisplayName ) {
-						docs.displayName = subcomponent.preferredDisplayName;
-					}
+				if ( subcomponent.preferredDisplayName ) {
+					docs.displayName = subcomponent.preferredDisplayName;
+				}
 
-					return docs;
-			  } );
+				return docs;
+			}
+		);
 		const docs = generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } );
 		const outputFile = path.resolve(
 			path.dirname( manifestPath ),
