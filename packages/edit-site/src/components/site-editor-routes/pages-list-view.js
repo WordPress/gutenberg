@@ -38,7 +38,7 @@ export const pagesListViewRoute = {
 		preview: <Editor />,
 		mobile: <PageList />,
 	},
-	width: {
+	widths: {
 		content: 380,
 	},
 };

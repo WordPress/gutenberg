@@ -47,7 +47,7 @@ export const pagesViewQuickEditRoute = {
 		mobile: <PageList />,
 		edit: <PageQuickEdit />,
 	},
-	width: {
+	widths: {
 		edit: 380,
 	},
 };

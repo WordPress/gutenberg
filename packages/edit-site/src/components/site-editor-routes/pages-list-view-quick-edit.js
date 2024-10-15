@@ -49,7 +49,7 @@ export const pagesListViewQuickEditRoute = {
 		preview: <Editor />,
 		edit: <PageQuickEdit />,
 	},
-	width: {
+	widths: {
 		content: 380,
 		edit: 380,
 	},
