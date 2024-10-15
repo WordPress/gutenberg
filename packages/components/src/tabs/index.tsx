@@ -18,6 +18,22 @@ import { Tab } from './tab';
 import { TabList } from './tablist';
 import { TabPanel } from './tabpanel';
 
+function externalToInternalTabId(
+	externalId: string | undefined | null,
+	instanceId: string
+) {
+	return externalId && `${ instanceId }-${ externalId }`;
+}
+
+function internalToExternalTabId(
+	internalId: string | undefined | null,
+	instanceId: string
+) {
+	return typeof internalId === 'string'
+		? internalId.replace( `${ instanceId }-`, '' )
+		: internalId;
+}
+
 function Tabs( {
 	selectOnMove = true,
 	defaultTabId,
@@ -25,20 +41,29 @@ function Tabs( {
 	onSelect,
 	children,
 	selectedTabId,
+	activeTabId,
+	defaultActiveTabId,
+	onActiveTabIdChange,
 }: TabsProps ) {
 	const instanceId = useInstanceId( Tabs, 'tabs' );
 	const store = Ariakit.useTabStore( {
 		selectOnMove,
 		orientation,
-		defaultSelectedId: defaultTabId && `${ instanceId }-${ defaultTabId }`,
-		setSelectedId: ( selectedId ) => {
-			const strippedDownId =
-				typeof selectedId === 'string'
-					? selectedId.replace( `${ instanceId }-`, '' )
-					: selectedId;
-			onSelect?.( strippedDownId );
+		defaultSelectedId: externalToInternalTabId( defaultTabId, instanceId ),
+		setSelectedId: ( newSelectedId ) => {
+			onSelect?.( internalToExternalTabId( newSelectedId, instanceId ) );
 		},
-		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
+		selectedId: externalToInternalTabId( selectedTabId, instanceId ),
+		defaultActiveId: externalToInternalTabId(
+			defaultActiveTabId,
+			instanceId
+		),
+		setActiveId: ( newActiveId ) => {
+			onActiveTabIdChange?.(
+				internalToExternalTabId( newActiveId, instanceId )
+			);
+		},
+		activeId: externalToInternalTabId( activeTabId, instanceId ),
 	} );
 
 	const { items, activeId } = Ariakit.useStoreState( store );
