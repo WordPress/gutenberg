@@ -32,17 +32,29 @@ function getTypeDocsForComponent( {
 		componentFilePath
 	);
 
-	const typeDocs = docgen
-		.parse( resolvedPath, OPTIONS )
-		.find( ( obj ) => obj.displayName === displayName );
+	const typeDocs = docgen.parse( resolvedPath, OPTIONS );
 
-	if ( typeof typeDocs === 'undefined' ) {
+	if ( typeDocs.length === 0 ) {
 		throw new Error(
-			`react-docgen-typescript could not generate type docs for ${ displayName } in ${ resolvedPath }`
+			`react-docgen-typescript could not generate any type docs from ${ resolvedPath }`
 		);
 	}
 
-	return typeDocs;
+	const matchingTypeDoc = typeDocs.find(
+		( obj ) => obj.displayName === displayName
+	);
+
+	if ( typeof matchingTypeDoc === 'undefined' ) {
+		const unmatchedTypeDocs = typeDocs
+			.map( ( obj ) => `\`${ obj.displayName }\`` )
+			.join( ', ' );
+
+		throw new Error(
+			`react-docgen-typescript could not find type docs for ${ displayName } in ${ resolvedPath }. (Found ${ unmatchedTypeDocs })`
+		);
+	}
+
+	return matchingTypeDoc;
 }
 
 async function parseManifest( manifestPath ) {
