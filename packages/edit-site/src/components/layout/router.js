@@ -78,7 +78,7 @@ export default function useActiveRoute() {
 		}
 
 		return {
-			key: matchedRoute.name,
+			name: matchedRoute.name,
 			areas: matchedRoute.areas,
 			widths: matchedRoute.widths,
 		};
