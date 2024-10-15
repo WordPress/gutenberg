@@ -88,48 +88,23 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
-const NOT_WP_SCRIPTS = [
-	'@wordpress/babel-plugin-import-jsx-pragma',
-	'@wordpress/babel-plugin-makepot',
-	'@wordpress/babel-preset-default',
-	'@wordpress/base-styles',
-	'@wordpress/browserslist-config',
-	'@wordpress/create-block',
-	'@wordpress/create-block-interactive-template',
-	'@wordpress/create-block-tutorial-template',
-	'@wordpress/dependency-extraction-webpack-plugin',
-	'@wordpress/docgen',
-	'@wordpress/e2e-test-utils',
-	'@wordpress/e2e-test-utils-playwright',
-	'@wordpress/e2e-tests',
-	'@wordpress/env',
-	'@wordpress/eslint-plugin',
-	'@wordpress/jest-console',
-	'@wordpress/jest-preset-default',
-	'@wordpress/jest-puppeteer-axe',
-	'@wordpress/lazy-import',
-	'@wordpress/npm-package-json-lint-config',
-	'@wordpress/postcss-plugins-preset',
-	'@wordpress/postcss-themes',
-	'@wordpress/prettier-config',
-	'@wordpress/project-management-automation',
-	'@wordpress/readable-js-assets-webpack-plugin',
-	'@wordpress/report-flaky-tests',
-	'@wordpress/scripts',
-	'@wordpress/stylelint-config',
-];
+/** @type {Array<string>} */
+const gutenbergScripts = [];
+for ( const packageDir of packageDirs ) {
+	const packageJson = require(
+		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
+	);
 
-const gutenbergPackages = packageDirs.filter(
-	( packageDir ) =>
-		! BUNDLED_PACKAGES.includes(
-			`${ WORDPRESS_NAMESPACE }${ packageDir }`
-		) &&
-		! NOT_WP_SCRIPTS.includes(
-			`${ WORDPRESS_NAMESPACE }${ packageDir }`
-		) &&
-		! packageDir.startsWith( 'react-native' ) &&
-		! packageDir.startsWith( 'interactivity' )
-);
+	if ( ! packageJson.wpScript ) {
+		continue;
+	}
+
+	if ( BUNDLED_PACKAGES.includes( packageJson.name ) ) {
+		continue;
+	}
+
+	gutenbergScripts.push( packageDir );
+}
 
 const exportDefaultPackages = [
 	'api-fetch',
@@ -153,7 +128,7 @@ module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: Object.fromEntries(
-		gutenbergPackages.map( ( packageName ) => [
+		gutenbergScripts.map( ( packageName ) => [
 			packageName,
 			{
 				import: `./packages/${ packageName }`,
@@ -187,7 +162,7 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergPackages
+			patterns: gutenbergScripts
 				.map( ( packageName ) => ( {
 					from: '*.css',
 					context: `./packages/${ packageName }/build-style`,
