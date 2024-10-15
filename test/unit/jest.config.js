@@ -23,6 +23,7 @@ module.exports = {
 		'<rootDir>/test/unit/config/testing-library.js',
 		'<rootDir>/test/unit/mocks/match-media.js',
 	],
+	testEnvironment: '<rootDir>/test/unit/config/jest-environment.js',
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
