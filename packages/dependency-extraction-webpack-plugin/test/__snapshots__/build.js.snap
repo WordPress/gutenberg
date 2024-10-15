@@ -335,7 +335,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '363140026eaa9abcaf33', 'type' => 'module');
+"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '3004d92fa670e58cb987', 'type' => 'module');
 "
 `;
 
@@ -760,7 +760,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => 'b16015e38aea0509f75f');
+"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => '5d6f3787a67ec0f2886d');
 "
 `;
 
