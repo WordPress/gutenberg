@@ -41,6 +41,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isZoomOut,
 } from './private-selectors';
 
 /**
@@ -2902,10 +2903,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	const editorMode = __unstableGetEditorMode( state );
-
 	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'zoom-out' ) {
+	if ( isZoomOut( state ) ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
@@ -3004,8 +3003,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
-			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'zoom-out' ) {
+			if ( isZoomOut( state ) ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
@@ -3027,6 +3025,7 @@ export const getBlockEditingMode = createRegistrySelector(
 				return 'disabled';
 			}
 
+			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'navigation' ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
