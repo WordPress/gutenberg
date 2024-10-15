@@ -73,7 +73,6 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 
-// Custom hook for managing responsive menu state.
 function useResponsiveMenu( navRef ) {
 	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] =
 		useState( false );
