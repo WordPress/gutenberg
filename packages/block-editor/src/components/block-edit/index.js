@@ -15,7 +15,6 @@ import {
 	mayDisplayParentControlsKey,
 	blockEditingModeKey,
 	blockBindingsKey,
-	isPreviewModeKey,
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
@@ -71,7 +70,6 @@ export default function BlockEdit( {
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
-					[ isPreviewModeKey ]: isPreviewMode,
 				} ),
 				[
 					name,
@@ -84,7 +82,6 @@ export default function BlockEdit( {
 					mayDisplayParentControls,
 					blockEditingMode,
 					bindings,
-					isPreviewMode,
 				]
 			) }
 		>

@@ -29,7 +29,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
+import { blockBindingsKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
@@ -503,8 +503,13 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
-	const context = useBlockEditContext();
-	const isPreviewMode = context[ isPreviewModeKey ];
+	const { isPreviewMode } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+
+		return {
+			isPreviewMode: getSettings().isPreviewMode,
+		};
+	}, [] );
 
 	if ( isPreviewMode ) {
 		// Remove all non-content props.
