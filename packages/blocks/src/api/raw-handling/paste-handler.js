@@ -32,6 +32,7 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import svgToImage from './svg-to-image';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -184,6 +185,8 @@ export function pasteHandler( {
 			if ( typeof piece !== 'string' ) {
 				return piece;
 			}
+
+			piece = deepFilterHTML( piece, [ svgToImage ] );
 
 			const filters = [
 				googleDocsUIDRemover,
