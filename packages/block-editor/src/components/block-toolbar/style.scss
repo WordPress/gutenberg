@@ -71,6 +71,9 @@
 		.components-toolbar {
 			border-right-color: $gray-600 !important;
 		}
+		.is-pressed {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 
 	> :last-child,
