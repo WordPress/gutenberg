@@ -43,6 +43,5 @@
 		"clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
 		"clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
 		"clean:install": "npm run clean && npm install"
-	},
-	"wpScript": true
+	}
 }
