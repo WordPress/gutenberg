@@ -5,7 +5,21 @@
 
 .block-editor-iframe__html {
 	transform-origin: top center;
-	@include editor-canvas-resize-animation;
+	// 400ms should match the animation speed used in iframe/index.js
+	$zoomOutAnimation: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
+
+	// We don't want to animate the transform of the translateX because it is used
+	// to "center" the canvas. Leaving it on causes the canvas to slide around in
+	// odd ways.
+	transition: $zoomOutAnimation, transform 0s scale 0s;
+	@include reduce-motion("transition");
+
+	&.zoom-out-animation {
+		// we only want to animate the scaling when entering zoom out. When sidebars
+		// are toggled, the resizing of the iframe handles scaling the canvas as well,
+		// and the doubled animations cause very odd animations.
+		transition: $zoomOutAnimation, transform 0s;
+	}
 }
 
 .block-editor-iframe__html.is-zoomed-out {
@@ -13,10 +27,11 @@
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
-
-	transform: scale(#{$scale});
-
+	$outer-container-width: var(--wp-block-editor-iframe-zoom-out-outer-container-width);
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
+	// Apply an X translation to center the scaled content within the available space.
+	transform: translateX(calc(( #{$outer-container-width} - #{ $container-width }) / 2 / #{$scale}));
+	scale: #{$scale};
 	background-color: $gray-300;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
