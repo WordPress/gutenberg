@@ -152,7 +152,7 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_exper
 		$comment_type[] = 'block_comment';
 		return $comment_type;
 	}
-	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type', 10, 1 );
+	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
 }
 
 /**
