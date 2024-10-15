@@ -75,15 +75,25 @@ function useRedirectOldPaths() {
 
 export default function useLayoutAreas() {
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas, quickEdit } =
-		params;
+	const {
+		postType,
+		postId,
+		path,
+		layout,
+		isCustom,
+		canvas,
+		quickEdit,
+		activeView,
+	} = params;
 	const hasEditCanvasMode = canvas === 'edit';
+	const history = useHistory();
 	useRedirectOldPaths();
 
 	// Page list
 	if ( postType === 'page' ) {
 		const isListLayout = layout === 'list' || ! layout;
-		const showQuickEdit = quickEdit && ! isListLayout;
+		const showQuickEdit =
+			quickEdit && window.__experimentalQuickEditDataViews;
 		return {
 			key: 'pages',
 			areas: {
@@ -94,21 +104,35 @@ export default function useLayoutAreas() {
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
-				content: <PostList postType={ postType } />,
-				preview: ! showQuickEdit &&
-					( isListLayout || hasEditCanvasMode ) && <Editor />,
+				content:
+					showQuickEdit && isListLayout && !! postId ? (
+						<PostEdit
+							postType={ postType }
+							postId={ postId }
+							onBack={ () => {
+								history.push( {
+									postId,
+									postType,
+									activeView,
+								} );
+							} }
+						/>
+					) : (
+						<PostList postType={ postType } />
+					),
+				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
 				mobile: hasEditCanvasMode ? (
 					<Editor />
 				) : (
 					<PostList postType={ postType } />
 				),
-				edit: showQuickEdit && (
+				edit: showQuickEdit && ! isListLayout && (
 					<PostEdit postType={ postType } postId={ postId } />
 				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
-				edit: showQuickEdit ? 380 : undefined,
+				edit: showQuickEdit && ! isListLayout ? 380 : undefined,
 			},
 		};
 	}

@@ -6,13 +6,19 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	FlexBlock,
+	Button,
+} from '@wordpress/components';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,7 +29,7 @@ import { unlock } from '../../lock-unlock';
 
 const { PostCardPanel } = unlock( editorPrivateApis );
 
-function PostEditForm( { postType, postId } ) {
+function PostEditForm( { postType, postId, onBack } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
 	const { record } = useSelect(
 		( select ) => {
@@ -89,9 +95,23 @@ function PostEditForm( { postType, postId } ) {
 
 	return (
 		<VStack spacing={ 4 }>
-			{ ids.length === 1 && (
-				<PostCardPanel postType={ postType } postId={ ids[ 0 ] } />
-			) }
+			<HStack justify="flex-start">
+				{ onBack && (
+					<Button
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						onClick={ onBack }
+						label={ __( 'Go back to post list' ) }
+					/>
+				) }
+				{ ids.length === 1 && (
+					<FlexBlock>
+						<PostCardPanel
+							postType={ postType }
+							postId={ ids[ 0 ] }
+						/>
+					</FlexBlock>
+				) }
+			</HStack>
 			<DataForm
 				data={ ids.length === 1 ? record : multiEdits }
 				fields={ fields }
@@ -102,7 +122,7 @@ function PostEditForm( { postType, postId } ) {
 	);
 }
 
-export function PostEdit( { postType, postId } ) {
+export function PostEdit( { postType, postId, onBack } ) {
 	return (
 		<Page
 			className={ clsx( 'edit-site-post-edit', {
@@ -111,7 +131,11 @@ export function PostEdit( { postType, postId } ) {
 			label={ __( 'Post Edit' ) }
 		>
 			{ postId && (
-				<PostEditForm postType={ postType } postId={ postId } />
+				<PostEditForm
+					postType={ postType }
+					postId={ postId }
+					onBack={ onBack }
+				/>
 			) }
 			{ ! postId && <p>{ __( 'Select a page to edit' ) }</p> }
 		</Page>
