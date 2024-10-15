@@ -423,14 +423,13 @@ function PagesList( { hasResolved, pages } ) {
 	);
 }
 
-const root = createRoot(
-	document.querySelector( '#my-first-gutenberg-app' )
-);
 window.addEventListener(
 	'load',
 	function () {
+		const rootDomElement = document.getElementById( 'my-first-gutenberg-app' );
+		const root = createRoot( rootDomElement );
 		root.render(
-			<MyFirstApp />
+			<MyFirstApp />,
 		);
 	},
 	false
