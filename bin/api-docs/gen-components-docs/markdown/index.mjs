@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-const json2md = require( 'json2md' );
+import json2md from 'json2md';
 
 /**
  * Internal dependencies
  */
-const { generateMarkdownPropsJson } = require( './props' );
+import { generateMarkdownPropsJson } from './props.mjs';
 
-function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
 	const mainDocsJson = [
 		'<!-- This file is generated automatically and cannot be edited directly. -->\n',
 		{ h1: typeDocs.displayName },
@@ -38,7 +38,3 @@ function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
 		[ ...mainDocsJson, ...subcomponentDocsJson ].filter( Boolean )
 	);
 }
-
-module.exports = {
-	generateMarkdownDocs,
-};

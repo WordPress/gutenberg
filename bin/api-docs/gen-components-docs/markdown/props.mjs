@@ -17,7 +17,7 @@ function renderPropType( type ) {
 	}
 }
 
-function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
+export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
 	const sortedKeys = Object.keys( props ).sort( ( [ a ], [ b ] ) =>
 		a.localeCompare( b )
 	);
@@ -48,6 +48,3 @@ function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
 	return [ { [ `h${ headingLevel }` ]: 'Props' }, ...propsJson ];
 }
 
-module.exports = {
-	generateMarkdownPropsJson,
-};

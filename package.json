@@ -285,7 +285,7 @@
 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
 		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:api-ref docs:theme-ref",
-		"docs:components": "node ./bin/api-docs/gen-components-docs",
+		"docs:components": "node ./bin/api-docs/gen-components-docs/index.mjs",
 		"docs:gen": "node ./docs/tool/index.js",
 		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.mjs",
 		"env": "wp-env",
