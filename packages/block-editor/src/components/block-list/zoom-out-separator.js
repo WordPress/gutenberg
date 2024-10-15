@@ -125,11 +125,11 @@ export function ZoomOutSeparator( {
 					<motion.div
 						initial={ { opacity: 0 } }
 						animate={ { opacity: 1 } }
-						exit={ { opacity: 0, transition: { delay: 0 } } }
+						exit={ { opacity: 0, transition: { delay: -0.125 } } }
 						transition={ {
-							type: 'tween',
+							ease: 'linear',
 							duration: 0.1,
-							delay: 0.1,
+							delay: 0.125,
 						} }
 					>
 						{ __( 'Drop pattern.' ) }
