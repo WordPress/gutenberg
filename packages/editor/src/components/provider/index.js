@@ -182,6 +182,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					postTypes: getPostTypes( { per_page: -1 } ),
 				};
 			}, [] );
+		const postTypesSlugs = useMemo( () => {
+			return postTypes?.map( ( entity ) => entity.slug ) || [];
+		}, [ postTypes ] );
+
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
@@ -194,8 +198,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					postContext.postType = 'post';
 				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
 					// If the slug is single-{postType}, infer the post type from the slug.
-					const postTypesSlugs =
-						postTypes?.map( ( entity ) => entity.slug ) || [];
 					const match = post.slug.match(
 						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
 					);
@@ -222,9 +224,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			shouldRenderTemplate,
 			post.id,
 			post.type,
+			post.slug,
+			postTypesSlugs,
 			rootLevelPost.type,
 			rootLevelPost.slug,
-			postTypes,
 		] );
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
