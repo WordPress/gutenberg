@@ -1,0 +1,47 @@
+import { Meta, Typeset } from '@storybook/addon-docs/blocks';
+import { linkTo, hrefTo } from '@storybook/addon-links';
+
+<Meta title="Foundations/Design Language/Elevation" name="page" />
+
+# Elevation
+
+Elevation, through the use of shadows, visually indicates the layers where overlapping UI elements reside. Shadows create the illusion of depth, showing how one UI element is positioned above another on the z-axis. Elevation should be used to organize elements, establish a clear hierarchy, and draw focus to key components.
+
+In the WordPress components package there are four levels of elevation:
+
+<table>
+	<thead>
+		<tr>
+			<th>Elevation</th>
+			<th>Value</th>
+			<th>Examples</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Extra small</td>
+			<td>For large sections and containers that group related content and controls, and may shift and overlap on top of other content.</td>
+			<td>Preview Frame, Content Frame</td>
+		</tr>
+		<tr>
+			<td>Small</td>
+			<td>For components that provide contextual feedback without being overly intrusive. Generally non-interruptive.</td>
+			<td>Tooltips, Snackbars</td>
+		</tr>
+		<tr>
+			<td>Medium</td>
+			<td>For components that provide additional actions.</td>
+			<td>Menus, Command Palette</td>
+		</tr>
+		<tr>
+			<td>Large</td>
+			<td>For components that confirm or provide decisions or other interruption necessary tasks.</td>
+			<td>Modals</td>
+		</tr>
+	</tbody>
+</table>
+
+## Tokens
+
+Use tokens to apply elevation in your work. Please refer to the Tokens section of Storybook to learn more.
+
