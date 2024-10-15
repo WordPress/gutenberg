@@ -22,13 +22,13 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Quote' );
 
@@ -63,13 +63,13 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Paragraph' );
 

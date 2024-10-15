@@ -230,7 +230,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						'show-icon-labels': showIconLabels,
 					} ) }
 					styles={ styles }
-					enableRegionNavigation={ false }
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}

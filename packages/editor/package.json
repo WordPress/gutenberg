@@ -31,7 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",

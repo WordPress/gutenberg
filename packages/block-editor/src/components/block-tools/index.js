@@ -25,7 +25,6 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
-import getEditorRegion from '../../utils/get-editor-region';
 
 function selector( select ) {
 	const {
@@ -83,7 +82,6 @@ export default function BlockTools( {
 	} = useShowBlockTools();
 
 	const {
-		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
 		replaceBlocks,
@@ -94,8 +92,6 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
-
-	const blockSelectionButtonRef = useRef();
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
@@ -157,13 +153,6 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
-			} else if (
-				clientIds.length === 1 &&
-				event.target === blockSelectionButtonRef?.current
-			) {
-				event.preventDefault();
-				clearSelectedBlock();
-				getEditorRegion( __unstableContentRef.current )?.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
