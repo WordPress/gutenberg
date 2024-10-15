@@ -11,6 +11,8 @@ import path from 'path';
  */
 import { generateMarkdownDocs } from './markdown/index.mjs';
 
+const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
+
 // For consistency, options should generally match the options used in Storybook.
 const OPTIONS = {
 	shouldExtractLiteralValuesFromEnum: true,
@@ -43,7 +45,7 @@ function getTypeDocsForComponent( {
 	return typeDocs;
 }
 
-const manifests = glob.sync( 'packages/components/src/**/docs-manifest.json' );
+const manifests = glob.sync( MANIFEST_GLOB );
 
 await Promise.all(
 	manifests.map( async ( manifestPath ) => {
