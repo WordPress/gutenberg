@@ -34,8 +34,6 @@ import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
-const EMPTY_OBJECT = {};
-
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -192,46 +190,52 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// `useSelect` is used purposely here to ensure `getFieldsList`
-	// is updated whenever there are updates in block context.
-	// `source.getFieldsList` may also call a selector via `select`.
-	const _fieldsList = {};
-	const { fieldsList, canUpdateBlockBindings } = useSelect(
+	const { canUpdateBlockBindings } = useSelect( ( select ) => {
+		return {
+			canUpdateBlockBindings:
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
+		};
+	}, [] );
+
+	/**
+	 * Create new selector for fieldsList to avoid unnecessary re-renders.
+	 * See: https://github.com/WordPress/gutenberg/pull/64072#discussion_r1764693730
+	 *
+	 * `useSelect` is used purposely here to ensure `getFieldsList` is updated
+	 * whenever there are updates in block context.
+	 * `source.getFieldsList` may also call a selector via `registry.select`.
+	 */
+	// A constant object needs to be used to avoid unnecessary re-renders.
+	const context = {};
+	const fieldsList = useSelect(
 		( select ) => {
 			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
+				return;
 			}
+			const _fieldsList = {};
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
 				( [ sourceName, { getFieldsList, usesContext } ] ) => {
 					if ( getFieldsList ) {
 						// Populate context.
-						const context = {};
 						if ( usesContext?.length ) {
 							for ( const key of usesContext ) {
 								context[ key ] = blockContext[ key ];
 							}
 						}
-						const sourceList = getFieldsList( {
+						_fieldsList[ sourceName ] = getFieldsList( {
 							select,
 							context,
 						} );
-						// Only add source if the list is not empty.
-						if ( Object.keys( sourceList || {} ).length ) {
-							_fieldsList[ sourceName ] = { ...sourceList };
-						}
+
+						// Clean `context` variable for next iterations.
+						Object.keys( context ).forEach( ( key ) => {
+							delete context[ key ];
+						} );
 					}
 				}
 			);
-			return {
-				fieldsList:
-					Object.values( _fieldsList ).length > 0
-						? _fieldsList
-						: EMPTY_OBJECT,
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
-			};
+			return _fieldsList;
 		},
 		[ blockContext, bindableAttributes ]
 	);
@@ -251,9 +255,16 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
+	// Remove empty sources from the list of fields.
+	Object.entries( fieldsList || {} ).forEach( ( [ key, value ] ) => {
+		if ( ! Object.keys( value || {} ).length ) {
+			delete fieldsList[ key ];
+		}
+	} );
+
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly =
-		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
+		! canUpdateBlockBindings || ! Object.keys( fieldsList || {} ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
