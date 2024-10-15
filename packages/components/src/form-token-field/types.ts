@@ -190,6 +190,10 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	tokenizeOnBlur?: boolean;
+	/**
+	 * Custom component that will be rendered in the dropdown when no suggestions are found.
+	 */
+	__experimentalRenderNoSuggestionsFound?: React.ReactNode;
 }
 
 /**
@@ -207,6 +211,7 @@ export interface SuggestionsListProps<
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
 	__experimentalRenderItem?: ( args: { item: T } ) => ReactNode;
+	__experimentalRenderNoSuggestionsFound?: ReactNode;
 }
 
 export interface TokenProps extends TokenItem {

@@ -86,4 +86,8 @@ export type ComboboxControlProps = Pick<
 	 * If passed, the combobox input will show a placeholder string if no values are present.
 	 */
 	placeholder?: string;
+	/**
+	 * Custom component that will be rendered in the dropdown when no suggestions are found.
+	 */
+	__experimentalRenderNoSuggestionsFound?: React.ReactNode;
 };
