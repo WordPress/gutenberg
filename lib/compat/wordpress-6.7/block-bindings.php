@@ -30,6 +30,21 @@ function gutenberg_bootstrap_server_block_bindings_sources() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_server_block_bindings_sources', 5 );
 
 /**
+ * Map the `manage_block_bindings` capability to `manage_options`.
+ */
+function gutenberg_add_manage_block_bindings_capability() {
+	global $wp_roles;
+	foreach ( $wp_roles->roles as $role_name => $role_info ) {
+		$role = get_role( $role_name );
+		// Map the capability to `manage_options`.
+		if ( $role->has_cap( 'manage_options' ) ) {
+			$role->add_cap( 'manage_block_bindings' );
+		}
+	}
+}
+add_action( 'init', 'gutenberg_add_manage_block_bindings_capability' );
+
+/**
  * Initialize `canUpdateBlockBindings` editor setting if it doesn't exist. By default, it is `true` only for admin users.
  *
  * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
@@ -37,7 +52,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_server_block_bin
  */
 function gutenberg_add_can_update_block_bindings_editor_setting( $editor_settings ) {
 	if ( empty( $editor_settings['canUpdateBlockBindings'] ) ) {
-		$editor_settings['canUpdateBlockBindings'] = current_user_can( 'manage_options' );
+		$editor_settings['canUpdateBlockBindings'] = current_user_can( 'manage_block_bindings' );
 	}
 	return $editor_settings;
 }
