@@ -58,7 +58,6 @@ function gutenberg_add_edit_block_binding_capability( $caps, $cap, $user_id, $ar
 			if ( empty( $object_subtype ) ) {
 				return array( 'do_not_allow' );
 			}
-
 			$caps = map_meta_cap( "edit_{$object_subtype}", $user_id, $object_id );
 		}
 	}
@@ -74,7 +73,7 @@ add_filter( 'map_meta_cap', 'gutenberg_add_edit_block_binding_capability', 5, 4 
  * @return array The editor settings including `canUpdateBlockBindings`.
  */
 function gutenberg_add_can_update_block_bindings_editor_setting( $editor_settings, $block_editor_context ) {
-	if ( empty( $editor_settings['canUpdateBlockBindings'] ) ) {
+	if ( ! isset( $editor_settings['canUpdateBlockBindings'] ) ) {
 		$editor_settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', $block_editor_context );
 	}
 	return $editor_settings;
