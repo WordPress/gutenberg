@@ -50,7 +50,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
-	$search_query        = empty( $_GET['search'] ) ? '' : sanitize_text_field( $_GET['search'] );
+	$search_query        = empty( $_GET['instant-search'] ) ? '' : sanitize_text_field( $_GET['instant-search'] );
 
 	// Check if the Instant Search experiment is enabled.
 	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );

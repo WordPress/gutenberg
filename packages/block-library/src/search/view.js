@@ -95,9 +95,9 @@ const { state, actions } = store(
 				if ( 's' === name ) {
 					state.search = value;
 					if ( ! isEmpty( value ) ) {
-						url.searchParams.set( 'search', value );
+						url.searchParams.set( 'instant-search', value );
 					} else {
-						url.searchParams.delete( 'search' );
+						url.searchParams.delete( 'instant-search' );
 					}
 				}
 

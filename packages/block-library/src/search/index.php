@@ -183,7 +183,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		wp_interactivity_state(
 			'core/search',
 			array(
-				'search' => isset( $_GET['search'] ) ? $_GET['search'] : '',
+				'search' => isset( $_GET['instant-search'] ) ? $_GET['instant-search'] : '',
 			)
 		);
 	}
