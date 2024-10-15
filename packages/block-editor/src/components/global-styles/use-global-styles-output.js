@@ -885,6 +885,25 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 	return ruleset;
 };
 
+/**
+ * Generates CSS @font-face declarations based on font settings in the theme.json tree.
+ *
+ * This function processes font families defined in the theme's typography settings,
+ * creating @font-face rules for each font face. It handles both file-based and URL-based
+ * font sources, resolving file paths to URLs when necessary.
+ *
+ * @param {Object} tree - The theme.json tree containing typography settings.
+ * @return {string} A string of CSS @font-face rules for the defined fonts.
+ *
+ * @example
+ * // Example output:
+ * // @font-face {
+ * //   font-family: "Open Sans";
+ * //   font-style: normal;
+ * //   font-weight: 400;
+ * //   src: url('https://example.com/wp-content/themes/example/assets/fonts/open-sans-regular.woff2') format('woff2');
+ * // }
+ */
 const getFontFaceDeclarations = ( tree ) => {
 	const fonts = tree?.settings?.typography?.fontFamilies;
 	let ruleset = '';
