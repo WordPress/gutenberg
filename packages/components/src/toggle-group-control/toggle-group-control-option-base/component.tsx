@@ -141,10 +141,14 @@ function ToggleGroupControlOptionBase(
 					<Ariakit.Radio
 						disabled={ disabled }
 						onFocusVisible={ () => {
+							const selectedValueIsNullish =
+								toggleGroupControlContext.value === null ||
+								toggleGroupControlContext.value === '';
+
 							// Conditions ensure that the first visible focus to a radio group
 							// without a selected option will not automatically select the option.
 							if (
-								toggleGroupControlContext.value !== null ||
+								! selectedValueIsNullish ||
 								toggleGroupControlContext.activeItemIsNotFirstItem?.()
 							) {
 								toggleGroupControlContext.setValue( value );
