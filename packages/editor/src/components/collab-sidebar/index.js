@@ -18,13 +18,13 @@ import { collabSidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
-import AddCommentButton from './commentButton';
-import AddCommentToolbarButton from './commentButtonToolbar';
+import AddCommentButton from './comment-button';
+import AddCommentToolbarButton from './comment-button-toolbar';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 const modifyBlockCommentAttributes = ( settings, name ) => {
-	if ( name?.includes( 'core/' ) && ! settings.attributes.blockCommentId ) {
+	if ( ! settings.attributes.blockCommentId ) {
 		settings.attributes = {
 			...settings.attributes,
 			blockCommentId: {
@@ -66,12 +66,17 @@ export default function CollabSidebar() {
 
 	const clientId = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
-		setBlockCommentID(
-			select( blockEditorStore ).getBlock( getSelectedBlockClientId() )
-				?.attributes.blockCommentId
-		);
 		return getSelectedBlockClientId();
 	}, [] );
+
+	const blockDetails = useSelect(
+		( select ) => {
+			return clientId
+				? select( blockEditorStore ).getBlock( clientId )
+				: null;
+		},
+		[ clientId ]
+	);
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -90,11 +95,17 @@ export default function CollabSidebar() {
 			comment_approved: 0,
 		};
 
-		if ( parentCommentId ) {
-			args.parent = parentCommentId;
-		}
+		// Create a new object, conditionally including the parent property
+		const updatedArgs = {
+			...args,
+			...( parentCommentId ? { parent: parentCommentId } : {} ),
+		};
 
-		const savedRecord = await saveEntityRecord( 'root', 'comment', args );
+		const savedRecord = await saveEntityRecord(
+			'root',
+			'comment',
+			updatedArgs
+		);
 
 		if ( savedRecord ) {
 			// If it's a main comment, update the block attributes with the comment id.
@@ -212,8 +223,11 @@ export default function CollabSidebar() {
 	}, [ postId, getEntityRecords ] );
 
 	useEffect( () => {
+		if ( blockDetails ) {
+			setBlockCommentID( blockDetails?.attributes.blockCommentId );
+		}
 		fetchComments();
-	}, [ postId, fetchComments ] );
+	}, [ postId, fetchComments, clientId ] );
 
 	const allBlocks = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlocks();

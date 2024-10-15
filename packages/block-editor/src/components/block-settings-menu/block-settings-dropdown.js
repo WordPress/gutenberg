@@ -295,10 +295,10 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
+									<__unstableCommentIconFill.Slot
+										fillProps={ { onClose } }
+									/>
 								</MenuGroup>
-								<__unstableCommentIconFill.Slot
-									fillProps={ { onClose } }
-								/>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>
 										<CopyMenuItem
