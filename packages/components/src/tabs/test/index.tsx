@@ -129,7 +129,11 @@ const ControlledTabs = ( {
 				) ) }
 			</Tabs.TabList>
 			{ tabs.map( ( tabObj ) => (
-				<Tabs.TabPanel key={ tabObj.tabId } tabId={ tabObj.tabId }>
+				<Tabs.TabPanel
+					key={ tabObj.tabId }
+					tabId={ tabObj.tabId }
+					focusable={ tabObj.tabpanel?.focusable }
+				>
 					{ tabObj.content }
 				</Tabs.TabPanel>
 			) ) }
@@ -244,7 +248,7 @@ describe( 'Tabs', () => {
 			expect( alphaButton ).toHaveFocus();
 		} );
 
-		it( 'should focus on the first enabled tab when pressing the Tab key if no tab is selected', async () => {
+		it( 'should focus the first tab, even if disabled, when the current selected tab id doesnt match an existing one', async () => {
 			const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
 				tabObj.tabId === 'alpha'
 					? {
@@ -260,7 +264,7 @@ describe( 'Tabs', () => {
 			await render(
 				<ControlledTabs
 					tabs={ TABS_WITH_ALPHA_DISABLED }
-					selectedTabId={ null }
+					selectedTabId="non-existing-tab"
 				/>
 			);
 
@@ -275,6 +279,11 @@ describe( 'Tabs', () => {
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 
 			await press.Tab();
+			expect(
+				await screen.findByRole( 'tab', { name: 'Alpha' } )
+			).toHaveFocus();
+
+			await press.ArrowRight();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )
 			).toHaveFocus();
@@ -1228,12 +1237,12 @@ describe( 'Tabs', () => {
 
 						// Tab key should focus the currently selected tab, which is Beta.
 						await press.Tab();
-						await waitFor( async () =>
-							expect( await getSelectedTab() ).toHaveTextContent(
-								'Beta'
-							)
+						expect( await getSelectedTab() ).toHaveTextContent(
+							'Beta'
 						);
-						expect( await getSelectedTab() ).toHaveFocus();
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
 
 						await rerender(
 							<ControlledTabs
@@ -1243,12 +1252,10 @@ describe( 'Tabs', () => {
 							/>
 						);
 
-						// When the selected tab is changed, it should not automatically receive focus.
-
+						// When the selected tab is changed, focus should not be changed.
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Gamma'
 						);
-
 						expect(
 							screen.getByRole( 'tab', { name: 'Beta' } )
 						).toHaveFocus();
@@ -1282,7 +1289,9 @@ describe( 'Tabs', () => {
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Beta'
 						);
-						expect( await getSelectedTab() ).toHaveFocus();
+						expect(
+							screen.getByRole( 'tab', { name: 'Beta' } )
+						).toHaveFocus();
 
 						await rerender(
 							<>
@@ -1296,7 +1305,6 @@ describe( 'Tabs', () => {
 						);
 
 						// When the selected tab is changed, it should not automatically receive focus.
-
 						expect( await getSelectedTab() ).toHaveTextContent(
 							'Gamma'
 						);
