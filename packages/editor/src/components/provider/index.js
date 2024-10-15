@@ -179,7 +179,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					isReady: __unstableIsEditorReady(),
 					mode: getRenderingMode(),
 					selection: getEditorSelection(),
-					postTypes: getEntitiesConfig( 'postType' ),
+					postTypes:
+						post.type === 'wp_template'
+							? getEntitiesConfig( 'postType' )
+							: null,
 				};
 			}, [] );
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
