@@ -109,7 +109,15 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						'— '.repeat( level ) + decodeEntities( treeNode.name ),
+						'— '.repeat( level ) +
+						decodeEntities( treeNode.name ) +
+						( fieldValue
+							? ` (${ sprintf(
+									/* translators: %s: Post ID */
+									__( 'ID: %s' ),
+									treeNode.id
+							  ) })`
+							: '' ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -148,7 +156,15 @@ export function PageAttributesParent() {
 		if ( parentPostTitle && ! optsHasParent ) {
 			opts.unshift( {
 				value: parentPostId,
-				label: parentPostTitle,
+				label:
+					parentPostTitle +
+					( fieldValue
+						? ` (${ sprintf(
+								/* translators: %s: Post ID */
+								__( 'ID: %s' ),
+								parentPostId
+						  ) })`
+						: '' ),
 			} );
 		}
 		return opts;
