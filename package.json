@@ -207,7 +207,7 @@
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
 		"native": "npm run --prefix packages/react-native-editor",
 		"other:changelog": "node ./bin/plugin/cli.js changelog",
-		"other:check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios,@ampproject/remapping,human-signals,fb-watchman,walker,chrome-launcher,lighthouse-logger,chromium-edge-launcher\" \"wp-scripts check-licenses --dev\"",
+		"other:check-licenses": "concurrently \"node ./bin/check-licenses.mjs\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build",
 		"other:check-local-changes": "node ./bin/check-local-changes.js",
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
