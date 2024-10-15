@@ -120,7 +120,7 @@ export function Comments( {
 							confirmMessage={
 								// translators: message displayed when marking a comment as resolved
 								__(
-									'Are you sure you want to mark this thread as resolved?'
+									'Are you sure you want to mark this comment as resolved?'
 								)
 							}
 							confirmAction={ () => {
@@ -136,7 +136,7 @@ export function Comments( {
 							confirmMessage={
 								// translators: message displayed when deleting a comment
 								__(
-									'Are you sure you want to delete this thread?'
+									'Are you sure you want to delete this comment?'
 								)
 							}
 							confirmAction={ () => {
@@ -153,7 +153,7 @@ export function Comments( {
 	return (
 		<>
 			{
-				// If there are no threads, show a message indicating no threads are available.
+				// If there are no comments, show a message indicating no comments are available.
 				( ! Array.isArray( threads ) || threads.length === 0 ) && (
 					<VStack
 						alignment="left"
@@ -188,25 +188,30 @@ export function Comments( {
 						<CommentBoard thread={ thread } />
 						{ 'reply' === actionState?.action &&
 							thread.id === actionState?.id && (
-								<VStack
+								<HStack
 									alignment="left"
 									spacing="3"
 									justify="flex-start"
-									className="editor-collab-sidebar-panel__comment-field"
+									className="editor-collab-sidebar-panel__user-comment"
 								>
-									<CommentForm
-										onSubmit={ ( inputComment ) => {
-											onAddReply(
-												inputComment,
-												thread.id
-											);
-											setActionState( false );
-										} }
-										onCancel={ () =>
-											setActionState( false )
-										}
-									/>
-								</VStack>
+									<VStack
+										spacing="3"
+										className="editor-collab-sidebar-panel__comment-field"
+									>
+										<CommentForm
+											onSubmit={ ( inputComment ) => {
+												onAddReply(
+													inputComment,
+													thread.id
+												);
+												setActionState( false );
+											} }
+											onCancel={ () =>
+												setActionState( false )
+											}
+										/>
+									</VStack>
+								</HStack>
 							) }
 						{ 0 < thread?.reply?.length &&
 							thread.reply.map( ( reply ) => (
@@ -246,7 +251,6 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 		<>
 			<TextareaControl
 				__nextHasNoMarginBottom
-				className="editor-collab-sidebar-panel__comment-field-textarea"
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
 			/>
@@ -257,7 +261,6 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 						accessibleWhenDisabled
 						variant="primary"
 						onClick={ () => onSubmit( inputComment ) }
-						size="compact"
 						disabled={
 							0 === sanitizeCommentString( inputComment ).length
 						}
@@ -269,7 +272,6 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 					<Button
 						__next40pxDefaultSize
 						onClick={ onCancel }
-						size="compact"
 					>
 						{ _x( 'Cancel', 'Cancel comment edit' ) }
 					</Button>
@@ -307,14 +309,12 @@ function ConfirmNotice( { confirmMessage, confirmAction, discardAction } ) {
 					__next40pxDefaultSize
 					variant="primary"
 					onClick={ confirmAction }
-					size="compact"
 				>
 					{ __( 'Yes' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
 					onClick={ discardAction }
-					size="compact"
 				>
 					{ __( 'No' ) }
 				</Button>
