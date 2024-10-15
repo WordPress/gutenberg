@@ -13,6 +13,11 @@
 	}
 }
 
+// When inside a group block, make sure the embed is not collapsed.
+.wp-block-group .wp-block-embed {
+	width: 100%;
+}
+
 // Supply a min-width when inside a cover block, to prevent it from collapsing.
 .wp-block-cover .wp-block-embed {
 	min-width: 320px;
