@@ -101,7 +101,6 @@ export function AddComment( {
 					variant="tertiary"
 					text={ _x( 'Cancel', 'Cancel comment button' ) }
 					onClick={ handleCancel }
-					size="compact"
 				/>
 				<Button
 					__next40pxDefaultSize
@@ -112,7 +111,6 @@ export function AddComment( {
 						0 === sanitizeCommentString( inputComment ).length
 					}
 					onClick={ () => onSubmit( inputComment ) }
-					size="compact"
 				/>
 			</HStack>
 		</VStack>

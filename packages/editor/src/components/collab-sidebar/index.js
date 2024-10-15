@@ -130,7 +130,7 @@ export default function CollabSidebar() {
 
 		if ( savedRecord ) {
 			// translators: Comment resolved successfully
-			createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
+			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
@@ -151,7 +151,7 @@ export default function CollabSidebar() {
 			createNotice(
 				'snackbar',
 				// translators: Comment edited successfully
-				__( 'Thread edited successfully.' ),
+				__( 'Comment edited successfully.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -187,7 +187,7 @@ export default function CollabSidebar() {
 		createNotice(
 			'snackbar',
 			// translators: Comment deleted successfully
-			__( 'Thread deleted successfully.' ),
+			__( 'Comment deleted successfully.' ),
 			{
 				type: 'snackbar',
 				isDismissible: true,
