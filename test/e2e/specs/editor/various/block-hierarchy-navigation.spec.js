@@ -70,7 +70,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.click();
 
 		// Tweak the columns count.
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '3' );
+		await page.getByRole( 'radio', { name: '3' } ).check();
 
 		// Wait for the new column block to appear in the list view
 		const column = listView.getByRole( 'gridcell', {
@@ -129,7 +129,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		// Navigate to the block settings sidebar and tweak the column count.
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
 		await expect(
-			page.getByRole( 'slider', { name: 'Columns' } )
+			page.getByRole( 'radiogroup', { name: 'Columns' } )
 		).toBeFocused();
 		await page.keyboard.press( 'ArrowRight' );
 
