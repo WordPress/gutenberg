@@ -14,7 +14,11 @@ import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import {
+	getUniqueByProperty,
+	getValueFromVariable,
+	getPresetVariableFromValue,
+} from './utils';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
@@ -408,7 +412,7 @@ export function useColorsPerOrigin( settings ) {
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
-				colors: themeColors,
+				colors: getUniqueByProperty( themeColors, 'slug' ),
 			} );
 		}
 		if (
@@ -421,7 +425,7 @@ export function useColorsPerOrigin( settings ) {
 					'Default',
 					'Indicates this palette comes from WordPress.'
 				),
-				colors: defaultColors,
+				colors: getUniqueByProperty( defaultColors, 'slug' ),
 			} );
 		}
 		if ( customColors && customColors.length ) {
@@ -430,7 +434,7 @@ export function useColorsPerOrigin( settings ) {
 					'Custom',
 					'Indicates this palette is created by the user.'
 				),
-				colors: customColors,
+				colors: getUniqueByProperty( customColors, 'slug' ),
 			} );
 		}
 		return result;
@@ -456,7 +460,7 @@ export function useGradientsPerOrigin( settings ) {
 					'Theme',
 					'Indicates this palette comes from the theme.'
 				),
-				gradients: themeGradients,
+				gradients: getUniqueByProperty( themeGradients, 'slug' ),
 			} );
 		}
 		if (
@@ -469,7 +473,7 @@ export function useGradientsPerOrigin( settings ) {
 					'Default',
 					'Indicates this palette comes from WordPress.'
 				),
-				gradients: defaultGradients,
+				gradients: getUniqueByProperty( defaultGradients, 'slug' ),
 			} );
 		}
 		if ( customGradients && customGradients.length ) {
@@ -478,7 +482,7 @@ export function useGradientsPerOrigin( settings ) {
 					'Custom',
 					'Indicates this palette is created by the user.'
 				),
-				gradients: customGradients,
+				gradients: getUniqueByProperty( customGradients, 'slug' ),
 			} );
 		}
 		return result;

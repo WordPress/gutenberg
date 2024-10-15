@@ -58,13 +58,14 @@ import type {
 
 const DEFAULT_COLOR = '#000';
 
-function NameInput( { value, onChange, label }: NameInputProps ) {
+function NameInput( { value, onChange, label, className }: NameInputProps ) {
 	return (
 		<NameInputControl
 			label={ label }
 			hideLabelFromVision
 			value={ value }
 			onChange={ onChange }
+			className={ className }
 		/>
 	);
 }
@@ -196,6 +197,7 @@ function Option< T extends PaletteElement >( {
 	popoverProps: receivedPopoverProps,
 	slugPrefix,
 	isGradient,
+	isDuplicate,
 }: OptionProps< T > ) {
 	const value = isGradient ? element.gradient : element.color;
 	const [ isEditingColor, setIsEditingColor ] = useState( false );
@@ -231,6 +233,10 @@ function Option< T extends PaletteElement >( {
 				<FlexItem>
 					{ ! canOnlyChangeValues ? (
 						<NameInput
+							className={ clsx(
+								'components-palette-edit__name-input',
+								{ 'is-duplicate': isDuplicate }
+							) }
 							label={
 								isGradient
 									? __( 'Gradient name' )
@@ -306,7 +312,13 @@ function PaletteEditListView< T extends PaletteElement >( {
 			onChange( deduplicateElementSlugs( updatedElements ) ),
 		100
 	);
-
+	const isDuplicate = useCallback(
+		( optionElement: PaletteElement ) =>
+			elements.filter(
+				( element ) => element.slug === optionElement.slug
+			).length > 1,
+		[ elements ]
+	);
 	return (
 		<VStack spacing={ 3 }>
 			<ItemGroup isRounded>
@@ -316,6 +328,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 						canOnlyChangeValues={ canOnlyChangeValues }
 						key={ index }
 						element={ element }
+						isDuplicate={ isDuplicate( element ) }
 						onChange={ ( newElement ) => {
 							debounceOnChange(
 								elements.map(
@@ -387,6 +400,22 @@ export function PaletteEdit( {
 }: PaletteEditProps ) {
 	const isGradient = !! gradients;
 	const elements = isGradient ? gradients : colors;
+	const duplicateSlugs = elements?.length
+		? elements.filter( ( element, index ) => {
+				const slug = element.slug;
+				return (
+					!! slug &&
+					elements.findIndex( ( otherElement, otherIndex ) => {
+						return (
+							otherIndex !== index &&
+							otherElement.slug === slug &&
+							otherElement.slug !== undefined
+						);
+					} ) !== -1
+				);
+		  } )
+		: [];
+
 	const [ isEditing, setIsEditing ] = useState( false );
 	const [ editingElement, setEditingElement ] = useState<
 		number | null | undefined
@@ -615,6 +644,22 @@ export function PaletteEdit( {
 								disableCustomColors
 							/>
 						) ) }
+					{ ! canOnlyChangeValues &&
+						! isEditing &&
+						duplicateSlugs?.length > 0 && (
+							<div className="components-palette-edit__warning">
+								Some items in this palette have identical names.
+								To prevent styles conflicts, give each item a
+								unique name.
+								<Button
+									className="components-palette-edit__edit_palette_button"
+									variant="link"
+									onClick={ () => setIsEditing( true ) }
+								>
+									{ __( 'Edit this palette.' ) }
+								</Button>
+							</div>
+						) }
 				</PaletteEditContents>
 			) }
 			{ ! hasElements && emptyMessage && (

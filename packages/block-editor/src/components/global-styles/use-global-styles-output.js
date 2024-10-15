@@ -63,39 +63,43 @@ const { kebabCase } = unlock( componentsPrivateApis );
  * @return {Array<Object>} An array of style declarations.
  */
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
-	return PRESET_METADATA.reduce(
-		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
-			const presetByOrigin = getValueFromObjectPath(
-				blockPresets,
-				path,
-				[]
-			);
-			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
-				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( value ) => {
-						if ( valueKey && ! valueFunc ) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ value[ valueKey ] }`
-							);
-						} else if (
-							valueFunc &&
-							typeof valueFunc === 'function'
-						) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ valueFunc( value, mergedSettings ) }`
-							);
-						}
-					} );
-				}
-			} );
+	const declarationsMap = new Map();
+	for ( const {
+		path,
+		valueKey,
+		valueFunc,
+		cssVarInfix,
+	} of PRESET_METADATA ) {
+		const presetByOrigin = getValueFromObjectPath( blockPresets, path, [] );
+		for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+			const presets = presetByOrigin[ origin ];
+			if ( ! presets ) {
+				continue;
+			}
+			for ( const value of presets ) {
+				const key = `--wp--preset--${ cssVarInfix }--${ kebabCase(
+					value.slug
+				) }`;
+				let declarationValue;
 
-			return declarations;
-		},
-		[]
+				if ( valueKey && ! valueFunc ) {
+					declarationValue = value[ valueKey ];
+				} else if ( typeof valueFunc === 'function' ) {
+					declarationValue = valueFunc( value, mergedSettings );
+				}
+				/*
+				 * Overwrite any duplicates.
+				 * See corresponding frontend method: WP_Theme_JSON_Gutenberg::get_settings_slugs.
+				 */
+				if ( declarationValue ) {
+					declarationsMap.set( key, declarationValue );
+				}
+			}
+		}
+	}
+	return Array.from(
+		declarationsMap,
+		( [ key, value ] ) => `${ key }: ${ value }`
 	);
 }
 
