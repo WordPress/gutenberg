@@ -89,7 +89,7 @@ export function SocialLinksEdit( props ) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ logosOnly ] );
 
-	const placeholderClasses = classNames( 'wp-social-link', {
+	const placeholderClasses = clsx( 'wp-social-link', {
 		[ `has-${ iconColor.slug }-color` ]: iconColor.slug,
 		[ `has-${ iconBackgroundColor.slug }-background-color` ]:
 			iconBackgroundColor.slug,
@@ -104,21 +104,21 @@ export function SocialLinksEdit( props ) {
 		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div
-					className={ classNames(
+					className={ clsx(
 						'wp-social-link-twitter',
 						placeholderClasses
 					) }
 					style={ placeholderStyles }
 				></div>
 				<div
-					className={ classNames(
+					className={ clsx(
 						'wp-social-link-facebook',
 						placeholderClasses
 					) }
 					style={ placeholderStyles }
 				></div>
 				<div
-					className={ classNames(
+					className={ clsx(
 						'wp-social-link-instagram',
 						placeholderClasses
 					) }
