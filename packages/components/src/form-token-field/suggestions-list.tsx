@@ -31,6 +31,7 @@ export function SuggestionsList<
 	displayTransform,
 	instanceId,
 	__experimentalRenderItem,
+	__experimentalRenderNoSuggestionsFound,
 }: SuggestionsListProps< T > ) {
 	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
@@ -156,6 +157,12 @@ export function SuggestionsList<
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
+			{ suggestions.length === 0 &&
+				__experimentalRenderNoSuggestionsFound && (
+					<li className="components-form-token-field__suggestion">
+						{ __experimentalRenderNoSuggestionsFound }
+					</li>
+				) }
 		</ul>
 	);
 }
