@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
