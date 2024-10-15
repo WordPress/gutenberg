@@ -227,10 +227,9 @@ test.describe( 'Cover', () => {
 		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
 
-	test( 'z-index of Navigation block inside a Cover block is higher than the other cover inner blocks', async ( {
+	test( 'other cover blocks are not over the navigation block when the menu is open', async ( {
 		editor,
 		page,
-		coverBlockUtils,
 	} ) => {
 		// Insert a Cover block
 		await editor.insertBlock( { name: 'core/cover' } );
@@ -272,7 +271,7 @@ test.describe( 'Cover', () => {
 			} )
 			.click();
 
-		// Set the viewport to a small screen where the menu will become a modal and open it.
+		// Set the viewport to a small screen and open menu.
 		await page.setViewportSize( { width: 375, height: 1000 } );
 		const navigationBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
@@ -282,15 +281,21 @@ test.describe( 'Cover', () => {
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();
 
-		const menuZIndex = await coverBlockUtils.calculateZIndexContext(
-			coverBlock.locator( '.wp-block-navigation__responsive-container' )
+		// Check if inner container of the second cover is clickable.
+		const secondInnerContainer = secondCoverBlock.locator(
+			'.wp-block-cover__inner-container'
 		);
+		let isClickable;
+		try {
+			isClickable = await secondInnerContainer.click( {
+				trial: true,
+				timeout: 1000, // This test will always take 1 second to run.
+			} );
+		} catch ( error ) {
+			isClickable = false;
+		}
 
-		const innerBlocksZIndex = await coverBlockUtils.calculateZIndexContext(
-			secondCoverBlock.locator( '.wp-block-cover__inner-container' )
-		);
-
-		expect( menuZIndex ).toBeGreaterThan( innerBlocksZIndex );
+		expect( isClickable ).toBe( false );
 	} );
 } );
 
@@ -320,28 +325,5 @@ class CoverBlockUtils {
 		await locator.setInputFiles( tmpFileName );
 
 		return filename;
-	}
-
-	async calculateZIndexContext( element ) {
-		const zIndexResult = await element.evaluate( ( el ) => {
-			let zIndex = 0;
-			let currentElement = el;
-
-			while ( currentElement ) {
-				const computedStyle = window.getComputedStyle( currentElement );
-				const zIndexValue = parseInt( computedStyle.zIndex, 10 );
-
-				// If the element creates a new stacking context
-				if ( ! isNaN( zIndexValue ) ) {
-					zIndex = zIndexValue;
-				}
-
-				currentElement = currentElement.parentElement; // Move up the DOM tree
-			}
-
-			return zIndex;
-		} );
-
-		return zIndexResult;
 	}
 }
