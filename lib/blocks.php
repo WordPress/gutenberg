@@ -525,58 +525,66 @@ add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtere
  * @param object $editor_context An object that contains information about the current context.
  * @return array The filtered list of allowed block types.
  */
-function gutenberg_denied_block_types( $allowed_blocks, $editor_context ) {
-    // If $allowed_blocks is empty or not provided, fetch all registered blocks
-    if ( ! $allowed_blocks || ! is_array( $allowed_blocks ) ) {
-        $allowed_blocks = array_keys( WP_Block_Type_Registry::get_instance()->get_all_registered() );
-    }
+function gutenberg_denied_block_types($allowed_blocks, $editor_context)
+{
+	// If $allowed_blocks is empty or not provided, fetch all registered blocks
+	if (!$allowed_blocks || !is_array($allowed_blocks)) {
+		$allowed_blocks = array_keys(WP_Block_Type_Registry::get_instance()->get_all_registered());
+	}
 
-    // Check if the current context is post or site editor
-    if ( isset( $editor_context->post ) ) {
-        // Get the current post type
-        $post_type = get_post_type( $editor_context->post );
+	// Check if the current context is post or site editor
+	if (isset($editor_context->post)) {
+		// Get the current post type
+		$post_type = get_post_type($editor_context->post);
 
-        // Example: Deny specific blocks for 'post' post type
-        if ( $post_type === 'post' ) {
-            // Deny specific blocks by removing them from $allowed_blocks
-            $denied_blocks = array(
-                'core/gallery',
-                'core/cover',
-            );
-            $allowed_blocks = array_diff( $allowed_blocks, $denied_blocks );
-        } elseif ( $post_type === 'page' ) {
-            // Deny specific blocks for pages
-            $denied_blocks = array(
-                'core/quote',
-                'core/video',
-            );
-            $allowed_blocks = array_diff( $allowed_blocks, $denied_blocks );
-        }
-    }
+		// Example: Deny specific blocks for 'post' post type
+		if ($post_type === 'post') {
+			// Deny specific blocks by removing them from $allowed_blocks
+			$denied_blocks = array(
+				'core/galledry',
+				'core/cover',
+			);
+			$allowed_blocks = array_diff($allowed_blocks, $denied_blocks);
+		} elseif ($post_type === 'page') {
+			// Deny specific blocks for pages
+			$denied_blocks = array(
+				'core/quote',
+				'core/video',
+			);
+			$allowed_blocks = array_diff($allowed_blocks, $denied_blocks);
+		}
+	}
 
-    // Deny blocks in the Site Editor context
-    if ( isset( $editor_context->name ) && 'core/edit-site' === $editor_context->name ) {
+	// Deny blocks in the Site Editor context
+	if (isset($editor_context->name) && 'core/edit-site' === $editor_context->name) {
 
-        // Get the template ID from the post being edited
-        $current_template = get_post();
+		if (isset($_GET['postId'])) { //phpcs:ignore
 
-        if ( $current_template && $current_template->post_name === 'home' ) {
-            // Deny specific blocks for the 'home' template
-            $denied_blocks = array(
-                'core/columns',
-                'core/quote',
-            );
-            $allowed_blocks = array_diff( $allowed_blocks, $denied_blocks );
-        } else {
-            // Deny specific blocks for other templates
-            $denied_blocks = array(
-                'core/gallery',
-                'core/cover',
-            );
-            $allowed_blocks = array_diff( $allowed_blocks, $denied_blocks );
-        }
-    }
-    return array_values($allowed_blocks);
+			$template_post_id = sanitize_text_field(wp_unslash($_GET['postId'])); //phpcs:ignore
+
+			$template_post = get_block_template($template_post_id,'wp_template');
+
+			if ($template_post) {
+				// Now you can use this template slug to apply conditions and deny blocks
+				if ('archive' === $template_post->slug) {
+					$denied_blocks = array(
+						'core/columns',
+						'core/quote',
+					);
+					$allowed_blocks = array_diff($allowed_blocks, $denied_blocks);
+				} elseif ($template_post->slug === 'single') {
+					// Deny specific blocks for other templates
+					$denied_blocks = array(
+						'core/gallery',
+						'core/cover',
+					);
+					$allowed_blocks = array_diff($allowed_blocks, $denied_blocks);
+				}
+			}
+
+		}
+	}
+	return array_values($allowed_blocks);
 }
 
-add_filter( 'allowed_block_types_all', 'gutenberg_denied_block_types', 10, 2 );
+add_filter('allowed_block_types_all', 'gutenberg_denied_block_types', 10, 2);
