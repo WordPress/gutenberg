@@ -81,7 +81,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		 * 4. The query already has posts.
 		 */
 		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) && $query->have_posts() ) {
-			$args = array_merge( $query->query_vars, array( 's' => $search_query ) );
+			$args  = array_merge( $query->query_vars, array( 's' => $search_query ) );
 			$query = new WP_Query( $args );
 		}
 	} else {
