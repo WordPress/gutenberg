@@ -104,6 +104,17 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'Should reject blocks with the block name itself as the only parent attribute value', () => {
+			const block = registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				parent: [ 'core/test-block' ],
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block core/test-block cannot be a parent of itself. Please remove the block name from the parent list.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
 			expect( console ).toHaveWarnedWith(
