@@ -379,7 +379,10 @@ describe( 'Interactivity API', () => {
 			const target = proxifyState< any >( 'test', { a: 1, b: 2 } );
 			const source = { a: 1, b: 2, c: 3 };
 
-			const spy = jest.fn( () => Object.keys( target ) );
+			let keys: any;
+			const spy = jest.fn( () => {
+				keys = Object.keys( target );
+			} );
 			effect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -387,7 +390,7 @@ describe( 'Interactivity API', () => {
 			deepMerge( target, source, false );
 
 			expect( spy ).toHaveBeenCalledTimes( 2 );
-			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
+			expect( keys ).toEqual( [ 'a', 'b', 'c' ] );
 		} );
 
 		it( 'should handle deeply nested properties that are initially undefined', () => {
