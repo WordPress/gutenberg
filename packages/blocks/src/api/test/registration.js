@@ -110,7 +110,7 @@ describe( 'blocks', () => {
 				parent: [ 'core/test-block' ],
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block core/test-block cannot be a parent of itself. Please remove the block name from the parent list.'
+				'Block "core/test-block" cannot be a parent of itself. Please remove the block name from the parent list.'
 			);
 			expect( block ).toBeUndefined();
 		} );
