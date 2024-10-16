@@ -45,6 +45,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			{ name: 'core/image' },
 			{ name: 'core/paragraph' },
 		] );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' )
+		).toBeFocused();
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
