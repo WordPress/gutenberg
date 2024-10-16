@@ -6,10 +6,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 This document outlines the various tokens relating to elevation in the WordPress components system.
 
-
 ## Values
 
-Tokens can be used in different ways, but regardless of which method is used, each token references the following values:
 
 <table>
 	<thead>
@@ -37,44 +35,47 @@ Tokens can be used in different ways, but regardless of which method is used, ea
 		</tr>
 	</tbody>
 </table>
+Tokens can be used in different ways, but regardless of which method is used, each token is meant to be used as the value of the CSS `box-shadow` property, and references the following values:
 
 ## CSS tokens
 
 Elevation tokens are defined as SASS variables:
 
-* `$elevation-x-small`
-* `$elevation-small`
-* `$elevation-medium`
-* `$elevation-large`
+-   `$elevation-x-small`
+-   `$elevation-small`
+-   `$elevation-medium`
+-   `$elevation-large`
 
 They can be used like so:
 
 ```css
-.my-component {
+.elevation-extra-small {
 	box-shadow: $elevation-x-small;
+}
+.elevation-small {
+	box-shadow: $elevation-small;
+}
+.elevation-medium {
+	box-shadow: $elevation-medium;
+}
+.elevation-large {
+	box-shadow: $elevation-large;
 }
 ```
 
-
-
 ## JS tokens
 
-Elevation tokens are also defined as configuration values in the WordPress components package:
+When working in the `@wordpress/components` package, the elevation tokens can also be consumed as JavaScript variables via the `CONFIG` object found in the `packages/components/src/utils/index.js` file:
 
-* `CONFIG.elevationXSmall`
-* `CONFIG.elevationSmall`
-* `CONFIG.elevationMedium`
-* `CONFIG.elevationLarge`
-
-
-If you're working on a component in that package you can access those values by importing:
+-   `CONFIG.elevationXSmall`
+-   `CONFIG.elevationSmall`
+-   `CONFIG.elevationMedium`
+-   `CONFIG.elevationLarge`
 
 ```js
+// Note: the `CONFIG` object is only available within the `@wordpress/components` package.
 import { CONFIG } from '../utils';
-```
 
-And applying them:
-
-```js
+// Later in the code:
 box-shadow: ${ CONFIG.elevationXSmall };
 ```
