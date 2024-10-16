@@ -2732,17 +2732,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The block nodes in theme.json.
 	 */
 	private static function get_block_nodes( $theme_json, $selectors = array(), $options = array() ) {
-		$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
-		$nodes     = array();
-		if ( ! isset( $theme_json['styles'] ) ) {
-			return $nodes;
-		}
+		$nodes = array();
 
-		// Blocks.
 		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
 			return $nodes;
 		}
 
+		$selectors               = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$include_variations      = $options['include_block_style_variations'] ?? false;
 		$include_node_paths_only = $options['include_node_paths_only'] ?? false;
 
