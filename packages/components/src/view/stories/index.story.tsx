@@ -10,7 +10,8 @@ import { View } from '..';
 
 const meta: Meta< typeof View > = {
 	component: View,
-	title: 'Components (Experimental)/View',
+	title: 'Components/Layout/View',
+	id: 'components-view',
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: 'text' } },

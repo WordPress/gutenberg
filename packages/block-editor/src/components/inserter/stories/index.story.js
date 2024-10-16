@@ -6,7 +6,7 @@ import { ExperimentalBlockEditorProvider } from '../../provider';
 import { patternCategories, patterns, reusableBlocks } from './utils/fixtures';
 import Inserter from '../';
 
-export default { title: 'BlockEditor/Inserter' };
+export default { title: 'Block Editor/Inserter' };
 
 export const LibraryWithoutPatterns = () => {
 	const wrapperStyle = {

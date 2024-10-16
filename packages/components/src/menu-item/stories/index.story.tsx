@@ -17,7 +17,8 @@ import Shortcut from '../../shortcut';
 
 const meta: Meta< typeof MenuItem > = {
 	component: MenuItem,
-	title: 'Components/MenuItem',
+	title: 'Components/Menus/MenuItem',
+	id: 'components-menuitem',
 	argTypes: {
 		children: { control: { type: null } },
 		icon: {

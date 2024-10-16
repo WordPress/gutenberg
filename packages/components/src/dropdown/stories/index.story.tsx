@@ -13,7 +13,8 @@ import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
-	title: 'Components/Dropdown',
+	title: 'Components/Selection & Input/Dropdown',
+	id: 'components-dropdown',
 	component: Dropdown,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { DropdownContentWrapper },

@@ -16,7 +16,8 @@ import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof MenuItemsChoice > = {
 	component: MenuItemsChoice,
-	title: 'Components/MenuItemsChoice',
+	title: 'Components/Menus/MenuItemsChoice',
+	id: 'components-menuitemschoice',
 	argTypes: {
 		onHover: { action: 'onHover' },
 		onSelect: { action: 'onSelect' },

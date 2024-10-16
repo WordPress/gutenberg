@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import TextDecorationControl from '../';
 
 export default {
-	title: 'BlockEditor/TextDecorationControl',
+	title: 'Block Editor/TextDecorationControl',
 	component: TextDecorationControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

@@ -22,7 +22,8 @@ import type { CombinedField, View } from '../../../types';
 import './style.css';
 
 const meta = {
-	title: 'DataViews/DataViews',
+	title: 'Components/Table/DataViews',
+	id: 'dataviews-dataviews',
 	component: DataViews,
 };
 export default meta;

@@ -98,7 +98,7 @@ function BlockMoverStory() {
 }
 
 export default {
-	title: 'BlockEditor/BlockMover',
+	title: 'Block Editor/BlockMover',
 };
 
 export const _default = () => {

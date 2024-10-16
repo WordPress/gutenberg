@@ -15,7 +15,8 @@ import DatePicker from '../date';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DatePicker > = {
-	title: 'Components/DatePicker',
+	title: 'Components/Selection & Input/Time & Date/DatePicker',
+	id: 'components-datepicker',
 	component: DatePicker,
 	argTypes: {
 		currentDate: { control: 'date' },

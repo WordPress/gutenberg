@@ -10,7 +10,8 @@ import ButtonGroup from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof ButtonGroup > = {
-	title: 'Components/ButtonGroup',
+	title: 'Components/Actions/ButtonGroup',
+	id: 'components-buttongroup',
 	component: ButtonGroup,
 	argTypes: {
 		children: { control: { type: null } },

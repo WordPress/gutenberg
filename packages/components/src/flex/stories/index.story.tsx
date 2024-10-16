@@ -11,7 +11,8 @@ import { View } from '../../view';
 
 const meta: Meta< typeof Flex > = {
 	component: Flex,
-	title: 'Components/Flex',
+	title: 'Components/Layout/Flex',
+	id: 'components-flex',
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
