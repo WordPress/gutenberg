@@ -378,11 +378,6 @@ function Iframe( {
 			`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
 		);
 
-		// iframeDocument.documentElement.style.setProperty(
-		// 	'--wp-block-editor-iframe-zoom-out-outer-container-width',
-		// 	`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
-		// );
-
 		return () => {
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-scale'
