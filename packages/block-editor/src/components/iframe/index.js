@@ -356,6 +356,20 @@ function Iframe( {
 				: scale
 		);
 
+		// Get the current scroll position of the iframe
+		const scrollY = iframeDocument.defaultView.scrollY;
+
+		// Figure out where this center point will be when the iframe is scaled
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scroll-y',
+			`${ scrollY }px`
+		);
+
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scroll-y-percentage',
+			scrollY / contentHeight
+		);
+
 		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',

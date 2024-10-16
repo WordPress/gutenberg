@@ -11,7 +11,7 @@
 	// We don't want to animate the transform of the translateX because it is used
 	// to "center" the canvas. Leaving it on causes the canvas to slide around in
 	// odd ways.
-	transition: $zoomOutAnimation, transform 0s scale 0s;
+	transition: $zoomOutAnimation, transform 0s translate 0s scale 0s;
 	@include reduce-motion("transition");
 
 	&.zoom-out-animation {
@@ -29,7 +29,11 @@
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$outer-container-width: var(--wp-block-editor-iframe-zoom-out-outer-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
-	// Apply an X translation to center the scaled content within the available space.
+	$scroll-y: var(--wp-block-editor-iframe-zoom-out-scroll-y, 0);
+	$scroll-y-percentage: var(--wp-block-editor-iframe-zoom-out-scroll-y-percentage, 0);
+	// Use translate with a 0 on the x, and then override it on the transform so we can animate the Y
+	// translation without animating the X.
+	translate: 0 calc(#{$scroll-y} * (1 - #{$scale}));
 	transform: translateX(calc(( #{$outer-container-width} - #{ $container-width }) / 2 / #{$scale}));
 	scale: #{$scale};
 	background-color: $gray-300;
@@ -39,7 +43,16 @@
 	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
 	$total-frame-height: calc(2 * #{$frame-size} / #{$scale});
 	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
-	margin-bottom: calc(-1 * #{$total-height});
+	// margin-top: calc(-1 * #{$total-height} *  #{$scroll-y-percentage});
+	// margin-bottom: calc(-1 * #{$total-height} * ( 1 -  #{$scroll-y-percentage} ) );
+	$scaled-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
+
+	// Our transform origin point needs to be at the top of the content, as the bottom is removed from the
+	// frame by the negative margin. We can find the scroll point by taking the scroll position when entering
+	// zoom out and ...?
+	// We remove the transform origin from the scroll y from the margin top value
+	// margin-top: calc(-1 * #{$scaled-scroll-y});
+
 	// Add the top/bottom frame size. We use scaling to account for the left/right, as
 	// the padding left/right causes the contents to reflow, which breaks the 1:1 scaling
 	// of the content.
@@ -47,7 +60,7 @@
 	padding-bottom: calc(#{$frame-size} / #{$scale});
 
 	body {
-		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
+		min-height: $scaled-height;
 
 		> .is-root-container:not(.wp-block-post-content) {
 			flex: 1;
