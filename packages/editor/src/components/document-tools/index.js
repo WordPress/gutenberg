@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import PluginHeaderToolbar from '../header-toolbar-slot/header-toolbar-slot';
 
 /**
  * WordPress dependencies
@@ -177,6 +178,9 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 								size="compact"
 							/>
 						) }
+						<div className="block-editor-header-toolbar-extender">
+							<PluginHeaderToolbar.Slot />
+						</div>
 					</>
 				) }
 			</div>
