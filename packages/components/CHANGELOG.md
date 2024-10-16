@@ -10,6 +10,7 @@
 -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
 -   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
 -   `Button`: fix `box-shadow` transition for secondary variation ([#66045](https://github.com/WordPress/gutenberg/pull/66045)).
+-   `ToggleGroupControl`: Don't set value on focus after a reset ([#66151](https://github.com/WordPress/gutenberg/pull/66151)).
 
 ### Deprecations
 
