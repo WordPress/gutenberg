@@ -215,9 +215,9 @@ function BlockPatternsList(
 
 		setActiveCompositeId( firstCompositeItemId );
 	}, [ shownPatterns, blockPatterns ] );
-	const handleClickPattern = ( pattern ) => {
-		setActivePattern( pattern.name ); // Set the clicked pattern as active
-		onClickPattern( pattern ); // Original onClick logic
+	const handleClickPattern = ( pattern, blocks ) => {
+		setActivePattern( pattern.name );
+		onClickPattern( pattern, blocks );
 	};
 	return (
 		<Composite
