@@ -69,22 +69,22 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		if ( in_the_loop() ) {
 			$query = clone $wp_query;
 			$query->rewind_posts();
-			$query_args = $wp_query->query_vars;
-
-			// Add search parameter if it exists.
-			if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
-				$query_args['s'] = $search_query;
-			}
-			$query->query( $query_args );
 		} else {
-			// The query has not been run yet, modify the global query.
-			if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
-				$wp_query->set( 's', $search_query );
-			}
 			$query = $wp_query;
 		}
-	} else {
 
+		/*
+		 * If the following conditions are met, run a new query with the search query:
+		 * 1. Enhanced pagination is on.
+		 * 2. Instant search is enabled.
+		 * 3. The search query is not empty.
+		 * 4. The query already has posts.
+		 */
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) && $query->have_posts() ) {
+			$args = array_merge( $query->query_vars, array( 's' => $search_query ) );
+			$query = new WP_Query( $args );
+		}
+	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 
 		// Add search parameter if enhanced pagination is on and search query exists
