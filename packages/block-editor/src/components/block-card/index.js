@@ -22,7 +22,15 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
-function BlockCard( { title, icon, description, blockType, className, name, inspectorBlockInfo } ) {
+function BlockCard({
+    title,
+    icon,
+    description,
+    blockType,
+    className,
+    name,
+    inspectorBlockInfo,
+}) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
