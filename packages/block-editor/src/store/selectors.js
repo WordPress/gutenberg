@@ -6,7 +6,7 @@ import {
 	getBlockTypes,
 	getBlockVariations,
 	hasBlockSupport,
-	getPossibleBlockTransformations,
+	getPossibleTransformationsForBlocks,
 	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -2217,6 +2217,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
  * @property {string}          name         The type of block to create.
  * @property {string}          title        Title of the item, as it appears in the inserter.
  * @property {string}          icon         Dashicon for the item, as it appears in the inserter.
+ * @property {Object}          transform    The block transform config to use.
+ * @property {string|null}     variation    The specific varaition for the block, if applicable.
  * @property {boolean}         isDisabled   Whether or not the user should be prevented from inserting
  *                                          this item.
  * @property {number}          frecency     Heuristic that combines frequency and recency.
@@ -2240,19 +2242,56 @@ export const getBlockTransformItems = createSelector(
 			] )
 		);
 
-		const possibleTransforms = getPossibleBlockTransformations(
+		const possibleTransforms = getPossibleTransformationsForBlocks(
 			normalizedBlocks
-		).reduce( ( accumulator, block ) => {
-			if ( itemsByName[ block?.name ] ) {
-				accumulator.push( itemsByName[ block.name ] );
+		).reduce( ( accumulator, { blockName, transform } ) => {
+			if ( itemsByName[ blockName ] ) {
+				const { title, icon, ...item } = itemsByName[ blockName ];
+
+				let id = blockName;
+				if ( transform.name ) {
+					id += `/${ transform.name }`;
+				}
+
+				accumulator.push( {
+					...item,
+					id,
+					// Use transform title/icon if set
+					title: transform.title ?? title,
+					icon: transform.icon ?? icon,
+					transform,
+					variation: null,
+				} );
+
+				// Add variations if it's the generic transform
+				if ( ! transform.name ) {
+					// Get switcher-scoped variations, add them as well
+					const transformVariations = getBlockVariations(
+						blockName,
+						'switcher'
+					);
+					for ( const variation of transformVariations ) {
+						if ( variation.isDefault ) {
+							continue;
+						}
+
+						accumulator.push( {
+							...item,
+							id: `${ item.id }/${ variation.name }`,
+							title: variation.title,
+							// Use block icon if variation has none
+							icon: variation.icon ?? icon,
+							transform,
+							// Flag the variation to use when selected
+							variation: variation.name,
+						} );
+					}
+				}
 			}
 			return accumulator;
 		}, [] );
-		return orderBy(
-			possibleTransforms,
-			( block ) => itemsByName[ block.name ].frecency,
-			'desc'
-		);
+
+		return orderBy( possibleTransforms, ( item ) => item.frecency, 'desc' );
 	},
 	( state, blocks, rootClientId ) => [
 		getBlockTypes(),

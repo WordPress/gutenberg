@@ -3548,6 +3548,13 @@ describe( 'selectors', () => {
 						},
 						{
 							type: 'block',
+							name: 'alt-transform-a2b',
+							title: 'Transforms b Alternative',
+							blocks: [ 'core/with-tranforms-b' ],
+							transform: () => {},
+						},
+						{
+							type: 'block',
 							blocks: [ 'core/with-tranforms-c' ],
 							transform: () => {},
 						},
@@ -3562,6 +3569,20 @@ describe( 'selectors', () => {
 						},
 					],
 				},
+				variations: [
+					{
+						name: 'variation-transform',
+						title: 'Transform Variation',
+						attributes: {},
+						scope: [ 'transform' ],
+					},
+					{
+						name: 'variation-switcher',
+						title: 'Switcher Variation',
+						attributes: {},
+						scope: [ 'switcher' ],
+					},
+				],
 			} );
 			registerBlockType( 'core/with-tranforms-b', {
 				category: 'text',
@@ -3618,27 +3639,35 @@ describe( 'selectors', () => {
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
-			expect( items ).toHaveLength( 2 );
+			expect( items ).toHaveLength( 3 );
 			const returnedProps = Object.keys( items[ 0 ] );
 			// Verify we have only the wanted props.
-			expect( returnedProps ).toHaveLength( 6 );
+			expect( returnedProps ).toHaveLength( 8 );
 			expect( returnedProps ).toEqual(
 				expect.arrayContaining( [
 					'id',
 					'name',
+					'variation',
 					'title',
 					'icon',
 					'frecency',
 					'isDisabled',
+					'transform',
 				] )
 			);
 			expect( items ).toEqual(
 				expect.arrayContaining( [
 					expect.objectContaining( {
 						name: 'core/with-tranforms-b',
+						title: 'Tranforms b',
 					} ),
 					expect.objectContaining( {
 						name: 'core/with-tranforms-c',
+						title: 'Tranforms c',
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+						title: 'Transforms b Alternative',
 					} ),
 				] )
 			);
@@ -3659,7 +3688,7 @@ describe( 'selectors', () => {
 			};
 			const block = { name: 'core/with-tranforms-a' };
 			const items = getBlockTransformItems( state, block );
-			expect( items ).toHaveLength( 2 );
+			expect( items ).toHaveLength( 3 );
 		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = {
@@ -3746,16 +3775,23 @@ describe( 'selectors', () => {
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
-			expect( items ).toHaveLength( 2 );
+			expect( items ).toHaveLength( 3 );
 			expect( items ).toEqual(
 				expect.arrayContaining( [
 					expect.objectContaining( {
 						name: 'core/with-tranforms-b',
+						title: 'Tranforms b',
 						isDisabled: false,
 					} ),
 					expect.objectContaining( {
 						name: 'core/with-tranforms-c',
+						title: 'Tranforms c',
 						isDisabled: true,
+					} ),
+					expect.objectContaining( {
+						name: 'core/with-tranforms-b',
+						title: 'Transforms b Alternative',
+						isDisabled: false,
 					} ),
 				] )
 			);
@@ -3780,10 +3816,16 @@ describe( 'selectors', () => {
 			};
 			const blocks = [ { name: 'core/with-tranforms-c' } ];
 			const items = getBlockTransformItems( state, blocks );
-			expect( items ).toHaveLength( 1 );
+			expect( items ).toHaveLength( 2 );
 			expect( items[ 0 ] ).toEqual(
 				expect.objectContaining( {
 					name: 'core/with-tranforms-a',
+					variation: null,
+					frecency: 2.5,
+				} ),
+				expect.objectContaining( {
+					name: 'core/with-tranforms-a',
+					variation: 'variation-switcher',
 					frecency: 2.5,
 				} )
 			);
