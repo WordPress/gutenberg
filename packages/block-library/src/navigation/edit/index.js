@@ -82,7 +82,7 @@ function useResponsiveMenu( navRef ) {
 			return;
 		}
 
-		const htmlElement = navRef.current.closest( 'html' );
+		const htmlElement = navRef.current.ownerDocument.documentElement;
 
 		// Add a `has-modal-open` class to the <html> when the responsive
 		// menu is open. This reproduces the same behavior of the frontend.
