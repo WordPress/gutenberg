@@ -81,7 +81,7 @@ function BlockCard( { title, icon, description, blockType, className, name } ) {
 						{ description }
 					</Text>
 				) }
-				<div className="block-editor-block-card__description-extender">
+				<div className="block-editor-block-card__inspector-block-info">
 					<InspectorBlockInfoFill.Slot />
 				</div>
 			</VStack>
