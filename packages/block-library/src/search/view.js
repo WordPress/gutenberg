@@ -100,7 +100,7 @@ const { state, actions } = store(
 					return;
 				}
 
-				const url = new URL( window.location );
+				const url = new URL( window.location.href );
 				if ( ! isEmpty( value ) ) {
 					state.search = value;
 					url.searchParams.set( 'instant-search', value );
