@@ -1136,7 +1136,7 @@ store( 'myPlugin', {
 
 This function is analogous to `getContext()`, but with 2 key differences:
 
-1. Whenever [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from the [Interactivity Router package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/) is called, the object returned by `getServerContext()` is updated. This is useful when you want to update the context of a block based on **new** context coming from the page loaded via `actions.navigate()`. This "new" context would be present in the HTML of the page loaded via `actions.navigate()`. This is not possible with `getContext()`, since it would return the context of the current page, not the page loaded via `actions.navigate()`.
+1. Whenever [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/) is called, the object returned by `getServerContext()` is updated. This is useful when you want to update the context of a block based on **new** context coming from the page loaded via `actions.navigate()`. This new context is embedded in the HTML of the page loaded via `actions.navigate()`.
 2. The object returned by `getServerContext()` is read-only.
 
 The server context cannot be directly used in directives, but you can use callbacks to subscribe to its changes.
