@@ -90,6 +90,7 @@ function gutenberg_test_block_bindings_registration() {
 		'post',
 		'text_custom_field',
 		array(
+			'label'        => 'Text custom field',
 			'default'      => 'Value of the text custom field',
 			'show_in_rest' => true,
 			'single'       => true,
@@ -106,6 +107,69 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'string',
 		)
 	);
+	register_meta(
+		'post',
+		'object_custom_field',
+		array(
+			'label'        => 'Object custom field',
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'object',
+			'default'      => json_decode( json_encode( array( 'foo' => 'bar' ) ), false ),
+		)
+	);
+	register_meta(
+		'post',
+		'array_custom_field',
+		array(
+			'label'        => 'Array custom field',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'single'       => true,
+			'type'         => 'array',
+			'default'      => array(),
+		)
+	);
+	register_meta(
+		'post',
+		'number',
+		array(
+			'label'        => 'Number custom field',
+			'type'         => 'number',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5.5,
+		)
+	);
+	register_meta(
+		'post',
+		'integer',
+		array(
+			'label'        => 'Integer custom field',
+			'type'         => 'integer',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5,
+		)
+	);
+	register_meta(
+		'post',
+		'boolean',
+		array(
+			'label'        => 'Boolean custom field',
+			'type'         => 'boolean',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => true,
+		)
+	);
+
 	// Register CPT custom fields.
 	register_meta(
 		'post',
