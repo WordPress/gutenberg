@@ -828,11 +828,11 @@ store( 'myPlugin', {
 } );
 ```
 
-#### When to Use
+### When to Use
 
 Whenever you have interactive blocks that rely on global state that may change due to navigation events, ensuring consistency across different parts of your application.
 
-#### Best Practices for using `getServerState()` and `getServerContext()`
+### Best Practices for using `getServerState()` and `getServerContext()`
 
 -   **Read-Only References:** Both `getServerState()` and `getServerContext()` return read-only objects. You can use those objects to update the global state or local context.
 -   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/api-reference.md#accessing-data-in-callbacks) to react to state and context changes.
