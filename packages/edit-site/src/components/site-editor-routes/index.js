@@ -54,7 +54,7 @@ export function useRegisterSiteEditorRoutes() {
 	const { registerRoute } = unlock( useDispatch( siteEditorStore ) );
 	useEffect( () => {
 		registry.batch( () => {
-			routes.map( registerRoute );
+			routes.forEach( registerRoute );
 		} );
 	}, [ registry, registerRoute ] );
 }
