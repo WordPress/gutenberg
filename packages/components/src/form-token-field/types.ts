@@ -211,7 +211,6 @@ export interface SuggestionsListProps<
 	displayTransform: ( value: T ) => string;
 	instanceId: string | number;
 	__experimentalRenderItem?: ( args: { item: T } ) => ReactNode;
-	__experimentalRenderNoSuggestionsFound?: ReactNode;
 }
 
 export interface TokenProps extends TokenItem {

@@ -130,7 +130,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		__experimentalRenderItem,
 		expandOnFocus = true,
 		placeholder,
-		__experimentalRenderNoSuggestionsFound,
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -390,9 +389,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							scrollIntoView
 							__experimentalRenderItem={
 								__experimentalRenderItem
-							}
-							__experimentalRenderNoSuggestionsFound={
-								__experimentalRenderNoSuggestionsFound
 							}
 						/>
 					) }

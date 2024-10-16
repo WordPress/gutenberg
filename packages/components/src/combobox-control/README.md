@@ -125,13 +125,6 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
-#### __experimentalRenderNoSuggestionsFound
-
-Custom component to be rendered when there are no suggestion that matches the current query input
-
--   Type: `ReactNode`
--   Required: No
-
 #### __next40pxDefaultSize
 
 Start opting into the larger default height that will become the default size in a future version.
