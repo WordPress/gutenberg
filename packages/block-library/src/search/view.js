@@ -83,22 +83,20 @@ const { state, actions } = store(
 			},
 			*updateSearch() {
 				const { ref } = getElement();
-				const { value, name } = ref;
+				const { value } = ref;
 
 				// Don't navigate if the search didn't really change.
-				if ( 's' === name && value === state.search ) {
+				if ( value === state.search ) {
 					return;
 				}
 
 				const url = new URL( window.location );
 
-				if ( 's' === name ) {
+				if ( ! isEmpty( value ) ) {
 					state.search = value;
-					if ( ! isEmpty( value ) ) {
-						url.searchParams.set( 'search', value );
-					} else {
-						url.searchParams.delete( 'search' );
-					}
+					url.searchParams.set( 'instant-search', value );
+				} else {
+					url.searchParams.delete( 'instant-search' );
 				}
 
 				const { actions: routerActions } = yield import(

@@ -81,13 +81,14 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
-		if ( $is_expandable_searchfield ) {
+		if ( $is_expandable_searchfield || $enhanced_pagination ) {
 			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 
 		}
 		if ( $is_expandable_searchfield ) {
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
+
 			// Adding these attributes manually is needed until the Interactivity API
 			// SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
@@ -182,7 +183,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		wp_interactivity_state(
 			'core/search',
 			array(
-				'search' => isset( $_GET['search'] ) ? $_GET['search'] : '',
+				'search' => isset( $_GET['instant-search'] ) ? $_GET['instant-search'] : '',
 			)
 		);
 	}
