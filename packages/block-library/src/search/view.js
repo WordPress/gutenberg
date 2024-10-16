@@ -112,9 +112,7 @@ const { state, actions } = store(
 					'@wordpress/interactivity-router'
 				);
 
-				routerActions.navigate(
-					`${ window.location.pathname }${ url.search }`
-				);
+				routerActions.navigate( url.href );
 			},
 		},
 	},
