@@ -122,7 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const initialContainerWidth = useRef();
+	const initialContainerWidth = useRef( 0 );
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -247,6 +247,11 @@ function Iframe( {
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
+	const outerContainerWidth = Math.max(
+		initialContainerWidth.current,
+		containerWidth
+	);
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -352,10 +357,7 @@ function Iframe( {
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						Math.max(
-							initialContainerWidth.current,
-							containerWidth
-						)
+						outerContainerWidth
 				: scale
 		);
 
@@ -378,7 +380,7 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-outer-container-width',
-			`${ Math.max( initialContainerWidth.current, containerWidth ) }px`
+			`${ outerContainerWidth }px`
 		);
 
 		return () => {
@@ -410,6 +412,7 @@ function Iframe( {
 		containerWidth,
 		windowInnerWidth,
 		isZoomedOut,
+		outerContainerWidth,
 	] );
 
 	// Make sure to not render the before and after focusable div elements in view
@@ -500,11 +503,7 @@ function Iframe( {
 				) }
 				style={ {
 					'--wp-block-editor-iframe-zoom-out-outer-container-width':
-						isZoomedOut &&
-						`${ Math.max(
-							initialContainerWidth.current,
-							containerWidth
-						) }px`,
+						isZoomedOut && `${ outerContainerWidth }px`,
 				} }
 			>
 				{ iframe }
