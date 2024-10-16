@@ -181,6 +181,8 @@ class WP_Navigation_Block_Renderer {
 			)
 		);
 
+		$container_attributes = preg_replace('/(\s|\")(wp-block-navigation)(\s|\")/', '$1', $container_attributes);
+
 		$inner_blocks_html = '';
 		$is_list_open      = false;
 
