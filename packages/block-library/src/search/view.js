@@ -90,8 +90,17 @@ const { state, actions } = store(
 					return;
 				}
 
-				const url = new URL( window.location );
+				state.search = value;
 
+				// Debounce the search by 300ms to prevent multiple navigations.
+				// We can do this by yielding a promise that resolves after 300ms and
+				// then bailing out if the search has changed.
+				yield new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
+				if ( value !== state.search ) {
+					return;
+				}
+
+				const url = new URL( window.location );
 				if ( ! isEmpty( value ) ) {
 					state.search = value;
 					url.searchParams.set( 'instant-search', value );
