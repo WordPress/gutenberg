@@ -42,7 +42,7 @@ function BlockPattern( {
 	showTitle = true,
 	showTooltip,
 	category,
-	isSelected, // new prop to manage active state
+	isSelected,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
@@ -244,7 +244,9 @@ function BlockPatternsList(
 						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
 						category={ category }
-						isSelected={ activePattern === pattern.name } // Highlight the active pattern
+						isSelected={
+							!! activePattern && activePattern === pattern.name
+						}
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />
