@@ -1,5 +1,3 @@
-import { Source } from '@storybook/blocks';
-
 /**
  * External dependencies
  */
