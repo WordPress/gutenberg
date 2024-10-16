@@ -93,7 +93,7 @@ function useResponsiveMenu( navRef ) {
 		}
 
 		return () => {
-			htmlElement.classList.remove( 'has-modal-open' );
+			htmlElement?.classList.remove( 'has-modal-open' );
 		};
 	}, [ navRef, isResponsiveMenuOpen ] );
 
