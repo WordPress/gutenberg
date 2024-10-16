@@ -4,11 +4,19 @@
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { comment as commentIcon } from '@wordpress/icons';
-import { __unstableCommentIconFill as CommentIconFill } from '@wordpress/block-editor';
+
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { __unstableCommentIconFill } = unlock( blockEditorPrivateApis );
 
 const AddCommentButton = ( { onClick } ) => {
 	return (
-		<CommentIconFill>
+		<__unstableCommentIconFill>
 			<MenuItem
 				icon={ commentIcon }
 				onClick={ onClick }
@@ -16,7 +24,7 @@ const AddCommentButton = ( { onClick } ) => {
 			>
 				{ _x( 'Comment', 'Add comment button' ) }
 			</MenuItem>
-		</CommentIconFill>
+		</__unstableCommentIconFill>
 	);
 };
 
