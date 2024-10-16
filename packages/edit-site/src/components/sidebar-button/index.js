@@ -11,7 +11,7 @@ import { Button } from '@wordpress/components';
 export default function SidebarButton( props ) {
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			{ ...props }
 			className={ clsx( 'edit-site-sidebar-button', props.className ) }
 		/>
