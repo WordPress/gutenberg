@@ -108,10 +108,12 @@ class Gutenberg_REST_Comment_Controller_6_8 extends WP_REST_Comments_Controller 
 
 		return true;
 	}
-	
 }
 
-add_action('rest_api_init', function() {
-	$controller = new Gutenberg_REST_Comment_Controller_6_8();
-	$controller->register_routes();
-});
+add_action(
+    'rest_api_init',
+    function() {
+        $controller = new Gutenberg_REST_Comment_Controller_6_8();
+        $controller->register_routes();
+    }
+);
