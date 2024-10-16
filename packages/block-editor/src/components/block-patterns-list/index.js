@@ -78,10 +78,7 @@ function BlockPattern( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ clsx(
-						'block-editor-block-patterns-list__list-item',
-						{ 'is-selected': isSelected } // Apply 'is-selected' class if this pattern is active
-					) }
+					className="block-editor-block-patterns-list__list-item"
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
 						setIsDragging( true );
@@ -125,6 +122,7 @@ function BlockPattern( {
 												pattern.type ===
 													INSERTER_PATTERN_TYPES.user &&
 												! pattern.syncStatus,
+											'is-selected': isSelected,
 										}
 									) }
 								/>
