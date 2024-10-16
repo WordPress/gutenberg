@@ -5,6 +5,5 @@ iframe[name="editor-canvas"] {
 	display: block;
 	background-color: transparent;
 	// Handles transitions between device previews
-	transition: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
-	@include reduce-motion("transition");
+	@include editor-canvas-resize-animation;
 }
