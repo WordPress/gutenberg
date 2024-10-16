@@ -131,4 +131,51 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
 	} );
+
+	it( 'should not have port mappings if disablePortMapping is specified', () => {
+		const envConfig = {
+			...CONFIG,
+			mysqlPort: 3306,
+		};
+
+		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
+			disablePortMapping: true,
+			env: { development: envConfig, tests: envConfig },
+		} );
+
+		expect( dockerConfig.services.wordpress.ports ).toBe( undefined );
+		expect( dockerConfig.services[ 'tests-wordpress' ].ports ).toBe(
+			undefined
+		);
+		expect( dockerConfig.services.mysql.ports ).toBe( undefined );
+		expect( dockerConfig.services[ 'tests-mysql' ].ports ).toBe(
+			undefined
+		);
+	} );
+
+	it( 'should have port mappings if disablePortMapping is not specified', () => {
+		const envConfig = {
+			...CONFIG,
+			mysqlPort: 3306,
+		};
+
+		const dockerConfig = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
+			env: { development: envConfig, tests: envConfig },
+		} );
+
+		expect( dockerConfig.services.wordpress.ports ).toEqual( [
+			'${WP_ENV_PORT:-8888}:80',
+		] );
+		expect( dockerConfig.services[ 'tests-wordpress' ].ports ).toEqual( [
+			'${WP_ENV_TESTS_PORT:-8888}:80',
+		] );
+		expect( dockerConfig.services.mysql.ports ).toEqual( [
+			'${WP_ENV_MYSQL_PORT:-3306}:3306',
+		] );
+		expect( dockerConfig.services[ 'tests-mysql' ].ports ).toEqual( [
+			'${WP_ENV_TESTS_MYSQL_PORT:-3306}:3306',
+		] );
+	} );
 } );

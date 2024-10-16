@@ -30,6 +30,7 @@ const postProcessConfig = require( './post-process-config' );
  * @property {Object.<string, string>}              lifecycleScripts        Any lifecycle scripts that we might need to execute.
  * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
  * @property {boolean}                              debug                   True if debug mode is enabled.
+ * @property {boolean}                              disablePortMapping      True if the container ports should not be exposed to the host.
  */
 
 /**

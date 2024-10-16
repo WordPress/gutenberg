@@ -164,21 +164,41 @@ module.exports = function buildDockerComposeConfig( config ) {
 		);
 	}
 
-	// Set the default ports based on the config values.
-	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
-	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
-		config.env.development.mysqlPort ?? ''
-	}}:3306`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
-	const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
-		config.env.tests.mysqlPort ?? ''
-	}}:3306`;
+	let developmentPorts, testsPorts, developmentMysqlPorts, testsMysqlPorts;
+	if ( config.disablePortMapping ) {
+		developmentPorts = {};
+		testsPorts = {};
+		developmentMysqlPorts = {};
+		testsMysqlPorts = {};
+	} else {
+		// Set the default ports based on the config values.
+		developmentPorts = {
+			ports: [ `\${WP_ENV_PORT:-${ config.env.development.port }}:80` ],
+		};
+		testsPorts = {
+			ports: [ `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80` ],
+		};
+		developmentMysqlPorts = {
+			ports: [
+				`\${WP_ENV_MYSQL_PORT:-${
+					config.env.development.mysqlPort ?? ''
+				}}:3306`,
+			],
+		};
+		testsMysqlPorts = {
+			ports: [
+				`\${WP_ENV_TESTS_MYSQL_PORT:-${
+					config.env.tests.mysqlPort ?? ''
+				}}:3306`,
+			],
+		};
+	}
 
 	return {
 		services: {
 			mysql: {
 				image: 'mariadb:lts',
-				ports: [ developmentMysqlPorts ],
+				...developmentMysqlPorts,
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -189,7 +209,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-mysql': {
 				image: 'mariadb:lts',
-				ports: [ testsMysqlPorts ],
+				...testsMysqlPorts,
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -205,7 +225,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ developmentPorts ],
+				...developmentPorts,
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,
@@ -223,7 +243,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'Tests-WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ testsPorts ],
+				...testsPorts,
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,

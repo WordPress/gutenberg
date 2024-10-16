@@ -23,20 +23,22 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * ~/.wp-env/Dockerfile.
  *
  * @param {Object}  options
- * @param {Object}  options.spinner      A CLI spinner which indicates progress.
- * @param {boolean} options.debug        True if debug mode is enabled.
- * @param {string}  options.xdebug       The Xdebug mode to set. Defaults to "off".
- * @param {boolean} options.writeChanges If true, writes the parsed config to the
- *                                       required docker files like docker-compose
- *                                       and Dockerfile. By default, this is false
- *                                       and only the `start` command writes any
- *                                       changes.
+ * @param {Object}  options.spinner            A CLI spinner which indicates progress.
+ * @param {boolean} options.debug              True if debug mode is enabled.
+ * @param {string}  options.xdebug             The Xdebug mode to set. Defaults to "off".
+ * @param {boolean} options.disablePortMapping True if the container ports should not be exposed to the host.
+ * @param {boolean} options.writeChanges       If true, writes the parsed config to the
+ *                                             required docker files like docker-compose
+ *                                             and Dockerfile. By default, this is false
+ *                                             and only the `start` command writes any
+ *                                             changes.
  * @return {WPConfig} The-env config object.
  */
 module.exports = async function initConfig( {
 	spinner,
 	debug,
 	xdebug = 'off',
+	disablePortMapping = false,
 	writeChanges = false,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
@@ -46,6 +48,9 @@ module.exports = async function initConfig( {
 	// config has changed when only the xdebug param has changed. This is needed
 	// so that Docker will rebuild the image whenever the xdebug flag changes.
 	config.xdebug = xdebug;
+
+	// Ditto for disablePortMapping.
+	config.disablePortMapping = disablePortMapping;
 
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 

@@ -428,6 +428,7 @@ async function parseEnvironmentConfig(
 		switch ( key ) {
 			case 'testsPort':
 			case 'lifecycleScripts':
+			case 'disablePortMapping':
 			case 'env': {
 				if ( options.rootConfig ) {
 					continue;
