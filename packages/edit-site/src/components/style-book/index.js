@@ -70,7 +70,6 @@ function useMultiOriginPalettes() {
 	const { colors, gradients } = useMultipleOriginColorsAndGradients();
 
 	// Add duotone filters to the palettes data.
-	// TODO: Might need to include `disableCustomDuotones` setting or whatever to match colors/gradients from useMultipleOriginColorsAndGradients.
 	const [
 		shouldDisplayDefaultDuotones,
 		customDuotones,
