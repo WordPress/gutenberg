@@ -51,8 +51,16 @@ function getPostMetaFields( select, context ) {
 	const registeredFields = getRegisteredPostMeta( context?.postType );
 	const metaFields = {};
 	Object.entries( registeredFields || {} ).forEach( ( [ key, props ] ) => {
-		// Don't include footnotes or private fields.
-		if ( key !== 'footnotes' && key.charAt( 0 ) !== '_' ) {
+		if (
+			// Don't include footnotes.
+			key !== 'footnotes' &&
+			// Don't include private fields.
+			key.charAt( 0 ) !== '_' &&
+			// Don't support boolean, object, and array fields yet.
+			typeof entityMetaValues?.[ key ] !== 'boolean' &&
+			typeof entityMetaValues?.[ key ] !== 'object' &&
+			! Array.isArray( entityMetaValues?.[ key ] )
+		) {
 			metaFields[ key ] = {
 				label: props.title || key,
 				value:
