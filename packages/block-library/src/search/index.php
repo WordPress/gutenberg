@@ -97,7 +97,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		// Instant search is only available when using the enhanced pagination.
 		if ( $enhanced_pagination ) {
 			$input->set_attribute( 'data-wp-bind--value', 'state.search' );
-			$input->set_attribute( 'data-wp-on--input', 'actions.updateSearch' );
+			$input->set_attribute( 'data-wp-on-async--input', 'actions.updateSearch' );
 		}
 	}
 
