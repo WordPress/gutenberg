@@ -6,9 +6,11 @@ import {
 	__experimentalText as Text,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	Button,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -67,10 +69,18 @@ function FontFamilies() {
 				/>
 			) }
 
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 2 }>
+				<HStack justify="space-between">
+					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
+					<Button
+						onClick={ () => setModalTabOpen( 'installed-fonts' ) }
+						label={ __( 'Manage fonts' ) }
+						icon={ settings }
+						size="small"
+					/>
+				</HStack>
 				{ activeFonts.length > 0 && (
 					<>
-						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 						<ItemGroup size="large" isBordered isSeparated>
 							{ activeFonts.map( ( font ) => (
 								<FontFamilyItem
@@ -82,31 +92,30 @@ function FontFamilies() {
 					</>
 				) }
 				{ ! hasFonts && (
-					<VStack>
-						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
+					<>
 						<Text as="p">
 							{ hasInstalledFonts
 								? __( 'No fonts activated.' )
 								: __( 'No fonts installed.' ) }
 						</Text>
-					</VStack>
+						<Button
+							className="edit-site-global-styles-font-families__manage-fonts"
+							variant="secondary"
+							__next40pxDefaultSize
+							onClick={ () => {
+								setModalTabOpen(
+									hasInstalledFonts
+										? 'installed-fonts'
+										: 'upload-fonts'
+								);
+							} }
+						>
+							{ hasInstalledFonts
+								? __( 'Manage fonts' )
+								: __( 'Add fonts' ) }
+						</Button>
+					</>
 				) }
-				<Button
-					className="edit-site-global-styles-font-families__manage-fonts"
-					variant="secondary"
-					__next40pxDefaultSize
-					onClick={ () => {
-						setModalTabOpen(
-							hasInstalledFonts
-								? 'installed-fonts'
-								: 'upload-fonts'
-						);
-					} }
-				>
-					{ hasInstalledFonts
-						? __( 'Manage fonts' )
-						: __( 'Add fonts' ) }
-				</Button>
 			</VStack>
 		</>
 	);

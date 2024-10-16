@@ -96,7 +96,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
-		'Toggle block inserter',
+		'Block Inserter',
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );

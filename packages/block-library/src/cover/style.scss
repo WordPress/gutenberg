@@ -95,8 +95,8 @@
 	}
 
 	.wp-block-cover__inner-container {
-		position: relative;
 		width: 100%;
+		z-index: z-index(".wp-block-cover__inner-container");
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
