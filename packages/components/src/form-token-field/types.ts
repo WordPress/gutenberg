@@ -190,10 +190,6 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	tokenizeOnBlur?: boolean;
-	/**
-	 * Custom component that will be rendered in the dropdown when no suggestions are found.
-	 */
-	__experimentalRenderNoSuggestionsFound?: React.ReactNode;
 }
 
 /**
