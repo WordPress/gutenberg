@@ -45,6 +45,9 @@ A transformation of type `block` is an object that takes the following parameter
 -   **isMatch** _(function, optional)_: a callback that receives the block attributes as the first argument and the block object as the second argument and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
 -   **isMultiBlock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
 -   **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
+-   **name** _(string, optional)_: a unique name for the transformation. If set, this transformation will be listed separately from the highest priority non-titled match.
+-   **title** _(string, optional)_: a custom title for the transformation, used in place of the block title. Only used if `name` is provided.
+-   **icon** _(string|Element, optional)_: a [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element. Only used if `name` is provided.
 
 **Example: from Paragraph block to Heading block**
 
