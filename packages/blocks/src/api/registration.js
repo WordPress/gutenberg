@@ -232,12 +232,7 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
-	if (
-		settings?.parent &&
-		Array.isArray( settings.parent ) &&
-		settings.parent.length === 1 &&
-		settings.parent[ 0 ] === name
-	) {
+	if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
 		warning(
 			'Block "' +
 				name +
