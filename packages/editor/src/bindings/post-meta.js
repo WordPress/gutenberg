@@ -56,10 +56,8 @@ function getPostMetaFields( select, context ) {
 			key !== 'footnotes' &&
 			// Don't include private fields.
 			key.charAt( 0 ) !== '_' &&
-			// Don't support boolean, object, and array fields yet.
-			typeof entityMetaValues?.[ key ] !== 'boolean' &&
-			typeof entityMetaValues?.[ key ] !== 'object' &&
-			! Array.isArray( entityMetaValues?.[ key ] )
+			// Only support string types.
+			typeof entityMetaValues?.[ key ] === 'string'
 		) {
 			metaFields[ key ] = {
 				label: props.title || key,
