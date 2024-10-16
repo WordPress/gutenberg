@@ -224,8 +224,6 @@ function BlockPatternsList(
 			orientation={ orientation }
 			activeId={ activeCompositeId }
 			setActiveId={ setActiveCompositeId }
-			selectedId={ activePattern }
-			setSelectedId={ setActivePattern }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
