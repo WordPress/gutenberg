@@ -186,6 +186,10 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 	}
 
+	.edit-site-style-book__example.is-disabled-example {
+		pointer-events: none;
+	}
+
 	.edit-site-style-book__example:focus:not(:disabled) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 		outline: 3px solid transparent;

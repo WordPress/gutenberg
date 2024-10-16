@@ -192,10 +192,6 @@ function GlobalStylesStyleBook() {
 				)
 			}
 			onSelect={ ( blockName ) => {
-				if ( blockName === 'duotones' ) {
-					return;
-				}
-
 				if (
 					STYLE_BOOK_COLOR_GROUPS.find(
 						( group ) => group.slug === blockName
