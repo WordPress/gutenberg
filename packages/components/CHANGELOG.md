@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.10.0 (2024-10-16)
+
 ### Bug Fixes
 
 -   `Tooltip`: add `aria-describedby` to the anchor only if not redundant ([#65989](https://github.com/WordPress/gutenberg/pull/65989)).
