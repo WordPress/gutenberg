@@ -127,7 +127,7 @@ export default function CollabSidebar() {
 					isDismissible: true,
 				}
 			);
-			fetchComments();
+			await fetchComments();
 		} else {
 			onError();
 		}
@@ -146,7 +146,7 @@ export default function CollabSidebar() {
 				isDismissible: true,
 			} );
 
-			fetchComments();
+			await fetchComments();
 		} else {
 			onError();
 		}
@@ -169,7 +169,7 @@ export default function CollabSidebar() {
 				}
 			);
 
-			fetchComments();
+			await fetchComments();
 		} else {
 			onError();
 		}
@@ -204,7 +204,7 @@ export default function CollabSidebar() {
 				isDismissible: true,
 			}
 		);
-		fetchComments();
+		await fetchComments();
 	};
 
 	const fetchComments = useCallback( async () => {
