@@ -44,13 +44,13 @@ function RootMenu() {
 	return (
 		<>
 			<ItemGroup>
-				{ hasTypographyPanel && (
+				{ hasBackgroundPanel && (
 					<NavigationButtonAsItem
-						icon={ typography }
-						path="/typography"
-						aria-label={ __( 'Typography styles' ) }
+						icon={ background }
+						path="/background"
+						aria-label={ __( 'Background styles' ) }
 					>
-						{ __( 'Typography' ) }
+						{ __( 'Background' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasColorPanel && (
@@ -62,13 +62,13 @@ function RootMenu() {
 						{ __( 'Colors' ) }
 					</NavigationButtonAsItem>
 				) }
-				{ hasBackgroundPanel && (
+				{ hasLayoutPanel && (
 					<NavigationButtonAsItem
-						icon={ background }
-						path="/background"
-						aria-label={ __( 'Background styles' ) }
+						icon={ layout }
+						path="/layout"
+						aria-label={ __( 'Layout styles' ) }
 					>
-						{ __( 'Background' ) }
+						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasShadowPanel && (
@@ -80,13 +80,13 @@ function RootMenu() {
 						{ __( 'Shadows' ) }
 					</NavigationButtonAsItem>
 				) }
-				{ hasLayoutPanel && (
+				{ hasTypographyPanel && (
 					<NavigationButtonAsItem
-						icon={ layout }
-						path="/layout"
-						aria-label={ __( 'Layout styles' ) }
+						icon={ typography }
+						path="/typography"
+						aria-label={ __( 'Typography styles' ) }
 					>
-						{ __( 'Layout' ) }
+						{ __( 'Typography' ) }
 					</NavigationButtonAsItem>
 				) }
 			</ItemGroup>
