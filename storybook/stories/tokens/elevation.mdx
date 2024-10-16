@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { ElevationTable } from './components.tsx';
 
 <Meta title="Tokens/Elevation" name="page" />
 
@@ -8,34 +9,40 @@ This document outlines the various tokens relating to elevation in the WordPress
 
 ## Values
 
-
-<table>
-	<thead>
-		<tr>
-			<th>Elevation</th>
-			<th>Value</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td>Extra small</td>
-			<td>`0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01);`</td>
-		</tr>
-		<tr>
-			<td>Small</td>
-			<td>`0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02);`</td>
-		</tr>
-		<tr>
-			<td>Medium</td>
-			<td>`0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02);`</td>
-		</tr>
-		<tr>
-			<td>Large</td>
-			<td>`0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02);`</td>
-		</tr>
-	</tbody>
-</table>
 Tokens can be used in different ways, but regardless of which method is used, each token is meant to be used as the value of the CSS `box-shadow` property, and references the following values:
+
+<ElevationTable
+	tokens={ [
+		{
+			name: 'Extra small',
+			valueShow:
+				'0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01)',
+			valueCode:
+				'0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)',
+		},
+		{
+			name: 'Small',
+			valueShow:
+				'0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02)',
+			valueCode:
+				'0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)',
+		},
+		{
+			name: 'Medium',
+			valueShow:
+				'0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02)',
+			valueCode:
+				'0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)',
+		},
+		{
+			name: 'Large',
+			valueShow:
+				'0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02)',
+			valueCode:
+				'0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)',
+		},
+	] }
+/>
 
 ## CSS tokens
 
