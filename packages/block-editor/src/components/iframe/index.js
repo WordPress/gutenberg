@@ -299,17 +299,6 @@ function Iframe( {
 	useEffect( () => cleanup, [ cleanup ] );
 
 	const zoomOutAnimationClassnameRef = useRef( null );
-	const handleZoomOutAnimationClassname = () => {
-		clearTimeout( zoomOutAnimationClassnameRef.current );
-
-		iframeDocument.documentElement.classList.add( 'zoom-out-animation' );
-
-		zoomOutAnimationClassnameRef.current = setTimeout( () => {
-			iframeDocument.documentElement.classList.remove(
-				'zoom-out-animation'
-			);
-		}, 400 ); // 400ms should match the animation speed used in components/iframe/content.scss
-	};
 
 	// Toggle zoom out CSS Classes only when zoom out mode changes. We could add these into the useEffect
 	// that controls settings the CSS variables, but then we would need to do more work to ensure we're
@@ -319,6 +308,20 @@ function Iframe( {
 		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
+
+		const handleZoomOutAnimationClassname = () => {
+			clearTimeout( zoomOutAnimationClassnameRef.current );
+
+			iframeDocument.documentElement.classList.add(
+				'zoom-out-animation'
+			);
+
+			zoomOutAnimationClassnameRef.current = setTimeout( () => {
+				iframeDocument.documentElement.classList.remove(
+					'zoom-out-animation'
+				);
+			}, 400 ); // 400ms should match the animation speed used in components/iframe/content.scss
+		};
 
 		handleZoomOutAnimationClassname();
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
