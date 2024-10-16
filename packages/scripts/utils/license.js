@@ -300,8 +300,8 @@ function checkDepLicense( path, licenses ) {
 /**
  *
  * @typedef Options
- * @property {boolean}       gpl2    Only allow GPL2 compatible licenses.
- * @property {Array<string>} ignored The list of ignored packages.
+ * @property {boolean}       gpl2      Only allow GPL2 compatible licenses.
+ * @property {Array<string>} [ignored] The list of ignored packages.
  */
 
 /**
@@ -314,7 +314,7 @@ function checkDepsInTree( deps, options ) {
 	for ( const key in deps ) {
 		const dep = deps[ key ];
 
-		if ( options.ignored.includes( dep.name ) ) {
+		if ( options.ignored?.includes( dep.name ) ) {
 			continue;
 		}
 
