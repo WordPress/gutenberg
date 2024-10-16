@@ -42,14 +42,7 @@
 	@include animation__fade-in($speed, $delay);
 }
 
-@mixin editor-canvas-resize-animation( $additional-transition-rules: null ) {
-	$resizeAnimation: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
-
-	@if $additional-transition-rules {
-		transition: $resizeAnimation, unquote($additional-transition-rules);
-	} @else {
-		transition: $resizeAnimation;
-	}
-
+@mixin editor-canvas-resize-animation( $additional-transition-rules... ) {
+	transition: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96), $additional-transition-rules;
 	@include reduce-motion("transition");
 }
