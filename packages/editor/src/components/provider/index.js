@@ -164,7 +164,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
-		const { editorSettings, selection, isReady, mode, postTypes } =
+		const { editorSettings, selection, isReady, mode, postTypeEntities } =
 			useSelect(
 				( select ) => {
 					const {
@@ -180,7 +180,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						isReady: __unstableIsEditorReady(),
 						mode: getRenderingMode(),
 						selection: getEditorSelection(),
-						postTypes:
+						postTypeEntities:
 							post.type === 'wp_template'
 								? getEntitiesConfig( 'postType' )
 								: null,
@@ -200,10 +200,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					postContext.postType = 'post';
 				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
 					// If the slug is single-{postType}, infer the post type from the name.
-					const postTypesNames =
-						postTypes?.map( ( entity ) => entity.name ) || [];
+					const postTypeNames =
+						postTypeEntities?.map( ( entity ) => entity.name ) ||
+						[];
 					const match = post.slug.match(
-						`^single-(${ postTypesNames.join( '|' ) })(?:-.+)?$`
+						`^single-(${ postTypeNames.join( '|' ) })(?:-.+)?$`
 					);
 					if ( match ) {
 						postContext.postType = match[ 1 ];
@@ -230,7 +231,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			post.type,
 			rootLevelPost.type,
 			rootLevelPost.slug,
-			postTypes,
+			postTypeEntities,
 		] );
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
