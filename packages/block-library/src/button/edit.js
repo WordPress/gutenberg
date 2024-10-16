@@ -37,6 +37,7 @@ import {
 	__experimentalGetElementClassName,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	InspectorBlockInfoFill,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -145,6 +146,15 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 		</PanelBody>
 	);
 }
+
+const InspectorBlockInfo = () => {
+    return (
+        <InspectorBlockInfoFill>
+            <a href='https://wordpress.org/documentation/article/buttons-block/'>Button</a>
+			<p>this is a test para</p>
+        </InspectorBlockInfoFill>
+    );
+};
 
 function ButtonEdit( props ) {
 	const {
@@ -389,6 +399,7 @@ function ButtonEdit( props ) {
 					/>
 				) }
 			</InspectorControls>
+			<InspectorBlockInfo />
 		</>
 	);
 }

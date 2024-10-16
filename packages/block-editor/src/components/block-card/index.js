@@ -21,9 +21,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
-import InspectorBlockInfoFill from '../inspector-block-info/inspector-block-info';
 
-function BlockCard( { title, icon, description, blockType, className, name } ) {
+function BlockCard( { title, icon, description, blockType, className, name, inspectorBlockInfo } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
@@ -79,11 +78,11 @@ function BlockCard( { title, icon, description, blockType, className, name } ) {
 				{ description && (
 					<Text className="block-editor-block-card__description">
 						{ description }
+						<div className="block-editor-block-card__inspector-block-info">
+							{ inspectorBlockInfo }
+						</div>
 					</Text>
 				) }
-				<div className="block-editor-block-card__inspector-block-info">
-					<InspectorBlockInfoFill.Slot />
-				</div>
 			</VStack>
 		</div>
 	);
