@@ -75,19 +75,31 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 							}
 						} }
 						onChange={ ( nextFootnote ) => {
+							const newValue = JSON.stringify(
+								footnotes.map( ( footnote ) => {
+									return footnote.id === id
+										? {
+												content: nextFootnote,
+												id,
+										  }
+										: footnote;
+								} )
+							);
 							updateMeta( {
 								...meta,
-								footnotes: JSON.stringify(
-									footnotes.map( ( footnote ) => {
-										return footnote.id === id
-											? {
-													content: nextFootnote,
-													id,
-											  }
-											: footnote;
-									} )
-								),
+								footnotes: newValue,
 							} );
+							const metaKeyInput = document.querySelector(
+								'input[value="footnotes"]'
+							);
+							const metaId = metaKeyInput
+								? metaKeyInput.id
+								: null;
+							if ( metaId ) {
+								document.querySelector(
+									`#${ metaId.replace( '-key', '-value' ) }`
+								).innerHTML = newValue;
+							}
 						} }
 					/>{ ' ' }
 					<a href={ `#${ id }-link` }>↩︎</a>
