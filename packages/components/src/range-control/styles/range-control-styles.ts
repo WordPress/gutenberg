@@ -57,7 +57,10 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
 	return '';
 };
 
-export const Wrapper = styled.div< WrapperProps >`
+export const Wrapper = styled( 'div', {
+	shouldForwardProp: ( prop: string ) =>
+		! [ 'color', '__nextHasNoMarginBottom', 'marks' ].includes( prop ),
+} )< WrapperProps >`
 	display: block;
 	flex: 1;
 	position: relative;
@@ -261,9 +264,20 @@ export const InputRange = styled.input`
 `;
 
 const tooltipShow = ( { show }: TooltipProps ) => {
-	return css( {
-		opacity: show ? 1 : 0,
-	} );
+	return css`
+		display: ${ show ? 'inline-block' : 'none' };
+		opacity: ${ show ? 1 : 0 };
+
+		@media not ( prefers-reduced-motion ) {
+			transition:
+				opacity 120ms ease,
+				display 120ms ease allow-discrete;
+		}
+
+		@starting-style {
+			opacity: 0;
+		}
+	`;
 };
 
 const tooltipPosition = ( { position }: TooltipProps ) => {
@@ -284,10 +298,8 @@ export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
 	border-radius: ${ CONFIG.radiusSmall };
 	color: white;
-	display: inline-block;
 	font-size: 12px;
 	min-width: 32px;
-	opacity: 0;
 	padding: 4px 8px;
 	pointer-events: none;
 	position: absolute;
@@ -295,11 +307,8 @@ export const Tooltip = styled.span< TooltipProps >`
 	user-select: none;
 	line-height: 1.4;
 
-	@media not ( prefers-reduced-motion ) {
-		transition: opacity 120ms ease;
-	}
-
 	${ tooltipShow };
+
 	${ tooltipPosition };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },

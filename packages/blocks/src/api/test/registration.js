@@ -1512,22 +1512,38 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		it( 'should not override label from the server', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
-				name: 'core/server',
+		it( 'should override label from the server', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
 				label: 'Server label',
 			} );
 			// Override the source with a different label in the client.
 			registerBlockBindingsSource( {
-				name: 'core/server',
+				name: 'core/testing',
 				label: 'Client label',
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block bindings "core/server" source label is already defined in the server.'
+				'Block bindings "core/testing" source label was overriden.'
 			);
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Client label' );
+		} );
+
+		it( 'should keep label from the server when not defined in the client', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Server label' );
 		} );
 
 		// Check the `usesContext` array is correct.
@@ -1543,10 +1559,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should add usesContext when only defined in the server', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
@@ -1562,10 +1576,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should add usesContext when only defined in the client', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 			} );
@@ -1581,10 +1593,8 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should merge usesContext from server and client without duplicates', () => {
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
@@ -1704,42 +1714,6 @@ describe( 'blocks', () => {
 			expect( console ).toHaveWarnedWith(
 				'Block bindings source "core/test-source" is already registered.'
 			);
-		} );
-
-		it( 'should correctly merge properties when bootstrap happens after registration', () => {
-			// Register source in the client.
-			const clientOnlyProperties = {
-				getValues: () => 'values',
-				setValues: () => 'new values',
-				canUserEditValue: () => true,
-			};
-			registerBlockBindingsSource( {
-				name: 'core/custom-source',
-				label: 'Client Label',
-				usesContext: [ 'postId', 'postType' ],
-				...clientOnlyProperties,
-			} );
-
-			// Bootstrap source from the server.
-			unlock(
-				dispatch( blocksStore )
-			).addBootstrappedBlockBindingsSource( {
-				name: 'core/custom-source',
-				label: 'Server Label',
-				usesContext: [ 'postId', 'serverContext' ],
-			} );
-
-			// Check that the bootstrap values prevail and the client properties are still there.
-			expect( getBlockBindingsSource( 'core/custom-source' ) ).toEqual( {
-				// Should use the server label.
-				label: 'Server Label',
-				// Should merge usesContext from server and client.
-				usesContext: [ 'postId', 'postType', 'serverContext' ],
-				// Should keep client properties.
-				...clientOnlyProperties,
-			} );
-
-			unregisterBlockBindingsSource( 'core/custom-source' );
 		} );
 	} );
 

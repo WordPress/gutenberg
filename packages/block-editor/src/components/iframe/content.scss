@@ -1,30 +1,25 @@
 .block-editor-iframe__body {
 	position: relative;
-}
-
-.block-editor-iframe__container {
-	width: 100%;
-	height: 100%;
-	overflow-x: hidden;
-}
-
-.block-editor-iframe__scale-container {
-	width: 100%;
-	height: 100%;
-	display: flex;
-}
-
-.block-editor-iframe__scale-container.is-zoomed-out {
-	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
-	width: $prev-container-width;
-	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
+	border: 0.01px solid transparent;
 }
 
 .block-editor-iframe__html {
-	border: 0 solid $gray-300;
 	transform-origin: top center;
-	@include editor-canvas-resize-animation;
+	// 400ms should match the animation speed used in iframe/index.js
+	$zoomOutAnimation: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
+
+	// We don't want to animate the transform of the translateX because it is used
+	// to "center" the canvas. Leaving it on causes the canvas to slide around in
+	// odd ways.
+	transition: $zoomOutAnimation, transform 0s scale 0s;
+	@include reduce-motion("transition");
+
+	&.zoom-out-animation {
+		// we only want to animate the scaling when entering zoom out. When sidebars
+		// are toggled, the resizing of the iframe handles scaling the canvas as well,
+		// and the doubled animations cause very odd animations.
+		transition: $zoomOutAnimation, transform 0s;
+	}
 }
 
 .block-editor-iframe__html.is-zoomed-out {
@@ -32,27 +27,27 @@
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
-	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
-
-	transform: scale(#{$scale});
-
+	$outer-container-width: var(--wp-block-editor-iframe-zoom-out-outer-container-width);
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
+	// Apply an X translation to center the scaled content within the available space.
+	transform: translateX(calc(( #{$outer-container-width} - #{ $container-width }) / 2 / #{$scale}));
+	scale: #{$scale};
 	background-color: $gray-300;
-
-	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
-	// layout, so we use border matching the background instead of margins.
-	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
 	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
-	$total-frame-height: calc(2 * #{$frame-size});
+	$total-frame-height: calc(2 * #{$frame-size} / #{$scale});
 	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
 	margin-bottom: calc(-1 * #{$total-height});
+	// Add the top/bottom frame size. We use scaling to account for the left/right, as
+	// the padding left/right causes the contents to reflow, which breaks the 1:1 scaling
+	// of the content.
+	padding-top: calc(#{$frame-size} / #{$scale});
+	padding-bottom: calc(#{$frame-size} / #{$scale});
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
-		display: flex;
-		flex-direction: column;
 
 		> .is-root-container:not(.wp-block-post-content) {
 			flex: 1;

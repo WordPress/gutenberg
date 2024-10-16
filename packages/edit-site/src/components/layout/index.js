@@ -20,7 +20,6 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
@@ -57,28 +56,13 @@ export default function Layout( { route } ) {
 	useCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
-			const { getAllShortcutKeyCombinations } = select(
-				keyboardShortcutsStore
-			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
-			return {
-				canvasMode: getCanvasMode(),
-				previousShortcut: getAllShortcutKeyCombinations(
-					'core/editor/previous-region'
-				),
-				nextShortcut: getAllShortcutKeyCombinations(
-					'core/editor/next-region'
-				),
-			};
-		},
-		[]
-	);
-	const navigateRegionsProps = useNavigateRegions( {
-		previous: previousShortcut,
-		next: nextShortcut,
-	} );
+	const { canvasMode } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		return {
+			canvasMode: getCanvasMode(),
+		};
+	}, [] );
+	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();

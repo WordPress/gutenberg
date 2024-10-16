@@ -30,7 +30,7 @@
 	"types": "build-types",
 	"wpScriptModuleExports": "./build-module/module/index.js",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@babel/runtime": "7.25.7",
 		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/i18n": "file:../i18n"
 	},

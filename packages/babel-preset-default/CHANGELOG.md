@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `@babel/core` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-react-jsx` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/plugin-transform-runtime` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-env` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/preset-typescript` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+-   The bundled `@babel/runtime` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).
+
 ## 8.9.0 (2024-10-03)
 
 ### Bug Fixes

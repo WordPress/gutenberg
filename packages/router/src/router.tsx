@@ -11,9 +11,10 @@ import {
  * Internal dependencies
  */
 import history from './history';
+import type { EnhancedHistory } from './history';
 
-const RoutesContext = createContext();
-const HistoryContext = createContext();
+const RoutesContext = createContext< Location | null >( null );
+const HistoryContext = createContext< EnhancedHistory >( history );
 
 export function useLocation() {
 	return useContext( RoutesContext );
@@ -23,7 +24,7 @@ export function useHistory() {
 	return useContext( HistoryContext );
 }
 
-export function RouterProvider( { children } ) {
+export function RouterProvider( { children }: { children: React.ReactNode } ) {
 	const location = useSyncExternalStore(
 		history.listen,
 		history.getLocationWithParams,

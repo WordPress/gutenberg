@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dragHandle, trash, edit } from '@wordpress/icons';
+import { dragHandle, trash } from '@wordpress/icons';
 import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -15,7 +15,6 @@ import BlockDraggable from '../block-draggable';
 import BlockMover from '../block-mover';
 import Shuffle from '../block-toolbar/shuffle';
 import NavigableToolbar from '../navigable-toolbar';
-import { unlock } from '../../lock-unlock';
 
 export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	const selected = useSelect(
@@ -74,12 +73,9 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
-		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock, __unstableSetEditorMode, resetZoomLevel } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
 
@@ -121,23 +117,6 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 			) }
 			{ canMove && canRemove && (
 				<Shuffle clientId={ clientId } as={ ToolbarButton } />
-			) }
-
-			{ ! isBlockTemplatePart && (
-				<ToolbarButton
-					className="zoom-out-toolbar-button"
-					icon={ edit }
-					label={ __( 'Edit' ) }
-					onClick={ () => {
-						// Setting may be undefined.
-						if ( typeof setIsInserterOpened === 'function' ) {
-							setIsInserterOpened( false );
-						}
-						__unstableSetEditorMode( 'edit' );
-						resetZoomLevel();
-						__unstableContentRef.current?.focus();
-					} }
-				/>
 			) }
 
 			{ canRemove && ! isBlockTemplatePart && (
