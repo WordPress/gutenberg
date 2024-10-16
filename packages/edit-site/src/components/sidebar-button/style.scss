@@ -14,7 +14,7 @@
 		outline: 3px solid transparent;
 	}
 
-	&:hover:not(:disabled,[aria-disabled=true]),
+	&:hover:not(:disabled,[aria-disabled="true"]),
 	&:focus-visible,
 	&:focus,
 	&:not([aria-disabled="true"]):active,
