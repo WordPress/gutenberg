@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.10.0 (2024-10-16)
+
 ### Enhancements
 
 -   Improvements to the experimental full-page navigation ([#64067](https://github.com/WordPress/gutenberg/pull/64067)):
