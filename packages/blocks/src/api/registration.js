@@ -809,13 +809,16 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	/*
 	 * Check if the source has been already registered on the client.
-	 * If the `getValues` property is defined, it could be assumed the source is already registered.
+	 * If any property expected to be "client-only" is defined, return a warning.
 	 */
-	if ( existingSource?.getValues ) {
-		warning(
-			'Block bindings source "' + name + '" is already registered.'
-		);
-		return;
+	const serverProps = [ 'label', 'usesContext' ];
+	for ( const prop in existingSource ) {
+		if ( ! serverProps.includes( prop ) && existingSource[ prop ] ) {
+			warning(
+				'Block bindings source "' + name + '" is already registered.'
+			);
+			return;
+		}
 	}
 
 	// Check the `name` property is correct.

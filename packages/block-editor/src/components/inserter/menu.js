@@ -322,7 +322,7 @@ function InserterMenu(
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
-					closeButtonLabel={ __( 'Close block inserter' ) }
+					closeButtonLabel={ __( 'Close Block Inserter' ) }
 					tabs={ [
 						{
 							name: 'blocks',

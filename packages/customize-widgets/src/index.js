@@ -39,10 +39,7 @@ const DISABLED_BLOCKS = [
 ];
 const ENABLE_EXPERIMENTAL_FSE_BLOCKS = false;
 
-const {
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} = unlock( editorPrivateApis );
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the widgets block editor in the customizer.
@@ -67,9 +64,6 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
-	bootstrapBlockBindingsSourcesFromServer(
-		blockEditorSettings?.blockBindingsSources
-	);
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {

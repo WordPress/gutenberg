@@ -2385,6 +2385,21 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
 	...getInsertBlockTypeDependants( state, rootClientId ),
 ];
 
+const patternsWithParsedBlocks = new WeakMap();
+function enhancePatternWithParsedBlocks( pattern ) {
+	let enhancedPattern = patternsWithParsedBlocks.get( pattern );
+	if ( ! enhancedPattern ) {
+		enhancedPattern = {
+			...pattern,
+			get blocks() {
+				return getParsedPattern( pattern ).blocks;
+			},
+		};
+		patternsWithParsedBlocks.set( pattern, enhancedPattern );
+	}
+	return enhancedPattern;
+}
+
 /**
  * Returns the list of allowed patterns for inner blocks children.
  *
@@ -2406,14 +2421,7 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				const { allowedBlockTypes } = getSettings( state );
 				const parsedPatterns = patterns
 					.filter( ( { inserter = true } ) => !! inserter )
-					.map( ( pattern ) => {
-						return {
-							...pattern,
-							get blocks() {
-								return getParsedPattern( pattern ).blocks;
-							},
-						};
-					} );
+					.map( enhancePatternWithParsedBlocks );
 
 				const availableParsedPatterns = parsedPatterns.filter(
 					( pattern ) =>
