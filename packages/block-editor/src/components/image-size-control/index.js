@@ -52,17 +52,13 @@ export default function ImageSizeControl( {
 	};
 
 	/**
-	 * Handler for adding the value to toggle group control.
+	 * Add the stored image preset value to toggle group control.
 	 */
-	const addSelectedScaleValue = () => {
-		const scaleSize = Math.round( currentWidth * ( 100 / imageWidth ) );
-
-		if ( IMAGE_SIZE_PRESETS.includes( scaleSize ) ) {
-			return scaleSize;
-		}
-
-		return undefined;
-	};
+	const selectedValue = IMAGE_SIZE_PRESETS.find( ( scale ) => {
+		const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+		const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+		return currentWidth === scaledWidth && currentHeight === scaledHeight;
+	} );
 
 	return (
 		<>
@@ -105,7 +101,7 @@ export default function ImageSizeControl( {
 						label={ __( 'Image size presets' ) }
 						hideLabelFromVision
 						onChange={ handleUpdateDimensions }
-						value={ addSelectedScaleValue() }
+						value={ selectedValue }
 						isBlock
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
