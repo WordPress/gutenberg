@@ -38,7 +38,7 @@ import {
 import DropdownMenu from '../../dropdown-menu';
 
 const meta: Meta< typeof Toolbar > = {
-	title: 'Components/Block Editor/Toolbar',
+	title: 'Block Editor/Toolbar',
 	id: 'components-toolbar',
 	component: Toolbar,
 	subcomponents: {

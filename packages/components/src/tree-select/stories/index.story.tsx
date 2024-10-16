@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import TreeSelect from '../';
 
 const meta: Meta< typeof TreeSelect > = {
-	title: 'Components/Specialty/TreeSelect',
+	title: 'Components/Selection & Input/TreeSelect',
 	id: 'components-treeselect',
 	component: TreeSelect,
 	argTypes: {

@@ -10,7 +10,7 @@ import KeyboardShortcuts from '..';
 
 const meta: Meta< typeof KeyboardShortcuts > = {
 	component: KeyboardShortcuts,
-	title: 'Components/Utlities/KeyboardShortcuts',
+	title: 'Components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
 		controls: { expanded: true },
