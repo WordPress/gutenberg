@@ -1531,6 +1531,21 @@ describe( 'blocks', () => {
 			expect( source.label ).toEqual( 'Client label' );
 		} );
 
+		it( 'should keep label from the server when not defined in the client', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Server label' );
+		} );
+
 		// Check the `usesContext` array is correct.
 		it( 'should reject invalid usesContext property', () => {
 			registerBlockBindingsSource( {
