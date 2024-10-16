@@ -113,7 +113,6 @@ function BlockPattern( {
 							render={
 								<div
 									role="option"
-									tabIndex={ 0 }
 									aria-label={ pattern.title }
 									aria-describedby={
 										pattern.description
