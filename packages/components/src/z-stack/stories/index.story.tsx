@@ -13,7 +13,8 @@ import { ZStack } from '..';
 
 const meta: Meta< typeof ZStack > = {
 	component: ZStack,
-	title: 'Components (Experimental)/ZStack',
+	title: 'Components/Layout/ZStack',
+	id: 'components-zstack',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: { control: { type: null } },

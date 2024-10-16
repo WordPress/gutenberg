@@ -33,7 +33,8 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
-	title: 'Components/Popover',
+	title: 'Components/Overlays/Popover',
+	id: 'components-popover',
 	component: Popover,
 	argTypes: {
 		anchor: { control: { type: null } },

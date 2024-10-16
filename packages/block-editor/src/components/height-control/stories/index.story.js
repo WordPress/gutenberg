@@ -10,7 +10,7 @@ import HeightControl from '../';
 
 export default {
 	component: HeightControl,
-	title: 'BlockEditor/HeightControl',
+	title: 'Block Editor/HeightControl',
 };
 
 const Template = ( props ) => {

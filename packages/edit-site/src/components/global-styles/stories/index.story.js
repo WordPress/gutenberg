@@ -16,8 +16,7 @@ const { GlobalStylesContext, ExperimentalBlockEditorProvider } = unlock(
 	blockEditorPrivateApis
 );
 
-export default { title: 'EditSite/GlobalStylesUI' };
-
+export default { title: 'playground/GlobalStylesUI' };
 const BASE_SETTINGS = {
 	settings: {
 		appearanceTools: false,

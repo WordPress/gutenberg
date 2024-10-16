@@ -3,7 +3,7 @@
  */
 import BlockDraggableChip from '../draggable-chip';
 
-export default { title: 'BlockEditor/BlockDraggable' };
+export default { title: 'Block Editor/BlockDraggable' };
 
 export const _default = () => {
 	// Create a wrapper box for the absolutely-positioned child component.

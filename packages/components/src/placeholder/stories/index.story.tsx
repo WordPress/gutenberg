@@ -19,7 +19,8 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
-	title: 'Components/Placeholder',
+	title: 'Block Editor/Placeholder',
+	id: 'components-placeholder',
 	argTypes: {
 		children: { control: { type: null } },
 		notices: { control: { type: null } },

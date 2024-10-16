@@ -10,7 +10,8 @@ import DataForm from '../index';
 import type { CombinedFormField } from '../../../types';
 
 const meta = {
-	title: 'DataViews/DataForm',
+	title: 'playground/DataForm',
+	id: 'dataviews-dataform',
 	component: DataForm,
 	argTypes: {
 		type: {

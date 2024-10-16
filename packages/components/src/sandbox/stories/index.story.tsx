@@ -10,7 +10,8 @@ import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
 	component: SandBox,
-	title: 'Components/SandBox',
+	title: 'Components/Utilites/SandBox',
+	id: 'components-sandbox',
 	argTypes: {
 		onFocus: { control: { type: null } },
 	},

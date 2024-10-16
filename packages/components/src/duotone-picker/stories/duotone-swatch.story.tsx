@@ -9,7 +9,8 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { DuotoneSwatch } from '..';
 
 const meta: Meta< typeof DuotoneSwatch > = {
-	title: 'Components/DuotoneSwatch',
+	title: 'Components/Selection & Input/Color/DuotoneSwatch',
+	id: 'components-duotoneswatch',
 	component: DuotoneSwatch,
 	parameters: {
 		controls: { expanded: true },

@@ -42,7 +42,8 @@ const JUSTIFICATIONS = {
 
 const meta: Meta< typeof HStack > = {
 	component: HStack,
-	title: 'Components (Experimental)/HStack',
+	title: 'Components/Layout/HStack',
+	id: 'components-hstack',
 	argTypes: {
 		as: {
 			control: { type: null },

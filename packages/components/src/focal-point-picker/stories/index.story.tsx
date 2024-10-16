@@ -13,7 +13,8 @@ import { useState } from '@wordpress/element';
 import FocalPointPicker from '..';
 
 const meta: Meta< typeof FocalPointPicker > = {
-	title: 'Components/FocalPointPicker',
+	title: 'Block Editor/FocalPointPicker',
+	id: 'components-focalpointpicker',
 	component: FocalPointPicker,
 	argTypes: {
 		help: { control: 'text' },

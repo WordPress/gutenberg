@@ -15,7 +15,8 @@ import { DuotonePicker } from '..';
 import type { DuotonePickerProps } from '../types';
 
 const meta: Meta< typeof DuotonePicker > = {
-	title: 'Components/DuotonePicker',
+	title: 'Components/Selection & Input/Color/DuotonePicker',
+	id: 'components-duotonepicker',
 	component: DuotonePicker,
 	argTypes: {
 		onChange: { action: 'onChange' },

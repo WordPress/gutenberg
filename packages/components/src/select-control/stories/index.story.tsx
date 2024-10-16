@@ -15,7 +15,8 @@ import SelectControl from '../';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Components/SelectControl',
+	title: 'Components/Selection & Input/SelectControl',
+	id: 'components-selectcontrol',
 	component: SelectControl,
 	argTypes: {
 		help: { control: { type: 'text' } },

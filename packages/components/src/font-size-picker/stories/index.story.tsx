@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
 import FontSizePicker from '../';
 
 const meta: Meta< typeof FontSizePicker > = {
-	title: 'Components/FontSizePicker',
+	title: 'Block Editor/FontSizePicker',
+	id: 'components-fontsizepicker',
 	component: FontSizePicker,
 	argTypes: {
 		value: { control: { type: null } },

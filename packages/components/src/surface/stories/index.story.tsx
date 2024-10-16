@@ -11,7 +11,8 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Surface > = {
 	component: Surface,
-	title: 'Components (Experimental)/Surface',
+	title: 'Components/Layout/Surface',
+	id: 'components-surface',
 	argTypes: {
 		children: { control: { type: null } },
 		as: { control: { type: 'text' } },

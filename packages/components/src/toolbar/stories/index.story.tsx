@@ -38,7 +38,8 @@ import {
 import DropdownMenu from '../../dropdown-menu';
 
 const meta: Meta< typeof Toolbar > = {
-	title: 'Components/Toolbar',
+	title: 'Components/Block Editor/Toolbar',
+	id: 'components-toolbar',
 	component: Toolbar,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

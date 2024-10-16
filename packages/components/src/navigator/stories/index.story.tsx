@@ -21,7 +21,8 @@ const meta: Meta< typeof Navigator > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		BackButton: Navigator.BackButton,
 	},
-	title: 'Components/Navigator',
+	title: 'Components/Navigation/Navigator',
+	id: 'components-navigator',
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },
