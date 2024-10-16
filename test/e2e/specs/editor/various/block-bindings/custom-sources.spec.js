@@ -757,7 +757,7 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
-	test.describe( 'getFieldsList', () => {
+	test.describe( 'render', () => {
 		test( 'should be possible to update attribute value through bindings UI', async ( {
 			editor,
 			page,
@@ -772,6 +772,9 @@ test.describe( 'Registered sources', () => {
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
 			await page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Text Field Label' } )
@@ -908,6 +911,9 @@ test.describe( 'Registered sources', () => {
 				},
 			} );
 			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
 			const textField = page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Text Field Label' } );
@@ -1096,7 +1102,7 @@ test.describe( 'Registered sources', () => {
 				'Add Empty Field Label'
 			);
 		} );
-		test( 'should show source label when value is empty, cannot edit, and `getFieldsList` is undefined', async ( {
+		test( 'should show source label when value is empty, cannot edit, and `render` is undefined', async ( {
 			editor,
 		} ) => {
 			await editor.insertBlock( {

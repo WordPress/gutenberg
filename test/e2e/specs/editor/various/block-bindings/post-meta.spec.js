@@ -164,6 +164,9 @@ test.describe( 'Post Meta source', () => {
 				} );
 				await contentBinding.click();
 				await page
+					.getByRole( 'menuitem', { name: 'Post Meta' } )
+					.click();
+				await page
 					.getByRole( 'menuitemradio' )
 					.filter( { hasText: 'Movie field label' } )
 					.click();
@@ -195,6 +198,9 @@ test.describe( 'Post Meta source', () => {
 				} );
 				await contentBinding.click();
 				await page
+					.getByRole( 'menuitem', { name: 'Post Meta' } )
+					.click();
+				await page
 					.getByRole( 'menuitemradio' )
 					.filter( { hasText: 'field_without_label_or_default' } )
 					.click();
@@ -220,6 +226,9 @@ test.describe( 'Post Meta source', () => {
 					.getByRole( 'button', {
 						name: 'content',
 					} )
+					.click();
+				await page
+					.getByRole( 'menuitem', { name: 'Post Meta' } )
 					.click();
 			} );
 
@@ -314,20 +323,19 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
+			// Check post meta dropdown is not available.
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Post Meta' } )
+			).toBeHidden();
+
 			// Check the fields registered by other sources are there.
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
 			const customSourceField = page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Text Field Label' } );
 			await expect( customSourceField ).toBeVisible();
-			// Check the post meta fields are not visible.
-			const globalField = page
-				.getByRole( 'menuitemradio' )
-				.filter( { hasText: 'text_custom_field' } );
-			await expect( globalField ).toBeHidden();
-			const movieField = page
-				.getByRole( 'menuitemradio' )
-				.filter( { hasText: 'Movie field label' } );
-			await expect( movieField ).toBeHidden();
 		} );
 		test( 'should show the key in attributes connected to post meta', async ( {
 			editor,
@@ -542,6 +550,7 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
+			await page.getByRole( 'menuitem', { name: 'Post Meta' } ).click();
 			const movieField = page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Movie field label' } );
