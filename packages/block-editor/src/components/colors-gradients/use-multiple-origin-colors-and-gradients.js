@@ -77,7 +77,7 @@ export default function useMultipleOriginColorsAndGradients() {
 			result.push( {
 				name: _x(
 					'Custom',
-					'Indicates this palette comes from the theme.'
+					'Indicates this palette is created by the user.'
 				),
 				slug: 'custom',
 				colors: customColors,

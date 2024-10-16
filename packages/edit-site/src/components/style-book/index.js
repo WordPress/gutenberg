@@ -90,7 +90,7 @@ function useMultiOriginPalettes() {
 			result.duotones.push( {
 				name: _x(
 					'Theme',
-					'Indicates this palette comes from the theme.'
+					'Indicates these duotone filters come from the theme.'
 				),
 				slug: 'theme',
 				duotones: themeDuotones,
@@ -105,7 +105,7 @@ function useMultiOriginPalettes() {
 			result.duotones.push( {
 				name: _x(
 					'Default',
-					'Indicates this palette comes from WordPress.'
+					'Indicates these duotone filters come from WordPress.'
 				),
 				slug: 'default',
 				duotones: defaultDuotones,
@@ -115,8 +115,7 @@ function useMultiOriginPalettes() {
 			result.duotones.push( {
 				name: _x(
 					'Custom',
-					// TODO: Should the follow saying from the theme or user? It currently matches useMultipleOriginColorsAndGradients.
-					'Indicates this palette comes from the theme.'
+					'Indicates these doutone filters are created by the user.'
 				),
 				slug: 'custom',
 				duotones: customDuotones,
