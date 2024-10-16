@@ -93,10 +93,6 @@ function BlockPattern( {
 							onDragEnd( event );
 						}
 					} }
-					onClick={ () => {
-						onClick( pattern, blocks );
-						onHover?.( null );
-					} }
 				>
 					<WithToolTip
 						showTooltip={
