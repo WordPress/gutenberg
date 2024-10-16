@@ -247,7 +247,7 @@ function Iframe( {
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
-	const outerContainerWidth = Math.max(
+	const scaleContainerWidth = Math.max(
 		initialContainerWidth.current,
 		containerWidth
 	);
@@ -357,7 +357,7 @@ function Iframe( {
 			scale === 'default'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
-						outerContainerWidth
+						scaleContainerWidth
 				: scale
 		);
 
@@ -379,8 +379,8 @@ function Iframe( {
 			`${ containerWidth }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-outer-container-width',
-			`${ outerContainerWidth }px`
+			'--wp-block-editor-iframe-zoom-out-scale-container-width',
+			`${ scaleContainerWidth }px`
 		);
 
 		return () => {
@@ -400,7 +400,7 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-container-width'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-outer-container-width'
+				'--wp-block-editor-iframe-zoom-out-scale-container-width'
 			);
 		};
 	}, [
@@ -412,7 +412,7 @@ function Iframe( {
 		containerWidth,
 		windowInnerWidth,
 		isZoomedOut,
-		outerContainerWidth,
+		scaleContainerWidth,
 	] );
 
 	// Make sure to not render the before and after focusable div elements in view
@@ -502,8 +502,8 @@ function Iframe( {
 					isZoomedOut && 'is-zoomed-out'
 				) }
 				style={ {
-					'--wp-block-editor-iframe-zoom-out-outer-container-width':
-						isZoomedOut && `${ outerContainerWidth }px`,
+					'--wp-block-editor-iframe-zoom-out-scale-container-width':
+						isZoomedOut && `${ scaleContainerWidth }px`,
 				} }
 			>
 				{ iframe }
