@@ -192,18 +192,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			// If it is a template, try to inherit the post type from the slug.
+			// If it is a template, try to inherit the post type from the name.
 			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
 					postContext.postType = 'post';
 				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
-					// If the slug is single-{postType}, infer the post type from the slug.
-					const postTypesSlugs =
-						postTypes?.map( ( entity ) => entity.slug ) || [];
+					// If the slug is single-{postType}, infer the post type from the name.
+					const postTypesNames =
+						postTypes?.map( ( entity ) => entity.name ) || [];
 					const match = post.slug.match(
-						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
+						`^single-(${ postTypesNames.join( '|' ) })(?:-.+)?$`
 					);
 					if ( match ) {
 						postContext.postType = match[ 1 ];
