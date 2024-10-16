@@ -10,8 +10,7 @@ import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
 	component: TextHighlight,
-	title: 'Components/Typography/TextHighlight',
-	id: 'components-texthighlight',
+	title: 'Components/TextHighlight',
 	parameters: {
 		controls: {
 			expanded: true,

@@ -9,8 +9,7 @@ import DropZone from '..';
 
 const meta: Meta< typeof DropZone > = {
 	component: DropZone,
-	title: 'Components/Selection & Input/File Upload/DropZone',
-	id: 'components-dropzone',
+	title: 'Components/DropZone',
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

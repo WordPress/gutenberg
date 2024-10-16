@@ -15,8 +15,7 @@ import Icon from '../../icon';
 import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
-	title: 'Components/Feedback/Snackbar',
-	id: 'components-snackbar',
+	title: 'Components/Snackbar',
 	component: Snackbar,
 	argTypes: {
 		as: { control: { type: null } },

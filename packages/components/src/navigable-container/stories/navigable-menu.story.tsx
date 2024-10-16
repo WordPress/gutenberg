@@ -9,8 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { NavigableMenu } from '..';
 
 const meta: Meta< typeof NavigableMenu > = {
-	title: 'Components/Containers/NavigableMenu',
-	id: 'components-navigablemenu',
+	title: 'Components/NavigableMenu',
 	component: NavigableMenu,
 	argTypes: {
 		children: { control: { type: null } },

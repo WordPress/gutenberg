@@ -14,8 +14,7 @@ import { useState } from '@wordpress/element';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
-	title: 'Components/Selection & Input/ToggleControl',
-	id: 'components-togglecontrol',
+	title: 'Components/ToggleControl',
 	component: ToggleControl,
 	argTypes: {
 		checked: { control: { type: null } },

@@ -14,8 +14,7 @@ import { useState } from '@wordpress/element';
 import BoxControl from '../';
 
 const meta: Meta< typeof BoxControl > = {
-	title: 'Block Editor/BoxControl',
-	id: 'components-boxcontrol',
+	title: 'Components/BoxControl',
 	component: BoxControl,
 	argTypes: {
 		values: { control: { type: null } },

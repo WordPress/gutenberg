@@ -11,7 +11,7 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import URLPopover from '../';
 
-export default { title: 'Block Editor/URLPopover' };
+export default { title: 'BlockEditor/URLPopover' };
 
 const TestURLPopover = () => {
 	const [ isVisible, setVisiblility ] = useState( false );

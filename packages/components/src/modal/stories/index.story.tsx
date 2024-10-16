@@ -19,8 +19,7 @@ import type { ModalProps } from '../types';
 
 const meta: Meta< typeof Modal > = {
 	component: Modal,
-	title: 'Components/Overlays/Modal',
-	id: 'components-modal',
+	title: 'Components/Modal',
 	argTypes: {
 		children: {
 			control: { type: null },

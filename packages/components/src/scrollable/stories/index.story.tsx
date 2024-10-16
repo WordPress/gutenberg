@@ -16,8 +16,7 @@ import { Scrollable } from '..';
 
 const meta: Meta< typeof Scrollable > = {
 	component: Scrollable,
-	title: 'Components/Layout/Scrollable',
-	id: 'components-scrollable',
+	title: 'Components (Experimental)/Scrollable',
 	argTypes: {
 		as: {
 			control: { type: 'text' },

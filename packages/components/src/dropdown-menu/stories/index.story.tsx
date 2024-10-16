@@ -23,8 +23,7 @@ import {
 } from '@wordpress/icons';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components/Menus/DropdownMenu',
-	id: 'components-dropdown-menu',
+	title: 'Components/DropdownMenu',
 	component: DropdownMenu,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

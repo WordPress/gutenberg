@@ -10,7 +10,7 @@ import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
-	title: 'Components/Selection & Input/BaseControl',
+	title: 'Components/BaseControl',
 	component: BaseControl,
 	argTypes: {
 		children: { control: { type: null } },

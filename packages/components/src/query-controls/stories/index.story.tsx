@@ -19,8 +19,7 @@ import type {
 } from '../types';
 
 const meta: Meta< typeof QueryControls > = {
-	title: 'Block Editor/QueryControls',
-	id: 'components-querycontrols',
+	title: 'Components/QueryControls',
 	component: QueryControls,
 	argTypes: {
 		numberOfItems: { control: { type: null } },

@@ -18,8 +18,7 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof RangeControl > = {
 	component: RangeControl,
-	title: 'Components/Selection & Input/RangeControl',
-	id: 'components-rangecontrol',
+	title: 'Components/RangeControl',
 	argTypes: {
 		afterIcon: {
 			control: { type: 'select' },

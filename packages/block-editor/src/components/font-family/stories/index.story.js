@@ -10,7 +10,7 @@ import FontFamilyControl from '..';
 
 export default {
 	component: FontFamilyControl,
-	title: 'Block Editor/FontFamilyControl',
+	title: 'BlockEditor/FontFamilyControl',
 };
 
 export const Default = {

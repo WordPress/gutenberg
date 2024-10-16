@@ -15,8 +15,7 @@ import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
 	component: TextControl,
-	title: 'Components/Selection & Input/TextControl',
-	id: 'components-textcontrol',
+	title: 'Components/TextControl',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },

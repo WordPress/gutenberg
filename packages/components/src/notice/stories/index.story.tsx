@@ -17,8 +17,7 @@ import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
-	title: 'Components/Feedback/Notice',
-	id: 'components-notice',
+	title: 'Components/Notice',
 	component: Notice,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NoticeList },

@@ -20,8 +20,7 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Containers/Tabs',
-	id: 'components-tabs',
+	title: 'Components (Experimental)/Tabs',
 	component: Tabs,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

@@ -14,8 +14,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
-	title: 'Components/Selection & input/File Upload/FormFileUpload',
-	id: 'components-formfileupload',
+	title: 'Components/FormFileUpload',
 	component: FormFileUpload,
 	argTypes: {
 		icon: { control: { type: null } },

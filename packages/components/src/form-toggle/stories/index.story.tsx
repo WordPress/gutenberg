@@ -15,8 +15,7 @@ import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
-	title: 'Components/Selection & Input/FormToggle',
-	id: 'components-formtoggle',
+	title: 'Components/FormToggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',

@@ -15,8 +15,7 @@ import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 const meta: Meta< typeof Slot > = {
 	component: Slot,
-	title: 'Components/Utilities/SlotFill',
-	id: 'components-slotfill',
+	title: 'Components/SlotFill',
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Fill, SlotFillProvider },
 	argTypes: {

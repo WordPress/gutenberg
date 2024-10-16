@@ -15,8 +15,7 @@ import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
 	component: RadioControl,
-	title: 'Components/Selection & Input/RadioControl',
-	id: 'components-radiocontrol',
+	title: 'Components/RadioControl',
 	argTypes: {
 		onChange: {
 			action: 'onChange',

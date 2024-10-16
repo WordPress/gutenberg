@@ -17,8 +17,7 @@ import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
 const meta: Meta< typeof AlignmentMatrixControl > = {
-	title: 'Block Editor/AlignmentMatrixControl',
-	id: 'components-alignmentmatrixcontrol',
+	title: 'Components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

@@ -10,8 +10,7 @@ import { ColorPicker } from '../component';
 
 const meta: Meta< typeof ColorPicker > = {
 	component: ColorPicker,
-	title: 'Components/Selection & Input/Color/ColorPicker',
-	id: 'components-colorpicker',
+	title: 'Components/ColorPicker',
 	argTypes: {
 		as: { control: { type: null } },
 		color: { control: { type: null } },

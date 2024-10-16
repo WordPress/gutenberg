@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element';
 import TextAlignmentControl from '../';
 
 export default {
-	title: 'Block Editor/TextAlignmentControl',
+	title: 'BlockEditor/TextAlignmentControl',
 	component: TextAlignmentControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

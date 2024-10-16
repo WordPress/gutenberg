@@ -15,8 +15,7 @@ import PaletteEdit from '..';
 import type { Color, Gradient } from '../types';
 
 const meta: Meta< typeof PaletteEdit > = {
-	title: 'Components/Selection & Input/Color/PaletteEdit',
-	id: 'components-paletteedit',
+	title: 'Components/PaletteEdit',
 	component: PaletteEdit,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

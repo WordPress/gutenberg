@@ -16,8 +16,7 @@ import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Block Editor/BorderBoxControl',
-	id: 'components-borderboxcontrol',
+	title: 'Components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

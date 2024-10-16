@@ -10,8 +10,7 @@ import { Truncate } from '..';
 
 const meta: Meta< typeof Truncate > = {
 	component: Truncate,
-	title: 'Components/Typography/Truncate',
-	id: 'components-truncate',
+	title: 'Components (Experimental)/Truncate',
 	argTypes: {
 		children: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },

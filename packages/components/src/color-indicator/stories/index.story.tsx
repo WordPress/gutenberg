@@ -10,8 +10,7 @@ import ColorIndicator from '..';
 
 const meta: Meta< typeof ColorIndicator > = {
 	component: ColorIndicator,
-	title: 'Components/Selection & Input/Color/ColorIndicator',
-	id: 'components-colorindicator',
+	title: 'Components/ColorIndicator',
 	argTypes: {
 		colorValue: {
 			control: { type: 'color' },

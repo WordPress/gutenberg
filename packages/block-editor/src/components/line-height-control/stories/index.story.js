@@ -10,7 +10,7 @@ import LineHeightControl from '../';
 
 export default {
 	component: LineHeightControl,
-	title: 'Block Editor/LineHeightControl',
+	title: 'BlockEditor/LineHeightControl',
 };
 
 const Template = ( props ) => {

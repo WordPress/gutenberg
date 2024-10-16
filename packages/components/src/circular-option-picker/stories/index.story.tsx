@@ -17,7 +17,7 @@ const CircularOptionPickerStoryContext = createContext< {
 } >( {} );
 
 const meta: Meta< typeof CircularOptionPicker > = {
-	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	title: 'Components/CircularOptionPicker',
 	component: CircularOptionPicker,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

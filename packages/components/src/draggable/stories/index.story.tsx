@@ -18,8 +18,7 @@ import Draggable from '..';
 
 const meta: Meta< typeof Draggable > = {
 	component: Draggable,
-	title: 'Components/Utilities/Draggable',
-	id: 'components-draggable',
+	title: 'Components/Draggable',
 	argTypes: {
 		elementId: { control: { type: null } },
 		__experimentalDragComponent: { control: { type: null } },

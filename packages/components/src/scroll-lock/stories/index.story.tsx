@@ -17,8 +17,7 @@ import ScrollLock from '..';
 
 const meta: Meta< typeof ScrollLock > = {
 	component: ScrollLock,
-	title: 'Components/Utilities/ScrollLock',
-	id: 'components-scrolllock',
+	title: 'Components/ScrollLock',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },

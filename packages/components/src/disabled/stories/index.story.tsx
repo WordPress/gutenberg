@@ -18,8 +18,7 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
-	title: 'Components/Utilities/Disabled',
-	id: 'components-disabled',
+	title: 'Components/Disabled',
 	component: Disabled,
 	argTypes: {
 		as: { control: { type: null } },

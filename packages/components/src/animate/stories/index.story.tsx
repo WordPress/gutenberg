@@ -10,8 +10,7 @@ import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Utilities/Animate',
-	id: 'components-animate',
+	title: 'Components/Animate',
 	component: Animate,
 	parameters: {
 		controls: { expanded: true },

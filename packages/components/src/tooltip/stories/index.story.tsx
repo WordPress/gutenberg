@@ -15,8 +15,7 @@ import Tooltip from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
-	title: 'Components/Overlays/Tooltip',
-	id: 'components-tooltip',
+	title: 'Components/Tooltip',
 	component: Tooltip,
 	argTypes: {
 		children: { control: { type: null } },

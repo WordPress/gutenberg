@@ -14,8 +14,7 @@ import { useState } from '@wordpress/element';
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
-	title: 'Components/Selection & Input/Search & Filtering/SearchControl',
-	id: 'components-searchcontrol',
+	title: 'Components/SearchControl',
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },

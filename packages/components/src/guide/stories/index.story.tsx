@@ -15,8 +15,7 @@ import Button from '../../button';
 import Guide from '..';
 
 const meta: Meta< typeof Guide > = {
-	title: 'Block Editor/Guide',
-	id: 'components-guide',
+	title: 'Components/Guide',
 	component: Guide,
 	argTypes: {
 		contentLabel: { control: 'text' },

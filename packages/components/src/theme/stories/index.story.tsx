@@ -13,8 +13,7 @@ import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof Theme > = {
 	component: Theme,
-	title: 'Components/Utilities/Theme',
-	id: 'components-theme',
+	title: 'Components/Theme',
 	argTypes: {
 		accent: { control: { type: 'color' } },
 		background: { control: { type: 'color' } },

@@ -15,8 +15,7 @@ import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
 	component: TextareaControl,
-	title: 'Components/Selection & Input/TextareaControl',
-	id: 'components-textareacontrol',
+	title: 'Components/TextareaControl',
 	argTypes: {
 		onChange: { action: 'onChange' },
 		label: { control: { type: 'text' } },

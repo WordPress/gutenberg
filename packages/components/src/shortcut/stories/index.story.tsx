@@ -10,8 +10,7 @@ import Shortcut from '../';
 
 const meta: Meta< typeof Shortcut > = {
 	component: Shortcut,
-	title: 'Components/Utilities/Shortcut',
-	id: 'components-shortcut',
+	title: 'Components/Shortcut',
 	parameters: {
 		controls: {
 			expanded: true,
