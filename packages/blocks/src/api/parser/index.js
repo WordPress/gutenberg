@@ -16,6 +16,7 @@ import { getSaveContent } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
+import { stripBlockVariationSuffixFromBlockName } from './convert-alias-block';
 import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
@@ -75,6 +76,24 @@ function convertLegacyBlocks( rawBlock ) {
 		...rawBlock,
 		blockName: correctName,
 		attrs: correctedAttributes,
+	};
+}
+
+/**
+ * Convert alias blocks to their canonical form. This function is used
+ * at the parser level for previous content.
+ *
+ * @param {WPRawBlock} rawBlock
+ *
+ * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
+ */
+function convertAliasBlocks( rawBlock ) {
+	const correctName = stripBlockVariationSuffixFromBlockName(
+		rawBlock.blockName
+	);
+	return {
+		...rawBlock,
+		blockName: correctName,
 	};
 }
 
@@ -200,6 +219,9 @@ export function parseRawBlock( rawBlock, options ) {
 	// and transformed others to new blocks. To avoid breaking existing content,
 	// we added this function to properly parse the old content.
 	normalizedBlock = convertLegacyBlocks( normalizedBlock );
+
+	// Convert alias blocks to their canonical form.
+	normalizedBlock = convertAliasBlocks( normalizedBlock );
 
 	// Try finding the type for known block name.
 	let blockType = getBlockType( normalizedBlock.blockName );
