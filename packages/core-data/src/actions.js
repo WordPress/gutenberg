@@ -351,12 +351,12 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param {string}        kind                 Kind of the edited entity record.
- * @param {string}        name                 Name of the edited entity record.
- * @param {number|string} recordId             Record ID of the edited entity record.
- * @param {Object}        edits                The edits.
- * @param {Object}        options              Options for the edit.
- * @param {boolean}       [options.undoIgnore] Whether to ignore the edit in undo history or not.
+ * @param {string}         kind                 Kind of the edited entity record.
+ * @param {string}         name                 Name of the edited entity record.
+ * @param {number|string=} recordId             Record ID of the edited entity record.
+ * @param {Object}         edits                The edits.
+ * @param {Object}         options              Options for the edit.
+ * @param {boolean}        [options.undoIgnore] Whether to ignore the edit in undo history or not.
  *
  * @return {Object} Action object.
  */
@@ -775,7 +775,7 @@ export const __experimentalBatch =
  *
  * @param {string}  kind     Kind of the entity.
  * @param {string}  name     Name of the entity.
- * @param {Object}  recordId ID of the record.
+ * @param {Object=} recordId ID of the record.
  * @param {Object=} options  Saving options.
  */
 export const saveEditedEntityRecord =
