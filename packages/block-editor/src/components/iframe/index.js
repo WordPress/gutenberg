@@ -437,6 +437,7 @@ function Iframe( {
 				// content.
 				src={ src }
 				title={ title }
+				role="application"
 				onKeyDown={ ( event ) => {
 					if ( props.onKeyDown ) {
 						props.onKeyDown( event );
