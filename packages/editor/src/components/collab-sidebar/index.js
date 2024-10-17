@@ -53,7 +53,7 @@ export default function CollabSidebar() {
 	const { getEntityRecords } = resolveSelect( coreStore );
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { openGeneralSidebar } = useDispatch( editorStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 
