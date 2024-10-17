@@ -10,6 +10,7 @@ import { useState, useMemo, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	DropdownMenu,
 	TextareaControl,
@@ -50,6 +51,24 @@ export function Comments( {
 	onCommentResolve,
 } ) {
 	const [ actionState, setActionState ] = useState( false );
+	const [ isConfirmDialogOpen, setIsConfirmDialogOpen ] = useState( false );
+
+	const handleConfirmDelete = () => {
+		onCommentDelete(actionState.id);
+		setActionState(false);
+		setIsConfirmDialogOpen(false);
+	};
+
+	const handleConfirmResolve = () => {
+		onCommentResolve(actionState.id);
+		setActionState(false);
+		setIsConfirmDialogOpen(false);
+	};
+
+	const handleCancelDelete = () => {
+		setActionState(false);
+		setIsConfirmDialogOpen(false);
+	};
 
 	const blockCommentId = useSelect( ( select ) => {
 		const clientID = select( blockEditorStore ).getSelectedBlockClientId();
@@ -64,18 +83,20 @@ export function Comments( {
 			<>
 				<CommentHeader
 					thread={ thread }
-					onResolve={ () =>
-						setActionState( {
+					onResolve={ () => {
+						setActionState({
 							action: 'resolve',
 							id: parentThread?.id ?? thread.id,
-						} )
-					}
+						});
+						setIsConfirmDialogOpen(true);
+					}}
 					onEdit={ () =>
 						setActionState( { action: 'edit', id: thread.id } )
 					}
-					onDelete={ () =>
-						setActionState( { action: 'delete', id: thread.id } )
-					}
+					onDelete={ () => {
+						setActionState({ action: 'delete', id: thread.id });
+						setIsConfirmDialogOpen(true);
+					}}
 					onReply={
 						! parentThread
 							? () =>
@@ -116,35 +137,33 @@ export function Comments( {
 				</HStack>
 				{ 'resolve' === actionState?.action &&
 					thread.id === actionState?.id && (
-						<ConfirmNotice
-							confirmMessage={
-								// translators: message displayed when marking a comment as resolved
-								__(
-									'Are you sure you want to mark this comment as resolved?'
-								)
-							}
-							confirmAction={ () => {
-								onCommentResolve( thread.id );
-								setActionState( false );
-							} }
-							discardAction={ () => setActionState( false ) }
-						/>
+						<ConfirmDialog
+                             isOpen={isConfirmDialogOpen}
+                             onConfirm={handleConfirmResolve}
+                             onCancel={handleCancelDelete}
+                             confirmButtonText="Yes"
+                             cancelButtonText="No"
+                         >
+                             {
+                                 // translators: message displayed when confirming an action
+                                 __('Are you sure you want to mark this comment as resolved?')
+                             }
+                        </ConfirmDialog>
 					) }
 				{ 'delete' === actionState?.action &&
 					thread.id === actionState?.id && (
-						<ConfirmNotice
-							confirmMessage={
-								// translators: message displayed when deleting a comment
-								__(
-									'Are you sure you want to delete this comment?'
-								)
-							}
-							confirmAction={ () => {
-								onCommentDelete( thread.id );
-								setActionState( false );
-							} }
-							discardAction={ () => setActionState( false ) }
-						/>
+						<ConfirmDialog
+                             isOpen={isConfirmDialogOpen}
+                             onConfirm={handleConfirmDelete}
+                             onCancel={handleCancelDelete}
+                             confirmButtonText="Yes"
+                             cancelButtonText="No"
+                        >
+                             {
+                                 // translators: message displayed when confirming an action
+                                 __('Are you sure you want to delete this comment?')
+                             }
+                        </ConfirmDialog>
 					) }
 			</>
 		);
@@ -275,45 +294,6 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 				</HStack>
 			</VStack>
 		</>
-	);
-}
-
-/**
- * Renders a confirmation notice component.
- *
- * @param {Object}   props                - The component props.
- * @param {string}   props.confirmMessage - The confirmation message to display. Defaults to 'Are you sure?' if not provided.
- * @param {Function} props.confirmAction  - The action to perform when the confirm button is clicked.
- * @param {Function} props.discardAction  - The action to perform when the discard button is clicked.
- * @return {JSX.Element} The confirmation notice component.
- */
-function ConfirmNotice( { confirmMessage, confirmAction, discardAction } ) {
-	return (
-		<VStack
-			// translators: title for the confirmation overlay
-			title={ __( 'Confirm' ) }
-			className="editor-collab-sidebar-panel__thread-overlay"
-			spacing="0"
-			justify="space-between"
-		>
-			<p>
-				{ confirmMessage ??
-					// translators: message displayed when confirming an action
-					__( 'Are you sure?' ) }
-			</p>
-			<HStack>
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					onClick={ confirmAction }
-				>
-					{ __( 'Yes' ) }
-				</Button>
-				<Button __next40pxDefaultSize onClick={ discardAction }>
-					{ __( 'No' ) }
-				</Button>
-			</HStack>
-		</VStack>
 	);
 }
 
