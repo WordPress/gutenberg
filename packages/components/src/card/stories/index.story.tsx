@@ -22,7 +22,8 @@ const meta: Meta< typeof Card > = {
 	component: Card,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
-	title: 'Components/Card',
+	title: 'Components/Containers/Card',
+	id: 'components-card',
 	argTypes: {
 		as: {
 			control: { type: null },

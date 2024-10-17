@@ -411,6 +411,7 @@ export function HierarchicalTermSelector( { slug } ) {
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ filterLabel }
+					placeholder={ filterLabel }
 					value={ filterValue }
 					onChange={ setFilter }
 				/>

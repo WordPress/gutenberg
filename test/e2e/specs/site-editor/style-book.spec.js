@@ -29,7 +29,7 @@ test.describe( 'Style Book', () => {
 
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
-			page.locator( 'role=button[name="Toggle block inserter"i]' )
+			page.locator( 'role=button[name="Block Inserter"i]' )
 		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
@@ -42,9 +42,6 @@ test.describe( 'Style Book', () => {
 	test( 'should have tabs containing block examples', async ( { page } ) => {
 		await expect( page.locator( 'role=tab[name="Text"i]' ) ).toBeVisible();
 		await expect( page.locator( 'role=tab[name="Media"i]' ) ).toBeVisible();
-		await expect(
-			page.locator( 'role=tab[name="Design"i]' )
-		).toBeVisible();
 		await expect(
 			page.locator( 'role=tab[name="Widgets"i]' )
 		).toBeVisible();

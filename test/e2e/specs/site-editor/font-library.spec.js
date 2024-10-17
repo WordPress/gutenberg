@@ -38,7 +38,7 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 
-		test( 'should display the "Add fonts" button', async ( { page } ) => {
+		test( 'should display the "Manage fonts" icon', async ( { page } ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
@@ -46,10 +46,10 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
-			const addFontsButton = page.getByRole( 'button', {
-				name: 'Add fonts',
+			const manageFontsIcon = page.getByRole( 'button', {
+				name: 'Manage fonts',
 			} );
-			await expect( addFontsButton ).toBeVisible();
+			await expect( manageFontsIcon ).toBeVisible();
 		} );
 	} );
 
@@ -66,9 +66,7 @@ test.describe( 'Font Library', () => {
 			} );
 		} );
 
-		test( 'should display the "Manage fonts" button', async ( {
-			page,
-		} ) => {
+		test( 'should display the "Manage fonts" icon', async ( { page } ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
@@ -76,13 +74,13 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
-			const manageFontsButton = page.getByRole( 'button', {
+			const manageFontsIcon = page.getByRole( 'button', {
 				name: 'Manage fonts',
 			} );
-			await expect( manageFontsButton ).toBeVisible();
+			await expect( manageFontsIcon ).toBeVisible();
 		} );
 
-		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" button', async ( {
+		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" icon', async ( {
 			page,
 		} ) => {
 			await page

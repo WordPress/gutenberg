@@ -62,7 +62,7 @@ export default function QueryInspectorControls( props ) {
 		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
-	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
+	const showSticky = postType === 'post';
 	const {
 		postTypesTaxonomiesMap,
 		postTypesSelectOptions,
@@ -70,9 +70,6 @@ export default function QueryInspectorControls( props ) {
 	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
-	useEffect( () => {
-		setShowSticky( postType === 'post' );
-	}, [ postType ] );
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
@@ -123,21 +120,18 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl =
 		isTemplate && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
-		! isTemplate;
+		! inherit && isControlAllowed( allowedControls, 'postType' );
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
-		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
-		! isTemplate;
+		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
-		( ! inherit &&
-			showSticky &&
-			isControlAllowed( allowedControls, 'sticky' ) ) ||
-		( showSticky && ! isTemplate );
+		! inherit &&
+		showSticky &&
+		isControlAllowed( allowedControls, 'sticky' );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
@@ -211,7 +205,7 @@ export default function QueryInspectorControls( props ) {
 							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
-								setQuery( { inherit: !! value } );
+								setQuery( { inherit: value === 'default' } );
 							} }
 							help={
 								inherit
@@ -222,14 +216,14 @@ export default function QueryInspectorControls( props ) {
 											'Display a list of posts or custom post types based on specific criteria.'
 									  )
 							}
-							value={ !! inherit }
+							value={ !! inherit ? 'default' : 'custom' }
 						>
 							<ToggleGroupControlOption
-								value
+								value="default"
 								label={ __( 'Default' ) }
 							/>
 							<ToggleGroupControlOption
-								value={ false }
+								value="custom"
 								label={ __( 'Custom' ) }
 							/>
 						</ToggleGroupControl>
@@ -321,7 +315,7 @@ export default function QueryInspectorControls( props ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Items' ) }
+						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
 					>
 						<PerPageControl
@@ -341,7 +335,7 @@ export default function QueryInspectorControls( props ) {
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem
-						label={ __( 'Max Pages to Show' ) }
+						label={ __( 'Max pages to show' ) }
 						hasValue={ () => pages > 0 }
 						onDeselect={ () => setQuery( { pages: 0 } ) }
 					>

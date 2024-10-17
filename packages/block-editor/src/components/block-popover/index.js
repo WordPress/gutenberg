@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import {
 	forwardRef,
 	useMemo,
@@ -21,6 +22,8 @@ import {
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 import { rectUnion, getVisibleElementBounds } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -74,12 +77,38 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
+	const { isZoomOut, parentSectionBlock, isSectionSelected } = useSelect(
+		( select ) => {
+			const {
+				isZoomOut: isZoomOutSelector,
+				getSectionRootClientId,
+				getParentSectionBlock,
+				getBlockOrder,
+			} = unlock( select( blockEditorStore ) );
+
+			return {
+				isZoomOut: isZoomOutSelector(),
+				parentSectionBlock:
+					getParentSectionBlock( clientId ) ?? clientId,
+				isSectionSelected: getBlockOrder(
+					getSectionRootClientId()
+				).includes( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	// This element is used to position the zoom out view vertical toolbar
+	// correctly, relative to the selected section.
+	const parentSectionElement = useBlockElement( parentSectionBlock );
+
 	const popoverAnchor = useMemo( () => {
 		if (
 			// popoverDimensionsRecomputeCounter is by definition always equal or greater
 			// than 0. This check is only there to satisfy the correctness of the
 			// exhaustive-deps rule for the `useMemo` hook.
 			popoverDimensionsRecomputeCounter < 0 ||
+			( isZoomOut && ! parentSectionElement ) ||
 			! selectedElement ||
 			( bottomClientId && ! lastSelectedElement )
 		) {
@@ -88,6 +117,35 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
+				// The zoom out view has a vertical block toolbar that should always
+				// be on the edge of the canvas, aligned to the top of the currently
+				// selected section. This condition changes the anchor of the toolbar
+				// to the section instead of the block to handle blocks that are
+				// not full width and nested blocks to keep section height.
+				if ( isZoomOut && isSectionSelected ) {
+					// Compute the height based on the parent section of the
+					// selected block, because the selected block may be
+					// shorter than the section.
+					const canvasElementRect = getVisibleElementBounds(
+						__unstableContentRef.current
+					);
+					const parentSectionElementRect =
+						getVisibleElementBounds( parentSectionElement );
+					const anchorHeight =
+						parentSectionElementRect.bottom -
+						parentSectionElementRect.top;
+
+					// Always use the width of the section root element to make sure
+					// the toolbar is always on the edge of the canvas.
+					const anchorWidth = canvasElementRect.width;
+					return new window.DOMRectReadOnly(
+						canvasElementRect.left,
+						parentSectionElementRect.top,
+						anchorWidth,
+						anchorHeight
+					);
+				}
+
 				return lastSelectedElement
 					? rectUnion(
 							getVisibleElementBounds( selectedElement ),
@@ -98,10 +156,14 @@ function BlockPopover(
 			contextElement: selectedElement,
 		};
 	}, [
+		popoverDimensionsRecomputeCounter,
+		isZoomOut,
+		parentSectionElement,
+		selectedElement,
 		bottomClientId,
 		lastSelectedElement,
-		selectedElement,
-		popoverDimensionsRecomputeCounter,
+		isSectionSelected,
+		__unstableContentRef,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {

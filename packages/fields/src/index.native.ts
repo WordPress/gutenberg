@@ -1,2 +1,2 @@
-export * from './actions/base-post/duplicate-post.native';
-export * from './actions/base-post/reorder-page.native';
+export * from './actions/duplicate-post.native';
+export * from './actions/reorder-page.native';

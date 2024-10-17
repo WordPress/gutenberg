@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
 import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
 
 /**
@@ -38,8 +41,7 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					size="compact"
 					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
@@ -53,8 +55,7 @@ class URLInputButton extends Component {
 					>
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								className="block-editor-url-input__back"
 								icon={ arrowLeft }
 								label={ __( 'Close' ) }
@@ -63,13 +64,16 @@ class URLInputButton extends Component {
 							<URLInput
 								value={ url || '' }
 								onChange={ onChange }
-							/>
-							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
-								icon={ keyboardReturn }
-								label={ __( 'Submit' ) }
-								type="submit"
+								suffix={
+									<InputControlSuffixWrapper variant="control">
+										<Button
+											size="small"
+											icon={ keyboardReturn }
+											label={ __( 'Submit' ) }
+											type="submit"
+										/>
+									</InputControlSuffixWrapper>
+								}
 							/>
 						</div>
 					</form>
