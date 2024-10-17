@@ -58,6 +58,7 @@ const gpl2CompatibleLicenses = [
 	'0BSD',
 	'Apache-2.0 WITH LLVM-exception',
 	'Artistic-2.0',
+	'BlueOak-1.0.0',
 	'BSD-2-Clause',
 	'BSD-3-Clause-W3C',
 	'BSD-3-Clause',

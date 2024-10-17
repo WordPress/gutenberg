@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add BlueOak-1.0.0 the GPLv2-comatible licenses recognized by check-licenses ([#66139](https://github.com/WordPress/gutenberg/pull/66139)).
+
 ### Internal
 
 -   Refactor to extract license related logic to a reusable module ([#66179](https://github.com/WordPress/gutenberg/pull/66179)).
