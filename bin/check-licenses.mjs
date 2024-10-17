@@ -10,17 +10,7 @@ import { spawnSync } from 'node:child_process';
  */
 import { checkDepsInTree } from '../packages/scripts/utils/license.js';
 
-const ignored = [
-	'@react-native-community/cli',
-	'@react-native-community/cli-platform-ios',
-	'@ampproject/remapping',
-	'human-signals',
-	'fb-watchman',
-	'walker',
-	'chrome-launcher',
-	'lighthouse-logger',
-	'chromium-edge-launcher',
-];
+const ignored = [ '@ampproject/remapping' ];
 
 /*
  * `wp-scripts check-licenses` uses prod and dev dependencies of the package to scan for dependencies. With npm workspaces, workspace packages (the @wordpress/* packages) are not listed in the main package json and this approach does not work.
