@@ -42,6 +42,8 @@ function BlockPattern( {
 	showTitle = true,
 	showTooltip,
 	category,
+	isSelected, // new prop to manage active state
+	setActivePattern, // function to set the active pattern
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
@@ -77,7 +79,10 @@ function BlockPattern( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className="block-editor-block-patterns-list__list-item"
+					className={ clsx(
+						'block-editor-block-patterns-list__list-item',
+						{ 'is-selected': isSelected } // Apply 'is-selected' class if this pattern is active
+					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
 						setIsDragging( true );
@@ -92,6 +97,10 @@ function BlockPattern( {
 							onDragEnd( event );
 						}
 					} }
+					onClick={ () => {
+						onClick( pattern, blocks );
+						onHover?.( null );
+					} }
 				>
 					<WithToolTip
 						showTooltip={
@@ -104,6 +113,7 @@ function BlockPattern( {
 							render={
 								<div
 									role="option"
+									tabIndex={ 0 }
 									aria-label={ pattern.title }
 									aria-describedby={
 										pattern.description
@@ -123,6 +133,7 @@ function BlockPattern( {
 							}
 							id={ id }
 							onClick={ () => {
+								setActivePattern( id ); // Set active pattern when clicked
 								onClick( pattern, blocks );
 								onHover?.( null );
 							} }
@@ -200,22 +211,30 @@ function BlockPatternsList(
 	ref
 ) {
 	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
+	const [ activePattern, setActivePattern ] = useState( null ); // State to track active pattern
 
 	useEffect( () => {
 		// Reset the active composite item whenever the available patterns change,
 		// to make sure that Composite widget can receive focus correctly when its
 		// composite items change. The first composite item will receive focus.
+
 		const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
 			shownPatterns.includes( pattern )
 		)?.name;
+
 		setActiveCompositeId( firstCompositeItemId );
 	}, [ shownPatterns, blockPatterns ] );
-
+	const handleClickPattern = ( pattern ) => {
+		setActivePattern( pattern.name ); // Set the clicked pattern as active
+		onClickPattern( pattern ); // Original onClick logic
+	};
 	return (
 		<Composite
 			orientation={ orientation }
 			activeId={ activeCompositeId }
 			setActiveId={ setActiveCompositeId }
+			selectedId={ activePattern }
+			setSelectedId={ setActivePattern }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
@@ -228,12 +247,14 @@ function BlockPatternsList(
 						key={ pattern.name }
 						id={ pattern.name }
 						pattern={ pattern }
-						onClick={ onClickPattern }
+						onClick={ handleClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
 						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
 						category={ category }
+						isSelected={ activePattern === pattern.name } // Highlight the active pattern
+						setActivePattern={ setActivePattern } // Function to set the active pattern
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />
