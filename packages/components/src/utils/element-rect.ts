@@ -134,7 +134,8 @@ const POLL_RATE = 100;
  * milliseconds until it succeeds.
  */
 export function useTrackElementOffsetRect(
-	targetElement: HTMLElement | undefined | null
+	targetElement: HTMLElement | undefined | null,
+	deps: unknown[] = []
 ) {
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
@@ -172,6 +173,16 @@ export function useTrackElementOffsetRect(
 			setIndicatorPosition( NULL_ELEMENT_OFFSET_RECT );
 		}
 	}, [ setElement, targetElement ] );
+
+	// Escape hatch to force a remeasurement when something else changes rather
+	// than the target elements' ref or size (for example, the target element
+	// can change its position within the tablist).
+	useLayoutEffect( () => {
+		measure();
+		// `measure` is a stable function, so it's safe to omit it from the deps array.
+		// deps can't be statically analyzed by ESLint
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, deps );
 
 	return indicatorPosition;
 }

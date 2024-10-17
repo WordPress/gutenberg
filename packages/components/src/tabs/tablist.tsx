@@ -68,9 +68,13 @@ export const TabList = forwardRef<
 	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
-	const selectedRect = useTrackElementOffsetRect(
-		store?.item( selectedId )?.element
-	);
+
+	const selectedItem = store?.item( selectedId );
+	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
+	const selectedItemIndex = renderedItems?.indexOf( selectedItem! ) ?? -1;
+	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+		selectedItemIndex,
+	] );
 
 	// Track overflow to show scroll hints.
 	const overflow = useTrackOverflow( parent, {
