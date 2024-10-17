@@ -98,8 +98,8 @@ const { state, actions } = store(
 				}
 
 				const url = new URL( window.location.href );
-				if ( ! isEmpty( value ) ) {
-					state.search = value;
+				url.searchParams.delete( 'paged' );
+				if ( value ) {
 					url.searchParams.set( 'instant-search', value );
 				} else {
 					url.searchParams.delete( 'instant-search' );
