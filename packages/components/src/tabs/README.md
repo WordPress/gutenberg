@@ -147,6 +147,33 @@ The function called when the `selectedTabId` changes.
 -   Required: No
 -   Default: `noop`
 
+###### `activeTabId`: `string | null`
+
+The current active tab `id`. The active tab is the tab element within the tablist widget that has DOM focus.
+
+- `null` represents the tablist (ie. the base composite element). Users
+  will be able to navigate out of it using arrow keys;
+- If `activeTabId` is initially set to `null`, the base composite element
+  itself will have focus and users will be able to navigate to it using
+  arrow keys.
+
+- Required: No
+
+###### `defaultActiveTabId`: `string | null`
+
+The tab id that should be active by default when the composite widget is rendered. If `null`, the tablist element itself will have focus and users will be able to navigate to it using arrow keys. If `undefined`, the first enabled item will be focused.
+
+_Note: this prop will be overridden by the `activeTabId` prop if it is provided._
+
+-   Required: No
+
+###### `onActiveTabIdChange`: `( ( activeId: string | null | undefined ) => void )`
+
+The function called when the `selectedTabId` changes.
+
+-   Required: No
+-   Default: `noop`
+
 ###### `orientation`: `'horizontal' | 'vertical' | 'both'`
 
 Defines the orientation of the tablist and determines which arrow keys can be used to move focus:
