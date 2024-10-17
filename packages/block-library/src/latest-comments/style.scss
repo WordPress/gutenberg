@@ -9,7 +9,6 @@ ol.wp-block-latest-comments {
 	box-sizing: border-box;
 }
 
-
 // Following styles leverage :where so that typography block support styles and
 // global styles apply when necessary.
 :where(.wp-block-latest-comments:not([style*="line-height"] .wp-block-latest-comments__comment)) {
