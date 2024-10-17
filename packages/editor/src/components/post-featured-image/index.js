@@ -188,7 +188,26 @@ function PostFeaturedImage( {
 										<img
 											className="editor-post-featured-image__preview-image"
 											src={ mediaSourceUrl }
-											alt=""
+											alt={
+												media.alt_text
+													? sprintf(
+															// Translators: %s: The selected image alt text.
+															__(
+																'Current image: %s'
+															),
+															media.alt_text
+													  )
+													: sprintf(
+															// Translators: %s: The selected image filename.
+															__(
+																'The current image has no alternative text. The file name is: %s'
+															),
+															media.media_details
+																.sizes?.full
+																?.file ||
+																media.slug
+													  )
+											}
 										/>
 									) }
 									{ isLoading && <Spinner /> }
