@@ -112,7 +112,12 @@ export const TabList = forwardRef<
 			ref={ refs }
 			store={ store }
 			render={ ( props ) => (
-				<div { ...props } tabIndex={ props.tabIndex ?? -1 } />
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
+				/>
 			) }
 			onBlur={ onBlur }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
