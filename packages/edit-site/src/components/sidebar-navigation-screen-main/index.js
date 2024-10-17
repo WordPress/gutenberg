@@ -21,6 +21,51 @@ import {
 	PATTERN_TYPES,
 } from '../../utils/constants';
 
+export function MainSidebarNavigationContent() {
+	return (
+		<ItemGroup>
+			<SidebarNavigationItem
+				uid="navigation-navigation-item"
+				params={ { postType: NAVIGATION_POST_TYPE } }
+				withChevron
+				icon={ navigation }
+			>
+				{ __( 'Navigation' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItemGlobalStyles
+				uid="styles-navigation-item"
+				icon={ styles }
+			>
+				{ __( 'Styles' ) }
+			</SidebarNavigationItemGlobalStyles>
+			<SidebarNavigationItem
+				uid="page-navigation-item"
+				params={ { postType: 'page' } }
+				withChevron
+				icon={ page }
+			>
+				{ __( 'Pages' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				uid="template-navigation-item"
+				params={ { postType: TEMPLATE_POST_TYPE } }
+				withChevron
+				icon={ layout }
+			>
+				{ __( 'Templates' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				uid="patterns-navigation-item"
+				params={ { postType: PATTERN_TYPES.user } }
+				withChevron
+				icon={ symbol }
+			>
+				{ __( 'Patterns' ) }
+			</SidebarNavigationItem>
+		</ItemGroup>
+	);
+}
+
 export default function SidebarNavigationScreenMain() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -38,51 +83,7 @@ export default function SidebarNavigationScreenMain() {
 			description={ __(
 				'Customize the appearance of your website using the block editor.'
 			) }
-			content={
-				<>
-					<ItemGroup>
-						<SidebarNavigationItem
-							uid="navigation-navigation-item"
-							params={ { postType: NAVIGATION_POST_TYPE } }
-							withChevron
-							icon={ navigation }
-						>
-							{ __( 'Navigation' ) }
-						</SidebarNavigationItem>
-						<SidebarNavigationItemGlobalStyles
-							uid="styles-navigation-item"
-							withChevron
-							icon={ styles }
-						>
-							{ __( 'Styles' ) }
-						</SidebarNavigationItemGlobalStyles>
-						<SidebarNavigationItem
-							uid="page-navigation-item"
-							params={ { postType: 'page' } }
-							withChevron
-							icon={ page }
-						>
-							{ __( 'Pages' ) }
-						</SidebarNavigationItem>
-						<SidebarNavigationItem
-							uid="template-navigation-item"
-							params={ { postType: TEMPLATE_POST_TYPE } }
-							withChevron
-							icon={ layout }
-						>
-							{ __( 'Templates' ) }
-						</SidebarNavigationItem>
-						<SidebarNavigationItem
-							uid="patterns-navigation-item"
-							params={ { postType: PATTERN_TYPES.user } }
-							withChevron
-							icon={ symbol }
-						>
-							{ __( 'Patterns' ) }
-						</SidebarNavigationItem>
-					</ItemGroup>
-				</>
-			}
+			content={ <MainSidebarNavigationContent /> }
 		/>
 	);
 }

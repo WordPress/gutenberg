@@ -18,7 +18,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
-export default function useEditorIframeProps() {
+export default function useEditorIframeProps( isPreviewOnly ) {
 	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
@@ -51,6 +51,7 @@ export default function useEditorIframeProps() {
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
 			if (
+				! isPreviewOnly &&
 				( keyCode === ENTER || keyCode === SPACE ) &&
 				! currentPostIsTrashed
 			) {
@@ -59,7 +60,9 @@ export default function useEditorIframeProps() {
 			}
 		},
 		onClick: () => {
-			setCanvasMode( 'edit' );
+			if ( ! isPreviewOnly ) {
+				setCanvasMode( 'edit' );
+			}
 		},
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {

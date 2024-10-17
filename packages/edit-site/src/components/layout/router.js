@@ -20,6 +20,8 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
+import GlobalStylesUIWrapper from '../sidebar-global-styles-wrapper';
+
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES,
@@ -148,15 +150,24 @@ export default function useLayoutAreas() {
 	}
 
 	// Styles
-	if ( path === '/wp_global_styles' ) {
+	if ( path && path.startsWith( '/wp_global_styles' ) ) {
 		return {
-			key: 'styles',
+			key: 'default',
 			areas: {
 				sidebar: (
 					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
 				),
-				preview: <Editor />,
-				mobile: hasEditCanvasMode && <Editor />,
+				content: <GlobalStylesUIWrapper />,
+				preview: <Editor isPreviewOnly />,
+				mobile: hasEditCanvasMode ? (
+					<Editor isPreviewOnly />
+				) : (
+					<GlobalStylesUIWrapper />
+				),
+			},
+			widths: {
+				content: 380,
+				hasResize: false,
 			},
 		};
 	}

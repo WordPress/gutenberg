@@ -35,6 +35,7 @@
 @import "./components/global-styles/font-library-modal/style.scss";
 @import "./components/pagination/style.scss";
 @import "./components/global-styles/variations/style.scss";
+@import "./components/sidebar-global-styles-wrapper/style.scss";
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {

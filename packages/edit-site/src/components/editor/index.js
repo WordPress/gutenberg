@@ -76,7 +76,10 @@ const siteIconVariants = {
 	},
 };
 
-export default function EditSiteEditor( { isPostsList = false } ) {
+export default function EditSiteEditor( {
+	isPostsList = false,
+	isPreviewOnly,
+} ) {
 	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
 	const isLoading = useIsSiteEditorLoading();
@@ -127,7 +130,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
-	const iframeProps = useEditorIframeProps();
+	const iframeProps = useEditorIframeProps( isPreviewOnly );
 	const isEditMode = canvasMode === 'edit';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
