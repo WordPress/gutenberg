@@ -25,8 +25,6 @@ export function useShowBlockTools() {
 			getSettings,
 			__unstableGetEditorMode,
 			isTyping,
-			getBlockOrder,
-			getSectionRootClientId,
 		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
@@ -44,17 +42,7 @@ export function useShowBlockTools() {
 			! isTyping() &&
 			editorMode === 'edit' &&
 			isEmptyDefaultBlock;
-		const isZoomOut = editorMode === 'zoom-out';
-		const isSectionSelected = getBlockOrder(
-			getSectionRootClientId()
-		).includes( clientId );
-		const _showZoomOutToolbar =
-			clientId &&
-			isZoomOut &&
-			! _showEmptyBlockSideInserter &&
-			isSectionSelected;
 		const _showBlockToolbarPopover =
-			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
@@ -63,7 +51,6 @@ export function useShowBlockTools() {
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
-			showZoomOutToolbar: _showZoomOutToolbar,
 		};
 	}, [] );
 }
