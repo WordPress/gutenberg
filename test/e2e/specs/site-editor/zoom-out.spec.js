@@ -44,7 +44,6 @@ test.describe( 'Zoom Out', () => {
 			const paddingValue = window.getComputedStyle( element ).paddingTop;
 			return parseFloat( paddingValue );
 		} );
-		await page.pause();
 		expect( htmlRect.y + paddingTop ).toBeGreaterThan( iframeRect.y );
 		expect( htmlRect.x ).toBeGreaterThan( iframeRect.x );
 	} );
