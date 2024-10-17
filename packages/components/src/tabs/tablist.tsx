@@ -111,8 +111,15 @@ export const TabList = forwardRef<
 		<StyledTabList
 			ref={ refs }
 			store={ store }
+			render={ ( props ) => (
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
+				/>
+			) }
 			onBlur={ onBlur }
-			tabIndex={ -1 }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
