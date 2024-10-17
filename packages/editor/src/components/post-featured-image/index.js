@@ -121,6 +121,35 @@ function PostFeaturedImage( {
 		} );
 	}
 
+	/**
+	 * Generates a description for the given image media object.
+	 *
+	 * @param {Object} imageMedia                               - The image media object.
+	 * @param {string} imageMedia.alt_text                      - The alternative text of the image.
+	 * @param {Object} imageMedia.media_details                 - The media details of the image.
+	 * @param {Object} imageMedia.media_details.sizes           - The sizes of the image.
+	 * @param {Object} imageMedia.media_details.sizes.full      - The full size details of the image.
+	 * @param {string} imageMedia.media_details.sizes.full.file - The file name of the full size image.
+	 * @param {string} imageMedia.slug                          - The slug of the image.
+	 * @return {string} The description of the image.
+	 */
+	function getImageDescription( imageMedia ) {
+		if ( imageMedia.alt_text ) {
+			return sprintf(
+				// Translators: %s: The selected image alt text.
+				__( 'Current image: %s' ),
+				imageMedia.alt_text
+			);
+		}
+		return sprintf(
+			// Translators: %s: The selected image filename.
+			__(
+				'The current image has no alternative text. The file name is: %s'
+			),
+			imageMedia.media_details.sizes?.full?.file || imageMedia.slug
+		);
+	}
+
 	return (
 		<PostFeaturedImageCheck>
 			{ noticeUI }
@@ -130,21 +159,7 @@ function PostFeaturedImage( {
 						id={ `editor-post-featured-image-${ featuredImageId }-describedby` }
 						className="hidden"
 					>
-						{ media.alt_text &&
-							sprintf(
-								// Translators: %s: The selected image alt text.
-								__( 'Current image: %s' ),
-								media.alt_text
-							) }
-						{ ! media.alt_text &&
-							sprintf(
-								// Translators: %s: The selected image filename.
-								__(
-									'The current image has no alternative text. The file name is: %s'
-								),
-								media.media_details.sizes?.full?.file ||
-									media.slug
-							) }
+						{ getImageDescription( media ) }
 					</div>
 				) }
 				<MediaUploadCheck fallback={ instructions }>
@@ -188,26 +203,7 @@ function PostFeaturedImage( {
 										<img
 											className="editor-post-featured-image__preview-image"
 											src={ mediaSourceUrl }
-											alt={
-												media.alt_text
-													? sprintf(
-															// Translators: %s: The selected image alt text.
-															__(
-																'Current image: %s'
-															),
-															media.alt_text
-													  )
-													: sprintf(
-															// Translators: %s: The selected image filename.
-															__(
-																'The current image has no alternative text. The file name is: %s'
-															),
-															media.media_details
-																.sizes?.full
-																?.file ||
-																media.slug
-													  )
-											}
+											alt={ getImageDescription( media ) }
 										/>
 									) }
 									{ isLoading && <Spinner /> }
