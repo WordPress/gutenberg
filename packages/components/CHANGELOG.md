@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
+-   `RadioGroup`: Fix arrow key navigation in RTL  ([#66202](https://github.com/WordPress/gutenberg/pull/66202)).
 
 ### Enhancements
 
