@@ -15,6 +15,10 @@
 
 -   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
 
+### Experimental
+
+-   `Tabs`: add props to control active tab item ([#66223](https://github.com/WordPress/gutenberg/pull/66223)).
+
 ## 28.10.0 (2024-10-16)
 
 ### Bug Fixes
