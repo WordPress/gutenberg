@@ -3,9 +3,6 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const isEmpty = ( obj ) =>
-	[ Object, Array ].includes( ( obj || {} ).constructor ) &&
-	! Object.entries( obj || {} ).length;
 
 const { state, actions } = store(
 	'core/search',
