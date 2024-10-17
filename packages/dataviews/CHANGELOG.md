@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.6.0 (2024-10-16)
+
 -   Invert the logic for which icon to show in `DataViews` when using the filter view. Icons now match the action of the button label. ([#65914](https://github.com/WordPress/gutenberg/pull/65914)).
 
 ## 4.5.0 (2024-10-03)

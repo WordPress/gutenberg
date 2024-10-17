@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.10.0 (2024-10-16)
+
 ### Internal
 
 -   Upgrade preact libraries [#66008](https://github.com/WordPress/gutenberg/pull/66008).

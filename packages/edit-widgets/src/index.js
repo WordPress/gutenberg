@@ -44,10 +44,7 @@ const disabledBlocks = [
 	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
 
-const {
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} = unlock( editorPrivateApis );
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -78,7 +75,6 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
