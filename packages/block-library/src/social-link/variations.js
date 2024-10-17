@@ -9,6 +9,7 @@ import {
 	ChainIcon,
 	CodepenIcon,
 	DeviantArtIcon,
+	DoctolibIcon,
 	DribbbleIcon,
 	DropboxIcon,
 	EtsyIcon,
@@ -107,6 +108,12 @@ const variations = [
 		attributes: { service: 'deviantart' },
 		title: 'DeviantArt',
 		icon: DeviantArtIcon,
+	},
+	{
+		name: 'doctolib',
+		attributes: { service: 'doctolib' },
+		title: 'Doctolib',
+		icon: DoctolibIcon,
 	},
 	{
 		name: 'dribbble',
