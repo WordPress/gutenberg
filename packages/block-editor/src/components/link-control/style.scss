@@ -55,7 +55,7 @@ $block-editor-link-control-number-of-actions: 1;
 // Provides positioning context for reset button. Without this then when an
 // error notice is displayed the input's reset button is incorrectly positioned.
 .block-editor-link-control__search-input-wrapper {
-	margin-bottom: $grid-unit-10;
+	margin-bottom: $grid-unit-05;
 	position: relative;
 }
 
@@ -112,7 +112,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-results {
 	margin-top: -$grid-unit-20;
 	padding: $grid-unit-10;
-	max-height: 200px;
+	max-height: $grid-unit * 24; // resolves to 194px
 	overflow-y: auto; // allow results list to scroll
 
 	&.is-loading {
@@ -125,6 +125,7 @@ $block-editor-link-control-number-of-actions: 1;
 	&.components-button.components-menu-item__button {
 		height: auto;
 		text-align: left;
+		max-height: $grid-unit * 11; // resolves to 44px
 	}
 
 	.components-menu-item__item {
