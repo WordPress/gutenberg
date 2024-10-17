@@ -11,6 +11,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import DefaultSidebar from './default-sidebar';
 
 const { interfaceStore } = unlock( editorPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function GlobalStylesSidebar() {
 	const {
@@ -32,6 +34,7 @@ export default function GlobalStylesSidebar() {
 		hasRevisions,
 		isRevisionsOpened,
 		isRevisionsStyleBookOpened,
+		isGlobalStylesOpen,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
@@ -52,12 +55,14 @@ export default function GlobalStylesSidebar() {
 		const globalStyles = globalStylesId
 			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
 			: undefined;
+		const _isGlobalStylesOpen =
+			_isEditCanvasMode &&
+			'edit-site/global-styles' === getActiveComplementaryArea( 'core' );
 
 		return {
 			isStyleBookOpened: 'style-book' === canvasContainerView,
 			shouldClearCanvasContainerView:
-				'edit-site/global-styles' !==
-					getActiveComplementaryArea( 'core' ) ||
+				! _isGlobalStylesOpen ||
 				! _isVisualEditorMode ||
 				! _isEditCanvasMode,
 			showListViewByDefault: _showListViewByDefault,
@@ -67,13 +72,22 @@ export default function GlobalStylesSidebar() {
 				'global-styles-revisions:style-book' === canvasContainerView,
 			isRevisionsOpened:
 				'global-styles-revisions' === canvasContainerView,
+			isGlobalStylesOpen: _isGlobalStylesOpen,
 		};
 	}, [] );
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { params } = useLocation();
 
 	useEffect( () => {
+/*		if (
+			isGlobalStylesOpen &&
+			params.path === '/wp_global_styles/style-book'
+		) {
+			setEditorCanvasContainerView( 'style-book' );
+			return;
+		}*/
 		if ( shouldClearCanvasContainerView ) {
 			setEditorCanvasContainerView( undefined );
 		}
@@ -125,6 +139,7 @@ export default function GlobalStylesSidebar() {
 			icon={ styles }
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
+			isActiveByDefault={ params?.path.startsWith( '/wp_global_styles' ) }
 			header={
 				<Flex
 					className="edit-site-global-styles-sidebar__header"
