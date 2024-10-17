@@ -54,20 +54,20 @@ export function Comments( {
 	const [ isConfirmDialogOpen, setIsConfirmDialogOpen ] = useState( false );
 
 	const handleConfirmDelete = () => {
-		onCommentDelete(actionState.id);
-		setActionState(false);
-		setIsConfirmDialogOpen(false);
+		onCommentDelete( actionState.id );
+		setActionState( false );
+		setIsConfirmDialogOpen( false );
 	};
 
 	const handleConfirmResolve = () => {
-		onCommentResolve(actionState.id);
-		setActionState(false);
-		setIsConfirmDialogOpen(false);
+		onCommentResolve( actionState.id );
+		setActionState( false );
+		setIsConfirmDialogOpen( false );
 	};
 
 	const handleCancelDelete = () => {
-		setActionState(false);
-		setIsConfirmDialogOpen(false);
+		setActionState( false );
+		setIsConfirmDialogOpen( false );
 	};
 
 	const blockCommentId = useSelect( ( select ) => {
@@ -84,19 +84,19 @@ export function Comments( {
 				<CommentHeader
 					thread={ thread }
 					onResolve={ () => {
-						setActionState({
+						setActionState( {
 							action: 'resolve',
 							id: parentThread?.id ?? thread.id,
-						});
-						setIsConfirmDialogOpen(true);
-					}}
+						} );
+						setIsConfirmDialogOpen( true );
+					} }
 					onEdit={ () =>
 						setActionState( { action: 'edit', id: thread.id } )
 					}
 					onDelete={ () => {
-						setActionState({ action: 'delete', id: thread.id });
-						setIsConfirmDialogOpen(true);
-					}}
+						setActionState( { action: 'delete', id: thread.id } );
+						setIsConfirmDialogOpen( true );
+					} }
 					onReply={
 						! parentThread
 							? () =>
@@ -138,32 +138,36 @@ export function Comments( {
 				{ 'resolve' === actionState?.action &&
 					thread.id === actionState?.id && (
 						<ConfirmDialog
-                             isOpen={isConfirmDialogOpen}
-                             onConfirm={handleConfirmResolve}
-                             onCancel={handleCancelDelete}
-                             confirmButtonText="Yes"
-                             cancelButtonText="No"
-                         >
-                             {
-                                 // translators: message displayed when confirming an action
-                                 __('Are you sure you want to mark this comment as resolved?')
-                             }
-                        </ConfirmDialog>
+							isOpen={ isConfirmDialogOpen }
+							onConfirm={ handleConfirmResolve }
+							onCancel={ handleCancelDelete }
+							confirmButtonText="Yes"
+							cancelButtonText="No"
+						>
+							{
+								// translators: message displayed when confirming an action
+								__(
+									'Are you sure you want to mark this comment as resolved?'
+								)
+							}
+						</ConfirmDialog>
 					) }
 				{ 'delete' === actionState?.action &&
 					thread.id === actionState?.id && (
 						<ConfirmDialog
-                             isOpen={isConfirmDialogOpen}
-                             onConfirm={handleConfirmDelete}
-                             onCancel={handleCancelDelete}
-                             confirmButtonText="Yes"
-                             cancelButtonText="No"
-                        >
-                             {
-                                 // translators: message displayed when confirming an action
-                                 __('Are you sure you want to delete this comment?')
-                             }
-                        </ConfirmDialog>
+							isOpen={ isConfirmDialogOpen }
+							onConfirm={ handleConfirmDelete }
+							onCancel={ handleCancelDelete }
+							confirmButtonText="Yes"
+							cancelButtonText="No"
+						>
+							{
+								// translators: message displayed when confirming an action
+								__(
+									'Are you sure you want to delete this comment?'
+								)
+							}
+						</ConfirmDialog>
 					) }
 			</>
 		);
