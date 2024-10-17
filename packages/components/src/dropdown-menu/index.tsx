@@ -53,7 +53,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		disableOpenOnArrowDown = false,
 		text,
 		noIcons,
-
+		focusOnMount,
 		open,
 		defaultOpen,
 		onToggle: onToggleProp,
@@ -212,6 +212,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 			open={ open }
 			defaultOpen={ defaultOpen }
 			onToggle={ onToggleProp }
+			focusOnMount={ focusOnMount }
 		/>
 	);
 }
