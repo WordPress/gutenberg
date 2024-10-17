@@ -2,14 +2,21 @@
 
 ## Unreleased
 
+### Internal
+
+-   Refactor to extract license related logic to a reusable module ([#66179](https://github.com/WordPress/gutenberg/pull/66179)).
+
+## 30.3.0 (2024-10-17)
+
 ### New Features
 
 - Add new `build-blocks-manifest` command to generate a PHP file containing block metadata from all `block.json` files in a project ([#65866](https://github.com/WordPress/gutenberg/pull/65866)).
 
+## 30.2.0 (2024-10-16)
+
 ## 30.1.0 (2024-10-03)
 
 ## 30.0.0 (2024-09-19)
-
 
 ### Breaking Changes
 
