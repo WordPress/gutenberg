@@ -1669,46 +1669,7 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
-		// When switching to zoom-out mode, we need to select the parent section
-		if ( mode === 'zoom-out' ) {
-			const firstSelectedClientId = select.getBlockSelectionStart();
-
-			const sectionRootClientId = select.getSectionRootClientId();
-
-			if ( firstSelectedClientId ) {
-				let sectionClientId;
-
-				if ( sectionRootClientId ) {
-					const sectionClientIds =
-						select.getBlockOrder( sectionRootClientId );
-
-					// If the selected block is a section block, use it.
-					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
-						sectionClientId = firstSelectedClientId;
-					} else {
-						// If the selected block is not a section block, find
-						// the parent section that contains the selected block.
-						sectionClientId = select
-							.getBlockParents( firstSelectedClientId )
-							.find( ( parent ) =>
-								sectionClientIds.includes( parent )
-							);
-					}
-				} else {
-					sectionClientId = select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					);
-				}
-
-				if ( sectionClientId ) {
-					dispatch.selectBlock( sectionClientId );
-				} else {
-					dispatch.clearSelectedBlock();
-				}
-			}
-		}
-
+	( { registry } ) => {
 		registry.dispatch( preferencesStore ).set( 'core', 'editorTool', mode );
 
 		if ( mode === 'navigation' ) {
@@ -1723,8 +1684,6 @@ export const __unstableSetEditorMode =
 					'You are currently in edit mode. To return to the navigation mode, press Escape.'
 				)
 			);
-		} else if ( mode === 'zoom-out' ) {
-			speak( __( 'You are currently in zoom-out mode.' ) );
 		}
 	};
 
