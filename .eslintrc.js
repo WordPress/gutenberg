@@ -195,19 +195,6 @@ module.exports = {
 				paths: restrictedImports,
 			},
 		],
-		'@typescript-eslint/no-restricted-imports': [
-			'error',
-			{
-				paths: [
-					{
-						name: 'react',
-						message:
-							'Please use React API through `@wordpress/element` instead.',
-						allowTypeImports: true,
-					},
-				],
-			},
-		],
 		'@typescript-eslint/consistent-type-imports': [
 			'error',
 			{
