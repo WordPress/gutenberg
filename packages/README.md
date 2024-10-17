@@ -1,6 +1,6 @@
 # Managing Packages
 
-This repository uses [monorepo](https://monorepo.tools) to manage WordPress modules and publish them with [lerna](https://lerna.js.org/) as packages to [npm](https://www.npmjs.com/).
+This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/workspaces) to manage WordPress packages and [lerna](https://lerna.js.org/) to publish them with to [npm](https://www.npmjs.com/).
 
 ## Creating a New Package
 
