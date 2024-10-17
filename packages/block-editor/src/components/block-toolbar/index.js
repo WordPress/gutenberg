@@ -16,7 +16,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import Shuffle from './shuffle';
 
 /**
  * Renders the block toolbar.
@@ -67,6 +68,7 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		hasParentPattern,
 		hasContentOnlyLocking,
+		showShuffleButton,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -78,6 +80,7 @@ export function PrivateBlockToolbar( {
 			getBlockAttributes,
 			getBlockParentsByBlockName,
 			getTemplateLock,
+			isZoomOutMode,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -118,6 +121,7 @@ export function PrivateBlockToolbar( {
 			shouldShowVisualToolbar: isValid && isVisual,
 			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
+				! isZoomOutMode() &&
 				parentBlockType &&
 				getBlockEditingMode( firstParentClientId ) === 'default' &&
 				hasBlockSupport(
@@ -130,6 +134,7 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
+			showShuffleButton: isZoomOutMode(),
 		};
 	}, [] );
 
@@ -179,7 +184,8 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! isMultiToolbar &&
+				{ showParentSelector &&
+					! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
@@ -215,6 +221,14 @@ export function PrivateBlockToolbar( {
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar && <BlockGroupToolbar /> }
+				{ showShuffleButton && (
+					<ToolbarGroup>
+						<Shuffle
+							clientId={ blockClientIds[ 0 ] }
+							as={ ToolbarButton }
+						/>
+					</ToolbarGroup>
+				) }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot
