@@ -28,6 +28,7 @@
 		{ "path": "../keycodes" },
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
+		{ "path": "../preferences" },
 		{ "path": "../plugins" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },

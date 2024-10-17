@@ -40,6 +40,7 @@
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/plugins" },
+		{ "path": "packages/preferences" },
 		{ "path": "packages/prettier-config" },
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue" },
