@@ -1261,7 +1261,7 @@ $my_context = array(
 );
 ?>
 <div
- <?php echo wp_interactivity_data_wp_context( $my_context ); ?>
+ <?php echo wp_kses_data( wp_interactivity_data_wp_context( $my_context ) ); ?>
 >
 </div>
 ```
