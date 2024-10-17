@@ -92,10 +92,11 @@ test.describe( 'data-wp-class', () => {
 
 	test( 'can use context values', async ( { page } ) => {
 		const el = page.getByTestId( 'can use context values' );
+		const toggle = page.getByTestId( 'toggle context value' );
 		await expect( el ).toHaveClass( '' );
-		await page.getByTestId( 'toggle context false value' ).click();
+		await toggle.click();
 		await expect( el ).toHaveClass( 'foo' );
-		await page.getByTestId( 'toggle context false value' ).click();
+		await toggle.click();
 		await expect( el ).toHaveClass( '' );
 	} );
 
@@ -111,11 +112,35 @@ test.describe( 'data-wp-class', () => {
 
 	test( 'can use "default" as a class name', async ( { page } ) => {
 		const el = page.getByTestId( 'class name default' );
-		const btn = page.getByTestId( 'toggle class name default' );
+		const toggle = page.getByTestId( 'toggle context value' );
 		await expect( el ).not.toHaveClass( 'default' );
-		await btn.click();
+		await toggle.click();
 		await expect( el ).toHaveClass( 'default' );
-		await btn.click();
+		await toggle.click();
 		await expect( el ).not.toHaveClass( 'default' );
+	} );
+
+	test( 'can use class names with non-alphanumeric characters', async ( {
+		page,
+	} ) => {
+		const expectedClassName = '#[^+-]$';
+		const el = page.getByTestId( 'class name no-aplhanumeric' );
+		const toggle = page.getByTestId( 'toggle context value' );
+		await expect( el ).not.toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).not.toHaveClass( expectedClassName );
+	} );
+
+	test( 'can use class name with HTML entities', async ( { page } ) => {
+		const expectedClassName = 'class-name-attribute="FOO bar"';
+		const el = page.getByTestId( 'class name HTML entities' );
+		const toggle = page.getByTestId( 'toggle context value' );
+		await expect( el ).not.toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).toHaveClass( expectedClassName );
+		await toggle.click();
+		await expect( el ).not.toHaveClass( expectedClassName );
 	} );
 } );

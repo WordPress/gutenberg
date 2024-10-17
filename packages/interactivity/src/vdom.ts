@@ -19,16 +19,15 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
+	`^${ fullPrefix }` + // ${fullPrefix} is the expected prefix string: "data-wp-".
 		// Match alphanumeric characters including hyphen-separated
 		// segments. It excludes underscore intentionally to prevent confusion.
 		// E.g., "custom-directive".
-		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
+		'(?:[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)' +
 		// (Optional) Match '--' followed by any alphanumeric charachters. It
 		// excludes underscore intentionally to prevent confusion, but it can
 		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
-	'i' // Case insensitive.
+		'(?:--)?'
 );
 
 // Regular expression for reference parsing. It can contain a namespace before
@@ -143,13 +142,22 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
-				const directiveMatch = directiveParser.exec( name );
-				if ( directiveMatch === null ) {
+				if ( ! directiveParser.test( name ) ) {
 					warn( `Found malformed directive name: ${ name }.` );
 					return obj;
 				}
-				const prefix = directiveMatch[ 1 ] || '';
-				const suffix = directiveMatch[ 2 ] || null;
+
+				const unprefixedDirective = name.slice( fullPrefix.length );
+				const splitIndex = unprefixedDirective.indexOf( '--' );
+				const [ prefix, suffix = null ] =
+					splitIndex === -1
+						? // If '--' is not found, prefix is the same as the unprefixed directive
+						  [ unprefixedDirective ]
+						: // Otherwise, split the unprefixed directive at "--" into `prefix` and `suffix`
+						  [
+								unprefixedDirective.slice( 0, splitIndex ),
+								unprefixedDirective.slice( splitIndex + 2 ),
+						  ];
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {
