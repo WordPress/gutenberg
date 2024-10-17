@@ -11,7 +11,7 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 
-export const TabListWrapper = styled.div`
+export const StyledTabList = styled( Ariakit.TabList )`
 	display: flex;
 	align-items: stretch;
 	overflow-x: auto;
