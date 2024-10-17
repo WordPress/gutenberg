@@ -69,9 +69,19 @@ export const TabList = forwardRef<
 	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
-	const selectedRect = useTrackElementOffsetRect(
-		store?.item( selectedId )?.element
-	);
+
+	const selectedItem = store?.item( selectedId );
+	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
+
+	const selectedItemIndex =
+		renderedItems && selectedItem
+			? renderedItems.indexOf( selectedItem )
+			: -1;
+	// Use selectedItemIndex as a dependency to force recalculation when the
+	// selected item index changes (elements are swapped / added / removed).
+	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+		selectedItemIndex,
+	] );
 
 	// Track overflow to show scroll hints.
 	const overflow = useTrackOverflow( parent, {

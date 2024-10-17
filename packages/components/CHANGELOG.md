@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
+-   `Tabs`: update indicator more reactively ([#66207](https://github.com/WordPress/gutenberg/pull/66207)).
 
 ### Enhancements
 
