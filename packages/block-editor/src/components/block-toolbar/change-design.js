@@ -118,12 +118,13 @@ export default function ChangeDesign( { clientId } ) {
 			renderContent={ () => (
 				<DropdownContentWrapper
 					className="block-editor-block-toolbar-change-design-content-wrapper"
-					paddingSize="medium"
+					paddingSize="none"
 				>
 					<BlockPatternsList
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ sameCategoryPatternsWithSingleWrapper }
 						onClickPattern={ onClickPattern }
+						showTitle={ false }
 					/>
 				</DropdownContentWrapper>
 			) }
