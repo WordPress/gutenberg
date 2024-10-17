@@ -6,6 +6,10 @@
 
 -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
 
+### Enhancements
+
+-   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
+
 ## 28.10.0 (2024-10-16)
 
 ### Bug Fixes
