@@ -66,6 +66,7 @@
 		"jest-dev-server": "^9.0.1",
 		"jest-environment-jsdom": "^29.6.2",
 		"jest-environment-node": "^29.6.2",
+		"json2php": "^0.0.9",
 		"markdownlint-cli": "^0.31.1",
 		"merge-deep": "^3.0.3",
 		"mini-css-extract-plugin": "^2.5.1",
