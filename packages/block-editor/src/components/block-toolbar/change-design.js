@@ -108,7 +108,6 @@ export default function ChangeDesign( { clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							isActive={ isOpen }
-							// label={ __( 'Change Design' ) }
 							onClick={ () => onToggle( ! isOpen ) }
 							aria-expanded={ isOpen }
 						>
