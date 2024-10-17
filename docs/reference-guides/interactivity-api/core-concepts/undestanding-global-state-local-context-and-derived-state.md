@@ -692,7 +692,7 @@ In this example, the derived state `state.double` reads from the local context p
 
 ### Example: Using derived state with both local context and global state
 
-Let's now consider a scenario where there are a global tax rate and local product prices and calculate the final price, including tax.
+Let's now consider a scenario where there is a global tax rate and local product prices and calculate the final price, including tax.
 
 ```html
 <div
@@ -735,6 +735,108 @@ In this example, `priceWithTax` is derived from both the global `taxRate` and th
 
 By using derived state, you create a more maintainable and less error-prone codebase. It ensures that related state values are always in sync, reduces the complexity of your actions, and makes your code more declarative and easier to reason about.
 
+## Subscribing to Server State and Context
+
+Interactivity API offers a region-based navigation feature that dynamically replaces a part of the page without a full page reload. The [Query block](/docs/reference-guides/core-blocks.md#query-loop) natively supports this feature when the `Force page reload` toggle is disabled. Developers can use the same functionality in custom blocks by calling [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from the [`@wordpress/interactivity-router`](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity-router) script module.
+
+When using region-based navigation, it's crucial to ensure that your interactive blocks stay in sync with the server-provided global state and local context. By default, the Interactivity API will never overwrite the global state or local context with the server-provided values. The Interactivity API provides two functions to help manage this synchronization: [`getServerState()`](/docs/reference-guides/interactivity-api/api-reference.md#getserverstate) and [`getServerContext()`](/docs/reference-guides/interactivity-api/api-reference.md#getservercontext).
+
+### `getServerState()`
+
+`getServerState()` allows you to subscribe to changes in the **global state** that occur during client-side navigation. This function is analogous to `getServerContext()`, but it works with the global state instead of the local context.
+
+Let's consider a quiz that has multiple questions. Each question is a separate page. When the user navigates to a new question, the server provides the new question and the time left to answer all the questions.
+
+```php
+<?php
+wp_interactivity_state( 'myPlugin', array(
+	'question' => get_question_for_page( get_the_ID() ),
+	'timeLeft' => 5 * 60, // Time to answer all the questions.
+) );
+?>
+```
+
+```javascript
+import { store, getServerState } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// This action would be triggered by a directive, like:
+		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
+		*nextQuestion() {
+			event.preventDefault( event );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			actions.navigate( '/question-2' );
+		},
+	},
+	callbacks: {
+		// This callback would be triggered by a directive, like:
+		// <div data-wp-watch="callbacks.updateQuestion"></div>
+		updateQuestion() {
+			const serverState = getServerState();
+
+			// Update with the new value coming from the server.
+			// We DON'T want to update `timeLeft` because it represents the time left to answer ALL the questions.
+			state.question = serverState.question;
+		},
+	},
+} );
+```
+
+### `getServerContext()`
+
+`getServerContext()` allows you to subscribe to changes in the **local context** that occur during client-side navigation. This function is analogous to `getServerState()`, but it works with the local context instead of the global state.
+
+Consider a quiz that has multiple questions. Each question is a separate page. When the user navigates to a new question, the server provides the new question and the time left to answer all the questions.
+
+```php
+<?php
+wp_interactivity_context( 'myPlugin', array(
+	'currentQuestion' => get_question_for_page( get_the_ID() ),
+) );
+?>
+```
+
+```javascript
+import { store, getServerContext } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// This action would be triggered by a directive, like:
+		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
+		*nextQuestion() {
+			event.preventDefault( event );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			actions.navigate( '/question-2' );
+		},
+	},
+	callbacks: {
+		// This callback would be triggered by a directive, like:
+		// <div data-wp-watch="callbacks.updateQuestion"></div>
+		updateQuestion() {
+			const serverContext = getServerContext();
+			const context = getContext();
+
+			// Update with the new value coming from the server.
+			context.currentQuestion = serverContext.currentQuestion;
+		},
+	},
+} );
+```
+
+### When to Use
+
+Whenever you have interactive blocks that rely on global state that may change due to navigation events, ensuring consistency across different parts of your application.
+
+### Best Practices for using `getServerState()` and `getServerContext()`
+
+-   **Read-Only References:** Both `getServerState()` and `getServerContext()` return read-only objects. You can use those objects to update the global state or local context.
+-   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/api-reference.md#accessing-data-in-callbacks) to react to state and context changes.
+
 ## Conclusion
 
-Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, and choose between global state and local context based on the scope and requirements of your data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain.
+Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, and choose between global state and local context based on the scope and requirements of your data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain. Finally, if you need to synchronize the state or context with the server, you can use `getServerState()` and `getServerContext()` to achieve this.
