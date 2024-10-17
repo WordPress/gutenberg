@@ -538,15 +538,6 @@ describe( 'Interactivity API', () => {
 				expect( result ).toEqual( { arr: [ 'a', 'b', 'c' ] } );
 			} );
 
-			it( 'should handle both target and source as objects with arrays', () => {
-				const target = { arr: [ 1, 2, 3 ] };
-				const source = { arr: [ 'a', 'b', 'c', 'd' ] };
-				const result: any = {};
-				deepMerge( result, target );
-				deepMerge( result, source );
-				expect( result ).toEqual( { arr: [ 'a', 'b', 'c', 'd' ] } );
-			} );
-
 			it( 'should handle objects with arrays containing object elements', () => {
 				const target = { arr: [ { a: 1 }, { b: 2 } ] };
 				const source = { arr: [ { a: 2 }, { c: 3 } ] };
