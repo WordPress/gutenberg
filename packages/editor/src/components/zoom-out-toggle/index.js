@@ -13,14 +13,16 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const ZoomOutToggle = () => {
-	const { isZoomOut, showIconLabels } = useSelect( ( select ) => ( {
+	const { isZoomOut, showIconLabels, mode } = useSelect( ( select ) => ( {
 		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
 		showIconLabels: select( preferencesStore ).get(
 			'core',
 			'showIconLabels'
 		),
+		mode: unlock( select( editorStore ) ).getEditorMode(),
 	} ) );
 
 	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
@@ -35,6 +37,11 @@ const ZoomOutToggle = () => {
 		}
 		__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 	};
+
+	if ( 'text' === mode ) {
+		resetZoomLevel();
+		__unstableSetEditorMode( 'edit' );
+	}
 
 	return (
 		<Button
