@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.3.0 (2024-10-17)
+
 ### New Features
 
 -   Add new `build-blocks-manifest` command to generate a PHP file containing block metadata from all `block.json` files in a project ([#65866](https://github.com/WordPress/gutenberg/pull/65866)).
