@@ -3,7 +3,6 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-
 const { state, actions } = store(
 	'core/search',
 	{
@@ -78,9 +77,8 @@ const { state, actions } = store(
 					actions.closeSearchInput();
 				}
 			},
-			*updateSearch() {
-				const { ref } = getElement();
-				const { value } = ref;
+			*updateSearch( e ) {
+				const { value } = e.target;
 
 				// Don't navigate if the search didn't really change.
 				if ( value === state.search ) {
