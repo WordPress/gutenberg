@@ -68,7 +68,7 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) && gutenberg_is_ex
 
 			add_filter(
 				'comments_clauses',
-				function( $clauses ) {
+				function ( $clauses ) {
 					global $wpdb;
 					// Exclude comments of type 'block_comment'
 					$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";

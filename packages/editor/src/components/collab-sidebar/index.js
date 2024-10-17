@@ -23,7 +23,7 @@ import AddCommentToolbarButton from './comment-button-toolbar';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
-const modifyBlockCommentAttributes = ( settings, name ) => {
+const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
 		settings.attributes = {
 			...settings.attributes,
