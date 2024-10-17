@@ -9,29 +9,31 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { memo, useContext, useState, useCallback } from '@wordpress/element';
+import { blockSettingsScreens } from '@wordpress/block-editor';
+import {
+	BottomSheet,
+	BottomSheetContext,
+	FocalPointPicker,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
-import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
-import FocalPointPicker from '../../focal-point-picker';
 
 const FocalPointSettingsPanelMemo = memo(
-	( {
-		focalPoint,
-		onFocalPointChange,
-		shouldEnableBottomSheetScroll,
-		url,
-	} ) => {
+	( { focalPoint, shouldEnableBottomSheetScroll, url } ) => {
 		const navigation = useNavigation();
 
 		function onButtonPress( action ) {
-			navigation.goBack();
 			if ( action === 'apply' ) {
-				onFocalPointChange( draftFocalPoint );
+				navigation.navigate( blockSettingsScreens.settings, {
+					draftFocalPoint,
+				} );
+				return;
 			}
+
+			navigation.goBack();
 		}
 
 		const [ draftFocalPoint, setDraftFocalPoint ] = useState( focalPoint );
@@ -44,17 +46,17 @@ const FocalPointSettingsPanelMemo = memo(
 
 		return (
 			<SafeAreaView style={ styles.safearea }>
-				<NavBar>
-					<NavBar.DismissButton
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.DismissButton
 						onPress={ () => onButtonPress( 'cancel' ) }
 					/>
-					<NavBar.Heading>
+					<BottomSheet.NavBar.Heading>
 						{ __( 'Edit focal point' ) }
-					</NavBar.Heading>
-					<NavBar.ApplyButton
+					</BottomSheet.NavBar.Heading>
+					<BottomSheet.NavBar.ApplyButton
 						onPress={ () => onButtonPress( 'apply' ) }
 					/>
-				</NavBar>
+				</BottomSheet.NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ useCallback( setPosition, [] ) }
