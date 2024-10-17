@@ -41,6 +41,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isZoomOut,
 } from './private-selectors';
 
 /**
@@ -1552,12 +1553,18 @@ export function getTemplateLock( state, rootClientId ) {
  * @param {string|Object} blockNameOrType The block type object, e.g., the response
  *                                        from the block directory; or a string name of
  *                                        an installed block type, e.g.' core/paragraph'.
+ * @param {Set}           checkedBlocks   Set of block names that have already been checked.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
-const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
+const isBlockVisibleInTheInserter = (
+	state,
+	blockNameOrType,
+	checkedBlocks = new Set()
+) => {
 	let blockType;
 	let blockName;
+
 	if ( blockNameOrType && 'object' === typeof blockNameOrType ) {
 		blockType = blockNameOrType;
 		blockName = blockNameOrType.name;
@@ -1565,6 +1572,7 @@ const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
 		blockType = getBlockType( blockNameOrType );
 		blockName = blockNameOrType;
 	}
+
 	if ( ! blockType ) {
 		return false;
 	}
@@ -1580,11 +1588,22 @@ const isBlockVisibleInTheInserter = ( state, blockNameOrType ) => {
 		return false;
 	}
 
+	if ( checkedBlocks.has( blockName ) ) {
+		return false;
+	}
+
+	checkedBlocks.add( blockName );
+
 	// If parent blocks are not visible, child blocks should be hidden too.
 	if ( !! blockType.parent?.length ) {
 		return blockType.parent.some(
 			( name ) =>
-				isBlockVisibleInTheInserter( state, name ) ||
+				( blockName !== name &&
+					isBlockVisibleInTheInserter(
+						state,
+						name,
+						checkedBlocks
+					) ) ||
 				// Exception for blocks with post-content parent,
 				// the root level is often consider as "core/post-content".
 				// This exception should only apply to the post editor ideally though.
@@ -2884,10 +2903,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	const editorMode = __unstableGetEditorMode( state );
-
 	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'zoom-out' ) {
+	if ( isZoomOut( state ) ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
@@ -2986,8 +3003,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
-			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'zoom-out' ) {
+			if ( isZoomOut( state ) ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
@@ -3009,6 +3025,7 @@ export const getBlockEditingMode = createRegistrySelector(
 				return 'disabled';
 			}
 
+			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'navigation' ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 

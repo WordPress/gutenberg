@@ -33,6 +33,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -54,8 +55,7 @@ function InserterMenu(
 	ref
 ) {
 	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
 		[]
 	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =

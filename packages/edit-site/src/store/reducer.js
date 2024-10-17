@@ -98,10 +98,20 @@ function editorCanvasContainerView( state = undefined, action ) {
 	return state;
 }
 
+function routes( state = [], action ) {
+	switch ( action.type ) {
+		case 'REGISTER_ROUTE':
+			return [ ...state, action.route ];
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	settings,
 	editedPost,
 	saveViewPanel,
 	canvasMode,
 	editorCanvasContainerView,
+	routes,
 } );

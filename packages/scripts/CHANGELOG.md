@@ -2,10 +2,23 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add BlueOak-1.0.0 the GPLv2-comatible licenses recognized by check-licenses ([#66139](https://github.com/WordPress/gutenberg/pull/66139)).
+
+### Internal
+
+-   Refactor to extract license related logic to a reusable module ([#66179](https://github.com/WordPress/gutenberg/pull/66179)).
+
+### New Features
+
+- Add new `build-blocks-manifest` command to generate a PHP file containing block metadata from all `block.json` files in a project ([#65866](https://github.com/WordPress/gutenberg/pull/65866)).
+
+## 30.2.0 (2024-10-16)
+
 ## 30.1.0 (2024-10-03)
 
 ## 30.0.0 (2024-09-19)
-
 
 ### Breaking Changes
 
