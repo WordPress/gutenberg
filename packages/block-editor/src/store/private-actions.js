@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -153,14 +154,27 @@ export const privateRemoveBlocks =
 			}
 		}
 
+		const blockOrder = select.getBlockOrder( rootClientId );
+		const removeRoot =
+			blockOrder.length === clientIds.length &&
+			isUnmodifiedBlock(
+				select.__unstableGetBlockWithoutInnerBlocks( rootClientId )
+			);
+
 		if ( selectPrevious ) {
-			dispatch.selectPreviousBlock( clientIds[ 0 ], selectPrevious );
+			dispatch.selectPreviousBlock(
+				removeRoot ? rootClientId : clientIds[ 0 ],
+				selectPrevious
+			);
 		}
 
 		// We're batching these two actions because an extra `undo/redo` step can
 		// be created, based on whether we insert a default block or not.
 		registry.batch( () => {
-			dispatch( { type: 'REMOVE_BLOCKS', clientIds } );
+			dispatch( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: removeRoot ? [ rootClientId ] : clientIds,
+			} );
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch( ensureDefaultBlock() );
