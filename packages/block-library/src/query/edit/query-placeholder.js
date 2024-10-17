@@ -83,7 +83,7 @@ export default function QueryPlaceholder( {
 						variant="primary"
 						onClick={ openPatternSelectionModal }
 					>
-						{ __( 'Choose' ) }
+						{ __( 'Choose design' ) }
 					</Button>
 				) }
 
