@@ -195,7 +195,7 @@ export const Tab = styled( Ariakit.Tab )`
 			opacity: 0;
 
 			@media not ( prefers-reduced-motion ) {
-				transition: opacity 0.15s 0.15s linear;
+				transition: opacity 0.1s linear;
 			}
 		}
 
@@ -253,7 +253,7 @@ export const TabChevron = styled( Icon )`
 		[data-select-on-move='true']
 			[role='tab']:is( [aria-selected='true'],  )
 			& {
-			transition: opacity 0.3s ease-in;
+			transition: opacity 0.15s 0.15s linear;
 		}
 	}
 	&:dir( rtl ) {
