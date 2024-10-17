@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { useEffect, useRef } from '@wordpress/element';
 import {
-	BlockControls,
 	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
@@ -19,22 +18,15 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	MenuGroup,
-	MenuItem,
-	PanelBody,
-	ToggleControl,
-	ToolbarDropdownMenu,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
 const sizeOptions = [
-	{ name: __( 'Small' ), value: 'has-small-icon-size' },
-	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
-	{ name: __( 'Large' ), value: 'has-large-icon-size' },
-	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
+	{ label: __( 'Small' ), value: 'has-small-icon-size' },
+	{ label: __( 'Normal' ), value: 'has-normal-icon-size' },
+	{ label: __( 'Large' ), value: 'has-large-icon-size' },
+	{ label: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
 export function SocialLinksEdit( props ) {
@@ -117,10 +109,6 @@ export function SocialLinksEdit( props ) {
 		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	const POPOVER_PROPS = {
-		position: 'bottom right',
-	};
-
 	const colorSettings = [
 		{
 			// Use custom attribute as fallback to prevent loss of named color selection when
@@ -161,45 +149,21 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<ToolbarDropdownMenu
-					label={ __( 'Size' ) }
-					text={ __( 'Size' ) }
-					icon={ null }
-					popoverProps={ POPOVER_PROPS }
-				>
-					{ ( { onClose } ) => (
-						<MenuGroup>
-							{ sizeOptions.map( ( entry ) => {
-								return (
-									<MenuItem
-										icon={
-											( size === entry.value ||
-												( ! size &&
-													entry.value ===
-														'has-normal-icon-size' ) ) &&
-											check
-										}
-										isSelected={ size === entry.value }
-										key={ entry.value }
-										onClick={ () => {
-											setAttributes( {
-												size: entry.value,
-											} );
-										} }
-										onClose={ onClose }
-										role="menuitemradio"
-									>
-										{ entry.name }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				</ToolbarDropdownMenu>
-			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						help={ __( 'Choose the size of the Social Icons.' ) }
+						label={ __( 'Size' ) }
+						onChange={ ( entry ) => {
+							setAttributes( {
+								size: entry,
+							} );
+						} }
+						value={ size ?? 'has-normal-icon-size' }
+						options={ sizeOptions }
+					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
