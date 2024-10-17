@@ -45,9 +45,16 @@ export interface DropdownMenuProps {
 	 * outside elements will be disabled and only menu content will be visible to
 	 * screen readers.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	modal?: boolean;
+	/**
+	 * Whether the element should be rendered as a React Portal.
+	 * When set to true will render the element at the end of the body element.
+	 *
+	 * @default true
+	 */
+	portal?: boolean;
 	/**
 	 * The placement of the dropdown menu popover.
 	 *
