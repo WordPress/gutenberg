@@ -122,7 +122,7 @@ function PostFeaturedImage( {
 	}
 
 	/**
-	 * Generates a description for the given image media object.
+	 * Get image Alt text.
 	 *
 	 * @param {Object} imageMedia                               - The image media object.
 	 * @param {string} imageMedia.alt_text                      - The alternative text of the image.
