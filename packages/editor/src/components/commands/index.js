@@ -57,7 +57,7 @@ function useEditorCommandLoader() {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isFocusMode: get( 'core', 'focusMode' ),
 			isTopToolbar: get( 'core', 'fixedToolbar' ),
-			isPreviewMode: getSettings().__unstableIsPreviewMode,
+			isPreviewMode: getSettings().isPreviewMode,
 			isViewable: getPostType( getCurrentPostType() )?.viewable ?? false,
 			isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
