@@ -114,7 +114,7 @@ class RCTAztecView: Aztec.TextView {
     /// contents, regardless of what HTML is provided to Aztec.
     private var fontWeight: String? = nil
     
-    /// Line height for all contents.  Once this is set, it will always override the font size for all of its
+    /// Line height for all contents.  Once this is set, it will always override the line height for all of its
     /// contents, regardless of what HTML is provided to Aztec.
     private var lineHeight: CGFloat? = nil
 
