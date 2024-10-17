@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`: fix indicator animation ([#66198](https://github.com/WordPress/gutenberg/pull/66198)).
 -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
 
 ### Enhancements
