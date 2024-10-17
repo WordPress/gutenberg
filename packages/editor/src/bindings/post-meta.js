@@ -55,9 +55,7 @@ function getPostMetaFields( select, context ) {
 			// Don't include footnotes.
 			key !== 'footnotes' &&
 			// Don't include private fields.
-			key.charAt( 0 ) !== '_' &&
-			// Only support string types.
-			typeof entityMetaValues?.[ key ] === 'string'
+			key.charAt( 0 ) !== '_'
 		) {
 			metaFields[ key ] = {
 				label: props.title || key,
@@ -66,6 +64,7 @@ function getPostMetaFields( select, context ) {
 					entityMetaValues?.[ key ] ??
 					// When using the default, an empty string IS NOT a valid value.
 					( props.default || undefined ),
+				type: props.type,
 			};
 		}
 	} );
