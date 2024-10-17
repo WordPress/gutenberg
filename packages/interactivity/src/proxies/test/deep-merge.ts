@@ -251,24 +251,6 @@ describe( 'Interactivity API', () => {
 			expect( result ).toEqual( { a: 1 } );
 		} );
 
-		it( 'should handle arrays', () => {
-			const target = { a: [ 1, 2 ] };
-			const source = { a: [ 3, 4 ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { a: [ 3, 4 ] } );
-		} );
-
-		it( 'should handle arrays when overwrite is false', () => {
-			const target = { a: [ 1, 2 ] };
-			const source = { a: [ 3, 4 ] };
-			const result = {};
-			deepMerge( result, target, false );
-			deepMerge( result, source, false );
-			expect( result ).toEqual( { a: [ 1, 2 ] } );
-		} );
-
 		it( 'should handle null values', () => {
 			const target = { a: 1, b: null };
 			const source = { b: 2, c: null };
@@ -501,76 +483,78 @@ describe( 'Interactivity API', () => {
 			expect( deepValue ).toBe( 'value 2' );
 		} );
 
-		it( 'should replace arrays in target with arrays from source', () => {
-			const target = { arr: [ 1, 2, 3 ] };
-			const source = { arr: [ 4, 5 ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { arr: [ 4, 5 ] } );
-		} );
+		describe( 'arrays', () => {
+			it( 'should handle arrays', () => {
+				const target = { a: [ 1, 2 ] };
+				const source = { a: [ 3, 4 ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { a: [ 3, 4 ] } );
+			} );
 
-		it( 'should add new array from source if not present in target', () => {
-			const target = { a: 1 };
-			const source = { arr: [ 1, 2, 3 ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { a: 1, arr: [ 1, 2, 3 ] } );
-		} );
+			it( 'should handle arrays when overwrite is false', () => {
+				const target = { a: [ 1, 2 ] };
+				const source = { a: [ 3, 4 ] };
+				const result = {};
+				deepMerge( result, target, false );
+				deepMerge( result, source, false );
+				expect( result ).toEqual( { a: [ 1, 2 ] } );
+			} );
 
-		it( 'should handle nested arrays', () => {
-			const target = { nested: { arr: [ 1, 2 ] } };
-			const source = { nested: { arr: [ 3, 4, 5 ] } };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { nested: { arr: [ 3, 4, 5 ] } } );
-		} );
+			it( 'should add new array from source if not present in target', () => {
+				const target = { a: 1 };
+				const source = { arr: [ 1, 2, 3 ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { a: 1, arr: [ 1, 2, 3 ] } );
+			} );
 
-		it( 'should not merge arrays when override is false', () => {
-			const target = { arr: [ 1, 2, 3 ] };
-			const source = { arr: [ 4, 5 ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source, false );
-			expect( result ).toEqual( { arr: [ 1, 2, 3 ] } );
-		} );
+			it( 'should handle nested arrays', () => {
+				const target = { nested: { arr: [ 1, 2 ] } };
+				const source = { nested: { arr: [ 3, 4, 5 ] } };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { nested: { arr: [ 3, 4, 5 ] } } );
+			} );
 
-		it( 'should handle object with array as target and object with object as source', () => {
-			const target = { arr: [ 1, 2, 3 ] };
-			const source = { arr: { 1: 'two', 3: 'four' } };
-			const result: any = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { arr: { 1: 'two', 3: 'four' } } );
-		} );
+			it( 'should handle object with array as target and object with object as source', () => {
+				const target = { arr: [ 1, 2, 3 ] };
+				const source = { arr: { 1: 'two', 3: 'four' } };
+				const result: any = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: { 1: 'two', 3: 'four' } } );
+			} );
 
-		it( 'should handle object with object as target and object with array as source', () => {
-			const target = { arr: { 0: 'zero', 2: 'two' } };
-			const source = { arr: [ 'a', 'b', 'c' ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { arr: [ 'a', 'b', 'c' ] } );
-		} );
+			it( 'should handle object with object as target and object with array as source', () => {
+				const target = { arr: { 0: 'zero', 2: 'two' } };
+				const source = { arr: [ 'a', 'b', 'c' ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: [ 'a', 'b', 'c' ] } );
+			} );
 
-		it( 'should handle both target and source as objects with arrays', () => {
-			const target = { arr: [ 1, 2, 3 ] };
-			const source = { arr: [ 'a', 'b', 'c', 'd' ] };
-			const result: any = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { arr: [ 'a', 'b', 'c', 'd' ] } );
-		} );
+			it( 'should handle both target and source as objects with arrays', () => {
+				const target = { arr: [ 1, 2, 3 ] };
+				const source = { arr: [ 'a', 'b', 'c', 'd' ] };
+				const result: any = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: [ 'a', 'b', 'c', 'd' ] } );
+			} );
 
-		it( 'should handle objects with arrays containing object elements', () => {
-			const target = { arr: [ { a: 1 }, { b: 2 } ] };
-			const source = { arr: [ { a: 2 }, { c: 3 } ] };
-			const result: any = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { arr: [ { a: 2 }, { c: 3 } ] } );
+			it( 'should handle objects with arrays containing object elements', () => {
+				const target = { arr: [ { a: 1 }, { b: 2 } ] };
+				const source = { arr: [ { a: 2 }, { c: 3 } ] };
+				const result: any = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: [ { a: 2 }, { c: 3 } ] } );
+			} );
 		} );
 	} );
 } );
