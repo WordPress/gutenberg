@@ -5,6 +5,16 @@
 .components-dropdown__content {
 	.components-popover__content {
 		padding: $grid-unit-10;
+
+		&:has(.components-menu-group) {
+			padding: 0;
+
+			.components-dropdown-menu__menu > .components-menu-item__button,
+			> .components-menu-item__button {
+				margin: $grid-unit-10;
+				width: auto;
+			}
+		}
 	}
 
 	[role="menuitem"] {
@@ -13,22 +23,9 @@
 
 	.components-menu-group {
 		padding: $grid-unit-10;
-		margin-top: 0;
-		margin-bottom: 0;
-		margin-left: -$grid-unit-10;
-		margin-right: -$grid-unit-10;
-
-		&:first-child {
-			margin-top: -$grid-unit-10;
-		}
-
-		&:last-child {
-			margin-bottom: -$grid-unit-10;
-		}
 	}
 
 	.components-menu-group + .components-menu-group {
-		margin-top: 0;
 		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-10;
 	}

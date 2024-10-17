@@ -6,10 +6,6 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-/**
- * Internal dependencies
- */
-import { proxifyState, peek } from './proxies';
 
 /**
  * Internal dependencies
@@ -22,133 +18,16 @@ import {
 	splitTask,
 	isPlainObject,
 } from './utils';
-import { directive, getEvaluate, type DirectiveEntry } from './hooks';
+import {
+	directive,
+	getEvaluate,
+	isDefaultDirectiveSuffix,
+	isNonDefaultDirectiveSuffix,
+	type DirectiveCallback,
+	type DirectiveEntry,
+} from './hooks';
 import { getScope } from './scopes';
-
-// Assigned objects should be ignored during proxification.
-const contextAssignedObjects = new WeakMap();
-
-// Store the context proxy and fallback for each object in the context.
-const contextObjectToProxy = new WeakMap();
-const contextProxyToObject = new WeakMap();
-const contextObjectToFallback = new WeakMap();
-
-const descriptor = Reflect.getOwnPropertyDescriptor;
-
-/**
- * Wrap a context object with a proxy to reproduce the context stack. The proxy
- * uses the passed `inherited` context as a fallback to look up for properties
- * that don't exist in the given context. Also, updated properties are modified
- * where they are defined, or added to the main context when they don't exist.
- *
- * By default, all plain objects inside the context are wrapped, unless it is
- * listed in the `ignore` option.
- *
- * @param current   Current context.
- * @param inherited Inherited context, used as fallback.
- *
- * @return The wrapped context object.
- */
-const proxifyContext = ( current: object, inherited: object = {} ): object => {
-	// Update the fallback object reference when it changes.
-	contextObjectToFallback.set( current, inherited );
-	if ( ! contextObjectToProxy.has( current ) ) {
-		const proxy = new Proxy( current, {
-			get: ( target: object, k: string ) => {
-				const fallback = contextObjectToFallback.get( current );
-				// Always subscribe to prop changes in the current context.
-				const currentProp = target[ k ];
-
-				// Return the inherited prop when missing in target.
-				if ( ! ( k in target ) && k in fallback ) {
-					return fallback[ k ];
-				}
-
-				// Proxify plain objects that were not directly assigned.
-				if (
-					k in target &&
-					! contextAssignedObjects.get( target )?.has( k ) &&
-					isPlainObject( currentProp )
-				) {
-					return proxifyContext( currentProp );
-				}
-
-				// Return the stored proxy for `currentProp` when it exists.
-				if ( contextObjectToProxy.has( currentProp ) ) {
-					return contextObjectToProxy.get( currentProp );
-				}
-
-				/*
-				 * For other cases, return the value from target, also
-				 * subscribing to changes in the parent context when the current
-				 * prop is not defined.
-				 */
-				return k in target ? currentProp : fallback[ k ];
-			},
-			set: ( target, k, value ) => {
-				const fallback = contextObjectToFallback.get( current );
-				const obj =
-					k in target || ! ( k in fallback ) ? target : fallback;
-
-				/*
-				 * Assigned object values should not be proxified so they point
-				 * to the original object and don't inherit unexpected
-				 * properties.
-				 */
-				if ( value && typeof value === 'object' ) {
-					if ( ! contextAssignedObjects.has( obj ) ) {
-						contextAssignedObjects.set( obj, new Set() );
-					}
-					contextAssignedObjects.get( obj ).add( k );
-				}
-
-				/*
-				 * When the value is a proxy, it's because it comes from the
-				 * context, so the inner value is assigned instead.
-				 */
-				if ( contextProxyToObject.has( value ) ) {
-					const innerValue = contextProxyToObject.get( value );
-					obj[ k ] = innerValue;
-				} else {
-					obj[ k ] = value;
-				}
-
-				return true;
-			},
-			ownKeys: ( target ) => [
-				...new Set( [
-					...Object.keys( contextObjectToFallback.get( current ) ),
-					...Object.keys( target ),
-				] ),
-			],
-			getOwnPropertyDescriptor: ( target, k ) =>
-				descriptor( target, k ) ||
-				descriptor( contextObjectToFallback.get( current ), k ),
-		} );
-		contextObjectToProxy.set( current, proxy );
-		contextProxyToObject.set( proxy, current );
-	}
-	return contextObjectToProxy.get( current );
-};
-
-/**
- * Recursively update values within a context object.
- *
- * @param target A context instance.
- * @param source Object with properties to update in `target`.
- */
-const updateContext = ( target: any, source: any ) => {
-	for ( const k in source ) {
-		if (
-			isPlainObject( peek( target, k ) ) &&
-			isPlainObject( source[ k ] )
-		) {
-			updateContext( peek( target, k ) as object, source[ k ] );
-		} else if ( ! ( k in target ) ) {
-			target[ k ] = source[ k ];
-		}
-	}
-};
+import { proxifyState, proxifyContext, deepMerge } from './proxies';
 
 /**
  * Recursively clone the passed object.
@@ -214,11 +93,13 @@ const cssStringToObject = (
  *
  * @param type 'window' or 'document'
  */
-const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
+const getGlobalEventDirective = (
+	type: 'window' | 'document'
+): DirectiveCallback => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry: DirectiveEntry ) => {
+			.filter( isNonDefaultDirectiveSuffix )
+			.forEach( ( entry ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = ( event: Event ) => evaluate( entry, event );
@@ -236,11 +117,13 @@ const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
  *
  * @param type 'window' or 'document'
  */
-const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
+const getGlobalAsyncEventDirective = (
+	type: 'window' | 'document'
+): DirectiveCallback => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-async-${ type }` ]
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry: DirectiveEntry ) => {
+			.filter( isNonDefaultDirectiveSuffix )
+			.forEach( ( entry ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
@@ -267,17 +150,20 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const defaultEntry = context.find(
-				( { suffix } ) => suffix === 'default'
-			);
-			const inheritedValue = useContext( inheritedContext );
+			const defaultEntry = context.find( isDefaultDirectiveSuffix );
+			const { client: inheritedClient, server: inheritedServer } =
+				useContext( inheritedContext );
 
 			const ns = defaultEntry!.namespace;
-			const currentValue = useRef( proxifyState( ns, {} ) );
+			const client = useRef( proxifyState( ns, {} ) );
+			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
-				const result = { ...inheritedValue };
+				const result = {
+					client: { ...inheritedClient },
+					server: { ...inheritedServer },
+				};
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
@@ -286,17 +172,23 @@ export default () => {
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}
-					updateContext(
-						currentValue.current,
-						deepClone( value ) as object
+					deepMerge(
+						client.current,
+						deepClone( value ) as object,
+						false
 					);
-					result[ namespace ] = proxifyContext(
-						currentValue.current,
-						inheritedValue[ namespace ]
+					deepMerge( server.current, deepClone( value ) as object );
+					result.client[ namespace ] = proxifyContext(
+						client.current,
+						inheritedClient[ namespace ]
+					);
+					result.server[ namespace ] = proxifyContext(
+						server.current,
+						inheritedServer[ namespace ]
 					);
 				}
 				return result;
-			}, [ defaultEntry, inheritedValue ] );
+			}, [ defaultEntry, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
@@ -373,15 +265,13 @@ export default () => {
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		const events = new Map< string, Set< DirectiveEntry > >();
-		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
-			( entry ) => {
-				const event = entry.suffix.split( '--' )[ 0 ];
-				if ( ! events.has( event ) ) {
-					events.set( event, new Set< DirectiveEntry >() );
-				}
-				events.get( event )!.add( entry );
+		on.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const event = entry.suffix.split( '--' )[ 0 ];
+			if ( ! events.has( event ) ) {
+				events.set( event, new Set< DirectiveEntry >() );
 			}
-		);
+			events.get( event )!.add( entry );
+		} );
 
 		events.forEach( ( entries, eventType ) => {
 			const existingHandler = element.props[ `on${ eventType }` ];
@@ -425,7 +315,7 @@ export default () => {
 		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
 			const events = new Map< string, Set< DirectiveEntry > >();
 			onAsync
-				.filter( ( { suffix } ) => suffix !== 'default' )
+				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					const event = entry.suffix.split( '--' )[ 0 ];
 					if ( ! events.has( event ) ) {
@@ -467,7 +357,7 @@ export default () => {
 		'class',
 		( { directives: { class: classNames }, element, evaluate } ) => {
 			classNames
-				.filter( ( { suffix } ) => suffix !== 'default' )
+				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
 					const className = entry.suffix;
 					const result = evaluate( entry );
@@ -508,119 +398,112 @@ export default () => {
 
 	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
-		style
-			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry ) => {
-				const styleProp = entry.suffix;
-				const result = evaluate( entry );
-				element.props.style = element.props.style || {};
-				if ( typeof element.props.style === 'string' ) {
-					element.props.style = cssStringToObject(
-						element.props.style
-					);
-				}
-				if ( ! result ) {
-					delete element.props.style[ styleProp ];
-				} else {
-					element.props.style[ styleProp ] = result;
-				}
+		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const styleProp = entry.suffix;
+			const result = evaluate( entry );
+			element.props.style = element.props.style || {};
+			if ( typeof element.props.style === 'string' ) {
+				element.props.style = cssStringToObject( element.props.style );
+			}
+			if ( ! result ) {
+				delete element.props.style[ styleProp ];
+			} else {
+				element.props.style[ styleProp ] = result;
+			}
 
-				useInit( () => {
-					/*
-					 * This seems necessary because Preact doesn't change the styles on
-					 * the hydration, so we have to do it manually. It doesn't need deps
-					 * because it only needs to do it the first time.
-					 */
-					if ( ! result ) {
-						(
-							element.ref as RefObject< HTMLElement >
-						 ).current!.style.removeProperty( styleProp );
-					} else {
-						(
-							element.ref as RefObject< HTMLElement >
-						 ).current!.style[ styleProp ] = result;
-					}
-				} );
+			useInit( () => {
+				/*
+				 * This seems necessary because Preact doesn't change the styles on
+				 * the hydration, so we have to do it manually. It doesn't need deps
+				 * because it only needs to do it the first time.
+				 */
+				if ( ! result ) {
+					(
+						element.ref as RefObject< HTMLElement >
+					 ).current!.style.removeProperty( styleProp );
+				} else {
+					( element.ref as RefObject< HTMLElement > ).current!.style[
+						styleProp
+					] = result;
+				}
 			} );
+		} );
 	} );
 
 	// data-wp-bind--[attribute]
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
-		bind.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
-			( entry ) => {
-				const attribute = entry.suffix;
-				const result = evaluate( entry );
-				element.props[ attribute ] = result;
+		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			const attribute = entry.suffix;
+			const result = evaluate( entry );
+			element.props[ attribute ] = result;
+
+			/*
+			 * This is necessary because Preact doesn't change the attributes on the
+			 * hydration, so we have to do it manually. It only needs to do it the
+			 * first time. After that, Preact will handle the changes.
+			 */
+			useInit( () => {
+				const el = ( element.ref as RefObject< HTMLElement > ).current!;
 
 				/*
-				 * This is necessary because Preact doesn't change the attributes on the
-				 * hydration, so we have to do it manually. It only needs to do it the
-				 * first time. After that, Preact will handle the changes.
+				 * We set the value directly to the corresponding HTMLElement instance
+				 * property excluding the following special cases. We follow Preact's
+				 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 				 */
-				useInit( () => {
-					const el = ( element.ref as RefObject< HTMLElement > )
-						.current!;
-
+				if ( attribute === 'style' ) {
+					if ( typeof result === 'string' ) {
+						el.style.cssText = result;
+					}
+					return;
+				} else if (
+					attribute !== 'width' &&
+					attribute !== 'height' &&
+					attribute !== 'href' &&
+					attribute !== 'list' &&
+					attribute !== 'form' &&
 					/*
-					 * We set the value directly to the corresponding HTMLElement instance
-					 * property excluding the following special cases. We follow Preact's
-					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
+					 * The value for `tabindex` follows the parsing rules for an
+					 * integer. If that fails, or if the attribute isn't present, then
+					 * the browsers should "follow platform conventions to determine if
+					 * the element should be considered as a focusable area",
+					 * practically meaning that most elements get a default of `-1` (not
+					 * focusable), but several also get a default of `0` (focusable in
+					 * order after all elements with a positive `tabindex` value).
+					 *
+					 * @see https://html.spec.whatwg.org/#tabindex-value
 					 */
-					if ( attribute === 'style' ) {
-						if ( typeof result === 'string' ) {
-							el.style.cssText = result;
-						}
+					attribute !== 'tabIndex' &&
+					attribute !== 'download' &&
+					attribute !== 'rowSpan' &&
+					attribute !== 'colSpan' &&
+					attribute !== 'role' &&
+					attribute in el
+				) {
+					try {
+						el[ attribute ] =
+							result === null || result === undefined
+								? ''
+								: result;
 						return;
-					} else if (
-						attribute !== 'width' &&
-						attribute !== 'height' &&
-						attribute !== 'href' &&
-						attribute !== 'list' &&
-						attribute !== 'form' &&
-						/*
-						 * The value for `tabindex` follows the parsing rules for an
-						 * integer. If that fails, or if the attribute isn't present, then
-						 * the browsers should "follow platform conventions to determine if
-						 * the element should be considered as a focusable area",
-						 * practically meaning that most elements get a default of `-1` (not
-						 * focusable), but several also get a default of `0` (focusable in
-						 * order after all elements with a positive `tabindex` value).
-						 *
-						 * @see https://html.spec.whatwg.org/#tabindex-value
-						 */
-						attribute !== 'tabIndex' &&
-						attribute !== 'download' &&
-						attribute !== 'rowSpan' &&
-						attribute !== 'colSpan' &&
-						attribute !== 'role' &&
-						attribute in el
-					) {
-						try {
-							el[ attribute ] =
-								result === null || result === undefined
-									? ''
-									: result;
-							return;
-						} catch ( err ) {}
-					}
-					/*
-					 * aria- and data- attributes have no boolean representation.
-					 * A `false` value is different from the attribute not being
-					 * present, so we can't remove it.
-					 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
-					 */
-					if (
-						result !== null &&
-						result !== undefined &&
-						( result !== false || attribute[ 4 ] === '-' )
-					) {
-						el.setAttribute( attribute, result );
-					} else {
-						el.removeAttribute( attribute );
-					}
-				} );
-			}
-		);
+					} catch ( err ) {}
+				}
+				/*
+				 * aria- and data- attributes have no boolean representation.
+				 * A `false` value is different from the attribute not being
+				 * present, so we can't remove it.
+				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
+				 */
+				if (
+					result !== null &&
+					result !== undefined &&
+					( result !== false || attribute[ 4 ] === '-' )
+				) {
+					el.setAttribute( attribute, result );
+				} else {
+					el.removeAttribute( attribute );
+				}
+			} );
+		} );
 	} );
 
 	// data-wp-ignore
@@ -645,7 +528,7 @@ export default () => {
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
-		const entry = text.find( ( { suffix } ) => suffix === 'default' );
+		const entry = text.find( isDefaultDirectiveSuffix );
 		if ( ! entry ) {
 			element.props.children = null;
 			return;
@@ -682,25 +565,33 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 
 			const [ entry ] = each;
-			const { namespace, suffix } = entry;
+			const { namespace } = entry;
 
 			const list = evaluate( entry );
+			const itemProp = isNonDefaultDirectiveSuffix( entry )
+				? kebabToCamelCase( entry.suffix )
+				: 'item';
 			return list.map( ( item ) => {
-				const itemProp =
-					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const itemContext = proxifyContext(
 					proxifyState( namespace, {} ),
-					inheritedValue[ namespace ]
+					inheritedValue.client[ namespace ]
 				);
 				const mergedContext = {
-					...inheritedValue,
-					[ namespace ]: itemContext,
+					client: {
+						...inheritedValue.client,
+						[ namespace ]: itemContext,
+					},
+					server: { ...inheritedValue.server },
 				};
 
 				// Set the item after proxifying the context.
-				mergedContext[ namespace ][ itemProp ] = item;
+				mergedContext.client[ namespace ][ itemProp ] = item;
 
-				const scope = { ...getScope(), context: mergedContext };
+				const scope = {
+					...getScope(),
+					context: mergedContext.client,
+					serverContext: mergedContext.server,
+				};
 				const key = eachKey
 					? getEvaluate( { scope } )( eachKey[ 0 ] )
 					: item;

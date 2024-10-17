@@ -19,7 +19,10 @@ module.exports = {
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
-	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
+	setupFilesAfterEnv: [
+		'<rootDir>/test/unit/config/testing-library.js',
+		'<rootDir>/test/unit/mocks/match-media.js',
+	],
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},

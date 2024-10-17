@@ -130,6 +130,7 @@
 		// ... and display labels.
 		&::after {
 			content: attr(aria-label);
+			white-space: nowrap;
 		}
 		&[aria-disabled="true"] {
 			background-color: transparent;

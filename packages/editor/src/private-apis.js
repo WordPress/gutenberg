@@ -23,10 +23,7 @@ import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
 } from './components/global-styles-provider';
-import {
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} from './bindings/api';
+import { registerCoreBlockBindingsSources } from './bindings/api';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -47,7 +44,6 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,

@@ -2,24 +2,93 @@
 
 ## Unreleased
 
+## 28.10.0 (2024-10-16)
+
 ### Bug Fixes
 
+-   `Tooltip`: add `aria-describedby` to the anchor only if not redundant ([#65989](https://github.com/WordPress/gutenberg/pull/65989)).
+-   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+-   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+-   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+-   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
+-   `Button`: fix `box-shadow` transition for secondary variation ([#66045](https://github.com/WordPress/gutenberg/pull/66045)).
+-   `ToggleGroupControl`: Don't set value on focus after a reset ([#66151](https://github.com/WordPress/gutenberg/pull/66151)).
+
+### Deprecations
+
+-   `SearchControl`: Soft deprecate `onClose` prop ([#65988](https://github.com/WordPress/gutenberg/pull/65988)).
+
+### Enhancements
+
+-   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
+-   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+
+## 28.9.0 (2024-10-03)
+
+### Bug Fixes
+
+-   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+-   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+-   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
+-   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+-   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+-   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
+
+### Deprecations
+
+-   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+-   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
+-   `__experimentalNavigator*` components can now be imported as a stable `Navigator`. Similarly, the `__experimentalUseNavigator` hook can be imported as a stable `useNavigator` ([#65802](https://github.com/WordPress/gutenberg/pull/65802)).
+
+### Enhancements
+
+-   `Tabs`: handle horizontal overflow and large tab lists gracefully ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
+-   `BorderControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+-   `BorderBoxControl`: promote to stable ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
+-   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+-   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+-   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
+-   `Navigator`: stabilize APIs ([#64613](https://github.com/WordPress/gutenberg/pull/64613)).
+-   `ToggleGroupControl`: indicator animation is now more lightweight and performant ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+
+## 28.8.0 (2024-09-19)
+
+### Bug Fixes
+
+-   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
+-   `MenuItemsChoice`: Allow menu items height to adapt to its content ([#65204](https://github.com/WordPress/gutenberg/pull/65204)).
+-   `BoxControl`: Unify input filed width whether linked or not ([#65348](https://github.com/WordPress/gutenberg/pull/65348)).
 
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
+-   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+-   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
 
 ### Enhancements
 
 -   `Navigator`: warn if a screen's `path` doesn't follow a URL-like scheme ([#65231](https://github.com/WordPress/gutenberg/pull/65231)).
 -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+-   `CustomSelectControl V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `DropdownMenu V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `FormToggle`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Popover`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `RangeControl`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `ResizeableBox`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Snackbar`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
 -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
+-   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### Bug Fixes
 

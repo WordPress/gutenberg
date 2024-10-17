@@ -11,11 +11,8 @@
 function createCurrentHook( hooks, storeKey ) {
 	return function currentHook() {
 		const hooksStore = hooks[ storeKey ];
-
-		return (
-			hooksStore.__current[ hooksStore.__current.length - 1 ]?.name ??
-			null
-		);
+		const currentArray = Array.from( hooksStore.__current );
+		return currentArray.at( -1 )?.name ?? null;
 	};
 }
 

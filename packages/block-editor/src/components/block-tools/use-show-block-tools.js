@@ -8,6 +8,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -22,10 +23,11 @@ export function useShowBlockTools() {
 			getBlock,
 			getBlockMode,
 			getSettings,
-			hasMultiSelection,
 			__unstableGetEditorMode,
 			isTyping,
-		} = select( blockEditorStore );
+			getBlockOrder,
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -42,29 +44,24 @@ export function useShowBlockTools() {
 			! isTyping() &&
 			editorMode === 'edit' &&
 			isEmptyDefaultBlock;
-		const maybeShowBreadcrumb =
-			hasSelectedBlock &&
-			! hasMultiSelection() &&
-			editorMode === 'navigation';
-
 		const isZoomOut = editorMode === 'zoom-out';
+		const isSectionSelected = getBlockOrder(
+			getSectionRootClientId()
+		).includes( clientId );
 		const _showZoomOutToolbar =
+			clientId &&
 			isZoomOut &&
-			block?.attributes?.align === 'full' &&
 			! _showEmptyBlockSideInserter &&
-			! maybeShowBreadcrumb;
+			isSectionSelected;
 		const _showBlockToolbarPopover =
 			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
-			! isEmptyDefaultBlock &&
-			! maybeShowBreadcrumb;
+			! isEmptyDefaultBlock;
 
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
-			showBreadcrumb:
-				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
 			showZoomOutToolbar: _showZoomOutToolbar,
 		};

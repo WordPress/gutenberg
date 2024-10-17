@@ -8,13 +8,11 @@ import clsx from 'clsx';
  */
 import { forwardRef, useEffect } from '@wordpress/element';
 import {
-	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
-	useMergeRefs,
 	useReducedMotion,
 	useViewportMatch,
 	useResizeObserver,
@@ -85,10 +83,6 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
-		enableRegionNavigation = true,
-		// Todo: does this need to be a prop.
-		// Can we use a dependency to keyboard-shortcuts directly?
-		shortcuts,
 	},
 	ref
 ) {
@@ -101,7 +95,6 @@ function InterfaceSkeleton(
 		duration: disableMotion ? 0 : ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
 	};
-	const navigateRegionsProps = useNavigateRegions( shortcuts );
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -123,15 +116,10 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
-			ref={ useMergeRefs( [
-				ref,
-				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
-			] ) }
+			ref={ ref }
 			className={ clsx(
 				className,
 				'interface-interface-skeleton',
-				navigateRegionsProps.className,
 				!! footer && 'has-footer'
 			) }
 		>

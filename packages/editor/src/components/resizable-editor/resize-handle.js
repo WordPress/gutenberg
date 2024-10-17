@@ -15,6 +15,11 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
 
+		if ( keyCode !== LEFT && keyCode !== RIGHT ) {
+			return;
+		}
+		event.preventDefault();
+
 		if (
 			( direction === 'left' && keyCode === LEFT ) ||
 			( direction === 'right' && keyCode === RIGHT )

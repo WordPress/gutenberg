@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import { dragHandle, trash, edit } from '@wordpress/icons';
+import { dragHandle, trash } from '@wordpress/icons';
 import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -26,7 +21,6 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		( select ) => {
 			const {
 				getBlock,
-				hasBlockMovingClientId,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
@@ -62,7 +56,6 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 			}
 
 			return {
-				blockMovingMode: hasBlockMovingClientId(),
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
@@ -75,27 +68,20 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	);
 
 	const {
-		blockMovingMode,
 		isBlockTemplatePart,
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
-		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock, __unstableSetEditorMode } =
-		useDispatch( blockEditorStore );
-
-	const classNames = clsx( 'zoom-out-toolbar', {
-		'is-block-moving-mode': !! blockMovingMode,
-	} );
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
 
 	return (
 		<NavigableToolbar
-			className={ classNames }
+			className="zoom-out-toolbar"
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
@@ -133,22 +119,6 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 				<Shuffle clientId={ clientId } as={ ToolbarButton } />
 			) }
 
-			{ ! isBlockTemplatePart && (
-				<ToolbarButton
-					className="zoom-out-toolbar-button"
-					icon={ edit }
-					label={ __( 'Edit' ) }
-					onClick={ () => {
-						// Setting may be undefined.
-						if ( typeof setIsInserterOpened === 'function' ) {
-							setIsInserterOpened( false );
-						}
-						__unstableSetEditorMode( 'edit' );
-						__unstableContentRef.current?.focus();
-					} }
-				/>
-			) }
-
 			{ canRemove && ! isBlockTemplatePart && (
 				<ToolbarButton
 					className="zoom-out-toolbar-button"
@@ -156,6 +126,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 					label={ __( 'Delete' ) }
 					onClick={ () => {
 						removeBlock( clientId );
+						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }

@@ -18,6 +18,7 @@ import {
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -297,6 +298,9 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
+
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
 		return {
@@ -466,7 +470,7 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ isSelected && (
+				{ hasNonContentControls && isSelected && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
@@ -595,7 +599,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ isSelected && (
+			{ hasNonContentControls && isSelected && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>

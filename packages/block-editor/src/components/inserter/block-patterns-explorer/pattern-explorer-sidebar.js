@@ -15,8 +15,7 @@ function PatternCategoriesList( {
 			{ patternCategories.map( ( { name, label } ) => {
 				return (
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						key={ name }
 						label={ label }
 						className={ `${ baseClassName }__categories-list__item` }
@@ -41,7 +40,7 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
 				__nextHasNoMarginBottom
 				onChange={ setSearchValue }
 				value={ searchValue }
-				label={ __( 'Search for patterns' ) }
+				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
 		</div>
