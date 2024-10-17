@@ -33,6 +33,13 @@
 		"html": false,
 		"align": true,
 		"alignWide": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"width": true,
+			"style": true,
+			"__experimentalSkipSerialization": true
+		},
 		"color": {
 			"__experimentalDuotone": "img, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,
@@ -49,6 +56,9 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder, .wp-block-site-logo .wp-block-image__crop-area"
 	},
 	"styles": [
 		{

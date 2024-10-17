@@ -39,6 +39,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -53,9 +54,37 @@ import { MIN_SIZE } from '../image/constants';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
+// If the logo is linked, wrap in an <a /> tag to trigger any inherited link element styles.
+const ImageWrapper = ( { isLink, href, title, children } ) => {
+	if ( ! isLink ) {
+		return children;
+	}
+	return (
+		<a
+			href={ href }
+			className="custom-logo-link"
+			title={ title }
+			rel="home"
+			onClick={ ( event ) => event.preventDefault() }
+			aria-disabled
+			style={ {
+				// When the site logo block is linked,
+				// it's wrapped with a disabled <a /> tag.
+				// Restore cursor style so it doesn't appear 'clickable'
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
+				cursor: 'default',
+				display: 'inline',
+			} }
+		>
+			{ children }
+		</a>
+	);
+};
+
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	attributes,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -66,12 +95,16 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
+	const { align, width, height, isLink, linkTarget, shouldSyncIcon } =
+		attributes;
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
+	const borderProps = useBorderProps( attributes );
+
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -92,7 +125,7 @@ const SiteLogo = ( {
 		if ( shouldSyncIcon && logoId !== iconId ) {
 			setAttributes( { shouldSyncIcon: false } );
 		}
-	}, [] );
+	}, [ iconId, logoId, setAttributes, shouldSyncIcon ] );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -111,7 +144,7 @@ const SiteLogo = ( {
 	const img = (
 		<>
 			<img
-				className="custom-logo"
+				className={ clsx( 'custom-logo', borderProps.className ) }
 				src={ logoUrl }
 				alt={ alt }
 				onLoad={ ( event ) => {
@@ -120,33 +153,24 @@ const SiteLogo = ( {
 						naturalHeight: event.target.naturalHeight,
 					} );
 				} }
+				style={ borderProps.style }
 			/>
 			{ isBlobURL( logoUrl ) && <Spinner /> }
 		</>
 	);
 
-	let imgWrapper = img;
-
-	// Disable reason: Image itself is not meant to be interactive, but
-	// should direct focus to block.
-	if ( isLink ) {
-		imgWrapper = (
-			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-			<a
-				href={ siteUrl }
-				className="custom-logo-link"
-				rel="home"
-				title={ title }
-				onClick={ ( event ) => event.preventDefault() }
-			>
-				{ img }
-			</a>
-			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		);
-	}
-
 	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
-		return <div style={ { width, height } }>{ imgWrapper }</div>;
+		return (
+			<div style={ { width, height } }>
+				<ImageWrapper
+					isLink={ isLink }
+					href={ siteUrl }
+					title={ title }
+				>
+					{ img }
+				</ImageWrapper>
+			</div>
+		);
 	}
 
 	// Set the default width to a responsible size.
@@ -206,20 +230,23 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditor
-				id={ logoId }
-				url={ logoUrl }
-				width={ currentWidth }
-				height={ currentHeight }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id );
-				} }
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-			/>
+			<ImageWrapper isLink={ isLink } href={ siteUrl } title={ title }>
+				<ImageEditor
+					id={ logoId }
+					url={ logoUrl }
+					width={ currentWidth }
+					height={ currentHeight }
+					naturalHeight={ naturalHeight }
+					naturalWidth={ naturalWidth }
+					onSaveImage={ ( imageAttributes ) => {
+						setLogo( imageAttributes.id );
+					} }
+					onFinishEditing={ () => {
+						setIsEditingImage( false );
+					} }
+					borderProps={ borderProps }
+				/>
+			</ImageWrapper>
 		) : (
 			<ResizableBox
 				size={ {
@@ -247,7 +274,13 @@ const SiteLogo = ( {
 					} );
 				} }
 			>
-				{ imgWrapper }
+				<ImageWrapper
+					isLink={ isLink }
+					href={ siteUrl }
+					title={ title }
+				>
+					{ img }
+				</ImageWrapper>
 			</ResizableBox>
 		);
 
@@ -395,6 +428,7 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
+	const borderProps = useBorderProps( attributes );
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -579,9 +613,7 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration
-				style={ {
-					width,
-				} }
+				style={ ( width, borderProps.style ) }
 			>
 				{ content }
 			</Placeholder>
@@ -591,6 +623,10 @@ export default function LogoEdit( {
 	const classes = clsx( className, {
 		'is-default-size': ! width,
 		'is-transient': temporaryURL,
+		'has-custom-border':
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
 	const blockProps = useBlockProps( { className: classes } );
