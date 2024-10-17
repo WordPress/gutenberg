@@ -300,6 +300,7 @@ const deepMergeRecursive = (
 	source: any,
 	override: boolean = true
 ) => {
+	// Only merge if both target and source are plain objects
 	if ( ! ( isPlainObject( target ) && isPlainObject( source ) ) ) {
 		return;
 	}
@@ -317,24 +318,31 @@ const deepMergeRecursive = (
 			hasPropSignal( proxy, key ) &&
 			getPropSignal( proxy, key );
 
+		// Handle getters and setters
 		if (
 			typeof desc.get === 'function' ||
 			typeof desc.set === 'function'
 		) {
 			if ( override || isNew ) {
+				// Define the property on the target object
 				Object.defineProperty( target, key, {
 					...desc,
 					configurable: true,
 					enumerable: true,
 				} );
+				// Update the getter in the property signal if it exists
 				if ( desc.get && propSignal ) {
 					propSignal.setGetter( desc.get );
 				}
 			}
+
+			// Handle nested objects
 		} else if ( isPlainObject( source[ key ] ) ) {
 			if ( isNew || ( override && ! isPlainObject( target[ key ] ) ) ) {
+				// Create a new object if the property is new or needs to be overridden
 				target[ key ] = {};
 				if ( propSignal ) {
+					// Create a new proxified state for the nested object
 					const ns = getNamespaceFromProxy( proxy );
 					propSignal.setValue(
 						proxifyState( ns, target[ key ] as Object )
@@ -342,13 +350,17 @@ const deepMergeRecursive = (
 				}
 			}
 			if ( isPlainObject( target[ key ] ) ) {
+				// Recursively merge nested objects
 				deepMergeRecursive( target[ key ], source[ key ], override );
 			}
+
+			// Handle primitive values and non-plain objects
 		} else if ( override || isNew ) {
 			Object.defineProperty( target, key, desc );
 			if ( propSignal ) {
 				const { value } = desc;
 				const ns = getNamespaceFromProxy( proxy );
+				// Proxify the value if necessary before setting it in the signal
 				propSignal.setValue(
 					shouldProxy( value ) ? proxifyState( ns, value ) : value
 				);
@@ -356,6 +368,7 @@ const deepMergeRecursive = (
 		}
 	}
 
+	// Update the iterable version if new keys were added
 	if ( hasNewKeys && objToIterable.has( target ) ) {
 		objToIterable.get( target )!.value++;
 	}
