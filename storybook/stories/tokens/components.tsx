@@ -41,6 +41,7 @@ export const ElevationTable = ( { tokens } ) => {
 									width: '100px',
 									height: '100px',
 									boxShadow: valueCode,
+									background: 'white',
 								} }
 							></div>
 						</td>
