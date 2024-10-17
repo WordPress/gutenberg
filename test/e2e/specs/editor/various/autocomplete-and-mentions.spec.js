@@ -80,6 +80,23 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
+
+		if ( type === 'mention' ) {
+			test( `${ completer }: should not trigger ${ type } if when the immediately preceding character is not a space`, async ( {
+				page,
+				editor,
+			} ) => {
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
+				await page.keyboard.type( 'email@da' );
+				await expect.poll( editor.getEditedPostContent )
+					.toBe( `<!-- wp:paragraph -->
+<p>email@da</p>
+<!-- /wp:paragraph -->` );
+			} );
+		}
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,
