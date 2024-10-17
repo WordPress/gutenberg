@@ -12,9 +12,12 @@ test.describe( 'Zoom Out', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test( 'Entering zoomed out mode zooms the canvas', async ( {
@@ -41,6 +44,7 @@ test.describe( 'Zoom Out', () => {
 			const paddingValue = window.getComputedStyle( element ).paddingTop;
 			return parseFloat( paddingValue );
 		} );
+		await page.pause();
 		expect( htmlRect.y + paddingTop ).toBeGreaterThan( iframeRect.y );
 		expect( htmlRect.x ).toBeGreaterThan( iframeRect.x );
 	} );
