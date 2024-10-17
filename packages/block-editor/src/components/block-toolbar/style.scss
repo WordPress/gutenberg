@@ -177,7 +177,7 @@
 			width: auto;
 
 			// Hide the button icons when labels are set to display...
-			svg {
+			svg, img, .dashicon {
 				display: none;
 			}
 			// ... and display labels.
