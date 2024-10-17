@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.10.0 (2024-10-16)
+
 ### Enhancements
 
 -   The bundled `@babel/core` dependency has been updated from requiring `^7.16.0` to requiring `7.25.7` ([#36244](https://github.com/WordPress/gutenberg/pull/36244)).

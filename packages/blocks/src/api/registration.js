@@ -232,6 +232,15 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
+		warning(
+			'Block "' +
+				name +
+				'" cannot be a parent of itself. Please remove the block name from the parent list.'
+		);
+		return;
+	}
+
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		warning(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
@@ -854,14 +863,6 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
-	if ( label && existingSource?.label ) {
-		warning(
-			'Block bindings "' +
-				name +
-				'" source label is already defined in the server.'
-		);
-		return;
-	}
 
 	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
@@ -871,6 +872,10 @@ export const registerBlockBindingsSource = ( source ) => {
 	if ( label && typeof label !== 'string' ) {
 		warning( 'Block bindings source label must be a string.' );
 		return;
+	}
+
+	if ( label && existingSource?.label && label !== existingSource?.label ) {
+		warning( 'Block bindings "' + name + '" source label was overriden.' );
 	}
 
 	// Check the `usesContext` property is correct.
