@@ -222,6 +222,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			shouldRenderTemplate,
 			post.id,
 			post.type,
+			post.slug,
 			rootLevelPost.type,
 			rootLevelPost.slug,
 			postTypes,

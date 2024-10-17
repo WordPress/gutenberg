@@ -9,7 +9,7 @@ test.describe( 'adding patterns', () => {
 	} );
 
 	test( 'should insert a block pattern', async ( { page, editor } ) => {
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 
 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		await page.fill(

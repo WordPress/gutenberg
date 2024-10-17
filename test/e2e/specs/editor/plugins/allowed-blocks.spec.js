@@ -21,7 +21,7 @@ test.describe( 'Allowed Blocks Filter', () => {
 	} ) => {
 		// The paragraph block is available.
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const searchbox = page

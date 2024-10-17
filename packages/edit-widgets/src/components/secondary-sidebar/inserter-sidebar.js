@@ -47,7 +47,7 @@ export default function InserterSidebar() {
 					__next40pxDefaultSize
 					icon={ close }
 					onClick={ closeInserter }
-					label={ __( 'Close block inserter' ) }
+					label={ __( 'Close Block Inserter' ) }
 				/>
 			</TagName>
 			<div className="edit-widgets-layout__inserter-panel-content">
