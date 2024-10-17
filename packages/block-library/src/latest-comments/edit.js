@@ -33,6 +33,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 		style: {
 			...attributes?.style,
 			spacing: undefined,
+			border: undefined,
 		},
 	};
 
