@@ -61,6 +61,30 @@ export type TabsProps = {
 	 */
 	onSelect?: Ariakit.TabStoreProps[ 'setSelectedId' ];
 	/**
+	 * The current active tab `id`. The active tab is the tab element within the
+	 * tablist widget that has DOM focus.
+	 * - `null` represents the tablist (ie. the base composite element). Users
+	 *   will be able to navigate out of it using arrow keys.
+	 * - If `activeTabId` is initially set to `null`, the base composite element
+	 *   itself will have focus and users will be able to navigate to it using
+	 *   arrow keys.activeTabId
+	 */
+	activeTabId?: Ariakit.TabStoreProps[ 'activeId' ];
+	/**
+	 * The tab id that should be active by default when the composite widget is
+	 * rendered. If `null`, the tablist element itself will have focus
+	 * and users will be able to navigate to it using arrow keys. If `undefined`,
+	 * the first enabled item will be focused.
+	 *
+	 * Note: this prop will be overridden by the `activeTabId` prop if it is
+	 * provided.
+	 */
+	defaultActiveTabId?: Ariakit.CompositeStoreProps[ 'defaultActiveId' ];
+	/**
+	 * A callback that gets called when the `activeTabId` state changes.
+	 */
+	onActiveTabIdChange?: Ariakit.TabStoreProps[ 'setActiveId' ];
+	/**
 	 * Defines the orientation of the tablist and determines which arrow keys
 	 * can be used to move focus:
 	 * - `both`: all arrow keys work.
