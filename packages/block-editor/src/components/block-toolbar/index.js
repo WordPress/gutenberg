@@ -60,7 +60,6 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
-		isContentOnlyEditingMode,
 		isDefaultEditingMode,
 		blockType,
 		toolbarKey,
@@ -116,7 +115,6 @@ export function PrivateBlockToolbar( {
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
-			isContentOnlyEditingMode: editingMode === 'contentOnly',
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
@@ -185,14 +183,11 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ showParentSelector &&
-					! isMultiToolbar &&
-					isLargeViewport &&
-					isDefaultEditingMode && <BlockParentSelector /> }
+				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
+					<BlockParentSelector />
+				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					( isDefaultEditingMode ||
-						( isContentOnlyEditingMode && ! hasParentPattern ) ||
-						isSynced ) && (
+					! hasParentPattern && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
@@ -203,19 +198,15 @@ export function PrivateBlockToolbar( {
 									disabled={ ! isDefaultEditingMode }
 									isUsingBindings={ isUsingBindings }
 								/>
-								{ isDefaultEditingMode && (
-									<>
-										{ ! isMultiToolbar && (
-											<BlockLockToolbar
-												clientId={ blockClientId }
-											/>
-										) }
-										<BlockMover
-											clientIds={ blockClientIds }
-											hideDragHandle={ hideDragHandle }
-										/>
-									</>
+								{ ! isMultiToolbar && (
+									<BlockLockToolbar
+										clientId={ blockClientId }
+									/>
 								) }
+								<BlockMover
+									clientIds={ blockClientIds }
+									hideDragHandle={ hideDragHandle }
+								/>
 							</ToolbarGroup>
 						</div>
 					) }
