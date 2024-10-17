@@ -164,7 +164,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			) }
 			<form
 				{ ...innerBlocksProps }
-				className="wp-block-form"
 				encType={ submissionMethod === 'email' ? 'text/plain' : null }
 			/>
 		</>
