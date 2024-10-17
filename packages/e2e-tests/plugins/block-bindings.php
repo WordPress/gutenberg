@@ -112,10 +112,18 @@ function gutenberg_test_block_bindings_registration() {
 		'object_custom_field',
 		array(
 			'label'        => 'Object custom field',
-			'show_in_rest' => true,
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'foo' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
 			'single'       => true,
 			'type'         => 'object',
-			'default'      => json_decode( json_encode( array( 'foo' => 'bar' ) ), false ),
 		)
 	);
 	register_meta(
