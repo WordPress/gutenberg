@@ -14,6 +14,7 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -45,6 +46,7 @@ function Tabs( {
 			onSelect?.( strippedDownId );
 		},
 		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
+		rtl: isRTL(),
 	} );
 
 	const isControlled = selectedTabId !== undefined;
