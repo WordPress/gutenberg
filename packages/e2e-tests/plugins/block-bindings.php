@@ -90,7 +90,6 @@ function gutenberg_test_block_bindings_registration() {
 		'post',
 		'text_custom_field',
 		array(
-			'label'        => 'Text custom field',
 			'default'      => 'Value of the text custom field',
 			'show_in_rest' => true,
 			'single'       => true,
@@ -102,6 +101,18 @@ function gutenberg_test_block_bindings_registration() {
 		'url_custom_field',
 		array(
 			'default'      => '#url-custom-field',
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
+	// Register different types of custom fields for testing.
+	register_meta(
+		'post',
+		'string_custom_field',
+		array(
+			'label'        => 'String custom field',
+			'default'      => '',
 			'show_in_rest' => true,
 			'single'       => true,
 			'type'         => 'string',

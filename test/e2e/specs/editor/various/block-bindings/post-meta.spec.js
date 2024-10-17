@@ -236,14 +236,14 @@ test.describe( 'Post Meta source', () => {
 			} ) => {
 				const globalField = page
 					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'Text custom field' } );
+					.filter( { hasText: 'text_custom_field' } );
 				await expect( globalField ).toBeVisible();
 			} );
 			test( 'should not include protected fields', async ( { page } ) => {
 				// Ensure the fields have loaded by checking the field is visible.
 				const globalField = page
 					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'Text custom field' } );
+					.filter( { hasText: 'text_custom_field' } );
 				await expect( globalField ).toBeVisible();
 				// Check the protected fields are not visible.
 				const protectedField = page
@@ -258,6 +258,7 @@ test.describe( 'Post Meta source', () => {
 			test( 'should show the default value if it is defined', async ( {
 				page,
 			} ) => {
+				await page.pause();
 				const fieldButton = page
 					.getByRole( 'menuitemradio' )
 					.filter( { hasText: 'Movie field label' } );
@@ -322,7 +323,7 @@ test.describe( 'Post Meta source', () => {
 			// Check the post meta fields are not visible.
 			const globalField = page
 				.getByRole( 'menuitemradio' )
-				.filter( { hasText: 'Text custom field' } );
+				.filter( { hasText: 'text_custom_field' } );
 			await expect( globalField ).toBeHidden();
 			const movieField = page
 				.getByRole( 'menuitemradio' )
@@ -567,7 +568,7 @@ test.describe( 'Post Meta source', () => {
 				.click();
 			await expect(
 				page.getByRole( 'menuitemradio', {
-					name: 'Text custom field',
+					name: 'String custom field',
 				} )
 			).toBeVisible();
 			await expect(
