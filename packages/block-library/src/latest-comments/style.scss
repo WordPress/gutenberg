@@ -3,8 +3,7 @@ ol.wp-block-latest-comments {
 	// Removes left spacing in Customizer Widgets screen.
 	// Due to low specificity this will be safely overridden
 	// by default wp-block layout styles in the Post/Site editor
-	margin: 0;
-	padding: 30px 30px 10px 30px;
+	margin-left: 0;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
@@ -31,9 +30,10 @@ ol.wp-block-latest-comments {
 .wp-block-latest-comments .wp-block-latest-comments {
 	// Remove left spacing. Higher specificity required to
 	// override default wp-block layout styles in the Post/Site editor.
-	// The following styles are to prevent duplicate spacing and border for the latest comments.
+	// The following styles are to prevent duplicate border for the latest comments.
 	border: none;
 	border-radius: inherit;
+	box-sizing: border-box;
 }
 
 .wp-block-latest-comments__comment {
