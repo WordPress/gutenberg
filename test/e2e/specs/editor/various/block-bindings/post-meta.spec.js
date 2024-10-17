@@ -258,7 +258,6 @@ test.describe( 'Post Meta source', () => {
 			test( 'should show the default value if it is defined', async ( {
 				page,
 			} ) => {
-				await page.pause();
 				const fieldButton = page
 					.getByRole( 'menuitemradio' )
 					.filter( { hasText: 'Movie field label' } );

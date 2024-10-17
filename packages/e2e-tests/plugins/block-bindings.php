@@ -21,14 +21,17 @@ function gutenberg_test_block_bindings_registration() {
 		'text_field'  => array(
 			'label' => 'Text Field Label',
 			'value' => 'Text Field Value',
+			'type'  => 'string',
 		),
 		'url_field'   => array(
 			'label' => 'URL Field Label',
 			'value' => $testing_url,
+			'type'  => 'string',
 		),
 		'empty_field' => array(
 			'label' => 'Empty Field Label',
 			'value' => '',
+			'type'  => 'string',
 		),
 	);
 
