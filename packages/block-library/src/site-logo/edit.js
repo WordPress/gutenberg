@@ -14,7 +14,6 @@ import {
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	MenuItem,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
@@ -356,22 +355,11 @@ function SiteLogoReplaceFlow( {
 	return (
 		<MediaReplaceFlow
 			{ ...mediaReplaceProps }
+			mediaURL={ mediaURL }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			accept={ ACCEPT_MEDIA_STRING }
-		>
-			{ ( { onClose } ) =>
-				mediaURL && (
-					<MenuItem
-						onClick={ () => {
-							onRemoveLogo();
-							onClose();
-						} }
-					>
-						{ __( 'Reset' ) }
-					</MenuItem>
-				)
-			}
-		</MediaReplaceFlow>
+			onReset={ onRemoveLogo }
+		/>
 	);
 }
 
@@ -435,7 +423,7 @@ export default function LogoEdit( {
 				context: 'view',
 			} );
 		const _isRequestingMediaItem =
-			_siteLogoId &&
+			!! _siteLogoId &&
 			! select( coreStore ).hasFinishedResolution( 'getMedia', [
 				_siteLogoId,
 				{ context: 'view' },
@@ -576,6 +564,7 @@ export default function LogoEdit( {
 					iconId={ siteIconId }
 					canUserEdit={ canUserEdit }
 				/>
+				{ canUserEdit && <DropZone onFilesDrop={ onFilesDrop } /> }
 			</>
 		);
 	}
@@ -639,6 +628,7 @@ export default function LogoEdit( {
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button
+											__next40pxDefaultSize
 											onClick={ open }
 											variant="secondary"
 										>
@@ -664,16 +654,17 @@ export default function LogoEdit( {
 			{ controls }
 			{ mediaInspectorPanel }
 			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
-			{ ! temporaryURL && ! logoUrl && ! canUserEdit && (
-				<Placeholder className="site-logo_placeholder">
-					{ !! isLoading && (
+			{ ( isLoading ||
+				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
+				<Placeholder className="site-logo_placeholder" withIllustration>
+					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>
 					) }
 				</Placeholder>
 			) }
-			{ ! temporaryURL && ! logoUrl && canUserEdit && (
+			{ ! isLoading && ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }
@@ -683,6 +674,7 @@ export default function LogoEdit( {
 					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
+								__next40pxDefaultSize
 								icon={ upload }
 								variant="primary"
 								label={ __( 'Choose logo' ) }

@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -82,7 +81,7 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
-		<Button
+		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
@@ -154,7 +153,7 @@ function ListViewBlockSelectButton(
 					</span>
 				) }
 			</HStack>
-		</Button>
+		</a>
 	);
 }
 

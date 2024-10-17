@@ -42,7 +42,9 @@ export default function Pagination( {
 							onClick={ () => changePage( 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'First page' ) }
+							size="compact"
 							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>«</span>
 						</Button>
@@ -51,7 +53,9 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage - 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'Previous page' ) }
+							size="compact"
 							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>‹</span>
 						</Button>
@@ -74,7 +78,9 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage + 1 ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Next page' ) }
+							size="compact"
 							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>›</span>
 						</Button>
@@ -83,8 +89,9 @@ export default function Pagination( {
 							onClick={ () => changePage( numPages ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Last page' ) }
-							size="default"
+							size="compact"
 							accessibleWhenDisabled
+							className="block-editor-patterns__grid-pagination-button"
 						>
 							<span>»</span>
 						</Button>

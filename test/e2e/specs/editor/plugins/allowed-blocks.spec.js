@@ -21,13 +21,13 @@ test.describe( 'Allowed Blocks Filter', () => {
 	} ) => {
 		// The paragraph block is available.
 		await page
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const searchbox = page
 			.getByRole( 'region', { name: 'Block Library' } )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} );
 
 		await searchbox.fill( 'Paragraph' );

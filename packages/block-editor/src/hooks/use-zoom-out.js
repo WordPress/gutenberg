@@ -8,32 +8,35 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
-
+import { unlock } from '../lock-unlock';
 /**
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
  *
  * @param {boolean} zoomOut If we should enter into zoomOut mode or not
  */
 export function useZoomOut( zoomOut = true ) {
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
+	const { __unstableSetEditorMode, setZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const { __unstableGetEditorMode } = unlock( useSelect( blockEditorStore ) );
 
-	const originalEditingMode = useRef( null );
+	const originalEditingModeRef = useRef( null );
 	const mode = __unstableGetEditorMode();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
-		if ( ! originalEditingMode.current ) {
-			originalEditingMode.current = mode;
+		if ( ! originalEditingModeRef.current ) {
+			originalEditingModeRef.current = mode;
 		}
 
 		return () => {
 			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
 			if (
 				__unstableGetEditorMode() === 'zoom-out' &&
-				__unstableGetEditorMode() !== originalEditingMode.current
+				__unstableGetEditorMode() !== originalEditingModeRef.current
 			) {
-				__unstableSetEditorMode( originalEditingMode.current );
+				__unstableSetEditorMode( originalEditingModeRef.current );
+				setZoomLevel( 100 );
 			}
 		};
 	}, [] );
@@ -42,12 +45,19 @@ export function useZoomOut( zoomOut = true ) {
 	useEffect( () => {
 		if ( zoomOut && mode !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
+			setZoomLevel( 50 );
 		} else if (
 			! zoomOut &&
 			__unstableGetEditorMode() === 'zoom-out' &&
-			originalEditingMode.current !== mode
+			originalEditingModeRef.current !== mode
 		) {
-			__unstableSetEditorMode( originalEditingMode.current );
+			__unstableSetEditorMode( originalEditingModeRef.current );
+			setZoomLevel( 100 );
 		}
-	}, [ __unstableGetEditorMode, __unstableSetEditorMode, zoomOut ] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
+	}, [
+		__unstableGetEditorMode,
+		__unstableSetEditorMode,
+		zoomOut,
+		setZoomLevel,
+	] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
 }

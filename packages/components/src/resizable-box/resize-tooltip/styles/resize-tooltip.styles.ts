@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import { Text } from '../../../text';
-import { font, COLORS } from '../../../utils';
+import { font, COLORS, CONFIG } from '../../../utils';
 
 export const Root = styled.div`
 	bottom: 0;
@@ -31,7 +31,7 @@ export const TooltipWrapper = styled.div`
 
 export const Tooltip = styled.div`
 	background: ${ COLORS.theme.foreground };
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	box-sizing: border-box;
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: 12px;

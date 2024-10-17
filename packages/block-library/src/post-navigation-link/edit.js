@@ -49,8 +49,11 @@ export default function PostNavigationLinkEdit( {
 	const displayArrow = arrowMap[ arrow ];
 
 	if ( showTitle ) {
-		/* translators: Label before for next and previous post. There is a space after the colon. */
-		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+		placeholder = isNext
+			? /* translators: Label before for next and previous post. There is a space after the colon. */
+			  __( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			: /* translators: Label before for next and previous post. There is a space after the colon. */
+			  __( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );

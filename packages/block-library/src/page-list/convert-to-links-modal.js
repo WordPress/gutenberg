@@ -31,10 +31,15 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 				{ convertDescription }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
-				<Button variant="tertiary" onClick={ onClose }>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ onClose }
+				>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
+					__next40pxDefaultSize
 					variant="primary"
 					accessibleWhenDisabled
 					disabled={ disabled }

@@ -25,6 +25,7 @@ function EditorHistoryRedo( props, ref ) {
 	const { redo } = useDispatch( editorStore );
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			ref={ ref }
 			icon={ ! isRTL() ? redoIcon : undoIcon }

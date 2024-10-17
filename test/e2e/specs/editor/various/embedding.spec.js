@@ -134,15 +134,15 @@ test.describe( 'Embedding content', () => {
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/'
 		);
 		await expect(
-			currenEmbedBlock.locator( 'figure' ),
+			currenEmbedBlock,
 			'WordPress valid content. Should render valid figure element.'
-		).toHaveClass( 'wp-block-embed' );
+		).toHaveClass( /wp-block-embed/ );
 
 		await embedUtils.insertEmbed(
 			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
 		);
 		await expect(
-			currenEmbedBlock.locator( 'figure' ),
+			currenEmbedBlock,
 			'Video content. Should render valid figure element, and include the aspect ratio class.'
 		).toHaveClass( /wp-embed-aspect-16-9/ );
 

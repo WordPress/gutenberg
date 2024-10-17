@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	PanelBody,
 	Placeholder,
+	SelectControl,
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
@@ -20,7 +21,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
 
@@ -33,19 +34,33 @@ export default function CategoriesEdit( {
 		showEmpty,
 		label,
 		showLabel,
+		taxonomy: taxonomySlug,
 	},
 	setAttributes,
 	className,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
+
+	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
+		'root',
+		'taxonomy'
+	);
+
+	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
+
+	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
+
+	const isHierarchicalTaxonomy =
+		! isResolvingTaxonomies && taxonomy?.hierarchical;
+
 	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
-	if ( showOnlyTopLevel ) {
+	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
 		query.parent = 0;
 	}
 
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
-		'category',
+		taxonomySlug,
 		query
 	);
 
@@ -66,7 +81,7 @@ export default function CategoriesEdit( {
 		! name ? __( '(Untitled)' ) : decodeEntities( name ).trim();
 
 	const renderCategoryList = () => {
-		const parentId = showHierarchy ? 0 : null;
+		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return categoriesList.map( ( category ) =>
 			renderCategoryListItem( category )
@@ -82,19 +97,21 @@ export default function CategoriesEdit( {
 					{ renderCategoryName( name ) }
 				</a>
 				{ showPostCounts && ` (${ count })` }
-				{ showHierarchy && !! childCategories.length && (
-					<ul className="children">
-						{ childCategories.map( ( childCategory ) =>
-							renderCategoryListItem( childCategory )
-						) }
-					</ul>
-				) }
+				{ isHierarchicalTaxonomy &&
+					showHierarchy &&
+					!! childCategories.length && (
+						<ul className="children">
+							{ childCategories.map( ( childCategory ) =>
+								renderCategoryListItem( childCategory )
+							) }
+						</ul>
+					) }
 			</li>
 		);
 	};
 
 	const renderCategoryDropdown = () => {
-		const parentId = showHierarchy ? 0 : null;
+		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return (
 			<>
@@ -102,7 +119,7 @@ export default function CategoriesEdit( {
 					<RichText
 						className="wp-block-categories__label"
 						aria-label={ __( 'Label text' ) }
-						placeholder={ __( 'Categories' ) }
+						placeholder={ taxonomy.name }
 						withoutInteractiveFormatting
 						value={ label }
 						onChange={ ( html ) =>
@@ -111,11 +128,17 @@ export default function CategoriesEdit( {
 					/>
 				) : (
 					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ label ? label : __( 'Categories' ) }
+						{ label ? label : taxonomy.name }
 					</VisuallyHidden>
 				) }
 				<select id={ selectId }>
-					<option>{ __( 'Select Category' ) }</option>
+					<option>
+						{ sprintf(
+							/* translators: %s: taxonomy's singular name */
+							__( 'Select %s' ),
+							taxonomy.labels.singular_name
+						) }
+					</option>
 					{ categoriesList.map( ( category ) =>
 						renderCategoryDropdownItem( category, 0 )
 					) }
@@ -133,7 +156,8 @@ export default function CategoriesEdit( {
 				{ renderCategoryName( name ) }
 				{ showPostCounts && ` (${ count })` }
 			</option>,
-			showHierarchy &&
+			isHierarchicalTaxonomy &&
+				showHierarchy &&
 				!! childCategories.length &&
 				childCategories.map( ( childCategory ) =>
 					renderCategoryDropdownItem( childCategory, level + 1 )
@@ -161,6 +185,23 @@ export default function CategoriesEdit( {
 		<TagName { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					{ Array.isArray( taxonomies ) && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Taxonomy' ) }
+							options={ taxonomies.map( ( t ) => ( {
+								label: t.name,
+								value: t.slug,
+							} ) ) }
+							value={ taxonomySlug }
+							onChange={ ( selectedTaxonomy ) =>
+								setAttributes( {
+									taxonomy: selectedTaxonomy,
+								} )
+							}
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
@@ -182,19 +223,21 @@ export default function CategoriesEdit( {
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
+					{ isHierarchicalTaxonomy && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show only top level terms' ) }
+							checked={ showOnlyTopLevel }
+							onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show only top level categories' ) }
-						checked={ showOnlyTopLevel }
-						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show empty categories' ) }
+						label={ __( 'Show empty terms' ) }
 						checked={ showEmpty }
 						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
-					{ ! showOnlyTopLevel && (
+					{ isHierarchicalTaxonomy && ! showOnlyTopLevel && (
 						<ToggleControl
 							__nextHasNoMarginBottom
 							label={ __( 'Show hierarchy' ) }
@@ -205,16 +248,12 @@ export default function CategoriesEdit( {
 				</PanelBody>
 			</InspectorControls>
 			{ isResolving && (
-				<Placeholder icon={ pin } label={ __( 'Categories' ) }>
+				<Placeholder icon={ pin } label={ __( 'Terms' ) }>
 					<Spinner />
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (
-				<p>
-					{ __(
-						'Your site does not have any posts, so there is nothing to display here at the moment.'
-					) }
-				</p>
+				<p>{ taxonomy.labels.no_terms }</p>
 			) }
 			{ ! isResolving &&
 				categories?.length > 0 &&

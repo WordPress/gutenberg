@@ -6,7 +6,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { NavigatorBackButton } from '../navigator-back-button';
+import { NavigatorBackButton } from '../navigator-back-button/component';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type { NavigatorBackButtonProps } from '../types';
@@ -17,21 +17,16 @@ function UnconnectedNavigatorToParentButton(
 ) {
 	deprecated( 'wp.components.NavigatorToParentButton', {
 		since: '6.7',
-		alternative: 'wp.components.NavigatorBackButton',
+		alternative: 'wp.components.Navigator.BackButton',
 	} );
 
 	return <NavigatorBackButton ref={ forwardedRef } { ...props } />;
 }
 
 /**
- * _Note: this component is deprecated. Please use the `NavigatorBackButton`
- * component instead._
- *
  * @deprecated
  */
 export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
-	'NavigatorToParentButton'
+	'Navigator.ToParentButton'
 );
-
-export default NavigatorToParentButton;

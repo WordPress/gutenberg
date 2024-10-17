@@ -73,6 +73,11 @@ describe( 'editor utils', () => {
 					dimensions: {
 						minHeight: '100px',
 					},
+					spacing: {
+						padding: {
+							top: 0,
+						},
+					},
 				},
 			},
 		},
@@ -442,6 +447,11 @@ describe( 'editor utils', () => {
 			[
 				{ ref: 'styles.background.backgroundImage' },
 				{ url: 'file:./assets/image.jpg' },
+				themeJson,
+			],
+			[
+				{ ref: 'styles.blocks.core/group.spacing.padding.top' },
+				0,
 				themeJson,
 			],
 			[

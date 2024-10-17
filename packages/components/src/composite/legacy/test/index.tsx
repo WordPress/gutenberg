@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { queryByAttribute, render, screen } from '@testing-library/react';
+import {
+	queryByAttribute,
+	render,
+	screen,
+	renderHook,
+} from '@testing-library/react';
 import { press, waitFor } from '@ariakit/test';
 
 /**
@@ -156,6 +161,57 @@ function getShiftTestItems() {
 	};
 }
 
+// Checking for deprecation warnings before other tests because the `deprecated`
+// utility only fires a console.warn the first time a component is rendered.
+describe( 'Shows a deprecation warning', () => {
+	it( 'useCompositeState', () => {
+		renderHook( () => useCompositeState() );
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
+		);
+	} );
+	it( 'Composite', () => {
+		const Test = () => {
+			const props = useCompositeState();
+			return <Composite { ...props } />;
+		};
+		render( <Test /> );
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__unstableComposite is deprecated since version 6.7. Please use Composite instead.'
+		);
+	} );
+	it( 'CompositeItem', () => {
+		const Test = () => {
+			const props = useCompositeState();
+			return (
+				<Composite { ...props }>
+					<CompositeItem { ...props } />
+				</Composite>
+			);
+		};
+		render( <Test /> );
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use Composite.Item instead.'
+		);
+	} );
+	it( 'CompositeGroup', () => {
+		const Test = () => {
+			const props = useCompositeState();
+			return (
+				<Composite { ...props }>
+					<CompositeGroup { ...props }>
+						<CompositeItem { ...props } />
+					</CompositeGroup>
+				</Composite>
+			);
+		};
+		render( <Test /> );
+		expect( console ).toHaveWarnedWith(
+			'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use Composite.Group or Composite.Row instead.'
+		);
+	} );
+} );
+
 describe.each( [
 	[
 		'With "spread" state',
@@ -176,7 +232,7 @@ describe.each( [
 				<button>After</button>
 			</>
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 
 		await press.Tab();
 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
@@ -204,7 +260,7 @@ describe.each( [
 				</Composite>
 			);
 		};
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
@@ -233,7 +289,7 @@ describe.each( [
 				</Composite>
 			);
 		};
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
 		expect( item2 ).toBeEnabled();
@@ -254,7 +310,7 @@ describe.each( [
 				} ) }
 			/>
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		const { item1, item2, item3 } = getOneDimensionalItems();
 
 		expect( item1.id ).toMatch( 'test-id-1' );
@@ -271,7 +327,7 @@ describe.each( [
 				} ) }
 			/>
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		const { item2 } = getOneDimensionalItems();
 
 		await press.Tab();
@@ -285,37 +341,37 @@ describe.each( [
 ] )( '%s', ( _when, rtl ) => {
 	const { previous, next, first, last } = getKeys( rtl );
 
-	function useOneDimensionalTest( initialState?: InitialState ) {
+	async function useOneDimensionalTest( initialState?: InitialState ) {
 		const Test = () => (
 			<OneDimensionalTest
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		return getOneDimensionalItems();
 	}
 
-	function useTwoDimensionalTest( initialState?: InitialState ) {
+	async function useTwoDimensionalTest( initialState?: InitialState ) {
 		const Test = () => (
 			<TwoDimensionalTest
 				state={ useCompositeState( { rtl, ...initialState } ) }
 			/>
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		return getTwoDimensionalItems();
 	}
 
-	function useShiftTest( shift: boolean ) {
+	async function useShiftTest( shift: boolean ) {
 		const Test = () => (
 			<ShiftTest state={ useCompositeState( { rtl, shift } ) } />
 		);
-		renderAndValidate( <Test /> );
+		await renderAndValidate( <Test /> );
 		return getShiftTestItems();
 	}
 
 	describe( 'In one dimension', () => {
 		test( 'All directions work with no orientation', async () => {
-			const { item1, item2, item3 } = useOneDimensionalTest();
+			const { item1, item2, item3 } = await useOneDimensionalTest();
 
 			await press.Tab();
 			expect( item1 ).toHaveFocus();
@@ -350,7 +406,7 @@ describe.each( [
 		} );
 
 		test( 'Only left/right work with horizontal orientation', async () => {
-			const { item1, item2, item3 } = useOneDimensionalTest( {
+			const { item1, item2, item3 } = await useOneDimensionalTest( {
 				orientation: 'horizontal',
 			} );
 
@@ -379,7 +435,7 @@ describe.each( [
 		} );
 
 		test( 'Only up/down work with vertical orientation', async () => {
-			const { item1, item2, item3 } = useOneDimensionalTest( {
+			const { item1, item2, item3 } = await useOneDimensionalTest( {
 				orientation: 'vertical',
 			} );
 
@@ -408,7 +464,7 @@ describe.each( [
 		} );
 
 		test( 'Focus wraps with loop enabled', async () => {
-			const { item1, item2, item3 } = useOneDimensionalTest( {
+			const { item1, item2, item3 } = await useOneDimensionalTest( {
 				loop: true,
 			} );
 
@@ -432,7 +488,7 @@ describe.each( [
 	describe( 'In two dimensions', () => {
 		test( 'All directions work as standard', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
-				useTwoDimensionalTest();
+				await useTwoDimensionalTest();
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -468,7 +524,7 @@ describe.each( [
 
 		test( 'Focus wraps around rows/columns with loop enabled', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
-				useTwoDimensionalTest( { loop: true } );
+				await useTwoDimensionalTest( { loop: true } );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -492,7 +548,7 @@ describe.each( [
 
 		test( 'Focus moves between rows/columns with wrap enabled', async () => {
 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
-				useTwoDimensionalTest( { wrap: true } );
+				await useTwoDimensionalTest( { wrap: true } );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -521,7 +577,7 @@ describe.each( [
 		} );
 
 		test( 'Focus wraps around start/end with loop and wrap enabled', async () => {
-			const { itemA1, itemC3 } = useTwoDimensionalTest( {
+			const { itemA1, itemC3 } = await useTwoDimensionalTest( {
 				loop: true,
 				wrap: true,
 			} );
@@ -539,7 +595,8 @@ describe.each( [
 		} );
 
 		test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
-			const { itemA1, itemB1, itemB2, itemC1 } = useShiftTest( true );
+			const { itemA1, itemB1, itemB2, itemC1 } =
+				await useShiftTest( true );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();
@@ -560,7 +617,7 @@ describe.each( [
 		} );
 
 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
-			const { itemA1, itemB1, itemB2 } = useShiftTest( false );
+			const { itemA1, itemB1, itemB2 } = await useShiftTest( false );
 
 			await press.Tab();
 			expect( itemA1 ).toHaveFocus();

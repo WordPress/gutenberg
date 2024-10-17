@@ -24,7 +24,7 @@ function FontSizes() {
 			</HStack>
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem
-					path="/typography/font-sizes/"
+					path="/typography/font-sizes"
 					aria-label={ __( 'Edit font size presets' ) }
 				>
 					<HStack direction="row">

@@ -9,10 +9,15 @@
 		margin-bottom: $grid-unit-10;
 		box-shadow: none;
 		outline: none;
+		border-radius: $radius-small;
 	}
 
 	.components-toolbar {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
+	}
+
+	.components-toolbar-group {
+		background: none;
 	}
 
 	.components-toolbar__control,

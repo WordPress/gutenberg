@@ -5,18 +5,14 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import { PrivateBlockPopover as BlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import ZoomOutToolbar from './zoom-out-toolbar';
 
 export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
-	const {
-		capturingClientId,
-		isInsertionPointVisible,
-		lastClientId,
-		rootClientId,
-	} = useSelectedBlockToolProps( clientId );
+	const { capturingClientId, isInsertionPointVisible, lastClientId } =
+		useSelectedBlockToolProps( clientId );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -33,6 +29,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 
 	return (
 		<BlockPopover
+			__unstableContentRef={ __unstableContentRef }
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
 			className={ clsx( 'zoom-out-toolbar-popover', {
@@ -42,8 +39,8 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 			{ ...props }
 		>
 			<ZoomOutToolbar
+				__unstableContentRef={ __unstableContentRef }
 				clientId={ clientId }
-				rootClientId={ rootClientId }
 			/>
 		</BlockPopover>
 	);

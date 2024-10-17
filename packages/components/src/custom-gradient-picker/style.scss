@@ -48,7 +48,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		height: inherit;
 		width: inherit;
 		min-width: $grid-unit-20;
-		border-radius: 50%;
+		border-radius: $radius-round;
 
 		background: $white;
 		padding: 2px;
@@ -65,7 +65,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
 		height: inherit;
 		width: inherit;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		padding: 0;
 
 		// Shadow and stroke.
@@ -98,25 +98,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	flex: 0 auto;
 	width: 20px;
 	height: 20px;
-}
-
-.components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
-	border: none;
-
-	// Work-around to target the inner button containers rendered by <ToolbarGroup />
-	> div + div {
-		margin-left: 1px;
-	}
-
-	button {
-		&.is-pressed {
-			> svg {
-				background: $white;
-				border: 1px solid $gray-600;
-				border-radius: 2px;
-			}
-		}
-	}
 }
 
 .components-custom-gradient-picker__ui-line {

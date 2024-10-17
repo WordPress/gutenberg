@@ -49,7 +49,12 @@ export default function MissingEdit( { attributes, clientId } ) {
 	let messageHTML;
 
 	const convertToHtmlButton = (
-		<Button key="convert" onClick={ convertToHTML } variant="primary">
+		<Button
+			__next40pxDefaultSize
+			key="convert"
+			onClick={ convertToHTML }
+			variant="primary"
+		>
 			{ __( 'Keep as HTML' ) }
 		</Button>
 	);
@@ -69,7 +74,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
-				'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
+				'Your site doesn’t include support for the "%s" block. You can leave it as-is, convert it to custom HTML, or remove it.'
 			),
 			originalName
 		);
@@ -78,7 +83,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
 			__(
-				'Your site doesn’t include support for the "%s" block. You can leave this block intact or remove it entirely.'
+				'Your site doesn’t include support for the "%s" block. You can leave it as-is or remove it.'
 			),
 			originalName
 		);

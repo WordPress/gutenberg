@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { _n, sprintf } from '@wordpress/i18n';
+import { _n, sprintf, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 	__experimentalText as Text,
 	Button,
 	Flex,
@@ -15,7 +15,7 @@ import {
  * Internal dependencies
  */
 import FontDemo from './font-demo';
-import { chevronRight } from '@wordpress/icons';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 	const variantsCount = font.fontFace?.length || 1;
@@ -28,6 +28,7 @@ function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				onClick();
 				if ( navigatorPath ) {
@@ -55,7 +56,7 @@ function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 						</Text>
 					</FlexItem>
 					<FlexItem>
-						<Icon icon={ chevronRight } />
+						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</FlexItem>
 				</Flex>
 			</Flex>

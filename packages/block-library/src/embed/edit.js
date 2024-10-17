@@ -14,7 +14,6 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-import { Caption } from '../utils/caption';
 
 /**
  * External dependencies
@@ -31,6 +30,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 import { getAuthority } from '@wordpress/url';
+import { Caption } from '../utils/caption';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -226,7 +226,7 @@ const EmbedEdit = ( props ) => {
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
-					onChange={ ( event ) => setURL( event.target.value ) }
+					onChange={ ( value ) => setURL( value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
@@ -262,7 +262,15 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<View { ...blockProps }>
+			<figure
+				{ ...blockProps }
+				className={ clsx( blockProps.className, className, {
+					[ `is-type-${ type }` ]: type,
+					[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+					[ `wp-block-embed-${ providerNameSlug }` ]:
+						providerNameSlug,
+				} ) }
+			>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -277,6 +285,8 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
 				/>
 				<Caption
 					attributes={ attributes }
@@ -286,7 +296,7 @@ const EmbedEdit = ( props ) => {
 					label={ __( 'Embed caption text' ) }
 					showToolbarButton={ isSelected }
 				/>
-			</View>
+			</figure>
 		</>
 	);
 };

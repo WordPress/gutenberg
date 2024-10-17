@@ -88,6 +88,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 				/>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => {
 							setIsAdding( false );
@@ -97,6 +98,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 					</Button>
 
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSaving }

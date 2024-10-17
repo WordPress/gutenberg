@@ -106,48 +106,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'Should navigate between inner and root blocks in navigation mode', async ( {
-		page,
-		writingFlowUtils,
-	} ) => {
-		await writingFlowUtils.addDemoContent();
-
-		// Switch to navigation mode.
-		await page.keyboard.press( 'Escape' );
-		// Arrow up to Columns block.
-		await page.keyboard.press( 'ArrowUp' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/columns' );
-		// Arrow right into Column block.
-		await page.keyboard.press( 'ArrowRight' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/column' );
-		// Arrow down to reach second Column block.
-		await page.keyboard.press( 'ArrowDown' );
-		// Arrow right again into Paragraph block.
-		await page.keyboard.press( 'ArrowRight' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
-		// Arrow left back to Column block.
-		await page.keyboard.press( 'ArrowLeft' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/column' );
-		// Arrow left back to Columns block.
-		await page.keyboard.press( 'ArrowLeft' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/columns' );
-		// Arrow up to first paragraph.
-		await page.keyboard.press( 'ArrowUp' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
-	} );
-
 	test( 'should navigate around inline boundaries', async ( {
 		editor,
 		page,
@@ -958,32 +916,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:table -->` );
 	} );
 
-	test( 'escape should set select mode and then focus the canvas', async ( {
-		page,
-		writingFlowUtils,
-	} ) => {
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Random Paragraph' );
-
-		// First escape enters navigation mode.
-		await page.keyboard.press( 'Escape' );
-		const navigationButton = page.getByLabel(
-			'Paragraph Block. Row 1. Random Paragraph'
-		);
-		await expect( navigationButton ).toBeVisible();
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
-
-		// Second escape should send focus to the canvas
-		await page.keyboard.press( 'Escape' );
-		// The navigation button should be hidden.
-		await expect( navigationButton ).toBeHidden();
-		await expect(
-			page.getByRole( 'region', { name: 'Editor content' } )
-		).toBeFocused();
-	} );
-
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
 	test( 'does not deselect the block when selecting text outside the editor canvas', async ( {
 		editor,
@@ -1222,11 +1154,11 @@ class WritingFlowUtils {
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'
 		);
 		await this.page.keyboard.type( '2nd col' ); // If this text is too long, it may wrap to a new line and cause test failure. That's why we're using "2nd" instead of "Second" here.
-
-		await this.page.keyboard.press( 'Escape' ); // Enter navigation mode.
-		await this.page.keyboard.press( 'ArrowLeft' ); // Move to the column block.
-		await this.page.keyboard.press( 'ArrowLeft' ); // Move to the columns block.
-		await this.page.keyboard.press( 'Enter' ); // Enter edit mode with the columns block selected.
+		await this.editor.showBlockToolbar();
+		await this.page.keyboard.press( 'Shift+Tab' ); // Move to toolbar to select parent
+		await this.page.keyboard.press( 'Enter' ); // Selects the column block.
+		await this.page.keyboard.press( 'Shift+Tab' ); // Move to toolbar to select parent
+		await this.page.keyboard.press( 'Enter' ); // Selects the columns block.
 		await this.page.keyboard.press( 'Enter' ); // Creates a paragraph after the columns block.
 		await this.page.keyboard.type( 'Second paragraph' );
 	}

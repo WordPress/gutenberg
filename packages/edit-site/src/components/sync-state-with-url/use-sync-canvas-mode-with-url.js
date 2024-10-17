@@ -21,48 +21,51 @@ export default function useSyncCanvasModeWithURL() {
 		[]
 	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const currentCanvasMode = useRef( canvasMode );
+	const currentCanvasModeRef = useRef( canvasMode );
 	const { canvas: canvasInUrl } = params;
-	const currentCanvasInUrl = useRef( canvasInUrl );
-	const currentUrlParams = useRef( params );
+	const currentCanvasInUrlRef = useRef( canvasInUrl );
+	const currentUrlParamsRef = useRef( params );
 	useEffect( () => {
-		currentUrlParams.current = params;
+		currentUrlParamsRef.current = params;
 	}, [ params ] );
 
 	useEffect( () => {
-		currentCanvasMode.current = canvasMode;
+		currentCanvasModeRef.current = canvasMode;
 		if ( canvasMode === 'init' ) {
 			return;
 		}
 
 		if (
 			canvasMode === 'edit' &&
-			currentCanvasInUrl.current !== canvasMode
+			currentCanvasInUrlRef.current !== canvasMode
 		) {
 			history.push( {
-				...currentUrlParams.current,
+				...currentUrlParamsRef.current,
 				canvas: 'edit',
 			} );
 		}
 
 		if (
 			canvasMode === 'view' &&
-			currentCanvasInUrl.current !== undefined
+			currentCanvasInUrlRef.current !== undefined
 		) {
 			history.push( {
-				...currentUrlParams.current,
+				...currentUrlParamsRef.current,
 				canvas: undefined,
 			} );
 		}
 	}, [ canvasMode, history ] );
 
 	useEffect( () => {
-		currentCanvasInUrl.current = canvasInUrl;
-		if ( canvasInUrl !== 'edit' && currentCanvasMode.current !== 'view' ) {
+		currentCanvasInUrlRef.current = canvasInUrl;
+		if (
+			canvasInUrl !== 'edit' &&
+			currentCanvasModeRef.current !== 'view'
+		) {
 			setCanvasMode( 'view' );
 		} else if (
 			canvasInUrl === 'edit' &&
-			currentCanvasMode.current !== 'edit'
+			currentCanvasModeRef.current !== 'edit'
 		) {
 			setCanvasMode( 'edit' );
 		}

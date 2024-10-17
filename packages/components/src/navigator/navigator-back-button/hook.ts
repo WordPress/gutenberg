@@ -9,7 +9,7 @@ import { useCallback } from '@wordpress/element';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';
-import useNavigator from '../use-navigator';
+import { useNavigator } from '../use-navigator';
 import type { NavigatorBackButtonProps } from '../types';
 
 export function useNavigatorBackButton(
@@ -20,7 +20,7 @@ export function useNavigatorBackButton(
 		as = Button,
 
 		...otherProps
-	} = useContextSystem( props, 'NavigatorBackButton' );
+	} = useContextSystem( props, 'Navigator.BackButton' );
 
 	const { goBack } = useNavigator();
 	const handleClick: React.MouseEventHandler< HTMLButtonElement > =

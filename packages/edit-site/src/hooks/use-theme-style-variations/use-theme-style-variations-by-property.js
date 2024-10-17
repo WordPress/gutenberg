@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { unlock } from '../../lock-unlock';
 
+const EMPTY_ARRAY = [];
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
@@ -82,7 +83,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 			).__experimentalGetCurrentThemeGlobalStylesVariations();
 
 		return {
-			variationsFromTheme: _variationsFromTheme || [],
+			variationsFromTheme: _variationsFromTheme || EMPTY_ARRAY,
 		};
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );

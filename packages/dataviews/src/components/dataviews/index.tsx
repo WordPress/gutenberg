@@ -12,8 +12,6 @@ import { useMemo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { default as DataViewsBulkActions } from '../dataviews-bulk-actions';
-import DataViewsBulkActionsToolbar from '../dataviews-bulk-actions-toolbar';
 import DataViewsContext from '../dataviews-context';
 import {
 	default as DataViewsFilters,
@@ -21,7 +19,7 @@ import {
 	FilterVisibilityToggle,
 } from '../dataviews-filters';
 import DataViewsLayout from '../dataviews-layout';
-import DataviewsPagination from '../dataviews-pagination';
+import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
 import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
@@ -118,11 +116,15 @@ export default function DataViews< Item >( {
 			<div className="dataviews-wrapper">
 				<HStack
 					alignment="top"
-					justify="start"
+					justify="space-between"
 					className="dataviews__view-actions"
 					spacing={ 1 }
 				>
-					<HStack justify="start" wrap>
+					<HStack
+						justify="start"
+						expanded={ false }
+						className="dataviews__search"
+					>
 						{ search && <DataViewsSearch label={ searchLabel } /> }
 						<FilterVisibilityToggle
 							filters={ filters }
@@ -133,7 +135,6 @@ export default function DataViews< Item >( {
 							isShowingFilter={ isShowingFilter }
 						/>
 					</HStack>
-					<DataViewsBulkActions />
 					<HStack
 						spacing={ 1 }
 						expanded={ false }
@@ -149,8 +150,7 @@ export default function DataViews< Item >( {
 				</HStack>
 				{ isShowingFilter && <DataViewsFilters /> }
 				<DataViewsLayout />
-				<DataviewsPagination />
-				<DataViewsBulkActionsToolbar />
+				<DataViewsFooter />
 			</div>
 		</DataViewsContext.Provider>
 	);
