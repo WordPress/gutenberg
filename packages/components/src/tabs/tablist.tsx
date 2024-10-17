@@ -16,13 +16,16 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import type { TabListProps } from './types';
 import { useTabsContext } from './context';
-import { TabListWrapper } from './styles';
+import { StyledOverflowIndicator, TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
 import type { ElementOffsetRect } from '../utils/element-rect';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
+import Icon from '../icon';
+import { chevronLeftSmall } from '@wordpress/icons';
+import type { ComponentPropsWithoutRef } from 'react';
 
 const DEFAULT_SCROLL_MARGIN = 24;
 
@@ -55,6 +58,16 @@ function useScrollRectIntoView(
 			parent.scrollLeft = parentScroll + rightOverflow;
 		}
 	}, [ margin, parent, rect ] );
+}
+
+function OverflowIndicator( props: ComponentPropsWithoutRef< 'div' > ) {
+	return (
+		<StyledOverflowIndicator { ...props }>
+			<button>
+				<Icon icon={ chevronLeftSmall } />
+			</button>
+		</StyledOverflowIndicator>
+	);
 }
 
 export const TabList = forwardRef<
@@ -123,7 +136,9 @@ export const TabList = forwardRef<
 				otherProps.className
 			) }
 		>
+			<OverflowIndicator className="left" />
 			{ children }
+			<OverflowIndicator className="right" />
 		</Ariakit.TabList>
 	);
 } );

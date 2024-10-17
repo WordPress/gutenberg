@@ -148,6 +148,44 @@ export const TabListWrapper = styled.div`
 	}
 `;
 
+export const StyledOverflowIndicator = styled.div`
+	position: sticky;
+	display: flex;
+
+	& button {
+		/* Resets */
+		width: 0;
+		padding: 0;
+		border: none;
+		background-color: white;
+
+		position: absolute;
+		left: 0;
+		height: 100%;
+		width: 1rem;
+
+		/* display: none; */
+	}
+
+	&.left {
+		left: 0;
+		.is-overflowing-first & button {
+			display: block;
+		}
+	}
+
+	&.right {
+		right: 1rem;
+		& svg {
+			rotate: 180deg;
+		}
+
+		.is-overflowing-last & button {
+			display: block;
+		}
+	}
+`;
+
 export const Tab = styled( Ariakit.Tab )`
 	& {
 		/* Resets */
