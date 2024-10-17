@@ -22,6 +22,7 @@ export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
+	__nextNoBaseControlMargin = false,
 	resetAllFilter,
 } ) {
 	if ( __experimentalGroup ) {
@@ -53,7 +54,15 @@ export default function InspectorControlsFill( {
 					return (
 						<ToolsPanelInspectorControl
 							fillProps={ fillProps }
-							children={ children }
+							children={
+								__nextNoBaseControlMargin ? (
+									<div className="block-editor-inspector-controls__no-base-control-margin">
+										{ children }
+									</div>
+								) : (
+									children
+								)
+							}
 							resetAllFilter={ resetAllFilter }
 						/>
 					);
