@@ -93,6 +93,10 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"isFeatureImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
