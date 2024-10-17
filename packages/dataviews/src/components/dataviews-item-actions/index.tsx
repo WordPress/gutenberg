@@ -248,7 +248,7 @@ function CompactItemActions< Item >( {
 		<DropdownMenuV2
 			trigger={
 				<Button
-					size="compact"
+					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					accessibleWhenDisabled
