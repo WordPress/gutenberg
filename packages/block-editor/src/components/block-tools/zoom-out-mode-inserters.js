@@ -73,11 +73,11 @@ function ZoomOutModeInserters() {
 				onClick={ () => {
 					setInserterIsOpened( {
 						rootClientId: sectionRootClientId,
-						insertionIndex: index,
+						insertionIndex: index + 1,
 						tab: 'patterns',
 						category: 'all',
 					} );
-					showInsertionPoint( sectionRootClientId, index, {
+					showInsertionPoint( sectionRootClientId, index + 1, {
 						operation: 'insert',
 					} );
 				} }
