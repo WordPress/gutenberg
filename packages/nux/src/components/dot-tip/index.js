@@ -20,7 +20,7 @@ function onClick( event ) {
 }
 
 export function DotTip( {
-	position = 'middle right',
+	placement = 'right',
 	children,
 	isVisible,
 	hasNextTip,
@@ -47,7 +47,7 @@ export function DotTip( {
 	return (
 		<Popover
 			className="nux-dot-tip"
-			position={ position }
+			placement={ placement }
 			focusOnMount
 			role="dialog"
 			aria-label={ __( 'Editor tips' ) }
