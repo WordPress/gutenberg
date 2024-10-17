@@ -136,6 +136,46 @@ class DependencyExtractionWebpackPlugin {
 	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
+			if ( null !== this.options.combinedOutputFile && this.options.combinedOutputFile.indexOf( ".min" ) > -1 ) {
+				return `<?php return ${ json2php(
+					JSON.parse( JSON.stringify( asset ) )
+				) };\n`;
+			} else if ( null !== this.options.combinedOutputFile )  {
+				const printer = json2php.make( { linebreak:"\n", indent:'\t' } );
+				let out = '';
+
+				out += '<?php\n';
+				out += 'return ' + printer( JSON.parse( JSON.stringify( asset ) ) ) ;
+				out += ';\n';
+
+				// Add trailing comma where needed.
+				out = out.replace( /'\n/g, "',\n" ).replace( ')\n', '),\n' );
+
+				// Correctly space version declarations.
+				out = out.replace( /'version' =>/g, "'version'      =>" );
+
+				// Correctly space array declarations for each package.
+				const regexp = /\n[\t]{1}'.*'\s=>/g;
+				let packages = out.match( regexp ).sort( ( a, b ) => b.length - a.length );
+				const longest = packages[0].length;
+				let newpkg = '';
+
+				for ( const pkg of packages ) {
+					if ( pkg.length < longest ) {
+						newpkg = pkg.replace( " ", " ".repeat( longest - ( pkg.length - 1 ) ) );
+						out = out.replace( pkg, newpkg );
+					}
+				}
+
+				return out;
+			}
+		}
+
+		return JSON.stringify( asset );
+	}
+
+	stringify( asset ) {
+		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
 				JSON.parse( JSON.stringify( asset ) )
 			) };\n`;
