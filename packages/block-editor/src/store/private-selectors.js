@@ -15,6 +15,7 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
+	isNavigationMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -579,4 +580,41 @@ export function getZoomLevel( state ) {
  */
 export function isZoomOut( state ) {
 	return getZoomLevel( state ) < 100;
+}
+
+/**
+ * Retrieves the client ID of the parent section block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const getParentSectionBlock = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( isSectionBlock( state, current ) ) {
+			result = current;
+		}
+	}
+	return result;
+};
+
+/**
+ * Retrieves the client ID is a content locking parent
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is a content locking parent.
+ */
+export function isSectionBlock( state, clientId ) {
+	const sectionRootClientId = getSectionRootClientId( state );
+	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
+	return (
+		getBlockName( state, clientId ) === 'core/block' ||
+		getTemplateLock( state, clientId ) === 'contentOnly' ||
+		( isNavigationMode( state ) && sectionClientIds.includes( clientId ) )
+	);
 }
