@@ -34,16 +34,28 @@
 // Text alignments.
 .has-text-align-center {
 	text-align: center;
+
+	&.wp-block-post-author {
+		justify-content: center;
+	}
 }
 
 .has-text-align-left {
 	/*rtl:ignore*/
 	text-align: left;
+
+	&.wp-block-post-author {
+		justify-content: left;
+	}
 }
 
 .has-text-align-right {
 	/*rtl:ignore*/
 	text-align: right;
+
+	&.wp-block-post-author {
+		justify-content: right;
+	}
 }
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
