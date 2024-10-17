@@ -27,10 +27,33 @@ import { useCanEditEntity } from '../utils/hooks';
 
 const ELLIPSIS = '…';
 
+function getTrimmedExcerpt( excerpt, excerptLength, wordCountType ) {
+	if ( wordCountType === 'words' ) {
+		return excerpt.split( ' ', excerptLength ).join( ' ' );
+	} else if ( wordCountType === 'characters_including_spaces' ) {
+		return excerpt.split( '', excerptLength ).join( '' );
+	} else if ( wordCountType === 'characters_excluding_spaces' ) {
+		/*
+		 * 1. Split the excerpt at the character limit,
+		 * then join the substrings back into one string.
+		 * 2. Count the number of spaces in the excerpt
+		 * by comparing the lengths of the string with and without spaces.
+		 * 3. Add the number to the length of the visible excerpt,
+		 * so that the spaces are excluded from the word count.
+		 */
+		const excerptWithSpaces = excerpt.split( '', excerptLength ).join( '' );
+
+		const numberOfSpaces =
+			excerptWithSpaces.length -
+			excerptWithSpaces.replaceAll( ' ', '' ).length;
+
+		return excerpt.split( '', excerptLength + numberOfSpaces ).join( '' );
+	}
+}
+
 export default function PostExcerptEditor( {
 	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
 	setAttributes,
-	isSelected,
 	context: { postId, postType, queryId },
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -145,67 +168,34 @@ export default function PostExcerptEditor( {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 
-	/**
-	 * The excerpt length setting needs to be applied to both
-	 * the raw and the rendered excerpt depending on which is being used.
-	 */
-	const rawOrRenderedExcerpt = (
-		rawExcerpt || strippedRenderedExcerpt
-	).trim();
+	// By default, use the raw excerpt, which is the user-entered custom excerpt.
+	const hasCustomExcerpt = !! rawExcerpt?.length;
+	let excerpt = rawExcerpt;
 
-	let trimmedExcerpt = '';
-	if ( wordCountType === 'words' ) {
-		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
-			.join( ' ' );
-	} else if ( wordCountType === 'characters_excluding_spaces' ) {
-		/*
-		 * 1. Split the excerpt at the character limit,
-		 * then join the substrings back into one string.
-		 * 2. Count the number of spaces in the excerpt
-		 * by comparing the lengths of the string with and without spaces.
-		 * 3. Add the number to the length of the visible excerpt,
-		 * so that the spaces are excluded from the word count.
-		 */
-		const excerptWithSpaces = rawOrRenderedExcerpt
-			.split( '', excerptLength )
-			.join( '' );
+	// When there's no custom excerpt is not custom, use the auto-generated excerpt, trimmed to the defined length.
+	if ( ! hasCustomExcerpt ) {
+		// Only trim the excerpt if it's not a custom excerpt.
+		excerpt = getTrimmedExcerpt(
+			strippedRenderedExcerpt,
+			excerptLength,
+			wordCountType
+		);
 
-		const numberOfSpaces =
-			excerptWithSpaces.length -
-			excerptWithSpaces.replaceAll( ' ', '' ).length;
-
-		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength + numberOfSpaces )
-			.join( '' );
-	} else if ( wordCountType === 'characters_including_spaces' ) {
-		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( '', excerptLength )
-			.join( '' );
+		// Add the ellipsis if the excerpt was trimmed, otherwise the server returns an ellipsis.
+		excerpt =
+			excerpt === strippedRenderedExcerpt ? excerpt : excerpt + ELLIPSIS;
 	}
-
-	const isTrimmed = trimmedExcerpt !== rawOrRenderedExcerpt;
-
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Excerpt text' ) }
-			value={
-				isSelected
-					? rawOrRenderedExcerpt
-					: ( ! isTrimmed
-							? rawOrRenderedExcerpt
-							: trimmedExcerpt + ELLIPSIS ) ||
-					  __( 'No excerpt found' )
-			}
+			value={ excerpt || __( 'No excerpt found' ) }
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ ! isTrimmed
-				? rawOrRenderedExcerpt || __( 'No excerpt found' )
-				: trimmedExcerpt + ELLIPSIS }
+			{ excerpt || __( 'No excerpt found' ) }
 		</p>
 	);
 	return (
@@ -230,17 +220,19 @@ export default function PostExcerptEditor( {
 							} )
 						}
 					/>
-					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
-						} }
-						min="10"
-						max="100"
-					/>
+					{ ! hasCustomExcerpt && (
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Max number of words' ) }
+							value={ excerptLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
