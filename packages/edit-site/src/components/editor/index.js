@@ -17,7 +17,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -48,7 +48,7 @@ import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 
-const { Editor, BackButton } = unlock( editorPrivateApis );
+const { Editor, BackButton, interfaceStore } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -92,6 +92,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		editorCanvasView,
 		currentPostIsTrashed,
 		hasSiteIcon,
+		isStylesOpen,
 	} = useSelect( ( select ) => {
 		const {
 			getEditorCanvasContainerView,
@@ -105,7 +106,11 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const _context = getEditedPostContext();
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
-
+		const _canvasMode = getCanvasMode();
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		const _isStylesOpen =
+			'edit' === _canvasMode &&
+			'edit-site/global-styles' === getActiveComplementaryArea( 'core' );
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
@@ -113,7 +118,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			canvasMode: getCanvasMode(),
+			canvasMode: _canvasMode,
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -122,6 +127,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
 			hasSiteIcon: !! siteData?.site_icon_url,
+			isStylesOpen: _isStylesOpen,
 		};
 	}, [] );
 	useEditorTitle();
@@ -152,7 +158,25 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { setCanvasMode, openGeneralSidebar, setEditorCanvasContainerView } = unlock(
+		useDispatch( editSiteStore )
+	);
+
+	useEffect( () => {
+		if (
+			! isStylesOpen &&
+			params?.path.startsWith( '/wp_global_styles' )
+		) {
+			openGeneralSidebar( 'edit-site/global-styles' );
+			if (
+				params.path === '/wp_global_styles/style-book' &&
+				'style-book' !== editorCanvasView
+			) {
+				setEditorCanvasContainerView( 'style-book' );
+			}
+		}
+	}, [ params?.path, isStylesOpen, editorCanvasView ] );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
