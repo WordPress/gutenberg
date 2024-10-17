@@ -300,7 +300,8 @@ const deepMergeRecursive = (
 	source: any,
 	override: boolean = true
 ) => {
-	// Only merge if both target and source are plain objects
+	// If target is not a plain object and the source is, we don't need to merge
+	// them because the source will be used as the new value of the target.
 	if ( ! ( isPlainObject( target ) && isPlainObject( source ) ) ) {
 		return;
 	}
@@ -324,7 +325,8 @@ const deepMergeRecursive = (
 			typeof desc.set === 'function'
 		) {
 			if ( override || isNew ) {
-				// Define the property on the target object
+				// Because we are setting a getter or setter, we need to use
+				// Object.defineProperty to define the property on the target object.
 				Object.defineProperty( target, key, {
 					...desc,
 					configurable: true,
@@ -349,8 +351,8 @@ const deepMergeRecursive = (
 					);
 				}
 			}
+			// Both target and source are plain objects, merge them recursively
 			if ( isPlainObject( target[ key ] ) ) {
-				// Recursively merge nested objects
 				deepMergeRecursive( target[ key ], source[ key ], override );
 			}
 
@@ -368,7 +370,6 @@ const deepMergeRecursive = (
 		}
 	}
 
-	// Update the iterable version if new keys were added
 	if ( hasNewKeys && objToIterable.has( target ) ) {
 		objToIterable.get( target )!.value++;
 	}
