@@ -60,6 +60,10 @@ html.interface-interface-skeleton__html-container {
 		overflow: auto;
 	}
 
+	@include break-medium() {
+		overflow-y: auto;
+	}
+
 	// In future versions of Mobile Safari, hopefully overscroll-behavior will be supported.
 	// This allows us to disallow the scroll-chaining and rubber-banding that is currently
 	// is the cause of the issue outlined above.
