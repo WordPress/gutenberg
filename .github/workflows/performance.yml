@@ -47,9 +47,9 @@ jobs:
                   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
                   nvm -v
 
-            - name: Compare performance with trunk
+            - name: Compare performance with base branch
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf $GITHUB_SHA trunk --tests-branch $GITHUB_SHA
+              run: ./bin/plugin/cli.js perf $GITHUB_SHA ${{ github.base_ref }} --tests-branch $GITHUB_SHA
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
