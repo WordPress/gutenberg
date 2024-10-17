@@ -20,26 +20,22 @@ import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
-		( select ) => {
-			const { isPage: _isPage, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const { getCurrentPostType, getCurrentTemplateId } =
-				select( editorStore );
-			return {
-				isPage: _isPage(),
-				canvasMode: getCanvasMode(),
-				templateId: getCurrentTemplateId(),
-				currentPostType: getCurrentPostType(),
-			};
-		},
-		[]
-	);
+	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
+	const { isPage, templateId, currentPostType } = useSelect( ( select ) => {
+		const { isPage: _isPage } = unlock( select( editSiteStore ) );
+		const { getCurrentPostType, getCurrentTemplateId } =
+			select( editorStore );
+		return {
+			isPage: _isPage(),
+			templateId: getCurrentTemplateId(),
+			currentPostType: getCurrentPostType(),
+		};
+	}, [] );
 
 	const { onClick: editTemplate } = useLink( {
 		postType: 'wp_template',

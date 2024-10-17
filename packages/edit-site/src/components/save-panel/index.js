@@ -15,6 +15,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,6 +29,7 @@ import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const { EntitiesSavedStatesExtensible, NavigableRegion } =
 	unlock( privateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
@@ -87,39 +90,34 @@ const _EntitiesSavedStates = ( { onClose, renderDialog = undefined } ) => {
 };
 
 export default function SavePanel() {
-	const { isSaveViewOpen, canvasMode, isDirty, isSaving } = useSelect(
-		( select ) => {
-			const {
-				__experimentalGetDirtyEntityRecords,
-				isSavingEntityRecord,
-				isResolving,
-			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
-			const isActivatingTheme = isResolving( 'activateTheme' );
-			const { isSaveViewOpened, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
+	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
+	const { isSaveViewOpen, isDirty, isSaving } = useSelect( ( select ) => {
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+			isResolving,
+		} = select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+		const isActivatingTheme = isResolving( 'activateTheme' );
+		const { isSaveViewOpened } = unlock( select( editSiteStore ) );
 
-			// The currently selected entity to display.
-			// Typically template or template part in the site editor.
-			return {
-				isSaveViewOpen: isSaveViewOpened(),
-				canvasMode: getCanvasMode(),
-				isDirty: dirtyEntityRecords.length > 0,
-				isSaving:
-					dirtyEntityRecords.some( ( record ) =>
-						isSavingEntityRecord(
-							record.kind,
-							record.name,
-							record.key
-						)
-					) || isActivatingTheme,
-			};
-		},
-		[]
-	);
+		// The currently selected entity to display.
+		// Typically template or template part in the site editor.
+		return {
+			isSaveViewOpen: isSaveViewOpened(),
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving:
+				dirtyEntityRecords.some( ( record ) =>
+					isSavingEntityRecord( record.kind, record.name, record.key )
+				) || isActivatingTheme,
+		};
+	}, [] );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const onClose = () => setIsSaveViewOpened( false );
+	useEffect( () => {
+		setIsSaveViewOpened( false );
+	}, [ canvasMode, setIsSaveViewOpened ] );
 
 	if ( canvasMode === 'view' ) {
 		return isSaveViewOpen ? (

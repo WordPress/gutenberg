@@ -13,14 +13,15 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -86,6 +87,9 @@ function ResizableFrame( {
 	defaultSize,
 	innerContentStyle,
 } ) {
+	const history = useHistory();
+	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
 	const disableMotion = useReducedMotion();
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
@@ -93,11 +97,7 @@ function ResizableFrame( {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
-	const canvasMode = useSelect(
-		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
-		[]
-	);
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
 	const resizableHandleHelpId = useInstanceId(
@@ -158,7 +158,16 @@ function ResizableFrame( {
 			setFrameSize( INITIAL_FRAME_SIZE );
 		} else {
 			// Trigger full screen if the frame is resized far enough to the left.
-			setCanvasMode( 'edit' );
+			history.push(
+				{
+					...params,
+					canvasMode: 'edit',
+				},
+				undefined,
+				{
+					transition: 'canvas-mode-edit-transition',
+				}
+			);
 		}
 	};
 

@@ -9,6 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,10 +24,12 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import SidebarNavigationScreenGlobalStylesContent from './content';
 
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
+	const history = useHistory();
+	const { params } = useLocation();
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -48,7 +51,16 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			{ ...props }
 			onClick={ () => {
 				// Switch to edit mode.
-				setCanvasMode( 'edit' );
+				history.push(
+					{
+						...params,
+						canvasMode: 'edit',
+					},
+					undefined,
+					{
+						transition: 'canvas-mode-edit-transition',
+					}
+				);
 				// Open global styles sidebar.
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
@@ -57,45 +69,51 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 }
 
 export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
+	const history = useHistory();
+	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
+	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { isViewMode, isStyleBookOpened, revisionsCount } = useSelect(
-		( select ) => {
-			const { getCanvasMode, getEditorCanvasContainerView } = unlock(
-				select( editSiteStore )
-			);
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
-			return {
-				isViewMode: 'view' === getCanvasMode(),
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				revisionsCount:
-					globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
-					0,
-			};
-		},
-		[]
-	);
+	const { isStyleBookOpened, revisionsCount } = useSelect( ( select ) => {
+		const { getEditorCanvasContainerView } = unlock(
+			select( editSiteStore )
+		);
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return {
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			revisionsCount:
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
+		};
+	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
+		history.push(
+			{
+				...params,
+				canvasMode: 'edit',
+			},
+			undefined,
+			{
+				transition: 'canvas-mode-edit-transition',
+			}
+		);
 		return Promise.all( [
 			setPreference( 'core', 'distractionFree', false ),
-			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar, setPreference ] );
+	}, [ history, params, openGeneralSidebar, setPreference ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
@@ -166,16 +184,18 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
-				<StyleBook
-					enableResizing={ false }
-					isSelected={ () => false }
-					onClick={ openStyleBook }
-					onSelect={ openStyleBook }
-					showCloseButton={ false }
-					showTabs={ false }
-				/>
-			) }
+			{ isStyleBookOpened &&
+				! isMobileViewport &&
+				canvasMode === 'view' && (
+					<StyleBook
+						enableResizing={ false }
+						isSelected={ () => false }
+						onClick={ openStyleBook }
+						onSelect={ openStyleBook }
+						showCloseButton={ false }
+						showTabs={ false }
+					/>
+				) }
 		</>
 	);
 }

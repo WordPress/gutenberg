@@ -48,6 +48,7 @@ import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
+import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -80,13 +81,14 @@ const siteIconVariants = {
 export default function EditSiteEditor( { isPostsList = false } ) {
 	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
 	const isLoading = useIsSiteEditorLoading();
+	useAdaptEditorToCanvas( canvasMode );
 	const {
 		editedPostType,
 		editedPostId,
 		contextPostType,
 		contextPostId,
-		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
@@ -97,7 +99,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		const {
 			getEditorCanvasContainerView,
 			getEditedPostContext,
-			getCanvasMode,
 			isPage,
 			getEditedPostType,
 			getEditedPostId,
@@ -114,7 +115,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -153,7 +153,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -264,7 +263,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											showTooltip
 											tooltipPosition="middle right"
 											onClick={ () => {
-												setCanvasMode( 'view' );
 												__unstableSetEditorMode(
 													'edit'
 												);
@@ -276,10 +274,30 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 													isPostsList &&
 													params?.focusMode
 												) {
-													history.push( {
-														page: 'gutenberg-posts-dashboard',
-														postType: 'post',
-													} );
+													history.push(
+														{
+															page: 'gutenberg-posts-dashboard',
+															postType: 'post',
+														},
+														undefined,
+														{
+															transition:
+																'canvas-mode-view-transition',
+														}
+													);
+												} else {
+													history.push(
+														{
+															...params,
+															canvasMode:
+																undefined,
+														},
+														undefined,
+														{
+															transition:
+																'canvas-mode-view-transition',
+														}
+													);
 												}
 											} }
 										>

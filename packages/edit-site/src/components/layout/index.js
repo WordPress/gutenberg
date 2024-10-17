@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -27,12 +26,12 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import ErrorBoundary from '../error-boundary';
-import { store as editSiteStore } from '../../store';
 import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
@@ -43,25 +42,20 @@ import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
-import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { NavigableRegion } = unlock( editorPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
 export default function Layout( { route } ) {
-	useSyncCanvasModeWithURL();
+	const { params } = useLocation();
+	const { canvasMode = 'view' } = params;
 	useCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const { canvasMode } = useSelect( ( select ) => {
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
-		return {
-			canvasMode: getCanvasMode(),
-		};
-	}, [] );
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -70,7 +64,7 @@ export default function Layout( { route } ) {
 		useState( false );
 	const { name: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: canvasMode,
+		triggerAnimationOnChange: routeKey + '-' + canvasMode,
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -83,13 +77,6 @@ export default function Layout( { route } ) {
 		// Should not depend on the previous canvas mode value but the next.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ canvasMode ] );
-
-	// Synchronizing the URL with the store value of canvasMode happens in an effect
-	// This condition ensures the component is only rendered after the synchronization happens
-	// which prevents any animations due to potential canvasMode value change.
-	if ( canvasMode === 'init' ) {
-		return null;
-	}
 
 	return (
 		<>
