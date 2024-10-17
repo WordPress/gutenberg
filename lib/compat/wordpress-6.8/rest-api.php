@@ -61,21 +61,21 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_exper
  * @return void
  */
 if ( ! function_exists( 'exclude_block_comments_from_admin' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
-    function exclude_block_comments_from_admin( $query ) {
-        // Only modify the query if it's for comments
-        if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
-            $query->set( 'type', '' );
+	function exclude_block_comments_from_admin( $query ) {
+		// Only modify the query if it's for comments
+		if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
+			$query->set( 'type', '' );
 
-            add_filter(
-                'comments_clauses',
-                function( $clauses ) {
-                    global $wpdb;
-                    // Exclude comments of type 'block_comment'
-                    $clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
-                    return $clauses;
-                }
-            );
-        }
-    }
-    add_action( 'pre_get_comments', 'exclude_block_comments_from_admin' );
+			add_filter(
+				'comments_clauses',
+				function( $clauses ) {
+					global $wpdb;
+					// Exclude comments of type 'block_comment'
+					$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
+					return $clauses;
+				}
+			);
+		}
+	}
+	add_action( 'pre_get_comments', 'exclude_block_comments_from_admin' );
 }
