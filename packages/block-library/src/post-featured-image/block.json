@@ -55,6 +55,10 @@
 		"useFirstImageFromPost": {
 			"type": "boolean",
 			"default": false
+		},
+		"displayCaption": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
