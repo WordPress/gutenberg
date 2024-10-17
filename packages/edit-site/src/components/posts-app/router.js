@@ -17,7 +17,7 @@ import PostList from '../post-list';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function useLayoutAreas() {
+export default function useActiveRoute() {
 	const { params = {} } = useLocation();
 	const { postType, layout, canvas } = params;
 	const labels = useSelect(
@@ -31,7 +31,7 @@ export default function useLayoutAreas() {
 	if ( [ 'post' ].includes( postType ) ) {
 		const isListLayout = layout === 'list' || ! layout;
 		return {
-			key: 'posts-list',
+			name: 'posts-list',
 			areas: {
 				sidebar: (
 					<SidebarNavigationScreen
@@ -59,7 +59,7 @@ export default function useLayoutAreas() {
 
 	// Fallback shows the home page preview
 	return {
-		key: 'default',
+		name: 'default',
 		areas: {
 			sidebar: <SidebarNavigationScreenMain />,
 			preview: <Editor isPostsList />,
