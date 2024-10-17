@@ -121,38 +121,6 @@ test.describe( 'Links', () => {
 		).toHaveValue( '' );
 	} );
 
-	test( `can be created without any text selected`, async ( {
-		page,
-		editor,
-		pageUtils,
-	} ) => {
-		// Create a block with some text.
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-		} );
-		await page.keyboard.type( 'This is Gutenberg: ' );
-
-		// Press Cmd+K to insert a link.
-		await pageUtils.pressKeys( 'primary+K' );
-
-		// Type a URL.
-		await page.keyboard.type( 'https://wordpress.org/gutenberg' );
-
-		// Press Enter to apply the link.
-		await pageUtils.pressKeys( 'Enter' );
-
-		// A link with the URL as its text should have been inserted.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'This is Gutenberg: <a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
-				},
-			},
-		] );
-	} );
-
 	test( `will automatically create a link if selected text is a valid HTTP based URL`, async ( {
 		page,
 		editor,
@@ -330,41 +298,6 @@ test.describe( 'Links', () => {
 		await expect( linkPopover ).toBeHidden();
 	} );
 
-	test( `can be edited when within a link but no selection has been made ("collapsed")`, async ( {
-		page,
-		editor,
-		LinkUtils,
-		pageUtils,
-	} ) => {
-		await LinkUtils.createLink();
-		await pageUtils.pressKeys( 'Escape' );
-		// Make a collapsed selection inside the link.
-		await pageUtils.pressKeys( 'ArrowLeft' );
-		await pageUtils.pressKeys( 'ArrowRight' );
-		await pageUtils.pressKeys( 'primary+k' );
-
-		const linkPopover = LinkUtils.getLinkPopover();
-		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
-
-		// Change the URL.
-		// getByPlaceholder required in order to handle Link Control component
-		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
-		await page.keyboard.type( '/handbook' );
-
-		// Submit the link.
-		await pageUtils.pressKeys( 'Enter' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'This is <a href="/handbook">Gutenberg</a>',
-				},
-			},
-		] );
-	} );
-
 	test( `escape dismisses the Link UI popover and returns focus`, async ( {
 		admin,
 		page,
@@ -485,9 +418,8 @@ test.describe( 'Links', () => {
 		await pageUtils.pressKeys( 'End' );
 		await expect( linkPopover ).toBeHidden();
 
-		// Move the caret back into the link text and the link popover
-		// should not be displayed.
-		await pageUtils.pressKeys( 'ArrowLeft' );
+		// Move the caret back into and selects the link text.
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 		await expect( linkPopover ).toBeHidden();
 
 		// Switch the Link UI into "Edit" mode via keyboard shortcut
@@ -1012,32 +944,6 @@ test.describe( 'Links', () => {
 			] );
 		} );
 
-		test( 'should not display text input when initially creating the link', async ( {
-			page,
-			editor,
-			pageUtils,
-			LinkUtils,
-		} ) => {
-			// Create a block with some text.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-			} );
-			await page.keyboard.type( 'This is Gutenberg: ' );
-
-			// Press Cmd+K to insert a link.
-			await pageUtils.pressKeys( 'primary+k' );
-
-			const linkPopover = LinkUtils.getLinkPopover();
-
-			// Check the Link UI is open before asserting on presence of text input
-			// within that control.
-			await expect( linkPopover ).toBeVisible();
-
-			// Let's check we've focused a text input.
-			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
-			await expect( textInput ).toBeHidden();
-		} );
-
 		test( 'should display text input when the link has a valid URL value', async ( {
 			pageUtils,
 			LinkUtils,
@@ -1048,8 +954,8 @@ test.describe( 'Links', () => {
 			// Make a collapsed selection inside the link. This is used
 			// as a stress test to ensure we can find the link text from a
 			// collapsed RichTextValue that contains a link format.
-			await pageUtils.pressKeys( 'ArrowLeft' );
-			await pageUtils.pressKeys( 'ArrowRight' );
+			await pageUtils.pressKeys( 'End' );
+			await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 			await pageUtils.pressKeys( 'primary+k' );
 
 			const linkPopover = LinkUtils.getLinkPopover();

@@ -170,9 +170,17 @@ function Edit( {
 		openedBy?.el?.tagName === 'A' && openedBy?.action === 'click'
 	);
 
+	const hasSelection = ! isCollapsed( value );
+
 	return (
 		<>
-			<RichTextShortcut type="primary" character="k" onUse={ addLink } />
+			{ hasSelection && (
+				<RichTextShortcut
+					type="primary"
+					character="k"
+					onUse={ addLink }
+				/>
+			) }
 			<RichTextShortcut
 				type="primaryShift"
 				character="k"
