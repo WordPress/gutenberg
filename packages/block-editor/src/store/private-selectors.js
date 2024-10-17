@@ -17,7 +17,6 @@ import {
 	getClientIdsWithDescendants,
 	isNavigationMode,
 	getBlockRootClientId,
-	__unstableGetEditorMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
