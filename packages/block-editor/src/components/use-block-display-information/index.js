@@ -9,6 +9,7 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import InspectorBlockInfoFill from '../inspector-block-info/inspector-block-info';
 
 /**
  * Internal dependencies
@@ -98,6 +99,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionLabel,
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
+				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />
 			};
 			if ( ! match ) {
 				return blockTypeInfo;
@@ -112,6 +114,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionLabel,
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
+				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />
 			};
 		},
 		[ clientId ]
