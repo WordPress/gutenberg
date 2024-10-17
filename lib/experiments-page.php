@@ -164,6 +164,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-block-comment',
+		__( 'Block Comments', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable multi-user commenting on blocks', 'gutenberg' ),
+			'id'    => 'gutenberg-block-comment',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-media-processing',
 		__( 'Client-side media processing', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

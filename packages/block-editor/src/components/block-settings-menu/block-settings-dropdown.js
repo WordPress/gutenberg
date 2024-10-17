@@ -19,12 +19,15 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
+import { privateApis as blockEditorPrivateApis } from '../../private-apis';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+const { __unstableCommentIconFill } = unlock( blockEditorPrivateApis );
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -294,6 +297,9 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
+									<__unstableCommentIconFill.Slot
+										fillProps={ { onClose } }
+									/>
 								</MenuGroup>
 								{ canCopyStyles && ! isContentOnly && (
 									<MenuGroup>
