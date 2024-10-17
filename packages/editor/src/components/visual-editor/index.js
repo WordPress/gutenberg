@@ -465,7 +465,8 @@ function VisualEditor( {
 								renderingMode !== 'post-only' ||
 									isDesignPostType
 									? 'wp-site-blocks'
-									: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+									: `${ blockListLayoutClass } wp-block-post-content`, // Ensure root level blocks receive default/flow blockGap styling rules.
+								'block-list-padding-bottom'
 							) }
 							layout={ blockListLayout }
 							dropZoneElement={
