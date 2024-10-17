@@ -69,8 +69,7 @@ export const NonClickableItems: StoryFn< typeof ItemGroup > = Template.bind(
 	{}
 );
 NonClickableItems.args = {
-	isBordered: true,
-	isSeparated: true,
+	...Default.args,
 	children: (
 		[
 			{
@@ -87,8 +86,7 @@ NonClickableItems.args = {
 
 export const CustomItemSize: StoryFn< typeof ItemGroup > = Template.bind( {} );
 CustomItemSize.args = {
-	isBordered: true,
-	isSeparated: true,
+	...Default.args,
 	children: (
 		[
 			{
