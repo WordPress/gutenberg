@@ -132,6 +132,8 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	}, [] );
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
+	// This checks the fills length. It might be faster to test editorCanvasView === undefined && editorCanvasView !== 'global-styles-css' instead
+	// from a custom hook.
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvasMode === 'edit';
@@ -158,9 +160,8 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
-	const { setCanvasMode, openGeneralSidebar, setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
+	const { setCanvasMode, openGeneralSidebar, setEditorCanvasContainerView } =
+		unlock( useDispatch( editSiteStore ) );
 
 	useEffect( () => {
 		if (
