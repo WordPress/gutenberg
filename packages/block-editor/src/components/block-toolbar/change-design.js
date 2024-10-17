@@ -111,7 +111,7 @@ export default function ChangeDesign( { clientId } ) {
 							onClick={ () => onToggle( ! isOpen ) }
 							aria-expanded={ isOpen }
 						>
-							{ __( 'Change Design' ) }
+							{ __( 'Change design' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				);
