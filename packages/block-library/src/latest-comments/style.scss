@@ -4,6 +4,7 @@ ol.wp-block-latest-comments {
 	// Due to low specificity this will be safely overridden
 	// by default wp-block layout styles in the Post/Site editor
 	margin-left: 0;
+
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
@@ -30,6 +31,7 @@ ol.wp-block-latest-comments {
 .wp-block-latest-comments .wp-block-latest-comments {
 	// Remove left spacing. Higher specificity required to
 	// override default wp-block layout styles in the Post/Site editor.
+	padding-left: 0;
 	// The following styles are to prevent duplicate border for the latest comments.
 	border: none;
 	border-radius: inherit;
