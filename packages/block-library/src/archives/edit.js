@@ -8,11 +8,30 @@ import {
 	Disabled,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	RichText,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { useInstanceId } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
-	const { showLabel, showPostCounts, displayAsDropdown, type } = attributes;
+	const {
+		showLabel,
+		showPostCounts,
+		displayAsDropdown,
+		type,
+		label,
+		uniqueId,
+	} = attributes;
+	const editAttributes = structuredClone( attributes );
+	editAttributes.isEdit = true;
+	const instanceId = useInstanceId( ArchivesEdit, 'wp-block-archives' );
+	useEffect( () => {
+		setAttributes( { uniqueId: instanceId } );
+	} );
 
 	return (
 		<>
@@ -68,11 +87,23 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
+				{ displayAsDropdown && showLabel && (
+					<RichText
+						tagName="label"
+						value={ label }
+						htmlFor={ uniqueId }
+						className={ 'wp-block-archives__label' }
+						onChange={ ( value ) =>
+							setAttributes( { label: value } )
+						}
+						placeholder={ __( 'Archives' ) }
+					/>
+				) }
 				<Disabled>
 					<ServerSideRender
 						block="core/archives"
 						skipBlockSupportAttributes
-						attributes={ attributes }
+						attributes={ editAttributes }
 					/>
 				</Disabled>
 			</div>
