@@ -13,11 +13,20 @@ import { __ } from '@wordpress/i18n';
  */
 const parseResponse = ( response, shouldParseResponse = true ) => {
 	if ( shouldParseResponse ) {
-		if ( response.status === 204 ) {
-			return null;
-		}
-
-		return response.json ? response.json() : Promise.reject( response );
+		return response
+			.clone()
+			.text()
+			.then( ( responseText ) => {
+				if (
+					response.status === 204 ||
+					( response.status === 200 && ! responseText )
+				) {
+					return null;
+				}
+				return response.json
+					? response.json()
+					: Promise.reject( response );
+			} );
 	}
 
 	return response;
