@@ -403,8 +403,7 @@ export function blockBindingsSources( state = {}, action ) {
 			return {
 				...state,
 				[ action.name ]: {
-					// Don't override the label if it's already set.
-					label: state[ action.name ]?.label || action.label,
+					label: action.label || state[ action.name ]?.label,
 					usesContext: getMergedUsesContext(
 						state[ action.name ]?.usesContext,
 						action.usesContext

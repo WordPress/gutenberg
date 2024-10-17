@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0 (2024-10-16)
+
 ### Breaking Changes
 
 -   `InterfaceSkeleton` no longer supports region navigation and its props `enableRegionNavigation` and `shortcuts` are removed. ([#63611](https://github.com/WordPress/gutenberg/pull/63611)). It’s recommended to add region navigation with the higher-order component `navigateRegions` or the hook `__unstableUseNavigateRegions` from `@wordpress/components`.

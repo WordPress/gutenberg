@@ -100,6 +100,12 @@
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
+
+		// Reset the z-index to auto when the body has a modal open. So when the
+		// modal is inside the cover, it doesn't create a stacking context.
+		@at-root .has-modal-open & {
+			z-index: auto;
+		}
 	}
 
 	// Position: Top

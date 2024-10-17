@@ -62,7 +62,7 @@ export default function QueryInspectorControls( props ) {
 		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
-	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
+	const showSticky = postType === 'post';
 	const {
 		postTypesTaxonomiesMap,
 		postTypesSelectOptions,
@@ -70,9 +70,6 @@ export default function QueryInspectorControls( props ) {
 	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
-	useEffect( () => {
-		setShowSticky( postType === 'post' );
-	}, [ postType ] );
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
