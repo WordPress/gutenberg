@@ -23,7 +23,6 @@ import { Icon, symbol } from '@wordpress/icons';
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-import BlockPatternsPaging from '../block-patterns-paging';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
@@ -177,17 +176,10 @@ function BlockPattern( {
 	);
 }
 
-function BlockPatternPlaceholder() {
-	return (
-		<div className="block-editor-block-patterns-list__item is-placeholder" />
-	);
-}
-
 function BlockPatternsList(
 	{
 		isDraggable,
 		blockPatterns,
-		shownPatterns,
 		onHover,
 		onClickPattern,
 		orientation,
@@ -195,7 +187,6 @@ function BlockPatternsList(
 		category,
 		showTitle = true,
 		showTitlesAsTooltip,
-		pagingProps,
 	},
 	ref
 ) {
@@ -205,11 +196,9 @@ function BlockPatternsList(
 		// Reset the active composite item whenever the available patterns change,
 		// to make sure that Composite widget can receive focus correctly when its
 		// composite items change. The first composite item will receive focus.
-		const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
-			shownPatterns.includes( pattern )
-		)?.name;
+		const firstCompositeItemId = blockPatterns[ 0 ]?.name;
 		setActiveCompositeId( firstCompositeItemId );
-	}, [ shownPatterns, blockPatterns ] );
+	}, [ blockPatterns ] );
 
 	return (
 		<Composite
@@ -222,8 +211,7 @@ function BlockPatternsList(
 			ref={ ref }
 		>
 			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
+				return (
 					<BlockPattern
 						key={ pattern.name }
 						id={ pattern.name }
@@ -235,11 +223,8 @@ function BlockPatternsList(
 						showTooltip={ showTitlesAsTooltip }
 						category={ category }
 					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
 				);
 			} ) }
-			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
 		</Composite>
 	);
 }

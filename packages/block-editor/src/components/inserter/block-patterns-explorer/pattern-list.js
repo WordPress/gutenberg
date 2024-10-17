@@ -151,9 +151,6 @@ function PatternList( {
 				{ hasItems && (
 					<>
 						<BlockPatternsList
-							shownPatterns={
-								pagingProps.categoryPatternsAsyncList
-							}
 							blockPatterns={ pagingProps.categoryPatterns }
 							onClickPattern={ onClickPattern }
 							isDraggable={ false }
