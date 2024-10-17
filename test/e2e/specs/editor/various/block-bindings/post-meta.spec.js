@@ -236,14 +236,14 @@ test.describe( 'Post Meta source', () => {
 			} ) => {
 				const globalField = page
 					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'text_custom_field' } );
+					.filter( { hasText: 'Text custom field' } );
 				await expect( globalField ).toBeVisible();
 			} );
 			test( 'should not include protected fields', async ( { page } ) => {
 				// Ensure the fields have loaded by checking the field is visible.
 				const globalField = page
 					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'text_custom_field' } );
+					.filter( { hasText: 'Text custom field' } );
 				await expect( globalField ).toBeVisible();
 				// Check the protected fields are not visible.
 				const protectedField = page
@@ -322,7 +322,7 @@ test.describe( 'Post Meta source', () => {
 			// Check the post meta fields are not visible.
 			const globalField = page
 				.getByRole( 'menuitemradio' )
-				.filter( { hasText: 'text_custom_field' } );
+				.filter( { hasText: 'Text custom field' } );
 			await expect( globalField ).toBeHidden();
 			const movieField = page
 				.getByRole( 'menuitemradio' )
