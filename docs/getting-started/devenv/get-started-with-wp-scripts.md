@@ -80,7 +80,25 @@ A `build/index.asset.php` file will also be created in the build process, which 
 
 ### Enqueuing assets
 
-If you register a block via `register_block_type` the scripts defined in `block.json` will be automatically enqueued (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))
+If you register a block via `register_block_type` the scripts defined in `block.json` will be automatically enqueued:
+
+```php
+/**
+ * Register the block.
+ */
+function example_register_block() {
+    // build folder which contains the "block.json" file
+	register_block_type( __DIR__ . '/build' );
+}
+
+add_action( 'init', 'example_register_block' );
+```
+
+See full [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda)
+
+This will both register the block on server-side and client-side. More information regarding the registering of a block can be found in [Registration of a block](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/)
+
+#### Manual enqueuing
 
 To manually enqueue files in the editor, in any other context, you can refer to the [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) guide for more information, but here's a typical implementation. 
 
