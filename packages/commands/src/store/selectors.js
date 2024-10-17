@@ -33,7 +33,9 @@ export const getCommandLoaders = createSelector(
 	( state, contextual = false ) =>
 		Object.values( state.commandLoaders ).filter( ( loader ) => {
 			const isContextual =
-				loader.context && loader.context === state.context;
+				loader.context && Array.isArray( loader.context )
+					? loader.context.includes( state.context )
+					: loader.context && loader.context === state.context;
 			return contextual ? isContextual : ! isContextual;
 		} ),
 	( state ) => [ state.commandLoaders, state.context ]
