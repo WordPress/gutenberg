@@ -8,6 +8,7 @@ import type { MouseEventHandler, ReactNode } from 'react';
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -156,6 +157,11 @@ export function SuggestionsList<
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
+			{ suggestions.length === 0 && (
+				<li className="components-form-token-field__suggestion is-empty">
+					{ __( 'No items found' ) }
+				</li>
+			) }
 		</ul>
 	);
 }

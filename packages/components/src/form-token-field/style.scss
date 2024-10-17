@@ -173,7 +173,6 @@
 	padding: $grid-unit-10 $grid-unit-15;
 	min-height: $button-size-compact;
 	margin: 0;
-	cursor: pointer;
 	box-sizing: border-box;
 
 	&.is-selected {
@@ -188,5 +187,9 @@
 		&.is-selected {
 			background-color: $components-color-accent-transparent-40;
 		}
+	}
+
+	&:not(.is-empty) {
+		cursor: pointer;
 	}
 }
