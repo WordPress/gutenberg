@@ -335,7 +335,10 @@ const deepMergeRecursive = (
 			if ( isNew || ( override && ! isPlainObject( target[ key ] ) ) ) {
 				target[ key ] = {};
 				if ( propSignal ) {
-					propSignal.setValue( target[ key ] );
+					const ns = getNamespaceFromProxy( proxy );
+					propSignal.setValue(
+						proxifyState( ns, target[ key ] as Object )
+					);
 				}
 			}
 			if ( isPlainObject( target[ key ] ) ) {
@@ -344,7 +347,11 @@ const deepMergeRecursive = (
 		} else if ( override || isNew ) {
 			Object.defineProperty( target, key, desc );
 			if ( propSignal ) {
-				propSignal.setValue( desc.value );
+				const { value } = desc;
+				const ns = getNamespaceFromProxy( proxy );
+				propSignal.setValue(
+					shouldProxy( value ) ? proxifyState( ns, value ) : value
+				);
 			}
 		}
 	}
