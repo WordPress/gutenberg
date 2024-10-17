@@ -333,11 +333,13 @@ Attribute definition:
 				type: 'string',
 				source: 'attribute',
 				attribute: 'src',
+                                selector: '[src]'
 			},
 			alt: {
 				type: 'string',
 				source: 'attribute',
 				attribute: 'alt',
+                                selector: '[alt]'
 			},
 		}
 	}
