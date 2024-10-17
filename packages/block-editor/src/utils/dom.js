@@ -149,6 +149,14 @@ export function getVisibleElementBounds( element ) {
 		for ( const child of currentElement.children ) {
 			if ( isElementVisible( child ) ) {
 				const childBounds = child.getBoundingClientRect();
+				// If the child is larger than the parent, adjust the x and y values to account for any scrolling.
+				if ( childBounds.width > bounds.width ) {
+					childBounds.x = bounds.x;
+				}
+				if ( childBounds.height > bounds.height ) {
+					childBounds.y = bounds.y;
+					childBounds.height = bounds.height;
+				}
 				bounds = rectUnion( bounds, childBounds );
 				stack.push( child );
 			}
