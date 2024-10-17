@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { createHooks, applyFilters } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -347,24 +347,11 @@ export function getPossibleBlockTransformations( blocks ) {
  * @return {?Object} Highest-priority transform candidate.
  */
 export function findTransform( transforms, predicate ) {
-	// The hooks library already has built-in mechanisms for managing priority
-	// queue, so leverage via locally-defined instance.
-	const hooks = createHooks();
-
-	for ( let i = 0; i < transforms.length; i++ ) {
-		const candidate = transforms[ i ];
-		if ( predicate( candidate ) ) {
-			hooks.addFilter(
-				'transform',
-				'transform/' + i.toString(),
-				( result ) => ( result ? result : candidate ),
-				candidate.priority
-			);
-		}
-	}
-
-	// Filter name is arbitrarily chosen but consistent with above aggregation.
-	return hooks.applyFilters( 'transform', null );
+	const priority = ( t ) => t.priority ?? 10;
+	const candidates = transforms
+		.filter( ( t ) => predicate( t ) )
+		.toSorted( ( t1, t2 ) => priority( t1 ) - priority( t2 ) );
+	return candidates.length > 0 ? candidates[ 0 ] : null;
 }
 
 /**
