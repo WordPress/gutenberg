@@ -5,7 +5,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import { PrivateBlockPopover as BlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import ZoomOutToolbar from './zoom-out-toolbar';
@@ -29,6 +29,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 
 	return (
 		<BlockPopover
+			__unstableContentRef={ __unstableContentRef }
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
 			className={ clsx( 'zoom-out-toolbar-popover', {
