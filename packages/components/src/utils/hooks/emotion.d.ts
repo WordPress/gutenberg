@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import type { EmotionCache } from '@emotion/utils';
 
 declare module '@emotion/react' {

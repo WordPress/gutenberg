@@ -8,6 +8,7 @@ import { useEffect, useContext, useRef } from '@wordpress/element';
  */
 import { inputEventContext } from './';
 
+/* eslint-disable react-hooks/rules-of-hooks */
 export function __unstableRichTextInputEvent( { inputType, onInput } ) {
 	const callbacks = useContext( inputEventContext );
 	const onInputRef = useRef();
@@ -29,3 +30,4 @@ export function __unstableRichTextInputEvent( { inputType, onInput } ) {
 
 	return null;
 }
+/* eslint-enable react-hooks/rules-of-hooks */

@@ -54,6 +54,7 @@ export function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
+/* eslint-disable react-hooks/rules-of-hooks */
 export function __experimentalUseGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
@@ -120,3 +121,4 @@ export function __experimentalUseGradient( {
 	}
 	return { gradientClass, gradientValue, setGradient };
 }
+/* eslint-enable react-hooks/rules-of-hooks */

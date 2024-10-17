@@ -12,7 +12,6 @@ const {
 	getArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
-	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
@@ -20,46 +19,27 @@ const args = getArgsFromCLI();
 
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 
-// See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
+// See: https://eslint.org/docs/latest/use/configure/configuration-files.
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
-	hasProjectFile( '.eslintrc.js' ) ||
-	hasProjectFile( '.eslintrc.json' ) ||
-	hasProjectFile( '.eslintrc.yaml' ) ||
-	hasProjectFile( '.eslintrc.yml' ) ||
-	hasProjectFile( 'eslintrc.config.js' ) ||
-	hasProjectFile( '.eslintrc' ) ||
-	hasPackageProp( 'eslintConfig' );
+	hasProjectFile( 'eslint.config.js' ) ||
+	hasProjectFile( 'eslint.config.mjs' ) ||
+	hasProjectFile( 'eslint.config.cjs' ) ||
+	hasProjectFile( 'eslint.config.ts' ) ||
+	hasProjectFile( 'eslint.config.mts' ) ||
+	hasProjectFile( 'eslint.config.cts' );
 
 // When a configuration is not provided by the project, use from the default
 // provided with the scripts module. Instruct ESLint to avoid discovering via
 // the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
 const defaultConfigArgs = ! hasLintConfig
-	? [ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ]
+	? [ '--no-config-lookup', '--config', fromConfigRoot( 'eslint.config.js' ) ]
 	: [];
-
-// See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
-const hasIgnoredFiles =
-	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.eslintignore' );
-
-const defaultIgnoreArgs = ! hasIgnoredFiles
-	? [ '--ignore-path', fromConfigRoot( '.eslintignore' ) ]
-	: [];
-
-const defaultExtArgs = hasArgInCLI( '--ext' )
-	? []
-	: [ '--ext', 'js,jsx,ts,tsx' ];
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[
-		...defaultConfigArgs,
-		...defaultIgnoreArgs,
-		...defaultExtArgs,
-		...args,
-		...defaultFilesArgs,
-	],
+	[ ...defaultConfigArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 

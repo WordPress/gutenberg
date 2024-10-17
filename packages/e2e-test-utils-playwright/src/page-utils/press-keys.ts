@@ -20,6 +20,7 @@ let clipboardDataHolder: {
 	'rich-text': '',
 };
 
+/* eslint-disable jsdoc/require-param */
 /**
  * Sets the clipboard data that can be pasted with
  * `pressKeys( 'primary+v' )`.
@@ -39,6 +40,7 @@ export function setClipboardData(
 		'rich-text': '',
 	};
 }
+/* eslint-enable jsdoc/require-param */
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 	const output = await page.evaluate(

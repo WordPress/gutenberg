@@ -15,11 +15,12 @@ const FUNCTION_SCOPE_JSX_IDENTIFIERS = new WeakMap();
  * undefined if it cannot be determined.
  *
  * @param {ESLintRuleContext} context ESLint context object.
+ * @param {ESTreeNode}        node    ESLint tree node.
  *
  * @return {ESLintScope|undefined} Function scope, if known.
  */
-function getClosestFunctionScope( context ) {
-	let functionScope = context.getScope();
+function getClosestFunctionScope( context, node ) {
+	let functionScope = context.sourceCode.getScope( node );
 	while ( functionScope.type !== 'function' && functionScope.upper ) {
 		functionScope = functionScope.upper;
 	}
@@ -73,7 +74,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 				// identifiers. Account for this by visiting JSX identifiers
 				// first, and tracking them in a map per function scope, which
 				// is later merged with the known variable references.
-				const functionScope = getClosestFunctionScope( context );
+				const functionScope = getClosestFunctionScope( context, node );
 				if ( ! functionScope ) {
 					return;
 				}
@@ -88,7 +89,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 				FUNCTION_SCOPE_JSX_IDENTIFIERS.get( functionScope ).add( node );
 			},
 			'ReturnStatement:exit'( node ) {
-				const functionScope = getClosestFunctionScope( context );
+				const functionScope = getClosestFunctionScope( context, node );
 				if ( ! functionScope ) {
 					return;
 				}

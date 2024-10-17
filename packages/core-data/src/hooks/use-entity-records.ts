@@ -142,6 +142,7 @@ export default function useEntityRecords< RecordType >(
 	};
 }
 
+/* eslint-disable react-hooks/rules-of-hooks */
 export function __experimentalUseEntityRecords(
 	kind: string,
 	name: string,
@@ -154,6 +155,7 @@ export function __experimentalUseEntityRecords(
 	} );
 	return useEntityRecords( kind, name, queryArgs, options );
 }
+/* eslint-enable react-hooks/rules-of-hooks */
 
 export function useEntityRecordsWithPermissions< RecordType >(
 	kind: string,

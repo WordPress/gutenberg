@@ -2,16 +2,17 @@
  * External dependencies
  */
 const { cosmiconfigSync } = require( 'cosmiconfig' );
+const ESLintParser = require( '@babel/eslint-parser' );
+const babelParser = require( '@babel/eslint-parser' );
 
 const config = {
-	parser: '@babel/eslint-parser',
-	parserOptions: {
-		sourceType: 'module',
+	languageOptions: {
+		ecmaVersion: 6,
+		parser: ESLintParser,
+		parserOptions: {
+			sourceType: 'module',
+		},
 	},
-	env: {
-		es6: true,
-	},
-	extends: [ require.resolve( './es5.js' ) ],
 	rules: {
 		// Disable ES5-specific (extended from ES5)
 		'vars-on-top': 'off',
@@ -56,13 +57,20 @@ const config = {
 // https://github.com/davidtheclark/cosmiconfig/issues/246.
 const result = cosmiconfigSync( 'babel' ).search();
 if ( ! result || ! result.filepath ) {
-	config.parserOptions = {
-		...config.parserOptions,
-		requireConfigFile: false,
-		babelOptions: {
-			presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
+	config.languageOptions = {
+		...config?.languageOptions,
+		parser: babelParser,
+		parserOptions: {
+			...config?.languageOptions?.parserOptions,
+			requireConfigFile: false,
+			babelOptions: {
+				configFile: false,
+				presets: [
+					require.resolve( '@wordpress/babel-preset-default' ),
+				],
+			},
 		},
 	};
 }
 
-module.exports = config;
+module.exports = [ ...require( './es5.js' ), config ];

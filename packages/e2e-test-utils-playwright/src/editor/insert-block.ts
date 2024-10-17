@@ -9,6 +9,7 @@ interface BlockRepresentation {
 	innerBlocks?: BlockRepresentation[];
 }
 
+/* eslint-disable jsdoc/require-param */
 /**
  * Insert a block.
  *
@@ -53,3 +54,4 @@ async function insertBlock(
 
 export type { BlockRepresentation };
 export { insertBlock };
+/* eslint-enable jsdoc/require-param */

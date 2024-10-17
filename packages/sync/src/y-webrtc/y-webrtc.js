@@ -1,7 +1,7 @@
 // File copied as is from the y-webrtc package with only exports
 // added to the following vars/functions: signalingConns,rooms, publishSignalingMessage, log.
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
+/* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable */
 /* eslint-disable */
 // @ts-nocheck
 

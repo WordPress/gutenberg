@@ -9,6 +9,7 @@ type Block = {
 	innerBlocks: Block[];
 };
 
+/* eslint-disable jsdoc/require-param */
 /**
  * Returns the edited blocks.
  *
@@ -74,3 +75,4 @@ export async function getBlocks(
 		[ full, clientId ]
 	);
 }
+/* eslint-enable jsdoc/require-param */
