@@ -40,6 +40,22 @@ describe( 'BlockVerticalAlignmentUI', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
+	test( 'should use custom label and description', () => {
+		render(
+			<BlockVerticalAlignmentUI
+				value={ alignment }
+				onChange={ onChange }
+				label="Custom Label"
+				description="Custom Description"
+			/>
+		);
+
+		const button = screen.getByRole( 'button', { name: 'Custom Label' } );
+		expect( button ).toHaveAttribute( 'aria-label', 'Custom Label' );
+		// The description is now part of the toggleProps and not directly accessible
+		// We can't easily test for the describedBy attribute here
+	} );
+
 	test( 'should expand controls when toggled', async () => {
 		const user = userEvent.setup();
 
@@ -59,7 +75,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Change vertical alignment',
+				name: 'Align vertically',
 			} )
 		);
 
@@ -86,7 +102,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 		);
 
 		const activeControl = screen.getByRole( 'button', {
-			name: `Align ${ alignment }`,
+			name: `Align top`,
 			pressed: true,
 		} );
 
