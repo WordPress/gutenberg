@@ -55,7 +55,7 @@ import { unlock } from '../lock-unlock';
 /**
  * Named block variation scopes.
  *
- * @typedef {'block'|'inserter'|'transform'} WPBlockVariationScope
+ * @typedef {'block'|'inserter'|'transform'|'hidden'} WPBlockVariationScope
  */
 
 /**
