@@ -111,8 +111,10 @@ export const TabList = forwardRef<
 		<StyledTabList
 			ref={ refs }
 			store={ store }
+			render={ ( props ) => (
+				<div { ...props } tabIndex={ props.tabIndex ?? -1 } />
+			) }
 			onBlur={ onBlur }
-			tabIndex={ -1 }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
