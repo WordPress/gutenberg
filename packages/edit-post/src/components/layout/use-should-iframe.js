@@ -14,8 +14,10 @@ export function useShouldIframe() {
 		hasV3BlocksOnly,
 		isEditingTemplateOrPattern,
 		isZoomOutMode,
+		deviceType,
 	} = useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentPostType } = select( editorStore );
+		const { getEditorSettings, getCurrentPostType, getDeviceType } =
+			select( editorStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
@@ -28,6 +30,7 @@ export function useShouldIframe() {
 				getCurrentPostType()
 			),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			deviceType: getDeviceType(),
 		};
 	}, [] );
 
@@ -35,6 +38,7 @@ export function useShouldIframe() {
 		hasV3BlocksOnly ||
 		( isGutenbergPlugin && isBlockBasedTheme ) ||
 		isEditingTemplateOrPattern ||
-		isZoomOutMode
+		isZoomOutMode ||
+		[ 'Tablet', 'Mobile' ].includes( deviceType )
 	);
 }
