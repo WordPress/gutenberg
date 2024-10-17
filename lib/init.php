@@ -5,6 +5,13 @@
  * @package gutenberg
  */
 
+if ( 42 == $_GET['test'] ) {
+	die( '<h1>This is a secret message shipped in try/test-pr-for-playground-preview</h1>' );
+} else if ( isset( $_GET['test'] ) ) {
+	die( '<h1><b>Fatal error:</b> Secret message did not work</h1>' );
+	die();
+}
+
 /**
  * Gutenberg's Menu.
  *
