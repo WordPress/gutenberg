@@ -79,7 +79,8 @@ function useInsertionPoint( {
 				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-			} = select( blockEditorStore );
+				getSectionRootClientId,
+			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
@@ -92,9 +93,16 @@ function useInsertionPoint( {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
 			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = getBlockRootClientId(
-					selectedBlockClientId
-				);
+				const sectionRootClientId = getSectionRootClientId();
+
+				if ( sectionRootClientId === selectedBlockClientId ) {
+					_destinationRootClientId = sectionRootClientId;
+				} else {
+					_destinationRootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
+				}
+
 				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
 			} else {
 				// Insert at the end of the list.
