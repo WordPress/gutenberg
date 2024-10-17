@@ -25,6 +25,7 @@ import {
 	appendToSelector,
 	getBlockStyleVariationSelector,
 	getResolvedValue,
+	getResolvedThemeFilePath,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -884,6 +885,91 @@ export const toCustomProperties = ( tree, blockSelectors ) => {
 	return ruleset;
 };
 
+/**
+ * Generates CSS @font-face declarations based on font settings in the theme.json tree.
+ *
+ * This function processes font families defined in the theme's typography settings,
+ * creating @font-face rules for each font face. It handles both file-based and URL-based
+ * font sources, resolving file paths to URLs when necessary.
+ *
+ * @param {Object} tree - The theme.json tree containing typography settings.
+ * @return {string} A string of CSS @font-face rules for the defined fonts.
+ *
+ * @example
+ * // Example output:
+ * // @font-face {
+ * //   font-family: "Open Sans";
+ * //   font-style: normal;
+ * //   font-weight: 400;
+ * //   src: url('https://example.com/wp-content/themes/example/assets/fonts/open-sans-regular.woff2') format('woff2');
+ * // }
+ */
+const getFontFaceDeclarations = ( tree ) => {
+	const fonts = tree?.settings?.typography?.fontFamilies;
+	let ruleset = '';
+
+	if ( ! fonts ) {
+		return ruleset;
+	}
+
+	const themeFileURIs = tree?._links?.[ 'wp:theme-file' ] ?? [];
+
+	// Iterate over main origins (theme, custom, default)
+	for ( const origin in fonts ) {
+		if ( Array.isArray( fonts[ origin ] ) ) {
+			fonts[ origin ].forEach( ( font ) => {
+				if ( font.fontFace ) {
+					font.fontFace.forEach( ( face ) => {
+						ruleset += '@font-face {\n';
+
+						// Optional properties
+						for ( const [ key, value ] of Object.entries( face ) ) {
+							if ( key !== 'src' ) {
+								ruleset += `  ${ kebabCase(
+									key
+								) }: ${ value };\n`;
+							}
+						}
+
+						if ( face.src ) {
+							const srcs = (
+								face.src && Array.isArray( face.src )
+									? face.src
+									: [ face.src ]
+							).map( ( src ) => {
+								if ( src.startsWith( 'file:' ) ) {
+									// Convert file path to URL and assume format based on extension
+									const resolvedSrc =
+										getResolvedThemeFilePath(
+											src,
+											themeFileURIs
+										);
+									const format = resolvedSrc
+										.split( '.' )
+										.pop();
+									return `url('${ resolvedSrc.replace(
+										'file:',
+										''
+									) }') format('${ format }')`;
+								}
+								// Assume it's already a URL and format is provided
+								return `url('${ src }')`;
+							} );
+							ruleset += `  src: ${ srcs.join(
+								',\n       '
+							) };\n`;
+						}
+
+						ruleset += '}\n\n';
+					} );
+				}
+			} );
+		}
+	}
+
+	return ruleset;
+};
+
 export const toStyles = (
 	tree,
 	blockSelectors,
@@ -912,6 +998,8 @@ export const toStyles = (
 		options.marginReset || options.rootPadding || options.layoutStyles;
 
 	let ruleset = '';
+
+	ruleset += getFontFaceDeclarations( tree );
 
 	if ( options.presets && ( contentSize || wideSize ) ) {
 		ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } {`;
@@ -1399,7 +1487,6 @@ export function useGlobalStylesOutputWithConfig(
 	} );
 
 	const { getBlockStyles } = useSelect( blocksStore );
-
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
@@ -1415,7 +1502,6 @@ export function useGlobalStylesOutputWithConfig(
 			updatedConfig,
 			blockSelectors
 		);
-
 		const globalStyles = toStyles(
 			updatedConfig,
 			blockSelectors,
