@@ -30,21 +30,19 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
-		__unstableGetEditorMode,
 		isTyping,
 		isDragging,
+		isZoomOut,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	const editorMode = __unstableGetEditorMode();
-
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: editorMode === 'zoom-out',
+		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 	};
 }
