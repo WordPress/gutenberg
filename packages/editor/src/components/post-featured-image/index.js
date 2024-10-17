@@ -158,46 +158,49 @@ function PostFeaturedImage( {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
-							<div className="editor-post-featured-image__container">
-								<Button
-									__next40pxDefaultSize
-									ref={ toggleRef }
-									className={
-										! featuredImageId
-											? 'editor-post-featured-image__toggle'
-											: 'editor-post-featured-image__preview'
-									}
-									onClick={ open }
-									aria-label={
-										! featuredImageId
-											? null
-											: __(
-													'Edit or replace the featured image'
-											  )
-									}
-									aria-describedby={
-										! featuredImageId
-											? null
-											: `editor-post-featured-image-${ featuredImageId }-describedby`
-									}
-									aria-haspopup="dialog"
-									disabled={ isLoading }
-									accessibleWhenDisabled
-								>
-									{ !! featuredImageId && media && (
-										<img
-											className="editor-post-featured-image__preview-image"
-											src={ mediaSourceUrl }
-											alt=""
-										/>
-									) }
-									{ isLoading && <Spinner /> }
-									{ ! featuredImageId &&
-										! isLoading &&
-										( postType?.labels
-											?.set_featured_image ||
-											DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
-								</Button>
+							<>
+								<div className="editor-post-featured-image__container">
+									<Button
+										__next40pxDefaultSize
+										ref={ toggleRef }
+										className={
+											! featuredImageId
+												? 'editor-post-featured-image__toggle'
+												: 'editor-post-featured-image__preview'
+										}
+										onClick={ open }
+										aria-label={
+											! featuredImageId
+												? null
+												: __(
+														'Edit or replace the featured image'
+												  )
+										}
+										aria-describedby={
+											! featuredImageId
+												? null
+												: `editor-post-featured-image-${ featuredImageId }-describedby`
+										}
+										aria-haspopup="dialog"
+										disabled={ isLoading }
+										accessibleWhenDisabled
+									>
+										{ !! featuredImageId && media && (
+											<img
+												className="editor-post-featured-image__preview-image"
+												src={ mediaSourceUrl }
+												alt=""
+											/>
+										) }
+										{ isLoading && <Spinner /> }
+										{ ! featuredImageId &&
+											! isLoading &&
+											( postType?.labels
+												?.set_featured_image ||
+												DEFAULT_SET_FEATURE_IMAGE_LABEL ) }
+									</Button>
+									<DropZone onFilesDrop={ onDropFiles } />
+								</div>
 								{ !! featuredImageId && (
 									<HStack className="editor-post-featured-image__actions">
 										<Button
@@ -205,6 +208,7 @@ function PostFeaturedImage( {
 											className="editor-post-featured-image__action"
 											onClick={ open }
 											aria-haspopup="dialog"
+											variant="secondary"
 										>
 											{ __( 'Replace' ) }
 										</Button>
@@ -215,13 +219,14 @@ function PostFeaturedImage( {
 												onRemoveImage();
 												toggleRef.current.focus();
 											} }
+											variant="secondary"
+											isDestructive
 										>
 											{ __( 'Remove' ) }
 										</Button>
 									</HStack>
 								) }
-								<DropZone onFilesDrop={ onDropFiles } />
-							</div>
+							</>
 						) }
 						value={ featuredImageId }
 					/>
