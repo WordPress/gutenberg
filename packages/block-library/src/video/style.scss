@@ -2,6 +2,7 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	video {
+		height: auto;
 		width: 100%;
 		vertical-align: middle;
 	}
