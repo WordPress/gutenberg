@@ -574,12 +574,12 @@ test.describe( 'Post Meta source', () => {
 				page.getByRole( 'menuitemradio', {
 					name: 'Number custom field',
 				} )
-			).toBeVisible();
+			).toBeHidden();
 			await expect(
 				page.getByRole( 'menuitemradio', {
 					name: 'Integer custom field',
 				} )
-			).toBeVisible();
+			).toBeHidden();
 			await expect(
 				page.getByRole( 'menuitemradio', {
 					name: 'Boolean custom field',
