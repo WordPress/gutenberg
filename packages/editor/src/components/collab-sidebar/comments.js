@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, RawHTML } from '@wordpress/element';
+import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -344,24 +344,22 @@ function CommentHeader( {
 		'time_format'
 	);
 
-	const memorizedMoreActions = useMemo( () => {
-		return [
-			{
-				title: _x( 'Edit', 'Edit comment' ),
-				onClick: onEdit,
-			},
-			{
-				title: _x( 'Delete', 'Delete comment' ),
-				onClick: onDelete,
-			},
-			{
-				title: _x( 'Reply', 'Reply on a comment' ),
-				onClick: onReply,
-			},
-		];
-	}, [ onEdit, onDelete, onReply ] );
+	const actions = [
+		{
+			title: _x( 'Edit', 'Edit comment' ),
+			onClick: onEdit,
+		},
+		{
+			title: _x( 'Delete', 'Delete comment' ),
+			onClick: onDelete,
+		},
+		{
+			title: _x( 'Reply', 'Reply on a comment' ),
+			onClick: onReply,
+		},
+	];
 
-	const moreActions = memorizedMoreActions.filter( ( item ) => item.onClick );
+	const moreActions = actions.filter( ( item ) => item.onClick );
 
 	return (
 		<HStack alignment="left" spacing="3" justify="flex-start">
