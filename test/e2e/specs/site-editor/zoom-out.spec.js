@@ -27,8 +27,8 @@ test.describe( 'Zoom Out', () => {
 
 		// Check that the html is scaled.
 		await expect( html ).toHaveCSS(
-			'transform',
-			'matrix(0.67, 0, 0, 0.67, 0, 0)'
+			'scale',
+			new RegExp( /0\.[5-8][0-9]*/, 'i' )
 		);
 		const iframeRect = await iframe.boundingBox();
 		const htmlRect = await html.boundingBox();

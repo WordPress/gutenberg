@@ -63,7 +63,7 @@ if ( ! function_exists( 'wp_register_block_template' ) ) {
 	 */
 	function wp_register_block_template( $template_name, $args = array() ) {
 		_deprecated_function( __FUNCTION__, 'Gutenberg 19.4.0', 'register_block_template' );
-		register_block_template( $template_name, $args );
+		return register_block_template( $template_name, $args );
 	}
 }
 
