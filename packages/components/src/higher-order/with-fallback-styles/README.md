@@ -11,8 +11,8 @@ const MyComponentWithFallbackStyles = withFallbackStyles(
 	( node, ownProps ) => {
 		const buttonNode = node.querySelector( 'button' );
 		return {
-			fallbackBackgroundColor: getComputedStyle( buttonNode )
-				.backgroundColor,
+			fallbackBackgroundColor:
+				getComputedStyle( buttonNode ).backgroundColor,
 			fallbackTextColor: getComputedStyle( buttonNode ).color,
 		};
 	}

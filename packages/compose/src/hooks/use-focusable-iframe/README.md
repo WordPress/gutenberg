@@ -18,12 +18,12 @@ event will bubble.
 import { useFocusableIframe } from '@wordpress/compose';
 
 const MyFocusableIframe = () => {
-    return(
-        <iframe
-            ref={ useFocusableIframe() }
-            src="/my-iframe-url"
-            onFocus={ () => console.log( 'iframe is focused' ) }
-        />
-    );
+	return (
+		<iframe
+			ref={ useFocusableIframe() }
+			src="/my-iframe-url"
+			onFocus={ () => console.log( 'iframe is focused' ) }
+		/>
+	);
 };
 ```

@@ -18,9 +18,7 @@ $ npm start
 
 The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation-1).
 
-
 _(requires `node` version `20.10.0` or above, and `npm` version `10.2.3` or above)_
-
 
 > [Watch a video introduction to create-block on Learn.wordpress.org](https://learn.wordpress.org/tutorial/using-the-create-block-tool/)
 
@@ -42,20 +40,19 @@ $ npx @wordpress/create-block@latest [options] [slug]
 
 When no `slug` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
 
-
 ### `slug`
 
 The use of `slug` is optional.
 
 When provided it triggers the _quick mode_, where this `slug` is used:
-- as the block slug (required for its identification)
-- as the output location (folder name) for scaffolded files
-- as the name of the WordPress plugin.
+
+-   as the block slug (required for its identification)
+-   as the output location (folder name) for scaffolded files
+-   as the name of the WordPress plugin.
 
 The rest of the configuration is set to all default values unless overridden with some options listed below.
 
 ### `options`
-
 
 ```bash
 -V, --version                output the version number
@@ -109,6 +106,7 @@ With this argument, the `create-block` package runs in _No plugin mode_ which on
 ```bash
 $ npx @wordpress/create-block@latest --no-plugin
 ```
+
 #### `--wp-env`
 
 With this argument, the `create-block` package will add to the generated plugin the configuration and the script to run [`wp-env` package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) within the plugin. This will allow you to easily set up a local WordPress environment (via Docker) for building and testing the generated plugin.

@@ -51,7 +51,9 @@ const ExampleControl = () => {
 			<>
 				<BottomSheet.NavBar>
 					<BottomSheet.NavBar.BackButton onPress={ goBack } />
-					<BottomSheet.NavBar.Heading>{ 'Howdy' }</BottomSheet.NavBar.Heading>
+					<BottomSheet.NavBar.Heading>
+						{ 'Howdy' }
+					</BottomSheet.NavBar.Heading>
 				</BottomSheet.NavBar>
 				<View paddingHorizontal={ 16 }>
 					<Text>{ 'World' }</Text>

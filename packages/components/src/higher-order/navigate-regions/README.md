@@ -23,4 +23,5 @@ const MyComponentWithNavigateRegions = navigateRegions( () => (
 ```
 
 ## Notes:
+
 It's important to note that an ARIA `role="region"` is an ARIA landmark role. It should be reserved for sections of content sufficiently important to have it listed in a summary of the page. Only use this ARIA role for the main sections of a page. All perceivable content should reside in a semantically meaningful landmark in order that content is not missed by the user.

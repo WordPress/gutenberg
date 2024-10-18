@@ -52,8 +52,8 @@ A function that returns nodes to be rendered within the Autocomplete.
 
 Whether or not the Autocomplete component is selected, and if its `Popover` should be displayed.
 
-- Required: Yes
-- Type: `Boolean`
+-   Required: Yes
+-   Type: `Boolean`
 
 ## Autocompleters
 
@@ -157,6 +157,7 @@ The `Autocomplete` component is not currently intended to be used as a standalon
 The block editor provides a separate, wrapped version of `Autocomplete` that supports the addition of custom completers via a filter.
 
 To implement your own completer in the block editor you will:
+
 1. Define the completer
 2. Write a callback that will add your completer to the list of existing completers
 3. Add a filter to the `editor.Autocomplete.completers` hook that will call your callback

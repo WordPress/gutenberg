@@ -57,7 +57,7 @@ Use this to customize the label of the _Finish_ button shown at the end of the g
 
 -   Type: `string`
 -   Required: No
--	Default: `'Finish'`
+-   Default: `'Finish'`
 
 ### onFinish
 

@@ -41,9 +41,7 @@ function MyComboboxControl() {
 			options={ filteredOptions }
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
-					options.filter( ( option ) =>
-						option.value === inputValue
-					)
+					options.filter( ( option ) => option.value === inputValue )
 				)
 			}
 		/>
@@ -118,22 +116,22 @@ If passed, the combobox input will show a placeholder string if no values are pr
 -   Type: `string`
 -   Required: No
 
-#### __experimentalRenderItem
+#### \_\_experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
-#### __next40pxDefaultSize
+#### \_\_next40pxDefaultSize
 
 Start opting into the larger default height that will become the default size in a future version.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
-#### __nextHasNoMarginBottom
+#### \_\_nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.
 

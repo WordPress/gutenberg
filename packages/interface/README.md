@@ -25,27 +25,19 @@ It is possible to control which complementary is enabled by using the store:
 Below are some examples of how to control the active complementary area using the store:
 
 ```js
-wp.data
-	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core' );
+wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core' );
 // -> "edit-post/document"
 
 wp.data
 	.dispatch( 'core/interface' )
 	.enableComplementaryArea( 'core', 'edit-post/block' );
 
-wp.data
-	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core' );
+wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core' );
 // -> "edit-post/block"
 
-wp.data
-	.dispatch( 'core/interface' )
-	.disableComplementaryArea( 'core' );
+wp.data.dispatch( 'core/interface' ).disableComplementaryArea( 'core' );
 
-wp.data
-	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core' );
+wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core' );
 // -> null
 ```
 

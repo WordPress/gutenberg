@@ -6,7 +6,6 @@ This component implements a `Modal` component from the `@wordpress/components` p
 
 Sections passed to this component should use `PreferencesModalSection` component from the `@wordpress/preferences` package.
 
-
 ## Example
 
 ```jsx

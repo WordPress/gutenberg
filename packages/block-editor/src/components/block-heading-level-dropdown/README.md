@@ -6,7 +6,6 @@ Uses `<ToolbarDropdownMenu>`.
 ## Usage
 
 ```jsx
-
 import { BlockControls, HeadingLevelDropdown } from '@wordpress/block-editor';
 
 const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
@@ -16,9 +15,7 @@ const MyHeadingLevelToolbar = () => (
 		<HeadingLevelDropdown
 			options={ HEADING_LEVELS }
 			value={ tag }
-			onChange={ ( newTag ) =>
-				setAttributes( { tag: newTag } )
-			}
+			onChange={ ( newTag ) => setAttributes( { tag: newTag } ) }
 		/>
 	</BlockControls>
 );

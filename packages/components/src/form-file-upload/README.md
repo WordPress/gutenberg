@@ -86,7 +86,7 @@ Optional callback function used to render the UI. If passed, the component does 
 -   Type: `Function`
 -   Required: No
 
-### __next40pxDefaultSize
+### \_\_next40pxDefaultSize
 
 Start opting into the larger default height that will become the default size in a future version.
 

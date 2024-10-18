@@ -46,12 +46,12 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 
 ### spinControls
 
- The type of spin controls to display. These are buttons that allow the user to
- quickly increment and decrement the number.
+The type of spin controls to display. These are buttons that allow the user to
+quickly increment and decrement the number.
 
- - 'none' - Do not show spin controls.
- - 'native' - Use browser's native HTML `input` controls.
- - 'custom' - Use plus and minus icon buttons.
+-   'none' - Do not show spin controls.
+-   'native' - Use browser's native HTML `input` controls.
+-   'custom' - Use plus and minus icon buttons.
 
 -   Type: `String`
 -   Required: No
@@ -140,7 +140,7 @@ Amount by which the `value` is changed when incrementing/decrementing. It is als
 -   Required: No
 -   Default: `1`
 
-### __next40pxDefaultSize
+### \_\_next40pxDefaultSize
 
 Start opting into the larger default height that will become the default size in a future version.
 

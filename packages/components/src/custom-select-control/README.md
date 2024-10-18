@@ -146,8 +146,8 @@ A handler for `blur` events on the trigger button.
 
 Start opting into the larger default height that will become the default size in a future version.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

@@ -148,6 +148,7 @@ An array or nested array of objects describing the options to be shown in the ex
 Each object should include an `icon` [Dashicon](https://developer.wordpress.org/resource/dashicons/) slug string, a human-readable `title` string, `isDisabled` boolean flag and an `onClick` function callback to invoke when the option is selected.
 
 A valid DropdownMenu must specify a `controls` or `children` prop, or both.
+
 -   Required: No
 
 #### `children`: `( callbackProps: DropdownCallbackProps ) => ReactNode`

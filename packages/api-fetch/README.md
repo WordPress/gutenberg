@@ -15,6 +15,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ## Usage
 
 ### GET
+
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
@@ -24,18 +25,22 @@ apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 ```
 
 ### GET with Query Args
+
 ```js
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
-const queryParams = { include: [1,2,3] }; // Return posts with ID = 1,2,3.
+const queryParams = { include: [ 1, 2, 3 ] }; // Return posts with ID = 1,2,3.
 
-apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then( ( posts ) => {
-	console.log( posts );
-} );
+apiFetch( { path: addQueryArgs( '/wp/v2/posts', queryParams ) } ).then(
+	( posts ) => {
+		console.log( posts );
+	}
+);
 ```
 
 ### POST
+
 ```js
 apiFetch( {
 	path: '/wp/v2/posts/1',

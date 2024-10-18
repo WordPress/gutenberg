@@ -45,9 +45,7 @@ should contain a `css` attribute. See `EditorStyles` for more info.
 ```jsx
 <BlockPreview
 	blocks={ blocks }
-	additionalStyles={ [
-		{ css: 'body { padding: 16px; }' },
-	] }
+	additionalStyles={ [ { css: 'body { padding: 16px; }' } ] }
 />
 ```
 

@@ -43,7 +43,8 @@ you can set the `HierarchicalTermSelector` component as shown below.
 
 ```js
 const el = React.createElement;
-const HierarchicalTermSelector = wp.editor.PostTaxonomiesHierarchicalTermSelector;
+const HierarchicalTermSelector =
+	wp.editor.PostTaxonomiesHierarchicalTermSelector;
 
 function customizeTrackSelector( OriginalComponent ) {
 	return function ( props ) {

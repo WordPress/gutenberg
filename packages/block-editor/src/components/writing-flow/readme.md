@@ -8,11 +8,11 @@ Selecting across blocks is possible by temporarily setting the `contentEditable`
 attribute to `true`. This sounds scary, but we prevent all default behaviours
 except for selection, so don't worry. :)
 
-* For selection by mouse, we make everything editable when the mouse leaves an
-  editable field.
-* For Shift+Click selection, we do it on `mousedown`.
-* For keyboard selection we do it when the selection reaches the edge of an
-  editable field.
+-   For selection by mouse, we make everything editable when the mouse leaves an
+    editable field.
+-   For Shift+Click selection, we do it on `mousedown`.
+-   For keyboard selection we do it when the selection reaches the edge of an
+    editable field.
 
 In the future, we should consider using the `contentEditable` attribute for
 arrow key navigation as well.

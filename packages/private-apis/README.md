@@ -105,10 +105,10 @@ The consent string for unlocking private APIs is intended to change on a regular
 2. Ensure the consent string has not being used previously.
 3. Append the new string to the history list below.
 4. Replace the consent string in the following locations:
-   * twice in the documentation above
-   * in the `src/implementation.js` file of this package
-   * in the `src/lock-unlock.js` file located in packages consuming private APIs
-   * search the full code base for any other occurrences
+    - twice in the documentation above
+    - in the `src/implementation.js` file of this package
+    - in the `src/lock-unlock.js` file located in packages consuming private APIs
+    - search the full code base for any other occurrences
 
 **Note**: The consent string is not used for user facing content and as such should _not_ be made translatable via the internationalization features of WordPress.
 

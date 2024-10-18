@@ -99,12 +99,12 @@ The heading level. Only applies in cases where gradients are provided from multi
 
 Whether the control should present as a set of buttons, each with its own tab stop.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `loop`: `boolean`
 
 Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`

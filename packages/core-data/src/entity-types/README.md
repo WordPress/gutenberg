@@ -4,8 +4,8 @@
 
 The types in this directory are designed to support the following use-cases:
 
-* Provide type-hinting and documentation for entity records fetched in the various REST API contexts.
-* Type-check the values we use to *edit* entity records, the values that are sent back to the server as updates.
+-   Provide type-hinting and documentation for entity records fetched in the various REST API contexts.
+-   Type-check the values we use to _edit_ entity records, the values that are sent back to the server as updates.
 
 **Warning:** The types model the expected API responses which is **not** the same as having a full type safety for the API-related operations. The API responses are type-cast to these definitions and therefore may not match those expectations; for example, a plugin could modify the response, or the API endpoint could have a nuanced implementation in which strings are sometimes used instead of numbers.
 
@@ -63,7 +63,7 @@ These contexts are supported by the core-data resolvers like `getEntityRecord()`
 The types describing different entity records must thus be aware of the relevant API context. This is implemented using the `Context` type parameter. For example, the implementation of the `Post` type resembles the following snippet:
 
 ```ts
-interface Post<C extends Context> {
+interface Post< C extends Context > {
 	/**
 	 * A named status for the post.
 	 */
@@ -75,12 +75,14 @@ interface Post<C extends Context> {
 
 The `status` field is a `PostStatus` when the requesting context is `view` or `edit`, but if requested with an `embed` context the field won't appear on the `Post` object at all.
 
-### Static type checks for *edited* entity records, where certain fields become strings instead of objects.
+### Static type checks for _edited_ entity records, where certain fields become strings instead of objects.
 
 When the `post` is retrieved using `getEntityRecord`, its `content` field is an object:
 
 ```js
-const post = wp.data.select('core').getEntityRecord( 'postType', 'post', 1, { context: 'view' } )
+const post = wp.data
+	.select( 'core' )
+	.getEntityRecord( 'postType', 'post', 1, { context: 'view' } );
 // `post.content` is an object with two fields: protected and rendered
 ```
 
@@ -108,7 +110,9 @@ const post : Updatable<Post< 'edit' >> = ...
 The `getEditedEntityRecord` selector returns the Updatable version of the entity records:
 
 ```js
-const post = wp.data.select('core').getEditedEntityRecord( 'postType', 'post', 1 );
+const post = wp.data
+	.select( 'core' )
+	.getEditedEntityRecord( 'postType', 'post', 1 );
 // `post.content` is a string
 ```
 
@@ -147,14 +151,14 @@ Removes all the properties of type never, even the deeply nested ones.
 
 ```ts
 type MyType = {
-  foo: string;
-  bar: never;
-  nested: {
-    foo: string;
-    bar: never;
-  }
-}
-const x = {} as OmitNevers<MyType>;
+	foo: string;
+	bar: never;
+	nested: {
+		foo: string;
+		bar: never;
+	};
+};
+const x = {} as OmitNevers< MyType >;
 // x is of type { foo: string; nested: { foo: string; }}
 // The `never` properties were removed entirely
 ```

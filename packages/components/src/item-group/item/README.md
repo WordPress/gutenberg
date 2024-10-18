@@ -33,14 +33,14 @@ function Example() {
 
 Even handler for processing `click` events. When defined, the `Item` component will render as a `button` (unless differently specified via the `as` prop).
 
-- Required: No
+-   Required: No
 
 ### `size`: `'small' | 'medium' | 'large'`
 
 Determines the amount of padding within the component.
 
-- Required: No
-- Default: `medium`
+-   Required: No
+-   Default: `medium`
 
 ### Context
 

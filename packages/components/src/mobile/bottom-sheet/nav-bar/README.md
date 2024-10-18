@@ -58,6 +58,6 @@ Note that the bottomSheet dismissal needs to be implemented in the callback that
 
 Callback invoked once the button is pressed.
 
-#### iosText 
+#### iosText
 
 Used to display iOS text if different from "Cancel".

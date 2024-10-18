@@ -296,8 +296,8 @@ Specifies the button's style. The accepted values are `'primary'` (the primary b
 
 Start opting into the larger default height that will become the default size in a future version.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

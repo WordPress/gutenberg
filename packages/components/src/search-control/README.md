@@ -16,16 +16,16 @@ import { __ } from '@wordpress/i18n';
 import { SearchControl } from '@wordpress/components';
 
 function MySearchControl( { className, setState } ) {
-    const [ searchInput, setSearchInput ] = useState( '' );
+	const [ searchInput, setSearchInput ] = useState( '' );
 
-    return (
-        <SearchControl
-            __nextHasNoMarginBottom
-            label={ __( 'Search posts' ) }
-            value={ searchInput }
-            onChange={ setSearchInput }
-        />
-    );
+	return (
+		<SearchControl
+			__nextHasNoMarginBottom
+			label={ __( 'Search posts' ) }
+			value={ searchInput }
+			onChange={ setSearchInput }
+		/>
+	);
 }
 ```
 
@@ -100,7 +100,7 @@ If true, the label will not be visible, but will be read by screen readers. Defa
 -   Required: No
 -   Default: `true`
 
-#### __nextHasNoMarginBottom
+#### \_\_nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.
 

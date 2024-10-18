@@ -104,9 +104,9 @@ Use this object to access properties/features of the `Popover` component that ar
 
 A callback invoked to render the content of the dropdown menu.
 
-- `isOpen`: whether the dropdown menu is opened or not
-- `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
-- `onClose`: A function that closes the menu if invoked
+-   `isOpen`: whether the dropdown menu is opened or not
+-   `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
+-   `onClose`: A function that closes the menu if invoked
 
 -   Required: Yes
 

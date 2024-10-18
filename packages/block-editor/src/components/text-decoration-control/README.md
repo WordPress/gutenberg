@@ -7,7 +7,6 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ![TextDecorationControl Element in Inspector Control](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/text-decoration-component.png?raw=true)
 
-
 ## Usage
 
 ```jsx
@@ -18,8 +17,8 @@ Then, you can use the component in your block editor UI:
 
 ```jsx
 <TextDecorationControl
-  value={textDecorationValue}
-  onChange={(newValue) => setAttributes({ textDecoration: newValue })}
+	value={ textDecorationValue }
+	onChange={ ( newValue ) => setAttributes( { textDecoration: newValue } ) }
 />
 ```
 

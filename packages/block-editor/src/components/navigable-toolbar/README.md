@@ -12,7 +12,6 @@ _Note: this prop is deprecated._
 
 Whether to immediately focus when the component mounts.
 
-- Type: `Boolean`
-- Required: No
-- Default: false
-
+-   Type: `Boolean`
+-   Required: No
+-   Default: false

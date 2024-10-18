@@ -35,6 +35,7 @@ export default compose(
 	MyColorfulComponent
 );
 ```
+
 ## Related components.
 
 -   [`PanelColorSettings`](https://github.com/WordPress/gutenberg/blob/bb00ad891db9937862b16867dcebd2a4d830ea86/packages/block-editor/src/components/panel-color-settings/index.js).

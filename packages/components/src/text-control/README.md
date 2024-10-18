@@ -127,7 +127,7 @@ A function that receives the value of the input.
 -   Type: `function`
 -   Required: Yes
 
-#### __next40pxDefaultSize
+#### \_\_next40pxDefaultSize
 
 Start opting into the larger default height that will become the default size in a future version.
 

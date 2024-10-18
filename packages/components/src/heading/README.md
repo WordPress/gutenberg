@@ -20,8 +20,8 @@ function Example() {
 
 `Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for:
 
-- `size` which is replaced by `level`;
-- `isBlock`'s default value, which is `true` for the `Heading` component.
+-   `size` which is replaced by `level`;
+-   `isBlock`'s default value, which is `true` for the `Heading` component.
 
 For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
 

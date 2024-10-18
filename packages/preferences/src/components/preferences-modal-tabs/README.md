@@ -5,7 +5,9 @@
 ## Example
 
 See the `PreferencesModal` readme for usage info.
+
 ## Props
+
 ### sections
 
 Sections to populate the modal with. Takes an array of objects, where each should include `name`, `tablabel` and `content`.

@@ -23,34 +23,35 @@ function Example() {
   );
 }
 ```
+
 ## Props
 
 ### `as`
 
 The HTML element or React component to render the component as.
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
- - Required: No
+-   Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+-   Required: No
 
 ### `label`
 
 Label to use for the angle picker.
 
- - Type: `string`
- - Required: No
- - Default: `__( 'Angle' )`
+-   Type: `string`
+-   Required: No
+-   Default: `__( 'Angle' )`
 
 ### `onChange`
 
 A function that receives the new value of the input.
 
- - Type: `(value: number) => void`
- - Required: Yes
+-   Type: `(value: number) => void`
+-   Required: Yes
 
 ### `value`
 
 The current value of the input. The value represents an angle in degrees
 and should be a value between 0 and 360.
 
- - Type: `string | number`
- - Required: Yes
+-   Type: `string | number`
+-   Required: Yes

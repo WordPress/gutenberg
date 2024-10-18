@@ -213,9 +213,9 @@ Legacy way to specify the popover's position with respect to its anchor.
 
 Possible values:
 
-- `yAxis`: `'top' | 'middle' | 'bottom'`
-- `xAxis`: `'left' | 'center' | 'right'`
-- `corner`: `'top' | 'right' | 'bottom' | 'left'`
+-   `yAxis`: `'top' | 'middle' | 'bottom'`
+-   `xAxis`: `'left' | 'center' | 'right'`
+-   `corner`: `'top' | 'right' | 'bottom' | 'left'`
 <!-- Break into two separate lists using an HTML comment -->
 -   Required: No
 
@@ -231,7 +231,8 @@ Adjusts the size of the popover to prevent its contents from going out of view w
 Specifies the popover's style.
 
 Leave undefined for the default style. Possible values are:
--   `unstyled`:  The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
+
+-   `unstyled`: The popover is essentially without any visible style, it has no background, border, outline or drop shadow, but the popover contents are still displayed.
 -   `toolbar`: A style that has no elevation, but a high contrast with other elements. This matches the style of the [`Toolbar` component](/packages/components/toolbar/README.md).
 <!-- Break into two separate lists using an HTML comment -->
 -   Required: No

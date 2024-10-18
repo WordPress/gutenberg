@@ -15,7 +15,7 @@ const MyTreeSelect = () => {
 
 	return (
 		<TreeSelect
-		  __nextHasNoMarginBottom
+			__nextHasNoMarginBottom
 			label="Parent page"
 			noOptionLabel="No parent page"
 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -48,7 +48,7 @@ const MyTreeSelect = () => {
 			] }
 		/>
 	);
-}
+};
 ```
 
 ## Props
@@ -91,7 +91,7 @@ An array containing the tree objects with the possible nodes the user can select
 -   Type: `Object[]`
 -   Required: No
 
-#### __nextHasNoMarginBottom
+#### \_\_nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.
 

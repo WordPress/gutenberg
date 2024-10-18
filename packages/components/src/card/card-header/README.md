@@ -9,8 +9,8 @@ import { Card, CardHeader } from '@wordpress/components';
 
 const Example = () => (
 	<Card>
- 		<CardHeader>...</CardHeader>
- 		<CardBody>...</CardBody>
+		<CardHeader>...</CardHeader>
+		<CardBody>...</CardBody>
 	</Card>
 );
 ```
@@ -23,8 +23,8 @@ Note: This component is connected to [`Card`'s Context](/packages/components/src
 
 Renders without a border.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `isShady`: `boolean`
 
@@ -37,6 +37,6 @@ Renders with a light gray background color.
 
 Determines the amount of padding within the component.
 
-- Required: No
-- Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+-   Required: No
+-   Default: `medium`
+-   Allowed values: `xSmall`, `small`, `medium`, `large`

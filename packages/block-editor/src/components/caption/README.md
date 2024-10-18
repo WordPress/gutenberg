@@ -21,7 +21,7 @@ const BlockCaption = ( {
 	text,
 	insertBlocksAfter,
 } ) => (
-	<View >
+	<View>
 		<Caption
 			isSelected={ isSelected }
 			onBlur={ onBlur }

@@ -23,7 +23,7 @@ const MyToggleControl = () => {
 					: 'No fixed background.'
 			}
 			checked={ hasFixedBackground }
-			onChange={ (newValue) => {
+			onChange={ ( newValue ) => {
 				setHasFixedBackground( newValue );
 			} }
 		/>
@@ -77,8 +77,8 @@ A function that receives the checked state (boolean) as input.
 
 The class that will be added with `components-base-control` and `components-toggle-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `components-toggle-control` are used.
 
--		Type: `String`
--		Required: No
+-         Type: `String`
+-         Required: No
 
 ### `__nextHasNoMarginBottom`
 

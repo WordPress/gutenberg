@@ -31,7 +31,7 @@ import { __experimentalText as Text, TextInput } from '@wordpress/components';
 
 function Example() {
 	return (
-		<Text adjustLineHeightForInnerControls={"small"}>
+		<Text adjustLineHeightForInnerControls={ 'small' }>
 			Lorem ipsum dolor sit amet, consectetur
 			<TextInput value="adipiscing elit..." />
 		</Text>

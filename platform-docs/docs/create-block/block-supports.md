@@ -26,8 +26,8 @@ If your block editor allows text and background colors, the block inspector will
 
 In addition to colors, the block editor provides by default a number of built-in block supports that any block type can use to quickly add customization options. These block supports include:
 
- - colors
- - typography
- - borders
- - dimensions and spacing
- - and more...
+-   colors
+-   typography
+-   borders
+-   dimensions and spacing
+-   and more...
