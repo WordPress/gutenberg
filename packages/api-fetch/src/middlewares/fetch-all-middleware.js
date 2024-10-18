@@ -74,7 +74,7 @@ const requestContainsUnboundedQuery = ( options ) => {
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-const fetchAllMiddleware = async ( options, next ) => {
+export const fetchAllMiddleware = async ( options, next ) => {
 	if ( options.parse === false ) {
 		// If a consumer has opted out of parsing, do not apply middleware.
 		return next( options );
@@ -124,5 +124,3 @@ const fetchAllMiddleware = async ( options, next ) => {
 	}
 	return mergedResults;
 };
-
-export default fetchAllMiddleware;

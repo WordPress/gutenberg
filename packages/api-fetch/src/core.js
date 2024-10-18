@@ -1,20 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+//import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import createNonceMiddleware from './middlewares/nonce';
-import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
-import fetchAllMiddleware from './middlewares/fetch-all-middleware';
-import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
-import httpV1Middleware from './middlewares/http-v1';
-import userLocaleMiddleware from './middlewares/user-locale';
-import mediaUploadMiddleware from './middlewares/media-upload';
-import createThemePreviewMiddleware from './middlewares/theme-preview';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -43,28 +34,6 @@ const DEFAULT_HEADERS = {
 const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
-
-/** @typedef {import('./types').APIFetchMiddleware} APIFetchMiddleware */
-/** @typedef {import('./types').APIFetchOptions} APIFetchOptions */
-
-/**
- * @type {import('./types').APIFetchMiddleware[]}
- */
-const middlewares = [
-	userLocaleMiddleware,
-	namespaceEndpointMiddleware,
-	httpV1Middleware,
-	fetchAllMiddleware,
-];
-
-/**
- * Register a middleware
- *
- * @param {import('./types').APIFetchMiddleware} middleware
- */
-function registerMiddleware( middleware ) {
-	middlewares.unshift( middleware );
-}
 
 /**
  * Checks the status of a response, throwing the Response as an error if
@@ -128,7 +97,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 			// Unfortunately the message might depend on the browser.
 			throw {
 				code: 'fetch_error',
-				message: __( 'You are probably offline.' ),
+				message: 'You are probably offline.',
 			};
 		}
 	);
@@ -143,16 +112,23 @@ let fetchHandler = defaultFetchHandler;
  *
  * @param {FetchHandler} newFetchHandler The new fetch handler
  */
-function setFetchHandler( newFetchHandler ) {
+export function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
+
+/** @type { typeof import('./middlewares/singleton').middlewares } */
+let middlewares;
 
 /**
  * @template T
  * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
-function apiFetch( options ) {
+export async function apiFetch( options ) {
+	if ( ! middlewares ) {
+		middlewares = ( await import( './middlewares/singleton' ) ).middlewares;
+	}
+
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
@@ -185,15 +161,3 @@ function apiFetch( options ) {
 		);
 	} );
 }
-
-apiFetch.use = registerMiddleware;
-apiFetch.setFetchHandler = setFetchHandler;
-
-apiFetch.createNonceMiddleware = createNonceMiddleware;
-apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
-apiFetch.createRootURLMiddleware = createRootURLMiddleware;
-apiFetch.fetchAllMiddleware = fetchAllMiddleware;
-apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
-apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
-
-export default apiFetch;
