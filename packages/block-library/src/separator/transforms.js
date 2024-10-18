@@ -18,6 +18,17 @@ const transforms = {
 			},
 		},
 	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/spacer' ],
+			transform: () => {
+				return createBlock( 'core/spacer', {
+					height: '50px',
+				} );
+			},
+		},
+	],
 };
 
 export default transforms;
