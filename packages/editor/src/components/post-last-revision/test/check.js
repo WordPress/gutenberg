@@ -47,7 +47,7 @@ describe( 'PostLastRevisionCheck', () => {
 		expect( screen.queryByText( 'Children' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should render anything if there is only one revision', () => {
+	it( 'should render if there is only one revision', () => {
 		setupDataMock( 1, 1 );
 
 		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
