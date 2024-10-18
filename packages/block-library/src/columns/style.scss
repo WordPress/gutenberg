@@ -94,19 +94,51 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
+	// Only apply display flex for vertically aligned columns.
+	&[class*="is-vertically-aligned-"] {
+		display: flex;
+		flex-direction: column;
+	}
+
+	// Columns need flex layout to achieve full height column when vertically
+	// aligned with a background color. This means normal float alignments for
+	// immediate children will not work properly. Allowing them to stretch full
+	// width then floating their contents gives reasonable compromise.
+	> .wp-block[data-align="left"] {
+		height: auto;
+
+		> * {
+			float: left;
+		}
+	}
+
+	> .wp-block[data-align="right"] {
+		height: auto;
+
+		> * {
+			float: right;
+		}
+	}
+
+	// Flex column layout requires this tweak so that inserter button is
+	// positioned correctly.
+	> .block-list-appender {
+		width: 100%;
+	}
+
 	/**
 	* Individual Column Alignment
 	*/
 	&.is-vertically-aligned-top {
-		align-self: flex-start;
+		justify-content: flex-start;
 	}
 
 	&.is-vertically-aligned-center {
-		align-self: center;
+		justify-content: center;
 	}
 
 	&.is-vertically-aligned-bottom {
-		align-self: flex-end;
+		justify-content: flex-end;
 	}
 
 	&.is-vertically-aligned-stretch {
@@ -118,4 +150,11 @@
 	&.is-vertically-aligned-bottom {
 		width: 100%;
 	}
+}
+
+// Once blocks are nested within columns that are vertically aligned, if they
+// are then aligned themselves full, wide etc they get auto margins effectively
+// shrinking their width.
+html :where(.wp-block-column[class*="is-vertically-aligned"] > .wp-block) {
+	width: 100%;
 }
