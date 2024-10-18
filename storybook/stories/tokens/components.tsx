@@ -6,7 +6,7 @@ import React from 'react';
 
 export const TokensTable = ( { tokenCategory, tokens, applyTokenStyle } ) => {
 	return (
-		<table>
+		<table style={ { width: '100%' } }>
 			<thead>
 				<tr>
 					<th>Token</th>
