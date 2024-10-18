@@ -88,7 +88,7 @@ export function ZoomOutSeparator( {
 					initial={ { height: 0 } }
 					animate={ {
 						// Use a height equal to that of the zoom out frame size.
-						height: 'calc(1 * var(--wp-block-editor-iframe-zoom-out-frame-size) / var(--wp-block-editor-iframe-zoom-out-scale)',
+						height: 'calc(1.5 * var(--wp-block-editor-iframe-zoom-out-frame-size) / var(--wp-block-editor-iframe-zoom-out-scale)',
 					} }
 					exit={ { height: 0 } }
 					transition={ {
