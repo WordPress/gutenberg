@@ -298,6 +298,41 @@ test.describe( 'Links', () => {
 		await expect( linkPopover ).toBeHidden();
 	} );
 
+	test( `can be edited when within a link but no selection has been made ("collapsed")`, async ( {
+		page,
+		editor,
+		LinkUtils,
+		pageUtils,
+	} ) => {
+		await LinkUtils.createLink();
+		await pageUtils.pressKeys( 'Escape' );
+		// Make a collapsed selection inside the link.
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowRight' );
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+		// Change the URL.
+		// getByPlaceholder required in order to handle Link Control component
+		// managing focus onto other inputs within the control.
+		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
+		await page.keyboard.type( '/handbook' );
+
+		// Submit the link.
+		await pageUtils.pressKeys( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is <a href="/handbook">Gutenberg</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `escape dismisses the Link UI popover and returns focus`, async ( {
 		admin,
 		page,
@@ -942,6 +977,31 @@ test.describe( 'Links', () => {
 					},
 				},
 			] );
+		} );
+
+		test( 'should not display text input when initially creating the link', async ( {
+			page,
+			editor,
+			LinkUtils,
+		} ) => {
+			// Create a block with some text.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.keyboard.type( 'This is Gutenberg: ' );
+
+			// Insert a link
+			await editor.clickBlockToolbarButton( 'Link' );
+
+			const linkPopover = LinkUtils.getLinkPopover();
+
+			// Check the Link UI is open before asserting on presence of text input
+			// within that control.
+			await expect( linkPopover ).toBeVisible();
+
+			// Let's check we've focused a text input.
+			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toBeHidden();
 		} );
 
 		test( 'should display text input when the link has a valid URL value', async ( {
