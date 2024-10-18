@@ -50,6 +50,11 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$search_query        = empty( $_GET['instant-search'] ) ? '' : sanitize_text_field( $_GET['instant-search'] );
+
+	// Check if the Instant Search experiment is enabled.
+	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
+	$instant_search_enabled = isset( $gutenberg_experiments['gutenberg-search-query-block'] ) && $gutenberg_experiments['gutenberg-search-query-block'];
 
 	// Use global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
@@ -67,9 +72,27 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		} else {
 			$query = $wp_query;
 		}
+
+		/*
+		 * If the following conditions are met, run a new query with the search query:
+		 * 1. Enhanced pagination is on.
+		 * 2. Instant search is enabled.
+		 * 3. The search query is not empty.
+		 * 4. The query already has posts.
+		 */
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) && $query->have_posts() ) {
+			$args  = array_merge( $query->query_vars, array( 's' => $search_query ) );
+			$query = new WP_Query( $args );
+		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+
+		// Add search parameter if enhanced pagination is on and search query exists
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
+			$query_args['s'] = $search_query;
+		}
+
+		$query = new WP_Query( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {

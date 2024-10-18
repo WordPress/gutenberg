@@ -3,7 +3,7 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { actions } = store(
+const { state, actions } = store(
 	'core/search',
 	{
 		state: {
@@ -29,14 +29,25 @@ const { actions } = store(
 				const { isSearchInputVisible } = getContext();
 				return isSearchInputVisible ? '0' : '-1';
 			},
+			get isSearchInputVisible() {
+				const ctx = getContext();
+
+				// `ctx.isSearchInputVisible` is a client-side-only context value, so
+				// if it's not set, it means that it's an initial page load, so we need
+				// to return the value of `ctx.isSearchInputInitiallyVisible`.
+				if ( typeof ctx.isSearchInputVisible === 'undefined' ) {
+					return ctx.isSearchInputInitiallyVisible;
+				}
+				return ctx.isSearchInputVisible;
+			},
 		},
 		actions: {
 			openSearchInput( event ) {
-				const ctx = getContext();
-				const { ref } = getElement();
-				if ( ! ctx.isSearchInputVisible ) {
+				if ( ! state.isSearchInputVisible ) {
 					event.preventDefault();
+					const ctx = getContext();
 					ctx.isSearchInputVisible = true;
+					const { ref } = getElement();
 					ref.parentElement.querySelector( 'input' ).focus();
 				}
 			},
@@ -65,6 +76,38 @@ const { actions } = store(
 				) {
 					actions.closeSearchInput();
 				}
+			},
+			*updateSearch( e ) {
+				const { value } = e.target;
+
+				// Don't navigate if the search didn't really change.
+				if ( value === state.search ) {
+					return;
+				}
+
+				state.search = value;
+
+				// Debounce the search by 300ms to prevent multiple navigations.
+				// We can do this by yielding a promise that resolves after 300ms and
+				// then bailing out if the search has changed.
+				yield new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
+				if ( value !== state.search ) {
+					return;
+				}
+
+				const url = new URL( window.location.href );
+				url.searchParams.delete( 'paged' );
+				if ( value ) {
+					url.searchParams.set( 'instant-search', value );
+				} else {
+					url.searchParams.delete( 'instant-search' );
+				}
+
+				const { actions: routerActions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+
+				routerActions.navigate( url.href );
 			},
 		},
 	},
