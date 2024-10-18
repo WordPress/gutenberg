@@ -74,26 +74,23 @@ _Example:_
 npm install change-case -w packages/a11y
 ```
 
-This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
-
-#### Removing Existing Dependencies
-
-Removing a dependency from one of the WordPress packages requires some manual work. You need to remove the line in the corresponding `dependencies` section of the `package.json` file.
+This command adds the `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder. If there was the same dependency installed then the version specified in the `package-lock.json` file is going to be reused. If you want to enforce a different version, you can do so by adding the `@` suffix to the package name.
 
 _Example:_
 
-```diff
-+++ b/packages/scripts/package.json
-@@ -43,7 +43,6 @@
-                "check-node-version": "^4.1.0",
-                "cross-spawn": "^5.1.0",
-                "eslint": "^7.1.0",
--               "jest": "^29.6.2",
-                "minimist": "^1.2.0",
-                "npm-package-json-lint": "^6.4.0",
+```bash
+npm install change-case@latest -w packages/a11y
 ```
 
-Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
+#### Removing Existing Dependencies
+
+Removing a dependency from one of the WordPress packages is similar to installation. You need to run a command like the following from the root of the project.
+
+_Example:_
+
+```bash
+npm uninstall change-case -w packages/a11y
+```
 
 #### Updating Existing Dependencies
 
