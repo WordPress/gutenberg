@@ -16,7 +16,6 @@
 		"url": "git+https://github.com/WordPress/gutenberg.git",
 		"directory": "packages/icons"
 	},
-	"sideEffects": false,
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
@@ -27,7 +26,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"wpScript": true,
 	"types": "build-types",
+	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
 		"@wordpress/element": "*",
@@ -35,6 +36,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }

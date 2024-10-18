@@ -27,8 +27,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"types": "build-types",
+	"wpScript": true,
 	"wpScriptModuleExports": "./build-module/module/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
 		"@wordpress/dom-ready": "*",
@@ -36,6 +37,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }

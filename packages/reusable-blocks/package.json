@@ -25,6 +25,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"wpScript": true,
 	"sideEffects": [
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
@@ -48,6 +49,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }
