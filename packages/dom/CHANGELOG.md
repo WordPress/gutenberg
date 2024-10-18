@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* This is an intentionally "misformatted" line.
+
 ## 4.10.0 (2024-10-16)
 
 ## 4.9.0 (2024-10-03)
