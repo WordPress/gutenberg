@@ -25,11 +25,12 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss",
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
-	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "*",
@@ -47,6 +48,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }

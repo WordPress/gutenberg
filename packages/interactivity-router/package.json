@@ -25,8 +25,8 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"types": "build-types",
 	"wpScriptModuleExports": "./build-module/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "*",
 		"@wordpress/interactivity": "*"

@@ -26,6 +26,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"wpScript": true,
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
 		"@react-spring/web": "^9.4.5",
@@ -81,6 +82,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }
