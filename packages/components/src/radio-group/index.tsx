@@ -7,6 +7,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useMemo, forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ function UnforwardedRadioGroup(
 		setValue: ( newValue ) => {
 			onChange?.( newValue ?? undefined );
 		},
+		rtl: isRTL(),
 	} );
 
 	const contextValue = useMemo(

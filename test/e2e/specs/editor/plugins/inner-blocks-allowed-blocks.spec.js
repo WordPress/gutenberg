@@ -45,7 +45,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',
@@ -92,7 +92,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
 		const blockLibrary = page
 			.getByRole( 'region', {
 				name: 'Block Library',

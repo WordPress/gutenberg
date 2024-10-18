@@ -411,7 +411,7 @@ function Layout( {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
-			const { __unstableGetEditorMode } = select( blockEditorStore );
+			const { isZoomOut } = unlock( select( blockEditorStore ) );
 			const { getEditorMode, getRenderingMode } = select( editorStore );
 			const isRenderingPostOnly = getRenderingMode() === 'post-only';
 
@@ -436,7 +436,7 @@ function Layout( {
 						? getEditedPostTemplateId()
 						: null,
 				enablePaddingAppender:
-					__unstableGetEditorMode() !== 'zoom-out' &&
+					! isZoomOut() &&
 					isRenderingPostOnly &&
 					! DESIGN_POST_TYPES.includes( currentPostType ),
 			};
