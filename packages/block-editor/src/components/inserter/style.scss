@@ -123,6 +123,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-header {
+	// Use `position: relative` to ensure any absolute positioned child elements are
+	// positioned relative to the panel header.
+	// This makes the overflow rule of the panel work correctly, particularly when the
+	// `VisuallyHidden` component is used within the inserter UI.
+	position: relative;
+
 	display: inline-flex;
 	align-items: center;
 	padding: $grid-unit-20 $grid-unit-20 0;
