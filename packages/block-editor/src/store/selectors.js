@@ -1628,7 +1628,7 @@ const isBlockVisibleInTheInserter = (
 	checkedBlocks.add( blockName );
 
 	// If parent blocks are not visible, child blocks should be hidden too.
-	if ( !! blockType.parent?.length ) {
+	if ( Array.isArray( blockType?.parent ) ) {
 		return blockType.parent.some(
 			( name ) =>
 				( blockName !== name &&
