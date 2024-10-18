@@ -27,7 +27,7 @@ function PostLastRevisionCheck( { children } ) {
 		};
 	}, [] );
 
-	if ( ! lastRevisionId || revisionsCount < 2 ) {
+	if ( ! lastRevisionId || revisionsCount < 1 ) {
 		return null;
 	}
 

@@ -39,12 +39,20 @@ describe( 'PostLastRevisionCheck', () => {
 		expect( screen.queryByText( 'Children' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should not render anything if there is only one revision', () => {
-		setupDataMock( 1, 1 );
+	it( 'should not render anything if there is less than one revision', () => {
+		setupDataMock( 1, 0 );
 
 		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
 
 		expect( screen.queryByText( 'Children' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'should render anything if there is only one revision', () => {
+		setupDataMock( 1, 1 );
+
+		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
+
+		expect( screen.queryByText( 'Children' ) ).toBeVisible();
 	} );
 
 	it( 'should render if there are two revisions', () => {
