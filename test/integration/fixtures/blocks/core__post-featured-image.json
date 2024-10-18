@@ -8,7 +8,8 @@
 			"rel": "",
 			"linkTarget": "_self",
 			"dimRatio": 0,
-			"useFirstImageFromPost": false
+			"useFirstImageFromPost": false,
+			"displayCaption": false
 		},
 		"innerBlocks": []
 	}
