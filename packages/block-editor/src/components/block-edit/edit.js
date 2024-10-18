@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { withFilters } from '@wordpress/components';
 import {
 	getBlockDefaultClassName,
-	hasBlockSupport,
+	getBlockVariationClassName,
 	getBlockType,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
@@ -18,6 +18,10 @@ import { useContext, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockContext from '../block-context';
+import {
+	hasBlockClassNameSupport,
+	hasVariationClassNameSupport,
+} from '../../hooks/supports';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -71,12 +75,23 @@ const EditWithGeneratedProps = ( props ) => {
 		return <EditWithFilters { ...props } context={ context } />;
 	}
 
-	// Generate a class name for the block's editable form.
-	const generatedClassName = hasBlockSupport( blockType, 'className', true )
-		? getBlockDefaultClassName( name )
-		: null;
+	const generatedClassNames = [];
+
+	if ( hasBlockClassNameSupport( blockType ) ) {
+		generatedClassNames.push( getBlockDefaultClassName( name ) );
+	}
+	if ( hasVariationClassNameSupport( blockType ) ) {
+		const variationClassName = getBlockVariationClassName(
+			blockType.name,
+			attributes
+		);
+		if ( variationClassName ) {
+			generatedClassNames.push( variationClassName );
+		}
+	}
+
 	const className = clsx(
-		generatedClassName,
+		generatedClassNames,
 		attributes.className,
 		props.className
 	);

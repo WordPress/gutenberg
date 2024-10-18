@@ -159,6 +159,8 @@ _Returns_
 
 Returns the block's default classname from its name.
 
+The return value can be filtered using the `blocks.getBlockDefaultClassName` filter.
+
 _Parameters_
 
 -   _blockName_ `string`: The block name.
@@ -238,6 +240,23 @@ Returns all registered blocks.
 _Returns_
 
 -   `Array`: Block settings.
+
+### getBlockVariationClassName
+
+Returns a block variation specific classname.
+
+If the given block matches a variation, the classname will be the block's default classname with the variation name appended (separated by a double underscore, i.e. `__`).
+
+Note that the block's default classname is affected by the `blocks.getBlockDefaultClassName` filter.
+
+_Parameters_
+
+-   _blockName_ `string`: The block name.
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `string|null`: The block variation classname, or null if the block doesn't match any variation.
 
 ### getChildBlockNames
 
