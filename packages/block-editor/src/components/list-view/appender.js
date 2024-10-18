@@ -15,6 +15,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import Inserter from '../inserter';
 import AriaReferencedText from './aria-referenced-text';
+import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
@@ -23,13 +24,11 @@ export const Appender = forwardRef(
 		const instanceId = useInstanceId( Appender );
 		const hideInserter = useSelect(
 			( select ) => {
-				const { getTemplateLock, __unstableGetEditorMode } =
-					select( blockEditorStore );
-
-				return (
-					!! getTemplateLock( clientId ) ||
-					__unstableGetEditorMode() === 'zoom-out'
+				const { getTemplateLock, isZoomOut } = unlock(
+					select( blockEditorStore )
 				);
+
+				return !! getTemplateLock( clientId ) || isZoomOut();
 			},
 			[ clientId ]
 		);

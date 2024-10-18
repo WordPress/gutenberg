@@ -1,7 +1,6 @@
-<!-- This file is generated automatically and cannot be edited directly. -->
-
 # AnglePickerControl
 
+<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-anglepickercontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 

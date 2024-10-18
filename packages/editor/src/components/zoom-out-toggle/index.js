@@ -23,7 +23,7 @@ const ZoomOutToggle = () => {
 		),
 	} ) );
 
-	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
+	const { resetZoomLevel, setZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -33,7 +33,6 @@ const ZoomOutToggle = () => {
 		} else {
 			setZoomLevel( 50 );
 		}
-		__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 	};
 
 	return (
