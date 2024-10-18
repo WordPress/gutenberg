@@ -50,7 +50,7 @@ addFilter(
 export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecords } = resolveSelect( coreStore );
+	const { getEntityRecords, getEntityRecord } = resolveSelect( coreStore );
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( editorStore );
@@ -189,11 +189,18 @@ export default function CollabSidebar() {
 	};
 
 	const onCommentDelete = async ( commentId ) => {
+		const childComment = await getEntityRecord(
+			'root',
+			'comment',
+			commentId
+		);
 		await deleteEntityRecord( 'root', 'comment', commentId );
 
-		updateBlockAttributes( clientId, {
-			blockCommentId: undefined,
-		} );
+		if ( childComment && ! childComment.parent ) {
+			updateBlockAttributes( clientId, {
+				blockCommentId: undefined,
+			} );
+		}
 
 		createNotice(
 			'snackbar',
