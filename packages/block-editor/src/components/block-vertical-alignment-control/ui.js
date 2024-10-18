@@ -3,37 +3,33 @@
  */
 import { _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import {
-	alignTop,
-	alignCenter,
-	alignBottom,
-	alignStretch,
-	spaceBetween,
-} from './icons';
+	alignItemTop,
+	alignItemCenter,
+	alignItemBottom,
+	alignItemStretch,
+	alignItemSpaceBetween,
+} from '@wordpress/icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
-		icon: alignTop,
+		icon: alignItemTop,
 		title: _x( 'Align top', 'Block vertical alignment setting' ),
 	},
 	center: {
-		icon: alignCenter,
+		icon: alignItemCenter,
 		title: _x( 'Align middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
-		icon: alignBottom,
+		icon: alignItemBottom,
 		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
 	},
 	stretch: {
-		icon: alignStretch,
+		icon: alignItemStretch,
 		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
 	},
 	'space-between': {
-		icon: spaceBetween,
+		icon: alignItemSpaceBetween,
 		title: _x( 'Space between', 'Block vertical alignment setting' ),
 	},
 };
