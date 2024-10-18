@@ -100,6 +100,12 @@
 		/*rtl:raw: direction: rtl; */
 	}
 
+	&.has-no-zindex-in-inner-blocks {
+		.wp-block-cover__inner-container {
+			position: relative; // It needs a position to be on top of the other elements.
+		}
+	}
+
 	// Position: Top
 	&.is-position-top-left {
 		align-items: flex-start;
