@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import {
+	getActiveBlockVariation,
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
@@ -34,6 +35,8 @@ import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 /**
  * Returns the block's default classname from its name.
  *
+ * The return value can be filtered using the `blocks.getBlockDefaultClassName` filter.
+ *
  * @param {string} blockName The block name.
  *
  * @return {string} The block's default class.
@@ -49,6 +52,28 @@ export function getBlockDefaultClassName( blockName ) {
 		className,
 		blockName
 	);
+}
+
+/**
+ * Returns a block variation specific classname.
+ *
+ * If the given block matches a variation, the classname will be the block's default classname
+ * with the variation name appended (separated by a double underscore, i.e. `__`).
+ *
+ * Note that the block's default classname  is affected by the `blocks.getBlockDefaultClassName` filter.
+ *
+ * @param {string} blockName  The block name.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {string|null} The block variation classname, or null if the block doesn't match any variation.
+ */
+export function getBlockVariationClassName( blockName, attributes ) {
+	const activeVariation = getActiveBlockVariation( blockName, attributes );
+	if ( ! activeVariation ) {
+		return null;
+	}
+
+	return getBlockDefaultClassName( blockName ) + '__' + activeVariation.name;
 }
 
 /**
