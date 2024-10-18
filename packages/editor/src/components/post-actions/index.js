@@ -126,7 +126,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 						action.id
 					) }` }
 					focusOnMount="firstContentElement"
-					size="small"
+					size="medium"
 				>
 					<RenderModal
 						items={ [ item ] }

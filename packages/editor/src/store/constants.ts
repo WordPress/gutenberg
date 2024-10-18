@@ -23,6 +23,7 @@ export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
 export const PATTERN_POST_TYPE = 'wp_block';
 export const NAVIGATION_POST_TYPE = 'wp_navigation';
+export const PAGE_POST_TYPE = 'page';
 export const TEMPLATE_ORIGINS = {
 	custom: 'custom',
 	theme: 'theme',

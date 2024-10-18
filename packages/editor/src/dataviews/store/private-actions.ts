@@ -20,6 +20,7 @@ import {
 	exportPattern,
 	permanentlyDeletePost,
 	restorePost,
+	setAsHomepage,
 	trashPost,
 	renamePost,
 	resetPost,
@@ -87,6 +88,14 @@ export const registerPostTypeActions =
 				kind: 'postType',
 				name: postType,
 			} );
+
+		const canManageOptions = await registry
+			.resolveSelect( coreStore )
+			.canUser( 'update', {
+				kind: 'root',
+				name: 'site',
+			} );
+
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
@@ -113,6 +122,9 @@ export const registerPostTypeActions =
 				? duplicatePattern
 				: undefined,
 			postTypeConfig.supports?.title ? renamePost : undefined,
+			canManageOptions && postTypeConfig.slug === 'page'
+				? setAsHomepage
+				: undefined,
 			postTypeConfig?.supports?.[ 'page-attributes' ]
 				? reorderPage
 				: undefined,
