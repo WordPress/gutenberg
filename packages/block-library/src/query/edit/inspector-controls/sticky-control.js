@@ -8,6 +8,7 @@ const stickyOptions = [
 	{ label: __( 'Include' ), value: '' },
 	{ label: __( 'Exclude' ), value: 'exclude' },
 	{ label: __( 'Only' ), value: 'only' },
+	{ label: __( 'Ignore' ), value: 'ignore' },
 ];
 
 export default function StickyControl( { value, onChange } ) {
