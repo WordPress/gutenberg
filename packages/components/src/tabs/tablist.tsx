@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,11 +15,10 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { TabListProps } from './types';
+import type { WordPressComponentProps } from '../context';
+import type { ElementOffsetRect } from '../utils/element-rect';
 import { useTabsContext } from './context';
 import { StyledTabList } from './styles';
-import type { WordPressComponentProps } from '../context';
-import clsx from 'clsx';
-import type { ElementOffsetRect } from '../utils/element-rect';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
