@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
@@ -8,6 +9,9 @@ import { useDispatch, useRegistry } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../store';
 import { useBlockEditContext } from '../components/block-edit';
+import { unlock } from '../lock-unlock';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
@@ -145,5 +149,83 @@ export function useBlockBindingsUtils( clientId ) {
 		} );
 	};
 
-	return { updateBlockBindings, removeAllBlockBindings };
+	/**
+	 * Component to list the fields that can be connected.
+	 * This allows other sources to reuse the UI created for "Post Meta".
+	 *
+	 * @param {Object} props                  Props needed to render the component.
+	 * @param {Object} props.fields           List of fields to include in the dropdown. Each field is an object with a label and a value.
+	 * @param {string} props.source           Name of the source that triggers the component.
+	 * @param {string} props.attribute        Attribute that is being updated.
+	 * @param {Object} [props.currentBinding] Optional object containing the current binding for that attribute if it exists.
+	 *
+	 * @example
+	 * ```js
+	 * import { useBlockBindingsUtils } from '@wordpress/block-editor'
+	 *
+	 * const { FieldsList } = useBlockBindingsUtils();
+	 * registerBlockBindingsSource( {
+	 *     name: 'core/custom-source',
+	 *     label: 'Custom Source',
+	 *     getValues: () => {},
+	 *     render: ( { attribute, binding }) => {
+	 *         const fields = {
+	 * 		       field_1: {
+	 * 			       label: 'Field 1 Label',
+	 * 			       value: 'Field 1 Value',
+	 * 		       },
+	 * 		       field_2: {
+	 * 			       label: 'Field 2 Label',
+	 * 			       value: 'Field 2 Value',
+	 * 		       },
+	 *         };
+	 *         return (
+	 *             <FieldsList
+	 *                 fields={ fields }
+	 *                 source="core/custom-source"
+	 *                 attribute={ attribute }
+	 *                 currentBinding={ binding }
+	 *             />
+	 *         );
+	 *     } );
+	 * } );
+	 * ```
+	 *
+	 * @return {Function} Component to list the fields that can be connected.
+	 */
+	const FieldsList = ( { fields, source, attribute, currentBinding } ) => {
+		if ( ! Object.keys( fields || {} ).length ) {
+			return null;
+		}
+
+		return (
+			<DropdownMenuV2.Group>
+				{ Object.entries( fields ).map( ( [ key, args ] ) => (
+					<DropdownMenuV2.RadioItem
+						key={ key }
+						onChange={ () =>
+							updateBlockBindings( {
+								[ attribute ]: {
+									source,
+									args: { key },
+								},
+							} )
+						}
+						name={ attribute + '-binding' }
+						value={ key }
+						checked={ key === currentBinding?.args?.key }
+					>
+						<DropdownMenuV2.ItemLabel>
+							{ args?.label }
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							{ args?.value }
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+				) ) }
+			</DropdownMenuV2.Group>
+		);
+	};
+
+	return { updateBlockBindings, removeAllBlockBindings, FieldsList };
 }

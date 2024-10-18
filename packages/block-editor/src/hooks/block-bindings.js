@@ -16,7 +16,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, Fragment } from '@wordpress/element';
+import { useContext, cloneElement } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -34,8 +34,6 @@ import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
-const EMPTY_OBJECT = {};
-
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -49,57 +47,87 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+function BlockBindingsPanelDropdown( { attribute, binding } ) {
+	const blockContext = useContext( BlockContext );
 	const registeredSources = getBlockBindingsSources();
-	const { updateBlockBindings } = useBlockBindingsUtils();
-	const currentKey = binding?.args?.key;
-	return (
-		<>
-			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
-				<Fragment key={ name }>
-					<DropdownMenuV2.Group>
-						{ Object.keys( fieldsList ).length > 1 && (
-							<DropdownMenuV2.GroupLabel>
-								{ registeredSources[ name ].label }
-							</DropdownMenuV2.GroupLabel>
-						) }
-						{ Object.entries( fields ).map( ( [ key, args ] ) => (
-							<DropdownMenuV2.RadioItem
-								key={ key }
-								onChange={ () =>
-									updateBlockBindings( {
-										[ attribute ]: {
-											source: name,
-											args: { key },
-										},
-									} )
-								}
-								name={ attribute + '-binding' }
-								value={ key }
-								checked={ key === currentKey }
-							>
-								<DropdownMenuV2.ItemLabel>
-									{ args?.label }
-								</DropdownMenuV2.ItemLabel>
-								<DropdownMenuV2.ItemHelpText>
-									{ args?.value }
-								</DropdownMenuV2.ItemHelpText>
-							</DropdownMenuV2.RadioItem>
-						) ) }
-					</DropdownMenuV2.Group>
-					{ i !== Object.keys( fieldsList ).length - 1 && (
-						<DropdownMenuV2.Separator />
-					) }
-				</Fragment>
-			) ) }
-		</>
+	// Get a new object with the rendered components to check if they are null.
+	const sourcesComponents = Object.entries( registeredSources ).reduce(
+		( acc, [ name, { render, usesContext } ] ) => {
+			const context = {};
+			if ( usesContext?.length ) {
+				for ( const key of usesContext ) {
+					context[ key ] = blockContext[ key ];
+				}
+			}
+
+			if ( render ) {
+				const SourceComponent = render( {
+					context,
+					attribute,
+					binding,
+				} );
+				// Only add the component if it's not null.
+				if ( SourceComponent ) {
+					acc[ name ] = SourceComponent;
+				}
+			}
+
+			return acc;
+		},
+		{}
+	);
+
+	// Return null if there are no components to render.
+	if ( Object.keys( sourcesComponents ).length === 0 ) {
+		return null;
+	}
+
+	return Object.entries( sourcesComponents ).map(
+		( [ sourceName, SourceComponent ] ) => {
+			return (
+				<DropdownMenuV2
+					key={ sourceName }
+					// TODO: Review mobile version.
+					placement="left-start"
+					gutter={ 8 }
+					trigger={
+						<DropdownMenuV2.Item>
+							{ registeredSources[ sourceName ].label }
+						</DropdownMenuV2.Item>
+					}
+				>
+					{ cloneElement( SourceComponent ) }
+				</DropdownMenuV2>
+			);
+		}
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
-	const { source: sourceName, args } = binding || {};
+function BlockBindingsAttribute( { attribute, binding } ) {
+	const blockContext = useContext( BlockContext );
+	const { source: sourceName } = binding || {};
 	const sourceProps = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
+	const bindingLabel = useSelect( ( select ) => {
+		if ( isSourceInvalid ) {
+			return;
+		}
+		// TODO: Explore if it makes sense to get the context in the parent component.
+		const { usesContext } = sourceProps;
+		const context = {};
+		if ( usesContext?.length ) {
+			for ( const key of usesContext ) {
+				context[ key ] = blockContext[ key ];
+			}
+		}
+		const _bindingsLabel = sourceProps?.getBindingLabel?.( {
+			select,
+			context,
+			attribute,
+			binding,
+		} );
+		return _bindingsLabel || sourceProps?.label || sourceName;
+	} );
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
@@ -109,18 +137,14 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 					variant={ ! isSourceInvalid && 'muted' }
 					isDestructive={ isSourceInvalid }
 				>
-					{ isSourceInvalid
-						? __( 'Invalid source' )
-						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
-						  sourceProps?.label ||
-						  sourceName }
+					{ isSourceInvalid ? __( 'Invalid source' ) : bindingLabel }
 				</Text>
 			) }
 		</VStack>
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
+function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
@@ -128,7 +152,6 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						fieldsList={ fieldsList }
 					/>
 				</Item>
 			) ) }
@@ -136,17 +159,37 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 	);
 }
 
-function EditableBlockBindingsPanelItems( {
-	attributes,
-	bindings,
-	fieldsList,
-} ) {
+function EditableBlockBindingsPanelItems( { attributes, bindings } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
 			{ attributes.map( ( attribute ) => {
 				const binding = bindings[ attribute ];
+				// Check if the DropdownComponent renders something that is valid and not null.
+				// TODO: Look for a better way to do this.
+				const DropdownComponent = (
+					<BlockBindingsPanelDropdown
+						attribute={ attribute }
+						binding={ binding }
+					/>
+				);
+				const renderedDropdown = DropdownComponent.type(
+					DropdownComponent.props
+				);
+
+				// Return a non-dropdown item if the dropdown component is null.
+				if ( ! renderedDropdown ) {
+					return (
+						<Item key={ attribute }>
+							<BlockBindingsAttribute
+								attribute={ attribute }
+								binding={ binding }
+							/>
+						</Item>
+					);
+				}
+
 				return (
 					<ToolsPanelItem
 						key={ attribute }
@@ -168,16 +211,11 @@ function EditableBlockBindingsPanelItems( {
 									<BlockBindingsAttribute
 										attribute={ attribute }
 										binding={ binding }
-										fieldsList={ fieldsList }
 									/>
 								</Item>
 							}
 						>
-							<BlockBindingsPanelDropdown
-								fieldsList={ fieldsList }
-								attribute={ attribute }
-								binding={ binding }
-							/>
+							{ cloneElement( DropdownComponent ) }
 						</DropdownMenuV2>
 					</ToolsPanelItem>
 				);
@@ -187,54 +225,15 @@ function EditableBlockBindingsPanelItems( {
 }
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
-	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// `useSelect` is used purposely here to ensure `getFieldsList`
-	// is updated whenever there are updates in block context.
-	// `source.getFieldsList` may also call a selector via `select`.
-	const _fieldsList = {};
-	const { fieldsList, canUpdateBlockBindings } = useSelect(
-		( select ) => {
-			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [ sourceName, { getFieldsList, usesContext } ] ) => {
-					if ( getFieldsList ) {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
-						const sourceList = getFieldsList( {
-							select,
-							context,
-						} );
-						// Only add source if the list is not empty.
-						if ( Object.keys( sourceList || {} ).length ) {
-							_fieldsList[ sourceName ] = { ...sourceList };
-						}
-					}
-				}
-			);
-			return {
-				fieldsList:
-					Object.values( _fieldsList ).length > 0
-						? _fieldsList
-						: EMPTY_OBJECT,
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
-			};
-		},
-		[ blockContext, bindableAttributes ]
-	);
+	// Lock the UI when the user can't update bindings or there are no components.
+	const readOnly = useSelect( ( select ) => {
+		return ! select( blockEditorStore ).getSettings()
+			.canUpdateBlockBindings;
+	}, [] );
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
@@ -250,10 +249,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			delete filteredBindings[ key ];
 		}
 	} );
-
-	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly =
-		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
@@ -273,13 +268,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ readOnly ? (
 						<ReadOnlyBlockBindingsPanelItems
 							bindings={ filteredBindings }
-							fieldsList={ fieldsList }
 						/>
 					) : (
 						<EditableBlockBindingsPanelItems
 							attributes={ bindableAttributes }
 							bindings={ filteredBindings }
-							fieldsList={ fieldsList }
 						/>
 					) }
 				</ItemGroup>
