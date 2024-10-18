@@ -225,6 +225,48 @@
 		}
 	}
 
+	.prev-button,
+	.next-button {
+		display: none;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		padding: 0;
+		cursor: pointer;
+		z-index: 5000000;
+		min-width: 40px; // equivalent to $button-size-next-default-40px
+		min-height: 40px; // equivalent to $button-size-next-default-40px;
+		align-items: center;
+		justify-content: center;
+
+		&[hidden] {
+			display: none;
+		}
+
+		&[aria-disabled="true"] {
+			opacity: 0.3;
+		}
+
+		&:hover,
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
+			background: none;
+			border: none;
+		}
+
+		@include break-mobile() {
+			display: flex;
+		}
+	}
+
+	.prev-button {
+		left: calc(env(safe-area-inset-left) + 16px); // equivalent to $grid-unit-20
+	}
+
+	.next-button {
+		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
+	}
+
 	.lightbox-image-container {
 		position: absolute;
 		overflow: hidden;
