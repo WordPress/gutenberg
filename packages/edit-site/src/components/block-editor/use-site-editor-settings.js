@@ -39,7 +39,7 @@ function useNavigateToPreviousEntityRecord() {
 
 export function useSpecificEditorSettings() {
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
 	const { settings, shouldUseTemplateAsDefaultRenderingMode } = useSelect(
 		( select ) => {
@@ -68,15 +68,15 @@ export function useSpecificEditorSettings() {
 
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode !== 'view',
+			focusMode: canvas !== 'view',
 			defaultRenderingMode,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			__unstableIsPreviewMode: canvasMode === 'view',
+			__unstableIsPreviewMode: canvas === 'view',
 		};
 	}, [
 		settings,
-		canvasMode,
+		canvas,
 		defaultRenderingMode,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,

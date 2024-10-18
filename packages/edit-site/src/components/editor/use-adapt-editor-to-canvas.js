@@ -7,7 +7,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { useLayoutEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
-export function useAdaptEditorToCanvas( canvasMode ) {
+export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const {
 		setDeviceType,
@@ -31,7 +31,7 @@ export function useAdaptEditorToCanvas( canvasMode ) {
 			// This behavior is disabled for small viewports.
 			if (
 				isMediumOrBigger &&
-				canvasMode === 'edit' &&
+				canvas === 'edit' &&
 				getPreference( 'core', 'showListViewByDefault' ) &&
 				! getPreference( 'core', 'distractionFree' )
 			) {
@@ -41,7 +41,7 @@ export function useAdaptEditorToCanvas( canvasMode ) {
 			}
 		} );
 	}, [
-		canvasMode,
+		canvas,
 		registry,
 		clearSelectedBlock,
 		setDeviceType,

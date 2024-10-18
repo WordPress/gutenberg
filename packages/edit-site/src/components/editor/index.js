@@ -81,9 +81,9 @@ const siteIconVariants = {
 export default function EditSiteEditor( { isPostsList = false } ) {
 	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const isLoading = useIsSiteEditorLoading();
-	useAdaptEditorToCanvas( canvasMode );
+	useAdaptEditorToCanvas( canvas );
 	const {
 		editedPostType,
 		editedPostId,
@@ -129,7 +129,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-	const isEditMode = canvasMode === 'edit';
+	const isEditMode = canvas === 'edit';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
@@ -144,14 +144,14 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 				css:
-					canvasMode === 'view'
+					canvas === 'view'
 						? `body{min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
 						  }}`
 						: undefined,
 			},
 		],
-		[ settings.styles, canvasMode, currentPostIsTrashed ]
+		[ settings.styles, canvas, currentPostIsTrashed ]
 	);
 	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
@@ -289,8 +289,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 													history.push(
 														{
 															...params,
-															canvasMode:
-																undefined,
+															canvas: undefined,
 														},
 														undefined,
 														{

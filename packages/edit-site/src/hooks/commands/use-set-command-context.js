@@ -20,7 +20,7 @@ const { useLocation } = unlock( routerPrivateApis );
  */
 export default function useSetCommandContext() {
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const hasBlockSelected = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockSelectionStart();
 	}, [] );
@@ -29,7 +29,7 @@ export default function useSetCommandContext() {
 
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
-	if ( canvasMode === 'edit' ) {
+	if ( canvas === 'edit' ) {
 		commandContext = 'entity-edit';
 	}
 	if ( hasBlockSelected ) {

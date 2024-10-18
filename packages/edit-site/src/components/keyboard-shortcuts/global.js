@@ -21,7 +21,7 @@ function KeyboardShortcutsGlobal() {
 	const { hasNonPostEntityChanges } = useSelect( editorStore );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -32,7 +32,7 @@ function KeyboardShortcutsGlobal() {
 			isSavingEntityRecord( record.kind, record.name, record.key )
 		);
 		const _hasNonPostEntityChanges = hasNonPostEntityChanges();
-		const isViewMode = canvasMode === 'view';
+		const isViewMode = canvas === 'view';
 		if (
 			( ! hasDirtyEntities || ! _hasNonPostEntityChanges || isSaving ) &&
 			! isViewMode

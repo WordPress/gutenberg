@@ -25,7 +25,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 function usePageContentFocusCommands() {
 	const { record: template } = useEditedEntityRecord();
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const { isPage, templateId, currentPostType } = useSelect( ( select ) => {
 		const { isPage: _isPage } = unlock( select( editSiteStore ) );
 		const { getCurrentPostType, getCurrentTemplateId } =
@@ -44,7 +44,7 @@ function usePageContentFocusCommands() {
 
 	const { setRenderingMode } = useDispatch( editorStore );
 
-	if ( ! isPage || canvasMode !== 'edit' ) {
+	if ( ! isPage || canvas !== 'edit' ) {
 		return { isLoading: false, commands: [] };
 	}
 

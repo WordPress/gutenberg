@@ -31,7 +31,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 function useGlobalStylesOpenStylesCommands() {
 	const { openGeneralSidebar } = unlock( useDispatch( editSiteStore ) );
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const history = useHistory();
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
@@ -54,9 +54,9 @@ function useGlobalStylesOpenStylesCommands() {
 							canvas: 'edit',
 						} );
 					}
-					if ( params.postId && canvasMode !== 'edit' ) {
+					if ( params.postId && canvas !== 'edit' ) {
 						history.push(
-							{ ...params, canvasMode: 'edit' },
+							{ ...params, canvas: 'edit' },
 							undefined,
 							{
 								transition: 'canvas-mode-edit-transition',
@@ -68,7 +68,7 @@ function useGlobalStylesOpenStylesCommands() {
 				icon: styles,
 			},
 		];
-	}, [ history, openGeneralSidebar, params, canvasMode, isBlockBasedTheme ] );
+	}, [ history, openGeneralSidebar, params, canvas, isBlockBasedTheme ] );
 
 	return {
 		isLoading: false,
@@ -79,7 +79,7 @@ function useGlobalStylesOpenStylesCommands() {
 function useGlobalStylesToggleWelcomeGuideCommands() {
 	const { openGeneralSidebar } = unlock( useDispatch( editSiteStore ) );
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const { set } = useDispatch( preferencesStore );
 
 	const history = useHistory();
@@ -104,11 +104,11 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 							canvas: 'edit',
 						} );
 					}
-					if ( params.postId && canvasMode !== 'edit' ) {
+					if ( params.postId && canvas !== 'edit' ) {
 						history.push(
 							{
 								...params,
-								canvasMode: 'edit',
+								canvas: 'edit',
 							},
 							undefined,
 							{
@@ -130,7 +130,7 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 	}, [
 		history,
 		openGeneralSidebar,
-		canvasMode,
+		canvas,
 		isBlockBasedTheme,
 		set,
 		params,
@@ -173,7 +173,7 @@ function useGlobalStylesOpenCssCommands() {
 		useDispatch( editSiteStore )
 	);
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const history = useHistory();
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -207,7 +207,7 @@ function useGlobalStylesOpenCssCommands() {
 							canvas: 'edit',
 						} );
 					}
-					if ( params.postId && canvasMode !== 'edit' ) {
+					if ( params.postId && canvas !== 'edit' ) {
 						history.push(
 							{
 								...params,
@@ -229,7 +229,7 @@ function useGlobalStylesOpenCssCommands() {
 		openGeneralSidebar,
 		setEditorCanvasContainerView,
 		canEditCSS,
-		canvasMode,
+		canvas,
 		params,
 	] );
 	return {
@@ -243,7 +243,7 @@ function useGlobalStylesOpenRevisionsCommands() {
 		useDispatch( editSiteStore )
 	);
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const history = useHistory();
 	const hasRevisions = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -273,7 +273,7 @@ function useGlobalStylesOpenRevisionsCommands() {
 							canvas: 'edit',
 						} );
 					}
-					if ( params.postId && canvasMode !== 'edit' ) {
+					if ( params.postId && canvas !== 'edit' ) {
 						history.push(
 							{
 								...params,
@@ -295,7 +295,7 @@ function useGlobalStylesOpenRevisionsCommands() {
 		history,
 		openGeneralSidebar,
 		setEditorCanvasContainerView,
-		canvasMode,
+		canvas,
 		params,
 	] );
 

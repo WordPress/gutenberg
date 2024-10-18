@@ -23,7 +23,7 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 export default function useEditorIframeProps() {
 	const { params } = useLocation();
 	const history = useHistory();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const currentPostIsTrashed = useSelect( ( select ) => {
 		return (
 			select( editorStore ).getCurrentPostAttribute( 'status' ) ===
@@ -33,10 +33,10 @@ export default function useEditorIframeProps() {
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
-		if ( canvasMode === 'edit' ) {
+		if ( canvas === 'edit' ) {
 			setIsFocused( false );
 		}
-	}, [ canvasMode ] );
+	}, [ canvas ] );
 
 	// In view mode, make the canvas iframe be perceived and behave as a button
 	// to switch to edit mode, with a meaningful label and no title attribute.
@@ -55,13 +55,13 @@ export default function useEditorIframeProps() {
 				! currentPostIsTrashed
 			) {
 				event.preventDefault();
-				history.push( { ...params, canvasMode: 'edit' }, undefined, {
+				history.push( { ...params, canvas: 'edit' }, undefined, {
 					transition: 'canvas-mode-edit-transition',
 				} );
 			}
 		},
 		onClick: () => {
-			history.push( { ...params, canvasMode: 'edit' }, undefined, {
+			history.push( { ...params, canvas: 'edit' }, undefined, {
 				transition: 'canvas-mode-edit-transition',
 			} );
 		},
@@ -76,8 +76,8 @@ export default function useEditorIframeProps() {
 
 	return {
 		className: clsx( 'edit-site-visual-editor__editor-canvas', {
-			'is-focused': isFocused && canvasMode === 'view',
+			'is-focused': isFocused && canvas === 'view',
 		} ),
-		...( canvasMode === 'view' ? viewModeIframeProps : {} ),
+		...( canvas === 'view' ? viewModeIframeProps : {} ),
 	};
 }

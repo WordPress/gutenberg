@@ -89,7 +89,7 @@ function ResizableFrame( {
 } ) {
 	const history = useHistory();
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const disableMotion = useReducedMotion();
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
@@ -161,7 +161,7 @@ function ResizableFrame( {
 			history.push(
 				{
 					...params,
-					canvasMode: 'edit',
+					canvas: 'edit',
 				},
 				undefined,
 				{
@@ -246,7 +246,7 @@ function ResizableFrame( {
 				}
 			} }
 			whileHover={
-				canvasMode === 'view'
+				canvas === 'view'
 					? {
 							scale: 1.005,
 							transition: {
@@ -284,7 +284,7 @@ function ResizableFrame( {
 			onMouseOver={ () => setShouldShowHandle( true ) }
 			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				[ isRTL() ? 'right' : 'left' ]: canvasMode === 'view' && (
+				[ isRTL() ? 'right' : 'left' ]: canvas === 'view' && (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
 							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }

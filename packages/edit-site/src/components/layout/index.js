@@ -52,7 +52,7 @@ const ANIMATION_DURATION = 0.3;
 
 export default function Layout( { route } ) {
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	useCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
@@ -64,19 +64,19 @@ export default function Layout( { route } ) {
 		useState( false );
 	const { name: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: routeKey + '-' + canvasMode,
+		triggerAnimationOnChange: routeKey + '-' + canvas,
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
-	const previousCanvaMode = usePrevious( canvasMode );
+	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
 			toggleRef.current?.focus();
 		}
 		// Should not depend on the previous canvas mode value but the next.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ canvasMode ] );
+	}, [ canvas ] );
 
 	return (
 		<>
@@ -90,7 +90,7 @@ export default function Layout( { route } ) {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-full-canvas': canvasMode === 'edit',
+						'is-full-canvas': canvas === 'edit',
 					}
 				) }
 			>
@@ -105,7 +105,7 @@ export default function Layout( { route } ) {
 							className="edit-site-layout__sidebar-region"
 						>
 							<AnimatePresence>
-								{ canvasMode === 'view' && (
+								{ canvas === 'view' && (
 									<motion.div
 										initial={ { opacity: 0 } }
 										animate={ { opacity: 1 } }
@@ -143,7 +143,7 @@ export default function Layout( { route } ) {
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
-							{ canvasMode !== 'edit' && (
+							{ canvas !== 'edit' && (
 								<SidebarContent routeKey={ routeKey }>
 									<SiteHubMobile
 										ref={ toggleRef }
@@ -159,7 +159,7 @@ export default function Layout( { route } ) {
 
 					{ ! isMobileViewport &&
 						areas.content &&
-						canvasMode !== 'edit' && (
+						canvas !== 'edit' && (
 							<div
 								className="edit-site-layout__area"
 								style={ {
@@ -198,9 +198,7 @@ export default function Layout( { route } ) {
 									<ErrorBoundary>
 										<ResizableFrame
 											isReady={ ! isEditorLoading }
-											isFullWidth={
-												canvasMode === 'edit'
-											}
+											isFullWidth={ canvas === 'edit' }
 											defaultSize={ {
 												width:
 													canvasSize.width -

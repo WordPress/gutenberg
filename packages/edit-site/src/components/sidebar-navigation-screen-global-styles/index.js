@@ -54,7 +54,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 				history.push(
 					{
 						...params,
-						canvasMode: 'edit',
+						canvas: 'edit',
 					},
 					undefined,
 					{
@@ -71,7 +71,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const history = useHistory();
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -102,7 +102,7 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 		history.push(
 			{
 				...params,
-				canvasMode: 'edit',
+				canvas: 'edit',
 			},
 			undefined,
 			{
@@ -184,18 +184,16 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					</>
 				}
 			/>
-			{ isStyleBookOpened &&
-				! isMobileViewport &&
-				canvasMode === 'view' && (
-					<StyleBook
-						enableResizing={ false }
-						isSelected={ () => false }
-						onClick={ openStyleBook }
-						onSelect={ openStyleBook }
-						showCloseButton={ false }
-						showTabs={ false }
-					/>
-				) }
+			{ isStyleBookOpened && ! isMobileViewport && canvas === 'view' && (
+				<StyleBook
+					enableResizing={ false }
+					isSelected={ () => false }
+					onClick={ openStyleBook }
+					onSelect={ openStyleBook }
+					showCloseButton={ false }
+					showTabs={ false }
+				/>
+			) }
 		</>
 	);
 }

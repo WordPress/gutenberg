@@ -28,7 +28,7 @@ const { useLocation } = unlock( routerPrivateApis );
 
 export default function GlobalStylesSidebar() {
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const {
 		shouldClearCanvasContainerView,
 		isStyleBookOpened,
@@ -45,7 +45,7 @@ export default function GlobalStylesSidebar() {
 			const canvasContainerView = getEditorCanvasContainerView();
 			const _isVisualEditorMode =
 				'visual' === select( editorStore ).getEditorMode();
-			const _isEditCanvasMode = 'edit' === canvasMode;
+			const _isEditCanvasMode = 'edit' === canvas;
 			const _showListViewByDefault = select( preferencesStore ).get(
 				'core',
 				'showListViewByDefault'
@@ -76,7 +76,7 @@ export default function GlobalStylesSidebar() {
 					'global-styles-revisions' === canvasContainerView,
 			};
 		},
-		[ canvasMode ]
+		[ canvas ]
 	);
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )

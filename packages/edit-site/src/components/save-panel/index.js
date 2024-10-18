@@ -91,7 +91,7 @@ const _EntitiesSavedStates = ( { onClose, renderDialog = undefined } ) => {
 
 export default function SavePanel() {
 	const { params } = useLocation();
-	const { canvasMode = 'view' } = params;
+	const { canvas = 'view' } = params;
 	const { isSaveViewOpen, isDirty, isSaving } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
@@ -117,9 +117,9 @@ export default function SavePanel() {
 	const onClose = () => setIsSaveViewOpened( false );
 	useEffect( () => {
 		setIsSaveViewOpened( false );
-	}, [ canvasMode, setIsSaveViewOpened ] );
+	}, [ canvas, setIsSaveViewOpened ] );
 
-	if ( canvasMode === 'view' ) {
+	if ( canvas === 'view' ) {
 		return isSaveViewOpen ? (
 			<Modal
 				className="edit-site-save-panel__modal"
