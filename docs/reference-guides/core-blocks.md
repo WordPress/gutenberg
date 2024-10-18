@@ -15,7 +15,7 @@ Display a date archive of your posts. ([Source](https://github.com/WordPress/gut
 -	**Name:** core/archives
 -	**Category:** widgets
 -	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** displayAsDropdown, showLabel, showPostCounts, type
+-	**Attributes:** displayAsDropdown, isEdit, label, showLabel, showPostCounts, type, uniqueId
 
 ## Audio
 
