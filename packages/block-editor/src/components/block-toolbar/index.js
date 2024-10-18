@@ -71,6 +71,7 @@ export function PrivateBlockToolbar( {
 		showShuffleButton,
 		showSlots,
 		showGroupButtons,
+		showLockButtons,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -139,6 +140,7 @@ export function PrivateBlockToolbar( {
 			showShuffleButton: isZoomOut(),
 			showSlots: ! isZoomOut(),
 			showGroupButtons: ! isZoomOut(),
+			showLockButtons: ! isZoomOut(),
 		};
 	}, [] );
 
@@ -199,11 +201,13 @@ export function PrivateBlockToolbar( {
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && isDefaultEditingMode && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
+								{ ! isMultiToolbar &&
+									isDefaultEditingMode &&
+									showLockButtons && (
+										<BlockLockToolbar
+											clientId={ blockClientId }
+										/>
+									) }
 								<BlockMover
 									clientIds={ blockClientIds }
 									hideDragHandle={ hideDragHandle }
