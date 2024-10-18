@@ -256,7 +256,6 @@ export default function CoverInspectorControls( {
 								</ToolsPanelItem>
 							</>
 						) }
-
 						{ showFocalPointPicker && (
 							<ToolsPanelItem
 								label={ __( 'Focal point' ) }
@@ -327,6 +326,7 @@ export default function CoverInspectorControls( {
 								value={ sizeSlug }
 								onChange={ updateImage }
 								options={ imageSizeOptions }
+								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
 							/>
 						) }
 					</ToolsPanel>

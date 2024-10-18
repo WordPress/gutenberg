@@ -255,6 +255,7 @@ function CoverEdit( {
 			isDark: newIsDark,
 		} );
 	};
+
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
 		const newIsDark = compositeIsDark(
