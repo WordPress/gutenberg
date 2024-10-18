@@ -6,30 +6,30 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useEditorIframeProps() {
-	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
-
-		return {
-			canvasMode: getCanvasMode(),
-			currentPostIsTrashed:
-				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
-				'trash',
-		};
+	const { params } = useLocation();
+	const history = useHistory();
+	const { canvasMode = 'view' } = params;
+	const currentPostIsTrashed = useSelect( ( select ) => {
+		return (
+			select( editorStore ).getCurrentPostAttribute( 'status' ) ===
+			'trash'
+		);
 	}, [] );
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
 	useEffect( () => {
@@ -55,11 +55,15 @@ export default function useEditorIframeProps() {
 				! currentPostIsTrashed
 			) {
 				event.preventDefault();
-				setCanvasMode( 'edit' );
+				history.push( { ...params, canvasMode: 'edit' }, undefined, {
+					transition: 'canvas-mode-edit-transition',
+				} );
 			}
 		},
 		onClick: () => {
-			setCanvasMode( 'edit' );
+			history.push( { ...params, canvasMode: 'edit' }, undefined, {
+				transition: 'canvas-mode-edit-transition',
+			} );
 		},
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {
