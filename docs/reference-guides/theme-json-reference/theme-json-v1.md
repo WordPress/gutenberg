@@ -1,6 +1,6 @@
 # Theme.json Version 1 Reference
 
-> This is the specification for  **version 1** of `theme.json`. This version works with WordPress 5.8 or later.
+> This is the specification for **version 1** of `theme.json`. This version works with WordPress 5.8 or later.
 
 <div class="callout callout-alert">
 

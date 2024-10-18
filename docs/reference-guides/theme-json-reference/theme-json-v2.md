@@ -1,6 +1,6 @@
 # Theme.json Version 2 Reference
 
-> This is the specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later.
+> This is the specification for **version 2** of `theme.json`. This version works with WordPress 5.9 or later.
 
 <div class="callout callout-alert">
 
@@ -28,13 +28,13 @@ See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage, backgroundSize
-- border: color, radius, style, width
-- color: link
-- dimensions: aspectRatio, minHeight
-- position: sticky
-- spacing: blockGap, margin, padding
-- typography: lineHeight
+-   background: backgroundImage, backgroundSize
+-   border: color, radius, style, width
+-   color: link
+-   dimensions: aspectRatio, minHeight
+-   position: sticky
+-   spacing: blockGap, margin, padding
+-   typography: lineHeight
 
 ---
 
@@ -50,12 +50,12 @@ Please note that when using this setting, `styles.spacing.padding` should always
 
 Settings related to borders.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| color | boolean | false |  |
-| radius | boolean | false |  |
-| style | boolean | false |  |
-| width | boolean | false |  |
+| Property | Type    | Default | Props |
+| -------- | ------- | ------- | ----- |
+| color    | boolean | false   |       |
+| radius   | boolean | false   |       |
+| style    | boolean | false   |       |
+| width    | boolean | false   |       |
 
 ---
 
@@ -63,10 +63,10 @@ Settings related to borders.
 
 Settings related to shadows.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
-| presets | array |  | name, shadow, slug |
+| Property       | Type    | Default | Props              |
+| -------------- | ------- | ------- | ------------------ |
+| defaultPresets | boolean | true    |                    |
+| presets        | array   |         | name, shadow, slug |
 
 ---
 
@@ -74,22 +74,22 @@ Settings related to shadows.
 
 Settings related to colors.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| background | boolean | true |  |
-| custom | boolean | true |  |
-| customDuotone | boolean | true |  |
-| customGradient | boolean | true |  |
-| defaultDuotone | boolean | true |  |
-| defaultGradients | boolean | true |  |
-| defaultPalette | boolean | true |  |
-| duotone | array |  | colors, name, slug |
-| gradients | array |  | gradient, name, slug |
-| link | boolean | false |  |
-| palette | array |  | color, name, slug |
-| text | boolean | true |  |
-| heading | boolean | true |  |
-| button | boolean | true |  |
+| Property         | Type    | Default | Props                |
+| ---------------- | ------- | ------- | -------------------- |
+| background       | boolean | true    |                      |
+| custom           | boolean | true    |                      |
+| customDuotone    | boolean | true    |                      |
+| customGradient   | boolean | true    |                      |
+| defaultDuotone   | boolean | true    |                      |
+| defaultGradients | boolean | true    |                      |
+| defaultPalette   | boolean | true    |                      |
+| duotone          | array   |         | colors, name, slug   |
+| gradients        | array   |         | gradient, name, slug |
+| link             | boolean | false   |                      |
+| palette          | array   |         | color, name, slug    |
+| text             | boolean | true    |                      |
+| heading          | boolean | true    |                      |
+| button           | boolean | true    |                      |
 
 ---
 
@@ -97,9 +97,9 @@ Settings related to colors.
 
 Settings related to background.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| backgroundImage | boolean | false |  |
+| Property        | Type    | Default | Props |
+| --------------- | ------- | ------- | ----- |
+| backgroundImage | boolean | false   |       |
 
 ---
 
@@ -107,10 +107,10 @@ Settings related to background.
 
 Settings related to dimensions.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| aspectRatio | boolean | false |  |
-| minHeight | boolean | false |  |
+| Property    | Type    | Default | Props |
+| ----------- | ------- | ------- | ----- |
+| aspectRatio | boolean | false   |       |
+| minHeight   | boolean | false   |       |
 
 ---
 
@@ -118,12 +118,12 @@ Settings related to dimensions.
 
 Settings related to layout.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| contentSize | string |  |  |
-| wideSize | string |  |  |
-| allowEditing | boolean | true |  |
-| allowCustomContentAndWideSize | boolean | true |  |
+| Property                      | Type    | Default | Props |
+| ----------------------------- | ------- | ------- | ----- |
+| contentSize                   | string  |         |       |
+| wideSize                      | string  |         |       |
+| allowEditing                  | boolean | true    |       |
+| allowCustomContentAndWideSize | boolean | true    |       |
 
 ---
 
@@ -131,10 +131,10 @@ Settings related to layout.
 
 Settings related to the lightbox.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| enabled | boolean |  |  |
-| allowEditing | boolean |  |  |
+| Property     | Type    | Default | Props |
+| ------------ | ------- | ------- | ----- |
+| enabled      | boolean |         |       |
+| allowEditing | boolean |         |       |
 
 ---
 
@@ -142,9 +142,9 @@ Settings related to the lightbox.
 
 Settings related to position.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| sticky | boolean | false |  |
+| Property | Type    | Default | Props |
+| -------- | ------- | ------- | ----- |
+| sticky   | boolean | false   |       |
 
 ---
 
@@ -152,15 +152,15 @@ Settings related to position.
 
 Settings related to spacing.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| blockGap | boolean, null | null |   |
-| margin | boolean | false |  |
-| padding | boolean | false |  |
-| units | array | px,em,rem,vh,vw,% |  |
-| customSpacingSize | boolean | true |  |
-| spacingSizes | array |  | name, size, slug |
-| spacingScale | object |  |  |
+| Property          | Type          | Default           | Props            |
+| ----------------- | ------------- | ----------------- | ---------------- |
+| blockGap          | boolean, null | null              |                  |
+| margin            | boolean       | false             |                  |
+| padding           | boolean       | false             |                  |
+| units             | array         | px,em,rem,vh,vw,% |                  |
+| customSpacingSize | boolean       | true              |                  |
+| spacingSizes      | array         |                   | name, size, slug |
+| spacingScale      | object        |                   |                  |
 
 ---
 
@@ -168,21 +168,21 @@ Settings related to spacing.
 
 Settings related to typography.
 
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| customFontSize | boolean | true |  |
-| fontStyle | boolean | true |  |
-| fontWeight | boolean | true |  |
-| fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
-| letterSpacing | boolean | true |  |
-| lineHeight | boolean | false |  |
-| textColumns | boolean | false |  |
-| textDecoration | boolean | true |  |
-| writingMode | boolean | false |  |
-| textTransform | boolean | true |  |
-| dropCap | boolean | true |  |
-| fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+| Property       | Type            | Default | Props                                               |
+| -------------- | --------------- | ------- | --------------------------------------------------- |
+| customFontSize | boolean         | true    |                                                     |
+| fontStyle      | boolean         | true    |                                                     |
+| fontWeight     | boolean         | true    |                                                     |
+| fluid          | object, boolean | false   | _{maxViewportWidth, minFontSize, minViewportWidth}_ |
+| letterSpacing  | boolean         | true    |                                                     |
+| lineHeight     | boolean         | false   |                                                     |
+| textColumns    | boolean         | false   |                                                     |
+| textDecoration | boolean         | true    |                                                     |
+| writingMode    | boolean         | false   |                                                     |
+| textTransform  | boolean         | true    |                                                     |
+| dropCap        | boolean         | true    |                                                     |
+| fontSizes      | array           |         | fluid, name, size, slug                             |
+| fontFamilies   | array           |         | fontFace, fontFamily, name, slug                    |
 
 ---
 
@@ -198,16 +198,16 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 Border styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string, object |  |
-| radius | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
-| top | object | color, style, width |
-| right | object | color, style, width |
-| bottom | object | color, style, width |
-| left | object | color, style, width |
+| Property | Type           | Props               |
+| -------- | -------------- | ------------------- |
+| color    | string, object |                     |
+| radius   | string, object |                     |
+| style    | string, object |                     |
+| width    | string, object |                     |
+| top      | object         | color, style, width |
+| right    | object         | color, style, width |
+| bottom   | object         | color, style, width |
+| left     | object         | color, style, width |
 
 ---
 
@@ -215,11 +215,11 @@ Border styles.
 
 Color styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| background | string, object |  |
-| gradient | string, object |  |
-| text | string, object |  |
+| Property   | Type           | Props |
+| ---------- | -------------- | ----- |
+| background | string, object |       |
+| gradient   | string, object |       |
+| text       | string, object |       |
 
 ---
 
@@ -227,10 +227,10 @@ Color styles.
 
 Dimensions styles
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| aspectRatio | string, object |  |
-| minHeight | string, object |  |
+| Property    | Type           | Props |
+| ----------- | -------------- | ----- |
+| aspectRatio | string, object |       |
+| minHeight   | string, object |       |
 
 ---
 
@@ -238,11 +238,11 @@ Dimensions styles
 
 Spacing styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| blockGap | string, object |  |
-| margin | object | bottom, left, right, top |
-| padding | object | bottom, left, right, top |
+| Property | Type           | Props                    |
+| -------- | -------------- | ------------------------ |
+| blockGap | string, object |                          |
+| margin   | object         | bottom, left, right, top |
+| padding  | object         | bottom, left, right, top |
 
 ---
 
@@ -250,18 +250,18 @@ Spacing styles.
 
 Typography styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| fontFamily | string, object |  |
-| fontSize | string, object |  |
-| fontStyle | string, object |  |
-| fontWeight | string, object |  |
-| letterSpacing | string, object |  |
-| lineHeight | string, object |  |
-| textColumns | string |  |
-| textDecoration | string, object |  |
-| writingMode | string, object |  |
-| textTransform | string, object |  |
+| Property       | Type           | Props |
+| -------------- | -------------- | ----- |
+| fontFamily     | string, object |       |
+| fontSize       | string, object |       |
+| fontStyle      | string, object |       |
+| fontWeight     | string, object |       |
+| letterSpacing  | string, object |       |
+| lineHeight     | string, object |       |
+| textColumns    | string         |       |
+| textDecoration | string, object |       |
+| writingMode    | string, object |       |
+| textTransform  | string, object |       |
 
 ---
 
@@ -269,9 +269,9 @@ Typography styles.
 
 CSS and SVG filter styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| duotone | string, object |  |
+| Property | Type           | Props |
+| -------- | -------------- | ----- |
+| duotone  | string, object |       |
 
 ---
 
@@ -285,12 +285,12 @@ Box shadow styles.
 
 Outline styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string, object |  |
-| offset | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
+| Property | Type           | Props |
+| -------- | -------------- | ----- |
+| color    | string, object |       |
+| offset   | string, object |       |
+| style    | string, object |       |
+| width    | string, object |       |
 
 ---
 
@@ -306,11 +306,11 @@ Additional metadata for custom templates defined in the templates folder.
 
 Type: `object`.
 
-| Property | Description | Type |
-| ---      | ---         | ---  |
-| name | Filename, without extension, of the template in the templates folder. | string |
-| title | Title of the template, translatable. | string |
-| postTypes | List of post types that can use this custom template. | array |
+| Property  | Description                                                           | Type   |
+| --------- | --------------------------------------------------------------------- | ------ |
+| name      | Filename, without extension, of the template in the templates folder. | string |
+| title     | Title of the template, translatable.                                  | string |
+| postTypes | List of post types that can use this custom template.                 | array  |
 
 ## templateParts
 
@@ -318,11 +318,11 @@ Additional metadata for template parts defined in the parts folder.
 
 Type: `object`.
 
-| Property | Description | Type |
-| ---      | ---         | ---  |
-| name | Filename, without extension, of the template in the parts folder. | string |
-| title | Title of the template, translatable. | string |
-| area | The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. | string |
+| Property | Description                                                                                                                                            | Type   |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| name     | Filename, without extension, of the template in the parts folder.                                                                                      | string |
+| title    | Title of the template, translatable.                                                                                                                   | string |
+| area     | The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. | string |
 
 ## Patterns
 

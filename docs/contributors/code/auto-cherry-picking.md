@@ -89,5 +89,5 @@ npm run other:cherry-pick "Backport to Gutenberg RC"
 In the future, it would be great if the script automatically selected the
 relevant label based on the currently selected branch:
 
-* release/X.Y - plugin release – "Backport to Gutenberg RC"
-* wp/X.Y - WP release – "Backport to WP Beta/RC"
+-   release/X.Y - plugin release – "Backport to Gutenberg RC"
+-   wp/X.Y - WP release – "Backport to WP Beta/RC"

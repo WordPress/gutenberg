@@ -6,7 +6,6 @@ Note: A single block can only contain one `InnerBlocks` component.
 
 Here is the basic InnerBlocks usage.
 
-
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
@@ -63,7 +62,10 @@ Specifying this prop does not affect the layout of the inner blocks, but results
 By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` when the block appender is clicked. You can modify the default block and its attributes that are inserted when the initial block appender is clicked by using the `defaultBlock` property. For example:
 
 ```js
-<InnerBlocks defaultBlock={['core/paragraph', {placeholder: "Lorem ipsum..."}]} directInsert />
+<InnerBlocks
+	defaultBlock={ [ 'core/paragraph', { placeholder: 'Lorem ipsum...' } ] }
+	directInsert
+/>
 ```
 
 By default this behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
@@ -71,7 +73,6 @@ By default this behavior is disabled until the `directInsert` prop is set to `tr
 ## Template
 
 Use the template property to define a set of blocks that prefill the InnerBlocks component when inserted. You can set attributes on the blocks to define their use. The example below shows a book review template using InnerBlocks component and setting placeholders values to show the block usage.
-
 
 ```js
 const MY_TEMPLATE = [
@@ -91,7 +92,6 @@ const MY_TEMPLATE = [
 		);
 	},
 ```
-
 
 Use the `templateLock` property to lock down the template. Using `all` locks the template completely so no changes can be made. Using `insert` prevents additional blocks from being inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
@@ -115,9 +115,9 @@ add_action( 'init', function() {
 
 A common pattern for using InnerBlocks is to create a custom block that will only be available if its parent block is inserted. This allows builders to establish a relationship between blocks, while limiting a nested block's discoverability. There are three relationships that builders can use: `parent`, `ancestor` and `allowedBlocks`. The differences are:
 
-- If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a __direct descendant of the parent__.
-- If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a __descendent of the parent__.
-- If you assign the `allowedBlocks` then you’re stating a relationship in the opposite direction, i.e., which blocks can be used and inserted as __direct descendants of this block__.
+-   If you assign a `parent` then you’re stating that the nested block can only be used and inserted as a **direct descendant of the parent**.
+-   If you assign an `ancestor` then you’re stating that the nested block can only be used and inserted as a **descendent of the parent**.
+-   If you assign the `allowedBlocks` then you’re stating a relationship in the opposite direction, i.e., which blocks can be used and inserted as **direct descendants of this block**.
 
 The key difference between `parent` and `ancestor` is `parent` has finer specificity, while an `ancestor` has greater flexibility in its nested hierarchy.
 
@@ -131,7 +131,7 @@ When defining a direct descendent block, use the `parent` block setting to defin
 {
 	"title": "Column",
 	"name": "core/column",
-	"parent": [ "core/columns" ],
+	"parent": [ "core/columns" ]
 	// ...
 }
 ```
@@ -148,7 +148,7 @@ When defining a descendent block, use the `ancestor` block setting. This prevent
 {
 	"title": "Comment Author Name",
 	"name": "core/comment-author-name",
-	"ancestor": [ "core/comment-template" ],
+	"ancestor": [ "core/comment-template" ]
 	// ...
 }
 ```
@@ -165,7 +165,13 @@ When defining a set of possible descendant blocks, use the `allowedBlocks` block
 {
 	"title": "Navigation",
 	"name": "core/navigation",
-	"allowedBlocks": [ "core/navigation-link", "core/search", "core/social-links", "core/page-list", "core/spacer" ],
+	"allowedBlocks": [
+		"core/navigation-link",
+		"core/search",
+		"core/social-links",
+		"core/page-list",
+		"core/spacer"
+	]
 	// ...
 }
 ```
@@ -177,8 +183,6 @@ You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlock
 The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package same as the `InnerBlocks` component itself and supports everything the component does. It also works like the `useBlockProps` hook.
 
 Here is the basic `useInnerBlocksProps` hook usage.
-
-
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -193,7 +197,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 		return (
 			<div { ...blockProps }>
-				<div {...innerBlocksProps} />
+				<div { ...innerBlocksProps } />
 			</div>
 		);
 	},
@@ -204,7 +208,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 		return (
 			<div { ...blockProps }>
-				<div {...innerBlocksProps} />
+				<div { ...innerBlocksProps } />
 			</div>
 		);
 	},
@@ -212,8 +216,6 @@ registerBlockType( 'gutenberg-examples/example-06', {
 ```
 
 This hook can also pass objects returned from the `useBlockProps` hook to the `useInnerBlocksProps` hook. This reduces the number of elements we need to create.
-
-
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -226,22 +228,17 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		const blockProps = useBlockProps();
 		const innerBlocksProps = useInnerBlocksProps( blockProps );
 
-		return (
-			<div {...innerBlocksProps} />
-		);
+		return <div { ...innerBlocksProps } />;
 	},
 
 	save: () => {
 		const blockProps = useBlockProps.save();
 		const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
-		return (
-			<div {...innerBlocksProps} />
-		);
+		return <div { ...innerBlocksProps } />;
 	},
 } );
 ```
-
 
 The above code will render to the following markup in the editor:
 
@@ -252,7 +249,6 @@ The above code will render to the following markup in the editor:
 ```
 
 Another benefit to using the hook approach is using the returned value, which is just an object, and deconstruct to get the react children from the object. This property contains the actual child inner blocks thus we can place elements on the same level as our inner blocks.
-
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -276,7 +272,6 @@ registerBlockType( 'gutenberg-examples/example-06', {
 	// ...
 } );
 ```
-
 
 ```html
 <div>

@@ -62,6 +62,7 @@ Navigate to the Plugins page in the WordPress admin and confirm that the plugin 
 ![The scaffolded block in the Editor](https://developer.wordpress.org/files/2023/12/block-tutorial-2.png)
 
 ## Reviewing the files
+
 Before we begin modifying the scaffolded block, it's important to review the plugin's file structure. Open the plugin folder in your code editor.
 
 ![The files that make up the block plugin](https://developer.wordpress.org/files/2023/12/block-tutorial-3.png)
@@ -234,7 +235,7 @@ const calendarIcon = (
 
 registerBlockType( metadata.name, {
 	icon: calendarIcon,
-	edit: Edit
+	edit: Edit,
 } );
 ```
 
@@ -269,8 +270,8 @@ export default function Edit() {
 
 It looks a bit more complicated than it is.
 
-- [`useBlockProps()`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#block-wrapper-props) outputs all the necessary CSS classes and styles in the [block's wrapper](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/#the-edit-components-markup) needed by the Editor, which includes the style provided by the block supports you added earlier
-- [`__()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/) is used for the internationalization of text strings
+-   [`useBlockProps()`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#block-wrapper-props) outputs all the necessary CSS classes and styles in the [block's wrapper](https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/#the-edit-components-markup) needed by the Editor, which includes the style provided by the block supports you added earlier
+-   [`__()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/) is used for the internationalization of text strings
 
 <div class="callout callout-info">
 	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals/block-wrapper/">block wrapper</a> documentation for an introductory guide on how to ensure the block's markup wrapper has the proper attributes.
@@ -288,9 +289,7 @@ Next, update the function to display the correct information.
 export default function Edit() {
 	const currentYear = new Date().getFullYear().toString();
 
-	return (
-		<p { ...useBlockProps() }>© { currentYear }</p>
-	);
+	return <p { ...useBlockProps() }>© { currentYear }</p>;
 }
 ```
 
@@ -373,8 +372,8 @@ Save the file, and you can now move on to the Editor.
 
 Open the `edit.js` file. You will need to accomplish two tasks.
 
-- Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes.
-- Update the block to display the correct content depending on the defined attributes.
+-   Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes.
+-   Update the block to display the correct content depending on the defined attributes.
 
 #### Adding the user interface
 
@@ -396,14 +395,13 @@ export default function Edit() {
 
 	return (
 		<>
-			<InspectorControls>
-				Testing
-			</InspectorControls>
+			<InspectorControls>Testing</InspectorControls>
 			<p { ...useBlockProps() }>© { currentYear }</p>
 		</>
 	);
 }
 ```
+
 Save the file and refresh the Editor. When selecting the block, you should see the "Testing" message in the Settings Sidebar.
 
 ![The Setting Sidebar now displays the message](https://developer.wordpress.org/files/2023/12/block-tutorial-9.png)
@@ -445,8 +443,8 @@ Save the file and refresh the Editor. You should now see the new Settings panel.
 
 The next step is to replace the "Testing" message with a `TextControl` component that allows the user to set the `startingYear` attribute. However, you must include two parameters in the `Edit()` function before doing so.
 
-- `attributes` is an object that contains all the attributes for the block
-- `setAttributes` is a function that allows you to update the value of an attribute
+-   `attributes` is an object that contains all the attributes for the block
+-   `setAttributes` is a function that allows you to update the value of an attribute
 
 With these parameters included, you can fetch the `showStartingYear` and `startingYear` attributes.
 
@@ -480,10 +478,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
 					<TextControl
-						label={ __(
-							'Starting year',
-							'copyright-date-block'
-						) }
+						label={ __( 'Starting year', 'copyright-date-block' ) }
 						value={ startingYear || '' }
 						onChange={ ( value ) =>
 							setAttributes( { startingYear: value } )
@@ -596,7 +591,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	let displayDate;
 
 	if ( showStartingYear && startingYear ) {
-			displayDate = startingYear + '–' + currentYear;
+		displayDate = startingYear + '–' + currentYear;
 	} else {
 		displayDate = currentYear;
 	}
@@ -785,7 +780,9 @@ After performing block recovery, open the Code editor and you will see the marku
 
 ```html
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} -->
-<p class="wp-block-create-block-copyright-date-block">Copyright Date Block – hello from the saved content!</p>
+<p class="wp-block-create-block-copyright-date-block">
+	Copyright Date Block – hello from the saved content!
+</p>
 <!-- /wp:create-block/copyright-date-block -->
 ```
 
@@ -815,9 +812,7 @@ export default function save( { attributes } ) {
 		displayDate = currentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p { ...useBlockProps.save() }>© { displayDate }</p>;
 }
 ```
 
@@ -875,9 +870,7 @@ export default function save( { attributes } ) {
 		displayDate = fallbackCurrentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p { ...useBlockProps.save() }>© { displayDate }</p>;
 }
 ```
 
@@ -905,9 +898,7 @@ export default function save( { attributes } ) {
 		displayDate = fallbackCurrentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p { ...useBlockProps.save() }>© { displayDate }</p>;
 }
 ```
 
@@ -965,7 +956,7 @@ You will not get any block validation errors, but the Editor will detect that ch
 
 #### Optimizing render.php
 
-The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$content` variable.
+The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the `render.php` file via the `$content` variable.
 
 Therefore, update the file to render the generated content if `currentYear` and `fallbackCurrentYear` do not match.
 
@@ -1002,9 +993,9 @@ For final reference, the complete code for this tutorial is available in the [Bl
 
 Now, whether you're now looking to refine your skills, tackle more advanced projects, or stay updated with the latest WordPress trends, the following resources will help you improve your block development skills:
 
-- [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/)
-- [Fundamentals of Block Development](https://developer.wordpress.org/block-editor/getting-started/fundamentals/)
-- [WordPress Developer Blog](https://developer.wordpress.org/news/)
-- [Block Development Examples](https://github.com/WordPress/block-development-examples) | GitHub repository
+-   [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/)
+-   [Fundamentals of Block Development](https://developer.wordpress.org/block-editor/getting-started/fundamentals/)
+-   [WordPress Developer Blog](https://developer.wordpress.org/news/)
+-   [Block Development Examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 
 Remember, every expert was once a beginner. Keep learning, experimenting, and, most importantly, have fun building with WordPress.

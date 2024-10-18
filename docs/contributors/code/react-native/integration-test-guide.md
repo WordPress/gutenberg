@@ -302,9 +302,8 @@ Note that a slider’s `testID` is "Slider " + label. So for a slider with a lab
 One caveat when adding blocks is that if they contain inner blocks, these inner blocks are not rendered. The following example shows how we can make a Buttons block render its inner Button blocks (assumes we’ve already obtained a reference to the Buttons block as `buttonsBlock`):
 
 ```js
-const innerBlockListWrapper = await within( buttonsBlock ).findByTestId(
-	'block-list-wrapper'
-);
+const innerBlockListWrapper =
+	await within( buttonsBlock ).findByTestId( 'block-list-wrapper' );
 fireEvent( innerBlockListWrapper, 'layout', {
 	nativeEvent: {
 		layout: {
@@ -313,9 +312,8 @@ fireEvent( innerBlockListWrapper, 'layout', {
 	},
 } );
 
-const buttonInnerBlock = await within( buttonsBlock ).findByLabelText(
-	/Button Block\. Row 1/
-);
+const buttonInnerBlock =
+	await within( buttonsBlock ).findByLabelText( /Button Block\. Row 1/ );
 fireEvent.press( buttonInnerBlock );
 ```
 

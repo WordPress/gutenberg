@@ -26,11 +26,11 @@ To start simply choose from one of these filtered lists below. Note: You can fin
 
 -   **All Gutenberg issues [without an assigned label](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+no%3Alabel+sort%3Aupdated-asc)**. Triaging by simply adding labels helps people focused on certain aspects of Gutenberg find relevant issues easier and start working on them.
 -   **All Gutenberg pull requests [without an assigned label](https://github.com/WordPress/gutenberg/pulls?q=is%3Aopen+is%3Apr+no%3Alabel)**. This requires a level of comfortability with code. For more guidance on which labels are best to use, please [review this section on labeling pull requests](/docs/contributors/repository-management.md#pull-requests) for contributors. You can also always check with the person authoring the pull request to make sure the labels match what they are intending to do.
--  **[The least recently updated](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Aupdated-asc) Gutenberg issues**. Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
--  **All Gutenberg issues [with no comments](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+comments%3A0+)**. Triaging this list helps make sure all issues are acknowledged, and can help identify issues that may need more information or discussion before they are actionable.
--  **[The least commented](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-asc) on Gutenberg issues**. Triaging this list helps the community figure out what things might still need traction for certain proposals.
--  **[The most commented](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-desc) on Gutenberg issues**. If you feel comfortable chiming in and the conversation has stagnated, the best way to triage these kinds of issues is to summarize the discussion thus far and do your best to identify action items, blockers, etc. Triaging this list allows finding solutions to important and complex issues to move forward.
--  You can also **create your own custom set of filters on GitHub**. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
+-   **[The least recently updated](https://github.com/WordPress/gutenberg/issues?q=is%3Aopen+is%3Aissue+sort%3Aupdated-asc) Gutenberg issues**. Triaging issues that are getting old and possibly out of date keeps important work from being overlooked.
+-   **All Gutenberg issues [with no comments](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+comments%3A0+)**. Triaging this list helps make sure all issues are acknowledged, and can help identify issues that may need more information or discussion before they are actionable.
+-   **[The least commented](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-asc) on Gutenberg issues**. Triaging this list helps the community figure out what things might still need traction for certain proposals.
+-   **[The most commented](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Acomments-desc) on Gutenberg issues**. If you feel comfortable chiming in and the conversation has stagnated, the best way to triage these kinds of issues is to summarize the discussion thus far and do your best to identify action items, blockers, etc. Triaging this list allows finding solutions to important and complex issues to move forward.
+-   You can also **create your own custom set of filters on GitHub**. If you have a filter you think might be useful for the community, feel free to submit a PR to add it to this list.
 
 ## General triage process
 
@@ -65,10 +65,10 @@ Generally speaking, the following labels are very useful for triaging issues and
 
 If you have enough knowledge about the report at hand and feel confident in doing so, you can consider adding priority. Note that it’s on purpose that no priority label infers a normal level.
 
-| Label                | Reason                                                                                                                                                                                                                                                     |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Priority: High`     | Fits one of the current focuses and is causing a major broken experience (including flow, visual bugs and blocks).                                                                                                                                         |
-| `Priority: Low`      | Enhancements that aren’t part of focuses, niche bugs, problems with old browsers.                                                                                                                                                                          |
+| Label            | Reason                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `Priority: High` | Fits one of the current focuses and is causing a major broken experience (including flow, visual bugs and blocks). |
+| `Priority: Low`  | Enhancements that aren’t part of focuses, niche bugs, problems with old browsers.                                  |
 
 ## Closing issues
 
@@ -87,17 +87,17 @@ Issues are closed for the following reasons:
 
 Here are some guidelines to follow when doing triage specifically around the time of a release. This is important to differentiate compared to general triage so problematic, release blocking bugs are properly identified and solutions are found.
 
--  **If a bug is introduced in a release candidate (RC) and it's going to break many workflows**, add it to the version milestone and flag in the [#core-editor](https://wordpress.slack.com/archives/C02QB2JS7) channel in WordPress.org slack.
--  **If a bug was introduced in the most recent version, and a next RC hasn’t yet happened**, ideally the developers can push to fix it prior to RC! The amount of push for a fix should scale proportional to the potential of breakage. In this case, add to the RC milestone and, if deemed urgent, ping in the [#core-editor](https://wordpress.slack.com/archives/C02QB2JS7) channel in WordPress.org slack.
--  **If a bug wasn’t introduced in the most recent version**, do not add a milestone. Instead, use labels like `[Priority] High` if it’s a pressing issue, and if needed you can call attention to it in the weekly core meetings.
+-   **If a bug is introduced in a release candidate (RC) and it's going to break many workflows**, add it to the version milestone and flag in the [#core-editor](https://wordpress.slack.com/archives/C02QB2JS7) channel in WordPress.org slack.
+-   **If a bug was introduced in the most recent version, and a next RC hasn’t yet happened**, ideally the developers can push to fix it prior to RC! The amount of push for a fix should scale proportional to the potential of breakage. In this case, add to the RC milestone and, if deemed urgent, ping in the [#core-editor](https://wordpress.slack.com/archives/C02QB2JS7) channel in WordPress.org slack.
+-   **If a bug wasn’t introduced in the most recent version**, do not add a milestone. Instead, use labels like `[Priority] High` if it’s a pressing issue, and if needed you can call attention to it in the weekly core meetings.
 
 ### Design specific triage
 
 Along with the general triage flows listed previously, there are some specific additions to the flows for more design-centric triage for design minded folks participating in triage.
 
 -   PR testing and reviews: this should be your first stop for daily self triage.
--  Label `Needs Design Feedback`: check if the issue does need design feedback and, if possible, give it. You can organize this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label).
-- Label  `Needs Design`: Does it really need a design? Does this fit a focus? If it has a design mark as `Needs Design Feedback` to better categorize the issue.
+-   Label `Needs Design Feedback`: check if the issue does need design feedback and, if possible, give it. You can organize this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label).
+-   Label `Needs Design`: Does it really need a design? Does this fit a focus? If it has a design mark as `Needs Design Feedback` to better categorize the issue.
 
 Reminders:
 

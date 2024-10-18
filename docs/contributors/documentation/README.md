@@ -189,7 +189,7 @@ Depending on where you are viewing this document, the brackets may show as doubl
 
 Videos in the Block Editor Handbook need to be hosted on the [WordPress YouTube channel](https://www.youtube.com/@WordPress) as unlisted videos. This process requires additional permissions. Reach out in the #marketing Slack channel for assistance.
 
-Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this: 
+Once the video has been uploaded to YouTube, retrieve the video embed link. It should look something like this:
 
 ```
 https://www.youtube.com/embed/nrut8SfXA44?si=YxvmHmAoYx-BDCog
@@ -198,7 +198,15 @@ https://www.youtube.com/embed/nrut8SfXA44?si=YxvmHmAoYx-BDCog
 Then, place the following code where you want the video to be embedded in the documentation. Update the embed link and video title accordingly.
 
 ```html
-<iframe width="960" height="540" src="[Video embed link]" title="[Video title]" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="true"></iframe>
+<iframe
+	width="960"
+	height="540"
+	src="[Video embed link]"
+	title="[Video title]"
+	frameborder="0"
+	allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+	allowfullscreen="true"
+></iframe>
 ```
 
 <div class="callout callout-info">

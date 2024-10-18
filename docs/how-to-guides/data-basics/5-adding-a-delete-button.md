@@ -1,7 +1,7 @@
 # Adding a delete button
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we added an ability to create new pages,
-and in this part we will add a *Delete* feature to our app.
+and in this part we will add a _Delete_ feature to our app.
 
 Here's a glimpse of what we're going to build:
 
@@ -15,11 +15,7 @@ Let's start by creating the `DeletePageButton` component and updating the user i
 import { Button } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 
-const DeletePageButton = () => (
-	<Button variant="primary">
-		Delete
-	</Button>
-)
+const DeletePageButton = () => <Button variant="primary">Delete</Button>;
 
 function PagesList( { hasResolved, pages } ) {
 	if ( ! hasResolved ) {
@@ -34,18 +30,18 @@ function PagesList( { hasResolved, pages } ) {
 			<thead>
 				<tr>
 					<td>Title</td>
-					<td style={{width: 190}}>Actions</td>
+					<td style={ { width: 190 } }>Actions</td>
 				</tr>
 			</thead>
 			<tbody>
 				{ pages?.map( ( page ) => (
-					<tr key={page.id}>
+					<tr key={ page.id }>
 						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
 							<div className="form-buttons">
 								<PageEditButton pageId={ page.id } />
-								{/* ↓ This is the only change in the PagesList component */}
-								<DeletePageButton pageId={ page.id }/>
+								{ /* ↓ This is the only change in the PagesList component */ }
+								<DeletePageButton pageId={ page.id } />
 							</div>
 						</td>
 					</tr>
@@ -68,10 +64,14 @@ Here's how you can try deleting entity records in your browser's dev tools:
 
 ```js
 // We need a valid page ID to call deleteEntityRecord, so let's get the first available one using getEntityRecords.
-const pageId = wp.data.select( 'core' ).getEntityRecords( 'postType', 'page' )[0].id;
+const pageId = wp.data
+	.select( 'core' )
+	.getEntityRecords( 'postType', 'page' )[ 0 ].id;
 
 // Now let's delete that page:
-const promise = wp.data.dispatch( 'core' ).deleteEntityRecord( 'postType', 'page', pageId );
+const promise = wp.data
+	.dispatch( 'core' )
+	.deleteEntityRecord( 'postType', 'page', pageId );
 
 // promise gets resolved or rejected when the API request succeeds or fails.
 ```
@@ -81,7 +81,7 @@ Once the REST API request is finished, you will notice one of the pages has disa
 Let's dispatch that action when `DeletePageButton` is clicked:
 
 ```js
-const DeletePageButton = ({ pageId }) => {
+const DeletePageButton = ( { pageId } ) => {
 	const { deleteEntityRecord } = useDispatch( coreDataStore );
 	const handleDelete = () => deleteEntityRecord( 'postType', 'page', pageId );
 	return (
@@ -89,7 +89,7 @@ const DeletePageButton = ({ pageId }) => {
 			Delete
 		</Button>
 	);
-}
+};
 ```
 
 ### Step 3: Add visual feedback
@@ -99,25 +99,35 @@ It may take a few moments for the REST API request to finish after clicking the 
 We'll need the `isDeletingEntityRecord` selector for that. It is similar to the `isSavingEntityRecord` selector we've already seen in [part 3](/docs/how-to-guides/data-basics/3-building-an-edit-form.md): it returns `true` or `false` and never issues any HTTP requests:
 
 ```js
-const DeletePageButton = ({ pageId }) => {
+const DeletePageButton = ( { pageId } ) => {
 	// ...
 	const { isDeleting } = useSelect(
-		select => ({
-			isDeleting: select( coreDataStore ).isDeletingEntityRecord( 'postType', 'page', pageId ),
-		}),
+		( select ) => ( {
+			isDeleting: select( coreDataStore ).isDeletingEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
+		} ),
 		[ pageId ]
-	)
+	);
 	return (
-		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting }>
+		<Button
+			variant="primary"
+			onClick={ handleDelete }
+			disabled={ isDeleting }
+		>
 			{ isDeleting ? (
 				<>
 					<Spinner />
 					Deleting...
 				</>
-			) : 'Delete' }
+			) : (
+				'Delete'
+			) }
 		</Button>
 	);
-}
+};
 ```
 
 Here's what it looks like in action:
@@ -126,47 +136,51 @@ Here's what it looks like in action:
 
 ### Step 4: Handle errors
 
-We optimistically assumed that a *delete* operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
+We optimistically assumed that a _delete_ operation would always succeed. Unfortunately, under the hood, it is a REST API request that can fail in many ways:
 
-* The website can be down.
-* The delete request may be invalid.
-* The page could have been deleted by someone else in the meantime.
+-   The website can be down.
+-   The delete request may be invalid.
+-   The page could have been deleted by someone else in the meantime.
 
 To tell the user when any of these errors happen, we need to extract the error information using the `getLastEntityDeleteError` selector:
 
 ```js
 // Replace 9 with an actual page ID
-wp.data.select( 'core' ).getLastEntityDeleteError( 'postType', 'page', 9 )
+wp.data.select( 'core' ).getLastEntityDeleteError( 'postType', 'page', 9 );
 ```
 
 Here's how we can apply it in `DeletePageButton`:
 
 ```js
 import { useEffect } from 'react';
-const DeletePageButton = ({ pageId }) => {
+const DeletePageButton = ( { pageId } ) => {
 	// ...
-	const { error, /* ... */ } = useSelect(
-		select => ( {
-			error: select( coreDataStore ).getLastEntityDeleteError( 'postType', 'page', pageId ),
+	const { error /* ... */ } = useSelect(
+		( select ) => ( {
+			error: select( coreDataStore ).getLastEntityDeleteError(
+				'postType',
+				'page',
+				pageId
+			),
 			// ...
 		} ),
-		[pageId]
+		[ pageId ]
 	);
 	useEffect( () => {
 		if ( error ) {
 			// Display the error
 		}
-	}, [error] )
+	}, [ error ] );
 
 	// ...
-}
+};
 ```
 
 The `error` object comes from the `@wordpress/api-fetch` and contains information about the error. It has the following properties:
 
-* `message` – a human-readable error message such as `Invalid post ID`.
-* `code` – a string-based error code such as `rest_post_invalid_id`. To learn about all possible error codes you'd need to refer to the [`/v2/pages` endpoint's source code](https://github.com/WordPress/wordpress-develop/blob/2648a5f984b8abf06872151898e3a61d3458a628/src/wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php#L226-L230).
-* `data` (optional) – error details, contains the `code` property containing the HTTP response code for the failed request.
+-   `message` – a human-readable error message such as `Invalid post ID`.
+-   `code` – a string-based error code such as `rest_post_invalid_id`. To learn about all possible error codes you'd need to refer to the [`/v2/pages` endpoint's source code](https://github.com/WordPress/wordpress-develop/blob/2648a5f984b8abf06872151898e3a61d3458a628/src/wp-includes/rest-api/endpoints/class-wp-rest-revisions-controller.php#L226-L230).
+-   `data` (optional) – error details, contains the `code` property containing the HTTP response code for the failed request.
 
 There are many ways to turn that object into an error message, but in this tutorial, we will display the `error.message`.
 
@@ -221,7 +235,9 @@ function Notifications() {
 		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices.filter( ({ type }) => type === 'snackbar' );
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
 
 	return (
 		<SnackbarList
@@ -236,7 +252,7 @@ function MyFirstApp() {
 	// ...
 	return (
 		<div>
-			{/* ... */}
+			{ /* ... */ }
 			<Notifications />
 		</div>
 	);
@@ -255,28 +271,35 @@ With the SnackbarNotices component in place, we're ready to dispatch some notifi
 import { useEffect } from 'react';
 import { store as noticesStore } from '@wordpress/notices';
 function DeletePageButton( { pageId } ) {
-	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	// useSelect returns a list of selectors if you pass the store handle
 	// instead of a callback:
-	const { getLastEntityDeleteError } = useSelect( coreDataStore )
+	const { getLastEntityDeleteError } = useSelect( coreDataStore );
 	const handleDelete = async () => {
-		const success = await deleteEntityRecord( 'postType', 'page', pageId);
+		const success = await deleteEntityRecord( 'postType', 'page', pageId );
 		if ( success ) {
 			// Tell the user the operation succeeded:
-			createSuccessNotice( "The page was deleted!", {
+			createSuccessNotice( 'The page was deleted!', {
 				type: 'snackbar',
 			} );
 		} else {
 			// We use the selector directly to get the fresh error *after* the deleteEntityRecord
 			// have failed.
-			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
-			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
+			const lastError = getLastEntityDeleteError(
+				'postType',
+				'page',
+				pageId
+			);
+			const message =
+				( lastError?.message || 'There was an error.' ) +
+				' Please refresh the page and try again.';
 			// Tell the user how exactly the operation has failed:
 			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
 		}
-	}
+	};
 	// ...
 }
 ```
@@ -312,33 +335,38 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, Modal, TextControl } from '@wordpress/components';
 
 function MyFirstApp() {
-	const [searchTerm, setSearchTerm] = useState( '' );
+	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const { pages, hasResolved } = useSelect(
 		( select ) => {
 			const query = {};
 			if ( searchTerm ) {
 				query.search = searchTerm;
 			}
-			const selectorArgs = ['postType', 'page', query];
-			const pages = select( coreDataStore ).getEntityRecords( ...selectorArgs );
+			const selectorArgs = [ 'postType', 'page', query ];
+			const pages = select( coreDataStore ).getEntityRecords(
+				...selectorArgs
+			);
 			return {
 				pages,
 				hasResolved: select( coreDataStore ).hasFinishedResolution(
 					'getEntityRecords',
-					selectorArgs,
+					selectorArgs
 				),
 			};
 		},
-		[searchTerm],
+		[ searchTerm ]
 	);
 
 	return (
 		<div>
 			<div className="list-controls">
-				<SearchControl onChange={ setSearchTerm } value={ searchTerm }/>
-				<PageCreateButton/>
+				<SearchControl
+					onChange={ setSearchTerm }
+					value={ searchTerm }
+				/>
+				<PageCreateButton />
 			</div>
-			<PagesList hasResolved={ hasResolved } pages={ pages }/>
+			<PagesList hasResolved={ hasResolved } pages={ pages } />
 			<Notifications />
 		</div>
 	);
@@ -350,7 +378,9 @@ function SnackbarNotices() {
 		[]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = notices.filter( ( { type } ) => type === 'snackbar' );
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
 
 	return (
 		<SnackbarList
@@ -362,10 +392,10 @@ function SnackbarNotices() {
 }
 
 function PagesList( { hasResolved, pages } ) {
-	if ( !hasResolved ) {
-		return <Spinner/>;
+	if ( ! hasResolved ) {
+		return <Spinner />;
 	}
-	if ( !pages?.length ) {
+	if ( ! pages?.length ) {
 		return <div>No results</div>;
 	}
 
@@ -383,8 +413,8 @@ function PagesList( { hasResolved, pages } ) {
 						<td>{ page.title.rendered }</td>
 						<td>
 							<div className="form-buttons">
-								<PageEditButton pageId={ page.id }/>
-								<DeletePageButton pageId={ page.id }/>
+								<PageEditButton pageId={ page.id } />
+								<DeletePageButton pageId={ page.id } />
 							</div>
 						</td>
 					</tr>
@@ -395,15 +425,16 @@ function PagesList( { hasResolved, pages } ) {
 }
 
 function DeletePageButton( { pageId } ) {
-	const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	// useSelect returns a list of selectors if you pass the store handle
 	// instead of a callback:
-	const { getLastEntityDeleteError } = useSelect( coreDataStore )
+	const { getLastEntityDeleteError } = useSelect( coreDataStore );
 	const handleDelete = async () => {
-		const success = await deleteEntityRecord( 'postType', 'page', pageId);
+		const success = await deleteEntityRecord( 'postType', 'page', pageId );
 		if ( success ) {
 			// Tell the user the operation succeeded:
-			createSuccessNotice( "The page was deleted!", {
+			createSuccessNotice( 'The page was deleted!', {
 				type: 'snackbar',
 			} );
 		} else {
@@ -413,31 +444,47 @@ function DeletePageButton( { pageId } ) {
 			// Then, lastError would be null inside of handleDelete.
 			// Why? Because we'd refer to the version of it that was computed
 			// before the handleDelete was even called.
-			const lastError = getLastEntityDeleteError( 'postType', 'page', pageId );
-			const message = ( lastError?.message || 'There was an error.' ) + ' Please refresh the page and try again.'
+			const lastError = getLastEntityDeleteError(
+				'postType',
+				'page',
+				pageId
+			);
+			const message =
+				( lastError?.message || 'There was an error.' ) +
+				' Please refresh the page and try again.';
 			// Tell the user how exactly the operation have failed:
 			createErrorNotice( message, {
 				type: 'snackbar',
 			} );
 		}
-	}
+	};
 
 	const { deleteEntityRecord } = useDispatch( coreDataStore );
 	const { isDeleting } = useSelect(
-		select => ( {
-			isDeleting: select( coreDataStore ).isDeletingEntityRecord( 'postType', 'page', pageId ),
+		( select ) => ( {
+			isDeleting: select( coreDataStore ).isDeletingEntityRecord(
+				'postType',
+				'page',
+				pageId
+			),
 		} ),
 		[ pageId ]
 	);
 
 	return (
-		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting }>
+		<Button
+			variant="primary"
+			onClick={ handleDelete }
+			disabled={ isDeleting }
+		>
 			{ isDeleting ? (
 				<>
 					<Spinner />
 					Deleting...
 				</>
-			) : 'Delete' }
+			) : (
+				'Delete'
+			) }
 		</Button>
 	);
 }
@@ -445,5 +492,5 @@ function DeletePageButton( { pageId } ) {
 
 ## What's next?
 
-* **Previous part:** [Building a *Create page form*](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository
+-   **Previous part:** [Building a _Create page form_](/docs/how-to-guides/data-basics/4-building-a-create-page-form.md)
+-   (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

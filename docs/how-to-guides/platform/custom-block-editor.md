@@ -214,18 +214,18 @@ import './styles.scss';
 
 Next, once the DOM is ready you will need to run a function which:
 
-- Grabs the editor settings from `window.getdaveSbeSettings` (previously inlined from PHP).
-- Registers all the Core WordPress blocks using `registerCoreBlocks`.
-- Renders an `<Editor>` component into the waiting `<div>` on the custom admin page.
+-   Grabs the editor settings from `window.getdaveSbeSettings` (previously inlined from PHP).
+-   Registers all the Core WordPress blocks using `registerCoreBlocks`.
+-   Renders an `<Editor>` component into the waiting `<div>` on the custom admin page.
 
 ```jsx
 domReady( function () {
-	const root = createRoot( document.getElementById( 'getdave-sbe-block-editor' ) );
+	const root = createRoot(
+		document.getElementById( 'getdave-sbe-block-editor' )
+	);
 	const settings = window.getdaveSbeSettings || {};
 	registerCoreBlocks();
-	root.render(
-		<Editor settings={ settings } />
-	);
+	root.render( <Editor settings={ settings } /> );
 } );
 ```
 
@@ -339,10 +339,10 @@ The children of `<BlockEditorProvider>` comprise the UI for the block editor. Th
 // File: src/components/block-editor/index.js
 
 <BlockEditorProvider
-	value={ blocks }           // Array of block objects
-	onInput={ updateBlocks }   // Handler to manage Block updates
+	value={ blocks } // Array of block objects
+	onInput={ updateBlocks } // Handler to manage Block updates
 	onChange={ persistBlocks } // Handler to manage Block updates/persistence
-	settings={ settings }      // Editor "settings" object
+	settings={ settings } // Editor "settings" object
 />
 ```
 
@@ -540,6 +540,6 @@ Finally, you will want to generate a notice - which will display in the `<Notice
 
 ## Wrapping up
 
-Congratulations for completing this guide. You should now have a better understanding of how the block editor works under the hood. 
+Congratulations for completing this guide. You should now have a better understanding of how the block editor works under the hood.
 
 The full code for the custom block editor you have just built is [available on GitHub](https://github.com/getdave/standalone-block-editor). Download and try it out for yourself. Experiment, then and take things even further.

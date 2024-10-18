@@ -231,11 +231,11 @@ This has happened occasionally, see [this one](https://github.com/WordPress/gute
 
 It's important to check that:
 
-- the plugin from the directory works as expected
-- the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
-- the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
-  - the `trunk` folder should have "Commiting version X.Y.Z"
-  - there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
+-   the plugin from the directory works as expected
+-   the ZIP contents (see [Downloads](https://plugins.trac.wordpress.org/browser/gutenberg/)) looks correct (doesn't have anything obvious missing)
+-   the [Gutenberg SVN repo](https://plugins.trac.wordpress.org/browser/gutenberg/) has two new commits (see [the log](https://plugins.trac.wordpress.org/browser/gutenberg/)):
+    -   the `trunk` folder should have "Commiting version X.Y.Z"
+    -   there is a new `tags/X.Y.Z` folder with the same contents as `trunk` whose latest commit is "Tagging version X.Y.Z"
 
 Most likely, the tag folder couldn't be created. This is a [known issue](https://plugins.trac.wordpress.org/browser/gutenberg/) that [can be fixed manually](https://github.com/WordPress/gutenberg/issues/55295#issuecomment-1759292978).
 

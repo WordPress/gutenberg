@@ -24,14 +24,14 @@ You can also use [block filters](/docs/reference-guides/filters/block-filters.md
 
 ```php
 function example_modify_heading_levels_globally( $args, $block_type ) {
-	
+
 	if ( 'core/heading' !== $block_type ) {
 		return $args;
 	}
 
 	// Remove H1, H2, and H6.
 	$args['attributes']['levelOptions']['default'] = [ 3, 4, 5 ];
-	
+
 	return $args;
 }
 add_filter( 'register_block_type_args', 'example_modify_heading_levels_globally', 10, 2 );
@@ -57,7 +57,7 @@ Block variations are registered using JavaScript and need to be disabled with Ja
 ```js
 wp.domReady( () => {
 	wp.blocks.unregisterBlockVariation( 'core/group', 'group-row' );
-});
+} );
 ```
 
 Assuming the code was placed in a `disable-variations.js` file located in the root of your theme folder, you can enqueue this file in the theme's `functions.php` using the code below.
@@ -86,7 +86,7 @@ So, you would use the following code to disable the "Rounded" block style for th
 ```js
 wp.domReady( () => {
 	wp.blocks.unregisterBlockStyle( 'core/image', 'rounded' );
-});
+} );
 ```
 
 This JavaScript should be enqueued much like the block variation example above. Refer to the [block styles](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) documentation for how to register and unregister styles using PHP.
@@ -132,7 +132,7 @@ wp.domReady( () => {
 	wp.richText.unregisterFormatType( 'core/keyboard' );
 	wp.richText.unregisterFormatType( 'core/subscript' );
 	wp.richText.unregisterFormatType( 'core/superscript' );
-});
+} );
 ```
 
 This JavaScript should be enqueued much like the block variation example above.

@@ -7,6 +7,7 @@ As of WordPress 6.3, the Post Editor is iframed if all registered blocks have a 
 For more information about why the Editor is iframed, please revisit the post [Blocks in an iframed (template) editor](https://make.wordpress.org/core/2021/06/29/blocks-in-an-iframed-template-editor/).
 
 ## The Editor versus Editor content
+
 Before enqueueing assets in the Editor, you must first identify what you are trying to target.
 
 Do you want to add styling or JavaScript to the user-generated content (blocks) in the Editor? Or do you want to modify the Editor user interface (UI) components or interact with Editor APIs? This could include everything from creating custom block controls to registering block variations.
@@ -14,6 +15,7 @@ Do you want to add styling or JavaScript to the user-generated content (blocks) 
 There are different hooks to use depending on the answers to these questions, and if you are building a block or a theme, there are additional approaches to consider. Refer to the designated sections below.
 
 ## Scenarios for enqueuing assets
+
 ### Editor scripts and styles
 
 Whenever you need to enqueue assets for the Editor itself (i.e. not the user-generated content), you should use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) and [`wp_enqueue_style`](https://developer.wordpress.org/reference/functions/wp_enqueue_style/) functions.

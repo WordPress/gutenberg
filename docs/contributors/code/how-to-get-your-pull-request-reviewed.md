@@ -17,12 +17,13 @@ Large batches slow you down. Ship your work in small chunks to merge more and le
 ## Share relevant context:
 
 Clarify:
-* What problem are you solving?
-* How does your PR solve it?
-* What feedback do you need?
-* What’s out of scope?
-* What’s unintuitive?
-* How to test?
+
+-   What problem are you solving?
+-   How does your PR solve it?
+-   What feedback do you need?
+-   What’s out of scope?
+-   What’s unintuitive?
+-   How to test?
 
 Summarize any related issues and PRs.
 
@@ -57,9 +58,9 @@ Look up the PRs of commenters of related issues, previous committers, and tech l
 
 Is their work unfamiliar? Do:
 
-* Take some time to understand it
-* Propose a pair programming session
-* Skip, go for the next PR
+-   Take some time to understand it
+-   Propose a pair programming session
+-   Skip, go for the next PR
 
 ## Reduce risk with clarity
 
@@ -67,10 +68,10 @@ Risk adds friction – an approval can backfire later.
 
 Clarity is like grease. Clearly document:
 
-* What risks are involved? Why take them?
-* Why is this PR the best solution?
-* How can the risk be minimized?
-* What else has been tried?
+-   What risks are involved? Why take them?
+-   Why is this PR the best solution?
+-   How can the risk be minimized?
+-   What else has been tried?
 
 ## Follow the attention
 

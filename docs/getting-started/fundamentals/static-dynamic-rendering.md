@@ -53,6 +53,7 @@ On the front end, the block will return the following markup. Notice how the del
 ```html
 <pre class="wp-block-preformatted">This is some preformatted text</pre>
 ```
+
 </details>
 <br/>
 
@@ -66,10 +67,9 @@ WordPress provides mechanisms like the <a href="https://developer.wordpress.org/
 
 Additional examples of WordPress blocks that use static rendering, meaning their output is fixed at the time of saving and doesn't rely on server-side processing, include:
 
-- [Separator](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.js)
-- [Spacer](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js)
-- [Button](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.js)
-
+-   [Separator](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/separator/save.js)
+-   [Spacer](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/spacer/save.js)
+-   [Button](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/button/save.js)
 
 ## Dynamic rendering
 
@@ -93,9 +93,9 @@ A block can define dynamic rendering in two main ways:
 
 Both of these methods receive the following data:
 
- - `$attributes`: The array of attributes for the block.
- - `$content`: The markup of the block as stored in the database, if any.
- - `$block`: The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the rendered block ([metadata of the block](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)).
+-   `$attributes`: The array of attributes for the block.
+-   `$content`: The markup of the block as stored in the database, if any.
+-   `$block`: The instance of the [WP_Block](https://developer.wordpress.org/reference/classes/wp_block/) class that represents the rendered block ([metadata of the block](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)).
 
 <details><summary><strong>View an example of dynamic rendering in the Site Title block</strong></summary>
 <br/>
@@ -168,12 +168,12 @@ Blocks with dynamic rendering can also save an HTML representation of the block 
 
 In some cases, the block saves an HTML representation of the block and uses a dynamic rendering to fine-tune this markup if some conditions are met. Some examples of core blocks using this approach are:
 
-- The [Cover](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js) a full HTML representation of the block in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74), which [dynamically injects](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16) the featured image if the "Use featured image" setting is enabled.
-- The [Image](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) block also [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.js) its HTML representation in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363), which [adds additional attributes](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) to the markup if specific conditions are met.
+-   The [Cover](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover) block [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/cover/save.js) a full HTML representation of the block in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L74), which [dynamically injects](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/cover/index.php#L16) the featured image if the "Use featured image" setting is enabled.
+-   The [Image](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image) block also [saves](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/image/save.js) its HTML representation in the database. This markup is processed via a [`render_callback`](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L363), which [adds additional attributes](https://github.com/WordPress/gutenberg/blob/22741661998834e69db74ad863705ee2ce97b446/packages/block-library/src/image/index.php#L18) to the markup if specific conditions are met.
 
 If you are using [InnerBlocks](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/nested-blocks-inner-blocks/) in a dynamic block, you will need to save the `InnerBlocks` in the `save` callback function using `<InnerBlocks.Content/>`.
 
 ## Additional resources
 
-- [Static vs. dynamic blocks: What’s the difference?](https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/) | Developer Blog
-- [Block deprecation – a tutorial](https://developer.wordpress.org/news/2023/03/10/block-deprecation-a-tutorial/) | Developer Blog
+-   [Static vs. dynamic blocks: What’s the difference?](https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/) | Developer Blog
+-   [Block deprecation – a tutorial](https://developer.wordpress.org/news/2023/03/10/block-deprecation-a-tutorial/) | Developer Blog

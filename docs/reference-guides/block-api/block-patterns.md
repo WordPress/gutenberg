@@ -9,8 +9,9 @@ Block Patterns are predefined block layouts available from the patterns tab of t
 The editor comes with several core block patterns. Theme and plugin authors can register additional custom block patterns using the `register_block_pattern` helper function.
 
 The `register_block_pattern` helper function receives two arguments.
+
 -   `title`: A machine-readable title with a naming convention of `namespace/title`.
--	`properties`: An array describing properties of the pattern.
+-   `properties`: An array describing properties of the pattern.
 
 The properties available for block patterns are:
 
@@ -84,7 +85,7 @@ Block patterns can be grouped using categories. The block editor comes with bund
 The `register_block_pattern_category` helper function receives two arguments.
 
 -   `title`: A machine-readable title for the block pattern category.
--	`properties`: An array describing properties of the pattern category.
+-   `properties`: An array describing properties of the pattern category.
 
 The properties of the pattern categories include:
 

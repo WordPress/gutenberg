@@ -48,6 +48,3 @@ You should be able to insert the "My First Interactive Block" block into any pos
       <li><a href="https://github.com/WordPress/gutenberg/discussions/55642#">Interactivity API showcase</a></li>
     </ul>
 </div>
-
-
-

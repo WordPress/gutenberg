@@ -6,14 +6,14 @@ A JavaScript build step refers to the process of transforming, bundling, and opt
 
 You will typically be working with ESNext and JSX when building for the Block Editor, and all examples in the Block Editor Handbook are written in these syntaxes. Learning how to set up a build step is essential. However, configuring the necessary tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), and [ESLint](https://eslint.org/) can become complex. This is where `wp-scripts` comes in.
 
-Here are a few things that `wp-scripts` can do: 
+Here are a few things that `wp-scripts` can do:
 
-- **Compilation:** Converts modern JavaScript (ESNext and JSX) into code compatible with most browsers, using Babel.
-- **Bundling:** Uses webpack to combine multiple JavaScript files into a single bundle for better performance.
-- **Code Linting:** Provides configurations for ESLint to help ensure code quality and conformity to coding standards.
-- **Code Formatting:** Incorporates Prettier for automated code styling to maintain consistent code formatting across projects.
-- **Sass Compilation:** Converts Sass (.scss or .sass) files to standard CSS.
-- **Code Minification:** Reduces the size of the JavaScript code for production to ensure faster page loads.
+-   **Compilation:** Converts modern JavaScript (ESNext and JSX) into code compatible with most browsers, using Babel.
+-   **Bundling:** Uses webpack to combine multiple JavaScript files into a single bundle for better performance.
+-   **Code Linting:** Provides configurations for ESLint to help ensure code quality and conformity to coding standards.
+-   **Code Formatting:** Incorporates Prettier for automated code styling to maintain consistent code formatting across projects.
+-   **Sass Compilation:** Converts Sass (.scss or .sass) files to standard CSS.
+-   **Code Minification:** Reduces the size of the JavaScript code for production to ensure faster page loads.
 
 The package abstracts away much of the initial setup, configuration, and boilerplate code associated with JavaScript development for modern WordPress. You can then focus on building blocks and Block Editor extensions.
 
@@ -25,9 +25,9 @@ The package abstracts away much of the initial setup, configuration, and boilerp
 
 ### Installation
 
-Ensure you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not. 
+Ensure you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not.
 
-Then, create a project folder and ensure it contains a `package.json` file, a `build` folder, and an `src` folder. The `src` folder should also include an `index.js` file. 
+Then, create a project folder and ensure it contains a `package.json` file, a `build` folder, and an `src` folder. The `src` folder should also include an `index.js` file.
 
 If you have not created a `package.json` file before, navigate to the project folder in the terminal and run the `npm init` command. An interactive prompt will walk you through the steps. Configure as you like, but when it asks for the "entry point", enter `build/index.js`.
 
@@ -57,14 +57,14 @@ Once installed, you can run the predefined scripts provided with `wp-scripts` by
 
 ```json
 {
-    "scripts": {
-        "start": "wp-scripts start",
-        "build": "wp-scripts build"
-    }
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "wp-scripts build"
+	}
 }
 ```
 
-These scripts can then be run using the command `npm run {script name}`. 
+These scripts can then be run using the command `npm run {script name}`.
 
 ### The build process with `wp-scripts`
 
@@ -74,7 +74,7 @@ When working on your project, use the `npm run start` command. This will start a
 
 When you are ready to deploy your project, use the `npm run build` command. This optimizes your code and makes it production-ready.
 
-After the build finishes, you will see the compiled JavaScript file created at `build/index.js`. 
+After the build finishes, you will see the compiled JavaScript file created at `build/index.js`.
 
 A `build/index.asset.php` file will also be created in the build process, which contains an array of dependencies and a version number (for cache busting). Please, note that to register a block without this `wp-scripts` build process you'll need to manually create `*.asset.php` dependencies files (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6)).
 
@@ -82,7 +82,7 @@ A `build/index.asset.php` file will also be created in the build process, which 
 
 If you register a block via `register_block_type` the scripts defined in `block.json` will be automatically enqueued (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))
 
-To manually enqueue files in the editor, in any other context, you can refer to the [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) guide for more information, but here's a typical implementation. 
+To manually enqueue files in the editor, in any other context, you can refer to the [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) guide for more information, but here's a typical implementation.
 
 ```php
 /**
@@ -109,15 +109,15 @@ While `start` and `build` will be the two most used scripts, several other usefu
 
 ### Maintaining code quality
 
-To help developers improve the quality of their code, `wp-scripts` comes pre-configured with tools like ESLint and Prettier. ESLint ensures your JavaScript adheres to best practices and the [WordPress coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/), while Prettier automatically formats your code. The available scripts include: 
+To help developers improve the quality of their code, `wp-scripts` comes pre-configured with tools like ESLint and Prettier. ESLint ensures your JavaScript adheres to best practices and the [WordPress coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/), while Prettier automatically formats your code. The available scripts include:
 
 ```json
 {
-    "scripts": {
-        "format": "wp-scripts format",
-        "lint:css": "wp-scripts lint-style",
-        "lint:js": "wp-scripts lint-js",
-    }
+	"scripts": {
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js"
+	}
 }
 ```
 
@@ -129,16 +129,16 @@ Beyond just writing code, verifying its functionality is crucial. `wp-scripts` i
 
 ```json
 {
-    "scripts": {
-        "test:e2e": "wp-scripts test-e2e",
-        "test:unit": "wp-scripts test-unit-js"
-    }
+	"scripts": {
+		"test:e2e": "wp-scripts test-e2e",
+		"test:unit": "wp-scripts test-unit-js"
+	}
 }
 ```
 
 Unit tests validate individual units of code, such as functions, ensuring they work as intended, while end-to-end (E2E) tests evaluate the entire project by simulating real-world user scenarios to ensure all parts of the system work seamlessly together.
 
-### Advanced configurations 
+### Advanced configurations
 
 While `wp-scripts` provides a solid default configuration, there might be cases where you need more specialized setups. The good news is `wp-scripts` is highly adaptable. For example, you can extend and override the default webpack configuration, allowing you to add loaders and plugins or modify almost any part of the build process. This flexibility ensures that as your project grows or its requirements change, `wp-scripts` can be tailored to your evolving needs.
 
@@ -146,5 +146,5 @@ See the `wp-scripts` [package documentation](https://developer.wordpress.org/blo
 
 ## Additional resources
 
-- [@wordpress/scripts](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) (Official documentation)
-- [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) (WordPress Developer Blog)
+-   [@wordpress/scripts](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) (Official documentation)
+-   [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) (WordPress Developer Blog)

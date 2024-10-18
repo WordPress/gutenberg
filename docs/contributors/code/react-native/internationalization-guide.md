@@ -1,6 +1,7 @@
 # React Native Internationalization Guide
 
 The native version of the editor references two types of string:
+
 1. Strings used in web and native platforms.
 2. Strings used only in the native platform.
 
@@ -9,6 +10,7 @@ Regarding the first type, these strings are translated following the same proces
 ## Extract strings only used in the native platform
 
 In order to identify these strings, you can use the script [`extract-used-strings`](https://github.com/WordPress/gutenberg/blob/trunk/packages/react-native-editor/bin/extract-used-strings.js) located in `packages/react-native-editor/bin/extract-used-strings.js` to generate a JSON object that contains all the strings referenced including the platforms where they are used, as well as the files that reference it. Here you can see the format:
+
 ```
  {
 	"gutenberg": {
@@ -35,13 +37,15 @@ It's important to note that the JSON object contains all used strings, so in ord
 ### NPM command
 
 Extract used strings:
+
 ```sh
 npm run native i18n:extract-used-strings -- "$PWD/used-strings.json"
 ```
 
-***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.*
+**\*NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.\*
 
 Extract used strings including extra plugins:
+
 ```sh
 npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plugin-1" <PLUGIN-1_SOURCE_PATH> "domain-plugin-2" <PLUGIN-2_SOURCE_PATH> ...
 ```
@@ -51,8 +55,9 @@ npm run native i18n:extract-used-strings -- "$PWD/used-strings.json" "domain-plu
 Once you have the list of used strings in the native platform, the strings have to be translated, however, this process is out of the scope of the native version so you have to provide your own translations.
 
 The process for injecting the translations data into the editor is via the `translations` initial prop which is passed to the editor during its initialization:
-- [Android reference](https://github.com/WordPress/gutenberg/blob/72854b4d6b09bd7fb7f996a5c55dd3cc0613ddf8/packages/react-native-bridge/android/react-native-bridge/src/main/java/org/wordpress/mobile/WPAndroidGlue/GutenbergProps.kt#L34)
-- [iOS reference](https://github.com/WordPress/gutenberg/blob/72854b4d6b09bd7fb7f996a5c55dd3cc0613ddf8/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift#L39-L43)
+
+-   [Android reference](https://github.com/WordPress/gutenberg/blob/72854b4d6b09bd7fb7f996a5c55dd3cc0613ddf8/packages/react-native-bridge/android/react-native-bridge/src/main/java/org/wordpress/mobile/WPAndroidGlue/GutenbergProps.kt#L34)
+-   [iOS reference](https://github.com/WordPress/gutenberg/blob/72854b4d6b09bd7fb7f996a5c55dd3cc0613ddf8/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift#L39-L43)
 
 The mechanism for integrating the provided translations to the mobile client, via the mentioned `translations` initial prop, is not described here, as it's specific to the mobile client and could be achieved in different ways. Nevertheless, it's important that they're provided by the mentioned initial prop, as the editor is in charge of merging them with the translations already included in the editor.
 
@@ -73,13 +78,15 @@ The strings included in these translation files are imported in the editor upon 
 ### NPM command
 
 Fetch un-optimized translations:
+
 ```sh
 npm run native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH>
 ```
 
-***NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path  for relative paths.*
+**\*NOTE:** We need to pass absolute paths, otherwise it uses `packages/react-native-editor` as root path for relative paths.\*
 
 Fetch optimized translations:
+
 ```sh
 npm run native i18n:fetch-translations -- "gutenberg" <OUTPUT_PATH> <USED_STRINGS_FILE>
 ```

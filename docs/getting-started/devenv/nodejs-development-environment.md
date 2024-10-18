@@ -8,7 +8,6 @@ Node Package Manager ([`npm`](https://docs.npmjs.com/cli/v10/commands/npm)) serv
 
 The Node Package eXecute ([`npx`](https://docs.npmjs.com/cli/v10/commands/npx)) tool is used to run commands from packages without installing them globally and is commonly used when scaffolding blocks with the [`create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
 
-
 ## Node.js installation on Mac and Linux (with `nvm`)
 
 It's recommended that you use [Node Version Manager](https://github.com/nvm-sh/nvm) (`nvm`) to install Node.js. This allows you to install and manage specific versions of `node`, which are installed locally in your home directory, avoiding any global permission issues.
@@ -31,13 +30,13 @@ Some projects, like Gutenberg, include an [`.nvmrc`](https://github.com/WordPres
 
 ## Node.js installation on Windows and others
 
-You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux. 
+You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
 
 Microsoft also provides a [detailed guide](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows#install-nvm-windows-nodejs-and-npm) on how to install `nvm` and Node.js on Windows and WSL.
 
 ## Troubleshooting
 
-If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file. 
+If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file.
 
 The default shell is `zsh` on macOS, so create the profile file by running `touch ~/.zshrc` in the terminal. It's fine to run if the file already exists. The default profile is `bash` for Ubuntu, including WSL, so use `touch ~/.bashrc` instead. Then repeat steps 2-4.
 

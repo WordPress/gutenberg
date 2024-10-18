@@ -25,8 +25,6 @@ There are a number of core blocks using the RichText component. The JavaScript e
 
 ## Example
 
-
-
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
