@@ -53,7 +53,7 @@ export type TabsProps = {
 	 * tabbable.
 	 *
 	 * Note: this prop will be overridden by the `selectedTabId` prop if it is
-	 * provided (meaning the component will be use in "controlled" mode).
+	 * provided (meaning the component will be used in "controlled" mode).
 	 */
 	defaultTabId?: Ariakit.TabStoreProps[ 'defaultSelectedId' ];
 	/**
@@ -111,7 +111,7 @@ export type TabListProps = {
 export type TabProps = {
 	/**
 	 * The unique ID of the tab. It will be used to register the tab and match
-	 * it to a corresponding `Tabs.Tabpanel` component.
+	 * it to a corresponding `Tabs.TabPanel` component.
 	 */
 	tabId: NonNullable< Ariakit.TabProps[ 'id' ] >;
 	/**

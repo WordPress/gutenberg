@@ -115,7 +115,7 @@ The children elements, which should include one instance of the `Tabs.Tablist` c
 
 ###### `selectOnMove`: `boolean`
 
-Determines if the tab should be selected when it receives focus. If set to  `false`, the tab will only be selected upon clicking, not when using arrow keys to shift focus (manual tab activation). See the [official W3C docs](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/) for more info.
+Determines if the tab should be selected when it receives focus. If set to `false`, the tab will only be selected upon clicking, not when using arrow keys to shift focus (manual tab activation). See the [official W3C docs](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/) for more info.
 
 -   Required: No
 -   Default: `true`
@@ -136,7 +136,7 @@ The id of the tab whose panel is currently visible.
 
 If left `undefined`, it will be automatically set to the first enabled tab. If set to `null`, no tab will be selected, and the tablist will be tabbable.
 
-_Note: this prop will be overridden by the `selectedTabId` prop if it is provided (meaning the component will be use in "controlled" mode)._
+_Note: this prop will be overridden by the `selectedTabId` prop if it is provided (meaning the component will be used in "controlled" mode)._
 
 -   Required: No
 
@@ -201,7 +201,7 @@ The children elements, which should include one or more instances of the `Tabs.T
 
 ###### `tabId`: `string`
 
-The unique ID of the tab. It will be used to register the tab and match it to a corresponding `Tabs.Tabpanel` component. If not provided, a unique ID will be automatically generated.
+The unique ID of the tab. It will be used to register the tab and match it to a corresponding `Tabs.TabPanel` component. If not provided, a unique ID will be automatically generated.
 
 - Required: Yes
 
