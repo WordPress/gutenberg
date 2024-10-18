@@ -69,6 +69,8 @@ export function PrivateBlockToolbar( {
 		hasParentPattern,
 		hasContentOnlyLocking,
 		showShuffleButton,
+		showSlots,
+		showGroupButtons,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -135,6 +137,8 @@ export function PrivateBlockToolbar( {
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: isZoomOut(),
+			showSlots: ! isZoomOut(),
+			showGroupButtons: ! isZoomOut(),
 		};
 	}, [] );
 
@@ -209,7 +213,8 @@ export function PrivateBlockToolbar( {
 					) }
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
-					isMultiToolbar && <BlockGroupToolbar /> }
+					isMultiToolbar &&
+					showGroupButtons && <BlockGroupToolbar /> }
 				{ showShuffleButton && (
 					<ToolbarGroup>
 						<Shuffle
@@ -218,7 +223,7 @@ export function PrivateBlockToolbar( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ shouldShowVisualToolbar && (
+				{ shouldShowVisualToolbar && showSlots && (
 					<>
 						<BlockControls.Slot
 							group="parent"
