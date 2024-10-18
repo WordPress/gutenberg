@@ -149,7 +149,7 @@ function Header( {
 				) }
 
 				{ canBeZoomedOut && isEditorIframed && isWideViewport && (
-					<ZoomOutToggle />
+					<ZoomOutToggle disabled={ forceDisableBlockTools } />
 				) }
 
 				<PreviewDropdown
