@@ -25,7 +25,7 @@ $block-editor-link-control-number-of-actions: 1;
 	.show-icon-labels & {
 		.components-button.has-icon {
 			// Hide the button icons when labels are set to display...
-			svg {
+			svg, img {
 				display: none;
 			}
 			// ... and display labels.
