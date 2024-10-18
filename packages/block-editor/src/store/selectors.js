@@ -566,9 +566,13 @@ export function getSelectedBlockClientId( state ) {
  * 		}
  * 	}
  *
- * 	wp.data.subscribe(() => {
- * 		getActiveBlockData()
- * 	})
+ * 	// Subscribe to changes in the editor
+ * 	// wp.data.subscribe(() => {
+ * 		// getActiveBlockData()
+ * 	// })
+ *
+ * 	// Update active block data on click
+ * 	// onclick="getActiveBlockData()"
  *```
  *
  * @return {?Object} Selected block.
