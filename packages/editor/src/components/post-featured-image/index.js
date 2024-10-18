@@ -122,16 +122,16 @@ function PostFeaturedImage( {
 	}
 
 	/**
-	 * Get image Alt text.
+	 * Generates the featured image alt text for this editing context.
 	 *
-	 * @param {Object} imageMedia                               - The image media object.
-	 * @param {string} imageMedia.alt_text                      - The alternative text of the image.
-	 * @param {Object} imageMedia.media_details                 - The media details of the image.
-	 * @param {Object} imageMedia.media_details.sizes           - The sizes of the image.
-	 * @param {Object} imageMedia.media_details.sizes.full      - The full size details of the image.
-	 * @param {string} imageMedia.media_details.sizes.full.file - The file name of the full size image.
-	 * @param {string} imageMedia.slug                          - The slug of the image.
-	 * @return {string} The description of the image.
+	 * @param {Object} imageMedia                               The image media object.
+	 * @param {string} imageMedia.alt_text                      The alternative text of the image.
+	 * @param {Object} imageMedia.media_details                 The media details of the image.
+	 * @param {Object} imageMedia.media_details.sizes           The sizes of the image.
+	 * @param {Object} imageMedia.media_details.sizes.full      The full size details of the image.
+	 * @param {string} imageMedia.media_details.sizes.full.file The file name of the full size image.
+	 * @param {string} imageMedia.slug                          The slug of the image.
+	 * @return {string} The featured image alt text.
 	 */
 	function getImageDescription( imageMedia ) {
 		if ( imageMedia.alt_text ) {
