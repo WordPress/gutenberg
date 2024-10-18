@@ -1628,18 +1628,8 @@ const isBlockVisibleInTheInserter = (
 	checkedBlocks.add( blockName );
 
 	// If parent blocks are not visible, child blocks should be hidden too.
-	//
-	// In some scenarios, blockType.parent may be a string.
-	// A better approach would be sanitize parent in all the places that can be modified:
-	// block registration, processBlockType, filters, etc.
-	// In the meantime, this is a hotfix to prevent the editor from crashing.
-	const parent =
-		typeof blockType.parent === 'string' ||
-		blockType.parent instanceof String
-			? [ blockType.parent ]
-			: blockType.parent;
-	if ( Array.isArray( parent ) ) {
-		return parent.some(
+	if ( Array.isArray( blockType.parent ) ) {
+		return blockType.parent.some(
 			( name ) =>
 				( blockName !== name &&
 					isBlockVisibleInTheInserter(
