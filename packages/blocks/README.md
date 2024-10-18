@@ -206,6 +206,21 @@ _Returns_
 
 -   `?*`: Block support value
 
+### getBlockTransformationResults
+
+Get the results of a specific transformation of the new block type.
+
+_Parameters_
+
+-   _blocks_ `Array|Object`: Blocks array or block object.
+-   _name_ `string`: Block name.
+-   _transformation_ `Object`: The specific transformation to use.
+-   _variation_ `?string`: Optional variation of new block type to apply.
+
+_Returns_
+
+-   `?Array`: Array of blocks or null.
+
 ### getBlockTransforms
 
 Returns normal block transforms for a given transform direction, optionally for a specific block by name, or an empty array if there are no transforms. If no block name is provided, returns transforms for all blocks. A normal transform object includes `blockName` as a property.
@@ -290,6 +305,18 @@ _Parameters_
 _Returns_
 
 -   `Array`: Block types that the blocks argument can be transformed to.
+
+### getPossibleTransformationsForBlocks
+
+Returns an array of transformations that the set of blocks received as argument can be transformed into.
+
+_Parameters_
+
+-   _blocks_ `Array`: Blocks array.
+
+_Returns_
+
+-   `Array`: Block transformations that the blocks argument can be used with.
 
 ### getSaveContent
 
@@ -835,6 +862,7 @@ _Parameters_
 
 -   _blocks_ `Array|Object`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variation_ `?string`: Optional variation of new block type.
 
 _Returns_
 

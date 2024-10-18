@@ -40,6 +40,7 @@ A block variation is defined by an object that can contain the following fields:
     -   `block` - Used by blocks to filter specific block variations. `Columns` and `Query` blocks have such variations, which are passed to the [experimental BlockVariationPicker](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md) component. This component handles displaying the variations and allows users to choose one of them.
     -   `inserter` - Block variation is shown on the inserter.
     -   `transform` - Block variation is shown in the component for variation transformations.
+	-   `switcher` - Block variation is shown in the block switcher menu.
 -   `isDefault` (optional, type `boolean`) – Defaults to `false`. Indicates whether the current variation is the default one (details below).
 -   `isActive` (optional, type `Function|string[]`) - A function or an array of block attributes that is used to determine if the variation is active when the block is selected. The function accepts `blockAttributes` and `variationAttributes` (details below).
 
