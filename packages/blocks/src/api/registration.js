@@ -232,6 +232,13 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	if (
+		typeof settings?.parent === 'string' ||
+		settings?.parent instanceof String
+	) {
+		settings.parent = [ settings.parent ];
+	}
+
 	if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
 		warning(
 			'Block "' +
