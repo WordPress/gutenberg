@@ -80,6 +80,7 @@ function useInsertionPoint( {
 				getBlockIndex,
 				getBlockOrder,
 				getSectionRootClientId,
+				__unstableGetEditorMode,
 			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -95,7 +96,13 @@ function useInsertionPoint( {
 			} else if ( ! isAppender && selectedBlockClientId ) {
 				const sectionRootClientId = getSectionRootClientId();
 
-				if ( sectionRootClientId === selectedBlockClientId ) {
+				// Avoids empty inserter when the selected block is acting
+				// as the "root".
+				// See https://github.com/WordPress/gutenberg/pull/66214.
+				if (
+					__unstableGetEditorMode() === 'zoom-out' &&
+					sectionRootClientId === selectedBlockClientId
+				) {
 					_destinationRootClientId = sectionRootClientId;
 					_destinationIndex = getBlockOrder(
 						_destinationRootClientId
