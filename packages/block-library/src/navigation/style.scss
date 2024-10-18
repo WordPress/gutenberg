@@ -507,10 +507,10 @@ button.wp-block-navigation-item__content {
 		@include reduce-motion("animation");
 
 		// Try to inherit any root paddings set, so the X can align to a top-right aligned menu.
-		padding-top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
-		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
-		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
-		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20em);
+		padding-top: min(clamp(1rem, var(--wp--style--root--padding-top), 20rem), var(--wp--style--root--padding-top));
+		padding-right: min(clamp(1rem, var(--wp--style--root--padding-right), 20rem), var(--wp--style--root--padding-right));
+		padding-bottom: min(clamp(1rem, var(--wp--style--root--padding-bottom), 20rem), var(--wp--style--root--padding-bottom));
+		padding-left: min(clamp(1rem, var(--wp--style--root--padding-left), 20em), var(--wp--style--root--padding-left));
 
 		// Allow modal to scroll.
 		overflow: auto;
