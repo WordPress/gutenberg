@@ -14,7 +14,8 @@ import ResizableBox from '..';
 import { useState } from '@wordpress/element';
 
 const meta: Meta< typeof ResizableBox > = {
-	title: 'Components/ResizableBox',
+	title: 'Components/Utilities/ResizableBox',
+	id: 'components-resizablebox',
 	component: ResizableBox,
 	argTypes: {
 		children: { control: { type: null } },

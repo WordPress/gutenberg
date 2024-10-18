@@ -16,7 +16,8 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Composite',
+	title: 'Components/Utilities/Composite',
+	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
