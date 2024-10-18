@@ -56,7 +56,13 @@ html.interface-interface-skeleton__html-container {
 	// or beyond the bottom of the page when the soft keyboard is showing, you scroll
 	// the body element and can scroll the toolbar out of view.
 	// This is still preferable, though, as it allows the editor to function at all.
-	overflow: auto;
+	@media (max-width: #{ ($break-medium - 1) }) {
+		overflow: auto;
+	}
+
+	@include break-medium() {
+		overflow-y: auto;
+	}
 
 	// In future versions of Mobile Safari, hopefully overscroll-behavior will be supported.
 	// This allows us to disallow the scroll-chaining and rubber-banding that is currently
