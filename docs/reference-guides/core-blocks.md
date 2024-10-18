@@ -912,7 +912,7 @@ A cloud of popular keywords, each sized by how often it appears. ([Source](https
 
 -	**Name:** core/tag-cloud
 -	**Category:** widgets
--	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (lineHeight), ~~html~~
 -	**Attributes:** largestFontSize, numberOfTags, showTagCounts, smallestFontSize, taxonomy
 
 ## Template Part
