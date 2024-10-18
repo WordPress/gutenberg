@@ -79,7 +79,7 @@ export type TabsProps = {
 	 * Note: this prop will be overridden by the `activeTabId` prop if it is
 	 * provided.
 	 */
-	defaultActiveTabId?: Ariakit.CompositeStoreProps[ 'defaultActiveId' ];
+	defaultActiveTabId?: Ariakit.TabStoreProps[ 'defaultActiveId' ];
 	/**
 	 * A callback that gets called when the `activeTabId` state changes.
 	 */
