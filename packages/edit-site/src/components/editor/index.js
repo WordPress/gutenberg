@@ -23,6 +23,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Icon, arrowUpLeft } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -153,6 +154,9 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -261,6 +265,11 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												setCanvasMode( 'view' );
+												__unstableSetEditorMode(
+													'edit'
+												);
+												resetZoomLevel();
+
 												// TODO: this is a temporary solution to navigate to the posts list if we are
 												// come here through `posts list` and are in focus mode editing a template, template part etc..
 												if (
