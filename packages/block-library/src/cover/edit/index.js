@@ -569,7 +569,6 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isUploadingMedia && <Spinner /> }
 
 				{ showOverlay && (
 					<span
@@ -592,6 +591,8 @@ function CoverEdit( {
 						style={ { backgroundImage: gradientValue, ...bgStyle } }
 					/>
 				) }
+
+				{ isUploadingMedia && <Spinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons
