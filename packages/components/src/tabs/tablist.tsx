@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useStoreState } from '@ariakit/react';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -62,10 +62,10 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
-	const selectedId = useStoreState( store, 'selectedId' );
-	const activeId = useStoreState( store, 'activeId' );
-	const selectOnMove = useStoreState( store, 'selectOnMove' );
-	const items = useStoreState( store, 'items' );
+	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
+	const activeId = Ariakit.useStoreState( store, 'activeId' );
+	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
+	const items = Ariakit.useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
 
