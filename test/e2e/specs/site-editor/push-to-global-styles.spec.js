@@ -29,13 +29,14 @@ test.describe( 'Push to Global Styles button', () => {
 		await page.keyboard.type( 'A heading' );
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		const settingsPanel = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
 
 		// Navigate to Styles -> Blocks -> Heading -> Typography
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Heading block styles' } )
-			.click();
+		await settingsPanel.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settingsPanel.getByRole( 'button', { name: 'Heading' } ).click();
 
 		// Headings should not have uppercase
 		await expect(
@@ -95,9 +96,9 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Heading block styles' } )
+		await page.getByRole( 'button', { name: 'Blocks' } ).click();
+		await settingsPanel
+			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();
 
 		// Headings should now have uppercase

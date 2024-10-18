@@ -97,8 +97,8 @@ test.describe( 'Style Book', () => {
 	test( 'should allow to return Global Styles root when example is clicked', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Blocks styles"]' );
-		await page.click( 'role=button[name="Heading block styles"]' );
+		await page.click( 'role=button[name="Blocks"]' );
+		await page.click( 'role=button[name="Heading"]' );
 
 		await page
 			.frameLocator( '[name="style-book-canvas"]' )
@@ -111,7 +111,7 @@ test.describe( 'Style Book', () => {
 		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
-			page.locator( 'role=button[name="Blocks styles"]' )
+			page.locator( 'role=button[name="Blocks"]' )
 		).toBeVisible();
 	} );
 

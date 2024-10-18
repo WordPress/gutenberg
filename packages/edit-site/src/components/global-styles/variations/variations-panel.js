@@ -55,7 +55,6 @@ export function VariationsPanel( { name } ) {
 							'/variations/' +
 							encodeURIComponent( style.name )
 						}
-						aria-label={ style.label }
 					>
 						{ style.label }
 					</NavigationButtonAsItem>

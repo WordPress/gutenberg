@@ -86,16 +86,9 @@ function BlockMenuItem( { block } ) {
 		return null;
 	}
 
-	const navigationButtonLabel = sprintf(
-		// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-		__( '%s block styles' ),
-		block.title
-	);
-
 	return (
 		<NavigationButtonAsItem
 			path={ '/blocks/' + encodeURIComponent( block.name ) }
-			aria-label={ navigationButtonLabel }
 		>
 			<HStack justify="flex-start">
 				<BlockIcon icon={ block.icon } />
