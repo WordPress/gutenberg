@@ -226,5 +226,8 @@ export const Tabs = Object.assign(
 		TabPanel: Object.assign( TabPanel, {
 			displayName: 'Tabs.TabPanel',
 		} ),
+		Context: Object.assign( TabsContext, {
+			displayName: 'Tabs.Context',
+		} ),
 	}
 );
