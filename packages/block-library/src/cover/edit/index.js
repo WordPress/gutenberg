@@ -205,8 +205,8 @@ function CoverEdit( {
 		if ( backgroundType === IMAGE_BACKGROUND_TYPE && mediaAttributes.id ) {
 			const { imageDefaultSize } = getSettings();
 
-			// Try to use the previous selected image size if its available
-			// otherwise try the default image size or fallback full size.
+			// Try to use the previous selected image size if it's available
+			// otherwise try the default image size or fallback to full size.
 			if ( sizeSlug && newMedia?.sizes?.[ sizeSlug ] ) {
 				mediaAttributes.sizeSlug = sizeSlug;
 				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ]?.url;
@@ -255,7 +255,6 @@ function CoverEdit( {
 			isDark: newIsDark,
 		} );
 	};
-
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
 		const newIsDark = compositeIsDark(
