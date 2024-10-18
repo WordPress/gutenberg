@@ -18,12 +18,7 @@
 	img {
 		height: auto;
 		max-width: 100%;
-	}
-
-	// Inherit border radius from style variations.
-	a,
-	img {
-		border-radius: inherit;
+		box-sizing: border-box;
 	}
 
 	&.aligncenter {
