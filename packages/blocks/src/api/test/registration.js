@@ -1512,20 +1512,38 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		it( 'should not override label from the server', () => {
+		it( 'should override label from the server', () => {
 			// Simulate bootstrap source from the server.
 			registerBlockBindingsSource( {
-				name: 'core/server',
+				name: 'core/testing',
 				label: 'Server label',
 			} );
 			// Override the source with a different label in the client.
 			registerBlockBindingsSource( {
-				name: 'core/server',
+				name: 'core/testing',
 				label: 'Client label',
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block bindings "core/server" source label is already defined in the server.'
+				'Block bindings "core/testing" source label was overriden.'
 			);
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Client label' );
+		} );
+
+		it( 'should keep label from the server when not defined in the client', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Server label' );
 		} );
 
 		// Check the `usesContext` array is correct.
