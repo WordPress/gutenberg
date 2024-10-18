@@ -197,5 +197,12 @@ export const processBlockType =
 			return;
 		}
 
+		if (
+			typeof settings.parent === 'string' ||
+			settings.parent instanceof String
+		) {
+			settings.parent = [ settings.parent ];
+		}
+
 		return settings;
 	};
