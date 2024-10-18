@@ -64,7 +64,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 				getBlockType( blockName ).attributes?.[ attribute ]?.type;
 			return _attributeType === 'rich-text' ? 'string' : _attributeType;
 		},
-		[ clientId ]
+		[ clientId, attribute ]
 	);
 	return (
 		<>
