@@ -19,6 +19,7 @@
 	background: $white;
 	padding-right: $grid-unit-15; // Reduced padding to account for close buttons.
 	gap: $grid-unit-10; // Always ensure space between contents and close buttons.
+	display: none;
 
 	.interface-complementary-area-header__title {
 		margin: 0;
@@ -35,5 +36,9 @@
 		@include break-medium() {
 			display: flex;
 		}
+	}
+
+	@include break-medium() {
+		display: flex;
 	}
 }
