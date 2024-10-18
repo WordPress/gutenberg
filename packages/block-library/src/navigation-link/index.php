@@ -176,8 +176,16 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	// Don't render the block's subtree if it is a draft or if the ID does not exist.
 	if ( $is_post_type && $navigation_link_has_id ) {
+
+		// Only render published or private posts.
+		// Note private posts are displayed to mirror behaviour of the Classic Menus system.
+		// It is not possible to add a Private posts to a menu, but if a post is added and then
+		// subsequently set to Private, it should still be displayed in the menu.
+		// See: https://github.com/WordPress/gutenberg/issues/33215.
+		$valid_post_statuses = array( 'publish', 'private' );
+
 		$post = get_post( $attributes['id'] );
-		if ( ! $post || 'publish' !== $post->post_status ) {
+		if ( ! $post || ! in_array( $post->post_status, $valid_post_statuses, true ) ) {
 			return '';
 		}
 	}
