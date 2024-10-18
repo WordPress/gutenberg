@@ -42,14 +42,14 @@ export const defaultLayouts = {
 	},
 	[ LAYOUT_GRID ]: {
 		layout: {
-			mediaField: 'featured-image',
+			mediaField: 'content-preview',
 			primaryField: 'title',
 		},
 	},
 	[ LAYOUT_LIST ]: {
 		layout: {
 			primaryField: 'title',
-			mediaField: 'featured-image',
+			mediaField: 'content-preview',
 		},
 	},
 };

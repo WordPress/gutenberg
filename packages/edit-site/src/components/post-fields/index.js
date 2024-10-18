@@ -26,6 +26,12 @@ import {
 import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { parse } from '@wordpress/blocks';
+import {
+	BlockPreview,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
+import { EditorProvider } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -38,6 +44,11 @@ import {
 } from '../../utils/constants';
 import { default as Link, useLink } from '../routes/link';
 import Media from '../media';
+import usePatternSettings from '../page-patterns/use-pattern-settings';
+import { unlock } from '../../lock-unlock';
+import { Async } from '../async';
+
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -121,6 +132,50 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+function ContentPreview( { item } ) {
+	const settings = usePatternSettings();
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const blocks = useMemo( () => {
+		return parse( item.content.raw );
+	}, [ item.content.raw ] );
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+
+	const isEmpty = ! blocks?.length;
+	// Wrap everything in a block editor provider to ensure 'styles' that are needed
+	// for the previews are synced between the site editor store and the block editor store.
+	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
+	// render patterns inside the previews.
+	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
+	// the block editor settings are needed in context where we don't have the block editor.
+	// Explore how we can solve this in a better way.
+	return (
+		<EditorProvider post={ item } settings={ settings }>
+			<div
+				className="edit-site-post-list-content-preview"
+				style={ { backgroundColor } }
+			>
+				<button
+					className="edit-site-post-list-content-preview__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || item.title }
+				>
+					{ isEmpty && __( 'Empty page' ) }
+					{ ! isEmpty && (
+						<Async>
+							<BlockPreview blocks={ blocks } />
+						</Async>
+					) }
+				</button>
+			</div>
+		</EditorProvider>
+	);
+}
+
 function PostStatusField( { item } ) {
 	const status = STATUSES.find( ( { value } ) => value === item.status );
 	const label = status?.label || item.status;
@@ -198,6 +253,16 @@ function usePostFields( viewType ) {
 					<FeaturedImage item={ item } viewType={ viewType } />
 				),
 				enableSorting: false,
+				isMediaField: true,
+			},
+			{
+				id: 'content-preview',
+				label: __( 'Content' ),
+				render: ( { item } ) => (
+					<ContentPreview item={ item } viewType={ viewType } />
+				),
+				enableSorting: false,
+				isMediaField: true,
 			},
 			{
 				label: __( 'Title' ),
