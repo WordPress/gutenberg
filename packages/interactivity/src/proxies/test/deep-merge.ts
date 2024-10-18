@@ -415,6 +415,13 @@ describe( 'Interactivity API', () => {
 
 			// Reading the value directly should also work
 			expect( target.a.b.c.d ).toBe( 'test value' );
+
+			// Modify the nested value
+			target.a.b.c.d = 'new test value';
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 3 );
+			expect( deepValue ).toBe( 'new test value' );
 		} );
 
 		it( 'should overwrite values that become objects', () => {
@@ -464,34 +471,6 @@ describe( 'Interactivity API', () => {
 			expect( target.message ).toBe( 'hello' );
 			expect( target.message.content ).toBeUndefined();
 			expect( target.message.fontStyle ).toBeUndefined();
-		} );
-
-		it( 'should keep reactivity of objects that are initially undefined', () => {
-			const target: any = proxifyState( 'test', {} );
-
-			let deepValue: any;
-			const spy = jest.fn( () => {
-				deepValue = target.obj?.nested;
-			} );
-			effect( spy );
-
-			// Initial call, the deep value is undefined
-			expect( spy ).toHaveBeenCalledTimes( 1 );
-			expect( deepValue ).toBeUndefined();
-
-			// Use deepMerge to add a deeply nested object to the target
-			deepMerge( target, { obj: { nested: 'value 1' } } );
-
-			// The effect should be called again
-			expect( spy ).toHaveBeenCalledTimes( 2 );
-			expect( deepValue ).toBe( 'value 1' );
-
-			// Modify the nested value
-			target.obj.nested = 'value 2';
-
-			// The effect should be called again
-			expect( spy ).toHaveBeenCalledTimes( 3 );
-			expect( deepValue ).toBe( 'value 2' );
 		} );
 
 		it( 'should keep reactivity of arrays that are initially undefined', () => {
