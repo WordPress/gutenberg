@@ -9,6 +9,7 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+		width: fit-content;
 
 		@media (prefers-reduced-motion: no-preference) {
 			&.hide {
