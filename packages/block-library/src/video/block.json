@@ -95,7 +95,17 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalSkipSerialization": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-video video, .wp-block-video .components-placeholder"
 	},
 	"editorStyle": "wp-block-video-editor",
 	"style": "wp-block-video"
