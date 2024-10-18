@@ -4,6 +4,7 @@
 import EditorFullPage from './fullpage';
 import EditorBox from './box';
 import EditorWithUndoRedo from './with-undo-redo';
+import EditorZoomOut from './zoom-out';
 
 export default {
 	title: 'Playground/Block Editor',
@@ -34,4 +35,12 @@ export const UndoRedo = () => {
 
 UndoRedo.parameters = {
 	sourceLink: 'storybook/stories/playground/with-undo-redo/index.js',
+};
+
+export const ZoomOut = () => {
+	return <EditorZoomOut />;
+};
+
+ZoomOut.parameters = {
+	sourceLink: 'storybook/stories/playground/zoom-out/index.js',
 };
