@@ -92,6 +92,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	protected static $theme_json_file_cache = array();
 
 	/**
+	 * Cache for resolved files per theme.
+	 *
+	 * @since 6.8.0
+	 * @var array
+	 */
+	protected static $resolved_theme_uris_cache = array();
+
+	/**
 	 * Processes a file that adheres to the theme.json schema
 	 * and returns an array with its contents, or a void array if none found.
 	 *
@@ -696,20 +704,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *              and `$i18n_schema` variables to reset.
 	 * @since 6.1.0 Added the `$blocks` and `$blocks_cache` variables
 	 *              to reset.
+	 * @since 6.8.0 Added the `$resolved_theme_uris_cache` variable to reset.
 	 */
 	public static function clean_cached_data() {
-		static::$core                     = null;
-		static::$blocks                   = null;
-		static::$blocks_cache             = array(
+		static::$core                      = null;
+		static::$blocks                    = null;
+		static::$blocks_cache              = array(
 			'core'   => array(),
 			'blocks' => array(),
 			'theme'  => array(),
 			'user'   => array(),
 		);
-		static::$theme                    = null;
-		static::$user                     = null;
-		static::$user_custom_post_type_id = null;
-		static::$i18n_schema              = null;
+		static::$theme                     = null;
+		static::$user                      = null;
+		static::$user_custom_post_type_id  = null;
+		static::$i18n_schema               = null;
+		static::$resolved_theme_uris_cache = array();
 	}
 
 	/**
@@ -850,6 +860,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $resolved_theme_uris;
 		}
 
+		$current_stylesheet_directory = get_stylesheet_directory();
+		if ( $current_stylesheet_directory && ! empty( static::$resolved_theme_uris_cache[ $current_stylesheet_directory ] ) ) {
+			return static::$resolved_theme_uris_cache[ $current_stylesheet_directory ];
+		}
+
 		$theme_json_data = $theme_json->get_raw_data();
 
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
@@ -901,7 +916,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				}
 			}
 		}
-
+		if ( $current_stylesheet_directory ) {
+			static::$resolved_theme_uris_cache[ $current_stylesheet_directory ] = $resolved_theme_uris;
+		}
 		return $resolved_theme_uris;
 	}
 
