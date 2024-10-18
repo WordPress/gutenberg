@@ -761,6 +761,21 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles
+	 */
+	public function test_get_user_data_from_wp_global_styles_returns_created_post() {
+		// Switch to a theme that does have support.
+		switch_theme( 'block-theme' );
+		wp_set_current_user( self::$administrator_id );
+		$theme = wp_get_theme();
+
+		$created  = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme, true );
+		$returned = WP_Theme_JSON_Resolver_Gutenberg::get_user_data_from_wp_global_styles( $theme );
+
+		$this->assertSame( $created, $returned, 'User data does not return created post' );
+	}
+
+	/**
 	 * @covers WP_Theme_JSON_Resolver_Gutenberg::get_theme_data
 	 */
 	public function test_get_theme_data_theme_supports_overrides_theme_json() {
