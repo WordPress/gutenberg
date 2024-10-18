@@ -47,6 +47,12 @@ type BaseButtonProps = {
 	 */
 	description?: string;
 	/**
+	 * Whether to show the accessible description.
+	 *
+	 * @default false
+	 */
+	showDescription?: boolean;
+	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
 	icon?: IconProps[ 'icon' ];
@@ -55,7 +61,7 @@ type BaseButtonProps = {
 	 *
 	 * @default 'left'
 	 */
-	iconPosition?: 'left' | 'right';
+	iconPosition?: 'left' | 'right' | 'top';
 	/**
 	 * If provided with `icon`, sets the icon size.
 	 * Please refer to the Icon component for more details regarding
