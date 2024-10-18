@@ -16,6 +16,7 @@ import {
 	getTemplateLock,
 	getClientIdsWithDescendants,
 	isNavigationMode,
+	__unstableGetEditorMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -546,7 +547,7 @@ export const getBlockStyles = createSelector(
  * @return {boolean} Is zoom out mode enabled.
  */
 export function isZoomOutMode( state ) {
-	return state.editorMode === 'zoom-out';
+	return __unstableGetEditorMode( state ) === 'zoom-out';
 }
 
 /**
