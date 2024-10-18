@@ -139,6 +139,7 @@ function Header( {
 					// when the publish sidebar has been closed.
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
+
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
 					disabled={ isNestedEntity }
@@ -149,7 +150,9 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				{ isEditorIframed && isWideViewport && <ZoomOutToggle /> }
+				{ isEditorIframed && isWideViewport && (
+					<ZoomOutToggle disabled={ forceDisableBlockTools } />
+				) }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
