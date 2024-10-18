@@ -116,5 +116,10 @@
 		}
 	},
 	"editorStyle": "wp-block-latest-posts-editor",
-	"style": "wp-block-latest-posts"
+	"style": [
+		"wp-block-latest-posts",
+		"wp-block-video",
+		"wp-block-cover",
+		"wp-block-media-text"
+	]
 }
