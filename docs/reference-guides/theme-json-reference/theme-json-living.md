@@ -192,6 +192,7 @@ Settings related to typography.
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
+| textShadow | Allow users to set text shadow. | `boolean` | `false` |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
@@ -328,6 +329,7 @@ Typography styles.
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
+| textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 
 ---
 
