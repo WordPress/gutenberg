@@ -248,7 +248,7 @@ describe( 'Tabs', () => {
 			expect( alphaButton ).toHaveFocus();
 		} );
 
-		it( 'should focus the first tab, even if disabled, when the current selected tab id doesnt match an existing one', async () => {
+		it( "should focus the first tab, even if disabled, when the current selected tab id doesn't match an existing one", async () => {
 			const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
 				tabObj.tabId === 'alpha'
 					? {
