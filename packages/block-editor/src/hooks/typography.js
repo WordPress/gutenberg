@@ -131,10 +131,9 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		TYPOGRAPHY_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultControls = 
+		getBlockSupport( name, [ TYPOGRAPHY_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ TYPOGRAPHY_SUPPORT_KEY, 'defaultControls' ] );
 
 	return (
 		<StylesTypographyPanel
