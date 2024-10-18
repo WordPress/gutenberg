@@ -47,4 +47,36 @@ test.describe( 'Zoom Out', () => {
 		expect( htmlRect.y + paddingTop ).toBeGreaterThan( iframeRect.y );
 		expect( htmlRect.x ).toBeGreaterThan( iframeRect.x );
 	} );
+
+	test( 'When in zoom out, a vertical toolbar appears for sections', async ( {
+		page,
+		editor,
+	} ) => {
+		await page.getByLabel( 'Zoom Out' ).click();
+
+		const firstPattern = editor.canvas
+			.locator( 'div' )
+			.filter( { hasText: 'A commitment to innovation' } )
+			.nth( 1 );
+
+		//Click on the first pattern of the theme
+		await firstPattern.click();
+
+		const toolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+
+		await expect( toolbar ).toBeVisible();
+
+		const toolbarRect = await toolbar.boundingBox();
+		const firstPatternRect = await firstPattern.boundingBox();
+
+		//Check that the toolbar is vertically aligned to the pattern and to the left
+		expect( Math.round( toolbarRect.y ) ).toEqual(
+			Math.round( firstPatternRect.y )
+		);
+		expect(
+			Math.round( toolbarRect.x ) + Math.round( toolbarRect.width )
+		).toEqual( Math.round( firstPatternRect.x ) );
+	} );
 } );
