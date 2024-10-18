@@ -1,0 +1,185 @@
+# Package labeling rules
+
+"[Package] A11y":
+- packages/a11y/**
+#"[Package] ":
+#- packages/annotations/**
+"[Package] API fetch":
+- packages/api-fetch/**
+"[Package] Autop":
+- packages/autop/**
+"[Package] Babel plugin import JSX pragma":
+- packages/babel-plugin-import-jsx-pragma/**
+"[Package] Babel plugin makepot":
+- packages/babel-plugin-makepot/**
+"[Package] Babel preset":
+- packages/babel-preset-default/**
+"[Package] Base styles":
+- packages/base-styles/**
+"[Package] Blob":
+- packages/blob/**
+#"[Package] Block directory":
+#- packages/block directory/**
+"[Package] Block editor":
+- packages/block-editor/**
+"[Package] Block library":
+- packages/block-library/**
+#"":
+#- packages/block-serialization-default-parser/**
+#"":
+#- packages/block-serialization-spec-parser/**
+"[Package] Blocks":
+- packages/blocks/**
+"[Package] Browserslist config":
+- packages/browserslist-config/**
+"[Package] Commands":
+- packages/commands/**
+"[Package] Components":
+- packages/components/**
+"[Package] Compose":
+- packages/compose/**
+#"":
+#- packages/core-commands/**
+"[Package] Core data":
+- packages/core-data/**
+"[Package] Create Block":
+- packages/create-block-interactive-template/**
+- packages/create-block-tutorial-template/**
+- packages/create-block/**
+#"":
+#- packages/customize-widgets/**
+"[Package] Data Controls":
+- packages/data-controls/**
+"[Package] Data":
+- packages/data/**
+"[Package] Date":
+- packages/date/**
+"[Package] Dependency Extraction Webpack Plugin":
+- packages/dependency-extraction-webpack-plugin/**
+"[Package] Deprecated":
+- packages/deprecated/**
+"[Package] Docgen":
+- packages/docgen/**
+"[Package] DOM ready":
+- packages/dom-ready/**
+"[Package] DOM":
+- packages/dom/**
+"[Package] E2E Test Utils":
+- packages/e2e-tests-utils-playwright/**
+- packages/e2e-test-utils/**
+"[Package] E2E Tests":
+- packages/e2e-tests/**
+"[Package] Edit Post":
+- packages/edit-post/**
+"[Package] Edit Site":
+- packages/edit-site/**
+"[Package] Edit Widgets":
+- packages/edit-widgets/**
+"[Package] Editor":
+- packages/editor/**
+"[Package] Element":
+- packages/element/**
+"[Package] Env":
+- packages/env/**
+"[Package] Escape HTML":
+- packages/escape-html/**
+"[Package] ESLint plugin":
+- packages/eslint-plugin/**
+"[Package] Format library":
+- packages/format-library/**
+"[Package] Hooks":
+- packages/hooks/**
+"[Package] HTML entities":
+- packages/html-entities/**
+"[Package] i18n":
+- packages/i18n/**
+"[Package] Icons":
+- packages/icons/**
+#"":
+#- packages/interactivity/**
+"[Package] Interface":
+- packages/interface/**
+"[Package] is-shallow-equal":
+- packages/is-shallow-equal/**
+"[Package] Jest console":
+- packages/jest-console/**
+"[Package] Jest preset":
+- packages/jest-preset-default/**
+"[Package] Jest Puppeteer aXe":
+- packages/jest-puppeteer-axe/**
+"[Package] Keyboard Shortcuts":
+- packages/keyboard-shortcuts/**
+"[Package] Keycodes":
+- packages/keycodes/**
+"[Package] Lazy import":
+- packages/lazy-import/**
+#"":
+#- packages/list-reusable-blocks/**
+"[Package] Media Utils":
+- packages/media-utils/**
+"[Package] Notices":
+- packages/notices/**
+"[Package] npm-package-json-lint-config":
+- packages/npm-package-json-lint-config/**
+"[Package] Plugins":
+- packages/plugins/**
+"[Package] PostCSS Plugins Preset":
+- packages/postcss-plugins-preset/**
+#"":
+#- packages/postcss-themes/**
+#"":
+#- packages/preferences-persistence/**
+"[Package] Preferences":
+- packages/preferences/**
+"[Package] Prettier config":
+- packages/prettier-config/**
+"[Package] Primitives":
+- packages/primitives/**
+"[Package] Priority Queue":
+- packages/priority-queue/**
+"[Package] Private APIs":
+- packages/private-apis/**
+"[Package] Project management automation":
+- packages/project-management-automation/**
+"[Package] React i18n":
+- packages/react-i18n/**
+#"":
+#- packages/react-native-aztec/**
+#"":
+#- packages/react-native-bridge/**
+#"":
+#- packages/react-native-editor/**
+"[Package] Readable JS Assets Webpack Plugin":
+- packages/readable-js-assets-webpack-plugin/**
+"[Package] Redux Routine":
+- packages/redux-routine/**
+#"":
+#- packages/report-flaky-tests/**
+#"":
+#- packages/reusable-blocks/**
+"[Package] Rich text":
+- packages/rich-text/**
+#"":
+#- packages/router/**
+"[Package] Scripts":
+- packages/scripts/**
+"[Package] Server Side Render":
+- packages/server-side-render/**
+#"":
+#- packages/shortcode/**
+"[Package] Style Engine":
+- packages/style-engine/**
+"[Package] stylelint config":
+- packages/stylelint-config/**
+"[Package] Token List":
+- packages/token-list/**
+"[Package] Url":
+- packages/url/**
+"[Package] Viewport":
+- packages/viewport/**
+"[Package] Warning":
+- packages/warning/**
+#"":
+#- packages/widgets/**
+"[Package] Word count":
+- packages/wordcount/**
