@@ -32,7 +32,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/element": "file:../element",
+		"@wordpress/element": "*",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
@@ -40,5 +40,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }
