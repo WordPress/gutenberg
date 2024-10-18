@@ -615,7 +615,7 @@ class Navigation {
 
 	getLinkControlSearch() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 
@@ -668,7 +668,7 @@ class Navigation {
 	 */
 	async addPage( label ) {
 		const linkControlSearch = this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 
 		await expect( linkControlSearch ).toBeFocused();

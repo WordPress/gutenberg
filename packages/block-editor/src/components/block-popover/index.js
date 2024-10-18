@@ -98,10 +98,10 @@ function BlockPopover(
 			contextElement: selectedElement,
 		};
 	}, [
+		popoverDimensionsRecomputeCounter,
+		selectedElement,
 		bottomClientId,
 		lastSelectedElement,
-		selectedElement,
-		popoverDimensionsRecomputeCounter,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {

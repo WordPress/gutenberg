@@ -1,3 +1,8 @@
 .list-reusable-blocks-import-dropdown__content .components-popover__content {
 	padding: 10px;
 }
+
+[class].list-reusable-blocks-import-dropdown__button {
+	// Todo: Make core button height and gutenberg button height equal.
+	height: 30px;
+}

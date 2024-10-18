@@ -203,6 +203,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
+	height: $button-size-small;
 
 	// This needs specificity to override an inherited padding.
 	// That source padding in turn has high specificity to protect

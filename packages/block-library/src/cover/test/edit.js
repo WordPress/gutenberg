@@ -190,7 +190,7 @@ describe( 'Cover block', () => {
 			test( 'does not display media settings panel if url is not set', async () => {
 				await setup();
 				expect(
-					screen.queryByRole( 'button', {
+					screen.queryByRole( 'heading', {
 						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
@@ -202,7 +202,7 @@ describe( 'Cover block', () => {
 
 				await selectBlock( 'Block: Cover' );
 				expect(
-					screen.getByRole( 'button', {
+					screen.getByRole( 'heading', {
 						name: 'Settings',
 					} )
 				).toBeInTheDocument();

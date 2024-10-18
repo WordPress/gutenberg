@@ -4,5 +4,6 @@ iframe[name="editor-canvas"] {
 	height: 100%;
 	display: block;
 	background-color: transparent;
+	// Handles transitions between device previews
 	@include editor-canvas-resize-animation;
 }

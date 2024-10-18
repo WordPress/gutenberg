@@ -73,7 +73,10 @@ export const Composite = Object.assign(
 		},
 		ref
 	) {
-		const store = Ariakit.useCompositeStore( {
+		// @ts-expect-error The store prop is undocumented and only used by the
+		// legacy compat layer.
+		const storeProp = props.store as Ariakit.CompositeStore;
+		const internalStore = Ariakit.useCompositeStore( {
 			activeId,
 			defaultActiveId,
 			setActiveId,
@@ -84,6 +87,8 @@ export const Composite = Object.assign(
 			orientation,
 			rtl,
 		} );
+
+		const store = storeProp ?? internalStore;
 
 		const contextValue = useMemo(
 			() => ( {

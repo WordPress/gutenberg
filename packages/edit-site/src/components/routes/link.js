@@ -33,14 +33,17 @@ export function useLink( params, state, shouldReplace = false ) {
 		...Object.keys( currentArgs )
 	);
 
+	let extraParams = {};
 	if ( isPreviewingTheme() ) {
-		params = {
-			...params,
+		extraParams = {
 			wp_theme_preview: currentlyPreviewingTheme(),
 		};
 	}
 
-	const newUrl = addQueryArgs( currentUrlWithoutArgs, params );
+	const newUrl = addQueryArgs( currentUrlWithoutArgs, {
+		...params,
+		...extraParams,
+	} );
 
 	return {
 		href: newUrl,

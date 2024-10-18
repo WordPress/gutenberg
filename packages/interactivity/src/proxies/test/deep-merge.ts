@@ -379,7 +379,10 @@ describe( 'Interactivity API', () => {
 			const target = proxifyState< any >( 'test', { a: 1, b: 2 } );
 			const source = { a: 1, b: 2, c: 3 };
 
-			const spy = jest.fn( () => Object.keys( target ) );
+			let keys: any;
+			const spy = jest.fn( () => {
+				keys = Object.keys( target );
+			} );
 			effect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -387,7 +390,115 @@ describe( 'Interactivity API', () => {
 			deepMerge( target, source, false );
 
 			expect( spy ).toHaveBeenCalledTimes( 2 );
-			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
+			expect( keys ).toEqual( [ 'a', 'b', 'c' ] );
+		} );
+
+		it( 'should handle deeply nested properties that are initially undefined', () => {
+			const target: any = proxifyState( 'test', {} );
+
+			let deepValue: any;
+			const spy = jest.fn( () => {
+				deepValue = target.a?.b?.c?.d;
+			} );
+			effect( spy );
+
+			// Initial call, the deep value is undefined
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( deepValue ).toBeUndefined();
+
+			// Use deepMerge to add a deeply nested object to the target
+			deepMerge( target, { a: { b: { c: { d: 'test value' } } } } );
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( deepValue ).toBe( 'test value' );
+
+			// Reading the value directly should also work
+			expect( target.a.b.c.d ).toBe( 'test value' );
+
+			// Modify the nested value
+			target.a.b.c.d = 'new test value';
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 3 );
+			expect( deepValue ).toBe( 'new test value' );
+		} );
+
+		it( 'should overwrite values that become objects', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge( target, {
+				message: { content: 'hello', fontStyle: 'italic' },
+			} );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+
+			expect( target.message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+		} );
+
+		it( 'should not overwrite values that become objects if `override` is false', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge(
+				target,
+				{ message: { content: 'hello', fontStyle: 'italic' } },
+				false
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+			expect( target.message ).toBe( 'hello' );
+			expect( target.message.content ).toBeUndefined();
+			expect( target.message.fontStyle ).toBeUndefined();
+		} );
+
+		it( 'should keep reactivity of arrays that are initially undefined', () => {
+			const target: any = proxifyState( 'test', {} );
+
+			let deepValue: any;
+			const spy = jest.fn( () => {
+				deepValue = target.array?.[ 0 ];
+			} );
+			effect( spy );
+
+			// Initial call, the deep value is undefined
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( deepValue ).toBeUndefined();
+
+			// Use deepMerge to add an array to the target
+			deepMerge( target, { array: [ 'value 1' ] } );
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( deepValue ).toBe( 'value 1' );
+
+			// Modify the array value
+			target.array[ 0 ] = 'value 2';
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 3 );
+			expect( deepValue ).toBe( 'value 2' );
 		} );
 	} );
 } );

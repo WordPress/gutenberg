@@ -1,36 +1,8 @@
 /**
  * Internal dependencies
  */
-import addContainer from './add-container';
-import addIntroText from './add-intro-text';
 import clear from './clear';
 import filterMessage from './filter-message';
-
-/**
- * Create the live regions.
- * @param {string} introTextContent The intro text content.
- */
-export function makeSetupFunction( introTextContent ) {
-	return function setup() {
-		const introText = document.getElementById( 'a11y-speak-intro-text' );
-		const containerAssertive = document.getElementById(
-			'a11y-speak-assertive'
-		);
-		const containerPolite = document.getElementById( 'a11y-speak-polite' );
-
-		if ( introText === null ) {
-			addIntroText( introTextContent );
-		}
-
-		if ( containerAssertive === null ) {
-			addContainer( 'assertive' );
-		}
-
-		if ( containerPolite === null ) {
-			addContainer( 'polite' );
-		}
-	};
-}
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.

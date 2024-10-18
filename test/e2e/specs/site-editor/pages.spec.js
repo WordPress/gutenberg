@@ -36,7 +36,9 @@ async function addPageContent( editor, page ) {
 		.fill( 'Lorem ipsum dolor sit amet' );
 
 	// Insert into Page Content using global inserter.
-	await page.getByRole( 'button', { name: 'Toggle block inserter' } ).click();
+	await page
+		.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+		.click();
 	await page.getByRole( 'option', { name: 'Heading', exact: true } ).click();
 	await editor.canvas
 		.getByRole( 'document', {

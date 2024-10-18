@@ -11,13 +11,14 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
+import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
 	const isInBetweenInserterDisabled = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree ||
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+			unlock( select( blockEditorStore ) ).isZoomOut(),
 		[]
 	);
 	const {
@@ -31,7 +32,8 @@ export function useInBetweenInserter() {
 		getBlockEditingMode,
 		getBlockName,
 		getBlockAttributes,
-	} = useSelect( blockEditorStore );
+		getParentSectionBlock,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -133,7 +135,8 @@ export function useInBetweenInserter() {
 				const clientId = element.id.slice( 'block-'.length );
 				if (
 					! clientId ||
-					__unstableIsWithinBlockOverlay( clientId )
+					__unstableIsWithinBlockOverlay( clientId ) ||
+					!! getParentSectionBlock( clientId )
 				) {
 					return;
 				}

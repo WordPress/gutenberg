@@ -26,15 +26,10 @@ export default ( props ) => ( element ) => {
 			preserveWhiteSpace,
 			pastePlainText,
 		} = props.current;
-		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
-		const { anchorNode, focusNode } = defaultView.getSelection();
-		const containsSelection =
-			element.contains( anchorNode ) && element.contains( focusNode );
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( ! containsSelection ) {
+		// the target is the element or inside the element.
+		if ( ! element.contains( event.target ) ) {
 			return;
 		}
 

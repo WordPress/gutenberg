@@ -1,10 +1,21 @@
 .block-directory-downloadable-block-list-item {
-	padding: $grid-unit-15;
-	width: 100%;
-	height: auto;
-	text-align: left;
+	& + & {
+		margin-top: $grid-unit-05;
+	}
+
 	display: grid;
 	grid-template-columns: auto 1fr;
+
+	width: 100%;
+	height: auto;
+	padding: $grid-unit-15;
+	margin: 0;
+
+	appearance: none;
+	background: none;
+	border: 0;
+	text-align: left;
+	transition: box-shadow 0.1s linear;
 
 	// The item contains absolutely positioned items.
 	// Set `position: relative` on the parent to prevent overflow issues
@@ -12,31 +23,23 @@
 	// See: https://github.com/WordPress/gutenberg/issues/63384
 	position: relative;
 
+
+	&:not([aria-disabled="true"]) {
+		cursor: pointer;
+	}
+
 	&:hover {
 		@include button-style__focus();
 	}
 
-	&.is-busy {
-		background: transparent;
-
-		.block-directory-downloadable-block-list-item__author {
-			border: 0;
-			clip: rect(1px, 1px, 1px, 1px);
-			-webkit-clip-path: inset(50%);
-			clip-path: inset(50%);
-			height: 1px;
-			margin: -1px;
-			overflow: hidden;
-			padding: 0;
-			position: absolute;
-			width: 1px;
-			word-wrap: normal !important;
-		}
+	&[data-focus-visible] {
+		@include button-style__focus();
 	}
 
-	&:disabled,
-	&[aria-disabled] {
-		opacity: 1;
+	&.is-installing {
+		.block-directory-downloadable-block-list-item__author {
+			display: none;
+		}
 	}
 }
 
@@ -55,6 +58,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.is-installing & {
+		// Adding an extra 6px to avoid the UI from jumping when the rating bar gets hidden
+		margin-right: $grid-unit-20 + 6px;
 	}
 }
 

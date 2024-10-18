@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { focus, isFormElement } from '@wordpress/dom';
-import { TAB, ESCAPE } from '@wordpress/keycodes';
+import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
@@ -19,20 +19,16 @@ export default function useTabNav() {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 
-	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
-		useSelect( blockEditorStore );
-	const { setNavigationMode, setLastFocus } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const isNavigationMode = useSelect(
-		( select ) => select( blockEditorStore ).isNavigationMode(),
-		[]
-	);
-
-	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
-
-	// Don't allow tabbing to this element in Navigation mode.
-	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
+	const {
+		hasMultiSelection,
+		getSelectedBlockClientId,
+		getBlockCount,
+		getBlockOrder,
+		getLastFocus,
+		getSectionRootClientId,
+		isZoomOut,
+	} = unlock( useSelect( blockEditorStore ) );
+	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
@@ -55,9 +51,25 @@ export default function useTabNav() {
 					)
 					.focus();
 			}
-		} else {
-			setNavigationMode( true );
+		}
+		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
+		else if ( isZoomOut() ) {
+			const sectionRootClientId = getSectionRootClientId();
+			const sectionBlocks = getBlockOrder( sectionRootClientId );
 
+			// If we have section within the section root, focus the first one.
+			if ( sectionBlocks.length ) {
+				container.current
+					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
+					.focus();
+			}
+			// If we don't have any section blocks, focus the section root.
+			else {
+				container.current
+					.querySelector( `[data-block="${ sectionRootClientId }"]` )
+					.focus();
+			}
+		} else {
 			const canvasElement =
 				container.current.ownerDocument === event.target.ownerDocument
 					? container.current
@@ -73,7 +85,6 @@ export default function useTabNav() {
 				const next = isBefore
 					? tabbables[ 0 ]
 					: tabbables[ tabbables.length - 1 ];
-
 				next.focus();
 			}
 		}
@@ -82,7 +93,7 @@ export default function useTabNav() {
 	const before = (
 		<div
 			ref={ focusCaptureBeforeRef }
-			tabIndex={ focusCaptureTabIndex }
+			tabIndex="0"
 			onFocus={ onFocusCapture }
 		/>
 	);
@@ -90,7 +101,7 @@ export default function useTabNav() {
 	const after = (
 		<div
 			ref={ focusCaptureAfterRef }
-			tabIndex={ focusCaptureTabIndex }
+			tabIndex="0"
 			onFocus={ onFocusCapture }
 		/>
 	);
@@ -98,12 +109,6 @@ export default function useTabNav() {
 	const ref = useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( event.keyCode === ESCAPE && ! hasMultiSelection() ) {
-				event.preventDefault();
-				setNavigationMode( true );
 				return;
 			}
 
@@ -119,20 +124,6 @@ export default function useTabNav() {
 
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
-
-			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
-				// Preserve the behaviour of entering navigation mode when
-				// tabbing into the content without a block selection.
-				// `onFocusCapture` already did this previously, but we need to
-				// do it again here because after clearing block selection,
-				// focus land on the writing flow container and pressing Tab
-				// will no longer send focus through the focus capture element.
-				if ( event.target === node ) {
-					setNavigationMode( true );
-				}
-				return;
-			}
-
 			const nextTabbable = focus.tabbable[ direction ]( event.target );
 
 			// We want to constrain the tabbing to the block and its child blocks.

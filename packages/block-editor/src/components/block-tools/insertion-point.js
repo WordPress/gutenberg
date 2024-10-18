@@ -18,6 +18,7 @@ import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import BlockDropZonePopover from '../block-popover/drop-zone';
+import { unlock } from '../../lock-unlock';
 
 export const InsertionPointOpenRef = createContext();
 
@@ -37,7 +38,6 @@ function InbetweenInsertionPointPopover( {
 		rootClientId,
 		isInserterShown,
 		isDistractionFree,
-		isNavigationMode,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const {
@@ -48,9 +48,8 @@ function InbetweenInsertionPointPopover( {
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			getSettings,
-			isNavigationMode: _isNavigationMode,
-			__unstableGetEditorMode,
-		} = select( blockEditorStore );
+			isZoomOut,
+		} = unlock( select( blockEditorStore ) );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
@@ -78,10 +77,9 @@ function InbetweenInsertionPointPopover( {
 				getBlockListSettings( insertionPoint.rootClientId )
 					?.orientation || 'vertical',
 			rootClientId: insertionPoint.rootClientId,
-			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isZoomOutMode: isZoomOut(),
 		};
 	}, [] );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );
@@ -144,7 +142,7 @@ function InbetweenInsertionPointPopover( {
 		},
 	};
 
-	if ( isDistractionFree && ! isNavigationMode ) {
+	if ( isDistractionFree ) {
 		return null;
 	}
 

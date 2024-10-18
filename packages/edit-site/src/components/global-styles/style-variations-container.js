@@ -3,7 +3,7 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { __experimentalGrid as Grid } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -20,12 +20,7 @@ const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 export default function StyleVariationsContainer( { gap = 2 } ) {
 	const { user } = useContext( GlobalStylesContext );
-	const [ currentUserStyles, setCurrentUserStyles ] = useState( user );
-	const userStyles = currentUserStyles?.styles;
-
-	useEffect( () => {
-		setCurrentUserStyles( user );
-	}, [ user ] );
+	const userStyles = user?.styles;
 
 	const variations = useSelect( ( select ) => {
 		return select(

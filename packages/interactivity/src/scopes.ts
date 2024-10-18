@@ -12,6 +12,7 @@ import type { Evaluate } from './hooks';
 export interface Scope {
 	evaluate: Evaluate;
 	context: object;
+	serverContext: object;
 	ref: RefObject< HTMLElement >;
 	attributes: createElement.JSX.HTMLAttributes;
 }
@@ -95,4 +96,47 @@ export const getElement = () => {
 		ref: ref.current,
 		attributes: deepImmutable( attributes ),
 	} );
+};
+
+/**
+ * Retrieves the part of the inherited context defined and updated from the
+ * server.
+ *
+ * The object returned is read-only, and includes the context defined in PHP
+ * with `wp_interactivity_data_wp_context()`, including the corresponding
+ * inherited properties. When `actions.navigate()` is called, this object is
+ * updated to reflect the changes in the new visited page, without affecting the
+ * context returned by `getContext()`. Directives can subscribe to those changes
+ * to update the context if needed.
+ *
+ * @example
+ * ```js
+ *  store('...', {
+ *    callbacks: {
+ *      updateServerContext() {
+ *        const context = getContext();
+ *        const serverContext = getServerContext();
+ *        // Override some property with the new value that came from the server.
+ *        context.overridableProp = serverContext.overridableProp;
+ *      },
+ *    },
+ *  });
+ * ```
+ *
+ * @param namespace Store namespace. By default, the namespace where the calling
+ *                  function exists is used.
+ * @return The server context content.
+ */
+export const getServerContext = < T extends object >(
+	namespace?: string
+): T => {
+	const scope = getScope();
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if ( ! scope ) {
+			throw Error(
+				'Cannot call `getServerContext()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
+			);
+		}
+	}
+	return scope.serverContext[ namespace || getNamespace() ];
 };

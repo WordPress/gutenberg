@@ -40,7 +40,7 @@ export default function SimpleTooltip(
 	return (
 		<Tooltip
 			{ ...restProps }
-			aria-hidden={ show }
+			aria-hidden="false"
 			className={ classes }
 			position={ position }
 			show={ show }
