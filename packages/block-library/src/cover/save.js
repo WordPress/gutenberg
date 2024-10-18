@@ -45,6 +45,7 @@ export default function save( { attributes } ) {
 		minHeight: minHeightProp,
 		minHeightUnit,
 		tagName: Tag,
+		sizeSlug,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -95,6 +96,7 @@ export default function save( { attributes } ) {
 		'wp-block-cover__image-background',
 		id ? `wp-image-${ id }` : null,
 		{
+			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 		}
