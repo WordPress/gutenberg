@@ -21,7 +21,7 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
-			blocks: [ 'core/spacer' ],
+			blocks: [ 'core/spacer' ], // Transform to Spacer.
 			transform: () => {
 				return createBlock( 'core/spacer', {
 					height: '50px',
