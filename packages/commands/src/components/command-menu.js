@@ -43,32 +43,45 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	if ( ! commands.length ) {
 		return null;
 	}
-
 	return (
 		<>
-			{ commands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.searchLabel ?? command.label }
-					onSelect={ () => command.callback( { close } ) }
-					id={ command.name }
-				>
-					<HStack
-						alignment="left"
-						className={ clsx( 'commands-command-menu__item', {
-							'has-icon': command.icon,
-						} ) }
+			{ commands.map( ( command ) => {
+				let postType;
+				let postId;
+				if ( command.name.startsWith( 'wp_template-' ) ) {
+					postType = 'wp_template';
+					postId = command.name.replace( 'wp_template-', '' );
+				} else if ( command.name.startsWith( 'wp_template_part-' ) ) {
+					postType = 'wp_template_part';
+					postId = command.name.replace( 'wp_template_part-', '' );
+				}
+
+				return (
+					<Command.Item
+						key={ command.name }
+						value={ command.searchLabel ?? command.label }
+						onSelect={ () => command.callback( { close } ) }
+						id={ command.name }
+						data-post-type={ postType }
+						data-post-id={ postId }
 					>
-						{ command.icon && <Icon icon={ command.icon } /> }
-						<span>
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
-					</HStack>
-				</Command.Item>
-			) ) }
+						<HStack
+							alignment="left"
+							className={ clsx( 'commands-command-menu__item', {
+								'has-icon': command.icon,
+							} ) }
+						>
+							{ command.icon && <Icon icon={ command.icon } /> }
+							<span>
+								<TextHighlight
+									text={ command.label }
+									highlight={ search }
+								/>
+							</span>
+						</HStack>
+					</Command.Item>
+				);
+			} ) }
 		</>
 	);
 }
