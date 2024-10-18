@@ -137,6 +137,7 @@ export default function GlobalStylesSidebar() {
 					</FlexItem>
 					<Flex
 						justify="flex-end"
+						gap={ 1 }
 						className="edit-site-global-styles-sidebar__header-actions"
 					>
 						<FlexItem>
