@@ -141,14 +141,20 @@ export function getVisibleElementBounds( element ) {
 	}
 
 	let bounds = element.getBoundingClientRect();
-
 	const stack = [ element ];
 	let currentElement;
 
 	while ( ( currentElement = stack.pop() ) ) {
 		for ( const child of currentElement.children ) {
 			if ( isElementVisible( child ) ) {
-				const childBounds = child.getBoundingClientRect();
+				let childBounds = child.getBoundingClientRect();
+
+				// If the parent is scrollable, intersect child bounds with the parent's scrollable bounds.
+				if ( isScrollable( currentElement ) ) {
+					const scrollBounds = currentElement.getBoundingClientRect();
+					childBounds = intersectRects( childBounds, scrollBounds );
+				}
+
 				bounds = rectUnion( bounds, childBounds );
 				stack.push( child );
 			}
@@ -165,12 +171,53 @@ export function getVisibleElementBounds( element ) {
 	 */
 	const left = Math.max( bounds.left, 0 );
 	const right = Math.min( bounds.right, viewport.innerWidth );
-	bounds = new window.DOMRectReadOnly(
+
+	return new window.DOMRectReadOnly(
 		left,
 		bounds.top,
 		right - left,
 		bounds.height
 	);
+}
 
-	return bounds;
+/**
+ * Checks if the element is scrollable.
+ *
+ * @param {Element} element Element.
+ * @return {boolean} True if the element is scrollable.
+ */
+function isScrollable( element ) {
+	const style = window.getComputedStyle( element );
+	return (
+		style.overflowX === 'auto' ||
+		style.overflowX === 'scroll' ||
+		style.overflowY === 'auto' ||
+		style.overflowY === 'scroll'
+	);
+}
+
+/**
+ * Returns the intersection of two DOMRect objects.
+ *
+ * @param {DOMRect} rect1 First rect.
+ * @param {DOMRect} rect2 Second rect.
+ * @return {DOMRect} Intersection of the two rects, or an empty rect if no overlap.
+ */
+function intersectRects( rect1, rect2 ) {
+	const left = Math.max( rect1.left, rect2.left );
+	const top = Math.max( rect1.top, rect2.top );
+	const right = Math.min( rect1.right, rect2.right );
+	const bottom = Math.min( rect1.bottom, rect2.bottom );
+
+	if ( right >= left && bottom >= top ) {
+		return new window.DOMRectReadOnly(
+			left,
+			top,
+			right - left,
+			bottom - top
+		);
+	}
+
+	// Return an empty rect if no intersection.
+	return new window.DOMRectReadOnly( 0, 0, 0, 0 );
 }
