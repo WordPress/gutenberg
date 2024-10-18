@@ -68,7 +68,7 @@ const SiteHub = memo(
 							label={ __( 'Go to the Dashboard' ) }
 							className="edit-site-layout__view-mode-toggle"
 							style={ {
-								transform: 'scale(0.5)',
+								transform: 'scale(0.5333) translateX(-4px)', // Offset to position the icon 12px from viewport edge
 								borderRadius: 4,
 							} }
 						>
@@ -99,7 +99,7 @@ const SiteHub = memo(
 							className="edit-site-site-hub__actions"
 						>
 							<Button
-								__next40pxDefaultSize
+								size="compact"
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
 								onClick={ () => openCommandCenter() }

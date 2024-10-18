@@ -465,7 +465,6 @@ function TableEdit( {
 					</BlockControls>
 					<BlockControls group="other">
 						<ToolbarDropdownMenu
-							hasArrowIndicator
 							icon={ table }
 							label={ __( 'Edit table' ) }
 							controls={ tableControls }

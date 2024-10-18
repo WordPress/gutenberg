@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import * as Ariakit from '@ariakit/react';
 import { useStoreState } from '@ariakit/react';
 
 /**
@@ -16,7 +15,7 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import type { TabListProps } from './types';
 import { useTabsContext } from './context';
-import { TabListWrapper } from './styles';
+import { StyledTabList } from './styles';
 import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
 import type { ElementOffsetRect } from '../utils/element-rect';
@@ -109,12 +108,19 @@ export const TabList = forwardRef<
 	}
 
 	return (
-		<Ariakit.TabList
+		<StyledTabList
 			ref={ refs }
 			store={ store }
-			render={ <TabListWrapper /> }
+			render={ ( props ) => (
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
+				/>
+			) }
 			onBlur={ onBlur }
-			tabIndex={ -1 }
+			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
 				overflow.first && 'is-overflowing-first',
@@ -123,6 +129,6 @@ export const TabList = forwardRef<
 			) }
 		>
 			{ children }
-		</Ariakit.TabList>
+		</StyledTabList>
 	);
 } );

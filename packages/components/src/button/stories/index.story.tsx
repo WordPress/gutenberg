@@ -22,7 +22,8 @@ import './style.css';
 import Button from '..';
 
 const meta: Meta< typeof Button > = {
-	title: 'Components/Button',
+	title: 'Components/Actions/Button',
+	id: 'components-button',
 	component: Button,
 	argTypes: {
 		// Overrides a limitation of the docgen interpreting our TS types for this as required.
