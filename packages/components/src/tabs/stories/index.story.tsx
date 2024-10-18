@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Tabs from '..';
+import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
