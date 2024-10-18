@@ -26,8 +26,6 @@ export function useShowBlockTools() {
 			hasMultiSelection,
 			__unstableGetEditorMode,
 			isTyping,
-			getBlockOrder,
-			getSectionRootClientId,
 		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
