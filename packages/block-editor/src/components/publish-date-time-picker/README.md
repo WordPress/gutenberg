@@ -20,10 +20,7 @@ const MyDateTimePicker = () => {
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				>
+				<Button onClick={ onToggle } aria-expanded={ isOpen }>
 					Select post date
 				</Button>
 			) }
@@ -48,5 +45,5 @@ const MyDateTimePicker = () => {
 
 Called when the user presses the close button.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No

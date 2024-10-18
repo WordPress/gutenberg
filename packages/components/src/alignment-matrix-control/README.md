@@ -14,53 +14,51 @@ const Example = () => {
 	const [ alignment, setAlignment ] = useState( 'center center' );
 
 	return (
-		<AlignmentMatrixControl
-			value={ alignment }
-			onChange={ setAlignment }
-		/>
+		<AlignmentMatrixControl value={ alignment } onChange={ setAlignment } />
 	);
 };
 ```
+
 ## Props
 
 ### `defaultValue`
 
 If provided, sets the default alignment value.
 
- - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
- - Required: No
- - Default: `'center center'`
+-   Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+-   Required: No
+-   Default: `'center center'`
 
 ### `label`
 
 Accessible label. If provided, sets the `aria-label` attribute of the
 underlying `grid` widget.
 
- - Type: `string`
- - Required: No
- - Default: `'Alignment Matrix Control'`
+-   Type: `string`
+-   Required: No
+-   Default: `'Alignment Matrix Control'`
 
 ### `onChange`
 
 A function that receives the updated alignment value.
 
- - Type: `(newValue: AlignmentMatrixControlValue) => void`
- - Required: No
+-   Type: `(newValue: AlignmentMatrixControlValue) => void`
+-   Required: No
 
 ### `value`
 
 The current alignment value.
 
- - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
- - Required: No
+-   Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+-   Required: No
 
 ### `width`
 
 If provided, sets the width of the control.
 
- - Type: `number`
- - Required: No
- - Default: `92`
+-   Type: `number`
+-   Required: No
+-   Default: `92`
 
 ## Subcomponents
 
@@ -72,14 +70,14 @@ If provided, sets the width of the control.
 
 If `true`, disables pointer events on the icon.
 
- - Type: `boolean`
- - Required: No
- - Default: `true`
+-   Type: `boolean`
+-   Required: No
+-   Default: `true`
 
 ##### `value`
 
 The current alignment value.
 
- - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
- - Required: No
- - Default: `center`
+-   Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+-   Required: No
+-   Default: `center`

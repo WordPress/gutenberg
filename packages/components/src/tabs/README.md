@@ -24,29 +24,29 @@ const onSelect = ( tabName ) => {
 };
 
 const MyUncontrolledTabs = () => (
-		<Tabs onSelect={ onSelect } defaultTabId="tab2">
-			<Tabs.TabList>
-				<Tabs.Tab tabId="tab1" title="Tab 1">
-					Tab 1
-				</Tabs.Tab>
-				<Tabs.Tab tabId="tab2" title="Tab 2">
-					Tab 2
-				</Tabs.Tab>
-				<Tabs.Tab tabId="tab3" title="Tab 3">
-					Tab 3
-				</Tabs.Tab>
-			</Tabs.TabList>
-			<Tabs.TabPanel tabId="tab1">
-				<p>Selected tab: Tab 1</p>
-			</Tabs.TabPanel>
-			<Tabs.TabPanel tabId="tab2">
-				<p>Selected tab: Tab 2</p>
-			</Tabs.TabPanel>
-			<Tabs.TabPanel tabId="tab3">
-				<p>Selected tab: Tab 3</p>
-			</Tabs.TabPanel>
-		</Tabs>
-	);
+	<Tabs onSelect={ onSelect } defaultTabId="tab2">
+		<Tabs.TabList>
+			<Tabs.Tab tabId="tab1" title="Tab 1">
+				Tab 1
+			</Tabs.Tab>
+			<Tabs.Tab tabId="tab2" title="Tab 2">
+				Tab 2
+			</Tabs.Tab>
+			<Tabs.Tab tabId="tab3" title="Tab 3">
+				Tab 3
+			</Tabs.Tab>
+		</Tabs.TabList>
+		<Tabs.TabPanel tabId="tab1">
+			<p>Selected tab: Tab 1</p>
+		</Tabs.TabPanel>
+		<Tabs.TabPanel tabId="tab2">
+			<p>Selected tab: Tab 2</p>
+		</Tabs.TabPanel>
+		<Tabs.TabPanel tabId="tab3">
+			<p>Selected tab: Tab 3</p>
+		</Tabs.TabPanel>
+	</Tabs>
+);
 ```
 
 #### Controlled Mode
@@ -98,10 +98,11 @@ const MyControlledTabs = () => (
 ### Components and Sub-components
 
 Tabs is comprised of four individual components:
-- `Tabs`: a wrapper component and context provider. It is responsible for managing the state of the tabs and rendering the `TabList` and `TabPanels`.
-- `TabList`: a wrapper component for the `Tab` components. It is responsible for rendering the list of tabs.
-- `Tab`: renders a single tab. The currently active tab receives default styling that can be overridden with CSS targeting [aria-selected="true"].
-- `TabPanel`: renders the content to display for a single tab once that tab is selected.
+
+-   `Tabs`: a wrapper component and context provider. It is responsible for managing the state of the tabs and rendering the `TabList` and `TabPanels`.
+-   `TabList`: a wrapper component for the `Tab` components. It is responsible for rendering the list of tabs.
+-   `Tab`: renders a single tab. The currently active tab receives default styling that can be overridden with CSS targeting [aria-selected="true"].
+-   `TabPanel`: renders the content to display for a single tab once that tab is selected.
 
 #### Tabs
 
@@ -147,7 +148,7 @@ The orientation of the `tablist` (`vertical` or `horizontal`)
 The ID of the tab to display. This id is prepended with the `Tabs` instanceId internally.
 If left `undefined`, the component assumes it is being used in uncontrolled mode. Consequently, any value different than `undefined` will set the component in `controlled` mode. When in controlled mode, the `null` value will result in no tab being selected.
 
-- Required: No
+-   Required: No
 
 #### TabList
 
@@ -167,26 +168,26 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
 
 A unique identifier for the tab, which is used to generate a unique id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.TabPanel` component.
 
-- Required: Yes
+-   Required: Yes
 
 ###### `children`: `React.ReactNode`
 
 The children elements, generally the text to display on the tab.
 
-- Required: No
+-   Required: No
 
 ###### `disabled`: `boolean`
 
 Determines if the tab button should be disabled.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ###### `render`: `React.ReactNode`
 
 The type of component to render the tab button as. If this prop is not provided, the tab button will be rendered as a `button` element.
 
-- Required: No
+-   Required: No
 
 #### TabPanel
 
@@ -196,17 +197,17 @@ The type of component to render the tab button as. If this prop is not provided,
 
 The children elements, generally the content to display on the tabpanel.
 
-- Required: No
+-   Required: No
 
 ###### `tabId`: `string`
 
 A unique identifier for the tabpanel, which is used to generate an instanced id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.Tab` component.
 
-- Required: Yes
+-   Required: Yes
 
 ###### `focusable`: `boolean`
 
 Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`

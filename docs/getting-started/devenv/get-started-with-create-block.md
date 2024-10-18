@@ -1,6 +1,6 @@
 # Get started with create-block
 
-Custom blocks for the Block Editor in WordPress are typically registered using plugins and are defined through a specific set of files. The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool to scaffold the structure of files needed to create and register a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/)) with no configuration required. 
+Custom blocks for the Block Editor in WordPress are typically registered using plugins and are defined through a specific set of files. The [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package is an officially supported tool to scaffold the structure of files needed to create and register a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/)) with no configuration required.
 
 The package is designed to help developers quickly set up a block development environment following WordPress best practices.
 
@@ -21,19 +21,19 @@ npx @wordpress/create-block@latest todo-list
 cd todo-list
 ```
 
-The `slug` provided (`todo-list`) defines the folder name for the scaffolded plugin and the internal block name. 
+The `slug` provided (`todo-list`) defines the folder name for the scaffolded plugin and the internal block name.
 
-Navigate to the Plugins page of our local WordPress installation and activate the "Todo List" plugin. The example block will then be available in the Editor. 
+Navigate to the Plugins page of our local WordPress installation and activate the "Todo List" plugin. The example block will then be available in the Editor.
 
 ### Basic usage
 
-The `create-block` assumes you will use modern JavaScript (ESNext and JSX) to build your block. This requires a build step to compile the code into a format that browsers can understand. Luckily, the `wp-scripts` package handles this process for you. Refer to the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts) for an introduction to this package. 
+The `create-block` assumes you will use modern JavaScript (ESNext and JSX) to build your block. This requires a build step to compile the code into a format that browsers can understand. Luckily, the `wp-scripts` package handles this process for you. Refer to the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts) for an introduction to this package.
 
- When `create-block` scaffolds the block, it installs `wp-scripts` and adds the most common scripts to the block's `package.json` file. By default, those include:
+When `create-block` scaffolds the block, it installs `wp-scripts` and adds the most common scripts to the block's `package.json` file. By default, those include:
 
 ```json
 {
-    "scripts": {
+	"scripts": {
 		"build": "wp-scripts build",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
@@ -82,6 +82,7 @@ npx @wordpress/create-block@latest --namespace="my-plugin" --slug="my-block" --v
 The `create-block` package also supports the use of templates, enabling you to create blocks based on predefined configurations and structures. This is especially useful when you have a preferred block structure or when you're building multiple blocks with similar configurations.
 
 To use a template, specify the `--template` option followed by the template name or path:
+
 ```bash
 npx @wordpress/create-block --template="my-custom-template"
 ```
@@ -90,6 +91,6 @@ Templates must be set up in advance so the `create-block` package knows where to
 
 ## Additional resources
 
-- [Using the create-block tool](https://learn.wordpress.org/tutorial/using-the-create-block-tool/) (Learn WordPress tutorial)
-- [@wordpress/create-block](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) (Official documentation)
-- [@wordpress/scripts](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) (Official documentation)
+-   [Using the create-block tool](https://learn.wordpress.org/tutorial/using-the-create-block-tool/) (Learn WordPress tutorial)
+-   [@wordpress/create-block](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) (Official documentation)
+-   [@wordpress/scripts](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) (Official documentation)

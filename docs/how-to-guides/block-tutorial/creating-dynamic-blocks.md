@@ -17,8 +17,6 @@ Block attributes can be used for any content or setting you want to save for tha
 
 The following code example shows how to create a dynamic block that shows only the last post as a link.
 
-
-
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -50,8 +48,6 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	},
 } );
 ```
-
-
 
 Because it is a dynamic block it doesn't need to override the default `save` implementation on the client. Instead, it needs a server component. The contents in the front of your site depend on the function called by the `render_callback` property of `register_block_type`.
 
@@ -115,8 +111,6 @@ Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/server-side-render/READ
 
 _Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation)._
 
-
-
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import ServerSideRender from '@wordpress/server-side-render';
@@ -141,7 +135,5 @@ registerBlockType( 'gutenberg-examples/example-dynamic', {
 	},
 } );
 ```
-
-
 
 Note that this code uses the `wp-server-side-render` package but not `wp-data`. Make sure to update the dependencies in the PHP code. You can use wp-scripts to automatically build dependencies (see the [block-development-examples repo](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/basic-esnext-a2ab62) for PHP code setup).

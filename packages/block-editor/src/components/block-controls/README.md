@@ -61,29 +61,28 @@ The component accepts the following props:
 
 Group of the block controls. Allows you to create and render multiple groups of block controls.
 
-- Type: `string`
-- Default: `default`
-- Required: No
+-   Type: `string`
+-   Default: `default`
+-   Required: No
 
 ### `controls`
 
-Allows overriding the default `controls` if the `default` group is used. 
+Allows overriding the default `controls` if the `default` group is used.
 
 See [this custom block tutorial page](/docs/getting-started/fundamentals/block-in-the-editor.md) for more details and examples with block controls.
 
-- Type: `array`
+-   Type: `array`
 
 ### `children`
 
 Additional control components to be rendered.
 
-- Type: `Element`
-- Required: No.
-
+-   Type: `Element`
+-   Required: No.
 
 ### `__experimentalShareWithChildBlocks`
 
 Whether the additional block controls should be added to the block toolbars of child blocks.
 
-- Type: `boolean`
-- Default: `false`
+-   Type: `boolean`
+-   Default: `false`

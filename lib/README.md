@@ -12,9 +12,9 @@ The following documentation is intended to act as a guide only. If you're unsure
 
 To make it easier for contributors to identify features that should be merged into Core and those that can be deleted, Gutenberg uses the following file structure for its PHP code:
 
-- `lib/experimental` - Experimental features that exist only in the plugin. They should not be merged into Core.
-- `lib/compat/wordpress-X.Y` - Stable features that are intended to be merged into Core in a future `X.Y` release, or that were previously merged to Core in the `X.Y` release and remain in the plugin for backwards compatibility when running the plugin on older versions of WordPress.
-- `lib/compat/plugin` - Features for backwards compatibility for the plugin consumers. These files don't need to be merged into Core and should have a timeline for when they should be removed from the plugin.
+-   `lib/experimental` - Experimental features that exist only in the plugin. They should not be merged into Core.
+-   `lib/compat/wordpress-X.Y` - Stable features that are intended to be merged into Core in a future `X.Y` release, or that were previously merged to Core in the `X.Y` release and remain in the plugin for backwards compatibility when running the plugin on older versions of WordPress.
+-   `lib/compat/plugin` - Features for backwards compatibility for the plugin consumers. These files don't need to be merged into Core and should have a timeline for when they should be removed from the plugin.
 
 Files at the root of `/lib` are generally considered to contain "evergreen" code. Such code is both fundamental to the proper functioning of the plugin, and also so often updated that versioning it between WordPress releases is not practical. Changes to these files are merged into Core as required.
 
@@ -98,6 +98,7 @@ if ( ! class_exists( 'WP_A_Stable_Class' ) ) {
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
 
 The `return` operator is considered an anti-pattern in the context provided below because it [does not halt](https://www.php.net/manual/en/function.return.php#112515) the parsing of the PHP script and can cause [unexpected side effects](https://github.com/WordPress/gutenberg/pull/58429#issuecomment-1916670097):
+
 ```php
 /**
  * ANTI-PATTERN

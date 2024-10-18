@@ -37,15 +37,15 @@ const Example = () => {
 	);
 	return (
 		<CircularOptionPicker
-				options={ colorOptions }
-				actions={
-					<CircularOptionPicker.ButtonAction
-						onClick={ () => setCurrentColor( undefined ) }
-					>
-						{ 'Clear' }
-					</CircularOptionPicker.ButtonAction>
-				}
-			/>
+			options={ colorOptions }
+			actions={
+				<CircularOptionPicker.ButtonAction
+					onClick={ () => setCurrentColor( undefined ) }
+				>
+					{ 'Clear' }
+				</CircularOptionPicker.ButtonAction>
+			}
+		/>
 	);
 };
 ```
@@ -56,7 +56,7 @@ const Example = () => {
 
 A CSS class to apply to the wrapper element.
 
-- Required: No
+-   Required: No
 
 ### `actions`: `ReactNode`
 
@@ -64,7 +64,7 @@ The action(s) to be rendered after the options, such as a 'clear' button as seen
 
 Usually a `CircularOptionPicker.ButtonAction` or `CircularOptionPicker.DropdownLinkAction` component.
 
-- Required: No
+-   Required: No
 
 ### `options`: `ReactNode`
 
@@ -72,27 +72,27 @@ The options to be rendered, such as color swatches.
 
 Usually a `CircularOptionPicker.Option` component.
 
-- Required: No
+-   Required: No
 
 ### `children`: `ReactNode`
 
 The child elements.
 
-- Required: No
+-   Required: No
 
 ### `asButtons`: `boolean`
 
 Whether the control should present as a set of buttons, each with its own tab stop.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `loop`: `boolean`
 
 Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`
 
 ## Subcomponents
 
@@ -108,13 +108,13 @@ A common use case is a 'clear' button to deselect the currently selected option.
 
 A CSS class to apply to the underlying `Button` component.
 
-- Required: No
+-   Required: No
 
 ##### `children`: `ReactNode`
 
 The button's children.
 
-- Required: No
+-   Required: No
 
 ##### Inherited props
 
@@ -130,13 +130,13 @@ The button's children.
 
 A CSS class to apply to the underlying `Dropdown` component.
 
-- Required: No
+-   Required: No
 
 ##### `linkText`: `string`
 
 The text to be displayed on the button.
 
-- Required: Yes
+-   Required: Yes
 
 ##### `dropdownProps`: `object`
 
@@ -144,12 +144,12 @@ The props for the underlying `Dropdown` component.
 
 Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.md#props), except for `className` and `renderToggle`.
 
-- Required: Yes
+-   Required: Yes
 
 ##### `buttonProps`: `object`
 
 Props for the underlying `Button` component.
 
-Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
+Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`.
 
-- Required: No
+-   Required: No

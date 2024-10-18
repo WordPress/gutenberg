@@ -8,8 +8,6 @@ The `Autocomplete` component found in `@wordpress/block-editor` applies this fil
 
 Here is an example of using the `editor.Autocomplete.completers` filter to add an acronym completer. You can find full documentation for the autocompleter interface with the `Autocomplete` component in the `@wordpress/components` package.
 
-
-
 ```jsx
 // Our completer
 const acronymCompleter = {

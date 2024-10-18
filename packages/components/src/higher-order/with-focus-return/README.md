@@ -39,7 +39,7 @@ const MyComponentWithFocusReturn = () => {
 			) }
 		</div>
 	);
-}
+};
 ```
 
 `withFocusReturn` can optionally be called as a higher-order function creator. Provided an options object, a new higher-order function is returned.

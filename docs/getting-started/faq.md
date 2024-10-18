@@ -84,7 +84,6 @@ Yes, it is supported. You can have multiple levels of nesting – blocks within 
 
 Yes, you can drag and drop blocks to rearrange their order.
 
-
 ## The Development Experience
 
 ### How do I make my own block?
@@ -215,5 +214,3 @@ In PHP:
 ```php
 $blocks = parse_blocks( $post_content );
 ```
-
-

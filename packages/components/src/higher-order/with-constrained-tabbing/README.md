@@ -43,5 +43,5 @@ const MyComponentWithConstrainedTabbing = () => {
 			</Button>
 		</div>
 	);
-}
+};
 ```

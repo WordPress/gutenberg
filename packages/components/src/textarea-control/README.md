@@ -79,7 +79,7 @@ const MyTextareaControl = () => {
 
 	return (
 		<TextareaControl
-		  __nextHasNoMarginBottom
+			__nextHasNoMarginBottom
 			label="Text"
 			help="Enter some text"
 			value={ text }

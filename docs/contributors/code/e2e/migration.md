@@ -24,10 +24,11 @@ The <code>e2e-test-utils-playwright</code> package is not meant to be a drop-in 
 </div>
 
 Playwright utilities are organized a little differently from those in the `e2e-test-utils` package. The `e2e-test-utils-playwright` package has the following folders that utils are divided up into:
-- `admin` - Utilities related to WordPress admin or WordPress admin's user interface (e.g. `visitAdminPage`).
-- `editor` - Utilities for the block editor (e.g. `clickBlockToolbarButton`).
-- `pageUtils` - General utilities for interacting with the browser (e.g. `pressKeys`).
-- `requestUtils` - Utilities for making REST API requests (e.g. `activatePlugin`). These utilities are used for setup and teardown of tests.
+
+-   `admin` - Utilities related to WordPress admin or WordPress admin's user interface (e.g. `visitAdminPage`).
+-   `editor` - Utilities for the block editor (e.g. `clickBlockToolbarButton`).
+-   `pageUtils` - General utilities for interacting with the browser (e.g. `pressKeys`).
+-   `requestUtils` - Utilities for making REST API requests (e.g. `activatePlugin`). These utilities are used for setup and teardown of tests.
 
 1. Copy the existing file in `e2e-test-utils` and paste it in the `admin`, `editor`, `page` or `request` folder in `e2e-test-utils-playwright` depending on the type of util.
 2. Update any parts of the util that need to be rewritten:

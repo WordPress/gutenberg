@@ -1,12 +1,12 @@
 # theme.json
 
-A theme's theme.json file is one of the best ways to curate the Editor experience and will likely be the first tool you use before reaching for more sophisticated solutions. 
+A theme's theme.json file is one of the best ways to curate the Editor experience and will likely be the first tool you use before reaching for more sophisticated solutions.
 
 ## Providing default controls/options
 
-Since theme.json acts as a configuration tool, there are numerous ways to define at a granular level what options are available. This section will use duotone as an example since it showcases a feature that cuts across a few blocks and allows for varying levels of access.   
+Since theme.json acts as a configuration tool, there are numerous ways to define at a granular level what options are available. This section will use duotone as an example since it showcases a feature that cuts across a few blocks and allows for varying levels of access.
 
-*Duotone with Core options and customization available for each image related block:*
+_Duotone with Core options and customization available for each image related block:_
 
 ```json
 {
@@ -14,14 +14,13 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 	"settings": {
 		"color": {
 			"customDuotone": true,
-			"duotone": [
-			]
+			"duotone": []
 		}
 	}
 }
 ```
 
-*Duotone with theme defined color options, Core options, and customization available for each image related block:*
+_Duotone with theme defined color options, Core options, and customization available for each image related block:_
 
 ```json
 {
@@ -43,14 +42,14 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 					"colors": [ "#000000", "#7f5dee" ],
 					"slug": "foreground-and-tertiary",
 					"name": "Foreground and tertiary"
-				},
+				}
 			]
 		}
 	}
 }
 ```
 
-*Duotone with defined default options and all customization available for the Post Featured Image block:*
+_Duotone with defined default options and all customization available for the Post Featured Image block:_
 
 ```json
 {
@@ -71,7 +70,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 						},
 						{
 							"colors": [ "#282828", "#0288d1" ],
-							"slug": "black-and-blue", 
+							"slug": "black-and-blue",
 							"name": "Black and Blue"
 						}
 					],
@@ -84,7 +83,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 }
 ```
 
-*Duotone with only defined default options and core options available for the Post Featured Image block (no customization):*
+_Duotone with only defined default options and core options available for the Post Featured Image block (no customization):_
 
 ```json
 {
@@ -93,7 +92,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 		"color": {
 			"custom": true,
 			"customDuotone": true
-		},	
+		},
 		"blocks": {
 			"core/post-featured-image": {
 				"color": {
@@ -113,7 +112,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 					"custom": false
 				}
 			}
-		} 
+		}
 	}
 }
 ```
@@ -122,7 +121,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ### Limit options on a per-block basis
 
-Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block: 
+Beyond defining default values, using theme.json allows you to also remove options entirely and instead rely on what the theme has set in place. Below is a visual showing two extremes with the same paragraph block:
 
 ![Image of restricted interface](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/Locking%20comparison%20visual.png?raw=true)
 
@@ -156,11 +155,11 @@ Continuing the examples with duotone, this means you could allow full access to 
 }
 ```
 
-You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/global-settings-and-styles.md). 
+You can read more about how best to [turn on/off options with theme.json here](/docs/how-to-guides/themes/global-settings-and-styles.md).
 
 ### Disable inherit default layout
 
-To disable the “Inherit default layout” setting for container blocks like the Group block, remove the following section: 
+To disable the “Inherit default layout” setting for container blocks like the Group block, remove the following section:
 
 ```json
 "layout": {

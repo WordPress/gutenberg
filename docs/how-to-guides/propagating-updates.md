@@ -18,7 +18,7 @@ The more that you approach design at the block level, the less need there is to 
 
 ### Blocks
 
-How to manage block updates depends on the nature of the block itself. If the block depends on external data, then making it dynamic from start with the `render_callback` function is often a better choice as it provides more control. If the block's structure is expected to change over time, then starting with the static block that uses `save()` method defining a default output is the recommended approach. Over time, it's possible to go hybrid and include also the `render_callback` that can use the output from `save` as a fallback while processing an alternate output. Keep in mind that that flexibility and controls comes at the cost of additional processing during rendering. Another option is using static blocks that rely on managing updates with [block deprecations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/). This will require you to manually update exist blocks.  Depending on your needs and comfortability, either approach can work. **To get started on creating blocks and save time, [you can use the Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).**
+How to manage block updates depends on the nature of the block itself. If the block depends on external data, then making it dynamic from start with the `render_callback` function is often a better choice as it provides more control. If the block's structure is expected to change over time, then starting with the static block that uses `save()` method defining a default output is the recommended approach. Over time, it's possible to go hybrid and include also the `render_callback` that can use the output from `save` as a fallback while processing an alternate output. Keep in mind that that flexibility and controls comes at the cost of additional processing during rendering. Another option is using static blocks that rely on managing updates with [block deprecations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/). This will require you to manually update exist blocks. Depending on your needs and comfortability, either approach can work. **To get started on creating blocks and save time, [you can use the Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/).**
 
 ### Patterns
 
@@ -34,7 +34,7 @@ If needed, one potential workaround for patterns with custom styles is to add a 
 <!-- /wp:group -->
 ```
 
-It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated.
+It is not fool-proof because users can modify the class via the editor UI. However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated.
 
 ### Synced Patterns
 
@@ -44,19 +44,17 @@ As the name suggests, these patterns are inherently synced across your site. Kee
 
 Because block themes allow users to directly edit templates and template parts, how changes are managed need to be adjusted in light of the greater access given to users. For context, when templates or template parts are changed by the user, the updated templates from the theme update don’t show for the user. Only new users of the theme or users who have not yet edited a template are experiencing the updated template. If users haven’t modified the files then the changes you make on the file system will be reflected on the user’s sites – you just need to update the files and they’ll get the changes. However if they have made changes to their templates then the only way you can update their templates is to:
 
-- Revert all their changes
-- Update the templates and template parts in the database
+-   Revert all their changes
+-   Update the templates and template parts in the database
 
 Generally speaking, if a user has made changes to templates then it’s recommended to leave the templates as is, unless agreed upon with the user (ie in an agency setting).
 
-One thing to be mindful of when updating templates is inserting references to new or different template parts.  For example, the templates/page.html template could insert a parts/header.html part in version 1.0 but change that reference to parts/header-alt.html in version 2.0.  Some developers may see this as a "workaround" in instances where users modified the original header.html.  However, this is likely to break a user's customized design since the page.html template would no longer reference the correct part unless they also modified and saved the page template.
+One thing to be mindful of when updating templates is inserting references to new or different template parts. For example, the templates/page.html template could insert a parts/header.html part in version 1.0 but change that reference to parts/header-alt.html in version 2.0. Some developers may see this as a "workaround" in instances where users modified the original header.html. However, this is likely to break a user's customized design since the page.html template would no longer reference the correct part unless they also modified and saved the page template.
 
-Likewise, it is generally poor practice to delete template parts in theme updates.  In this scenario, users could create custom top-level templates that include a call to the part and expect it to continue existing.
+Likewise, it is generally poor practice to delete template parts in theme updates. In this scenario, users could create custom top-level templates that include a call to the part and expect it to continue existing.
 
 ### Resources
 
-- [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/documentation/article/comparing-patterns-template-parts-and-reusable-blocks/)
-- [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
-- [Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/)
-
-
+-   [Comparing Patterns, Template Parts, and Reusable Blocks](https://wordpress.org/documentation/article/comparing-patterns-template-parts-and-reusable-blocks/)
+-   [Block deprecation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/)
+-   [Create Block tool](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/)

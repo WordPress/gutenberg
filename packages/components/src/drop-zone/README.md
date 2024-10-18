@@ -21,7 +21,7 @@ const MyDropZone = () => {
 			/>
 		</div>
 	);
-}
+};
 ```
 
 ## Props

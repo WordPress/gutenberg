@@ -36,7 +36,6 @@ This prop is passed directly to the `URLInput` component.
 
 ## Example
 
-
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { URLInputButton } from '@wordpress/block-editor';
@@ -67,7 +66,6 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
-
 
 # `URLInput`
 
@@ -131,7 +129,6 @@ When hiding the URLInput using CSS (as is sometimes done for accessibility purpo
 This prop allows the suggestions list to be programmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
 
 ## Example
-
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';

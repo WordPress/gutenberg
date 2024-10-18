@@ -36,7 +36,15 @@ const QUERY_DEFAULTS = {
 
 const MyQueryControls = () => {
 	const [ query, setQuery ] = useState( QUERY_DEFAULTS );
-	const { category, categories, maxItems, minItems, numberOfItems, order, orderBy  } = query;
+	const {
+		category,
+		categories,
+		maxItems,
+		minItems,
+		numberOfItems,
+		order,
+		orderBy,
+	} = query;
 
 	const updateQuery = ( newQuery ) => {
 		setQuery( { ...query, ...newQuery } );
@@ -45,11 +53,15 @@ const MyQueryControls = () => {
 	return (
 		<QueryControls
 			{ ...{ maxItems, minItems, numberOfItems, order, orderBy } }
-			onOrderByChange={ ( newOrderBy ) => updateQuery( { orderBy: newOrderBy } ) }
+			onOrderByChange={ ( newOrderBy ) =>
+				updateQuery( { orderBy: newOrderBy } )
+			}
 			onOrderChange={ ( newOrder ) => updateQuery( { order: newOrder } ) }
 			categoriesList={ categories }
 			selectedCategoryId={ category }
-			onCategoryChange={ ( newCategory ) => updateQuery( { category: newCategory } ) }
+			onCategoryChange={ ( newCategory ) =>
+				updateQuery( { category: newCategory } )
+			}
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
 				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
@@ -100,7 +112,8 @@ const QUERY_DEFAULTS = {
 
 const MyQueryControls = () => {
 	const [ query, setQuery ] = useState( QUERY_DEFAULTS );
-	const { orderBy, order, selectedCategories, categories, numberOfItems } = query;
+	const { orderBy, order, selectedCategories, categories, numberOfItems } =
+		query;
 
 	const updateQuery = ( newQuery ) => {
 		setQuery( { ...query, ...newQuery } );
@@ -109,11 +122,15 @@ const MyQueryControls = () => {
 	return (
 		<QueryControls
 			{ ...{ orderBy, order, numberOfItems } }
-			onOrderByChange={ ( newOrderBy ) => updateQuery( { orderBy: newOrderBy } ) }
+			onOrderByChange={ ( newOrderBy ) =>
+				updateQuery( { orderBy: newOrderBy } )
+			}
 			onOrderChange={ ( newOrder ) => updateQuery( { order: newOrder } ) }
 			categorySuggestions={ categories }
 			selectedCategories={ selectedCategories }
-			onCategoryChange={ ( category ) => updateQuery( { selectedCategories: category } ) }
+			onCategoryChange={ ( category ) =>
+				updateQuery( { selectedCategories: category } )
+			}
 			onNumberOfItemsChange={ ( newNumberOfItems ) =>
 				updateQuery( { numberOfItems: newNumberOfItems } )
 			}
@@ -245,5 +262,5 @@ The selected category for the `categoriesList` prop.
 
 Start opting into the larger default height that will become the default size in a future version.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`

@@ -34,7 +34,7 @@ jobs:
 
                   # Find any changelog file that contains the Gutenberg PR link
                   gutenberg_pr_url="https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
-                  changelog_file=$(grep -rl "[-*] ${gutenberg_pr_url}" "${changelog_folder}" | head -n 1)
+                  changelog_file=$(grep -Erl "[-*] +${gutenberg_pr_url}" "${changelog_folder}" | head -n 1)
 
                   # Confirm that there is an entry containing the Gutenberg PR link
                   if [[ -z "${changelog_file}" ]]; then

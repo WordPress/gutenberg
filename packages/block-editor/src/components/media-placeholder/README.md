@@ -66,10 +66,10 @@ This property is similar to the `accept` property. The difference is the format 
 
 If true, the MediaUpload component auto-opens the picker of the respective platform.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-- Platform: Mobile
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+-   Platform: Mobile
 
 ### className
 

@@ -27,36 +27,48 @@ function TreeMenu() {
 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>Select</Button>
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMove } { ...props }>Move</Button>
+						<Button onClick={ onMove } { ...props }>
+							Move
+						</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>Select</Button>
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMove } { ...props }>Move</Button>
+						<Button onClick={ onMove } { ...props }>
+							Move
+						</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onSelect } { ...props }>Select</Button>
+						<Button onClick={ onSelect } { ...props }>
+							Select
+						</Button>
 					) }
 				</TreeGridCell>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button onClick={ onMove } { ...props }>Move</Button>
+						<Button onClick={ onMove } { ...props }>
+							Move
+						</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>
@@ -131,10 +143,22 @@ If there is a need to implement `aria-expanded` elsewhere in the row, cell, or e
 function TreeMenu() {
 	return (
 		<TreeGrid>
-			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 } isExpanded={ undefined } data-expanded={ false }>
+			<TreeGridRow
+				level={ 1 }
+				positionInSet={ 1 }
+				setSize={ 2 }
+				isExpanded={ undefined }
+				data-expanded={ false }
+			>
 				<TreeGridCell>
 					{ ( props ) => (
-						<Button aria-expanded="false" onClick={ onSelect } { ...props }>Select</Button>
+						<Button
+							aria-expanded="false"
+							onClick={ onSelect }
+							{ ...props }
+						>
+							Select
+						</Button>
 					) }
 				</TreeGridCell>
 			</TreeGridRow>

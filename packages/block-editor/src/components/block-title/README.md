@@ -6,11 +6,13 @@ It prioritizes contextual titles such as block variation and reusable block labe
 
 The component will be empty if a title cannot be determined.
 
-
 ## Usage
 
 ```jsx
-<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" maximumLength={ 12 }/>
+<BlockTitle
+	clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1"
+	maximumLength={ 12 }
+/>
 ```
 
 ### Props

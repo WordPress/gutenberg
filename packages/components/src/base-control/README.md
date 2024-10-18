@@ -72,7 +72,7 @@ The content to be displayed within the BaseControl.
 -   Type: `Element`
 -   Required: Yes
 
-### __nextHasNoMarginBottom
+### \_\_nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.
 

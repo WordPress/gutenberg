@@ -359,7 +359,7 @@
 		"wp-env": "wp-env"
 	},
 	"lint-staged": {
-		"*.{js,json,ts,tsx,yml,yaml}": [
+		"*.{js,json,ts,tsx,yml,yaml,md}": [
 			"wp-scripts format"
 		],
 		"*.{js,ts,tsx}": [

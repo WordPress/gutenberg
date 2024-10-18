@@ -455,15 +455,15 @@ Link support has been made stable as part of WordPress 5.8. It's `false` by defa
 When the user sets the link color of a block, a new style will be added in the form of:
 
 ```css
-.wp-elements-<uuid> a {
+.wp-elements-<uuid > a {
 	color: <link-color> !important;
 }
 ```
 
 where
 
-- `<uuid>` is a random number
-- `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
+-   `<uuid>` is a random number
+-   `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
 
 The block will get attached the class `.wp-elements-<uuid>`.
 
@@ -471,12 +471,12 @@ The block will get attached the class `.wp-elements-<uuid>`.
 
 Use this setting to enable the following Global Styles settings:
 
-- border: color, radius, style, width
-- color: link
-- spacing: blockGap, margin, padding
-- typography: lineHeight
-- dimensions: aspectRatio, minHeight
-- position: sticky
+-   border: color, radius, style, width
+-   color: link
+-   spacing: blockGap, margin, padding
+-   typography: lineHeight
+-   dimensions: aspectRatio, minHeight
+-   position: sticky
 
 ```php
 add_theme_support( 'appearance-tools' );

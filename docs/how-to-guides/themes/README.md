@@ -10,7 +10,7 @@ In terms of block editor terminology this is any theme that defines its template
 
 ### Block theme
 
-This is any theme that has, at a minimum, an `index.html` format template in the `/block-templates` or `/templates` folders, and with templates  provided in form of block content markup. While many `Block` themes will make use of a `theme.json` file to provide configuration and styling settings, a `theme.json` is not a requirement of `Block` themes. The advantage of `Block` themes is that the block editor can be used to edit all areas of the site: headers, footers, sidebars, etc.
+This is any theme that has, at a minimum, an `index.html` format template in the `/block-templates` or `/templates` folders, and with templates provided in form of block content markup. While many `Block` themes will make use of a `theme.json` file to provide configuration and styling settings, a `theme.json` is not a requirement of `Block` themes. The advantage of `Block` themes is that the block editor can be used to edit all areas of the site: headers, footers, sidebars, etc.
 
 ### Full site editing (FSE)
 
@@ -18,5 +18,5 @@ There isn't an FSE specific theme type. In WordPress > 5.9 FSE is enabled for an
 
 **Contents**
 
-- [Global Settings (theme.json)](/docs/how-to-guides/themes/global-settings-and-styles.md)
-- [Theme Support](/docs/how-to-guides/themes/theme-support.md)
+-   [Global Settings (theme.json)](/docs/how-to-guides/themes/global-settings-and-styles.md)
+-   [Theme Support](/docs/how-to-guides/themes/theme-support.md)

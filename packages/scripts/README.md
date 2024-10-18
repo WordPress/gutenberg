@@ -117,7 +117,6 @@ and should be registered in WordPress using the Modules API.
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
-
 ### `build-blocks-manifest`
 
 This script generates a PHP file containing block metadata from all
@@ -128,10 +127,12 @@ when registering multiple block types, as it allows you to use
 Usage: `wp-scripts build-blocks-manifest [options]`
 
 Options:
-- `--input`: Specify the input directory (default: 'build')
-- `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
+
+-   `--input`: Specify the input directory (default: 'build')
+-   `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
 
 Example:
+
 ```bash
 wp-scripts build-blocks-manifest --input=src --output=dist/blocks-manifest.php
 ```

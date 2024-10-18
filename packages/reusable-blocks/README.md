@@ -69,9 +69,8 @@ This package also provides convenient utilities for managing reusable blocks thr
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 function MyConvertToStaticButton( { clientId } ) {
-	const { __experimentalConvertBlockToStatic } = useDispatch(
-		reusableBlocksStore
-	);
+	const { __experimentalConvertBlockToStatic } =
+		useDispatch( reusableBlocksStore );
 	return (
 		<button
 			onClick={ () => __experimentalConvertBlockToStatic( clientId ) }
@@ -82,9 +81,8 @@ function MyConvertToStaticButton( { clientId } ) {
 }
 
 function MyConvertToReusableButton( { clientId } ) {
-	const { __experimentalConvertBlocksToReusable } = useDispatch(
-		reusableBlocksStore
-	);
+	const { __experimentalConvertBlocksToReusable } =
+		useDispatch( reusableBlocksStore );
 	return (
 		<button
 			onClick={ () =>
@@ -97,9 +95,8 @@ function MyConvertToReusableButton( { clientId } ) {
 }
 
 function MyDeleteReusableBlockButton( { id } ) {
-	const { __experimentalDeleteReusableBlock } = useDispatch(
-		reusableBlocksStore
-	);
+	const { __experimentalDeleteReusableBlock } =
+		useDispatch( reusableBlocksStore );
 	return (
 		<button onClick={ () => __experimentalDeleteReusableBlock( id ) }>
 			Delete reusable block

@@ -33,30 +33,30 @@ function Example() {
 
 Renders borders around each items.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `isRounded`: `boolean`
 
 Renders with rounded corners.
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`
 
 ### `isSeparated`: `boolean`
 
 Renders items individually. Even if `isBordered` is `false`, a border in between each item will be still be displayed.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `size`: `'small' | 'medium' | 'large'`
 
 Determines the amount of padding within the component.
 When not defined, it defaults to the value from the context (which is `medium` by default).
 
-- Required: No
-- Default: `medium`
+-   Required: No
+-   Default: `medium`
 
 ### Context
 

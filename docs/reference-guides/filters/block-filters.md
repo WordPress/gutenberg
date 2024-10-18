@@ -12,7 +12,7 @@ Filters the raw metadata loaded from the `block.json` file when registering a bl
 
 The callback function for this filter receives one parameter:
 
-- `$metadata` (`array`): Metadata loaded from `block.json` for registering a block type.
+-   `$metadata` (`array`): Metadata loaded from `block.json` for registering a block type.
 
 The following example sets the `apiVersion` of all blocks to `2`.
 
@@ -24,11 +24,11 @@ function example_filter_metadata_registration( $metadata ) {
 add_filter( 'block_type_metadata', 'example_filter_metadata_registration' );
 ```
 
-Here's a more robust example that disables background color and gradient support for Heading blocks. The `block_type_metadata` filter is excellent for [curating the Editor experience](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/). 
+Here's a more robust example that disables background color and gradient support for Heading blocks. The `block_type_metadata` filter is excellent for [curating the Editor experience](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/).
 
 ```php
 function example_disable_heading_background_color_and_gradients( $metadata ) {
-	
+
 	// Only apply the filter to Heading blocks.
 	if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
 		return $metadata;
@@ -36,7 +36,7 @@ function example_disable_heading_background_color_and_gradients( $metadata ) {
 
 	// Check if 'supports' key exists.
 	if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
-		
+
 		// Remove Background color and Gradients support.
 		$metadata['supports']['color']['background'] = false;
 		$metadata['supports']['color']['gradients']  = false;
@@ -72,8 +72,8 @@ Filters a block's arguments array (`$args`) right before the block type is offic
 
 The callback function for this filter receives two parameters:
 
-- `$args` (`array`): Array of arguments for registering a block type.
-- `$block_type` (`string`): Block type name including namespace.
+-   `$args` (`array`): Array of arguments for registering a block type.
+-   `$block_type` (`string`): Block type name including namespace.
 
 `register_block_type_args` is the most low-level PHP filter available, and it will work for every block registered on the server. All settings defined on the server are propagated to the client with higher priority than those set in the client.
 
@@ -139,25 +139,25 @@ The following PHP filters are available to change the output of a block on the f
 
 ### `render_block`
 
-Filters the front-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
+Filters the front-end content of any block. This filter has no impact on the behavior of blocks in the Editor.
 
 The callback function for this filter receives three parameters:
 
-- `$block_content` (`string`): The block content.
-- `$block` (`array`): The full block, including name and attributes.
-- `$instance` (`WP_Block`): The block instance.
+-   `$block_content` (`string`): The block content.
+-   `$block` (`array`): The full block, including name and attributes.
+-   `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Here the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used to easily add the class instead of relying on regex.
 
 ```php
 function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
-	
+
 	// Check if the block is a Paragraph block.
 	if ( 'core/paragraph' === $block['blockName'] ) {
-	   
+
 		// Add the custom class to the block content using the HTML API.
 		$processor = new WP_HTML_Tag_Processor( $block_content );
-		
+
 		if ( $processor->next_tag( 'p' ) ) {
 			$processor->add_class( 'example-class' );
 		}
@@ -176,18 +176,18 @@ Filters the front-end content of the defined block. This is just a simpler form 
 
 The callback function for this filter receives three parameters:
 
-- `$block_content` (`string`): The block content.
-- `$block` (`array`): The full block, including name and attributes.
-- `$instance` (`WP_Block`): The block instance.
+-   `$block_content` (`string`): The block content.
+-   `$block` (`array`): The full block, including name and attributes.
+-   `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Notice that compared to the `render_block` example above, you no longer need to check the block type before modifying the content. Again, the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used instead of regex.
 
 ```php
 function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
-	   
+
 	// Add the custom class to the block content using the HTML API.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
-	
+
 	if ( $processor->next_tag( 'p' ) ) {
 		$processor->add_class( 'example-class' );
 	}
@@ -207,15 +207,14 @@ A filter that applies to the result of a block's `save` function. This filter is
 
 The callback function for this filter receives three parameters:
 
-- `element` (`Object`): The element to be modified and returned.
-- `blockType` (`Object`): A block-type definition object. 
-- `attributes` (`Object`): The block's attributes. 
+-   `element` (`Object`): The element to be modified and returned.
+-   `blockType` (`Object`): A block-type definition object.
+-   `attributes` (`Object`): The block's attributes.
 
 The following example wraps a Cover block in an outer container `div`.
 
 ```js
 function wrapCoverBlockInContainer( element, blockType, attributes ) {
-	
 	// Skip if element is undefined.
 	if ( ! element ) {
 		return;
@@ -243,9 +242,9 @@ A filter that applies to all blocks returning a WP Element in the `save` functio
 
 The callback function for this filter receives three parameters:
 
-- `props` (`Object`): The current `save` element's props to be modified and returned.
-- `blockType` (`Object`): A block-type definition object. 
-- `attributes` (`Object`): The block's attributes. 
+-   `props` (`Object`): The current `save` element's props to be modified and returned.
+-   `blockType` (`Object`): A block-type definition object.
+-   `attributes` (`Object`): The block's attributes.
 
 The following example adds a red background by default to all blocks.
 
@@ -295,27 +294,28 @@ Used to filter an individual transform result from block transformation. All of 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
 The callback function for this filter accepts 4 parameters:
-- `blockAttributes` (`Object`): All block attributes.
-- `blockType` (`Object`): The block type.
-- `innerHTML` (`string`): Raw block content.
-- `attributes` (`object`): Known block attributes (from delimiters).
+
+-   `blockAttributes` (`Object`): All block attributes.
+-   `blockType` (`Object`): The block type.
+-   `innerHTML` (`string`): Raw block content.
+-   `attributes` (`object`): Known block attributes (from delimiters).
 
 In the example below, we use the `blocks.getBlockAttributes` filter to lock the position of all paragraph blocks on a page.
 
 ```js
 // Our filter function
-function lockParagraphs( blockAttributes, blockType, innerHTML, attributes  ) {
-    if('core/paragraph' === blockType.name) {
-        blockAttributes['lock'] = {move: true}
-    }
-    return blockAttributes;
+function lockParagraphs( blockAttributes, blockType, innerHTML, attributes ) {
+	if ( 'core/paragraph' === blockType.name ) {
+		blockAttributes[ 'lock' ] = { move: true };
+	}
+	return blockAttributes;
 }
 
 // Add the filter
 wp.hooks.addFilter(
-    'blocks.getBlockAttributes',
-    'my-plugin/lock-paragraphs',
-    lockParagraphs
+	'blocks.getBlockAttributes',
+	'my-plugin/lock-paragraphs',
+	lockParagraphs
 );
 ```
 

@@ -4,12 +4,11 @@ When developing custom blocks for WordPress, it's best practice to register them
 
 Adhering to the `create-block` tool's structure is not mandatory, but it serves as a reliable reference. The files it generates encompass everything needed for a block's definition and registration. Following this structure can help maintain consistency and ensure your blocks are well-organized and easy to maintain.
 
-[![Open File Structure of a Block diagram image](https://developer.wordpress.org/files/2023/11/file-structure-block.png)](https://developer.wordpress.org/files/2023/11/file-structure-block.png "Open File Structure of a Block diagram image")
+[![Open File Structure of a Block diagram image](https://developer.wordpress.org/files/2023/11/file-structure-block.png)](https://developer.wordpress.org/files/2023/11/file-structure-block.png 'Open File Structure of a Block diagram image')
 
 ## `<plugin-file>.php`
 
-
-When creating a block in a WordPress plugin, you usually register the block on the server in the main PHP file of the plugin. This is done using the [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) function. 
+When creating a block in a WordPress plugin, you usually register the block on the server in the main PHP file of the plugin. This is done using the [`register_block_type()`](https://developer.wordpress.org/reference/functions/register_block_type/) function.
 
 <div class="callout callout-info">
     For more on creating a WordPress plugin, refer to the documentation on <a href="https://developer.wordpress.org/plugins/plugin-basics/">Plugin Basics</a> and the <a href="https://developer.wordpress.org/plugins/plugin-basics/header-requirements/"> Header Requirements</a> for the main PHP file.
@@ -23,25 +22,25 @@ The `package.json` file is used to configure a Node.js project, which is technic
 
 In a standard project, the `src` (source) folder contains the raw, uncompiled code, including JavaScript, CSS, and other assets necessary for developing the block. This is where you write and edit your block's source code, utilizing modern JavaScript features and JSX for React components.
 
-The [build process](docs/block-editor/getting-started/fundamentals/javascript-in-the-block-editor/#javascript-build-process.md) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder. 
+The [build process](docs/block-editor/getting-started/fundamentals/javascript-in-the-block-editor/#javascript-build-process.md) provided by `wp-scripts` will then take the files from this folder and generate the production-ready files in the project's `build` folder.
 
 ### `block.json`
 
-The `block.json` file contains the [block's metadata](docs/block-editor/reference-guides/block-api/block-metadata/), streamlining its definition and registration across client-side and server-side environments. 
+The `block.json` file contains the [block's metadata](docs/block-editor/reference-guides/block-api/block-metadata/), streamlining its definition and registration across client-side and server-side environments.
 
-This file includes the block name, description, [attributes](docs/block-editor/reference-guides/block-api/block-attributes/), [supports](docs/block-editor/reference-guides/block-api/block-supports/), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling. 
+This file includes the block name, description, [attributes](docs/block-editor/reference-guides/block-api/block-attributes/), [supports](docs/block-editor/reference-guides/block-api/block-supports/), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling.
 
-When a build process is applied, the `block.json` file and the other generated files are moved to a designated folder, often the `build` folder. Consequently, the file paths specified within `block.json` point to these processed, bundled versions of the files. 
+When a build process is applied, the `block.json` file and the other generated files are moved to a designated folder, often the `build` folder. Consequently, the file paths specified within `block.json` point to these processed, bundled versions of the files.
 
 A few of the most important properties that can be defined in a `block.json` are:
 
-- **[`editorScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script):** Usually set with the path of a bundled `index.js` file that was built from `src/index.js`.
-- **[`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style):** Usually set with the path of a bundled `style-index.css` file that was built from `src/style.(css|scss|sass)`.
-- **[`editorStyle`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style):** Usually set with the path of a bundled `index.css` that was built from `src/editor.(css|scss|sass)`.
-- **[`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render):** Usually set with the path of a bundled `render.php` that was copied from `src/render.php`.
-- **[`viewScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script):** Usually set with the path of a bundled `view.js` that was built from `src/view.js`.
+-   **[`editorScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-script):** Usually set with the path of a bundled `index.js` file that was built from `src/index.js`.
+-   **[`style`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style):** Usually set with the path of a bundled `style-index.css` file that was built from `src/style.(css|scss|sass)`.
+-   **[`editorStyle`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style):** Usually set with the path of a bundled `index.css` that was built from `src/editor.(css|scss|sass)`.
+-   **[`render`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render):** Usually set with the path of a bundled `render.php` that was copied from `src/render.php`.
+-   **[`viewScript`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script):** Usually set with the path of a bundled `view.js` that was built from `src/view.js`.
 
-[![Open Build Output Diagram in excalidraw](https://developer.wordpress.org/files/2023/11/file-structure-build-output.png)](https://excalidraw.com/#json=c22LROgcG4JkD-7SkuE-N,rQW_ViJBq0Yk3qhCgqD6zQ "Open Build Output Diagram in excalidraw")
+[![Open Build Output Diagram in excalidraw](https://developer.wordpress.org/files/2023/11/file-structure-build-output.png)](https://excalidraw.com/#json=c22LROgcG4JkD-7SkuE-N,rQW_ViJBq0Yk3qhCgqD6zQ 'Open Build Output Diagram in excalidraw')
 
 ### `index.js`
 
@@ -87,4 +86,4 @@ This transformation process includes minification, transpilation from modern Jav
 
 ## Additional resources
 
-- [Diagram featuring the file structure of a block](https://excalidraw.com/#json=YYpeR-kY1ZMhFKVZxGhMi,mVZewfwNAh_oL-7bj4gmdw)
+-   [Diagram featuring the file structure of a block](https://excalidraw.com/#json=YYpeR-kY1ZMhFKVZxGhMi,mVZewfwNAh_oL-7bj4gmdw)

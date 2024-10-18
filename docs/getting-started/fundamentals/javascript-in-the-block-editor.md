@@ -22,11 +22,11 @@ For an introduction, refer to the [Get started with wp-scripts](/docs/getting-st
 
 The diagram below provides an overview of the build process when using the `wp-scripts` package. It's designed to work out of the box with [standard configurations](/docs/getting-started/devenv/get-started-with-wp-scripts.md#basic-usage) for development and production environments.
 
-[![Open Build Process diagram image](https://developer.wordpress.org/files/2023/11/build-process.png)](https://developer.wordpress.org/files/2023/11/build-process.png "Open Build Process diagram image")
+[![Open Build Process diagram image](https://developer.wordpress.org/files/2023/11/build-process.png)](https://developer.wordpress.org/files/2023/11/build-process.png 'Open Build Process diagram image')
 
-- **Production Mode (`npm run build`):** In this mode, `wp-scripts` compiles your JavaScript, minifying the output to reduce file size and improve loading times in the browser. This is ideal for deploying your code to a live site.
+-   **Production Mode (`npm run build`):** In this mode, `wp-scripts` compiles your JavaScript, minifying the output to reduce file size and improve loading times in the browser. This is ideal for deploying your code to a live site.
 
-- **Development Mode (`npm run start`):** This mode is tailored for active development. It skips minification for easier debugging, generates source maps for better error tracking, and watches your source files for changes. When a change is detected, it automatically rebuilds the affected files, allowing you to see updates in real-time.
+-   **Development Mode (`npm run start`):** This mode is tailored for active development. It skips minification for easier debugging, generates source maps for better error tracking, and watches your source files for changes. When a change is detected, it automatically rebuilds the affected files, allowing you to see updates in real-time.
 
 The `wp-scripts` package also facilitates the use of JavaScript modules, allowing code distribution across multiple files and resulting in a streamlined bundle after the build process. The [block-development-example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) GitHub repository provides some good examples.
 
@@ -60,17 +60,14 @@ add_action( 'enqueue_block_editor_assets', 'example_enqueue_block_variations' );
 Then in the `variations.js` file, you can register a new variation for the Media & Text block like so:
 
 ```js
-wp.blocks.registerBlockVariation(
-	'core/media-text',
-	{
-		name: 'media-text-custom',
-		title: 'Media & Text Custom',
-		attributes: {
-			align: 'wide',
-			backgroundColor: 'tertiary'
-		},
-	}
-);
+wp.blocks.registerBlockVariation( 'core/media-text', {
+	name: 'media-text-custom',
+	title: 'Media & Text Custom',
+	attributes: {
+		align: 'wide',
+		backgroundColor: 'tertiary',
+	},
+} );
 ```
 
 For scripts that need to run in the Block Editor, make sure you use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) function.
@@ -83,12 +80,12 @@ Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets
 
 ## Additional resources
 
-- [Package reference](/docs/reference-guides/packages.md)
-- [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md)
-- [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md)
-- [WordPress package handles](/docs/contributors/code/scripts.md)
-- [JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
-- [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
-- [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
-- [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
-- [Build process diagram](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw)
+-   [Package reference](/docs/reference-guides/packages.md)
+-   [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md)
+-   [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md)
+-   [WordPress package handles](/docs/contributors/code/scripts.md)
+-   [JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
+-   [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
+-   [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
+-   [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
+-   [Build process diagram](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw)

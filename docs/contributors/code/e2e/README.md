@@ -5,8 +5,8 @@ This living document serves to prescribe instructions and best practices for wri
 <div class="callout callout-info">
 
 See the dedicated guide if you're working with the previous Jest + Puppeteer framework. See the <a href="https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/migration.md">migration guide</a> if you're migrating tests from Jest + Puppeteer.
-</div>
 
+</div>
 
 ## Running tests
 
@@ -36,6 +36,7 @@ xvfb-run npm run test:e2e
 # Only run webkit tests.
 xvfb-run -- npm run test:e2e -- --project=webkit
 ```
+
 If you're already editing in VS Code, you may find the [Playwright extension](https://playwright.dev/docs/getting-started-vscode) helpful for running, writing and debugging tests.
 
 ## Best practices
@@ -59,8 +60,9 @@ It can also be chained to perform complex queries:
 
 ```js
 // Select an option with a name "Buttons" under the "Block Library" region.
-page.getByRole( 'region', { name: 'Block Library' } )
-	.getByRole( 'option', { name: 'Buttons' } )
+page.getByRole( 'region', { name: 'Block Library' } ).getByRole( 'option', {
+	name: 'Buttons',
+} );
 ```
 
 See the [official documentation](https://playwright.dev/docs/locators) for more info on how to use them.
@@ -95,13 +97,14 @@ We can insert as many assertions in one test as needed. It's better to make expl
 
 ### [Overusing snapshots](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/e2e/overusing-snapshots.md)
 
-
 ## Cross-browser testing
 
 By default, tests are only run in chromium. You can _tag_ tests to run them in different browsers. Use `@browser` anywhere in the test title to run it in that browser. Tests will always run in chromium by default, append `-chromium` to disable testing in chromium. Available browsers are `chromium`, `firefox`, and `webkit`.
 
 ```js
-test( 'I will run in @firefox and @webkit (and chromium by default)', async ( { page } ) => {
+test( 'I will run in @firefox and @webkit (and chromium by default)', async ( {
+	page,
+} ) => {
 	// ...
 } );
 

@@ -15,10 +15,7 @@ Renders the markup for the line height setting option in the block inspector.
 ```jsx
 import { LineHeightControl } from '@wordpress/block-editor';
 const MyLineHeightControl = () => (
-	<LineHeightControl
-		value={ lineHeight }
-		onChange={ onChange }
-	/>
+	<LineHeightControl value={ lineHeight } onChange={ onChange } />
 );
 ```
 
@@ -38,8 +35,8 @@ A callback function that handles the application of the line height value.
 
 #### `__next40pxDefaultSize`
 
-- **Type:** `boolean`
-- **Default:** `false`
+-   **Type:** `boolean`
+-   **Default:** `false`
 
 Start opting into the larger default height that will become the default size in a future version.
 

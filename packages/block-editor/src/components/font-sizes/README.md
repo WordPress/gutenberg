@@ -6,7 +6,6 @@ There is an equivalent component exposed under @wordpress/components. The differ
 
 ## Usage
 
-
 ```jsx
 import { FontSizePicker } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
@@ -49,33 +48,32 @@ const MyFontSizePicker = () => {
 
 The component accepts the following props:
 
-
 ### fallbackFontSize
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
 
-- Type: `Number`
-- Required: No
+-   Type: `Number`
+-   Required: No
 
 ### onChange
 
 A function that receives the new font size value.
 If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font size to undefined or set the font size a starting value.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ### value
 
 The current font size value.
 
-- Type: `Number`
-- Required: No
+-   Type: `Number`
+-   Required: No
 
 ### withSlider
 
 If `true`, the UI will contain a slider, instead of a numeric text input field. If `false`, no slider will be present.
 
-- Type: `Boolean`
-- Required: no
-- Default: `false`
+-   Type: `Boolean`
+-   Required: no
+-   Default: `false`

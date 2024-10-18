@@ -14,12 +14,12 @@ Given a block list object, you can retrieve an initial HTML version like so:
 import { serialize } from '@wordpress/blocks';
 
 const blockList = [
-    {
-        name: 'core/paragraph',
-        attributes: {
-            content: 'Hello world!',
-        },
-    },
+	{
+		name: 'core/paragraph',
+		attributes: {
+			content: 'Hello world!',
+		},
+	},
 ];
 
 const html = serialize( blockList );

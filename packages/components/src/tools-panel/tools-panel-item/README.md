@@ -38,9 +38,10 @@ panel's menu.
 
 The supplied label is dual purpose.
 It is used as:
+
 1. the human-readable label for the panel's dropdown menu
 2. a key to locate the corresponding item in the panel's menu context to
-determine if the panel item should be displayed.
+   determine if the panel item should be displayed.
 
 A panel item's `label` should be unique among all items within a single panel.
 

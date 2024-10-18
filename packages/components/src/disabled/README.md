@@ -38,12 +38,7 @@ A component can detect if it has been wrapped in a `<Disabled />` by accessing i
 ```jsx
 function CustomButton( props ) {
 	const isDisabled = useContext( Disabled.Context );
-	return (
-		<button
-			{ ...props }
-			style={ { opacity: isDisabled ? 0.5 : 1 } }
-		/>
-	);
+	return <button { ...props } style={ { opacity: isDisabled ? 0.5 : 1 } } />;
 }
 ```
 

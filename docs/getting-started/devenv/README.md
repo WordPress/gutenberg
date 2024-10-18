@@ -43,7 +43,7 @@ To be able to use the Node.js tools and [packages provided by WordPress](https:/
 
 A local WordPress environment (site) provides a controlled, efficient, and secure space for development, allowing you to build and test your code before deploying it to a production site. The same [requirements](https://en-gb.wordpress.org/about/requirements/) for WordPress apply to local sites.
 
-In the broader WordPress community, many tools are available for setting up a local WordPress environment on your computer. The Block Editor Handbook covers `wp-env`, which is open-source and maintained by the WordPress project itself. It's also the recommended tool for Gutenberg development. 
+In the broader WordPress community, many tools are available for setting up a local WordPress environment on your computer. The Block Editor Handbook covers `wp-env`, which is open-source and maintained by the WordPress project itself. It's also the recommended tool for Gutenberg development.
 
 Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-started-with-wp-env.md) guide for setup instructions.
 
@@ -53,8 +53,8 @@ Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-starte
 
 This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
 
-- [Local](https://localwp.com/)
-- [WP Studio](https://developer.wordpress.com/studio/)
-- [XAMPP](https://www.apachefriends.org/)
-- [MAMP](https://www.mamp.info/en/mamp/mac/)
-- [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)
+-   [Local](https://localwp.com/)
+-   [WP Studio](https://developer.wordpress.com/studio/)
+-   [XAMPP](https://www.apachefriends.org/)
+-   [MAMP](https://www.mamp.info/en/mamp/mac/)
+-   [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

@@ -14,12 +14,12 @@ const attributes = {
 		type: 'string',
 		source: 'text',
 		selector: 'div',
-		'default': ''
-	}
+		default: '',
+	},
 };
 ```
 
-Add this to the settings arguments of the `registerBlockType` function call. 
+Add this to the settings arguments of the `registerBlockType` function call.
 
 **Note:** The text source is equivalent to `innerText` attribute of a DOM element.
 
@@ -39,10 +39,10 @@ function Save( { attributes } ) {
 }
 
 registerBlockType( 'create-block/gutenpride', {
-    // ...
-    attributes,
-    edit: Edit,
-    save: Save,
+	// ...
+	attributes,
+	edit: Edit,
+	save: Save,
 } );
 ```
 

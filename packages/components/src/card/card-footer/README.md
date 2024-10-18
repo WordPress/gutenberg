@@ -9,8 +9,8 @@ import { Card, CardFooter } from '@wordpress/components';
 
 const Example = () => (
 	<Card>
- 		<CardBody>...</CardBody>
- 		<CardFooter>...</CardFooter>
+		<CardBody>...</CardBody>
+		<CardFooter>...</CardFooter>
 	</Card>
 );
 ```
@@ -51,8 +51,8 @@ Note: This component is connected to [`Card`'s Context](/packages/components/src
 
 Renders without a border.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `isShady`: `boolean`
 
@@ -69,6 +69,6 @@ See the documentation for the `justify` prop for the [`Flex` component](/package
 
 Determines the amount of padding within the component.
 
-- Required: No
-- Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+-   Required: No
+-   Default: `medium`
+-   Allowed values: `xSmall`, `small`, `medium`, `large`

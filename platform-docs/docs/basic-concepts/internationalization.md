@@ -11,7 +11,9 @@ Translations can be provided by calling the `setLocaleData` function with a doma
 ```js
 import { setLocaleData } from '@wordpress/i18n';
 
-setLocaleData( { 'Type / to choose a block': [ 'Taper / pour choisir un bloc' ] } );
+setLocaleData( {
+	'Type / to choose a block': [ 'Taper / pour choisir un bloc' ],
+} );
 ```
 
 # RTL Support
@@ -34,6 +36,6 @@ Finally, make sure to add a `dir` property to the `html` element of your documen
 
 ```html
 <html dir="rtl">
-    <!-- rest of your app -->
+	<!-- rest of your app -->
 </html>
 ```

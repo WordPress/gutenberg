@@ -39,30 +39,30 @@ function Example() {
 
 Size of the elevation shadow, based on the Style system's elevation system. This may be helpful in highlighting certain content. For more information, check out [`Elevation`](/packages/components/src/elevation/README.md).
 
-- Required: No
-- Default: `0`
+-   Required: No
+-   Default: `0`
 
 ### `isBorderless`: `boolean`
 
 Renders without a border.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
 
 ### `isRounded`: `boolean`
 
 Renders with rounded corners.
 
-- Required: No
-- Default: `true`
+-   Required: No
+-   Default: `true`
 
 ### `size`: `string`
 
 Determines the amount of padding within the component.
 
-- Required: No
-- Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+-   Required: No
+-   Default: `medium`
+-   Allowed values: `xSmall`, `small`, `medium`, `large`
 
 ### Inherited props
 

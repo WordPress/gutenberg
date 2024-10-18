@@ -40,20 +40,20 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 -   `supports` (Object): The [supports definition](/docs/reference-guides/block-api/block-registration.md) of the deprecated form of the block.
 -   `save` (Function): The [save implementation](/docs/reference-guides/block-api/block-edit-save.md) of the deprecated form of the block.
 -   `migrate`: (Function, Optional). A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of attributes and inner blocks compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
-	- _Parameters_
-		- `attributes`: The block's old attributes.
-		- `innerBlocks`: The block's old inner blocks.
-	- _Return_
-		- `Object | Array`: Either the updated block attributes or tuple array `[attributes, innerBlocks]`.
+    -   _Parameters_
+        -   `attributes`: The block's old attributes.
+        -   `innerBlocks`: The block's old inner blocks.
+    -   _Return_
+        -   `Object | Array`: Either the updated block attributes or tuple array `[attributes, innerBlocks]`.
 -   `isEligible`: (Function, Optional). A function which returns `true` if the deprecation can handle the block migration even if the block is valid. It is particularly useful in cases where a block is technically valid even once deprecated, but still requires updates to its attributes or inner blocks. This function is **not** called when the results of all previous deprecations' save functions were invalid.
-	- _Parameters_
-		- `attributes`: The raw block attributes as parsed from the serialized HTML, and before the block type code is applied.
-		- `innerBlocks`: The block's current inner blocks.
-		- `data`: An object containing properties representing the block node and its resulting block object.
-			- `data.blockNode`: The raw form of the block as a result of parsing the serialized HTML.
-			- `data.block`: The block object, which is the result of applying the block type to the `blockNode`.
-	- _Return_
-		- `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
+    -   _Parameters_
+        -   `attributes`: The raw block attributes as parsed from the serialized HTML, and before the block type code is applied.
+        -   `innerBlocks`: The block's current inner blocks.
+        -   `data`: An object containing properties representing the block node and its resulting block object.
+            -   `data.blockNode`: The raw form of the block as a result of parsing the serialized HTML.
+            -   `data.block`: The block object, which is the result of applying the block type to the `blockNode`.
+    -   _Return_
+        -   `boolean`: Whether or not this otherwise valid block is eligible to be migrated by this deprecation.
 
 <div class="callout callout-alert">
 It's important to note that <code>attributes</code>, <code>supports</code>, and <code>save</code> are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
@@ -106,7 +106,6 @@ Sometimes, you need to update the attributes set to rename or modify old attribu
 
 **Example**
 
-
 ```js
 const { registerBlockType } = wp.blocks;
 
@@ -146,7 +145,6 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	],
 } );
 ```
-
 
 In the example above we updated the markup of the block to use a `div` instead of `p` and rename the `text` attribute to `content`.
 

@@ -143,10 +143,10 @@ Only applies if `gallery === true`.
 
 If true, the picker of the respective platform auto-opens.
 
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-- Platform: Mobile
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+-   Platform: Mobile
 
 ### gallery
 

@@ -27,7 +27,7 @@ _Optional._ Placeholder text to show when the field is empty, similar to the
 
 ### `disableLineBreaks: Boolean`
 
-_Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
+_Optional._ Disables inserting line breaks on `Enter` when it is set to `true`
 
 ### `onReplace( blocks: Array ): Function`
 
@@ -113,13 +113,11 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-
 ## RichTextToolbarButton
 
 Slot to extend the format toolbar. Use it in the edit function of a `registerFormatType` call to surface the format to the UI.
 
 ### Example
-
 
 ```js
 import { registerFormatType } from '@wordpress/rich-text';

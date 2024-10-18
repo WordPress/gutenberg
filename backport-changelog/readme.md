@@ -2,7 +2,7 @@
 
 If you've changed or added files to the Gutenberg plugin, you'll need to confirm whether the changes are to be backported to [WordPress Core](https://github.com/WordPress/wordpress-develop), and therefore featured in the next release of WordPress.
 
-On open Gutenberg PRs, changes to certain files are flagged as requiring backporting to WordPress Core, for example, PHP files in `/lib` and PHP unit tests. 
+On open Gutenberg PRs, changes to certain files are flagged as requiring backporting to WordPress Core, for example, PHP files in `/lib` and PHP unit tests.
 
 These changes must have a corresponding Core PR before they can be merged to Gutenberg trunk.
 
@@ -28,17 +28,17 @@ A single Core PR may contain changes from one or multiple Gutenberg PRs.
 
 Let's say the next WordPress release is 6.9. You have two Gutenberg PRs — `1111` and `2222` — whose changes are backported in a single Core PR, number `1234`.
 
-First you would create a file named `1234.md` in the `/6.9` folder. 
+First you would create a file named `1234.md` in the `/6.9` folder.
 
-If the `/6.9` folder doesn't exist, create it. 
+If the `/6.9` folder doesn't exist, create it.
 
 Then you would add the following content to your new file:
 
 ```md
 https://github.com/WordPress/wordpress-develop/pull/1234
 
-* https://github.com/WordPress/gutenberg/pull/1111
-* https://github.com/WordPress/gutenberg/pull/2222
+-   https://github.com/WordPress/gutenberg/pull/1111
+-   https://github.com/WordPress/gutenberg/pull/2222
 ```
 
 If `1234.md` already exists, you would add the Gutenberg PRs to the list in the existing file.
@@ -53,8 +53,8 @@ Some Gutenberg PRs may be flagged as needing a core backport PR when they don't,
 
 For individual PRs, there are two Github labels that can be used to exclude a PR from the backport changelog CI check:
 
-- `Backport from WordPress Core` - Indicates that the PR is a backport from WordPress Core and doesn't need a Core PR.
-- `No Core Sync Required` - Indicates that any changes do not need to be synced to WordPress Core.
+-   `Backport from WordPress Core` - Indicates that the PR is a backport from WordPress Core and doesn't need a Core PR.
+-   `No Core Sync Required` - Indicates that any changes do not need to be synced to WordPress Core.
 
 If there are specific file or directory changes that should **never** be flagged as requiring a Core backport PR, you can add it to the list of exceptions in [.github/workflows/check-backport-changelog.yml](https://github.com/WordPress/gutenberg/tree/trunk/.github/workflows/check-backport-changelog.yml).
 

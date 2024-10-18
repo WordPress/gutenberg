@@ -6,7 +6,6 @@ This feature is still experimental. “Experimental” means this is an early im
 
 `ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
 
-
 ## Usage
 
 ```js

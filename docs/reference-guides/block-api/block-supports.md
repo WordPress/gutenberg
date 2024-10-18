@@ -52,7 +52,7 @@ Anchors let you link directly to a specific block on a page. This property adds 
 ```js
 // Declare support for anchor links.
 supports: {
-	anchor: true
+	anchor: true;
 }
 ```
 
@@ -68,14 +68,14 @@ supports: {
 	// Declare support for block's alignment.
 	// This adds support for all the options:
 	// left, center, right, wide, and full.
-	align: true
+	align: true;
 }
 ```
 
 ```js
 supports: {
 	// Declare support for specific alignment options.
-	align: [ 'left', 'right', 'full' ]
+	align: [ 'left', 'right', 'full' ];
 }
 ```
 
@@ -100,7 +100,7 @@ This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme
 ```js
 supports: {
 	// Remove the support for wide alignment.
-	alignWide: false
+	alignWide: false;
 }
 ```
 
@@ -114,7 +114,7 @@ ARIA-labels let you define an accessible label for elements. This property allow
 ```js
 supports: {
 	// Add support for an aria label.
-	ariaLabel: true
+	ariaLabel: true;
 }
 ```
 
@@ -136,8 +136,8 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	background: {
-		backgroundImage: true // Enable background image control.
-		backgroundSize: true // Enable background image + size control.
+		backgroundImage: true; // Enable background image control.
+		backgroundSize: true; // Enable background image + size control.
 	}
 }
 ```
@@ -150,13 +150,13 @@ When a background images is selected and its position or size are changed, the b
 
 -   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
     -   `background`: an attribute of `object` type.
-        - `backgroundImage`: an attribute of `object` type, containing information about the selected image
-            - `url`: type `string`, URL to the image
-            - `id`: type `int`, media attachment ID
-            - `source`: type `string`, at the moment the only value is `file`
-            - `title`: type `string`, title of the media attachment
-        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
-        - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+        -   `backgroundImage`: an attribute of `object` type, containing information about the selected image
+            -   `url`: type `string`, URL to the image
+            -   `id`: type `int`, media attachment ID
+            -   `source`: type `string`, at the moment the only value is `file`
+            -   `title`: type `string`, title of the media attachment
+        -   `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
+        -   `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
 
@@ -184,7 +184,7 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 ```js
 supports: {
 	// Remove the support for the generated className.
-	className: false
+	className: false;
 }
 ```
 
@@ -209,7 +209,7 @@ Note that the `background` and `text` keys have a default value of `true`, so if
 supports: {
 	color: {
 		// This also enables text and background UI controls.
-		gradients: true // Enables the gradients UI control.
+		gradients: true; // Enables the gradients UI control.
 	}
 }
 ```
@@ -233,7 +233,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-    color: true // Enables background and text color support.
+	color: true; // Enables background and text color support.
 }
 ```
 
@@ -241,10 +241,10 @@ To disable background support while keeping other color supports enabled, set to
 
 ```js
 supports: {
-    color: {
-        // Disables background support. Text color support is still enabled.
-        background: false
-    }
+	color: {
+		// Disables background support. Text color support is still enabled.
+		background: false;
+	}
 }
 ```
 
@@ -297,7 +297,7 @@ To enable button color support, set `color.button` to `true`.
 ```js
 supports: {
 	color: {
-		button: true
+		button: true;
 	}
 }
 ```
@@ -341,7 +341,7 @@ The contrast checker appears only if the block declares support for color. It te
 ```js
 supports: {
 	color: {
-		enableContrastChecker: false
+		enableContrastChecker: false;
 	}
 }
 ```
@@ -417,7 +417,7 @@ To enable heading color support, set `color.heading` to `true`.
 supports: {
 	color: {
 		// Enable heading color support.
-		heading: true
+		heading: true;
 	}
 }
 ```
@@ -459,7 +459,7 @@ To enable link color support, set `color.link` to `true`.
 ```js
 supports: {
 	color: {
-		link: true
+		link: true;
 	}
 }
 ```
@@ -484,11 +484,11 @@ When the block declares support for `color.link`, the attributes definition is e
                         color: {
                             text: 'var:preset|color|contrast',
                         },
-						":hover": {
-							color: {
-								text: "#000000"
-							}
-						}
+    					":hover": {
+    						color: {
+    							text: "#000000"
+    						}
+    					}
                     }
                 }
             }
@@ -504,7 +504,7 @@ When color support is declared, this property is enabled by default (along with 
 
 ```js
 supports: {
-	color: true // Enables background and text, but not link.
+	color: true; // Enables background and text, but not link.
 }
 ```
 
@@ -514,7 +514,7 @@ To disable text color support while keeping other color supports enabled, set `c
 supports: {
 	color: {
 		// Disable text color support.
-		text: false
+		text: false;
 	}
 }
 ```
@@ -567,7 +567,7 @@ This property adds a field to define a custom className for the block's wrapper.
 ```js
 supports: {
 	// Remove the support for the custom className.
-	customClassName: false
+	customClassName: false;
 }
 ```
 
@@ -585,8 +585,8 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		minHeight: true // Enable min height control.
+		aspectRatio: true; // Enable aspect ratio control.
+		minHeight: true; // Enable min height control.
 	}
 }
 ```
@@ -671,7 +671,7 @@ By default, a block's markup can be edited individually. To disable this behavio
 ```js
 supports: {
 	// Remove support for an HTML mode.
-	html: false
+	html: false;
 }
 ```
 
@@ -685,7 +685,7 @@ By default, all blocks will appear in the inserter, block transforms menu, Style
 ```js
 supports: {
 	// Hide this block from the inserter.
-	inserter: false
+	inserter: false;
 }
 ```
 
@@ -794,7 +794,7 @@ A block may want to disable the ability to toggle the lock state. It can be lock
 ```js
 supports: {
 	// Remove support for locking UI.
-	lock: false
+	lock: false;
 }
 ```
 
@@ -808,7 +808,7 @@ A non-multiple block can be inserted into each post, one time only. For example,
 ```js
 supports: {
 	// Use the block just once per post
-	multiple: false
+	multiple: false;
 }
 ```
 
@@ -828,7 +828,7 @@ Note that sticky position controls are currently only available for blocks set a
 ```js
 supports: {
 	position: {
-		sticky: true // Enable selecting sticky position.
+		sticky: true; // Enable selecting sticky position.
 	}
 }
 ```
@@ -889,7 +889,7 @@ This property adds block controls which allow the user to set a box shadow for a
 
 ```js
 supports: {
-	shadow: true // Enable the box-shadow picker.
+	shadow: true; // Enable the box-shadow picker.
 }
 ```
 
@@ -1078,21 +1078,21 @@ This property adds block toolbar controls which allow to change block's text ali
 
 ```js
 supports: {
-    typography: {
-        // Declare support for block's text alignment.
-        // This adds support for all the options:
-        // left, center, right.
-        textAlign: true
-    }
+	typography: {
+		// Declare support for block's text alignment.
+		// This adds support for all the options:
+		// left, center, right.
+		textAlign: true;
+	}
 }
 ```
 
 ```js
 supports: {
-    typography: {
-        // Declare support for specific text alignment options.
-        textAlign: [ 'left', 'right' ]
-    }
+	typography: {
+		// Declare support for specific text alignment options.
+		textAlign: [ 'left', 'right' ];
+	}
 }
 ```
 

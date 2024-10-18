@@ -7,7 +7,7 @@ Before following this guide, install [Node.js development tools](/docs/getting-s
 ![wp-env basics diagram](https://developer.wordpress.org/files/2023/10/wp-env-diagram.png)
 
 ## Quick start
- 
+
 1. Download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your operating system.
 2. Run `npm -g install @wordpress/env` in the terminal to install `wp-env` globally.
 3. In the terminal, navigate to an existing plugin directory, theme directory, or a new working directory.
@@ -20,9 +20,9 @@ The `wp-env` tool uses [Docker](https://www.docker.com/) to create a virtual mac
 
 Use the links below to download and install Docker Desktop for your operating system.
 
-- [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
-- [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
-- [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/)
+-   [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
+-   [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+-   [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/)
 
 If you are using a version of Ubuntu prior to 20.04.1, see the additional [troubleshooting notes](#ubuntu-docker-setup) below.
 
@@ -36,7 +36,7 @@ The `wp-env` tool is used to create a local WordPress environment with Docker. S
 npm -g install @wordpress/env
 ```
 
-This will install the `wp-env` globally, allowing the tool to be run from any directory. To confirm it's installed and available, run `wp-env --version`, and the version number should appear. 
+This will install the `wp-env` globally, allowing the tool to be run from any directory. To confirm it's installed and available, run `wp-env --version`, and the version number should appear.
 
 Next, navigate to an existing plugin directory, theme directory, or a new working directory in the terminal and run:
 
@@ -90,7 +90,7 @@ If you see the error: `Host is already in use by another container`
 
 ### Ubuntu Docker setup
 
-If you are using a version of Ubuntu prior to 20.04.1, you may encounter errors when setting up a local WordPress environment with `wp-env`. 
+If you are using a version of Ubuntu prior to 20.04.1, you may encounter errors when setting up a local WordPress environment with `wp-env`.
 
 To resolve this, start by following the [installation guide](https://docs.docker.com/install/linux/docker-ce/ubuntu/) from Docker. `docker-compose` is also required, which you may need to install separately. Refer to the [Docker compose documentation](https://docs.docker.com/compose/install/).
 
@@ -137,8 +137,8 @@ Your environment should now be set up at <code>http://localhost:8888</code>.
 
 ## Additional resources
 
-- [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
-- [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
-- [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
-- [wp-env: Simple Local Environments for WordPress](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/) (Make WordPress Core Blog)
-- [`wp-env` Basics diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA) (Excalidraw)
+-   [@wordpress/env](https://www.npmjs.com/package/@wordpress/env) (Official documentation)
+-   [Docker Desktop](https://docs.docker.com/desktop) (Official documentation)
+-   [Quick and easy local WordPress development with wp-env](https://developer.wordpress.org/news/2023/03/quick-and-easy-local-wordpress-development-with-wp-env/) (WordPress Developer Blog)
+-   [wp-env: Simple Local Environments for WordPress](https://make.wordpress.org/core/2020/03/03/wp-env-simple-local-environments-for-wordpress/) (Make WordPress Core Blog)
+-   [`wp-env` Basics diagram](https://excalidraw.com/#json=8Tp55B-R6Z6-pNGtmenU6,_DeBR1IBxuHNIKPTVEaseA) (Excalidraw)

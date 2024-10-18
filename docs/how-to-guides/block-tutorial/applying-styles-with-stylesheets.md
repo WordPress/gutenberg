@@ -87,6 +87,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 In order to include the blockEditor as a dependency, make sure to run the build step, or update the asset php file.
 
 Build the scripts and update the asset file which is used to keep track of dependencies and the build version.
+
 ```bash
 npm run build
 ```
@@ -144,9 +145,9 @@ If you are using `@wordpress/scripts` you will need to import your stylesheet wi
 
 Example:
 
-- In `edit.js` you would place `import './editor.scss';`
-- In `index.js` you would place `import './style.scss';`
-- In `view.js` you would place `import './view.scss';` (interactive block template)
+-   In `edit.js` you would place `import './editor.scss';`
+-   In `index.js` you would place `import './style.scss';`
+-   In `view.js` you would place `import './view.scss';` (interactive block template)
 </div>
 
 **Note:** If you have multiple files to include, you can use standard `wp_enqueue_style` functions like any other plugin or theme. You will want to use the following hooks for the block editor:

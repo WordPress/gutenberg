@@ -8,19 +8,19 @@ For example:
 
 ```json
 {
-    "attributes": {
-        "style": {
-            "spacing": {
-                "margin": {
-                    "top": "10px"
-                },
-                "padding": "1em"
-            },
-            "typography": {
-                "fontSize": "2.2rem"
-            }
-        }
-    }
+	"attributes": {
+		"style": {
+			"spacing": {
+				"margin": {
+					"top": "10px"
+				},
+				"padding": "1em"
+			},
+			"typography": {
+				"fontSize": "2.2rem"
+			}
+		}
+	}
 }
 ```
 
@@ -47,6 +47,7 @@ array(
 ```
 
 ## Use case
+
 When [registering a block support](https://developer.wordpress.org/reference/classes/wp_block_supports/register/), it is possible to pass an 'apply' callback in the block support config array to add or extend block support attributes with "class" or "style" properties.
 
 If a block has opted into the block support, the values of "class" and "style" will be applied to the block element's "class" and "style" attributes accordingly when rendered in the frontend HTML. Note, this applies only to server-side rendered blocks, for example, the [Site Title block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/#site-title).
@@ -84,10 +85,10 @@ WP_Block_Supports::get_instance()->register(
 
 It's important to note that, for now, the Style Engine will only generate styles for the following, core block supports:
 
-- border
-- color
-- spacing
-- typography
+-   border
+-   color
+-   spacing
+-   typography
 
 In future releases, it will be possible to extend this list.
 
@@ -100,13 +101,13 @@ Before passing the block style object to the Style Engine, you'll need to take i
 
 If a block either:
 
-- has no support for a style, or
-- skips serialization of that style
+-   has no support for a style, or
+-   skips serialization of that style
 
 it's likely that you'll want to remove those style values from the style object before passing it to the Style Engine with help of two functions:
 
-- wp_should_skip_block_supports_serialization()
-- block_has_support()
+-   wp_should_skip_block_supports_serialization()
+-   block_has_support()
 
 We can now update the "apply" callback code above so that we'll only return "style" and "class", where a block has support, and it doesn't skip serialization:
 

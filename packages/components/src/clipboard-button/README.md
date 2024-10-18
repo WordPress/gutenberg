@@ -37,15 +37,15 @@ The component accepts the following props:
 
 The class that will be added to the classes of the underlying `<Button>` component.
 
-- Type: `string`
-- Required: no
+-   Type: `string`
+-   Required: no
 
 ### text
 
 The text that will be copied to the clipboard.
 
-- Type: `string`
-- Required: yes
+-   Type: `string`
+-   Required: yes
 
 ### onCopy
 

@@ -25,7 +25,7 @@ _Example_: Attributes object defining three attributes - `url`, `title`, and `si
 }
 ```
 
-When a block is parsed this definition will be used to extract data from the block content. Anything that matches will  be available to your block through the `attributes` prop.
+When a block is parsed this definition will be used to extract data from the block content. Anything that matches will be available to your block through the `attributes` prop.
 
 This parsing process can be summarized as:
 
@@ -37,8 +37,11 @@ _Example_: Attributes available in the `edit` and function, using the above attr
 ```js
 function YourBlockEdit( { attributes } ) {
 	return (
-		<p>URL is { attributes.url }, title is { attributes.title }, and size is { attributes.size }.</p>
-	)
+		<p>
+			URL is { attributes.url }, title is { attributes.title }, and size
+			is { attributes.size }.
+		</p>
+	);
 }
 ```
 
@@ -52,9 +55,7 @@ _Example_: Example `save` function that contains the `url` attribute
 
 ```js
 function YourBlockSave( { attributes } ) {
-	return (
-		<img src={ attributes.url } />
-	)
+	return <img src={ attributes.url } />;
 }
 ```
 
@@ -76,13 +77,13 @@ A `type` is required, unless an `enum` is provided. A `type` can be used with an
 
 The `type` field MUST be one of the following:
 
-- `null`
-- `boolean`
-- `object`
-- `array`
-- `string`
-- `integer`
-- `number` (same as `integer`)
+-   `null`
+-   `boolean`
+-   `object`
+-   `array`
+-   `string`
+-   `integer`
+-   `number` (same as `integer`)
 
 Note that the validity of an `object` is determined by your `source`. For an example, see the `query` details below.
 
@@ -95,7 +96,7 @@ _Example_: Example `enum`.
 ```js
 {
 	size: {
-		enum: [ 'large', 'small', 'tiny' ]
+		enum: [ 'large', 'small', 'tiny' ];
 	}
 }
 ```
@@ -105,12 +106,13 @@ _Example_: Example `enum`.
 Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
 The available `source` values are:
-- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
-- `attribute` - data is stored in an HTML element attribute.
-- `text` - data is stored in HTML text.
-- `html` - data is stored in HTML. This is typically used by `RichText`.
-- `query` - data is stored as an array of objects.
-- `meta` - data is stored in post meta (deprecated).
+
+-   `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
+-   `attribute` - data is stored in an HTML element attribute.
+-   `text` - data is stored in HTML text.
+-   `html` - data is stored in HTML. This is typically used by `RichText`.
+-   `query` - data is stored as an array of objects.
+-   `meta` - data is stored in post meta (deprecated).
 
 The `source` field is usually combined with a `selector` field. If no selector argument is specified, the source definition runs against the block's root node. If a selector argument is specified, it will run against the matching element(s) within the block.
 
@@ -129,6 +131,7 @@ Use an `attribute` source to extract the value from an attribute in the markup. 
 _Example_: Extract the `src` attribute from an image found in the block's markup.
 
 Saved content:
+
 ```html
 <div>
 	Block Content
@@ -138,6 +141,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	url: {
@@ -150,6 +154,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "url": "https://lorempixel.com/1200/800/" }
 ```
@@ -159,6 +164,7 @@ Most attributes from markup will be of type `string`. Numeric attributes in HTML
 _Example_: Extract the `width` attribute from an image found in the block's markup.
 
 Saved content:
+
 ```html
 <div>
 	Block Content
@@ -168,6 +174,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	width: {
@@ -180,6 +187,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "width": "50" }
 ```
@@ -189,6 +197,7 @@ The only exception is when checking for the existence of an attribute (for examp
 _Example_: Extract the `disabled` attribute from a button found in the block's markup.
 
 Saved content:
+
 ```html
 <div>
 	Block Content
@@ -198,6 +207,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	disabled: {
@@ -210,6 +220,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "disabled": true }
 ```
@@ -221,6 +232,7 @@ Use `text` to extract the inner text from markup. Note that HTML is returned acc
 _Example_: Extract the `content` attribute from a figcaption element found in the block's markup.
 
 Saved content:
+
 ```html
 <figure>
 	<img src="/image.jpg" />
@@ -230,6 +242,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	content: {
@@ -241,6 +254,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "content": "The inner text of the figcaption element" }
 ```
@@ -250,6 +264,7 @@ Another example, using `text` as the source, and using `.my-content` class as th
 _Example_: Extract the `content` attribute from an element with `.my-content` class found in the block's markup.
 
 Saved content:
+
 ```html
 <div>
 	<img src="/image.jpg" />
@@ -259,6 +274,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	content: {
@@ -270,6 +286,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "content": "The inner text of .my-content class" }
 ```
@@ -281,15 +298,19 @@ Use `html` to extract the inner HTML from markup. Note that text is returned acc
 _Example_: Extract the `content` attribute from a figcaption element found in the block's markup.
 
 Saved content:
+
 ```html
 <figure>
 	<img src="/image.jpg" />
 
-	<figcaption>The inner text of the <strong>figcaption</strong> element</figcaption>
+	<figcaption>
+		The inner text of the <strong>figcaption</strong> element
+	</figcaption>
 </figure>
 ```
 
 Attribute definition:
+
 ```js
 {
 	content: {
@@ -301,6 +322,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
@@ -314,6 +336,7 @@ The `query` field is effectively a nested block attributes definition. It is pos
 _Example_: Extract `src` and `alt` from each image element in the block's markup.
 
 Saved content:
+
 ```html
 <div>
 	<img src="https://lorempixel.com/1200/800/" alt="large image" />
@@ -322,6 +345,7 @@ Saved content:
 ```
 
 Attribute definition:
+
 ```js
 {
 	images: {
@@ -345,6 +369,7 @@ Attribute definition:
 ```
 
 Attribute available in the block:
+
 ```js
 {
 	"images": [
@@ -363,6 +388,7 @@ Although attributes may be obtained from a post's meta, meta attribute sources a
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key.
 
 Attribute definition:
+
 ```js
 {
 	author: {
@@ -384,7 +410,6 @@ edit( { attributes, setAttributes } ) {
 	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
-
 
 #### Considerations
 

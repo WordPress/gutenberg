@@ -87,5 +87,5 @@ List of events to show in the date picker. Each event will appear as a dot on th
 
 The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
-- Required: No
-- Default: 0
+-   Required: No
+-   Default: 0

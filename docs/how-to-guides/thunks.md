@@ -4,9 +4,11 @@
 
 ```js
 // actions.js
-export const myThunkAction = () => ( { select, dispatch } ) => {
-	return "I'm a thunk! I can be dispatched, use selectors, and even dispatch other actions.";
-};
+export const myThunkAction =
+	() =>
+	( { select, dispatch } ) => {
+		return "I'm a thunk! I can be dispatched, use selectors, and even dispatch other actions.";
+	};
 ```
 
 ## Why are thunks useful?
@@ -31,14 +33,20 @@ const controls = {
 Side effects like store operations and fetch functions would be implemented outside of the action. Thunks provide an alternative to this approach. They allow you to use side effects inline, like this:
 
 ```js
-export const saveRecordAction = ( id ) => async ({ select, dispatch }) => {
-	const record = select( 'current-store', 'getRecord', id );
-	dispatch({ type: 'BEFORE_SAVE', id, record });
-	const response = await fetch({ url: 'https://...', method: 'POST', data: record });
-	const results = await response.json();
-	dispatch({ type: 'AFTER_SAVE', id, results });
-	return results;
-}
+export const saveRecordAction =
+	( id ) =>
+	async ( { select, dispatch } ) => {
+		const record = select( 'current-store', 'getRecord', id );
+		dispatch( { type: 'BEFORE_SAVE', id, record } );
+		const response = await fetch( {
+			url: 'https://...',
+			method: 'POST',
+			data: record,
+		} );
+		const results = await response.json();
+		dispatch( { type: 'AFTER_SAVE', id, results } );
+		return results;
+	};
 ```
 
 This removes the need to implement separate controls.
@@ -89,22 +97,27 @@ If we used controls to save the temperature, the store definition would look lik
 
 ```js
 const store = wp.data.createReduxStore( 'my-store', {
-    actions: {
-        saveTemperatureToAPI: function*( temperature ) {
-            const result = yield { type: 'FETCH_JSON', url: 'https://...', method: 'POST', data: { temperature } };
-            return result;
-        }
-    },
-    controls: {
-        async FETCH_JSON( action ) {
-            const response = await window.fetch( action.url, {
-                method: action.method,
-                body: JSON.stringify( action.data ),
-            } );
-            return response.json();
-        }
-    },
-    // reducers, selectors, ...
+	actions: {
+		saveTemperatureToAPI: function* ( temperature ) {
+			const result = yield {
+				type: 'FETCH_JSON',
+				url: 'https://...',
+				method: 'POST',
+				data: { temperature },
+			};
+			return result;
+		},
+	},
+	controls: {
+		async FETCH_JSON( action ) {
+			const response = await window.fetch( action.url, {
+				method: action.method,
+				body: JSON.stringify( action.data ),
+			} );
+			return response.json();
+		},
+	},
+	// reducers, selectors, ...
 } );
 ```
 
@@ -114,16 +127,16 @@ Let's see how this indirection can be removed with thunks:
 
 ```js
 const store = wp.data.createReduxStore( 'my-store', {
-    actions: {
-        saveTemperatureToAPI: ( temperature ) => async () => {
-            const response = await window.fetch( 'https://...', {
-                method: 'POST',
-                body: JSON.stringify( { temperature } ),
-            } );
-            return await response.json();
-        }
-    },
-    // reducers, selectors, ...
+	actions: {
+		saveTemperatureToAPI: ( temperature ) => async () => {
+			const response = await window.fetch( 'https://...', {
+				method: 'POST',
+				body: JSON.stringify( { temperature } ),
+			} );
+			return await response.json();
+		},
+	},
+	// reducers, selectors, ...
 } );
 ```
 
@@ -131,18 +144,20 @@ That's pretty cool! What's even better is that resolvers are supported as well:
 
 ```js
 const store = wp.data.createReduxStore( 'my-store', {
-    // ...
-    selectors: {
-        getTemperature: ( state ) => state.temperature
-    },
-    resolvers: {
-        getTemperature: () => async ( { dispatch } ) => {
-            const response = await window.fetch( 'https://...' );
-            const result = await response.json();
-            dispatch.receiveCurrentTemperature( result.temperature );
-        }
-    },
-    // ...
+	// ...
+	selectors: {
+		getTemperature: ( state ) => state.temperature,
+	},
+	resolvers: {
+		getTemperature:
+			() =>
+			async ( { dispatch } ) => {
+				const response = await window.fetch( 'https://...' );
+				const result = await response.json();
+				dispatch.receiveCurrentTemperature( result.temperature );
+			},
+	},
+	// ...
 } );
 ```
 
@@ -157,23 +172,26 @@ A thunk receives a single object argument with the following keys:
 
 An object containing the store’s selectors pre-bound to state, which means you don't need to provide the state, only the additional arguments. `select` triggers the related resolvers, if any, but does not wait for them to finish. It just returns the current value even if it's null.
 
-
 If a selector is part of the public API, it's available as a method on the select object:
 
 ```js
-const thunk = () => ( { select } ) => {
-    // select is an object of the store’s selectors, pre-bound to current state:
-    const temperature = select.getTemperature();
-}
+const thunk =
+	() =>
+	( { select } ) => {
+		// select is an object of the store’s selectors, pre-bound to current state:
+		const temperature = select.getTemperature();
+	};
 ```
 
 Since not all selectors are exposed on the store, `select` doubles as a function that supports passing a selector as an argument:
 
 ```js
-const thunk = () => ( { select } ) => {
-    // select supports private selectors:
-    const doubleTemperature = select( ( temperature ) => temperature * 2 );
-}
+const thunk =
+	() =>
+	( { select } ) => {
+		// select supports private selectors:
+		const doubleTemperature = select( ( temperature ) => temperature * 2 );
+	};
 ```
 
 ### resolveSelect
@@ -202,16 +220,18 @@ const thunk = () => ( { dispatch } ) => {
 Since not all actions are exposed on the store, `dispatch` doubles as a function that supports passing a Redux action as an argument:
 
 ```js
-const thunk = () => async ( { dispatch } ) => {
-	// dispatch is also a function accepting inline actions:
-	dispatch({ type: 'SET_TEMPERATURE', temperature: result.value });
+const thunk =
+	() =>
+	async ( { dispatch } ) => {
+		// dispatch is also a function accepting inline actions:
+		dispatch( { type: 'SET_TEMPERATURE', temperature: result.value } );
 
-	// thunks are interchangeable with actions
-	dispatch( updateTemperature( 100 ) );
+		// thunks are interchangeable with actions
+		dispatch( updateTemperature( 100 ) );
 
-	// Thunks may be async, too. When they are, dispatch returns a promise
-	await dispatch( ( ) => window.fetch( /* ... */ ) );
-}
+		// Thunks may be async, too. When they are, dispatch returns a promise
+		await dispatch( () => window.fetch( /* ... */ ) );
+	};
 ```
 
 ### registry
@@ -220,8 +240,12 @@ A registry provides access to other stores through its `dispatch`, `select`, and
 These are very similar to the ones described above, with a slight twist. Calling `registry.select( storeName )` returns a function returning an object of selectors from `storeName`. This comes handy when you need to interact with another store. For example:
 
 ```js
-const thunk = () => ( { registry } ) => {
-  const error = registry.select( 'core' ).getLastEntitySaveError( 'root', 'menu', menuId );
-  /* ... */
-}
+const thunk =
+	() =>
+	( { registry } ) => {
+		const error = registry
+			.select( 'core' )
+			.getLastEntitySaveError( 'root', 'menu', menuId );
+		/* ... */
+	};
 ```

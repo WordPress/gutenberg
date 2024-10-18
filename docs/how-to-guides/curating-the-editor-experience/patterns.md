@@ -1,12 +1,12 @@
 # Patterns
 
-Block [patterns](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/) are one of the best ways to provide users with unique and curated editing experiences. 
+Block [patterns](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-patterns/) are one of the best ways to provide users with unique and curated editing experiences.
 
 ## Prioritize starter patterns for any post type
 
-When a user creates new content, regardless of post type, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the `core/post-content` block types. By default, WordPress does not include any of these patterns, so the modal will not appear without at least two of these post content patterns being added. 
+When a user creates new content, regardless of post type, they are met with an empty canvas. However, that experience can be improved thanks to the option to have patterns from a specific type prioritized upon creation of a new piece of content. The modal appears each time the user creates a new item when there are patterns on their website that declare support for the `core/post-content` block types. By default, WordPress does not include any of these patterns, so the modal will not appear without at least two of these post content patterns being added.
 
-To opt into this, include `core/post-content` in the Block Types for your pattern. From there, you can control which post types the pattern should show up for via the Post Types option. Here's an example of a pattern that would appear when creating a new post. 
+To opt into this, include `core/post-content` in the Block Types for your pattern. From there, you can control which post types the pattern should show up for via the Post Types option. Here's an example of a pattern that would appear when creating a new post.
 
 ```php
 <?php
@@ -48,11 +48,11 @@ To opt into this, include `core/post-content` in the Block Types for your patter
 <!-- /wp:cover -->
 ```
 
-Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/) and [note that WordPress 6.1 brought this functionality to all post types](https://make.wordpress.org/core/2022/10/10/miscellaneous-editor-changes-for-wordpress-6-1/#start-content-patterns-for-all-post-types).  
+Read more about this functionality in the [Page creation patterns in WordPress 6.0 dev note](https://make.wordpress.org/core/2022/05/03/page-creation-patterns-in-wordpress-6-0/) and [note that WordPress 6.1 brought this functionality to all post types](https://make.wordpress.org/core/2022/10/10/miscellaneous-editor-changes-for-wordpress-6-1/#start-content-patterns-for-all-post-types).
 
 ## Prioritize starter patterns for template creation
 
-In the same way patterns can be prioritized for new posts or pages, the same experience can be added to the template creation process. When patterns declare support for the 'templateTypes' property, the patterns will appear anytime a template that matches the designation is created, along with the options to start from a blank state or use the current fallback of the template. By default, WordPress does not include any of these patterns. 
+In the same way patterns can be prioritized for new posts or pages, the same experience can be added to the template creation process. When patterns declare support for the 'templateTypes' property, the patterns will appear anytime a template that matches the designation is created, along with the options to start from a blank state or use the current fallback of the template. By default, WordPress does not include any of these patterns.
 
 To opt into this, a pattern needs to specify a property called `templateTypes`, which is an array containing the templates where the patterns can be used as the full content. Here's an example of a pattern that would appear when creating a 404 template:
 
@@ -71,7 +71,7 @@ Read more about this functionality in the [Patterns on the create a new template
 
 ## Lock patterns
 
-As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](/docs/reference-guides/block-api/block-patterns.md). 
+As mentioned in the prior section on Locking APIs, aspects of patterns themselves can be locked so that the important aspects of the design can be preserved. [Here’s an example of a pattern](https://gist.github.com/annezazu/acee30f8b6e8995e1b1a52796e6ef805) with various blocks locked in different ways. You can build these patterns in the editor itself, including adding locking options, before [following the documentation to register them](/docs/reference-guides/block-api/block-patterns.md).
 
 ## Prioritize specific patterns from the Pattern Directory
 
@@ -79,7 +79,7 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 
 ```json
 {
-    "patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
 
@@ -87,4 +87,4 @@ The content creator will then find the respective Pattern in the inserter “Pat
 
 ## Additional resources
 
-- [Using template patterns to build multiple homepage designs](https://developer.wordpress.org/news/2023/04/13/using-template-patterns-to-build-multiple-homepage-designs/) (WordPress Developer Blog)
+-   [Using template patterns to build multiple homepage designs](https://developer.wordpress.org/news/2023/04/13/using-template-patterns-to-build-multiple-homepage-designs/) (WordPress Developer Blog)

@@ -6,7 +6,7 @@ sidebar_position: 3
 
 You can customize the block editor by providing a `settings` prop to the `BlockEditorProvider` component. This prop accepts an object with the following properties:
 
-## __experimentalFeatures
+## \_\_experimentalFeatures
 
 The experimental features setting is an object that allows you to enable/disable common block editor features. For instance, the following settings enables support for text, background colors and allow users to pick a custom color or one of the defined theme palette colors. Core block types and third-party block types using the block supports feature will automatically take these settings into account.
 
@@ -113,54 +113,54 @@ The inserter media categories setting is an array of media categories to display
 
 ```jsx
 const inserterMediaCategories = {
-    name: 'openverse',
-    labels: {
-        name: 'Openverse',
-        search_items: 'Search Openverse',
-    },
-    mediaType: 'image',
-    async fetch( query = {} ) {
-        const defaultArgs = {
-            mature: false,
-            excluded_source: 'flickr,inaturalist,wikimedia',
-            license: 'pdm,cc0',
-        };
-        const finalQuery = { ...query, ...defaultArgs };
-        // Sometimes you might need to map the supported request params according to the `InserterMediaRequest`
-        // interface. In this example the `search` query param is named `q`.
-        const mapFromInserterMediaRequest = {
-            per_page: 'page_size',
-            search: 'q',
-        };
-        const url = new URL( 'https://api.openverse.engineering/v1/images/' );
-        Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
-            const queryKey = mapFromInserterMediaRequest[ key ] || key;
-            url.searchParams.set( queryKey, value );
-        } );
-        const response = await window.fetch( url, {
-            headers: {
-                'User-Agent': 'WordPress/inserter-media-fetch',
-            },
-        } );
-        const jsonResponse = await response.json();
-        const results = jsonResponse.results;
-        return results.map( ( result ) => ( {
-            ...result,
-            // If your response result includes an `id` prop that you want to access later, it should
-            // be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
-            // a report URL getter.
-            // Additionally you should always clear the `id` value of your response results because
-            // it is used to identify WordPress media items.
-            sourceId: result.id,
-            id: undefined,
-            caption: result.caption,
-            previewUrl: result.thumbnail,
-        } ) );
-    },
-    getReportUrl: ( { sourceId } ) =>
-        `https://wordpress.org/openverse/image/${ sourceId }/report/`,
-    isExternalResource: true,
-}
+	name: 'openverse',
+	labels: {
+		name: 'Openverse',
+		search_items: 'Search Openverse',
+	},
+	mediaType: 'image',
+	async fetch( query = {} ) {
+		const defaultArgs = {
+			mature: false,
+			excluded_source: 'flickr,inaturalist,wikimedia',
+			license: 'pdm,cc0',
+		};
+		const finalQuery = { ...query, ...defaultArgs };
+		// Sometimes you might need to map the supported request params according to the `InserterMediaRequest`
+		// interface. In this example the `search` query param is named `q`.
+		const mapFromInserterMediaRequest = {
+			per_page: 'page_size',
+			search: 'q',
+		};
+		const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
+			const queryKey = mapFromInserterMediaRequest[ key ] || key;
+			url.searchParams.set( queryKey, value );
+		} );
+		const response = await window.fetch( url, {
+			headers: {
+				'User-Agent': 'WordPress/inserter-media-fetch',
+			},
+		} );
+		const jsonResponse = await response.json();
+		const results = jsonResponse.results;
+		return results.map( ( result ) => ( {
+			...result,
+			// If your response result includes an `id` prop that you want to access later, it should
+			// be mapped to `InserterMediaItem`'s `sourceId` prop. This can be useful if you provide
+			// a report URL getter.
+			// Additionally you should always clear the `id` value of your response results because
+			// it is used to identify WordPress media items.
+			sourceId: result.id,
+			id: undefined,
+			caption: result.caption,
+			previewUrl: result.thumbnail,
+		} ) );
+	},
+	getReportUrl: ( { sourceId } ) =>
+		`https://wordpress.org/openverse/image/${ sourceId }/report/`,
+	isExternalResource: true,
+};
 ```
 
 ## hasFixedToolbar

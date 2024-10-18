@@ -12,8 +12,8 @@ One of the most common ways to modify the Editor is through the [`block_editor_s
 
 The `block_editor_settings_all` hook passes two parameters to the callback function:
 
-- `$settings` – An array of configurable settings for the Editor.
-- `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
+-   `$settings` – An array of configurable settings for the Editor.
+-   `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
 
 The following example modifies the maximum upload file size. Add this to a plugin or your theme's `functions.php` file to test it.
 
@@ -239,9 +239,9 @@ addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
 	( error ) => {
-		// Error is the exception's error object. 
+		// Error is the exception's error object.
 		// You can console.log it or send it to an external error-tracking tool.
-		console.log ( error );
+		console.log( error );
 	}
 );
 ```

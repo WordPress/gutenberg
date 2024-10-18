@@ -61,25 +61,27 @@ await expect.poll( editor.getBlocks ).toMatchObject( [
 	{
 		name: 'core/paragraph',
 		attributes: { content: '' },
-	}
+	},
 ] );
 
 // ...
 
 // Expect the paragraph to be merged into the quote block.
-await expect.poll( editor.getBlocks ).toMatchObject( [ {
-	name: 'core/quote',
-	innerBlocks: [
-		{
-			name: 'core/paragraph',
-			attributes: { content: '1' },
-		},
-		{
-			name: 'core/paragraph',
-			attributes: { content: '2' },
-		},
-	],
-} ] );
+await expect.poll( editor.getBlocks ).toMatchObject( [
+	{
+		name: 'core/quote',
+		innerBlocks: [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '1' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		],
+	},
+] );
 ```
 
 These assertions are more readable and explicit. You can add additional assertions or split existing ones into multiple ones to highlight their importance. Whether to keep the comments is up to you, but it's usually fine to omit them when the code is already readable without them.
@@ -97,10 +99,12 @@ expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph -->
 We can consider this pattern as a variant of snapshot testing, and we should follow the same rule when writing them. It's often better to rewrite them using `editor.getBlocks` or other methods to make explicit assertions.
 
 ```js
-await expect.poll( editor.getBlocks ).toMatchObject( [ {
-	name: 'core/paragraph',
-	attributes: { content: 'Paragraph' },
-} ] );
+await expect.poll( editor.getBlocks ).toMatchObject( [
+	{
+		name: 'core/paragraph',
+		attributes: { content: 'Paragraph' },
+	},
+] );
 ```
 
 ## What about test coverage?
@@ -121,5 +125,5 @@ If you find yourself creating multiple snapshots of similar contents in the same
 
 ## Further readings
 
-- [Effective Snapshot Testing - Kent C. Dodds](https://kentcdodds.com/blog/effective-snapshot-testing)
-- [Common Testing Mistakes - Kent C. Dodds](https://kentcdodds.com/blog/common-testing-mistakes)
+-   [Effective Snapshot Testing - Kent C. Dodds](https://kentcdodds.com/blog/effective-snapshot-testing)
+-   [Common Testing Mistakes - Kent C. Dodds](https://kentcdodds.com/blog/common-testing-mistakes)

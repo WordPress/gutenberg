@@ -13,9 +13,10 @@ By registering your own block variation with some specific Query Loop block sett
 With the block variations API you can provide the default settings that make the most sense for your use-case.
 
 In order to have a Query Loop variation properly working, we'll need to:
-- Register the block variation for the `core/query` block with some default values
-- Define a layout for the block variation
-- Use the `namespace` attribute in the `isActive` block variation property
+
+-   Register the block variation for the `core/query` block with some default values
+-   Define a layout for the block variation
+-   Use the `namespace` attribute in the `isActive` block variation property
 
 Let's go on a journey, for example, of setting up a variation for a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
 

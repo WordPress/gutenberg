@@ -179,6 +179,7 @@ The global styles folder also offers a set of reusable UI components. These comp
 	}
 }
 ```
+
 -   `defaultControls`: The default controls are the controls that are used by default to render the UI. They are used to provide the UI components with the necessary information to render the UI. An example value for the default controls for the `ColorPanel` component is:
 
 ```js

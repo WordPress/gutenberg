@@ -6,9 +6,9 @@ Ensuring proper attributes to the block wrapper is especially important when usi
 
 A block in WordPress can be defined with three distinct types of markup, each serving a unique role:
 
-- **Editor Markup:** This is the visual representation of the block within the Block Editor. It's defined using an `Edit` React component when the block is registered on the client side via [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype).
-- **Save Markup:** This markup is what gets saved to the database when the block's content is saved. It's specified through a `save` function, also provided to `registerBlockType` during block registration. If the block doesn't utilize dynamic rendering, this saved markup is what will be displayed on the front end.
-- **Dynamic Render Markup:** When a block's content needs to be generated dynamically, this markup comes into play. It's defined server-side, either through a `render_callback` function in [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) or a [`render.php`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) file specified in `block.json`. If present, this markup overrides any saved markup and is used for the block's front-end display.
+-   **Editor Markup:** This is the visual representation of the block within the Block Editor. It's defined using an `Edit` React component when the block is registered on the client side via [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#registerblocktype).
+-   **Save Markup:** This markup is what gets saved to the database when the block's content is saved. It's specified through a `save` function, also provided to `registerBlockType` during block registration. If the block doesn't utilize dynamic rendering, this saved markup is what will be displayed on the front end.
+-   **Dynamic Render Markup:** When a block's content needs to be generated dynamically, this markup comes into play. It's defined server-side, either through a `render_callback` function in [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) or a [`render.php`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#render) file specified in `block.json`. If present, this markup overrides any saved markup and is used for the block's front-end display.
 
 For both the [`Edit` component and the `save` function](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), it's important to use a wrapper element that's a standard DOM element (like a `<div>`) or a React component that passes all additional props to native DOM elements. Using React Fragments (`<Fragment>`) or the `<ServerSideRender>` component won't work for these wrappers.
 
@@ -18,11 +18,11 @@ The [`useBlockProps()`](https://developer.wordpress.org/block-editor/reference-g
 
 This hook simplifies several tasks, including:
 
-- Assigning a unique `id` to the block's HTML structure.
-- Adding various accessibility and `data-` attributes for enhanced functionality and information.
-- Incorporating classes and inline styles that reflect the block's custom settings. By default, this includes:
-    - The `wp-block` class for general block styling.
-    - A block-specific class that combines the block's namespace and name, ensuring unique and targeted styling capabilities.
+-   Assigning a unique `id` to the block's HTML structure.
+-   Adding various accessibility and `data-` attributes for enhanced functionality and information.
+-   Incorporating classes and inline styles that reflect the block's custom settings. By default, this includes:
+    -   The `wp-block` class for general block styling.
+    -   A block-specific class that combines the block's namespace and name, ensuring unique and targeted styling capabilities.
 
 In the following example, the Editor markup of the block is defined in the `Edit` component using the `useBlockProps()` hook.
 
@@ -40,20 +40,22 @@ The markup of the block in the Block Editor could look like this, where the clas
 
 ```html
 <p
-    tabindex="0"
-    id="block-4462939a-b918-44bb-9b7c-35a0db5ab8fe"
-    role="document"
-    aria-label="Block: Minimal Gutenberg Block ca6eda"
-    data-block="4462939a-b918-44bb-9b7c-35a0db5ab8fe"
-    data-type="block-development-examples/minimal-block-ca6eda"
-    data-title="Minimal Gutenberg Block ca6eda"
-    class="
+	tabindex="0"
+	id="block-4462939a-b918-44bb-9b7c-35a0db5ab8fe"
+	role="document"
+	aria-label="Block: Minimal Gutenberg Block ca6eda"
+	data-block="4462939a-b918-44bb-9b7c-35a0db5ab8fe"
+	data-type="block-development-examples/minimal-block-ca6eda"
+	data-title="Minimal Gutenberg Block ca6eda"
+	class="
         block-editor-block-list__block
         wp-block
         is-selected
         wp-block-block-development-examples-minimal-block-ca6eda
     "
->Hello World - Block Editor</p>
+>
+	Hello World - Block Editor
+</p>
 ```
 
 In a block's `Edit` component, use the `useBlockProps()` hook to include additional classes and attributes by passing them as arguments. (See [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/edit.js))
@@ -81,7 +83,9 @@ _See the [full block example](https://github.com/WordPress/block-development-exa
 The markup of the block on the front end could look like this, where the class is applied automatically:
 
 ```html
-<p class="wp-block-block-development-examples-minimal-block-ca6eda">Hello World – Frontend</p>
+<p class="wp-block-block-development-examples-minimal-block-ca6eda">
+	Hello World – Frontend
+</p>
 ```
 
 If you want to add any additional classes or attributes to the `save` function of the block, they should be passed as an argument of `useBlockProps.save()`. (See [example](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/stylesheets-79a4c3/src/save.js))
@@ -89,13 +93,17 @@ If you want to add any additional classes or attributes to the `save` function o
 When you add `supports` for any feature, the proper classes get added to the object returned by the `useBlockProps.save()` hook. Text and background color classes have been added to the Paragraph block in the example below.
 
 ```html
-<p class="
+<p
+	class="
     wp-block-block-development-examples-block-supports-6aa4dd
     has-accent-4-color
     has-contrast-background-color
     has-text-color
     has-background
-">Hello World</p>
+"
+>
+	Hello World
+</p>
 ```
 
 The [example block](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/block-supports-6aa4dd) that generated this HTML is available in the [Block Development Examples](https://github.com/WordPress/block-development-examples) repository.
