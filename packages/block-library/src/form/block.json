@@ -4,7 +4,7 @@
 	"__experimental": true,
 	"name": "core/form",
 	"title": "Form",
-	"category": "common",
+	"category": "design",
 	"allowedBlocks": [
 		"core/paragraph",
 		"core/heading",
