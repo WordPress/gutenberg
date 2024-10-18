@@ -167,7 +167,7 @@ function VisualEditor( {
 			deviceType: getDeviceType(),
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
-			isPreview: editorSettings.__unstableIsPreviewMode,
+			isPreview: editorSettings.isPreviewMode,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );

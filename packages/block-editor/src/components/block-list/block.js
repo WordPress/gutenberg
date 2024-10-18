@@ -629,8 +629,7 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const { supportsLayout, __unstableIsPreviewMode: isPreviewMode } =
-				getSettings();
+			const { supportsLayout, isPreviewMode } = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
