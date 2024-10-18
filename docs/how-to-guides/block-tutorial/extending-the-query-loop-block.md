@@ -230,6 +230,17 @@ addFilter( 'editor.BlockEdit', 'core/query', withBookQueryControls );
 
 Of course, you'll be responsible for implementing the logic of your control (you might want to take a look at [`@wordpress/components`](https://www.npmjs.com/package/@wordpress/components) to make your controls fit seamlessly within the Gutenberg UI). Any extra parameter you assign within the `query` object inside the blocks attributes can be used to create a custom query according to your needs, with a little extra effort.
 
+An example assigning bookAuthor to query object
+
+```
+onChange={ ( value ) =>
+	setAttributes( { query: {
+		...attributes.query,
+		bookAuthor: value,
+	} } )
+}
+```
+
 Currently, you'll likely have to implement slightly different paths to make the query behave correctly both on the front-end side (i.e. on the end user's side) and to show the correct preview on the editor side.
 
 ```js
