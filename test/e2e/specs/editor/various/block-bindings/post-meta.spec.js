@@ -547,5 +547,54 @@ test.describe( 'Post Meta source', () => {
 				.filter( { hasText: 'Movie field label' } );
 			await expect( movieField ).toBeVisible();
 		} );
+		test( 'should not be possible to connect non-supported fields through the attributes panel', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: 'content',
+				} )
+				.click();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'String custom field',
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Number custom field',
+				} )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Integer custom field',
+				} )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Boolean custom field',
+				} )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Object custom field',
+				} )
+			).toBeHidden();
+			await expect(
+				page.getByRole( 'menuitemradio', {
+					name: 'Array custom field',
+				} )
+			).toBeHidden();
+		} );
 	} );
 } );

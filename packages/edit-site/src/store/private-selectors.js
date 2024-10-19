@@ -19,3 +19,7 @@ export function getCanvasMode( state ) {
 export function getEditorCanvasContainerView( state ) {
 	return state.editorCanvasContainerView;
 }
+
+export function getRoutes( state ) {
+	return state.routes;
+}

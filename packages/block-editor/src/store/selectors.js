@@ -41,6 +41,7 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isZoomOut,
 } from './private-selectors';
 
 /**
@@ -540,6 +541,39 @@ export function getSelectedBlockClientId( state ) {
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
+ *
+ * @example
+ *
+ *```js
+ * import { select } from '@wordpress/data'
+ * import { store as blockEditorStore } from '@wordpress/block-editor'
+ *
+ * // Set initial active block client ID
+ * let activeBlockClientId = null
+ *
+ * const getActiveBlockData = () => {
+ * 	const activeBlock = select(blockEditorStore).getSelectedBlock()
+ *
+ * 	if (activeBlock && activeBlock.clientId !== activeBlockClientId) {
+ * 		activeBlockClientId = activeBlock.clientId
+ *
+ * 		// Get active block name and attributes
+ * 		const activeBlockName = activeBlock.name
+ * 		const activeBlockAttributes = activeBlock.attributes
+ *
+ * 		// Log active block name and attributes
+ * 		console.log(activeBlockName, activeBlockAttributes)
+ * 		}
+ * 	}
+ *
+ * 	// Subscribe to changes in the editor
+ * 	// wp.data.subscribe(() => {
+ * 		// getActiveBlockData()
+ * 	// })
+ *
+ * 	// Update active block data on click
+ * 	// onclick="getActiveBlockData()"
+ *```
  *
  * @return {?Object} Selected block.
  */
@@ -2902,10 +2936,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	const editorMode = __unstableGetEditorMode( state );
-
 	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'zoom-out' ) {
+	if ( isZoomOut( state ) ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
@@ -3004,8 +3036,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
-			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'zoom-out' ) {
+			if ( isZoomOut( state ) ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
@@ -3027,6 +3058,7 @@ export const getBlockEditingMode = createRegistrySelector(
 				return 'disabled';
 			}
 
+			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'navigation' ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 

@@ -48,7 +48,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { isZoomOut } = unlock( select( blockEditorStore ) );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -61,7 +61,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			isZoomedOutView: isZoomOut(),
 		};
 	}, [] );
 

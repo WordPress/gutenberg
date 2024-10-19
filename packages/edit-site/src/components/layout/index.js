@@ -68,9 +68,9 @@ export default function Layout( { route } ) {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { key: routeKey, areas, widths } = route;
+	const { name: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+		triggerAnimationOnChange: canvasMode,
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
