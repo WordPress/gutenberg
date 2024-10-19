@@ -97,10 +97,7 @@ function GridItem< Item >( {
 				className="dataviews-view-grid__title-actions"
 				alignment="top"
 			>
-				<HStack
-					className="dataviews-view-grid__primary-field"
-					alignment="top"
-				>
+				<HStack className="dataviews-view-grid__primary-field">
 					{ renderedPrimaryField }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />

@@ -112,10 +112,21 @@
 		white-space: normal;
 		padding-top: 3px;
 		align-self: start;
-	}
 
+		button.components-button.is-link {
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			display: -webkit-box;
+			white-space: normal;
+		}
+	}
 	.edit-site-patterns__pattern-lock-icon {
 		align-self: start;
+	}
+
+	.components-button.dataviews-all-actions-button.has-icon:not(.has-text) {
+		min-width: 24px;
+		height: 24px;
 	}
 }
 
