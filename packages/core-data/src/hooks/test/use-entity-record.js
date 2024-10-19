@@ -140,7 +140,14 @@ describe( 'useEntityRecord', () => {
 		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
 		);
-		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+		await waitFor( () =>
+			expect( triggerFetch ).toHaveBeenCalledWith( {
+				path: '/wp/v2/widgets/1?context=edit',
+				parse: false,
+			} )
+		);
+		// Clear the fetch call history.
+		triggerFetch.mockReset();
 
 		rerender( <UI enabled={ false } /> );
 
@@ -157,6 +164,6 @@ describe( 'useEntityRecord', () => {
 		await act(
 			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
 		);
-		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+		expect( triggerFetch ).toHaveBeenCalledTimes( 0 );
 	} );
 } );
