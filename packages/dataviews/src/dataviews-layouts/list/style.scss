@@ -7,60 +7,37 @@ ul.dataviews-view-list {
 
 	li {
 		margin: 0;
-		cursor: pointer;
 		border-top: 1px solid $gray-100;
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
-			border-radius: $grid-unit-05;
-
-			> * {
-				width: 100%;
-			}
+			padding: $grid-unit-20 $grid-unit-30;
 		}
 
 		.dataviews-view-list__item-actions {
-			position: absolute;
-			top: $grid-unit-20;
-			right: 0;
-
+			flex: 0;
+			overflow: hidden;
 
 			> div {
 				height: $button-size-small;
 			}
 
 			.components-button {
+				position: relative;
+				z-index: 1;
 				opacity: 0;
 			}
 		}
 
-		&:has(.dataviews-view-list__fields:empty) {
+		&:where(.is-selected, .is-hovered, :focus-within) {
 			.dataviews-view-list__item-actions {
-				top: 50%;
-				transform: translateY(-50%);
-			}
-		}
-
-		&.is-selected,
-		&.is-hovered,
-		&:focus-within {
-			.dataviews-view-list__item-actions {
-				background: #f8f8f8;
-				padding-left: $grid-unit-10;
-				margin-right: $grid-unit-30;
-				box-shadow: -12px 0 8px 0 #f8f8f8;
+				flex-basis: min-content;
+				overflow: unset;
+				margin-inline: $grid-unit-10 0;
 
 				.components-button {
 					opacity: 1;
-					position: static;
 				}
-			}
-		}
-
-		&.is-selected {
-			.dataviews-view-list__item-actions {
-				background-color: rgb(247 248 255);
-				box-shadow: -12px 0 8px 0 rgb(247 248 255);
 			}
 		}
 
@@ -105,27 +82,38 @@ ul.dataviews-view-list {
 	}
 
 	.dataviews-view-list__item {
-		box-sizing: border-box;
-		padding: $grid-unit-20 $grid-unit-30;
-		width: 100%;
+		position: absolute;
+		z-index: 1;
+		inset: 0;
 		scroll-margin: $grid-unit-10 0;
+		appearance: none;
+		border: none;
+		background: none;
+		padding: 0;
+		cursor: pointer;
 
 		&:focus-visible {
+			outline: none;
+
 			&::before {
 				position: absolute;
 				content: "";
-				top: var(--wp-admin-border-width-focus);
-				right: var(--wp-admin-border-width-focus);
-				bottom: var(--wp-admin-border-width-focus);
-				left: var(--wp-admin-border-width-focus);
+				inset: var(--wp-admin-border-width-focus);
 				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 				border-radius: $radius-small;
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
 			}
 		}
-		.dataviews-view-list__primary-field {
-			min-height: $grid-unit-30;
-			line-height: $grid-unit-30;
-			overflow: hidden;
+	}
+	.dataviews-view-list__primary-field {
+		flex: 1;
+		min-height: $grid-unit-30;
+		line-height: $grid-unit-30;
+		overflow: hidden;
+		// The field should be in front of the main button in case it has a link/button.
+		&:has(a, button) {
+			z-index: 1;
 		}
 	}
 
@@ -164,6 +152,7 @@ ul.dataviews-view-list {
 
 	.dataviews-view-list__field-wrapper {
 		min-height: $grid-unit-05 * 13; // Ensures title is centrally aligned when all fields are hidden
+		flex-grow: 1;
 	}
 
 	.dataviews-view-list__fields {

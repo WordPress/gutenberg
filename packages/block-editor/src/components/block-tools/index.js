@@ -19,34 +19,30 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
-import getEditorRegion from '../../utils/get-editor-region';
 
 function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
-		__unstableGetEditorMode,
 		isTyping,
 		isDragging,
+		isZoomOut,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	const editorMode = __unstableGetEditorMode();
-
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: editorMode === 'zoom-out',
+		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 	};
 }
@@ -76,14 +72,10 @@ export default function BlockTools( {
 		isGroupable,
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
-	const {
-		showEmptyBlockSideInserter,
-		showBlockToolbarPopover,
-		showZoomOutToolbar,
-	} = useShowBlockTools();
+	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
+		useShowBlockTools();
 
 	const {
-		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
 		replaceBlocks,
@@ -94,8 +86,6 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
-
-	const blockSelectionButtonRef = useRef();
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
@@ -157,13 +147,6 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
-			} else if (
-				clientIds.length === 1 &&
-				event.target === blockSelectionButtonRef?.current
-			) {
-				event.preventDefault();
-				clearSelectedBlock();
-				getEditorRegion( __unstableContentRef.current )?.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
@@ -219,13 +202,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
-					/>
-				) }
-
-				{ showZoomOutToolbar && (
-					<ZoomOutPopover
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
 					/>
 				) }
 

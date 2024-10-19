@@ -70,17 +70,3 @@ export function removeBlockBindingsSource( name ) {
 		name,
 	};
 }
-
-/**
- * Add bootstrapped block bindings sources, usually initialized from the server.
- *
- * @param {string} source Name of the source to bootstrap.
- */
-export function addBootstrappedBlockBindingsSource( source ) {
-	return {
-		type: 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE',
-		name: source.name,
-		label: source.label,
-		usesContext: source.usesContext,
-	};
-}

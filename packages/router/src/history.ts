@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { createBrowserHistory } from 'history';
+import { createBrowserHistory, type BrowserHistory } from 'history';
 
 /**
  * WordPress dependencies
  */
 import { buildQueryString } from '@wordpress/url';
+
+export interface EnhancedHistory extends BrowserHistory {
+	getLocationWithParams: () => Location;
+}
 
 const history = createBrowserHistory();
 
@@ -16,7 +20,7 @@ const originalHistoryReplace = history.replace;
 // Preserve the `wp_theme_preview` query parameter when navigating
 // around the Site Editor.
 // TODO: move this hack out of the router into Site Editor code.
-function preserveThemePreview( params ) {
+function preserveThemePreview( params: Record< string, any > ) {
 	if ( params.hasOwnProperty( 'wp_theme_preview' ) ) {
 		return params;
 	}
@@ -28,12 +32,15 @@ function preserveThemePreview( params ) {
 	return { ...params, wp_theme_preview: currentThemePreview };
 }
 
-function push( params, state ) {
+function push( params: Record< string, any >, state: Record< string, any > ) {
 	const search = buildQueryString( preserveThemePreview( params ) );
 	return originalHistoryPush.call( history, { search }, state );
 }
 
-function replace( params, state ) {
+function replace(
+	params: Record< string, any >,
+	state: Record< string, any >
+) {
 	const search = buildQueryString( preserveThemePreview( params ) );
 	return originalHistoryReplace.call( history, { search }, state );
 }
@@ -54,8 +61,9 @@ function getLocationWithParams() {
 	return locationWithParams;
 }
 
-history.push = push;
-history.replace = replace;
-history.getLocationWithParams = getLocationWithParams;
-
-export default history;
+export default {
+	...history,
+	push,
+	replace,
+	getLocationWithParams,
+};

@@ -1,5 +1,3 @@
-.wp-block-post-content::after {
-	content: "";
-	display: table;
-	clear: both;
+.wp-block-post-content {
+	display: flow-root;
 }

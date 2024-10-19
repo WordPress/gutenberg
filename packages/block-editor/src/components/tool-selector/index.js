@@ -67,7 +67,9 @@ function ToolSelector( props, ref ) {
 							value={
 								mode === 'navigation' ? 'navigation' : 'edit'
 							}
-							onSelect={ __unstableSetEditorMode }
+							onSelect={ ( newMode ) => {
+								__unstableSetEditorMode( newMode );
+							} }
 							choices={ [
 								{
 									value: 'navigation',
@@ -78,6 +80,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Focus on content.' ),
+									'aria-label': __( 'Write' ),
 								},
 								{
 									value: 'edit',
@@ -88,6 +91,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Edit layout and styles.' ),
+									'aria-label': __( 'Design' ),
 								},
 							] }
 						/>

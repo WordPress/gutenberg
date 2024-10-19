@@ -201,11 +201,11 @@ class ToolbarUtils {
 		this.pageUtils = pageUtils;
 
 		this.documentToolbarButton = this.page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+			name: 'Block Inserter',
 			exact: true,
 		} );
 		this.documentToolbarTooltip = this.page.locator(
-			'text=Toggle block inserter'
+			'text=Block Inserter'
 		);
 		this.blockToolbarParagraphButton = this.page.getByRole( 'button', {
 			name: 'Paragraph',

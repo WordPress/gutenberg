@@ -877,6 +877,10 @@ updateBlockBindings( { url: undefined } );
 removeAllBlockBindings();
 ```
 
+_Parameters_
+
+-   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+
 _Returns_
 
 -   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
@@ -1073,11 +1077,11 @@ _Parameters_
 
 ### useZoomOut
 
-A hook used to set the zoomed out view, invoking the hook sets the mode.
+A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
 
 _Parameters_
 
--   _zoomOut_ `boolean`: If we should zoom out or not.
+-   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
 
 ### Warning
 
