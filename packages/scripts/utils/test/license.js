@@ -7,10 +7,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-import {
-	detectTypeFromLicenseText,
-	checkAllCompatible,
-} from '../check-licenses';
+import { detectTypeFromLicenseText, checkAllCompatible } from '../license';
 
 describe( 'detectTypeFromLicenseText', () => {
 	let licenseText;

@@ -33,10 +33,8 @@ test.describe( 'Columns', () => {
 			.first()
 			.click();
 
-		// Toggle Block inserter
-		await page
-			.locator( 'role=button[name="Toggle block inserter"i]' )
-			.click();
+		// Block Inserter
+		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 
 		// Verify Column
 		const inserterOptions = page.locator(

@@ -21,14 +21,17 @@ function gutenberg_test_block_bindings_registration() {
 		'text_field'  => array(
 			'label' => 'Text Field Label',
 			'value' => 'Text Field Value',
+			'type'  => 'string',
 		),
 		'url_field'   => array(
 			'label' => 'URL Field Label',
 			'value' => $testing_url,
+			'type'  => 'string',
 		),
 		'empty_field' => array(
 			'label' => 'Empty Field Label',
 			'value' => '',
+			'type'  => 'string',
 		),
 	);
 
@@ -106,6 +109,89 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'string',
 		)
 	);
+	// Register different types of custom fields for testing.
+	register_meta(
+		'post',
+		'string_custom_field',
+		array(
+			'label'        => 'String custom field',
+			'default'      => '',
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+		)
+	);
+	register_meta(
+		'post',
+		'object_custom_field',
+		array(
+			'label'        => 'Object custom field',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'foo' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+			'single'       => true,
+			'type'         => 'object',
+		)
+	);
+	register_meta(
+		'post',
+		'array_custom_field',
+		array(
+			'label'        => 'Array custom field',
+			'show_in_rest' => array(
+				'schema' => array(
+					'type'  => 'array',
+					'items' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'single'       => true,
+			'type'         => 'array',
+			'default'      => array(),
+		)
+	);
+	register_meta(
+		'post',
+		'number',
+		array(
+			'label'        => 'Number custom field',
+			'type'         => 'number',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5.5,
+		)
+	);
+	register_meta(
+		'post',
+		'integer',
+		array(
+			'label'        => 'Integer custom field',
+			'type'         => 'integer',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => 5,
+		)
+	);
+	register_meta(
+		'post',
+		'boolean',
+		array(
+			'label'        => 'Boolean custom field',
+			'type'         => 'boolean',
+			'show_in_rest' => true,
+			'single'       => true,
+			'default'      => true,
+		)
+	);
+
 	// Register CPT custom fields.
 	register_meta(
 		'post',

@@ -14,7 +14,7 @@ test.describe( 'Group', () => {
 	} ) => {
 		// Search for the group block and insert it.
 		const inserterButton = page.locator(
-			'role=button[name="Toggle block inserter"i]'
+			'role=button[name="Block Inserter"i]'
 		);
 
 		await inserterButton.click();

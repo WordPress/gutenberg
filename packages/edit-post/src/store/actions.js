@@ -481,7 +481,7 @@ export const initializeMetaBoxes =
 		addAction(
 			'editor.savePost',
 			'core/edit-post/save-metaboxes',
-			async ( options ) => {
+			async ( post, options ) => {
 				if ( ! options.isAutosave && select.hasMetaBoxes() ) {
 					await dispatch.requestMetaBoxUpdates();
 				}
