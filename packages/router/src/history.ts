@@ -12,6 +12,10 @@ export interface EnhancedHistory extends BrowserHistory {
 	getLocationWithParams: () => Location;
 }
 
+interface PushOptions {
+	transition?: string;
+}
+
 const history = createBrowserHistory();
 
 const originalHistoryPush = history.push;
@@ -32,9 +36,35 @@ function preserveThemePreview( params: Record< string, any > ) {
 	return { ...params, wp_theme_preview: currentThemePreview };
 }
 
-function push( params: Record< string, any >, state: Record< string, any > ) {
-	const search = buildQueryString( preserveThemePreview( params ) );
-	return originalHistoryPush.call( history, { search }, state );
+function push(
+	params: Record< string, any >,
+	state: Record< string, any >,
+	options: PushOptions = {}
+) {
+	const performPush = () => {
+		const search = buildQueryString( preserveThemePreview( params ) );
+		return originalHistoryPush.call( history, { search }, state );
+	};
+
+	/*
+	 * Skip transition in mobile, otherwise it crashes the browser.
+	 * See: https://github.com/WordPress/gutenberg/pull/63002.
+	 */
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
+	if (
+		! isMediumOrBigger ||
+		// @ts-expect-error
+		! document.startViewTransition ||
+		! options.transition
+	) {
+		return performPush();
+	}
+	document.documentElement.classList.add( options.transition );
+	// @ts-expect-error
+	const transition = document.startViewTransition( () => performPush() );
+	transition.finished.finally( () => {
+		document.documentElement.classList.remove( options.transition ?? '' );
+	} );
 }
 
 function replace(
