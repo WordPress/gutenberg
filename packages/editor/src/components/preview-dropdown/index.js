@@ -46,12 +46,10 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			};
 		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
-		__unstableSetEditorMode( 'edit' );
 		resetZoomLevel();
 	};
 
