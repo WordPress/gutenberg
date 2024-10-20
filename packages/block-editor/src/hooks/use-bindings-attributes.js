@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore, getBlockType } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useContext } from '@wordpress/element';
@@ -70,30 +70,34 @@ function replacePatternOverrideDefaultBindings( blockName, bindings ) {
  * Based on the given block name,
  * check if it is possible to bind the block.
  *
- * @param {string} blockName - The block name.
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
-export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+export function canBindBlock() {
+	return true;
 }
 
 /**
  * Based on the given block name and attribute name,
  * check if it is possible to bind the block attribute.
  *
- * @param {string} blockName     - The block name.
- * @param {string} attributeName - The attribute name.
  * @return {boolean} Whether it is possible to bind the block attribute.
  */
-export function canBindAttribute( blockName, attributeName ) {
-	return (
-		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
-	);
+export function canBindAttribute() {
+	return true;
 }
 
 export function getBindableAttributes( blockName ) {
-	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+	const bindableAttributes = [];
+	const blockType = getBlockType( blockName );
+	if ( blockType.attributes ) {
+		for ( const attribute in blockType.attributes ) {
+			if ( blockType.attributes[ attribute ].role === 'content' ) {
+				bindableAttributes.push( attribute );
+			}
+		}
+	}
+
+	return bindableAttributes;
 }
 
 export const withBlockBindingSupport = createHigherOrderComponent(
@@ -133,10 +137,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				) ) {
 					const { source: sourceName, args: sourceArgs } = binding;
 					const source = sources[ sourceName ];
-					if (
-						! source ||
-						! canBindAttribute( name, attributeName )
-					) {
+					if ( ! source || ! canBindAttribute() ) {
 						continue;
 					}
 
@@ -301,11 +302,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
  * to upgrade bound attributes.
  *
  * @param {WPBlockSettings} settings - Registered block settings.
- * @param {string}          name     - Block name.
  * @return {WPBlockSettings} Filtered block settings.
  */
-function shimAttributeSource( settings, name ) {
-	if ( ! canBindBlock( name ) ) {
+function shimAttributeSource( settings ) {
+	if ( ! canBindBlock() ) {
 		return settings;
 	}
 

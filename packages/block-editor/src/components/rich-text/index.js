@@ -166,10 +166,7 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			if (
-				! blockBindings?.[ identifier ] ||
-				! canBindBlock( blockName )
-			) {
+			if ( ! blockBindings?.[ identifier ] || ! canBindBlock() ) {
 				return {};
 			}
 

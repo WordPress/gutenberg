@@ -261,7 +261,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
-			! canBindAttribute( blockName, key ) ||
+			! canBindAttribute() ||
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
