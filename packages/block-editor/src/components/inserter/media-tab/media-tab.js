@@ -24,7 +24,7 @@ function MediaTab( {
 	rootClientId,
 	selectedCategory,
 	onSelectCategory,
-	onHasCategories,
+	setHasCategories,
 	onInsert,
 	children,
 } ) {
@@ -51,8 +51,8 @@ function MediaTab( {
 	);
 
 	useEffect( () => {
-		onHasCategories( !! categories.length );
-	}, [ categories, onHasCategories ] );
+		setHasCategories( !! categories.length );
+	}, [ categories, setHasCategories ] );
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;

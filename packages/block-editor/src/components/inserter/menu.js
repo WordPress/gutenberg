@@ -246,9 +246,7 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
-				onHasCategories={ ( _hasCategories ) =>
-					setHasCategories( _hasCategories )
-				}
+				setHasCategories={ setHasCategories }
 			>
 				{ showPatternPanel && (
 					<PatternCategoryPreviews
@@ -277,9 +275,7 @@ function InserterMenu(
 				selectedCategory={ selectedMediaCategory }
 				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
-				onHasCategories={ ( _hasCategories ) =>
-					setHasCategories( _hasCategories )
-				}
+				setHasCategories={ setHasCategories }
 			>
 				{ showMediaPanel && (
 					<MediaCategoryPanel

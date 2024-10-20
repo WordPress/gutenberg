@@ -24,7 +24,7 @@ function BlockPatternsTab( {
 	selectedCategory,
 	onInsert,
 	rootClientId,
-	onHasCategories,
+	setHasCategories,
 	children,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
@@ -39,8 +39,8 @@ function BlockPatternsTab( {
 	);
 
 	useEffect( () => {
-		onHasCategories( !! categories.length );
-	}, [ categories, onHasCategories ] );
+		setHasCategories( !! categories.length );
+	}, [ categories, setHasCategories ] );
 
 	if ( isResolvingPatterns ) {
 		return (
