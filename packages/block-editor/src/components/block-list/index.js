@@ -187,7 +187,7 @@ function Items( {
 
 			const _order = getBlockOrder( rootClientId );
 
-			if ( getSettings().__unstableIsPreviewMode ) {
+			if ( getSettings().isPreviewMode ) {
 				return {
 					order: _order,
 					selectedBlocks: EMPTY_ARRAY,

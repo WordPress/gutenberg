@@ -70,6 +70,7 @@ export function useSpecificEditorSettings() {
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			__unstableIsPreviewMode: canvasMode === 'view',
+			isPreviewMode: canvasMode === 'view',
 		};
 	}, [
 		settings,

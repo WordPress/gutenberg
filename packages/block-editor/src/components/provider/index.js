@@ -46,9 +46,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		return (
 			<SlotFillProvider passthrough>
-				{ ! settings?.__unstableIsPreviewMode && (
-					<KeyboardShortcuts.Register />
-				) }
+				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
 				<BlockRefsProvider>{ children }</BlockRefsProvider>
 			</SlotFillProvider>
 		);
