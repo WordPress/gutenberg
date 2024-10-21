@@ -34,6 +34,7 @@ ul.dataviews-view-list {
 				flex-basis: min-content;
 				overflow: unset;
 				margin-inline: $grid-unit-10 0;
+				padding-right: $grid-unit-05;
 
 				.components-button {
 					opacity: 1;
