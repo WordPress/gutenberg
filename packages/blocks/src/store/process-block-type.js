@@ -197,5 +197,26 @@ export const processBlockType =
 			return;
 		}
 
+		// Parent being an array hasn't been enforced in the past,
+		// so this is a way to maintain backwards compatibility
+		// with 3rd party blocks that may have been using it as a string.
+		if (
+			typeof settings.parent === 'string' ||
+			settings.parent instanceof String
+		) {
+			settings.parent = [ settings.parent ];
+		}
+
+		if (
+			! Array.isArray( settings?.parent ) &&
+			settings?.parent !== undefined
+		) {
+			warning(
+				'Block parent must be an array of block types, but it is ',
+				settings?.parent
+			);
+			return;
+		}
+
 		return settings;
 	};
