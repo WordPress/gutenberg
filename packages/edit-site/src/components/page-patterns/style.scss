@@ -43,6 +43,10 @@
 
 .edit-site-patterns__pattern-lock-icon {
 	min-width: min-content;
+
+	.dataviews-view-grid & {
+		align-self: start;
+	}
 }
 
 .edit-site-patterns__section-header {
@@ -101,6 +105,29 @@
 
 	.edit-site-patterns__pattern-lock-icon {
 		fill: currentcolor;
+	}
+
+	.dataviews-view-grid & {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		white-space: normal;
+		padding-top: 3px;
+		align-self: start;
+
+		button.components-button.is-link {
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			display: -webkit-box;
+			white-space: normal;
+		}
+	}
+}
+
+.components-button.dataviews-all-actions-button.has-icon:not(.has-text) {
+	.dataviews-view-grid & {
+		min-width: 24px;
+		height: 24px;
 	}
 }
 
