@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+export { default as HelpContentSlot } from './components/global-styles/help-content-slot/help-content-slot';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
