@@ -1366,55 +1366,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
 
-		$this->assertSame( $expected_data, $actual );
-	}
+		$this->assertSame( $expected_data, $actual, 'Resolved theme uris do not match.' );
 
-	public function test_get_resolved_theme_uris_cache() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'background' => array(
-						'backgroundImage' => array(
-							'url' => 'file:./example/img/image.png',
-						),
-					),
-					'blocks'     => array(
-						'core/quote' => array(
-							'background' => array(
-								'backgroundImage' => array(
-									'url' => 'file:./example/img/quote.jpg',
-								),
-							),
-						),
-						'core/verse' => array(
-							'background' => array(
-								'backgroundImage' => array(
-									'url' => 'file:./example/img/verse.gif',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		/*
-		 * This filter callback normalizes the return value from `get_theme_file_uri`
-		 * to guard against changes in test environments.
-		 * The test suite otherwise returns full system dir path, e.g.,
-		 * /wordpress-phpunit/includes/../data/themedir1/default/example/img/image.png
-		 */
-		$filter_theme_file_uri_callback = function ( $file ) {
-			return 'https://example.org/wp-content/themes/example-theme/example/' . explode( 'example/', $file )[1];
-		};
-		add_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
-		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
-		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
-
+		// Test that resolved theme uris are cached.
 		$current_stylesheet_directory = get_stylesheet_directory();
-		$expected_data                = array( "$current_stylesheet_directory" => $actual );
-		$this->assertSame( $expected_data, static::$property_resolved_theme_uris_cache->getValue() );
+		$expected_cache_data          = array( "$current_stylesheet_directory" => $actual );
+		$this->assertSame( $expected_cache_data, static::$property_resolved_theme_uris_cache->getValue(), 'Resolved theme uris cache data does not match.' );
 	}
 
 	/**
