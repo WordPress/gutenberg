@@ -122,7 +122,7 @@ export default function CoverInspectorControls( {
 	const { gradientValue, setGradient } = __experimentalUseGradient();
 	const { getSettings } = useSelect( blockEditorStore );
 
-	const imageSizes = getSettings().imageSizes;
+	const imageSizes = getSettings()?.imageSizes;
 
 	const image = useSelect(
 		( select ) =>
@@ -145,10 +145,10 @@ export default function CoverInspectorControls( {
 	}
 
 	const imageSizeOptions = imageSizes
-		.filter(
+		?.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
-		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+		?.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -321,7 +321,7 @@ export default function CoverInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ ! useFeaturedImage && !! imageSizeOptions.length && (
+						{ ! useFeaturedImage && !! imageSizeOptions?.length && (
 							<ResolutionTool
 								value={ sizeSlug }
 								onChange={ updateImage }
