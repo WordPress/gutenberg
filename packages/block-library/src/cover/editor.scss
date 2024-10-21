@@ -42,7 +42,6 @@
 	// Shown while media is being uploaded
 	.components-spinner {
 		position: absolute;
-		z-index: z-index(".wp-block-cover__inner-container");
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%); // Account for spinner dimensions
@@ -117,4 +116,11 @@
 
 .color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
 	margin-top: $grid-unit-30;
+}
+
+// Backward compatibility for v14 deprecation.
+.wp-block-cover:not(.has-no-zindex-in-inner-blocks) {	// Shown while media is being uploaded
+	.components-spinner {
+		z-index: z-index(".wp-block-cover__inner-container");
+	}
 }
