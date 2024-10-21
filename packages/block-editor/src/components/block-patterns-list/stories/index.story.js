@@ -19,9 +19,32 @@ const blockEditorSettings = {
 	styles: [ { css: blockLibraryStyles } ],
 };
 
-const meta = {
+export default {
 	component: BlockPatternsList,
 	title: 'BlockEditor/BlockPatternsList',
+};
+
+export const Default = {
+	render: function Template( props ) {
+		const shownPatterns = useAsyncList( props.blockPatterns );
+		return (
+			<ExperimentalBlockEditorProvider settings={ blockEditorSettings }>
+				<div style={ { width: '300px' } }>
+					<BlockPatternsList
+						shownPatterns={ shownPatterns }
+						{ ...props }
+					/>
+				</div>
+			</ExperimentalBlockEditorProvider>
+		);
+	},
+	args: {
+		blockPatterns: patterns,
+		isDraggable: false,
+		label: 'Block patterns story',
+		showTitle: true,
+		showTitlesAsTooltip: false,
+	},
 	argTypes: {
 		blockPatterns: { description: 'The patterns to render.' },
 		shownPatterns: {
@@ -42,8 +65,7 @@ const meta = {
 				'Whether to render the title of each pattern as a tooltip. If enabled, it takes precedence over `showTitle` prop.',
 		},
 		orientation: {
-			description:
-				'Orientation for the underlying composite widget.',
+			description: 'Orientation for the underlying composite widget.',
 			table: {
 				defaultValue: { summary: 'both' },
 				type: { summary: 'string' },
@@ -58,24 +80,4 @@ const meta = {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 	},
-};
-
-export default meta;
-
-const Template = ( props ) => {
-	const shownPatterns = useAsyncList( props.blockPatterns );
-	return (
-		<ExperimentalBlockEditorProvider settings={ blockEditorSettings }>
-			<BlockPatternsList shownPatterns={ shownPatterns } { ...props } />
-		</ExperimentalBlockEditorProvider>
-	);
-};
-
-export const Default = Template.bind( {} );
-Default.args = {
-	blockPatterns: patterns,
-	isDraggable: false,
-	label: 'Block patterns story',
-	showTitle: true,
-	showTitlesAsTooltip: false,
 };
