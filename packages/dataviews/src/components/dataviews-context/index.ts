@@ -27,6 +27,9 @@ type DataViewsContextType< Item > = {
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 	getItemId: ( item: Item ) => string;
 	density: number;
+	onPinItem?: ( itemId: string ) => void;
+	onUnpinItem?: ( itemId: string ) => void;
+	pinnedItems: string[];
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -38,12 +41,15 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 		totalItems: 0,
 		totalPages: 0,
 	},
+	pinnedItems: [],
 	selection: [],
 	onChangeSelection: () => {},
 	setOpenedFilter: () => {},
 	openedFilter: null,
 	getItemId: ( item ) => item.id,
 	density: 0,
+	onPinItem: () => {},
+	onUnpinItem: () => {},
 } );
 
 export default DataViewsContext;

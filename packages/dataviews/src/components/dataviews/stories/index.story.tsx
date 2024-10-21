@@ -184,3 +184,39 @@ export const CombinedFields = () => {
 		/>
 	);
 };
+
+export const PinnedItems = () => {
+	const [ view, setView ] = useState< View >( {
+		...DEFAULT_VIEW,
+		fields: [ 'title', 'description', 'categories' ],
+	} );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+	// Pin the first item
+	const [ pinnedItems, setPinnedItems ] = useState< string[] >( [
+		...shownData[ 0 ].id.toString(),
+	] );
+
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			enablePinnedItems
+			pinnedItems={ pinnedItems }
+			onPinItem={ ( itemId: string ) => {
+				setPinnedItems( ( prev ) => [ ...prev, itemId ] );
+			} }
+			onUnpinItem={ ( itemId: string ) => {
+				setPinnedItems( ( prev ) =>
+					prev.filter( ( id ) => id !== itemId )
+				);
+			} }
+			onChangeView={ setView }
+			defaultLayouts={ defaultLayouts }
+			view={ view }
+			fields={ fields }
+		/>
+	);
+};
