@@ -10,8 +10,16 @@
 		"textAlign": {
 			"type": "string"
 		},
+		"prefix": {
+			"type": "string",
+			"default": ""
+		},
 		"format": {
 			"type": "string"
+		},
+		"suffix": {
+			"type": "string",
+			"default": ""
 		},
 		"isLink": {
 			"type": "boolean",
