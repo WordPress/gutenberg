@@ -354,7 +354,7 @@ function Iframe( {
 		// but calc( 100px / 2px ) is not.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
+			scale === 'auto-scaled'
 				? ( Math.min( containerWidth, maxWidth ) -
 						parseInt( frameSize ) * 2 ) /
 						scaleContainerWidth

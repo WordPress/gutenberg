@@ -31,7 +31,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 		if ( isZoomOut ) {
 			resetZoomLevel();
 		} else {
-			setZoomLevel( 50 );
+			setZoomLevel( 'auto-scaled' );
 		}
 	};
 
