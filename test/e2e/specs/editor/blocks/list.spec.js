@@ -1250,6 +1250,21 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
+	test( 'remove empty list graciously through UI', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* 1' );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+
+		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
 	test( 'should not change the contents when you change the list type to Ordered', async ( {
 		editor,
 		page,
