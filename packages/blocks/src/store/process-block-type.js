@@ -207,7 +207,10 @@ export const processBlockType =
 			settings.parent = [ settings.parent ];
 		}
 
-		if ( ! Array.isArray( settings?.parent ) && 'parent' in settings ) {
+		if (
+			! Array.isArray( settings?.parent ) &&
+			settings?.parent !== undefined
+		) {
 			warning(
 				'Block parent must be an array of block types, but it is ',
 				settings?.parent
