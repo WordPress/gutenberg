@@ -14,6 +14,7 @@ import {
 	external,
 	keyboard,
 	symbol,
+	plus,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -34,6 +35,7 @@ function useEditorCommandLoader() {
 	const {
 		editorMode,
 		isListViewOpen,
+		isInserterOpen,
 		showBlockBreadcrumbs,
 		isDistractionFree,
 		isTopToolbar,
@@ -45,14 +47,19 @@ function useEditorCommandLoader() {
 		isPublishSidebarEnabled,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { isListViewOpened, getCurrentPostType, getEditorSettings } =
-			select( editorStore );
+		const {
+			isListViewOpened,
+			isInserterOpened,
+			getCurrentPostType,
+			getEditorSettings,
+		} = select( editorStore );
 		const { getSettings } = select( blockEditorStore );
 		const { getPostType } = select( coreStore );
 
 		return {
 			editorMode: get( 'core', 'editorMode' ) ?? 'visual',
 			isListViewOpen: isListViewOpened(),
+			isInserterOpen: isInserterOpened(),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isFocusMode: get( 'core', 'focusMode' ),
@@ -71,6 +78,7 @@ function useEditorCommandLoader() {
 	const {
 		__unstableSaveForPreview,
 		setIsListViewOpened,
+		setIsInserterOpened,
 		switchEditorMode,
 		toggleDistractionFree,
 	} = useDispatch( editorStore );
@@ -157,6 +165,49 @@ function useEditorCommandLoader() {
 			);
 		},
 	} );
+
+	commands.push( {
+		name: 'core/go-to-block-inserter',
+		label: isInserterOpen
+			? __( 'Go to Block Inserter' )
+			: __( 'Open Block Inserter' ),
+		icon: plus,
+		callback: ( { close } ) => {
+			if ( isInserterOpen ) {
+				// How should we best send focus to the block library? Currently focus happens
+				// on mount within the inserter, but it's already mounted, so we need a way to
+				// send focus.
+				document
+					.querySelector( '[aria-label="Block Library"]' )
+					.focus();
+			} else {
+				setIsInserterOpened( true );
+			}
+			close();
+			if ( ! isInserterOpen ) {
+				createInfoNotice( __( 'Block Inserter open.' ), {
+					id: 'core/editor/toggle-block-inserter/notice',
+					type: 'snackbar',
+				} );
+			}
+		},
+	} );
+
+	if ( isInserterOpen ) {
+		commands.push( {
+			name: 'core/close-block-inserter',
+			label: __( 'Close Block Inserter' ),
+			icon: plus,
+			callback: ( { close } ) => {
+				setIsInserterOpened( false );
+				close();
+				createInfoNotice( __( 'Block Inserter closed.' ), {
+					id: 'core/editor/toggle-block-inserter/notice',
+					type: 'snackbar',
+				} );
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/toggle-top-toolbar',
