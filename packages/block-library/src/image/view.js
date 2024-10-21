@@ -52,13 +52,16 @@ const { state, actions, callbacks } = store(
 				);
 			},
 			get imgStyles() {
-				return (
-					state.overlayOpened &&
-					`${ state.currentImage.imgStyles?.replace(
-						/;$/,
-						''
-					) }; object-fit:cover;`
-				);
+				const styles = state.currentImage.imgStyles
+					.split( ';' )
+					.filter( ( style ) => !! style )
+					.map( ( style ) =>
+						style.startsWith( 'border-width:' )
+							? 'border-width: 0'
+							: style
+					)
+					.join( ';' );
+				return state.overlayOpened && `${ styles }; object-fit:cover;`;
 			},
 			get imageButtonRight() {
 				const { imageId } = getContext();
@@ -195,11 +198,20 @@ const { state, actions, callbacks } = store(
 				let {
 					naturalWidth,
 					naturalHeight,
-					offsetWidth: originalWidth,
-					offsetHeight: originalHeight,
+					clientWidth: originalWidth,
+					clientHeight: originalHeight,
 				} = state.currentImage.imageRef;
 				let { x: screenPosX, y: screenPosY } =
 					state.currentImage.imageRef.getBoundingClientRect();
+				const computedStyle = window.getComputedStyle(
+					state.currentImage.imageRef
+				);
+				screenPosX +=
+					parseFloat( computedStyle.borderLeftWidth ) +
+					parseFloat( computedStyle.paddingLeft );
+				screenPosY +=
+					parseFloat( computedStyle.borderTopWidth ) +
+					parseFloat( computedStyle.paddingTop );
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
