@@ -277,6 +277,10 @@
 -   Update `ariakit` to version `0.4.10` ([#64637](https://github.com/WordPress/gutenberg/pull/64637)).
 -   Ariakit: Use `useStoreState()` instead of `store.useState()` ([#64648](https://github.com/WordPress/gutenberg/pull/64648)).
 
+### Internal
+
+-   `TextControl`: Support generic props type ([#64293](https://github.com/WordPress/gutenberg/pull/64293)).
+
 ## 28.5.0 (2024-08-07)
 
 ### Bug Fixes
