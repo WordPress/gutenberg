@@ -1344,14 +1344,6 @@ _Related_
 
 -   multiSelect in core/block-editor store.
 
-### openGeneralSidebar
-
-Action that opens an editor sidebar.
-
-_Parameters_
-
--   _name_ `?string`: Sidebar name to be opened.
-
 ### openPublishSidebar
 
 Returns an action object used in signalling that the user opened the publish sidebar.
