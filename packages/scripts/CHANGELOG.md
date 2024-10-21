@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+-   Add `--packager` flag to the `packages-update` command to allow specifying a custom packager when updating npm packages ([#](N/A)
 
 ### Enhancements
 
