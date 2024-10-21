@@ -1369,8 +1369,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_data, $actual, 'Resolved theme uris do not match.' );
 
 		// Test that resolved theme uris are cached.
-		$current_stylesheet_directory = get_stylesheet_directory();
-		$expected_cache_data          = array( "$current_stylesheet_directory" => $actual );
+		$cache_key           = md5( wp_json_encode( $theme_json->get_raw_data() ) );
+		$expected_cache_data = array( "$cache_key" => $actual );
 		$this->assertSame( $expected_cache_data, static::$property_resolved_theme_uris_cache->getValue(), 'Resolved theme uris cache data does not match.' );
 	}
 
