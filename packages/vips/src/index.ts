@@ -27,10 +27,10 @@ import type {
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
-type EmscriptenModule = {
+interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
-};
+}
 
 let location = '';
 
