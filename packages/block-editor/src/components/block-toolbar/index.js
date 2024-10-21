@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -17,6 +17,7 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -48,6 +49,7 @@ import { unlock } from '../../lock-unlock';
  * @param {boolean}  props.focusOnMount                Focus the toolbar when mounted.
  * @param {number}   props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
  * @param {Function} props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
+ * @param {Object}   props.__unstableContentRef        Ref object for the content area.
  * @param {string}   props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
 export function PrivateBlockToolbar( {
@@ -55,6 +57,7 @@ export function PrivateBlockToolbar( {
 	focusOnMount,
 	__experimentalInitialIndex,
 	__experimentalOnIndexChange,
+	__unstableContentRef,
 	variant = 'unstyled',
 } ) {
 	const {
@@ -68,10 +71,8 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		hasParentPattern,
 		hasContentOnlyLocking,
-		showShuffleButton,
-		showSlots,
-		showGroupButtons,
-		showLockButtons,
+		isZoomOutMode,
+		canRemove,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -85,6 +86,7 @@ export function PrivateBlockToolbar( {
 			getTemplateLock,
 			getParentSectionBlock,
 			isZoomOut,
+			canRemoveBlock,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -117,6 +119,7 @@ export function PrivateBlockToolbar( {
 		const _hasTemplateLock = selectedBlockClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
 		);
+		const _isZoomOut = isZoomOut();
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -125,7 +128,7 @@ export function PrivateBlockToolbar( {
 			shouldShowVisualToolbar: isValid && isVisual,
 			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
 			showParentSelector:
-				! isZoomOut() &&
+				! _isZoomOut &&
 				parentBlockType &&
 				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
@@ -137,12 +140,11 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
-			showShuffleButton: isZoomOut(),
-			showSlots: ! isZoomOut(),
-			showGroupButtons: ! isZoomOut(),
-			showLockButtons: ! isZoomOut(),
+			isZoomOutMode: _isZoomOut,
+			canRemove: canRemoveBlock( selectedBlockClientId ),
 		};
 	}, [] );
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -203,7 +205,7 @@ export function PrivateBlockToolbar( {
 								<BlockSwitcher clientIds={ blockClientIds } />
 								{ ! isMultiToolbar &&
 									isDefaultEditingMode &&
-									showLockButtons && (
+									! isZoomOutMode && (
 										<BlockLockToolbar
 											clientId={ blockClientId }
 										/>
@@ -218,8 +220,8 @@ export function PrivateBlockToolbar( {
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
-					showGroupButtons && <BlockGroupToolbar /> }
-				{ showShuffleButton && (
+					! isZoomOutMode && <BlockGroupToolbar /> }
+				{ isZoomOutMode && (
 					<ToolbarGroup>
 						<Shuffle
 							clientId={ blockClientIds[ 0 ] }
@@ -227,7 +229,19 @@ export function PrivateBlockToolbar( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ shouldShowVisualToolbar && showSlots && (
+				{ isZoomOutMode &&
+					canRemove &&
+					! isTemplatePart( blockType ) && (
+						<ToolbarButton
+							icon={ trash }
+							label={ __( 'Delete' ) }
+							onClick={ () => {
+								removeBlock( blockClientId );
+								__unstableContentRef.current?.focus();
+							} }
+						/>
+					) }
+				{ shouldShowVisualToolbar && ! isZoomOutMode && (
 					<>
 						<BlockControls.Slot
 							group="parent"
@@ -254,7 +268,9 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				<BlockSettingsMenu clientIds={ blockClientIds } />
+				{ ! isZoomOutMode && (
+					<BlockSettingsMenu clientIds={ blockClientIds } />
+				) }
 			</div>
 		</NavigableToolbar>
 	);
