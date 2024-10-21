@@ -6,4 +6,5 @@ iframe[name="editor-canvas"] {
 	background-color: transparent;
 	// Handles transitions between device previews
 	@include editor-canvas-resize-animation;
+	background-color: $gray-300;
 }
