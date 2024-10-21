@@ -2,6 +2,7 @@
 name: Bug report (Mobile)
 about: Report a bug with the mobile app version of Gutenberg
 labels: Mobile App - i.e. Android or iOS
+type: 'Bug'
 
 ---
 
@@ -40,7 +41,7 @@ Please list the steps needed to reproduce the bug. For example:
 ## Screenshots or screen recording (optional)
 <!--
 If possible, please upload a screenshot or screen recording which demonstrates
-the bug. 
+the bug.
 -->
 
 ## WordPress information
