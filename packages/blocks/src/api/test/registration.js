@@ -742,6 +742,33 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should transform parent string to array', () => {
+			const blockType = {
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				parent: 'core/paragraph',
+			};
+			registerBlockType( 'core/test-block-parent-string', blockType );
+			expect( getBlockType( 'core/test-block-parent-string' ) ).toEqual( {
+				name: 'core/test-block-parent-string',
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [],
+				blockHooks: {},
+				parent: [ 'core/paragraph' ],
+			} );
+		} );
+
 		describe( 'applyFilters', () => {
 			afterEach( () => {
 				removeAllFilters( 'blocks.registerBlockType' );
