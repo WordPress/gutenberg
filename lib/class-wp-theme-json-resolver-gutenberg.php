@@ -861,9 +861,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $resolved_theme_uris;
 		}
 
-		$current_stylesheet_directory = get_stylesheet_directory();
-		if ( $current_stylesheet_directory && ! empty( static::$resolved_theme_uris_cache[ $current_stylesheet_directory ] ) ) {
-			return static::$resolved_theme_uris_cache[ $current_stylesheet_directory ];
+		$theme_json_data               = $theme_json->get_raw_data();
+		$resolved_theme_uris_cache_key = md5( wp_json_encode( $theme_json_data ) );
+
+		if ( ! empty( static::$resolved_theme_uris_cache[ $resolved_theme_uris_cache_key ] ) ) {
+			return static::$resolved_theme_uris_cache[ $resolved_theme_uris_cache_key ];
 		}
 
 		$theme_json_data = $theme_json->get_raw_data();
@@ -917,9 +919,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				}
 			}
 		}
-		if ( $current_stylesheet_directory ) {
-			static::$resolved_theme_uris_cache[ $current_stylesheet_directory ] = $resolved_theme_uris;
-		}
+		static::$resolved_theme_uris_cache[ $resolved_theme_uris_cache_key ] = $resolved_theme_uris;
 		return $resolved_theme_uris;
 	}
 
