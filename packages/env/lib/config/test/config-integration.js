@@ -76,6 +76,7 @@ describe( 'Config Integration', () => {
 					port: 123,
 					lifecycleScripts: {
 						afterStart: 'test',
+						afterStop: './bin/after-stop.sh',
 						afterClean: null,
 						afterDestroy: null,
 					},
