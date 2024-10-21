@@ -31,7 +31,8 @@ module.exports = {
 			.replace( '__unstable', '' );
 	},
 	processors: [
-		'count-components-and-props',
+		'raw-report',
+		//'count-components-and-props',
 		//'count-components',
 	],
 };
