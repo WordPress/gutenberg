@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { join } = require( 'path' );
-const { readdirSync } = require( 'node:fs' );
 
 /**
  * WordPress dependencies
@@ -15,25 +14,39 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 const { baseConfig, plugins } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
+const { createRequire } = require( 'node:module' );
 
-const packageDirs = readdirSync(
-	new URL( '../packages', `file://${ __dirname }` ),
-	{
-		withFileTypes: true,
-	}
-).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
+const rootURL = new URL( '..', `file://${ __dirname }` );
+const fromRootRequire = createRequire( rootURL );
+
+/** @type {Iterable<[string, string]>} */
+const iterableDeps = Object.entries(
+	fromRootRequire( './package.json' ).dependencies
+);
 
 /** @type {Map<string, string>} */
 const gutenbergScriptModules = new Map();
-for ( const packageDir of packageDirs ) {
-	const packageJson = require( `@wordpress/${ packageDir }/package.json` );
-
-	if ( ! Object.hasOwn( packageJson, 'wpScriptModuleExports' ) ) {
+for ( const [ packageName, versionSpecifier ] of iterableDeps ) {
+	if (
+		! packageName.startsWith( WORDPRESS_NAMESPACE ) ||
+		! versionSpecifier.startsWith( 'file:' ) ||
+		packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
+	) {
 		continue;
 	}
 
-	const moduleName = packageJson.name.substring( WORDPRESS_NAMESPACE.length );
-	let { wpScriptModuleExports } = packageJson;
+	const packageRequire = createRequire(
+		// Remove the leading "file:" specifier to build a package URL.
+		new URL( `${ versionSpecifier.substring( 5 ) }/`, rootURL )
+	);
+
+	const depPackageJson = packageRequire( './package.json' );
+	if ( ! Object.hasOwn( depPackageJson, 'wpScriptModuleExports' ) ) {
+		continue;
+	}
+
+	const moduleName = packageName.substring( WORDPRESS_NAMESPACE.length );
+	let { wpScriptModuleExports } = depPackageJson;
 
 	// Special handling for { "wpScriptModuleExports": "./build-module/index.js" }.
 	if ( typeof wpScriptModuleExports === 'string' ) {
@@ -62,7 +75,7 @@ for ( const packageDir of packageDirs ) {
 
 		gutenbergScriptModules.set(
 			`${ moduleName }/${ name }`,
-			require.resolve( `@wordpress/${ packageDir }/${ exportPath }` )
+			packageRequire.resolve( exportPath )
 		);
 	}
 }

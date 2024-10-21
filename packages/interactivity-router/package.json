@@ -28,8 +28,8 @@
 	"types": "build-types",
 	"wpScriptModuleExports": "./build-module/index.js",
 	"dependencies": {
-		"@wordpress/a11y": "*",
-		"@wordpress/interactivity": "*"
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/interactivity": "file:../interactivity"
 	},
 	"publishConfig": {
 		"access": "public"
