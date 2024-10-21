@@ -124,3 +124,4 @@ export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
  * and toggling the sidebar.
  */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+export { default as PluginHeaderToolbar } from './header-toolbar-slot/header-toolbar-slot';
