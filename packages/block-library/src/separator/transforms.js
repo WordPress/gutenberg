@@ -22,9 +22,9 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/spacer' ], // Transform to Spacer.
-			transform: () => {
+			transform: ( { anchor } ) => {
 				return createBlock( 'core/spacer', {
-					height: '50px',
+					anchor: anchor || '',
 				} );
 			},
 		},
