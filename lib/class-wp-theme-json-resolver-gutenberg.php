@@ -849,6 +849,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 * @since 6.7.0 Added support for resolving block styles.
+	 * @since 6.8.0 Added caching for resolved theme URIs.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
