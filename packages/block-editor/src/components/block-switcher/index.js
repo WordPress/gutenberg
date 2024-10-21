@@ -11,7 +11,7 @@ import {
 	MenuGroup,
 } from '@wordpress/components';
 import {
-	switchToBlockType,
+	getBlockTransformationResults,
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
@@ -82,8 +82,14 @@ function BlockSwitcherDropdownMenuContents( {
 		}
 	}
 	// Simple block tranformation based on the `Block Transforms` API.
-	function onBlockTransform( name ) {
-		const newBlocks = switchToBlockType( blocks, name );
+	function onBlockTransform( { name, variation, transform } ) {
+		const newBlocks = getBlockTransformationResults(
+			blocks,
+			name,
+			transform,
+			variation
+		);
+
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}
@@ -158,8 +164,8 @@ function BlockSwitcherDropdownMenuContents( {
 						blockVariationTransformations
 					}
 					blocks={ blocks }
-					onSelect={ ( name ) => {
-						onBlockTransform( name );
+					onSelect={ ( transformation ) => {
+						onBlockTransform( transformation );
 						onClose();
 					} }
 					onSelectVariation={ ( name ) => {

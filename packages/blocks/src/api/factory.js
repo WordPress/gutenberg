@@ -14,6 +14,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
 import {
 	getBlockType,
 	getBlockTypes,
+	getBlockVariations,
 	getGroupingBlockName,
 } from './registration';
 import {
@@ -282,6 +283,124 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 };
 
 /**
+ * Returns transformations that the 'blocks' are valid for, based on
+ * 'from' transforms on other blocks.
+ *
+ * @param {Array} blocks The blocks to transform from.
+ *
+ * @return {Array} Transformations that the blocks can be transformed into.
+ */
+const getPossibleFromTransformations = ( blocks ) => {
+	if ( ! blocks.length ) {
+		return [];
+	}
+
+	const allBlockTypes = getBlockTypes();
+
+	const possibleFromTransformations = allBlockTypes
+		.map( ( blockType ) => {
+			const fromTransforms = getBlockTransforms( 'from', blockType.name );
+
+			// Get the first valid generic transform
+			const genericTransform = findTransform(
+				fromTransforms,
+				( transform ) => {
+					return (
+						! transform.name &&
+						isPossibleTransformForSource(
+							transform,
+							'from',
+							blocks
+						)
+					);
+				}
+			);
+
+			// Get the valid named transformations
+			const namedTransformations = fromTransforms
+				.filter( ( transform ) => {
+					return (
+						!! transform.name &&
+						isPossibleTransformForSource(
+							transform,
+							'from',
+							blocks
+						)
+					);
+				} )
+				.map( ( transform ) => {
+					return {
+						blockName: blockType.name,
+						transform,
+					};
+				} );
+
+			if ( genericTransform ) {
+				return [
+					{
+						blockName: blockType.name,
+						transform: genericTransform,
+					},
+					...namedTransformations,
+				];
+			}
+
+			return namedTransformations;
+		} )
+		.flat();
+
+	return possibleFromTransformations;
+};
+
+/**
+ * Returns transformations that the 'blocks' are valid for, based on
+ * the source block's own 'to' transforms.
+ *
+ * @param {Array} blocks The blocks to transform from.
+ *
+ * @return {Array} Transformations that the source can be transformed into.
+ */
+const getPossibleToTransformations = ( blocks ) => {
+	if ( ! blocks.length ) {
+		return [];
+	}
+
+	const sourceBlock = blocks[ 0 ];
+	const blockType = getBlockType( sourceBlock.name );
+	const transformsTo = blockType
+		? getBlockTransforms( 'to', blockType.name )
+		: [];
+
+	// filter all 'to' transforms to find those that are possible.
+	const possibleTransforms = transformsTo.filter( ( transform ) => {
+		return (
+			transform && isPossibleTransformForSource( transform, 'to', blocks )
+		);
+	} );
+
+	// Compile the generic transformations (1 per block type)
+	// and the named transformations (as many as exist)
+	const genericTransformations = new Map();
+	const namedTransformations = [];
+	for ( const transform of possibleTransforms ) {
+		const blockName = transform.blocks[ 0 ];
+		if ( transform.name ) {
+			namedTransformations.push( {
+				blockName,
+				transform,
+			} );
+		} else if ( ! genericTransformations.has( blockName ) ) {
+			genericTransformations.set( blockName, {
+				blockName,
+				transform,
+			} );
+		}
+	}
+
+	return [ ...genericTransformations.values(), ...namedTransformations ];
+};
+
+/**
  * Determines whether transform is a "block" type
  * and if so whether it is a "wildcard" transform
  * ie: targets "any" block type
@@ -332,6 +451,37 @@ export function getPossibleBlockTransformations( blocks ) {
 			...blockTypesForToTransforms,
 		] ),
 	];
+}
+
+/**
+ * Returns an array of transformations that the set of blocks received as argument
+ * can be transformed into.
+ *
+ * @param {Array} blocks Blocks array.
+ *
+ * @return {Array} Block transformations that the blocks argument can be used with.
+ */
+export function getPossibleTransformationsForBlocks( blocks ) {
+	if ( ! blocks.length ) {
+		return [];
+	}
+
+	const fromTransformations = getPossibleFromTransformations( blocks );
+	const toTransformations = getPossibleToTransformations( blocks );
+
+	// Get unique transformations by blockName + transformatio name
+	const uniqueTransformations = new Map( [
+		...fromTransformations.map( ( entry ) => {
+			const key = entry.blockName + '/' + entry.transform.name;
+			return [ key, entry ];
+		} ),
+		...toTransformations.map( ( entry ) => {
+			const key = entry.blockName + '/' + entry.transform.name;
+			return [ key, entry ];
+		} ),
+	] );
+
+	return [ ...uniqueTransformations.values() ];
 }
 
 /**
@@ -452,48 +602,23 @@ function maybeCheckTransformIsMatch( transform, blocks ) {
 }
 
 /**
- * Switch one or more blocks into one or more blocks of the new block type.
+ * Get the results of a specific transformation of the new block type.
  *
- * @param {Array|Object} blocks Blocks array or block object.
- * @param {string}       name   Block name.
+ * @param {Array|Object} blocks         Blocks array or block object.
+ * @param {string}       name           Block name.
+ * @param {Object}       transformation The specific transformation to use.
+ * @param {?string}      variation      Optional variation of new block type to apply.
  *
  * @return {?Array} Array of blocks or null.
  */
-export function switchToBlockType( blocks, name ) {
+export function getBlockTransformationResults(
+	blocks,
+	name,
+	transformation,
+	variation
+) {
 	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
-	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
-	const sourceName = firstBlock.name;
-
-	// Find the right transformation by giving priority to the "to"
-	// transformation.
-	const transformationsFrom = getBlockTransforms( 'from', name );
-	const transformationsTo = getBlockTransforms( 'to', sourceName );
-
-	const transformation =
-		findTransform(
-			transformationsTo,
-			( t ) =>
-				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( name ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock ) &&
-				maybeCheckTransformIsMatch( t, blocksArray )
-		) ||
-		findTransform(
-			transformationsFrom,
-			( t ) =>
-				t.type === 'block' &&
-				( isWildcardBlockTransform( t ) ||
-					t.blocks.indexOf( sourceName ) !== -1 ) &&
-				( ! isMultiBlock || t.isMultiBlock ) &&
-				maybeCheckTransformIsMatch( t, blocksArray )
-		);
-
-	// Stop if there is no valid transformation.
-	if ( ! transformation ) {
-		return null;
-	}
 
 	let transformationResults;
 
@@ -552,6 +677,27 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
+	// If a variation was specified, apply that variation's attributes to each resulting block
+	if ( variation ) {
+		const variationConfig = getBlockVariations( name ).find(
+			( config ) => config.name === variation
+		);
+
+		if ( variationConfig ) {
+			transformationResults = transformationResults.map(
+				( { attributes, ...result } ) => {
+					return {
+						...result,
+						attributes: {
+							...attributes,
+							...variationConfig.attributes,
+						},
+					};
+				}
+			);
+		}
+	}
+
 	const ret = transformationResults.map( ( result, index, results ) => {
 		/**
 		 * Filters an individual transform result from block transformation.
@@ -573,6 +719,59 @@ export function switchToBlockType( blocks, name ) {
 	} );
 
 	return ret;
+}
+
+/**
+ * Switch one or more blocks into one or more blocks of the new block type.
+ *
+ * @param {Array|Object} blocks    Blocks array or block object.
+ * @param {string}       name      Block name.
+ * @param {?string}      variation Optional variation of new block type.
+ *
+ * @return {?Array} Array of blocks or null.
+ */
+export function switchToBlockType( blocks, name, variation ) {
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	const isMultiBlock = blocksArray.length > 1;
+	const firstBlock = blocksArray[ 0 ];
+	const sourceName = firstBlock.name;
+
+	// Find the right transformation by giving priority to the "to"
+	// transformation.
+	const transformationsFrom = getBlockTransforms( 'from', name );
+	const transformationsTo = getBlockTransforms( 'to', sourceName );
+
+	const transformation =
+		findTransform(
+			transformationsTo,
+			( t ) =>
+				t.type === 'block' &&
+				( isWildcardBlockTransform( t ) ||
+					t.blocks.indexOf( name ) !== -1 ) &&
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				maybeCheckTransformIsMatch( t, blocksArray )
+		) ||
+		findTransform(
+			transformationsFrom,
+			( t ) =>
+				t.type === 'block' &&
+				( isWildcardBlockTransform( t ) ||
+					t.blocks.indexOf( sourceName ) !== -1 ) &&
+				( ! isMultiBlock || t.isMultiBlock ) &&
+				maybeCheckTransformIsMatch( t, blocksArray )
+		);
+
+	// Stop if there is no valid transformation.
+	if ( ! transformation ) {
+		return null;
+	}
+
+	return getBlockTransformationResults(
+		blocks,
+		name,
+		transformation,
+		variation
+	);
 }
 
 /**
