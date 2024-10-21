@@ -51,6 +51,22 @@ function render_block_core_site_logo( $attributes ) {
 	}
 
 	$classnames = array();
+
+	$border_attributes = block_core_site_logo_get_border_attributes( $attributes );
+	if ( $border_attributes ) {
+		$classnames[] = 'has-custom-border';
+
+		$processor = new WP_HTML_Tag_Processor( $custom_logo );
+		$processor->next_tag( 'img' );
+		if ( ! empty( $border_attributes['class'] ) ) {
+			$processor->add_class( $border_attributes['class'] );
+		}
+		if ( ! empty( $border_attributes['style'] ) ) {
+			$processor->set_attribute( 'style', $border_attributes['style'] );
+		}
+		$custom_logo = $processor->get_updated_html();
+	}
+
 	if ( empty( $attributes['width'] ) ) {
 		$classnames[] = 'is-default-size';
 	}
@@ -58,6 +74,49 @@ function render_block_core_site_logo( $attributes ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 	$html               = sprintf( '<div %s>%s</div>', $wrapper_attributes, $custom_logo );
 	return $html;
+}
+
+/**
+ * Generates class names and styles to apply the border support styles for
+ * the site logo block.
+ *
+ * @since 6.7.0
+ *
+ * @param array $attributes The block attributes.
+ * @return array The border-related classnames and styles for the block.
+ */
+function block_core_site_logo_get_border_attributes( $attributes ) {
+	$sides         = array( 'top', 'right', 'bottom', 'left' );
+	$border_styles = array(
+		'radius' => $attributes['style']['border']['radius'] ?? null,
+		'style'  => $attributes['style']['border']['style'] ?? null,
+		'width'  => $attributes['style']['border']['width'] ?? null,
+	);
+
+	// Border color.
+	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
+	$border_styles['color'] = $preset_color ?? $custom_color;
+
+	// Individual border styles e.g. top, left etc.
+	foreach ( $sides as $side ) {
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
+		$border_styles[ $side ] = array(
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
+		);
+	}
+
+	$styles     = wp_style_engine_get_styles( array( 'border' => $border_styles ) );
+	$attributes = array();
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
+	}
+	return $attributes;
 }
 
 /**
