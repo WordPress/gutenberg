@@ -66,7 +66,7 @@ export function AddComment( {
 		setInputComment( '' );
 	};
 
-	if ( ! showAddCommentBoard || ! clientId || 0 !== blockCommentId ) {
+	if ( ! showAddCommentBoard || ! clientId || undefined !== blockCommentId ) {
 		return null;
 	}
 
