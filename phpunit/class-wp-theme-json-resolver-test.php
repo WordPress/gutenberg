@@ -32,6 +32,20 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	private static $property_blocks_cache_orig_value;
 
 	/**
+	 * WP_Theme_JSON_Resolver_Gutenberg::$resolved_theme_uris_cache property.
+	 *
+	 * @var ReflectionProperty
+	 */
+	private static $property_resolved_theme_uris_cache;
+
+	/**
+	 * Original value of the WP_Theme_JSON_Resolver_Gutenberg::$resolved_theme_uris_cache property.
+	 *
+	 * @var array
+	 */
+	private static $property_resolved_theme_uris_cache_orig_value;
+
+	/**
 	 * WP_Theme_JSON_Resolver_Gutenberg::$core property.
 	 *
 	 * @var ReflectionProperty
@@ -81,11 +95,16 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		static::$property_core = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'core' );
 		static::$property_core->setAccessible( true );
 		static::$property_core_orig_value = static::$property_core->getValue();
+
+		static::$property_resolved_theme_uris_cache = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'resolved_theme_uris_cache' );
+		static::$property_resolved_theme_uris_cache->setAccessible( true );
+		static::$property_resolved_theme_uris_cache_orig_value = static::$property_resolved_theme_uris_cache->getValue();
 	}
 
 	public static function tear_down_after_class() {
 		static::$property_blocks_cache->setValue( null, static::$property_blocks_cache_orig_value );
 		static::$property_core->setValue( null, static::$property_core_orig_value );
+		static::$property_resolved_theme_uris_cache->setValue( null, static::$property_resolved_theme_uris_cache_orig_value );
 		parent::tear_down_after_class();
 	}
 
@@ -1347,7 +1366,12 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
 
-		$this->assertSame( $expected_data, $actual );
+		$this->assertSame( $expected_data, $actual, 'Resolved theme uris do not match.' );
+
+		// Test that resolved theme uris are cached.
+		$cache_key           = md5( wp_json_encode( $theme_json->get_raw_data() ) );
+		$expected_cache_data = array( "$cache_key" => $actual );
+		$this->assertSame( $expected_cache_data, static::$property_resolved_theme_uris_cache->getValue(), 'Resolved theme uris cache data does not match.' );
 	}
 
 	/**
