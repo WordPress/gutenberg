@@ -37,6 +37,12 @@
 	"supports": {
 		"html": false,
 		"align": true,
+		"color": {
+			"background": true,
+			"text": false,
+			"gradients": true,
+			"link": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
