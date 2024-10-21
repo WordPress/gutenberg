@@ -26,6 +26,7 @@ import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
 import PreviewStyles from './preview-styles';
 import { unlock } from '../../lock-unlock';
+import HelpContentSlot from './help-content-slot/help-content-slot';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -65,6 +66,9 @@ function ScreenRoot() {
 							<PreviewStyles />
 						</CardMedia>
 					</Card>
+					<div className="global-styles-help-content">
+						<HelpContentSlot.Slot />
+					</div>
 					{ hasVariations && (
 						<ItemGroup>
 							<NavigationButtonAsItem
