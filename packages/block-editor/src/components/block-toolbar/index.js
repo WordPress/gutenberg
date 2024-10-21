@@ -16,7 +16,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import Shuffle from './shuffle';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -67,6 +68,10 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		hasParentPattern,
 		hasContentOnlyLocking,
+		showShuffleButton,
+		showSlots,
+		showGroupButtons,
+		showLockButtons,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -79,6 +84,7 @@ export function PrivateBlockToolbar( {
 			getBlockParentsByBlockName,
 			getTemplateLock,
 			getParentSectionBlock,
+			isZoomOut,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -119,6 +125,7 @@ export function PrivateBlockToolbar( {
 			shouldShowVisualToolbar: isValid && isVisual,
 			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
 			showParentSelector:
+				! isZoomOut() &&
 				parentBlockType &&
 				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
@@ -130,6 +137,10 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
+			showShuffleButton: isZoomOut(),
+			showSlots: ! isZoomOut(),
+			showGroupButtons: ! isZoomOut(),
+			showLockButtons: ! isZoomOut(),
 		};
 	}, [] );
 
@@ -179,7 +190,7 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! isMultiToolbar && isLargeViewport && (
+				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
@@ -190,11 +201,13 @@ export function PrivateBlockToolbar( {
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && isDefaultEditingMode && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
+								{ ! isMultiToolbar &&
+									isDefaultEditingMode &&
+									showLockButtons && (
+										<BlockLockToolbar
+											clientId={ blockClientId }
+										/>
+									) }
 								<BlockMover
 									clientIds={ blockClientIds }
 									hideDragHandle={ hideDragHandle }
@@ -204,8 +217,17 @@ export function PrivateBlockToolbar( {
 					) }
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
-					isMultiToolbar && <BlockGroupToolbar /> }
-				{ shouldShowVisualToolbar && (
+					isMultiToolbar &&
+					showGroupButtons && <BlockGroupToolbar /> }
+				{ showShuffleButton && (
+					<ToolbarGroup>
+						<Shuffle
+							clientId={ blockClientIds[ 0 ] }
+							as={ ToolbarButton }
+						/>
+					</ToolbarGroup>
+				) }
+				{ shouldShowVisualToolbar && showSlots && (
 					<>
 						<BlockControls.Slot
 							group="parent"

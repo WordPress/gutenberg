@@ -210,8 +210,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
-		height: $grid-unit-80;
-		width: $grid-unit-80;
+		height: $header-height;
+		width: $header-height;
 		justify-content: center;
 		align-items: center;
 	}

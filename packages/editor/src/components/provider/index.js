@@ -164,40 +164,47 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
-		const { editorSettings, selection, isReady, mode, postTypes } =
-			useSelect( ( select ) => {
-				const {
-					getEditorSettings,
-					getEditorSelection,
-					getRenderingMode,
-					__unstableIsEditorReady,
-				} = select( editorStore );
-				const { getPostTypes } = select( coreStore );
+		const { editorSettings, selection, isReady, mode, postTypeEntities } =
+			useSelect(
+				( select ) => {
+					const {
+						getEditorSettings,
+						getEditorSelection,
+						getRenderingMode,
+						__unstableIsEditorReady,
+					} = select( editorStore );
+					const { getEntitiesConfig } = select( coreStore );
 
-				return {
-					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady(),
-					mode: getRenderingMode(),
-					selection: getEditorSelection(),
-					postTypes: getPostTypes( { per_page: -1 } ),
-				};
-			}, [] );
+					return {
+						editorSettings: getEditorSettings(),
+						isReady: __unstableIsEditorReady(),
+						mode: getRenderingMode(),
+						selection: getEditorSelection(),
+						postTypeEntities:
+							post.type === 'wp_template'
+								? getEntitiesConfig( 'postType' )
+								: null,
+					};
+				},
+				[ post.type ]
+			);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
-			// If it is a template, try to inherit the post type from the slug.
+			// If it is a template, try to inherit the post type from the name.
 			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
 				} else if ( post.slug === 'single' ) {
 					postContext.postType = 'post';
 				} else if ( post.slug.split( '-' )[ 0 ] === 'single' ) {
-					// If the slug is single-{postType}, infer the post type from the slug.
-					const postTypesSlugs =
-						postTypes?.map( ( entity ) => entity.slug ) || [];
+					// If the slug is single-{postType}, infer the post type from the name.
+					const postTypeNames =
+						postTypeEntities?.map( ( entity ) => entity.name ) ||
+						[];
 					const match = post.slug.match(
-						`^single-(${ postTypesSlugs.join( '|' ) })(?:-.+)?$`
+						`^single-(${ postTypeNames.join( '|' ) })(?:-.+)?$`
 					);
 					if ( match ) {
 						postContext.postType = match[ 1 ];
@@ -225,7 +232,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			post.slug,
 			rootLevelPost.type,
 			rootLevelPost.slug,
-			postTypes,
+			postTypeEntities,
 		] );
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
