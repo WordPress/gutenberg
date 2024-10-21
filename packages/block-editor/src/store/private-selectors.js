@@ -523,9 +523,8 @@ export function isSectionBlock( state, clientId ) {
 	return (
 		getBlockName( state, clientId ) === 'core/block' ||
 		getTemplateLock( state, clientId ) === 'contentOnly' ||
-		( [ 'navigation', 'zoom-out' ].includes(
-			__unstableGetEditorMode( state )
-		) &&
+		( ( __unstableGetEditorMode( state ) === 'navigation' ||
+			isZoomOut( state ) ) &&
 			sectionClientIds.includes( clientId ) )
 	);
 }
