@@ -29,7 +29,6 @@ const modifyBlockCommentAttributes = ( settings ) => {
 			...settings.attributes,
 			blockCommentId: {
 				type: 'number',
-				default: 0,
 			},
 		};
 	}
