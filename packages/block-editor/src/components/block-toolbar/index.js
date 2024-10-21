@@ -16,7 +16,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import Shuffle from './shuffle';
+import ChangeDesign from './change-design';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -220,12 +220,7 @@ export function PrivateBlockToolbar( {
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
 				{ showShuffleButton && (
-					<ToolbarGroup>
-						<Shuffle
-							clientId={ blockClientIds[ 0 ] }
-							as={ ToolbarButton }
-						/>
-					</ToolbarGroup>
+					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ shouldShowVisualToolbar && showSlots && (
 					<>
