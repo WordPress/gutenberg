@@ -9,11 +9,11 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import InspectorBlockInfoFill from '../inspector-block-info/inspector-block-info';
 
 /**
  * Internal dependencies
  */
+import InspectorBlockInfoFill from '../inspector-block-info/inspector-block-info';
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
@@ -99,7 +99,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionLabel,
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
-				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />
+				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />,
 			};
 			if ( ! match ) {
 				return blockTypeInfo;
@@ -114,7 +114,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionLabel,
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
-				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />
+				inspectorBlockInfo: <InspectorBlockInfoFill.Slot />,
 			};
 		},
 		[ clientId ]

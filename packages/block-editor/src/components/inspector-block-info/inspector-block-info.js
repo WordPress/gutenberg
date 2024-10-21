@@ -11,9 +11,7 @@ import {
 	mayDisplayControlsKey,
 } from '../block-edit/context';
 
-const { Fill, Slot } = createSlotFill(
-	'InspectorBlockInfoFill'
-);
+const { Fill, Slot } = createSlotFill( 'InspectorBlockInfoFill' );
 
 const InspectorBlockInfoFill = ( props ) => {
 	const context = useBlockEditContext();
