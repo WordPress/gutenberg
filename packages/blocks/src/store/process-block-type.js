@@ -61,7 +61,22 @@ function mergeBlockVariations(
 
 	return result;
 }
+function handleExperimentalBorder( rawSupports ) {
+	if ( ! rawSupports ) {
+		return rawSupports;
+	}
 
+	const supports = { ...rawSupports };
+
+	if (
+		supports?.__experimentalBorder &&
+		typeof supports.__experimentalBorder === 'object'
+	) {
+		supports.border = supports.__experimentalBorder;
+	}
+
+	return supports;
+}
 /**
  * Takes the unprocessed block type settings, merges them with block type metadata
  * and applies all the existing filters for the registered block type.
@@ -101,6 +116,7 @@ export const processBlockType =
 					: []
 			),
 		};
+		blockType.supports = handleExperimentalBorder( blockType.supports );
 
 		const settings = applyFilters(
 			'blocks.registerBlockType',
@@ -108,6 +124,7 @@ export const processBlockType =
 			name,
 			null
 		);
+		blockType.supports = handleExperimentalBorder( blockType.supports );
 
 		if (
 			settings.description &&
@@ -119,29 +136,30 @@ export const processBlockType =
 		}
 
 		if ( settings.deprecated ) {
-			settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-				Object.fromEntries(
-					Object.entries(
-						// Only keep valid deprecation keys.
-						applyFilters(
-							'blocks.registerBlockType',
-							// Merge deprecation keys with pre-filter settings
-							// so that filters that depend on specific keys being
-							// present don't fail.
-							{
-								// Omit deprecation keys here so that deprecations
-								// can opt out of specific keys like "supports".
-								...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-								...deprecation,
-							},
-							blockType.name,
-							deprecation
-						)
-					).filter( ( [ key ] ) =>
+			settings.deprecated = settings.deprecated.map( ( deprecation ) => {
+				deprecation.supports = handleExperimentalBorder(
+					deprecation.supports
+				);
+
+				const filteredDeprecation = applyFilters(
+					'blocks.registerBlockType',
+					{
+						...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+						...deprecation,
+					},
+					blockType.name,
+					deprecation
+				);
+				filteredDeprecation.supports = handleExperimentalBorder(
+					filteredDeprecation.supports
+				);
+
+				return Object.fromEntries(
+					Object.entries( filteredDeprecation ).filter( ( [ key ] ) =>
 						DEPRECATED_ENTRY_KEYS.includes( key )
 					)
-				)
-			);
+				);
+			} );
 		}
 
 		if ( ! isPlainObject( settings ) ) {
