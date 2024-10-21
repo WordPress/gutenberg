@@ -119,6 +119,22 @@ function isElementVisible( element ) {
 }
 
 /**
+ * Checks if the element is scrollable.
+ *
+ * @param {Element} element Element.
+ * @return {boolean} True if the element is scrollable.
+ */
+function isScrollable( element ) {
+	const style = window.getComputedStyle( element );
+	return (
+		style.overflowX === 'auto' ||
+		style.overflowX === 'scroll' ||
+		style.overflowY === 'auto' ||
+		style.overflowY === 'scroll'
+	);
+}
+
+/**
  * Returns the rect of the element including all visible nested elements.
  *
  * Visible nested elements, including elements that overflow the parent, are
@@ -136,41 +152,23 @@ function isElementVisible( element ) {
  */
 export function getVisibleElementBounds( element ) {
 	const viewport = element.ownerDocument.defaultView;
+
 	if ( ! viewport ) {
 		return new window.DOMRectReadOnly();
 	}
 
-	const parentRect = element.getBoundingClientRect();
-	let bounds = parentRect;
-
+	let bounds = element.getBoundingClientRect();
 	const stack = [ element ];
-	const xValues = [];
-	const yValues = [];
 	let currentElement;
 
 	while ( ( currentElement = stack.pop() ) ) {
 		for ( const child of currentElement.children ) {
 			if ( isElementVisible( child ) ) {
-				const childBounds = child.getBoundingClientRect();
-				yValues.push( childBounds.y );
-				xValues.push( childBounds.x );
-				/*
-				 * If the child is larger than the parent, adjust the x and y values to the greatest known
-				 * to account for any scrolling.
-				 */
-				if ( childBounds.width > parentRect.width ) {
-					childBounds.x = Math.max(
-						parentRect.x,
-						xValues.sort().at( -1 ) || 0
-					);
+				let childBounds = child.getBoundingClientRect();
+				// If the parent is scrollable, use parent's scrollable bounds.
+				if ( isScrollable( currentElement ) ) {
+					childBounds = currentElement.getBoundingClientRect();
 				}
-				if ( childBounds.height > parentRect.height ) {
-					childBounds.y = Math.max(
-						parentRect.y,
-						yValues.sort().at( -1 ) || 0
-					);
-				}
-
 				bounds = rectUnion( bounds, childBounds );
 				stack.push( child );
 			}
@@ -187,12 +185,12 @@ export function getVisibleElementBounds( element ) {
 	 */
 	const left = Math.max( bounds.left, 0 );
 	const right = Math.min( bounds.right, viewport.innerWidth );
-
 	bounds = new window.DOMRectReadOnly(
 		left,
 		bounds.top,
 		right - left,
 		bounds.height
 	);
+
 	return bounds;
 }
