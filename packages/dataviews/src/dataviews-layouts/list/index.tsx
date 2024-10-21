@@ -49,7 +49,7 @@ interface ListViewItemProps< Item > {
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 }
 
-const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -195,7 +195,7 @@ function ListItem< Item >( {
 				/>
 			) }
 			<div role="gridcell">
-				<DropdownMenu
+				<Menu
 					trigger={
 						<Composite.Item
 							id={ generateDropdownTriggerCompositeId(
@@ -219,7 +219,7 @@ function ListItem< Item >( {
 						actions={ eligibleActions }
 						item={ item }
 					/>
-				</DropdownMenu>
+				</Menu>
 			</div>
 		</HStack>
 	);

@@ -27,7 +27,7 @@ import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
 import RenameFontSizeDialog from './rename-font-size-dialog';
 import SizeControl from '../size-control';
 
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontSize() {
@@ -166,7 +166,7 @@ function FontSize() {
 								marginBottom={ 0 }
 								paddingX={ 4 }
 							>
-								<DropdownMenuV2
+								<Menu
 									trigger={
 										<Button
 											size="small"
@@ -175,21 +175,17 @@ function FontSize() {
 										/>
 									}
 								>
-									<DropdownMenuV2.Item
-										onClick={ toggleRenameDialog }
-									>
-										<DropdownMenuV2.ItemLabel>
+									<Menu.Item onClick={ toggleRenameDialog }>
+										<Menu.ItemLabel>
 											{ __( 'Rename' ) }
-										</DropdownMenuV2.ItemLabel>
-									</DropdownMenuV2.Item>
-									<DropdownMenuV2.Item
-										onClick={ toggleDeleteConfirm }
-									>
-										<DropdownMenuV2.ItemLabel>
+										</Menu.ItemLabel>
+									</Menu.Item>
+									<Menu.Item onClick={ toggleDeleteConfirm }>
+										<Menu.ItemLabel>
 											{ __( 'Delete' ) }
-										</DropdownMenuV2.ItemLabel>
-									</DropdownMenuV2.Item>
-								</DropdownMenuV2>
+										</Menu.ItemLabel>
+									</Menu.Item>
+								</Menu>
 							</Spacer>
 						</FlexItem>
 					) }

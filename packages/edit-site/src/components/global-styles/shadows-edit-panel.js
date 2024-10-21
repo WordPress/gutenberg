@@ -51,7 +51,7 @@ import {
 } from './shadow-utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 const customShadowMenuItems = [
 	{
@@ -163,7 +163,7 @@ export default function ShadowsEditPanel() {
 				<ScreenHeader title={ selectedShadow.name } />
 				<FlexItem>
 					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
-						<DropdownMenuV2
+						<Menu
 							trigger={
 								<Button
 									size="small"
@@ -176,7 +176,7 @@ export default function ShadowsEditPanel() {
 								? customShadowMenuItems
 								: presetShadowMenuItems
 							).map( ( item ) => (
-								<DropdownMenuV2.Item
+								<Menu.Item
 									key={ item.action }
 									onClick={ () => onMenuClick( item.action ) }
 									disabled={
@@ -185,12 +185,12 @@ export default function ShadowsEditPanel() {
 											baseSelectedShadow.shadow
 									}
 								>
-									<DropdownMenuV2.ItemLabel>
+									<Menu.ItemLabel>
 										{ item.label }
-									</DropdownMenuV2.ItemLabel>
-								</DropdownMenuV2.Item>
+									</Menu.ItemLabel>
+								</Menu.Item>
 							) ) }
-						</DropdownMenuV2>
+						</Menu>
 					</Spacer>
 				</FlexItem>
 			</HStack>

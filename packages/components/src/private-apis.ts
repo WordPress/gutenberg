@@ -17,6 +17,6 @@ lock( privateApis, {
 	ComponentsContext,
 	Tabs,
 	Theme,
-	DropdownMenuV2: Menu,
+	Menu,
 	kebabCase,
 } );
