@@ -63,7 +63,27 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"spacing": {
+			"__experimentalSkipSerialization": true,
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"__experimentalBorder": {
+			"__experimentalSkipSerialization": true,
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-post-navigation-link:not(:empty)",
+		"spacing": ".wp-block-post-navigation-link:not(:empty)"
 	},
 	"style": "wp-block-post-navigation-link"
 }
