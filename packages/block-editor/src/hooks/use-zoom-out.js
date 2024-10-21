@@ -26,7 +26,7 @@ export function useZoomOut( zoomOut = true ) {
 
 		return () => {
 			if ( isZoomOutOnMount ) {
-				setZoomLevel( 50 );
+				setZoomLevel( 'auto-scaled' );
 			} else {
 				resetZoomLevel();
 			}
@@ -35,7 +35,7 @@ export function useZoomOut( zoomOut = true ) {
 
 	useEffect( () => {
 		if ( zoomOut ) {
-			setZoomLevel( 50 );
+			setZoomLevel( 'auto-scaled' );
 		} else {
 			resetZoomLevel();
 		}

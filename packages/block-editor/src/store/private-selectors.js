@@ -596,6 +596,16 @@ export function isZoomOut( state ) {
 }
 
 /**
+ * Returns whether the zoom level.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|"auto-scaled"} Zoom level.
+ */
+export function getZoomLevel( state ) {
+	return state.zoomLevel;
+}
+
+/**
  * Finds the closest block where the block is allowed to be inserted.
  *
  * @param {Object}            state    Editor state.
