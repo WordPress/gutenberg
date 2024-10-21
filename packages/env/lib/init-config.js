@@ -138,7 +138,10 @@ RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
-${ installDependencies( 'wordpress', env, config ) }`;
+${ installDependencies( 'wordpress', env, config ) }
+
+# Configure HTTPS if it is enabled.
+${ enableHttps( config ) }`;
 }
 
 /**
@@ -253,6 +256,49 @@ RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8
 USER root`;
 
 	return dockerFileContent;
+}
+
+function enableHttps( config ) {
+	// Configure HTTPS if it is enabled.
+	if ( config.https ) {
+		const domain = config.env.development.config.WP_HOME.replace(
+			/^https?:\/\//i,
+			''
+		).replace( /:\d+$/, '' );
+		const siteName = `${ domain }-ssl`;
+		const certFile = `${ domain }.crt`;
+		const keyFile = `${ domain }.key`;
+		const containerCertPath = `/etc/ssl/certs/${ certFile }`;
+		const containerKeyPath = `/etc/ssl/private/${ keyFile }`;
+
+		// Create an Apache SSL configuration to the container.
+		const apacheConfigPath = '/etc/apache2/sites-available';
+		const apacheConfigFile = `${ apacheConfigPath }/${ siteName }.conf`;
+
+		return `
+# Copy the certificate and key files to the container.
+COPY ./certs/${ certFile } ${ containerCertPath }
+COPY ./certs/${ keyFile } ${ containerKeyPath }
+
+# Create apache config
+COPY <<EOF ${ apacheConfigFile }
+<VirtualHost *:443>
+	ServerName ${ domain }
+	DocumentRoot /var/www/html
+	SSLEngine on
+	SSLCertificateFile ${ containerCertPath }
+	SSLCertificateKeyFile ${ containerKeyPath }
+	<Directory /var/www/html>
+		AllowOverride All
+		Require all granted
+	</Directory>
+</VirtualHost>
+EOF
+
+RUN a2enmod ssl
+RUN a2ensite ${ siteName }
+RUN service apache2 restart`;
+	}
 }
 
 /**

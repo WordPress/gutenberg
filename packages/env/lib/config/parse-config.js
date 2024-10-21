@@ -40,6 +40,11 @@ const mergeConfigs = require( './merge-configs' );
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterDestroy The script to run after the "destroy" command has completed.
  * @property {Object.<string, WPEnvironmentConfig>} env                           The environment-specific configuration options.
+ * @property {boolean}                              https                         Whether to use HTTPS.
+ * @property {number}                               httpsPort                     The HTTPS port to use in the development environment.
+ * @property {number}                               testsHttpsPort                The HTTPS port to use in the tests environment.
+ * @property {string}                               sslCertPath                   Path to the SSL certificate.
+ * @property {string}                               sslKeyPath                    Path to the SSL key.
  */
 
 /**
@@ -86,6 +91,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	https: false,
+	httpsPort: 443,
+	testsHttpsPort: 8443,
 	mysqlPort: null,
 	mappings: {},
 	config: {
@@ -228,6 +236,9 @@ async function getDefaultConfig(
 
 		// These configuration options are root-only and should not be present
 		// on environment-specific configuration objects.
+		https: false,
+		sslCertPath: null,
+		sslKeyPath: null,
 		lifecycleScripts: {
 			afterStart: null,
 			afterClean: null,
@@ -272,6 +283,26 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	// We're going to take care to set it at both the root-level and the
 	// environment level. This is not totally necessary, but, it's a
 	// better representation of how broad the override is.
+
+	if ( overrides.https !== undefined ) {
+		overrideConfig.https = overrides.https;
+		if (
+			overrides.sslCertPath !== undefined &&
+			overrides.sslKeyPath !== undefined
+		) {
+			overrideConfig.sslCertPath = overrides.sslCertPath;
+			overrideConfig.sslKeyPath = overrides.sslKeyPath;
+		}
+		if ( overrides.httpsPort ) {
+			overrideConfig.httpsPort = overrides.httpsPort;
+			overrideConfig.env.development.httpsPort = overrides.httpsPort;
+		}
+
+		if ( overrides.testsHttpsPort ) {
+			overrideConfig.testsHttpsPort = overrides.testsHttpsPort;
+			overrideConfig.env.tests.httpsPort = overrides.testsHttpsPort;
+		}
+	}
 
 	if ( overrides.port ) {
 		overrideConfig.port = overrides.port;
@@ -346,6 +377,36 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	);
 
 	// Parse any root-only options.
+	if ( rawConfig.https !== undefined ) {
+		if ( typeof rawConfig.https !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "https" must be a boolean.`
+			);
+		}
+		parsedConfig.https = rawConfig.https;
+
+		if ( rawConfig.sslCertPath && rawConfig.sslKeyPath ) {
+			if (
+				typeof rawConfig.sslCertPath !== 'string' ||
+				typeof rawConfig.sslKeyPath !== 'string'
+			) {
+				throw new ValidationError(
+					`Invalid ${ configFile }: "sslCertPath" and "sslKeyPath" must be strings.`
+				);
+			}
+			parsedConfig.sslCertPath = rawConfig.sslCertPath;
+			parsedConfig.sslKeyPath = rawConfig.sslKeyPath;
+		}
+
+		if ( rawConfig.httpsPort !== undefined ) {
+			checkPort( configFile, `httpsPort`, rawConfig.httpsPort );
+			parsedConfig.httpsPort = rawConfig.httpsPort;
+		}
+		if ( rawConfig.testsHttpsPort !== undefined ) {
+			checkPort( configFile, `testsHttpsPort`, rawConfig.testsHttpsPort );
+			parsedConfig.testsHttpsPort = rawConfig.testsHttpsPort;
+		}
+	}
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
@@ -426,6 +487,9 @@ async function parseEnvironmentConfig(
 		// because these aren't part of the above defaults but are
 		// configuration options that we will parse.
 		switch ( key ) {
+			case 'https':
+			case 'sslCertPath':
+			case 'sslKeyPath':
 			case 'testsPort':
 			case 'lifecycleScripts':
 			case 'env': {
@@ -445,6 +509,24 @@ async function parseEnvironmentConfig(
 	// Parse each option individually so that we can handle the validation
 	// and any conversion that is required to use the option.
 	const parsedConfig = {};
+
+	if ( config.https !== undefined ) {
+		if ( typeof config.https !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "${ environmentPrefix }https" must be a boolean.`
+			);
+		}
+		parsedConfig.https = config.https;
+
+		if ( config.httpsPort !== undefined ) {
+			checkPort(
+				configFile,
+				`${ environmentPrefix }httpsPort`,
+				config.httpsPort
+			);
+			parsedConfig.httpsPort = config.httpsPort;
+		}
+	}
 
 	if ( config.port !== undefined ) {
 		checkPort( configFile, `${ environmentPrefix }port`, config.port );

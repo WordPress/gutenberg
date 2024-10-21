@@ -166,10 +166,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 	// Set the default ports based on the config values.
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
+	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
 		config.env.development.mysqlPort ?? ''
 	}}:3306`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 	const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
 		config.env.tests.mysqlPort ?? ''
 	}}:3306`;
@@ -205,7 +205,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ developmentPorts ],
+				ports: [
+					developmentPorts,
+					`${ config.env.development.httpsPort }:443`,
+				],
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,
@@ -223,7 +226,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'Tests-WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ testsPorts ],
+				ports: [ testsPorts, `${ config.env.tests.httpsPort }:443` ],
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,

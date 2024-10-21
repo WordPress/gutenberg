@@ -38,6 +38,7 @@
 	"dependencies": {
 		"chalk": "^4.0.0",
 		"copy-dir": "^1.3.0",
+		"devcert": "^1.2.2",
 		"docker-compose": "^0.24.3",
 		"extract-zip": "^1.6.7",
 		"got": "^11.8.5",

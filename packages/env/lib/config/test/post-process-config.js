@@ -5,13 +5,34 @@
 const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 
+/**
+ * External dependencies
+ */
+const fs = require( 'fs' );
+const os = require( 'os' );
+const path = require( 'path' );
+
+const testFolderPath = path.resolve( os.homedir + '/.wp-env/test-unit' );
+
 describe( 'postProcessConfig', () => {
+	beforeAll( () => {
+		if ( ! fs.existsSync( testFolderPath ) ) {
+			fs.mkdirSync( testFolderPath, { recursive: true } );
+		}
+	} );
+
+	afterAll( () => {
+		if ( fs.existsSync( testFolderPath ) ) {
+			fs.rmSync( testFolderPath, { recursive: true } );
+		}
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should merge relevant root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should merge relevant root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 123,
 			testsPort: 456,
 			coreSource: {
@@ -152,8 +173,8 @@ describe( 'postProcessConfig', () => {
 		} );
 	} );
 
-	it( 'should not merge some root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should not merge some root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 8888,
 			testsPort: 8889,
 			lifecycleScripts: {
@@ -183,8 +204,8 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'appendPortToWPConfigs', () => {
-		it( 'should add port to certain environment config options', () => {
-			const processed = postProcessConfig( {
+		it( 'should add port to certain environment config options', async () => {
+			const processed = await postProcessConfig( {
 				port: 123,
 				config: {
 					WP_TESTS_DOMAIN: 'localhost',
@@ -231,8 +252,8 @@ describe( 'postProcessConfig', () => {
 			} );
 		} );
 
-		it( 'should not overwrite port in WP_HOME', () => {
-			const processed = postProcessConfig( {
+		it( 'should not overwrite port in WP_HOME', async () => {
+			const processed = await postProcessConfig( {
 				env: {
 					development: {
 						port: 123,
@@ -277,23 +298,51 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'validatePortUniqueness', () => {
-		it( 'should fail when two environments have the same port', () => {
-			expect( () => {
-				postProcessConfig( {
-					env: {
-						development: {
-							port: 123,
-						},
-						tests: {
-							port: 123,
-						},
+		it( 'should fail when two environments have the same port', async () => {
+			const processed = postProcessConfig( {
+				env: {
+					development: {
+						port: 123,
 					},
-				} );
-			} ).toThrow(
+					tests: {
+						port: 123,
+					},
+				},
+			} );
+
+			await expect( processed ).rejects.toThrow(
 				new ValidationError(
 					'The "development" and "tests" environments may not have the same port.'
 				)
 			);
+		} );
+	} );
+
+	describe( 'enableHttps', () => {
+		it( 'should create SSL and change WP_HOME and WP_SITEURL to HTTPS', async () => {
+			const processed = await postProcessConfig( {
+				coreSource: {
+					path: testFolderPath,
+				},
+				https: true,
+				config: {
+					WP_HOME: 'http://localhost',
+					WP_SITEURL: 'http://localhost',
+				},
+			} );
+
+			expect( processed ).toEqual( {
+				coreSource: {
+					path: testFolderPath,
+				},
+				https: true,
+				sslCertPath: expect.any( String ),
+				sslKeyPath: expect.any( String ),
+				config: {
+					WP_HOME: 'https://localhost',
+					WP_SITEURL: 'https://localhost',
+				},
+			} );
 		} );
 	} );
 } );
