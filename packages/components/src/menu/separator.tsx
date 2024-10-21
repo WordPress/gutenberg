@@ -7,21 +7,21 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { DropdownMenuContext } from './context';
-import type { DropdownMenuSeparatorProps } from './types';
+import { MenuContext } from './context';
+import type { MenuSeparatorProps } from './types';
 import * as Styled from './styles';
 
-export const DropdownMenuSeparator = forwardRef<
+export const MenuSeparator = forwardRef<
 	HTMLHRElement,
-	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
->( function DropdownMenuSeparator( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
+	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
+>( function MenuSeparator( props, ref ) {
+	const menuContext = useContext( MenuContext );
 	return (
-		<Styled.DropdownMenuSeparator
+		<Styled.MenuSeparator
 			ref={ ref }
 			{ ...props }
-			store={ dropdownMenuContext?.store }
-			variant={ dropdownMenuContext?.variant }
+			store={ menuContext?.store }
+			variant={ menuContext?.variant }
 		/>
 	);
 } );

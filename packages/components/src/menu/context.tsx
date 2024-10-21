@@ -6,8 +6,8 @@ import { createContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DropdownMenuContext as DropdownMenuContextType } from './types';
+import type { MenuContext as MenuContextType } from './types';
 
-export const DropdownMenuContext = createContext<
-	DropdownMenuContextType | undefined
->( undefined );
+export const MenuContext = createContext< MenuContextType | undefined >(
+	undefined
+);
