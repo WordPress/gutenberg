@@ -25,6 +25,7 @@
 		"npm": ">=8.19.2"
 	},
 	"main": "parser.js",
+	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {
 		"pegjs": "^0.10.0",
