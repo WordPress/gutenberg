@@ -9,6 +9,7 @@ import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -52,7 +53,7 @@ export default function CollabSidebar() {
 	const { getEntityRecords, getEntityRecord } = resolveSelect( coreStore );
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { openGeneralSidebar } = useDispatch( editorStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 
@@ -82,7 +83,7 @@ export default function CollabSidebar() {
 
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
-		openGeneralSidebar( 'edit-post/collab-sidebar' );
+		enableComplementaryArea( 'core', 'edit-post/collab-sidebar' );
 	};
 
 	// Function to save the comment.

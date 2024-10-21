@@ -30,10 +30,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import { privateApis as editorPrivateApis } from '../private-apis';
 import { unlock } from '../lock-unlock';
-
-const { interfaceStore } = unlock( editorPrivateApis );
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -193,19 +190,6 @@ export const editPost =
 		registry
 			.dispatch( coreStore )
 			.editEntityRecord( 'postType', type, id, edits, options );
-	};
-
-/**
- * Action that opens an editor sidebar.
- *
- * @param {?string} name Sidebar name to be opened.
- */
-export const openGeneralSidebar =
-	( name ) =>
-	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.enableComplementaryArea( 'core', name );
 	};
 
 /**
