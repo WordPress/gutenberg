@@ -79,7 +79,9 @@ function useInsertionPoint( {
 				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-			} = select( blockEditorStore );
+				getSectionRootClientId,
+				__unstableGetEditorMode,
+			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
@@ -92,10 +94,26 @@ function useInsertionPoint( {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
 			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = getBlockRootClientId(
-					selectedBlockClientId
-				);
-				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
+				const sectionRootClientId = getSectionRootClientId();
+
+				// Avoids empty inserter when the selected block is acting
+				// as the "root".
+				// See https://github.com/WordPress/gutenberg/pull/66214.
+				if (
+					__unstableGetEditorMode() === 'zoom-out' &&
+					sectionRootClientId === selectedBlockClientId
+				) {
+					_destinationRootClientId = sectionRootClientId;
+					_destinationIndex = getBlockOrder(
+						_destinationRootClientId
+					).length;
+				} else {
+					_destinationRootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
+					_destinationIndex =
+						getBlockIndex( selectedBlockClientId ) + 1;
+				}
 			} else {
 				// Insert at the end of the list.
 				_destinationIndex = getBlockOrder(
