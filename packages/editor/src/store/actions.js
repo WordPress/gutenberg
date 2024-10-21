@@ -278,7 +278,11 @@ export const savePost =
 
 		if ( ! error ) {
 			try {
-				await doActionAsync( 'editor.savePost', options );
+				await doActionAsync(
+					'editor.savePost',
+					{ id: previousRecord.id },
+					options
+				);
 			} catch ( err ) {
 				error = err;
 			}

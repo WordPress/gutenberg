@@ -1,4 +1,4 @@
-# Part 4: Building a Create page form
+# Building a Create page form
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we created an *Edit page* feature, and in this part we will add a *Create page* feature. Here's a glimpse of what we're going to build:
 
