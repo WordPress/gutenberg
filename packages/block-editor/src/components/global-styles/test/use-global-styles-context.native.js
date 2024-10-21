@@ -414,6 +414,7 @@ describe( 'getGlobalStyles', () => {
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
 				__experimentalFeatures: {
+					blocks: {},
 					color: {
 						palette: RAW_FEATURES.color.palette,
 						gradients,
