@@ -291,7 +291,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 -	**Experimental:** true
 -	**Category:** common
 -	**Allowed Blocks:** core/paragraph, core/heading, core/form-input, core/form-submit-button, core/form-submission-notification, core/group, core/columns
--	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** action, email, method, submissionMethod
 
 ## Input Field
