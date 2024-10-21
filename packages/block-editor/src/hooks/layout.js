@@ -105,6 +105,13 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		layoutClassnames.push( 'is-nowrap' );
 	}
 
+	if (
+		usedLayout?.flexDirectionOrder &&
+		usedLayout.flexDirectionOrder === 'reverse'
+	) {
+		layoutClassnames.push( 'is-reversed' );
+	}
+
 	return layoutClassnames;
 }
 
