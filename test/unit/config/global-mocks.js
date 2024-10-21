@@ -46,5 +46,6 @@ if ( ! global.TextEncoder ) {
 	global.TextEncoder = TextEncoder;
 }
 
+// Override jsdom built-ins with native node implementation.
 global.Blob = BlobPolyfill;
 global.File = FilePolyfill;

@@ -1,7 +1,1 @@
-module.exports = {
-	process() {
-		return {
-			code: 'module.exports = ""',
-		};
-	},
-};
+// Stub file for Jest.
