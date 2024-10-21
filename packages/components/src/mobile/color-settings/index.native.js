@@ -13,7 +13,7 @@ import { memo, useEffect, useContext } from '@wordpress/element';
  */
 import PickerScreen from './picker-screen';
 import GradientPickerScreen from './gradient-picker-screen';
-import PaletteScreen from './palette.screen';
+import PaletteScreen from './palette-screen';
 import BottomSheet from '../bottom-sheet';
 import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
@@ -45,13 +45,15 @@ const ColorSettingsMemo = memo(
 					name={ colorsUtils.screens.palette }
 					initialParams={ {
 						defaultSettings,
-						onColorChange,
 						colorValue,
 						gradientValue,
-						onGradientChange,
-						onColorCleared,
 						label,
 						hideNavigation,
+					} }
+					screenProps={ {
+						onColorChange,
+						onColorCleared,
+						onGradientChange,
 					} }
 				>
 					<PaletteScreen />
