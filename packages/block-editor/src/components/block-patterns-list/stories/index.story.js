@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import blockLibraryStyles from '!!raw-loader!../../../../../block-library/build-style/style.css';
+
+/**
  * WordPress dependencies
  */
 import { useAsyncList } from '@wordpress/compose';
@@ -7,7 +12,12 @@ import { useAsyncList } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockPatternsList from '../';
+import { ExperimentalBlockEditorProvider } from '../../provider';
 import patterns from './fixtures';
+
+const blockEditorSettings = {
+	styles: [ { css: blockLibraryStyles } ],
+};
 
 const meta = {
 	component: BlockPatternsList,
@@ -54,7 +64,11 @@ export default meta;
 
 const Template = ( props ) => {
 	const shownPatterns = useAsyncList( props.blockPatterns );
-	return <BlockPatternsList shownPatterns={ shownPatterns } { ...props } />;
+	return (
+		<ExperimentalBlockEditorProvider settings={ blockEditorSettings }>
+			<BlockPatternsList shownPatterns={ shownPatterns } { ...props } />
+		</ExperimentalBlockEditorProvider>
+	);
 };
 
 export const Default = Template.bind( {} );
