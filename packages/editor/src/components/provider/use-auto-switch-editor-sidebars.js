@@ -12,10 +12,9 @@ import { store as interfaceStore } from '@wordpress/interface';
  * sidebar state.
  */
 function useAutoSwitchEditorSidebars() {
-	const { hasBlockSelection } = useSelect( ( select ) => {
+	const { clientId } = useSelect( ( select ) => {
 		return {
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
+			clientId: select( blockEditorStore ).getSelectedBlockClientId(),
 		};
 	}, [] );
 
@@ -24,25 +23,29 @@ function useAutoSwitchEditorSidebars() {
 	const { get: getPreference } = useSelect( preferencesStore );
 
 	useEffect( () => {
+		const isDistractionFree = getPreference( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			return;
+		}
+
 		const activeGeneralSidebar = getActiveComplementaryArea( 'core' );
 		const isEditorSidebarOpened = [
 			'edit-post/document',
 			'edit-post/block',
 		].includes( activeGeneralSidebar );
-		const isDistractionFree = getPreference( 'core', 'distractionFree' );
-		if ( ! isEditorSidebarOpened || isDistractionFree ) {
-			return;
-		}
-		if ( hasBlockSelection ) {
+
+		// Experiment: If the block is selected, show the block sidebar.
+		// https://github.com/WordPress/gutenberg/issues/54633
+		if ( clientId ) {
 			enableComplementaryArea( 'core', 'edit-post/block' );
-		} else {
+		} else if ( isEditorSidebarOpened ) {
 			enableComplementaryArea( 'core', 'edit-post/document' );
 		}
 	}, [
-		hasBlockSelection,
 		getActiveComplementaryArea,
 		enableComplementaryArea,
 		getPreference,
+		clientId,
 	] );
 }
 
