@@ -6,6 +6,7 @@ import { useCallback, useState } from '@wordpress/element';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
+	useDebounce,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
@@ -532,6 +533,26 @@ export default function useBlockDropZone( {
 		200
 	);
 
+	const throttledLeave = useDebounce(
+		useCallback(
+			( event, ownerDocument ) => {
+				// If the drag event is leaving the drop zone and entering an insertion point,
+				// do not hide the insertion point as it is conceptually within the dropzone.
+				if (
+					isInsertionPoint( event.relatedTarget, ownerDocument ) ||
+					isInsertionPoint( event.target, ownerDocument )
+				) {
+					return;
+				}
+
+				throttled.cancel();
+				hideInsertionPoint();
+			},
+			[ hideInsertionPoint ]
+		),
+		200
+	);
+
 	return useDropZone( {
 		dropZoneElement,
 		isDisabled,
@@ -543,19 +564,7 @@ export default function useBlockDropZone( {
 			throttled( event, event.currentTarget.ownerDocument );
 		},
 		onDragLeave( event ) {
-			const { ownerDocument } = event.currentTarget;
-
-			// If the drag event is leaving the drop zone and entering an insertion point,
-			// do not hide the insertion point as it is conceptually within the dropzone.
-			if (
-				isInsertionPoint( event.relatedTarget, ownerDocument ) ||
-				isInsertionPoint( event.target, ownerDocument )
-			) {
-				return;
-			}
-
-			throttled.cancel();
-			hideInsertionPoint();
+			throttledLeave( event, event.currentTarget.ownerDocument );
 		},
 		onDragEnd() {
 			throttled.cancel();
