@@ -738,6 +738,39 @@ _Returns_
 
 Returns the currently selected block, or null if there is no selected block.
 
+_Usage_
+
+```js
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+// Set initial active block client ID
+let activeBlockClientId = null;
+
+const getActiveBlockData = () => {
+	const activeBlock = select( blockEditorStore ).getSelectedBlock();
+
+	if ( activeBlock && activeBlock.clientId !== activeBlockClientId ) {
+		activeBlockClientId = activeBlock.clientId;
+
+		// Get active block name and attributes
+		const activeBlockName = activeBlock.name;
+		const activeBlockAttributes = activeBlock.attributes;
+
+		// Log active block name and attributes
+		console.log( activeBlockName, activeBlockAttributes );
+	}
+};
+
+// Subscribe to changes in the editor
+// wp.data.subscribe(() => {
+// getActiveBlockData()
+// })
+
+// Update active block data on click
+// onclick="getActiveBlockData()"
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
