@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +24,7 @@ function MediaTab( {
 	rootClientId,
 	selectedCategory,
 	onSelectCategory,
+	setHasCategories,
 	onInsert,
 	children,
 } ) {
@@ -48,6 +49,10 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
+
+	useEffect( () => {
+		setHasCategories( !! categories.length );
+	}, [ categories, setHasCategories ] );
 
 	if ( ! categories.length ) {
 		return <InserterNoResults />;

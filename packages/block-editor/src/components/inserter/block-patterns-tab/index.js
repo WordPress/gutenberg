@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -24,6 +24,7 @@ function BlockPatternsTab( {
 	selectedCategory,
 	onInsert,
 	rootClientId,
+	setHasCategories,
 	children,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
@@ -36,6 +37,10 @@ function BlockPatternsTab( {
 			unlock( select( blockEditorStore ) ).isResolvingPatterns(),
 		[]
 	);
+
+	useEffect( () => {
+		setHasCategories( !! categories.length );
+	}, [ categories, setHasCategories ] );
 
 	if ( isResolvingPatterns ) {
 		return (

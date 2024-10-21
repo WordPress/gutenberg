@@ -67,6 +67,8 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
+
+	const [ hasCategories, setHasCategories ] = useState( true );
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
 			return __experimentalInitialTab;
@@ -146,10 +148,12 @@ function InserterMenu(
 
 	const showPatternPanel =
 		selectedTab === 'patterns' &&
+		hasCategories &&
 		! delayedFilterValue &&
 		!! selectedPatternCategory;
 
-	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
+	const showMediaPanel =
+		selectedTab === 'media' && !! selectedMediaCategory && hasCategories;
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
@@ -242,6 +246,7 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
+				setHasCategories={ setHasCategories }
 			>
 				{ showPatternPanel && (
 					<PatternCategoryPreviews
@@ -270,6 +275,7 @@ function InserterMenu(
 				selectedCategory={ selectedMediaCategory }
 				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
+				setHasCategories={ setHasCategories }
 			>
 				{ showMediaPanel && (
 					<MediaCategoryPanel
