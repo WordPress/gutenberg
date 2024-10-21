@@ -30,11 +30,10 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/element": "*",
-		"@wordpress/primitives": "*"
+		"@wordpress/element": "file:../element",
+		"@wordpress/primitives": "file:../primitives"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"wpScript": true
+	}
 }

@@ -4,7 +4,6 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
-const { readdirSync } = require( 'node:fs' );
 
 /**
  * WordPress dependencies
@@ -17,12 +16,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const packageDirs = readdirSync(
-	new URL( '../packages', `file://${ __dirname }` ),
-	{
-		withFileTypes: true,
-	}
-).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
+const { dependencies } = require( '../../package' );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
@@ -88,23 +82,15 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
-/** @type {Array<string>} */
-const gutenbergScripts = [];
-for ( const packageDir of packageDirs ) {
-	const packageJson = require(
-		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
-	);
-
-	if ( ! packageJson.wpScript ) {
-		continue;
-	}
-
-	if ( BUNDLED_PACKAGES.includes( packageJson.name ) ) {
-		continue;
-	}
-
-	gutenbergScripts.push( packageDir );
-}
+const gutenbergPackages = Object.keys( dependencies )
+	.filter(
+		( packageName ) =>
+			! BUNDLED_PACKAGES.includes( packageName ) &&
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
+	)
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 const exportDefaultPackages = [
 	'api-fetch',
@@ -128,7 +114,7 @@ module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: Object.fromEntries(
-		gutenbergScripts.map( ( packageName ) => [
+		gutenbergPackages.map( ( packageName ) => [
 			packageName,
 			{
 				import: `./packages/${ packageName }`,
@@ -162,7 +148,7 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergScripts
+			patterns: gutenbergPackages
 				.map( ( packageName ) => ( {
 					from: '*.css',
 					context: `./packages/${ packageName }/build-style`,
