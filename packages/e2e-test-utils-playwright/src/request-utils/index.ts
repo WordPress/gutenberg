@@ -17,11 +17,12 @@ import { createUser, deleteAllUsers } from './users';
 import { setupRest, rest, getMaxBatchSize, batchRest } from './rest';
 import { getPluginsMap, activatePlugin, deactivatePlugin } from './plugins';
 import { deleteAllTemplates, createTemplate } from './templates';
+import { activateTheme } from './themes';
 import {
-	activateTheme,
 	getCurrentThemeGlobalStylesPostId,
 	getThemeGlobalStylesRevisions,
-} from './themes';
+	updateGlobalStyles,
+} from './global-styles';
 import { createBlock, deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
@@ -204,6 +205,9 @@ class RequestUtils {
 	/** @borrows getThemeGlobalStylesRevisions as this.getThemeGlobalStylesRevisions */
 	getThemeGlobalStylesRevisions: typeof getThemeGlobalStylesRevisions =
 		getThemeGlobalStylesRevisions.bind( this );
+	/** @borrows updateGlobalStyles as this.updateGlobalStyles */
+	updateGlobalStyles: typeof updateGlobalStyles =
+		updateGlobalStyles.bind( this );
 	/** @borrows deleteAllPatternCategories as this.deleteAllPatternCategories */
 	deleteAllPatternCategories = deleteAllPatternCategories.bind( this );
 	/** @borrows setGutenbergExperiments as this.setGutenbergExperiments */
