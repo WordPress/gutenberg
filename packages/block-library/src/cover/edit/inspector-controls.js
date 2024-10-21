@@ -19,12 +19,15 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSettings,
+	store as blockEditorStore,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -32,8 +35,9 @@ import { __ } from '@wordpress/i18n';
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -95,6 +99,7 @@ export default function CoverInspectorControls( {
 } ) {
 	const {
 		useFeaturedImage,
+		id,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -112,7 +117,38 @@ export default function CoverInspectorControls( {
 		overlayColor,
 	} = currentSettings;
 
+	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
 	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { getSettings } = useSelect( blockEditorStore );
+
+	const imageSizes = getSettings()?.imageSizes;
+
+	const image = useSelect(
+		( select ) =>
+			id && isImageBackground
+				? select( coreStore ).getMedia( id, { context: 'view' } )
+				: null,
+		[ id, isImageBackground ]
+	);
+
+	function updateImage( newSizeSlug ) {
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			url: newUrl,
+			sizeSlug: newSizeSlug,
+		} );
+	}
+
+	const imageSizeOptions = imageSizes
+		?.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		?.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -175,6 +211,7 @@ export default function CoverInspectorControls( {
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
+								sizeSlug: undefined,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -283,6 +320,14 @@ export default function CoverInspectorControls( {
 									}
 								/>
 							</ToolsPanelItem>
+						) }
+						{ ! useFeaturedImage && !! imageSizeOptions?.length && (
+							<ResolutionTool
+								value={ sizeSlug }
+								onChange={ updateImage }
+								options={ imageSizeOptions }
+								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+							/>
 						) }
 					</ToolsPanel>
 				) }
