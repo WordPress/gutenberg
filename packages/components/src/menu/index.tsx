@@ -22,23 +22,20 @@ import { chevronRightSmall } from '@wordpress/icons';
  */
 import { useContextSystem, contextConnect } from '../context';
 import type { WordPressComponentProps } from '../context';
-import type {
-	DropdownMenuContext as DropdownMenuContextType,
-	DropdownMenuProps,
-} from './types';
+import type { MenuContext as MenuContextType, MenuProps } from './types';
 import * as Styled from './styles';
-import { DropdownMenuContext } from './context';
-import { DropdownMenuItem } from './item';
-import { DropdownMenuCheckboxItem } from './checkbox-item';
-import { DropdownMenuRadioItem } from './radio-item';
-import { DropdownMenuGroup } from './group';
-import { DropdownMenuGroupLabel } from './group-label';
-import { DropdownMenuSeparator } from './separator';
-import { DropdownMenuItemLabel } from './item-label';
-import { DropdownMenuItemHelpText } from './item-help-text';
+import { MenuContext } from './context';
+import { MenuItem } from './item';
+import { MenuCheckboxItem } from './checkbox-item';
+import { MenuRadioItem } from './radio-item';
+import { MenuGroup } from './group';
+import { MenuGroupLabel } from './group-label';
+import { MenuSeparator } from './separator';
+import { MenuItemLabel } from './item-label';
+import { MenuItemHelpText } from './item-help-text';
 
-const UnconnectedDropdownMenu = (
-	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
+const UnconnectedMenu = (
+	props: WordPressComponentProps< MenuProps, 'div', false >,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const {
@@ -62,11 +59,12 @@ const UnconnectedDropdownMenu = (
 
 		// Rest
 		...otherProps
-	} = useContextSystem<
-		typeof props & Pick< DropdownMenuContextType, 'variant' >
-	>( props, 'DropdownMenu' );
+	} = useContextSystem< typeof props & Pick< MenuContextType, 'variant' > >(
+		props,
+		'Menu'
+	);
 
-	const parentContext = useContext( DropdownMenuContext );
+	const parentContext = useContext( MenuContext );
 
 	const computedDirection = isRTL() ? 'rtl' : 'ltr';
 
@@ -91,7 +89,7 @@ const UnconnectedDropdownMenu = (
 		}
 	}
 
-	const dropdownMenuStore = Ariakit.useMenuStore( {
+	const menuStore = Ariakit.useMenuStore( {
 		parent: parentContext?.store,
 		open,
 		defaultOpen,
@@ -104,25 +102,25 @@ const UnconnectedDropdownMenu = (
 	} );
 
 	const contextValue = useMemo(
-		() => ( { store: dropdownMenuStore, variant } ),
-		[ dropdownMenuStore, variant ]
+		() => ( { store: menuStore, variant } ),
+		[ menuStore, variant ]
 	);
 
 	// Extract the side from the applied placement — useful for animations.
 	// Using `currentPlacement` instead of `placement` to make sure that we
 	// use the final computed placement (including "flips" etc).
 	const appliedPlacementSide = useStoreState(
-		dropdownMenuStore,
+		menuStore,
 		'currentPlacement'
 	).split( '-' )[ 0 ];
 
 	if (
-		dropdownMenuStore.parent &&
-		! ( isValidElement( trigger ) && DropdownMenuItem === trigger.type )
+		menuStore.parent &&
+		! ( isValidElement( trigger ) && MenuItem === trigger.type )
 	) {
 		// eslint-disable-next-line no-console
 		console.warn(
-			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
+			'For nested Menus, the `trigger` should always be a `MenuItem`.'
 		);
 	}
 
@@ -153,9 +151,9 @@ const UnconnectedDropdownMenu = (
 			{ /* Menu trigger */ }
 			<Ariakit.MenuButton
 				ref={ ref }
-				store={ dropdownMenuStore }
+				store={ menuStore }
 				render={
-					dropdownMenuStore.parent
+					menuStore.parent
 						? cloneElement( trigger, {
 								// Add submenu arrow, unless a `suffix` is explicitly specified
 								suffix: (
@@ -178,13 +176,13 @@ const UnconnectedDropdownMenu = (
 			<Ariakit.Menu
 				{ ...otherProps }
 				modal={ modal }
-				store={ dropdownMenuStore }
+				store={ menuStore }
 				// Root menu has an 8px distance from its trigger,
 				// otherwise 0 (which causes the submenu to slightly overlap)
-				gutter={ gutter ?? ( dropdownMenuStore.parent ? 0 : 8 ) }
+				gutter={ gutter ?? ( menuStore.parent ? 0 : 8 ) }
 				// Align nested menu by the same (but opposite) amount
 				// as the menu container's padding.
-				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
+				shift={ shift ?? ( menuStore.parent ? -4 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
 				wrapperProps={ wrapperProps }
@@ -200,45 +198,42 @@ const UnconnectedDropdownMenu = (
 					</Styled.MenuPopoverOuterWrapper>
 				) }
 			>
-				<DropdownMenuContext.Provider value={ contextValue }>
+				<MenuContext.Provider value={ contextValue }>
 					{ children }
-				</DropdownMenuContext.Provider>
+				</MenuContext.Provider>
 			</Ariakit.Menu>
 		</>
 	);
 };
 
-export const DropdownMenuV2 = Object.assign(
-	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
-	{
-		Context: Object.assign( DropdownMenuContext, {
-			displayName: 'DropdownMenuV2.Context',
-		} ),
-		Item: Object.assign( DropdownMenuItem, {
-			displayName: 'DropdownMenuV2.Item',
-		} ),
-		RadioItem: Object.assign( DropdownMenuRadioItem, {
-			displayName: 'DropdownMenuV2.RadioItem',
-		} ),
-		CheckboxItem: Object.assign( DropdownMenuCheckboxItem, {
-			displayName: 'DropdownMenuV2.CheckboxItem',
-		} ),
-		Group: Object.assign( DropdownMenuGroup, {
-			displayName: 'DropdownMenuV2.Group',
-		} ),
-		GroupLabel: Object.assign( DropdownMenuGroupLabel, {
-			displayName: 'DropdownMenuV2.GroupLabel',
-		} ),
-		Separator: Object.assign( DropdownMenuSeparator, {
-			displayName: 'DropdownMenuV2.Separator',
-		} ),
-		ItemLabel: Object.assign( DropdownMenuItemLabel, {
-			displayName: 'DropdownMenuV2.ItemLabel',
-		} ),
-		ItemHelpText: Object.assign( DropdownMenuItemHelpText, {
-			displayName: 'DropdownMenuV2.ItemHelpText',
-		} ),
-	}
-);
+export const Menu = Object.assign( contextConnect( UnconnectedMenu, 'Menu' ), {
+	Context: Object.assign( MenuContext, {
+		displayName: 'Menu.Context',
+	} ),
+	Item: Object.assign( MenuItem, {
+		displayName: 'Menu.Item',
+	} ),
+	RadioItem: Object.assign( MenuRadioItem, {
+		displayName: 'Menu.RadioItem',
+	} ),
+	CheckboxItem: Object.assign( MenuCheckboxItem, {
+		displayName: 'Menu.CheckboxItem',
+	} ),
+	Group: Object.assign( MenuGroup, {
+		displayName: 'Menu.Group',
+	} ),
+	GroupLabel: Object.assign( MenuGroupLabel, {
+		displayName: 'Menu.GroupLabel',
+	} ),
+	Separator: Object.assign( MenuSeparator, {
+		displayName: 'Menu.Separator',
+	} ),
+	ItemLabel: Object.assign( MenuItemLabel, {
+		displayName: 'Menu.ItemLabel',
+	} ),
+	ItemHelpText: Object.assign( MenuItemHelpText, {
+		displayName: 'Menu.ItemHelpText',
+	} ),
+} );
 
-export default DropdownMenuV2;
+export default Menu;

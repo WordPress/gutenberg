@@ -9,15 +9,11 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import * as Styled from './styles';
 
-export const DropdownMenuItemLabel = forwardRef<
+export const MenuItemLabel = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemLabel( props, ref ) {
+>( function MenuItemLabel( props, ref ) {
 	return (
-		<Styled.DropdownMenuItemLabel
-			numberOfLines={ 1 }
-			ref={ ref }
-			{ ...props }
-		/>
+		<Styled.MenuItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />
 	);
 } );

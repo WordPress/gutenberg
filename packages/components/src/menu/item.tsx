@@ -7,44 +7,44 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import type { DropdownMenuItemProps } from './types';
+import type { MenuItemProps } from './types';
 import * as Styled from './styles';
-import { DropdownMenuContext } from './context';
+import { MenuContext } from './context';
 import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
 
-export const DropdownMenuItem = forwardRef<
+export const MenuItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
->( function DropdownMenuItem(
+	WordPressComponentProps< MenuItemProps, 'div', false >
+>( function MenuItem(
 	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
 	ref
 ) {
 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
-	const dropdownMenuContext = useContext( DropdownMenuContext );
+	const menuContext = useContext( MenuContext );
 
 	return (
-		<Styled.DropdownMenuItem
+		<Styled.MenuItem
 			ref={ ref }
 			{ ...props }
 			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
+			store={ menuContext?.store }
 		>
 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
+			<Styled.MenuItemContentWrapper>
+				<Styled.MenuItemChildrenWrapper>
 					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
+				</Styled.MenuItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuItem>
+			</Styled.MenuItemContentWrapper>
+		</Styled.MenuItem>
 	);
 } );

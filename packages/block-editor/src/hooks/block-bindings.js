@@ -34,7 +34,7 @@ import { useBlockEditContext } from '../components/block-edit';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { store as blockEditorStore } from '../store';
 
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 const EMPTY_OBJECT = {};
 
@@ -70,18 +70,18 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 		<>
 			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
 				<Fragment key={ name }>
-					<DropdownMenuV2.Group>
+					<Menu.Group>
 						{ Object.keys( fieldsList ).length > 1 && (
-							<DropdownMenuV2.GroupLabel>
+							<Menu.GroupLabel>
 								{ registeredSources[ name ].label }
-							</DropdownMenuV2.GroupLabel>
+							</Menu.GroupLabel>
 						) }
 						{ Object.entries( fields )
 							.filter(
 								( [ , args ] ) => args?.type === attributeType
 							)
 							.map( ( [ key, args ] ) => (
-								<DropdownMenuV2.RadioItem
+								<Menu.RadioItem
 									key={ key }
 									onChange={ () =>
 										updateBlockBindings( {
@@ -95,17 +95,17 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 									value={ key }
 									checked={ key === currentKey }
 								>
-									<DropdownMenuV2.ItemLabel>
+									<Menu.ItemLabel>
 										{ args?.label }
-									</DropdownMenuV2.ItemLabel>
-									<DropdownMenuV2.ItemHelpText>
+									</Menu.ItemLabel>
+									<Menu.ItemHelpText>
 										{ args?.value }
-									</DropdownMenuV2.ItemHelpText>
-								</DropdownMenuV2.RadioItem>
+									</Menu.ItemHelpText>
+								</Menu.RadioItem>
 							) ) }
-					</DropdownMenuV2.Group>
+					</Menu.Group>
 					{ i !== Object.keys( fieldsList ).length - 1 && (
-						<DropdownMenuV2.Separator />
+						<Menu.Separator />
 					) }
 				</Fragment>
 			) ) }
@@ -175,7 +175,7 @@ function EditableBlockBindingsPanelItems( {
 							} );
 						} }
 					>
-						<DropdownMenuV2
+						<Menu
 							placement={
 								isMobile ? 'bottom-start' : 'left-start'
 							}
@@ -195,7 +195,7 @@ function EditableBlockBindingsPanelItems( {
 								attribute={ attribute }
 								binding={ binding }
 							/>
-						</DropdownMenuV2>
+						</Menu>
 					</ToolsPanelItem>
 				);
 			} ) }

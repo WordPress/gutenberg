@@ -9,15 +9,11 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import * as Styled from './styles';
 
-export const DropdownMenuItemHelpText = forwardRef<
+export const MenuItemHelpText = forwardRef<
 	HTMLSpanElement,
 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemHelpText( props, ref ) {
+>( function MenuItemHelpText( props, ref ) {
 	return (
-		<Styled.DropdownMenuItemHelpText
-			numberOfLines={ 2 }
-			ref={ ref }
-			{ ...props }
-		/>
+		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
 	);
 } );

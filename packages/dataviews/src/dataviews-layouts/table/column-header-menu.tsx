@@ -29,7 +29,7 @@ import type {
 } from '../../types';
 import { getVisibleFieldIds } from '../index';
 
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -45,7 +45,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 		.filter( Boolean )
 		.map( ( child, i ) => (
 			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuV2.Separator /> }
+				{ i > 0 && <Menu.Separator /> }
 				{ child }
 			</Fragment>
 		) );
@@ -101,7 +101,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}
 
 	return (
-		<DropdownMenuV2
+		<Menu
 			align="start"
 			trigger={
 				<Button
@@ -122,7 +122,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		>
 			<WithDropDownMenuSeparators>
 				{ isSortable && (
-					<DropdownMenuV2.Group>
+					<Menu.Group>
 						{ SORTING_DIRECTIONS.map(
 							( direction: SortDirection ) => {
 								const isChecked =
@@ -133,7 +133,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								const value = `${ fieldId }-${ direction }`;
 
 								return (
-									<DropdownMenuV2.RadioItem
+									<Menu.RadioItem
 										key={ value }
 										// All sorting radio items share the same name, so that
 										// selecting a sorting option automatically deselects the
@@ -153,18 +153,18 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 											} );
 										} }
 									>
-										<DropdownMenuV2.ItemLabel>
+										<Menu.ItemLabel>
 											{ sortLabels[ direction ] }
-										</DropdownMenuV2.ItemLabel>
-									</DropdownMenuV2.RadioItem>
+										</Menu.ItemLabel>
+									</Menu.RadioItem>
 								);
 							}
 						) }
-					</DropdownMenuV2.Group>
+					</Menu.Group>
 				) }
 				{ canAddFilter && (
-					<DropdownMenuV2.Group>
-						<DropdownMenuV2.Item
+					<Menu.Group>
+						<Menu.Item
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
 								setOpenedFilter( fieldId );
@@ -182,14 +182,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<DropdownMenuV2.ItemLabel>
+							<Menu.ItemLabel>
 								{ __( 'Add filter' ) }
-							</DropdownMenuV2.ItemLabel>
-						</DropdownMenuV2.Item>
-					</DropdownMenuV2.Group>
+							</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Group>
 				) }
-				<DropdownMenuV2.Group>
-					<DropdownMenuV2.Item
+				<Menu.Group>
+					<Menu.Item
 						prefix={ <Icon icon={ arrowLeft } /> }
 						disabled={ index < 1 }
 						onClick={ () => {
@@ -207,11 +207,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							} );
 						} }
 					>
-						<DropdownMenuV2.ItemLabel>
-							{ __( 'Move left' ) }
-						</DropdownMenuV2.ItemLabel>
-					</DropdownMenuV2.Item>
-					<DropdownMenuV2.Item
+						<Menu.ItemLabel>{ __( 'Move left' ) }</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item
 						prefix={ <Icon icon={ arrowRight } /> }
 						disabled={ index >= visibleFieldIds.length - 1 }
 						onClick={ () => {
@@ -227,12 +225,10 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							} );
 						} }
 					>
-						<DropdownMenuV2.ItemLabel>
-							{ __( 'Move right' ) }
-						</DropdownMenuV2.ItemLabel>
-					</DropdownMenuV2.Item>
+						<Menu.ItemLabel>{ __( 'Move right' ) }</Menu.ItemLabel>
+					</Menu.Item>
 					{ isHidable && field && (
-						<DropdownMenuV2.Item
+						<Menu.Item
 							prefix={ <Icon icon={ unseen } /> }
 							onClick={ () => {
 								onHide( field );
@@ -244,14 +240,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<DropdownMenuV2.ItemLabel>
+							<Menu.ItemLabel>
 								{ __( 'Hide column' ) }
-							</DropdownMenuV2.ItemLabel>
-						</DropdownMenuV2.Item>
+							</Menu.ItemLabel>
+						</Menu.Item>
 					) }
-				</DropdownMenuV2.Group>
+				</Menu.Group>
 			</WithDropDownMenuSeparators>
-		</DropdownMenuV2>
+		</Menu>
 	);
 } );
 
