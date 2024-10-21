@@ -116,9 +116,13 @@ export const createUpgradedEmbedBlock = (
 		( matchedBlock.attributes.providerNameSlug !== providerNameSlug ||
 			! providerNameSlug );
 	if ( shouldCreateNewBlock ) {
+		// We only transfer the previous attributes that could have been modified
+		// by the user.
+		const { caption, allowResponsive } = restAttributes;
 		return createBlock( DEFAULT_EMBED_BLOCK, {
 			url,
-			...restAttributes,
+			caption,
+			allowResponsive,
 			...matchedBlock.attributes,
 		} );
 	}
