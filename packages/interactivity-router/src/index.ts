@@ -336,12 +336,6 @@ export const { state, actions } = store< Store >( 'core/router', {
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );
 				}
-
-				// Scroll to the anchor if exits in the link.
-				const { hash } = new URL( href, window.location.href );
-				if ( hash ) {
-					document.querySelector( hash )?.scrollIntoView();
-				}
 			} else {
 				yield forcePageReload( href );
 			}
@@ -431,11 +425,29 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		// Navigate on click.
 		document.addEventListener(
 			'click',
-			function ( event ) {
-				const ref = ( event.target as Element ).closest( 'a' );
-				if ( isValidLink( ref ) && isValidEvent( event ) ) {
-					event.preventDefault();
-					actions.navigate( ref.href );
+			async function ( event ) {
+				if ( event.target && event.target instanceof HTMLElement ) {
+					const ref = event.target.closest( 'a' );
+					if (
+						isValidLink( ref ) &&
+						isValidEvent( event ) &&
+						! event.target.hasAttribute( 'data-wp-on--click' ) // Don't override other click directives.
+					) {
+						event.preventDefault();
+						await actions.navigate( ref.href );
+
+						// Scroll to the anchor if it exists in the link.
+						const { hash } = new URL(
+							ref.href,
+							window.location.href
+						);
+						if ( !! hash ) {
+							document.querySelector( hash )?.scrollIntoView();
+						} else {
+							// Scroll to the top of the page by default.
+							window.scrollTo( 0, 0 );
+						}
+					}
 				}
 			},
 			true
