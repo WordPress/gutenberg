@@ -84,6 +84,49 @@ describe( 'Edit', () => {
 		expect( editElement ).toHaveClass( 'my-class' );
 	} );
 
+	it( 'should combine the default class name with a variation one', () => {
+		const edit = ( { className } ) => (
+			<div data-testid="foo-bar" className={ className } />
+		);
+
+		registerBlockType( 'core/test-block', {
+			edit,
+			save: noop,
+			category: 'text',
+			title: 'block title',
+			attributes: {
+				fruit: {
+					type: 'string',
+					default: 'Apples',
+				},
+			},
+			supports: {
+				className: {
+					block: true,
+					variation: true,
+				},
+			},
+			variations: [
+				{
+					name: 'variation',
+					title: 'block variation title',
+					attributes: {
+						fruit: 'Bananas',
+					},
+					isActive: [ 'fruit' ],
+				},
+			],
+		} );
+
+		render(
+			<Edit name="core/test-block" attributes={ { fruit: 'Bananas' } } />
+		);
+
+		const editElement = screen.getByTestId( 'foo-bar' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block__variation' );
+	} );
+
 	it( 'should assign context', () => {
 		const edit = ( { context } ) => context.value;
 		registerBlockType( 'core/test-block', {
