@@ -40,7 +40,6 @@ export const Default = {
 	},
 	args: {
 		blockPatterns: patterns,
-		isDraggable: false,
 		label: 'Block patterns story',
 		showTitle: true,
 		showTitlesAsTooltip: false,
@@ -63,17 +62,6 @@ export const Default = {
 		showTitlesAsTooltip: {
 			description:
 				'Whether to render the title of each pattern as a tooltip. If enabled, it takes precedence over `showTitle` prop.',
-		},
-		orientation: {
-			description: 'Orientation for the underlying composite widget.',
-			table: {
-				defaultValue: { summary: 'both' },
-				type: { summary: 'string' },
-			},
-		},
-		category: { description: 'The currently selected pattern category.' },
-		isDraggable: {
-			description: 'Whether the pattern list item should be draggable.',
 		},
 	},
 	parameters: {
