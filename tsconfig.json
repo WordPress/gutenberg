@@ -54,6 +54,7 @@
 		{ "path": "packages/sync" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/undo-manager" },
+		{ "path": "packages/upload-media" },
 		{ "path": "packages/url" },
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
