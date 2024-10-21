@@ -240,6 +240,9 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		settings?.parent instanceof String
 	) {
 		settings.parent = [ settings.parent ];
+		warning(
+			'Block parent must be an array of block types, but it is a string'
+		);
 	}
 
 	if (
