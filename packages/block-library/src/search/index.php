@@ -177,9 +177,9 @@ function render_block_core_search( $attributes ) {
 			)
 		);
 		$form_directives      = '
-		 data-wp-interactive="core/search"'
-		. $form_context .
-		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
+		 data-wp-interactive="core/search"
+		 ' . $form_context . '
+		 data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
 		 data-wp-on-async--keydown="actions.handleSearchKeydown"
 		 data-wp-on-async--focusout="actions.handleSearchFocusout"
 		';
