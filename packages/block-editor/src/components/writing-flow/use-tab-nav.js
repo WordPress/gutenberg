@@ -27,7 +27,6 @@ export default function useTabNav() {
 		getLastFocus,
 		getSectionRootClientId,
 		isZoomOut,
-		__unstableGetEditorMode,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
@@ -54,7 +53,7 @@ export default function useTabNav() {
 			}
 		}
 		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
-		else if ( __unstableGetEditorMode() === 'zoom-out' && isZoomOut() ) {
+		else if ( isZoomOut() ) {
 			const sectionRootClientId = getSectionRootClientId();
 			const sectionBlocks = getBlockOrder( sectionRootClientId );
 

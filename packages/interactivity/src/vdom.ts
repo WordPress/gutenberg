@@ -161,7 +161,6 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			}, {} );
 		}
 
-		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
 		if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,

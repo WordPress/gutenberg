@@ -46,18 +46,13 @@ export default function InspectorControlsTabs( {
 				<Tabs.TabList>
 					{ tabs.map( ( tab ) =>
 						showIconLabels ? (
-							<Tabs.Tab
-								key={ tab.name }
-								tabId={ tab.name }
-								className={ tab.className }
-							>
+							<Tabs.Tab key={ tab.name } tabId={ tab.name }>
 								{ tab.title }
 							</Tabs.Tab>
 						) : (
 							<Tooltip text={ tab.title } key={ tab.name }>
 								<Tabs.Tab
 									tabId={ tab.name }
-									className={ tab.className }
 									aria-label={ tab.title }
 								>
 									<Icon icon={ tab.icon } />

@@ -33,7 +33,6 @@ function CategoryTabs( {
 
 	return (
 		<Tabs
-			className="block-editor-inserter__category-tabs"
 			selectOnMove={ false }
 			selectedTabId={ selectedCategory ? selectedCategory.name : null }
 			orientation="vertical"

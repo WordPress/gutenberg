@@ -11,7 +11,7 @@ import {
 	isDragging,
 	getBlockStyles,
 } from '../private-selectors';
-import { getBlockEditingMode } from '../selectors';
+import { getBlockEditingMode, __unstableGetEditorMode } from '../selectors';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -125,9 +125,15 @@ describe( 'private selectors', () => {
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
+		const get = jest.fn( () => 'edit' );
 		getBlockEditingMode.registry = {
 			select: jest.fn( () => ( {
 				hasContentRoleAttribute,
+			} ) ),
+		};
+		__unstableGetEditorMode.registry = {
+			select: jest.fn( () => ( {
+				get,
 			} ) ),
 		};
 
@@ -428,6 +434,7 @@ describe( 'private selectors', () => {
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
 					] ),
+
 					order: new Map( [
 						[
 							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
@@ -442,7 +449,6 @@ describe( 'private selectors', () => {
 						],
 						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
-					byClientId: new Map( [] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],
@@ -495,7 +501,6 @@ describe( 'private selectors', () => {
 						],
 						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
-					byClientId: new Map( [] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],

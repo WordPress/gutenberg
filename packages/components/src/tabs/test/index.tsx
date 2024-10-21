@@ -13,7 +13,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Tabs from '..';
+import { Tabs } from '..';
 import type { TabsProps } from '../types';
 
 type Tab = {

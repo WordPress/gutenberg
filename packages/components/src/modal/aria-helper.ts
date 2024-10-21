@@ -47,6 +47,7 @@ export function elementShouldBeHidden( element: Element ) {
 	const role = element.getAttribute( 'role' );
 	return ! (
 		element.tagName === 'SCRIPT' ||
+		element.hasAttribute( 'hidden' ) ||
 		element.hasAttribute( 'aria-hidden' ) ||
 		element.hasAttribute( 'aria-live' ) ||
 		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
