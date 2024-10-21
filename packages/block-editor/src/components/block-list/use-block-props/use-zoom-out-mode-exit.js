@@ -12,25 +12,18 @@ import { unlock } from '../../../lock-unlock';
 
 /**
  * Allows Zoom Out mode to be exited by double clicking in the selected block.
- *
- * @param {string} clientId Block client ID.
  */
-export function useZoomOutModeExit( { editorMode } ) {
+export function useZoomOutModeExit() {
 	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
-	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect(
 		( node ) => {
-			// In "compose" mode.
-			const composeMode = editorMode === 'zoom-out' && isZoomOut();
-
-			if ( ! composeMode ) {
-				return;
-			}
-
 			function onDoubleClick( event ) {
+				if ( ! isZoomOut() ) {
+					return;
+				}
+
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
 
@@ -41,7 +34,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 					) {
 						__experimentalSetIsInserterOpened( false );
 					}
-					__unstableSetEditorMode( 'edit' );
 					resetZoomLevel();
 				}
 			}
@@ -52,6 +44,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ editorMode, getSettings, __unstableSetEditorMode ]
+		[ getSettings, isZoomOut, resetZoomLevel ]
 	);
 }

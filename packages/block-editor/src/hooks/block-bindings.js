@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockBindingsSources,
+	getBlockType,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -12,7 +16,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -26,6 +30,7 @@ import {
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
+import { useBlockEditContext } from '../components/block-edit';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { store as blockEditorStore } from '../store';
 
@@ -47,10 +52,20 @@ const useToolsPanelDropdownMenuProps = () => {
 };
 
 function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
-	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+	const { clientId } = useBlockEditContext();
 	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const currentKey = binding?.args?.key;
+	const attributeType = useSelect(
+		( select ) => {
+			const { name: blockName } =
+				select( blockEditorStore ).getBlock( clientId );
+			const _attributeType =
+				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			return _attributeType === 'rich-text' ? 'string' : _attributeType;
+		},
+		[ clientId, attribute ]
+	);
 	return (
 		<>
 			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
@@ -61,29 +76,33 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								{ registeredSources[ name ].label }
 							</DropdownMenuV2.GroupLabel>
 						) }
-						{ Object.entries( fields ).map( ( [ key, args ] ) => (
-							<DropdownMenuV2.RadioItem
-								key={ key }
-								onChange={ () =>
-									updateBlockBindings( {
-										[ attribute ]: {
-											source: name,
-											args: { key },
-										},
-									} )
-								}
-								name={ attribute + '-binding' }
-								value={ key }
-								checked={ key === currentKey }
-							>
-								<DropdownMenuV2.ItemLabel>
-									{ args?.label }
-								</DropdownMenuV2.ItemLabel>
-								<DropdownMenuV2.ItemHelpText>
-									{ args?.value }
-								</DropdownMenuV2.ItemHelpText>
-							</DropdownMenuV2.RadioItem>
-						) ) }
+						{ Object.entries( fields )
+							.filter(
+								( [ , args ] ) => args?.type === attributeType
+							)
+							.map( ( [ key, args ] ) => (
+								<DropdownMenuV2.RadioItem
+									key={ key }
+									onChange={ () =>
+										updateBlockBindings( {
+											[ attribute ]: {
+												source: name,
+												args: { key },
+											},
+										} )
+									}
+									name={ attribute + '-binding' }
+									value={ key }
+									checked={ key === currentKey }
+								>
+									<DropdownMenuV2.ItemLabel>
+										{ args?.label }
+									</DropdownMenuV2.ItemLabel>
+									<DropdownMenuV2.ItemHelpText>
+										{ args?.value }
+									</DropdownMenuV2.ItemHelpText>
+								</DropdownMenuV2.RadioItem>
+							) ) }
 					</DropdownMenuV2.Group>
 					{ i !== Object.keys( fieldsList ).length - 1 && (
 						<DropdownMenuV2.Separator />
@@ -96,8 +115,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 
 function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 	const { source: sourceName, args } = binding || {};
-	const sourceProps =
-		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
+	const sourceProps = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
@@ -186,7 +204,6 @@ function EditableBlockBindingsPanelItems( {
 }
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
-	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const bindableAttributes = getBindableAttributes( blockName );
@@ -194,14 +211,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// `useSelect` is used purposely here to ensure `getFieldsList`
 	// is updated whenever there are updates in block context.
-	// `source.getFieldsList` may also call a selector via `registry.select`.
+	// `source.getFieldsList` may also call a selector via `select`.
 	const _fieldsList = {};
 	const { fieldsList, canUpdateBlockBindings } = useSelect(
 		( select ) => {
 			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 				return EMPTY_OBJECT;
 			}
-			const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
 				( [ sourceName, { getFieldsList, usesContext } ] ) => {
@@ -214,7 +230,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							}
 						}
 						const sourceList = getFieldsList( {
-							registry,
+							select,
 							context,
 						} );
 						// Only add source if the list is not empty.
@@ -234,7 +250,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						.canUpdateBlockBindings,
 			};
 		},
-		[ blockContext, bindableAttributes, registry ]
+		[ blockContext, bindableAttributes ]
 	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {

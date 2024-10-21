@@ -19,9 +19,6 @@ export const setCanvasMode =
 			registry.batch( () => {
 				registry.dispatch( blockEditorStore ).clearSelectedBlock();
 				registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
-				registry
-					.dispatch( blockEditorStore )
-					.__unstableSetEditorMode( 'edit' );
 				const isPublishSidebarOpened = registry
 					.select( editorStore )
 					.isPublishSidebarOpened();
@@ -93,3 +90,10 @@ export const setEditorCanvasContainerView =
 			view,
 		} );
 	};
+
+export function registerRoute( route ) {
+	return {
+		type: 'REGISTER_ROUTE',
+		route,
+	};
+}

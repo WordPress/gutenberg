@@ -20,7 +20,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -39,7 +39,6 @@ import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
-import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
 import BlockContext from '../block-context';
 
@@ -175,15 +174,20 @@ export function RichTextWrapper(
 			}
 
 			const relatedBinding = blockBindings[ identifier ];
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
+			const blockBindingsContext = {};
+			if ( blockBindingsSource?.usesContext?.length ) {
+				for ( const key of blockBindingsSource.usesContext ) {
+					blockBindingsContext[ key ] = blockContext[ key ];
+				}
+			}
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
 					select,
-					context: blockContext,
+					context: blockBindingsContext,
 					args: relatedBinding.args,
 				} );
 
@@ -200,8 +204,8 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				registry,
-				context: blockContext,
+				select,
+				context: blockBindingsContext,
 			} );
 			const bindingKey =
 				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
@@ -229,14 +233,7 @@ export function RichTextWrapper(
 				bindingsLabel: _bindingsLabel,
 			};
 		},
-		[
-			blockBindings,
-			identifier,
-			blockName,
-			blockContext,
-			registry,
-			adjustedValue,
-		]
+		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;
@@ -391,19 +388,7 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		let element = anchorRef.current;
-
-		if ( ! element ) {
-			return;
-		}
-
-		// Writing flow might be editable, so we should make sure focus goes to
-		// the root editable element.
-		while ( element.parentElement?.isContentEditable ) {
-			element = element.parentElement;
-		}
-
-		element.focus();
+		anchorRef.current?.focus();
 	}
 
 	const TagName = tagName;

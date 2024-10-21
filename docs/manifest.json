@@ -198,7 +198,7 @@
 		"parent": "data-basics"
 	},
 	{
-		"title": "Part 4: Building a Create page form",
+		"title": "Building a Create page form",
 		"slug": "4-building-a-create-page-form",
 		"markdown_source": "../docs/how-to-guides/data-basics/4-building-a-create-page-form.md",
 		"parent": "data-basics"
@@ -1098,33 +1098,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorBackButton",
-		"slug": "navigator-back-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorButton",
-		"slug": "navigator-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorProvider",
-		"slug": "navigator-provider",
-		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorScreen",
-		"slug": "navigator-screen",
-		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "NavigatorToParentButton",
-		"slug": "navigator-to-parent-button",
-		"markdown_source": "../packages/components/src/navigator/navigator-to-parent-button/README.md",
+		"title": "Navigator",
+		"slug": "navigator",
+		"markdown_source": "../packages/components/src/navigator/README.md",
 		"parent": "components"
 	},
 	{

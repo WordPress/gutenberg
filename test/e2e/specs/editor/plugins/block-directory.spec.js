@@ -122,7 +122,7 @@ test.describe( 'Block Directory', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -135,7 +135,7 @@ test.describe( 'Block Directory', () => {
 		 */
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( '@$@@Dsdsdfw2$@' );
 
@@ -209,7 +209,7 @@ test.describe( 'Block Directory', () => {
 
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -226,7 +226,7 @@ test.describe( 'Block Directory', () => {
 
 		await blockLibrary
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( MOCK_BLOCK1.title );
 

@@ -18,7 +18,7 @@ test.describe( 'Allowed Patterns', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
@@ -26,7 +26,7 @@ test.describe( 'Allowed Patterns', () => {
 				name: 'Block Library',
 			} )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Test:' );
 
@@ -54,14 +54,14 @@ test.describe( 'Allowed Patterns', () => {
 			);
 		} );
 
-		test( 'should show all patterns even if not allowed', async ( {
+		test( 'should hide patterns with only hidden blocks', async ( {
 			admin,
 			page,
 		} ) => {
 			await admin.createNewPost();
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 
 			await page
@@ -69,7 +69,7 @@ test.describe( 'Allowed Patterns', () => {
 					name: 'Block Library',
 				} )
 				.getByRole( 'searchbox', {
-					name: 'Search for blocks and patterns',
+					name: 'Search',
 				} )
 				.fill( 'Test:' );
 
@@ -77,11 +77,7 @@ test.describe( 'Allowed Patterns', () => {
 				page
 					.getByRole( 'listbox', { name: 'Block patterns' } )
 					.getByRole( 'option' )
-			).toHaveText( [
-				'Test: Single heading',
-				'Test: Single paragraph',
-				'Test: Paragraph inside group',
-			] );
+			).toHaveText( [ 'Test: Single heading' ] );
 		} );
 	} );
 } );

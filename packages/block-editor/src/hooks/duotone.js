@@ -314,8 +314,11 @@ function useDuotoneStyles( {
 	}, [ isValidFilter, blockElement, colors ] );
 }
 
+// Used for generating the instance ID
+const DUOTONE_BLOCK_PROPS_REFERENCE = {};
+
 function useBlockProps( { clientId, name, style } ) {
-	const id = useInstanceId( useBlockProps );
+	const id = useInstanceId( DUOTONE_BLOCK_PROPS_REFERENCE );
 	const selector = useMemo( () => {
 		const blockType = getBlockType( name );
 

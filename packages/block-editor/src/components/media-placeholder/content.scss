@@ -1,25 +1,9 @@
 .block-editor-media-placeholder__url-input-form {
-	display: flex;
+	min-width: 260px;
 
-	// Selector requires a lot of specificity to override base styles.
-	input[type="url"].block-editor-media-placeholder__url-input-field {
-		width: 100%;
-		min-width: 200px;
-
-		@include break-small() {
-			width: 300px;
-		}
-
-		flex-grow: 1;
-		border: none;
-		border-radius: 0;
-		margin: 2px;
-
+	@include break-small() {
+		width: 300px;
 	}
-}
-
-.block-editor-media-placeholder__url-input-submit-button {
-	flex-shrink: 1;
 }
 
 .block-editor-media-placeholder__cancel-button.is-link {

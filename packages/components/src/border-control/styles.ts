@@ -156,7 +156,6 @@ export const resetButton = css`
 		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
-		height: 40px;
 	}
 `;
 

@@ -19,7 +19,7 @@ exports[`DotTip should render correctly 1`] = `
     </p>
     <p>
       <button
-        class="components-button is-link"
+        class="components-button is-next-40px-default-size is-link"
         type="button"
       >
         Got it
@@ -27,7 +27,7 @@ exports[`DotTip should render correctly 1`] = `
     </p>
     <button
       aria-label="Disable tips"
-      class="components-button nux-dot-tip__disable has-icon"
+      class="components-button nux-dot-tip__disable is-small has-icon"
       type="button"
     >
       <svg

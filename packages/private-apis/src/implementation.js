@@ -59,18 +59,8 @@ const registeredPrivateApis = [];
 const requiredConsent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
-/** @type {boolean} */
-let allowReRegistration;
-// The safety measure is meant for WordPress core where IS_WORDPRESS_CORE
-// is set to true.
-// For the general use-case, the re-registration should be allowed by default
-// Let's default to true, then. Try/catch will fall back to "true" even if the
-// environment variable is not explicitly defined.
-try {
-	allowReRegistration = globalThis.IS_WORDPRESS_CORE ? false : true;
-} catch ( error ) {
-	allowReRegistration = true;
-}
+// The safety measure is meant for WordPress core where IS_WORDPRESS_CORE is set to true.
+const allowReRegistration = globalThis.IS_WORDPRESS_CORE ? false : true;
 
 /**
  * Called by a @wordpress package wishing to opt-in to accessing or exposing

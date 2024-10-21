@@ -48,6 +48,7 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -107,7 +108,6 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -335,15 +335,8 @@ function VisualEditor( {
 		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useZoomOutModeExit(),
 	] );
-
-	const zoomOutProps =
-		isZoomedOut && ! isTabletViewport
-			? {
-					scale: 'default',
-					frameSize: '48px',
-			  }
-			: {};
 
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
@@ -401,7 +394,6 @@ function VisualEditor( {
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
-						...zoomOutProps,
 						style: {
 							...iframeProps?.style,
 							...deviceStyles,

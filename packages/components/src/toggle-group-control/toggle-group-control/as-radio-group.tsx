@@ -9,7 +9,8 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef, useEffect, useMemo } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		size,
 		value: valueProp,
 		id: idProp,
+		setSelectedElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -65,21 +67,41 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		defaultValue,
 		value,
 		setValue: wrappedOnChangeProp,
+		rtl: isRTL(),
 	} );
 
 	const selectedValue = useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
 
+	// Ensures that the active id is also reset after the value is "reset" by the consumer.
+	useEffect( () => {
+		if ( selectedValue === '' ) {
+			radio.setActiveId( undefined );
+		}
+	}, [ radio, selectedValue ] );
+
 	const groupContextValue = useMemo(
-		() =>
-			( {
-				baseId,
-				isBlock: ! isAdaptiveWidth,
-				size,
-				value: selectedValue,
-				setValue,
-			} ) as ToggleGroupControlContextProps,
-		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
+		(): ToggleGroupControlContextProps => ( {
+			activeItemIsNotFirstItem: () =>
+				radio.getState().activeId !== radio.first(),
+			baseId,
+			isBlock: ! isAdaptiveWidth,
+			size,
+			// @ts-expect-error - This is wrong and we should fix it.
+			value: selectedValue,
+			// @ts-expect-error - This is wrong and we should fix it.
+			setValue,
+			setSelectedElement,
+		} ),
+		[
+			baseId,
+			isAdaptiveWidth,
+			radio,
+			selectedValue,
+			setSelectedElement,
+			setValue,
+			size,
+		]
 	);
 
 	return (

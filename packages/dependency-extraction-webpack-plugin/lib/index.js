@@ -166,12 +166,74 @@ class DependencyExtractionWebpackPlugin {
 					{
 						name: this.constructor.name,
 						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY,
+					},
+					() => this.checkForMagicComments( compilation )
+				);
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
 							.PROCESS_ASSETS_STAGE_ANALYSE,
 					},
 					() => this.addAssets( compilation )
 				);
 			}
 		);
+	}
+
+	/**
+	 * Check for magic comments before minification, so minification doesn't have to preserve them.
+	 * @param {webpack.Compilation} compilation
+	 */
+	checkForMagicComments( compilation ) {
+		// Accumulate all entrypoint chunks, some of them shared
+		const entrypointChunks = new Set();
+		for ( const entrypoint of compilation.entrypoints.values() ) {
+			for ( const chunk of entrypoint.chunks ) {
+				entrypointChunks.add( chunk );
+			}
+		}
+
+		// Process each entrypoint chunk independently
+		for ( const chunk of entrypointChunks ) {
+			const chunkFiles = Array.from( chunk.files );
+
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
+			);
+			if ( ! chunkJSFile ) {
+				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
+				continue;
+			}
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const processContentsForMagicComments = ( content ) => {
+				const magicComments = [];
+
+				if ( content.includes( '/* wp:polyfill */' ) ) {
+					magicComments.push( 'wp-polyfill' );
+				}
+
+				return magicComments;
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				const wpMagicComments =
+					processContentsForMagicComments( content );
+				compilation.updateAsset( filename, ( v ) => v, {
+					wpMagicComments,
+				} );
+			} );
+		}
 	}
 
 	/** @param {webpack.Compilation} compilation */
@@ -286,8 +348,11 @@ class DependencyExtractionWebpackPlugin {
 
 			// Prepare to look for magic comments, in order to decide whether
 			// `wp-polyfill` is needed.
-			const processContentsForMagicComments = ( content ) => {
-				if ( content.includes( '/* wp:polyfill */' ) ) {
+			const handleMagicComments = ( info ) => {
+				if ( ! info ) {
+					return;
+				}
+				if ( info.includes( 'wp-polyfill' ) ) {
 					chunkStaticDeps.add( 'wp-polyfill' );
 				}
 			};
@@ -299,7 +364,7 @@ class DependencyExtractionWebpackPlugin {
 				const content = asset.source.buffer();
 
 				processContentsForHash( content );
-				processContentsForMagicComments( content );
+				handleMagicComments( asset.info.wpMagicComments );
 			} );
 
 			// Finalise hash.

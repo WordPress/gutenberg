@@ -17,7 +17,8 @@ import { closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, NormalizedField, Field } from '../../types';
+import { getVisibleFields } from '../get-visible-fields';
+import type { DataFormProps, NormalizedField } from '../../types';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -44,12 +45,10 @@ function DropdownHeader( {
 				<Spacer />
 				{ onClose && (
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
-						className="dataforms-layouts-panel__dropdown-header-action"
 						label={ __( 'Close' ) }
 						icon={ closeSmall }
 						onClick={ onClose }
+						size="small"
 					/>
 				) }
 			</HStack>
@@ -144,13 +143,13 @@ export default function FormPanel< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				( form.fields ?? [] )
-					.map( ( fieldId ) =>
-						fields.find( ( { id } ) => id === fieldId )
-					)
-					.filter( ( field ): field is Field< Item > => !! field )
+				getVisibleFields< Item >(
+					fields,
+					form.fields,
+					form.combinedFields
+				)
 			),
-		[ fields, form.fields ]
+		[ fields, form.fields, form.combinedFields ]
 	);
 
 	return (

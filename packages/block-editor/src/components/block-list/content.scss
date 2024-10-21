@@ -24,7 +24,7 @@
 // hack a progressive enhancement.
 /* stylelint-disable -- Stylelint is disabled to allow the hack to work. */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
-_::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
+_::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .block-editor-block-list__layout::selection {
 	background-color: transparent;
 }
 /* stylelint-enable */
@@ -91,14 +91,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		}
 	}
 
-	// Ensure an accurate partial text selection.
-	// To do this, we disable text selection on the main container, then re-enable it only on the
-	// elements that actually get selected.
-	// To keep in mind: user-select is currently inherited to all nodes inside.
-	.has-multi-selection & {
-		user-select: none;
-	}
-
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;
@@ -117,11 +109,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	overflow-wrap: break-word;
 
 	pointer-events: auto;
-	user-select: text;
 
 	&.is-editing-disabled {
 		pointer-events: none;
-		user-select: none;
 	}
 
 	&.has-negative-margin {
@@ -411,6 +401,19 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	margin-left: -1px;
 	margin-right: -1px;
 	transition: background-color 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	font-size: $default-font-size;
+	font-family: $default-font;
+	color: $black;
+	font-weight: normal;
+
+	.is-zoomed-out & {
+		// Maintains an absolute font-size by counter-scaling based on the zoom level.
+		font-size: calc(#{$default-font-size} / var(--wp-block-editor-iframe-zoom-out-scale));
+	}
 
 	&.is-dragged-over {
 		background: $gray-400;

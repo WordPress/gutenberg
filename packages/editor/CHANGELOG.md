@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Post Featured Image`: Fix `Set featured image` button's `box-shadow` transition to prevent border from flashing when focused.
+
+## 14.10.0 (2024-10-16)
+
+## 14.9.0 (2024-10-03)
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)

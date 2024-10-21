@@ -117,6 +117,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.settings.templateLock,
 		state.blockListSettings,
 		state.editorMode,
+		state.zoomLevel,
 		getSectionRootClientId( state ),
 	]
 );
@@ -474,69 +475,45 @@ export function getExpandedBlock( state ) {
  * with the provided client ID.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
-				result = current;
-			}
+export const getContentLockingParent = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blockListSettings,
-		state.settings.templateLock,
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID of the parent section block.
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
-export const getParentSectionBlock = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while (
-			! result &&
-			( current = state.blocks.parents.get( current ) )
-		) {
-			if ( isSectionBlock( state, current ) ) {
-				result = current;
-			}
+export const getParentSectionBlock = ( state, clientId ) => {
+	let current = clientId;
+	let result;
+	while ( ! result && ( current = state.blocks.parents.get( current ) ) ) {
+		if ( isSectionBlock( state, current ) ) {
+			result = current;
 		}
-		return result;
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blocks.order,
-		state.blockListSettings,
-		state.editorMode,
-		state.settings.templateLock,
-		state.blocks.byClientId,
-		getSectionRootClientId( state ),
-	]
-);
+	}
+	return result;
+};
 
 /**
  * Retrieves the client ID is a content locking parent
  *
  * @param {Object} state    Global application state.
- * @param {Object} clientId Client Id of the block.
+ * @param {string} clientId Client Id of the block.
  *
  * @return {boolean} Whether the block is a content locking parent.
  */
@@ -596,17 +573,6 @@ export const getBlockStyles = createSelector(
 );
 
 /**
- * Returns whether zoom out mode is enabled.
- *
- * @param {Object} state Editor state.
- *
- * @return {boolean} Is zoom out mode enabled.
- */
-export function isZoomOutMode( state ) {
-	return state.editorMode === 'zoom-out';
-}
-
-/**
  * Retrieves the client ID of the block which contains the blocks
  * acting as "sections" in the editor. This is typically the "main content"
  * of the template/post.
@@ -620,23 +586,13 @@ export function getSectionRootClientId( state ) {
 }
 
 /**
- * Returns the zoom out state.
- *
- * @param {Object} state Global application state.
- * @return {boolean} The zoom out state.
- */
-export function getZoomLevel( state ) {
-	return state.zoomLevel;
-}
-
-/**
  * Returns whether the editor is considered zoomed out.
  *
  * @param {Object} state Global application state.
  * @return {boolean} Whether the editor is zoomed.
  */
 export function isZoomOut( state ) {
-	return getZoomLevel( state ) < 100;
+	return state.zoomLevel < 100;
 }
 
 /**
@@ -697,4 +653,14 @@ export function getClosestAllowedInsertionPointForPattern(
 	}
 	const names = getGrammar( pattern ).map( ( { blockName: name } ) => name );
 	return getClosestAllowedInsertionPoint( state, names, clientId );
+}
+
+/**
+ * Where the point where the next block will be inserted into.
+ *
+ * @param {Object} state
+ * @return {Object} where the insertion point in the block editor is or null if none is set.
+ */
+export function getInsertionPoint( state ) {
+	return state.insertionPoint;
 }

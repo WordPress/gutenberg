@@ -145,11 +145,9 @@ function ListItem< Item >( {
 	const descriptionId = `${ idPrefix }-description`;
 
 	const [ isHovered, setIsHovered ] = useState( false );
-	const handleMouseEnter = () => {
-		setIsHovered( true );
-	};
-	const handleMouseLeave = () => {
-		setIsHovered( false );
+	const handleHover: React.MouseEventHandler = ( { type } ) => {
+		const isHover = type === 'mouseenter';
+		setIsHovered( isHover );
 	};
 
 	useEffect( () => {
@@ -187,6 +185,45 @@ function ListItem< Item >( {
 		<primaryField.render item={ item } />
 	) : null;
 
+	const usedActions = eligibleActions?.length > 0 && (
+		<HStack spacing={ 3 } className="dataviews-view-list__item-actions">
+			{ primaryAction && (
+				<PrimaryActionGridCell
+					idPrefix={ idPrefix }
+					primaryAction={ primaryAction }
+					item={ item }
+				/>
+			) }
+			<div role="gridcell">
+				<DropdownMenu
+					trigger={
+						<Composite.Item
+							id={ generateDropdownTriggerCompositeId(
+								idPrefix
+							) }
+							render={
+								<Button
+									size="small"
+									icon={ moreVertical }
+									label={ __( 'Actions' ) }
+									accessibleWhenDisabled
+									disabled={ ! actions.length }
+									onKeyDown={ onDropdownTriggerKeyDown }
+								/>
+							}
+						/>
+					}
+					placement="bottom-end"
+				>
+					<ActionsDropdownMenuGroup
+						actions={ eligibleActions }
+						item={ item }
+					/>
+				</DropdownMenu>
+			</div>
+		</HStack>
+	);
+
 	return (
 		<Composite.Row
 			ref={ itemRef }
@@ -196,116 +233,60 @@ function ListItem< Item >( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
 			} ) }
-			onMouseEnter={ handleMouseEnter }
-			onMouseLeave={ handleMouseLeave }
+			onMouseEnter={ handleHover }
+			onMouseLeave={ handleHover }
 		>
-			<HStack
-				className="dataviews-view-list__item-wrapper"
-				alignment="center"
-				spacing={ 0 }
-			>
+			<HStack className="dataviews-view-list__item-wrapper" spacing={ 0 }>
 				<div role="gridcell">
 					<Composite.Item
-						render={ <div /> }
-						role="button"
 						id={ generateItemWrapperCompositeId( idPrefix ) }
 						aria-pressed={ isSelected }
 						aria-labelledby={ labelId }
 						aria-describedby={ descriptionId }
 						className="dataviews-view-list__item"
 						onClick={ () => onSelect( item ) }
-					>
-						<HStack
-							spacing={ 3 }
-							justify="start"
-							alignment="flex-start"
-						>
-							<div className="dataviews-view-list__media-wrapper">
-								{ renderedMediaField }
-							</div>
-							<VStack
-								spacing={ 1 }
-								className="dataviews-view-list__field-wrapper"
-							>
-								<span
-									className="dataviews-view-list__primary-field"
-									id={ labelId }
-								>
-									{ renderedPrimaryField }
-								</span>
-								<div
-									className="dataviews-view-list__fields"
-									id={ descriptionId }
-								>
-									{ visibleFields.map( ( field ) => (
-										<div
-											key={ field.id }
-											className="dataviews-view-list__field"
-										>
-											<VisuallyHidden
-												as="span"
-												className="dataviews-view-list__field-label"
-											>
-												{ field.label }
-											</VisuallyHidden>
-											<span className="dataviews-view-list__field-value">
-												<field.render item={ item } />
-											</span>
-										</div>
-									) ) }
-								</div>
-							</VStack>
-						</HStack>
-					</Composite.Item>
+					/>
 				</div>
-				{ eligibleActions?.length > 0 && (
-					<HStack
-						spacing={ 3 }
-						justify="flex-end"
-						className="dataviews-view-list__item-actions"
-						style={ {
-							flexShrink: '0',
-							width: 'auto',
-						} }
+				<HStack spacing={ 3 } justify="start" alignment="flex-start">
+					<div className="dataviews-view-list__media-wrapper">
+						{ renderedMediaField }
+					</div>
+					<VStack
+						spacing={ 1 }
+						className="dataviews-view-list__field-wrapper"
 					>
-						{ primaryAction && (
-							<PrimaryActionGridCell
-								idPrefix={ idPrefix }
-								primaryAction={ primaryAction }
-								item={ item }
-							/>
-						) }
-						<div role="gridcell">
-							<DropdownMenu
-								trigger={
-									<Composite.Item
-										id={ generateDropdownTriggerCompositeId(
-											idPrefix
-										) }
-										render={
-											<Button
-												size="small"
-												icon={ moreVertical }
-												label={ __( 'Actions' ) }
-												accessibleWhenDisabled
-												disabled={ ! actions.length }
-												onKeyDown={
-													onDropdownTriggerKeyDown
-												}
-											/>
-										}
-									/>
-								}
-								placement="bottom-end"
+						<HStack spacing={ 0 }>
+							<div
+								className="dataviews-view-list__primary-field"
+								id={ labelId }
 							>
-								<ActionsDropdownMenuGroup
-									actions={ eligibleActions }
-									item={ item }
-								/>
-							</DropdownMenu>
+								{ renderedPrimaryField }
+							</div>
+							{ usedActions }
+						</HStack>
+						<div
+							className="dataviews-view-list__fields"
+							id={ descriptionId }
+						>
+							{ visibleFields.map( ( field ) => (
+								<div
+									key={ field.id }
+									className="dataviews-view-list__field"
+								>
+									<VisuallyHidden
+										as="span"
+										className="dataviews-view-list__field-label"
+									>
+										{ field.label }
+									</VisuallyHidden>
+									<span className="dataviews-view-list__field-value">
+										<field.render item={ item } />
+									</span>
+								</div>
+							) ) }
 						</div>
-					</HStack>
-				) }
+					</VStack>
+				</HStack>
 			</HStack>
 		</Composite.Row>
 	);

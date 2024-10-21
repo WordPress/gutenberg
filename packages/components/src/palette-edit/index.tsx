@@ -24,7 +24,7 @@ import Button from '../button';
 import { ColorPicker } from '../color-picker';
 import { FlexItem } from '../flex';
 import { HStack } from '../h-stack';
-import { ItemGroup } from '../item-group';
+import { Item, ItemGroup } from '../item-group';
 import { VStack } from '../v-stack';
 import GradientPicker from '../gradient-picker';
 import ColorPalette from '../color-palette';
@@ -35,7 +35,6 @@ import {
 	PaletteEditStyles,
 	PaletteHeading,
 	IndicatorStyled,
-	PaletteItem,
 	NameContainer,
 	NameInputControl,
 	DoneButton,
@@ -49,7 +48,6 @@ import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,
-	Gradient,
 	NameInputProps,
 	OptionProps,
 	PaletteEditListViewProps,
@@ -68,6 +66,28 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
 			onChange={ onChange }
 		/>
 	);
+}
+
+/*
+ * Deduplicates the slugs of the provided elements.
+ */
+export function deduplicateElementSlugs< T extends PaletteElement >(
+	elements: T[]
+) {
+	const slugCounts: { [ slug: string ]: number } = {};
+
+	return elements.map( ( element ) => {
+		let newSlug: string | undefined;
+
+		const { slug } = element;
+		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+
+		if ( slugCounts[ slug ] > 1 ) {
+			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		}
+
+		return { ...element, slug: newSlug ?? slug };
+	} );
 }
 
 /**
@@ -109,7 +129,7 @@ export function getNameAndSlugForPosition(
 	};
 }
 
-function ColorPickerPopover< T extends Color | Gradient >( {
+function ColorPickerPopover< T extends PaletteElement >( {
 	isGradient,
 	element,
 	onChange,
@@ -167,7 +187,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	);
 }
 
-function Option< T extends Color | Gradient >( {
+function Option< T extends PaletteElement >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
@@ -192,7 +212,7 @@ function Option< T extends Color | Gradient >( {
 	);
 
 	return (
-		<PaletteItem ref={ setPopoverAnchor } as="div">
+		<Item ref={ setPopoverAnchor } size="small">
 			<HStack justify="flex-start">
 				<Button
 					onClick={ () => {
@@ -261,11 +281,11 @@ function Option< T extends Color | Gradient >( {
 					onClose={ () => setIsEditingColor( false ) }
 				/>
 			) }
-		</PaletteItem>
+		</Item>
 	);
 }
 
-function PaletteEditListView< T extends Color | Gradient >( {
+function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
@@ -280,11 +300,15 @@ function PaletteEditListView< T extends Color | Gradient >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const debounceOnChange = useDebounce(
+		( updatedElements: T[] ) =>
+			onChange( deduplicateElementSlugs( updatedElements ) ),
+		100
+	);
 
 	return (
 		<VStack spacing={ 3 }>
-			<ItemGroup isRounded>
+			<ItemGroup isRounded isBordered isSeparated>
 				{ elements.map( ( element, index ) => (
 					<Option
 						isGradient={ isGradient }
