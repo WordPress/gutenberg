@@ -22,8 +22,7 @@
 }
 
 .edit-site-style-book__tablist-container {
-	flex-shrink: 0;
-	flex-grow: 0;
+	flex: none;
 
 	display: flex;
 	width: 100%;
@@ -32,8 +31,7 @@
 }
 
 .edit-site-style-book__tabpanel {
-	flex-grow: 1;
-	flex-shrink: 0;
+	flex: 1 0 auto;
 
 	overflow: auto;
 }
