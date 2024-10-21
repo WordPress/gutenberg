@@ -43,7 +43,7 @@ const meta = {
 		},
 		orientation: {
 			description:
-				'Orientation for arrow key navigation. Internally Composite component is used and it"s default value.',
+				'Orientation for the underlying composite widget.',
 			table: {
 				defaultValue: { summary: 'both' },
 				type: { summary: 'string' },
