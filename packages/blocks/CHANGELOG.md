@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+### Bug fixes
+
 - Enforce `blockType.parent` to be an array. While `parent` being a string wasn't never supported, it worked with some unintended side-effects that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250). For that reason, we've added some code that automatically migrates strings to arrays — though it still raises a warning.
 
 ## 13.10.0 (2024-10-16)
