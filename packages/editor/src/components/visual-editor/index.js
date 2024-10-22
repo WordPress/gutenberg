@@ -384,7 +384,9 @@ function VisualEditor( {
 			<ResizableEditor
 				enableResizing={ enableResizing }
 				height={
-					sizes.height && ! forceFullHeight ? sizes.height : '100%'
+					sizes.height && ! forceFullHeight
+						? sizes.height + 1 // Add 1px to avoid scrollbars.
+						: '100%'
 				}
 			>
 				<BlockCanvas
