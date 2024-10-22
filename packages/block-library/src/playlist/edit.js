@@ -172,6 +172,8 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 						checked={ images }
 					/>
 					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
 						label={ __( 'Order' ) }
 						value={ order }
 						options={ [
@@ -264,6 +266,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 								className="wp-block-playlist__item"
 							>
 								<Button
+									__next40pxDefaultSize
 									aria-current={
 										track.id === ids[ trackListIndex ]?.id
 									}
