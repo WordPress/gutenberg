@@ -5,7 +5,7 @@ import { Button, __experimentalGrid as Grid } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 // @ts-ignore
-import { MediaUpload } from '@wordpress/block-editor';
+import { MediaUpload } from '@wordpress/media-utils';
 import { lineSolid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
