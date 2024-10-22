@@ -11,6 +11,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -72,6 +73,7 @@ export default function GlobalStylesSidebar() {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	useEffect( () => {
 		if ( shouldClearCanvasContainerView ) {
@@ -140,20 +142,22 @@ export default function GlobalStylesSidebar() {
 						gap={ 1 }
 						className="edit-site-global-styles-sidebar__header-actions"
 					>
-						<FlexItem>
-							<Button
-								icon={ seen }
-								label={ __( 'Style Book' ) }
-								isPressed={
-									isStyleBookOpened ||
-									isRevisionsStyleBookOpened
-								}
-								accessibleWhenDisabled
-								disabled={ shouldClearCanvasContainerView }
-								onClick={ toggleStyleBook }
-								size="compact"
-							/>
-						</FlexItem>
+						{ ! isMobileViewport && (
+							<FlexItem>
+								<Button
+									icon={ seen }
+									label={ __( 'Style Book' ) }
+									isPressed={
+										isStyleBookOpened ||
+										isRevisionsStyleBookOpened
+									}
+									accessibleWhenDisabled
+									disabled={ shouldClearCanvasContainerView }
+									onClick={ toggleStyleBook }
+									size="compact"
+								/>
+							</FlexItem>
+						) }
 						<FlexItem>
 							<Button
 								label={ __( 'Revisions' ) }
