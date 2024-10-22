@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { startOfYear, endOfYear, format as dateFormat } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -43,6 +48,7 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
+const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, setDisplayLayout, isTemplate } = props;
@@ -59,10 +65,15 @@ export default function QueryInspectorControls( props ) {
 		inherit,
 		taxQuery,
 		parents,
+		after,
+		before,
 		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const showSticky = postType === 'post';
+	const [ queryYear, setQueryYear ] = useState(
+		!! after ? new Date( after ).getFullYear() : ''
+	);
 	const {
 		postTypesTaxonomiesMap,
 		postTypesSelectOptions,
@@ -103,6 +114,23 @@ export default function QueryInspectorControls( props ) {
 
 		setQuery( updateQuery );
 	};
+	const onYearChange = ( value ) => {
+		setQueryYear( value );
+		const yearRegex = /^\d{4}$/;
+
+		if ( ! yearRegex.test( value ) ) {
+			setQuery( {
+				after: '',
+				before: '',
+			} );
+			return;
+		}
+
+		setQuery( {
+			after: dateFormat( startOfYear( value ), TIMEZONELESS_FORMAT ),
+			before: dateFormat( endOfYear( value ), TIMEZONELESS_FORMAT ),
+		} );
+	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
 		debounce( () => {
@@ -141,6 +169,9 @@ export default function QueryInspectorControls( props ) {
 	const showTaxControl =
 		!! taxonomies?.length &&
 		isControlAllowed( allowedControls, 'taxQuery' );
+	const showYearControl =
+		isControlAllowed( allowedControls, 'after' ) ||
+		isControlAllowed( allowedControls, 'before' );
 	const showAuthorControl = isControlAllowed( allowedControls, 'author' );
 	const showSearchControl = isControlAllowed( allowedControls, 'search' );
 	const showParentControl =
@@ -176,7 +207,8 @@ export default function QueryInspectorControls( props ) {
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl ||
-		showFormatControl;
+		showFormatControl ||
+		showYearControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
@@ -353,6 +385,8 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
+							after: undefined,
+							before: undefined,
 							format: [],
 						} );
 						setQuerySearch( '' );
@@ -399,6 +433,27 @@ export default function QueryInspectorControls( props ) {
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ setQuerySearch }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showYearControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! after || !! before }
+							label={ __( 'Year' ) }
+							onDeselect={ () =>
+								setQuery( {
+									after: undefined,
+									before: undefined,
+								} )
+							}
+						>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Year:' ) }
+								type="number"
+								value={ queryYear }
+								onChange={ onYearChange }
 							/>
 						</ToolsPanelItem>
 					) }

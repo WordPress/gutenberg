@@ -17,6 +17,8 @@
 				"inherit": true,
 				"taxQuery": null,
 				"parents": [],
+				"after": "",
+				"before": "",
 				"format": []
 			},
 			"tagName": "div",

@@ -110,6 +110,7 @@ require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
 require __DIR__ . '/compat/wordpress-6.7/class-wp-block-templates-registry.php';
 require __DIR__ . '/compat/wordpress-6.7/compat.php';
+require __DIR__ . '/compat/wordpress-6.7/query-loop-block-filter.php';
 require __DIR__ . '/compat/wordpress-6.7/post-formats.php';
 
 // Experimental features.
