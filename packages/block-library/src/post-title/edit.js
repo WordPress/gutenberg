@@ -116,6 +116,22 @@ export default function PostTitleEdit( {
 				/>
 			</TagName>
 		);
+	} else if ( isLink ) {
+		/* If the postType or postId is not set, It might be in template editor. Just show the title as a link.
+		 * This is a fallback for the case where the postType and postId are not set.
+		 */
+		titleElement = (
+			<TagName { ...blockProps }>
+				<a
+					href={ link }
+					target={ linkTarget }
+					onClick={ ( event ) => event.preventDefault() }
+					dangerouslySetInnerHTML={ {
+						__html: __( 'Title' ),
+					} }
+				/>
+			</TagName>
+		);
 	}
 
 	return (
