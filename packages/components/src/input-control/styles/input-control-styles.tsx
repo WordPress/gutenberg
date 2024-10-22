@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
-import type { LabelPosition, Size } from '../types';
+import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -317,4 +317,36 @@ export const Label = (
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
+`;
+
+const prefixSuffixWrapperStyles = ( {
+	variant = 'default',
+	size,
+	__next40pxDefaultSize,
+	isPrefix,
+}: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
+	const { paddingLeft: padding } = getSizeConfig( {
+		inputSize: size,
+		__next40pxDefaultSize,
+	} );
+
+	const paddingProperty = isPrefix
+		? 'paddingInlineStart'
+		: 'paddingInlineEnd';
+
+	if ( variant === 'default' ) {
+		return css( {
+			[ paddingProperty ]: padding,
+		} );
+	}
+
+	// If variant is 'icon' or 'control'
+	return css( {
+		display: 'flex',
+		[ paddingProperty ]: padding - 4,
+	} );
+};
+
+export const PrefixSuffixWrapper = styled.div`
+	${ prefixSuffixWrapperStyles }
 `;

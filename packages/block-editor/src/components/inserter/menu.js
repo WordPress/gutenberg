@@ -33,6 +33,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -54,8 +55,7 @@ function InserterMenu(
 	ref
 ) {
 	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
 		[]
 	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
@@ -77,6 +77,10 @@ function InserterMenu(
 		}
 	}
 	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
+
+	const shouldUseZoomOut =
+		selectedTab === 'patterns' || selectedTab === 'media';
+	useZoomOut( shouldUseZoomOut );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -102,12 +106,12 @@ function InserterMenu(
 			window.requestAnimationFrame( () => {
 				if (
 					! shouldFocusBlock &&
-					! blockTypesTabRef?.current.contains(
+					! blockTypesTabRef.current?.contains(
 						ref.current.ownerDocument.activeElement
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
-					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+					blockTypesTabRef.current?.querySelector( 'button' ).focus();
 				}
 			} );
 		},
@@ -115,9 +119,9 @@ function InserterMenu(
 	);
 
 	const onInsertPattern = useCallback(
-		( blocks, patternName ) => {
+		( blocks, patternName, ...args ) => {
 			onToggleInsertionPoint( false );
-			onInsertBlocks( blocks, { patternName } );
+			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
 		},
 		[ onInsertBlocks, onSelect ]
@@ -147,11 +151,6 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
-	const showZoomOut =
-		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
-
-	useZoomOut( showZoomOut );
-
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -169,7 +168,7 @@ function InserterMenu(
 						setFilterValue( value );
 					} }
 					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 				{ !! delayedFilterValue && (
@@ -323,7 +322,7 @@ function InserterMenu(
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
-					closeButtonLabel={ __( 'Close block inserter' ) }
+					closeButtonLabel={ __( 'Close Block Inserter' ) }
 					tabs={ [
 						{
 							name: 'blocks',

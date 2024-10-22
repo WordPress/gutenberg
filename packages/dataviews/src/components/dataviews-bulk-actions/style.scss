@@ -1,7 +1,12 @@
-.dataviews-bulk-actions__modal {
-	z-index: z-index(".dataviews-bulk-actions__modal");
+
+.dataviews-bulk-actions-footer__item-count {
+	color: $gray-900;
+	font-weight: 500;
+	font-size: 11px;
+	text-transform: uppercase;
 }
 
-.dataviews-bulk-actions__edit-button.components-button {
-	flex-shrink: 0;
+.dataviews-bulk-actions-footer__container {
+	margin-right: auto;
+	min-height: $grid-unit-40;
 }

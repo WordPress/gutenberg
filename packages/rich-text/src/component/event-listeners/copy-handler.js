@@ -2,21 +2,18 @@
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
+import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
-import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
-		const { record, createRecord, handleChange } = props.current;
+		const { record } = props.current;
 		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
-		const { anchorNode, focusNode, isCollapsed } =
-			defaultView.getSelection();
-		const containsSelection =
-			element.contains( anchorNode ) && element.contains( focusNode );
-
-		if ( isCollapsed || ! containsSelection ) {
+		if (
+			isCollapsed( record.current ) ||
+			! element.contains( ownerDocument.activeElement )
+		) {
 			return;
 		}
 
@@ -29,7 +26,7 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		if ( event.type === 'cut' ) {
-			handleChange( remove( createRecord() ) );
+			ownerDocument.execCommand( 'delete' );
 		}
 	}
 

@@ -32,6 +32,8 @@ const meta: Meta< typeof DropdownMenuV2 > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Group: DropdownMenuV2.Group,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		GroupLabel: DropdownMenuV2.GroupLabel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Separator: DropdownMenuV2.Separator,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: DropdownMenuV2.Context,
@@ -83,6 +85,7 @@ export const Default: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
 		<DropdownMenuV2.Item disabled>Disabled item</DropdownMenuV2.Item>
 		<DropdownMenuV2.Separator />
 		<DropdownMenuV2.Group>
+			<DropdownMenuV2.GroupLabel>Group label</DropdownMenuV2.GroupLabel>
 			<DropdownMenuV2.Item
 				prefix={ <Icon icon={ customLink } size={ 24 } /> }
 			>
@@ -182,6 +185,9 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 	return (
 		<DropdownMenuV2 { ...props }>
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Single selection, uncontrolled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.CheckboxItem
 					name="checkbox-individual-uncontrolled-a"
 					value="a"
@@ -191,7 +197,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item A
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 				<DropdownMenuV2.CheckboxItem
@@ -203,12 +209,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item B
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 			</DropdownMenuV2.Group>
 			<DropdownMenuV2.Separator />
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Single selection, controlled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.CheckboxItem
 					name="checkbox-individual-controlled-a"
 					value="a"
@@ -219,7 +228,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item A
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 				<DropdownMenuV2.CheckboxItem
@@ -232,12 +241,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item B
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 			</DropdownMenuV2.Group>
 			<DropdownMenuV2.Separator />
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Multiple selection, uncontrolled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.CheckboxItem
 					name="checkbox-multiple-uncontrolled"
 					value="a"
@@ -246,7 +258,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item A
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled, multiple selection
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 				<DropdownMenuV2.CheckboxItem
@@ -258,12 +270,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item B
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled, multiple selection, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 			</DropdownMenuV2.Group>
 			<DropdownMenuV2.Separator />
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Multiple selection, controlled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.CheckboxItem
 					name="checkbox-multiple-controlled"
 					value="a"
@@ -274,7 +289,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item A
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled, multiple selection
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 				<DropdownMenuV2.CheckboxItem
@@ -287,7 +302,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Checkbox item B
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled, multiple selection, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.CheckboxItem>
 			</DropdownMenuV2.Group>
@@ -307,12 +322,15 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 	return (
 		<DropdownMenuV2 { ...props }>
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Uncontrolled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.RadioItem name="radio-uncontrolled" value="one">
 					<DropdownMenuV2.ItemLabel>
 						Radio item 1
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.RadioItem>
 				<DropdownMenuV2.RadioItem
@@ -324,12 +342,15 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Radio item 2
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Uncontrolled, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.RadioItem>
 			</DropdownMenuV2.Group>
 			<DropdownMenuV2.Separator />
 			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Controlled
+				</DropdownMenuV2.GroupLabel>
 				<DropdownMenuV2.RadioItem
 					name="radio-controlled"
 					value="one"
@@ -340,7 +361,7 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Radio item 1
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled
+						Initially unchecked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.RadioItem>
 				<DropdownMenuV2.RadioItem
@@ -353,7 +374,7 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Radio item 2
 					</DropdownMenuV2.ItemLabel>
 					<DropdownMenuV2.ItemHelpText>
-						Controlled, initially checked
+						Initially checked
 					</DropdownMenuV2.ItemHelpText>
 				</DropdownMenuV2.RadioItem>
 			</DropdownMenuV2.Group>

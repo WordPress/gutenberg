@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
 	chevronRight,
@@ -17,7 +17,11 @@ import { VIEWMODES } from './constants';
 
 const Actions = ( { onBlockPatternSelect } ) => (
 	<div className="block-editor-block-pattern-setup__actions">
-		<Button variant="primary" onClick={ onBlockPatternSelect }>
+		<Button
+			__next40pxDefaultSize
+			variant="primary"
+			onClick={ onBlockPatternSelect }
+		>
 			{ __( 'Choose' ) }
 		</Button>
 	</div>
@@ -31,14 +35,16 @@ const CarouselNavigation = ( {
 } ) => (
 	<div className="block-editor-block-pattern-setup__navigation">
 		<Button
-			icon={ chevronLeft }
+			size="compact"
+			icon={ isRTL() ? chevronRight : chevronLeft }
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
 			disabled={ activeSlide === 0 }
 			accessibleWhenDisabled
 		/>
 		<Button
-			icon={ chevronRight }
+			size="compact"
+			icon={ isRTL() ? chevronLeft : chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
 			disabled={ activeSlide === totalSlides - 1 }
@@ -60,12 +66,14 @@ const SetupToolbar = ( {
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
+				size="compact"
 				icon={ stretchFullWidth }
 				label={ __( 'Carousel view' ) }
 				onClick={ () => setViewMode( VIEWMODES.carousel ) }
 				isPressed={ isCarouselView }
 			/>
 			<Button
+				size="compact"
 				icon={ grid }
 				label={ __( 'Grid view' ) }
 				onClick={ () => setViewMode( VIEWMODES.grid ) }

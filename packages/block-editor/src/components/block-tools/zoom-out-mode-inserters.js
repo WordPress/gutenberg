@@ -16,38 +16,33 @@ function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
 		hasSelection,
-		blockInsertionPoint,
 		blockOrder,
-		blockInsertionPointVisible,
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
-		hoveredBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
-			getBlockInsertionPoint,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getHoveredBlockClientId,
-			isBlockInsertionPointVisible,
-		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
+		const root = getSectionRootClientId();
+
 		return {
 			hasSelection: !! getSelectionStart().clientId,
-			blockInsertionPoint: getBlockInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
-			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
-			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
 
-	const { showInsertionPoint } = useDispatch( blockEditorStore );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { showInsertionPoint } = unlock( useDispatch( blockEditorStore ) );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -59,63 +54,36 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! hasSelection ) {
 		return null;
 	}
 
-	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		const shouldRenderInsertionPoint =
-			blockInsertionPointVisible && blockInsertionPoint.index === index;
+	const previousClientId = selectedBlockClientId;
+	const index = blockOrder.findIndex(
+		( clientId ) => selectedBlockClientId === clientId
+	);
+	const nextClientId = blockOrder[ index + 1 ];
 
-		const previousClientId = clientId;
-		const nextClientId = blockOrder[ index ];
-
-		const isSelected =
-			hasSelection &&
-			( selectedBlockClientId === previousClientId ||
-				selectedBlockClientId === nextClientId );
-
-		const isHovered =
-			hoveredBlockClientId === previousClientId ||
-			hoveredBlockClientId === nextClientId;
-
-		return (
-			<BlockPopoverInbetween
-				key={ index }
-				previousClientId={ previousClientId }
-				nextClientId={ nextClientId }
-			>
-				{ shouldRenderInsertionPoint && (
-					<div
-						style={ {
-							borderRadius: '0',
-							height: '12px',
-							opacity: 1,
-							transform: 'translateY(-50%)',
-							width: '100%',
-						} }
-						className="block-editor-block-list__insertion-point-indicator"
-					/>
-				) }
-				{ ! shouldRenderInsertionPoint && (
-					<ZoomOutModeInserterButton
-						isVisible={ isSelected || isHovered }
-						onClick={ () => {
-							setInserterIsOpened( {
-								rootClientId: sectionRootClientId,
-								insertionIndex: index,
-								tab: 'patterns',
-								category: 'all',
-							} );
-							showInsertionPoint( sectionRootClientId, index, {
-								operation: 'insert',
-							} );
-						} }
-					/>
-				) }
-			</BlockPopoverInbetween>
-		);
-	} );
+	return (
+		<BlockPopoverInbetween
+			previousClientId={ previousClientId }
+			nextClientId={ nextClientId }
+		>
+			<ZoomOutModeInserterButton
+				onClick={ () => {
+					setInserterIsOpened( {
+						rootClientId: sectionRootClientId,
+						insertionIndex: index + 1,
+						tab: 'patterns',
+						category: 'all',
+					} );
+					showInsertionPoint( sectionRootClientId, index + 1, {
+						operation: 'insert',
+					} );
+				} }
+			/>
+		</BlockPopoverInbetween>
+	);
 }
 
 export default ZoomOutModeInserters;

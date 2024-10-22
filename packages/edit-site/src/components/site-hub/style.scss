@@ -4,6 +4,7 @@
 	justify-content: space-between;
 	gap: $grid-unit-10;
 	margin-right: $grid-unit-15;
+	height: $grid-unit-70;
 }
 
 .edit-site-site-hub__actions {
@@ -29,6 +30,9 @@
 	overflow: hidden;
 	// Add space for the ↗ to render.
 	padding-right: $grid-unit-20;
+
+	// Create 12px gap between site icon and site title
+	margin-left: - $grid-unit-05;
 	position: relative;
 	text-decoration: none;
 	text-overflow: ellipsis;

@@ -8,6 +8,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { GLOBAL_POST_TYPES } from '../../store/constants';
 
 /**
  * Wrapper component that renders its children only if the post can trashed.
@@ -34,10 +35,12 @@ export default function PostTrashCheck( { children } ) {
 			: false;
 
 		return {
-			canTrashPost: ( ! isNew || postId ) && canUserDelete,
+			canTrashPost:
+				( ! isNew || postId ) &&
+				canUserDelete &&
+				! GLOBAL_POST_TYPES.includes( postType ),
 		};
 	}, [] );
-
 	if ( ! canTrashPost ) {
 		return null;
 	}

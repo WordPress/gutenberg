@@ -22,9 +22,11 @@ test.describe( 'Templates', () => {
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
-		// Descending by title.
-		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
+		// Wait for the template list to be visible.
+		await expect(
+			page.locator( '[aria-label="Templates"]' )
+		).toBeVisible();
+
 		const firstTitle = page
 			.getByRole( 'region', {
 				name: 'Template',
@@ -32,6 +34,10 @@ test.describe( 'Templates', () => {
 			} )
 			.getByRole( 'link', { includeHidden: true } )
 			.first();
+
+		// Descending by title.
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
 		// Ascending by title.

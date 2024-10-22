@@ -28,10 +28,7 @@ import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
 
-const {
-	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
-} = unlock( editorPrivateApis );
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -48,7 +45,6 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
@@ -79,7 +75,15 @@ export function initializeEditor( id, settings ) {
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 	} );
+
+	if ( window.__experimentalMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
 
 	dispatch( editSiteStore ).updateSettings( settings );
 

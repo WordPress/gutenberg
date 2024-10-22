@@ -393,36 +393,27 @@ function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			// Only open this API in Gutenberg and for `core/post-meta` for the moment.
+			let getFieldsList;
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				getFieldsList = action.getFieldsList;
+			} else if ( action.name === 'core/post-meta' ) {
+				getFieldsList = action.getFieldsList;
+			}
 			return {
 				...state,
 				[ action.name ]: {
-					// Don't override the label if it's already set.
-					label: state[ action.name ]?.label || action.label,
+					label: action.label || state[ action.name ]?.label,
 					usesContext: getMergedUsesContext(
 						state[ action.name ]?.usesContext,
 						action.usesContext
 					),
 					getValues: action.getValues,
 					setValues: action.setValues,
-					getPlaceholder: action.getPlaceholder,
-					canUserEditValue: action.canUserEditValue,
-					getFieldsList: action.getFieldsList,
-				},
-			};
-		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
-			return {
-				...state,
-				[ action.name ]: {
-					/*
-					 * Keep the exisitng properties in case the source has been registered
-					 * in the client before bootstrapping.
-					 */
-					...state[ action.name ],
-					label: action.label,
-					usesContext: getMergedUsesContext(
-						state[ action.name ]?.usesContext,
-						action.usesContext
-					),
+					// Only set `canUserEditValue` if `setValues` is also defined.
+					canUserEditValue:
+						action.setValues && action.canUserEditValue,
+					getFieldsList,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':

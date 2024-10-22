@@ -1,14 +1,5 @@
 .block-editor-hooks__block-hooks {
 	/**
-	 * Since we're displaying the block icon alongside the block name,
-	 * we need to right-align the toggle.
-	 */
-	.components-toggle-control .components-h-stack {
-		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
-		flex-direction: row-reverse;
-	}
-
-	/**
 	 * Un-reverse the flex direction for the toggle's label.
 	 */
 	.components-toggle-control .components-h-stack .components-h-stack {

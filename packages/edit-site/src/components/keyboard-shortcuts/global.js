@@ -5,6 +5,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -12,12 +13,14 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+const { useHistory } = unlock( routerPrivateApis );
+
 function KeyboardShortcutsGlobal() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { hasNonPostEntityChanges } = useSelect( editorStore );
-	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const history = useHistory();
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -28,7 +31,8 @@ function KeyboardShortcutsGlobal() {
 			isSavingEntityRecord( record.kind, record.name, record.key )
 		);
 		const _hasNonPostEntityChanges = hasNonPostEntityChanges();
-		const isViewMode = getCanvasMode() === 'view';
+		const isViewMode =
+			history.getLocationWithParams().params.canvas === 'view';
 		if (
 			( ! hasDirtyEntities || ! _hasNonPostEntityChanges || isSaving ) &&
 			! isViewMode

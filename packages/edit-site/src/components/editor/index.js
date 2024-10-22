@@ -22,7 +22,8 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, homeButton } from '@wordpress/icons';
+import { Icon, arrowUpLeft } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitleAndIcon,
+	getEditorCanvasContainerTitle,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
@@ -47,6 +48,7 @@ import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
+import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -66,26 +68,27 @@ const toggleHomeIconVariants = {
 
 const siteIconVariants = {
 	edit: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 	hover: {
 		clipPath: 'inset( 22% round 2px )',
 	},
 	tap: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 };
 
 export default function EditSiteEditor( { isPostsList = false } ) {
 	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const isLoading = useIsSiteEditorLoading();
+	useAdaptEditorToCanvas( canvas );
 	const {
 		editedPostType,
 		editedPostId,
 		contextPostType,
 		contextPostId,
-		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
@@ -96,7 +99,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		const {
 			getEditorCanvasContainerView,
 			getEditedPostContext,
-			getCanvasMode,
 			isPage,
 			getEditedPostType,
 			getEditedPostId,
@@ -113,7 +115,6 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -128,7 +129,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-	const isEditMode = canvasMode === 'edit';
+	const isEditMode = canvas === 'edit';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
@@ -143,16 +144,18 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 				css:
-					canvasMode === 'view'
+					canvas === 'view'
 						? `body{min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
 						  }}`
 						: undefined,
 			},
 		],
-		[ settings.styles, canvasMode, currentPostIsTrashed ]
+		[ settings.styles, canvas, currentPostIsTrashed ]
 	);
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -204,8 +207,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	);
 
 	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const { title, icon } =
-		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+	const title = getEditorCanvasContainerTitle( editorCanvasView );
 
 	const isReady = ! isLoading;
 	const transition = {
@@ -231,14 +233,12 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						'show-icon-labels': showIconLabels,
 					} ) }
 					styles={ styles }
-					enableRegionNavigation={ false }
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
 					title={ title }
-					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -258,21 +258,45 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
+											__next40pxDefaultSize
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"
 											onClick={ () => {
-												setCanvasMode( 'view' );
+												__unstableSetEditorMode(
+													'edit'
+												);
+												resetZoomLevel();
+
 												// TODO: this is a temporary solution to navigate to the posts list if we are
 												// come here through `posts list` and are in focus mode editing a template, template part etc..
 												if (
 													isPostsList &&
 													params?.focusMode
 												) {
-													history.push( {
-														page: 'gutenberg-posts-dashboard',
-														postType: 'post',
-													} );
+													history.push(
+														{
+															page: 'gutenberg-posts-dashboard',
+															postType: 'post',
+														},
+														undefined,
+														{
+															transition:
+																'canvas-mode-view-transition',
+														}
+													);
+												} else {
+													history.push(
+														{
+															...params,
+															canvas: undefined,
+														},
+														undefined,
+														{
+															transition:
+																'canvas-mode-view-transition',
+														}
+													);
 												}
 											} }
 										>
@@ -292,7 +316,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											) }
 											variants={ toggleHomeIconVariants }
 										>
-											<Icon icon={ homeButton } />
+											<Icon icon={ arrowUpLeft } />
 										</motion.div>
 									</motion.div>
 								)

@@ -10,7 +10,6 @@ import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	MenuItem,
 	ToggleControl,
 	PanelBody,
 	Placeholder,
@@ -309,6 +308,7 @@ export default function PostFeaturedImageEdit( {
 				mediaLibraryButton={ ( { open } ) => {
 					return (
 						<Button
+							__next40pxDefaultSize
 							icon={ upload }
 							variant="primary"
 							label={ label }
@@ -366,11 +366,8 @@ export default function PostFeaturedImageEdit( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
+						onReset={ () => setFeaturedImage( 0 ) }
+					/>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>

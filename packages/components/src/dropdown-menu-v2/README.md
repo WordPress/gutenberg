@@ -311,7 +311,7 @@ The help text contents.
 
 -   Required: yes
 
-### `DropdownMenuGroup`
+### `DropdownMenuV2.Group`
 
 Used to group menu items.
 
@@ -325,6 +325,20 @@ The contents of the group.
 
 -   Required: yes
 
-### `DropdownMenuSeparatorProps`
+### `DropdownMenuV2.GroupLabel`
+
+Used to render a group label. The label text should be kept as short as possible.
+
+#### Props
+
+The component accepts the following props:
+
+##### `children`: `React.ReactNode`
+
+The contents of the group label.
+
+-   Required: yes
+
+### `DropdownMenuV2.Separator`
 
 Used to render a visual separator.

@@ -5,13 +5,11 @@ export const ALLOWED_RESOURCE_ACTIONS = [
 	'delete',
 ];
 
-export function getUserPermissionsFromResponse( response ) {
+export function getUserPermissionsFromAllowHeader( allowedMethods ) {
 	const permissions = {};
-
-	// Optional chaining operator is used here because the API requests don't
-	// return the expected result in the React native version. Instead, API requests
-	// only return the result, without including response properties like the headers.
-	const allowedMethods = response.headers?.get( 'allow' ) || '';
+	if ( ! allowedMethods ) {
+		return permissions;
+	}
 
 	const methods = {
 		create: 'POST',

@@ -5,6 +5,10 @@
 // Undo default editor styles.
 // These need extra specificity.
 .editor-styles-wrapper .wp-block-navigation {
+	// Extra specificity is applied to do two things in classic themes:
+	// 1. Override the auto margin from alignment styles. This is needed as the `ul` element
+	//    has a `wp-block` class applied to it, even though it's not a block.
+	// 2. Override list indentation that targets `ul,ol` elements.
 	ul {
 		margin-top: 0;
 		margin-bottom: 0;
@@ -100,7 +104,6 @@
 		background: $gray-900;
 		padding: 0;
 		width: $button-size-small;
-		border-radius: $radius-block-ui;
 		margin-right: 0;
 		margin-left: auto;
 	}
@@ -200,6 +203,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
 	background-color: $gray-900;
 	color: $white;
+	height: $button-size-small;
 
 	// This needs specificity to override an inherited padding.
 	// That source padding in turn has high specificity to protect
@@ -322,7 +326,7 @@ $color-control-label-height: 20px;
 }
 
 .wp-block-navigation-placeholder__controls {
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	display: none;
@@ -478,7 +482,7 @@ $color-control-label-height: 20px;
 	}
 }
 
-// The iframe makes these rules a lot simpler.
+// `body.editor-styles-wrapper` ensures this only applies to the iframed editor.
 body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-open {
 	top: 0;
 	right: 0;
@@ -560,7 +564,11 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	width: 100%;
 	background-color: $gray-100;
 	padding: 0 $grid-unit-30;
-	height: $grid-unit-40 * 2;
+
+	// Adding !important to override default 40px size.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
+	height: $grid-unit-40 * 2 !important;
+
 	margin-bottom: $grid-unit-15;
 
 	&.open {

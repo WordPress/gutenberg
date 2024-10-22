@@ -8,7 +8,7 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	__experimentalLinkControl as LinkControl,
 	store as blockEditorStore,
@@ -28,7 +28,7 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { chevronLeftSmall, plus } from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
 /**
@@ -123,7 +123,7 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 
 			<Button
 				className="link-ui-block-inserter__back"
-				icon={ chevronLeftSmall }
+				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 				onClick={ ( e ) => {
 					e.preventDefault();
 					onBack();
@@ -310,6 +310,7 @@ const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 	return (
 		<VStack className="link-ui-tools">
 			<Button
+				__next40pxDefaultSize
 				ref={ addBlockButtonRef }
 				icon={ plus }
 				onClick={ ( e ) => {

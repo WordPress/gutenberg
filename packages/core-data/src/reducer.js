@@ -521,6 +521,11 @@ export function userPermissions( state = {}, action ) {
 				...state,
 				[ action.key ]: action.isAllowed,
 			};
+		case 'RECEIVE_USER_PERMISSIONS':
+			return {
+				...state,
+				...action.permissions,
+			};
 	}
 
 	return state;
@@ -623,6 +628,25 @@ export function defaultTemplates( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning an object of registered post meta.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function registeredPostMeta( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REGISTERED_POST_META':
+			return {
+				...state,
+				[ action.postType ]: action.registeredPostMeta,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -644,4 +668,5 @@ export default combineReducers( {
 	userPatternCategories,
 	navigationFallbackId,
 	defaultTemplates,
+	registeredPostMeta,
 } );

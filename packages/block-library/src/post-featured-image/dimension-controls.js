@@ -236,8 +236,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<SelectControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }

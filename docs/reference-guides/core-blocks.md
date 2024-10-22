@@ -72,14 +72,14 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight)
 -	**Attributes:** month, year
 
-## Categories List
+## Terms List
 
-Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
+Display a list of all terms of a given taxonomy. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
 -	**Name:** core/categories
 -	**Category:** widgets
 -	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts
+-	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
 
@@ -246,7 +246,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 -	**Name:** core/cover
 -	**Category:** media
 -	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
+-	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Details
 
@@ -493,7 +493,7 @@ Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenbe
 -	**Name:** core/navigation-submenu
 -	**Category:** design
 -	**Parent:** core/navigation
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
 
 ## Page Break

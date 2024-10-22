@@ -67,7 +67,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
-function EditorStyles( { styles, scope } ) {
+function EditorStyles( { styles, scope, transformOptions } ) {
 	const overrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		[]
@@ -88,14 +88,15 @@ function EditorStyles( { styles, scope } ) {
 		return [
 			transformStyles(
 				_styles.filter( ( style ) => style?.css ),
-				scope
+				scope,
+				transformOptions
 			),
 			_styles
 				.filter( ( style ) => style.__unstableType === 'svgs' )
 				.map( ( style ) => style.assets )
 				.join( '' ),
 		];
-	}, [ styles, overrides, scope ] );
+	}, [ styles, overrides, scope, transformOptions ] );
 
 	return (
 		<>
