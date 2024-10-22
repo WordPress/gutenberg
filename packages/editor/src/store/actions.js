@@ -159,6 +159,29 @@ export function setEditedPost( postType, postId ) {
  *
  * @param {Object} edits   Post attributes to edit.
  * @param {Object} options Options for the edit.
+ *
+ * @example
+ * ```js
+ * // Update the post title
+ * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
+ * ```
+ *
+ * @example
+ *```js
+ * 	// Get specific media size based on the featured media ID
+ * 	// Note: change sizes?.large for any registered size
+ * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
+ * 		const getFeaturedMediaId =
+ * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+ * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ *
+ * 		return (
+ * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 		);
+ * }, [] );
+ * ```
+ *
+ * @return {Object} Action object
  */
 export const editPost =
 	( edits, options ) =>
@@ -255,7 +278,11 @@ export const savePost =
 
 		if ( ! error ) {
 			try {
-				await doActionAsync( 'editor.savePost', options );
+				await doActionAsync(
+					'editor.savePost',
+					{ id: previousRecord.id },
+					options
+				);
 			} catch ( err ) {
 				error = err;
 			}
@@ -856,9 +883,11 @@ export const switchEditorMode =
 	( { dispatch, registry } ) => {
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
-		// Unselect blocks when we switch to a non visual mode.
 		if ( mode !== 'visual' ) {
+			// Unselect blocks when we switch to a non visual mode.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			// Exit zoom out state when switching to a non visual mode.
+			unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
 		}
 
 		if ( mode === 'visual' ) {

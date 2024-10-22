@@ -6,24 +6,23 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
-export function usePaddingAppender() {
+// Ruleset to add space for the typewriter effect. When typing in the last
+// block, there needs to be room to scroll up.
+const CSS =
+	':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}';
+
+export function usePaddingAppender( enabled ) {
 	const registry = useRegistry();
-	return useRefEffect(
+	const effect = useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
-				if ( event.target !== node ) {
-					return;
-				}
-
-				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-
-				const pseudoHeight = defaultView.parseInt(
-					defaultView.getComputedStyle( node, ':after' ).height,
-					10
-				);
-
-				if ( ! pseudoHeight ) {
+				if (
+					event.target !== node &&
+					// Tests for the parent element because in the iframed editor if the click is
+					// below the padding the target will be the parent element (html) and should
+					// still be treated as intent to append.
+					event.target !== node.parentElement
+				) {
 					return;
 				}
 
@@ -38,7 +37,7 @@ export function usePaddingAppender() {
 					return;
 				}
 
-				event.stopPropagation();
+				event.preventDefault();
 
 				const blockOrder = registry
 					.select( blockEditorStore )
@@ -57,11 +56,15 @@ export function usePaddingAppender() {
 					insertDefaultBlock();
 				}
 			}
-			node.addEventListener( 'mousedown', onMouseDown );
+			const { ownerDocument } = node;
+			// Adds the listener on the document so that in the iframed editor clicks below the
+			// padding can be handled as they too should be treated as intent to append.
+			ownerDocument.addEventListener( 'mousedown', onMouseDown );
 			return () => {
-				node.removeEventListener( 'mousedown', onMouseDown );
+				ownerDocument.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
 		[ registry ]
 	);
+	return enabled ? [ effect, CSS ] : [];
 }

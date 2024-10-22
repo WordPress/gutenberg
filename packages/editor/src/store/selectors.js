@@ -28,6 +28,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
+import { unlock } from '../lock-unlock';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -177,6 +178,11 @@ export const getCurrentPost = createRegistrySelector(
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ *
+ *```js
+ * const currentPostType = wp.data.select( 'core/editor' ).getCurrentPostType();
+ *```
  * @return {string} Post type.
  */
 export function getCurrentPostType( state ) {
@@ -315,6 +321,22 @@ const getNestedEditedPostProperty = createSelector(
  *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Post attribute name.
+ *
+ * @example
+ *
+ *```js
+ * 	// Get specific media size based on the featured media ID
+ * 	// Note: change sizes?.large for any registered size
+ * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
+ * 		const getFeaturedMediaId =
+ * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+ * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ *
+ * 		return (
+ * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 		);
+ * }, [] );
+ *```
  *
  * @return {*} Post attribute value.
  */
@@ -1278,8 +1300,8 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
-		if ( editorMode === 'zoom-out' ) {
+		const isZoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		if ( isZoomOut ) {
 			return 'Desktop';
 		}
 		return state.deviceType;

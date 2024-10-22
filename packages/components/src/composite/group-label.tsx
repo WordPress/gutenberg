@@ -20,11 +20,13 @@ export const CompositeGroupLabel = forwardRef<
 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
 >( function CompositeGroupLabel( props, ref ) {
 	const context = useCompositeContext();
+
+	// @ts-expect-error The store prop is undocumented and only used by the
+	// legacy compat layer. The `store` prop is documented, but its type is
+	// obfuscated to discourage its use outside of the component's internals.
+	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+
 	return (
-		<Ariakit.CompositeGroupLabel
-			store={ context.store as Ariakit.CompositeStore }
-			{ ...props }
-			ref={ ref }
-		/>
+		<Ariakit.CompositeGroupLabel store={ store } { ...props } ref={ ref } />
 	);
 } );

@@ -127,6 +127,10 @@ _Returns_
 
 -   `?Object`: Block bindings source.
 
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### getBlockBindingsSources
 
 Returns all registered block bindings sources.
@@ -134,6 +138,10 @@ Returns all registered block bindings sources.
 _Returns_
 
 -   `Array`: Block bindings sources.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
 
 ### getBlockContent
 
@@ -542,6 +550,10 @@ _Parameters_
 -   _source.setValues_ `[Function]`: Optional function to update multiple values connected to the source.
 -   _source.canUserEditValue_ `[Function]`: Optional function to determine if the user can edit the value.
 
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### registerBlockCollection
 
 Registers a new block collection to group blocks in the same namespace in the inserter.
@@ -858,6 +870,10 @@ unregisterBlockBindingsSource( 'plugin/my-custom-source' );
 _Parameters_
 
 -   _name_ `string`: The name of the block bindings source to unregister.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
 
 ### unregisterBlockStyle
 

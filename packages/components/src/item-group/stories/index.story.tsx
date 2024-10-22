@@ -37,6 +37,8 @@ const Template: StoryFn< typeof ItemGroup > = ( props ) => (
 
 export const Default: StoryFn< typeof ItemGroup > = Template.bind( {} );
 Default.args = {
+	isBordered: true,
+	isSeparated: true,
 	children: (
 		[
 			{
@@ -67,6 +69,7 @@ export const NonClickableItems: StoryFn< typeof ItemGroup > = Template.bind(
 	{}
 );
 NonClickableItems.args = {
+	...Default.args,
 	children: (
 		[
 			{
@@ -83,6 +86,7 @@ NonClickableItems.args = {
 
 export const CustomItemSize: StoryFn< typeof ItemGroup > = Template.bind( {} );
 CustomItemSize.args = {
+	...Default.args,
 	children: (
 		[
 			{
@@ -98,9 +102,9 @@ CustomItemSize.args = {
 	 ).map( mapPropsToItem ),
 };
 
-export const WithBorder: StoryFn< typeof ItemGroup > = Template.bind( {} );
-WithBorder.args = {
+export const WithoutBorder: StoryFn< typeof ItemGroup > = Template.bind( {} );
+WithoutBorder.args = {
 	...Default.args,
-	isBordered: true,
-	isSeparated: true,
+	isBordered: false,
+	isSeparated: false,
 };

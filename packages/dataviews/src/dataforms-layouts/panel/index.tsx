@@ -17,7 +17,8 @@ import { closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, NormalizedField, Field } from '../../types';
+import { getVisibleFields } from '../get-visible-fields';
+import type { DataFormProps, NormalizedField } from '../../types';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -142,13 +143,13 @@ export default function FormPanel< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				( form.fields ?? [] )
-					.map( ( fieldId ) =>
-						fields.find( ( { id } ) => id === fieldId )
-					)
-					.filter( ( field ): field is Field< Item > => !! field )
+				getVisibleFields< Item >(
+					fields,
+					form.fields,
+					form.combinedFields
+				)
 			),
-		[ fields, form.fields ]
+		[ fields, form.fields, form.combinedFields ]
 	);
 
 	return (

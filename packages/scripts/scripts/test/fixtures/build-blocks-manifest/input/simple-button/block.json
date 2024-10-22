@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "my-plugin/simple-button",
+	"title": "Simple Button",
+	"category": "design",
+	"icon": "button",
+	"description": "A simple button block.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "my-plugin",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}

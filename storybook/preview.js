@@ -127,6 +127,13 @@ export const parameters = {
 				'Playground',
 				'BlockEditor',
 				'Components',
+				[
+					'Introduction',
+					'Contributing Guidelines',
+					'Actions',
+					'Containers',
+					'Utilities',
+				],
 				'Components (Experimental)',
 				'Icons',
 			],

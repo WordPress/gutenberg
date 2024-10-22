@@ -30,6 +30,10 @@ function isObjectEmpty( object ) {
  * - `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
  * - `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
  *
+ * @since 6.7.0 Introduced in WordPress core.
+ *
+ * @param {?string} clientId Optional block client ID. If not set, it will use the current block client ID from the context.
+ *
  * @return {?WPBlockBindingsUtils} Object containing the block bindings utils.
  *
  * @example
@@ -60,8 +64,9 @@ function isObjectEmpty( object ) {
  * removeAllBlockBindings();
  * ```
  */
-export function useBlockBindingsUtils() {
-	const { clientId } = useBlockEditContext();
+export function useBlockBindingsUtils( clientId ) {
+	const { clientId: contextClientId } = useBlockEditContext();
+	const blockClientId = clientId || contextClientId;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useRegistry().select( blockEditorStore );
 
@@ -96,7 +101,7 @@ export function useBlockBindingsUtils() {
 	 */
 	const updateBlockBindings = ( bindings ) => {
 		const { metadata: { bindings: currentBindings, ...metadata } = {} } =
-			getBlockAttributes( clientId );
+			getBlockAttributes( blockClientId );
 		const newBindings = { ...currentBindings };
 
 		Object.entries( bindings ).forEach( ( [ attribute, binding ] ) => {
@@ -116,7 +121,7 @@ export function useBlockBindingsUtils() {
 			delete newMetadata.bindings;
 		}
 
-		updateBlockAttributes( clientId, {
+		updateBlockAttributes( blockClientId, {
 			metadata: isObjectEmpty( newMetadata ) ? undefined : newMetadata,
 		} );
 	};
@@ -134,8 +139,8 @@ export function useBlockBindingsUtils() {
 	 */
 	const removeAllBlockBindings = () => {
 		const { metadata: { bindings, ...metadata } = {} } =
-			getBlockAttributes( clientId );
-		updateBlockAttributes( clientId, {
+			getBlockAttributes( blockClientId );
+		updateBlockAttributes( blockClientId, {
 			metadata: isObjectEmpty( metadata ) ? undefined : metadata,
 		} );
 	};

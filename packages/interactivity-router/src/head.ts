@@ -1,4 +1,12 @@
 /**
+ * The cache of prefetched stylesheets and scripts.
+ */
+export const headElements = new Map<
+	string,
+	{ tag: HTMLElement; text?: string }
+>();
+
+/**
  * Helper to update only the necessary tags in the head.
  *
  * @async
@@ -29,6 +37,14 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 		}
 	}
 
+	await Promise.all(
+		[ ...headElements.entries() ]
+			.filter( ( [ , { tag } ] ) => tag.nodeName === 'SCRIPT' )
+			.map( async ( [ url ] ) => {
+				await import( /* webpackIgnore: true */ url );
+			} )
+	);
+
 	// Prepare new assets.
 	const toAppend = [ ...newHeadMap.values() ];
 
@@ -41,60 +57,66 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
  * Fetches and processes head assets (stylesheets and scripts) from a specified document.
  *
  * @async
- * @param doc               The document from which to fetch head assets. It should support standard DOM querying methods.
- * @param headElements      A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
- * @param headElements.tag
- * @param headElements.text
+ * @param doc The document from which to fetch head assets. It should support standard DOM querying methods.
  *
  * @return Returns an array of HTML elements representing the head assets.
  */
 export const fetchHeadAssets = async (
-	doc: Document,
-	headElements: Map< string, { tag: HTMLElement; text: string } >
+	doc: Document
 ): Promise< HTMLElement[] > => {
 	const headTags = [];
-	const assets = [
-		{
-			tagName: 'style',
-			selector: 'link[rel=stylesheet]',
-			attribute: 'href',
-		},
-		{ tagName: 'script', selector: 'script[src]', attribute: 'src' },
-	];
-	for ( const asset of assets ) {
-		const { tagName, selector, attribute } = asset;
-		const tags = doc.querySelectorAll<
-			HTMLScriptElement | HTMLStyleElement
-		>( selector );
 
-		// Use Promise.all to wait for fetch to complete
-		await Promise.all(
-			Array.from( tags ).map( async ( tag ) => {
-				const attributeValue = tag.getAttribute( attribute );
-				if ( ! headElements.has( attributeValue ) ) {
-					try {
-						const response = await fetch( attributeValue );
-						const text = await response.text();
-						headElements.set( attributeValue, {
-							tag,
-							text,
-						} );
-					} catch ( e ) {
-						// eslint-disable-next-line no-console
-						console.error( e );
-					}
-				}
+	// We only want to fetch module scripts because regular scripts (without
+	// `async` or `defer` attributes) can depend on the execution of other scripts.
+	// Scripts found in the head are blocking and must be executed in order.
+	const scripts = doc.querySelectorAll< HTMLScriptElement >(
+		'script[type="module"][src]'
+	);
 
-				const headElement = headElements.get( attributeValue );
-				const element = doc.createElement( tagName );
-				element.innerText = headElement.text;
-				for ( const attr of headElement.tag.attributes ) {
-					element.setAttribute( attr.name, attr.value );
+	scripts.forEach( ( script ) => {
+		const src = script.getAttribute( 'src' );
+		if ( ! headElements.has( src ) ) {
+			// add the <link> elements to prefetch the module scripts
+			const link = doc.createElement( 'link' );
+			link.rel = 'modulepreload';
+			link.href = src;
+			document.head.append( link );
+			headElements.set( src, { tag: script } );
+		}
+	} );
+
+	const stylesheets = doc.querySelectorAll< HTMLLinkElement >(
+		'link[rel=stylesheet]'
+	);
+
+	await Promise.all(
+		Array.from( stylesheets ).map( async ( tag ) => {
+			const href = tag.getAttribute( 'href' );
+			if ( ! href ) {
+				return;
+			}
+
+			if ( ! headElements.has( href ) ) {
+				try {
+					const response = await fetch( href );
+					const text = await response.text();
+					headElements.set( href, {
+						tag,
+						text,
+					} );
+				} catch ( e ) {
+					// eslint-disable-next-line no-console
+					console.error( e );
 				}
-				headTags.push( element );
-			} )
-		);
-	}
+			}
+
+			const headElement = headElements.get( href );
+			const styleElement = doc.createElement( 'style' );
+			styleElement.textContent = headElement.text;
+
+			headTags.push( styleElement );
+		} )
+	);
 
 	return [
 		doc.querySelector( 'title' ),
