@@ -39,6 +39,7 @@
 			"radius": true,
 			"color": true,
 			"width": true,
+			"style": true
 		},
 		"html": false,
 		"spacing": {
