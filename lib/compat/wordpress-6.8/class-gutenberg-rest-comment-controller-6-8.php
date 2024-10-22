@@ -42,11 +42,6 @@ class Gutenberg_REST_Comment_Controller_6_8 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Skip all the checks if comment type is not comment.
-		if ( 'comment' !== $request['comment_type'] ) {
-			return true;
-		}
-
 		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
 		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
 			return new WP_Error(
@@ -95,7 +90,7 @@ class Gutenberg_REST_Comment_Controller_6_8 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		if ( 'draft' === $post->post_status ) {
+		if ( 'draft' === $post->post_status && 'comment' === $request['comment_type'] ) {
 			return new WP_Error(
 				'rest_comment_draft_post',
 				__( 'Sorry, you are not allowed to create a comment on this post.' ),
@@ -119,7 +114,7 @@ class Gutenberg_REST_Comment_Controller_6_8 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		if ( ! comments_open( $post->ID ) ) {
+		if ( ! comments_open( $post->ID ) && 'comment' === $request['comment_type'] ) {
 			return new WP_Error(
 				'rest_comment_closed',
 				__( 'Sorry, comments are closed for this item.' ),
