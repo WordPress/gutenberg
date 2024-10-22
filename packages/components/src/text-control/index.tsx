@@ -41,6 +41,7 @@ function UnforwardedTextControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="TextControl"
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }

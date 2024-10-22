@@ -122,7 +122,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 */
 	public function data_background_block_support() {
 		return array(
-			'background image style is applied to uploaded images' => array(
+			'background image style is applied' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
 				'background_settings' => array(
@@ -131,7 +131,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => array(
 						'url' => 'https://example.com/image.jpg',
-						'id'  => 123,
 					),
 				),
 				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
@@ -158,7 +157,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage'      => array(
 						'url' => 'https://example.com/image.jpg',
-						'id'  => 123,
 					),
 					'backgroundRepeat'     => 'no-repeat',
 					'backgroundSize'       => 'contain',
@@ -176,7 +174,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => array(
 						'url' => 'https://example.com/image.jpg',
-						'id'  => 123,
 					),
 				),
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
@@ -191,7 +188,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => array(
 						'url' => 'https://example.com/image.jpg',
-						'id'  => 123,
 					),
 				),
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
@@ -206,7 +202,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => array(
 						'url' => 'https://example.com/image.jpg',
-						'id'  => 123,
 					),
 				),
 				'expected_wrapper'    => '<div>Content</div>',

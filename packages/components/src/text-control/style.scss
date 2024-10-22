@@ -23,7 +23,8 @@
 
 		// Subtract 1px to account for the border, which isn't included on the element
 		// on newer components like InputControl, SelectControl, etc.
-		padding-left: $grid-unit-20;
-		padding-right: $grid-unit-20;
+		// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
 	}
 }

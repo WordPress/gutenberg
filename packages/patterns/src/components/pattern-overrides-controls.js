@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useState, useId } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockBindingsUtils,
+} from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -14,22 +17,6 @@ import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
-
-function removeBindings( bindings ) {
-	let updatedBindings = { ...bindings };
-	delete updatedBindings.__default;
-	if ( ! Object.keys( updatedBindings ).length ) {
-		updatedBindings = undefined;
-	}
-	return updatedBindings;
-}
-
-function addBindings( bindings ) {
-	return {
-		...bindings,
-		__default: { source: PATTERN_OVERRIDES_BINDING_SOURCE },
-	};
-}
 
 function PatternOverridesControls( {
 	attributes,
@@ -49,24 +36,22 @@ function PatternOverridesControls( {
 	const isConnectedToOtherSources =
 		defaultBindings?.source &&
 		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
+	const { updateBlockBindings } = useBlockBindingsUtils();
 
 	function updateBindings( isChecked, customName ) {
-		const prevBindings = attributes?.metadata?.bindings;
-		const updatedBindings = isChecked
-			? addBindings( prevBindings )
-			: removeBindings( prevBindings );
-
-		const updatedMetadata = {
-			...attributes.metadata,
-			bindings: updatedBindings,
-		};
-
 		if ( customName ) {
-			updatedMetadata.name = customName;
+			setAttributes( {
+				metadata: {
+					...attributes.metadata,
+					name: customName,
+				},
+			} );
 		}
 
-		setAttributes( {
-			metadata: updatedMetadata,
+		updateBlockBindings( {
+			__default: isChecked
+				? { source: PATTERN_OVERRIDES_BINDING_SOURCE }
+				: undefined,
 		} );
 	}
 
@@ -92,6 +77,7 @@ function PatternOverridesControls( {
 		<>
 			<InspectorControls group="advanced">
 				<BaseControl
+					__nextHasNoMarginBottom
 					id={ controlId }
 					label={ __( 'Overrides' ) }
 					help={ helpText }

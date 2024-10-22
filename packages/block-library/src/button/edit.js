@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
-import { unlock } from '../lock-unlock';
 
 /**
  * WordPress dependencies
@@ -45,7 +44,7 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
-	store as blocksStore,
+	getBlockBindingsSource,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -240,9 +239,9 @@ function ButtonEdit( props ) {
 				return {};
 			}
 
-			const blockBindingsSource = unlock(
-				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
 
 			return {
 				lockUrlControls:
@@ -254,7 +253,7 @@ function ButtonEdit( props ) {
 					} ),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ context, isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -380,6 +379,7 @@ function ButtonEdit( props ) {
 			<InspectorControls group="advanced">
 				{ isLinkTag && (
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Link rel' ) }
 						value={ rel || '' }

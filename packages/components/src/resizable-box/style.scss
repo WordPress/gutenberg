@@ -28,14 +28,14 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	content: "";
 	width: $resize-handler-size;
 	height: $resize-handler-size;
-	border-radius: 50%;
+	border-radius: $radius-round;
 	background: $white;
 	cursor: inherit;
 	position: absolute;
 	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
 	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
 
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, $elevation-x-small;
 	// Only visible in Windows High Contrast mode.
 	outline: 2px solid transparent;
 }
@@ -43,7 +43,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 // This is the "visible" resize handle for side handles - the line
 .components-resizable-box__side-handle::before {
 	display: block;
-	border-radius: 2px;
+	border-radius: $radius-full;
 	content: "";
 	width: 3px;
 	height: 3px;

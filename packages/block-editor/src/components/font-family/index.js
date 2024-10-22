@@ -11,6 +11,8 @@ import { __ } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 
 export default function FontFamilyControl( {
+	/** Start opting into the larger default height that will become the default size in a future version. */
+	__next40pxDefaultSize = false,
 	/** Start opting into the new margin-free styles that will become the default in a future version. */
 	__nextHasNoMarginBottom = false,
 	value = '',
@@ -50,6 +52,7 @@ export default function FontFamilyControl( {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ __( 'Font' ) }
 			options={ options }

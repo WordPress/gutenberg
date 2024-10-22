@@ -1,18 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { SelectControl, TextControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
-import type {
-	SortDirection,
-	ValidationContext,
-	DataFormControlProps,
-} from '../types';
+import type { SortDirection, ValidationContext } from '../types';
 
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
 	return direction === 'asc'
@@ -31,64 +20,8 @@ function isValid( value: any, context?: ValidationContext ) {
 	return true;
 }
 
-function Edit< Item >( {
-	data,
-	field,
-	onChange,
-	hideLabelFromVision,
-}: DataFormControlProps< Item > ) {
-	const { id, label, placeholder } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
-	);
-
-	if ( field.elements ) {
-		const elements = [
-			/*
-			 * Value can be undefined when:
-			 *
-			 * - the field is not required
-			 * - in bulk editing
-			 *
-			 */
-			{ label: __( 'Select item' ), value: '' },
-			...field.elements,
-		];
-
-		return (
-			<SelectControl
-				label={ label }
-				value={ value }
-				options={ elements }
-				onChange={ onChangeControl }
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				hideLabelFromVision={ hideLabelFromVision }
-			/>
-		);
-	}
-
-	return (
-		<TextControl
-			label={ label }
-			placeholder={ placeholder }
-			value={ value ?? '' }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-			hideLabelFromVision={ hideLabelFromVision }
-		/>
-	);
-}
-
 export default {
 	sort,
 	isValid,
-	Edit,
+	Edit: 'text',
 };

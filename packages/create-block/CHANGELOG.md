@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 4.53.0 (2024-10-16)
+
+## 4.52.0 (2024-10-03)
+
+## 4.51.0 (2024-09-19)
+
+## 4.50.0 (2024-09-05)
+
+### Enhancements
+
+-   Unpin the `@wordpress/scripts` version and set the minimum supported WordPress version to 6.6 ([#64920](https://github.com/WordPress/gutenberg/pull/64920)).
+
+## 4.49.0 (2024-08-21)
+
 ## 4.48.0 (2024-08-07)
 
 ## 4.47.0 (2024-07-24)

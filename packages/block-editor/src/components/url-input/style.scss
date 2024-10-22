@@ -9,32 +9,13 @@ $input-size: 300px;
 	position: relative;
 	padding: 1px;
 
-	input[type="text"] {
-		width: 100%;
-		@include break-small() {
-			width: $input-size;
-		}
-		padding: $input-padding;
-		margin-left: 0;
-		margin-right: 0;
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&::-ms-clear {
-			display: none;
-		}
+	@include break-small() {
+		min-width: $input-size;
+		width: auto;
 	}
 
 	&.is-full-width {
 		width: 100%;
-
-		.block-editor-url-input__input[type="text"] {
-			width: 100%;
-		}
 
 		&__suggestions {
 			width: 100%;
@@ -47,10 +28,6 @@ $input-size: 300px;
 		top: calc(50% - #{$spinner-size} / 2);
 		right: $grid-unit;
 	}
-}
-
-.block-editor-url-input__input[type="text"] {
-	@include input-control;
 }
 
 // Suggestions
@@ -120,8 +97,8 @@ $input-size: 300px;
 }
 
 .block-editor-url-input__button-modal {
-	box-shadow: $shadow-popover;
-	border: 1px solid $gray-300;
+	box-shadow: $elevation-x-small;
+	border: $border-width solid $gray-300;
 	background: $white;
 }
 
@@ -132,10 +109,4 @@ $input-size: 300px;
 	flex-shrink: 1;
 	min-width: 0;
 	align-items: flex-start;
-
-	.components-button {
-		flex-shrink: 0;
-		width: $button-size;
-		height: $button-size;
-	}
 }

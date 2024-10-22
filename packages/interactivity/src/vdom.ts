@@ -7,6 +7,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
  */
 import { directivePrefix as p } from './constants';
 import { warn } from './utils';
+import { type DirectiveEntry } from './hooks';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -139,29 +140,27 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 		}
 
 		if ( directives.length ) {
-			props.__directives = directives.reduce(
-				( obj, [ name, ns, value ] ) => {
-					const directiveMatch = directiveParser.exec( name );
-					if ( directiveMatch === null ) {
-						warn( `Found malformed directive name: ${ name }.` );
-						return obj;
-					}
-					const prefix = directiveMatch[ 1 ] || '';
-					const suffix = directiveMatch[ 2 ] || 'default';
-
-					obj[ prefix ] = obj[ prefix ] || [];
-					obj[ prefix ].push( {
-						namespace: ns ?? currentNamespace(),
-						value,
-						suffix,
-					} );
+			props.__directives = directives.reduce<
+				Record< string, Array< DirectiveEntry > >
+			>( ( obj, [ name, ns, value ] ) => {
+				const directiveMatch = directiveParser.exec( name );
+				if ( directiveMatch === null ) {
+					warn( `Found malformed directive name: ${ name }.` );
 					return obj;
-				},
-				{}
-			);
+				}
+				const prefix = directiveMatch[ 1 ] || '';
+				const suffix = directiveMatch[ 2 ] || null;
+
+				obj[ prefix ] = obj[ prefix ] || [];
+				obj[ prefix ].push( {
+					namespace: ns ?? currentNamespace()!,
+					value: value as DirectiveEntry[ 'value' ],
+					suffix,
+				} );
+				return obj;
+			}, {} );
 		}
 
-		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
 		if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,

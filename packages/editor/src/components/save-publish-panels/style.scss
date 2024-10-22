@@ -3,7 +3,7 @@
 .editor-layout__toggle-sidebar-panel,
 .editor-layout__toggle-entities-saved-states-panel {
 	z-index: z-index(".editor-layout__toggle-sidebar-panel");
-	position: fixed !important; // Need to override the default relative positionning
+	position: fixed !important; // Necessary to override the default relative positioning.
 	top: -9999em;
 	bottom: auto;
 	left: auto;
@@ -11,8 +11,8 @@
 	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $gray-300;
-	height: auto !important; // Need to override the default sidebar positionnings
+	border: $border-width dotted $gray-300;
+	height: auto !important; // Necessary to override the default sidebar positioning.
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;

@@ -23,7 +23,7 @@ import {
 } from '../../utils/constants';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import usePatterns from './use-patterns';
+import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsHeader from './header';
 import { useEditPostAction } from '../dataviews-actions';
 import {
@@ -78,6 +78,7 @@ export default function DataviewsPatterns() {
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const previousCategoryId = usePrevious( categoryId );
+	const previousPostType = usePrevious( type );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
@@ -121,10 +122,10 @@ export default function DataviewsPatterns() {
 
 	// Reset the page number when the category changes.
 	useEffect( () => {
-		if ( previousCategoryId !== categoryId ) {
+		if ( previousCategoryId !== categoryId || previousPostType !== type ) {
 			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
-	}, [ categoryId, previousCategoryId ] );
+	}, [ categoryId, previousCategoryId, previousPostType, type ] );
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
 		// However, the author filter in template parts is done client-side.
@@ -135,6 +136,8 @@ export default function DataviewsPatterns() {
 		}
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
+
+	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 
 	const templatePartActions = usePostActions( {
 		postType: TEMPLATE_PART_POST_TYPE,
@@ -175,7 +178,7 @@ export default function DataviewsPatterns() {
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }
-					data={ data || EMPTY_ARRAY }
+					data={ dataWithPermissions || EMPTY_ARRAY }
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }

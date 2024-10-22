@@ -323,6 +323,7 @@ function PushChangesToGlobalStylesControl( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className="edit-site-push-changes-to-global-styles-control"
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.

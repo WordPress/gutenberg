@@ -1,3 +1,12 @@
+.components-radio-control {
+	border: 0;
+	margin: 0;
+	padding: 0;
+
+	font-family: $default-font;
+	font-size: $default-font-size;
+}
+
 .components-radio-control__group-wrapper.has-help {
 	margin-block-end: $grid-unit-15;
 }
@@ -32,7 +41,7 @@
 
 		&::before {
 			content: "";
-			border-radius: 50%;
+			border-radius: $radius-round;
 		}
 	}
 }
@@ -57,5 +66,7 @@
 
 	// Override the top margin of the StyledHelp component from BaseControl.
 	// TODO: we should tweak the StyledHelp component to not have a top margin.
-	margin-top: 0;
+	&.components-radio-control__option-description {
+		margin-top: 0;
+	}
 }

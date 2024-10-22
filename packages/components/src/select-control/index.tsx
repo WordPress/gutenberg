@@ -99,6 +99,7 @@ function UnforwardedSelectControl< V extends string >(
 			help={ help }
 			id={ id }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="SelectControl"
 		>
 			<StyledInputBase
 				className={ classes }

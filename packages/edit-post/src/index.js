@@ -28,7 +28,6 @@ import { unlock } from './lock-unlock';
 const {
 	BackButton: __experimentalMainDashboardButton,
 	registerCoreBlockBindingsSources,
-	bootstrapBlockBindingsSourcesFromServer,
 } = unlock( editorPrivateApis );
 
 /**
@@ -70,8 +69,16 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 	} );
+
+	if ( window.__experimentalMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
@@ -87,7 +94,6 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

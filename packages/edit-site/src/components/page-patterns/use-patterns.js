@@ -256,12 +256,44 @@ const selectUserPatterns = createSelector(
 	]
 );
 
+export function useAugmentPatternsWithPermissions( patterns ) {
+	const idsAndTypes = useMemo(
+		() =>
+			patterns
+				?.filter( ( record ) => record.type !== PATTERN_TYPES.theme )
+				.map( ( record ) => [ record.type, record.id ] ) ?? [],
+		[ patterns ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordPermissions } = unlock(
+				select( coreStore )
+			);
+			return idsAndTypes.reduce( ( acc, [ type, id ] ) => {
+				acc[ id ] = getEntityRecordPermissions( 'postType', type, id );
+				return acc;
+			}, {} );
+		},
+		[ idsAndTypes ]
+	);
+
+	return useMemo(
+		() =>
+			patterns?.map( ( record ) => ( {
+				...record,
+				permissions: permissions?.[ record.id ] ?? {},
+			} ) ) ?? [],
+		[ patterns, permissions ]
+	);
+}
+
 export const usePatterns = (
 	postType,
 	categoryId,
 	{ search = '', syncStatus } = {}
 ) => {
-	const { patterns, ...rest } = useSelect(
+	return useSelect(
 		( select ) => {
 			if ( postType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplateParts( select, categoryId, search );
@@ -284,35 +316,6 @@ export const usePatterns = (
 		},
 		[ categoryId, postType, search, syncStatus ]
 	);
-
-	const ids = useMemo(
-		() => patterns?.map( ( record ) => record.id ) ?? [],
-		[ patterns ]
-	);
-
-	const permissions = useSelect(
-		( select ) => {
-			const { getEntityRecordsPermissions } = unlock(
-				select( coreStore )
-			);
-			return getEntityRecordsPermissions( 'postType', postType, ids );
-		},
-		[ ids, postType ]
-	);
-
-	const patternsWithPermissions = useMemo(
-		() =>
-			patterns?.map( ( record, index ) => ( {
-				...record,
-				permissions: permissions[ index ],
-			} ) ) ?? [],
-		[ patterns, permissions ]
-	);
-
-	return {
-		...rest,
-		patterns: patternsWithPermissions,
-	};
 };
 
 export default usePatterns;

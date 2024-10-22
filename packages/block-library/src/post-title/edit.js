@@ -162,6 +162,7 @@ export default function PostTitleEdit( {
 										checked={ linkTarget === '_blank' }
 									/>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Link rel' ) }
 										value={ rel }

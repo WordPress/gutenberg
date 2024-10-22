@@ -24,7 +24,7 @@
 // hack a progressive enhancement.
 /* stylelint-disable -- Stylelint is disabled to allow the hack to work. */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
-_::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
+_::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .block-editor-block-list__layout::selection {
 	background-color: transparent;
 }
 /* stylelint-enable */
@@ -80,7 +80,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
-	&.is-navigate-mode .block-editor-block-list__block.is-selected,
 	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
@@ -89,62 +88,13 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		&::after {
 			@include selected-block-focus();
 			z-index: 1;
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
-	}
-
-	// Moving blocks using keyboard (Ellipsis > Move).
-	& .is-block-moving-mode.block-editor-block-list__block.is-selected {
-
-		&::after {
-			content: "";
-			position: absolute;
-			z-index: 0;
-			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
-			right: 0;
-			left: 0;
-			top: -$default-block-margin * 0.5;
-			border-radius: $radius-block-ui;
-			border-top: 4px solid $gray-400;
-			bottom: auto;
-			box-shadow: none;
-		}
-	}
-
-	& .is-block-moving-mode.can-insert-moving-block.block-editor-block-list__block.is-selected {
-		&::after {
-			border-color: var(--wp-admin-theme-color);
-		}
-	}
-
-	// Ensure an accurate partial text selection.
-	// To do this, we disable text selection on the main container, then re-enable it only on the
-	// elements that actually get selected.
-	// To keep in mind: user-select is currently inherited to all nodes inside.
-	.has-multi-selection & {
-		user-select: none;
 	}
 
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;
 	}
-}
-
-.is-block-moving-mode.block-editor-block-list__block-selection-button {
-	// Should be invisible but not unfocusable.
-	opacity: 0;
-	font-size: 1px;
-	height: 1px;
-	padding: 0;
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
@@ -159,11 +109,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	overflow-wrap: break-word;
 
 	pointer-events: auto;
-	user-select: text;
 
 	&.is-editing-disabled {
 		pointer-events: none;
-		user-select: none;
 	}
 
 	&.has-negative-margin {
@@ -220,26 +168,12 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: $radius-block-ui;
 		background-color: rgba($white, 0.4);
 	}
 
 	// Avoid conflict with the multi-selection highlight color.
 	&.has-warning.is-multi-selected::after {
 		background-color: transparent;
-	}
-
-	// Reusable blocks clickthrough overlays.
-	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
-		// Remove only the top click overlay.
-		&::after {
-			display: none;
-		}
-
-		// Restore it for subsequent.
-		.block-editor-block-list__layout.has-overlay::after {
-			display: block;
-		}
 	}
 
 	// Reusable blocks parent border.
@@ -255,11 +189,13 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 
-	&.is-selected {
+	&.is-selected,
+	&.is-hovered {
 		cursor: default;
 
-		&.rich-text {
-			cursor: unset;
+		&.rich-text,
+		.rich-text {
+			cursor: auto;
 		}
 	}
 
@@ -285,11 +221,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
 			outline-color: var(--wp-block-synced-color);
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 }
@@ -316,7 +247,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.is-root-container:not([inert]) .block-editor-block-list__block.is-reusable.is-selected .block-editor-block-list__block.has-editable-outline::after {
+.is-root-container:not([inert]) .block-editor-block-list__block.is-selected .block-editor-block-list__block.has-editable-outline::after {
 	animation-name: block-editor-is-editable__animation;
 	animation-duration: 0.8s;
 	animation-timing-function: ease-out;
@@ -429,7 +360,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	width: 100%;
 	border: none;
 	outline: none;
-	border-radius: 2px;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
@@ -461,4 +392,38 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		// solves this.
 		margin-bottom: auto;
 	}
+}
+
+.block-editor-block-list__zoom-out-separator {
+	/* same color as the iframe's background */
+	background: $gray-300;
+	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
+	margin-left: -1px;
+	margin-right: -1px;
+	transition: background-color 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	font-size: $default-font-size;
+	font-family: $default-font;
+	color: $black;
+	font-weight: normal;
+
+	.is-zoomed-out & {
+		// Maintains an absolute font-size by counter-scaling based on the zoom level.
+		font-size: calc(#{$default-font-size} / var(--wp-block-editor-iframe-zoom-out-scale));
+	}
+
+	&.is-dragged-over {
+		background: $gray-400;
+	}
+}
+
+// In Post Editor allow the separator to occupy the full width by ignoring (cancelling out) the global padding.
+.has-global-padding > .block-editor-block-list__zoom-out-separator,
+.block-editor-block-list__layout.is-root-container.has-global-padding > .block-editor-block-list__zoom-out-separator {
+	max-width: none;
+	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
+	margin: 0 calc(-1 * var(--wp--style--root--padding-right) - 1px) 0 calc(-1 * var(--wp--style--root--padding-left) - 1px) !important;
 }

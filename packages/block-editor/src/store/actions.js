@@ -21,6 +21,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -34,8 +35,6 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { STORE_NAME } from './constants';
-import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1670,83 +1669,35 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
-		// When switching to zoom-out mode, we need to select the parent section
-		if ( mode === 'zoom-out' ) {
-			const firstSelectedClientId = select.getBlockSelectionStart();
-			const { sectionRootClientId } = unlock(
-				registry.select( STORE_NAME ).getSettings()
-			);
-			if ( firstSelectedClientId ) {
-				let sectionClientId;
-
-				if ( sectionRootClientId ) {
-					const sectionClientIds =
-						select.getBlockOrder( sectionRootClientId );
-
-					// If the selected block is a section block, use it.
-					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
-						sectionClientId = firstSelectedClientId;
-					} else {
-						// If the selected block is not a section block, find
-						// the parent section that contains the selected block.
-						sectionClientId = select
-							.getBlockParents( firstSelectedClientId )
-							.find( ( parent ) =>
-								sectionClientIds.includes( parent )
-							);
-					}
-				} else {
-					sectionClientId = select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					);
-				}
-
-				if ( sectionClientId ) {
-					dispatch.selectBlock( sectionClientId );
-				} else {
-					dispatch.clearSelectedBlock();
-				}
-			}
-		}
-
-		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+	( { registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorTool', mode );
 
 		if ( mode === 'navigation' ) {
-			speak(
-				__(
-					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-				)
-			);
+			speak( __( 'You are currently in Write mode.' ) );
 		} else if ( mode === 'edit' ) {
-			speak(
-				__(
-					'You are currently in edit mode. To return to the navigation mode, press Escape.'
-				)
-			);
-		} else if ( mode === 'zoom-out' ) {
-			speak( __( 'You are currently in zoom-out mode.' ) );
+			speak( __( 'You are currently in Design mode.' ) );
 		}
 	};
 
 /**
- * Action that enables or disables the block moving mode.
+ * Set the block moving client ID.
  *
- * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
+ * @deprecated
+ *
+ * @return {Object} Action object.
  */
-export const setBlockMovingClientId =
-	( hasBlockMovingClientId = null ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
-
-		if ( hasBlockMovingClientId ) {
-			speak(
-				__(
-					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
-				)
-			);
+export function setBlockMovingClientId() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).setBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
 		}
+	);
+	return {
+		type: 'DO_NOTHING',
 	};
+}
 
 /**
  * Action that duplicates a list of blocks.

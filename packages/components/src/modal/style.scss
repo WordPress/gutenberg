@@ -8,9 +8,15 @@
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
-	// backdrop-filter: blur($grid-unit);
-	// This animates the appearance of the white background.
-	@include edit-post__fade-in-animation();
+	// This animates the appearance of the backdrop.
+	@include animation__fade-in();
+
+	&.is-animating-out {
+		// Note: it's important that the fade-out animation doesn't end after the
+		// modal frame's disappear animation, because the component will be removed
+		// from the DOM when that animation ends.
+		@include animation__fade-out($delay: 80ms);
+	}
 }
 
 // The modal window element.
@@ -20,19 +26,26 @@
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;
 	background: $white;
-	box-shadow: $shadow-modal;
-	border-radius: $grid-unit-05 $grid-unit-05 0 0;
+	box-shadow: $elevation-large;
+	border-radius: $radius-large $radius-large 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.1s ease-out;
+	animation-name: components-modal__appear-animation;
+	animation-duration: var(--modal-frame-animation-duration);
 	animation-fill-mode: forwards;
+	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
 	@include reduce-motion("animation");
+
+	.components-modal__screen-overlay.is-animating-out & {
+		animation-name: components-modal__disappear-animation;
+		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
+	}
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
-		border-radius: $grid-unit-05;
+		border-radius: $radius-large;
 		margin: auto;
 		width: auto;
 		min-width: $modal-min-width;
@@ -80,10 +93,25 @@
 
 @keyframes components-modal__appear-animation {
 	from {
-		transform: translateY($grid-unit-40);
+		opacity: 0;
+		transform: scale(0.9);
 	}
 	to {
-		transform: translateY(0);
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+// Note: this animation is also used in the animationend JS event listener.
+// Make sure that the animation name is kept in sync across the two files.
+@keyframes components-modal__disappear-animation {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.9);
 	}
 }
 
@@ -113,11 +141,6 @@
 	h1 {
 		line-height: 1;
 		margin: 0;
-	}
-
-	.components-button {
-		position: relative;
-		left: $grid-unit-10;
 	}
 
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {

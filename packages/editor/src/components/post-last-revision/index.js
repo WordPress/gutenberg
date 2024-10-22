@@ -36,6 +36,7 @@ function PostLastRevision() {
 	return (
 		<PostLastRevisionCheck>
 			<Button
+				__next40pxDefaultSize
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ) }

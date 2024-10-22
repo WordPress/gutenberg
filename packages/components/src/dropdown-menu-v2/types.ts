@@ -87,6 +87,13 @@ export interface DropdownMenuGroupProps {
 	children: React.ReactNode;
 }
 
+export interface DropdownMenuGroupLabelProps {
+	/**
+	 * The contents of the dropdown menu group.
+	 */
+	children: React.ReactNode;
+}
+
 export interface DropdownMenuItemProps {
 	/**
 	 * The contents of the menu item.

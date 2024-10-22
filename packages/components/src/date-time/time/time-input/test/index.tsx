@@ -80,12 +80,11 @@ describe( 'TimeInput', () => {
 		const minutesInput = screen.getByRole( 'spinbutton', {
 			name: 'Minutes',
 		} );
-		const amButton = screen.getByRole( 'button', { name: 'AM' } );
-		const pmButton = screen.getByRole( 'button', { name: 'PM' } );
+		const amButton = screen.getByRole( 'radio', { name: 'AM' } );
+		const pmButton = screen.getByRole( 'radio', { name: 'PM' } );
 
-		// TODO: Update assert these states through the accessibility tree rather than through styles, see: https://github.com/WordPress/gutenberg/issues/61163
-		expect( amButton ).toHaveClass( 'is-primary' );
-		expect( pmButton ).not.toHaveClass( 'is-primary' );
+		expect( amButton ).toBeChecked();
+		expect( pmButton ).not.toBeChecked();
 		expect( hoursInput ).not.toHaveValue( 0 );
 		expect( hoursInput ).toHaveValue( 12 );
 
@@ -94,7 +93,7 @@ describe( 'TimeInput', () => {
 		await user.keyboard( '{Tab}' );
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 0, minutes: 35 } );
-		expect( amButton ).toHaveClass( 'is-primary' );
+		expect( amButton ).toBeChecked();
 
 		await user.clear( hoursInput );
 		await user.type( hoursInput, '12' );
@@ -107,7 +106,7 @@ describe( 'TimeInput', () => {
 			hours: 12,
 			minutes: 35,
 		} );
-		expect( pmButton ).toHaveClass( 'is-primary' );
+		expect( pmButton ).toBeChecked();
 	} );
 
 	it( 'should call onChange with defined minutes steps', async () => {

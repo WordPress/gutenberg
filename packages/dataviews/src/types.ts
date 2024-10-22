@@ -63,9 +63,9 @@ export type FieldTypeDefinition< Item > = {
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
-	 * Callback used to render an edit control for the field.
+	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > >;
+	Edit: ComponentType< DataFormControlProps< Item > > | string;
 };
 
 /**
@@ -88,6 +88,12 @@ export type Field< Item > = {
 	label?: string;
 
 	/**
+	 * The header of the field. Defaults to the label.
+	 * It allows the usage of a React Element to render the field labels.
+	 */
+	header?: string | ReactElement;
+
+	/**
 	 * A description of the field.
 	 */
 	description?: string;
@@ -105,7 +111,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | 'radio';
+	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
 	 * Callback used to sort the field.
@@ -151,11 +157,14 @@ export type Field< Item > = {
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
+	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	Edit: ComponentType< DataFormControlProps< Item > >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	enableHiding: boolean;
+	enableSorting: boolean;
 };
 
 /**
@@ -164,14 +173,6 @@ export type NormalizedField< Item > = Field< Item > & {
 export type Fields< Item > = Field< Item >[];
 
 export type Data< Item > = Item[];
-
-/**
- * The form configuration.
- */
-export type Form = {
-	type?: 'regular' | 'panel';
-	fields?: string[];
-};
 
 export type DataFormControlProps< Item > = {
 	data: Item;
@@ -288,6 +289,8 @@ export interface CombinedField {
 	id: string;
 
 	label: string;
+
+	header?: string | ReactElement;
 
 	/**
 	 * The fields to use as columns.
@@ -426,6 +429,12 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
 }
 
 export interface RenderModalProps< Item > {
@@ -507,9 +516,37 @@ export interface SupportedLayouts {
 	table?: Omit< ViewTable, 'type' >;
 }
 
+export interface CombinedFormField< Item > extends CombinedField {
+	render?: ComponentType< { item: Item } >;
+}
+
+export interface DataFormCombinedEditProps< Item > {
+	field: NormalizedCombinedFormField< Item >;
+	data: Item;
+	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
+}
+
+export type NormalizedCombinedFormField< Item > = CombinedFormField< Item > & {
+	fields: NormalizedField< Item >[];
+	Edit?: ComponentType< DataFormCombinedEditProps< Item > >;
+};
+
+/**
+ * The form configuration.
+ */
+export type Form< Item > = {
+	type?: 'regular' | 'panel';
+	fields?: string[];
+	/**
+	 * The fields to combine.
+	 */
+	combinedFields?: CombinedFormField< Item >[];
+};
+
 export interface DataFormProps< Item > {
 	data: Item;
 	fields: Field< Item >[];
-	form: Form;
+	form: Form< Item >;
 	onChange: ( value: Record< string, any > ) => void;
 }

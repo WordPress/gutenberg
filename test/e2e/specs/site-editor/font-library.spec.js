@@ -24,9 +24,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 			await page
 				.getByRole( 'button', {
 					name: 'Add fonts',
@@ -38,18 +36,16 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 		} );
 
-		test( 'should display the "Add fonts" button', async ( { page } ) => {
+		test( 'should display the "Manage fonts" icon', async ( { page } ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
-			const addFontsButton = page.getByRole( 'button', {
-				name: 'Add fonts',
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
+			const manageFontsIcon = page.getByRole( 'button', {
+				name: 'Manage fonts',
 			} );
-			await expect( addFontsButton ).toBeVisible();
+			await expect( manageFontsIcon ).toBeVisible();
 		} );
 	} );
 
@@ -66,32 +62,26 @@ test.describe( 'Font Library', () => {
 			} );
 		} );
 
-		test( 'should display the "Manage fonts" button', async ( {
-			page,
-		} ) => {
+		test( 'should display the "Manage fonts" icon', async ( { page } ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
-			const manageFontsButton = page.getByRole( 'button', {
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
+			const manageFontsIcon = page.getByRole( 'button', {
 				name: 'Manage fonts',
 			} );
-			await expect( manageFontsButton ).toBeVisible();
+			await expect( manageFontsIcon ).toBeVisible();
 		} );
 
-		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" button', async ( {
+		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" icon', async ( {
 			page,
 		} ) => {
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 			await page
 				.getByRole( 'button', {
 					name: 'Manage fonts',
@@ -110,9 +100,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 			await page
 				.getByRole( 'button', {
 					name: 'Manage fonts',
@@ -162,9 +150,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Styles' } )
 				.click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 			await page
 				.getByRole( 'button', {
 					name: 'Add fonts',
@@ -198,7 +184,7 @@ test.describe( 'Font Library', () => {
 			// Check CSS preset was created.
 			await page.getByRole( 'button', { name: 'Close' } ).click();
 			await page
-				.getByRole( 'button', { name: 'Typography Headings styles' } )
+				.getByRole( 'button', { name: 'Headings', exact: true } )
 				.click();
 			await page.getByLabel( 'Font' ).selectOption( 'Exo 2' );
 			await expect(
@@ -254,9 +240,7 @@ test.describe( 'Font Library', () => {
 			// Click "Back" button
 			await page.getByRole( 'button', { name: 'Back' } ).click();
 
-			await page
-				.getByRole( 'button', { name: 'Typography styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 
 			// Click "Jost 2 variants" button
 			await page
@@ -288,9 +272,7 @@ test.describe( 'Font Library', () => {
 			// Click "Back" button
 			await page.getByRole( 'button', { name: 'Back' } ).click();
 
-			await page
-				.getByRole( 'button', { name: 'Typography styles' } )
-				.click();
+			await page.getByRole( 'button', { name: 'Typography' } ).click();
 
 			// Click Cardo font-family.
 			await page

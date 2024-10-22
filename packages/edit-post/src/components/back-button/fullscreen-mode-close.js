@@ -91,6 +91,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	return (
 		<motion.div whileHover="expand">
 			<Button
+				__next40pxDefaultSize
 				className={ classes }
 				href={ buttonHref }
 				label={ buttonLabel }

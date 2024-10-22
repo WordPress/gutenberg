@@ -2,14 +2,10 @@
  * WordPress dependencies
  */
 import { usePrevious, useReducedMotion } from '@wordpress/compose';
-import { isRTL } from '@wordpress/i18n';
 import {
-	__experimentalHStack as HStack,
-	FlexBlock,
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +33,6 @@ function CategoryTabs( {
 
 	return (
 		<Tabs
-			className="block-editor-inserter__category-tabs"
 			selectOnMove={ false }
 			selectedTabId={ selectedCategory ? selectedCategory.name : null }
 			orientation="vertical"
@@ -55,18 +50,12 @@ function CategoryTabs( {
 					<Tabs.Tab
 						key={ category.name }
 						tabId={ category.name }
-						className="block-editor-inserter__category-tab"
 						aria-label={ category.label }
 						aria-current={
 							category === selectedCategory ? 'true' : undefined
 						}
 					>
-						<HStack>
-							<FlexBlock>{ category.label }</FlexBlock>
-							<Icon
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
+						{ category.label }
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>

@@ -30,7 +30,7 @@
 	align-items: center;
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
-		border-radius: 2px;
+		border-radius: $radius-small;
 		color: $white;
 		padding: 0;
 		min-width: $grid-unit-30;
