@@ -7,6 +7,8 @@ ol.wp-block-latest-comments {
 
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+
+	padding-left: 0;
 }
 
 // Following styles leverage :where so that typography block support styles and
