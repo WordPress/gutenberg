@@ -80,7 +80,7 @@ Example:
      <li><a href="/post-2">Post 2</a></li>
      <li><a href="/post-3">Post 3</a></li>
   </ul>
-  <a data-wp-on--click="actions.navigate" href="/page/2">
+  <a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
 </div>
 ```
 
