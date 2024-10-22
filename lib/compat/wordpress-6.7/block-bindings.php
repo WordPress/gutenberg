@@ -57,7 +57,7 @@ function gutenberg_update_meta_args_with_label( $args ) {
 	}
 
 	$schema = array( 'title' => $args['label'] );
-	if ( ! is_array( $args['show_in_rest'] ) ) {
+	if ( ! empty( $args['show_in_rest'] ) && ! is_array( $args['show_in_rest'] ) ) {
 		$args['show_in_rest'] = array(
 			'schema' => $schema,
 		);
