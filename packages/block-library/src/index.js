@@ -240,6 +240,10 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( playlist );
+	}
+
 	// When in a WordPress context, conditionally
 	// add the classic block and TinyMCE editor
 	// under any of the following conditions:
@@ -255,10 +259,6 @@ const getAllBlocks = () => {
 			) )
 	) {
 		blocks.push( classic );
-	}
-
-	if ( window?.__experimentalEnablePlaylistBlock ) {
-		blocks.push( playlist );
 	}
 
 	return blocks.filter( Boolean );
