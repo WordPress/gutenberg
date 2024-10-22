@@ -19,4 +19,3 @@ function gutenberg_register_post_counts_routes() {
 }
 
 add_action( 'rest_api_init', 'gutenberg_register_post_counts_routes' );
-
