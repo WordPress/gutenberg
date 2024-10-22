@@ -31,6 +31,7 @@ export default function PostNavigationEdit( { setAttributes, attributes } ) {
 		<>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Navigation name' ) }
 					value={ ariaLabel || __( 'Posts' ) }
