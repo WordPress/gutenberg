@@ -592,7 +592,7 @@ export function getSectionRootClientId( state ) {
  * @return {boolean} Whether the editor is zoomed.
  */
 export function isZoomOut( state ) {
-	return state.zoomLevel < 100;
+	return state.zoomLevel === 'auto-scaled' || state.zoomLevel < 100;
 }
 
 /**
