@@ -18,7 +18,7 @@ const initialHtml = `
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const blockTransforms = [
 	'Separator',
-	...transformsWithInnerBlocks
+	...transformsWithInnerBlocks,
 ];
 
 setupCoreBlocks();

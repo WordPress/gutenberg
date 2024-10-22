@@ -18,7 +18,7 @@ const initialHtml = `
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const blockTransforms = [
 	'Spacer',
-	...transformsWithInnerBlocks
+	...transformsWithInnerBlocks,
 ];
 
 setupCoreBlocks();
