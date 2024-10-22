@@ -223,7 +223,7 @@ export default function CollabSidebar() {
 				per_page: 100,
 			} );
 
-			if ( data ) {
+			if ( undefined !== data ) {
 				setThreads( Array.isArray( data ) ? data : [] );
 			}
 		}
