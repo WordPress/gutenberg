@@ -351,8 +351,6 @@ function VisualEditor( {
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
 		! isZoomedOut;
-	const shouldIframe =
-		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -377,7 +375,7 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': shouldIframe,
+					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
@@ -388,7 +386,7 @@ function VisualEditor( {
 				}
 			>
 				<BlockCanvas
-					shouldIframe={ shouldIframe }
+					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
