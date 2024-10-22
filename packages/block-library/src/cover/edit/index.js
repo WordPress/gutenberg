@@ -511,7 +511,8 @@ function CoverEdit( {
 			'has-custom-content-position':
 				! isContentPositionCenter( contentPosition ),
 		},
-		getPositionClassName( contentPosition )
+		getPositionClassName( contentPosition ),
+		'has-no-zindex-in-inner-blocks'
 	);
 
 	const showOverlay =
