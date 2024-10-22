@@ -294,7 +294,7 @@ const getAllBlocks = () => {
 		blocks.push( navigationOverlayClose );
 	}
 
-	if ( window?.__experimentalEnablePlaylistBlock ) {
+	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );
 	}
 
