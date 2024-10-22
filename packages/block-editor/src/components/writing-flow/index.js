@@ -47,19 +47,21 @@ export function useWritingFlow() {
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;
+					node.dataset.hasMultiSelection = hasMultiSelection;
 
 					if ( ! hasMultiSelection ) {
-						return;
+						return () => {
+							delete node.dataset.hasMultiSelection;
+						};
 					}
 
-					node.classList.add( 'has-multi-selection' );
 					node.setAttribute(
 						'aria-label',
 						__( 'Multiple selected blocks' )
 					);
 
 					return () => {
-						node.classList.remove( 'has-multi-selection' );
+						delete node.dataset.hasMultiSelection;
 						node.removeAttribute( 'aria-label' );
 					};
 				},
