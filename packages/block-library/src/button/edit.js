@@ -13,7 +13,7 @@ import removeAnchorTag from '../utils/remove-anchor-tag';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
 	Button,
@@ -137,7 +137,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 							}
 							onClick={ () => handleChange( widthValue ) }
 						>
-							{ widthValue }%
+							{ sprintf(
+								/* translators: Percentage value. */
+								__( '%1$s%%' ),
+								widthValue
+							) }
 						</Button>
 					);
 				} ) }
