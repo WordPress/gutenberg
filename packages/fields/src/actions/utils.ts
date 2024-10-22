@@ -34,10 +34,10 @@ export function getItemTitle( item: Post ) {
 	if ( typeof item.title === 'string' ) {
 		return decodeEntities( item.title );
 	}
-	if ( item.title && 'rendered' in item.title ) {
+	if ( 'rendered' in item.title ) {
 		return decodeEntities( item.title.rendered );
 	}
-	if ( item.title && 'raw' in item?.title ) {
+	if ( 'raw' in item.title ) {
 		return decodeEntities( item.title.raw );
 	}
 	return '';
