@@ -1,16 +1,5 @@
 <?php
 /**
- * PHP and WordPress configuration compatibility functions for the Gutenberg
- * editor plugin changes related to REST API.
- *
- * @package gutenberg
- */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
-}
-
-/**
  * Updates the comment type in the REST API for WordPress version 6.7.
  *
  * This function is used as a filter callback for the 'rest_pre_insert_comment' hook.

@@ -405,12 +405,30 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`combine-assets\` sh
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'assets.php' should match snapshot 1`] = `
+"<?php return array('fileA.js' => array('dependencies' => array('lodash', 'wp-blob'), 'version' => 'e1840d27f0719ffa42d3'), 'fileB.js' => array('dependencies' => array('wp-token-list'), 'version' => '1e60e007d6496c9b46cf'));
+"
+`;
+
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('wp-interactivity'), 'version' => '82601013091064d44360');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-graph\` should produce expected output: External modules should match snapshot 2`] = `
 [
   {
     "externalType": "window",
