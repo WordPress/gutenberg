@@ -9,6 +9,7 @@ import {
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import { select, dispatch } from '@wordpress/data';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { sectionRootClientIdKey } from '../private-keys';
+import { lock } from '../../lock-unlock';
 
 const {
 	getBlockName,
@@ -2424,7 +2426,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 0,
 				},
@@ -2465,7 +2467,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2503,7 +2505,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			const insertionPoint1 = getBlockInsertionPoint( state );
@@ -2545,7 +2547,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2587,7 +2589,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2629,7 +2631,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2642,7 +2644,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
@@ -2650,7 +2652,7 @@ describe( 'selectors', () => {
 
 		it( 'should return true if assigned insertion point', () => {
 			const state = {
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 5,
 				},
@@ -4469,21 +4471,26 @@ describe( 'getBlockEditingMode', () => {
 
 	const navigationModeStateWithRootSection = {
 		...baseState,
-		editorMode: 'navigation',
 		settings: {
 			[ sectionRootClientIdKey ]: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', // The group is the "main" container
 		},
 	};
 
-	const __experimentalHasContentRoleAttribute = jest.fn( ( name ) => {
-		// consider paragraphs as content blocks.
-		return name === 'core/p';
+	const hasContentRoleAttribute = jest.fn( () => false );
+
+	const fauxPrivateAPIs = {};
+
+	lock( fauxPrivateAPIs, {
+		hasContentRoleAttribute,
 	} );
+
 	getBlockEditingMode.registry = {
-		select: jest.fn( () => ( {
-			__experimentalHasContentRoleAttribute,
-		} ) ),
+		select: jest.fn( () => fauxPrivateAPIs ),
 	};
+
+	afterEach( () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', undefined );
+	} );
 
 	it( 'should return default by default', () => {
 		expect(
@@ -4586,7 +4593,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		hasContentRoleAttribute.mockReturnValueOnce( false );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'disabled' );
@@ -4602,13 +4609,14 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );
 	} );
 
 	it( 'in navigation mode, the root section container is default', () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
@@ -4618,6 +4626,7 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, anything outside the section container is disabled', () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
@@ -4627,6 +4636,7 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, sections are contentOnly', () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
@@ -4642,12 +4652,16 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
 				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
 			)
 		).toBe( 'contentOnly' );
+
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,
@@ -4657,6 +4671,7 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'in navigation mode, blocks without content attributes within sections are disabled', () => {
+		dispatch( preferencesStore ).set( 'core', 'editorTool', 'navigation' );
 		expect(
 			getBlockEditingMode(
 				navigationModeStateWithRootSection,

@@ -19,10 +19,16 @@ export default function useTabNav() {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 
-	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
-		useSelect( blockEditorStore );
+	const {
+		hasMultiSelection,
+		getSelectedBlockClientId,
+		getBlockCount,
+		getBlockOrder,
+		getLastFocus,
+		getSectionRootClientId,
+		isZoomOut,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
-	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
@@ -45,6 +51,24 @@ export default function useTabNav() {
 					)
 					.focus();
 			}
+		}
+		// In "compose" mode without a selected ID, we want to place focus on the section root when tabbing to the canvas.
+		else if ( isZoomOut() ) {
+			const sectionRootClientId = getSectionRootClientId();
+			const sectionBlocks = getBlockOrder( sectionRootClientId );
+
+			// If we have section within the section root, focus the first one.
+			if ( sectionBlocks.length ) {
+				container.current
+					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
+					.focus();
+			}
+			// If we don't have any section blocks, focus the section root.
+			else {
+				container.current
+					.querySelector( `[data-block="${ sectionRootClientId }"]` )
+					.focus();
+			}
 		} else {
 			const canvasElement =
 				container.current.ownerDocument === event.target.ownerDocument
@@ -61,7 +85,6 @@ export default function useTabNav() {
 				const next = isBefore
 					? tabbables[ 0 ]
 					: tabbables[ tabbables.length - 1 ];
-
 				next.focus();
 			}
 		}

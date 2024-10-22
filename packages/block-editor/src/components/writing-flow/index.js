@@ -23,7 +23,6 @@ import useSelectionObserver from './use-selection-observer';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
-import useEventRedirect from './use-event-redirect';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -48,25 +47,26 @@ export function useWritingFlow() {
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;
+					node.dataset.hasMultiSelection = hasMultiSelection;
 
 					if ( ! hasMultiSelection ) {
-						return;
+						return () => {
+							delete node.dataset.hasMultiSelection;
+						};
 					}
 
-					node.classList.add( 'has-multi-selection' );
 					node.setAttribute(
 						'aria-label',
 						__( 'Multiple selected blocks' )
 					);
 
 					return () => {
-						node.classList.remove( 'has-multi-selection' );
+						delete node.dataset.hasMultiSelection;
 						node.removeAttribute( 'aria-label' );
 					};
 				},
 				[ hasMultiSelection ]
 			),
-			useEventRedirect(),
 		] ),
 		after,
 	];

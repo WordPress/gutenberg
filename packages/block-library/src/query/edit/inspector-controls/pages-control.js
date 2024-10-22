@@ -8,7 +8,7 @@ export const PagesControl = ( { pages, onChange } ) => {
 	return (
 		<NumberControl
 			__next40pxDefaultSize
-			label={ __( 'Max pages' ) }
+			label={ __( 'Max pages to show' ) }
 			value={ pages }
 			min={ 0 }
 			onChange={ ( newPages ) => {

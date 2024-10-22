@@ -10,6 +10,18 @@
 	}
 }
 
+// Reset user select, but the next rule should take precedence for nested
+// groups.
+:where([data-has-multi-selection]:not([contenteditable="true"]) .wp-block-group > *) {
+	user-select: initial;
+}
+
+// When we are not multi-selecting, prevent children from capturing the
+// selection, which happens when the group is flex and children inlined.
+:where([data-has-multi-selection]:not([contenteditable="true"]) .wp-block-group) {
+	user-select: none;
+}
+
 // Place block list appender in the same place content will appear.
 [data-type="core/group"].is-selected {
 	.block-list-appender {
@@ -39,9 +51,9 @@
 	&::after {
 		content: "";
 		display: flex;
-		flex: 1 0 $grid-unit-60;
+		flex: 1 0 $button-size-next-default-40px;
 		pointer-events: none;
-		min-height: $grid-unit-60 - $border-width - $border-width;
+		min-height: $button-size-next-default-40px - $border-width - $border-width;
 		border: $border-width dashed currentColor;
 	}
 

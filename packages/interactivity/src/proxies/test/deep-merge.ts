@@ -251,24 +251,6 @@ describe( 'Interactivity API', () => {
 			expect( result ).toEqual( { a: 1 } );
 		} );
 
-		it( 'should handle arrays', () => {
-			const target = { a: [ 1, 2 ] };
-			const source = { a: [ 3, 4 ] };
-			const result = {};
-			deepMerge( result, target );
-			deepMerge( result, source );
-			expect( result ).toEqual( { a: [ 3, 4 ] } );
-		} );
-
-		it( 'should handle arrays when overwrite is false', () => {
-			const target = { a: [ 1, 2 ] };
-			const source = { a: [ 3, 4 ] };
-			const result = {};
-			deepMerge( result, target, false );
-			deepMerge( result, source, false );
-			expect( result ).toEqual( { a: [ 1, 2 ] } );
-		} );
-
 		it( 'should handle null values', () => {
 			const target = { a: 1, b: null };
 			const source = { b: 2, c: null };
@@ -379,7 +361,10 @@ describe( 'Interactivity API', () => {
 			const target = proxifyState< any >( 'test', { a: 1, b: 2 } );
 			const source = { a: 1, b: 2, c: 3 };
 
-			const spy = jest.fn( () => Object.keys( target ) );
+			let keys: any;
+			const spy = jest.fn( () => {
+				keys = Object.keys( target );
+			} );
 			effect( spy );
 
 			expect( spy ).toHaveBeenCalledTimes( 1 );
@@ -387,7 +372,180 @@ describe( 'Interactivity API', () => {
 			deepMerge( target, source, false );
 
 			expect( spy ).toHaveBeenCalledTimes( 2 );
-			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
+			expect( keys ).toEqual( [ 'a', 'b', 'c' ] );
+		} );
+
+		it( 'should handle deeply nested properties that are initially undefined', () => {
+			const target: any = proxifyState( 'test', {} );
+
+			let deepValue: any;
+			const spy = jest.fn( () => {
+				deepValue = target.a?.b?.c?.d;
+			} );
+			effect( spy );
+
+			// Initial call, the deep value is undefined
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( deepValue ).toBeUndefined();
+
+			// Use deepMerge to add a deeply nested object to the target
+			deepMerge( target, { a: { b: { c: { d: 'test value' } } } } );
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( deepValue ).toBe( 'test value' );
+
+			// Reading the value directly should also work
+			expect( target.a.b.c.d ).toBe( 'test value' );
+
+			// Modify the nested value
+			target.a.b.c.d = 'new test value';
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 3 );
+			expect( deepValue ).toBe( 'new test value' );
+		} );
+
+		it( 'should overwrite values that become objects', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge( target, {
+				message: { content: 'hello', fontStyle: 'italic' },
+			} );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+
+			expect( target.message ).toEqual( {
+				content: 'hello',
+				fontStyle: 'italic',
+			} );
+		} );
+
+		it( 'should not overwrite values that become objects if `override` is false', () => {
+			const target: any = proxifyState( 'test', { message: 'hello' } );
+
+			let message: any;
+			const spy = jest.fn( () => ( message = target.message ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+
+			deepMerge(
+				target,
+				{ message: { content: 'hello', fontStyle: 'italic' } },
+				false
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( message ).toBe( 'hello' );
+			expect( target.message ).toBe( 'hello' );
+			expect( target.message.content ).toBeUndefined();
+			expect( target.message.fontStyle ).toBeUndefined();
+		} );
+
+		it( 'should keep reactivity of arrays that are initially undefined', () => {
+			const target: any = proxifyState( 'test', {} );
+
+			let deepValue: any;
+			const spy = jest.fn( () => {
+				deepValue = target.array?.[ 0 ];
+			} );
+			effect( spy );
+
+			// Initial call, the deep value is undefined
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( deepValue ).toBeUndefined();
+
+			// Use deepMerge to add an array to the target
+			deepMerge( target, { array: [ 'value 1' ] } );
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( deepValue ).toBe( 'value 1' );
+
+			// Modify the array value
+			target.array[ 0 ] = 'value 2';
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 3 );
+			expect( deepValue ).toBe( 'value 2' );
+		} );
+
+		describe( 'arrays', () => {
+			it( 'should handle arrays', () => {
+				const target = { a: [ 1, 2 ] };
+				const source = { a: [ 3, 4 ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { a: [ 3, 4 ] } );
+			} );
+
+			it( 'should handle arrays when overwrite is false', () => {
+				const target = { a: [ 1, 2 ] };
+				const source = { a: [ 3, 4 ] };
+				const result = {};
+				deepMerge( result, target, false );
+				deepMerge( result, source, false );
+				expect( result ).toEqual( { a: [ 1, 2 ] } );
+			} );
+
+			it( 'should add new array from source if not present in target', () => {
+				const target = { a: 1 };
+				const source = { arr: [ 1, 2, 3 ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { a: 1, arr: [ 1, 2, 3 ] } );
+			} );
+
+			it( 'should handle nested arrays', () => {
+				const target = { nested: { arr: [ 1, 2 ] } };
+				const source = { nested: { arr: [ 3, 4, 5 ] } };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { nested: { arr: [ 3, 4, 5 ] } } );
+			} );
+
+			it( 'should handle object with array as target and object with object as source', () => {
+				const target = { arr: [ 1, 2, 3 ] };
+				const source = { arr: { 1: 'two', 3: 'four' } };
+				const result: any = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: { 1: 'two', 3: 'four' } } );
+			} );
+
+			it( 'should handle object with object as target and object with array as source', () => {
+				const target = { arr: { 0: 'zero', 2: 'two' } };
+				const source = { arr: [ 'a', 'b', 'c' ] };
+				const result = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: [ 'a', 'b', 'c' ] } );
+			} );
+
+			it( 'should handle objects with arrays containing object elements', () => {
+				const target = { arr: [ { a: 1 }, { b: 2 } ] };
+				const source = { arr: [ { a: 2 }, { c: 3 } ] };
+				const result: any = {};
+				deepMerge( result, target );
+				deepMerge( result, source );
+				expect( result ).toEqual( { arr: [ { a: 2 }, { c: 3 } ] } );
+			} );
 		} );
 	} );
 } );

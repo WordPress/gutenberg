@@ -48,6 +48,7 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -107,7 +108,6 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -174,17 +174,19 @@ function VisualEditor( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
-		isZoomOutMode,
+		isZoomedOut,
 	} = useSelect( ( select ) => {
-		const { getSettings, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { getSettings, isZoomOut: _isZoomOut } = unlock(
+			select( blockEditorStore )
+		);
+
 		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isZoomedOut: _isZoomOut(),
 		};
 	}, [] );
 
@@ -333,15 +335,8 @@ function VisualEditor( {
 		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useZoomOutModeExit(),
 	] );
-
-	const zoomOutProps =
-		isZoomOutMode && ! isTabletViewport
-			? {
-					scale: 'default',
-					frameSize: '48px',
-			  }
-			: {};
 
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
@@ -355,9 +350,7 @@ function VisualEditor( {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
-		! isZoomOutMode;
-	const shouldIframe =
-		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
+		! isZoomedOut;
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -382,7 +375,7 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': shouldIframe,
+					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
@@ -393,13 +386,12 @@ function VisualEditor( {
 				}
 			>
 				<BlockCanvas
-					shouldIframe={ shouldIframe }
+					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
-						...zoomOutProps,
 						style: {
 							...iframeProps?.style,
 							...deviceStyles,

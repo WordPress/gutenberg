@@ -10,7 +10,8 @@ import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
 	component: VisuallyHidden,
-	title: 'Components/VisuallyHidden',
+	title: 'Components/Utilities/VisuallyHidden',
+	id: 'components-visuallyhidden',
 	argTypes: {
 		children: { control: { type: null } },
 		as: { control: { type: 'text' } },

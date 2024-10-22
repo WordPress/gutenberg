@@ -27,7 +27,10 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				getBlockParentsByBlockName,
 				getSettings,
 				getBlockAttributes,
+				getBlockParents,
 			} = select( blockEditorStore );
+			const { getCurrentTemplateId, getRenderingMode } =
+				select( editorStore );
 			const patternParent = getBlockParentsByBlockName(
 				clientId,
 				'core/block',
@@ -41,23 +44,17 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					'wp_block',
 					getBlockAttributes( patternParent ).ref
 				);
-			} else {
-				const { getCurrentTemplateId } = select( editorStore );
-				const templateId = getCurrentTemplateId();
-				const { getBlockParents } = unlock(
-					select( blockEditorStore )
+			} else if (
+				getRenderingMode() === 'template-locked' &&
+				! getBlockParents( clientId ).some( ( parent ) =>
+					postContentBlocks.includes( parent )
+				)
+			) {
+				record = select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_template',
+					getCurrentTemplateId()
 				);
-				if (
-					! getBlockParents( clientId ).some( ( parent ) =>
-						postContentBlocks.includes( parent )
-					)
-				) {
-					record = select( coreStore ).getEntityRecord(
-						'postType',
-						'wp_template',
-						templateId
-					);
-				}
 			}
 			if ( ! record ) {
 				return {};

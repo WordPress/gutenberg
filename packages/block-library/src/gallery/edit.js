@@ -25,6 +25,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	MediaReplaceFlow,
+	useSettings,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -38,6 +39,7 @@ import {
 	customLink,
 	image as imageIcon,
 	linkOff,
+	fullscreen,
 } from '@wordpress/icons';
 
 /**
@@ -55,6 +57,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_LIGHTBOX,
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
@@ -62,7 +65,7 @@ import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
-const linkOptions = [
+let linkOptions = [
 	{
 		icon: customLink,
 		label: __( 'Link images to attachment pages' ),
@@ -74,6 +77,13 @@ const linkOptions = [
 		label: __( 'Link images to media files' ),
 		value: LINK_DESTINATION_MEDIA,
 		noticeText: __( 'Media Files' ),
+	},
+	{
+		icon: fullscreen,
+		label: __( 'Expand on click' ),
+		value: LINK_DESTINATION_LIGHTBOX,
+		noticeText: __( 'Lightbox effect' ),
+		infoText: __( 'Scale images with a lightbox effect' ),
 	},
 	{
 		icon: linkOff,
@@ -106,6 +116,14 @@ export default function GalleryEdit( props ) {
 		isContentLocked,
 		onFocus,
 	} = props;
+
+	const lightboxSetting = useSettings( 'blocks.core/image.lightbox' )[ 0 ];
+
+	if ( ! lightboxSetting?.allowEditing ) {
+		linkOptions = linkOptions.filter(
+			( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
+		);
+	}
 
 	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
 		attributes;
@@ -363,9 +381,13 @@ export default function GalleryEdit( props ) {
 			const image = block.attributes.id
 				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
+
 			changedAttributes[ block.clientId ] = getHrefAndDestination(
 				image,
-				value
+				value,
+				false,
+				block.attributes,
+				lightboxSetting
 			);
 		} );
 		updateBlockAttributes( blocks, changedAttributes, true );
@@ -646,6 +668,7 @@ export default function GalleryEdit( props ) {
 												onClose();
 											} }
 											role="menuitemradio"
+											info={ linkItem.infoText }
 										>
 											{ linkItem.label }
 										</MenuItem>

@@ -32,6 +32,7 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import { useZoomOutModeExit } from './components/block-list/use-block-props/use-zoom-out-mode-exit';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
@@ -47,7 +48,6 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
-import { useBlockBindingsUtils } from './utils/block-bindings';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -79,6 +79,7 @@ lock( privateApis, {
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
@@ -92,6 +93,5 @@ lock( privateApis, {
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
-	useBlockBindingsUtils,
 	sectionRootClientIdKey,
 } );

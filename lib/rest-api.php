@@ -13,9 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Overrides the REST controller for the `wp_global_styles` post type.
  *
- * @param array  $args      Array of arguments for registering a post type.
+ * @param array $args Array of arguments for registering a post type.
  *                          See the register_post_type() function for accepted arguments.
- * @param string $post_type Post type key.
  *
  * @return array Array of arguments for registering a post type.
  */

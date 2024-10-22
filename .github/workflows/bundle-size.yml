@@ -37,19 +37,19 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+            - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
               with:
                   fetch-depth: 1
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
+              uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@f780fd104362cfce9e118f9198df2ee37d12946c # v2.6.0
+            - uses: preactjs/compressed-size-action@6fa0e7ca017120c754863b31123c5ee2860fd434 # v2.7.0
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/**/*.min.js,build/**/*.css,build-module/**/*.min.js}'

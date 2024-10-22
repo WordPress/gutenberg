@@ -20,7 +20,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -167,10 +167,7 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 				</Flex>
 			) ) }
 		</ZStack>
-		<FlexItem
-			className="block-editor-panel-color-gradient-settings__color-name"
-			title={ label }
-		>
+		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
 			{ label }
 		</FlexItem>
 	</HStack>
@@ -231,19 +228,10 @@ function ColorPanelDropdown( {
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
-						'aria-label': sprintf(
-							/* translators: %s is the type of color property, e.g., "background" */
-							__( 'Color %s styles' ),
-							label
-						),
 					};
 
 					return (
-						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
-							{ ...toggleProps }
-						>
+						<Button __next40pxDefaultSize { ...toggleProps }>
 							<LabeledColorIndicators
 								indicators={ indicators }
 								label={ label }

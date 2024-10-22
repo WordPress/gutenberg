@@ -7,26 +7,44 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
-const ZoomOutToggle = () => {
-	const { isZoomOutMode } = useSelect( ( select ) => ( {
-		isZoomOutMode:
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const ZoomOutToggle = ( { disabled } ) => {
+	const { isZoomOut, showIconLabels } = useSelect( ( select ) => ( {
+		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
+		showIconLabels: select( preferencesStore ).get(
+			'core',
+			'showIconLabels'
+		),
 	} ) );
 
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { resetZoomLevel, setZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const handleZoomOut = () => {
-		__unstableSetEditorMode( isZoomOutMode ? 'edit' : 'zoom-out' );
+		if ( isZoomOut ) {
+			resetZoomLevel();
+		} else {
+			setZoomLevel( 50 );
+		}
 	};
 
 	return (
 		<Button
+			accessibleWhenDisabled
+			disabled={ disabled }
 			onClick={ handleZoomOut }
 			icon={ zoomOutIcon }
-			label={ __( 'Toggle Zoom Out' ) }
-			isPressed={ isZoomOutMode }
+			label={ __( 'Zoom Out' ) }
+			isPressed={ isZoomOut }
 			size="compact"
+			showTooltip={ ! showIconLabels }
 		/>
 	);
 };
