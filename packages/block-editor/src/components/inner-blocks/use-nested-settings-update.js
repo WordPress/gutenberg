@@ -41,7 +41,6 @@ function useShallowMemo( value ) {
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
- * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
@@ -63,7 +62,6 @@ function useShallowMemo( value ) {
  */
 export default function useNestedSettingsUpdate(
 	clientId,
-	parentLock,
 	allowedBlocks,
 	prioritizedInserterBlocks,
 	defaultBlock,
@@ -90,16 +88,11 @@ export default function useNestedSettingsUpdate(
 		prioritizedInserterBlocks
 	);
 
-	const _templateLock =
-		templateLock === undefined || parentLock === 'contentOnly'
-			? parentLock
-			: templateLock;
-
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
 			prioritizedInserterBlocks: _prioritizedInserterBlocks,
-			templateLock: _templateLock,
+			templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -176,7 +169,7 @@ export default function useNestedSettingsUpdate(
 		clientId,
 		_allowedBlocks,
 		_prioritizedInserterBlocks,
-		_templateLock,
+		templateLock,
 		defaultBlock,
 		directInsert,
 		__experimentalDefaultBlock,

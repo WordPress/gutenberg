@@ -105,13 +105,11 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useBlockContext( clientId );
 
-	const { nestingLevel, parentLock } = useSelect(
+	const { nestingLevel } = useSelect(
 		( select ) => {
-			const { getBlockParents, getTemplateLock, getBlockRootClientId } =
-				select( blockEditorStore );
+			const { getBlockParents } = select( blockEditorStore );
 			return {
 				nestingLevel: getBlockParents( clientId )?.length,
-				parentLock: getTemplateLock( getBlockRootClientId( clientId ) ),
 			};
 		},
 		[ clientId ]
@@ -119,7 +117,6 @@ function UncontrolledInnerBlocks( props ) {
 
 	useNestedSettingsUpdate(
 		clientId,
-		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,

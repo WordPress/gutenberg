@@ -3830,28 +3830,45 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the specified clientId was not found', () => {
 			const state = {
-				settings: { templateLock: 'all' },
+				settings: {},
 				blockListSettings: {
 					chicken: {
 						templateLock: 'insert',
 					},
+					ribs: {},
+				},
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							ribs: '',
+						} )
+					),
 				},
 			};
 
 			expect( getTemplateLock( state, 'ribs' ) ).toBe( false );
 		} );
 
-		it( 'should return false if template lock was not set on the specified block', () => {
+		it( 'should return the parent lock if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
 				blockListSettings: {
 					chicken: {
-						test: 'tes1t',
+						templateLock: 'insert',
 					},
+				},
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							ribs: '',
+						} )
+					),
 				},
 			};
 
-			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
+			expect( getTemplateLock( state, 'ribs' ) ).toBe( 'all' );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {
@@ -3861,6 +3878,14 @@ describe( 'selectors', () => {
 					chicken: {
 						templateLock: 'insert',
 					},
+				},
+				blocks: {
+					parents: new Map(
+						Object.entries( {
+							chicken: '',
+							ribs: '',
+						} )
+					),
 				},
 			};
 

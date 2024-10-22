@@ -1572,7 +1572,17 @@ export function getTemplateLock( state, rootClientId ) {
 		return state.settings.templateLock ?? false;
 	}
 
-	return getBlockListSettings( state, rootClientId )?.templateLock ?? false;
+	const currentLock = getBlockListSettings(
+		state,
+		rootClientId
+	)?.templateLock;
+	if ( currentLock !== undefined ) {
+		return currentLock;
+	}
+	return getTemplateLock(
+		state,
+		getBlockRootClientId( state, rootClientId )
+	);
 }
 
 /**
@@ -2948,7 +2958,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		return true;
 	}
 
-	// In navigation mode, the block overlay is active when the block is not
+	// For sections, the block overlay is active when the block is not
 	// selected (and doesn't contain a selected child). The same behavior is
 	// also enabled in all modes for blocks that have controlled children
 	// (reusable block, template part, navigation), unless explicitly disabled
