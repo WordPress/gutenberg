@@ -26,6 +26,8 @@
 	// the bottom margin set on `...__list-item` above
 	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
+	outline: 0;
+
 	.block-editor-block-patterns-list__item-title {
 		flex-grow: 1;
 		font-size: $helptext-font-size;
