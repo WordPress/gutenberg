@@ -46,9 +46,10 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					getBlockAttributes( patternParent ).ref
 				);
 			} else {
-				const { getCurrentTemplateId } = select( editorStore );
+				const { getCurrentTemplateId, getRenderingMode } =
+					select( editorStore );
 				const templateId = getCurrentTemplateId();
-				const { getContentLockingParent, getRenderingMode } = unlock(
+				const { getContentLockingParent } = unlock(
 					select( blockEditorStore )
 				);
 				if (
