@@ -8,6 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
@@ -1660,17 +1661,29 @@ export function template( state = { isValid: true }, action ) {
  */
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_SETTINGS':
-			if ( action.reset ) {
-				return {
-					...SETTINGS_DEFAULTS,
-					...action.settings,
-				};
-			}
+		case 'UPDATE_SETTINGS': {
+			const updatedSettings = action.reset
+				? {
+						...SETTINGS_DEFAULTS,
+						...action.settings,
+				  }
+				: {
+						...state,
+						...action.settings,
+				  };
+
 			return {
-				...state,
-				...action.settings,
+				...updatedSettings,
+				get __unstableIsPreviewMode() {
+					deprecated( '__unstableIsPreviewMode', {
+						since: '19.5',
+						alternative: 'isPreviewMode',
+					} );
+
+					return this.isPreviewMode;
+				},
 			};
+		}
 	}
 
 	return state;
