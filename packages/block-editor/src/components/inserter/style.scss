@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -24,13 +24,19 @@ $block-inserter-tabs-height: 44px;
 	&.show-as-tabs {
 		gap: 0;
 	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
 		border: none;
 		outline: none;
-		box-shadow: $shadow-popover;
+		box-shadow: $elevation-x-small;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -38,12 +44,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
-				border-radius: $radius-block-ui $radius-block-ui 0 0;
+				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
-				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+				border-radius: 0 0 $radius-medium $radius-medium;
 			}
 
 			&.components-button {
@@ -85,6 +91,12 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -111,6 +123,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-header {
+	// Use `position: relative` to ensure any absolute positioned child elements are
+	// positioned relative to the panel header.
+	// This makes the overflow rule of the panel work correctly, particularly when the
+	// `VisuallyHidden` component is used within the inserter UI.
+	position: relative;
+
 	display: inline-flex;
 	align-items: center;
 	padding: $grid-unit-20 $grid-unit-20 0;
@@ -141,15 +159,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__reusable-blocks-panel {
 	position: relative;
 	text-align: right;
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	margin: auto $grid-unit-20 $grid-unit-20;
-}
-
-.block-editor-inserter__manage-reusable-blocks {
-	justify-content: center;
-	width: 100%;
 }
 
 .block-editor-inserter__no-results,
@@ -211,107 +220,46 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
+	flex-grow: 1;
 	padding: $grid-unit-20;
-	height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 }
 
 .block-editor-inserter__category-tablist {
-	display: flex;
-	flex-direction: column;
-	border: none;
 	margin-bottom: $grid-unit-10;
-	// Push the listitem wrapping the "explore" button to the bottom of the panel.
-	div[role="listitem"]:last-child {
-		margin-top: auto;
-	}
-
-	.block-editor-inserter__category-tab {
-		// Account for the icon on the right so that it's visually balanced.
-		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
-		text-align: left;
-		font-weight: inherit;
-		display: block;
-		position: relative;
-		height: auto;
-
-		&[aria-selected="true"] {
-			color: var(--wp-admin-theme-color);
-
-			.components-flex-item {
-				filter: brightness(0.95);
-			}
-
-			svg {
-				fill: var(--wp-admin-theme-color);
-			}
-
-			&::after {
-				content: "";
-				display: block;
-				outline: none;
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				border-radius: $radius-block-ui;
-				opacity: 0.04;
-				background: var(--wp-admin-theme-color);
-				height: 100%;
-			}
-		}
-
-		&:focus-visible,
-		&:focus:not(:disabled) {
-			border-radius: 2px;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-
-		&::before {
-			display: none;
-		}
-
-		&::after {
-			display: none;
-		}
-	}
 }
 
 .block-editor-inserter__category-panel {
-	background: $gray-100;
-	border-top: $border-width solid $gray-200;
-	box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-	position: absolute;
-	top: -$border-width;
-	left: 0;
-	height: calc(100% + #{$border-width});
-	width: 100%;
-	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
+	padding: 0 $grid-unit-20;
 
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
-		width: 300px;
-	}
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
+		position: absolute;
+		top: -$border-width;
+		height: calc(100% + #{$border-width});
+		background: $gray-100;
+		border-top: $border-width solid $gray-200;
 
-	.block-editor-inserter__media-list,
-	.block-editor-block-patterns-list {
-		padding: 0 $grid-unit-30 $grid-unit-20;
+		.block-editor-inserter__media-list,
+		.block-editor-block-patterns-list {
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
 	}
 }
 
 .block-editor-inserter__patterns-category-panel-header {
-	padding: $grid-unit-10 $grid-unit-30;
+	padding: $grid-unit-10 0;
+	@include break-medium {
+		padding: $grid-unit-10 $grid-unit-30;
+	}
 }
 
 .block-editor-inserter__patterns-category-no-results {
@@ -326,7 +274,6 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__preview-content {
-	min-height: $grid-unit-60 * 3;
 	background: $gray-100;
 	display: grid;
 	flex-grow: 1;
@@ -341,7 +288,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
@@ -359,7 +306,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
@@ -401,7 +348,6 @@ $block-inserter-tabs-height: 44px;
 	background: $gray-900;
 	color: $white;
 	width: 100%;
-	height: ($button-size + $grid-unit-10);
 	border-radius: 0;
 
 	&:hover {
@@ -516,10 +462,15 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		padding: $grid-unit-20 $grid-unit-30 $grid-unit-10;
+		margin-bottom: $grid-unit-30;
 		// TODO: Consider using the Theme component to automatically adapt to a gray background.
-		&:not(:focus-within) {
-			--wp-components-color-background: #{$white};
+		@include break-medium() {
+			margin-bottom: 0;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+
+			&:not(:focus-within) {
+				--wp-components-color-background: #{$white};
+			}
 		}
 	}
 }
@@ -554,7 +505,6 @@ $block-inserter-tabs-height: 44px;
 
 		> button {
 			background: $white;
-			border-radius: $radius-block-ui;
 			display: none;
 
 			// These styles are important so as focus isn't lost
@@ -581,14 +531,13 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: 2px;
+		border-radius: $radius-small;
 
 		> * {
 			margin: 0 auto;
 			max-width: 100%;
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-block-ui;
 		}
 
 		.block-editor-inserter__media-list__item-preview-spinner {
@@ -643,30 +592,6 @@ $block-inserter-tabs-height: 44px;
 	margin: $grid-unit-20 $grid-unit-20 0;
 }
 
-.reusable-blocks-menu-items__rename-hint {
-	align-items: top;
-	background: $gray-100;
-	border-radius: $radius-block-ui;
-	color: $gray-900;
-	display: flex;
-	flex-direction: row;
-	max-width: 380px;
-}
-
-.reusable-blocks-menu-items__rename-hint-content {
-	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
-}
-
-.reusable-blocks-menu-items__rename-hint-dismiss {
-	// The dismiss button has a lot of empty space through its padding.
-	// Apply margin to visually align the icon with the top of the text to its left.
-	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
-}
-
-.components-menu-group .reusable-blocks-menu-items__rename-hint {
-	margin: 0;
-}
-
 .block-editor-patterns__sync-status-filter {
 	.components-input-control__container {
 		select.components-select-control__input {
@@ -691,4 +616,28 @@ $block-inserter-tabs-height: 44px;
 			height: 100%;
 		}
 	}
+}
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
+		}
+	}
+}
+
+.block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	padding: 0 $grid-unit-30 $grid-unit-20;
 }

@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
 import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
 
 /**
@@ -38,6 +41,7 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
+					size="compact"
 					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
@@ -51,20 +55,25 @@ class URLInputButton extends Component {
 					>
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
+								__next40pxDefaultSize
 								className="block-editor-url-input__back"
 								icon={ arrowLeft }
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
 							<URLInput
-								__nextHasNoMarginBottom
 								value={ url || '' }
 								onChange={ onChange }
-							/>
-							<Button
-								icon={ keyboardReturn }
-								label={ __( 'Submit' ) }
-								type="submit"
+								suffix={
+									<InputControlSuffixWrapper variant="control">
+										<Button
+											size="small"
+											icon={ keyboardReturn }
+											label={ __( 'Submit' ) }
+											type="submit"
+										/>
+									</InputControlSuffixWrapper>
+								}
 							/>
 						</div>
 					</form>

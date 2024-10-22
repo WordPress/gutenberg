@@ -13,13 +13,17 @@ module.exports = {
 	moduleNameMapper: {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
+		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
-	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
+	setupFilesAfterEnv: [
+		'<rootDir>/test/unit/config/testing-library.js',
+		'<rootDir>/test/unit/mocks/match-media.js',
+	],
 	testEnvironmentOptions: {
 		url: 'http://localhost/',
 	},
@@ -40,7 +44,7 @@ module.exports = {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|deepsignal)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [

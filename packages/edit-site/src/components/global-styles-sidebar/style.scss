@@ -22,20 +22,17 @@
 	flex-direction: column;
 	min-height: 100%;
 
-	&__panel,
-	&__navigator-provider {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-	}
-
-	&__navigator-screen {
+	&__panel {
 		flex: 1;
 	}
 }
 
 .edit-site-global-styles-sidebar .edit-site-global-styles-sidebar__header-title {
 	margin: 0;
+}
+
+.edit-site-global-styles-sidebar .edit-site-global-styles-sidebar__header-actions {
+	flex: 1;
 }
 
 .edit-site-global-styles-sidebar .components-navigation__menu-title-heading {
@@ -82,6 +79,8 @@
 .show-icon-labels {
 	.edit-site-global-styles-sidebar__header {
 		.components-button.has-icon {
+			width: auto;
+
 			// Hide the button icons when labels are set to display...
 			svg {
 				display: none;

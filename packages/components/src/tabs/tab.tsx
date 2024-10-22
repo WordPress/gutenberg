@@ -10,8 +10,13 @@ import { forwardRef } from '@wordpress/element';
 import type { TabProps } from './types';
 import warning from '@wordpress/warning';
 import { useTabsContext } from './context';
-import { Tab as StyledTab } from './styles';
+import {
+	Tab as StyledTab,
+	TabChildren as StyledTabChildren,
+	TabChevron as StyledTabChevron,
+} from './styles';
 import type { WordPressComponentProps } from '../context';
+import { chevronRight } from '@wordpress/icons';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
@@ -33,7 +38,8 @@ export const Tab = forwardRef<
 			render={ render }
 			{ ...otherProps }
 		>
-			{ children }
+			<StyledTabChildren>{ children }</StyledTabChildren>
+			<StyledTabChevron icon={ chevronRight } />
 		</StyledTab>
 	);
 } );

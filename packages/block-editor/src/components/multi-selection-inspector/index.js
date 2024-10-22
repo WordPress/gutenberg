@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { sprintf, _n } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { serialize } from '@wordpress/blocks';
 import { count as wordCount } from '@wordpress/wordcount';
 import { copy } from '@wordpress/icons';
@@ -13,7 +13,13 @@ import { copy } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
-function MultiSelectionInspector( { blocks } ) {
+export default function MultiSelectionInspector() {
+	const { blocks } = useSelect( ( select ) => {
+		const { getMultiSelectedBlocks } = select( blockEditorStore );
+		return {
+			blocks: getMultiSelectedBlocks(),
+		};
+	}, [] );
 	const words = wordCount( serialize( blocks ), 'words' );
 
 	return (
@@ -38,10 +44,3 @@ function MultiSelectionInspector( { blocks } ) {
 		</div>
 	);
 }
-
-export default withSelect( ( select ) => {
-	const { getMultiSelectedBlocks } = select( blockEditorStore );
-	return {
-		blocks: getMultiSelectedBlocks(),
-	};
-} )( MultiSelectionInspector );

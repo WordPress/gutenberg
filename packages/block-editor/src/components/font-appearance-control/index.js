@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -9,11 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
-import { unlock } from '../../lock-unlock';
 
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 /**
  * Adjusts font appearance field label in case either font styles or weights
  * are disabled.
@@ -43,6 +39,8 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
  */
 export default function FontAppearanceControl( props ) {
 	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next40pxDefaultSize = false,
 		onChange,
 		hasFontStyles = true,
 		hasFontWeights = true,
@@ -154,6 +152,7 @@ export default function FontAppearanceControl( props ) {
 			<CustomSelectControl
 				{ ...otherProps }
 				className="components-font-appearance-control"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }

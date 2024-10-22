@@ -15,15 +15,17 @@
 		}
 	}
 
-	/*
-	Small tweak to left-align the checkbox.
-	Even though `:has` is not currently supported in Firefox, this is a small tweak
-	and does not affect the functionality of the block or the user's experience.
-	There will be a minor inconsistency between browsers. However, it's more important to provide
-	a better experience for 80+% of users, until Firefox catches up and supports `:has`.
-	*/
 	&:has(input[type="checkbox"]) {
+		flex-direction: row;
 		width: fit-content;
+
+		.wp-block-form-input__label-content {
+			margin: 0;
+		}
+	}
+
+	&:has(.wp-block-form-input__label-content + input[type="checkbox"]) {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This style is required for old markup. */
 		flex-direction: row-reverse;
 	}
 }

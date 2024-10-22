@@ -202,7 +202,10 @@ export default function getGlobalStylesChanges( next, previous, options = {} ) {
 			}, {} )
 		).map( ( [ key, changeValues ] ) => {
 			const changeValuesLength = changeValues.length;
-			const joinedChangesValue = changeValues.join( __( ', ' ) );
+			const joinedChangesValue = changeValues.join(
+				/* translators: Used between list items, there is a space after the comma. */
+				__( ', ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+			);
 			switch ( key ) {
 				case 'blocks': {
 					return sprintf(

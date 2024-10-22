@@ -48,6 +48,7 @@ const Template: StoryFn< typeof ToggleControl > = ( {
 
 export const Default = Template.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	label: 'Enable something',
 };
 

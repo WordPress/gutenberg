@@ -200,7 +200,7 @@ describe( 'utils', () => {
 			expect( getEmbedInfoByProvider( 'instagram' ) ).toEqual(
 				expect.objectContaining( {
 					icon: embedInstagramIcon,
-					title: 'Instagram',
+					title: 'Instagram Embed',
 				} )
 			);
 		} );

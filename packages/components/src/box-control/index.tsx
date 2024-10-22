@@ -47,14 +47,14 @@ function useUniqueId( idProp?: string ) {
 }
 
 /**
- * BoxControl components let users set values for Top, Right, Bottom, and Left.
- * This can be used as an input control for values like `padding` or `margin`.
+ * A control that lets users set values for top, right, bottom, and left. Can be
+ * used as an input control for values like `padding` or `margin`.
  *
  * ```jsx
- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+ * import { BoxControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
- * const Example = () => {
+ * function Example() {
  * 	const [ values, setValues ] = useState( {
  * 		top: '50px',
  * 		left: '10%',

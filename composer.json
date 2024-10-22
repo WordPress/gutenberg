@@ -23,14 +23,15 @@
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
-		}
+		},
+		"lock": false
 	},
 	"require-dev": {
 		"phpcompatibility/phpcompatibility-wp": "^2.1.3",
 		"wp-coding-standards/wpcs": "^3.0",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"spatie/phpunit-watcher": "^1.23",
-		"yoast/phpunit-polyfills": "^1.0",
+		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev"
 	},
 	"repositories": [
@@ -43,7 +44,7 @@
 		}
 	],
 	"require": {
-		"composer/installers": "~1.0"
+		"composer/installers": "^1.0 || ^2.0"
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",

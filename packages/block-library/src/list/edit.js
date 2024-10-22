@@ -110,7 +110,7 @@ function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
-				describedBy={ __( 'Outdent list item' ) }
+				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ outdentList }
 			/>
@@ -147,7 +147,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
 				title={ __( 'Unordered' ) }
-				describedBy={ __( 'Convert to unordered list' ) }
+				description={ __( 'Convert to unordered list' ) }
 				isActive={ ordered === false }
 				onClick={ () => {
 					setAttributes( { ordered: false } );
@@ -156,7 +156,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatListNumberedRTL : formatListNumbered }
 				title={ __( 'Ordered' ) }
-				describedBy={ __( 'Convert to ordered list' ) }
+				description={ __( 'Convert to ordered list' ) }
 				isActive={ ordered === true }
 				onClick={ () => {
 					setAttributes( { ordered: true } );

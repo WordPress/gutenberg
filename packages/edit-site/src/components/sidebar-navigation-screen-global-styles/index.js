@@ -5,18 +5,16 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import StyleVariationsContainer from '../global-styles/style-variations-container';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
@@ -24,16 +22,14 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
-import ColorVariations from '../global-styles/variations/variations-color';
-import TypographyVariations from '../global-styles/variations/variations-typography';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import SidebarNavigationScreenGlobalStylesContent from './content';
 
-const noop = () => {};
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-
+	const history = useHistory();
+	const { params } = useLocation();
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -55,7 +51,16 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 			{ ...props }
 			onClick={ () => {
 				// Switch to edit mode.
-				setCanvasMode( 'edit' );
+				history.push(
+					{
+						...params,
+						canvas: 'edit',
+					},
+					undefined,
+					{
+						transition: 'canvas-mode-edit-transition',
+					}
+				);
 				// Open global styles sidebar.
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
@@ -63,93 +68,52 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 }
 
-function SidebarNavigationScreenGlobalStylesContent() {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
-
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( [
-		'color',
-	] );
-	const typographyVariations =
-		useCurrentMergeThemeStyleVariationsWithUserConfig( [ 'typography' ] );
-
-	const gap = 3;
-
-	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
-	// loaded. This is necessary because the Iframe component waits until
-	// the block editor store's `__internalIsInitialized` is true before
-	// rendering the iframe. Without this, the iframe previews will not render
-	// in mobile viewport sizes, where the editor canvas is hidden.
-	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<VStack
-				spacing={ 10 }
-				className="edit-site-global-styles-variation-container"
-			>
-				<StyleVariationsContainer gap={ gap } />
-				{ colorVariations?.length && (
-					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
-				) }
-				{ typographyVariations?.length && (
-					<TypographyVariations
-						title={ __( 'Typography' ) }
-						gap={ gap }
-					/>
-				) }
-			</VStack>
-		</BlockEditorProvider>
-	);
-}
-
 export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
+	const history = useHistory();
+	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
+	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { isViewMode, isStyleBookOpened, revisionsCount } = useSelect(
-		( select ) => {
-			const { getCanvasMode, getEditorCanvasContainerView } = unlock(
-				select( editSiteStore )
-			);
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
-			return {
-				isViewMode: 'view' === getCanvasMode(),
-				isStyleBookOpened:
-					'style-book' === getEditorCanvasContainerView(),
-				revisionsCount:
-					globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
-					0,
-			};
-		},
-		[]
-	);
+	const { isStyleBookOpened, revisionsCount } = useSelect( ( select ) => {
+		const { getEditorCanvasContainerView } = unlock(
+			select( editSiteStore )
+		);
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return {
+			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
+			revisionsCount:
+				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
+		};
+	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
+		history.push(
+			{
+				...params,
+				canvas: 'edit',
+			},
+			undefined,
+			{
+				transition: 'canvas-mode-edit-transition',
+			}
+		);
 		return Promise.all( [
 			setPreference( 'core', 'distractionFree', false ),
-			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar, setPreference ] );
+	}, [ history, params, openGeneralSidebar, setPreference ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
@@ -220,7 +184,7 @@ export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 					</>
 				}
 			/>
-			{ isStyleBookOpened && ! isMobileViewport && isViewMode && (
+			{ isStyleBookOpened && ! isMobileViewport && canvas === 'view' && (
 				<StyleBook
 					enableResizing={ false }
 					isSelected={ () => false }

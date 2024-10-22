@@ -53,20 +53,21 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card size="small" className="edit-site-global-styles-screen-root">
+		<Card
+			size="small"
+			className="edit-site-global-styles-screen-root"
+			isRounded={ false }
+		>
 			<CardBody>
 				<VStack spacing={ 4 }>
-					<Card>
-						<CardMedia>
+					<Card className="edit-site-global-styles-screen-root__active-style-tile">
+						<CardMedia className="edit-site-global-styles-screen-root__active-style-tile-preview">
 							<PreviewStyles />
 						</CardMedia>
 					</Card>
 					{ hasVariations && (
 						<ItemGroup>
-							<NavigationButtonAsItem
-								path="/variations"
-								aria-label={ __( 'Browse styles' ) }
-							>
+							<NavigationButtonAsItem path="/variations">
 								<HStack justify="space-between">
 									<FlexItem>
 										{ __( 'Browse styles' ) }
@@ -103,10 +104,7 @@ function ScreenRoot() {
 					) }
 				</Spacer>
 				<ItemGroup>
-					<NavigationButtonAsItem
-						path="/blocks"
-						aria-label={ __( 'Blocks styles' ) }
-					>
+					<NavigationButtonAsItem path="/blocks">
 						<HStack justify="space-between">
 							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
 							<IconWithCurrentColor
@@ -132,10 +130,7 @@ function ScreenRoot() {
 							) }
 						</Spacer>
 						<ItemGroup>
-							<NavigationButtonAsItem
-								path="/css"
-								aria-label={ __( 'Additional CSS' ) }
-							>
+							<NavigationButtonAsItem path="/css">
 								<HStack justify="space-between">
 									<FlexItem>
 										{ __( 'Additional CSS' ) }

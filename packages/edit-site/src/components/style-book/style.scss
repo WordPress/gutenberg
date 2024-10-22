@@ -3,13 +3,17 @@
 	// This is useful when the style book is used to fill a frame.
 	height: 100%;
 	&.is-button {
-		border-radius: $radius-block-ui * 4;
+		border-radius: $radius-large;
 	}
+
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
 }
 
 .edit-site-style-book__iframe {
 	&.is-button {
-		border-radius: $radius-block-ui * 4;
+		border-radius: $radius-large;
 	}
 	&.is-focused {
 		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
@@ -17,19 +21,17 @@
 	}
 }
 
-.edit-site-style-book__tabs {
-	[role="tablist"] {
-		background: $white;
-		color: $gray-900;
-	}
+.edit-site-style-book__tablist-container {
+	flex: none;
 
-	[role="tabpanel"] {
-		bottom: 0;
-		left: 0;
-		overflow: auto;
-		padding: 0;
-		position: absolute;
-		right: 0;
-		top: $grid-unit-60; // Height of tabs.
-	}
+	display: flex;
+	width: 100%;
+	padding-right: 56px;
+	background: $white;
+}
+
+.edit-site-style-book__tabpanel {
+	flex: 1 0 auto;
+
+	overflow: auto;
 }

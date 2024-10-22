@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -62,7 +63,7 @@ const CustomSelectButton = ( {
 		CustomSelectStore,
 	'onChange'
 > ) => {
-	const { value: currentValue } = store.useState();
+	const { value: currentValue } = useStoreState( store );
 
 	const computedRenderSelectedValue = useMemo(
 		() => renderSelectedValue ?? defaultRenderSelectedValue,
@@ -145,6 +146,8 @@ function _CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
+					// Match legacy behavior
+					flip={ ! isLegacy }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }

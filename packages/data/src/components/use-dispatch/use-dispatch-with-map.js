@@ -25,14 +25,14 @@ import useRegistry from '../registry-provider/use-registry';
  */
 const useDispatchWithMap = ( dispatchMap, deps ) => {
 	const registry = useRegistry();
-	const currentDispatchMap = useRef( dispatchMap );
+	const currentDispatchMapRef = useRef( dispatchMap );
 
 	useIsomorphicLayoutEffect( () => {
-		currentDispatchMap.current = dispatchMap;
+		currentDispatchMapRef.current = dispatchMap;
 	} );
 
 	return useMemo( () => {
-		const currentDispatchProps = currentDispatchMap.current(
+		const currentDispatchProps = currentDispatchMapRef.current(
 			registry.dispatch,
 			registry
 		);
@@ -48,7 +48,7 @@ const useDispatchWithMap = ( dispatchMap, deps ) => {
 					return [
 						propName,
 						( ...args ) =>
-							currentDispatchMap
+							currentDispatchMapRef
 								.current( registry.dispatch, registry )
 								[ propName ]( ...args ),
 					];

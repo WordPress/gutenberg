@@ -16,24 +16,36 @@ function GridLayoutSync( props ) {
 }
 
 function GridTools( { clientId, layout } ) {
-	const { isSelected, isDragging } = useSelect( ( select ) => {
-		const { isBlockSelected, isDraggingBlocks } =
-			select( blockEditorStore );
+	const isVisible = useSelect(
+		( select ) => {
+			const {
+				isBlockSelected,
+				isDraggingBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
 
-		return {
-			isSelected: isBlockSelected( clientId ),
-			isDragging: isDraggingBlocks(),
-		};
-	} );
+			// These calls are purposely ordered from least expensive to most expensive.
+			// Hides the visualizer in cases where the user is not or cannot interact with it.
+			if (
+				( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
+				getTemplateLock( clientId ) ||
+				getBlockEditingMode( clientId ) !== 'default'
+			) {
+				return false;
+			}
 
-	if ( ! isSelected && ! isDragging ) {
-		return null;
-	}
+			return true;
+		},
+		[ clientId ]
+	);
 
 	return (
 		<>
-			<GridVisualizer clientId={ clientId } parentLayout={ layout } />
 			<GridLayoutSync clientId={ clientId } />
+			{ isVisible && (
+				<GridVisualizer clientId={ clientId } parentLayout={ layout } />
+			) }
 		</>
 	);
 }
@@ -41,7 +53,7 @@ function GridTools( { clientId, layout } ) {
 const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( props.attributes.layout?.type !== 'grid' ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		return (
@@ -50,7 +62,7 @@ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 					clientId={ props.clientId }
 					layout={ props.attributes.layout }
 				/>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},

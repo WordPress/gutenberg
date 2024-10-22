@@ -38,7 +38,7 @@
 	}
 
 	// Styles copied from button block styles.
-	input[type="submit"] {
+	:where(input[type="submit"]) {
 		box-shadow: none;
 		cursor: pointer;
 		display: inline-block;

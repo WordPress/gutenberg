@@ -2,13 +2,15 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { join, sep } = require( 'path' );
+const { join, sep, basename } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const { PhpFilePathsPlugin } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies
@@ -52,12 +54,12 @@ const createEntrypoints = () => {
 	/*
 	 * Returns an array of paths to block view files within the `@wordpress/block-library` package.
 	 * These paths can be matched by the regex `blockViewRegex` in order to extract
-	 * the block's filename.
+	 * the block's filename. All blocks were migrated to script modules but the Form block.
 	 *
 	 * Returns an empty array if no files were found.
 	 */
 	const blockViewScriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/**/view*.js'
+		'./packages/block-library/build-module/form/view.js'
 	);
 
 	/*
@@ -90,6 +92,10 @@ module.exports = [
 		plugins: [
 			...plugins,
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+			new PhpFilePathsPlugin( {
+				context: './packages/block-library/src/',
+				props: [ 'render', 'variations' ],
+			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
 					[
@@ -127,17 +133,35 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/index.php`,
+							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname ] = absoluteFilename.match(
-									new RegExp(
-										`([\\w-]+)${ escapeRegExp(
-											sep
-										) }index\\.php$`
+								const [ , dirname, fileBasename ] =
+									absoluteFilename.match(
+										new RegExp(
+											`([\\w-]+)${ escapeRegExp(
+												sep
+											) }([\\w-]+)\\.php$`
+										)
+									);
+								if ( fileBasename === 'index' ) {
+									return join( to, `${ dirname }.php` );
+								}
+								return join(
+									to,
+									dirname,
+									`${ fileBasename }.php`
+								);
+							},
+							filter: ( filepath ) => {
+								return (
+									basename( filepath ) === 'index.php' ||
+									PhpFilePathsPlugin.paths.includes(
+										realpathSync( filepath ).replace(
+											/\\/g,
+											'/'
+										)
 									)
 								);
-
-								return join( to, `${ dirname }.php` );
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';

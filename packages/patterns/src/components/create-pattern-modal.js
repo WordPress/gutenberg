@@ -131,6 +131,7 @@ export function CreatePatternModalContents( {
 					categoryMap={ categoryMap }
 				/>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ _x( 'Synced', 'pattern (singular)' ) }
 					help={ __(
 						'Sync this pattern across multiple locations.'

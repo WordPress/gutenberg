@@ -1,30 +1,14 @@
 /**
- * External dependencies
- */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
-/**
  * Internal dependencies
  */
-const config = require( '../' ),
-	validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/properties-valid.css',
-		'utf-8'
-	),
-	invalidCss = fs.readFileSync(
-		'./packages/stylelint-config/test/properties-invalid.css',
-		'utf-8'
-	);
+const utils = require( './utils' );
+const getStylelintResult = utils.getStylelintResult;
 
 describe( 'flags no warnings with valid properties css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validCss,
-			config,
-		} );
+		result = getStylelintResult( './properties-valid.css' );
 	} );
 
 	it( 'did not error', () => {
@@ -42,10 +26,7 @@ describe( 'flags warnings with invalid properties css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: invalidCss,
-			config,
-		} );
+		result = getStylelintResult( './properties-invalid.css' );
 	} );
 
 	it( 'did error', () => {

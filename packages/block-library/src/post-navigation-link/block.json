@@ -34,6 +34,12 @@
 			"default": ""
 		}
 	},
+	"example": {
+		"attributes": {
+			"label": "Next post",
+			"arrow": "arrow"
+		}
+	},
 	"usesContext": [ "postType" ],
 	"supports": {
 		"reusable": false,

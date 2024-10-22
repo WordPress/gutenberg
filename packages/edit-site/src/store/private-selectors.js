@@ -1,15 +1,4 @@
 /**
- * Returns the current canvas mode.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Canvas mode.
- */
-export function getCanvasMode( state ) {
-	return state.canvasMode;
-}
-
-/**
  * Returns the editor canvas container view.
  *
  * @param {Object} state Global application state.
@@ -18,4 +7,8 @@ export function getCanvasMode( state ) {
  */
 export function getEditorCanvasContainerView( state ) {
 	return state.editorCanvasContainerView;
+}
+
+export function getRoutes( state ) {
+	return state.routes;
 }

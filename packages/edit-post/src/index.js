@@ -27,7 +27,7 @@ import { unlock } from './lock-unlock';
 
 const {
 	BackButton: __experimentalMainDashboardButton,
-	registerDefaultActions,
+	registerCoreBlockBindingsSources,
 } = unlock( editorPrivateApis );
 
 /**
@@ -69,8 +69,16 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 	} );
+
+	if ( window.__experimentalMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
@@ -86,6 +94,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -93,7 +102,6 @@ export function initializeEditor(
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
-	registerDefaultActions();
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

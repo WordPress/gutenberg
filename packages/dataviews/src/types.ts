@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -42,9 +42,31 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Record< string, unknown >;
+export type FieldType = 'text' | 'integer' | 'datetime';
 
-export type FieldType = 'text';
+export type ValidationContext = {
+	elements?: Option[];
+};
+
+/**
+ * An abstract interface for Field based on the field type.
+ */
+export type FieldTypeDefinition< Item > = {
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+
+	/**
+	 * Callback used to render an edit control for the field or control name.
+	 */
+	Edit: ComponentType< DataFormControlProps< Item > > | string;
+};
 
 /**
  * A dataview field for a specific property of a data type.
@@ -63,7 +85,18 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
+
+	/**
+	 * The header of the field. Defaults to the label.
+	 * It allows the usage of a React Element to render the field labels.
+	 */
+	header?: string | ReactElement;
+
+	/**
+	 * A description of the field.
+	 */
+	description?: string;
 
 	/**
 	 * Placeholder for the field.
@@ -73,22 +106,22 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: Item } ) => ReactNode;
+	render?: ComponentType< { item: Item } >;
 
 	/**
-	 * The width of the field column.
+	 * Callback used to render an edit control for the field.
 	 */
-	width?: string | number;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
-	 * The minimum width of the field column.
+	 * Callback used to sort the field.
 	 */
-	maxWidth?: string | number;
+	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * The maximum width of the field column.
+	 * Callback used to validate the field.
 	 */
-	minWidth?: string | number;
+	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
 	 * Whether the field is sortable.
@@ -114,26 +147,24 @@ export type Field< Item > = {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-} & ( Item extends ItemRecord
-	? {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue?: ( args: { item: Item } ) => any;
-	  }
-	: {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue: ( args: { item: Item } ) => any;
-	  } );
+
+	/**
+	 * Callback used to retrieve the value of the field from the item.
+	 * Defaults to `item[ field.id ]`.
+	 */
+	getValue?: ( args: { item: Item } ) => any;
+};
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
+	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
-	render: ( args: { item: Item } ) => ReactNode;
+	render: ComponentType< { item: Item } >;
+	Edit: ComponentType< DataFormControlProps< Item > >;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	enableHiding: boolean;
+	enableSorting: boolean;
 };
 
 /**
@@ -143,11 +174,11 @@ export type Fields< Item > = Field< Item >[];
 
 export type Data< Item > = Item[];
 
-/**
- * The form configuration.
- */
-export type Form = {
-	visibleFields?: string[];
+export type DataFormControlProps< Item > = {
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
 };
 
 /**
@@ -249,9 +280,44 @@ interface ViewBase {
 	perPage?: number;
 
 	/**
-	 * The hidden fields.
+	 * The fields to render
 	 */
 	fields?: string[];
+}
+
+export interface CombinedField {
+	id: string;
+
+	label: string;
+
+	header?: string | ReactElement;
+
+	/**
+	 * The fields to use as columns.
+	 */
+	children: string[];
+
+	/**
+	 * The direction of the stack.
+	 */
+	direction: 'horizontal' | 'vertical';
+}
+
+export interface ColumnStyle {
+	/**
+	 * The width of the field column.
+	 */
+	width?: string | number;
+
+	/**
+	 * The minimum width of the field column.
+	 */
+	maxWidth?: string | number;
+
+	/**
+	 * The maximum width of the field column.
+	 */
+	minWidth?: string | number;
 }
 
 export interface ViewTable extends ViewBase {
@@ -264,9 +330,14 @@ export interface ViewTable extends ViewBase {
 		primaryField?: string;
 
 		/**
-		 * The field to use as the media field.
+		 * The fields to use as columns.
 		 */
-		mediaField?: string;
+		combinedFields?: CombinedField[];
+
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 
@@ -358,6 +429,18 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
+}
+
+export interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
 }
 
 export interface ActionModal< Item > extends ActionBase< Item > {
@@ -368,11 +451,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 		items,
 		closeModal,
 		onActionPerformed,
-	}: {
-		items: Item[];
-		closeModal?: () => void;
-		onActionPerformed?: ( items: Item[] ) => void;
-	} ) => ReactElement;
+	}: RenderModalProps< Item > ) => ReactElement;
 
 	/**
 	 * Whether to hide the modal header.
@@ -407,10 +486,11 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
@@ -434,4 +514,39 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+}
+
+export interface CombinedFormField< Item > extends CombinedField {
+	render?: ComponentType< { item: Item } >;
+}
+
+export interface DataFormCombinedEditProps< Item > {
+	field: NormalizedCombinedFormField< Item >;
+	data: Item;
+	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
+}
+
+export type NormalizedCombinedFormField< Item > = CombinedFormField< Item > & {
+	fields: NormalizedField< Item >[];
+	Edit?: ComponentType< DataFormCombinedEditProps< Item > >;
+};
+
+/**
+ * The form configuration.
+ */
+export type Form< Item > = {
+	type?: 'regular' | 'panel';
+	fields?: string[];
+	/**
+	 * The fields to combine.
+	 */
+	combinedFields?: CombinedFormField< Item >[];
+};
+
+export interface DataFormProps< Item > {
+	data: Item;
+	fields: Field< Item >[];
+	form: Form< Item >;
+	onChange: ( value: Record< string, any > ) => void;
 }

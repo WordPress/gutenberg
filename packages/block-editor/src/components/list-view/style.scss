@@ -41,6 +41,15 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		svg {
+			fill: currentColor;
+			// Optimizate for high contrast modes.
+			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+			@media (forced-colors: active) {
+				fill: CanvasText;
+			}
+		}
 	}
 
 	&:not(.is-selected) .block-editor-list-view-block-select-button {
@@ -101,16 +110,16 @@
 
 	// Border radius for corners of the selected item.
 	&.is-first-selected td:first-child {
-		border-top-left-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
 	}
 	&.is-first-selected td:last-child {
-		border-top-right-radius: $radius-block-ui;
+		border-top-right-radius: $radius-small;
 	}
 	&.is-last-selected td:first-child {
-		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-small;
 	}
 	&.is-last-selected td:last-child {
-		border-bottom-right-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-small;
 	}
 	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
@@ -119,23 +128,23 @@
 		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 	}
 	&.is-branch-selected.is-first-selected td:first-child {
-		border-top-left-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
 	}
 	&.is-branch-selected.is-first-selected td:last-child {
-		border-top-right-radius: $radius-block-ui;
+		border-top-right-radius: $radius-small;
 	}
 	&[data-expanded="false"] {
 		&.is-branch-selected.is-first-selected td:first-child {
-			border-top-left-radius: $radius-block-ui;
+			border-top-left-radius: $radius-small;
 		}
 		&.is-branch-selected.is-first-selected td:last-child {
-			border-top-right-radius: $radius-block-ui;
+			border-top-right-radius: $radius-small;
 		}
 		&.is-branch-selected.is-last-selected td:first-child {
-			border-bottom-left-radius: $radius-block-ui;
+			border-bottom-left-radius: $radius-small;
 		}
 		&.is-branch-selected.is-last-selected td:last-child {
-			border-bottom-right-radius: $radius-block-ui;
+			border-bottom-right-radius: $radius-small;
 		}
 	}
 	&.is-branch-selected:not(.is-selected) td {
@@ -214,23 +223,17 @@
 		height: $grid-unit-40;
 		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
-		border-radius: $radius-block-ui;
 		position: relative;
 		white-space: nowrap;
-
-		&.is-dropping-before::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
-			top: -2px;
-			right: 0;
-			left: 0;
-			border-top: 4px solid var(--wp-admin-theme-color);
-		}
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: inherit;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 400;
+		margin: 0;
+		text-decoration: none;
+		transition: box-shadow 0.1s linear;
 
 		.components-modal__content & {
 			padding-left: 0;
@@ -273,7 +276,7 @@
 
 	&.is-visible .block-editor-list-view-block-contents {
 		opacity: 1;
-		@include edit-post__fade-in-animation;
+		@include animation__fade-in;
 	}
 
 	.block-editor-block-icon {
@@ -406,7 +409,7 @@
 		right: 0;
 		transform: translateY(-50%);
 		background: rgba($black, 0.1);
-		border-radius: $radius-block-ui;
+		border-radius: $radius-x-small;
 		padding: 2px 6px;
 		max-width: 100%;
 		box-sizing: border-box;
@@ -416,7 +419,8 @@
 		background: rgba($black, 0.3);
 	}
 
-	.block-editor-list-view-block-select-button__lock {
+	.block-editor-list-view-block-select-button__lock,
+	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
 
@@ -428,10 +432,10 @@
 		background-size: cover;
 		width: 18px;
 		height: 18px;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-x-small;
 
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-block-ui $white;
+			box-shadow: 0 0 0 $radius-small $white;
 		}
 
 		&:not(:first-child) {
@@ -441,7 +445,7 @@
 
 	&.is-selected .block-editor-list-view-block-select-button__image {
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-block-ui var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 		}
 	}
 }
@@ -552,7 +556,6 @@ svg {
 	background-color: #1e1e1e;
 	color: #fff;
 	margin: $grid-unit-10 0 0 24px;
-	border-radius: 2px;
 	height: 24px;
 	min-width: 24px;
 	padding: 0;

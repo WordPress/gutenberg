@@ -16,7 +16,7 @@
 	cursor: ew-resize;
 	outline: none;
 	background: none;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-full;
 	border: 0;
 	height: 100px;
 
@@ -29,7 +29,7 @@
 		content: "";
 		width: $grid-unit-05;
 		background-color: rgba($gray-700, 0.4);
-		border-radius: $radius-block-ui;
+		border-radius: $radius-full;
 	}
 
 	&.is-left {
