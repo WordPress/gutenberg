@@ -4,32 +4,32 @@
 import { _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import {
-	alignItemTop,
-	alignItemCenter,
-	alignItemBottom,
-	alignItemStretch,
-	alignItemSpaceBetween,
+	justifyTop,
+	justifyCenterVertical,
+	justifyBottom,
+	justifyStretchVertical,
+	justifySpaceBetweenVertical,
 } from '@wordpress/icons';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
-		icon: alignItemTop,
+		icon: justifyTop,
 		title: _x( 'Align top', 'Block vertical alignment setting' ),
 	},
 	center: {
-		icon: alignItemCenter,
+		icon: justifyCenterVertical,
 		title: _x( 'Align middle', 'Block vertical alignment setting' ),
 	},
 	bottom: {
-		icon: alignItemBottom,
+		icon: justifyBottom,
 		title: _x( 'Align bottom', 'Block vertical alignment setting' ),
 	},
 	stretch: {
-		icon: alignItemStretch,
+		icon: justifyStretchVertical,
 		title: _x( 'Stretch to fill', 'Block vertical alignment setting' ),
 	},
 	'space-between': {
-		icon: alignItemSpaceBetween,
+		icon: justifySpaceBetweenVertical,
 		title: _x( 'Space between', 'Block vertical alignment setting' ),
 	},
 };

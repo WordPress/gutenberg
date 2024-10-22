@@ -3,10 +3,10 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const alignItemBottom = (
+const justifyCenterVertical = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Path d="M15 4H9v11h6V4zM4 18.5V20h16v-1.5H4z" />
+		<Path d="M20 11h-5V4H9v7H4v1.5h5V20h6v-7.5h5z" />
 	</SVG>
 );
 
-export default alignItemBottom;
+export default justifyCenterVertical;
