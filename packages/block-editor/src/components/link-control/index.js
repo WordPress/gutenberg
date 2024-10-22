@@ -122,6 +122,7 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
+	searchInputLabel,
 	searchInputPlaceholder,
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
@@ -390,6 +391,7 @@ function LinkControl( {
 						<LinkControlSearchInput
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
+							label={ searchInputLabel }
 							placeholder={ searchInputPlaceholder }
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
