@@ -4,7 +4,7 @@
 }
 
 .block-editor-iframe__html {
-	transform-origin: top center;
+	transform-origin: center;
 	// We don't want to animate the transform of the translateX because it is used
 	// to "center" the canvas. Leaving it on causes the canvas to slide around in
 	// odd ways.
@@ -22,7 +22,6 @@
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
-	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	// Apply an X translation to center the scaled content within the available space.
@@ -32,10 +31,8 @@
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
-	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
 	$total-frame-height: calc(2 * #{$frame-size} / #{$scale});
-	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
-	margin-bottom: calc(-1 * #{$total-height});
+	transform-origin: center;
 	// Add the top/bottom frame size. We use scaling to account for the left/right, as
 	// the padding left/right causes the contents to reflow, which breaks the 1:1 scaling
 	// of the content.
