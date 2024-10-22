@@ -201,8 +201,8 @@ export const processBlockType =
 		// so this is a way to maintain backwards compatibility
 		// with 3rd party blocks that may have been using it as a string.
 		if (
-			typeof settings.parent === 'string' ||
-			settings.parent instanceof String
+			typeof settings?.parent === 'string' ||
+			settings?.parent instanceof String
 		) {
 			settings.parent = [ settings.parent ];
 		}
@@ -212,8 +212,17 @@ export const processBlockType =
 			settings?.parent !== undefined
 		) {
 			warning(
-				'Block parent must be an array of block types, but it is ',
-				settings?.parent
+				'Block parent must be undefined or an array of block types, but it is ',
+				settings.parent
+			);
+			return;
+		}
+
+		if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
+			warning(
+				'Block "' +
+					name +
+					'" cannot be a parent of itself. Please remove the block name from the parent list.'
 			);
 			return;
 		}
