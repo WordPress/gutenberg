@@ -1591,23 +1591,7 @@ export function updateBlockListSettings( clientId, settings ) {
  * @return {Object} Action object
  */
 export function updateSettings( settings ) {
-	let updatedSettings = settings;
-
-	if ( Object.hasOwn( updatedSettings, '__unstableIsPreviewMode' ) ) {
-		deprecated(
-			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
-			{
-				since: '6.8',
-				alternative: 'isPreviewMode',
-			}
-		);
-
-		updatedSettings = { ...updatedSettings };
-		updatedSettings.isPreviewMode = updatedSettings.__unstableIsPreviewMode;
-		delete updatedSettings.__unstableIsPreviewMode;
-	}
-
-	return __experimentalUpdateSettings( updatedSettings, {
+	return __experimentalUpdateSettings( settings, {
 		stripExperimentalSettings: true,
 	} );
 }
