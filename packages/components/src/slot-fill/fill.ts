@@ -23,9 +23,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
 		const refValue = ref.current;
 		registerFill( name, refValue );
 		return () => unregisterFill( name, refValue );
-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useLayoutEffect( () => {
@@ -33,9 +32,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
 		if ( slot ) {
 			slot.forceUpdate();
 		}
-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ children ] );
 
 	useLayoutEffect( () => {
@@ -46,9 +44,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
 		unregisterFill( ref.current.name, ref.current );
 		ref.current.name = name;
 		registerFill( name, ref.current );
-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ name ] );
 
 	return null;

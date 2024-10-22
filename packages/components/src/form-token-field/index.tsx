@@ -124,17 +124,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 
 		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ suggestions, prevSuggestions, value, prevValue ] );
 
 	useEffect( () => {
 		updateSuggestions();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ incompleteTokenValue ] );
 
 	useEffect( () => {
 		updateSuggestions();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ __experimentalAutoSelectFirstMatch ] );
 
 	if ( disabled && isActive ) {

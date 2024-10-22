@@ -42,6 +42,5 @@ export const useNavigationTreeItem = (
 			removeItem( itemId );
 		};
 		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/41639
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ activeMenu, search ] );
 };

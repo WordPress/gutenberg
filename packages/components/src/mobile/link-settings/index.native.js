@@ -101,9 +101,6 @@ function LinkSettings( {
 		if ( onHandleClosingBottomSheet ) {
 			onHandleClosingBottomSheet( onCloseSettingsSheet );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
 
 	useEffect( () => {
@@ -115,9 +112,6 @@ function LinkSettings( {
 		if ( url !== urlInputValue ) {
 			setUrlInputValue( url || '' );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ url ] );
 
 	useEffect( () => {
@@ -141,9 +135,6 @@ function LinkSettings( {
 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
 			onSetAttributes();
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ editorSidebarOpened, isVisible ] );
 
 	useEffect( () => {
@@ -156,9 +147,6 @@ function LinkSettings( {
 				url: prependHTTP( urlValue ),
 			} );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ urlValue ] );
 
 	const onChangeURL = useCallback(
@@ -188,9 +176,6 @@ function LinkSettings( {
 				rel: linkRelInputValue,
 			} );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
 	const onCloseSettingsSheet = useCallback( () => {
@@ -223,9 +208,6 @@ function LinkSettings( {
 				rel: updatedRel,
 			} );
 		},
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ linkRelInputValue ]
 	);
 

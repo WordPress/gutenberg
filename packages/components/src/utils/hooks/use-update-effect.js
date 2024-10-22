@@ -19,11 +19,9 @@ function useUpdateEffect( effect, deps ) {
 		}
 		mountedRef.current = true;
 		return undefined;
-		// Disable reasons:
 		// 1. This hook needs to pass a dep list that isn't an array literal
 		// 2. `effect` is missing from the array, and will need to be added carefully to avoid additional warnings
 		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, deps );
 
 	useEffect(
