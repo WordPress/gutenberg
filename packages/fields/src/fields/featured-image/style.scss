@@ -6,26 +6,6 @@
 	background:
 		$white
 		linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
-
-	&__table {
-		width: 32px;
-		height: 32px;
-		background-color: $gray-100;
-		border-radius: $grid-unit-05;
-		position: relative;
-
-		&::after {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
-			border-radius: $grid-unit-05;
-			pointer-events: none;
-		}
-	}
 }
 
 .fields-controls__featured-image-title {
@@ -37,6 +17,8 @@
 }
 
 .fields-controls__featured-image-image {
+	width: 100%;
+	height: 100%;
 	border-radius: $radius-small;
 	align-self: center;
 }
@@ -88,23 +70,26 @@ fieldset.fields-controls__featured-image {
 	}
 }
 
-.fields-controls__featured-image-button {
-	box-shadow: none;
-	border: none;
-	padding: 0;
-	background-color: unset;
-	box-sizing: border-box;
-	cursor: pointer;
-	overflow: hidden;
-	height: 100%;
-	width: 100%;
-	border-radius: $grid-unit-05;
+.dataforms-layouts-panel__field-control {
+	.fields-controls__featured-image-image {
+		width: 16px;
+		height: 16px;
+	}
 
-	&:focus-visible {
-		box-shadow:
-			0 0 0 var(--wp-admin-border-width-focus)
-			var(--wp-admin-theme-color);
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
+	.fields-controls__featured-image-placeholder {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.dataviews-view-table__cell-content-wrapper {
+	.fields-controls__featured-image-image {
+		width: 32px;
+		height: 32px;
+	}
+
+	.fields-controls__featured-image-placeholder {
+		width: 32px;
+		height: 32px;
 	}
 }

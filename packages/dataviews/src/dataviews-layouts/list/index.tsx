@@ -36,7 +36,6 @@ import {
 	ActionModal,
 } from '../../components/dataviews-item-actions';
 import type { Action, NormalizedField, ViewListProps } from '../../types';
-import { LAYOUT_LIST } from '../../constants';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
@@ -177,13 +176,13 @@ function ListItem< Item >( {
 	}, [ actions, item ] );
 
 	const renderedMediaField = mediaField?.render ? (
-		<mediaField.render item={ item } view={ LAYOUT_LIST } />
+		<mediaField.render item={ item } />
 	) : (
 		<div className="dataviews-view-list__media-placeholder"></div>
 	);
 
 	const renderedPrimaryField = primaryField?.render ? (
-		<primaryField.render item={ item } view={ LAYOUT_LIST } />
+		<primaryField.render item={ item } />
 	) : null;
 
 	const usedActions = eligibleActions?.length > 0 && (
@@ -281,10 +280,7 @@ function ListItem< Item >( {
 										{ field.label }
 									</VisuallyHidden>
 									<span className="dataviews-view-list__field-value">
-										<field.render
-											item={ item }
-											view={ LAYOUT_LIST }
-										/>
+										<field.render item={ item } />
 									</span>
 								</div>
 							) ) }

@@ -19,7 +19,6 @@ import { closeSmall } from '@wordpress/icons';
 import { normalizeFields } from '../../normalize-fields';
 import { getVisibleFields } from '../get-visible-fields';
 import type { DataFormProps, NormalizedField } from '../../types';
-import { LAYOUT_PANEL } from '../../constants';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -111,7 +110,7 @@ function FormField< Item >( {
 							) }
 							onClick={ onToggle }
 						>
-							<field.render item={ data } view={ LAYOUT_PANEL } />
+							<field.render item={ data } />
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (

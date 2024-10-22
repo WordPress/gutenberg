@@ -24,7 +24,6 @@ import SingleSelectionCheckbox from '../../components/dataviews-selection-checkb
 import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from '../../types';
 import type { SetSelection } from '../../private-types';
-import { LAYOUT_GRID } from '../../constants';
 
 interface GridItemProps< Item > {
 	selection: string[];
@@ -55,10 +54,10 @@ function GridItem< Item >( {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	const renderedMediaField = mediaField?.render ? (
-		<mediaField.render item={ item } view={ LAYOUT_GRID } />
+		<mediaField.render item={ item } />
 	) : null;
 	const renderedPrimaryField = primaryField?.render ? (
-		<primaryField.render item={ item } view={ LAYOUT_GRID } />
+		<primaryField.render item={ item } />
 	) : null;
 	return (
 		<VStack
@@ -116,10 +115,7 @@ function GridItem< Item >( {
 								key={ field.id }
 								className="dataviews-view-grid__field-value"
 							>
-								<field.render
-									item={ item }
-									view={ LAYOUT_GRID }
-								/>
+								<field.render item={ item } />
 							</FlexItem>
 						);
 					} ) }
@@ -155,10 +151,7 @@ function GridItem< Item >( {
 										className="dataviews-view-grid__field-value"
 										style={ { maxHeight: 'none' } }
 									>
-										<field.render
-											item={ item }
-											view={ LAYOUT_GRID }
-										/>
+										<field.render item={ item } />
 									</FlexItem>
 								</>
 							</Flex>

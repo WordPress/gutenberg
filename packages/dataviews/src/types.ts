@@ -7,12 +7,6 @@ import type { ReactElement, ComponentType } from 'react';
  * Internal dependencies
  */
 import type { SetSelection } from './private-types';
-import type {
-	LAYOUT_GRID,
-	LAYOUT_LIST,
-	LAYOUT_PANEL,
-	LAYOUT_TABLE,
-} from './constants';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -189,11 +183,6 @@ export type DataFormControlProps< Item > = {
 
 export type DataViewRenderFieldProps< Item > = {
 	item: Item;
-	view:
-		| typeof LAYOUT_LIST
-		| typeof LAYOUT_GRID
-		| typeof LAYOUT_TABLE
-		| typeof LAYOUT_PANEL;
 };
 
 /**
