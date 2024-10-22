@@ -9,6 +9,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
@@ -20,12 +21,13 @@ export function useZoomOut( zoomOut = true ) {
 		useDispatch( blockEditorStore )
 	);
 	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
+	const isWideViewport = useViewportMatch( 'large' );
 
 	useEffect( () => {
 		const isZoomOutOnMount = isZoomOut();
 
 		return () => {
-			if ( isZoomOutOnMount ) {
+			if ( isZoomOutOnMount && isWideViewport ) {
 				setZoomLevel( 50 );
 			} else {
 				resetZoomLevel();
@@ -34,10 +36,10 @@ export function useZoomOut( zoomOut = true ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( zoomOut ) {
+		if ( zoomOut && isWideViewport ) {
 			setZoomLevel( 50 );
 		} else {
 			resetZoomLevel();
 		}
-	}, [ zoomOut, setZoomLevel, resetZoomLevel ] );
+	}, [ zoomOut, setZoomLevel, resetZoomLevel, isWideViewport ] );
 }
