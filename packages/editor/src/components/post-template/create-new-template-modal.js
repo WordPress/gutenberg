@@ -118,6 +118,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			>
 				<VStack spacing="3">
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
@@ -129,11 +130,16 @@ export default function CreateNewTemplateModal( { onClose } ) {
 						) }
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ cancel }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ cancel }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							isBusy={ isBusy }

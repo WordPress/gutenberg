@@ -2,12 +2,7 @@
  * Internal dependencies
  */
 import { lock } from '../lock-unlock';
-import {
-	registerBlockBindingsSource,
-	unregisterBlockBindingsSource,
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-} from './registration';
+import { isUnmodifiedBlockContent } from './utils';
 
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
@@ -146,6 +141,10 @@ export {
 	unregisterBlockStyle,
 	registerBlockVariation,
 	unregisterBlockVariation,
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
+	getBlockBindingsSource,
+	getBlockBindingsSources,
 } from './registration';
 export {
 	isUnmodifiedBlock,
@@ -155,6 +154,7 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	getBlockAttributesNamesByRole,
 	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
@@ -177,9 +177,4 @@ export {
 } from './constants';
 
 export const privateApis = {};
-lock( privateApis, {
-	registerBlockBindingsSource,
-	unregisterBlockBindingsSource,
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-} );
+lock( privateApis, { isUnmodifiedBlockContent } );

@@ -21,7 +21,7 @@ const toolsPanelGrid = {
 		grid-template-columns: ${ `repeat( ${ columns }, minmax(0, 1fr) )` };
 	`,
 	spacing: css`
-		column-gap: ${ space( 2 ) };
+		column-gap: ${ space( 4 ) };
 		row-gap: ${ space( 4 ) };
 	`,
 	item: {

@@ -565,6 +565,27 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should paste link to formatted text', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>test</strong>' },
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',

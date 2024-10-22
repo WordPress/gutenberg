@@ -12,16 +12,37 @@
  * Fonts & basic variables.
  */
 
-$default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif;
-$default-font-size: 13px;
-$default-line-height: 1.4;
-$editor-html-font: Menlo, Consolas, monaco, monospace;
-$editor-font-size: 16px;
-$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
-$text-editor-font-size: 15px;
-$editor-line-height: 1.8;
-$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in".
+$default-font: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif; // Todo: deprecate in favor of $family variables
+$default-line-height: 1.4; // Todo: deprecate in favor of $line-height tokens
 
+/**
+ * Typography
+ */
+
+// Sizes
+$font-size-x-small: 11px;
+$font-size-small: 12px;
+$font-size-medium: 13px;
+$font-size-large: 15px;
+$font-size-x-large: 20px;
+$font-size-2x-large: 32px;
+
+// Line heights
+$font-line-height-x-small: 16px;
+$font-line-height-small: 20px;
+$font-line-height-medium: 24px;
+$font-line-height-large: 28px;
+$font-line-height-x-large: 32px;
+$font-line-height-2x-large: 40px;
+
+// Weights
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+
+// Families
+$font-family-headings: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-body: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+$font-family-mono: Menlo, Consolas, monaco, monospace;
 
 /**
  * Grid System.
@@ -39,6 +60,33 @@ $grid-unit-50: 5 * $grid-unit;		// 40px
 $grid-unit-60: 6 * $grid-unit;		// 48px
 $grid-unit-70: 7 * $grid-unit;		// 56px
 $grid-unit-80: 8 * $grid-unit;		// 64px
+
+/**
+ * Radius scale.
+ */
+
+$radius-x-small: 1px;   // Applied to elements like buttons nested within primitives like inputs.
+$radius-small: 2px;     // Applied to most primitives.
+$radius-medium: 4px;    // Applied to containers with smaller padding.
+$radius-large: 8px;     // Applied to containers with larger padding.
+$radius-full: 9999px;   // For pills.
+$radius-round: 50%;     // For circles and ovals.
+
+/**
+ * Elevation scale.
+ */
+
+// For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.
+$elevation-x-small: 0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01);
+
+// For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.
+$elevation-small: 0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02);
+
+// For components that offer additional actions. Example: Menus, Command Palette
+$elevation-medium: 0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02);
+
+// For components that confirm decisions or handle necessary interruptions. Example: Modals.
+$elevation-large: 0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02);
 
 /**
  * Dimensions.
@@ -64,23 +112,25 @@ $modal-width-large: 840px;
 $spinner-size: 16px;
 $canvas-padding: $grid-unit-20;
 
-
 /**
- * Shadows.
+ * Mobile specific styles
  */
-
-$shadow-popover: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
-$shadow-modal: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
+$mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in".
 
 /**
- * Editor widths.
+ * Editor styles.
  */
 
 $sidebar-width: 280px;
 $content-width: 840px;
 $wide-content-width: 1100px;
 $widget-area-width: 700px;
-
+$secondary-sidebar-width: 350px;
+$editor-font-size: 16px;
+$default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
+$text-editor-font-size: 15px;
+$editor-line-height: 1.8;
+$editor-html-font: $font-family-mono;
 
 /**
  * Block & Editor UI.
@@ -91,14 +141,15 @@ $border-width: 1px;
 $border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 1.5px;
 $helptext-font-size: 12px;
-$radius-round: 50%;
-$radius-block-ui: 2px;
-$radio-input-size: 20px;
+$radio-input-size: 16px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
 // Deprecated, please avoid using these.
 $block-padding: 14px; // Used to define space between block footprint and surrouding borders.
-
+$radius-block-ui: $radius-small;
+$shadow-popover: $elevation-x-small;
+$shadow-modal: $elevation-large;
+$default-font-size: $font-size-medium;
 
 /**
  * Block paddings.

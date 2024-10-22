@@ -26,6 +26,8 @@
 	// the bottom margin set on `...__list-item` above
 	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
+	outline: 0;
+
 	.block-editor-block-patterns-list__item-title {
 		flex-grow: 1;
 		font-size: $helptext-font-size;
@@ -36,12 +38,12 @@
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-medium;
 
 		&::after {
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-medium;
 		}
 	}
 

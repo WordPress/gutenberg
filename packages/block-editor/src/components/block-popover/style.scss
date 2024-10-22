@@ -57,6 +57,6 @@
 		position: absolute;
 		inset: 0;
 		background-color: var(--wp-admin-theme-color);
-		border-radius: 2px;
+		border-radius: $radius-small;
 	}
 }

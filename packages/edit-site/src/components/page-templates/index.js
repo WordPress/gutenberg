@@ -1,36 +1,18 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
-import { parse } from '@wordpress/blocks';
-import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	privateApis as editorPrivateApis,
-	EditorProvider,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { Async } from '../async';
 import Page from '../page';
-import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	OPERATOR_IS_ANY,
@@ -38,15 +20,18 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-
-import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import {
+	authorField,
+	descriptionField,
+	previewField,
+	titleField,
+} from './fields';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -58,7 +43,7 @@ const defaultLayouts = {
 			combinedFields: [
 				{
 					id: 'template',
-					header: __( 'Template' ),
+					label: __( 'Template' ),
 					children: [ 'title', 'description' ],
 					direction: 'vertical',
 				},
@@ -69,8 +54,7 @@ const defaultLayouts = {
 					minWidth: 320,
 				},
 				preview: {
-					minWidth: 120,
-					maxWidth: 120,
+					width: '1%',
 				},
 				author: {
 					width: '1%',
@@ -108,104 +92,6 @@ const DEFAULT_VIEW = {
 	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
-
-function Title( { item, viewType } ) {
-	if ( viewType === LAYOUT_LIST ) {
-		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
-	}
-	const linkProps = {
-		params: {
-			postId: item.id,
-			postType: item.type,
-			canvas: 'edit',
-		},
-	};
-	return (
-		<Link { ...linkProps }>
-			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
-		</Link>
-	);
-}
-
-function AuthorField( { item } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-
-	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ imageUrl && (
-				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span className="page-templates-author-field__name">{ text }</span>
-		</HStack>
-	);
-}
-
-function Preview( { item, viewType } ) {
-	const settings = usePatternSettings();
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
-	const blocks = useMemo( () => {
-		return parse( item.content.raw );
-	}, [ item.content.raw ] );
-	const { onClick } = useLink( {
-		postId: item.id,
-		postType: item.type,
-		canvas: 'edit',
-	} );
-
-	const isEmpty = ! blocks?.length;
-	// Wrap everything in a block editor provider to ensure 'styles' that are needed
-	// for the previews are synced between the site editor store and the block editor store.
-	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
-	// render patterns inside the previews.
-	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
-	// the block editor settings are needed in context where we don't have the block editor.
-	// Explore how we can solve this in a better way.
-	return (
-		<EditorProvider post={ item } settings={ settings }>
-			<div
-				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
-				style={ { backgroundColor } }
-			>
-				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<Async>
-						<BlockPreview blocks={ blocks } />
-					</Async>
-				) }
-				{ viewType !== LAYOUT_LIST && (
-					<button
-						className="page-templates-preview-field__button"
-						type="button"
-						onClick={ onClick }
-						aria-label={ item.title?.rendered || item.title }
-					>
-						{ isEmpty && __( 'Empty template' ) }
-						{ ! isEmpty && (
-							<Async>
-								<BlockPreview blocks={ blocks } />
-							</Async>
-						) }
-					</button>
-				) }
-			</div>
-		</EditorProvider>
-	);
-}
 
 export default function PageTemplates() {
 	const { params } = useLocation();
@@ -248,13 +134,10 @@ export default function PageTemplates() {
 		} ) );
 	}, [ activeView ] );
 
-	const { records, isResolving: isLoadingData } = useEntityRecords(
-		'postType',
-		TEMPLATE_POST_TYPE,
-		{
+	const { records, isResolving: isLoadingData } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
-		}
-	);
+		} );
 	const history = useHistory();
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -285,50 +168,15 @@ export default function PageTemplates() {
 
 	const fields = useMemo(
 		() => [
+			previewField,
+			titleField,
+			descriptionField,
 			{
-				header: __( 'Preview' ),
-				id: 'preview',
-				render: ( { item } ) => {
-					return <Preview item={ item } viewType={ view.type } />;
-				},
-				enableSorting: false,
-			},
-			{
-				header: __( 'Template' ),
-				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered,
-				render: ( { item } ) => (
-					<Title item={ item } viewType={ view.type } />
-				),
-				enableHiding: false,
-				enableGlobalSearch: true,
-			},
-			{
-				header: __( 'Description' ),
-				id: 'description',
-				render: ( { item } ) => {
-					return (
-						item.description && (
-							<span className="page-templates-description">
-								{ decodeEntities( item.description ) }
-							</span>
-						)
-					);
-				},
-				enableSorting: false,
-				enableGlobalSearch: true,
-			},
-			{
-				header: __( 'Author' ),
-				id: 'author',
-				getValue: ( { item } ) => item.author_text,
-				render: ( { item } ) => {
-					return <AuthorField viewType={ view.type } item={ item } />;
-				},
+				...authorField,
 				elements: authors,
 			},
 		],
-		[ authors, view.type ]
+		[ authors ]
 	);
 
 	const { data, paginationInfo } = useMemo( () => {
@@ -366,6 +214,7 @@ export default function PageTemplates() {
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }

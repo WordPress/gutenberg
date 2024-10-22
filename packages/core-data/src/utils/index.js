@@ -11,6 +11,6 @@ export { default as getNestedValue } from './get-nested-value';
 export { default as isNumericID } from './is-numeric-id';
 export {
 	getUserPermissionCacheKey,
-	getUserPermissionsFromResponse,
+	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 } from './user-permissions';

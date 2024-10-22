@@ -15,7 +15,6 @@ import {
 	BlockBreadcrumb,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -32,6 +31,8 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorContentSlotFill from './content-slot-fill';
 
+import { unlock } from '../../lock-unlock';
+
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
@@ -47,7 +48,6 @@ const interfaceLabels = {
 
 export default function EditorInterface( {
 	className,
-	enableRegionNavigation,
 	styles,
 	children,
 	forceIsDirty,
@@ -58,7 +58,6 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	title,
-	icon,
 	iframeProps,
 } ) {
 	const {
@@ -68,16 +67,15 @@ export default function EditorInterface( {
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
-		previousShortcut,
-		nextShortcut,
 		showBlockBreadcrumbs,
 		documentLabel,
-		blockEditorMode,
+		isZoomOut,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
+		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
 
 		return {
 			mode: select( editorStore ).getEditorMode(),
@@ -86,20 +84,12 @@ export default function EditorInterface( {
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.__unstableIsPreviewMode,
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			blockEditorMode:
-				select( blockEditorStore ).__unstableGetEditorMode(),
+			isZoomOut: _isZoomOut(),
 		};
 	}, [] );
-	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
@@ -121,12 +111,10 @@ export default function EditorInterface( {
 
 	return (
 		<InterfaceSkeleton
-			enableRegionNavigation={ enableRegionNavigation }
-			isDistractionFree={ isDistractionFree && isWideViewport }
+			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
-				'is-distraction-free':
-					isDistractionFree && isWideViewport && ! isPreviewMode,
+				'is-distraction-free': isDistractionFree && ! isPreviewMode,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -142,7 +130,7 @@ export default function EditorInterface( {
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
-						icon={ icon }
+						isEditorIframed={ ! disableIframe }
 					/>
 				)
 			}
@@ -209,7 +197,7 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				isRichEditingEnabled &&
-				blockEditorMode !== 'zoom-out' &&
+				! isZoomOut &&
 				mode === 'visual' && (
 					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)
@@ -232,10 +220,6 @@ export default function EditorInterface( {
 					  )
 					: undefined
 			}
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
 		/>
 	);
 }

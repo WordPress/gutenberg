@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import {
-	Button,
+	Icon,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -43,25 +44,22 @@ export default function InspectorControlsTabs( {
 		<div className="block-editor-block-inspector__tabs">
 			<Tabs defaultTabId={ initialTabName } key={ clientId }>
 				<Tabs.TabList>
-					{ tabs.map( ( tab ) => (
-						<Tabs.Tab
-							key={ tab.name }
-							tabId={ tab.name }
-							render={
-								<Button
-									icon={
-										! showIconLabels ? tab.icon : undefined
-									}
-									label={
-										! showIconLabels ? tab.title : undefined
-									}
-									className={ tab.className }
+					{ tabs.map( ( tab ) =>
+						showIconLabels ? (
+							<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+								{ tab.title }
+							</Tabs.Tab>
+						) : (
+							<Tooltip text={ tab.title } key={ tab.name }>
+								<Tabs.Tab
+									tabId={ tab.name }
+									aria-label={ tab.title }
 								>
-									{ showIconLabels && tab.title }
-								</Button>
-							}
-						/>
-					) ) }
+									<Icon icon={ tab.icon } />
+								</Tabs.Tab>
+							</Tooltip>
+						)
+					) }
 				</Tabs.TabList>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab showAdvancedControls={ !! blockName } />

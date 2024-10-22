@@ -19,6 +19,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="wp-block-navigation-delete-menu-button"
 				variant="secondary"
 				isDestructive

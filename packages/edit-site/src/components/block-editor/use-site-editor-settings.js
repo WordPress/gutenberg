@@ -3,7 +3,6 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 
@@ -15,7 +14,6 @@ import { unlock } from '../../lock-unlock';
 import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { useBlockEditorSettings } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
@@ -40,22 +38,25 @@ function useNavigateToPreviousEntityRecord() {
 }
 
 export function useSpecificEditorSettings() {
+	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-	const { canvasMode, settings, shouldUseTemplateAsDefaultRenderingMode } =
-		useSelect( ( select ) => {
-			const { getEditedPostContext, getCanvasMode, getSettings } = unlock(
+	const { settings, shouldUseTemplateAsDefaultRenderingMode } = useSelect(
+		( select ) => {
+			const { getEditedPostContext, getSettings } = unlock(
 				select( editSiteStore )
 			);
 			const _context = getEditedPostContext();
 			return {
-				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
 				// @see https://github.com/WordPress/gutenberg/pull/62304/
 				shouldUseTemplateAsDefaultRenderingMode:
 					_context?.postId && _context?.postType !== 'post',
 			};
-		}, [] );
+		},
+		[]
+	);
 	const defaultRenderingMode = shouldUseTemplateAsDefaultRenderingMode
 		? 'template-locked'
 		: 'post-only';
@@ -67,35 +68,19 @@ export function useSpecificEditorSettings() {
 
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode !== 'view',
+			focusMode: canvas !== 'view',
 			defaultRenderingMode,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			__unstableIsPreviewMode: canvasMode === 'view',
+			__unstableIsPreviewMode: canvas === 'view',
 		};
 	}, [
 		settings,
-		canvasMode,
+		canvas,
 		defaultRenderingMode,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
 	] );
 
 	return defaultEditorSettings;
-}
-
-export default function useSiteEditorSettings() {
-	const defaultEditorSettings = useSpecificEditorSettings();
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = unlock(
-			select( editSiteStore )
-		);
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		return {
-			postType: usedPostType,
-			postId: usedPostId,
-		};
-	}, [] );
-	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

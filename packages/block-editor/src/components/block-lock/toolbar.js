@@ -20,7 +20,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		false
 	);
 
-	const hasLockButtonShown = useRef( false );
+	const hasLockButtonShownRef = useRef( false );
 
 	// If the block lock button has been shown, we don't want to remove it
 	// from the toolbar until the toolbar is rendered again without it.
@@ -29,11 +29,11 @@ export default function BlockLockToolbar( { clientId } ) {
 	// whence it came, and to do that, we need to leave the button in the toolbar.
 	useEffect( () => {
 		if ( isLocked ) {
-			hasLockButtonShown.current = true;
+			hasLockButtonShownRef.current = true;
 		}
 	}, [ isLocked ] );
 
-	if ( ! isLocked && ! hasLockButtonShown.current ) {
+	if ( ! isLocked && ! hasLockButtonShownRef.current ) {
 		return null;
 	}
 

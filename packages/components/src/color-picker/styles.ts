@@ -81,7 +81,7 @@ export const ColorfulWrapper = styled.div`
 	.react-colorful__alpha {
 		width: 184px;
 		height: 16px;
-		border-radius: 16px;
+		border-radius: ${ CONFIG.radiusFull };
 		margin-bottom: ${ space( 2 ) };
 	}
 

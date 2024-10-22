@@ -114,13 +114,17 @@
 		width: calc(100% - #{$canvas-padding});
 
 		.edit-site-resizable-frame__inner-content {
-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
-			transition: border-radius 0.4s;
+			box-shadow: $elevation-x-small;
+			transition: border-radius, box-shadow 0.4s;
 			// This ensure the radius work properly.
 			overflow: hidden;
 
 			.edit-site-layout:not(.is-full-canvas) & {
-				border-radius: $radius-block-ui * 4;
+				border-radius: $radius-large;
+			}
+
+			&:hover {
+				box-shadow: $elevation-large;
 			}
 		}
 	}
@@ -147,6 +151,14 @@
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	animation-delay: 255ms;
+}
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
 }
 /* stylelint-enable  */
 
@@ -192,14 +204,14 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		right: 9px;
 		bottom: 9px;
 		left: 9px;
-		border-radius: $radius-block-ui + $border-width + $border-width;
+		border-radius: $radius-medium;
 		box-shadow: none;
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
-		height: $grid-unit-80;
-		width: $grid-unit-80;
+		height: $header-height;
+		width: $header-height;
 		justify-content: center;
 		align-items: center;
 	}
@@ -238,6 +250,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	flex-grow: 1;
 	margin: 0;
 	overflow: hidden;
+	box-shadow: $elevation-x-small;
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
@@ -250,26 +263,4 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	bottom: 16px;
 	padding-left: 16px;
 	padding-right: 16px;
-}
-
-.edit-site-layout.is-full-canvas {
-	.edit-site-layout__view-mode-toggle.components-button {
-		&:focus-visible,
-		&:focus {
-
-			box-shadow: none;
-			outline: none;
-			outline-offset: 0;
-
-			.edit-site-site-icon svg {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
-				outline: 3px solid #0000;
-				height: 40px;
-				width: 40px;
-				padding: 2px;
-				border-radius: 2px;
-			}
-
-		}
-	}
 }

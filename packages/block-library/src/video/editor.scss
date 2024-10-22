@@ -1,40 +1,3 @@
-// Provide special styling for the placeholder.
-// @todo this particular minimal style of placeholder could be componentized further.
-.wp-block-video.wp-block-video {
-	// Show Placeholder style on-select.
-	&.is-selected .components-placeholder {
-		// Block UI appearance.
-		color: $gray-900;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		border: none;
-
-		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
-		border-radius: $radius-block-ui;
-
-		> svg {
-			opacity: 0;
-		}
-
-		.components-placeholder__illustration {
-			display: none;
-		}
-
-		&::before {
-			opacity: 0;
-		}
-	}
-
-	// Remove the transition while we still have a legacy placeholder style.
-	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
-	// parent border that may get applied when you deselect.
-	.components-placeholder__label,
-	.components-placeholder__instructions,
-	.components-button {
-		transition: none;
-	}
-}
-
 .wp-block[data-align="center"] > .wp-block-video {
 	text-align: center;
 }
@@ -57,10 +20,6 @@
 }
 
 .editor-video-poster-control {
-	.components-base-control__label {
-		display: block;
-	}
-
 	.components-button {
 		margin-right: $grid-unit-10;
 	}
@@ -89,7 +48,6 @@
 
 .block-library-video-tracks-editor > .components-popover__content {
 	width: 360px;
-	padding: 0;
 }
 
 .block-library-video-tracks-editor__track-list,
@@ -98,10 +56,3 @@
 		padding: 0;
 	}
 }
-
-.block-library-video-tracks-editor__single-track-editor,
-.block-library-video-tracks-editor__track-list,
-.block-library-video-tracks-editor__add-tracks-container {
-	padding: $grid-unit-15;
-}
-

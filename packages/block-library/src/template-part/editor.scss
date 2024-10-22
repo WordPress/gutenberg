@@ -35,11 +35,6 @@
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
 			outline-color: var(--wp-block-synced-color);
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 }

@@ -14,7 +14,7 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 	cursor: pointer;
 	// Show a thin outline in Windows high contrast mode.
 	outline: 1px solid transparent;
-	border-radius: $radius-block-ui $radius-block-ui 0 0;
+	border-radius: $radius-medium $radius-medium 0 0;
 	box-shadow: $border-as-box-shadow;
 
 	&:focus {
@@ -26,10 +26,7 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 	&::after {
 		content: "";
 		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
+		inset: $border-width;
 		z-index: -1;
 		// The background image creates a checkerboard pattern. Ignore rtlcss to
 		// make it work both in LTR and RTL.
@@ -41,12 +38,13 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 		background-position: 0 0, 24px 24px;
 		/*rtl:end:ignore*/
 		background-size: calc(2 * 24px) calc(2 * 24px);
+		border-radius: $radius-medium - $border-width $radius-medium - $border-width 0 0;
 	}
 }
 
 .components-color-palette__custom-color-text-wrapper {
 	padding: $grid-unit-15 $grid-unit-20;
-	border-radius: 0 0 $radius-block-ui $radius-block-ui;
+	border-radius: 0 0 $radius-medium $radius-medium;
 	position: relative;
 	font-size: $default-font-size;
 

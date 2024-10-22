@@ -8,13 +8,11 @@ import clsx from 'clsx';
  */
 import { forwardRef, useEffect } from '@wordpress/element';
 import {
-	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
-	useMergeRefs,
 	useReducedMotion,
 	useViewportMatch,
 	useResizeObserver,
@@ -85,10 +83,6 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
-		enableRegionNavigation = true,
-		// Todo: does this need to be a prop.
-		// Can we use a dependency to keyboard-shortcuts directly?
-		shortcuts,
 	},
 	ref
 ) {
@@ -101,7 +95,6 @@ function InterfaceSkeleton(
 		duration: disableMotion ? 0 : ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
 	};
-	const navigateRegionsProps = useNavigateRegions( shortcuts );
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -123,15 +116,10 @@ function InterfaceSkeleton(
 
 	return (
 		<div
-			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
-			ref={ useMergeRefs( [
-				ref,
-				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
-			] ) }
+			ref={ ref }
 			className={ clsx(
 				className,
 				'interface-interface-skeleton',
-				navigateRegionsProps.className,
 				!! footer && 'has-footer'
 			) }
 		>
@@ -143,22 +131,22 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__header"
 							aria-label={ mergedLabels.header }
 							initial={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
 							whileHover={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHover'
 									: 'visible'
 							}
 							animate={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeDisabled'
 									: 'visible'
 							}
 							exit={
-								isDistractionFree
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
@@ -182,30 +170,32 @@ function InterfaceSkeleton(
 								ariaLabel={ mergedLabels.secondarySidebar }
 								as={ motion.div }
 								initial="closed"
-								animate={
-									isMobileViewport ? 'mobileOpen' : 'open'
-								}
+								animate="open"
 								exit="closed"
 								variants={ {
 									open: { width: secondarySidebarSize.width },
 									closed: { width: 0 },
-									mobileOpen: { width: '100vw' },
 								} }
 								transition={ defaultTransition }
 							>
-								<div
+								<motion.div
 									style={ {
 										position: 'absolute',
 										width: isMobileViewport
 											? '100vw'
 											: 'fit-content',
 										height: '100%',
-										right: 0,
+										left: 0,
 									} }
+									variants={ {
+										open: { x: 0 },
+										closed: { x: '-100%' },
+									} }
+									transition={ defaultTransition }
 								>
 									{ secondarySidebarResizeListener }
 									{ secondarySidebar }
-								</div>
+								</motion.div>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>

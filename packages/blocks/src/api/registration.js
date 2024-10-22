@@ -232,6 +232,15 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		return;
 	}
 
+	if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
+		warning(
+			'Block "' +
+				name +
+				'" cannot be a parent of itself. Please remove the block name from the parent list.'
+		);
+		return;
+	}
+
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
 		warning(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
@@ -767,13 +776,15 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * behavior. Once registered, the source is available to be connected
  * to the supported block attributes.
  *
+ * @since 6.7.0 Introduced in WordPress core.
+ *
  * @param {Object}   source                    Properties of the source to be registered.
  * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   [source.label]            Human-readable label.
- * @param {Function} [source.getValues]        Function to get the values from the source.
- * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
- * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
- * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ * @param {string}   [source.label]            Human-readable label. Optional when it is defined in the server.
+ * @param {Array}    [source.usesContext]      Optional array of context needed by the source only in the editor.
+ * @param {Function} [source.getValues]        Optional function to get the values from the source.
+ * @param {Function} [source.setValues]        Optional function to update multiple values connected to the source.
+ * @param {Function} [source.canUserEditValue] Optional function to determine if the user can edit the value.
  *
  * @example
  * ```js
@@ -783,9 +794,9 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * registerBlockBindingsSource( {
  *     name: 'plugin/my-custom-source',
  *     label: _x( 'My Custom Source', 'block bindings source' ),
- *     getValues: () => getSourceValues(),
- *     setValues: () => updateMyCustomValuesInBatch(),
- *     getPlaceholder: () => 'Placeholder text when the value is undefined',
+ *     usesContext: [ 'postType' ],
+ *     getValues: getSourceValues,
+ *     setValues: updateMyCustomValuesInBatch,
  *     canUserEditValue: () => true,
  * } );
  * ```
@@ -794,10 +805,11 @@ export const registerBlockBindingsSource = ( source ) => {
 	const {
 		name,
 		label,
+		usesContext,
 		getValues,
 		setValues,
-		getPlaceholder,
 		canUserEditValue,
+		getFieldsList,
 	} = source;
 
 	const existingSource = unlock(
@@ -806,13 +818,16 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	/*
 	 * Check if the source has been already registered on the client.
-	 * If the `getValues` property is defined, it could be assumed the source is already registered.
+	 * If any property expected to be "client-only" is defined, return a warning.
 	 */
-	if ( existingSource?.getValues ) {
-		warning(
-			'Block bindings source "' + name + '" is already registered.'
-		);
-		return;
+	const serverProps = [ 'label', 'usesContext' ];
+	for ( const prop in existingSource ) {
+		if ( ! serverProps.includes( prop ) && existingSource[ prop ] ) {
+			warning(
+				'Block bindings source "' + name + '" is already registered.'
+			);
+			return;
+		}
 	}
 
 	// Check the `name` property is correct.
@@ -848,14 +863,6 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
-	if ( label && existingSource?.label ) {
-		warning(
-			'Block bindings "' +
-				name +
-				'" source label is already defined in the server.'
-		);
-		return;
-	}
 
 	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
@@ -864,6 +871,16 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	if ( label && typeof label !== 'string' ) {
 		warning( 'Block bindings source label must be a string.' );
+		return;
+	}
+
+	if ( label && existingSource?.label && label !== existingSource?.label ) {
+		warning( 'Block bindings "' + name + '" source label was overriden.' );
+	}
+
+	// Check the `usesContext` property is correct.
+	if ( usesContext && ! Array.isArray( usesContext ) ) {
+		warning( 'Block bindings source usesContext must be an array.' );
 		return;
 	}
 
@@ -879,15 +896,16 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Check the `getPlaceholder` property is correct.
-	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
-		warning( 'Block bindings source getPlaceholder must be a function.' );
+	// Check the `canUserEditValue` property is correct.
+	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
+		warning( 'Block bindings source canUserEditValue must be a function.' );
 		return;
 	}
 
-	// Check the `getPlaceholder` property is correct.
-	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
-		warning( 'Block bindings source canUserEditValue must be a function.' );
+	// Check the `getFieldsList` property is correct.
+	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+		// eslint-disable-next-line no-console
+		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}
 
@@ -895,7 +913,9 @@ export const registerBlockBindingsSource = ( source ) => {
 };
 
 /**
- * Unregisters a block bindings source
+ * Unregisters a block bindings source by providing its name.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @param {string} name The name of the block bindings source to unregister.
  *
@@ -916,7 +936,9 @@ export function unregisterBlockBindingsSource( name ) {
 }
 
 /**
- * Returns a registered block bindings source.
+ * Returns a registered block bindings source by its name.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @param {string} name Block bindings source name.
  *
@@ -928,6 +950,8 @@ export function getBlockBindingsSource( name ) {
 
 /**
  * Returns all registered block bindings sources.
+ *
+ * @since 6.7.0 Introduced in WordPress core.
  *
  * @return {Array} Block bindings sources.
  */

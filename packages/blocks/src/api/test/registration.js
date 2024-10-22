@@ -104,6 +104,17 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
+		it( 'Should reject blocks with the block name itself as the only parent attribute value', () => {
+			const block = registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				parent: [ 'core/test-block' ],
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block "core/test-block" cannot be a parent of itself. Please remove the block name from the parent list.'
+			);
+			expect( block ).toBeUndefined();
+		} );
+
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
 			expect( console ).toHaveWarnedWith(
@@ -1512,20 +1523,106 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		it( 'should not override label from the server', () => {
-			// Simulate bootstrapping a source from the server registration.
+		it( 'should override label from the server', () => {
+			// Simulate bootstrap source from the server.
 			registerBlockBindingsSource( {
-				name: 'core/server',
+				name: 'core/testing',
 				label: 'Server label',
 			} );
 			// Override the source with a different label in the client.
 			registerBlockBindingsSource( {
-				name: 'core/server',
+				name: 'core/testing',
 				label: 'Client label',
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block bindings "core/server" source label is already defined in the server.'
+				'Block bindings "core/testing" source label was overriden.'
 			);
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Client label' );
+		} );
+
+		it( 'should keep label from the server when not defined in the client', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.label ).toEqual( 'Server label' );
+		} );
+
+		// Check the `usesContext` array is correct.
+		it( 'should reject invalid usesContext property', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: 'should be an array',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source usesContext must be an array.'
+			);
+		} );
+
+		it( 'should add usesContext when only defined in the server', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client without usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should add usesContext when only defined in the client', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postId', 'postType' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should merge usesContext from server and client without duplicates', () => {
+			// Simulate bootstrap source from the server.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postType', 'clientContext' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [
+				'postId',
+				'postType',
+				'clientContext',
+			] );
 		} );
 
 		// Check the `getValues` callback is correct.
@@ -1554,19 +1651,6 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		// Check the `getPlaceholder` callback is correct.
-		it( 'should reject invalid getPlaceholder callback', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				getPlaceholder: 'should be a function',
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Block bindings source getPlaceholder must be a function.'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
 		// Check the `canUserEditValue` callback is correct.
 		it( 'should reject invalid canUserEditValue callback', () => {
 			registerBlockBindingsSource( {
@@ -1580,14 +1664,30 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		// Check the `getFieldsList` callback is correct.
+		it( 'should reject invalid getFieldsList callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getFieldsList: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getFieldsList must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
 		// Check correct sources are registered as expected.
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
 				label: 'Valid Source',
+				usesContext: [ 'postId' ],
 				getValues: () => 'value',
 				setValues: () => 'new values',
-				getPlaceholder: () => 'placeholder',
 				canUserEditValue: () => true,
+				getFieldsList: () => {
+					return { field: 'value' };
+				},
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
@@ -1605,10 +1705,11 @@ describe( 'blocks', () => {
 				label: 'Valid Source',
 			} );
 			const source = getBlockBindingsSource( 'core/valid-source' );
+			expect( source.usesContext ).toBeUndefined();
 			expect( source.getValues ).toBeUndefined();
 			expect( source.setValues ).toBeUndefined();
-			expect( source.getPlaceholder ).toBeUndefined();
 			expect( source.canUserEditValue ).toBeUndefined();
+			expect( source.getFieldsList ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
 		} );
 

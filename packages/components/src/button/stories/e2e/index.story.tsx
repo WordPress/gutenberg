@@ -31,28 +31,110 @@ export const VariantStates: StoryFn< typeof Button > = (
 		'link',
 	];
 
-	return (
-		<div style={ { display: 'flex', flexDirection: 'column', gap: 24 } }>
-			{ variants.map( ( variant ) => (
-				<div
-					style={ { display: 'flex', gap: 8 } }
-					key={ variant ?? 'undefined' }
+	const VariantsRow = ( {
+		buttonProps,
+		name,
+	}: {
+		buttonProps?: ButtonAsButtonProps;
+		name: string;
+	} ) => {
+		return (
+			<tr>
+				<th
+					style={ {
+						fontSize: 13,
+						fontWeight: 'normal',
+						padding: 8,
+						background: '#f3f4f5',
+					} }
 				>
-					<Button { ...props } variant={ variant } />
-					{ /* eslint-disable-next-line no-restricted-syntax */ }
-					<Button { ...props } variant={ variant } disabled />
-					<Button
-						{ ...props }
-						variant={ variant }
-						disabled
-						accessibleWhenDisabled
-					/>
-					<Button { ...props } variant={ variant } isBusy />
-					<Button { ...props } variant={ variant } isDestructive />
-					<Button { ...props } variant={ variant } isPressed />
-				</div>
-			) ) }
-		</div>
+					{ name }
+				</th>
+				{ variants.map( ( variant ) => (
+					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
+						<Button
+							{ ...props }
+							variant={ variant }
+							{ ...buttonProps }
+						/>
+					</td>
+				) ) }
+			</tr>
+		);
+	};
+
+	return (
+		<table>
+			<thead>
+				<tr style={ { background: '#f3f4f5' } }>
+					<th />
+					{ variants.map( ( variant ) => (
+						<th
+							key={ variant ?? 'undefined' }
+							style={ { padding: 8 } }
+						>
+							{ variant ?? '(default)' }
+						</th>
+					) ) }
+				</tr>
+			</thead>
+			<tbody>
+				<VariantsRow name="(default)" />
+				<VariantsRow
+					name="disabled"
+					buttonProps={ { disabled: true } }
+				/>
+				<VariantsRow
+					name="focusable disabled"
+					buttonProps={ {
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isBusy"
+					buttonProps={ {
+						isBusy: true,
+					} }
+				/>
+				<VariantsRow
+					name="isBusy disabled"
+					buttonProps={ {
+						isBusy: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isDestructive"
+					buttonProps={ {
+						isDestructive: true,
+					} }
+				/>
+				<VariantsRow
+					name="isDestructive disabled"
+					buttonProps={ {
+						isDestructive: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isPressed"
+					buttonProps={ {
+						isPressed: true,
+					} }
+				/>
+				<VariantsRow
+					name="isPressed disabled"
+					buttonProps={ {
+						isPressed: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+			</tbody>
+		</table>
 	);
 };
 VariantStates.args = {

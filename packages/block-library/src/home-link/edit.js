@@ -19,13 +19,10 @@ import { useEffect } from '@wordpress/element';
 const preventDefault = ( event ) => event.preventDefault();
 
 export default function HomeEdit( { attributes, setAttributes, context } ) {
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
+	const homeUrl = useSelect( ( select ) => {
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
 	}, [] );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );

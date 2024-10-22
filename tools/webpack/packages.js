@@ -34,6 +34,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/fields',
 ];
 
 // PHP files in packages that have to be copied during build.
@@ -140,12 +141,26 @@ module.exports = {
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
+	module: {
+		rules: [
+			...baseConfig.module.rules,
+			{
+				test: /\.wasm$/,
+				type: 'asset/resource',
+				generator: {
+					// FIXME: Do not hardcode path.
+					filename: './build/vips/[name].wasm',
+					publicPath: '',
+				},
+			},
+		],
+	},
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},
 	plugins: [
 		...plugins,
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages
 				.map( ( packageName ) => ( {

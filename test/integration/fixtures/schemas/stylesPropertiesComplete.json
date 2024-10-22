@@ -1,0 +1,13 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"elements": {
+			"button": {
+				":hover": {
+					"invalidAdditionalProperty": true
+				}
+			}
+		}
+	}
+}

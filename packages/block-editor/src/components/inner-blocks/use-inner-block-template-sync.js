@@ -52,7 +52,7 @@ export default function useInnerBlockTemplateSync(
 		useDispatch( blockEditorStore );
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
-	const existingTemplate = useRef( null );
+	const existingTemplateRef = useRef( null );
 
 	useLayoutEffect( () => {
 		let isCancelled = false;
@@ -76,14 +76,14 @@ export default function useInnerBlockTemplateSync(
 
 			const hasTemplateChanged = ! fastDeepEqual(
 				template,
-				existingTemplate.current
+				existingTemplateRef.current
 			);
 
 			if ( ! shouldApplyTemplate || ! hasTemplateChanged ) {
 				return;
 			}
 
-			existingTemplate.current = template;
+			existingTemplateRef.current = template;
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
 				template

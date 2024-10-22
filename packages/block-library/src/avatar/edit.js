@@ -58,6 +58,7 @@ const AvatarInspectorControls = ( {
 			/>
 			{ attributes.isLink && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					onChange={ ( value ) =>
 						setAttributes( {

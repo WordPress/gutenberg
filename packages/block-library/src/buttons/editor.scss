@@ -33,14 +33,14 @@ $blocks-block__margin: 0.5em;
 	//
 	// This back compat rule is ignored if the user decides to use the
 	// newer justification options on the button block, hence the :not.
-	/* stylelint-disable indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
+	/* stylelint-disable @stylistic/indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
 	&:not(
 		.is-content-justification-space-between,
 		.is-content-justification-right,
 		.is-content-justification-left,
 		.is-content-justification-center
 	) .wp-block[data-align="center"] {
-	/* stylelint-enable indentation */
+	/* stylelint-enable @stylistic/indentation */
 		margin-left: auto;
 		margin-right: auto;
 		margin-top: 0;
@@ -50,12 +50,6 @@ $blocks-block__margin: 0.5em;
 			// Some margin hacks are needed, since margin doesn't seem to
 			// collapse in the same way when a parent layout it flex.
 			margin-bottom: 0;
-		}
-	}
-
-	.editor-styles-wrapper &.has-custom-font-size {
-		.wp-block-button__link {
-			font-size: inherit;
 		}
 	}
 }

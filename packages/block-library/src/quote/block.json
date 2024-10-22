@@ -14,13 +14,13 @@
 			"selector": "blockquote",
 			"multiline": "p",
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"citation": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "cite",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"textAlign": {
 			"type": "string"
@@ -28,6 +28,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"align": [ "left", "right", "wide", "full" ],
 		"html": false,
 		"background": {
 			"backgroundImage": true,

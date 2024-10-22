@@ -227,7 +227,7 @@ The final step is to write a release post on [make.wordpress.org/core](https://m
 
 > The plugin was published to the WordPress.org plugin directory but the workflow failed.
 
-This has happened ocassionally, see [this one](https://github.com/WordPress/gutenberg/actions/runs/6955409957/job/18924124118) for example.
+This has happened occasionally, see [this one](https://github.com/WordPress/gutenberg/actions/runs/6955409957/job/18924124118) for example.
 
 It's important to check that:
 

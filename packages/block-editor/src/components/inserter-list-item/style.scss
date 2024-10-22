@@ -43,7 +43,6 @@
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-block-ui;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 	position: relative;
@@ -72,7 +71,7 @@
 				bottom: 0;
 				left: 0;
 				right: 0;
-				border-radius: $radius-block-ui;
+				border-radius: $radius-small;
 				opacity: 0.04;
 				background: var(--wp-admin-theme-color);
 				// This fixes drag-and-drop in Firefox.
@@ -97,7 +96,6 @@
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	border-radius: $radius-block-ui;
 	color: $gray-900;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -120,4 +118,5 @@
 .block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
 	font-size: 12px;
+	hyphens: auto;
 }

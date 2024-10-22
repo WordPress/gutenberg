@@ -25,7 +25,14 @@ import { useArchiveLabel } from './use-archive-label';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
+	attributes: {
+		type,
+		level,
+		levelOptions,
+		textAlign,
+		showPrefix,
+		showSearchTerm,
+	},
 	setAttributes,
 } ) {
 	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
@@ -130,6 +137,7 @@ export default function QueryTitleEdit( {
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

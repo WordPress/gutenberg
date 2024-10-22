@@ -3,7 +3,7 @@
 	--checkbox-input-size: 24px; // Width & height for small viewports.
 
 	@include break-small() {
-		--checkbox-input-size: 20px;
+		--checkbox-input-size: 16px;
 	}
 
 	--checkbox-input-margin: #{$grid-unit-10};
@@ -12,6 +12,7 @@
 .components-checkbox-control__label {
 	// Ensure label is aligned with checkbox along X axis
 	line-height: var(--checkbox-input-size);
+	cursor: pointer;
 }
 
 .components-checkbox-control__input[type="checkbox"] {
@@ -61,6 +62,7 @@
 	vertical-align: middle;
 	width: var(--checkbox-input-size);
 	aspect-ratio: 1;
+	line-height: 1; // maintains proper height even with WP common.css
 	flex-shrink: 0;
 }
 

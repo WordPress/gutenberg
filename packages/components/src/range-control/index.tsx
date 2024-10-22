@@ -41,13 +41,23 @@ import { space } from '../utils/space';
 
 const noop = () => {};
 
-function useUniqueId( idProp?: string ) {
-	const id = useInstanceId(
-		UnforwardedRangeControl,
-		'inspector-range-control'
-	);
+/**
+ * Computes the value that `RangeControl` should reset to when pressing
+ * the reset button.
+ */
+function computeResetValue( {
+	resetFallbackValue,
+	initialPosition,
+}: Pick< RangeControlProps, 'resetFallbackValue' | 'initialPosition' > ) {
+	if ( resetFallbackValue !== undefined ) {
+		return ! Number.isNaN( resetFallbackValue ) ? resetFallbackValue : null;
+	}
 
-	return idProp || id;
+	if ( initialPosition !== undefined ) {
+		return ! Number.isNaN( initialPosition ) ? initialPosition : null;
+	}
+
+	return null;
 }
 
 function UnforwardedRangeControl(
@@ -65,7 +75,6 @@ function UnforwardedRangeControl(
 		disabled = false,
 		help,
 		hideLabelFromVision = false,
-		id: idProp,
 		initialPosition,
 		isShiftStepEnabled = true,
 		label,
@@ -133,7 +142,10 @@ function UnforwardedRangeControl(
 		!! marks && 'is-marked'
 	);
 
-	const id = useUniqueId( idProp );
+	const id = useInstanceId(
+		UnforwardedRangeControl,
+		'inspector-range-control'
+	);
 	const describedBy = !! help ? `${ id }__help` : undefined;
 	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
 
@@ -173,13 +185,12 @@ function UnforwardedRangeControl(
 	};
 
 	const handleOnReset = () => {
-		let resetValue: number | null = parseFloat( `${ resetFallbackValue }` );
-		let onChangeResetValue: number | undefined = resetValue;
-
-		if ( isNaN( resetValue ) ) {
-			resetValue = null;
-			onChangeResetValue = undefined;
-		}
+		// Reset to `resetFallbackValue` if defined, otherwise set internal value
+		// to `null` — which, if propagated to the `value` prop, will cause
+		// the value to be reset to the `initialPosition` prop if defined.
+		const resetValue = Number.isNaN( resetFallbackValue )
+			? null
+			: resetFallbackValue ?? null;
 
 		setValue( resetValue );
 
@@ -196,7 +207,7 @@ function UnforwardedRangeControl(
 		 * preserve the undefined callback argument, except when a
 		 * resetFallbackValue is defined.
 		 */
-		onChange( onChangeResetValue );
+		onChange( resetValue ?? undefined );
 	};
 
 	const handleShowTooltip = () => setShowTooltip( true );
@@ -217,9 +228,11 @@ function UnforwardedRangeControl(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="RangeControl"
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -335,7 +348,17 @@ function UnforwardedRangeControl(
 							className="components-range-control__reset"
 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
 							accessibleWhenDisabled={ ! disabled }
-							disabled={ disabled || value === undefined }
+							// The reset button should be disabled if RangeControl itself is disabled,
+							// or if the current `value` is equal to the value that would be currently
+							// assigned when clicking the button.
+							disabled={
+								disabled ||
+								value ===
+									computeResetValue( {
+										resetFallbackValue,
+										initialPosition,
+									} )
+							}
 							variant="secondary"
 							size="small"
 							onClick={ handleOnReset }
@@ -360,6 +383,7 @@ function UnforwardedRangeControl(
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <RangeControl
+ *       __nextHasNoMarginBottom
  *       help="Please select how transparent you would like this."
  *       initialPosition={50}
  *       label="Opacity"

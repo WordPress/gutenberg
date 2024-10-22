@@ -30,6 +30,7 @@ function TableOfContents(
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					__next40pxDefaultSize
 					{ ...props }
 					ref={ ref }
 					onClick={ hasBlocks ? onToggle : undefined }
