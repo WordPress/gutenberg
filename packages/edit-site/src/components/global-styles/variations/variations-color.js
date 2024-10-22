@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalVStack as VStack,
 	__experimentalGrid as Grid,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 /**

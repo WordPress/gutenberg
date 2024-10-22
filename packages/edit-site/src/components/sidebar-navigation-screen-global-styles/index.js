@@ -5,9 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -16,7 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import StyleVariationsContainer from '../global-styles/style-variations-container';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
@@ -24,11 +21,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
-import ColorVariations from '../global-styles/variations/variations-color';
-import TypographyVariations from '../global-styles/variations/variations-typography';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-
-const noop = () => {};
+import SidebarNavigationScreenGlobalStylesContent from './content';
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -60,53 +53,6 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 				openGeneralSidebar( 'edit-site/global-styles' );
 			} }
 		/>
-	);
-}
-
-function SidebarNavigationScreenGlobalStylesContent() {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
-
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( [
-		'color',
-	] );
-	const typographyVariations =
-		useCurrentMergeThemeStyleVariationsWithUserConfig( [ 'typography' ] );
-
-	const gap = 3;
-
-	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
-	// loaded. This is necessary because the Iframe component waits until
-	// the block editor store's `__internalIsInitialized` is true before
-	// rendering the iframe. Without this, the iframe previews will not render
-	// in mobile viewport sizes, where the editor canvas is hidden.
-	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<VStack
-				spacing={ 10 }
-				className="edit-site-global-styles-variation-container"
-			>
-				<StyleVariationsContainer gap={ gap } />
-				{ colorVariations?.length && (
-					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
-				) }
-				{ typographyVariations?.length && (
-					<TypographyVariations
-						title={ __( 'Typography' ) }
-						gap={ gap }
-					/>
-				) }
-			</VStack>
-		</BlockEditorProvider>
 	);
 }
 

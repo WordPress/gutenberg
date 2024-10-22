@@ -32,7 +32,7 @@ const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = (
-	{ path, method = 'GET', data },
+	{ path, method = 'GET', data, parse },
 	retries = 20,
 	retryCount = 1
 ) => {
@@ -57,7 +57,23 @@ const fetchHandler = (
 	}
 
 	const parseResponse = ( response ) => {
-		if ( typeof response === 'string' ) {
+		const isStringResponse = typeof response === 'string';
+
+		// If the 'parse' parameter is false, return the response as a new Response object
+		// with the JSON string. This is necessary because one of the middlewares in the API
+		// fetch library expects the response to be a JavaScript Response object with JSON
+		// functionality. By doing this, we ensure that the response is handled correctly
+		// by fetch-all-middleware.
+		if ( parse === false ) {
+			const body = isStringResponse
+				? response
+				: JSON.stringify( response );
+			return new Response( body, {
+				headers: { 'Content-Type': 'application/json' },
+			} );
+		}
+
+		if ( isStringResponse ) {
 			response = JSON.parse( response );
 		}
 		return response;

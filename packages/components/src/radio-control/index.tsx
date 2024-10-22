@@ -16,6 +16,20 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
+import { StyledHelp } from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
+
+function generateOptionDescriptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }-option-description`;
+}
+
+function generateOptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }`;
+}
+
+function generateHelpId( radioGroupId: string ) {
+	return `${ radioGroupId }__help`;
+}
 
 /**
  * Render a user interface to select the user type using radio inputs.
@@ -53,10 +67,15 @@ export function RadioControl(
 		onChange,
 		hideLabelFromVision,
 		options = [],
+		id: preferredId,
 		...additionalProps
 	} = props;
-	const instanceId = useInstanceId( RadioControl );
-	const id = `inspector-radio-control-${ instanceId }`;
+	const id = useInstanceId(
+		RadioControl,
+		'inspector-radio-control',
+		preferredId
+	);
+
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
@@ -65,22 +84,32 @@ export function RadioControl(
 	}
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			label={ label }
+		<fieldset
 			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
 			className={ clsx( className, 'components-radio-control' ) }
+			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
-			<VStack spacing={ 3 }>
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+			) : (
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+
+			<VStack
+				spacing={ 3 }
+				className={ clsx( 'components-radio-control__group-wrapper', {
+					'has-help': !! help,
+				} ) }
+			>
 				{ options.map( ( option, index ) => (
 					<div
-						key={ `${ id }-${ index }` }
+						key={ generateOptionId( id, index ) }
 						className="components-radio-control__option"
 					>
 						<input
-							id={ `${ id }-${ index }` }
+							id={ generateOptionId( id, index ) }
 							className="components-radio-control__input"
 							type="radio"
 							name={ id }
@@ -88,20 +117,40 @@ export function RadioControl(
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={
-								!! help ? `${ id }__help` : undefined
+								!! option.description
+									? generateOptionDescriptionId( id, index )
+									: undefined
 							}
 							{ ...additionalProps }
 						/>
 						<label
 							className="components-radio-control__label"
-							htmlFor={ `${ id }-${ index }` }
+							htmlFor={ generateOptionId( id, index ) }
 						>
 							{ option.label }
 						</label>
+						{ !! option.description ? (
+							<StyledHelp
+								__nextHasNoMarginBottom
+								id={ generateOptionDescriptionId( id, index ) }
+								className="components-radio-control__option-description"
+							>
+								{ option.description }
+							</StyledHelp>
+						) : null }
 					</div>
 				) ) }
 			</VStack>
-		</BaseControl>
+			{ !! help && (
+				<StyledHelp
+					__nextHasNoMarginBottom
+					id={ generateHelpId( id ) }
+					className="components-base-control__help"
+				>
+					{ help }
+				</StyledHelp>
+			) }
+		</fieldset>
 	);
 }
 

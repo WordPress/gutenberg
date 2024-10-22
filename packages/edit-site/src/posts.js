@@ -72,6 +72,7 @@ export function initializePostsDashboard( id, settings ) {
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 	} );
 
 	dispatch( editSiteStore ).updateSettings( settings );

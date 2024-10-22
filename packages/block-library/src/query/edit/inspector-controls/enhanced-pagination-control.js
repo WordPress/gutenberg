@@ -25,18 +25,19 @@ export default function EnhancedPaginationControl( {
 		);
 	} else if ( enhancedPagination ) {
 		help = __(
-			"Browsing between pages won't require a full page reload, unless non-compatible blocks are detected."
+			'Reload the full page—instead of just the posts list—when visitors navigate between pages.'
 		);
 	} else if ( hasUnsupportedBlocks ) {
 		help = __(
-			"Force page reload can't be disabled because there are non-compatible blocks inside the Query block."
+			'Enhancement disabled because there are non-compatible blocks inside the Query block.'
 		);
 	}
 
 	return (
 		<>
 			<ToggleControl
-				label={ __( 'Force page reload' ) }
+				__nextHasNoMarginBottom
+				label={ __( 'Reload full page' ) }
 				help={ help }
 				checked={
 					! enhancedPagination && ! fullPageClientSideNavigation

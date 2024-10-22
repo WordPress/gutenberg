@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Tabs from '..';
+import { Tabs } from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
@@ -20,7 +20,8 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components (Experimental)/Tabs',
+	title: 'Components/Containers/Tabs',
+	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -29,6 +30,8 @@ const meta: Meta< typeof Tabs > = {
 		'Tabs.Tab': Tabs.Tab,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],
 	parameters: {
@@ -69,6 +72,112 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 };
 
 export const Default = Template.bind( {} );
+
+export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
+	const [ fullWidth, setFullWidth ] = useState( false );
+	return (
+		<div>
+			<div style={ { maxWidth: '40rem', marginBottom: '1rem' } }>
+				<p>
+					This story helps understand how the TabList component
+					behaves under different conditions. The container below
+					(with the dotted red border) can be horizontally resized,
+					and it has a bit of padding to be out of the way of the
+					TabList.
+				</p>
+				<p>
+					The button will toggle between full width (adding{ ' ' }
+					<code>width: 100%</code>) and the default width.
+				</p>
+				<p>Try the following:</p>
+				<ul>
+					<li>
+						<strong>Small container</strong> that causes tabs to
+						overflow with scroll.
+					</li>
+					<li>
+						<strong>Large container</strong> that exceeds the normal
+						width of the tabs.
+						<ul>
+							<li>
+								<strong>
+									With <code>width: 100%</code>
+								</strong>{ ' ' }
+								set on the TabList (tabs fill up the space).
+							</li>
+							<li>
+								<strong>
+									Without <code>width: 100%</code>
+								</strong>{ ' ' }
+								(defaults to <code>auto</code>) set on the
+								TabList (tabs take up space proportional to
+								their content).
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<Button
+				style={ { marginBottom: '1rem' } }
+				variant="primary"
+				onClick={ () => setFullWidth( ! fullWidth ) }
+			>
+				{ fullWidth
+					? 'Remove width: 100% from TabList'
+					: 'Set width: 100% in TabList' }
+			</Button>
+			<Tabs { ...props }>
+				<div
+					style={ {
+						width: '20rem',
+						border: '2px dotted red',
+						padding: '1rem',
+						resize: 'horizontal',
+						overflow: 'auto',
+					} }
+				>
+					<Tabs.TabList
+						style={ {
+							maxWidth: '100%',
+							width: fullWidth ? '100%' : undefined,
+						} }
+					>
+						<Tabs.Tab tabId="tab1">
+							Label with multiple words
+						</Tabs.Tab>
+						<Tabs.Tab tabId="tab2">Short</Tabs.Tab>
+						<Tabs.Tab tabId="tab3">
+							Hippopotomonstrosesquippedaliophobia
+						</Tabs.Tab>
+						<Tabs.Tab tabId="tab4">Tab 4</Tabs.Tab>
+						<Tabs.Tab tabId="tab5">Tab 5</Tabs.Tab>
+					</Tabs.TabList>
+				</div>
+				<Tabs.TabPanel tabId="tab1">
+					<p>Selected tab: Tab 1</p>
+					<p>(Label with multiple words)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab2">
+					<p>Selected tab: Tab 2</p>
+					<p>(Short)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab3">
+					<p>Selected tab: Tab 3</p>
+					<p>(Hippopotomonstrosesquippedaliophobia)</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab4">
+					<p>Selected tab: Tab 4</p>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId="tab5">
+					<p>Selected tab: Tab 5</p>
+				</Tabs.TabPanel>
+			</Tabs>
+		</div>
+	);
+};
+SizeAndOverflowPlayground.args = {
+	defaultTabId: 'tab4',
+};
 
 const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (

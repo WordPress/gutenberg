@@ -5,6 +5,7 @@ import { useEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,10 +38,9 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		url,
 		frontPageTemplateId,
 	} = useSelect( ( select ) => {
-		const { getSite, getUnstableBase, getEntityRecords } =
-			select( coreDataStore );
-		const siteData = getSite();
-		const base = getUnstableBase();
+		const { getEntityRecord, getEntityRecords } = select( coreDataStore );
+		const siteData = getEntityRecord( 'root', 'site' );
+		const base = getEntityRecord( 'root', '__unstableBase' );
 		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
@@ -87,6 +87,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypesWithoutParentTemplate.includes( postType ) &&
 				postId
 			) {
+				return undefined;
+			}
+
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
 				return undefined;
 			}
 
@@ -244,9 +249,14 @@ export default function useInitEditedEntityFromURL() {
 		useResolveEditedEntityAndContext( params );
 
 	const { setEditedEntity } = useDispatch( editSiteStore );
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	useEffect( () => {
 		if ( isReady ) {
+			__unstableSetEditorMode( 'edit' );
+			resetZoomLevel();
 			setEditedEntity( postType, postId, context );
 		}
 	}, [ isReady, postType, postId, context, setEditedEntity ] );

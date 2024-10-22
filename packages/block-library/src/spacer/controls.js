@@ -10,7 +10,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	BaseControl,
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -57,19 +56,17 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	return (
 		<>
 			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
-				<BaseControl label={ label } id={ inputId }>
-					<UnitControl
-						id={ inputId }
-						isResetValueOnUnitChange
-						min={ MIN_SPACER_SIZE }
-						onChange={ handleOnChange }
-						style={ { maxWidth: 80 } }
-						value={ computedValue }
-						units={ units }
-					/>
-				</BaseControl>
+				<UnitControl
+					id={ inputId }
+					isResetValueOnUnitChange
+					min={ MIN_SPACER_SIZE }
+					onChange={ handleOnChange }
+					value={ computedValue }
+					units={ units }
+					label={ label }
+					__next40pxDefaultSize
+				/>
 			) }
-
 			{ spacingSizes?.length > 0 && (
 				<View className="tools-panel-item-spacing">
 					<SpacingSizesControl

@@ -155,6 +155,7 @@ function AudioEdit( {
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onReset={ () => onSelectAudio( undefined ) }
 					/>
 				</BlockControls>
 			) }
@@ -174,6 +175,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
@@ -197,9 +199,9 @@ function AudioEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag if the block is not selected
-					so the user clicking on it won't play the
-					file or change the position slider when the controls are enabled.
+				Disable the audio tag if the block is not selected
+				so the user clicking on it won't play the
+				file or change the position slider when the controls are enabled.
 				*/ }
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<audio controls="controls" src={ src ?? temporaryURL } />

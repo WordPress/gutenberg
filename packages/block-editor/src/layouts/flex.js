@@ -12,7 +12,6 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	Button,
 	ToggleControl,
 	Flex,
 	FlexItem,
@@ -110,7 +109,6 @@ export default {
 					<FlexLayoutVerticalAlignmentControl
 						layout={ layout }
 						onChange={ onChange }
-						isToolbar
 					/>
 				) }
 			</BlockControls>
@@ -190,11 +188,7 @@ export default {
 	},
 };
 
-function FlexLayoutVerticalAlignmentControl( {
-	layout,
-	onChange,
-	isToolbar = false,
-} ) {
+function FlexLayoutVerticalAlignmentControl( { layout, onChange } ) {
 	const { orientation = 'horizontal' } = layout;
 
 	const defaultVerticalAlignment =
@@ -210,52 +204,17 @@ function FlexLayoutVerticalAlignmentControl( {
 			verticalAlignment: value,
 		} );
 	};
-	if ( isToolbar ) {
-		return (
-			<BlockVerticalAlignmentControl
-				onChange={ onVerticalAlignmentChange }
-				value={ verticalAlignment }
-				controls={
-					orientation === 'horizontal'
-						? [ 'top', 'center', 'bottom', 'stretch' ]
-						: [ 'top', 'center', 'bottom', 'space-between' ]
-				}
-			/>
-		);
-	}
-
-	const verticalAlignmentOptions = [
-		{
-			value: 'flex-start',
-			label: __( 'Align items top' ),
-		},
-		{
-			value: 'center',
-			label: __( 'Align items center' ),
-		},
-		{
-			value: 'flex-end',
-			label: __( 'Align items bottom' ),
-		},
-	];
 
 	return (
-		<fieldset className="block-editor-hooks__flex-layout-vertical-alignment-control">
-			<legend>{ __( 'Vertical alignment' ) }</legend>
-			<div>
-				{ verticalAlignmentOptions.map( ( value, icon, label ) => {
-					return (
-						<Button
-							key={ value }
-							label={ label }
-							icon={ icon }
-							isPressed={ verticalAlignment === value }
-							onClick={ () => onVerticalAlignmentChange( value ) }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<BlockVerticalAlignmentControl
+			onChange={ onVerticalAlignmentChange }
+			value={ verticalAlignment }
+			controls={
+				orientation === 'horizontal'
+					? [ 'top', 'center', 'bottom', 'stretch' ]
+					: [ 'top', 'center', 'bottom', 'space-between' ]
+			}
+		/>
 	);
 }
 
@@ -325,6 +284,7 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
@@ -370,6 +330,7 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }

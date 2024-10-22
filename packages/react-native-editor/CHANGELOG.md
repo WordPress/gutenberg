@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+
+## 1.121.0
 -   [internal] Fix Inserter items list filtering [#62334]
 -   [*] Prevent hiding the keyboard when creating new list items [#62446]
 -   [*] Fix issue when pasting HTML content [#62588]

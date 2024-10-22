@@ -3,7 +3,14 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
-	a {
+	:where(a) {
 		display: inline-block;
+		font-family: inherit;
+		font-size: inherit;
+		font-style: inherit;
+		font-weight: inherit;
+		letter-spacing: inherit;
+		line-height: inherit;
+		text-decoration: inherit;
 	}
 }

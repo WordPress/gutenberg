@@ -20,7 +20,6 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
@@ -57,37 +56,21 @@ export default function Layout( { route } ) {
 	useCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
-		( select ) => {
-			const { getAllShortcutKeyCombinations } = select(
-				keyboardShortcutsStore
-			);
-			const { getCanvasMode } = unlock( select( editSiteStore ) );
-			return {
-				canvasMode: getCanvasMode(),
-				previousShortcut: getAllShortcutKeyCombinations(
-					'core/editor/previous-region'
-				),
-				nextShortcut: getAllShortcutKeyCombinations(
-					'core/editor/next-region'
-				),
-			};
-		},
-		[]
-	);
-	const navigateRegionsProps = useNavigateRegions( {
-		previous: previousShortcut,
-		next: nextShortcut,
-	} );
+	const { canvasMode } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		return {
+			canvasMode: getCanvasMode(),
+		};
+	}, [] );
+	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
-	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { key: routeKey, areas, widths } = route;
+	const { name: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+		triggerAnimationOnChange: canvasMode,
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -113,7 +96,6 @@ export default function Layout( { route } ) {
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
-			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
@@ -200,6 +182,17 @@ export default function Layout( { route } ) {
 								{ areas.content }
 							</div>
 						) }
+
+					{ ! isMobileViewport && areas.edit && (
+						<div
+							className="edit-site-layout__area"
+							style={ {
+								maxWidth: widths?.edit,
+							} }
+						>
+							{ areas.edit }
+						</div>
+					) }
 
 					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">

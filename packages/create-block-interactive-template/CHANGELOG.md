@@ -1,6 +1,22 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## Unreleased
+## 2.8.0 (2024-09-19)
+
+### Enhancements
+
+-   Added TypeScript variant of the template ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
+
+## 2.7.0 (2024-09-05)
+
+### Enhancements
+
+-   Set the minimum supported WordPress version to 6.6 to make it work seamlessly with the latest version of `@wordpress/scripts` package ([#64920](https://github.com/WordPress/gutenberg/pull/64920)).
+
+## 2.6.0 (2024-08-21)
+
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
 
 ## 2.3.0 (2024-07-10)
 

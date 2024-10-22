@@ -10,17 +10,8 @@ import {
 	VisuallyHidden,
 	ToggleControl,
 	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
+	CustomSelectControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somwhat recent, has a day greater than 12, and a month with more than three letters.
@@ -138,6 +129,7 @@ function NonDefaultControls( { format, onChange } ) {
 	return (
 		<VStack>
 			<CustomSelectControl
+				__next40pxDefaultSize
 				label={ __( 'Choose a format' ) }
 				options={ [ ...suggestedOptions, customOption ] }
 				value={
@@ -158,6 +150,7 @@ function NonDefaultControls( { format, onChange } ) {
 			/>
 			{ isCustom && (
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision

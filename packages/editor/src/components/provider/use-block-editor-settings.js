@@ -23,18 +23,23 @@ import {
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
-import { lock, unlock } from '../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
 
-const EMPTY_BLOCKS_LIST = [];
 const EMPTY_OBJECT = {};
 
 function __experimentalReusableBlocksSelect( select ) {
-	return (
-		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
-			per_page: -1,
-		} ) ?? EMPTY_BLOCKS_LIST
-	);
+	const { getEntityRecords, hasFinishedResolution } = select( coreStore );
+	const reusableBlocks = getEntityRecords( 'postType', 'wp_block', {
+		per_page: -1,
+	} );
+	return hasFinishedResolution( 'getEntityRecords', [
+		'postType',
+		'wp_block',
+		{ per_page: -1 },
+	] )
+		? reusableBlocks
+		: undefined;
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -47,6 +52,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'allowedMimeTypes',
 	'bodyPlaceholder',
 	'canLockBlocks',
+	'canUpdateBlockBindings',
 	'capabilities',
 	'clearBlockSelection',
 	'codeEditingEnabled',
@@ -74,7 +80,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
-	'sectionRootClientId',
 	'styles',
 	'titlePlaceholder',
 	'supportsLayout',
@@ -83,8 +88,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
-	'__experimentalArchiveTitleTypeLabel',
-	'__experimentalArchiveTitleNameLabel',
 ];
 
 const {
@@ -92,6 +95,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	sectionRootClientIdKey,
 } = unlock( privateApis );
 
 /**
@@ -135,7 +139,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
-			const siteSettings = canUser( 'read', 'settings' )
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
@@ -169,8 +176,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
-				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
-				userCanCreatePages: canUser( 'create', 'pages' ),
+				hasUploadPermissions:
+					canUser( 'create', {
+						kind: 'root',
+						name: 'media',
+					} ) ?? true,
+				userCanCreatePages: canUser( 'create', {
+					kind: 'postType',
+					name: 'page',
+				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
@@ -303,7 +317,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalUndo: undo,
 			// Check whether we want all site editor frames to have outlines
 			// including the navigation / pattern / parts editors.
-			outlineMode: postType === 'wp_template',
+			outlineMode: ! isDistractionFree && postType === 'wp_template',
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
@@ -317,10 +331,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			[ sectionRootClientIdKey ]: sectionRootClientId,
 		};
-		lock( blockEditorSettings, {
-			sectionRootClientId,
-		} );
+
 		return blockEditorSettings;
 	}, [
 		allowedBlockTypes,
@@ -345,6 +358,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		setIsInserterOpened,
 		sectionRootClientId,
 		globalStylesData,
+		globalStylesLinksData,
 	] );
 }
 

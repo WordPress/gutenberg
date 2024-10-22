@@ -16,7 +16,7 @@
 
 .edit-site-editor-canvas-container__section {
 	background: $white; // Fallback color, overridden by JavaScript.
-	border-radius: $radius-block-ui;
+	border-radius: $radius-large;
 	bottom: 0;
 	left: 0;
 	overflow: hidden;
@@ -29,7 +29,7 @@
 .edit-site-editor-canvas-container__close-button {
 	position: absolute;
 	right: $grid-unit-10;
-	top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
-	z-index: 1;
+	top: $grid-unit-10;
+	z-index: 2;
 	background: $white;
 }

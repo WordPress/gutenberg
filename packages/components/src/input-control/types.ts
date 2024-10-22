@@ -31,6 +31,7 @@ interface BaseProps {
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
@@ -208,16 +209,31 @@ export interface InputControlLabelProps {
 	size?: BaseProps[ 'size' ];
 }
 
-export type InputControlPrefixWrapperProps = {
+export type PrefixSuffixWrapperProps = {
 	/**
-	 * The prefix to be inserted.
+	 * The content to be inserted.
 	 */
 	children: ReactNode;
-};
-
-export type InputControlSuffixWrapperProps = {
 	/**
-	 * The suffix to be inserted.
+	 * Internal prop used to control the padding size of the wrapper.
+	 *
+	 * @ignore
 	 */
-	children: ReactNode;
+	size?: BaseProps[ 'size' ];
+	/**
+	 * Internal prop used to control the padding size of the wrapper.
+	 *
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: BaseProps[ '__next40pxDefaultSize' ];
+	/**
+	 * Adjust the wrapper based on the prefix or suffix content.
+	 *
+	 * - `'default'`: Standard padding for text content.
+	 * - `'icon'`: For icons.
+	 * - `'control'`: For controls, like buttons or selects.
+	 *
+	 * @default 'default'
+	 */
+	variant?: 'default' | 'icon' | 'control';
 };

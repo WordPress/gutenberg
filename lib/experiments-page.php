@@ -45,7 +45,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-sync-collaboration',
-		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		__( 'Live Collaboration and offline persistence', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -80,8 +80,20 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-block-experiments',
+		__( 'Experimental blocks', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable experimental blocks.<p class="description">(Warning: these blocks may have significant changes during development that cause validation errors and display issues.)</p>', 'gutenberg' ),
+			'id'    => 'gutenberg-block-experiments',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-form-blocks',
-		__( 'Form and input blocks ', 'gutenberg' ),
+		__( 'Form and input blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -93,7 +105,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-grid-interactivity',
-		__( 'Grid interactivity ', 'gutenberg' ),
+		__( 'Grid interactivity', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -128,18 +140,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-patterns-tab',
-		__( 'Enable zoomed out view when patterns are browsed in the inserter', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable zoomed out view when selecting a pattern category in the main inserter.', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-patterns-tab',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-new-posts-dashboard',
 		__( 'Redesigned posts dashboard', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -148,6 +148,30 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enable a redesigned posts dashboard.', 'gutenberg' ),
 			'id'    => 'gutenberg-new-posts-dashboard',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-quick-edit-dataviews',
+		__( 'Quick Edit in DataViews', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Allow access to a quick edit panel in the pages data views.', 'gutenberg' ),
+			'id'    => 'gutenberg-quick-edit-dataviews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-processing',
+		__( 'Client-side media processing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable client-side media processing.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-processing',
 		)
 	);
 
@@ -184,7 +208,7 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 	?>
-	<p><?php echo __( "The block editor includes experimental features that are useable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
+	<p><?php echo __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
 }

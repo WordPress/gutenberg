@@ -69,8 +69,8 @@ describe( 'useEntityRecords', () => {
 			hasStarted: true,
 			isResolving: false,
 			status: 'SUCCESS',
-			totalItems: null,
-			totalPages: null,
+			totalItems: 3,
+			totalPages: 1,
 		} );
 	} );
 } );

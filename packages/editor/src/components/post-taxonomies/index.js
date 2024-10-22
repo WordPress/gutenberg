@@ -32,10 +32,17 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
+		const taxonomyComponentProps = {
+			slug: taxonomy.slug,
+			...( taxonomy.hierarchical
+				? {}
+				: { __nextHasNoMarginBottom: true } ),
+		};
+
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
-					<TaxonomyComponent slug={ taxonomy.slug } />,
+					<TaxonomyComponent { ...taxonomyComponentProps } />,
 					taxonomy
 				) }
 			</Fragment>

@@ -13,10 +13,4 @@
 	&:focus:not(:disabled) {
 		@include block-toolbar-button-style__focus();
 	}
-
-	&.is-selected,
-	&:not(:disabled,[aria-disabled="true"]):active {
-		background: $components-color-accent;
-		color: $white;
-	}
 }

@@ -135,10 +135,6 @@ function ShadowItem( { shadow, category } ) {
 	return (
 		<NavigationButtonAsItem
 			path={ `/shadows/edit/${ category }/${ shadow.slug }` }
-			aria-label={
-				// translators: %s: name of the shadow
-				sprintf( 'Edit shadow %s', shadow.name )
-			}
 			icon={ shadowIcon }
 		>
 			{ shadow.name }

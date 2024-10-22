@@ -12,11 +12,19 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 
-import type { Post, TemplateOrTemplatePart } from '../types';
+import type { Post, TemplatePart, Template } from '../types';
+
+export function isTemplate( post: Post ): post is Template {
+	return post.type === TEMPLATE_POST_TYPE;
+}
+
+export function isTemplatePart( post: Post ): post is TemplatePart {
+	return post.type === TEMPLATE_PART_POST_TYPE;
+}
 
 export function isTemplateOrTemplatePart(
 	p: Post
-): p is TemplateOrTemplatePart {
+): p is Template | TemplatePart {
 	return p.type === TEMPLATE_POST_TYPE || p.type === TEMPLATE_PART_POST_TYPE;
 }
 
@@ -39,7 +47,7 @@ export function getItemTitle( item: Post ) {
  * @param template The template entity to check.
  * @return Whether the template is removable.
  */
-export function isTemplateRemovable( template: TemplateOrTemplatePart ) {
+export function isTemplateRemovable( template: Template | TemplatePart ) {
 	if ( ! template ) {
 		return false;
 	}
@@ -49,6 +57,8 @@ export function isTemplateRemovable( template: TemplateOrTemplatePart ) {
 	return (
 		[ template.source, template.source ].includes(
 			TEMPLATE_ORIGINS.custom
-		) && ! template.has_theme_file
+		) &&
+		! Boolean( template.type === 'wp_template' && template?.plugin ) &&
+		! template.has_theme_file
 	);
 }

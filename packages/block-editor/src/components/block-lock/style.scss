@@ -8,13 +8,9 @@
 	}
 }
 
-.block-editor-block-lock-modal__options {
-	margin-top: $grid-unit-20;
-
-	legend {
-		margin-bottom: $grid-unit-20;
-		padding: 0;
-	}
+.block-editor-block-lock-modal__options legend {
+	margin-bottom: $grid-unit-20;
+	padding: 0;
 }
 
 .block-editor-block-lock-modal__checklist {
@@ -45,14 +41,14 @@
 
 	&:hover {
 		background-color: $gray-100;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 	}
 }
 
 .block-editor-block-lock-modal__template-lock {
 	border-top: $border-width solid $gray-300;
 	margin-top: $grid-unit-20;
-	padding: $grid-unit-15 0;
+	padding-top: $grid-unit-20;
 }
 
 .block-editor-block-lock-modal__actions {

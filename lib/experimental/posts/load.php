@@ -29,7 +29,7 @@ function gutenberg_posts_dashboard() {
 	);
 
 	$editor_settings         = get_block_editor_settings( $custom_settings, $block_editor_context );
-	$active_global_styles_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+	$active_global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$active_theme            = get_stylesheet();
 
 	$preload_paths = array(

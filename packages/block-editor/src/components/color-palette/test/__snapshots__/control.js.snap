@@ -45,7 +45,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -220,7 +220,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                           aria-label="Color: red"
                           aria-selected="true"
                           class="components-button components-circular-option-picker__option"
-                          data-active-item=""
+                          data-active-item="true"
                           id="components-circular-option-picker-0-0"
                           role="option"
                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"

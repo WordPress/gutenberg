@@ -18,7 +18,7 @@ import InspectorControls from '../inspector-controls';
 import {
 	useHasColorPanel,
 	useHasTextPanel,
-	useHasBackgroundPanel,
+	useHasBackgroundColorPanel,
 } from './color-panel.js';
 import { useGlobalStyles } from './use-global-styles-context';
 
@@ -95,7 +95,7 @@ const ColorPanel = ( {
 	);
 
 	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const setBackgroundColor = useCallback(

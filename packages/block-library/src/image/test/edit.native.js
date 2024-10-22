@@ -48,6 +48,7 @@ function mockGetMedia( media ) {
 const FETCH_MEDIA = {
 	request: {
 		path: `/wp/v2/media/1?context=edit`,
+		parse: false,
 	},
 	response: {
 		source_url: 'https://cldup.com/cXyG__fTLN.jpg',
