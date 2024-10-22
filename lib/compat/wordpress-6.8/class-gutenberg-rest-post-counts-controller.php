@@ -37,7 +37,7 @@ class Gutenberg_REST_Post_Counts_Controller extends WP_REST_Controller {
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<post_type>[\w-]+)',
 			array(
-				'args' => array(
+				'args'   => array(
 					'post_type' => array(
 						'description' => __( 'An alphanumeric identifier for the post type.' ),
 						'type'        => 'string',
@@ -96,7 +96,7 @@ class Gutenberg_REST_Post_Counts_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		$post_type = $request['post_type'];
-		$counts = wp_count_posts( $post_type );
+		$counts    = wp_count_posts( $post_type );
 
 		if ( ! $counts ) {
 			return new WP_Error(
@@ -120,7 +120,7 @@ class Gutenberg_REST_Post_Counts_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$data = array();
+		$data   = array();
 		$fields = $this->get_fields_for_response( $request );
 
 		foreach ( $fields as $field ) {
@@ -130,8 +130,8 @@ class Gutenberg_REST_Post_Counts_Controller extends WP_REST_Controller {
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		$response = rest_ensure_response( $data );
 

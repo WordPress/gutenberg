@@ -18,7 +18,7 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id = $factory->user->create(
 			array(
-				'role'       => 'administrator',
+				'role' => 'administrator',
 			)
 		);
 
@@ -74,9 +74,9 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 	 * @covers Gutenberg_REST_Post_Counts_Controller::et_item_schema
 	 */
 	public function test_get_item_schema() {
-		$request = new WP_REST_Request( 'OPTIONS', '/wp/v2/counts/post' );
-		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/counts/post' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
 		$this->assertCount( 7, $properties );
@@ -94,9 +94,9 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 	 */
 	public function test_get_item_response() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/counts/post' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/counts/post' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'publish', $data );
@@ -115,10 +115,12 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 		wp_set_current_user( self::$admin_id );
 
 		$published = self::factory()->post->create( array( 'post_status' => 'publish' ) );
-		$future    = self::factory()->post->create( array(
-			'post_status' => 'future',
-			'post_date' => date('Y-m-d H:i:s', strtotime('+1 day'))
-		) );
+		$future    = self::factory()->post->create(
+			array(
+				'post_status' => 'future',
+				'post_date'   => date( 'Y-m-d H:i:s', strtotime( '+1 day' ) ),
+			)
+		);
 		$draft     = self::factory()->post->create( array( 'post_status' => 'draft' ) );
 		$pending   = self::factory()->post->create( array( 'post_status' => 'pending' ) );
 		$private   = self::factory()->post->create( array( 'post_status' => 'private' ) );
@@ -126,7 +128,7 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/counts/post' );
 		$response = rest_get_server()->dispatch( $request );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertSame( 1, $data['publish'], 'Published post count mismatch.' );
 		$this->assertSame( 1, $data['future'], 'Future post count mismatch.' );
