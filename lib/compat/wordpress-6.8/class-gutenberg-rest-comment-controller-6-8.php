@@ -43,7 +43,7 @@ class Gutenberg_REST_Comment_Controller_6_8 extends WP_REST_Comments_Controller 
 		}
 
 		// Skip all the checks if comment type is not comment.
-		if( 'comment' !== $request['comment_type'] ) {
+		if ( 'comment' !== $request['comment_type'] ) {
 			return true;
 		}
 
