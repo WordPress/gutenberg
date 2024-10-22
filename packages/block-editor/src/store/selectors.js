@@ -542,6 +542,39 @@ export function getSelectedBlockClientId( state ) {
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ *
+ *```js
+ * import { select } from '@wordpress/data'
+ * import { store as blockEditorStore } from '@wordpress/block-editor'
+ *
+ * // Set initial active block client ID
+ * let activeBlockClientId = null
+ *
+ * const getActiveBlockData = () => {
+ * 	const activeBlock = select(blockEditorStore).getSelectedBlock()
+ *
+ * 	if (activeBlock && activeBlock.clientId !== activeBlockClientId) {
+ * 		activeBlockClientId = activeBlock.clientId
+ *
+ * 		// Get active block name and attributes
+ * 		const activeBlockName = activeBlock.name
+ * 		const activeBlockAttributes = activeBlock.attributes
+ *
+ * 		// Log active block name and attributes
+ * 		console.log(activeBlockName, activeBlockAttributes)
+ * 		}
+ * 	}
+ *
+ * 	// Subscribe to changes in the editor
+ * 	// wp.data.subscribe(() => {
+ * 		// getActiveBlockData()
+ * 	// })
+ *
+ * 	// Update active block data on click
+ * 	// onclick="getActiveBlockData()"
+ *```
+ *
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
@@ -1595,8 +1628,18 @@ const isBlockVisibleInTheInserter = (
 	checkedBlocks.add( blockName );
 
 	// If parent blocks are not visible, child blocks should be hidden too.
-	if ( !! blockType.parent?.length ) {
-		return blockType.parent.some(
+	//
+	// In some scenarios, blockType.parent may be a string.
+	// A better approach would be sanitize parent in all the places that can be modified:
+	// block registration, processBlockType, filters, etc.
+	// In the meantime, this is a hotfix to prevent the editor from crashing.
+	const parent =
+		typeof blockType.parent === 'string' ||
+		blockType.parent instanceof String
+			? [ blockType.parent ]
+			: blockType.parent;
+	if ( Array.isArray( parent ) ) {
+		return parent.some(
 			( name ) =>
 				( blockName !== name &&
 					isBlockVisibleInTheInserter(
@@ -1610,6 +1653,7 @@ const isBlockVisibleInTheInserter = (
 				name === 'core/post-content'
 		);
 	}
+
 	return true;
 };
 

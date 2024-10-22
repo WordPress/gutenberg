@@ -91,6 +91,7 @@
 		"@wordpress/undo-manager": "file:packages/undo-manager",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
+		"@wordpress/vips": "file:packages/vips",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount"
@@ -235,6 +236,7 @@
 		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"puppeteer-core": "23.1.0",
+		"raw-loader": "4.0.2",
 		"react": "18.3.1",
 		"react-docgen-typescript": "2.2.2",
 		"react-dom": "18.3.1",

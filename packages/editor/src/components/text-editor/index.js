@@ -6,7 +6,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useEffect, useRef } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -14,7 +13,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 import PostTextEditor from '../post-text-editor';
 import PostTitleRaw from '../post-title/post-title-raw';
-import { unlock } from '../../lock-unlock';
 
 export default function TextEditor( { autoFocus = false } ) {
 	const { switchEditorMode } = useDispatch( editorStore );
@@ -28,20 +26,13 @@ export default function TextEditor( { autoFocus = false } ) {
 		};
 	}, [] );
 
-	const { resetZoomLevel, __unstableSetEditorMode } = unlock(
-		useDispatch( blockEditorStore )
-	);
-
 	const titleRef = useRef();
 	useEffect( () => {
-		resetZoomLevel();
-		__unstableSetEditorMode( 'edit' );
-
 		if ( autoFocus ) {
 			return;
 		}
 		titleRef?.current?.focus();
-	}, [ autoFocus, resetZoomLevel, __unstableSetEditorMode ] );
+	}, [ autoFocus ] );
 
 	return (
 		<div className="editor-text-editor">
