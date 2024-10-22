@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -67,6 +67,8 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
+	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
+
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
 			return __experimentalInitialTab;
@@ -80,7 +82,7 @@ function InserterMenu(
 
 	const shouldUseZoomOut =
 		selectedTab === 'patterns' || selectedTab === 'media';
-	useZoomOut( shouldUseZoomOut );
+	useZoomOut( shouldUseZoomOut && isLargeViewport );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
