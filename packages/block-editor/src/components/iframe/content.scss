@@ -26,29 +26,30 @@
 	$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	$scroll-y: var(--wp-block-editor-iframe-zoom-out-scroll-y, 0);
-	$scroll-y-percentage: var(--wp-block-editor-iframe-zoom-out-scroll-y-percentage, 0);
-	// Use translate with a 0 on the x, and then override it on the transform so we can animate the Y
-	// translation without animating the X.
-	translate: 0 calc(#{$scroll-y} * (1 - #{$scale}));
-	// Apply an X translation to center the scaled content within the available space.
-	transform: translateX(calc(( #{$scale-container-width} - #{ $container-width }) / 2 / #{$scale}));
-	scale: #{$scale};
-	background-color: $gray-300;
+	// $scroll-y-percentage: var(--wp-block-editor-iframe-zoom-out-scroll-y-percentage, 0);
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
 	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
 	$total-frame-height: calc(2 * #{$frame-size} / #{$scale});
 	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
-	// margin-top: calc(-1 * #{$total-height} *  #{$scroll-y-percentage});
-	// margin-bottom: calc(-1 * #{$total-height} * ( 1 -  #{$scroll-y-percentage} ) );
 	$scaled-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
 
-	// Our transform origin point needs to be at the top of the content, as the bottom is removed from the
-	// frame by the negative margin. We can find the scroll point by taking the scroll position when entering
-	// zoom out and ...?
-	// We remove the transform origin from the scroll y from the margin top value
-	// margin-top: calc(-1 * #{$scaled-scroll-y});
+	$translate-x: calc(( #{$scale-container-width} - #{ $container-width }) / 2 / #{$scale});
+	$translate-y: calc(#{$scroll-y} * (1 - #{$scale}) + 2 * #{$frame-size});
+
+	// Keep separate so only X translation is animated.
+	translate: 0 $translate-y;
+	// Apply an X translation to center the scaled content within the available space.
+	transform: translateX(#{$translate-x});
+
+	// FIXME: Applying the negative top margin completely undoes the effect of
+	// the translate-y. We need to find a way to apply the negative margin without
+	// affecting the layout.
+	// margin-top: calc(-1 * (#{$translate-y}));
+
+	scale: #{$scale};
+	background-color: $gray-300;
 
 	// Add the top/bottom frame size. We use scaling to account for the left/right, as
 	// the padding left/right causes the contents to reflow, which breaks the 1:1 scaling

@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -309,7 +310,7 @@ function Iframe( {
 	// that controls settings the CSS variables, but then we would need to do more work to ensure we're
 	// only toggling these when the zoom out mode changes, as that useEffect is also triggered by a large
 	// number of dependencies.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
@@ -328,17 +329,45 @@ function Iframe( {
 			}, 400 ); // 400ms should match the animation speed used in components/iframe/content.scss
 		};
 
+		// Get the current scroll position of the iframe
+		const scrollY = iframeDocument.defaultView.scrollY;
+
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+
+		// Figure out where this center point will be when the iframe is scaled
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scroll-y',
+			`${ scrollY }px`
+		);
+
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scroll-y-percentage',
+			scrollY / contentHeight
+		);
+
 		handleZoomOutAnimationClassname();
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		return () => {
 			handleZoomOutAnimationClassname();
 			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scroll-y'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scroll-y-percentage'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-content-height'
+			);
 		};
-	}, [ iframeDocument, isZoomedOut ] );
+	}, [ contentHeight, iframeDocument, isZoomedOut ] );
 
 	// Calculate the scaling and CSS variables for the zoom out canvas
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
@@ -361,28 +390,10 @@ function Iframe( {
 				: scale
 		);
 
-		// Get the current scroll position of the iframe
-		const scrollY = iframeDocument.defaultView.scrollY;
-
-		// Figure out where this center point will be when the iframe is scaled
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-scroll-y',
-			`${ scrollY }px`
-		);
-
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-scroll-y-percentage',
-			scrollY / contentHeight
-		);
-
 		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
 			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-content-height',
-			`${ contentHeight }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-inner-height',
@@ -405,9 +416,6 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-frame-size'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-content-height'
-			);
-			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-inner-height'
 			);
 			iframeDocument.documentElement.style.removeProperty(
@@ -422,7 +430,6 @@ function Iframe( {
 		frameSize,
 		iframeDocument,
 		iframeWindowInnerHeight,
-		contentHeight,
 		containerWidth,
 		windowInnerWidth,
 		isZoomedOut,
