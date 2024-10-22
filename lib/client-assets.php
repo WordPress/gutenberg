@@ -327,7 +327,6 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reset-editor-styles',
 		'wp-block-library',
 		'wp-patterns',
-		'wp-reusable-blocks',
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
