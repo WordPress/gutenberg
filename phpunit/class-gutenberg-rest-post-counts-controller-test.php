@@ -118,7 +118,7 @@ class Gutenberg_Test_REST_Post_Counts_Controller extends WP_Test_REST_Controller
 		$future    = self::factory()->post->create(
 			array(
 				'post_status' => 'future',
-				'post_date'   => date( 'Y-m-d H:i:s', strtotime( '+1 day' ) ),
+				'post_date'   => gmdate( 'Y-m-d H:i:s', strtotime( '+1 day' ) ),
 			)
 		);
 		$draft     = self::factory()->post->create( array( 'post_status' => 'draft' ) );
