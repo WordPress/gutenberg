@@ -1675,7 +1675,7 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 			Object.defineProperty( updatedSettings, '__unstableIsPreviewMode', {
 				get() {
 					deprecated( '__unstableIsPreviewMode', {
-						since: '19.5',
+						since: '6.8',
 						alternative: 'isPreviewMode',
 					} );
 

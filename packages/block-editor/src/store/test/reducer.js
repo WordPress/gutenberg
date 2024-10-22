@@ -3086,7 +3086,7 @@ describe( 'state', () => {
 			expect( settingsObject.isPreviewMode ).toBeDefined();
 
 			expect( consoleWarn ).toHaveBeenCalledWith(
-				'__unstableIsPreviewMode is deprecated since version 19.5. Please use isPreviewMode instead.'
+				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
 			);
 
 			consoleWarn.mockRestore();
