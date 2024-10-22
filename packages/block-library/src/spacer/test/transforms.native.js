@@ -16,10 +16,7 @@ const initialHtml = `
 <!-- /wp:spacer -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [
-	'Separator',
-	...transformsWithInnerBlocks,
-];
+const blockTransforms = [ 'Separator', ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 
