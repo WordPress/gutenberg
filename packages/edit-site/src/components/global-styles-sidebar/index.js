@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { FlexItem, FlexBlock, Flex, Button } from '@wordpress/components';
+import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -130,38 +130,46 @@ export default function GlobalStylesSidebar() {
 					className="edit-site-global-styles-sidebar__header"
 					gap={ 1 }
 				>
-					<FlexBlock style={ { minWidth: 'min-content' } }>
+					<FlexItem>
 						<h2 className="edit-site-global-styles-sidebar__header-title">
 							{ __( 'Styles' ) }
 						</h2>
-					</FlexBlock>
-					<FlexItem>
-						<Button
-							icon={ seen }
-							label={ __( 'Style Book' ) }
-							isPressed={
-								isStyleBookOpened || isRevisionsStyleBookOpened
-							}
-							accessibleWhenDisabled
-							disabled={ shouldClearCanvasContainerView }
-							onClick={ toggleStyleBook }
-							size="compact"
-						/>
 					</FlexItem>
-					<FlexItem>
-						<Button
-							label={ __( 'Revisions' ) }
-							icon={ backup }
-							onClick={ toggleRevisions }
-							accessibleWhenDisabled
-							disabled={ ! hasRevisions }
-							isPressed={
-								isRevisionsOpened || isRevisionsStyleBookOpened
-							}
-							size="compact"
-						/>
-					</FlexItem>
-					<GlobalStylesMenuSlot />
+					<Flex
+						justify="flex-end"
+						gap={ 1 }
+						className="edit-site-global-styles-sidebar__header-actions"
+					>
+						<FlexItem>
+							<Button
+								icon={ seen }
+								label={ __( 'Style Book' ) }
+								isPressed={
+									isStyleBookOpened ||
+									isRevisionsStyleBookOpened
+								}
+								accessibleWhenDisabled
+								disabled={ shouldClearCanvasContainerView }
+								onClick={ toggleStyleBook }
+								size="compact"
+							/>
+						</FlexItem>
+						<FlexItem>
+							<Button
+								label={ __( 'Revisions' ) }
+								icon={ backup }
+								onClick={ toggleRevisions }
+								accessibleWhenDisabled
+								disabled={ ! hasRevisions }
+								isPressed={
+									isRevisionsOpened ||
+									isRevisionsStyleBookOpened
+								}
+								size="compact"
+							/>
+						</FlexItem>
+						<GlobalStylesMenuSlot />
+					</Flex>
 				</Flex>
 			}
 		>
