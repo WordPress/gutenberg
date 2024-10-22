@@ -164,7 +164,7 @@ const v8ToV11BlockAttributes = {
 	},
 };
 
-const v12BlockAttributes = {
+const v12toV13BlockAttributes = {
 	...v8ToV11BlockAttributes,
 	useFeaturedImage: {
 		type: 'boolean',
@@ -173,6 +173,13 @@ const v12BlockAttributes = {
 	tagName: {
 		type: 'string',
 		default: 'div',
+	},
+};
+
+const v14BlockAttributes = {
+	...v12toV13BlockAttributes,
+	sizeSlug: {
+		type: 'string',
 	},
 };
 
@@ -246,7 +253,7 @@ const v12BlockSupports = {
 
 // Deprecation for blocks that have z-index.
 const v14 = {
-	attributes: v12BlockAttributes,
+	attributes: v14BlockAttributes,
 	supports: v12BlockSupports,
 	save( { attributes } ) {
 		const {
@@ -268,6 +275,7 @@ const v14 = {
 			minHeight: minHeightProp,
 			minHeightUnit,
 			tagName: Tag,
+			sizeSlug,
 		} = attributes;
 		const overlayColorClass = getColorClassName(
 			'background-color',
@@ -320,6 +328,7 @@ const v14 = {
 			'wp-block-cover__image-background',
 			id ? `wp-image-${ id }` : null,
 			{
+				[ `size-${ sizeSlug }` ]: sizeSlug,
 				'has-parallax': hasParallax,
 				'is-repeated': isRepeated,
 			}
@@ -397,7 +406,7 @@ const v14 = {
 
 // Deprecation for blocks that does not have the aria-label when the image background is fixed or repeated.
 const v13 = {
-	attributes: v12BlockAttributes,
+	attributes: v12toV13BlockAttributes,
 	supports: v12BlockSupports,
 	save( { attributes } ) {
 		const {
@@ -547,7 +556,7 @@ const v13 = {
 
 // Deprecation for blocks to prevent auto overlay color from overriding previously set values.
 const v12 = {
-	attributes: v12BlockAttributes,
+	attributes: v12toV13BlockAttributes,
 	supports: v12BlockSupports,
 	isEligible( attributes ) {
 		return (
