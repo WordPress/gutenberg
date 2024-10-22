@@ -15,8 +15,11 @@ const initialHtml = `
 <hr class="wp-block-separator has-alpha-channel-opacity"/>
 <!-- /wp:separator -->`;
 
-const transformsWithInnerBlocks = [ 'Columns', 'Group', 'Spacer' ];
-const blockTransforms = [ ...transformsWithInnerBlocks ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [
+	'Spacer',
+	...transformsWithInnerBlocks
+];
 
 setupCoreBlocks();
 

@@ -15,8 +15,11 @@ const initialHtml = `
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 <!-- /wp:spacer -->`;
 
-const transformsWithInnerBlocks = [ 'Columns', 'Group', 'Separator' ];
-const blockTransforms = [ ...transformsWithInnerBlocks ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [
+	'Separator',
+	...transformsWithInnerBlocks
+];
 
 setupCoreBlocks();
 
