@@ -333,6 +333,7 @@
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
 		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
+		"test:visreg": "npx playwright test test/visreg/example.spec.js",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
 		"test:native:watch": "npm run test:native -- --watch",
 		"test:native:clean": "jest --clearCache --config test/native/jest.config.js; rm -rf $TMPDIR/jest_*",
