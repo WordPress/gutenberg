@@ -42,7 +42,7 @@ function BlockPattern( {
 	showTitle = true,
 	showTooltip,
 	category,
-	isSelected
+	isSelected,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
@@ -215,9 +215,9 @@ function BlockPatternsList(
 
 		setActiveCompositeId( firstCompositeItemId );
 	}, [ shownPatterns, blockPatterns ] );
-	const handleClickPattern = (pattern, blocks) => {
-		setActivePattern(pattern.name);
-		onClickPattern(pattern, blocks);
+	const handleClickPattern = ( pattern, blocks ) => {
+		setActivePattern( pattern.name );
+		onClickPattern( pattern, blocks );
 	};
 	return (
 		<Composite
