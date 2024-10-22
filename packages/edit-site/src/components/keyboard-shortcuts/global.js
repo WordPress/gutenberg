@@ -13,15 +13,14 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 function KeyboardShortcutsGlobal() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { hasNonPostEntityChanges } = useSelect( editorStore );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-	const { params } = useLocation();
-	const { canvas = 'view' } = params;
+	const history = useHistory();
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -32,7 +31,8 @@ function KeyboardShortcutsGlobal() {
 			isSavingEntityRecord( record.kind, record.name, record.key )
 		);
 		const _hasNonPostEntityChanges = hasNonPostEntityChanges();
-		const isViewMode = canvas === 'view';
+		const isViewMode =
+			history.getLocationWithParams().params.canvas === 'view';
 		if (
 			( ! hasDirtyEntities || ! _hasNonPostEntityChanges || isSaving ) &&
 			! isViewMode
