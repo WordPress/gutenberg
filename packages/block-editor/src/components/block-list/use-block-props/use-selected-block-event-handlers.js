@@ -21,18 +21,12 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const {
-		getBlockRootClientId,
-		getBlockIndex,
-		isZoomOut,
-		__unstableGetEditorMode,
-	} = unlock( useSelect( blockEditorStore ) );
-	const {
-		insertAfterBlock,
-		removeBlock,
-		__unstableSetEditorMode,
-		resetZoomLevel,
-	} = unlock( useDispatch( blockEditorStore ) );
+	const { getBlockRootClientId, getBlockIndex, isZoomOut } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { insertAfterBlock, removeBlock, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	return useRefEffect(
 		( node ) => {
@@ -66,12 +60,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				event.preventDefault();
 
-				if (
-					keyCode === ENTER &&
-					__unstableGetEditorMode() === 'zoom-out' &&
-					isZoomOut()
-				) {
-					__unstableSetEditorMode( 'edit' );
+				if ( keyCode === ENTER && isZoomOut() ) {
 					resetZoomLevel();
 				} else if ( keyCode === ENTER ) {
 					insertAfterBlock( clientId );
@@ -105,8 +94,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			getBlockIndex,
 			insertAfterBlock,
 			removeBlock,
-			__unstableGetEditorMode,
-			__unstableSetEditorMode,
 			isZoomOut,
 			resetZoomLevel,
 		]

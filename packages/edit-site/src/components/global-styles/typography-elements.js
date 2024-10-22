@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
@@ -36,17 +36,8 @@ function ElementItem( { parentMenu, element, label } ) {
 	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient' );
 	const [ color ] = useGlobalStyle( prefix + 'color.text' );
 
-	const navigationButtonLabel = sprintf(
-		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
-		__( 'Typography %s styles' ),
-		label
-	);
-
 	return (
-		<NavigationButtonAsItem
-			path={ parentMenu + '/typography/' + element }
-			aria-label={ navigationButtonLabel }
-		>
+		<NavigationButtonAsItem path={ parentMenu + '/typography/' + element }>
 			<HStack justify="flex-start">
 				<FlexItem
 					className="edit-site-global-styles-screen-typography__indicator"
@@ -61,6 +52,7 @@ function ElementItem( { parentMenu, element, label } ) {
 						fontWeight,
 						...extraStyles,
 					} }
+					aria-hidden="true"
 				>
 					{ __( 'Aa' ) }
 				</FlexItem>
