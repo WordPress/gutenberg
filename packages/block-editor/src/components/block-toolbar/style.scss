@@ -285,3 +285,19 @@
 		}
 	}
 }
+
+.block-editor-block-toolbar-change-design-content-wrapper {
+	padding: $grid-unit-15;
+	width: 320px;
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-15;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-inserter__media-list__list-item {
+			min-height: 100px;
+		}
+	}
+}
