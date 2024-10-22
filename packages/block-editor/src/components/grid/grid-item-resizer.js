@@ -7,7 +7,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
@@ -73,8 +73,8 @@ function GridItemResizerInner( {
 	}, [ blockElement, rootBlockElement ] );
 
 	const justification = {
-		right: 'flex-start',
-		left: 'flex-end',
+		right: 'left',
+		left: 'right',
 	};
 
 	const alignment = {
@@ -98,7 +98,7 @@ function GridItemResizerInner( {
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
-			__unstablePopoverSlot="block-toolbar"
+			__unstablePopoverSlot="__unstable-block-tools-after"
 			additionalStyles={ styles }
 		>
 			<ResizableBox
@@ -119,6 +119,15 @@ function GridItemResizerInner( {
 				} }
 				bounds={ bounds }
 				boundsByDirection
+				onPointerDown={ ( { target, pointerId } ) => {
+					/*
+					 * Captures the pointer to avoid hiccups while dragging over objects
+					 * like iframes and ensures that the event to end the drag is
+					 * captured by the target (resize handle) whether or not it’s under
+					 * the pointer.
+					 */
+					target.setPointerCapture( pointerId );
+				} }
 				onResizeStart={ ( event, direction ) => {
 					/*
 					 * The container justification and alignment need to be set
@@ -126,21 +135,6 @@ function GridItemResizerInner( {
 					 * so that it resizes in the right direction.
 					 */
 					setResizeDirection( direction );
-
-					/*
-					 * The mouseup event on the resize handle doesn't trigger if the mouse
-					 * isn't directly above the handle, so we try to detect if it happens
-					 * outside the grid and dispatch a mouseup event on the handle.
-					 */
-					blockElement.ownerDocument.addEventListener(
-						'mouseup',
-						() => {
-							event.target.dispatchEvent(
-								new Event( 'mouseup', { bubbles: true } )
-							);
-						},
-						{ once: true }
-					);
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
 					const columnGap = parseFloat(

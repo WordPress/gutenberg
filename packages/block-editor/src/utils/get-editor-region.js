@@ -23,7 +23,7 @@ export default function getEditorRegion( editor ) {
 			return iframeDocument === editor.ownerDocument;
 		} ) ?? editor;
 
-	// The region is provivided by the editor, not the block-editor.
+	// The region is provided by the editor, not the block-editor.
 	// We should send focus to the region if one is available to reuse the
 	// same interface for navigating landmarks. If no region is available,
 	// use the canvas instead.

@@ -3,7 +3,7 @@ module.exports = ( api ) => {
 	return {
 		presets: [ 'module:@react-native/babel-preset' ],
 		plugins: [
-			'@babel/plugin-proposal-async-generator-functions',
+			'@babel/plugin-transform-async-generator-functions',
 			'@babel/plugin-transform-runtime',
 			[
 				'react-native-platform-specific-extensions',
@@ -12,7 +12,7 @@ module.exports = ( api ) => {
 				},
 			],
 			'react-native-reanimated/plugin',
-			'@babel/plugin-proposal-export-namespace-from',
+			'@babel/plugin-transform-export-namespace-from',
 			'@babel/plugin-transform-dynamic-import',
 		],
 		overrides: [

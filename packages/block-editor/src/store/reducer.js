@@ -1601,7 +1601,7 @@ export function blocksMode( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function insertionPoint( state = null, action ) {
+export function insertionCue( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
 			const {
@@ -1785,47 +1785,6 @@ export const blockListSettings = ( state = {}, action ) => {
 	}
 	return state;
 };
-
-/**
- * Reducer returning which mode is enabled.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function editorMode( state = 'edit', action ) {
-	// Let inserting block in navigation mode always trigger Edit mode.
-	if ( action.type === 'INSERT_BLOCKS' && state === 'navigation' ) {
-		return 'edit';
-	}
-
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return action.mode;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning whether the block moving mode is enabled or not.
- *
- * @param {string|null} state  Current state.
- * @param {Object}      action Dispatched action.
- *
- * @return {string|null} Updated state.
- */
-export function hasBlockMovingClientId( state = null, action ) {
-	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
-		return action.hasBlockMovingClientId;
-	}
-
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return null;
-	}
-
-	return state;
-}
 
 /**
  * Reducer return an updated state representing the most recent block attribute
@@ -2068,6 +2027,61 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer setting currently hovered block.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function hoveredBlockClientId( state = false, action ) {
+	switch ( action.type ) {
+		case 'HOVER_BLOCK':
+			return action.clientId;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting zoom out state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {number} Updated state.
+ */
+export function zoomLevel( state = 100, action ) {
+	switch ( action.type ) {
+		case 'SET_ZOOM_LEVEL':
+			return action.zoom;
+		case 'RESET_ZOOM_LEVEL':
+			return 100;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting the insertion point
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPoint( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTION_POINT':
+			return action.value;
+		case 'SELECT_BLOCK':
+			return null;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2081,13 +2095,12 @@ const combinedReducers = combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
+	insertionCue,
 	template,
 	settings,
 	preferences,
 	lastBlockAttributesChange,
 	lastFocus,
-	editorMode,
-	hasBlockMovingClientId,
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
@@ -2100,6 +2113,8 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	hoveredBlockClientId,
+	zoomLevel,
 } );
 
 function withAutomaticChangeReset( reducer ) {

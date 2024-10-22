@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.3.0",
+	"version": "14.10.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**,bindings/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
+		"@babel/runtime": "7.25.7",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
@@ -47,6 +47,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/fields": "file:../fields",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
@@ -75,7 +76,8 @@
 		"is-plain-object": "^5.0.0",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"remove-accents": "^0.5.0"
+		"remove-accents": "^0.5.0",
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

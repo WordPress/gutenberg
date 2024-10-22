@@ -20,6 +20,7 @@ import {
 	isRawAttribute,
 	setNestedValue,
 	isNumericID,
+	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -46,6 +47,7 @@ export interface State {
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
+	registeredPostMeta: Record< string, Object >;
 }
 
 type EntityRecordKey = string | number;
@@ -1156,13 +1158,7 @@ export function canUser(
 		return false;
 	}
 
-	const key = (
-		isEntity
-			? [ action, resource.kind, resource.name, resource.id ]
-			: [ action, resource, id ]
-	)
-		.filter( Boolean )
-		.join( '/' );
+	const key = getUserPermissionCacheKey( action, resource, id );
 
 	return state.userPermissions[ key ];
 }

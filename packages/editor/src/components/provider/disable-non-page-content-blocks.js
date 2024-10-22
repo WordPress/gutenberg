@@ -4,48 +4,31 @@
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 
-const DEFAULT_CONTENT_ONLY_BLOCKS = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-	'core/template-part',
-];
+/**
+ * Internal dependencies
+ */
+import usePostContentBlocks from './use-post-content-blocks';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyBlocks = applyFilters(
-		'editor.postContentBlockTypes',
-		DEFAULT_CONTENT_ONLY_BLOCKS
+	const contentOnlyIds = usePostContentBlocks();
+	const templateParts = useSelect( ( select ) => {
+		const { getBlocksByName } = select( blockEditorStore );
+		return getBlocksByName( 'core/template-part' );
+	}, [] );
+	const disabledIds = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( blockEditorStore );
+			return templateParts.flatMap( ( clientId ) =>
+				getBlockOrder( clientId )
+			);
+		},
+		[ templateParts ]
 	);
-
-	// Note that there are two separate subscription because the result for each
-	// returns a new array.
-	const contentOnlyIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockParents, getBlockName } =
-			select( blockEditorStore );
-		return getBlocksByName( contentOnlyBlocks ).filter( ( clientId ) =>
-			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = getBlockName( parentClientId );
-				return (
-					// Ignore descendents of the query block.
-					parentBlockName !== 'core/query' &&
-					// Enable only the top-most block.
-					! contentOnlyBlocks.includes( parentBlockName )
-				);
-			} )
-		);
-	}, [] );
-	const disabledIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
-			( clientId ) => getBlockOrder( clientId )
-		);
-	}, [] );
 
 	const registry = useRegistry();
 
@@ -56,6 +39,9 @@ export default function DisableNonPageContentBlocks() {
 		registry.batch( () => {
 			setBlockEditingMode( '', 'disabled' );
 			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of templateParts ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 			for ( const clientId of disabledIds ) {
@@ -69,12 +55,15 @@ export default function DisableNonPageContentBlocks() {
 				for ( const clientId of contentOnlyIds ) {
 					unsetBlockEditingMode( clientId );
 				}
+				for ( const clientId of templateParts ) {
+					unsetBlockEditingMode( clientId );
+				}
 				for ( const clientId of disabledIds ) {
 					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
-	}, [ contentOnlyIds, disabledIds, registry ] );
+	}, [ templateParts, contentOnlyIds, disabledIds, registry ] );
 
 	return null;
 }

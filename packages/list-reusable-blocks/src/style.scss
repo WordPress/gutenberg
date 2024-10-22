@@ -6,10 +6,6 @@
 	align-items: center;
 	position: relative;
 	top: -3px;
-	// Todo: Make core button height and gutenberg button height equal.
-	.components-button {
-		height: 26px;
-	}
 }
 
 @include wordpress-admin-schemes();

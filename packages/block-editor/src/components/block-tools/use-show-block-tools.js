@@ -8,6 +8,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -20,47 +21,36 @@ export function useShowBlockTools() {
 			getSelectedBlockClientId,
 			getFirstMultiSelectedBlockClientId,
 			getBlock,
+			getBlockMode,
 			getSettings,
-			hasMultiSelection,
 			__unstableGetEditorMode,
 			isTyping,
-		} = select( blockEditorStore );
+		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-		const block = getBlock( clientId ) || { name: '', attributes: {} };
+		const block = getBlock( clientId );
 		const editorMode = __unstableGetEditorMode();
-		const hasSelectedBlock = clientId && block?.name;
-		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
+		const hasSelectedBlock = !! clientId && !! block;
+		const isEmptyDefaultBlock =
+			hasSelectedBlock &&
+			isUnmodifiedDefaultBlock( block ) &&
+			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
 			clientId &&
 			! isTyping() &&
 			editorMode === 'edit' &&
 			isEmptyDefaultBlock;
-		const maybeShowBreadcrumb =
-			hasSelectedBlock &&
-			! hasMultiSelection() &&
-			editorMode === 'navigation';
-
 		const _showBlockToolbarPopover =
-			editorMode !== 'zoom-out' &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
-			! isEmptyDefaultBlock &&
-			! maybeShowBreadcrumb;
+			! isEmptyDefaultBlock;
 
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
-			showBreadcrumb:
-				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
-			showZoomOutToolbar:
-				editorMode === 'zoom-out' &&
-				! _showEmptyBlockSideInserter &&
-				! maybeShowBreadcrumb &&
-				! _showBlockToolbarPopover,
 		};
 	}, [] );
 }

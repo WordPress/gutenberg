@@ -107,7 +107,8 @@ type BaseQueryControlsProps = {
 	 * Start opting into the larger default height that will become the
 	 * default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 };

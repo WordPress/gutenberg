@@ -84,6 +84,7 @@ function ImportForm( { instanceId, onUpload } ) {
 			</label>
 			<input id={ inputId } type="file" onChange={ onChangeFile } />
 			<Button
+				__next40pxDefaultSize
 				type="submit"
 				isBusy={ isLoading }
 				accessibleWhenDisabled

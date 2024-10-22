@@ -3,10 +3,7 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
+	Navigator,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
@@ -98,19 +95,16 @@ export default function PreferencesModalTabs( { sections } ) {
 		);
 	} else {
 		modalContent = (
-			<NavigatorProvider
-				initialPath="/"
-				className="preferences__provider"
-			>
-				<NavigatorScreen path="/">
+			<Navigator initialPath="/" className="preferences__provider">
+				<Navigator.Screen path="/">
 					<Card isBorderless size="small">
 						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										<NavigatorButton
+										<Navigator.Button
 											key={ tab.name }
-											path={ tab.name }
+											path={ `/${ tab.name }` }
 											as={ Item }
 											isAction
 										>
@@ -130,19 +124,19 @@ export default function PreferencesModalTabs( { sections } ) {
 													/>
 												</FlexItem>
 											</HStack>
-										</NavigatorButton>
+										</Navigator.Button>
 									);
 								} ) }
 							</ItemGroup>
 						</CardBody>
 					</Card>
-				</NavigatorScreen>
+				</Navigator.Screen>
 				{ sections.length &&
 					sections.map( ( section ) => {
 						return (
-							<NavigatorScreen
+							<Navigator.Screen
 								key={ `${ section.name }-menu` }
-								path={ section.name }
+								path={ `/${ section.name }` }
 							>
 								<Card isBorderless size="large">
 									<CardHeader
@@ -151,7 +145,7 @@ export default function PreferencesModalTabs( { sections } ) {
 										size="small"
 										gap="6"
 									>
-										<NavigatorBackButton
+										<Navigator.BackButton
 											icon={
 												isRTL()
 													? chevronRight
@@ -165,10 +159,10 @@ export default function PreferencesModalTabs( { sections } ) {
 									</CardHeader>
 									<CardBody>{ section.content }</CardBody>
 								</Card>
-							</NavigatorScreen>
+							</Navigator.Screen>
 						);
 					} ) }
-			</NavigatorProvider>
+			</Navigator>
 		);
 	}
 

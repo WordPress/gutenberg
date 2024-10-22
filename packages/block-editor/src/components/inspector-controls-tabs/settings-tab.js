@@ -9,6 +9,7 @@ const SettingsTab = ( { showAdvancedControls = false } ) => (
 	<>
 		<InspectorControls.Slot />
 		<PositionControls />
+		<InspectorControls.Slot group="bindings" />
 		{ showAdvancedControls && (
 			<div>
 				<AdvancedControls />

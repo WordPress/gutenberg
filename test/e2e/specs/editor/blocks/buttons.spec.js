@@ -60,7 +60,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -91,7 +91,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -123,7 +123,9 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
+		const urlInput = page.locator(
+			'role=combobox[name="Search or type URL"i]'
+		);
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );
@@ -289,11 +291,11 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=option[name="Color: Vivid red"i]' );
 
@@ -318,13 +320,13 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=button[name="Custom color picker."i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
@@ -353,7 +355,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
@@ -382,7 +384,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click(

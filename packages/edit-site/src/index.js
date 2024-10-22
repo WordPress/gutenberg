@@ -28,7 +28,7 @@ import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
 
-const { registerDefaultActions } = unlock( editorPrivateApis );
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -45,6 +45,7 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
@@ -53,7 +54,6 @@ export function initializeEditor( id, settings ) {
 			enableFSEBlocks: true,
 		} );
 	}
-	registerDefaultActions();
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
@@ -75,7 +75,15 @@ export function initializeEditor( id, settings ) {
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 	} );
+
+	if ( window.__experimentalMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
 
 	dispatch( editSiteStore ).updateSettings( settings );
 

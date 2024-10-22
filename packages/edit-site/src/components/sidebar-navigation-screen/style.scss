@@ -68,7 +68,11 @@
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
 	overflow-wrap: break-word;
-	padding: $grid-unit-05 * 0.5 0 0 0;
+
+	&#{&},
+	&#{&} .edit-site-sidebar-navigation-screen__title {
+		line-height: $font-line-height-x-large;
+	}
 }
 
 .edit-site-sidebar-navigation-screen__actions {
@@ -146,7 +150,6 @@
 	.components-input-control__input {
 		color: $gray-200 !important;
 		background: $gray-800 !important;
-		border-radius: $radius-block-ui;
 	}
 	.components-input-control__backdrop {
 		border: 4px !important;

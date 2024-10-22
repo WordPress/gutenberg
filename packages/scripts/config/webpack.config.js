@@ -31,11 +31,11 @@ const {
 	hasPostCSSConfig,
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
-	getRenderPropPaths,
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 	fromProjectRoot,
+	PhpFilePathsPlugin,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -48,28 +48,6 @@ const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
-
-/**
- * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
- * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
- * changes in `block.json` files are picked up in watch mode.
- */
-class RenderPathsPlugin {
-	/**
-	 * Paths with the `render` props included in `block.json` files.
-	 *
-	 * @type {string[]}
-	 */
-	static renderPaths;
-
-	apply( compiler ) {
-		const pluginName = this.constructor.name;
-
-		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.renderPaths = getRenderPropPaths();
-		} );
-	}
-}
 
 const cssLoaders = [
 	{
@@ -97,6 +75,7 @@ const cssLoaders = [
 					plugins: isProduction
 						? [
 								...postcssPlugins,
+								require( 'postcss-import' ),
 								require( 'cssnano' )( {
 									// Provide a fallback configuration if there's not
 									// one explicitly available in the project.
@@ -125,6 +104,7 @@ const baseConfig = {
 	target,
 	output: {
 		filename: '[name].js',
+		chunkFilename: '[name].js?v=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {
@@ -321,7 +301,10 @@ const scriptConfig = {
 				cleanStaleWebpackAssets: false,
 			} ),
 
-		new RenderPathsPlugin(),
+		new PhpFilePathsPlugin( {
+			context: getWordPressSrcDirectory(),
+			props: [ 'render', 'variations' ],
+		} ),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -371,7 +354,7 @@ const scriptConfig = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							RenderPathsPlugin.renderPaths.includes(
+							PhpFilePathsPlugin.paths.includes(
 								realpathSync( filepath ).replace( /\\/g, '/' )
 							)
 						);

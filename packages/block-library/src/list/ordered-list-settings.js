@@ -13,25 +13,10 @@ import {
 const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 	<InspectorControls>
 		<PanelBody title={ __( 'Settings' ) }>
-			<TextControl
-				__nextHasNoMarginBottom
-				label={ __( 'Start value' ) }
-				type="number"
-				onChange={ ( value ) => {
-					const int = parseInt( value, 10 );
-
-					setAttributes( {
-						// It should be possible to unset the value,
-						// e.g. with an empty string.
-						start: isNaN( int ) ? undefined : int,
-					} );
-				} }
-				value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
-				step="1"
-			/>
 			<SelectControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Numbering style' ) }
+				label={ __( 'List style' ) }
 				options={ [
 					{
 						label: __( 'Numbers' ),
@@ -57,9 +42,26 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 				value={ type }
 				onChange={ ( newValue ) => setAttributes( { type: newValue } ) }
 			/>
+			<TextControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Start value' ) }
+				type="number"
+				onChange={ ( value ) => {
+					const int = parseInt( value, 10 );
+
+					setAttributes( {
+						// It should be possible to unset the value,
+						// e.g. with an empty string.
+						start: isNaN( int ) ? undefined : int,
+					} );
+				} }
+				value={ Number.isInteger( start ) ? start.toString( 10 ) : '' }
+				step="1"
+			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
-				label={ __( 'Reverse list numbering' ) }
+				label={ __( 'Reverse order' ) }
 				checked={ reversed || false }
 				onChange={ ( value ) => {
 					setAttributes( {

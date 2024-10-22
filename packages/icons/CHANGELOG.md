@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+## 10.10.0 (2024-10-16)
+
+### Enhancements
+
+-   Update `cloudUpload` icon to improve visibility of the up arrow.
+
+### New Features
+
+-   Add new `cloudDownload` icon.
+-   Update `unseen` icon to be a strike-through eye, rather than a closed eye, to match provide consistency. ([#65914](https://github.com/WordPress/gutenberg/pull/65914)).
+
+## 10.9.0 (2024-10-03)
+
+## 10.8.0 (2024-09-19)
+
+### New Features
+
+-   Add new `envelope` icon.
+
+-   Add new `bell` and `bell-unread` icons.
+-   Add new `arrowUpLeft` and `arrowDownRight` icons.
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
+### New Features
+
+-   Add new `send` icon.
+
+## 10.4.0 (2024-07-24)
+
 ## 10.3.0 (2024-07-10)
 
 ## 10.2.0 (2024-06-26)

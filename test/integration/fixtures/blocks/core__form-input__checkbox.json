@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "checkbox",
+			"label": "Label",
+			"inlineLabel": true,
+			"required": true,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	}
+]

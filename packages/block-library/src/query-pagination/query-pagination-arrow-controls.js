@@ -10,6 +10,7 @@ import {
 export function QueryPaginationArrowControls( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Arrow' ) }
 			value={ value }

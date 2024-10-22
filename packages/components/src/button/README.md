@@ -138,7 +138,7 @@ An optional additional class name to apply to the rendered button.
 
 -   Required: No
 
-#### `describedBy`: `string`
+#### `description`: `string`
 
 An accessible description for the button.
 
@@ -291,6 +291,13 @@ If provided with`showTooltip`, sets the position of the tooltip. Please refer to
 Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
 
 -   Required: No
+
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`
 
 ## Related components
 

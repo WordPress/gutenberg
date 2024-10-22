@@ -18,7 +18,7 @@ on:
     # You cannot filter this event for PR comments only.
     # However, the logic below does short-circuit the workflow for issues.
     issue_comment:
-        type:
+        types:
             - created
     # This event will run everytime a new PR review is initially submitted.
     pull_request_review:

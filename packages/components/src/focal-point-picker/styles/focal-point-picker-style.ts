@@ -22,7 +22,7 @@ export const MediaWrapper = styled.div`
 
 export const MediaContainer = styled.div`
 	align-items: center;
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusSmall };
 	cursor: pointer;
 	display: inline-flex;
 	justify-content: center;

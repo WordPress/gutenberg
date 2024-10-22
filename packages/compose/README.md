@@ -305,6 +305,29 @@ _Returns_
 
 -   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
+### useEvent
+
+Creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks. Throws when used in the render phase.
+
+_Usage_
+
+```tsx
+function Component( props ) {
+	const onClick = useEvent( props.onClick );
+	useEffect( () => {
+		onClick();
+		// Won't trigger the effect again when props.onClick is updated.
+	}, [ onClick ] );
+	// Won't re-render Button when props.onClick is updated (if `Button` is
+	// wrapped in `React.memo`).
+	return <Button onClick={ onClick } />;
+}
+```
+
+_Parameters_
+
+-   _callback_ `T`: The callback function to wrap.
+
 ### useFocusableIframe
 
 Dispatches a bubbling focus event when the iframe receives focus. Use `onFocus` as usual on the iframe or a parent element.
@@ -500,22 +523,29 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen the resize event of any target element when it changes sizes. \_Note: `useResizeObserver` will report `null` until after first render.
+Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API) for an HTML or SVG element.
+
+Pass the returned setter as a callback ref to the React element you want to observe, or use it in layout effects for advanced use cases.
 
 _Usage_
 
-```js
-const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+```tsx
+const setElement = useResizeObserver(
+	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
+	{ box: 'border-box' }
+);
+<div ref={ setElement } />;
 
-	return (
-		<div>
-			{ resizeListener }
-			Your content here
-		</div>
-	);
-};
+// The setter can be used in other ways, for example:
+useLayoutEffect( () => {
+	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
+}, [ elementId ] );
 ```
+
+_Parameters_
+
+-   _callback_ `ResizeObserverCallback`: The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
+-   _options_ `ResizeObserverOptions`: Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 
 ### useStateWithHistory
 

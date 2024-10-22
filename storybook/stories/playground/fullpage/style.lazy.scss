@@ -46,19 +46,3 @@
 		display: block;
 	}
 }
-
-/**
- * Animations
- */
-
-// These keyframes should not be part of the _animations.scss mixins file.
-// Because keyframe animations can't be defined as mixins properly, they are duplicated.
-// Since hey are intended only for the editor, we add them here instead.
-@keyframes edit-post__fade-in-animation {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
