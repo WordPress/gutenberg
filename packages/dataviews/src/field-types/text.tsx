@@ -4,6 +4,8 @@
 import type { SortDirection, ValidationContext } from '../types';
 
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
+	if (valueA === null) return 1;
+	if (valueB === null) return -1;
 	return direction === 'asc'
 		? valueA.localeCompare( valueB )
 		: valueB.localeCompare( valueA );
