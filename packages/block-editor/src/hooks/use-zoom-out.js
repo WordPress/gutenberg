@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ export function useZoomOut( zoomOut = true ) {
 
 	const originalEditingModeRef = useRef( null );
 	const mode = __unstableGetEditorMode();
+	const isWideViewport = useViewportMatch( 'large' );
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
@@ -43,7 +45,9 @@ export function useZoomOut( zoomOut = true ) {
 
 	// The effect opens the zoom-out view if we want it open and it's not currently in zoom-out mode.
 	useEffect( () => {
-		if ( zoomOut && mode !== 'zoom-out' ) {
+		if ( ! isWideViewport ) {
+			setZoomLevel( 100 );
+		} else if ( zoomOut && mode !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
 			setZoomLevel( 50 );
 		} else if (
@@ -59,5 +63,6 @@ export function useZoomOut( zoomOut = true ) {
 		__unstableSetEditorMode,
 		zoomOut,
 		setZoomLevel,
+		isWideViewport,
 	] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
 }
