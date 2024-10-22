@@ -48,7 +48,7 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type FieldType = 'text' | 'integer' | 'datetime';
+export type FieldType = 'text' | 'integer' | 'datetime' | string;
 
 export type ValidationContext = {
 	elements?: Option[];

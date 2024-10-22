@@ -13,6 +13,7 @@ import { FeaturedImageView } from './featured-image-view';
 
 const featuredImageField: Field< BasePost > = {
 	id: 'featured_media',
+	type: 'featured-image',
 	label: __( 'Featured Image' ),
 	getValue: ( { item } ) => item.featured_media,
 	Edit: FeaturedImageEdit,
