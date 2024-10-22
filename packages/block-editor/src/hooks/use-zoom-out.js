@@ -41,5 +41,5 @@ export function useZoomOut( zoomOut = true ) {
 		} else {
 			resetZoomLevel();
 		}
-	}, [ zoomOut, setZoomLevel, resetZoomLevel ] );
+	}, [ zoomOut, setZoomLevel, resetZoomLevel, isWideViewport ] );
 }
