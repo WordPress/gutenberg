@@ -448,12 +448,7 @@ export default function SearchEdit( {
 						/>
 						<ToggleGroupControl
 							label={ __( 'Percentage Width' ) }
-							value={
-								PERCENTAGE_WIDTHS.includes( width ) &&
-								widthUnit === '%'
-									? width
-									: undefined
-							}
+							value={ width }
 							hideLabelFromVision
 							onChange={ ( newWidth ) => {
 								setAttributes( {
@@ -461,6 +456,7 @@ export default function SearchEdit( {
 									widthUnit: '%',
 								} );
 							} }
+							isBlock
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 						>
