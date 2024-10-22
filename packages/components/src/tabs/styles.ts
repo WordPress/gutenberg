@@ -100,7 +100,7 @@ export const Tab = styled( Ariakit.Tab )`
 		box-shadow: none;
 		cursor: pointer;
 		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
-		padding: ${ space( 4 ) };
+		padding: ${ space( 3 ) } ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 500;
 		text-align: inherit;
