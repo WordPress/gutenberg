@@ -252,6 +252,14 @@ function Iframe( {
 		containerWidth
 	);
 
+	const maxWidth = 750;
+	const scaleValue =
+		scale === 'default'
+			? ( Math.min( containerWidth, maxWidth ) -
+					parseInt( frameSize ) * 2 ) /
+			  scaleContainerWidth
+			: scale;
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -343,7 +351,6 @@ function Iframe( {
 			return;
 		}
 
-		const maxWidth = 750;
 		// Note: When we initialize the zoom out when the canvas is smaller (sidebars open),
 		// initialContainerWidth will be smaller than the full page, and reflow will happen
 		// when the canvas area becomes larger due to sidebars closing. This is a known but
@@ -354,11 +361,7 @@ function Iframe( {
 		// but calc( 100px / 2px ) is not.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
-				? ( Math.min( containerWidth, maxWidth ) -
-						parseInt( frameSize ) * 2 ) /
-						scaleContainerWidth
-				: scale
+			scaleValue
 		);
 
 		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
@@ -404,7 +407,7 @@ function Iframe( {
 			);
 		};
 	}, [
-		scale,
+		scaleValue,
 		frameSize,
 		iframeDocument,
 		iframeWindowInnerHeight,
