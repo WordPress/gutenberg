@@ -749,8 +749,14 @@ describe( 'blocks', () => {
 				title: 'block title',
 				parent: 'core/paragraph',
 			};
-			registerBlockType( 'core/test-block-parent-string', blockType );
-			expect( getBlockType( 'core/test-block-parent-string' ) ).toEqual( {
+			const block = registerBlockType(
+				'core/test-block-parent-string',
+				blockType
+			);
+			expect( console ).toHaveWarnedWith(
+				'Parent must be undefined or an array of strings (block types), but it is a string.'
+			);
+			expect( block ).toEqual( {
 				name: 'core/test-block-parent-string',
 				save: noop,
 				category: 'text',
