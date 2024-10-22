@@ -48,10 +48,14 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 			} else {
 				const { getCurrentTemplateId } = select( editorStore );
 				const templateId = getCurrentTemplateId();
-				const { getContentLockingParent } = unlock(
+				const { getContentLockingParent, getRenderingMode } = unlock(
 					select( blockEditorStore )
 				);
-				if ( ! getContentLockingParent( clientId ) && templateId ) {
+				if (
+					getRenderingMode() === 'template-locked' &&
+					! getContentLockingParent( clientId ) &&
+					templateId
+				) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
 						'wp_template',
