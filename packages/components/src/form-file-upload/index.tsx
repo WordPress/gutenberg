@@ -18,7 +18,7 @@ import type { FormFileUploadProps } from './types';
  *
  * const MyFormFileUpload = () => (
  *   <FormFileUpload
- *     accept="image/*, , image/heic"
+ *     accept="image/*, image/heic"
  *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
  *   >
  *     Upload
