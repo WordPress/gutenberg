@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Bug fixes
+### Breaking changes
 
 - Normalize `blockType.parent` to be an array. While string values were never supported, they appeared to work with some unintended side-effects that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250). For that reason, we've added some code that automatically migrates strings to arrays — though it still raises a warning.
 
