@@ -1672,9 +1672,8 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 						...action.settings,
 				  };
 
-			return {
-				...updatedSettings,
-				get __unstableIsPreviewMode() {
+			Object.defineProperty( updatedSettings, '__unstableIsPreviewMode', {
+				get() {
 					deprecated( '__unstableIsPreviewMode', {
 						since: '19.5',
 						alternative: 'isPreviewMode',
@@ -1682,7 +1681,9 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 
 					return this.isPreviewMode;
 				},
-			};
+			} );
+
+			return updatedSettings;
 		}
 	}
 
