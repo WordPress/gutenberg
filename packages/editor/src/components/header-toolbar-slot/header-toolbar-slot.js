@@ -30,7 +30,6 @@ const PluginHeaderToolbarFill = ( {
 	className = 'plugin-header-toolbar-button',
 	contentClassName = 'plugin-header-toolbar-content',
 } ) => {
-
 	if ( null === renderContent || ! isFunction( renderContent ) ) {
 		warning(
 			'PluginHeaderToolbar requires renderContent property to be specified and be a valid function.'
@@ -54,6 +53,7 @@ const PluginHeaderToolbarFill = ( {
 									aria-expanded={ isOpen }
 									icon={ icon }
 									className="components-button"
+									__next40pxDefaultSize
 								/>
 							) }
 							renderContent={ renderContent }

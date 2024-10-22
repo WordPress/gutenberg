@@ -2,6 +2,9 @@
  * External dependencies
  */
 import clsx from 'clsx';
+/**
+ * Internal dependencies
+ */
 import PluginHeaderToolbar from '../header-toolbar-slot/header-toolbar-slot';
 
 /**
