@@ -68,7 +68,7 @@ export function migrateToListV2( attributes ) {
 		attributes;
 
 	const list = document.createElement( ordered ? 'ol' : 'ul' );
-	list.innerHTML = values;
+	list.innerText = values;
 	if ( start ) {
 		list.setAttribute( 'start', start );
 	}
