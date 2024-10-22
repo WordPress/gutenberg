@@ -93,7 +93,6 @@ function StyleBook( {
 	const settings = useMemo(
 		() => ( {
 			...originalSettings,
-			__unstableIsPreviewMode: true,
 			isPreviewMode: true,
 		} ),
 		[ originalSettings ]
@@ -332,7 +331,6 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		() => ( {
 			...originalSettings,
 			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
 			isPreviewMode: true,
 		} ),
 		[ originalSettings ]

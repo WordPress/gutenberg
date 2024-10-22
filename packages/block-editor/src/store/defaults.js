@@ -168,13 +168,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
 
-	/**
-	 * Use isPreviewMode instead.
-	 *
-	 * @deprecated
-	 */
-	__unstableIsPreviewMode: false,
-
 	isPreviewMode: false,
 
 	// These settings will be completely revamped in the future.

@@ -43,7 +43,6 @@ export default function usePatternSettings() {
 		return {
 			...restStoredSettings,
 			__experimentalBlockPatterns: blockPatterns,
-			__unstableIsPreviewMode: true,
 			isPreviewMode: true,
 		};
 	}, [ storedSettings, blockPatterns ] );

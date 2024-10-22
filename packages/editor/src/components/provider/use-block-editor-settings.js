@@ -74,6 +74,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'imageDimensions',
 	'imageEditing',
 	'imageSizes',
+	'isPreviewMode',
 	'isRTL',
 	'locale',
 	'maxWidth',
@@ -85,8 +86,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'supportsLayout',
 	'widgetTypesToHideFromLegacyWidgetBlock',
 	'__unstableHasCustomAppender',
-	'__unstableIsPreviewMode',
-	'isPreviewMode', // TODO: Reorder this when removing __unstableIsPreviewMode.
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
 ];
