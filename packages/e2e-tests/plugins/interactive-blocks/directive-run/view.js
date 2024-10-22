@@ -21,9 +21,7 @@ directive(
 		element,
 		evaluate,
 	} ) => {
-		const entry = showChildren.find(
-			( { suffix } ) => suffix === 'default'
-		);
+		const entry = showChildren.find( ( { suffix } ) => suffix === null );
 		return evaluate( entry )
 			? element
 			: cloneElement( element, { children: null } );

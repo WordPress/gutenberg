@@ -38,10 +38,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		listViewShortcut,
 		inserterSidebarToggleRef,
 		listViewToggleRef,
-		hasFixedToolbar,
 		showIconLabels,
 	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
 		const {
 			isListViewOpened,
@@ -50,7 +48,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { isZoomOut } = unlock( select( blockEditorStore ) );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -60,11 +58,10 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			isZoomedOutView: isZoomOut(),
 		};
 	}, [] );
 
@@ -99,7 +96,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
-		'Toggle block inserter',
+		'Block Inserter',
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
@@ -137,7 +134,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && ! hasFixedToolbar && (
+						{ isLargeViewport && (
 							<ToolbarItem
 								as={ ToolSelector }
 								showTooltip={ ! showIconLabels }

@@ -24,13 +24,13 @@ function createDoingHook( hooks, storeKey ) {
 
 		// If the hookName was not passed, check for any current hook.
 		if ( 'undefined' === typeof hookName ) {
-			return 'undefined' !== typeof hooksStore.__current[ 0 ];
+			return hooksStore.__current.size > 0;
 		}
 
-		// Return the __current hook.
-		return hooksStore.__current[ 0 ]
-			? hookName === hooksStore.__current[ 0 ].name
-			: false;
+		// Find if the `hookName` hook is in `__current`.
+		return Array.from( hooksStore.__current ).some(
+			( hook ) => hook.name === hookName
+		);
 	};
 }
 

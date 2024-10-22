@@ -239,6 +239,22 @@ _Returns_
 
 -   `boolean`: True if rtl, false if ltr.
 
+### isSelectionForward
+
+Returns true if the given selection object is in the forward direction, or false otherwise.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition>
+
+_Parameters_
+
+-   _selection_ `Selection`: Selection object to check.
+
+_Returns_
+
+-   `boolean`: Whether the selection is forward.
+
 ### isTextContent
 
 _Parameters_

@@ -15,7 +15,7 @@
 		outline: none;
 
 		[data-rich-text-format-boundary] {
-			border-radius: 2px;
+			border-radius: $radius-small;
 		}
 	}
 }

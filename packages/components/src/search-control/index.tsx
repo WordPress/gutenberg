@@ -10,6 +10,7 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { forwardRef, useMemo, useRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -29,6 +30,12 @@ function SuffixItem( {
 }: SuffixItemProps ) {
 	if ( ! onClose && ! value ) {
 		return <Icon icon={ search } />;
+	}
+
+	if ( onClose ) {
+		deprecated( '`onClose` prop in wp.components.SearchControl', {
+			since: '6.8',
+		} );
 	}
 
 	const onReset = () => {
@@ -67,7 +74,7 @@ function UnforwardedSearchControl(
 ) {
 	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
 	// Work with the design team (@WordPress/gutenberg-design) if you need this feature.
-	delete restProps.disabled;
+	const { disabled, ...filteredRestProps } = restProps;
 
 	const searchRef = useRef< HTMLInputElement >( null );
 	const instanceId = useInstanceId(
@@ -77,10 +84,13 @@ function UnforwardedSearchControl(
 
 	const contextValue = useMemo(
 		() => ( {
-			// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-			// to provide backwards compatibile margin for SearchControl.
-			// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
-			BaseControl: { _overrides: { __nextHasNoMarginBottom } },
+			BaseControl: {
+				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+				// to provide backwards compatibile margin for SearchControl.
+				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+				_overrides: { __nextHasNoMarginBottom },
+				__associatedWPComponentName: 'SearchControl',
+			},
 			// `isBorderless` is still experimental and not a public prop for InputControl yet.
 			InputBase: { isBorderless: true },
 		} ),
@@ -114,7 +124,7 @@ function UnforwardedSearchControl(
 						/>
 					</SuffixItemWrapper>
 				}
-				{ ...restProps }
+				{ ...filteredRestProps }
 			/>
 		</ContextSystemProvider>
 	);

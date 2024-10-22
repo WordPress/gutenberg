@@ -11,15 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the customizer nonces REST API routes.
- */
-function gutenberg_register_rest_customizer_nonces() {
-	$customizer_nonces = new WP_Rest_Customizer_Nonces();
-	$customizer_nonces->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_customizer_nonces' );
-
-/**
  * Registers the Block editor settings REST API routes.
  */
 function gutenberg_register_block_editor_settings() {

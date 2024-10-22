@@ -57,7 +57,8 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state: State, kind: string, name: string, ids: string[] ) => {
-			return ids.map( ( id ) => ( {
+			const normalizedIds = Array.isArray( ids ) ? ids : [ ids ];
+			return normalizedIds.map( ( id ) => ( {
 				delete: select( STORE_NAME ).canUser( 'delete', {
 					kind,
 					name,
@@ -90,5 +91,17 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
-	return getEntityRecordsPermissions( state, kind, name, [ id ] )[ 0 ];
+	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
+}
+
+/**
+ * Returns the registered post meta fields for a given post type.
+ *
+ * @param state    Data state.
+ * @param postType Post type.
+ *
+ * @return Registered post meta fields.
+ */
+export function getRegisteredPostMeta( state: State, postType: string ) {
+	return state.registeredPostMeta?.[ postType ] ?? {};
 }

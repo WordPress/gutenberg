@@ -22,7 +22,12 @@ const TestURLPopover = () => {
 
 	return (
 		<>
-			<Button onClick={ () => setVisiblility( true ) }>Edit URL</Button>
+			<Button
+				__next40pxDefaultSize
+				onClick={ () => setVisiblility( true ) }
+			>
+				Edit URL
+			</Button>
 			{ isVisible && (
 				<URLPopover
 					onClose={ close }
@@ -37,6 +42,7 @@ const TestURLPopover = () => {
 					<form onSubmit={ close }>
 						<input type="url" value={ url } onChange={ setUrl } />
 						<Button
+							__next40pxDefaultSize
 							icon={ keyboardReturn }
 							label={ __( 'Apply' ) }
 							type="submit"

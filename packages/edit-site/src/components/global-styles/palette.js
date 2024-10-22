@@ -54,32 +54,35 @@ function Palette( { name } ) {
 	const screenPath = ! name
 		? '/colors/palette'
 		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
-	const paletteButtonText =
-		colors.length > 0 ? __( 'Edit palette' ) : __( 'Add colors' );
 
 	return (
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButtonAsItem
-					path={ screenPath }
-					aria-label={ paletteButtonText }
-				>
+				<NavigationButtonAsItem path={ screenPath }>
 					<HStack direction="row">
-						{ colors.length <= 0 && (
+						{ colors.length > 0 ? (
+							<>
+								<ZStack isLayered={ false } offset={ -8 }>
+									{ colors
+										.slice( 0, 5 )
+										.map( ( { color }, index ) => (
+											<ColorIndicatorWrapper
+												key={ `${ color }-${ index }` }
+											>
+												<ColorIndicator
+													colorValue={ color }
+												/>
+											</ColorIndicatorWrapper>
+										) ) }
+								</ZStack>
+								<FlexItem isBlock>
+									{ __( 'Edit palette' ) }
+								</FlexItem>
+							</>
+						) : (
 							<FlexItem>{ __( 'Add colors' ) }</FlexItem>
 						) }
-						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors
-								.slice( 0, 5 )
-								.map( ( { color }, index ) => (
-									<ColorIndicatorWrapper
-										key={ `${ color }-${ index }` }
-									>
-										<ColorIndicator colorValue={ color } />
-									</ColorIndicatorWrapper>
-								) ) }
-						</ZStack>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>
 				</NavigationButtonAsItem>
@@ -87,6 +90,7 @@ function Palette( { name } ) {
 			{ window.__experimentalEnableColorRandomizer &&
 				themeColors?.length > 0 && (
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						icon={ shuffle }
 						onClick={ randomizeThemeColors }

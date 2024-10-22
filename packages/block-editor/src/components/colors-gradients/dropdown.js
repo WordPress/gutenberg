@@ -88,7 +88,7 @@ const renderToggle =
 		};
 
 		return (
-			<Button { ...toggleProps }>
+			<Button __next40pxDefaultSize { ...toggleProps }>
 				<LabeledColorIndicator
 					colorValue={ colorValue }
 					label={ label }

@@ -126,13 +126,14 @@ function TitleField( { item } ) {
 			<Flex
 				as="div"
 				gap={ 0 }
-				justify="left"
+				justify="flex-start"
 				className="edit-site-patterns__pattern-title"
 			>
 				{ item.type === PATTERN_TYPES.theme ? (
 					title
 				) : (
 					<Button
+						__next40pxDefaultSize
 						variant="link"
 						onClick={ onClick }
 						// Required for the grid's roving tab index system.

@@ -100,10 +100,18 @@ Callback which is called at the start of drag operations.
 
 Function which is called before internal updates to the value state. It receives the upcoming value and may return a modified one.
 
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
+### `__next40pxDefaultSize`
 
 -   Type: `Boolean`
 -   Required: No
 -   Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+### `__nextHasNoMarginBottom`
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

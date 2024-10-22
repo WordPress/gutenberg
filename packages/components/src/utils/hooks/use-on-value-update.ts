@@ -2,11 +2,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
-/**
- * Internal dependencies
- */
-import { useEvent } from './use-event';
+import { useEvent } from '@wordpress/compose';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 
 /**
  * Context object for the `onUpdate` callback of `useOnValueUpdate`.
@@ -30,7 +27,7 @@ export function useOnValueUpdate< T >(
 ) {
 	const previousValueRef = useRef( value );
 	const updateCallbackEvent = useEvent( onUpdate );
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( previousValueRef.current !== value ) {
 			updateCallbackEvent( {
 				previousValue: previousValueRef.current,

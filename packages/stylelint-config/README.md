@@ -30,13 +30,35 @@ If you've globally installed `@wordpress/stylelint-config` using the `-g` flag, 
 
 ## Presets
 
-In addition to the default preset, there is also a SCSS preset. This preset extends both `@wordpress/stylelint-config` and [`stylelint-config-recommended-scss`](https://github.com/kristerkari/stylelint-config-recommended-scss).
+In addition to the default preset, there is also a SCSS preset and 2 stylistic variant presets.
 
 ### SCSS
+
+This preset extends both `@wordpress/stylelint-config` and [`stylelint-config-recommended-scss`](https://github.com/kristerkari/stylelint-config-recommended-scss).
 
 ```json
 {
 	"extends": [ "@wordpress/stylelint-config/scss" ]
+}
+```
+
+### Stylistic
+
+This preset extends `@wordpress/stylelint-config` and adds stylistic rules such as `indentation`.
+
+```json
+{
+	"extends": [ "@wordpress/stylelint-config/stylistic" ]
+}
+```
+
+### SCSS Stylistic
+
+This preset extends`@wordpress/stylelint-config`, `@wordpress/stylelint-config/stylistic` and `@wordpress/stylelint-config/scss`, and adapts some stylistic rules for SCSS.
+
+```json
+{
+	"extends": [ "@wordpress/stylelint-config/scss-stylistic" ]
 }
 ```
 
@@ -48,10 +70,10 @@ For example, to change the `indentation` to four spaces and turn off the `number
 
 ```json
 {
-	"extends": "@wordpress/stylelint-config",
+	"extends": "@wordpress/stylelint-config/stylistic",
 	"rules": {
-		"indentation": 4,
-		"number-leading-zero": null
+		"@stylistic/indentation": 4,
+		"@stylistic/number-leading-zero": null
 	}
 }
 ```

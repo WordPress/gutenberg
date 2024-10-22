@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 9.10.0 (2024-10-16)
+
+## 9.9.0 (2024-10-03)
+
+## 9.8.0 (2024-09-19)
+
+## 9.7.0 (2024-09-05)
+
+## 9.6.0 (2024-08-21)
+
+## 9.5.0 (2024-08-07)
+
+### New Feature
+
+-   Query Loop Block: Moves per page, offset, and pages controls into Inspector Controls. ([#58207](https://github.com/WordPress/gutenberg/pull/58207))
+
 ## 9.4.0 (2024-07-24)
 
 ## 9.3.0 (2024-07-10)

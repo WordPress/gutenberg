@@ -7,8 +7,8 @@
 
 .block-editor-block-draggable-chip {
 	background-color: $gray-900;
-	border-radius: $radius-block-ui;
-	box-shadow: 0 6px 8px rgba($black, 0.3);
+	border-radius: $radius-small;
+	box-shadow: $elevation-small;
 	color: $white;
 	cursor: grabbing;
 	display: inline-flex;
@@ -77,6 +77,6 @@
 	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
 		background-color: $gray-700;
 		opacity: 1;
-		box-shadow: 0 4px 8px rgba($black, 0.2);
+		box-shadow: $elevation-small;
 	}
 }

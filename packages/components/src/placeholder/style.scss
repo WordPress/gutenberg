@@ -19,7 +19,7 @@
 
 
 	// Block UI appearance.
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;	// Match the block toolbar material radius.
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
@@ -144,6 +144,9 @@
 	display: flex;
 	box-shadow: none;
 
+	// In the unselected state, radius should match Global Styles > Image > Radius.
+	border-radius: 0;
+
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
 	backdrop-filter: blur(100px);
@@ -183,8 +186,17 @@
 		}
 	}
 
-	// By painting the borders here, we enable them to be replaced by the Border control.
-	@include placeholder-style();
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: currentColor;
+		opacity: 0.1;
+	}
 
 	overflow: hidden;
 	.is-selected & {

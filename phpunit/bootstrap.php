@@ -24,12 +24,6 @@ if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 define( 'GUTENBERG_DIR_TESTDATA', __DIR__ . '/data/' );
 define( 'GUTENBERG_DIR_TESTFIXTURES', __DIR__ . '/fixtures/' );
 
-// Pretend that these are Core unit tests. This is needed so that
-// wp_theme_has_theme_json() does not cache its return value between each test.
-if ( ! defined( 'WP_RUN_CORE_TESTS' ) ) {
-	define( 'WP_RUN_CORE_TESTS', true );
-}
-
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
 
@@ -95,6 +89,8 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-widget-experiments' => '1',
 		'gutenberg-full-site-editing'  => 1,
 		'gutenberg-form-blocks'        => 1,
+		'gutenberg-block-experiments'  => 1,
+		'gutenberg-media-processing'   => 1,
 	),
 );
 

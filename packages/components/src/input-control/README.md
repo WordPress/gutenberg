@@ -107,3 +107,11 @@ The current value of the input.
 
 -   Type: `String`
 -   Required: No
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

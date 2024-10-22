@@ -34,7 +34,14 @@ export default function Shuffle( { clientId, as = Container } ) {
 			const _categories = attributes?.metadata?.categories || EMPTY_ARRAY;
 			const _patternName = attributes?.metadata?.patternName;
 			const rootBlock = getBlockRootClientId( clientId );
-			const _patterns = __experimentalGetAllowedPatterns( rootBlock );
+
+			// Calling `__experimentalGetAllowedPatterns` is expensive.
+			// Checking if the block can be shuffled prevents unnecessary selector calls.
+			// See: https://github.com/WordPress/gutenberg/pull/64736.
+			const _patterns =
+				_categories.length > 0
+					? __experimentalGetAllowedPatterns( rootBlock )
+					: EMPTY_ARRAY;
 			return {
 				categories: _categories,
 				patterns: _patterns,
@@ -45,12 +52,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 	);
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const sameCategoryPatternsWithSingleWrapper = useMemo( () => {
-		if (
-			! categories ||
-			categories.length === 0 ||
-			! patterns ||
-			patterns.length === 0
-		) {
+		if ( categories.length === 0 || ! patterns || patterns.length === 0 ) {
 			return EMPTY_ARRAY;
 		}
 		return patterns.filter( ( pattern ) => {

@@ -11,12 +11,11 @@ import {
 	ToggleControl,
 	TextControl,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function InitPatternModal() {
 	const { editPost } = useDispatch( editorStore );
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ title, setTitle ] = useState( '' );
 
@@ -28,14 +27,9 @@ export default function InitPatternModal() {
 			isNewPost: isCleanNewPost(),
 		};
 	}, [] );
-
-	useEffect( () => {
-		if ( isNewPost && postType === 'wp_block' ) {
-			setIsModalOpen( true );
-		}
-		// We only want the modal to open when the page is first loaded.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
+	const [ isModalOpen, setIsModalOpen ] = useState(
+		() => isNewPost && postType === 'wp_block'
+	);
 
 	if ( postType !== 'wp_block' || ! isNewPost ) {
 		return null;
@@ -74,6 +68,7 @@ export default function InitPatternModal() {
 								__next40pxDefaultSize
 							/>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
@@ -87,6 +82,7 @@ export default function InitPatternModal() {
 							/>
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="primary"
 									type="submit"
 									disabled={ ! title }

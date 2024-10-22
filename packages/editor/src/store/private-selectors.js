@@ -25,7 +25,10 @@ import {
 	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
-import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
+import {
+	getEntityActions as _getEntityActions,
+	isEntityReady as _isEntityReady,
+} from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -34,13 +37,13 @@ const EMPTY_INSERTION_POINT = {
 };
 
 /**
- * Get the insertion point for the inserter.
+ * Get the inserter.
  *
  * @param {Object} state Global application state.
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export const getInsertionPoint = createRegistrySelector( ( select ) =>
+export const getInserter = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state ) => {
 			if ( typeof state.blockInserterPanel === 'object' ) {
@@ -110,7 +113,10 @@ export const getPostIcon = createRegistrySelector(
 			// `icon` is the `menu_icon` property of a post type. We
 			// only handle `dashicons` for now, even if the `menu_icon`
 			// also supports urls and svg as values.
-			if ( postTypeEntity?.icon?.startsWith( 'dashicons-' ) ) {
+			if (
+				typeof postTypeEntity?.icon === 'string' &&
+				postTypeEntity.icon.startsWith( 'dashicons-' )
+			) {
 				return postTypeEntity.icon.slice( 10 );
 			}
 			return pageIcon;
@@ -159,6 +165,10 @@ export const hasPostMetaChanges = createRegistrySelector(
 
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
+}
+
+export function isEntityReady( state, ...args ) {
+	return _isEntityReady( state.dataviews, ...args );
 }
 
 /**

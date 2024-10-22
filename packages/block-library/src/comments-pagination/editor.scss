@@ -5,7 +5,7 @@ $pagination-margin: 0.5em;
 	justify-content: center;
 }
 
-.editor-styles-wrapper {
+:where(.editor-styles-wrapper) {
 	.wp-block-comments-pagination {
 		max-width: 100%;
 		&.block-editor-block-list__layout {

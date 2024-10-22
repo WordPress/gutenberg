@@ -117,6 +117,41 @@ and should be registered in WordPress using the Modules API.
 
 This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll look for a webpack config in the top-level directory of your package and will use it if it finds one. If none is found, it’ll use the default config provided by `@wordpress/scripts` packages. Learn more in the [Advanced Usage](#advanced-usage) section.
 
+
+### `build-blocks-manifest`
+
+This script generates a PHP file containing block metadata from all
+`block.json` files in the project. This is useful for enhancing performance
+when registering multiple block types, as it allows you to use
+`wp_register_block_metadata_collection()` in WordPress.
+
+Usage: `wp-scripts build-blocks-manifest [options]`
+
+Options:
+- `--input`: Specify the input directory (default: 'build')
+- `--output`: Specify the output file path (default: 'build/blocks-manifest.php')
+
+Example:
+```bash
+wp-scripts build-blocks-manifest --input=src --output=dist/blocks-manifest.php
+```
+
+This command will scan the specified input directory for `block.json` files,
+compile their metadata into a single PHP file, and output it to the specified
+location. You can then use this file with
+`wp_register_block_metadata_collection()` in your plugin:
+
+```php
+wp_register_block_metadata_collection(
+    plugin_dir_path( __FILE__ ) . 'dist',
+    plugin_dir_path( __FILE__ ) . 'dist/blocks-manifest.php'
+);
+```
+
+Using this approach can improve performance when registering multiple block
+types, especially for plugins with several custom blocks. Note that this
+feature is only available in WordPress 6.7 and later versions.
+
 ### `check-engines`
 
 Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code.

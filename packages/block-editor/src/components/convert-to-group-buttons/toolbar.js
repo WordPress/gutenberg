@@ -85,27 +85,27 @@ function BlockGroupToolbar() {
 		<ToolbarGroup>
 			<ToolbarButton
 				icon={ group }
-				label={ _x( 'Group', 'verb' ) }
+				label={ _x( 'Group', 'action: convert blocks to group' ) }
 				onClick={ onConvertToGroup }
 			/>
 			{ canInsertRow && (
 				<ToolbarButton
 					icon={ row }
-					label={ _x( 'Row', 'single horizontal line' ) }
+					label={ _x( 'Row', 'action: convert blocks to row' ) }
 					onClick={ onConvertToRow }
 				/>
 			) }
 			{ canInsertStack && (
 				<ToolbarButton
 					icon={ stack }
-					label={ _x( 'Stack', 'verb' ) }
+					label={ _x( 'Stack', 'action: convert blocks to stack' ) }
 					onClick={ onConvertToStack }
 				/>
 			) }
 			{ canInsertGrid && (
 				<ToolbarButton
 					icon={ grid }
-					label={ _x( 'Grid', 'verb' ) }
+					label={ _x( 'Grid', 'action: convert blocks to grid' ) }
 					onClick={ onConvertToGrid }
 				/>
 			) }

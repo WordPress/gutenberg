@@ -21,9 +21,9 @@ const ANIMATION_PARAMS = {
 };
 
 const INLINE_PADDING = {
-	compact: 8, // space(2)
-	small: 8, // space(2)
-	default: 16, // space(4)
+	compact: CONFIG.controlPaddingXSmall,
+	small: CONFIG.controlPaddingXSmall,
+	default: CONFIG.controlPaddingX,
 };
 
 const getSelectSize = (
@@ -118,8 +118,9 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	flex-direction: column;
 
 	background-color: ${ COLORS.theme.background };
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	border: 1px solid ${ COLORS.theme.foreground };
+	box-shadow: ${ CONFIG.elevationMedium };
 
 	/* z-index(".components-popover") */
 	z-index: 1000000;
@@ -132,12 +133,13 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	min-width: min-content;
 
 	/* Animation */
-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	animation-name: ${ slideDownAndFade };
-	will-change: transform, opacity;
-	@media ( prefers-reduced-motion ) {
-		animation-duration: 0s;
+	&[data-open] {
+		@media not ( prefers-reduced-motion ) {
+			animation-duration: ${ ANIMATION_PARAMS.DURATION };
+			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+			animation-name: ${ slideDownAndFade };
+			will-change: transform, opacity;
+		}
 	}
 
 	&[data-focus-visible] {

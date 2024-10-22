@@ -2,31 +2,19 @@
  * WordPress dependencies
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import Editor from '../editor';
-import PostList from '../post-list';
-import PagePatterns from '../page-patterns';
-import PageTemplates from '../page-templates';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
-import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
-import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
-import DataViewsSidebarContent from '../sidebar-dataviews';
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
-import { PostEdit } from '../post-edit';
+import { store as editSiteStore } from '../../store';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -73,129 +61,26 @@ function useRedirectOldPaths() {
 	}, [ history, params ] );
 }
 
-export default function useLayoutAreas() {
+export default function useActiveRoute() {
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas, quickEdit } =
-		params;
-	const hasEditCanvasMode = canvas === 'edit';
 	useRedirectOldPaths();
-
-	// Page list
-	if ( postType === 'page' ) {
-		const isListLayout = layout === 'list' || ! layout;
-		const showQuickEdit = quickEdit && ! isListLayout;
-		return {
-			key: 'pages',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreen
-						title={ __( 'Pages' ) }
-						backPath={ {} }
-						content={ <DataViewsSidebarContent /> }
-					/>
-				),
-				content: <PostList postType={ postType } />,
-				preview: ! showQuickEdit &&
-					( isListLayout || hasEditCanvasMode ) && <Editor />,
-				mobile: hasEditCanvasMode ? (
-					<Editor />
-				) : (
-					<PostList postType={ postType } />
-				),
-				edit: showQuickEdit && (
-					<PostEdit postType={ postType } postId={ postId } />
-				),
-			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-				edit: showQuickEdit ? 380 : undefined,
-			},
-		};
-	}
-
-	// Templates
-	if ( postType === TEMPLATE_POST_TYPE ) {
-		const isListLayout = isCustom !== 'true' && layout === 'list';
-		return {
-			key: 'templates',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
-				),
-				content: <PageTemplates />,
-				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
-				mobile: hasEditCanvasMode ? <Editor /> : <PageTemplates />,
-			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
-		};
-	}
-
-	// Patterns
-	if (
-		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.user ].includes( postType )
-	) {
-		return {
-			key: 'patterns',
-			areas: {
-				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
-				content: <PagePatterns />,
-				mobile: hasEditCanvasMode ? <Editor /> : <PagePatterns />,
-				preview: hasEditCanvasMode && <Editor />,
-			},
-		};
-	}
-
-	// Styles
-	if ( path === '/wp_global_styles' ) {
-		return {
-			key: 'styles',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
-				),
-				preview: <Editor />,
-				mobile: hasEditCanvasMode && <Editor />,
-			},
-		};
-	}
-
-	// Navigation
-	if ( postType === NAVIGATION_POST_TYPE ) {
-		if ( postId ) {
+	const routes = useSelect( ( select ) => {
+		return unlock( select( editSiteStore ) ).getRoutes();
+	}, [] );
+	return useMemo( () => {
+		const matchedRoute = routes.find( ( route ) => route.match( params ) );
+		if ( ! matchedRoute ) {
 			return {
-				key: 'navigation',
-				areas: {
-					sidebar: (
-						<SidebarNavigationScreenNavigationMenu
-							backPath={ { postType: NAVIGATION_POST_TYPE } }
-						/>
-					),
-					preview: <Editor />,
-					mobile: hasEditCanvasMode && <Editor />,
-				},
+				key: 404,
+				areas: {},
+				widths: {},
 			};
 		}
-		return {
-			key: 'navigation',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
-				),
-				preview: <Editor />,
-				mobile: hasEditCanvasMode && <Editor />,
-			},
-		};
-	}
 
-	// Fallback shows the home page preview
-	return {
-		key: 'default',
-		areas: {
-			sidebar: <SidebarNavigationScreenMain />,
-			preview: <Editor />,
-			mobile: hasEditCanvasMode && <Editor />,
-		},
-	};
+		return {
+			name: matchedRoute.name,
+			areas: matchedRoute.areas,
+			widths: matchedRoute.widths,
+		};
+	}, [ routes, params ] );
 }

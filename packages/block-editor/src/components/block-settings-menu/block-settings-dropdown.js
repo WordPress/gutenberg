@@ -58,7 +58,6 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = clientIds[ 0 ];
 	const {
 		firstParentClientId,
-		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
 		selectedBlockClientIds,
@@ -67,7 +66,6 @@ export function BlockSettingsDropdown( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
@@ -86,7 +84,6 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
 					( getActiveBlockVariation(
@@ -186,6 +183,9 @@ export function BlockSettingsDropdown( {
 		}
 	}
 
+	const shouldShowBlockParentMenuItem =
+		! parentBlockIsSelected && !! firstParentClientId;
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -195,7 +195,6 @@ export function BlockSettingsDropdown( {
 				canCopyStyles,
 				canDuplicate,
 				canInsertBlock,
-				canMove,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
@@ -203,26 +202,39 @@ export function BlockSettingsDropdown( {
 				onRemove,
 				onCopy,
 				onPasteStyles,
-				onMoveTo,
-			} ) => (
-				<DropdownMenu
-					icon={ moreVertical }
-					label={ __( 'Options' ) }
-					className="block-editor-block-settings-menu"
-					popoverProps={ POPOVER_PROPS }
-					open={ open }
-					onToggle={ onToggle }
-					noIcons
-					{ ...props }
-				>
-					{ ( { onClose } ) => (
-						<>
-							<MenuGroup>
-								<__unstableBlockSettingsMenuFirstItem.Slot
-									fillProps={ { onClose } }
-								/>
-								{ ! parentBlockIsSelected &&
-									!! firstParentClientId && (
+			} ) => {
+				// It is possible that some plugins register fills for this menu
+				// even if Core doesn't render anything in the block settings menu.
+				// in which case, we may want to render the menu anyway.
+				// That said for now, we can start more conservative.
+				const isEmpty =
+					! canRemove &&
+					! canDuplicate &&
+					! canInsertBlock &&
+					isContentOnly;
+
+				if ( isEmpty ) {
+					return null;
+				}
+
+				return (
+					<DropdownMenu
+						icon={ moreVertical }
+						label={ __( 'Options' ) }
+						className="block-editor-block-settings-menu"
+						popoverProps={ POPOVER_PROPS }
+						open={ open }
+						onToggle={ onToggle }
+						noIcons
+						{ ...props }
+					>
+						{ ( { onClose } ) => (
+							<>
+								<MenuGroup>
+									<__unstableBlockSettingsMenuFirstItem.Slot
+										fillProps={ { onClose } }
+									/>
+									{ shouldShowBlockParentMenuItem && (
 										<BlockParentSelectorMenuItem
 											parentClientId={
 												firstParentClientId
@@ -230,101 +242,103 @@ export function BlockSettingsDropdown( {
 											parentBlockType={ parentBlockType }
 										/>
 									) }
-								{ count === 1 && (
-									<BlockHTMLConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
-								{ ! isContentOnly && (
-									<CopyMenuItem
-										clientIds={ clientIds }
-										onCopy={ onCopy }
-										shortcut={ displayShortcut.primary(
-											'c'
-										) }
-									/>
-								) }
-								{ canDuplicate && (
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onDuplicate,
-											updateSelectionAfterDuplicate
-										) }
-										shortcut={ shortcuts.duplicate }
-									>
-										{ __( 'Duplicate' ) }
-									</MenuItem>
-								) }
-								{ canInsertBlock && ! isContentOnly && (
-									<>
+									{ count === 1 && (
+										<BlockHTMLConvertButton
+											clientId={ firstBlockClientId }
+										/>
+									) }
+									{ ! isContentOnly && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											onCopy={ onCopy }
+											shortcut={ displayShortcut.primary(
+												'c'
+											) }
+										/>
+									) }
+									{ canDuplicate && (
 										<MenuItem
 											onClick={ pipe(
 												onClose,
-												onInsertBefore
+												onDuplicate,
+												updateSelectionAfterDuplicate
 											) }
-											shortcut={ shortcuts.insertBefore }
+											shortcut={ shortcuts.duplicate }
 										>
-											{ __( 'Add before' ) }
+											{ __( 'Duplicate' ) }
 										</MenuItem>
+									) }
+									{ canInsertBlock && ! isContentOnly && (
+										<>
+											<MenuItem
+												onClick={ pipe(
+													onClose,
+													onInsertBefore
+												) }
+												shortcut={
+													shortcuts.insertBefore
+												}
+											>
+												{ __( 'Add before' ) }
+											</MenuItem>
+											<MenuItem
+												onClick={ pipe(
+													onClose,
+													onInsertAfter
+												) }
+												shortcut={
+													shortcuts.insertAfter
+												}
+											>
+												{ __( 'Add after' ) }
+											</MenuItem>
+										</>
+									) }
+								</MenuGroup>
+								{ canCopyStyles && ! isContentOnly && (
+									<MenuGroup>
+										<CopyMenuItem
+											clientIds={ clientIds }
+											onCopy={ onCopy }
+											label={ __( 'Copy styles' ) }
+										/>
+										<MenuItem onClick={ onPasteStyles }>
+											{ __( 'Paste styles' ) }
+										</MenuItem>
+									</MenuGroup>
+								) }
+								<BlockSettingsMenuControls.Slot
+									fillProps={ {
+										onClose,
+										count,
+										firstBlockClientId,
+									} }
+									clientIds={ clientIds }
+								/>
+								{ typeof children === 'function'
+									? children( { onClose } )
+									: Children.map( ( child ) =>
+											cloneElement( child, { onClose } )
+									  ) }
+								{ canRemove && (
+									<MenuGroup>
 										<MenuItem
 											onClick={ pipe(
 												onClose,
-												onInsertAfter
+												onRemove,
+												updateSelectionAfterRemove
 											) }
-											shortcut={ shortcuts.insertAfter }
+											shortcut={ shortcuts.remove }
 										>
-											{ __( 'Add after' ) }
+											{ __( 'Delete' ) }
 										</MenuItem>
-									</>
+									</MenuGroup>
 								) }
-							</MenuGroup>
-							{ canCopyStyles && ! isContentOnly && (
-								<MenuGroup>
-									<CopyMenuItem
-										clientIds={ clientIds }
-										onCopy={ onCopy }
-										label={ __( 'Copy styles' ) }
-									/>
-									<MenuItem onClick={ onPasteStyles }>
-										{ __( 'Paste styles' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-							<BlockSettingsMenuControls.Slot
-								fillProps={ {
-									onClose,
-									canMove,
-									onMoveTo,
-									onlyBlock,
-									count,
-									firstBlockClientId,
-								} }
-								clientIds={ clientIds }
-							/>
-							{ typeof children === 'function'
-								? children( { onClose } )
-								: Children.map( ( child ) =>
-										cloneElement( child, { onClose } )
-								  ) }
-							{ canRemove && (
-								<MenuGroup>
-									<MenuItem
-										onClick={ pipe(
-											onClose,
-											onRemove,
-											updateSelectionAfterRemove
-										) }
-										shortcut={ shortcuts.remove }
-									>
-										{ __( 'Delete' ) }
-									</MenuItem>
-								</MenuGroup>
-							) }
-						</>
-					) }
-				</DropdownMenu>
-			) }
+							</>
+						) }
+					</DropdownMenu>
+				);
+			} }
 		</BlockActions>
 	);
 }

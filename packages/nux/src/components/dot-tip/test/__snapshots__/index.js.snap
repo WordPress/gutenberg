@@ -7,7 +7,7 @@ exports[`DotTip should render correctly 1`] = `
   data-wp-c16t="true"
   data-wp-component="Popover"
   role="dialog"
-  style="position: absolute; top: 0px; left: 0px; opacity: 1; transform: translateX(0px) translateY(0px) translateX(0em) scale(1) translateZ(0); transform-origin: 0% 50% 0;"
+  style="position: absolute; top: 0px; left: 0px; transform: none;"
   tabindex="-1"
 >
   <div
@@ -19,7 +19,7 @@ exports[`DotTip should render correctly 1`] = `
     </p>
     <p>
       <button
-        class="components-button is-link"
+        class="components-button is-next-40px-default-size is-link"
         type="button"
       >
         Got it
@@ -27,7 +27,7 @@ exports[`DotTip should render correctly 1`] = `
     </p>
     <button
       aria-label="Disable tips"
-      class="components-button nux-dot-tip__disable has-icon"
+      class="components-button nux-dot-tip__disable is-small has-icon"
       type="button"
     >
       <svg

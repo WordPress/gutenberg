@@ -58,10 +58,6 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_update_ignore_hooked_blocks_meta_preserves_entities() {
-		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
-			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
-		}
-
 		register_block_type(
 			'tests/my-block',
 			array(
@@ -97,10 +93,6 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_dont_modify_no_post_id() {
-		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
-			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
-		}
-
 		register_block_type(
 			'tests/my-block',
 			array(
@@ -127,10 +119,6 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_retains_content_if_not_set() {
-		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
-			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
-		}
-
 		register_block_type(
 			'tests/my-block',
 			array(

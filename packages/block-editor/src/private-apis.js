@@ -6,7 +6,6 @@ import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
-import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
 	extractWords,
@@ -16,7 +15,7 @@ import {
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
+import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -33,11 +32,13 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import { useZoomOutModeExit } from './components/block-list/use-block-props/use-zoom-out-mode-exit';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	sectionRootClientIdKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -58,7 +59,6 @@ lock( privateApis, {
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
-	PrivateInserter,
 	PrivateQuickInserter,
 	extractWords,
 	getNormalizedSearchTerms,
@@ -68,7 +68,6 @@ lock( privateApis, {
 	BlockInfo,
 	useHasBlockToolbar,
 	cleanEmptyObject,
-	useStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,
@@ -80,6 +79,7 @@ lock( privateApis, {
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
+	useZoomOutModeExit,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
@@ -93,4 +93,5 @@ lock( privateApis, {
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
+	sectionRootClientIdKey,
 } );

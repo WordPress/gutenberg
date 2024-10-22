@@ -24,20 +24,16 @@ test.describe( 'Site Editor Inserter', () => {
 	test( 'inserter toggle button should toggle global inserter', async ( {
 		page,
 	} ) => {
-		await page.click( 'role=button[name="Toggle block inserter"i]' );
+		await page.click( 'role=button[name="Block Inserter"i]' );
 
 		// Visibility check
 		await expect(
-			page.locator(
-				'role=searchbox[name="Search for blocks and patterns"i]'
-			)
+			page.locator( 'role=searchbox[name="Search"i]' )
 		).toBeVisible();
-		await page.click( 'role=button[name="Toggle block inserter"i]' );
+		await page.click( 'role=button[name="Block Inserter"i]' );
 		//Hidden State check
 		await expect(
-			page.locator(
-				'role=searchbox[name="Search for blocks and patterns"i]'
-			)
+			page.locator( 'role=searchbox[name="Search"i]' )
 		).toBeHidden();
 	} );
 
@@ -47,7 +43,8 @@ test.describe( 'Site Editor Inserter', () => {
 		editor,
 	} ) => {
 		const inserterButton = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+			name: 'Block Inserter',
+			exact: true,
 		} );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -15,30 +20,41 @@ import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { ActionItem } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
-import { speak } from '@wordpress/a11y';
+import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
 		useSelect( ( select ) => {
 			const { getDeviceType, getCurrentPostType } = select( editorStore );
-			const { getUnstableBase, getPostType } = select( coreStore );
+			const { getEntityRecord, getPostType } = select( coreStore );
 			const { get } = select( preferencesStore );
 			const _currentPostType = getCurrentPostType();
 			return {
 				deviceType: getDeviceType(),
-				homeUrl: getUnstableBase()?.home,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				isTemplate: _currentPostType === 'wp_template',
 				isViewable: getPostType( _currentPostType )?.viewable ?? false,
 				showIconLabels: get( 'core', 'showIconLabels' ),
 			};
 		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+
+	const handleDevicePreviewChange = ( newDeviceType ) => {
+		setDeviceType( newDeviceType );
+		__unstableSetEditorMode( 'edit' );
+		resetZoomLevel();
+	};
+
 	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) {
 		return null;
@@ -49,6 +65,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 	const toggleProps = {
 		className: 'editor-preview-dropdown__toggle',
+		iconPosition: 'right',
 		size: 'compact',
 		showTooltip: ! showIconLabels,
 		disabled,
@@ -59,9 +76,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const deviceIcons = {
+		desktop,
 		mobile,
 		tablet,
-		desktop,
 	};
 
 	/**
@@ -87,41 +104,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		},
 	];
 
-	/**
-	 * The selected choice.
-	 *
-	 * @type {Object}
-	 */
-	let selectedChoice = choices.find(
-		( choice ) => choice.value === deviceType
-	);
-
-	/**
-	 * If no selected choice is found, default to the first
-	 */
-	if ( ! selectedChoice ) {
-		selectedChoice = choices[ 0 ];
-	}
-
-	/**
-	 * Handles the selection of a device type.
-	 *
-	 * @param {string} value The device type.
-	 */
-	const onSelect = ( value ) => {
-		setDeviceType( value );
-		if ( value === 'Desktop' ) {
-			speak( __( 'Desktop selected' ), 'assertive' );
-		} else if ( value === 'Tablet' ) {
-			speak( __( 'Tablet selected' ), 'assertive' );
-		} else {
-			speak( __( 'Mobile selected' ), 'assertive' );
-		}
-	};
-
 	return (
 		<DropdownMenu
-			className="editor-preview-dropdown"
+			className={ clsx(
+				'editor-preview-dropdown',
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
@@ -134,8 +122,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					<MenuGroup>
 						<MenuItemsChoice
 							choices={ choices }
-							value={ selectedChoice.value }
-							onSelect={ onSelect }
+							value={ deviceType }
+							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
 					{ isTemplate && (
@@ -173,6 +161,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							/>
 						</MenuGroup>
 					) }
+					<ActionItem.Slot
+						name="core/plugin-preview-menu"
+						as={ MenuGroup }
+						fillProps={ { onClick: onClose } }
+					/>
 				</>
 			) }
 		</DropdownMenu>

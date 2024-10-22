@@ -11,6 +11,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalVStack as VStack,
 	Disabled,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -106,64 +107,87 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		setAttributes( updateObj );
 	};
 
+	// Remove border styles from the server-side attributes to prevent duplicate border.
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+		},
+	};
+
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				<SelectControl
-					__nextHasNoMarginBottom
-					label={ __( 'Taxonomy' ) }
-					options={ getTaxonomyOptions() }
-					value={ taxonomy }
-					onChange={ ( selectedTaxonomy ) =>
-						setAttributes( { taxonomy: selectedTaxonomy } )
-					}
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Show post counts' ) }
-					checked={ showTagCounts }
-					onChange={ () =>
-						setAttributes( { showTagCounts: ! showTagCounts } )
-					}
-				/>
-				<RangeControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Number of tags' ) }
-					value={ numberOfTags }
-					onChange={ ( value ) =>
-						setAttributes( { numberOfTags: value } )
-					}
-					min={ MIN_TAGS }
-					max={ MAX_TAGS }
-					required
-				/>
-				<Flex>
-					<FlexItem isBlock>
-						<UnitControl
-							label={ __( 'Smallest size' ) }
-							value={ smallestFontSize }
-							onChange={ ( value ) => {
-								onFontSizeChange( 'smallestFontSize', value );
-							} }
-							units={ units }
-							min={ MIN_FONT_SIZE }
-							max={ MAX_FONT_SIZE }
-						/>
-					</FlexItem>
-					<FlexItem isBlock>
-						<UnitControl
-							label={ __( 'Largest size' ) }
-							value={ largestFontSize }
-							onChange={ ( value ) => {
-								onFontSizeChange( 'largestFontSize', value );
-							} }
-							units={ units }
-							min={ MIN_FONT_SIZE }
-							max={ MAX_FONT_SIZE }
-						/>
-					</FlexItem>
-				</Flex>
+				<VStack
+					spacing={ 4 }
+					className="wp-block-tag-cloud__inspector-settings"
+				>
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Taxonomy' ) }
+						options={ getTaxonomyOptions() }
+						value={ taxonomy }
+						onChange={ ( selectedTaxonomy ) =>
+							setAttributes( { taxonomy: selectedTaxonomy } )
+						}
+					/>
+					<Flex gap={ 4 }>
+						<FlexItem isBlock>
+							<UnitControl
+								label={ __( 'Smallest size' ) }
+								value={ smallestFontSize }
+								onChange={ ( value ) => {
+									onFontSizeChange(
+										'smallestFontSize',
+										value
+									);
+								} }
+								units={ units }
+								min={ MIN_FONT_SIZE }
+								max={ MAX_FONT_SIZE }
+								size="__unstable-large"
+							/>
+						</FlexItem>
+						<FlexItem isBlock>
+							<UnitControl
+								label={ __( 'Largest size' ) }
+								value={ largestFontSize }
+								onChange={ ( value ) => {
+									onFontSizeChange(
+										'largestFontSize',
+										value
+									);
+								} }
+								units={ units }
+								min={ MIN_FONT_SIZE }
+								max={ MAX_FONT_SIZE }
+								size="__unstable-large"
+							/>
+						</FlexItem>
+					</Flex>
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Number of tags' ) }
+						value={ numberOfTags }
+						onChange={ ( value ) =>
+							setAttributes( { numberOfTags: value } )
+						}
+						min={ MIN_TAGS }
+						max={ MAX_TAGS }
+						required
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Show tag counts' ) }
+						checked={ showTagCounts }
+						onChange={ () =>
+							setAttributes( { showTagCounts: ! showTagCounts } )
+						}
+					/>
+				</VStack>
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -176,7 +200,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<ServerSideRender
 						skipBlockSupportAttributes
 						block="core/tag-cloud"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>

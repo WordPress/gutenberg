@@ -1,7 +1,7 @@
 .components-accessible-toolbar {
 	display: inline-flex;
 	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	flex-shrink: 0;
 
 	& > .components-toolbar-group:last-child {
@@ -47,7 +47,7 @@
 			content: "";
 			position: absolute;
 			display: block;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			height: $grid-unit-40;
 
 			// Position the focus rectangle.
