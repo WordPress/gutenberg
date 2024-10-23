@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,24 +22,43 @@ export function useZoomOut( zoomOut = true ) {
 	);
 	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
 	const isWideViewport = useViewportMatch( 'large' );
+	const programatticEnterZoomOut = useRef( null );
 
 	useEffect( () => {
 		const isZoomOutOnMount = isZoomOut();
 
 		return () => {
-			if ( isZoomOutOnMount && isWideViewport ) {
+			// We never changed modes for them, so there is nothing to do.
+			if ( programatticEnterZoomOut.current === null ) {
+				return;
+			}
+
+			// If we exited zoom out for them and they were originally in zoom out mode, enter zoom out again.
+			if (
+				programatticEnterZoomOut.current === false &&
+				isZoomOutOnMount &&
+				isWideViewport
+			) {
 				setZoomLevel( 'auto-scaled' );
-			} else {
+			}
+			// We entered zoom out for them, and they were not originally in zoom out mode, so reset the zoom level.
+			else if (
+				programatticEnterZoomOut.current === true &&
+				isZoomOut() &&
+				! isZoomOutOnMount
+			) {
 				resetZoomLevel();
 			}
 		};
 	}, [] );
 
 	useEffect( () => {
-		if ( zoomOut && isWideViewport ) {
+		if ( zoomOut && ! isZoomOut() && isWideViewport ) {
+			programatticEnterZoomOut.current = true;
 			setZoomLevel( 'auto-scaled' );
-		} else {
+		} else if ( ! zoomOut && isZoomOut() ) {
+			programatticEnterZoomOut.current = false;
 			resetZoomLevel();
 		}
-	}, [ zoomOut, setZoomLevel, resetZoomLevel, isWideViewport ] );
+	}, [ zoomOut, isZoomOut, setZoomLevel, resetZoomLevel, isWideViewport ] );
 }
