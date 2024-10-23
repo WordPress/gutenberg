@@ -310,8 +310,9 @@ const parseCache = new Map();
  * @return {Array} Block list.
  */
 export default function parse( content, options ) {
+	const cacheKey = JSON.stringify( { content, options } );
 	if ( parseCache.has( content ) ) {
-		return parseCache.get( content );
+		return parseCache.get( cacheKey );
 	}
 
 	const parsed = grammarParse( content ).reduce(
@@ -324,7 +325,7 @@ export default function parse( content, options ) {
 		},
 		[]
 	);
-	parseCache.set( content, parsed );
+	parseCache.set( cacheKey, parsed );
 
 	return parsed;
 }
