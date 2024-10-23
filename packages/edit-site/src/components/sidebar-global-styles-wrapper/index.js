@@ -37,7 +37,7 @@ export default function GlobalStylesUIWrapper() {
 		];
 	}, [ pathWithPrefix, history ] );
 	return (
-		<Page className="edit-site-styes" title={ __( 'Styles' ) }>
+		<Page className="edit-site-styles" title={ __( 'Styles' ) }>
 			<GlobalStylesUI path={ path } onPathChange={ onPathChange } />
 		</Page>
 	);

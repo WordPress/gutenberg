@@ -1,5 +1,6 @@
-.edit-site-styes .edit-site-page-content {
+.edit-site-styles .edit-site-page-content {
 	.edit-site-global-styles-screen-root {
+		box-shadow: none;
 		& > div > hr {
 			display: none;
 		}
@@ -9,12 +10,15 @@
 			border-top: none;
 		}
 		overflow-y: auto;
-		padding-top: $grid-unit-15;
-		padding-left: $grid-unit-50;
-		padding-right: $grid-unit-50;
-		@container (max-width: 430px) {
+		padding-left: 0;
+		padding-right: 0;
+
+		.edit-site-global-styles-sidebar__navigator-screen {
+			padding-top: $grid-unit-15;
 			padding-left: $grid-unit-15;
 			padding-right: $grid-unit-15;
+			padding-bottom: $grid-unit-15;
+			outline: none;
 		}
 	}
 	.edit-site-page-header {
