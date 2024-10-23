@@ -20,4 +20,7 @@ const slugField: Field< BasePost > = {
 	render: SlugView,
 };
 
+/**
+ * The slugField is a field that allows the user to edit the slug of a postType.
+ */
 export default slugField;

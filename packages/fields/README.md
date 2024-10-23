@@ -72,7 +72,7 @@ Undocumented declaration.
 
 ### slugField
 
-Undocumented declaration.
+The slugField is a field that allows the user to edit the slug of a postType.
 
 ### titleField
 
