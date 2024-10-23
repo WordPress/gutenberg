@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -234,6 +234,35 @@ export default function CollabSidebar() {
 		return null; // or maybe return some message indicating no threads are available.
 	}
 
+	// Process comments to build the tree structure
+	const resultComments = useMemo( () => {
+		// Create a compare to store the references to all objects by id
+		const compare = {};
+		const result = [];
+
+		const filteredComments = threads.filter(
+			( comment ) => comment.status !== 'trash'
+		);
+
+		// Initialize each object with an empty `reply` array
+		filteredComments.forEach( ( item ) => {
+			compare[ item.id ] = { ...item, reply: [] };
+		} );
+
+		// Iterate over the data to build the tree structure
+		filteredComments.forEach( ( item ) => {
+			if ( item.parent === 0 ) {
+				// If parent is 0, it's a root item, push it to the result array
+				result.push( compare[ item.id ] );
+			} else if ( compare[ item.parent ] ) {
+				// Otherwise, find its parent and push it to the parent's `reply` array
+				compare[ item.parent ].reply.push( compare[ item.id ] );
+			}
+		} );
+
+		return result;
+	}, [ threads ] );
+
 	return (
 		<>
 			{ ! blockCommentID && (
@@ -251,13 +280,13 @@ export default function CollabSidebar() {
 			>
 				<div className="editor-collab-sidebar-panel">
 					<AddComment
-						threads={ threads }
+						threads={ resultComments }
 						onSubmit={ addNewComment }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
 					/>
 					<Comments
-						threads={ threads }
+						threads={ resultComments }
 						onEditComment={ onEditComment }
 						onAddReply={ addNewComment }
 						onCommentDelete={ onCommentDelete }
