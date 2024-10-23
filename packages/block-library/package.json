@@ -31,6 +31,7 @@
 		"{src,build,build-module}/*/init.js"
 	],
 	"wpScriptModuleExports": {
+		"./accordion-group/view": "./build-module/accordion-group/view.js",
 		"./file/view": "./build-module/file/view.js",
 		"./image/view": "./build-module/image/view.js",
 		"./navigation/view": "./build-module/navigation/view.js",
