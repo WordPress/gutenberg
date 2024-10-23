@@ -21,39 +21,40 @@ test.describe( 'Site Editor Inserter', () => {
 		await editor.canvas.locator( 'body' ).click();
 	} );
 
+	test.use( {
+		InserterUtils: async ( { editor, page }, use ) => {
+			await use( new InserterUtils( { editor, page } ) );
+		},
+	} );
+
 	test( 'inserter toggle button should toggle global inserter', async ( {
-		page,
+		InserterUtils,
 	} ) => {
-		await page.click( 'role=button[name="Block Inserter"i]' );
+		const inserterButton = InserterUtils.getInserterButton();
+
+		await inserterButton.click();
+
+		const blockLibrary = InserterUtils.getBlockLibrary();
 
 		// Visibility check
-		await expect(
-			page.locator( 'role=searchbox[name="Search"i]' )
-		).toBeVisible();
-		await page.click( 'role=button[name="Block Inserter"i]' );
+		await expect( blockLibrary ).toBeVisible();
+		await inserterButton.click();
 		//Hidden State check
-		await expect(
-			page.locator( 'role=searchbox[name="Search"i]' )
-		).toBeHidden();
+		await expect( blockLibrary ).toBeHidden();
 	} );
 
 	// A test for https://github.com/WordPress/gutenberg/issues/43090.
 	test( 'should close the inserter when clicking on the toggle button', async ( {
-		page,
 		editor,
+		InserterUtils,
 	} ) => {
-		const inserterButton = page.getByRole( 'button', {
-			name: 'Block Inserter',
-			exact: true,
-		} );
-		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
-		} );
+		const inserterButton = InserterUtils.getInserterButton();
+		const blockLibrary = InserterUtils.getBlockLibrary();
 
 		const beforeBlocks = await editor.getBlocks();
 
 		await inserterButton.click();
-		await blockLibrary.getByRole( 'tab', { name: 'Blocks' } ).click();
+		await InserterUtils.getBlockLibraryTab( 'Blocks' ).click();
 		await blockLibrary.getByRole( 'option', { name: 'Buttons' } ).click();
 
 		await expect
@@ -64,4 +65,65 @@ test.describe( 'Site Editor Inserter', () => {
 
 		await expect( blockLibrary ).toBeHidden();
 	} );
+
+	test( 'should open the inserter to patterns tab if using zoom out', async ( {
+		InserterUtils,
+	} ) => {
+		const zoomOutButton = InserterUtils.getZoomOutButton();
+		const inserterButton = InserterUtils.getInserterButton();
+		const blockLibrary = InserterUtils.getBlockLibrary();
+
+		await zoomOutButton.click();
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		await inserterButton.click();
+		const patternsTab = InserterUtils.getBlockLibraryTab( 'Patterns' );
+		await expect( patternsTab ).toHaveAttribute(
+			'data-active-item',
+			'true'
+		);
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+
+		// We should still be in Zoom Out
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+	} );
 } );
+
+class InserterUtils {
+	constructor( { editor, page } ) {
+		this.editor = editor;
+		this.page = page;
+	}
+
+	getInserterButton() {
+		return this.page.getByRole( 'button', {
+			name: 'Block Inserter',
+			exact: true,
+		} );
+	}
+
+	getBlockLibrary() {
+		return this.page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+	}
+
+	getBlockLibraryTab( name ) {
+		return this.page.getByRole( 'tab', { name } );
+	}
+
+	getZoomOutButton() {
+		return this.page.getByRole( 'button', {
+			name: 'Zoom Out',
+			exact: true,
+		} );
+	}
+
+	getZoomCanvas() {
+		return this.page.locator( '.is-zoomed-out' );
+	}
+}
