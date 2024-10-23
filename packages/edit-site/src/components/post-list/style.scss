@@ -9,7 +9,9 @@
 	width: 100%;
 	border-radius: $grid-unit-05;
 
-	&.is-layout-table:not(:has(.edit-site-post-list__featured-image-button)),
+	&.is-layout-table:not(
+	:has(.edit-site-post-list__featured-image-button)
+),
 	&.is-layout-table .edit-site-post-list__featured-image-button {
 		width: $grid-unit-40;
 		height: $grid-unit-40;
@@ -46,7 +48,9 @@
 	border-radius: $grid-unit-05;
 
 	&:focus-visible {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow:
+			0 0 0 var(--wp-admin-border-width-focus)
+			var(--wp-admin-theme-color);
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 	}
@@ -54,7 +58,9 @@
 
 .dataviews-view-grid__card.is-selected {
 	.edit-site-post-list__featured-image-button::after {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow:
+			inset 0 0 0 var(--wp-admin-border-width-focus)
+			var(--wp-admin-theme-color);
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 	}
 }
@@ -62,6 +68,25 @@
 .edit-site-post-list__title span {
 	text-overflow: ellipsis;
 	overflow: hidden;
+}
+
+.dataviews-view-grid__primary-field.dataviews-view-grid__primary-field--clickable,
+.dataviews-view-table__primary-field.dataviews-view-table__primary-field--clickable {
+	.edit-site-post-list__title span {
+		cursor: pointer;
+		text-decoration: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		flex-grow: 0;
+		color: $gray-900;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+		@include link-reset();
+	}
 }
 
 .edit-site-post-list__title-badge {

@@ -29,6 +29,8 @@ interface GridItemProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
+	onClick: ( item: Item ) => void;
+	isClickable: ( item: Item ) => boolean;
 	item: Item;
 	actions: Action< Item >[];
 	mediaField?: NormalizedField< Item >;
@@ -41,6 +43,8 @@ interface GridItemProps< Item > {
 function GridItem< Item >( {
 	selection,
 	onChangeSelection,
+	onClick,
+	isClickable,
 	getItemId,
 	item,
 	actions,
@@ -59,6 +63,7 @@ function GridItem< Item >( {
 	const renderedPrimaryField = primaryField?.render ? (
 		<primaryField.render item={ item } />
 	) : null;
+
 	return (
 		<VStack
 			spacing={ 0 }
@@ -81,7 +86,27 @@ function GridItem< Item >( {
 				}
 			} }
 		>
-			<div className="dataviews-view-grid__media">
+			<div
+				className={ clsx( 'dataviews-view-grid__media', {
+					'dataviews-view-grid__media--clickable':
+						isClickable( item ),
+				} ) }
+				tabIndex={ isClickable( item ) ? 0 : undefined }
+				role="button"
+				onClick={ () => {
+					if ( isClickable( item ) ) {
+						onClick( item );
+					}
+				} }
+				onKeyDown={ ( event ) => {
+					if (
+						( event.key === 'Enter' || event.key === '' ) &&
+						isClickable( item )
+					) {
+						onClick( item );
+					}
+				} }
+			>
 				{ renderedMediaField }
 			</div>
 			<SingleSelectionCheckbox
@@ -96,7 +121,27 @@ function GridItem< Item >( {
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
 			>
-				<HStack className="dataviews-view-grid__primary-field">
+				<HStack
+					className={ clsx( 'dataviews-view-grid__primary-field', {
+						'dataviews-view-grid__primary-field--clickable':
+							isClickable( item ),
+					} ) }
+					tabIndex={ isClickable( item ) ? 0 : undefined }
+					role="button"
+					onClick={ () => {
+						if ( isClickable( item ) ) {
+							onClick( item );
+						}
+					} }
+					onKeyDown={ ( event ) => {
+						if (
+							( event.key === 'Enter' || event.key === '' ) &&
+							isClickable( item )
+						) {
+							onClick( item );
+						}
+					} }
+				>
 					{ renderedPrimaryField }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
@@ -170,6 +215,8 @@ export default function ViewGrid< Item >( {
 	getItemId,
 	isLoading,
 	onChangeSelection,
+	onClick,
+	isClickable,
 	selection,
 	view,
 	density,
@@ -223,6 +270,8 @@ export default function ViewGrid< Item >( {
 								key={ getItemId( item ) }
 								selection={ selection }
 								onChangeSelection={ onChangeSelection }
+								onClick={ onClick }
+								isClickable={ isClickable }
 								getItemId={ getItemId }
 								item={ item }
 								actions={ actions }

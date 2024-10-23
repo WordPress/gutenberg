@@ -208,9 +208,7 @@ export default function PostList( { postType } ) {
 		return found?.filters ?? [];
 	};
 
-	const { isLoading: isLoadingFields, fields: _fields } = usePostFields(
-		view.type
-	);
+	const { isLoading: isLoadingFields, fields: _fields } = usePostFields();
 	const fields = useMemo( () => {
 		const activeViewFilters = getActiveViewFilters(
 			defaultViews,
@@ -402,6 +400,14 @@ export default function PostList( { postType } ) {
 				onChangeView={ setView }
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
+				isClickable={ ( item ) => item.status !== 'trash' }
+				handleClick={ ( { id } ) => {
+					history.push( {
+						postId: id,
+						postType,
+						canvas: 'edit',
+					} );
+				} }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
 				header={

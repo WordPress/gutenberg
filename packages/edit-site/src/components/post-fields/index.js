@@ -31,12 +31,7 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import {
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	OPERATOR_IS_ANY,
-} from '../../utils/constants';
-import { default as Link } from '../routes/link';
+import { OPERATOR_IS_ANY } from '../../utils/constants';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -134,7 +129,7 @@ function PostAuthorField( { item } ) {
 	);
 }
 
-function usePostFields( viewType ) {
+function usePostFields() {
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
@@ -159,30 +154,10 @@ function usePostFields( viewType ) {
 						? item.title
 						: item.title?.raw,
 				render: ( { item } ) => {
-					const addLink =
-						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( viewType ) &&
-						item.status !== 'trash';
 					const renderedTitle =
 						typeof item.title === 'string'
 							? item.title
 							: item.title?.rendered;
-					const title = addLink ? (
-						<Link
-							params={ {
-								postId: item.id,
-								postType: item.type,
-								canvas: 'edit',
-							} }
-						>
-							{ decodeEntities( renderedTitle ) ||
-								__( '(no title)' ) }
-						</Link>
-					) : (
-						<span>
-							{ decodeEntities( renderedTitle ) ||
-								__( '(no title)' ) }
-						</span>
-					);
 
 					let suffix = '';
 					if ( item.id === frontPageId ) {
@@ -205,7 +180,10 @@ function usePostFields( viewType ) {
 							alignment="center"
 							justify="flex-start"
 						>
-							{ title }
+							<span>
+								{ decodeEntities( renderedTitle ) ||
+									__( '(no title)' ) }
+							</span>
 							{ suffix }
 						</HStack>
 					);
@@ -347,7 +325,7 @@ function usePostFields( viewType ) {
 				],
 			},
 		],
-		[ authors, viewType, frontPageId, postsPageId ]
+		[ authors, frontPageId, postsPageId ]
 	);
 
 	return {

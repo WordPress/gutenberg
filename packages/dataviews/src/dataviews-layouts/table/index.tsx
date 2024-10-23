@@ -40,6 +40,8 @@ interface TableColumnFieldProps< Item > {
 	primaryField?: NormalizedField< Item >;
 	field: NormalizedField< Item >;
 	item: Item;
+	isClickable: ( item: Item ) => boolean;
+	onClick: ( item: Item ) => void;
 }
 
 interface TableColumnCombinedProps< Item > {
@@ -48,6 +50,8 @@ interface TableColumnCombinedProps< Item > {
 	field: CombinedField;
 	item: Item;
 	view: ViewTableType;
+	isClickable: ( item: Item ) => boolean;
+	onClick: ( item: Item ) => void;
 }
 
 interface TableColumnProps< Item > {
@@ -56,6 +60,8 @@ interface TableColumnProps< Item > {
 	item: Item;
 	column: string;
 	view: ViewTableType;
+	isClickable: ( item: Item ) => boolean;
+	onClick: ( item: Item ) => void;
 }
 
 interface TableRowProps< Item > {
@@ -69,6 +75,8 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
+	isClickable: ( item: Item ) => boolean;
+	onClick: ( item: Item ) => void;
 }
 
 function TableColumn< Item >( {
@@ -102,13 +110,32 @@ function TableColumnField< Item >( {
 	primaryField,
 	item,
 	field,
+	isClickable,
+	onClick,
 }: TableColumnFieldProps< Item > ) {
 	return (
 		<div
 			className={ clsx( 'dataviews-view-table__cell-content-wrapper', {
 				'dataviews-view-table__primary-field':
 					primaryField?.id === field.id,
+				'dataviews-view-table__primary-field--clickable':
+					isClickable( item ),
 			} ) }
+			tabIndex={ isClickable( item ) ? 0 : undefined }
+			role="button"
+			onClick={ () => {
+				if ( isClickable( item ) ) {
+					onClick( item );
+				}
+			} }
+			onKeyDown={ ( event ) => {
+				if (
+					( event.key === 'Enter' || event.key === '' ) &&
+					isClickable( item )
+				) {
+					onClick( item );
+				}
+			} }
 		>
 			<field.render { ...{ item } } />
 		</div>
@@ -139,6 +166,8 @@ function TableRow< Item >( {
 	primaryField,
 	selection,
 	getItemId,
+	isClickable,
+	onClick,
 	onChangeSelection,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
@@ -214,6 +243,8 @@ function TableRow< Item >( {
 					<td key={ column } style={ { width, maxWidth, minWidth } }>
 						<TableColumn
 							primaryField={ primaryField }
+							isClickable={ isClickable }
+							onClick={ onClick }
 							fields={ fields }
 							item={ item }
 							column={ column }
@@ -252,6 +283,8 @@ function ViewTable< Item >( {
 	onChangeSelection,
 	selection,
 	setOpenedFilter,
+	onClick,
+	isClickable,
 	view,
 }: ViewTableProps< Item > ) {
 	const headerMenuRefs = useRef<
@@ -392,6 +425,8 @@ function ViewTable< Item >( {
 								selection={ selection }
 								getItemId={ getItemId }
 								onChangeSelection={ onChangeSelection }
+								onClick={ onClick }
+								isClickable={ isClickable }
 							/>
 						) ) }
 				</tbody>
