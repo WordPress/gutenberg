@@ -209,21 +209,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
-
-	const iframeResizeRef = useRefEffect( ( node ) => {
-		const nodeWindow = node.ownerDocument.defaultView;
-
-		setIframeWindowInnerHeight( nodeWindow.innerHeight );
-		const onResize = () => {
-			setIframeWindowInnerHeight( nodeWindow.innerHeight );
-		};
-		nodeWindow.addEventListener( 'resize', onResize );
-		return () => {
-			nodeWindow.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
 	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
 
 	const windowResizeRef = useRefEffect( ( node ) => {
@@ -259,10 +244,6 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		// Avoid resize listeners when not needed, these will trigger
-		// unnecessary re-renders when animating the iframe width, or when
-		// expanding preview iframes.
-		isZoomedOut ? iframeResizeRef : null,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -371,10 +352,6 @@ function Iframe( {
 			`${ contentHeight }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-inner-height',
-			`${ iframeWindowInnerHeight }px`
-		);
-		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-container-width',
 			`${ containerWidth }px`
 		);
@@ -394,9 +371,6 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-content-height'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-inner-height'
-			);
-			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-container-width'
 			);
 			iframeDocument.documentElement.style.removeProperty(
@@ -407,7 +381,6 @@ function Iframe( {
 		scale,
 		frameSize,
 		iframeDocument,
-		iframeWindowInnerHeight,
 		contentHeight,
 		containerWidth,
 		windowInnerWidth,
