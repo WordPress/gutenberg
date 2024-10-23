@@ -22,6 +22,8 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import AddCommentToolbarButton from './comment-button-toolbar';
 
+const threadsEmptyArray = [];
+
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 const modifyBlockCommentAttributes = ( settings ) => {
@@ -54,7 +56,6 @@ export default function CollabSidebar() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-	const threadsEmptyArray = [];
 	const { postId } = useSelect( ( select ) => {
 		return {
 			postId: select( editorStore ).getCurrentPostId(),
