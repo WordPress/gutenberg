@@ -48,6 +48,7 @@
 		"@wordpress/editor": "*",
 		"@wordpress/element": "*",
 		"@wordpress/escape-html": "*",
+		"@wordpress/fields": "*",
 		"@wordpress/hooks": "*",
 		"@wordpress/html-entities": "*",
 		"@wordpress/i18n": "*",
