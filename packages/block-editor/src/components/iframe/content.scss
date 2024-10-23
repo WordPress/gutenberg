@@ -44,16 +44,5 @@
 
 	body {
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
-
-		> .is-root-container:not(.wp-block-post-content) {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-
-			> main {
-				flex: 1;
-			}
-		}
 	}
 }
