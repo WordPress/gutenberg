@@ -96,6 +96,35 @@ export default function CollabSidebar() {
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
+	// Process comments to build the tree structure
+	const resultComments = useMemo( () => {
+		// Create a compare to store the references to all objects by id
+		const compare = {};
+		const result = [];
+
+		const filteredComments = threads.filter(
+			( comment ) => comment.status !== 'trash'
+		);
+
+		// Initialize each object with an empty `reply` array
+		filteredComments.forEach( ( item ) => {
+			compare[ item.id ] = { ...item, reply: [] };
+		} );
+
+		// Iterate over the data to build the tree structure
+		filteredComments.forEach( ( item ) => {
+			if ( item.parent === 0 ) {
+				// If parent is 0, it's a root item, push it to the result array
+				result.push( compare[ item.id ] );
+			} else if ( compare[ item.parent ] ) {
+				// Otherwise, find its parent and push it to the parent's `reply` array
+				compare[ item.parent ].reply.push( compare[ item.id ] );
+			}
+		} );
+
+		return result;
+	}, [ threads ] );
+
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
 		enableComplementaryArea( 'core', 'edit-post/collab-sidebar' );
@@ -233,35 +262,6 @@ export default function CollabSidebar() {
 	if ( ! isBlockCommentExperimentEnabled ) {
 		return null; // or maybe return some message indicating no threads are available.
 	}
-
-	// Process comments to build the tree structure
-	const resultComments = useMemo( () => {
-		// Create a compare to store the references to all objects by id
-		const compare = {};
-		const result = [];
-
-		const filteredComments = threads.filter(
-			( comment ) => comment.status !== 'trash'
-		);
-
-		// Initialize each object with an empty `reply` array
-		filteredComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure
-		filteredComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		return result;
-	}, [ threads ] );
 
 	return (
 		<>
