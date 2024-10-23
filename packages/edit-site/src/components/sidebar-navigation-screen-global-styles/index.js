@@ -26,8 +26,6 @@ import SidebarButton from '../sidebar-button';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export function SidebarNavigationItemGlobalStyles( props ) {
-	const { openGeneralSidebar } = useDispatch( editSiteStore );
-	const history = useHistory();
 	const { params } = useLocation();
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
