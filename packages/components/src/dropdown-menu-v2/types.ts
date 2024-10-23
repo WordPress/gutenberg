@@ -17,10 +17,6 @@ export interface DropdownMenuContext {
 
 export interface DropdownMenuProps {
 	/**
-	 * The trigger button.
-	 */
-	trigger: React.ReactElement;
-	/**
 	 * The contents of the dropdown.
 	 */
 	children?: React.ReactNode;
@@ -41,6 +37,19 @@ export interface DropdownMenuProps {
 	 */
 	onOpenChange?: ( open: boolean ) => void;
 	/**
+	 * The placement of the dropdown menu popover.
+	 *
+	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
+	 */
+	placement?: Placement;
+}
+
+export interface DropdownMenuPopoverProps {
+	/**
+	 * The contents of the dropdown.
+	 */
+	children?: React.ReactNode;
+	/**
 	 * The modality of the dropdown menu. When set to true, interaction with
 	 * outside elements will be disabled and only menu content will be visible to
 	 * screen readers.
@@ -48,12 +57,6 @@ export interface DropdownMenuProps {
 	 * @default true
 	 */
 	modal?: boolean;
-	/**
-	 * The placement of the dropdown menu popover.
-	 *
-	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
-	 */
-	placement?: Placement;
 	/**
 	 * The distance between the popover and the anchor element.
 	 *
@@ -80,6 +83,18 @@ export interface DropdownMenuProps {
 		  ) => boolean );
 }
 
+export interface DropdownMenuTriggerButtonProps {
+	/**
+	 * The contents of the dropdown menu group.
+	 */
+	children?: React.ReactNode;
+
+	render?: Ariakit.MenuButtonProps[ 'render' ];
+}
+
+export interface DropdownMenuSubmenuTriggerItemProps
+	extends DropdownMenuItemProps {}
+
 export interface DropdownMenuGroupProps {
 	/**
 	 * The contents of the dropdown menu group.
@@ -98,7 +113,7 @@ export interface DropdownMenuItemProps {
 	/**
 	 * The contents of the menu item.
 	 */
-	children: React.ReactNode;
+	children?: React.ReactNode;
 	/**
 	 * The contents of the menu item's prefix.
 	 */
