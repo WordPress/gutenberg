@@ -40,14 +40,14 @@ export function ExperimentalBlockCanvas( {
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();
 	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
-	const isZoomedOut = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
+	const zoomLevel = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
 		[]
 	);
 	const zoomOutIframeProps =
-		isZoomedOut && ! isTabletViewport
+		zoomLevel !== 100 && ! isTabletViewport
 			? {
-					scale: 'default',
+					scale: zoomLevel,
 					frameSize: '40px',
 			  }
 			: {};

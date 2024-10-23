@@ -11,6 +11,8 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,8 +25,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import DefaultSidebar from './default-sidebar';
 
 const { interfaceStore } = unlock( editorPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function GlobalStylesSidebar() {
+	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const {
 		shouldClearCanvasContainerView,
 		isStyleBookOpened,
@@ -32,52 +37,58 @@ export default function GlobalStylesSidebar() {
 		hasRevisions,
 		isRevisionsOpened,
 		isRevisionsStyleBookOpened,
-	} = useSelect( ( select ) => {
-		const { getActiveComplementaryArea } = select( interfaceStore );
-		const { getEditorCanvasContainerView, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const canvasContainerView = getEditorCanvasContainerView();
-		const _isVisualEditorMode =
-			'visual' === select( editorStore ).getEditorMode();
-		const _isEditCanvasMode = 'edit' === getCanvasMode();
-		const _showListViewByDefault = select( preferencesStore ).get(
-			'core',
-			'showListViewByDefault'
-		);
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
+	} = useSelect(
+		( select ) => {
+			const { getActiveComplementaryArea } = select( interfaceStore );
+			const { getEditorCanvasContainerView } = unlock(
+				select( editSiteStore )
+			);
+			const canvasContainerView = getEditorCanvasContainerView();
+			const _isVisualEditorMode =
+				'visual' === select( editorStore ).getEditorMode();
+			const _isEditCanvasMode = 'edit' === canvas;
+			const _showListViewByDefault = select( preferencesStore ).get(
+				'core',
+				'showListViewByDefault'
+			);
+			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+				select( coreStore );
 
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const globalStyles = globalStylesId
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+				: undefined;
 
-		return {
-			isStyleBookOpened: 'style-book' === canvasContainerView,
-			shouldClearCanvasContainerView:
-				'edit-site/global-styles' !==
-					getActiveComplementaryArea( 'core' ) ||
-				! _isVisualEditorMode ||
-				! _isEditCanvasMode,
-			showListViewByDefault: _showListViewByDefault,
-			hasRevisions:
-				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
-			isRevisionsStyleBookOpened:
-				'global-styles-revisions:style-book' === canvasContainerView,
-			isRevisionsOpened:
-				'global-styles-revisions' === canvasContainerView,
-		};
-	}, [] );
+			return {
+				isStyleBookOpened: 'style-book' === canvasContainerView,
+				shouldClearCanvasContainerView:
+					'edit-site/global-styles' !==
+						getActiveComplementaryArea( 'core' ) ||
+					! _isVisualEditorMode ||
+					! _isEditCanvasMode,
+				showListViewByDefault: _showListViewByDefault,
+				hasRevisions:
+					!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]
+						?.count,
+				isRevisionsStyleBookOpened:
+					'global-styles-revisions:style-book' ===
+					canvasContainerView,
+				isRevisionsOpened:
+					'global-styles-revisions' === canvasContainerView,
+			};
+		},
+		[ canvas ]
+	);
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	useEffect( () => {
 		if ( shouldClearCanvasContainerView ) {
 			setEditorCanvasContainerView( undefined );
 		}
-	}, [ shouldClearCanvasContainerView ] );
+	}, [ shouldClearCanvasContainerView, setEditorCanvasContainerView ] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
 
@@ -140,20 +151,22 @@ export default function GlobalStylesSidebar() {
 						gap={ 1 }
 						className="edit-site-global-styles-sidebar__header-actions"
 					>
-						<FlexItem>
-							<Button
-								icon={ seen }
-								label={ __( 'Style Book' ) }
-								isPressed={
-									isStyleBookOpened ||
-									isRevisionsStyleBookOpened
-								}
-								accessibleWhenDisabled
-								disabled={ shouldClearCanvasContainerView }
-								onClick={ toggleStyleBook }
-								size="compact"
-							/>
-						</FlexItem>
+						{ ! isMobileViewport && (
+							<FlexItem>
+								<Button
+									icon={ seen }
+									label={ __( 'Style Book' ) }
+									isPressed={
+										isStyleBookOpened ||
+										isRevisionsStyleBookOpened
+									}
+									accessibleWhenDisabled
+									disabled={ shouldClearCanvasContainerView }
+									onClick={ toggleStyleBook }
+									size="compact"
+								/>
+							</FlexItem>
+						) }
 						<FlexItem>
 							<Button
 								label={ __( 'Revisions' ) }

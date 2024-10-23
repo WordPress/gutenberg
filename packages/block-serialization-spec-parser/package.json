@@ -37,5 +37,6 @@
 		"build": "concurrently \"npm run build:js\" \"npm run build:php\"",
 		"build:js": "pegjs --format commonjs -o ./parser.js ./grammar.pegjs",
 		"build:php": "node bin/create-php-parser.js"
-	}
+	},
+	"wpScript": true
 }

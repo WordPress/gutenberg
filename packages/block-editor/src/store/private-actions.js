@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
@@ -41,14 +42,32 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
 	// There are no plugins in the mobile apps, so there is no
 	// need to strip the experimental settings:
 	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
 		cleanSettings = {};
-		for ( const key in settings ) {
+		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+				cleanSettings[ key ] = incomingSettings[ key ];
 			}
 		}
 	}
