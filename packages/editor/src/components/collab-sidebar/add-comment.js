@@ -55,7 +55,10 @@ export function AddComment( {
 		};
 	} );
 
-	const userAvatar = currentUser?.avatar_urls[ 48 ] ?? defaultAvatar;
+	const userAvatar =
+		currentUser && currentUser.avatar_urls && currentUser.avatar_urls[ 48 ]
+			? currentUser.avatar_urls[ 48 ]
+			: defaultAvatar;
 
 	useEffect( () => {
 		setInputComment( '' );
