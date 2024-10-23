@@ -110,7 +110,10 @@ export function AddComment( {
 					disabled={
 						0 === sanitizeCommentString( inputComment ).length
 					}
-					onClick={ () => onSubmit( inputComment ) }
+					onClick={ () => {
+						onSubmit( inputComment );
+						setInputComment( '' );
+					} }
 				/>
 			</HStack>
 		</VStack>

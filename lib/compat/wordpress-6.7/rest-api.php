@@ -115,6 +115,7 @@ function gutenberg_override_default_rest_server() {
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
 
+
 /**
  * Filters the arguments for registering a wp_global_styles post type.
  * Note when syncing to Core: the capabilities should be updates for `wp_global_styles` in the wp-includes/post.php.
