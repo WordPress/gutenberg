@@ -3,7 +3,7 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useZoomOut } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
@@ -12,6 +12,9 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import ScreenHeader from './header';
 import SidebarNavigationScreenGlobalStylesContent from '../sidebar-navigation-screen-global-styles/content';
+import { unlock } from '../../lock-unlock';
+
+const { useZoomOut } = unlock( blockEditorPrivateApis );
 
 function ScreenStyleVariations() {
 	// Style Variations should only be previewed in with
