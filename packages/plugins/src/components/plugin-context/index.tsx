@@ -35,7 +35,7 @@ export function usePluginContext() {
  * A Higher Order Component used to inject Plugin context to the
  * wrapped component.
  *
- * @deprecated Use `usePluginContext` hook instead.
+ * @deprecated 6.8.0 Use `usePluginContext` hook instead.
  *
  * @param  mapContextToProps Function called on every context change,
  *                           expected to return object of props to
