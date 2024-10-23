@@ -1,14 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { ComplementaryArea } from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -76,16 +69,10 @@ import { store as editorStore } from '../../store';
  * ```
  */
 export default function PluginSidebar( { className, ...props } ) {
-	const { postTitle } = useSelect( ( select ) => {
-		return {
-			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
-		};
-	}, [] );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
 			className="editor-sidebar"
-			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core"
 			{ ...props }
 		/>

@@ -117,12 +117,12 @@ function Iframe( {
 		const settings = getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
-			isPreviewMode: settings.__unstableIsPreviewMode,
+			isPreviewMode: settings.isPreviewMode,
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const initialContainerWidth = useRef( 0 );
+	const initialContainerWidthRef = useRef( 0 );
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -243,12 +243,12 @@ function Iframe( {
 
 	useEffect( () => {
 		if ( ! isZoomedOut ) {
-			initialContainerWidth.current = containerWidth;
+			initialContainerWidthRef.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
 	const scaleContainerWidth = Math.max(
-		initialContainerWidth.current,
+		initialContainerWidthRef.current,
 		containerWidth
 	);
 
@@ -345,7 +345,7 @@ function Iframe( {
 
 		const maxWidth = 750;
 		// Note: When we initialize the zoom out when the canvas is smaller (sidebars open),
-		// initialContainerWidth will be smaller than the full page, and reflow will happen
+		// initialContainerWidthRef will be smaller than the full page, and reflow will happen
 		// when the canvas area becomes larger due to sidebars closing. This is a known but
 		// minor divergence for now.
 
