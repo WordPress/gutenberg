@@ -15,24 +15,29 @@ import { unlock } from '../../lock-unlock';
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
-		hasSelection,
+		selectedSectionClientId,
 		blockOrder,
 		setInserterIsOpened,
 		sectionRootClientId,
-		selectedBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
 			getBlockOrder,
-			getSelectionStart,
 			getSelectedBlockClientId,
 			getSectionRootClientId,
+			isSectionBlock,
+			getParentSectionBlock,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
+		const selectionBlockClientId = getSelectedBlockClientId();
+		const _selectedSectionClientId =
+			! selectionBlockClientId || isSectionBlock( selectionBlockClientId )
+				? selectionBlockClientId
+				: getParentSectionBlock( selectionBlockClientId );
 
 		return {
-			hasSelection: !! getSelectionStart().clientId,
+			selectedSectionClientId: _selectedSectionClientId,
 			blockOrder: getBlockOrder( root ),
 			sectionRootClientId: root,
 			setInserterIsOpened:
@@ -54,13 +59,13 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady || ! hasSelection ) {
+	if ( ! isReady || ! selectedSectionClientId ) {
 		return null;
 	}
 
-	const previousClientId = selectedBlockClientId;
+	const previousClientId = selectedSectionClientId;
 	const index = blockOrder.findIndex(
-		( clientId ) => selectedBlockClientId === clientId
+		( clientId ) => selectedSectionClientId === clientId
 	);
 	const nextClientId = blockOrder[ index + 1 ];
 
