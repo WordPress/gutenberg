@@ -71,6 +71,14 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 					} );
 				}
 
+				// If selected page is set to draft, publish the page.
+				if ( item.status === 'draft' ) {
+					await saveEntityRecord( 'postType', 'page', {
+						...item,
+						status: 'publish',
+					} );
+				}
+
 				// Set the existing page ID as the new page, if that action was selected.
 				if ( postsPageOption === 'choose-existing' ) {
 					newPage.id = existingPageId;
@@ -320,7 +328,7 @@ const setAsHomepage: Action< PostWithPermissions > = {
 	id: 'set-as-homepage',
 	label: __( 'Set as homepage' ),
 	isEligible( post ) {
-		if ( post.status !== 'publish' ) {
+		if ( post.status === 'trash' ) {
 			return false;
 		}
 
