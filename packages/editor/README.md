@@ -878,9 +878,9 @@ function onPreviewClick() {
 }
 
 const ExternalPreviewMenuItem = () => (
-	<PreviewDropdownMenuItem icon={ external } onClick={ onPreviewClick }>
+	<PluginPreviewMenuItem icon={ external } onClick={ onPreviewClick }>
 		{ __( 'Preview in new tab' ) }
-	</PreviewDropdownMenuItem>
+	</PluginPreviewMenuItem>
 );
 registerPlugin( 'external-preview-menu-item', {
 	render: ExternalPreviewMenuItem,
