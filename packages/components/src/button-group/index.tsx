@@ -8,6 +8,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -22,6 +23,14 @@ function UnforwardedButtonGroup(
 	const { className, ...restProps } = props;
 	const classes = clsx( 'components-button-group', className );
 
+	/**
+	 * Add deprecation notice for `ButtonGroup` component.
+	 */
+	deprecated( 'wp.components.ButtonGroup', {
+		since: '6.7',
+		alternative: 'wp.components.ToggleGroupControl',
+	} );
+
 	return (
 		<div ref={ ref } role="group" className={ classes } { ...restProps } />
 	);
@@ -30,6 +39,8 @@ function UnforwardedButtonGroup(
 /**
  * ButtonGroup can be used to group any related buttons together. To emphasize
  * related buttons, a group should share a common container.
+ *
+ * @deprecated use `ToggleGroupControl` instead.
  *
  * ```jsx
  * import { Button, ButtonGroup } from '@wordpress/components';
