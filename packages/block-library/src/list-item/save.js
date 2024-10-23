@@ -8,7 +8,7 @@ export default function save( { attributes } ) {
 	 * Render the list item only if there is content.
 	 * This check is to eliminate empty list items from the front end.
 	 */
-	if ( attributes.content?.length === 0 ) {
+	if ( RichText.isEmpty( attributes.content ) ) {
 		return null;
 	}
 
