@@ -37,6 +37,10 @@
 			width: 100%;
 			z-index: 1;
 		}
+
+		.wp-block-cover__inner-container {
+			z-index: 2;
+		}
 	}
 
 	// Shown while media is being uploaded
@@ -116,11 +120,4 @@
 
 .color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
 	margin-top: $grid-unit-30;
-}
-
-// Backward compatibility for v14 deprecation.
-.wp-block-cover:not(.has-no-zindex-in-inner-blocks) {	// Shown while media is being uploaded
-	.components-spinner {
-		z-index: z-index(".wp-block-cover__inner-container");
-	}
 }
