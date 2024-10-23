@@ -5,5 +5,5 @@
  * @return {string} - The sanitized comment string.
  */
 export function sanitizeCommentString( str ) {
-	return str.trim().replace( /[^\x20-\x7E]/g, '' );
+	return str.trim();
 }

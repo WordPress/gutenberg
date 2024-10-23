@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
-import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -50,19 +50,35 @@ addFilter(
 export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecords, getEntityRecord } = resolveSelect( coreStore );
+	const { getEntityRecord } = resolveSelect( coreStore );
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 
-	const [ threads, setThreads ] = useState( () => [] );
 	const { postId } = useSelect( ( select ) => {
 		return {
 			postId: select( editorStore ).getCurrentPostId(),
 		};
 	}, [] );
+
+	const threads = useSelect(
+		( select ) => {
+			if ( ! postId ) {
+				return [];
+			}
+			const { getEntityRecords } = select( coreStore );
+			const data = getEntityRecords( 'root', 'comment', {
+				post: postId,
+				type: 'block_comment',
+				status: 'any',
+				per_page: 100,
+			} );
+			return Array.isArray( data ) ? data : [];
+		},
+		[ postId ]
+	);
 
 	const clientId = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
@@ -127,7 +143,6 @@ export default function CollabSidebar() {
 					isDismissible: true,
 				}
 			);
-			await fetchComments();
 		} else {
 			onError();
 		}
@@ -145,8 +160,6 @@ export default function CollabSidebar() {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-
-			await fetchComments();
 		} else {
 			onError();
 		}
@@ -168,8 +181,6 @@ export default function CollabSidebar() {
 					isDismissible: true,
 				}
 			);
-
-			await fetchComments();
 		} else {
 			onError();
 		}
@@ -211,30 +222,13 @@ export default function CollabSidebar() {
 				isDismissible: true,
 			}
 		);
-		await fetchComments();
 	};
-
-	const fetchComments = useCallback( async () => {
-		if ( postId ) {
-			const data = await getEntityRecords( 'root', 'comment', {
-				post: postId,
-				type: 'block_comment',
-				status: 'any',
-				per_page: 100,
-			} );
-
-			if ( undefined !== data ) {
-				setThreads( Array.isArray( data ) ? data : [] );
-			}
-		}
-	}, [ postId, getEntityRecords ] );
 
 	useEffect( () => {
 		if ( blockDetails ) {
 			setBlockCommentID( blockDetails?.attributes.blockCommentId );
 		}
-		fetchComments();
-	}, [ postId, fetchComments, clientId ] );
+	}, [ postId, clientId ] );
 
 	const allBlocks = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlocks();
