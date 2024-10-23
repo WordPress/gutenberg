@@ -10,16 +10,26 @@ import { useSettings } from '../use-settings';
 
 export default createHigherOrderComponent( ( WrappedComponent ) => {
 	return ( props ) => {
-		const [ colorsFeature, enableCustomColors ] = useSettings(
-			'color.palette',
-			'color.custom'
-		);
-		const {
-			colors = colorsFeature,
-			disableCustomColors = ! enableCustomColors,
-		} = props;
+		// Get the default colors, theme colors, and custom colors
+		const [ defaultColors, themeColors, customColors, enableCustomColors ] =
+			useSettings(
+				'color.palette.default',
+				'color.palette.theme',
+				'color.palette.custom',
+				'color.custom'
+			);
+
+		const colors = [
+			...( defaultColors || [] ),
+			...( themeColors || [] ),
+			...( customColors || [] ),
+		];
+
+		const { disableCustomColors = ! enableCustomColors } = props;
+
 		const hasColorsToChoose =
 			( colors && colors.length > 0 ) || ! disableCustomColors;
+
 		return (
 			<WrappedComponent
 				{ ...{
