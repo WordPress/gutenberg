@@ -61,7 +61,7 @@ describe( 'BlockAlignmentUI', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Align',
+				name: 'Align block',
 			} )
 		);
 
