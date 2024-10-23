@@ -192,7 +192,7 @@ _Returns_
 
 #### withPluginContext
 
-> **Deprecated** Use `usePluginContext` hook instead.
+> **Deprecated** 6.8.0 Use `usePluginContext` hook instead.
 
 A Higher Order Component used to inject Plugin context to the wrapped component.
 
