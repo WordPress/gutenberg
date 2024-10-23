@@ -385,7 +385,7 @@ function VisualEditor( {
 				enableResizing={ enableResizing }
 				height={
 					sizes.height && ! forceFullHeight
-						? sizes.height + 1 // Add 1px to avoid scrollbars.
+						? sizes.height + 2 // Add 2px to avoid scrollbars.
 						: '100%'
 				}
 			>
