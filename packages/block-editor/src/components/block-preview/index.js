@@ -59,7 +59,7 @@ export function BlockPreview( {
 		() => ( {
 			...originalSettings,
 			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
+			isPreviewMode: true,
 		} ),
 		[ originalSettings ]
 	);
@@ -124,7 +124,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			...originalSettings,
 			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
 			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
+			isPreviewMode: true,
 		} ),
 		[ originalSettings ]
 	);

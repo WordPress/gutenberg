@@ -8,11 +8,6 @@ import { doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import duplicateTemplatePart from '../actions/duplicate-template-part';
-import resetPost from '../actions/reset-post';
-import trashPost from '../actions/trash-post';
-import renamePost from '../actions/rename-post';
-import restorePost from '../actions/restore-post';
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -24,8 +19,13 @@ import {
 	reorderPage,
 	exportPattern,
 	permanentlyDeletePost,
+	restorePost,
+	trashPost,
+	renamePost,
+	resetPost,
+	deletePost,
 } from '@wordpress/fields';
-import deletePost from '../actions/delete-post';
+import duplicateTemplatePart from '../actions/duplicate-template-part';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -117,8 +117,8 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			resetPost,
 			restorePost,
+			resetPost,
 			deletePost,
 			trashPost,
 			permanentlyDeletePost,

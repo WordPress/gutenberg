@@ -6,8 +6,8 @@ import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { getPath } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -23,46 +23,55 @@ function useAddNewPageCommand() {
 		'site-editor.php'
 	);
 	const history = useHistory();
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme()?.is_block_theme;
+	}, [] );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const createPageEntity = async ( { close } ) => {
-		try {
-			const page = await saveEntityRecord(
-				'postType',
-				'page',
-				{
-					status: 'draft',
-				},
-				{
-					throwOnError: true,
+	const createPageEntity = useCallback(
+		async ( { close } ) => {
+			try {
+				const page = await saveEntityRecord(
+					'postType',
+					'page',
+					{
+						status: 'draft',
+					},
+					{
+						throwOnError: true,
+					}
+				);
+				if ( page?.id ) {
+					history.push( {
+						postId: page.id,
+						postType: 'page',
+						canvas: 'edit',
+					} );
 				}
-			);
-			if ( page?.id ) {
-				history.push( {
-					postId: page.id,
-					postType: 'page',
-					canvas: 'edit',
-				} );
-			}
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the item.' );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while creating the item.' );
 
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		} finally {
-			close();
-		}
-	};
+				createErrorNotice( errorMessage, {
+					type: 'snackbar',
+				} );
+			} finally {
+				close();
+			}
+		},
+		[ createErrorNotice, history, saveEntityRecord ]
+	);
 
 	const commands = useMemo( () => {
-		const addNewPage = isSiteEditor
-			? createPageEntity
-			: () => ( document.location.href = 'post-new.php?post_type=page' );
+		const addNewPage =
+			isSiteEditor && isBlockBasedTheme
+				? createPageEntity
+				: () =>
+						( document.location.href =
+							'post-new.php?post_type=page' );
 		return [
 			{
 				name: 'core/add-new-page',
@@ -71,7 +80,7 @@ function useAddNewPageCommand() {
 				callback: addNewPage,
 			},
 		];
-	}, [ createPageEntity, isSiteEditor ] );
+	}, [ createPageEntity, isSiteEditor, isBlockBasedTheme ] );
 
 	return {
 		isLoading: false,

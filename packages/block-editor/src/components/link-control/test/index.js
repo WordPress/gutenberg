@@ -138,7 +138,9 @@ describe( 'Basic rendering', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		expect( searchInput ).toBeVisible();
 	} );
@@ -147,7 +149,9 @@ describe( 'Basic rendering', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		expect( searchInput ).toBeVisible();
 		// Make sure we use the ARIA 1.0 pattern with aria-owns.
@@ -170,7 +174,9 @@ describe( 'Basic rendering', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, 'Hello' );
@@ -283,7 +289,9 @@ describe( 'Basic rendering', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -296,7 +304,7 @@ describe( 'Basic rendering', () => {
 			render( <LinkControl value={ { url: 'https://example.com' } } /> );
 
 			expect(
-				screen.queryByRole( 'combobox', { name: 'Link' } )
+				screen.queryByRole( 'combobox', { name: 'Search or type URL' } )
 			).not.toBeInTheDocument();
 		} );
 
@@ -309,7 +317,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			expect(
-				screen.getByRole( 'combobox', { name: 'Link' } )
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
 			).toBeVisible();
 		} );
 
@@ -327,7 +335,7 @@ describe( 'Basic rendering', () => {
 			await user.click( editButton );
 
 			expect(
-				screen.getByRole( 'combobox', { name: 'Link' } )
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
 			).toBeVisible();
 
 			// If passed `forceIsEditingLink` of `false` while editing, should
@@ -340,7 +348,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			expect(
-				screen.queryByRole( 'combobox', { name: 'Link' } )
+				screen.queryByRole( 'combobox', { name: 'Search or type URL' } )
 			).not.toBeInTheDocument();
 		} );
 
@@ -428,7 +436,7 @@ describe( 'Basic rendering', () => {
 
 			// Should revert back to editing mode.
 			expect(
-				screen.getByRole( 'combobox', { name: 'Link' } )
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
 			).toBeVisible();
 		} );
 	} );
@@ -450,7 +458,9 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -475,7 +485,7 @@ describe( 'Searching for a link', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Simulate searching for a term.
@@ -526,7 +536,7 @@ describe( 'Searching for a link', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Simulate searching for a term.
@@ -558,7 +568,9 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -601,7 +613,9 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl showSuggestions={ false } /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, 'anything' );
@@ -618,7 +632,9 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -648,7 +664,9 @@ describe( 'Searching for a link', () => {
 		render( <LinkControl noURLSuggestion /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, 'couldbeurlorentitysearchterm' );
@@ -679,7 +697,7 @@ describe( 'Manual link entry', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Simulate searching for a term.
@@ -715,7 +733,7 @@ describe( 'Manual link entry', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				if ( searchString.length ) {
@@ -749,7 +767,7 @@ describe( 'Manual link entry', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				// Remove the existing link.
@@ -830,7 +848,7 @@ describe( 'Manual link entry', () => {
 			await toggleSettingsDrawer( user );
 
 			let searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			let textInput = screen.getByRole( 'textbox', {
@@ -865,7 +883,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			textInput = screen.getByRole( 'textbox', {
@@ -913,7 +931,7 @@ describe( 'Manual link entry', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				// Simulate searching for a term.
@@ -949,7 +967,7 @@ describe( 'Link submission', () => {
 		render( <LinkControlConsumer /> );
 
 		const searchInput = screen.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 
 		const submitButton = screen.getByRole( 'button', {
@@ -988,7 +1006,7 @@ describe( 'Link submission', () => {
 		render( <LinkControlConsumer /> );
 
 		const searchInput = screen.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 
 		const createSubmitButton = screen.queryByRole( 'button', {
@@ -1035,9 +1053,9 @@ describe( 'Default search suggestions', () => {
 		// Verify input has no value has default suggestions should only show
 		// when this does not have a value.
 		// Search Input UI.
-		expect( screen.getByRole( 'combobox', { name: 'Link' } ) ).toHaveValue(
-			''
-		);
+		expect(
+			screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toHaveValue( '' );
 
 		// Ensure only called once as a guard against potential infinite
 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
@@ -1064,7 +1082,9 @@ describe( 'Default search suggestions', () => {
 		} );
 		await user.click( currentLinkBtn );
 
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Search input is set to the URL value.
 		expect( searchInput ).toHaveValue( initialValue.url );
@@ -1086,7 +1106,9 @@ describe( 'Default search suggestions', () => {
 		render( <LinkControl showInitialSuggestions /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -1124,7 +1146,9 @@ describe( 'Default search suggestions', () => {
 
 		render( <LinkControl showInitialSuggestions /> );
 
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		const searchResultsField = screen.queryByRole( 'listbox', {
 			name: 'Suggestions',
@@ -1183,7 +1207,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Simulate searching for a term.
@@ -1250,7 +1274,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, 'Some new page to create' );
@@ -1299,7 +1325,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, entityNameText );
@@ -1342,7 +1370,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		render( <LinkControlConsumer /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, entityNameText );
@@ -1366,7 +1396,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				const searchResultsField = screen.queryByRole( 'listbox' );
@@ -1387,7 +1417,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			const searchResultsField = screen.queryByRole( 'listbox' );
@@ -1411,7 +1441,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				// Simulate searching for a term.
@@ -1445,7 +1475,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			render( <LinkControl createSuggestion={ createSuggestion } /> );
 
 			// Search Input UI.
-			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
 
 			// Simulate searching for a term.
 			await user.type( searchInput, searchText );
@@ -1460,7 +1492,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			await user.click( createButton );
 
-			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
 
 			const errorNotice = screen.getAllByText(
 				'API response returned invalid entity.'
@@ -1533,7 +1567,9 @@ describe( 'Selecting links', () => {
 		// Simulate searching for a term.
 		await user.click( currentLinkBtn );
 
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 		currentLinkUI = screen.queryByLabelText( 'Currently selected' );
 
 		// We should be back to showing the search input.
@@ -1574,7 +1610,7 @@ describe( 'Selecting links', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				// Simulate searching for a term.
@@ -1636,7 +1672,7 @@ describe( 'Selecting links', () => {
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
-					name: 'Link',
+					name: 'Search or type URL',
 				} );
 
 				// Simulate searching for a term.
@@ -1726,7 +1762,7 @@ describe( 'Selecting links', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Step down into the search results, highlighting the first result item.
@@ -1784,7 +1820,7 @@ describe( 'Selecting links', () => {
 
 			// focus the search input
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			fireEvent.focus( searchInput );
@@ -2006,7 +2042,9 @@ describe( 'Post types', () => {
 		render( <LinkControl /> );
 
 		// Search Input UI.
-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
 
 		// Simulate searching for a term.
 		await user.type( searchInput, searchTerm );
@@ -2034,7 +2072,7 @@ describe( 'Post types', () => {
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
-				name: 'Link',
+				name: 'Search or type URL',
 			} );
 
 			// Simulate searching for a term.

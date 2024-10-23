@@ -10,6 +10,10 @@ import { useEvent, useResizeObserver } from '@wordpress/compose';
  */
 export type ElementOffsetRect = {
 	/**
+	 * The element the rect belongs to.
+	 */
+	element: HTMLElement | undefined;
+	/**
 	 * The distance from the top edge of the offset parent to the top edge of
 	 * the element.
 	 */
@@ -43,6 +47,7 @@ export type ElementOffsetRect = {
  * An `ElementOffsetRect` object with all values set to zero.
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
+	element: undefined,
 	top: 0,
 	right: 0,
 	bottom: 0,
@@ -75,9 +80,11 @@ export function getElementOffsetRect(
 	if ( rect.width === 0 || rect.height === 0 ) {
 		return;
 	}
+	const offsetParent = element.offsetParent;
 	const offsetParentRect =
-		element.offsetParent?.getBoundingClientRect() ??
-		NULL_ELEMENT_OFFSET_RECT;
+		offsetParent?.getBoundingClientRect() ?? NULL_ELEMENT_OFFSET_RECT;
+	const offsetParentScrollX = offsetParent?.scrollLeft ?? 0;
+	const offsetParentScrollY = offsetParent?.scrollTop ?? 0;
 
 	// Computed widths and heights have subpixel precision, and are not affected
 	// by distortions.
@@ -90,13 +97,22 @@ export function getElementOffsetRect(
 	const scaleY = computedHeight / rect.height;
 
 	return {
+		element,
 		// To obtain the adjusted values for the position:
 		// 1. Compute the element's position relative to the offset parent.
 		// 2. Correct for the scale factor.
-		top: ( rect.top - offsetParentRect?.top ) * scaleY,
-		right: ( offsetParentRect?.right - rect.right ) * scaleX,
-		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
-		left: ( rect.left - offsetParentRect?.left ) * scaleX,
+		// 3. Adjust for the scroll position of the offset parent.
+		top:
+			( rect.top - offsetParentRect?.top ) * scaleY + offsetParentScrollY,
+		right:
+			( offsetParentRect?.right - rect.right ) * scaleX -
+			offsetParentScrollX,
+		bottom:
+			( offsetParentRect?.bottom - rect.bottom ) * scaleY -
+			offsetParentScrollY,
+		left:
+			( rect.left - offsetParentRect?.left ) * scaleX +
+			offsetParentScrollX,
 		// Computed dimensions don't need any adjustments.
 		width: computedWidth,
 		height: computedHeight,
@@ -109,20 +125,26 @@ const POLL_RATE = 100;
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
  *
+ * When no element is provided (`null` or `undefined`), the hook will return
+ * a "null" rect, in which all values are `0` and `element` is `undefined`.
+ *
  * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
  * documentation for more details). When that happens, this hook will attempt
  * to measure again after a frame, and if that fails, it will poll every 100
  * milliseconds until it succeeds.
  */
 export function useTrackElementOffsetRect(
-	targetElement: HTMLElement | undefined | null
+	targetElement: HTMLElement | undefined | null,
+	deps: unknown[] = []
 ) {
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
 	const intervalRef = useRef< ReturnType< typeof setInterval > >();
 
 	const measure = useEvent( () => {
-		if ( targetElement ) {
+		// Check that the targetElement is still attached to the DOM, in case
+		// it was removed since the last `measure` call.
+		if ( targetElement && targetElement.isConnected ) {
 			const elementOffsetRect = getElementOffsetRect( targetElement );
 			if ( elementOffsetRect ) {
 				setIndicatorPosition( elementOffsetRect );
@@ -145,10 +167,22 @@ export function useTrackElementOffsetRect(
 		}
 	} );
 
-	useLayoutEffect(
-		() => setElement( targetElement ),
-		[ setElement, targetElement ]
-	);
+	useLayoutEffect( () => {
+		setElement( targetElement );
+		if ( ! targetElement ) {
+			setIndicatorPosition( NULL_ELEMENT_OFFSET_RECT );
+		}
+	}, [ setElement, targetElement ] );
+
+	// Escape hatch to force a remeasurement when something else changes rather
+	// than the target elements' ref or size (for example, the target element
+	// can change its position within the tablist).
+	useLayoutEffect( () => {
+		measure();
+		// `measure` is a stable function, so it's safe to omit it from the deps array.
+		// deps can't be statically analyzed by ESLint
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, deps );
 
 	return indicatorPosition;
 }

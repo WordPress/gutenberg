@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
-import { withPluginContext } from '@wordpress/plugins';
+import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
 /**
@@ -62,12 +61,14 @@ import { ActionItem } from '@wordpress/interface';
  *
  * @return {Component} The component to be rendered.
  */
-export default compose(
-	withPluginContext( ( context, ownProps ) => {
-		return {
-			as: ownProps.as ?? MenuItem,
-			icon: ownProps.icon || context.icon,
-			name: 'core/plugin-more-menu',
-		};
-	} )
-)( ActionItem );
+export default function PluginMoreMenuItem( props ) {
+	const context = usePluginContext();
+	return (
+		<ActionItem
+			name="core/plugin-more-menu"
+			as={ props.as ?? MenuItem }
+			icon={ props.icon || context.icon }
+			{ ...props }
+		/>
+	);
+}

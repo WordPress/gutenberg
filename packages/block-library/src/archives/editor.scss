@@ -1,3 +1,11 @@
 ul.wp-block-archives {
 	padding-left: 2.5em;
 }
+
+// The following styles are to prevent duplicate spacing and borders for the archives
+// block in the editor given it uses server side rendering.
+// See https://github.com/WordPress/gutenberg/pull/63400
+.wp-block-archives .wp-block-archives {
+	margin: 0;
+	border: 0;
+}

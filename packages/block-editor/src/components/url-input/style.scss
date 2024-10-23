@@ -109,10 +109,4 @@ $input-size: 300px;
 	flex-shrink: 1;
 	min-width: 0;
 	align-items: flex-start;
-
-	.components-button {
-		flex-shrink: 0;
-		width: $button-size;
-		height: $button-size;
-	}
 }

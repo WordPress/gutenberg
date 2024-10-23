@@ -114,13 +114,17 @@
 		width: calc(100% - #{$canvas-padding});
 
 		.edit-site-resizable-frame__inner-content {
-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
-			transition: border-radius 0.4s;
+			box-shadow: $elevation-x-small;
+			transition: border-radius, box-shadow 0.4s;
 			// This ensure the radius work properly.
 			overflow: hidden;
 
 			.edit-site-layout:not(.is-full-canvas) & {
 				border-radius: $radius-large;
+			}
+
+			&:hover {
+				box-shadow: $elevation-large;
 			}
 		}
 	}
@@ -206,8 +210,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
-		height: $grid-unit-80;
-		width: $grid-unit-80;
+		height: $header-height;
+		width: $header-height;
 		justify-content: center;
 		align-items: center;
 	}
@@ -246,6 +250,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	flex-grow: 1;
 	margin: 0;
 	overflow: hidden;
+	box-shadow: $elevation-x-small;
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;

@@ -8,6 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
@@ -1601,7 +1602,7 @@ export function blocksMode( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function insertionPoint( state = null, action ) {
+export function insertionCue( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
 			const {
@@ -1660,17 +1661,30 @@ export function template( state = { isValid: true }, action ) {
  */
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_SETTINGS':
-			if ( action.reset ) {
-				return {
-					...SETTINGS_DEFAULTS,
-					...action.settings,
-				};
-			}
-			return {
-				...state,
-				...action.settings,
-			};
+		case 'UPDATE_SETTINGS': {
+			const updatedSettings = action.reset
+				? {
+						...SETTINGS_DEFAULTS,
+						...action.settings,
+				  }
+				: {
+						...state,
+						...action.settings,
+				  };
+
+			Object.defineProperty( updatedSettings, '__unstableIsPreviewMode', {
+				get() {
+					deprecated( '__unstableIsPreviewMode', {
+						since: '6.8',
+						alternative: 'isPreviewMode',
+					} );
+
+					return this.isPreviewMode;
+				},
+			} );
+
+			return updatedSettings;
+		}
 	}
 
 	return state;
@@ -1785,22 +1799,6 @@ export const blockListSettings = ( state = {}, action ) => {
 	}
 	return state;
 };
-
-/**
- * Reducer returning which mode is enabled.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function editorMode( state = 'edit', action ) {
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return action.mode;
-	}
-
-	return state;
-}
 
 /**
  * Reducer return an updated state representing the most recent block attribute
@@ -2066,7 +2064,7 @@ export function hoveredBlockClientId( state = false, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {number} Updated state.
  */
 export function zoomLevel( state = 100, action ) {
 	switch ( action.type ) {
@@ -2074,6 +2072,25 @@ export function zoomLevel( state = 100, action ) {
 			return action.zoom;
 		case 'RESET_ZOOM_LEVEL':
 			return 100;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer setting the insertion point
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPoint( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTION_POINT':
+			return action.value;
+		case 'SELECT_BLOCK':
+			return null;
 	}
 
 	return state;
@@ -2092,12 +2109,12 @@ const combinedReducers = combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
+	insertionCue,
 	template,
 	settings,
 	preferences,
 	lastBlockAttributesChange,
 	lastFocus,
-	editorMode,
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,

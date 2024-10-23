@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -39,14 +42,32 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
 	// There are no plugins in the mobile apps, so there is no
 	// need to strip the experimental settings:
 	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
 		cleanSettings = {};
-		for ( const key in settings ) {
+		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+				cleanSettings[ key ] = incomingSettings[ key ];
 			}
 		}
 	}
@@ -360,6 +381,20 @@ export function expandBlock( clientId ) {
 }
 
 /**
+ * @param {Object} value
+ * @param {string} value.rootClientId The root client ID to insert at.
+ * @param {number} value.index        The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setInsertionPoint( value ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		value,
+	};
+}
+
+/**
  * Temporarily modify/unlock the content-only block for editions.
  *
  * @param {string} clientId The client id of the block.
@@ -390,12 +425,54 @@ export const modifyContentLockBlock =
  * @param {number} zoom the new zoom level
  * @return {Object} Action object.
  */
-export function setZoomLevel( zoom = 100 ) {
-	return {
-		type: 'SET_ZOOM_LEVEL',
-		zoom,
+export const setZoomLevel =
+	( zoom = 100 ) =>
+	( { select, dispatch } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
+		if ( zoom !== 100 ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			const sectionRootClientId = select.getSectionRootClientId();
+
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
+				}
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
+
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		}
+
+		dispatch( {
+			type: 'SET_ZOOM_LEVEL',
+			zoom,
+		} );
 	};
-}
 
 /**
  * Resets the Zoom state.

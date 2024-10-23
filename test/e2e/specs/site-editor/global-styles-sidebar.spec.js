@@ -28,21 +28,21 @@ test.describe( 'Global styles sidebar', () => {
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks styles' } )
+			.getByRole( 'button', { name: 'Blocks' } )
 			.click();
 
 		await page
-			.getByRole( 'searchbox', { name: 'Search for blocks' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'heading' );
 
 		// Matches both Heading and Table of Contents blocks.
 		// The latter contains "heading" in its description.
 		await expect(
-			page.getByRole( 'button', { name: 'Heading block styles' } )
+			page.getByRole( 'button', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Table of Contents block styles',
+				name: 'Table of Contents',
 			} )
 		).toBeVisible();
 	} );

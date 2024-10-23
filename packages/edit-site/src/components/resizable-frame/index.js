@@ -13,14 +13,15 @@ import {
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 // Removes the inline styles in the drag handles.
 const HANDLE_STYLES_OVERRIDE = {
@@ -86,6 +87,9 @@ function ResizableFrame( {
 	defaultSize,
 	innerContentStyle,
 } ) {
+	const history = useHistory();
+	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const disableMotion = useReducedMotion();
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
@@ -93,11 +97,7 @@ function ResizableFrame( {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ shouldShowHandle, setShouldShowHandle ] = useState( false );
 	const [ resizeRatio, setResizeRatio ] = useState( 1 );
-	const canvasMode = useSelect(
-		( select ) => unlock( select( editSiteStore ) ).getCanvasMode(),
-		[]
-	);
-	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
+
 	const FRAME_TRANSITION = { type: 'tween', duration: isResizing ? 0 : 0.5 };
 	const frameRef = useRef( null );
 	const resizableHandleHelpId = useInstanceId(
@@ -158,7 +158,16 @@ function ResizableFrame( {
 			setFrameSize( INITIAL_FRAME_SIZE );
 		} else {
 			// Trigger full screen if the frame is resized far enough to the left.
-			setCanvasMode( 'edit' );
+			history.push(
+				{
+					...params,
+					canvas: 'edit',
+				},
+				undefined,
+				{
+					transition: 'canvas-mode-edit-transition',
+				}
+			);
 		}
 	};
 
@@ -171,7 +180,10 @@ function ResizableFrame( {
 		event.preventDefault();
 
 		const step = 20 * ( event.shiftKey ? 5 : 1 );
-		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
+		const delta =
+			step *
+			( event.key === 'ArrowLeft' ? 1 : -1 ) *
+			( isRTL() ? -1 : 1 );
 		const newWidth = Math.min(
 			Math.max(
 				FRAME_MIN_WIDTH,
@@ -200,15 +212,17 @@ function ResizableFrame( {
 	const resizeHandleVariants = {
 		hidden: {
 			opacity: 0,
-			left: 0,
+			...( isRTL() ? { right: 0 } : { left: 0 } ),
 		},
 		visible: {
 			opacity: 1,
-			left: -14, // Account for the handle's width.
+			// Account for the handle's width.
+			...( isRTL() ? { right: -14 } : { left: -14 } ),
 		},
 		active: {
 			opacity: 1,
-			left: -14, // Account for the handle's width.
+			// Account for the handle's width.
+			...( isRTL() ? { right: -14 } : { left: -14 } ),
 			scaleY: 1.3,
 		},
 	};
@@ -232,7 +246,7 @@ function ResizableFrame( {
 				}
 			} }
 			whileHover={
-				canvasMode === 'view'
+				canvas === 'view'
 					? {
 							scale: 1.005,
 							transition: {
@@ -246,10 +260,11 @@ function ResizableFrame( {
 			size={ frameSize }
 			enable={ {
 				top: false,
-				right: false,
 				bottom: false,
 				// Resizing will be disabled until the editor content is loaded.
-				left: isReady,
+				...( isRTL()
+					? { right: isReady, left: false }
+					: { left: isReady, right: false } ),
 				topRight: false,
 				bottomRight: false,
 				bottomLeft: false,
@@ -269,7 +284,7 @@ function ResizableFrame( {
 			onMouseOver={ () => setShouldShowHandle( true ) }
 			onMouseOut={ () => setShouldShowHandle( false ) }
 			handleComponent={ {
-				left: canvasMode === 'view' && (
+				[ isRTL() ? 'right' : 'left' ]: canvas === 'view' && (
 					<>
 						<Tooltip text={ __( 'Drag to resize' ) }>
 							{ /* Disable reason: role="separator" does in fact support aria-valuenow */ }

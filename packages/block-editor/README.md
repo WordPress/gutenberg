@@ -839,6 +839,56 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBlockBindingsUtils
+
+Retrieves the existing utils needed to update the block `bindings` metadata. They can be used to create, modify, or remove connections from the existing block attributes.
+
+It contains the following utils:
+
+-   `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
+-   `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
+
+_Usage_
+
+```js
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
+
+// Update url and alt attributes.
+updateBlockBindings( {
+	url: {
+		source: 'core/post-meta',
+		args: {
+			key: 'url_custom_field',
+		},
+	},
+	alt: {
+		source: 'core/post-meta',
+		args: {
+			key: 'text_custom_field',
+		},
+	},
+} );
+
+// Remove binding from url attribute.
+updateBlockBindings( { url: undefined } );
+
+// Remove bindings from all attributes.
+removeAllBlockBindings();
+```
+
+_Parameters_
+
+-   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+
+_Returns_
+
+-   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
+
 ### useBlockCommands
 
 Undocumented declaration.
@@ -1027,11 +1077,11 @@ _Parameters_
 
 ### useZoomOut
 
-A hook used to set the zoomed out view, invoking the hook sets the mode.
+A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
 
 _Parameters_
 
--   _zoomOut_ `boolean`: If we should zoom out or not.
+-   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
 
 ### Warning
 

@@ -179,7 +179,6 @@ function ComplementaryArea( {
 	panelClassName,
 	scope,
 	name,
-	smallScreenTitle,
 	title,
 	toggleShortcut,
 	isActiveByDefault,
@@ -220,6 +219,9 @@ function ComplementaryArea( {
 		},
 		[ identifier, scope ]
 	);
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
 	useAdjustComplementaryListener(
 		scope,
 		identifier,
@@ -300,7 +302,6 @@ function ComplementaryArea( {
 					className={ headerClassName }
 					closeLabel={ closeLabel }
 					onClose={ () => disableComplementaryArea( scope ) }
-					smallScreenTitle={ smallScreenTitle }
 					toggleButtonProps={ {
 						label: closeLabel,
 						size: 'small',
@@ -314,7 +315,7 @@ function ComplementaryArea( {
 							<h2 className="interface-complementary-area-header__title">
 								{ title }
 							</h2>
-							{ isPinnable && (
+							{ isPinnable && ! isMobileViewport && (
 								<Button
 									className="interface-complementary-area__pin-unpin-item"
 									icon={ isPinned ? starFilled : starEmpty }

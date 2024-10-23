@@ -68,7 +68,11 @@
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
 	overflow-wrap: break-word;
-	padding: $grid-unit-05 * 0.5 0 0 0;
+
+	&#{&},
+	&#{&} .edit-site-sidebar-navigation-screen__title {
+		line-height: $font-line-height-x-large;
+	}
 }
 
 .edit-site-sidebar-navigation-screen__actions {

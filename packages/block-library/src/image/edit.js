@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
-import { store as blocksStore, createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -28,7 +28,6 @@ import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
@@ -372,9 +371,9 @@ export function ImageEdit( {
 				return {};
 			}
 
-			const blockBindingsSource = unlock(
-				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
 
 			return {
 				lockUrlControls:

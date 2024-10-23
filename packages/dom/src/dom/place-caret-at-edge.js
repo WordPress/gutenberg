@@ -67,14 +67,7 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	const { ownerDocument } = container;
-	const { defaultView } = ownerDocument;
-	assertIsDefined( defaultView, 'defaultView' );
-	const selection = defaultView.getSelection();
-	assertIsDefined( selection, 'selection' );
-
 	if ( ! container.isContentEditable ) {
-		selection.removeAllRanges();
 		return;
 	}
 
@@ -86,6 +79,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
+	const { ownerDocument } = container;
+	const { defaultView } = ownerDocument;
+	assertIsDefined( defaultView, 'defaultView' );
+	const selection = defaultView.getSelection();
+	assertIsDefined( selection, 'selection' );
 	selection.removeAllRanges();
 	selection.addRange( range );
 }

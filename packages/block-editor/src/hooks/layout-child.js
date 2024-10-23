@@ -17,6 +17,9 @@ import {
 	GridItemMovers,
 } from '../components/grid';
 
+// Used for generating the instance ID
+const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
+
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
@@ -32,7 +35,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	} = layout;
 	const parentLayout = useLayout() || {};
 	const { columnCount, minimumColumnWidth } = parentLayout;
-	const id = useInstanceId( useBlockPropsChildLayoutStyles );
+	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
 	const selector = `.wp-container-content-${ id }`;
 
 	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
@@ -172,9 +175,54 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		isManualPlacement,
 	} = parentLayout;
 
-	const rootClientId = useSelect(
+	if ( parentLayoutType !== 'grid' ) {
+		return null;
+	}
+
+	return (
+		<GridTools
+			clientId={ clientId }
+			style={ style }
+			setAttributes={ setAttributes }
+			allowSizingOnChildren={ allowSizingOnChildren }
+			isManualPlacement={ isManualPlacement }
+			parentLayout={ parentLayout }
+		/>
+	);
+}
+
+function GridTools( {
+	clientId,
+	style,
+	setAttributes,
+	allowSizingOnChildren,
+	isManualPlacement,
+	parentLayout,
+} ) {
+	const { rootClientId, isVisible } = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlockRootClientId( clientId );
+			const {
+				getBlockRootClientId,
+				getBlockEditingMode,
+				getTemplateLock,
+			} = select( blockEditorStore );
+
+			const _rootClientId = getBlockRootClientId( clientId );
+
+			if (
+				getTemplateLock( _rootClientId ) ||
+				getBlockEditingMode( _rootClientId ) !== 'default'
+			) {
+				return {
+					rootClientId: _rootClientId,
+					isVisible: false,
+				};
+			}
+
+			return {
+				rootClientId: _rootClientId,
+				isVisible: true,
+			};
 		},
 		[ clientId ]
 	);
@@ -182,7 +230,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
 
-	if ( parentLayoutType !== 'grid' ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
