@@ -52,7 +52,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 export default function SidebarNavigationScreenGlobalStyles() {
 	const history = useHistory();
 	const { params } = useLocation();
-	const { canvas = 'view' } = params;
+	const { canvas = 'view', path = '' } = params;
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -148,10 +148,23 @@ export default function SidebarNavigationScreenGlobalStyles() {
 			{ canvas === 'view' && isViewingStyleBook && (
 				<StyleBook
 					enableResizing={ false }
-					isSelected={ () => false }
 					showCloseButton={ false }
 					showTabs={ false }
-					onClick={ () => {} }
+					isSelected={ ( blockName ) =>
+						// Match '/blocks/core%2Fbutton' and
+						// '/blocks/core%2Fbutton/typography', but not
+						// '/blocks/core%2Fbuttons'.
+						path ===
+							`/wp_global_styles/blocks/${ encodeURIComponent(
+								blockName
+							) }` ||
+						path.startsWith(
+							`/wp_global_styles/blocks/${ encodeURIComponent(
+								blockName
+							) }/`
+						)
+					}
+					path={ path }
 				/>
 			) }
 		</>

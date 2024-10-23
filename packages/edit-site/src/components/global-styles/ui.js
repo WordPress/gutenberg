@@ -329,16 +329,15 @@ function GlobalStylesUI( { path, onPathChange } ) {
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
 		[]
 	);
-	const WrapperComponent = path && onPathChange ? NavigationSync : Fragment;
+
 	return (
 		<Navigator
 			className="edit-site-global-styles-sidebar__navigator-provider"
 			initialPath="/"
 		>
-			<WrapperComponent
-				path={ path }
-				onPathChange={ onPathChange }
-			></WrapperComponent>
+			{ path && onPathChange && (
+				<NavigationSync path={ path } onPathChange={ onPathChange } />
+			) }
 			<GlobalStylesNavigationScreen path="/">
 				<ScreenRoot />
 			</GlobalStylesNavigationScreen>
