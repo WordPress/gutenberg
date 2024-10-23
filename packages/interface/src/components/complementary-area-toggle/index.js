@@ -3,12 +3,12 @@
  */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { usePluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
 import { store as interfaceStore } from '../../store';
-import complementaryAreaContext from '../complementary-area-context';
 
 /**
  * Whether the role supports checked state.
@@ -29,17 +29,20 @@ function roleSupportsCheckedState( role ) {
 	].includes( role );
 }
 
-function ComplementaryAreaToggle( {
+export default function ComplementaryAreaToggle( {
 	as = Button,
 	scope,
-	identifier,
-	icon,
+	identifier: identifierProp,
+	icon: iconProp,
 	selectedIcon,
 	name,
 	shortcut,
 	...props
 } ) {
 	const ComponentToUse = as;
+	const context = usePluginContext();
+	const icon = iconProp || context.icon;
+	const identifier = identifierProp || `${ context.name }/${ name }`;
 	const isSelected = useSelect(
 		( select ) =>
 			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
@@ -70,5 +73,3 @@ function ComplementaryAreaToggle( {
 		/>
 	);
 }
-
-export default complementaryAreaContext( ComplementaryAreaToggle );

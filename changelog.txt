@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 19.5.0-rc.1 =
-
+= 19.5.0 =
 
 ## Changelog
 
@@ -78,6 +77,7 @@
 - Allow label override when it is defined in client registration. ([66160](https://github.com/WordPress/gutenberg/pull/66160))
 - Bootstrap server sources earlier. ([66058](https://github.com/WordPress/gutenberg/pull/66058))
 - Fix: Don't render image when `src` attribute is empty. ([66004](https://github.com/WordPress/gutenberg/pull/66004))
+- Allow the field types matching attribute types in bindings. ([66174](https://github.com/WordPress/gutenberg/pull/66174))
 
 #### Global Styles
 - Always preview style variations using desktop device type. ([66023](https://github.com/WordPress/gutenberg/pull/66023))
@@ -232,6 +232,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @ajlende @akasunil @Aljullu @andrewserong @AnmolVerma404 @ciampo @DaniGuardiola @dhruvang21 @draganescu @getdave @hbhalodia @jameskoster @jasmussen @jeryj @jsnajdr @leemyongpakva @MaggieCabrera @Mamaduka @matiasbenedetto @matt-west @mcsf @mediaformat @michalczaplinski @mikachan @mirka @ndiego @ntsekouras @ramonjd @renatho @richtabor @rmccue @sabernhardt @SantosGuillamot @shail-mehta @sirreal @stokesman @t-hamano @talldan @troychaplin @tyxla @up1512001 @vk17-starlord @Vrishabhsk @westonruter @youknowriad
+
+
 
 
 = 19.4.0 =

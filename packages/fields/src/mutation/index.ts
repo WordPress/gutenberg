@@ -10,9 +10,9 @@ import { dispatch } from '@wordpress/data';
  */
 import type { CoreDataError, Post } from '../types';
 
-const getErrorMessagesFromPromises = < T >(
+function getErrorMessagesFromPromises< T >(
 	allSettledResults: PromiseSettledResult< T >[]
-) => {
+) {
 	const errorMessages = new Set< string >();
 	// If there was at lease one failure.
 	if ( allSettledResults.length === 1 ) {
@@ -36,7 +36,7 @@ const getErrorMessagesFromPromises = < T >(
 		}
 	}
 	return errorMessages;
-};
+}
 
 export type NoticeSettings< T extends Post > = {
 	success: {
