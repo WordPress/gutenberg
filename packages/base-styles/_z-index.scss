@@ -206,6 +206,9 @@ $z-layers: (
 
 	// Ensure footer stays above the preview field.
 	".dataviews-footer": 2,
+
+	// Needs to be below media library (.media-model) that has a z-index of 160000.
+	".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown": 160000 - 10,
 );
 
 @function z-index( $key ) {
