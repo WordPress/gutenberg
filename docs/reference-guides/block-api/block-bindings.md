@@ -222,10 +222,10 @@ There are a few examples in Core that can be used as a reference.
 
 `unregisterBlockBindingsSource` unregisters a block bindings source by providing its name.
 
-
 ```js
 import { unregisterBlockBindingsSource } from '@wordpress/blocks';
 
 unregisterBlockBindingsSource( 'plugin/my-custom-source' );
 ```
+
 
