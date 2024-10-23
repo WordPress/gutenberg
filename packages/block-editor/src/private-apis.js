@@ -24,6 +24,7 @@ import {
 	useLayoutClasses,
 	useLayoutStyles,
 	__unstableBlockStyleVariationOverridesWithConfig,
+	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
@@ -80,6 +81,7 @@ lock( privateApis, {
 	usesContextKey,
 	useFlashEditableBlocks,
 	useZoomOutModeExit,
+	useZoomOut,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
