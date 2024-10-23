@@ -286,6 +286,8 @@ export function parseRawBlock( rawBlock, options ) {
 	return updatedBlock;
 }
 
+const parseCache = new Map();
+
 /**
  * Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
  * defined through a parsing expression grammar to take advantage of the regular
@@ -308,11 +310,21 @@ export function parseRawBlock( rawBlock, options ) {
  * @return {Array} Block list.
  */
 export default function parse( content, options ) {
-	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {
-		const block = parseRawBlock( rawBlock, options );
-		if ( block ) {
-			accumulator.push( block );
-		}
-		return accumulator;
-	}, [] );
+	if ( parseCache.has( content ) ) {
+		return parseCache.get( content );
+	}
+
+	const parsed = grammarParse( content ).reduce(
+		( accumulator, rawBlock ) => {
+			const block = parseRawBlock( rawBlock, options );
+			if ( block ) {
+				accumulator.push( block );
+			}
+			return accumulator;
+		},
+		[]
+	);
+	parseCache.set( content, parsed );
+
+	return parsed;
 }
