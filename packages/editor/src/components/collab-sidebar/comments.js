@@ -343,7 +343,7 @@ function CommentHeader( {
 		},
 	];
 
-	let moreActions = actions.filter( ( item ) => item.onClick );
+	const moreActions = actions.filter( ( item ) => item.onClick );
 
 	return (
 		<HStack alignment="left" spacing="3" justify="flex-start">
