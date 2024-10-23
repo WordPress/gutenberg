@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -229,53 +229,6 @@ export default function CollabSidebar() {
 		}
 	}, [ postId, clientId ] );
 
-	const allBlocks = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlocks();
-	}, [] );
-
-	// Process comments to build the tree structure
-	const resultComments = useMemo( () => {
-		// Create a compare to store the references to all objects by id
-		const compare = {};
-		const result = [];
-
-		const filteredComments = threads.filter(
-			( comment ) => comment.status !== 'trash'
-		);
-
-		// Initialize each object with an empty `reply` array
-		filteredComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure
-		filteredComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		const filteredBlocks = allBlocks?.filter(
-			( block ) => block.attributes.blockCommentId !== 0
-		);
-
-		const blockCommentIds = filteredBlocks?.map(
-			( block ) => block.attributes.blockCommentId
-		);
-		const threadIdMap = new Map(
-			result?.map( ( thread ) => [ thread.id, thread ] )
-		);
-		const sortedThreads = blockCommentIds
-			.map( ( id ) => threadIdMap.get( id ) )
-			.filter( ( thread ) => thread !== undefined );
-
-		return sortedThreads;
-	}, [ threads, allBlocks ] );
-
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
 		return null; // or maybe return some message indicating no threads are available.
@@ -298,13 +251,13 @@ export default function CollabSidebar() {
 			>
 				<div className="editor-collab-sidebar-panel">
 					<AddComment
-						threads={ resultComments }
+						threads={ threads }
 						onSubmit={ addNewComment }
 						showCommentBoard={ showCommentBoard }
 						setShowCommentBoard={ setShowCommentBoard }
 					/>
 					<Comments
-						threads={ resultComments }
+						threads={ threads }
 						onEditComment={ onEditComment }
 						onAddReply={ addNewComment }
 						onCommentDelete={ onCommentDelete }
