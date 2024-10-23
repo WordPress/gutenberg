@@ -19,6 +19,8 @@ function render_block_core_playlist( $attributes ) {
 		return '';
 	}
 
+	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
+
 	$tracklist          = isset( $attributes['tracklist'] ) ? $attributes['tracklist'] : true;
 	$tracknumbers       = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
 	$images             = isset( $attributes['images'] ) ? $attributes['images'] : true;
@@ -42,31 +44,34 @@ function render_block_core_playlist( $attributes ) {
 		);
 	}
 
-	$html  = '<figure ' . $wrapper_attributes . '>';
-	$html .= '<div class="wp-block-playlist__current-item">';
-	if ( $images ) {
-		$html .= '<img src="' . esc_url( isset( $attributes['ids'][0]['image']['src'] ) ? $attributes['ids'][0]['image']['src'] : $placeholder_image ) . '" alt="">';
-	}
+	wp_interactivity_state(
+		'core/playlist',
+		array(
+			'currentID'     => $current_id,
+			'currentURL'    => $attributes['ids'][0]['url'],
+			'currentTitle'  => $current_title ,
+			'currentAlbum ' => $current_album,
+			'currentArtist' => $current_artist,
+			'currentImage'  => isset( $attributes['ids'][0]['image']['src'] ) ? $attributes['ids'][0]['image']['src'] : $placeholder_image,
+			'ariaLabel'     => $aria_label,
+		)
+	);
 
-	// Note: The Media library allows some HTML in these fields.
-	if ( isset( $current_title ) || isset( $current_album ) || isset( $current_artist ) ) {
-		$html .= '<ul>';
-		if ( isset( $current_title ) ) {
-			$html .= '<li class="wp-block-playlist__item-title">' . wp_kses_post( $current_title ) . '</li>';
-		}
-		if ( isset( $current_album ) ) {
-			$html .= '<li class="wp-block-playlist__item-album">' . wp_kses_post( $current_album ) . '</li>';
-		}
-		if ( isset( $current_artist ) ) {
-			$html .= '<li class="wp-block-playlist__item-artist">' . wp_kses_post( $current_artist ) . '</li>';
-		}
-		$html .= '</ul>';
-	}
-	$html .= '<audio controls="controls" src="' . esc_url( $attributes['ids'][0]['url'] ) . '" aria-label="' . esc_attr( $aria_label ) . '"></audio>';
+	$html  = '<figure ' . $wrapper_attributes . 'data-wp-interactive="core/playlist">';
+	$html .= '<div class="wp-block-playlist__current-item">';
+	$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="48px" height="64px">';
+	$html .= '<ul>';
+	$html .= '<li class="wp-block-playlist__item-title" data-wp-text="state.currentTitle"></li>';
+	$html .= '<li class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></li>';
+	$html .= '<li class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></li>';
+	$html .= '</ul>';
+	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel"></audio>';
 	$html .= '</div>'; // End of current track information.
+
 	if ( $tracklist ) {
 		$html .= '<' . $tagname . ' class="wp-block-playlist__tracks">';
 		foreach ( $attributes['ids'] as $key => $value ) {
+			$id     = isset( $attributes['ids'][ $key ]['id'] ) ? $attributes['ids'][ $key ]['id'] : '';
 			$url    = isset( $attributes['ids'][ $key ]['url'] ) ? $attributes['ids'][ $key ]['url'] : '';
 			$title  = isset( $attributes['ids'][ $key ]['title'] ) ? $attributes['ids'][ $key ]['title'] : '';
 			$artist = isset( $attributes['ids'][ $key ]['artist'] ) ? $attributes['ids'][ $key ]['artist'] : '';
@@ -74,17 +79,19 @@ function render_block_core_playlist( $attributes ) {
 			$image  = isset( $attributes['ids'][ $key ]['image']['src'] ) ? $attributes['ids'][ $key ]['image']['src'] : $placeholder_image;
 			$length = isset( $attributes['ids'][ $key ]['length'] ) ? $attributes['ids'][ $key ]['length'] : '';
 
+			$contexts = wp_interactivity_data_wp_context(
+				array(
+					'trackID'       => $id,
+					'trackURL'      => $url,
+					'trackTitle'    => $title,
+					'trackArtist'   => $artist,
+					'trackAlbum'    => $album,
+					'trackImageSrc' => $image,
+				),
+			);
+
 			$html .= '<li class="wp-block-playlist__item">';
-			$html .= '<button';
-			if ( isset( $attributes['ids'][ $key ]['id'] ) && $attributes['ids'][ $key ]['id'] === $current_id ) {
-				$html .= ' aria-current="true"';
-			}
-			$html .= ' data-playlist-track-url="' . esc_url( $url ) . '" .
-			data-playlist-track-title="' . esc_attr( $title ) . '" .
-			data-playlist-track-artist="' . esc_attr( $artist ) . '" .
-			data-playlist-track-album="' . esc_attr( $album ) . '" .
-			data-playlist-track-image-src="' . esc_url( $image ) . '" .
-			>';
+			$html .= '<button '. $contexts . 'data-wp-on--click="actions.changeTrack">';
 
 			/**
 			 * Use quotation marks for song titles when they are combined with the artist name,

@@ -59,12 +59,12 @@
 				"width": true
 			}
 		},
+		"interactivity": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
 		}
 	},
-	"viewScript": "file:./view.min.js",
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }
