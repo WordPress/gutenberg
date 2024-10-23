@@ -151,6 +151,16 @@ function usePostFields( viewType ) {
 		() => [
 			featuredImageField,
 			{
+				id: 'is-pinned',
+				label: __( 'Pinned' ),
+				getValue: ( { item } ) =>
+					item.id === frontPageId || item.id === postsPageId,
+				enableSorting: false,
+				render: ( { item } ) =>
+					item.id === frontPageId ||
+					( item.id === postsPageId && <span>Pinned</span> ),
+			},
+			{
 				label: __( 'Title' ),
 				id: 'title',
 				type: 'text',

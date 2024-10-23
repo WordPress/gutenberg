@@ -28,6 +28,9 @@ export default function DataViewsLayout() {
 		onChangeSelection,
 		setOpenedFilter,
 		density,
+		onPinItem,
+		onUnpinItem,
+		pinnedItems = [],
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
@@ -46,6 +49,9 @@ export default function DataViewsLayout() {
 			setOpenedFilter={ setOpenedFilter }
 			view={ view }
 			density={ density }
+			onPinItem={ onPinItem }
+			onUnpinItem={ onUnpinItem }
+			pinnedItems={ pinnedItems }
 		/>
 	);
 }

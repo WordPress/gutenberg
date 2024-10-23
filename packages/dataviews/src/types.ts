@@ -468,17 +468,16 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 	modalHeader?: string;
 }
 
+export interface ActionContext< Item > {
+	registry: any;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
 export interface ActionButton< Item > extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
-	callback: (
-		items: Item[],
-		context: {
-			registry: any;
-			onActionPerformed?: ( items: Item[] ) => void;
-		}
-	) => void;
+	callback: ( items: Item[], context: ActionContext< Item > ) => void;
 }
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
@@ -495,6 +494,9 @@ export interface ViewBaseProps< Item > {
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
 	density: number;
+	onPinItem?: ( itemId: string ) => void;
+	onUnpinItem?: ( itemId: string ) => void;
+	pinnedItems: string[];
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
