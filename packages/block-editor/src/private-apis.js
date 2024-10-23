@@ -32,7 +32,6 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
-import { useZoomOutModeExit } from './components/block-list/use-block-props/use-zoom-out-mode-exit';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
@@ -79,7 +78,6 @@ lock( privateApis, {
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
-	useZoomOutModeExit,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,

@@ -3,12 +3,12 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Allows Zoom Out mode to be exited by double clicking in the selected block.

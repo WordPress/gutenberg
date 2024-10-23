@@ -41,6 +41,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
+import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 
 const {
 	LayoutStyle,
@@ -48,7 +49,6 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
-	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
