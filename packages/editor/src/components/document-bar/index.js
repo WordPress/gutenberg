@@ -28,6 +28,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import usePageTypeBadge from '../../utils/pageTypeBadge';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -59,8 +60,6 @@ export default function DocumentBar( props ) {
 		isUnsyncedPattern,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
-		isFrontPage,
-		isPostsPage,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -69,7 +68,6 @@ export default function DocumentBar( props ) {
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
 		const {
-			canUser,
 			getEditedEntityRecord,
 			getPostType,
 			isResolving: isResolvingSelector,
@@ -83,12 +81,6 @@ export default function DocumentBar( props ) {
 		);
 		const _templateInfo = getTemplateInfo( _document );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
-		const siteSettings = canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} )
-			? getEditedEntityRecord( 'root', 'site' )
-			: undefined;
 
 		return {
 			postType: _postType,
@@ -106,8 +98,6 @@ export default function DocumentBar( props ) {
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
-			isFrontPage: siteSettings?.page_on_front === _postId,
-			isPostsPage: siteSettings?.page_for_posts === _postId,
 		};
 	}, [] );
 
@@ -120,6 +110,8 @@ export default function DocumentBar( props ) {
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
 	const title = props.title || entityTitle;
 	const icon = props.icon;
+
+	const pageType = usePageTypeBadge();
 
 	const mountedRef = useRef( false );
 	useEffect( () => {
@@ -195,25 +187,16 @@ export default function DocumentBar( props ) {
 									? decodeEntities( title )
 									: __( 'No title' ) }
 							</span>
-							{ isFrontPage && ! props.title && (
+							{ pageType && ! props.title && (
 								<span className="editor-document-bar__post-type-label">
-									{ '. ' + __( 'Homepage' ) }
+									{ '. ' + pageType }
 								</span>
 							) }
-							{ isPostsPage && ! props.title && (
+							{ postTypeLabel && ! props.title && ! pageType && (
 								<span className="editor-document-bar__post-type-label">
-									{ '. ' + __( 'Posts Page' ) }
+									{ '· ' + decodeEntities( postTypeLabel ) }
 								</span>
 							) }
-							{ postTypeLabel &&
-								! props.title &&
-								! isFrontPage &&
-								! isPostsPage && (
-									<span className="editor-document-bar__post-type-label">
-										{ '· ' +
-											decodeEntities( postTypeLabel ) }
-									</span>
-								) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
