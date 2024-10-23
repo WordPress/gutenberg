@@ -288,8 +288,8 @@ section.wp-block-cover-image > h2,
 	}
 }
 
-// Backward compatibility for v14 deprecation.
-.wp-block-cover:not(
+// Backward compatibility for v14 deprecation. Only applied to the frontend.
+body:not(.editor-styles-wrapper) .wp-block-cover:not(
 .wp-block-cover:has(
 	/* When the `.wp-block-cover__inner-container` comes right after the
 	`.wp-block-cover__background` , it means that it's using the new HTML
