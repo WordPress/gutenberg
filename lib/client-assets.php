@@ -320,13 +320,13 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
 
+	// Only add CONTENT styles here that should be enqueued in the iframe!
 	$wp_edit_blocks_dependencies = array(
 		'wp-components',
 		// This need to be added before the block library styles,
 		// The block library styles override the "reset" styles.
 		'wp-reset-editor-styles',
 		'wp-block-library',
-		'wp-patterns',
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
