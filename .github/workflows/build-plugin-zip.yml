@@ -214,6 +214,26 @@ jobs:
                   name: release-notes
                   path: ./release-notes.txt
 
+    create-playground-link:
+        name: Create WordPress Playground Link
+        runs-on: ubuntu-latest
+        needs: build
+        if: |
+            !cancelled() && (
+              github.event_name == 'pull_request' &&
+              needs.build.outputs.job_status == 'success'
+            )
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+            - name: Create WordPress Playground link comment
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      require('./.github/workflows/scripts/generate-playground-blueprint.js').run({ github, context });
+
     revert-version-bump:
         name: Revert version bump if build failed
         needs: [bump-version, build]
