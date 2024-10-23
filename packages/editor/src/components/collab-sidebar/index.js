@@ -51,8 +51,6 @@ export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getEntityRecord } = resolveSelect( coreStore );
-
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
@@ -75,7 +73,7 @@ export default function CollabSidebar() {
 				status: 'any',
 				per_page: 100,
 			} );
-			return Array.isArray( data ) ? data : [];
+			return data ? data : [];
 		},
 		[ postId ]
 	);
