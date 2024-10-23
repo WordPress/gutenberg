@@ -8,7 +8,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -99,7 +99,11 @@ export default function ImageSizeControl( {
 											)
 										}
 									>
-										{ scale }%
+										{ sprintf(
+											/* translators: Percentage value. */
+											__( '%1$s%%' ),
+											scale
+										) }
 									</Button>
 								);
 							} ) }
