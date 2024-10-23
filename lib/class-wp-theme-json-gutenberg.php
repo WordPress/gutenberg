@@ -2738,9 +2738,13 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		$selectors               = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
 		$include_variations      = $options['include_block_style_variations'] ?? false;
 		$include_node_paths_only = $options['include_node_paths_only'] ?? false;
+
+		// If only node paths are to be returned, skip selector assignment.
+		if ( ! $include_node_paths_only ) {
+			$selectors = empty( $selectors ) ? static::get_blocks_metadata() : $selectors;
+		}
 
 		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
 			$node_path = array( 'styles', 'blocks', $name );

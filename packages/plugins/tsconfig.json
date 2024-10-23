@@ -9,6 +9,7 @@
 	"references": [
 		{ "path": "../components" },
 		{ "path": "../compose" },
+		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },

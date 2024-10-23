@@ -91,7 +91,10 @@ function StyleBook( {
 	);
 
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			isPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 
@@ -120,39 +123,38 @@ function StyleBook( {
 			>
 				{ resizeObserver }
 				{ showTabs ? (
-					<div className="edit-site-style-book__tabs">
-						<Tabs>
-							<div className="edit-site-style-book__tablist-container">
-								<Tabs.TabList>
-									{ tabs.map( ( tab ) => (
-										<Tabs.Tab
-											tabId={ tab.slug }
-											key={ tab.slug }
-										>
-											{ tab.title }
-										</Tabs.Tab>
-									) ) }
-								</Tabs.TabList>
-							</div>
-							{ tabs.map( ( tab ) => (
-								<Tabs.TabPanel
-									key={ tab.slug }
-									tabId={ tab.slug }
-									focusable={ false }
-								>
-									<StyleBookBody
-										category={ tab.slug }
-										examples={ examples }
-										isSelected={ isSelected }
-										onSelect={ onSelect }
-										settings={ settings }
-										sizes={ sizes }
-										title={ tab.title }
-									/>
-								</Tabs.TabPanel>
-							) ) }
-						</Tabs>
-					</div>
+					<Tabs>
+						<div className="edit-site-style-book__tablist-container">
+							<Tabs.TabList>
+								{ tabs.map( ( tab ) => (
+									<Tabs.Tab
+										tabId={ tab.slug }
+										key={ tab.slug }
+									>
+										{ tab.title }
+									</Tabs.Tab>
+								) ) }
+							</Tabs.TabList>
+						</div>
+						{ tabs.map( ( tab ) => (
+							<Tabs.TabPanel
+								key={ tab.slug }
+								tabId={ tab.slug }
+								focusable={ false }
+								className="edit-site-style-book__tabpanel"
+							>
+								<StyleBookBody
+									category={ tab.slug }
+									examples={ examples }
+									isSelected={ isSelected }
+									onSelect={ onSelect }
+									settings={ settings }
+									sizes={ sizes }
+									title={ tab.title }
+								/>
+							</Tabs.TabPanel>
+						) ) }
+					</Tabs>
 				) : (
 					<StyleBookBody
 						examples={ examples }
@@ -329,7 +331,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		() => ( {
 			...originalSettings,
 			focusMode: false, // Disable "Spotlight mode".
-			__unstableIsPreviewMode: true,
+			isPreviewMode: true,
 		} ),
 		[ originalSettings ]
 	);
