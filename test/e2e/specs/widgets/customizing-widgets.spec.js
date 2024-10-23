@@ -79,7 +79,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		const inlineInserterSearchBox = page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
+			'role=searchbox[name="Search"i]'
 		);
 
 		await expect( inlineInserterSearchBox ).toBeFocused();
@@ -651,9 +651,7 @@ class WidgetsCustomizerPage {
 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
 		);
 
-		const searchBox = this.page.locator(
-			'role=searchbox[name="Search for blocks and patterns"i]'
-		);
+		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
 
 		// Clear the input.
 		await searchBox.evaluate( ( node ) => {

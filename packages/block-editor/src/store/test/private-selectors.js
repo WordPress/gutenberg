@@ -11,7 +11,7 @@ import {
 	isDragging,
 	getBlockStyles,
 } from '../private-selectors';
-import { getBlockEditingMode } from '../selectors';
+import { getBlockEditingMode, __unstableGetEditorMode } from '../selectors';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -125,9 +125,15 @@ describe( 'private selectors', () => {
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
+		const get = jest.fn( () => 'edit' );
 		getBlockEditingMode.registry = {
 			select: jest.fn( () => ( {
 				hasContentRoleAttribute,
+			} ) ),
+		};
+		__unstableGetEditorMode.registry = {
+			select: jest.fn( () => ( {
+				get,
 			} ) ),
 		};
 

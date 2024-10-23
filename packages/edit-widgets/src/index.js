@@ -9,6 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { StrictMode, createRoot } from '@wordpress/element';
 import {
 	registerCoreBlocks,
@@ -29,7 +30,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import './store';
 import './filters';
 import * as widgetArea from './blocks/widget-area';
-
+import { unlock } from './lock-unlock';
 import Layout from './components/layout';
 import {
 	ALLOW_REUSABLE_BLOCKS,
@@ -42,6 +43,8 @@ const disabledBlocks = [
 	'core/template-part',
 	...( ALLOW_REUSABLE_BLOCKS ? [] : [ 'core/block' ] ),
 ];
+
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -72,6 +75,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

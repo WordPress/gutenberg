@@ -19,7 +19,6 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
@@ -31,21 +30,19 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
-		__unstableGetEditorMode,
 		isTyping,
 		isDragging,
+		isZoomOut,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	const editorMode = __unstableGetEditorMode();
-
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: editorMode === 'zoom-out',
+		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
 	};
 }
@@ -75,11 +72,8 @@ export default function BlockTools( {
 		isGroupable,
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
-	const {
-		showEmptyBlockSideInserter,
-		showBlockToolbarPopover,
-		showZoomOutToolbar,
-	} = useShowBlockTools();
+	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
+		useShowBlockTools();
 
 	const {
 		duplicateBlocks,
@@ -208,13 +202,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 						isTyping={ isTyping }
-					/>
-				) }
-
-				{ showZoomOutToolbar && (
-					<ZoomOutPopover
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
 					/>
 				) }
 

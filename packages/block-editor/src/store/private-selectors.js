@@ -117,6 +117,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.settings.templateLock,
 		state.blockListSettings,
 		state.editorMode,
+		state.zoomLevel,
 		getSectionRootClientId( state ),
 	]
 );
@@ -572,17 +573,6 @@ export const getBlockStyles = createSelector(
 );
 
 /**
- * Returns whether zoom out mode is enabled.
- *
- * @param {Object} state Editor state.
- *
- * @return {boolean} Is zoom out mode enabled.
- */
-export function isZoomOutMode( state ) {
-	return state.editorMode === 'zoom-out';
-}
-
-/**
  * Retrieves the client ID of the block which contains the blocks
  * acting as "sections" in the editor. This is typically the "main content"
  * of the template/post.
@@ -596,23 +586,23 @@ export function getSectionRootClientId( state ) {
 }
 
 /**
- * Returns the zoom out state.
- *
- * @param {Object} state Global application state.
- * @return {boolean} The zoom out state.
- */
-export function getZoomLevel( state ) {
-	return state.zoomLevel;
-}
-
-/**
  * Returns whether the editor is considered zoomed out.
  *
  * @param {Object} state Global application state.
  * @return {boolean} Whether the editor is zoomed.
  */
 export function isZoomOut( state ) {
-	return getZoomLevel( state ) < 100;
+	return state.zoomLevel === 'auto-scaled' || state.zoomLevel < 100;
+}
+
+/**
+ * Returns whether the zoom level.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|"auto-scaled"} Zoom level.
+ */
+export function getZoomLevel( state ) {
+	return state.zoomLevel;
 }
 
 /**

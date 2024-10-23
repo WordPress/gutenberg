@@ -174,7 +174,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Expect to see the block inserter.
 		await expect(
 			page.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 		).toBeFocused();
 
@@ -588,7 +588,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 

@@ -36,7 +36,7 @@ function FontSize() {
 
 	const {
 		params: { origin, slug },
-		goTo,
+		goBack,
 	} = useNavigator();
 
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
@@ -53,10 +53,10 @@ function FontSize() {
 
 	// Navigate to the font sizes list if the font size is not available.
 	useEffect( () => {
-		if ( ! fontSize ) {
-			goTo( '/typography/font-sizes/', { isBack: true } );
+		if ( !! slug && ! fontSize ) {
+			goBack();
 		}
-	}, [ fontSize, goTo ] );
+	}, [ slug, fontSize, goBack ] );
 
 	if ( ! origin || ! slug || ! fontSize ) {
 		return null;
@@ -158,7 +158,6 @@ function FontSize() {
 							__( 'Manage the font size %s.' ),
 							fontSize.name
 						) }
-						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
 					{ origin === 'custom' && (
 						<FlexItem>

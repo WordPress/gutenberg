@@ -181,13 +181,13 @@ function Items( {
 				__unstableGetVisibleBlocks,
 				getTemplateLock,
 				getBlockEditingMode,
-				__unstableGetEditorMode,
 				isSectionBlock,
+				isZoomOut: _isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
 
-			if ( getSettings().__unstableIsPreviewMode ) {
+			if ( getSettings().isPreviewMode ) {
 				return {
 					order: _order,
 					selectedBlocks: EMPTY_ARRAY,
@@ -200,13 +200,13 @@ function Items( {
 				order: _order,
 				selectedBlocks: getSelectedBlockClientIds(),
 				visibleBlocks: __unstableGetVisibleBlocks(),
-				isZoomOut: __unstableGetEditorMode() === 'zoom-out',
+				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
 					! isSectionBlock( rootClientId ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&
-					__unstableGetEditorMode() !== 'zoom-out' &&
+					! _isZoomOut() &&
 					( hasCustomAppender ||
 						rootClientId === selectedBlockClientId ||
 						( ! rootClientId &&

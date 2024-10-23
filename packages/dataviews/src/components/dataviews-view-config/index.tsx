@@ -358,7 +358,7 @@ function FieldItem( {
 								}
 							}, 50 );
 						} }
-						icon={ isVisible ? seen : unseen }
+						icon={ isVisible ? unseen : seen }
 						label={
 							isVisible
 								? sprintf(
