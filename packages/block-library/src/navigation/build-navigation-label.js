@@ -4,14 +4,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 
-// Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
-export default function buildNavigationLabel( title, id, status ) {
-	if ( ! title?.rendered ) {
+function buildNavigationLabel( title, id, status ) {
+	if ( ! title ) {
 		/* translators: %s is the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
-	const decodedTitle = decodeEntities( title?.rendered );
+	const decodedTitle = decodeEntities( title );
 
 	if ( status === 'publish' ) {
 		return decodedTitle;
@@ -24,3 +23,5 @@ export default function buildNavigationLabel( title, id, status ) {
 		status
 	);
 }
+
+export default buildNavigationLabel;
