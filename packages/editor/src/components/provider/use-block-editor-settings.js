@@ -21,7 +21,7 @@ import {
  * Internal dependencies
  */
 import inserterMediaCategories from '../media-categories';
-import { mediaUpload } from '../../utils';
+import { mediaUpload, mediaSideload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
@@ -294,6 +294,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
+			__experimentalMediaSideload: hasUploadPermissions
+				? mediaSideload
+				: undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { hasFinishedResolution, getBlockPatternsForPostType } =

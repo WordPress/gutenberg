@@ -483,6 +483,10 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 > **Deprecated** since 5.3, use `wp.blockEditor.MediaPlaceholder` instead.
 
+### mediaSideload
+
+Undocumented declaration.
+
 ### MediaUpload
 
 > **Deprecated** since 5.3, use `wp.blockEditor.MediaUpload` instead.

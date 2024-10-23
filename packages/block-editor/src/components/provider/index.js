@@ -4,6 +4,8 @@
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
+//eslint-disable-next-line import/no-extraneous-dependencies -- Experimental package, not published.
+import { MediaUploadProvider } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -14,6 +16,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import useMediaUploadSettings from './use-media-upload-settings';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -43,6 +46,24 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		// Syncs the entity provider with changes in the block-editor store.
 		useBlockSync( props );
+
+		const mediaUploadSettings = useMediaUploadSettings( settings );
+
+		if ( window.__experimentalMediaProcessing ) {
+			return (
+				<MediaUploadProvider
+					settings={ mediaUploadSettings }
+					useSubRegistry={ false }
+				>
+					<SlotFillProvider passthrough>
+						{ ! settings?.__unstableIsPreviewMode && (
+							<KeyboardShortcuts.Register />
+						) }
+						<BlockRefsProvider>{ children }</BlockRefsProvider>
+					</SlotFillProvider>
+				</MediaUploadProvider>
+			);
+		}
 
 		return (
 			<SlotFillProvider passthrough>
