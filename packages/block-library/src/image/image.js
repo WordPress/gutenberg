@@ -256,6 +256,21 @@ export default function Image( {
 		if ( undefined !== embedBlock ) {
 			onReplace( embedBlock );
 		}
+
+		// Check if the image is of HEIC type.
+		if ( url.endsWith( '.heic' ) ) {
+			const filename = getFilename( url );
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: file name */
+					__(
+						'The image file "%s" is in HEIC format, which is not supported by your browser. Consider converting it to JPEG and re-uploading.'
+					),
+					filename
+				),
+				{ type: 'snackbar' }
+			);
+		}
 	}
 
 	function onImageLoad( event ) {
