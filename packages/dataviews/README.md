@@ -324,7 +324,7 @@ Callback that signals the user selected one of more items, and takes them as par
 
 A function that determines if an item is clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
 
-### `onClickable`: `function`
+### `onClick`: `function`
 
 A callback function that is triggered when a user clicks on a media field or primary field. This function is currently implemented only in the `grid` and `list` views.
 
