@@ -68,7 +68,7 @@ const SlugEdit = ( {
 	} );
 
 	const postUrlSlugDescriptionId =
-		'editor-post-url__slug-description-' + useInstanceId( SlugEdit );
+		'fields-controls__slug-description-' + useInstanceId( SlugEdit );
 
 	return (
 		<fieldset className="fields-controls__slug">
