@@ -30,9 +30,5 @@ module.exports = {
 			.replace( '__experimental', '' )
 			.replace( '__unstable', '' );
 	},
-	processors: [
-		'raw-report',
-		//'count-components-and-props',
-		//'count-components',
-	],
+	processors: [ [ 'raw-report', { outputTo: './results/gutenberg.json' } ] ],
 };

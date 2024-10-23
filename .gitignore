@@ -13,6 +13,7 @@ coverage
 # Directories/files that may appear in your environment
 *.log
 yarn.lock
+results
 /artifacts
 /test/e2e/artifacts
 /perf-envs
