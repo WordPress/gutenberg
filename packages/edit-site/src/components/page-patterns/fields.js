@@ -110,6 +110,7 @@ export const previewField = {
 	id: 'preview',
 	render: PreviewField,
 	enableSorting: false,
+	isMediaField: true,
 };
 
 function TitleField( { item } ) {

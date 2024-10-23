@@ -37,6 +37,7 @@ import {
 	SORTING_DIRECTIONS,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 	sortIcons,
 	sortLabels,
 } from '../../constants';
@@ -247,10 +248,11 @@ interface FieldItemProps {
 	index: number;
 	isVisible: boolean;
 	isHidable: boolean;
+	isMediaField?: boolean;
 }
 
 function FieldItem( {
-	field: { id, label, index, isVisible, isHidable },
+	field: { id, label, index, isVisible, isHidable, isMediaField },
 	fields,
 	view,
 	onChangeView,
@@ -338,6 +340,39 @@ function FieldItem( {
 						accessibleWhenDisabled
 						size="compact"
 						onClick={ () => {
+							if (
+								! isVisible &&
+								isMediaField &&
+								( view.type === LAYOUT_GRID ||
+									view.type === LAYOUT_LIST )
+							) {
+								onChangeView( {
+									...view,
+									fields: [
+										...visibleFieldIds.filter(
+											( fieldId ) => {
+												const field = fields.find(
+													( possibleField ) => {
+														return (
+															possibleField.id ===
+															fieldId
+														);
+													}
+												);
+												if ( ! field ) {
+													return false;
+												}
+												return ! field.isMediaField;
+											}
+										),
+										id,
+									],
+									layout: {
+										...view.layout,
+										mediaField: id,
+									},
+								} );
+							} else {
 							onChangeView( {
 								...view,
 								fields: isVisible
@@ -346,6 +381,7 @@ function FieldItem( {
 									  )
 									: [ ...visibleFieldIds, id ],
 							} );
+							}
 							// Focus the visibility button to avoid focus loss.
 							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
 							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
@@ -397,7 +433,7 @@ function FieldControl() {
 
 	const visibleFields = fields
 		.filter( ( { id } ) => visibleFieldIds.includes( id ) )
-		.map( ( { id, label, enableHiding } ) => {
+		.map( ( { id, label, enableHiding, isMediaField } ) => {
 			return {
 				id,
 				label,
@@ -406,6 +442,7 @@ function FieldControl() {
 				isHidable: notHidableFieldIds.includes( id )
 					? false
 					: enableHiding,
+				isMediaField,
 			};
 		} );
 	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
@@ -416,20 +453,44 @@ function FieldControl() {
 				index: visibleFieldIds.indexOf( id ),
 				isVisible: true,
 				isHidable: notHidableFieldIds.includes( id ),
+				isMediaField: false,
 			} );
 		} );
+	}
+	if (
+		( view.type === LAYOUT_GRID || view.type === LAYOUT_LIST ) &&
+		view.layout?.mediaField
+	) {
+		if (
+			! visibleFields.find( ( { id } ) => id === view.layout?.mediaField )
+		) {
+			const field = fields.find(
+				( { id } ) => id === view.layout?.mediaField
+			);
+			if ( field ) {
+				visibleFields.push( {
+					id: field.id,
+					label: field.label,
+					index: visibleFieldIds.indexOf( field.id ),
+					isVisible: true,
+					isHidable: notHidableFieldIds.includes( field.id ),
+					isMediaField: field.isMediaField,
+				} );
+			}
+		}
 	}
 	visibleFields.sort( ( a, b ) => a.index - b.index );
 
 	const hiddenFields = fields
 		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
-		.map( ( { id, label, enableHiding }, index ) => {
+		.map( ( { id, label, enableHiding, isMediaField }, index ) => {
 			return {
 				id,
 				label,
 				index,
 				isVisible: false,
 				isHidable: enableHiding,
+				isMediaField,
 			};
 		} );
 

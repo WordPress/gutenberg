@@ -75,27 +75,40 @@ function getCombinedFieldIds( view: View ): string[] {
 	return combinedFields;
 }
 
+function getMediaFieldIds( view: View ): string[] {
+	const mediaFields: string[] = [];
+	if ( view.type === LAYOUT_GRID && view.layout?.mediaField ) {
+		mediaFields.push( view.layout.mediaField );
+	}
+	if ( view.type === LAYOUT_LIST && view.layout?.mediaField ) {
+		mediaFields.push( view.layout.mediaField );
+	}
+	return mediaFields;
+}
+
 export function getVisibleFieldIds(
 	view: View,
 	fields: Field< any >[]
 ): string[] {
 	const fieldsToExclude = getCombinedFieldIds( view );
 
+	let visibleFields = [];
 	if ( view.fields ) {
-		return view.fields.filter( ( id ) => ! fieldsToExclude.includes( id ) );
-	}
-
-	const visibleFields = [];
-	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		visibleFields = view.fields.filter(
+			( id ) => ! fieldsToExclude.includes( id )
+		);
+	} else {
+		if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+			visibleFields.push(
+				...view.layout.combinedFields.map( ( { id } ) => id )
+			);
+		}
 		visibleFields.push(
-			...view.layout.combinedFields.map( ( { id } ) => id )
+			...fields
+				.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
+				.map( ( { id } ) => id )
 		);
 	}
-	visibleFields.push(
-		...fields
-			.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
-			.map( ( { id } ) => id )
-	);
 
 	return visibleFields;
 }
