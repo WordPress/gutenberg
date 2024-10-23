@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { funnel } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -124,7 +124,7 @@ export function FilterVisibilityToggle( {
 				className="dataviews-filters__visibility-toggle"
 				size="compact"
 				icon={ funnel }
-				label={ __( 'Toggle filter display' ) }
+				label={ _x( 'Filter', 'verb' ) }
 				onClick={ () => {
 					if ( ! isShowingFilter ) {
 						setOpenedFilter( null );

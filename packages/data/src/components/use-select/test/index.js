@@ -676,7 +676,7 @@ describe( 'useSelect', () => {
 				return (
 					<>
 						<div role="status">{ state }</div>
-						<button onClick={ toggle }>Toggle</button>
+						<button onClick={ toggle }>Open</button>
 					</>
 				);
 			} );
@@ -693,7 +693,7 @@ describe( 'useSelect', () => {
 				'count2:0'
 			);
 
-			act( () => screen.getByText( 'Toggle' ).click() );
+			act( () => screen.getByText( 'Open' ).click() );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );
