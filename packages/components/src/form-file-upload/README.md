@@ -9,7 +9,7 @@ import { FormFileUpload } from '@wordpress/components';
 
 const MyFormFileUpload = () => (
 	<FormFileUpload
-		accept="image/*, image/heic"
+		accept="image/*"
 		onChange={ ( event ) => console.log( event.currentTarget.files ) }
 	>
 		Upload

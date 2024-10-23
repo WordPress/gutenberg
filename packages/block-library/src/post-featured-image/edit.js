@@ -301,7 +301,7 @@ export default function PostFeaturedImageEdit( {
 		image = (
 			<MediaPlaceholder
 				onSelect={ onSelectImage }
-				accept="image/*, image/heic"
+				accept="image/*"
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onError={ onUploadError }
 				placeholder={ placeholder }
@@ -363,7 +363,7 @@ export default function PostFeaturedImageEdit( {
 						mediaId={ featuredImage }
 						mediaURL={ mediaUrl }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*, image/heic"
+						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
 						onReset={ () => setFeaturedImage( 0 ) }

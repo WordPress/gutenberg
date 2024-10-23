@@ -361,7 +361,7 @@ function BackgroundImageControls( {
 				mediaId={ id }
 				mediaURL={ url }
 				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-				accept="image/*, image/heic"
+				accept="image/*"
 				onSelect={ onSelectMedia }
 				popoverProps={ {
 					className: clsx( {
