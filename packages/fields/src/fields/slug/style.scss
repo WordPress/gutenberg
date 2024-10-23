@@ -1,0 +1,22 @@
+.fields-controls__slug {
+	.fields-controls__slug-external-icon {
+		margin-left: 5ch;
+	}
+
+	.fields-controls__slug-input input.components-input-control__input {
+		padding-inline-start: 0 !important;
+	}
+
+	.fields-controls__slug-help-link {
+		word-break: break-word;
+	}
+
+	.fields-controls__slug-help {
+		display: flex;
+		flex-direction: column;
+
+		.fields-controls__slug-help-slug {
+			font-weight: 600;
+		}
+	}
+}
