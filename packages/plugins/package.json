@@ -30,6 +30,7 @@
 		"@babel/runtime": "7.25.7",
 		"@wordpress/components": "*",
 		"@wordpress/compose": "*",
+		"@wordpress/deprecated": "*",
 		"@wordpress/element": "*",
 		"@wordpress/hooks": "*",
 		"@wordpress/icons": "*",
