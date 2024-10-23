@@ -94,16 +94,11 @@
 	}
 
 	.wp-block-cover__inner-container {
+		position: relative; // Needed after the v14 deprecation..
 		width: 100%;
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
-	}
-
-	&.has-no-zindex-in-inner-blocks {
-		.wp-block-cover__inner-container {
-			position: relative; // It needs a position to be on top of the other elements.
-		}
 	}
 
 	// Position: Top
@@ -294,7 +289,16 @@ section.wp-block-cover-image > h2,
 }
 
 // Backward compatibility for v14 deprecation.
-.wp-block-cover:not(.has-no-zindex-in-inner-blocks) {
+.wp-block-cover:not(
+.wp-block-cover:has(
+	/* When the `.wp-block-cover__inner-container` comes right after the
+	`.wp-block-cover__background` , it means that it's using the new HTML
+	structure or that it's using the color background or gradient (even in
+	the deprecated version). In the last option we also don't need the z-index
+	because the elements are in the expected order. */
+	.wp-block-cover__background + .wp-block-cover__inner-container
+)
+) {
 	.wp-block-cover__video-background {
 		z-index: z-index(".wp-block-cover__video-background");
 	}
