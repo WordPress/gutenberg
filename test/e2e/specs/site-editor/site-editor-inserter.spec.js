@@ -91,6 +91,33 @@ test.describe( 'Site Editor Inserter', () => {
 		// We should still be in Zoom Out
 		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
 	} );
+
+	test( 'should enter zoom out from patterns tab and exit zoom out when closing the inserter', async ( {
+		InserterUtils,
+	} ) => {
+		const inserterButton = InserterUtils.getInserterButton();
+		const blockLibrary = InserterUtils.getBlockLibrary();
+
+		await inserterButton.click();
+		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
+
+		const blocksTab = InserterUtils.getBlockLibraryTab( 'Blocks' );
+		await expect( blocksTab ).toHaveAttribute( 'data-active-item', 'true' );
+
+		const patternsTab = InserterUtils.getBlockLibraryTab( 'Patterns' );
+		await patternsTab.click();
+		await expect( patternsTab ).toHaveAttribute(
+			'data-active-item',
+			'true'
+		);
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+
+		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
+	} );
 } );
 
 class InserterUtils {
