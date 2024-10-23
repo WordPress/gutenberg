@@ -254,7 +254,10 @@ export default function PostTemplateEdit( {
 			icon: list,
 			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
-			isActive: layoutType === 'default' || layoutType === 'constrained',
+			isActive:
+				'undefined' === typeof layout ||
+				layoutType === 'default' ||
+				layoutType === 'constrained',
 		},
 		{
 			icon: grid,
