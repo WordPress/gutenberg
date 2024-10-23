@@ -33,6 +33,7 @@ function ScreenCSS() {
 				description={
 					<>
 						{ description }
+						<br />
 						<ExternalLink
 							href={ __(
 								'https://developer.wordpress.org/advanced-administration/wordpress/css/'

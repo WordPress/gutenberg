@@ -269,7 +269,7 @@ function FooterContent< Item >( {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
-	const footerContent = useRef< JSX.Element | null >( null );
+	const footerContentRef = useRef< JSX.Element | null >( null );
 
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
@@ -306,8 +306,8 @@ function FooterContent< Item >( {
 		[ actions, selectedItems ]
 	);
 	if ( ! actionInProgress ) {
-		if ( footerContent.current ) {
-			footerContent.current = null;
+		if ( footerContentRef.current ) {
+			footerContentRef.current = null;
 		}
 		return renderFooterContent(
 			data,
@@ -320,8 +320,8 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection
 		);
-	} else if ( ! footerContent.current ) {
-		footerContent.current = renderFooterContent(
+	} else if ( ! footerContentRef.current ) {
+		footerContentRef.current = renderFooterContent(
 			data,
 			actions,
 			getItemId,
@@ -333,7 +333,7 @@ function FooterContent< Item >( {
 			onChangeSelection
 		);
 	}
-	return footerContent.current;
+	return footerContentRef.current;
 }
 
 export function BulkActionsFooter() {
