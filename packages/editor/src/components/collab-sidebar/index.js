@@ -51,8 +51,6 @@ export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getEntityRecord } = resolveSelect( coreStore );
-
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
