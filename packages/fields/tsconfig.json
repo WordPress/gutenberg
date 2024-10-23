@@ -23,7 +23,9 @@
 		{ "path": "../blob" },
 		{ "path": "../core-data" },
 		{ "path": "../hooks" },
-		{ "path": "../html-entities" }
+		{ "path": "../html-entities" },
+		{ "path": "../media-utils" },
+		{ "path": "../router" }
 	],
 	"include": [ "src" ]
 }

@@ -31,9 +31,6 @@ export const defaultLayouts = {
 		layout: {
 			primaryField: 'title',
 			styles: {
-				'featured-image': {
-					width: '1%',
-				},
 				title: {
 					maxWidth: 300,
 				},
@@ -42,14 +39,14 @@ export const defaultLayouts = {
 	},
 	[ LAYOUT_GRID ]: {
 		layout: {
-			mediaField: 'featured-image',
+			mediaField: 'featured_media',
 			primaryField: 'title',
 		},
 	},
 	[ LAYOUT_LIST ]: {
 		layout: {
 			primaryField: 'title',
-			mediaField: 'featured-image',
+			mediaField: 'featured_media',
 		},
 	},
 };

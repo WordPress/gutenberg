@@ -38,22 +38,25 @@ function useNavigateToPreviousEntityRecord() {
 }
 
 export function useSpecificEditorSettings() {
+	const { params } = useLocation();
+	const { canvas = 'view' } = params;
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-	const { canvasMode, settings, shouldUseTemplateAsDefaultRenderingMode } =
-		useSelect( ( select ) => {
-			const { getEditedPostContext, getCanvasMode, getSettings } = unlock(
+	const { settings, shouldUseTemplateAsDefaultRenderingMode } = useSelect(
+		( select ) => {
+			const { getEditedPostContext, getSettings } = unlock(
 				select( editSiteStore )
 			);
 			const _context = getEditedPostContext();
 			return {
-				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
 				// @see https://github.com/WordPress/gutenberg/pull/62304/
 				shouldUseTemplateAsDefaultRenderingMode:
 					_context?.postId && _context?.postType !== 'post',
 			};
-		}, [] );
+		},
+		[]
+	);
 	const defaultRenderingMode = shouldUseTemplateAsDefaultRenderingMode
 		? 'template-locked'
 		: 'post-only';
@@ -65,15 +68,15 @@ export function useSpecificEditorSettings() {
 
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
-			focusMode: canvasMode !== 'view',
+			focusMode: canvas !== 'view',
 			defaultRenderingMode,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			__unstableIsPreviewMode: canvasMode === 'view',
+			isPreviewMode: canvas === 'view',
 		};
 	}, [
 		settings,
-		canvasMode,
+		canvas,
 		defaultRenderingMode,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
