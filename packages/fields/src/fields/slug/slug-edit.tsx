@@ -9,7 +9,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { copySmall } from '@wordpress/icons';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -61,11 +61,14 @@ const SlugEdit = ( {
 	const { createNotice } = useDispatch( noticesStore );
 
 	const copyButtonRef = useCopyToClipboard( permalink, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Copied Permalink to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
 	} );
+
+	const postUrlSlugDescriptionId =
+		'editor-post-url__slug-description-' + useInstanceId( SlugEdit );
 
 	return (
 		<fieldset className="fields-controls__slug">
@@ -73,7 +76,9 @@ const SlugEdit = ( {
 				<VStack>
 					<VStack spacing="0px">
 						<span>
-							{ __( 'Customize the last part of the URL.' ) }
+							{ __(
+								'Customize the last part of the Permalink.'
+							) }
 						</span>
 						<ExternalLink href="https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink">
 							{ __( 'Learn more' ) }
@@ -109,19 +114,29 @@ const SlugEdit = ( {
 								onChangeControl( originalSlug.current );
 							}
 						} }
+						aria-describedby={ postUrlSlugDescriptionId }
 						help={
-							<ExternalLink
-								className="fields-controls__slug-help"
-								href={ permalink }
-							>
-								<span>{ permalinkPrefix }</span>
-								<span className="fields-controls__slug-help-slug">
-									{ slugToDisplay }
-								</span>
-								<span className="fields-controls__slug-help-suffix">
-									{ permalinkSuffix }
-								</span>
-							</ExternalLink>
+							<>
+								<p className="fields-controls__slug-help">
+									<span className="fields-controls__slug-help-visual-label">
+										{ __( 'Permalink:' ) }
+									</span>
+									<ExternalLink
+										className="fields-controls__slug-help-link"
+										href={ permalink }
+									>
+										<span className="fields-controls__slug-help-prefix">
+											{ permalinkPrefix }
+										</span>
+										<span className="fields-controls__slug-help-slug">
+											{ slugToDisplay }
+										</span>
+										<span className="fields-controls__slug-help-suffix">
+											{ permalinkSuffix }
+										</span>
+									</ExternalLink>
+								</p>
+							</>
 						}
 					/>
 				</VStack>

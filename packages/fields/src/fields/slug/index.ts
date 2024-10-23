@@ -14,7 +14,7 @@ import SlugView from './slug-view';
 const slugField: Field< BasePost > = {
 	id: 'slug',
 	type: 'text',
-	label: __( 'Link' ),
+	label: __( 'Slug' ),
 	getValue: ( { item } ) => item.slug,
 	Edit: SlugEdit,
 	render: SlugView,
