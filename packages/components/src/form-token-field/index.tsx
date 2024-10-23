@@ -75,6 +75,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
+		__filterSuggestions,
+		__onSuggestionClick,
+		__forceSuggestionFocus = false,
 		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
@@ -458,16 +461,34 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
 			return;
 		}
+
 		addNewTokens( [ token ] );
 		speak( messages.added, 'assertive' );
 
 		setIncompleteTokenValue( '' );
-		setSelectedSuggestionIndex( -1 );
-		setSelectedSuggestionScroll( false );
 		setIsExpanded( ! __experimentalExpandOnFocus );
 
 		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
+		}
+
+		/*
+		 * If a __filterSuggestions is provided,
+		 * it's possible that the token has been already added.
+		 */
+		const isTokenTaken = value.some( ( item ) => {
+			return getTokenValue( item ) === token;
+		} );
+
+		__onSuggestionClick?.( token, isTokenTaken );
+
+		if ( __forceSuggestionFocus ) {
+			const index = getMatchingSuggestions().indexOf( token );
+			setSelectedSuggestionIndex( index );
+			setSelectedSuggestionScroll( true );
+		} else {
+			setSelectedSuggestionScroll( false );
+			setSelectedSuggestionIndex( -1 );
 		}
 	}
 
@@ -523,6 +544,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			} );
 
 			_suggestions = startsWithMatch.concat( containsMatch );
+		}
+
+		// Apply custom filter if provided.
+		if ( __filterSuggestions ) {
+			_suggestions = __filterSuggestions( _suggestions, match );
 		}
 
 		return _suggestions.slice( 0, _maxSuggestions );

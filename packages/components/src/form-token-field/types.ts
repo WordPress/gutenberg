@@ -184,6 +184,27 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
+
+	/**
+	 * Use this prop to filter the suggestions list.
+	 * It receives the list of suggestions and the current input value.
+	 * It should return a filtered list of suggestions.
+	 */
+	__filterSuggestions?: ( suggestions: string[], value: string ) => string[];
+
+	/**
+	 * Callback to be called when a suggestion is clicked.
+	 */
+	__onSuggestionClick?: (
+		suggestion: string,
+		isSuggestionTaken: boolean
+	) => void;
+
+	/**
+	 * If true, the suggestion item will be focused when the suggestions list is opened.
+	 */
+	__forceSuggestionFocus?: boolean;
+
 	/**
 	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
 	 *

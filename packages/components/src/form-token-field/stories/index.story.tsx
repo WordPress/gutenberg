@@ -3,6 +3,8 @@
  */
 import type { Meta, StoryFn } from '@storybook/react';
 import type { ComponentProps } from 'react';
+import styled from '@emotion/styled';
+
 /**
  * WordPress dependencies
  */
@@ -12,6 +14,8 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import FormTokenField from '../';
+import CheckboxControl from '../../checkbox-control';
+import Label from '../../input-control/label';
 
 const meta: Meta< typeof FormTokenField > = {
 	component: FormTokenField,
@@ -136,4 +140,93 @@ WithValidatedInput.args = {
 	...Default.args,
 	__experimentalValidateInput: ( input: string ) =>
 		continents.includes( input ),
+};
+
+const fruits = [
+	'Apple',
+	'Apricot',
+	'Avocado',
+	'Banana',
+	'Blackberry',
+	'Blueberry',
+];
+
+const CheckboxLabelWrapper = styled.div`
+	.suggestion-checkbox-label {
+		display: flex !important;
+		align-items: center;
+		color: inherit;
+	}
+`;
+
+export const WithSuggestionCheckbox: StoryFn< typeof FormTokenField > = ( {
+	suggestions,
+	...args
+} ) => {
+	const [ selectedFruits, setSelectedFruits ] = useState<
+		ComponentProps< typeof FormTokenField >[ 'value' ]
+	>( [] );
+
+	/*
+	 * Combine the suggested fruits with
+	 */
+	let allFruits = suggestions ? [ ...suggestions ] : [];
+
+	if ( selectedFruits ) {
+		allFruits = allFruits.concat(
+			selectedFruits.map( ( fruit ) => String( fruit ) )
+		);
+
+		// Remove duplicates
+		allFruits = [ ...new Set( allFruits ) ];
+
+		// Sort the values
+		allFruits.sort();
+	}
+
+	return (
+		<FormTokenField
+			{ ...args }
+			value={ selectedFruits }
+			suggestions={ allFruits }
+			onChange={ setSelectedFruits }
+			__filterSuggestions={ ( _filteredSuggestions, value ) => {
+				return allFruits.filter( ( suggestion ) =>
+					suggestion.toLowerCase().includes( value.toLowerCase() )
+				);
+			} }
+			__onSuggestionClick={ ( suggestion, isSuggestionTaken ) => {
+				// If the suggestion is taken, filter the selected continents
+				if ( isSuggestionTaken ) {
+					const filteredContinents = selectedFruits?.filter(
+						( continent ) => continent !== suggestion
+					);
+					setSelectedFruits( filteredContinents );
+				}
+			} }
+			__experimentalRenderItem={ ( { item } ) => {
+				const itemTaken = selectedFruits?.includes( item );
+				return (
+					<CheckboxLabelWrapper>
+						<Label className="suggestion-checkbox-label">
+							<CheckboxControl
+								checked={ itemTaken }
+								onChange={ () => {} }
+							/>
+							{ item }
+						</Label>
+					</CheckboxLabelWrapper>
+				);
+			} }
+		/>
+	);
+};
+
+WithSuggestionCheckbox.args = {
+	label: 'Pick or create a fruit',
+	suggestions: fruits,
+	__nextHasNoMarginBottom: true,
+	__experimentalExpandOnFocus: true,
+	__experimentalAutoSelectFirstMatch: true,
+	__forceSuggestionFocus: true,
 };
