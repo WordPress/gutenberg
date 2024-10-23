@@ -54,7 +54,7 @@ export default function CollabSidebar() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-
+	const threadsEmptyArray = [];
 	const { postId } = useSelect( ( select ) => {
 		return {
 			postId: select( editorStore ).getCurrentPostId(),
@@ -64,7 +64,7 @@ export default function CollabSidebar() {
 	const threads = useSelect(
 		( select ) => {
 			if ( ! postId ) {
-				return [];
+				return threadsEmptyArray;
 			}
 			const { getEntityRecords } = select( coreStore );
 			const data = getEntityRecords( 'root', 'comment', {
@@ -73,7 +73,7 @@ export default function CollabSidebar() {
 				status: 'any',
 				per_page: 100,
 			} );
-			return data ? data : [];
+			return data || threadsEmptyArray;
 		},
 		[ postId ]
 	);
