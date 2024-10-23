@@ -28,28 +28,6 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const PAGE_POST_TYPE = 'page';
 
-const useSiteSettings = () =>
-	useSelect( ( _select ) => {
-		const siteSettings = _select( coreStore ).getEntityRecord< Settings >(
-			'root',
-			'site'
-		);
-		const _pageOnFront = siteSettings?.page_on_front || null;
-		const _currentHomePage =
-			_pageOnFront &&
-			_select( coreStore ).getEntityRecord(
-				'postType',
-				'page',
-				_pageOnFront
-			);
-
-		return {
-			currentHomePage: _currentHomePage,
-			pageForPosts: siteSettings?.page_for_posts,
-			showOnFront: siteSettings?.show_on_front,
-		};
-	} );
-
 const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 	( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -58,8 +36,20 @@ const SetAsHomepageModal: ActionModal< PostWithPermissions >[ 'RenderModal' ] =
 		const [ postsPageOption, setPostsPageOption ] = useState( 'none' );
 		const [ existingPageId, setExistingPageId ] = useState( 0 );
 		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
-		const { currentHomePage, pageForPosts, showOnFront } =
-			useSiteSettings();
+		const siteSettings = select( coreStore ).getEntityRecord< Settings >(
+			'root',
+			'site'
+		);
+		const pageOnFront = siteSettings?.page_on_front || null;
+		const currentHomePage =
+			pageOnFront &&
+			select( coreStore ).getEntityRecord(
+				'postType',
+				'page',
+				pageOnFront
+			);
+		const pageForPosts = siteSettings?.page_for_posts;
+		const showOnFront = siteSettings?.show_on_front;
 		const currentHomePageTitle = getItemTitle( currentHomePage as Page );
 
 		const { editEntityRecord, saveEditedEntityRecord, saveEntityRecord } =
