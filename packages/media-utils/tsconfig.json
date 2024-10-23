@@ -12,6 +12,7 @@
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
 		{ "path": "../element" },
-		{ "path": "../i18n" }
+		{ "path": "../i18n" },
+		{ "path": "../private-apis" }
 	]
 }
