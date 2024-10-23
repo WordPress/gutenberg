@@ -1,5 +1,7 @@
 # Bindings
 
+_**Note:** This section is  yet under development._
+
 Block Bindings API lets you “bind” dynamic data to the block’s attributes, which are then reflected in the final HTML markup that is output to the browser on the front end.
 
 An example could be connecting an Image block url attribute to a function that returns random images from an external API.
@@ -66,21 +68,46 @@ Note that `register_block_bindings_source()` should be called from a handler att
 Here is an example:
 
 ```php
-function wp_movies_register_block_bindings_actor_birthday() {
-	register_block_bindings_source(
-		'wpmovies/actor-birthday',
-		array(
-			'label'              => __( 'Actor Birthday', 'wp-movies' ),
-			'uses_context'       => array( 'postId' ),
-			'get_value_callback' => function( $source_args, $block_instance, $attribute_name ) {
-				$birthday = get_post_meta( $block_instance->context['postId'], '_wpmovies_actors_birthday', true );
-				return gmdate( 'jS F Y', strtotime( $birthday ) );
-			},
-		)
-	);
-}
+add_action(
+	'init',
+	function() {
+		register_block_bindings_source(
+			'wpmovies/visualization-date',
+			array(
+				'label'              => __( 'Visualization Date', 'custom-bindings' ),
+				'get_value_callback' => function( array $source_args, $block_instance ) {
+					$post_id = $block_instance->context['postId'];
+					$visualization_date = get_post_meta( $post_id, 'wp_movies_visualization_date', true );
+					if ( ! $visualization_date ) {
+						$visualization_date = date("m/d/Y");
+					}
+					return $visualization_date;
+				},
+				'uses_context'       => array( 'postId', 'postType' ),
+			)
+		);
+	}
+);
+```
 
-add_action( 'init', 'wp_movies_register_block_bindings_actor_birthday' );
+This example needs a `post_meta` registered:
+
+```php
+add_action(
+	'init',
+	function() {
+		register_meta(
+			'post',
+			'wp_movies_visualization_date',
+			array(
+				'show_in_rest'      => true,
+				'single'            => true,
+				'type'              => 'string',
+				'label'				=> __( 'Movie visualization date' ),
+			)
+		);
+	}
+);
 ```
 
 #### Server registration Core examples
@@ -109,6 +136,10 @@ The function to register a custom source is `registerBlockBindingsSource( args )
 
 `label` argument will override the one defined in the server if they are different.
 
+
+This example will show a custom post meta date on the editor and, if it doesn't exist, it will show today's date.
+The user can edit the value of the date. (Caution: this example is not formatting the user input as a date, it's only for educational purposes.)
+
 ```js
 import {
 	registerBlockBindingsSource,
@@ -117,12 +148,39 @@ import { __ } from '@wordpress/i18n';
 
 registerBlockBindingsSource( {
 	name: 'wpmovies/visualization-date',
-	label: __('Visualization day'),
+	label: __( 'Visualization Date' ),
+	useContext: [ 'postId', 'postType' ],
 	setValues( { select, dispatch, context, bindings } ) {
-		console.log('setValues', bindings);
+		dispatch( coreDataStore ).editEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId,
+			{
+				meta: {
+					wp_movies_visualization_date: bindings?.content?.newValue,
+				},
+			}
+		);
 	},
-	getValues( { select, context, bindings } ) {
-		console.log('getValues', bindings);
+	getValues( { select, context } ) {
+		let wpModiesVisualizationDate;
+		const { getEditedEntityRecord } = select( coreDataStore );
+		if ( context?.postType && context?.postId ) {
+			return getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta?.wp_movies_visualization_date;
+		}
+		if ( wpModiesVisualizationDate ) {
+			return {
+				content: wpModiesVisualizationDate,
+			};
+		}
+
+		return {
+			content: new Date().toLocaleDateString( 'en-US' ),
+		};
 	},
 	canUserEditValue( { select, context } ) {
 		return true;
@@ -130,9 +188,44 @@ registerBlockBindingsSource( {
 } );
 ```
 
+#### getValues
+
+`getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties.
+
+- `bindings` return the bindings object. It must have the attributes as a key, and the value can be a string or an object with arguments.
+- `cliendId` returns a `string` with the current block client id.
+- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+- `select` returns an `object` of a given store selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+
+The function must return an `object` with this structure:
+`{ 'block attribute' : value }`
+
+#### setValues
+
+`setValues` updates all the values of the source of the block bound. It receives an `object` as an argument with the following properties.
+
+- `bindings` return the bindings object. It must have the attributes as a key, and the value can be a string or an object with arguments. This object contains a `newValue` property with the user's input.
+- `cliendId` returns a `string` with the current block client id.
+- `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
+- `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
+- `select` returns an `object` of a given store selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+
+
 #### Editor registration Core examples
 
 There are a few examples in Core that can be used as a reference.
 
 - Post Meta. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/post-meta.js#L74-L146)
 - Pattern overrides. [Source code](https://github.com/WordPress/gutenberg/blob/5afd6c27bfba2be2e06b502257753fbfff1ae9f0/packages/editor/src/bindings/pattern-overrides.js#L8-L100)
+
+## Unregistering a source
+
+`unregisterBlockBindingsSource` unregisters a block bindings source by providing its name.
+
+
+```js
+import { unregisterBlockBindingsSource } from '@wordpress/blocks';
+
+unregisterBlockBindingsSource( 'plugin/my-custom-source' );
+```
+
