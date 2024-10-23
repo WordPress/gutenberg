@@ -118,6 +118,39 @@ test.describe( 'Site Editor Inserter', () => {
 
 		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
 	} );
+
+	test( 'should return you to zoom out if starting from zoom out', async ( {
+		InserterUtils,
+	} ) => {
+		const zoomOutButton = InserterUtils.getZoomOutButton();
+		const inserterButton = InserterUtils.getInserterButton();
+		const blockLibrary = InserterUtils.getBlockLibrary();
+
+		await zoomOutButton.click();
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		await inserterButton.click();
+		const patternsTab = InserterUtils.getBlockLibraryTab( 'Patterns' );
+		await expect( patternsTab ).toHaveAttribute(
+			'data-active-item',
+			'true'
+		);
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		const blocksTab = InserterUtils.getBlockLibraryTab( 'Blocks' );
+		await blocksTab.click();
+		await expect( blocksTab ).toHaveAttribute( 'data-active-item', 'true' );
+
+		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
+
+		// Close the inserter
+		await inserterButton.click();
+
+		await expect( blockLibrary ).toBeHidden();
+
+		// We should return to zoom out since we started from there
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+	} );
 } );
 
 class InserterUtils {
