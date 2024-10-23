@@ -30,7 +30,6 @@ export default function DefaultSidebar( {
 				scope="core"
 				identifier={ identifier }
 				title={ title }
-				smallScreenTitle={ title }
 				icon={ icon }
 				closeLabel={ closeLabel }
 				header={ header }

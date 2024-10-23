@@ -53,7 +53,10 @@ function Revisions( { userConfig, blocks } ) {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			isPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 

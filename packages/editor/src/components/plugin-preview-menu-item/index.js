@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
-import { withPluginContext } from '@wordpress/plugins';
+import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
 /**
@@ -27,12 +26,12 @@ import { ActionItem } from '@wordpress/interface';
  * }
  *
  * const ExternalPreviewMenuItem = () => (
- *   <PreviewDropdownMenuItem
+ *   <PluginPreviewMenuItem
  *     icon={ external }
  *     onClick={ onPreviewClick }
  *   >
  *     { __( 'Preview in new tab' ) }
- *   </PreviewDropdownMenuItem>
+ *   </PluginPreviewMenuItem>
  * );
  * registerPlugin( 'external-preview-menu-item', {
  *     render: ExternalPreviewMenuItem,
@@ -41,12 +40,14 @@ import { ActionItem } from '@wordpress/interface';
  *
  * @return {Component} The rendered menu item component.
  */
-export default compose(
-	withPluginContext( ( context, ownProps ) => {
-		return {
-			as: ownProps.as ?? MenuItem,
-			icon: ownProps.icon || context.icon,
-			name: 'core/plugin-preview-menu',
-		};
-	} )
-)( ActionItem );
+export default function PluginPreviewMenuItem( props ) {
+	const context = usePluginContext();
+	return (
+		<ActionItem
+			name="core/plugin-preview-menu"
+			as={ props.as ?? MenuItem }
+			icon={ props.icon || context.icon }
+			{ ...props }
+		/>
+	);
+}

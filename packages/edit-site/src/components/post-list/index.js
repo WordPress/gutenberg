@@ -418,7 +418,7 @@ export default function PostList( { postType } ) {
 							size="compact"
 							isPressed={ quickEdit }
 							icon={ drawerRight }
-							label={ __( 'Toggle details panel' ) }
+							label={ __( 'Details panel' ) }
 							onClick={ () => {
 								history.push( {
 									...location.params,
