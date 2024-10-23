@@ -192,6 +192,8 @@ _Returns_
 
 #### withPluginContext
 
+> **Deprecated** Use `usePluginContext` hook instead.
+
 A Higher Order Component used to inject Plugin context to the wrapped component.
 
 _Parameters_
