@@ -23,6 +23,11 @@ export const DropdownMenuItem = forwardRef<
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.Item can only be rendered inside a DropdownMenu component'
+		);
+	}
 	return (
 		<Styled.DropdownMenuItem
 			ref={ ref }

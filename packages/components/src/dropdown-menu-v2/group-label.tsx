@@ -17,6 +17,13 @@ export const DropdownMenuGroupLabel = forwardRef<
 	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
 >( function DropdownMenuGroup( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.GroupLabel can only be rendered inside a DropdownMenu component'
+		);
+	}
+
 	return (
 		<Styled.DropdownMenuGroupLabel
 			ref={ ref }
