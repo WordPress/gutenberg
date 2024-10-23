@@ -266,6 +266,13 @@ $block-inserter-tabs-height: 44px;
 	margin-top: $grid-unit-30;
 }
 
+.block-editor-inserter__patterns-category-filters__help {
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-300;
+	color: $gray-700;
+	min-width: 280px;
+}
+
 .block-editor-inserter__media-list,
 .block-editor-block-patterns-list {
 	overflow-y: auto;
