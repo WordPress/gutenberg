@@ -1,5 +1,5 @@
 type PostStatus =
-	| 'published'
+	| 'publish'
 	| 'draft'
 	| 'pending'
 	| 'private'

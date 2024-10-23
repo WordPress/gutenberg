@@ -30,15 +30,17 @@ export function isTemplateOrTemplatePart(
 	return p.type === TEMPLATE_POST_TYPE || p.type === TEMPLATE_PART_POST_TYPE;
 }
 
-export function getItemTitle( item: Post ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
-	}
-	if ( 'rendered' in item.title ) {
-		return decodeEntities( item.title.rendered );
-	}
-	if ( 'raw' in item.title ) {
-		return decodeEntities( item.title.raw );
+export function getItemTitle( item: Post ): string {
+	if ( item ) {
+		if ( typeof item.title === 'string' ) {
+			return decodeEntities( item.title );
+		}
+		if ( 'rendered' in item.title ) {
+			return decodeEntities( item.title.rendered );
+		}
+		if ( 'raw' in item.title ) {
+			return decodeEntities( item.title.raw );
+		}
 	}
 	return '';
 }

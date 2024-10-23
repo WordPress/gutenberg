@@ -310,7 +310,7 @@ export interface GetEntityRecord {
 		state: State,
 		kind: string,
 		name: string,
-		key: EntityRecordKey,
+		key?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined;
 
@@ -321,7 +321,7 @@ export interface GetEntityRecord {
 	>(
 		kind: string,
 		name: string,
-		key: EntityRecordKey,
+		key?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
 	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;

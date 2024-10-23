@@ -245,7 +245,7 @@ function useMappingSelect( suspense, mapSelect, deps ) {
  *                              When a store key is passed, all selectors for the store will be
  *                              returned. This is only meant for usage of these selectors in event
  *                              callbacks, not for data needed to create the element tree.
- * @param {unknown[]} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ * @param {unknown[]} [deps]    If provided, this memoizes the mapSelect so the same `mapSelect` is
  *                              invoked on every state change unless the dependencies change.
  *
  * @example
