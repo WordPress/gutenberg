@@ -217,12 +217,6 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				{ isZoomOutMode && (
-					<Shuffle
-						clientId={ blockClientIds[ 0 ] }
-						as={ ToolbarButton }
-					/>
-				) }
 				{ ! hasContentOnlyLocking &&
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
