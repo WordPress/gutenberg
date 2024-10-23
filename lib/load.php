@@ -196,3 +196,8 @@ require_once __DIR__ . '/experimental/data-views.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
 	require_once __DIR__ . '/experimental/media/load.php';
 }
+
+// Gutenberg UI for the Settings API.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-settings-api' ) ) {
+	require_once __DIR__ . '/experimental/settings/load.php';
+}
