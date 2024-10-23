@@ -126,6 +126,47 @@ test.describe( 'Site Editor Inserter', () => {
 		const inserterButton = InserterUtils.getInserterButton();
 		const blockLibrary = InserterUtils.getBlockLibrary();
 
+		// Manually enter zoom out
+		await zoomOutButton.click();
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		// Open inserter
+		await inserterButton.click();
+
+		// Patterns tab should be active
+		const patternsTab = InserterUtils.getBlockLibraryTab( 'Patterns' );
+		await expect( patternsTab ).toHaveAttribute(
+			'data-active-item',
+			'true'
+		);
+		// Canvas should be zoomed
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+
+		// Select blocks tab
+		const blocksTab = InserterUtils.getBlockLibraryTab( 'Blocks' );
+		await blocksTab.click();
+		await expect( blocksTab ).toHaveAttribute( 'data-active-item', 'true' );
+		// Zoom out should disengage
+		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
+
+		// Close the inserter
+		await inserterButton.click();
+		await expect( blockLibrary ).toBeHidden();
+
+		// We should return to zoom out since the inserter was opened with
+		// zoom out engaged, and it was automatically disengaged when selecting
+		// the blocks tab
+		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+	} );
+
+	// Test for https://github.com/WordPress/gutenberg/issues/66328
+	test( 'should not return you to zoom out if manually disengaged', async ( {
+		InserterUtils,
+	} ) => {
+		const zoomOutButton = InserterUtils.getZoomOutButton();
+		const inserterButton = InserterUtils.getInserterButton();
+		const blockLibrary = InserterUtils.getBlockLibrary();
+
 		await zoomOutButton.click();
 		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
 
@@ -137,10 +178,7 @@ test.describe( 'Site Editor Inserter', () => {
 		);
 		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
 
-		const blocksTab = InserterUtils.getBlockLibraryTab( 'Blocks' );
-		await blocksTab.click();
-		await expect( blocksTab ).toHaveAttribute( 'data-active-item', 'true' );
-
+		await zoomOutButton.click();
 		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
 
 		// Close the inserter
@@ -148,8 +186,8 @@ test.describe( 'Site Editor Inserter', () => {
 
 		await expect( blockLibrary ).toBeHidden();
 
-		// We should return to zoom out since we started from there
-		await expect( await InserterUtils.getZoomCanvas() ).toBeVisible();
+		// We should not return to zoom out since it was manually disengaged
+		await expect( await InserterUtils.getZoomCanvas() ).toBeHidden();
 	} );
 } );
 
