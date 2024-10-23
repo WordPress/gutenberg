@@ -322,7 +322,7 @@ Callback that signals the user selected one of more items, and takes them as par
 
 ### `isClickable`: `function`
 
-A function that determines if an item is clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
+A function that determines if a media field or a primary field are clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
 
 ### `onClick`: `function`
 
