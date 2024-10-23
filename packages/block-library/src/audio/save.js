@@ -5,10 +5,13 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { autoplay, caption, loop, preload, src } = attributes;
+
+	const borderProps = getBorderClassesAndStyles( attributes );
 
 	return (
 		src && (
@@ -19,6 +22,8 @@ export default function save( { attributes } ) {
 					autoPlay={ autoplay }
 					loop={ loop }
 					preload={ preload }
+					className={ borderProps.className }
+					style={ borderProps.style }
 				/>
 				{ ! RichText.isEmpty( caption ) && (
 					<RichText.Content
