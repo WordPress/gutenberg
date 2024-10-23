@@ -75,7 +75,7 @@ export default function CollabSidebar() {
 				status: 'any',
 				per_page: 100,
 			} );
-			return Array.isArray( data ) ? data : [];
+			return data ? data : [];
 		},
 		[ postId ]
 	);
