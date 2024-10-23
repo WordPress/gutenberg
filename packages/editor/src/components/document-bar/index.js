@@ -59,6 +59,8 @@ export default function DocumentBar( props ) {
 		isUnsyncedPattern,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
+		isFrontPage,
+		isPostsPage,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -67,6 +69,7 @@ export default function DocumentBar( props ) {
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
 		const {
+			canUser,
 			getEditedEntityRecord,
 			getPostType,
 			isResolving: isResolvingSelector,
@@ -80,6 +83,12 @@ export default function DocumentBar( props ) {
 		);
 		const _templateInfo = getTemplateInfo( _document );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
 
 		return {
 			postType: _postType,
@@ -97,6 +106,8 @@ export default function DocumentBar( props ) {
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
+			isFrontPage: siteSettings?.page_on_front === _postId,
+			isPostsPage: siteSettings?.page_for_posts === _postId,
 		};
 	}, [] );
 
@@ -184,11 +195,25 @@ export default function DocumentBar( props ) {
 									? decodeEntities( title )
 									: __( 'No title' ) }
 							</span>
-							{ postTypeLabel && ! props.title && (
+							{ isFrontPage && ! props.title && (
 								<span className="editor-document-bar__post-type-label">
-									{ '· ' + decodeEntities( postTypeLabel ) }
+									{ '. ' + __( 'Homepage' ) }
 								</span>
 							) }
+							{ isPostsPage && ! props.title && (
+								<span className="editor-document-bar__post-type-label">
+									{ '. ' + __( 'Posts Page' ) }
+								</span>
+							) }
+							{ postTypeLabel &&
+								! props.title &&
+								! isFrontPage &&
+								! isPostsPage && (
+									<span className="editor-document-bar__post-type-label">
+										{ '· ' +
+											decodeEntities( postTypeLabel ) }
+									</span>
+								) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
