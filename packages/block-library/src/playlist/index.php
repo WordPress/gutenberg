@@ -29,6 +29,7 @@ function render_block_core_playlist( $attributes ) {
 	$artists      = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
 	$images       = isset( $attributes['images'] ) ? $attributes['images'] : true;
 	$tagname      = $tracknumbers ? 'ol' : 'ul';
+	$caption      = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
 
 	/**
 	 * Assign the current track information to variables.
@@ -107,11 +108,11 @@ function render_block_core_playlist( $attributes ) {
 					'trackArtist'   => $artist,
 					'trackAlbum'    => $album,
 					'trackImageSrc' => $image,
-				),
+				)
 			);
 
 			$html .= '<li class="wp-block-playlist__item">';
-			$html .= '<button '. $contexts . 'data-wp-on--click="actions.changeTrack">';
+			$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack">';
 
 			/**
 			 * Use quotation marks for song titles when they are combined with the artist name.
@@ -143,6 +144,10 @@ function render_block_core_playlist( $attributes ) {
 			$html .= '</li>';
 		}
 		$html .= '</' . $tagname . '>';
+	}
+
+	if ( $caption ) {
+		$html .= '<figcaption class="wp-element-caption">' . wp_kses_post( $caption ) . '</figcaption>';
 	}
 
 	$html .= '</figure>';
