@@ -1,6 +1,9 @@
 .block-editor-iframe__body {
 	position: relative;
-	border: 0.01px solid transparent;
+	// Ensures margins of children are contained so that the body background paints behind them.
+	// Otherwise, the background of html (when zoomed out) would show there and appear broken. It’s
+	// important mostly for post-only views yet conceivably an issue in templated views too.
+	display: flow-root;
 }
 
 .block-editor-iframe__html {
