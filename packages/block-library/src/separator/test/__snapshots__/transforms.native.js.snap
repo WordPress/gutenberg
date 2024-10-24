@@ -17,3 +17,9 @@ exports[`Separator block transforms to Group block 1`] = `
 <!-- /wp:separator --></div>
 <!-- /wp:group -->"
 `;
+
+exports[`Separator block transforms to Spacer block 1`] = `
+"<!-- wp:spacer -->
+<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->"
+`;
