@@ -20,10 +20,12 @@ import { UploadError } from '../upload-error';
 import {
 	cloneFile,
 	convertBlobToFile,
+	fetchFile,
 	getFileBasename,
 	getFileExtension,
 	isImageTypeSupported,
 	renameFile,
+	validateMimeType,
 } from '../utils';
 import { PREFERENCES_NAME } from '../constants';
 import { StubFile } from '../stub-file';
@@ -76,6 +78,7 @@ type ActionCreators = {
 	generateThumbnails: typeof generateThumbnails;
 	uploadOriginal: typeof uploadOriginal;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	fetchRemoteFile: typeof fetchRemoteFile;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -405,6 +408,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.uploadOriginal(
 					id,
 					operationArgs as OperationArgs[ OperationType.UploadOriginal ]
+				);
+				break;
+
+			case OperationType.FetchRemoteFile:
+				dispatch.fetchRemoteFile(
+					id,
+					operationArgs as OperationArgs[ OperationType.FetchRemoteFile ]
 				);
 				break;
 		}
@@ -967,6 +977,61 @@ export function sideloadItem( id: QueueItemId ) {
 				dispatch.resumeItem( post as number );
 			},
 		} );
+	};
+}
+
+type FetchRemoteFileArgs = OperationArgs[ OperationType.FetchRemoteFile ];
+
+/**
+ * Fetches a remote file from another server and adds it to the item.
+ *
+ * @param id     Item ID.
+ * @param [args] Additional arguments for the operation.
+ */
+export function fetchRemoteFile( id: QueueItemId, args: FetchRemoteFileArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id ) as QueueItem;
+
+		try {
+			const sourceFile = await fetchFile( args.url, args.fileName );
+
+			validateMimeType( sourceFile, args.allowedTypes );
+
+			if ( args.skipAttachment ) {
+				dispatch.finishOperation( id, {
+					sourceFile,
+				} );
+			} else {
+				const file = args.newFileName
+					? renameFile( cloneFile( sourceFile ), args.newFileName )
+					: cloneFile( sourceFile );
+
+				const blobUrl = createBlobURL( sourceFile );
+				dispatch< CacheBlobUrlAction >( {
+					type: Type.CacheBlobUrl,
+					id,
+					blobUrl,
+				} );
+
+				dispatch.finishOperation( id, {
+					sourceFile,
+					file,
+					attachment: {
+						url: blobUrl,
+					},
+				} );
+			}
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'FETCH_REMOTE_FILE_ERROR',
+					message: 'Remote file could not be downloaded',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
 	};
 }
 

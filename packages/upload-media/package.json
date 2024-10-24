@@ -37,6 +37,7 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
 		"@wordpress/vips": "file:../vips",
+		"mime": "^3.0.0",
 		"uuid": "^9.0.1"
 	},
 	"publishConfig": {

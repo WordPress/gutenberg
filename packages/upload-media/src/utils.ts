@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import mime from 'mime/lite';
+
+/**
  * WordPress dependencies
  */
 import { getFilename } from '@wordpress/url';
@@ -92,6 +97,46 @@ export function getFileBasename( name: string ): string {
  */
 export function getFileNameFromUrl( url: string ) {
 	return getFilename( url ) || _x( 'unnamed', 'file name' );
+}
+
+/**
+ * Fetches a remote file and returns a File instance.
+ *
+ * @param url          URL.
+ * @param nameOverride File name to use, instead of deriving it from the URL.
+ */
+export async function fetchFile( url: string, nameOverride?: string ) {
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Could not fetch remote file: ${ response.status }` );
+	}
+
+	const name = nameOverride || getFileNameFromUrl( url );
+	const blob = await response.blob();
+
+	const ext = getFileExtension( name );
+	const guessedMimeType = ext ? mime.getType( ext ) : '';
+
+	let type = '';
+
+	// blob.type can be an empty string when server does not return a correct Content-Type.
+	if ( blob.type && blob.type !== 'application/octet-stream' ) {
+		type = blob.type;
+	} else if ( guessedMimeType ) {
+		type = guessedMimeType;
+	}
+
+	const file = new File( [ blob ], name, { type } );
+
+	if ( ! type ) {
+		throw new UploadError( {
+			code: 'FETCH_REMOTE_FILE_ERROR',
+			message: 'File could not be downloaded',
+			file,
+		} );
+	}
+
+	return file;
 }
 
 /**
