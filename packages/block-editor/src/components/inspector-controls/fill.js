@@ -5,6 +5,7 @@ import {
 	__experimentalStyleProvider as StyleProvider,
 	__experimentalToolsPanelContext as ToolsPanelContext,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 import { useEffect, useContext } from '@wordpress/element';
@@ -12,6 +13,8 @@ import { useEffect, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -36,7 +39,29 @@ export default function InspectorControlsFill( {
 		group = __experimentalGroup;
 	}
 
-	const context = useBlockEditContext();
+	const { clientId, ...context } = useBlockEditContext();
+
+	// Register any clientIds with `contentOnly` controls before the
+	// `mayDisplayControls` early return so that parent blocks can know whether
+	// child blocks have those controls.
+	const { addContentOnlyControlsBlock, removeContentOnlyControlsBlock } =
+		unlock( useDispatch( blockEditorStore ) );
+	useEffect( () => {
+		if ( group === 'contentOnly' ) {
+			addContentOnlyControlsBlock( clientId );
+		}
+		return () => {
+			if ( group === 'contentOnly' ) {
+				removeContentOnlyControlsBlock( clientId );
+			}
+		};
+	}, [
+		clientId,
+		group,
+		addContentOnlyControlsBlock,
+		removeContentOnlyControlsBlock,
+	] );
+
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
