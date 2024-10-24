@@ -40,7 +40,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 			category: 'global',
 			description: __( 'Enter or exit zoom out.' ),
 			keyCombination: {
-				modifier: 'primaryShift',
+				modifier: 'access',
 				character: 'z',
 			},
 		} );
