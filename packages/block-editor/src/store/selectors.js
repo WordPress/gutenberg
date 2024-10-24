@@ -1677,21 +1677,27 @@ const canInsertBlockTypeUnmemoized = (
 		blockType = getBlockType( blockName );
 	}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
+	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+	const templateLock = getTemplateLock( state, rootClientId );
+	const allowsContentOnlyInsertion =
+		templateLock === 'contentOnly' &&
+		!! parentBlockListSettings?.contentOnlyInsertion;
+
+	const isLocked = !! templateLock;
+	if ( isLocked && ! allowsContentOnlyInsertion ) {
 		return false;
 	}
 
 	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
-	if ( _isSectionBlock ) {
+	const allowSectionInsertion =
+		!! parentBlockListSettings?.contentOnlyInsertion;
+	if ( _isSectionBlock && ! allowSectionInsertion ) {
 		return false;
 	}
 
 	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
-
-	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 
 	// The parent block doesn't have settings indicating it doesn't support
 	// inner blocks, return false.
@@ -1834,12 +1840,19 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const rootClientId = getBlockRootClientId( state, clientId );
-	if ( getTemplateLock( state, rootClientId ) ) {
+	const templateLock = getTemplateLock( state, rootClientId );
+	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+	const allowsContentOnlyInsertion =
+		templateLock === 'contentOnly' &&
+		!! parentBlockListSettings?.contentOnlyInsertion;
+	if ( templateLock && ! allowsContentOnlyInsertion ) {
 		return false;
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
-	if ( isBlockWithinSection ) {
+	const allowSectionInsertion =
+		!! parentBlockListSettings?.contentOnlyInsertion;
+	if ( isBlockWithinSection && ! allowSectionInsertion ) {
 		return false;
 	}
 

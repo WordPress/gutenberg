@@ -139,6 +139,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			renderAppender: false,
 		} ),
 		__experimentalCaptureToolbars: true,
+		contentOnlyInsertion: true,
 	} );
 	useMigrateOnLoad( attributes, clientId );
 
