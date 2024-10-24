@@ -32,15 +32,21 @@ runs:
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
-          run: |
-              npm ci
+          run: npm ci
           shell: bash
-        - name: Upload npm logs as an artifact on failure
+
+        - name: Find npm log location
+          id: npm-cache-location
+          if: ${{ failure() || runner.debug }}
+          run: echo "NODE_CACHE_LOCATION=$(npm config get cache)" >> $GITHUB_OUTPUT
+          shell: bash
+
+        - name: Upload logs as artifact
+          if: ${{ failure() || runner.debug }}
           uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
-          if: failure()
           with:
-              name: npm-logs
-              path: C:\npm\cache\_logs
+              name: npm-logs-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.node-version.outputs.NODE_VERSION }}
+              path: '${{ steps.npm-cache-location.outputs.NODE_CACHE_LOCATION }}/_logs'
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.
