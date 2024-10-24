@@ -287,7 +287,7 @@ function isInsertionPoint( targetToCheck, ownerDocument ) {
 	return !! (
 		defaultView &&
 		targetToCheck instanceof defaultView.HTMLElement &&
-		targetToCheck.dataset.isInsertionPoint
+		targetToCheck.closest( '[data-is-insertion-point]' )
 	);
 }
 
