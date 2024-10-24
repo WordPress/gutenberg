@@ -4,7 +4,9 @@
 	"name": "core/query-pagination-numbers",
 	"title": "Page Numbers",
 	"category": "theme",
-	"parent": [ "core/query-pagination" ],
+	"parent": [
+		"core/query-pagination"
+	],
 	"description": "Displays a list of page numbers for pagination.",
 	"textdomain": "default",
 	"attributes": {
@@ -13,7 +15,11 @@
 			"default": 2
 		}
 	},
-	"usesContext": [ "queryId", "query", "enhancedPagination" ],
+	"usesContext": [
+		"queryId",
+		"query",
+		"enhancedPagination"
+	],
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -36,6 +42,10 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
 		},
 		"__experimentalBorder": {
 			"radius": true,

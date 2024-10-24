@@ -755,7 +755,7 @@ Displays a list of page numbers for pagination. ([Source](https://github.com/Wor
 -	**Name:** core/query-pagination-numbers
 -	**Category:** theme
 -	**Parent:** core/query-pagination
--	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), spacing (margin, padding), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** midSize
 
 ## Previous Page
