@@ -6,6 +6,7 @@
 
 -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
 -   `RadioGroup`: Fix arrow key navigation in RTL ([#66202](https://github.com/WordPress/gutenberg/pull/66202)).
+-   `Tabs` and `ToggleGroupControl`: round indicator size ([#66426](https://github.com/WordPress/gutenberg/pull/66426)).
 
 ### Enhancements
 
@@ -40,8 +41,8 @@
 
 -   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
 -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
--   `ComboboxControl`: display `No items found` when there are no matches found ([#66142](https://github.com/WordPress/gutenberg/pull/66142)) 
--   `FormTokenField`: display `No items found` when there are no matches found. This occurs when the `__experimentalExpandOnFocus` prop is enabled ([#66142](https://github.com/WordPress/gutenberg/pull/66142)) 
+-   `ComboboxControl`: display `No items found` when there are no matches found ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
+-   `FormTokenField`: display `No items found` when there are no matches found. This occurs when the `__experimentalExpandOnFocus` prop is enabled ([#66142](https://github.com/WordPress/gutenberg/pull/66142))
 
 ## 28.9.0 (2024-10-03)
 
