@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	TextControl,
+	TextareaControl,
 } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -91,7 +91,7 @@ export function AddComment( {
 					{ currentUser?.name ?? '' }
 				</span>
 			</HStack>
-			<TextControl
+			<TextareaControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ inputComment }
