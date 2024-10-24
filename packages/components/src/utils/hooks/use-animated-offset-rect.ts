@@ -46,6 +46,7 @@ export function useAnimatedOffsetRect(
 		prefix = 'subelement',
 		dataAttribute = `${ prefix }-animated`,
 		transitionEndFilter = () => true,
+		roundRect = false,
 	}: {
 		/**
 		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
@@ -72,6 +73,13 @@ export function useAnimatedOffsetRect(
 		 * @default () => true
 		 */
 		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
+		/**
+		 * Whether the `rect` measurements should be rounded down when applied
+		 * to the CSS variables. This can be useful to avoid blurry animations or
+		 * to avoid subpixel rendering issues.
+		 * @default false
+		 */
+		roundRect?: boolean;
 	} = {}
 ) {
 	const setProperties = useEvent( () => {
@@ -80,7 +88,11 @@ export function useAnimatedOffsetRect(
 				property !== 'element' &&
 				container?.style.setProperty(
 					`--${ prefix }-${ property }`,
-					String( rect[ property ] )
+					String(
+						roundRect
+							? Math.floor( rect[ property ] )
+							: rect[ property ]
+					)
 				)
 		);
 	} );

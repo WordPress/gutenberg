@@ -58,6 +58,7 @@ function UnconnectedToggleGroupControl(
 		prefix: 'selected',
 		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+		roundRect: true,
 	} );
 
 	const cx = useCx();

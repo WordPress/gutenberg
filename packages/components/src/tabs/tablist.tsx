@@ -93,6 +93,7 @@ export const TabList = forwardRef<
 		prefix: 'selected',
 		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+		roundRect: true,
 	} );
 
 	// Make sure selected tab is scrolled into view.
