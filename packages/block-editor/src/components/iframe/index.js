@@ -34,7 +34,11 @@ import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
 import cubicBezier from './bezier-easing';
 
-const scrollEasing = cubicBezier( 0.46, 0.03, 0.52, 0.96 );
+// Easing function from the CSS editor-canvas-resize-animation.
+// const scrollEasing = cubicBezier( 0.46, 0.03, 0.52, 0.96 );
+
+// Complementary easing function to the CSS editor-canvas-resize-animation.
+const scrollEasing = cubicBezier( 1 - 0.52, 1 - 0.96, 1 - 0.46, 1 - 0.03 );
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -434,7 +438,7 @@ function Iframe( {
 	const prevContainerHeightRef = useRef( containerHeight );
 
 	// Scroll based on the new scale
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! iframeDocument ) {
 			return;
 		}
@@ -447,42 +451,42 @@ function Iframe( {
 			return;
 		}
 
+		const { documentElement } = iframeDocument;
+		const { scrollTop } = documentElement;
+
+		// Convert previous values to the zoomed in scale.
+		const scrollTopOriginal = Math.floor(
+			( scrollTop + containerHeightPrev / 2 - frameSizeValuePrev ) /
+				scaleValuePrev -
+				containerHeightPrev / 2
+		);
+
+		// Convert the zoomed in value to the new scale.
+		const scrollTopNext = Math.floor(
+			( scrollTopOriginal + containerHeight / 2 ) * scaleValue +
+				frameSizeValue -
+				containerHeight / 2
+		);
+
+		console.log( {
+			scaleValue,
+			scaleValuePrev,
+		} );
+		console.log( {
+			frameSizeValue,
+			frameSizeValuePrev,
+		} );
+		console.log( {
+			containerHeight,
+			containerHeightPrev,
+		} );
+		console.log( {
+			scrollTop,
+			scrollTopOriginal,
+			scrollTopNext,
+		} );
+
 		let raf = requestAnimationFrame( ( start ) => {
-			const { documentElement } = iframeDocument;
-			const { scrollTop } = documentElement;
-
-			// Convert previous values to the zoomed in scale.
-			const scrollTopOriginal = Math.floor(
-				( scrollTop + containerHeightPrev / 2 - frameSizeValuePrev ) /
-					scaleValuePrev -
-					containerHeightPrev / 2
-			);
-
-			// Convert the zoomed in value to the new scale.
-			const scrollTopNext = Math.floor(
-				( scrollTopOriginal + containerHeight / 2 ) * scaleValue +
-					frameSizeValue -
-					containerHeight / 2
-			);
-
-			console.log( {
-				scaleValue,
-				scaleValuePrev,
-			} );
-			console.log( {
-				frameSizeValue,
-				frameSizeValuePrev,
-			} );
-			console.log( {
-				containerHeight,
-				containerHeightPrev,
-			} );
-			console.log( {
-				scrollTop,
-				scrollTopOriginal,
-				scrollTopNext,
-			} );
-
 			const duration = 400; // Should match the CSS transition duration.
 			console.log( documentElement.scrollTop, '0.000', '0.000' );
 			const step = ( timestamp ) => {
