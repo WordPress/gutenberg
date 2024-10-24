@@ -10,7 +10,6 @@ export default function save( { attributes } ) {
 	return (
 		<form
 			{ ...blockProps }
-			className="wp-block-form"
 			encType={ submissionMethod === 'email' ? 'text/plain' : null }
 		>
 			<InnerBlocks.Content />
