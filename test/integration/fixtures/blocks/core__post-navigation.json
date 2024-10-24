@@ -1,0 +1,35 @@
+[
+	{
+		"name": "core/post-navigation",
+		"isValid": true,
+		"attributes": {
+			"ariaLabel": "Posts"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/post-navigation-link",
+				"isValid": true,
+				"attributes": {
+					"type": "previous",
+					"showTitle": false,
+					"linkLabel": false,
+					"arrow": "none",
+					"taxonomy": ""
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/post-navigation-link",
+				"isValid": true,
+				"attributes": {
+					"type": "next",
+					"showTitle": false,
+					"linkLabel": false,
+					"arrow": "none",
+					"taxonomy": ""
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

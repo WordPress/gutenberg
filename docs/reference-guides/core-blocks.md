@@ -645,6 +645,15 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
+## Post Navigation
+
+Displays links to the next and previous post, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-navigation))
+
+-	**Name:** core/post-navigation
+-	**Category:** theme
+-	**Supports:** align, ariaLabel, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** ariaLabel
+
 ## Post Navigation Link
 
 Displays the next or previous post link that is adjacent to the current post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-navigation-link))
