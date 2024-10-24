@@ -29,6 +29,12 @@ export const DropdownMenuCheckboxItem = forwardRef<
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.CheckboxItem can only be rendered inside a DropdownMenu component'
+		);
+	}
+
 	return (
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }

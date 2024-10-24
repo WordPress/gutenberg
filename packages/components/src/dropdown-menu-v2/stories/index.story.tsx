@@ -21,10 +21,24 @@ import Modal from '../../modal';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { ContextSystemProvider } from '../../context';
 
+// TODO:
+// - Variant doesn't seem to work
+// - Checkbox example seems weird (multiple selection vs single selection)
+// - Inner/outer modals seem the same, is the example working?
+// - Migrate to CSF 3
+// - Migrate unit tests
+// - Tidy up types
+
 const meta: Meta< typeof DropdownMenuV2 > = {
 	title: 'Components (Experimental)/DropdownMenu V2',
 	component: DropdownMenuV2,
 	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		TriggerButton: DropdownMenuV2.TriggerButton,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		SubmenuTriggerItem: DropdownMenuV2.SubmenuTriggerItem,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		Popover: DropdownMenuV2.Popover,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: DropdownMenuV2.Item,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -62,102 +76,118 @@ export default meta;
 
 export const Default: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
 	<DropdownMenuV2 { ...props }>
-		<DropdownMenuV2.Item>
-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
-		</DropdownMenuV2.Item>
-		<DropdownMenuV2.Item>
-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
-			<DropdownMenuV2.ItemHelpText>Help text</DropdownMenuV2.ItemHelpText>
-		</DropdownMenuV2.Item>
-		<DropdownMenuV2.Item>
-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
-			<DropdownMenuV2.ItemHelpText>
-				The menu item help text is automatically truncated when there
-				are more than two lines of text
-			</DropdownMenuV2.ItemHelpText>
-		</DropdownMenuV2.Item>
-		<DropdownMenuV2.Item hideOnClick={ false }>
-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
-			<DropdownMenuV2.ItemHelpText>
-				This item doesn&apos;t close the menu on click
-			</DropdownMenuV2.ItemHelpText>
-		</DropdownMenuV2.Item>
-		<DropdownMenuV2.Item disabled>Disabled item</DropdownMenuV2.Item>
-		<DropdownMenuV2.Separator />
-		<DropdownMenuV2.Group>
-			<DropdownMenuV2.GroupLabel>Group label</DropdownMenuV2.GroupLabel>
-			<DropdownMenuV2.Item
-				prefix={ <Icon icon={ customLink } size={ 24 } /> }
-			>
-				<DropdownMenuV2.ItemLabel>With prefix</DropdownMenuV2.ItemLabel>
+		<DropdownMenuV2.TriggerButton
+			render={ <Button __next40pxDefaultSize variant="secondary" /> }
+		>
+			Open menu
+		</DropdownMenuV2.TriggerButton>
+		<DropdownMenuV2.Popover>
+			<DropdownMenuV2.Item>
+				<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
 			</DropdownMenuV2.Item>
-			<DropdownMenuV2.Item suffix="⌘S">With suffix</DropdownMenuV2.Item>
-			<DropdownMenuV2.Item
-				disabled
-				prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
-				suffix="⌥⌘T"
-			>
-				<DropdownMenuV2.ItemLabel>
-					Disabled with prefix and suffix
-				</DropdownMenuV2.ItemLabel>
+			<DropdownMenuV2.Item>
+				<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
 				<DropdownMenuV2.ItemHelpText>
-					And help text
+					Help text
 				</DropdownMenuV2.ItemHelpText>
 			</DropdownMenuV2.Item>
-		</DropdownMenuV2.Group>
+			<DropdownMenuV2.Item>
+				<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+				<DropdownMenuV2.ItemHelpText>
+					The menu item help text is automatically truncated when
+					there are more than two lines of text
+				</DropdownMenuV2.ItemHelpText>
+			</DropdownMenuV2.Item>
+			<DropdownMenuV2.Item hideOnClick={ false }>
+				<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+				<DropdownMenuV2.ItemHelpText>
+					This item doesn&apos;t close the menu on click
+				</DropdownMenuV2.ItemHelpText>
+			</DropdownMenuV2.Item>
+			<DropdownMenuV2.Item disabled>Disabled item</DropdownMenuV2.Item>
+			<DropdownMenuV2.Separator />
+			<DropdownMenuV2.Group>
+				<DropdownMenuV2.GroupLabel>
+					Group label
+				</DropdownMenuV2.GroupLabel>
+				<DropdownMenuV2.Item
+					prefix={ <Icon icon={ customLink } size={ 24 } /> }
+				>
+					<DropdownMenuV2.ItemLabel>
+						With prefix
+					</DropdownMenuV2.ItemLabel>
+				</DropdownMenuV2.Item>
+				<DropdownMenuV2.Item suffix="⌘S">
+					With suffix
+				</DropdownMenuV2.Item>
+				<DropdownMenuV2.Item
+					disabled
+					prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
+					suffix="⌥⌘T"
+				>
+					<DropdownMenuV2.ItemLabel>
+						Disabled with prefix and suffix
+					</DropdownMenuV2.ItemLabel>
+					<DropdownMenuV2.ItemHelpText>
+						And help text
+					</DropdownMenuV2.ItemHelpText>
+				</DropdownMenuV2.Item>
+			</DropdownMenuV2.Group>
+		</DropdownMenuV2.Popover>
 	</DropdownMenuV2>
 );
-Default.args = {
-	trigger: (
-		<Button __next40pxDefaultSize variant="secondary">
-			Open menu
-		</Button>
-	),
-};
+Default.args = {};
 
 export const WithSubmenu: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
 	<DropdownMenuV2 { ...props }>
-		<DropdownMenuV2.Item>Level 1 item</DropdownMenuV2.Item>
-		<DropdownMenuV2
-			trigger={
-				<DropdownMenuV2.Item suffix="Suffix">
+		<DropdownMenuV2.TriggerButton
+			render={ <Button __next40pxDefaultSize variant="secondary" /> }
+		>
+			Open menu
+		</DropdownMenuV2.TriggerButton>
+		<DropdownMenuV2.Popover>
+			<DropdownMenuV2.Item>Level 1 item</DropdownMenuV2.Item>
+			<DropdownMenuV2.Item>Level 1 item</DropdownMenuV2.Item>
+			<DropdownMenuV2.Item>Level 1 item</DropdownMenuV2.Item>
+			<DropdownMenuV2>
+				<DropdownMenuV2.SubmenuTriggerItem suffix="Suffix">
 					<DropdownMenuV2.ItemLabel>
 						Submenu trigger item with a long label
 					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-			}
-		>
-			<DropdownMenuV2.Item>
-				<DropdownMenuV2.ItemLabel>
-					Level 2 item
-				</DropdownMenuV2.ItemLabel>
-			</DropdownMenuV2.Item>
-			<DropdownMenuV2.Item>
-				<DropdownMenuV2.ItemLabel>
-					Level 2 item
-				</DropdownMenuV2.ItemLabel>
-			</DropdownMenuV2.Item>
-			<DropdownMenuV2
-				trigger={
+				</DropdownMenuV2.SubmenuTriggerItem>
+				<DropdownMenuV2.Popover>
 					<DropdownMenuV2.Item>
 						<DropdownMenuV2.ItemLabel>
-							Submenu trigger
+							Level 2 item
 						</DropdownMenuV2.ItemLabel>
 					</DropdownMenuV2.Item>
-				}
-			>
-				<DropdownMenuV2.Item>
-					<DropdownMenuV2.ItemLabel>
-						Level 3 item
-					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-				<DropdownMenuV2.Item>
-					<DropdownMenuV2.ItemLabel>
-						Level 3 item
-					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item>
+						<DropdownMenuV2.ItemLabel>
+							Level 2 item
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2>
+						<DropdownMenuV2.SubmenuTriggerItem>
+							<DropdownMenuV2.ItemLabel>
+								Submenu trigger
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.SubmenuTriggerItem>
+						<DropdownMenuV2.Popover>
+							<DropdownMenuV2.Item>
+								<DropdownMenuV2.ItemLabel>
+									Level 3 item
+								</DropdownMenuV2.ItemLabel>
+							</DropdownMenuV2.Item>
+							<DropdownMenuV2.Item>
+								<DropdownMenuV2.ItemLabel>
+									Level 3 item
+								</DropdownMenuV2.ItemLabel>
+							</DropdownMenuV2.Item>
+						</DropdownMenuV2.Popover>
+					</DropdownMenuV2>
+				</DropdownMenuV2.Popover>
 			</DropdownMenuV2>
-		</DropdownMenuV2>
+		</DropdownMenuV2.Popover>
 	</DropdownMenuV2>
 );
 WithSubmenu.args = {
@@ -184,128 +214,135 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 
 	return (
 		<DropdownMenuV2 { ...props }>
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Single selection, uncontrolled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-individual-uncontrolled-a"
-					value="a"
-					suffix="⌥⌘T"
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item A
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-individual-uncontrolled-b"
-					value="b"
-					defaultChecked
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item B
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-			</DropdownMenuV2.Group>
-			<DropdownMenuV2.Separator />
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Single selection, controlled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-individual-controlled-a"
-					value="a"
-					checked={ isAChecked }
-					onChange={ ( e ) => setAChecked( e.target.checked ) }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item A
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-individual-controlled-b"
-					value="b"
-					checked={ isBChecked }
-					onChange={ ( e ) => setBChecked( e.target.checked ) }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item B
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-			</DropdownMenuV2.Group>
-			<DropdownMenuV2.Separator />
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Multiple selection, uncontrolled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-multiple-uncontrolled"
-					value="a"
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item A
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-multiple-uncontrolled"
-					value="b"
-					defaultChecked
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item B
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-			</DropdownMenuV2.Group>
-			<DropdownMenuV2.Separator />
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Multiple selection, controlled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-multiple-controlled"
-					value="a"
-					checked={ multipleCheckboxesValue.includes( 'a' ) }
-					onChange={ onMultipleCheckboxesCheckedChange }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item A
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-				<DropdownMenuV2.CheckboxItem
-					name="checkbox-multiple-controlled"
-					value="b"
-					checked={ multipleCheckboxesValue.includes( 'b' ) }
-					onChange={ onMultipleCheckboxesCheckedChange }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Checkbox item B
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.CheckboxItem>
-			</DropdownMenuV2.Group>
+			<DropdownMenuV2.TriggerButton
+				render={ <Button __next40pxDefaultSize variant="secondary" /> }
+			>
+				Open menu
+			</DropdownMenuV2.TriggerButton>
+			<DropdownMenuV2.Popover>
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Single selection, uncontrolled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-individual-uncontrolled-a"
+						value="a"
+						suffix="⌥⌘T"
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item A
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-individual-uncontrolled-b"
+						value="b"
+						defaultChecked
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item B
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2.Group>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Single selection, controlled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-individual-controlled-a"
+						value="a"
+						checked={ isAChecked }
+						onChange={ ( e ) => setAChecked( e.target.checked ) }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item A
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-individual-controlled-b"
+						value="b"
+						checked={ isBChecked }
+						onChange={ ( e ) => setBChecked( e.target.checked ) }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item B
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2.Group>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Multiple selection, uncontrolled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-multiple-uncontrolled"
+						value="a"
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item A
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-multiple-uncontrolled"
+						value="b"
+						defaultChecked
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item B
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2.Group>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Multiple selection, controlled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-multiple-controlled"
+						value="a"
+						checked={ multipleCheckboxesValue.includes( 'a' ) }
+						onChange={ onMultipleCheckboxesCheckedChange }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item A
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+					<DropdownMenuV2.CheckboxItem
+						name="checkbox-multiple-controlled"
+						value="b"
+						checked={ multipleCheckboxesValue.includes( 'b' ) }
+						onChange={ onMultipleCheckboxesCheckedChange }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Checkbox item B
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.CheckboxItem>
+				</DropdownMenuV2.Group>
+			</DropdownMenuV2.Popover>
 		</DropdownMenuV2>
 	);
 };
@@ -321,63 +358,73 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 
 	return (
 		<DropdownMenuV2 { ...props }>
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Uncontrolled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.RadioItem name="radio-uncontrolled" value="one">
-					<DropdownMenuV2.ItemLabel>
-						Radio item 1
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.RadioItem>
-				<DropdownMenuV2.RadioItem
-					name="radio-uncontrolled"
-					value="two"
-					defaultChecked
-				>
-					<DropdownMenuV2.ItemLabel>
-						Radio item 2
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.RadioItem>
-			</DropdownMenuV2.Group>
-			<DropdownMenuV2.Separator />
-			<DropdownMenuV2.Group>
-				<DropdownMenuV2.GroupLabel>
-					Controlled
-				</DropdownMenuV2.GroupLabel>
-				<DropdownMenuV2.RadioItem
-					name="radio-controlled"
-					value="one"
-					checked={ radioValue === 'one' }
-					onChange={ onRadioChange }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Radio item 1
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially unchecked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.RadioItem>
-				<DropdownMenuV2.RadioItem
-					name="radio-controlled"
-					value="two"
-					checked={ radioValue === 'two' }
-					onChange={ onRadioChange }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Radio item 2
-					</DropdownMenuV2.ItemLabel>
-					<DropdownMenuV2.ItemHelpText>
-						Initially checked
-					</DropdownMenuV2.ItemHelpText>
-				</DropdownMenuV2.RadioItem>
-			</DropdownMenuV2.Group>
+			<DropdownMenuV2.TriggerButton
+				render={ <Button __next40pxDefaultSize variant="secondary" /> }
+			>
+				Open menu
+			</DropdownMenuV2.TriggerButton>
+			<DropdownMenuV2.Popover>
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Uncontrolled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.RadioItem
+						name="radio-uncontrolled"
+						value="one"
+					>
+						<DropdownMenuV2.ItemLabel>
+							Radio item 1
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+					<DropdownMenuV2.RadioItem
+						name="radio-uncontrolled"
+						value="two"
+						defaultChecked
+					>
+						<DropdownMenuV2.ItemLabel>
+							Radio item 2
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+				</DropdownMenuV2.Group>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.GroupLabel>
+						Controlled
+					</DropdownMenuV2.GroupLabel>
+					<DropdownMenuV2.RadioItem
+						name="radio-controlled"
+						value="one"
+						checked={ radioValue === 'one' }
+						onChange={ onRadioChange }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Radio item 1
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially unchecked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+					<DropdownMenuV2.RadioItem
+						name="radio-controlled"
+						value="two"
+						checked={ radioValue === 'two' }
+						onChange={ onRadioChange }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Radio item 2
+						</DropdownMenuV2.ItemLabel>
+						<DropdownMenuV2.ItemHelpText>
+							Initially checked
+						</DropdownMenuV2.ItemHelpText>
+					</DropdownMenuV2.RadioItem>
+				</DropdownMenuV2.Group>
+			</DropdownMenuV2.Popover>
 		</DropdownMenuV2>
 	);
 };
@@ -402,33 +449,44 @@ export const WithModals: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 	return (
 		<>
 			<DropdownMenuV2 { ...props }>
-				<DropdownMenuV2.Item
-					onClick={ () => setOuterModalOpen( true ) }
-					hideOnClick={ false }
+				<DropdownMenuV2.TriggerButton
+					render={
+						<Button __next40pxDefaultSize variant="secondary" />
+					}
 				>
-					<DropdownMenuV2.ItemLabel>
-						Open outer modal
-					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-				<DropdownMenuV2.Item
-					onClick={ () => setInnerModalOpen( true ) }
-					hideOnClick={ false }
-				>
-					<DropdownMenuV2.ItemLabel>
-						Open inner modal
-					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-				{ isInnerModalOpen && (
-					<Modal
-						onRequestClose={ () => setInnerModalOpen( false ) }
-						overlayClassName={ modalOverlayClassName }
+					Open menu
+				</DropdownMenuV2.TriggerButton>
+				<DropdownMenuV2.Popover>
+					<DropdownMenuV2.Item
+						onClick={ () => setOuterModalOpen( true ) }
+						hideOnClick={ false }
 					>
-						Modal&apos;s contents
-						<button onClick={ () => setInnerModalOpen( false ) }>
-							Close
-						</button>
-					</Modal>
-				) }
+						<DropdownMenuV2.ItemLabel>
+							Open outer modal
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item
+						onClick={ () => setInnerModalOpen( true ) }
+						hideOnClick={ false }
+					>
+						<DropdownMenuV2.ItemLabel>
+							Open inner modal
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					{ isInnerModalOpen && (
+						<Modal
+							onRequestClose={ () => setInnerModalOpen( false ) }
+							overlayClassName={ modalOverlayClassName }
+						>
+							Modal&apos;s contents
+							<button
+								onClick={ () => setInnerModalOpen( false ) }
+							>
+								Close
+							</button>
+						</Modal>
+					) }
+				</DropdownMenuV2.Popover>
 			</DropdownMenuV2>
 			{ isOuterModalOpen && (
 				<Modal
@@ -503,10 +561,21 @@ export const WithSlotFill: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 	return (
 		<SlotFillProvider>
 			<DropdownMenuV2 { ...props }>
-				<DropdownMenuV2.Item>
-					<DropdownMenuV2.ItemLabel>Item</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-				<Slot />
+				<DropdownMenuV2.TriggerButton
+					render={
+						<Button __next40pxDefaultSize variant="secondary" />
+					}
+				>
+					Open menu
+				</DropdownMenuV2.TriggerButton>
+				<DropdownMenuV2.Popover>
+					<DropdownMenuV2.Item>
+						<DropdownMenuV2.ItemLabel>
+							Item
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					<Slot />
+				</DropdownMenuV2.Popover>
 			</DropdownMenuV2>
 
 			<Fill>
@@ -515,20 +584,19 @@ export const WithSlotFill: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 						Item from fill
 					</DropdownMenuV2.ItemLabel>
 				</DropdownMenuV2.Item>
-				<DropdownMenuV2
-					trigger={
+				<DropdownMenuV2>
+					<DropdownMenuV2.SubmenuTriggerItem>
+						<DropdownMenuV2.ItemLabel>
+							Submenu from fill
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.SubmenuTriggerItem>
+					<DropdownMenuV2.Popover>
 						<DropdownMenuV2.Item>
 							<DropdownMenuV2.ItemLabel>
-								Submenu from fill
+								Submenu item from fill
 							</DropdownMenuV2.ItemLabel>
 						</DropdownMenuV2.Item>
-					}
-				>
-					<DropdownMenuV2.Item>
-						<DropdownMenuV2.ItemLabel>
-							Submenu item from fill
-						</DropdownMenuV2.ItemLabel>
-					</DropdownMenuV2.Item>
+					</DropdownMenuV2.Popover>
 				</DropdownMenuV2>
 			</Fill>
 		</SlotFillProvider>
@@ -547,32 +615,38 @@ export const ToolbarVariant: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
 	// TODO: add toolbar
 	<ContextSystemProvider value={ toolbarVariantContextValue }>
 		<DropdownMenuV2 { ...props }>
-			<DropdownMenuV2.Item>
-				<DropdownMenuV2.ItemLabel>
-					Level 1 item
-				</DropdownMenuV2.ItemLabel>
-			</DropdownMenuV2.Item>
-			<DropdownMenuV2.Item>
-				<DropdownMenuV2.ItemLabel>
-					Level 1 item
-				</DropdownMenuV2.ItemLabel>
-			</DropdownMenuV2.Item>
-			<DropdownMenuV2.Separator />
-			<DropdownMenuV2
-				trigger={
-					<DropdownMenuV2.Item>
+			<DropdownMenuV2.TriggerButton
+				render={ <Button __next40pxDefaultSize variant="secondary" /> }
+			>
+				Open menu
+			</DropdownMenuV2.TriggerButton>
+			<DropdownMenuV2.Popover>
+				<DropdownMenuV2.Item>
+					<DropdownMenuV2.ItemLabel>
+						Level 1 item
+					</DropdownMenuV2.ItemLabel>
+				</DropdownMenuV2.Item>
+				<DropdownMenuV2.Item>
+					<DropdownMenuV2.ItemLabel>
+						Level 1 item
+					</DropdownMenuV2.ItemLabel>
+				</DropdownMenuV2.Item>
+				<DropdownMenuV2.Separator />
+				<DropdownMenuV2>
+					<DropdownMenuV2.SubmenuTriggerItem>
 						<DropdownMenuV2.ItemLabel>
 							Submenu trigger
 						</DropdownMenuV2.ItemLabel>
-					</DropdownMenuV2.Item>
-				}
-			>
-				<DropdownMenuV2.Item>
-					<DropdownMenuV2.ItemLabel>
-						Level 2 item
-					</DropdownMenuV2.ItemLabel>
-				</DropdownMenuV2.Item>
-			</DropdownMenuV2>
+					</DropdownMenuV2.SubmenuTriggerItem>
+					<DropdownMenuV2.Popover>
+						<DropdownMenuV2.Item>
+							<DropdownMenuV2.ItemLabel>
+								Level 2 item
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2.Popover>
+				</DropdownMenuV2>
+			</DropdownMenuV2.Popover>
 		</DropdownMenuV2>
 	</ContextSystemProvider>
 );
@@ -594,32 +668,43 @@ export const InsideModal: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
 			{ isModalOpen && (
 				<Modal onRequestClose={ () => setModalOpen( false ) }>
 					<DropdownMenuV2 { ...props }>
-						<DropdownMenuV2.Item>
-							<DropdownMenuV2.ItemLabel>
-								Level 1 item
-							</DropdownMenuV2.ItemLabel>
-						</DropdownMenuV2.Item>
-						<DropdownMenuV2.Item>
-							<DropdownMenuV2.ItemLabel>
-								Level 1 item
-							</DropdownMenuV2.ItemLabel>
-						</DropdownMenuV2.Item>
-						<DropdownMenuV2.Separator />
-						<DropdownMenuV2
-							trigger={
-								<DropdownMenuV2.Item>
+						<DropdownMenuV2.TriggerButton
+							render={
+								<Button
+									__next40pxDefaultSize
+									variant="secondary"
+								/>
+							}
+						>
+							Open menu
+						</DropdownMenuV2.TriggerButton>
+						<DropdownMenuV2.Popover>
+							<DropdownMenuV2.Item>
+								<DropdownMenuV2.ItemLabel>
+									Level 1 item
+								</DropdownMenuV2.ItemLabel>
+							</DropdownMenuV2.Item>
+							<DropdownMenuV2.Item>
+								<DropdownMenuV2.ItemLabel>
+									Level 1 item
+								</DropdownMenuV2.ItemLabel>
+							</DropdownMenuV2.Item>
+							<DropdownMenuV2.Separator />
+							<DropdownMenuV2>
+								<DropdownMenuV2.SubmenuTriggerItem>
 									<DropdownMenuV2.ItemLabel>
 										Submenu trigger
 									</DropdownMenuV2.ItemLabel>
-								</DropdownMenuV2.Item>
-							}
-						>
-							<DropdownMenuV2.Item>
-								<DropdownMenuV2.ItemLabel>
-									Level 2 item
-								</DropdownMenuV2.ItemLabel>
-							</DropdownMenuV2.Item>
-						</DropdownMenuV2>
+								</DropdownMenuV2.SubmenuTriggerItem>
+								<DropdownMenuV2.Popover>
+									<DropdownMenuV2.Item>
+										<DropdownMenuV2.ItemLabel>
+											Level 2 item
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+								</DropdownMenuV2.Popover>
+							</DropdownMenuV2>
+						</DropdownMenuV2.Popover>
 					</DropdownMenuV2>
 					<Button onClick={ () => setModalOpen( false ) }>
 						Close modal

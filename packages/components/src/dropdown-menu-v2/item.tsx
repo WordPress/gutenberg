@@ -16,12 +16,20 @@ export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
 >( function DropdownMenuItem(
-	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
+	{ prefix, suffix, children, onBlur, hideOnClick = true, store, ...props },
 	ref
 ) {
 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.Item can only be rendered inside a DropdownMenu component'
+		);
+	}
+
+	const computedStore = store ?? dropdownMenuContext.store;
 
 	return (
 		<Styled.DropdownMenuItem
@@ -30,7 +38,7 @@ export const DropdownMenuItem = forwardRef<
 			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
+			store={ computedStore }
 		>
 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
 

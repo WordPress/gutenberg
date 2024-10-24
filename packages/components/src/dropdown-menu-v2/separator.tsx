@@ -16,6 +16,13 @@ export const DropdownMenuSeparator = forwardRef<
 	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
 >( function DropdownMenuSeparator( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
+
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.Separator can only be rendered inside a DropdownMenu component'
+		);
+	}
+
 	return (
 		<Styled.DropdownMenuSeparator
 			ref={ ref }

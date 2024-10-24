@@ -36,6 +36,12 @@ export const DropdownMenuRadioItem = forwardRef<
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
+	if ( ! dropdownMenuContext?.store ) {
+		throw new Error(
+			'DropdownMenu.RadioItem can only be rendered inside a DropdownMenu component'
+		);
+	}
+
 	return (
 		<Styled.DropdownMenuRadioItem
 			ref={ ref }
