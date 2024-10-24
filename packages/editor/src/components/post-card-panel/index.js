@@ -27,22 +27,17 @@ import {
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
+import usePageTypeBadge from '../../utils/pageTypeBadge';
 
 export default function PostCardPanel( {
 	postType,
 	postId,
 	onActionPerformed,
 } ) {
-	const { isFrontPage, isPostsPage, title, icon, isSync } = useSelect(
+	const { title, icon, isSync } = useSelect(
 		( select ) => {
 			const { __experimentalGetTemplateInfo } = select( editorStore );
-			const { canUser, getEditedEntityRecord } = select( coreStore );
-			const siteSettings = canUser( 'read', {
-				kind: 'root',
-				name: 'site',
-			} )
-				? getEditedEntityRecord( 'root', 'site' )
-				: undefined;
+			const { getEditedEntityRecord } = select( coreStore );
 			const _record = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -71,12 +66,13 @@ export default function PostCardPanel( {
 					area: _record?.area,
 				} ),
 				isSync: _isSync,
-				isFrontPage: siteSettings?.page_on_front === postId,
-				isPostsPage: siteSettings?.page_for_posts === postId,
 			};
 		},
 		[ postId, postType ]
 	);
+
+	const pageTypeBadge = usePageTypeBadge();
+
 	return (
 		<div className="editor-post-card-panel">
 			<HStack
@@ -99,14 +95,9 @@ export default function PostCardPanel( {
 					lineHeight="20px"
 				>
 					{ title ? decodeEntities( title ) : __( 'No title' ) }
-					{ isFrontPage && (
+					{ pageTypeBadge && (
 						<span className="editor-post-card-panel__title-badge">
-							{ __( 'Homepage' ) }
-						</span>
-					) }
-					{ isPostsPage && (
-						<span className="editor-post-card-panel__title-badge">
-							{ __( 'Posts Page' ) }
+							{ pageTypeBadge }
 						</span>
 					) }
 				</Text>

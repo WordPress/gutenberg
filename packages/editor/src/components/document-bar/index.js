@@ -28,6 +28,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import usePageTypeBadge from '../../utils/pageTypeBadge';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -110,6 +111,8 @@ export default function DocumentBar( props ) {
 	const title = props.title || entityTitle;
 	const icon = props.icon;
 
+	const pageTypeBadge = usePageTypeBadge();
+
 	const mountedRef = useRef( false );
 	useEffect( () => {
 		mountedRef.current = true;
@@ -184,11 +187,15 @@ export default function DocumentBar( props ) {
 									? decodeEntities( title )
 									: __( 'No title' ) }
 							</span>
-							{ postTypeLabel && ! props.title && (
-								<span className="editor-document-bar__post-type-label">
-									{ '· ' + decodeEntities( postTypeLabel ) }
-								</span>
-							) }
+							<span className="editor-document-bar__post-type-label">
+								{ `. ${
+									postTypeLabel &&
+									! props.title &&
+									! pageTypeBadge
+										? decodeEntities( postTypeLabel )
+										: pageTypeBadge
+								}` }
+							</span>
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
