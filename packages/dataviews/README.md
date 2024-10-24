@@ -318,7 +318,7 @@ The `defaultLayouts` property should be an object that includes properties named
 
 ### `onChangeSelection`: `function`
 
-Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
+Callback that signals the user selected one of more items, and takes them as parameter.
 
 ### `isClickable`: `function`
 
