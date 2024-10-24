@@ -373,7 +373,9 @@ describe( 'Basic rendering', () => {
 				/>
 			);
 
-			const linkPreview = screen.getByLabelText( 'Currently selected' );
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			const isPreviewError = linkPreview.classList.contains( 'is-error' );
 			expect( isPreviewError ).toBe( true );
@@ -834,7 +836,9 @@ describe( 'Manual link entry', () => {
 
 			render( <LinkControlConsumer /> );
 
-			let linkPreview = screen.getByLabelText( 'Currently selected' );
+			let linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			expect( linkPreview ).toBeInTheDocument();
 
@@ -868,7 +872,9 @@ describe( 'Manual link entry', () => {
 			// Cancel the editing process.
 			await user.click( cancelButton );
 
-			linkPreview = screen.getByLabelText( 'Currently selected' );
+			linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			expect( linkPreview ).toBeInTheDocument();
 
@@ -1076,7 +1082,9 @@ describe( 'Default search suggestions', () => {
 
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
-		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
+		const currentLinkUI = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
 			name: 'Edit link',
 		} );
@@ -1230,8 +1238,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			// Check for loading indicator.
 			const loadingIndicator = screen.getByText( 'Creating…' );
-			const currentLinkLabel =
-				screen.queryByLabelText( 'Currently selected' );
+			const currentLinkLabel = screen.queryByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			expect( currentLinkLabel ).not.toBeInTheDocument();
 			expect( loadingIndicator ).toBeVisible();
@@ -1242,8 +1251,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Resolve the `createSuggestion` promise.
 			resolver();
 
-			const currentLink =
-				await screen.findByLabelText( 'Currently selected' );
+			const currentLink = await screen.findByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -1291,7 +1301,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		await user.click( createButton );
 
-		const currentLink = screen.getByLabelText( 'Currently selected' );
+		const currentLink = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		expect( currentLink ).toHaveTextContent( 'Some new page to create' );
 		expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -1350,7 +1362,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		triggerEnter( searchInput );
 
 		expect(
-			await screen.findByLabelText( 'Currently selected' )
+			await screen.findByRole( 'group', {
+				name: 'Manage link',
+			} )
 		).toHaveTextContent( entityNameText );
 	} );
 
@@ -1529,7 +1543,9 @@ describe( 'Selecting links', () => {
 
 		render( <LinkControlConsumer /> );
 
-		const currentLink = screen.getByLabelText( 'Currently selected' );
+		const currentLink = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 		const currentLinkAnchor = screen.getByRole( 'link', {
 			name: `${ selectedLink.title } (opens in a new tab)`,
 		} );
@@ -1559,7 +1575,9 @@ describe( 'Selecting links', () => {
 		render( <LinkControlConsumer /> );
 
 		// Required in order to select the button below.
-		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
+		let currentLinkUI = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
 			name: 'Edit link',
 		} );
@@ -1570,7 +1588,9 @@ describe( 'Selecting links', () => {
 		const searchInput = screen.getByRole( 'combobox', {
 			name: 'Search or type URL',
 		} );
-		currentLinkUI = screen.queryByLabelText( 'Currently selected' );
+		currentLinkUI = screen.queryByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		// We should be back to showing the search input.
 		expect( searchInput ).toBeVisible();
@@ -1733,8 +1753,9 @@ describe( 'Selecting links', () => {
 				triggerEnter( searchInput );
 
 				// Check that the suggestion selected via is now shown as selected.
-				const currentLink =
-					screen.getByLabelText( 'Currently selected' );
+				const currentLink = screen.getByRole( 'group', {
+					name: 'Manage link',
+				} );
 				const currentLinkAnchor = screen.getByRole( 'link', {
 					name: `${ selectedLink.title } (opens in a new tab)`,
 				} );
@@ -2127,7 +2148,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
 
@@ -2148,7 +2171,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 	} );
@@ -2165,7 +2190,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
@@ -2197,7 +2224,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
@@ -2221,7 +2250,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
 
@@ -2256,7 +2287,9 @@ describe( 'Rich link previews', () => {
 
 			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-			const linkPreview = screen.getByLabelText( 'Currently selected' );
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			await waitFor( () =>
 				expect( linkPreview ).toHaveClass( 'is-rich' )
@@ -2281,7 +2314,9 @@ describe( 'Rich link previews', () => {
 
 			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-			const linkPreview = screen.getByLabelText( 'Currently selected' );
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
 
 			expect( linkPreview ).toHaveClass( 'is-fetching' );
 
@@ -2300,7 +2335,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		expect( linkPreview ).toHaveClass( 'is-fetching' );
 		expect( linkPreview ).not.toHaveClass( 'is-rich' );
@@ -2313,7 +2350,9 @@ describe( 'Rich link previews', () => {
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
-		const linkPreview = screen.getByLabelText( 'Currently selected' );
+		const linkPreview = screen.getByRole( 'group', {
+			name: 'Manage link',
+		} );
 
 		expect( linkPreview ).toHaveClass( 'is-fetching' );
 
