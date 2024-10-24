@@ -11,7 +11,7 @@ import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 
-export const TabListWrapper = styled.div`
+export const StyledTabList = styled( Ariakit.TabList )`
 	display: flex;
 	align-items: stretch;
 	overflow-x: auto;
@@ -195,7 +195,7 @@ export const Tab = styled( Ariakit.Tab )`
 			opacity: 0;
 
 			@media not ( prefers-reduced-motion ) {
-				transition: opacity 0.15s 0.15s linear;
+				transition: opacity 0.1s linear;
 			}
 		}
 
@@ -207,7 +207,6 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='horizontal'] & {
 		padding-inline: ${ space( 4 ) };
 		height: ${ space( 12 ) };
-		text-align: center;
 		scroll-margin: 24px;
 
 		&::after {
@@ -219,7 +218,6 @@ export const Tab = styled( Ariakit.Tab )`
 	[aria-orientation='vertical'] & {
 		padding: ${ space( 2 ) } ${ space( 3 ) };
 		min-height: ${ space( 10 ) };
-		text-align: start;
 
 		&[aria-selected='true'] {
 			color: ${ COLORS.theme.accent };
@@ -234,6 +232,16 @@ export const Tab = styled( Ariakit.Tab )`
 
 export const TabChildren = styled.span`
 	flex-grow: 1;
+
+	display: flex;
+	align-items: center;
+
+	[aria-orientation='horizontal'] & {
+		justify-content: center;
+	}
+	[aria-orientation='vertical'] & {
+		justify-content: start;
+	}
 `;
 
 export const TabChevron = styled( Icon )`
@@ -253,7 +261,7 @@ export const TabChevron = styled( Icon )`
 		[data-select-on-move='true']
 			[role='tab']:is( [aria-selected='true'],  )
 			& {
-			transition: opacity 0.3s ease-in;
+			transition: opacity 0.15s 0.15s linear;
 		}
 	}
 	&:dir( rtl ) {

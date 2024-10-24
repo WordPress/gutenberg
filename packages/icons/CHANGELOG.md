@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.10.0 (2024-10-16)
+
 ### Enhancements
 
 -   Update `cloudUpload` icon to improve visibility of the up arrow.

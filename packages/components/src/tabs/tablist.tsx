@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,10 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { TabListProps } from './types';
-import { useTabsContext } from './context';
-import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
-import clsx from 'clsx';
 import type { ElementOffsetRect } from '../utils/element-rect';
+import { useTabsContext } from './context';
+import { StyledTabList } from './styles';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
@@ -63,15 +62,25 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
-	const selectedId = useStoreState( store, 'selectedId' );
-	const activeId = useStoreState( store, 'activeId' );
-	const selectOnMove = useStoreState( store, 'selectOnMove' );
-	const items = useStoreState( store, 'items' );
+	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
+	const activeId = Ariakit.useStoreState( store, 'activeId' );
+	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
+	const items = Ariakit.useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
-	const selectedRect = useTrackElementOffsetRect(
-		store?.item( selectedId )?.element
-	);
+
+	const selectedItem = store?.item( selectedId );
+	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
+
+	const selectedItemIndex =
+		renderedItems && selectedItem
+			? renderedItems.indexOf( selectedItem )
+			: -1;
+	// Use selectedItemIndex as a dependency to force recalculation when the
+	// selected item index changes (elements are swapped / added / removed).
+	const selectedRect = useTrackElementOffsetRect( selectedItem?.element, [
+		selectedItemIndex,
+	] );
 
 	// Track overflow to show scroll hints.
 	const overflow = useTrackOverflow( parent, {
@@ -109,12 +118,18 @@ export const TabList = forwardRef<
 	}
 
 	return (
-		<Ariakit.TabList
+		<StyledTabList
 			ref={ refs }
 			store={ store }
-			render={ <TabListWrapper /> }
+			render={ ( props ) => (
+				<div
+					{ ...props }
+					// Fallback to -1 to prevent browsers from making the tablist
+					// tabbable when it is a scrolling container.
+					tabIndex={ props.tabIndex ?? -1 }
+				/>
+			) }
 			onBlur={ onBlur }
-			tabIndex={ -1 }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
@@ -124,6 +139,6 @@ export const TabList = forwardRef<
 			) }
 		>
 			{ children }
-		</Ariakit.TabList>
+		</StyledTabList>
 	);
 } );

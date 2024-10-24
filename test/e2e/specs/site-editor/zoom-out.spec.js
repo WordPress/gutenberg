@@ -12,9 +12,12 @@ test.describe( 'Zoom Out', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test( 'Entering zoomed out mode zooms the canvas', async ( {
@@ -27,8 +30,8 @@ test.describe( 'Zoom Out', () => {
 
 		// Check that the html is scaled.
 		await expect( html ).toHaveCSS(
-			'transform',
-			'matrix(0.67, 0, 0, 0.67, 0, 0)'
+			'scale',
+			new RegExp( /0\.[5-8][0-9]*/, 'i' )
 		);
 		const iframeRect = await iframe.boundingBox();
 		const htmlRect = await html.boundingBox();

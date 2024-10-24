@@ -6,17 +6,24 @@ import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
 const isGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN ? true : false;
 
 export function useShouldIframe() {
 	const {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
-		isEditingTemplate,
+		isEditingTemplateOrPattern,
 		isZoomOutMode,
+		deviceType,
 	} = useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentPostType } = select( editorStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { getEditorSettings, getCurrentPostType, getDeviceType } =
+			select( editorStore );
+		const { isZoomOut } = unlock( select( blockEditorStore ) );
 		const { getBlockTypes } = select( blocksStore );
 		const editorSettings = getEditorSettings();
 		return {
@@ -24,15 +31,19 @@ export function useShouldIframe() {
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
 			} ),
-			isEditingTemplate: getCurrentPostType() === 'wp_template',
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isEditingTemplateOrPattern: [ 'wp_template', 'wp_block' ].includes(
+				getCurrentPostType()
+			),
+			isZoomOutMode: isZoomOut(),
+			deviceType: getDeviceType(),
 		};
 	}, [] );
 
 	return (
 		hasV3BlocksOnly ||
 		( isGutenbergPlugin && isBlockBasedTheme ) ||
-		isEditingTemplate ||
-		isZoomOutMode
+		isEditingTemplateOrPattern ||
+		isZoomOutMode ||
+		[ 'Tablet', 'Mobile' ].includes( deviceType )
 	);
 }

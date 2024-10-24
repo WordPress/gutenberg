@@ -6,38 +6,28 @@
  */
 
 /**
- * Adds the block bindings sources registered in the server to the editor settings.
- *
- * This allows them to be bootstrapped in the editor.
- *
- * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
- * @return array The editor settings including the block bindings sources.
+ * Bootstrap the block bindings sources registered in the server.
  */
-function gutenberg_add_server_block_bindings_sources_to_editor_settings( $editor_settings ) {
-	// Check if the sources are already exposed in the editor settings.
-	if ( isset( $editor_settings['blockBindingsSources'] ) ) {
-		return $editor_settings;
-	}
-
-	$registered_block_bindings_sources = get_all_registered_block_bindings_sources();
-	if ( ! empty( $registered_block_bindings_sources ) ) {
-		// Initialize array.
-		$editor_settings['blockBindingsSources'] = array();
-		foreach ( $registered_block_bindings_sources as $source_name => $source_properties ) {
-			// Add source with the label to editor settings.
-			$editor_settings['blockBindingsSources'][ $source_name ] = array(
-				'label' => $source_properties->label,
+function gutenberg_bootstrap_server_block_bindings_sources() {
+	$registered_sources = get_all_registered_block_bindings_sources();
+	if ( ! empty( $registered_sources ) ) {
+		$filtered_sources = array();
+		foreach ( $registered_sources as $source ) {
+			$filtered_sources[] = array(
+				'name'        => $source->name,
+				'label'       => $source->label,
+				'usesContext' => $source->uses_context,
 			);
-			// Add `usesContext` property if exists.
-			if ( ! empty( $source_properties->uses_context ) ) {
-				$editor_settings['blockBindingsSources'][ $source_name ]['usesContext'] = $source_properties->uses_context;
-			}
 		}
+		$script = sprintf( 'for ( const source of %s ) { ! wp.blocks.getBlockBindingsSource( source.name ) && wp.blocks.registerBlockBindingsSource( source ); }', wp_json_encode( $filtered_sources ) );
+		wp_add_inline_script(
+			'wp-blocks',
+			$script
+		);
 	}
-	return $editor_settings;
 }
 
-add_filter( 'block_editor_settings_all', 'gutenberg_add_server_block_bindings_sources_to_editor_settings', 10 );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_server_block_bindings_sources', 5 );
 
 /**
  * Initialize `canUpdateBlockBindings` editor setting if it doesn't exist. By default, it is `true` only for admin users.

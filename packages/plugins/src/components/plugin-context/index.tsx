@@ -3,6 +3,7 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -34,6 +35,8 @@ export function usePluginContext() {
  * A Higher Order Component used to inject Plugin context to the
  * wrapped component.
  *
+ * @deprecated 6.8.0 Use `usePluginContext` hook instead.
+ *
  * @param  mapContextToProps Function called on every context change,
  *                           expected to return object of props to
  *                           merge with the component's own props.
@@ -47,6 +50,10 @@ export const withPluginContext = (
 	) => T & PluginContext
 ) =>
 	createHigherOrderComponent( ( OriginalComponent ) => {
+		deprecated( 'wp.plugins.withPluginContext', {
+			since: '6.8.0',
+			alternative: 'wp.plugins.usePluginContext',
+		} );
 		return ( props ) => (
 			<Context.Consumer>
 				{ ( context ) => (

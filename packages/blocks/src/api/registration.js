@@ -809,13 +809,16 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	/*
 	 * Check if the source has been already registered on the client.
-	 * If the `getValues` property is defined, it could be assumed the source is already registered.
+	 * If any property expected to be "client-only" is defined, return a warning.
 	 */
-	if ( existingSource?.getValues ) {
-		warning(
-			'Block bindings source "' + name + '" is already registered.'
-		);
-		return;
+	const serverProps = [ 'label', 'usesContext' ];
+	for ( const prop in existingSource ) {
+		if ( ! serverProps.includes( prop ) && existingSource[ prop ] ) {
+			warning(
+				'Block bindings source "' + name + '" is already registered.'
+			);
+			return;
+		}
 	}
 
 	// Check the `name` property is correct.
@@ -851,14 +854,6 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
-	if ( label && existingSource?.label ) {
-		warning(
-			'Block bindings "' +
-				name +
-				'" source label is already defined in the server.'
-		);
-		return;
-	}
 
 	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
@@ -868,6 +863,10 @@ export const registerBlockBindingsSource = ( source ) => {
 	if ( label && typeof label !== 'string' ) {
 		warning( 'Block bindings source label must be a string.' );
 		return;
+	}
+
+	if ( label && existingSource?.label && label !== existingSource?.label ) {
+		warning( 'Block bindings "' + name + '" source label was overriden.' );
 	}
 
 	// Check the `usesContext` property is correct.
