@@ -765,7 +765,7 @@ Displays the previous posts page link. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/query-pagination-previous
 -	**Category:** theme
 -	**Parent:** core/query-pagination
--	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Query Title
