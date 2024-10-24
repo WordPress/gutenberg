@@ -51,6 +51,12 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"color": {
+			"text": false,
+			"background": true,
+			"link": true,
+			"gradients": true
 		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
