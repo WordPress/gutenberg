@@ -472,6 +472,8 @@ _Properties_
 -   _name_ `string`: The type of block to create.
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
+-   _transform_ `Object`: The block transform config to use.
+-   _variation_ `string|null`: The specific varaition for the block, if applicable.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 

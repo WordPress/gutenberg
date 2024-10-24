@@ -83,11 +83,13 @@ describe( 'BlockSwitcher', () => {
 		useSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [
 				{
+					id: 'core/heading',
 					name: 'core/heading',
 					title: headingBlockType.title,
 					frecency: 1,
 				},
 				{
+					id: 'core/paragraph',
 					name: 'core/paragraph',
 					title: paragraphBlockType.title,
 					frecency: 1,
