@@ -40,7 +40,7 @@ function _gutenberg_add_block_templates_from_registry( $query_result, $query, $t
 	}
 
 	if ( ! isset( $query['wp_id'] ) ) {
-		$template_files = _gutenberg_get_block_templates_files( $template_type, $query );
+		$template_files = _gutenberg_get_block_templates_files( $template_type );
 
 		/*
 		 * Add templates registered in the template registry. Filtering out the ones which have a theme file.

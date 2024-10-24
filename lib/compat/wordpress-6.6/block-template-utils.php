@@ -215,10 +215,6 @@ function _gutenberg_get_block_templates_files( $template_type, $query = array() 
 					$template_files[ $template_slug ] = $candidate;
 				}
 
-				if ( 'page' === $post_type && 'page' === $template_slug ) {
-					$template_files[ $template_slug ] = $candidate;
-				}
-
 				// @core-merge: This code will go into Core's '_get_block_templates_files' function.
 				// The custom templates with no associated post-types are available for all post-types.
 				if ( $post_type && ! isset( $candidate['postTypes'] ) && $is_custom ) {
