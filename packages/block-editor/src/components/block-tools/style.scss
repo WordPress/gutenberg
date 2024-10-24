@@ -118,13 +118,28 @@
 		}
 	}
 
-	.block-editor-block-toolbar {
-		overflow: visible;
-	}
-
 	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-right-color: $gray-900;
+	}
+
+	.is-dark-toolbar {
+		background-color: $gray-900;
+		color: $white;
+		button {
+			color: $white;
+			background-color: $gray-900 !important;
+		}
+		.block-editor-block-switcher__toggle {
+			color: $white;
+		}
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right-color: $gray-600 !important;
+		}
+		.is-pressed {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 
 	// Hide the block toolbar if the insertion point is shown.
