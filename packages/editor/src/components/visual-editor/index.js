@@ -260,7 +260,7 @@ function VisualEditor( {
 		);
 	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
-	const { layout = {}, align = '' } = newestPostContentAttributes || {};
+	const { layout = {} } = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -271,8 +271,7 @@ function VisualEditor( {
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
-		themeSupportsLayout && postContentLayoutClasses,
-		align && `align${ align }`
+		themeSupportsLayout && postContentLayoutClasses
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
@@ -316,12 +315,6 @@ function VisualEditor( {
 		}
 		titleRef?.current?.focus();
 	}, [ autoFocus, isCleanNewPost ] );
-
-	// Add some styles for alignwide/alignfull Post Content and its children.
-	const alignCSS = `.is-root-container.alignwide { max-width: var(--wp--style--global--wide-size); margin-left: auto; margin-right: auto;}
-		.is-root-container.alignwide:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: var(--wp--style--global--wide-size);}
-		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
-		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
@@ -411,7 +404,6 @@ function VisualEditor( {
 									selector=".block-editor-block-list__layout.is-root-container"
 									layout={ postEditorLayout }
 								/>
-								{ align && <LayoutStyle css={ alignCSS } /> }
 								{ postContentLayoutStyles && (
 									<LayoutStyle
 										layout={ postContentLayout }
