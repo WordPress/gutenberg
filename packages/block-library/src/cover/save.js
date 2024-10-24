@@ -106,26 +106,6 @@ export default function save( { attributes } ) {
 
 	return (
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
-			<span
-				aria-hidden="true"
-				className={ clsx(
-					'wp-block-cover__background',
-					overlayColorClass,
-					dimRatioToClass( dimRatio ),
-					{
-						'has-background-dim': dimRatio !== undefined,
-						// For backwards compatibility. Former versions of the Cover Block applied
-						// `.wp-block-cover__gradient-background` in the presence of
-						// media, a gradient and a dim.
-						'wp-block-cover__gradient-background':
-							url && gradientValue && dimRatio !== 0,
-						'has-background-gradient': gradientValue,
-						[ gradientClass ]: gradientClass,
-					}
-				) }
-				style={ bgStyle }
-			/>
-
 			{ ! useFeaturedImage &&
 				isImageBackground &&
 				url &&
@@ -162,6 +142,27 @@ export default function save( { attributes } ) {
 					data-object-position={ objectPosition }
 				/>
 			) }
+
+			<span
+				aria-hidden="true"
+				className={ clsx(
+					'wp-block-cover__background',
+					overlayColorClass,
+					dimRatioToClass( dimRatio ),
+					{
+						'has-background-dim': dimRatio !== undefined,
+						// For backwards compatibility. Former versions of the Cover Block applied
+						// `.wp-block-cover__gradient-background` in the presence of
+						// media, a gradient and a dim.
+						'wp-block-cover__gradient-background':
+							url && gradientValue && dimRatio !== 0,
+						'has-background-gradient': gradientValue,
+						[ gradientClass ]: gradientClass,
+					}
+				) }
+				style={ bgStyle }
+			/>
+
 			<div
 				{ ...useInnerBlocksProps.save( {
 					className: 'wp-block-cover__inner-container',

@@ -54,7 +54,6 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		z-index: z-index(".wp-block-cover.has-background-dim::before");
 		opacity: 0.5;
 	}
 
@@ -95,17 +94,11 @@
 	}
 
 	.wp-block-cover__inner-container {
+		position: relative; // Needed after the v14 deprecation..
 		width: 100%;
-		z-index: z-index(".wp-block-cover__inner-container");
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
-
-		// Reset the z-index to auto when the body has a modal open. So when the
-		// modal is inside the cover, it doesn't create a stacking context.
-		@at-root .has-modal-open & {
-			z-index: auto;
-		}
 	}
 
 	// Position: Top
@@ -215,14 +208,6 @@ video.wp-block-cover__video-background {
 	}
 }
 
-.wp-block-cover__video-background {
-	z-index: z-index(".wp-block-cover__video-background");
-}
-
-.wp-block-cover__image-background {
-	z-index: z-index(".wp-block-cover__image-background");
-}
-
 // Styles below only exist to support older versions of the block.
 // Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
 // We are using the previous referred differences to target old versions.
@@ -300,5 +285,43 @@ section.wp-block-cover-image > h2,
 	:where(.wp-block-cover h5:not(.has-text-color)),
 	:where(.wp-block-cover h6:not(.has-text-color)) {
 		color: inherit;
+	}
+}
+
+// Backward compatibility for v14 deprecation. Only applied to the frontend.
+body:not(.editor-styles-wrapper) .wp-block-cover:not(
+.wp-block-cover:has(
+	/* When the `.wp-block-cover__inner-container` comes right after the
+	`.wp-block-cover__background` , it means that it's using the new HTML
+	structure or that it's using the color background or gradient (even in
+	the deprecated version). In the last option we also don't need the z-index
+	because the elements are in the expected order. */
+	.wp-block-cover__background + .wp-block-cover__inner-container
+)
+) {
+	.wp-block-cover__video-background {
+		z-index: z-index(".wp-block-cover__video-background");
+	}
+
+	.wp-block-cover__image-background {
+		z-index: z-index(".wp-block-cover__image-background");
+	}
+
+	// The first selector is required for old Cover markup/
+	// Keep .wp-block-cover__gradient-background for v8 deprecation.
+	&.has-background-dim:not(.has-background-gradient)::before,
+	.wp-block-cover__background,
+	.wp-block-cover__gradient-background {
+		z-index: z-index(".wp-block-cover.has-background-dim::before");
+	}
+
+	.wp-block-cover__inner-container {
+		z-index: z-index(".wp-block-cover__inner-container");
+
+		// Reset the z-index to auto when the body has a modal open. So when the
+		// modal is inside the cover, it doesn't create a stacking context.
+		@at-root .has-modal-open & {
+			z-index: auto;
+		}
 	}
 }
