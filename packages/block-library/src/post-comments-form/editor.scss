@@ -1,6 +1,16 @@
 .wp-block-post-comments-form * {
 	pointer-events: none;
 
+	.comment-reply-title {
+		pointer-events: visible;
+		cursor: text;
+
+		&.disabled {
+			pointer-events: none;
+			cursor: default;
+		}
+	}
+
 	&.block-editor-warning * {
 		pointer-events: auto;
 	}
