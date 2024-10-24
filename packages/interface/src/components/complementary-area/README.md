@@ -84,14 +84,6 @@ The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 -   Type: `String`
 -   Required: Yes
 
-### smallScreenTitle
-
-In small screens, the complementary area may take up the entire screen.
-`smallScreenTitle` allows displaying a title above the complementary area, so the user is more aware of what the area refers to.
-
--   Type: `String`
--   Required: No
-
 ### title
 
 Human friendly title of the complementary area.

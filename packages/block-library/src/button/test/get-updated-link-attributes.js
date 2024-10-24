@@ -79,6 +79,21 @@ describe( 'getUpdatedLinkAttributes method', () => {
 		expect( result.rel ).toEqual( 'rel_value nofollow' );
 	} );
 
+	it( 'should correctly update link attributes with nofollow without spacing', () => {
+		const options = {
+			url: 'example.com',
+			opensInNewTab: false,
+			nofollow: true,
+			rel: '',
+		};
+
+		const result = getUpdatedLinkAttributes( options );
+
+		expect( result.url ).toEqual( 'http://example.com' );
+		expect( result.linkTarget ).toEqual( undefined );
+		expect( result.rel ).toEqual( 'nofollow' );
+	} );
+
 	it( 'should correctly handle rel with existing nofollow values and remove duplicates', () => {
 		const options = {
 			url: 'example.com',

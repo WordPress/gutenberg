@@ -19,7 +19,6 @@ const setValues = ( { dispatch, bindings } ) => {
 
 registerBlockBindingsSource( {
 	name: 'testing/complete-source',
-	label: 'Complete Source',
 	getValues,
 	setValues,
 	canUserEditValue: () => true,

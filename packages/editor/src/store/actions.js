@@ -278,7 +278,11 @@ export const savePost =
 
 		if ( ! error ) {
 			try {
-				await doActionAsync( 'editor.savePost', options );
+				await doActionAsync(
+					'editor.savePost',
+					{ id: previousRecord.id },
+					options
+				);
 			} catch ( err ) {
 				error = err;
 			}
@@ -879,9 +883,11 @@ export const switchEditorMode =
 	( { dispatch, registry } ) => {
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
-		// Unselect blocks when we switch to a non visual mode.
 		if ( mode !== 'visual' ) {
+			// Unselect blocks when we switch to a non visual mode.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			// Exit zoom out state when switching to a non visual mode.
+			unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
 		}
 
 		if ( mode === 'visual' ) {
