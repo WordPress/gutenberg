@@ -97,15 +97,6 @@ export function Comments( {
 						setActionState( { action: 'delete', id: thread.id } );
 						setIsConfirmDialogOpen( true );
 					} }
-					onReply={
-						! parentThread
-							? () =>
-									setActionState( {
-										action: 'reply',
-										id: thread.id,
-									} )
-							: undefined
-					}
 					status={ parentThread?.status ?? thread.status }
 				/>
 				<HStack
@@ -209,8 +200,8 @@ export function Comments( {
 						spacing="3"
 					>
 						<CommentBoard thread={ thread } />
-						{ 'reply' === actionState?.action &&
-							thread.id === actionState?.id && (
+						{ 'edit' !== actionState?.action &&
+							thread.id === blockCommentId && (
 								<HStack
 									alignment="left"
 									spacing="3"
@@ -227,11 +218,7 @@ export function Comments( {
 													inputComment,
 													thread.id
 												);
-												setActionState( false );
 											} }
-											onCancel={ () =>
-												setActionState( false )
-											}
 										/>
 									</VStack>
 								</HStack>
@@ -292,9 +279,11 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 							? _x( 'Update', 'verb' )
 							: _x( 'Reply', 'Add reply comment' ) }
 					</Button>
-					<Button __next40pxDefaultSize onClick={ onCancel }>
-						{ _x( 'Cancel', 'Cancel comment edit' ) }
-					</Button>
+					{ onCancel && (
+						<Button __next40pxDefaultSize onClick={ onCancel }>
+							{ _x( 'Cancel', 'Cancel comment edit' ) }
+						</Button>
+					) }
 				</HStack>
 			</VStack>
 		</>
@@ -309,18 +298,10 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
  * @param {Function} props.onResolve - The function to resolve the comment.
  * @param {Function} props.onEdit    - The function to edit the comment.
  * @param {Function} props.onDelete  - The function to delete the comment.
- * @param {Function} props.onReply   - The function to reply to the comment.
  * @param {string}   props.status    - The status of the comment.
  * @return {JSX.Element} The rendered comment header.
  */
-function CommentHeader( {
-	thread,
-	onResolve,
-	onEdit,
-	onDelete,
-	onReply,
-	status,
-} ) {
+function CommentHeader( { thread, onResolve, onEdit, onDelete, status } ) {
 	const dateSettings = getDateSettings();
 	const [ dateTimeFormat = dateSettings.formats.time ] = useEntityProp(
 		'root',
@@ -336,10 +317,6 @@ function CommentHeader( {
 		{
 			title: _x( 'Delete', 'Delete comment' ),
 			onClick: onDelete,
-		},
-		{
-			title: _x( 'Reply', 'Reply on a comment' ),
-			onClick: onReply,
 		},
 	];
 
