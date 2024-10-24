@@ -312,10 +312,6 @@ The key is the name of the block (`string`) to hook into, and the value is the p
 }
 ```
 
-It’s crucial to emphasize that the Block Hooks feature is only designed to work with _static_ block-based templates, template parts, and patterns. For patterns, this includes those provided by the theme, from [Block Pattern Directory](https://wordpress.org/patterns/), or from calls to [`register_block_pattern`](https://developer.wordpress.org/reference/functions/register_block_pattern/).
-
-Block Hooks will not work with post content or patterns crafted by the user, such as synced patterns, or theme templates and template parts that have been modified by the user.
-
 ## Block collections
 
 ## `registerBlockCollection`
