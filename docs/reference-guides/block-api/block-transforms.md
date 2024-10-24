@@ -88,6 +88,42 @@ transforms: {
 },
 ```
 
+**Example: create InnerBlocks from a template**
+
+A single block can be transformed with the addition of InnerBlocks created from a template. Example, a single block used to generate an event listing in a specific format or for a custom post type can be transformed to use the Query Loop block.
+
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/query' ],
+            transform: ( attributes ) => {
+		const queryAttributes = {"queryId":0,"query":{"perPage":20,"pages":0,"offset":0,"postType":"mycustomtype","order":"asc","author":"","search":"","exclude":[],"sticky":"","inherit":false},"namespace":"mycustomtype/loop"};
+		const template = [
+		['core/post-template',{"layout":{"type":"grid","columnCount":2}},
+			[ [ 'core/post-title',  {"isLink":true}  ],
+			[ 'core/post-featured-image' ],
+			[ 'mycustomtype/customblock' ]] ,
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results', {}, [['core/paragraph', {"content": "No events found."}] ]],
+		];
+		const innerBlocks = createBlocksFromInnerBlocksTemplate( template );
+                return createBlock(
+                    'core/query',
+                    queryAttributes,
+                    innerBlocks
+                );
+            },
+        },
+    ],
+},
+```
+
+In this example, a namespace is included in the queryAttributes so the core/query will inherit the custom controls for a block variation (See [Variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/).Otherwise, that should be omitted.
+
+Like createBlock, createBlocksFromInnerBlocksTemplate is imported from [`wp-blocks` package](/packages/blocks/README.md#createBlock). Its function is to convert a template in array format to an array of block objects.
+
 ### Enter
 
 This type of transformations support the _from_ direction, allowing blocks to be created from some content introduced by the user. They're applied in a new block line after the user has introduced some content and hit the ENTER key.
