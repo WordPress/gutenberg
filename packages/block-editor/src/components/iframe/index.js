@@ -129,6 +129,7 @@ function Iframe( {
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
+	/** @type {[Document, React.Dispatch<React.SetStateAction<Document>>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const initialContainerWidth = useRef( 0 );
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -438,7 +439,7 @@ function Iframe( {
 	const prevContainerHeightRef = useRef( containerHeight );
 
 	// Scroll based on the new scale
-	useLayoutEffect( () => {
+	useEffect( () => {
 		if ( ! iframeDocument ) {
 			return;
 		}
@@ -451,22 +452,39 @@ function Iframe( {
 			return;
 		}
 
-		const { documentElement } = iframeDocument;
+		// TODO: Scroll top is sometimes wrong by containerHeight sometimes in Firefox.
+
+		const { documentElement, defaultView } = iframeDocument;
 		const { scrollTop } = documentElement;
+		const { scrollY } = defaultView;
 
 		// Convert previous values to the zoomed in scale.
-		const scrollTopOriginal = Math.floor(
+		// Use Math.round to avoid subpixel scrolling which would effectively result in a Math.floor.
+		const scrollTopOriginal = Math.round(
 			( scrollTop + containerHeightPrev / 2 - frameSizeValuePrev ) /
 				scaleValuePrev -
 				containerHeightPrev / 2
 		);
 
 		// Convert the zoomed in value to the new scale.
-		const scrollTopNext = Math.floor(
+		// Use Math.round to avoid subpixel scrolling which would effectively result in a Math.floor.
+		const scrollTopNext = Math.round(
 			( scrollTopOriginal + containerHeight / 2 ) * scaleValue +
 				frameSizeValue -
 				containerHeight / 2
 		);
+
+		// Convert previous values to the zoomed in scale.
+		const scrollYOriginal =
+			( scrollY + containerHeightPrev / 2 - frameSizeValuePrev ) /
+				scaleValuePrev -
+			containerHeightPrev / 2;
+
+		// Convert the zoomed in value to the new scale.
+		const scrollYNext =
+			( scrollYOriginal + containerHeight / 2 ) * scaleValue +
+			frameSizeValue -
+			containerHeight / 2;
 
 		console.log( {
 			scaleValue,
@@ -485,31 +503,55 @@ function Iframe( {
 			scrollTopOriginal,
 			scrollTopNext,
 		} );
-
-		let raf = requestAnimationFrame( ( start ) => {
-			const duration = 400; // Should match the CSS transition duration.
-			console.log( documentElement.scrollTop, '0.000', '0.000' );
-			const step = ( timestamp ) => {
-				const progress = Math.min(
-					( timestamp - start ) / duration,
-					1
-				);
-				const easing = scrollEasing( progress );
-				documentElement.scrollTop = Math.floor(
-					scrollTop + ( scrollTopNext - scrollTop ) * easing
-				);
-				console.log(
-					documentElement.scrollTop,
-					progress.toFixed( 3 ),
-					easing.toFixed( 3 )
-				);
-				if ( progress < 1 ) {
-					raf = requestAnimationFrame( step );
-				}
-			};
-			raf = requestAnimationFrame( step );
+		console.log( {
+			scrollY,
+			scrollYOriginal,
+			scrollYNext,
 		} );
 
+		documentElement.scrollTop = scrollTopNext;
+
+		// defaultView.scroll( {
+		// 	top: scrollY + ( frameSizeValue - frameSizeValuePrev ),
+		// 	behavior: 'auto',
+		// } );
+
+		// let raf = requestAnimationFrame( ( start ) => {
+		// 	const duration = 400; // Should match the CSS transition duration.
+		// 	console.log( documentElement.scrollTop, '0.000', '0.000' );
+		// 	const step = ( timestamp ) => {
+		// 		const progress = Math.min(
+		// 			( timestamp - start ) / duration,
+		// 			1
+		// 		);
+		// 		const easing = scrollEasing( progress );
+		// 		documentElement.scrollTop = Math.floor(
+		// 			scrollTop + ( scrollTopNext - scrollTop ) * easing
+		// 		);
+		// 		console.log(
+		// 			documentElement.scrollTop,
+		// 			progress.toFixed( 3 ),
+		// 			easing.toFixed( 3 )
+		// 		);
+		// 		if ( progress < 1 ) {
+		// 			raf = requestAnimationFrame( step );
+		// 		}
+		// 	};
+		// 	raf = requestAnimationFrame( step );
+		// } );
+
+		// const timers = Array.from( { length: 20 }, ( _, i ) => {
+		// 	const delay = i * 100;
+		// 	// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		// 	return setTimeout( () => {
+		// 		if ( i === 10 ) {
+		// 			documentElement.scrollTop = scrollTopNext;
+		// 		}
+		// 		console.log( delay, documentElement.scrollTop );
+		// 	}, delay );
+		// } );
+
+		console.log();
 		if ( scaleValuePrev !== scaleValue ) {
 			console.log( 'scaleValue changed' );
 			prevScaleRef.current = scaleValue;
@@ -524,7 +566,8 @@ function Iframe( {
 		}
 
 		return () => {
-			cancelAnimationFrame( raf );
+			// cancelAnimationFrame( raf );
+			// timers.forEach( clearTimeout );
 		};
 	}, [ iframeDocument, scaleValue, frameSizeValue, containerHeight ] );
 
