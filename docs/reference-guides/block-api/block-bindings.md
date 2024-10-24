@@ -2,7 +2,7 @@
 
 Block Bindings API lets you “bind” dynamic data to the block’s attributes, which are then reflected in the final HTML markup that is output to the browser on the front end.
 
-An example could be connecting an Image block url attribute to a function that returns random images from an external API.
+An example could be connecting an Image block `url` attribute to a function that returns random images from an external API.
 
 ```html
 <!-- wp:image {
@@ -19,21 +19,21 @@ An example could be connecting an Image block url attribute to a function that r
 
 ## Compatible blocks and its attributes
 
-Right now, not all blocks attributes are compatible with block bindings. There is some effort going on increasing this compatibility, but, right now, this is the list:
+Right now, not all blocks attributes are compatible with block bindings. There is some effort going on increasing this compatibility, but for now, this is the list:
 
-- Paragraph block.
+- Paragraph block:
     - content
 
-- Heading block.
+- Heading block:
     - content
 
-- Image block.
+- Image block:
     - ID
     - url
     - title
     - alt
 
-- Button block.
+- Button block:
     - text
     - url
     - linkTarget
@@ -45,19 +45,19 @@ Registering a source consists of defining a **name** for that source and a callb
 
 Once a source is registered, any block that supports the Block Bindings API can use a value from that source by setting its `metadata.bindings` attribute to a value that refers to the source.
 
-Registration can be done in the server via PHP or in the editor via JavaScript and both can coexist.
+Registration can be done on the server via PHP or in the editor via JavaScript, and both can coexist.
 
-The label defined on server registration will be overridden by the label defined in Editor.
+The label defined in server registration will be overridden by the label defined in the editor.
 
 ### Server registration
 
-Server registration allows to apply a callback that will be executed on the frontend for the defined bound attribute.
+Server registration allows applying a callback that will be executed on the frontend for the defined bound attribute.
 
 The function to register a custom source is `register_block_bindings_source($name, $args)`.
 
-- `name` is a `string` that sets the unique id for the custom source.
+- `name` is a `string` that sets the unique ID for the custom source.
 - `args` is an `array` that contains:
-    - `label` is a `string` with the human readable name of the custom source.
+    - `label` is a `string` with the human-readable name of the custom source.
     - `uses_context` is an `array` with the block context that is passed to the callback (optional).
     - `get_value_callback` is the `function` that will run on the bound block render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overriden with the filter `block_bindings_source_value`.
 
@@ -110,8 +110,8 @@ add_action(
 
 #### Block bindings source value filter
 
-The value returned by `get_value_callback` can be modified with `block_bindings_source_value` filter.
-The filter has the following params:
+The value returned by `get_value_callback` can be modified with the `block_bindings_source_value` filter.
+The filter has the following parameters:
 
 - `value`: The value to be filtered.
 - `name`: The name of the source.
@@ -130,24 +130,23 @@ There are a few examples in Core that can be used as a reference.
 
 ### Editor registration
 
-Editor registration on the client allows to define what the bound block will do when the value is retrieved or when the value is edited.
+Editor registration on the client allows defining what the bound block will do when the value is retrieved or when the value is edited.
 
 The function to register a custom source is `registerBlockBindingsSource( args )`.
 
-- `args` is an `object` with the following structure
-    - `name` is a `string` with the unique and machine readable name.
-    - `label` is a tring with the human readable name of the custom source. (optional)
-    - `usesContext` is an optional `array` with the block context that the custom source may need. (optional)
-    - `getValues` is an optional `function` that retrieves the values from the source. (optional)
-    - `setValues` is an optional `function` that allows to update the values connected to the source. (optional)
-    - `canUserEditValue` is an optional `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
-    - `getFieldsList` is a private `function`. It cannot be used yet by third party developers. It creates a list for the block bindings UI with post meta.
+- `args` is an `object` with the following structure:
+    - `name` is a `string` with the unique and machine-readable name.
+    - `label` is a `string` with the human readable name of the custom source. (optional)
+    - `usesContext` is an `array` with the block context that the custom source may need. (optional)
+    - `getValues` is a `function` that retrieves the values from the source. (optional)
+    - `setValues` is a `function` that allows updating the values connected to the source. (optional)
+    - `canUserEditValue` is a `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
+    - `getFieldsList` is a private `function`. It cannot be used yet by third-party developers. It creates a list for the block bindings UI with post meta.
 
-`label` argument will override the one defined in the server if they are different.
+The `label` argument will override the one defined on the server if they are different.
 
 
-This example will show a custom post meta date on the editor and, if it doesn't exist, it will show today's date.
-The user can edit the value of the date. (Caution: this example is not formatting the user input as a date, it's only for educational purposes.)
+This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: this example is not formatting the user input as a date, it's only for educational purposes.)
 
 ```js
 import {
@@ -199,25 +198,25 @@ registerBlockBindingsSource( {
 
 #### getValues
 
-`getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties.
+The `getValues` function retrieves the value from the source on block loading. It receives an `object` as an argument with the following properties:
 
 - `bindings` return the bindings object. It must have the attributes as a key, and the value can be a string or an object with arguments.
-- `cliendId` returns a `string` with the current block client id.
+- `cliendId` returns a `string` with the current block client ID.
 - `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
-- `select` returns an `object` of a given store selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 The function must return an `object` with this structure:
 `{ 'block attribute' : value }`
 
 #### setValues
 
-`setValues` updates all the values of the source of the block bound. It receives an `object` as an argument with the following properties.
+The `setValues` function updates all the values of the source of the block bound. It receives an `object` as an argument with the following properties:
 
-- `bindings` return the bindings object. It must have the attributes as a key, and the value can be a string or an object with arguments. This object contains a `newValue` property with the user's input.
-- `cliendId` returns a `string` with the current block client id.
+- `bindings` returns the bindings object. It must have the attributes as a key, and the value can be a string or an object with arguments. This object contains a `newValue` property with the user's input.
+- `cliendId` returns a `string` with the current block client ID.
 - `context` returns an `object` of the current block context, defined in the `usesContext` property. [More about block context.](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/).
 - `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
-- `select` returns an `object` of a given store selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
+- `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
 
 #### Editor registration Core examples
@@ -263,7 +262,7 @@ WordPress 6.7 includes a hook with two helpers that allows developers to edit th
 
 ### updateBlockBindings
 
-`updateBlockBindings` works similar to `updateBlockAttributes`, can be used to create, update o remove specific connections.
+`updateBlockBindings` works similarly to `updateBlockAttributes`, and can be used to create, update, or remove specific connections.
 
 ```js
 import { useBlockBindingsUtils } from '@wordpress/block-editor';
@@ -281,7 +280,7 @@ function updateBlockBindingsURLSource( url ) {
 
 ### removeAllBlockBindings
 
-`removeAllBlockBindings`, as its name, will remove all existing connections in a block by removing the `metadata.bindings` attribute.
+`removeAllBlockBindings`, as its name suggests, will remove all existing connections in a block by removing the `metadata.bindings` attribute.
 
 ```js
 import { useBlockBindingsUtils } from '@wordpress/block-editor';
