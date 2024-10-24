@@ -13,7 +13,6 @@
 	}
 
 	/* end utility classes */
-
 	.navigation {
 		&::after {
 			content: "";
@@ -145,4 +144,8 @@
 // Styles copied from button block styles.
 :where(.wp-block-post-comments input[type="submit"]) {
 	border: none;
+}
+
+.wp-block-comments {
+	box-sizing: border-box;
 }
