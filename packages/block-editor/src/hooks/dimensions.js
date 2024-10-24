@@ -86,19 +86,18 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultDimensionsControls = getBlockSupport( name, [
-		DIMENSIONS_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
-	const defaultSpacingControls = getBlockSupport( name, [
-		SPACING_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultDimensionsControls = 
+		getBlockSupport( name, [ DIMENSIONS_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ DIMENSIONS_SUPPORT_KEY, 'defaultControls' ] );
+
+	const defaultSpacingControls = 
+		getBlockSupport( name, [ SPACING_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ SPACING_SUPPORT_KEY, 'defaultControls' ] );
+
 	const defaultControls = {
 		...defaultDimensionsControls,
 		...defaultSpacingControls,
 	};
-
 	return (
 		<>
 			<StylesDimensionsPanel

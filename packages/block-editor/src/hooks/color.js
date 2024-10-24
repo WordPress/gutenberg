@@ -288,10 +288,9 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		COLOR_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
+	const defaultControls = 
+		getBlockSupport( name, [ COLOR_SUPPORT_KEY, '__experimentalDefaultControls' ] ) ||
+		getBlockSupport( name, [ COLOR_SUPPORT_KEY, 'defaultControls' ] );
 
 	const enableContrastChecking =
 		Platform.OS === 'web' &&
