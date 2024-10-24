@@ -884,7 +884,7 @@ Add white space between blocks and customize its height. ([Source](https://githu
 
 -	**Name:** core/spacer
 -	**Category:** design
--	**Supports:** anchor, interactivity (clientNavigation), spacing (margin)
+-	**Supports:** anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (margin)
 -	**Attributes:** height, width
 
 ## Table
