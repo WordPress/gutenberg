@@ -67,7 +67,7 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const isLargeViewport = ! useViewportMatch( 'large', '<' );
+	const isLargeViewport = useViewportMatch( 'large', '>=' );
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
