@@ -72,7 +72,7 @@ export function useSpecificEditorSettings() {
 			defaultRenderingMode,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			__unstableIsPreviewMode: canvas === 'view',
+			isPreviewMode: canvas === 'view',
 		};
 	}, [
 		settings,

@@ -12,6 +12,7 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
+import CollabSidebar from '../collab-sidebar';
 import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
@@ -174,6 +175,7 @@ function Header( {
 						}
 					/>
 				) }
+				<CollabSidebar />
 
 				{ customSaveButton }
 				<MoreMenu />

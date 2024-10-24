@@ -25,6 +25,7 @@ import {
 	useViewportMatch,
 	usePrevious,
 } from '@wordpress/compose';
+import { usePluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -32,7 +33,6 @@ import {
 import ComplementaryAreaHeader from '../complementary-area-header';
 import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
-import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
 import { store as interfaceStore } from '../../store';
 
@@ -171,19 +171,22 @@ function ComplementaryArea( {
 	children,
 	className,
 	closeLabel = __( 'Close plugin' ),
-	identifier,
+	identifier: identifierProp,
 	header,
 	headerClassName,
-	icon,
+	icon: iconProp,
 	isPinnable = true,
 	panelClassName,
 	scope,
 	name,
-	smallScreenTitle,
 	title,
 	toggleShortcut,
 	isActiveByDefault,
 } ) {
+	const context = usePluginContext();
+	const icon = iconProp || context.icon;
+	const identifier = identifierProp || `${ context.name }/${ name }`;
+
 	// This state is used to delay the rendering of the Fill
 	// until the initial effect runs.
 	// This prevents the animation from running on mount if
@@ -220,6 +223,9 @@ function ComplementaryArea( {
 		},
 		[ identifier, scope ]
 	);
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
 	useAdjustComplementaryListener(
 		scope,
 		identifier,
@@ -300,7 +306,6 @@ function ComplementaryArea( {
 					className={ headerClassName }
 					closeLabel={ closeLabel }
 					onClose={ () => disableComplementaryArea( scope ) }
-					smallScreenTitle={ smallScreenTitle }
 					toggleButtonProps={ {
 						label: closeLabel,
 						size: 'small',
@@ -314,7 +319,7 @@ function ComplementaryArea( {
 							<h2 className="interface-complementary-area-header__title">
 								{ title }
 							</h2>
-							{ isPinnable && (
+							{ isPinnable && ! isMobileViewport && (
 								<Button
 									className="interface-complementary-area__pin-unpin-item"
 									icon={ isPinned ? starFilled : starEmpty }
@@ -343,9 +348,6 @@ function ComplementaryArea( {
 	);
 }
 
-const ComplementaryAreaWrapped =
-	withComplementaryAreaContext( ComplementaryArea );
+ComplementaryArea.Slot = ComplementaryAreaSlot;
 
-ComplementaryAreaWrapped.Slot = ComplementaryAreaSlot;
-
-export default ComplementaryAreaWrapped;
+export default ComplementaryArea;
