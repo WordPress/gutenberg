@@ -1,7 +1,5 @@
 # Bindings
 
-_**Note:** This section is  yet under development._
-
 Block Bindings API lets you “bind” dynamic data to the block’s attributes, which are then reflected in the final HTML markup that is output to the browser on the front end.
 
 An example could be connecting an Image block url attribute to a function that returns random images from an external API.
@@ -57,11 +55,11 @@ Server registration allows to apply a callback that will be executed on the fron
 
 The function to register a custom source is `register_block_bindings_source($name, $args)`.
 
-- `$name` is a `string` that sets the unique id for the custom source.
-- `$args` is an `array` that contains:
+- `name` is a `string` that sets the unique id for the custom source.
+- `args` is an `array` that contains:
     - `label` is a `string` with the human readable name of the custom source.
-    - `uses_context` is an `array` with the block context that is passed to the callback.
-    - `get_value_callback` is the `function` that will run on the bound block render function. It accepts three arguments: `$source_args`, `$block_instance` and `$attribute_name`.
+    - `uses_context` is an `array` with the block context that is passed to the callback (optional).
+    - `get_value_callback` is the `function` that will run on the bound block render function. It accepts three arguments: `source_args`, `block_instance` and `attribute_name`. This value can be overriden with the filter `block_bindings_source_value`.
 
 Note that `register_block_bindings_source()` should be called from a handler attached to the `init` hook.
 
@@ -110,6 +108,17 @@ add_action(
 );
 ```
 
+#### Block bindings source value filter
+
+The value returned by `get_value_callback` can be modified with `block_bindings_source_value` filter.
+The filter has the following params:
+
+- `value`: The value to be filtered.
+- `name`: The name of the source.
+- `source_args`: Array containing source arguments.
+- `block_instance`: The block instance object.
+- `attribute_name`: The name of the attribute.
+
 #### Server registration Core examples
 
 There are a few examples in Core that can be used as a reference.
@@ -127,11 +136,11 @@ The function to register a custom source is `registerBlockBindingsSource( args )
 
 - `args` is an `object` with the following structure
     - `name` is a `string` with the unique and machine readable name.
-    - `label` is a tring with the human readable name of the custom source.
-    - `usesContext` is an optional `array` with the block context that the custom source may need.
-    - `getValues` is an optional `function` that retrieves the values from the source.
-    - `setValues` is an optional `function` that allows to update the values connected to the source.
-    - `canUserEditValue` is an optional `function` to determine if the user can edit the value. The user won't be able to edit by default.
+    - `label` is a tring with the human readable name of the custom source. (optional)
+    - `usesContext` is an optional `array` with the block context that the custom source may need. (optional)
+    - `getValues` is an optional `function` that retrieves the values from the source. (optional)
+    - `setValues` is an optional `function` that allows to update the values connected to the source. (optional)
+    - `canUserEditValue` is an optional `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
     - `getFieldsList` is a private `function`. It cannot be used yet by third party developers. It creates a list for the block bindings UI with post meta.
 
 `label` argument will override the one defined in the server if they are different.
@@ -227,5 +236,62 @@ import { unregisterBlockBindingsSource } from '@wordpress/blocks';
 
 unregisterBlockBindingsSource( 'plugin/my-custom-source' );
 ```
+
+## Getting all sources
+
+`getBlockBindingsSources` returns all registered block bindings sources.
+
+```js
+import { getBlockBindingsSources } from '@wordpress/blocks';
+
+const registeredSources = getBlockBindingsSources();
+```
+
+## Getting one specific source
+
+`getBlockBindingsSource` return a specific block bindings source by its name.
+
+```js
+import { getBlockBindingsSource } from '@wordpress/blocks';
+
+const blockBindingsSource = getBlockBindingsSource( 'plugin/my-custom-source' );
+```
+
+## Block Bindings Utils
+
+WordPress 6.7 includes a hook with two helpers that allows developers to edit the `metadata.bindings` attribute easily.
+
+### updateBlockBindings
+
+`updateBlockBindings` works similar to `updateBlockAttributes`, can be used to create, update o remove specific connections.
+
+```js
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+
+const { updateBlockBindings } = useBlockBindingsUtils();
+
+function updateBlockBindingsURLSource( url ) {
+	updateBlockBindings({
+		url: {
+			source: 'myplugin/new-source',
+		}
+	})
+}
+```
+
+### removeAllBlockBindings
+
+`removeAllBlockBindings`, as its name, will remove all existing connections in a block by removing the `metadata.bindings` attribute.
+
+```js
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+
+const { removeAllBlockBindings } = useBlockBindingsUtils();
+
+function clearBlockBindings() {
+	removeAllBlockBindings();
+}
+```
+
 
 
