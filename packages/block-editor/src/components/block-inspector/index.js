@@ -27,6 +27,7 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
+import InspectorControlsLastItem from '../inspector-controls-last-item-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
@@ -255,12 +256,15 @@ const BlockInspectorSingleBlock = ( {
 			<BlockVariationTransforms blockClientId={ clientId } />
 			<BlockInfo.Slot />
 			{ showTabs && (
-				<InspectorControlsTabs
-					hasBlockStyles={ hasBlockStyles }
-					clientId={ clientId }
-					blockName={ blockName }
-					tabs={ availableTabs }
-				/>
+				<>
+					<InspectorControlsTabs
+						hasBlockStyles={ hasBlockStyles }
+						clientId={ clientId }
+						blockName={ blockName }
+						tabs={ availableTabs }
+					/>
+					<InspectorControlsLastItem.Slot />
+				</>
 			) }
 			{ ! showTabs && (
 				<>
@@ -309,6 +313,35 @@ const BlockInspectorSingleBlock = ( {
 							</div>
 						</>
 					) }
+					<InspectorControls.Slot />
+					<InspectorControls.Slot group="list" />
+					<InspectorControls.Slot
+						group="color"
+						label={ __( 'Color' ) }
+						className="color-block-support-panel__inner-wrapper"
+					/>
+					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background image' ) }
+					/>
+					<InspectorControls.Slot
+						group="typography"
+						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						group="dimensions"
+						label={ __( 'Dimensions' ) }
+					/>
+					<InspectorControls.Slot
+						group="border"
+						label={ borderPanelLabel }
+					/>
+					<InspectorControls.Slot group="styles" />
+					<PositionControls />
+					<div>
+						<AdvancedControls />
+					</div>
+					<InspectorControlsLastItem.Slot />
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />

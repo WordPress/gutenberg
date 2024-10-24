@@ -14,6 +14,7 @@ import {
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
+import InspectorControlsLastItem from './components/inspector-controls-last-item-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
@@ -67,6 +68,7 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
+	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
 	BlockQuickNavigation,

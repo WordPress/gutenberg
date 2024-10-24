@@ -1,3 +1,10 @@
+.wp-block-post-author__transform {
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	margin: $grid-unit-20;
+	padding: $grid-unit-20;
+}
+
 .wp-block-post-author__inspector-settings {
 	// Counteract the margin added by the block inspector.
 	.components-base-control,

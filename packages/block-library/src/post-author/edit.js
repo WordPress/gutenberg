@@ -12,17 +12,29 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	ComboboxControl,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { migrateToRecommendedBlocks } from './utils';
+import { unlock } from '../lock-unlock';
+
+const { InspectorControlsLastItem } = unlock( blockEditorPrivateApis );
 
 const minimumUsersForCombobox = 25;
 
@@ -36,6 +48,7 @@ function PostAuthorEdit( {
 	context: { postType, postId, queryId },
 	attributes,
 	setAttributes,
+	clientId,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const { authorId, authorDetails, authors } = useSelect(
@@ -58,6 +71,7 @@ function PostAuthorEdit( {
 	);
 
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const { textAlign, showAvatar, showBio, byline, isLink, linkTarget } =
 		attributes;
@@ -96,6 +110,10 @@ function PostAuthorEdit( {
 	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
 	const showAuthorControl =
 		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
+
+	function transformBlock() {
+		replaceBlock( clientId, migrateToRecommendedBlocks( attributes ) );
+	}
 
 	return (
 		<>
@@ -179,6 +197,26 @@ function PostAuthorEdit( {
 					</VStack>
 				</PanelBody>
 			</InspectorControls>
+			<InspectorControlsLastItem>
+				<VStack
+					className="wp-block-post-author__transform"
+					alignment="left"
+					spacing={ 4 }
+				>
+					<Text as="p">
+						{ __(
+							'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design youor content as needed.'
+						) }
+					</Text>
+					<Button
+						variant="primary"
+						onClick={ transformBlock }
+						__next40pxDefaultSize
+					>
+						{ __( 'Migrate' ) }
+					</Button>
+				</VStack>
+			</InspectorControlsLastItem>
 
 			<BlockControls group="block">
 				<AlignmentControl
