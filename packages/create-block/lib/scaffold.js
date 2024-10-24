@@ -58,6 +58,14 @@ module.exports = async (
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
 
+	// We need values to store the paths to the root of the plugin. This could be the slug or the targetDir if passed.
+	// Once we have them, we can pass them to the functions that use that as part of the view rather than rebuilding it in each function.
+
+	//const pathToRoot = targetDir || slug;
+
+	// create-block --target-dir my-plugin would make the root my-plugin and the files would be in my-plugin/src
+	// create-block my-plugin would make the root my-plugin and the files would be in my-plugin/my-plugin
+
 	const transformedValues = transformer( {
 		$schema,
 		apiVersion,
