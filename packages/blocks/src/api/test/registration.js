@@ -742,6 +742,39 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should transform parent string to array', () => {
+			const blockType = {
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				parent: 'core/paragraph',
+			};
+			const block = registerBlockType(
+				'core/test-block-parent-string',
+				blockType
+			);
+			expect( console ).toHaveWarnedWith(
+				'Parent must be undefined or an array of strings (block types), but it is a string.'
+			);
+			expect( block ).toEqual( {
+				name: 'core/test-block-parent-string',
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [],
+				blockHooks: {},
+				parent: [ 'core/paragraph' ],
+			} );
+		} );
+
 		describe( 'applyFilters', () => {
 			afterEach( () => {
 				removeAllFilters( 'blocks.registerBlockType' );
