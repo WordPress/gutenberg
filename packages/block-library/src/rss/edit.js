@@ -117,7 +117,14 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			isActive: blockLayout === 'grid',
 		},
 	];
-
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+			spacing:undefined
+		},
+	};
 	return (
 		<>
 			<BlockControls>
@@ -189,7 +196,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<Disabled>
 					<ServerSideRender
 						block="core/rss"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>

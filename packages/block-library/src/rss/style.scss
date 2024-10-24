@@ -41,3 +41,10 @@ ul.wp-block-rss { // The ul is needed for specificity to override the reset styl
 	display: block;
 	font-size: 0.8125em;
 }
+.wp-block-rss {
+	box-sizing: border-box;
+	.wp-block-rss {
+		margin: 0;
+		border: 0;
+	}
+}
