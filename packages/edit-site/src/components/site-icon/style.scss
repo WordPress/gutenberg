@@ -19,4 +19,13 @@
 	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
 	}
+
+}
+
+/* Apply focus border to both the site icon and image when the button is focused */
+button:focus {
+	.edit-site-site-icon__icon,
+	.edit-site-site-icon__image {
+		border: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	}
 }
