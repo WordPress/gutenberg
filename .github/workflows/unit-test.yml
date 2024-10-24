@@ -32,7 +32,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -70,7 +70,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -121,7 +121,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -173,7 +173,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -278,7 +278,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -348,7 +348,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
