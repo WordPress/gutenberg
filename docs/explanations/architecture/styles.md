@@ -543,6 +543,7 @@ The current semantic class names that can be output by the Layout block support 
 -   `is-content-justification-right`: When a block explicitly sets `justifyContent` to `right`.
 -   `is-content-justification-space-between`: When a block explicitly sets `justifyContent` to `space-between`.
 -   `is-nowrap`: When a block explicitly sets `flexWrap` to `nowrap`.
+-   `is-reversed`: When a block explicitly sets `flexDirectionOrder` to `reverse`.
 
 ### Opting out of generated layout styles
 

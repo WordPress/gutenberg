@@ -450,11 +450,25 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
 				);
 			}
+
+			if ( ! empty( $layout['flexDirectionOrder'] ) && 'reverse' === $layout['flexDirectionOrder'] ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'flex-direction' => 'row-reverse' ),
+				);
+			}
 		} else {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'flex-direction' => 'column' ),
-			);
+			if ( ! empty( $layout['flexDirectionOrder'] ) && 'reverse' === $layout['flexDirectionOrder'] ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'flex-direction' => 'column-reverse' ),
+				);
+			} else {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'flex-direction' => 'column' ),
+				);
+			}
 			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
@@ -792,6 +806,10 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	if ( ! empty( $block['attrs']['layout']['flexWrap'] ) && 'nowrap' === $block['attrs']['layout']['flexWrap'] ) {
 		$class_names[] = 'is-nowrap';
+	}
+
+	if ( ! empty( $block['attrs']['layout']['flexDirectionOrder'] ) && 'reverse' === $block['attrs']['layout']['flexDirectionOrder'] ) {
+		$class_names[] = 'is-reversed';
 	}
 
 	// Get classname for layout type.
