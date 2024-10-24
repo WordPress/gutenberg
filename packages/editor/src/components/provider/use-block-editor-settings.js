@@ -21,7 +21,8 @@ import {
  * Internal dependencies
  */
 import inserterMediaCategories from '../media-categories';
-import { mediaUpload, mediaSideload } from '../../utils';
+import { mediaUpload } from '../../utils';
+import { default as mediaSideload } from '../../utils/media-sideload';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
