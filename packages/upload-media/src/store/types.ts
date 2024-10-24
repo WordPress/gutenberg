@@ -185,11 +185,22 @@ export enum OperationType {
 	ResizeCrop = 'RESIZE_CROP',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	Compress = 'TRANSCODE_COMPRESS',
+	FetchRemoteFile = 'FETCH_REMOTE_FILE',
 	GenerateMetadata = 'GENERATE_METADATA',
 	Upload = 'UPLOAD',
 }
 
 export interface OperationArgs {
+	[ OperationType.Compress ]: {
+		requireApproval?: boolean;
+	};
+	[ OperationType.FetchRemoteFile ]: {
+		url: string;
+		fileName: string;
+		newFileName?: string;
+		skipAttachment?: boolean;
+		allowedTypes?: string[];
+	};
 	[ OperationType.TranscodeImage ]: {
 		requireApproval?: boolean;
 		outputFormat?: ImageFormat;
