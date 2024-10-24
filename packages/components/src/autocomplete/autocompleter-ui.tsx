@@ -165,9 +165,8 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		useLayoutEffect( () => {
 			onChangeOptions( items );
 			announce( items );
-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// We want to avoid introducing unexpected side effects.
 			// See https://github.com/WordPress/gutenberg/pull/41820
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ items ] );
 
 		if ( items.length === 0 ) {
@@ -235,8 +234,5 @@ function useOnClickOutside(
 			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'touchstart', listener );
 		};
-		// Disable reason: `ref` is a ref object and should not be included in a
-		// hook's dependency list.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ handler ] );
+	}, [ handler, ref ] );
 }

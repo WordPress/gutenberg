@@ -112,9 +112,7 @@ const ImageComponent = ( {
 			}
 		}
 		return () => ( isCurrent = false );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {

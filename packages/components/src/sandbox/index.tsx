@@ -262,23 +262,20 @@ function SandBox( {
 				checkMessageForResize
 			);
 		};
-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	useEffect( () => {
 		trySandBox();
-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandBox( true );
-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
 		// See https://github.com/WordPress/gutenberg/pull/44378
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ html, type ] );
 
 	return (

@@ -357,18 +357,6 @@ module.exports = {
 			},
 		},
 		{
-			files: [
-				// Components package.
-				'packages/components/src/**/*.[tj]s?(x)',
-				// Navigation block.
-				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
-			],
-			excludedFiles: [ ...developmentFiles ],
-			rules: {
-				'react-hooks/exhaustive-deps': 'error',
-			},
-		},
-		{
 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
 			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],

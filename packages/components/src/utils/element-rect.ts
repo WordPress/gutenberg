@@ -181,7 +181,6 @@ export function useTrackElementOffsetRect(
 		measure();
 		// `measure` is a stable function, so it's safe to omit it from the deps array.
 		// deps can't be statically analyzed by ESLint
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, deps );
 
 	return indicatorPosition;
