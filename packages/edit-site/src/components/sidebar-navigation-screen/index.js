@@ -14,9 +14,10 @@ import {
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useContext } from '@wordpress/element';
+import { useEntitiesSavedStatesIsDirty } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -66,6 +67,11 @@ export default function SidebarNavigationScreen( {
 	const backPath = backPathProp ?? location.state?.backPath;
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
+	// Check for unsaved changes
+	const { dirtyEntityRecords } = useEntitiesSavedStatesIsDirty();
+	const hasUnsavedChanges = !! dirtyEntityRecords.length;
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+
 	return (
 		<>
 			<VStack
@@ -93,11 +99,18 @@ export default function SidebarNavigationScreen( {
 					) }
 					{ isRoot && (
 						<SidebarButton
+							onClick={ () => {
+								if ( hasUnsavedChanges ) {
+									setIsSaveViewOpened( true );
+								} else {
+									window.location.href =
+										dashboardLink || 'index.php';
+								}
+							} }
 							icon={ icon }
 							label={
 								dashboardLinkText || __( 'Go to the Dashboard' )
 							}
-							href={ dashboardLink || 'index.php' }
 						/>
 					) }
 					<Heading
