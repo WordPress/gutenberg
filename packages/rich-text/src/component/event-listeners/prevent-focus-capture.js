@@ -17,6 +17,7 @@ export default () => ( element ) => {
 		}
 		value = element.getAttribute( 'contenteditable' );
 		element.setAttribute( 'contenteditable', 'false' );
+		defaultView.getSelection().removeAllRanges();
 	}
 
 	function onPointerUp() {
