@@ -493,6 +493,8 @@ export interface ViewBaseProps< Item > {
 	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
+	onClick: ( item: Item ) => void;
+	isClickable: ( item: Item ) => boolean;
 	view: View;
 	density: number;
 }

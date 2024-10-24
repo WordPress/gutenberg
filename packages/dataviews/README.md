@@ -318,7 +318,15 @@ The `defaultLayouts` property should be an object that includes properties named
 
 ### `onChangeSelection`: `function`
 
-Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
+Callback that signals the user selected one of more items, and takes them as parameter.
+
+### `isClickable`: `function`
+
+A function that determines if a media field or a primary field are clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
+
+### `onClick`: `function`
+
+A callback function that is triggered when a user clicks on a media field or primary field. This function is currently implemented only in the `grid` and `list` views.
 
 ## Types
 
