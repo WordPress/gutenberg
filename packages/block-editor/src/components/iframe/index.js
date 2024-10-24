@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +32,13 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
+import cubicBezier from './bezier-easing';
+
+// Easing function from the CSS editor-canvas-resize-animation.
+// const scrollEasing = cubicBezier( 0.46, 0.03, 0.52, 0.96 );
+
+// Complementary easing function to the CSS editor-canvas-resize-animation.
+const scrollEasing = cubicBezier( 1 - 0.52, 1 - 0.96, 1 - 0.46, 1 - 0.03 );
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -121,6 +129,7 @@ function Iframe( {
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
+	/** @type {[Document, React.Dispatch<React.SetStateAction<Document>>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const initialContainerWidth = useRef( 0 );
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -128,8 +137,10 @@ function Iframe( {
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const [ containerResizeListener, { width: containerWidth } ] =
-		useResizeObserver();
+	const [
+		containerResizeListener,
+		{ width: containerWidth, height: containerHeight },
+	] = useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -252,6 +263,15 @@ function Iframe( {
 		containerWidth
 	);
 
+	const frameSizeValue = parseInt( frameSize );
+
+	const maxWidth = 750;
+	const scaleValue =
+		scale === 'default'
+			? ( Math.min( containerWidth, maxWidth ) - frameSizeValue * 2 ) /
+			  scaleContainerWidth
+			: scale;
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -343,7 +363,6 @@ function Iframe( {
 			return;
 		}
 
-		const maxWidth = 750;
 		// Note: When we initialize the zoom out when the canvas is smaller (sidebars open),
 		// initialContainerWidth will be smaller than the full page, and reflow will happen
 		// when the canvas area becomes larger due to sidebars closing. This is a known but
@@ -354,11 +373,7 @@ function Iframe( {
 		// but calc( 100px / 2px ) is not.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
-				? ( Math.min( containerWidth, maxWidth ) -
-						parseInt( frameSize ) * 2 ) /
-						scaleContainerWidth
-				: scale
+			scaleValue
 		);
 
 		// frameSize has to be a px value for the scaling and frame size to be computed correctly.
@@ -404,7 +419,7 @@ function Iframe( {
 			);
 		};
 	}, [
-		scale,
+		scaleValue,
 		frameSize,
 		iframeDocument,
 		iframeWindowInnerHeight,
@@ -418,6 +433,143 @@ function Iframe( {
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+
+	const prevScaleRef = useRef( scaleValue );
+	const prevFrameSizeRef = useRef( frameSizeValue );
+	const prevContainerHeightRef = useRef( containerHeight );
+
+	// Scroll based on the new scale
+	useEffect( () => {
+		if ( ! iframeDocument ) {
+			return;
+		}
+
+		const scaleValuePrev = prevScaleRef.current;
+		const frameSizeValuePrev = prevFrameSizeRef.current;
+		const containerHeightPrev = prevContainerHeightRef.current;
+
+		if ( containerHeightPrev === containerHeight ) {
+			return;
+		}
+
+		// TODO: Scroll top is sometimes wrong by containerHeight sometimes in Firefox.
+
+		const { documentElement, defaultView } = iframeDocument;
+		const { scrollTop } = documentElement;
+		const { scrollY } = defaultView;
+
+		// Convert previous values to the zoomed in scale.
+		// Use Math.round to avoid subpixel scrolling which would effectively result in a Math.floor.
+		const scrollTopOriginal = Math.round(
+			( scrollTop + containerHeightPrev / 2 - frameSizeValuePrev ) /
+				scaleValuePrev -
+				containerHeightPrev / 2
+		);
+
+		// Convert the zoomed in value to the new scale.
+		// Use Math.round to avoid subpixel scrolling which would effectively result in a Math.floor.
+		const scrollTopNext = Math.round(
+			( scrollTopOriginal + containerHeight / 2 ) * scaleValue +
+				frameSizeValue -
+				containerHeight / 2
+		);
+
+		// Convert previous values to the zoomed in scale.
+		const scrollYOriginal =
+			( scrollY + containerHeightPrev / 2 - frameSizeValuePrev ) /
+				scaleValuePrev -
+			containerHeightPrev / 2;
+
+		// Convert the zoomed in value to the new scale.
+		const scrollYNext =
+			( scrollYOriginal + containerHeight / 2 ) * scaleValue +
+			frameSizeValue -
+			containerHeight / 2;
+
+		console.log( {
+			scaleValue,
+			scaleValuePrev,
+		} );
+		console.log( {
+			frameSizeValue,
+			frameSizeValuePrev,
+		} );
+		console.log( {
+			containerHeight,
+			containerHeightPrev,
+		} );
+		console.log( {
+			scrollTop,
+			scrollTopOriginal,
+			scrollTopNext,
+		} );
+		console.log( {
+			scrollY,
+			scrollYOriginal,
+			scrollYNext,
+		} );
+
+		documentElement.scrollTop = scrollTopNext;
+
+		// defaultView.scroll( {
+		// 	top: scrollY + ( frameSizeValue - frameSizeValuePrev ),
+		// 	behavior: 'auto',
+		// } );
+
+		// let raf = requestAnimationFrame( ( start ) => {
+		// 	const duration = 400; // Should match the CSS transition duration.
+		// 	console.log( documentElement.scrollTop, '0.000', '0.000' );
+		// 	const step = ( timestamp ) => {
+		// 		const progress = Math.min(
+		// 			( timestamp - start ) / duration,
+		// 			1
+		// 		);
+		// 		const easing = scrollEasing( progress );
+		// 		documentElement.scrollTop = Math.floor(
+		// 			scrollTop + ( scrollTopNext - scrollTop ) * easing
+		// 		);
+		// 		console.log(
+		// 			documentElement.scrollTop,
+		// 			progress.toFixed( 3 ),
+		// 			easing.toFixed( 3 )
+		// 		);
+		// 		if ( progress < 1 ) {
+		// 			raf = requestAnimationFrame( step );
+		// 		}
+		// 	};
+		// 	raf = requestAnimationFrame( step );
+		// } );
+
+		// const timers = Array.from( { length: 20 }, ( _, i ) => {
+		// 	const delay = i * 100;
+		// 	// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		// 	return setTimeout( () => {
+		// 		if ( i === 10 ) {
+		// 			documentElement.scrollTop = scrollTopNext;
+		// 		}
+		// 		console.log( delay, documentElement.scrollTop );
+		// 	}, delay );
+		// } );
+
+		console.log();
+		if ( scaleValuePrev !== scaleValue ) {
+			console.log( 'scaleValue changed' );
+			prevScaleRef.current = scaleValue;
+		}
+		if ( frameSizeValuePrev !== frameSizeValue ) {
+			console.log( 'frameSizeValue changed' );
+			prevFrameSizeRef.current = frameSizeValue;
+		}
+		if ( containerHeightPrev !== containerHeight ) {
+			console.log( 'containerHeight changed' );
+			prevContainerHeightRef.current = containerHeight;
+		}
+
+		return () => {
+			// cancelAnimationFrame( raf );
+			// timers.forEach( clearTimeout );
+		};
+	}, [ iframeDocument, scaleValue, frameSizeValue, containerHeight ] );
 
 	const iframe = (
 		<>
