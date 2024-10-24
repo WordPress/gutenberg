@@ -270,7 +270,7 @@ To avoid this validation error, use `render_block` server-side to modify existin
 
 ### `blocks.getBlockDefaultClassName`
 
-Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
+[Generated HTML classes for blocks](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname) follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
 
 ```js
 // Our filter function.
@@ -285,6 +285,8 @@ wp.hooks.addFilter(
 	setBlockCustomClassName
 );
 ```
+
+If a block has opted into [block support for generated block _variation_ specific class names](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname), the filter also affects those. With the above example, if the `core/code` block has a `php` variation, it would get `my-plugin-code-php` as its variation specific class name (instead of the default `wp-block-code-php`).
 
 ### `blocks.switchToBlockType.transformedBlock`
 

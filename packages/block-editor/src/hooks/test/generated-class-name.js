@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,11 +13,46 @@ const noop = () => {};
 
 describe( 'generated className', () => {
 	const blockSettings = {
-		name: 'chicken/ribs',
+		name: 'produce/fruit',
 		save: noop,
 		category: 'text',
 		title: 'block title',
+		attributes: {
+			fruit: {
+				type: 'string',
+				default: 'apple',
+			},
+		},
 	};
+
+	const variations = [
+		{
+			name: 'apple',
+			attributes: {
+				fruit: 'apple',
+			},
+			isActive: [ 'fruit' ],
+			isDefault: true,
+		},
+		{
+			name: 'banana',
+			attributes: {
+				fruit: 'banana',
+			},
+			isActive: [ 'fruit' ],
+		},
+	];
+
+	beforeAll( () => {
+		registerBlockType( 'produce/fruit', {
+			...blockSettings,
+			variations,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'produce/fruit' );
+	} );
 
 	describe( 'addSaveProps', () => {
 		const addSaveProps = applyFilters.bind(
@@ -40,6 +76,24 @@ describe( 'generated className', () => {
 			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
 
+		it( 'should do nothing if the block settings opt out of generated className support via the block property', () => {
+			const attributes = { className: 'foo' };
+			const extraProps = addSaveProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						className: {
+							block: false,
+						},
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps ).not.toHaveProperty( 'className' );
+		} );
+
 		it( 'should inject the generated className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
@@ -48,18 +102,78 @@ describe( 'generated className', () => {
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
+			expect( extraProps.className ).toBe( 'wp-block-produce-fruit foo' );
 		} );
 
 		it( 'should not inject duplicates into className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
-				{ className: 'foo wp-block-chicken-ribs' },
+				{ className: 'foo wp-block-produce-fruit' },
 				blockSettings,
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
+			expect( extraProps.className ).toBe( 'wp-block-produce-fruit foo' );
+		} );
+
+		it( "should not inject the generated variation className if support isn't enabled", () => {
+			const attributes = { className: 'foo', fruit: 'banana' };
+			const extraProps = addSaveProps(
+				{},
+				{
+					...blockSettings,
+					variations,
+					supports: {
+						className: false,
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps ).not.toHaveProperty( 'className' );
+		} );
+
+		it( 'should inject generated classNames for both block and variation', () => {
+			const attributes = { className: 'bar', fruit: 'banana' };
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				{
+					...blockSettings,
+					variations,
+					supports: {
+						className: {
+							variation: true,
+						},
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps.className ).toBe(
+				'wp-block-produce-fruit wp-block-produce-fruit__banana foo'
+			);
+		} );
+
+		it( 'should only inject the generated variation className if the block property is explicitly set to false', () => {
+			const attributes = { className: 'bar', fruit: 'banana' };
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				{
+					...blockSettings,
+					variations,
+					supports: {
+						className: {
+							block: false,
+							variation: true,
+						},
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps.className ).toBe(
+				'wp-block-produce-fruit__banana foo'
+			);
 		} );
 	} );
 } );

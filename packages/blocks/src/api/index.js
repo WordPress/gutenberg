@@ -65,6 +65,7 @@ export {
 	default as serialize,
 	getBlockInnerHTML as getBlockContent,
 	getBlockDefaultClassName,
+	getBlockVariationClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,
 	getSaveContent,
