@@ -22,7 +22,7 @@ import useMediaUploadSettings from './use-media-upload-settings';
 
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
-		const { children, settings, stripExperimentalSettings = false } = props;
+		const { settings, stripExperimentalSettings = false } = props;
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -47,6 +47,13 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// Syncs the entity provider with changes in the block-editor store.
 		useBlockSync( props );
 
+		const children = (
+			<SlotFillProvider passthrough>
+				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
+				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
+			</SlotFillProvider>
+		);
+
 		const mediaUploadSettings = useMediaUploadSettings( settings );
 
 		if ( window.__experimentalMediaProcessing ) {
@@ -55,22 +62,12 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					<SlotFillProvider passthrough>
-						{ ! settings?.__unstableIsPreviewMode && (
-							<KeyboardShortcuts.Register />
-						) }
-						<BlockRefsProvider>{ children }</BlockRefsProvider>
-					</SlotFillProvider>
+					{ children }
 				</MediaUploadProvider>
 			);
 		}
 
-		return (
-			<SlotFillProvider passthrough>
-				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
-				<BlockRefsProvider>{ children }</BlockRefsProvider>
-			</SlotFillProvider>
-		);
+		return children;
 	}
 );
 
