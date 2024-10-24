@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, createInterpolateElement } from '@wordpress/element';
+import {
+	useMemo,
+	createInterpolateElement,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
@@ -48,6 +52,8 @@ function InlineLinkUI( {
 	contentRef,
 	focusOnMount,
 } ) {
+	const [ justCreated, setJustCreated ] = useState( false );
+
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
 	// Get the text content minus any HTML tags.
@@ -197,8 +203,11 @@ function InlineLinkUI( {
 		// being created for the first time. If it is then focus should remain within the
 		// Link UI because it should remain open for the user to modify the link they have
 		// just created.
-		if ( ! isNewLink ) {
+		if ( isNewLink ) {
+			setJustCreated( true );
+		} else {
 			stopAddingLink();
+			setJustCreated( false );
 		}
 
 		if ( ! isValidHref( newUrl ) ) {
@@ -249,6 +258,12 @@ function InlineLinkUI( {
 		);
 	}
 
+	// If the link is being created for the first time then force the Link UI
+	// to be in edit mode so that the user can modify the link they have just
+	// created. Passing undefined will allow the default behaviour to continue
+	// uninterrupted.
+	const forceEditMode = justCreated ? true : undefined;
+
 	return (
 		<Popover
 			anchor={ popoverAnchor }
@@ -280,6 +295,7 @@ function InlineLinkUI( {
 						perPage: 20,
 					},
 				} }
+				forceIsEditingLink={ forceEditMode }
 			/>
 		</Popover>
 	);
