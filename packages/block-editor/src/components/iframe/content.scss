@@ -21,7 +21,6 @@
 .block-editor-iframe__html.is-zoomed-out {
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
-	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$scale-container-width: var(--wp-block-editor-iframe-zoom-out-scale-container-width);
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
@@ -43,17 +42,6 @@
 	padding-bottom: calc(#{$frame-size} / #{$scale});
 
 	body {
-		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
-
-		> .is-root-container:not(.wp-block-post-content) {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-
-			> main {
-				flex: 1;
-			}
-		}
+		min-height: 100vh;
 	}
 }
