@@ -103,3 +103,31 @@ function gutenberg_add_format_query_vars_to_query_loop_block( $query, $block ) {
 	return $query;
 }
 add_filter( 'query_loop_block_query_vars', 'gutenberg_add_format_query_vars_to_query_loop_block', 10, 2 );
+
+/**
+ * Adds `ignore` option for sticky posts to the Query block.
+ * 
+ * @see 'query_loop_block_query_vars'
+ * 
+ * @param array    $query The query vars.
+ * @param WP_Block $block Block instance.
+ * @return array   The filtered query vars.
+ */
+function gutenberg_add_ignore_sticky_posts_to_query_loop_block( $query, $block ) {
+	if ( ! empty( $block->context['query']['sticky'] ) && 'ignore' === $block->context['query']['sticky'] ) {
+		// Core function excludes all sticky posts if the `sticky` value is anything
+		// other than `only`. We must reset that here, but it could potentially also
+		// re-allow a sticky post that had been excluded in some other way. This 
+		// works okay for testing, but the real fix will need to be in the
+		// core function.
+		$sticky = get_option( 'sticky_posts' );
+
+		$query['post__not_in'] = array_diff( $query['post__not_in'], ! empty( $sticky ) ? $sticky : array() );
+
+		// Ignore sticky posts.
+		$query['ignore_sticky_posts'] = 1;
+	}
+
+	return $query;
+}
+add_filter( 'query_loop_block_query_vars', 'gutenberg_add_ignore_sticky_posts_to_query_loop_block', 10, 2 );
