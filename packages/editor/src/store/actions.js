@@ -874,6 +874,82 @@ export const toggleDistractionFree =
 	};
 
 /**
+ * Action that toggles the Spotlight Mode view option.
+ * Shows a notice when option is toggled.
+ */
+export const toggleSpotlightMode =
+	() =>
+	( { registry } ) => {
+		// Determine the current state of the Spotlight Mode option.
+		const isFocusMode = registry
+			.select( preferencesStore )
+			.get( 'core', 'focusMode' );
+
+		// Toggle the Spotlight Mode option.
+		registry.dispatch( preferencesStore ).toggle( 'core', 'focusMode' );
+
+		// Show a notice when the Spotlight Mode option is toggled for visual feedback.
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFocusMode ? __( 'Spotlight off.' ) : __( 'Spotlight on.' ),
+				{
+					id: 'core/editor/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
+	};
+
+/**
+ * Action that toggles the Top Toolbar view option.
+ * Shows a notice when option is toggled.
+ */
+export const toggleTopToolbar =
+	() =>
+	( { registry } ) => {
+		// Determine the current state of the Top Toolbar option.
+		const isTopToolbar = registry
+			.select( preferencesStore )
+			.get( 'core', 'fixedToolbar' );
+
+		// Toggle the Top Toolbar option.
+		registry.dispatch( preferencesStore ).toggle( 'core', 'fixedToolbar' );
+
+		// Show a notice when the Top Toolbar option is toggled for visual feedback.
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar off.' )
+					: __( 'Top toolbar on.' ),
+				{
+					id: 'core/editor/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
+	};
+
+/**
  * Triggers an action used to switch editor mode.
  *
  * @param {string} mode The editor mode.

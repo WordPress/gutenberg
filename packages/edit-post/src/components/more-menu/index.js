@@ -14,11 +14,16 @@ import { unlock } from '../../lock-unlock';
 import ManagePatternsMenuItem from './manage-patterns-menu-item';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import EditPostPreferencesModal from '../preferences-modal';
+import { store as editorStore } from '../../store';
+import { useDispatch } from '@wordpress/data';
 
 const { ToolsMoreMenuGroup, ViewMoreMenuGroup } = unlock( editorPrivateApis );
 
 const MoreMenu = () => {
 	const isLargeViewport = useViewportMatch( 'large' );
+
+	// Action to toggle the FullscreenMode with a Notice for visual feedback.
+	const { toggleFullscreenMode } = useDispatch( editorStore );
 
 	return (
 		<>
@@ -29,6 +34,8 @@ const MoreMenu = () => {
 						name="fullscreenMode"
 						label={ __( 'Fullscreen mode' ) }
 						info={ __( 'Show and hide the admin user interface' ) }
+						handleToggling={ false }
+						onToggle={ toggleFullscreenMode }
 						messageActivated={ __( 'Fullscreen mode activated' ) }
 						messageDeactivated={ __(
 							'Fullscreen mode deactivated'

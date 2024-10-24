@@ -29,7 +29,8 @@ import { store as editorStore } from '../../store';
 export default function MoreMenu() {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { toggleDistractionFree } = useDispatch( editorStore );
+	const { toggleDistractionFree, toggleSpotlightMode, toggleTopToolbar } =
+		useDispatch( editorStore );
 	const showIconLabels = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( 'core', 'showIconLabels' ),
@@ -37,6 +38,7 @@ export default function MoreMenu() {
 	);
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
+		toggleTopToolbar();
 	};
 
 	return (
@@ -61,6 +63,7 @@ export default function MoreMenu() {
 							<PreferenceToggleMenuItem
 								scope="core"
 								name="fixedToolbar"
+								handleToggling={ false }
 								onToggle={ turnOffDistractionFree }
 								label={ __( 'Top toolbar' ) }
 								info={ __(
@@ -95,6 +98,8 @@ export default function MoreMenu() {
 								name="focusMode"
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
+								handleToggling={ false }
+								onToggle={ toggleSpotlightMode }
 								messageActivated={ __(
 									'Spotlight mode activated'
 								) }
