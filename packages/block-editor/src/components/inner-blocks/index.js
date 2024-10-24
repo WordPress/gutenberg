@@ -204,8 +204,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			} = unlock( select( blockEditorStore ) );
 
 			if ( ! clientId ) {
-				// Disable the root drop zone when zoomed out.
-				return { isDropZoneDisabled: isZoomOut() };
+				const sectionRootClientId = getSectionRootClientId();
+				// Disable the root drop zone when zoomed out and the section root client id
+				// is not the root block list (represented by an empty string).
+				return {
+					isDropZoneDisabled:
+						isZoomOut() && sectionRootClientId !== '',
+				};
 			}
 
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
@@ -221,7 +226,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				// The inner blocks belonging to the section drop zone is
 				// already disabled by the blocks themselves being disabled.
 				const sectionRootClientId = getSectionRootClientId();
-
 				_isDropZoneDisabled = clientId !== sectionRootClientId;
 			}
 
