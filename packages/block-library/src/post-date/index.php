@@ -65,15 +65,27 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
+	$prefix = '';
+	if ( isset( $attributes['prefix'] ) && $attributes['prefix'] ) {
+		$prefix = wp_kses_post( '<span class="wp-block-post-date__prefix">' . $attributes['prefix'] . '</span>' );
+	}
+
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $formatted_date );
 	}
 
+	$suffix = '';
+	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
+		$suffix = wp_kses_post( '<span class="wp-block-post-date__suffix">' . $attributes['suffix'] . '</span>' );
+	}
+
 	return sprintf(
-		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
+		'<div %1$s>%2$s<time datetime="%3$s">%4$s</time>%5$s</div>',
 		$wrapper_attributes,
+		$prefix,
 		$unformatted_date,
-		$formatted_date
+		$formatted_date,
+		$suffix
 	);
 }
 
