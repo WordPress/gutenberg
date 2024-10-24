@@ -19,6 +19,8 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -26,19 +28,17 @@ import { store as coreStore } from '@wordpress/core-data';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
-	attributes: {
-		type,
-		label,
-		showTitle,
-		textAlign,
-		linkLabel,
-		arrow,
-		taxonomy,
-	},
+	attributes,
 	setAttributes,
 } ) {
+	const { type, label, showTitle, textAlign, linkLabel, arrow, taxonomy } =
+		attributes;
+
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
+
+	const borderProps = useBorderProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
 
 	const arrowMap = {
 		none: '',
@@ -184,7 +184,14 @@ export default function PostNavigationLinkEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
+			<div
+				{ ...blockProps }
+				style={ {
+					...blockProps.style,
+					...borderProps.style,
+					...spacingProps.style,
+				} }
+			>
 				{ ! isNext && displayArrow && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-previous is-arrow-${ arrow }` }

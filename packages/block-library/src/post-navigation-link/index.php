@@ -30,11 +30,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes .= " has-text-align-{$attributes['textAlign']}";
 	}
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => $classes,
-		)
-	);
+
 	// Set default values.
 	$format = '%link';
 	$link   = 'next' === $navigation_type ? _x( 'Next', 'label for next post link' ) : _x( 'Previous', 'label for previous post link' );
@@ -116,11 +112,96 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$content = $get_link_function( $format, $link );
 	}
 
+	$support_styles = block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes );
+	$classes       .= ! empty( $support_styles['class'] ) ? " {$support_styles['class']}" : '';
+
+	// Get the wrapper attributes.
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classes,
+			'style' => ! empty( $content ) && $support_styles['style'] ? $support_styles['style'] : '',
+		)
+	);
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
 		$content
 	);
+}
+
+/**
+ * Generates class names and styles to apply the border and spacing support styles for
+ * the Post Navigation Link block.
+ *
+ * @since 6.7.0
+ *
+ * @param array $attributes The block attributes.
+ * @return array The border and spacing related classnames and styles for the block.
+ */
+function block_core_post_navigation_link_get_border_and_spacing_attributes( $attributes ) {
+	$border_styles = array();
+	$sides         = array( 'top', 'right', 'bottom', 'left' );
+
+	// Border radius.
+	if ( isset( $attributes['style']['border']['radius'] ) ) {
+		$border_styles['radius'] = $attributes['style']['border']['radius'];
+	}
+
+	// Border style.
+	if ( isset( $attributes['style']['border']['style'] ) ) {
+		$border_styles['style'] = $attributes['style']['border']['style'];
+	}
+
+	// Border width.
+	if ( isset( $attributes['style']['border']['width'] ) ) {
+		$border_styles['width'] = $attributes['style']['border']['width'];
+	}
+
+	// Border color.
+	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
+	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
+
+	// Individual border styles e.g. top, left etc.
+	foreach ( $sides as $side ) {
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
+		$border_styles[ $side ] = array(
+			'color' => isset( $border['color'] ) ? $border['color'] : null,
+			'style' => isset( $border['style'] ) ? $border['style'] : null,
+			'width' => isset( $border['width'] ) ? $border['width'] : null,
+		);
+	}
+
+	// Individual padding styles e.g. top, left etc.
+	$padding_style = array();
+	foreach ( $sides as $side ) {
+		$padding_style[ $side ] = $attributes['style']['spacing']['padding'][ $side ] ?? null;
+	}
+
+	// Individual margin styles e.g. top, left etc.
+	$margin_style = array();
+	foreach ( $sides as $side ) {
+		$margin_style[ $side ] = $attributes['style']['spacing']['margin'][ $side ] ?? null;
+	}
+
+	$styles     = wp_style_engine_get_styles(
+		array(
+			'border'  => $border_styles,
+			'spacing' => array(
+				'padding' => $padding_style,
+				'margin'  => $margin_style,
+			),
+		)
+	);
+	$attributes = array();
+	if ( ! empty( $styles['classnames'] ) ) {
+		$attributes['class'] = $styles['classnames'];
+	}
+	if ( ! empty( $styles['css'] ) ) {
+		$attributes['style'] = $styles['css'];
+	}
+	return $attributes;
 }
 
 /**
