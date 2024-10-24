@@ -30,19 +30,62 @@ function gutenberg_bootstrap_server_block_bindings_sources() {
 add_action( 'enqueue_block_editor_assets', 'gutenberg_bootstrap_server_block_bindings_sources', 5 );
 
 /**
+ * Map the `edit_block_binding` capability to `edit_{object_subtype}` or `edit_theme_options``
+ * depending on the context.
+ * @param array  $caps    Primitive capabilities required of the user.
+ * @param string $cap     Capability being checked.
+ * @param int    $user_id The user ID.
+ * @param array  $args    Argumenst that add the context to the cap.
+ * @return array The updated capabilities.
+ */
+function gutenberg_add_edit_block_binding_capability( $caps, $cap, $user_id, $args ) {
+	if ( 'edit_block_binding' === $cap ) {
+		$block_editor_context = $args[0];
+		if ( isset( $block_editor_context->post ) ) {
+			$object_id = $block_editor_context->post->ID;
+		}
+		/*
+		* If the post ID is null, check if the context is the site editor.
+		* Fall back to the edit_theme_options in that case.
+		*/
+		if ( ! isset( $object_id ) ) {
+			if ( ! isset( $block_editor_context->name ) || 'core/edit-site' !== $block_editor_context->name ) {
+				return array( 'do_not_allow' );
+			}
+			$caps = map_meta_cap( 'edit_theme_options', $user_id );
+		} else {
+			$object_subtype = get_object_subtype( 'post', (int) $object_id );
+			if ( empty( $object_subtype ) ) {
+				return array( 'do_not_allow' );
+			}
+			$post_type_object = get_post_type_object( $object_subtype );
+			// Initialize empty array if it doesn't exist.
+			if ( ! isset( $post_type_object->capabilities ) ) {
+				$post_type_object->capabilities = array();
+			}
+			$post_type_capabilities = get_post_type_capabilities( $post_type_object );
+			$caps                   = map_meta_cap( $post_type_capabilities->edit_post, $user_id, $object_id );
+		}
+	}
+	return $caps;
+}
+add_filter( 'map_meta_cap', 'gutenberg_add_edit_block_binding_capability', 5, 4 );
+
+/**
  * Initialize `canUpdateBlockBindings` editor setting if it doesn't exist. By default, it is `true` only for admin users.
  *
- * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
+ * @param array $editor_settings      The block editor settings from the `block_editor_settings_all` filter.
+ * @param array $block_editor_context The block editor context.
  * @return array The editor settings including `canUpdateBlockBindings`.
  */
-function gutenberg_add_can_update_block_bindings_editor_setting( $editor_settings ) {
-	if ( empty( $editor_settings['canUpdateBlockBindings'] ) ) {
-		$editor_settings['canUpdateBlockBindings'] = current_user_can( 'manage_options' );
+function gutenberg_add_can_update_block_bindings_editor_setting( $editor_settings, $block_editor_context ) {
+	if ( ! isset( $editor_settings['canUpdateBlockBindings'] ) ) {
+		$editor_settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', $block_editor_context );
 	}
 	return $editor_settings;
 }
 
-add_filter( 'block_editor_settings_all', 'gutenberg_add_can_update_block_bindings_editor_setting', 10 );
+add_filter( 'block_editor_settings_all', 'gutenberg_add_can_update_block_bindings_editor_setting', 10, 2 );
 
 /**
  * Add `label` to `register_meta`.
