@@ -113,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		style: {
 			...attributes?.style,
 			border: undefined,
+			color: undefined,
 		},
 	};
 
@@ -198,7 +199,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 			<div { ...useBlockProps() }>
 				<Disabled>
 					<ServerSideRender
-						skipBlockSupportAttributes
 						block="core/tag-cloud"
 						attributes={ serverSideAttributes }
 					/>
