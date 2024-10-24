@@ -65,11 +65,6 @@ const variations = [
 		attributes: { layout: { type: 'constrained' } },
 		isDefault: true,
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			! blockAttributes.layout ||
-			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default' ||
-			blockAttributes.layout?.type === 'constrained',
 		icon: group,
 	},
 	{
@@ -78,10 +73,7 @@ const variations = [
 		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' &&
-			( ! blockAttributes.layout?.orientation ||
-				blockAttributes.layout?.orientation === 'horizontal' ),
+		isActive: [ 'layout.type' ],
 		icon: row,
 		example,
 	},
@@ -91,9 +83,7 @@ const variations = [
 		description: __( 'Arrange blocks vertically.' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' &&
-			blockAttributes.layout?.orientation === 'vertical',
+		isActive: [ 'layout.type', 'layout.orientation' ],
 		icon: stack,
 		example,
 	},
@@ -103,8 +93,7 @@ const variations = [
 		description: __( 'Arrange blocks in a grid.' ),
 		attributes: { layout: { type: 'grid' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'grid',
+		isActive: [ 'layout.type' ],
 		icon: grid,
 		example,
 	},
