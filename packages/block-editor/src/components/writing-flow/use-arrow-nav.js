@@ -169,6 +169,8 @@ export default function useArrowNav() {
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.
 		let verticalRect;
+		// Track when user reaches edge.
+		let edgeHasFocus = false;
 
 		function onMouseDown() {
 			verticalRect = null;
@@ -206,6 +208,7 @@ export default function useArrowNav() {
 			const { defaultView } = ownerDocument;
 
 			if ( ! isNav ) {
+				edgeHasFocus = false;
 				return;
 			}
 
@@ -233,13 +236,19 @@ export default function useArrowNav() {
 				return;
 			}
 
+			// If no longer on an edge, let's unset our edge focus tracker.
+			if ( ! isNavEdge( target, isReverse ) ) {
+				edgeHasFocus = false;
+				return;
+			}
+
 			// Abort if our current target is not a candidate for navigation
 			// (e.g. preserve native input behaviors).
 			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 				return;
 			}
 
-			// When presing any key other than up or down, the initial vertical
+			// When pressing any key other than up or down, the initial vertical
 			// position must ALWAYS be reset. The vertical position is saved so
 			// it can be restored as well as possible on sebsequent vertical
 			// arrow key presses. It may not always be possible to restore the
@@ -282,14 +291,21 @@ export default function useArrowNav() {
 				);
 
 				if ( closestTabbable ) {
-					placeCaretAtVerticalEdge(
-						closestTabbable,
-						// When Alt is pressed, place the caret at the furthest
-						// horizontal edge and the furthest vertical edge.
-						altKey ? ! isReverse : isReverse,
-						altKey ? undefined : verticalRect
-					);
-					event.preventDefault();
+					// User currently has focus on the edge. The next arrow press will move focus. This is currently modeled after how Slack's implementation operates with confirmation up arrow key press to leave the message compose field.
+					if ( edgeHasFocus ) {
+						placeCaretAtVerticalEdge(
+							closestTabbable,
+							// When Alt is pressed, place the caret at the furthest
+							// horizontal edge and the furthest vertical edge.
+							altKey ? ! isReverse : isReverse,
+							altKey ? undefined : verticalRect
+						);
+						event.preventDefault();
+						// Important to unset our focus tracker now that block has changed.
+						edgeHasFocus = false;
+					} else {
+						edgeHasFocus = true;
+					}
 				}
 			} else if (
 				isHorizontal &&
@@ -302,8 +318,16 @@ export default function useArrowNav() {
 					isReverseDir,
 					node
 				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-				event.preventDefault();
+
+				// User currently has focus on the edge. The next arrow press will move focus. This is currently modeled after how Slack's implementation operates with confirmation up arrow key press to leave the message compose field.
+				if ( edgeHasFocus ) {
+					placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+					event.preventDefault();
+					// Important to unset our focus tracker now that block has changed.
+					edgeHasFocus = false;
+				} else {
+					edgeHasFocus = true;
+				}
 			}
 		}
 
