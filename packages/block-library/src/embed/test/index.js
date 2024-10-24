@@ -194,6 +194,42 @@ describe( 'utils', () => {
 				} )
 			);
 		} );
+
+		it( 'should not override default values of YouTube embed block, except user-editable attributes, when upgrading from Facebook embed block', () => {
+			const userEditedAttributes = {
+				allowResponsive: false,
+				caption: 'Facebook embed',
+			};
+			const facebookEmbedAttributes = {
+				...userEditedAttributes,
+				previewable: false,
+				providerNameSlug: 'facebook',
+				responsive: true,
+			};
+			const youtubeURL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+			const expectedYoutubeEmbedAttributes = {
+				...userEditedAttributes,
+				previewable: true,
+				providerNameSlug: 'youtube',
+				responsive: true,
+			};
+
+			const result = createUpgradedEmbedBlock( {
+				attributes: {
+					...facebookEmbedAttributes,
+					url: youtubeURL,
+				},
+			} );
+
+			expect( result ).toEqual(
+				expect.objectContaining( {
+					name: DEFAULT_EMBED_BLOCK,
+					attributes: expect.objectContaining(
+						expectedYoutubeEmbedAttributes
+					),
+				} )
+			);
+		} );
 	} );
 	describe( 'getEmbedInfoByProvider', () => {
 		it( 'should return embed info from existent variation', () => {
