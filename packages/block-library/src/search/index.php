@@ -96,7 +96,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		}
 		// Instant search is only available when using the enhanced pagination.
 		if ( $enhanced_pagination ) {
-			$input->set_attribute( 'data-wp-bind--value', 'state.search' );
+			$input->set_attribute( 'data-wp-bind--value', 'context.search' );
 			$input->set_attribute( 'data-wp-on-async--input', 'actions.updateSearch' );
 		}
 	}
@@ -178,15 +178,6 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$form_directives = 'data-wp-interactive="core/search"';
 	}
 
-	// Adding wp_interactivity_state for the search block.
-	if ( $enhanced_pagination ) {
-		wp_interactivity_state(
-			'core/search',
-			array(
-				'search' => isset( $_GET['instant-search'] ) ? $_GET['instant-search'] : '',
-			)
-		);
-	}
 
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
@@ -197,12 +188,17 @@ function render_block_core_search( $attributes, $content, $block ) {
 				'inputId'                       => $input_id,
 				'ariaLabelExpanded'             => $aria_label_expanded,
 				'ariaLabelCollapsed'            => $aria_label_collapsed,
+				'search'                        => empty( $_GET[ 'instant-search-' . $block->context['queryId'] ] ) ? '' : sanitize_text_field( $_GET[ 'instant-search-' . $block->context['queryId'] ] ),
+				'isInherited'                   => isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'],
+				'queryId'                       => $block->context['queryId'],
 			)
 		);
-		$form_directives     .= $form_context .
-		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
-		 data-wp-on-async--keydown="actions.handleSearchKeydown"
-		 data-wp-on-async--focusout="actions.handleSearchFocusout"
+		$form_directives    = '
+		 	data-wp-interactive="core/search"'
+			. $form_context .
+			'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
+			data-wp-on-async--keydown="actions.handleSearchKeydown"
+			data-wp-on-async--focusout="actions.handleSearchFocusout"
 		';
 	}
 
