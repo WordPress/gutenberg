@@ -301,18 +301,20 @@ function ShadowEditor( { shadow, onChange } ) {
 	const shadowParts = useMemo( () => getShadowParts( shadow ), [ shadow ] );
 
 	const onChangeShadowPart = ( index, part ) => {
-		shadowParts[ index ] = part;
-		onChange( shadowParts.join( ', ' ) );
+		const newShadowParts = shadowParts.map( ( p, i ) =>
+			i === index ? part : p
+		);
+		onChange( newShadowParts.join( ', ' ) );
 	};
 
 	const onAddShadowPart = () => {
-		shadowParts.push( defaultShadow );
-		onChange( shadowParts.join( ', ' ) );
+		const newShadowParts = [ ...shadowParts, defaultShadow ];
+		onChange( newShadowParts.join( ', ' ) );
 	};
 
 	const onRemoveShadowPart = ( index ) => {
-		shadowParts.splice( index, 1 );
-		onChange( shadowParts.join( ', ' ) );
+		const newShadowParts = shadowParts.filter( ( p, i ) => i !== index );
+		onChange( newShadowParts.join( ', ' ) );
 	};
 
 	return (
