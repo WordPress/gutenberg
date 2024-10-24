@@ -108,7 +108,6 @@ function gutenberg_generate_block_templates_export_file() {
 		$replacement              = '"file:./assets/$1"';
 		$replace_pattern          = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
 		$theme_json_encoded       = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
-		$is_assets_folder_created = false;
 
 		// Add each image to the assets directory.
 		foreach ( $matches[1] as $file ) {
@@ -117,12 +116,9 @@ function gutenberg_generate_block_templates_export_file() {
 			if ( ! $file_content ) {
 				continue;
 			}
-			if ( ! $is_assets_folder_created ) {
-				if ( $zip->locateName( 'assets' ) === false ) {
-					// Directory doesn't exist, so add it
-					$zip->addEmptyDir( 'assets' );
-				}
-				$is_assets_folder_created = true;
+			if ( $zip->locateName( 'assets' ) === false ) {
+				// Directory doesn't exist, so add it
+				$zip->addEmptyDir( 'assets' );
 			}
 			$zip->addFromString(
 				'assets/' . basename( parse_url( $file, PHP_URL_PATH ) ),
