@@ -61,12 +61,18 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-const scrollToSection = ( anchor, iframe ) => {
-	if ( ! iframe ) {
+/**
+ * Scrolls to a section within an iframe.
+ *
+ * @param {string}            anchorId The id of the element to scroll to.
+ * @param {HTMLIFrameElement} iframe   The target iframe.
+ */
+const scrollToSection = ( anchorId, iframe ) => {
+	if ( ! iframe || ! iframe?.contentDocument ) {
 		return;
 	}
-	const frameWindow = iframe.contentWindow;
-	const element = frameWindow.document.getElementById( anchor );
+
+	const element = iframe.contentDocument.getElementById( anchorId );
 	if ( element ) {
 		element.scrollIntoView( {
 			behavior: 'smooth',
@@ -74,6 +80,14 @@ const scrollToSection = ( anchor, iframe ) => {
 	}
 };
 
+/**
+ * Parses a Block Editor navigation path to extract the block name and
+ * build a style book navigation path. The object can be extended to include a category,
+ * representing a style book tab/section.
+ *
+ * @param {string} path An internal Block Editor navigation path.
+ * @return {null|{block: string}} An object containing the example to navigate to.
+ */
 const getStyleBookNavigationFromPath = ( path ) => {
 	if ( path && typeof path === 'string' && path.includes( '/blocks/' ) ) {
 		const block = decodeURIComponent( path.split( '/blocks/' )[ 1 ] );
