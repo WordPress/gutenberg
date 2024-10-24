@@ -8,6 +8,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 
+const CONTENT_ONLY_RICH_TEXT_BLOCKS = [ 'core/paragraph', 'core/heading' ];
+
 /**
  * Returns props for the selected block tools and empty block inserter.
  *
@@ -24,7 +26,11 @@ export default function useSelectedBlockToolProps( clientId ) {
 				getBlockInsertionPoint,
 				getBlockOrder,
 				hasMultiSelection,
+				getSelectionStart,
+				getSelectionEnd,
 				getLastMultiSelectedBlockClientId,
+				getBlockEditingMode,
+				getBlockName,
 			} = select( blockEditorStore );
 
 			const blockParentsClientIds = getBlockParents( clientId );
@@ -50,13 +56,24 @@ export default function useSelectedBlockToolProps( clientId ) {
 					order[ insertionPoint.index ] === clientId;
 			}
 
+			const _hasMultiSelection = hasMultiSelection();
+
 			return {
 				capturingClientId,
 				isInsertionPointVisible,
-				lastClientId: hasMultiSelection()
+				lastClientId: _hasMultiSelection
 					? getLastMultiSelectedBlockClientId()
 					: null,
 				rootClientId: getBlockRootClientId( clientId ),
+				isContentOnlyRichTextBlock:
+					getBlockEditingMode( clientId ) === 'contentOnly' &&
+					CONTENT_ONLY_RICH_TEXT_BLOCKS.includes(
+						getBlockName( clientId )
+					),
+				// Maybe rely on documentHasTextSelection instead?
+				hasTextSelection:
+					! _hasMultiSelection &&
+					getSelectionStart().offset !== getSelectionEnd().offset,
 			};
 		},
 		[ clientId ]
