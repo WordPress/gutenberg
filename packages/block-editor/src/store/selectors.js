@@ -1660,130 +1660,143 @@ const isBlockVisibleInTheInserter = (
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
-const canInsertBlockTypeUnmemoized = (
-	state,
-	blockName,
-	rootClientId = null
-) => {
-	if ( ! isBlockVisibleInTheInserter( state, blockName ) ) {
-		return false;
-	}
+const canInsertBlockTypeUnmemoized = createRegistrySelector(
+	( select ) =>
+		( state, blockName, rootClientId = null ) => {
+			if ( ! isBlockVisibleInTheInserter( state, blockName ) ) {
+				return false;
+			}
 
-	let blockType;
-	if ( blockName && 'object' === typeof blockName ) {
-		blockType = blockName;
-		blockName = blockType.name;
-	} else {
-		blockType = getBlockType( blockName );
-	}
+			let blockType;
+			if ( blockName && 'object' === typeof blockName ) {
+				blockType = blockName;
+				blockName = blockType.name;
+			} else {
+				blockType = getBlockType( blockName );
+			}
 
-	const isLocked = !! getTemplateLock( state, rootClientId );
-	if ( isLocked ) {
-		return false;
-	}
+			const isLocked = !! getTemplateLock( state, rootClientId );
+			if ( isLocked ) {
+				return false;
+			}
 
-	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
-	if ( _isSectionBlock ) {
-		return false;
-	}
+			const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+			if ( _isSectionBlock ) {
+				return false;
+			}
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const hasContentChild = () =>
+				getBlockOrder( state, rootClientId ).some( ( childId ) => {
+					const childName = getBlockName( state, childId );
+					return hasContentRoleAttribute( childName );
+				} );
+			if (
+				getBlockEditingMode( state, rootClientId ?? '' ) ===
+					'disabled' &&
+				! hasContentChild()
+			) {
+				return false;
+			}
 
-	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
-		return false;
-	}
+			const parentBlockListSettings = getBlockListSettings(
+				state,
+				rootClientId
+			);
 
-	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+			// The parent block doesn't have settings indicating it doesn't support
+			// inner blocks, return false.
+			if ( rootClientId && parentBlockListSettings === undefined ) {
+				return false;
+			}
 
-	// The parent block doesn't have settings indicating it doesn't support
-	// inner blocks, return false.
-	if ( rootClientId && parentBlockListSettings === undefined ) {
-		return false;
-	}
+			const parentName = getBlockName( state, rootClientId );
+			const parentBlockType = getBlockType( parentName );
 
-	const parentName = getBlockName( state, rootClientId );
-	const parentBlockType = getBlockType( parentName );
+			// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
+			const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
+			let hasParentAllowedBlock = checkAllowList(
+				parentAllowedChildBlocks,
+				blockName
+			);
 
-	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
-	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
-	let hasParentAllowedBlock = checkAllowList(
-		parentAllowedChildBlocks,
-		blockName
-	);
+			// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
+			if ( hasParentAllowedBlock !== false ) {
+				const parentAllowedBlocks =
+					parentBlockListSettings?.allowedBlocks;
+				const hasParentListAllowedBlock = checkAllowList(
+					parentAllowedBlocks,
+					blockName
+				);
+				// Never downgrade the result from `true` to `null`
+				if ( hasParentListAllowedBlock !== null ) {
+					hasParentAllowedBlock = hasParentListAllowedBlock;
+				}
+			}
 
-	// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
-	if ( hasParentAllowedBlock !== false ) {
-		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
-		const hasParentListAllowedBlock = checkAllowList(
-			parentAllowedBlocks,
-			blockName
-		);
-		// Never downgrade the result from `true` to `null`
-		if ( hasParentListAllowedBlock !== null ) {
-			hasParentAllowedBlock = hasParentListAllowedBlock;
+			const blockAllowedParentBlocks = blockType.parent;
+			const hasBlockAllowedParent = checkAllowList(
+				blockAllowedParentBlocks,
+				parentName
+			);
+
+			let hasBlockAllowedAncestor = true;
+			const blockAllowedAncestorBlocks = blockType.ancestor;
+			if ( blockAllowedAncestorBlocks ) {
+				const ancestors = [
+					rootClientId,
+					...getBlockParents( state, rootClientId ),
+				];
+
+				hasBlockAllowedAncestor = ancestors.some(
+					( ancestorClientId ) =>
+						checkAllowList(
+							blockAllowedAncestorBlocks,
+							getBlockName( state, ancestorClientId )
+						)
+				);
+			}
+
+			const canInsert =
+				hasBlockAllowedAncestor &&
+				( ( hasParentAllowedBlock === null &&
+					hasBlockAllowedParent === null ) ||
+					hasParentAllowedBlock === true ||
+					hasBlockAllowedParent === true );
+
+			if ( ! canInsert ) {
+				return canInsert;
+			}
+
+			/**
+			 * This filter is an ad-hoc solution to prevent adding template parts inside post content.
+			 * Conceptually, having a filter inside a selector is bad pattern so this code will be
+			 * replaced by a declarative API that doesn't the following drawbacks:
+			 *
+			 * Filters are not reactive: Upon switching between "template mode" and non "template mode",
+			 * the filter and selector won't necessarily be executed again. For now, it doesn't matter much
+			 * because you can't switch between the two modes while the inserter stays open.
+			 *
+			 * Filters are global: Once they're defined, they will affect all editor instances and all registries.
+			 * An ideal API would only affect specific editor instances.
+			 */
+			return applyFilters(
+				'blockEditor.__unstableCanInsertBlockType',
+				canInsert,
+				blockType,
+				rootClientId,
+				{
+					// Pass bound selectors of the current registry. If we're in a nested
+					// context, the data will differ from the one selected from the root
+					// registry.
+					getBlock: getBlock.bind( null, state ),
+					getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
+						null,
+						state
+					),
+				}
+			);
 		}
-	}
-
-	const blockAllowedParentBlocks = blockType.parent;
-	const hasBlockAllowedParent = checkAllowList(
-		blockAllowedParentBlocks,
-		parentName
-	);
-
-	let hasBlockAllowedAncestor = true;
-	const blockAllowedAncestorBlocks = blockType.ancestor;
-	if ( blockAllowedAncestorBlocks ) {
-		const ancestors = [
-			rootClientId,
-			...getBlockParents( state, rootClientId ),
-		];
-
-		hasBlockAllowedAncestor = ancestors.some( ( ancestorClientId ) =>
-			checkAllowList(
-				blockAllowedAncestorBlocks,
-				getBlockName( state, ancestorClientId )
-			)
-		);
-	}
-
-	const canInsert =
-		hasBlockAllowedAncestor &&
-		( ( hasParentAllowedBlock === null &&
-			hasBlockAllowedParent === null ) ||
-			hasParentAllowedBlock === true ||
-			hasBlockAllowedParent === true );
-
-	if ( ! canInsert ) {
-		return canInsert;
-	}
-
-	/**
-	 * This filter is an ad-hoc solution to prevent adding template parts inside post content.
-	 * Conceptually, having a filter inside a selector is bad pattern so this code will be
-	 * replaced by a declarative API that doesn't the following drawbacks:
-	 *
-	 * Filters are not reactive: Upon switching between "template mode" and non "template mode",
-	 * the filter and selector won't necessarily be executed again. For now, it doesn't matter much
-	 * because you can't switch between the two modes while the inserter stays open.
-	 *
-	 * Filters are global: Once they're defined, they will affect all editor instances and all registries.
-	 * An ideal API would only affect specific editor instances.
-	 */
-	return applyFilters(
-		'blockEditor.__unstableCanInsertBlockType',
-		canInsert,
-		blockType,
-		rootClientId,
-		{
-			// Pass bound selectors of the current registry. If we're in a nested
-			// context, the data will differ from the one selected from the root
-			// registry.
-			getBlock: getBlock.bind( null, state ),
-			getBlockParentsByBlockName: getBlockParentsByBlockName.bind(
-				null,
-				state
-			),
-		}
-	);
-};
+);
 
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
@@ -1794,11 +1807,7 @@ const canInsertBlockTypeUnmemoized = (
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
-export const canInsertBlockType = createSelector(
-	canInsertBlockTypeUnmemoized,
-	( state, blockName, rootClientId ) =>
-		getInsertBlockTypeDependants( state, rootClientId )
-);
+export const canInsertBlockType = canInsertBlockTypeUnmemoized;
 
 /**
  * Determines if the given blocks are allowed to be inserted into the block
