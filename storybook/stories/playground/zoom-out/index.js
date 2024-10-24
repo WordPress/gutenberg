@@ -50,7 +50,7 @@ export default function EditorZoomOut( { zoomLevel } ) {
 		<div
 			className="editor-zoom-out"
 			onKeyDown={ ( event ) => event.stopPropagation() }
-			style={ { background: '#ddd', border: '1px solid gray' } }
+			style={ { border: '1px solid gray' } }
 		>
 			<BlockEditorProvider
 				value={ blocks }

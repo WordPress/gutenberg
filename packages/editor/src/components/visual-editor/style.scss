@@ -1,7 +1,18 @@
 .editor-visual-editor {
 	position: relative;
 	display: flex;
+
+	// This duplicates the iframe background but it's necessary in some situations
+	// when the iframe doesn't cover the whole canvas
+	// like the "focused entities".
 	background-color: $gray-300;
+
+	// This overrides the iframe background since it's applied again here
+	// It also prevents some style glitches if `editor-visual-editor`
+	// like when hovering the preview in the site editor.
+	iframe[name="editor-canvas"] {
+		background-color: transparent;
+	}
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
