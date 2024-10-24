@@ -418,7 +418,7 @@ An organized collection of items displayed in a specific order. ([Source](https:
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
-## List item
+## List Item
 
 An individual item within a list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
 
@@ -534,7 +534,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 -	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
-## Pattern placeholder
+## Pattern Placeholder
 
 Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
@@ -672,7 +672,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** prefix, separator, suffix, term, textAlign
 
-## Time To Read
+## Time to Read
 
 Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
@@ -718,7 +718,7 @@ An advanced block that allows displaying post types based on different query par
 -	**Supports:** align (full, wide), interactivity, layout, ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
-## No results
+## No Results
 
 Contains the block elements used to render content when no query results are found. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-no-results))
 
