@@ -232,7 +232,5 @@ function useOnClickOutside(
 			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'touchstart', listener );
 		};
-		// `ref` is a ref object and should not be included in a
-		// hook's dependency list.
-	}, [ handler ] );
+	}, [ handler, ref ] );
 }
