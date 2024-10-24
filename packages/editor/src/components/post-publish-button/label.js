@@ -63,7 +63,7 @@ export default function PublishButtonLabel() {
 		! isAutosaving
 	) {
 		/* translators: button label text should, if possible, be under 16 characters. */
-		return __( 'Saving…' );
+		return __( 'Updating…' );
 	}
 	if ( ! hasPublishAction ) {
 		// TODO: this is because "Submit for review" string is too long in some languages.
@@ -79,7 +79,7 @@ export default function PublishButtonLabel() {
 			! [ 'future', 'publish' ].includes( postStatus ) ) ||
 		( ! postStatusHasChanged && postStatus === 'future' )
 	) {
-		return __( 'Save' );
+		return __( 'Update' );
 	}
 	if ( isBeingScheduled ) {
 		return __( 'Schedule' );
