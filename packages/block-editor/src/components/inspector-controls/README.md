@@ -221,3 +221,22 @@ function MyBlockEdit( { attributes, setAttributes } ) {
 	);
 }
 ```
+
+## Inspector Control Groups
+
+You can define which `InspectorControls` group to render controls into via the `group` prop.
+
+Styles-related controls that do not fit conceptually under the block support panels (border, color, dimensions, typography, etc.) can be included under the "Appearance" tab in the Block Inspector.
+
+```jsx
+<InspectorControls group="styles">
+  // Add your custom styles-related controls here.
+</InspectorControls>
+```
+
+## Block Inspector Tabs vs InspectorControl Groups
+
+Each Block Inspector tab is responsible for displaying a subset of the available Inspector Controls groups.
+
+- **Settings Tab**: Includes any items rendered into the `default`, `settings` (alias for default), `advanced`, or `position` groups.
+- **Appearance Tab**: Renders block support groups such as `border`, `color`, `dimensions`, and `typography`. It also includes the `styles` group, which offers a means of displaying items under the Appearance tab but outside of the block support.
