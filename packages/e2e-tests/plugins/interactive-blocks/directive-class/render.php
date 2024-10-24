@@ -6,7 +6,10 @@
  */
 ?>
 
-<div data-wp-interactive='{"namespace": "directive-class"}'>
+<div
+	data-wp-interactive='{"namespace": "directive-class"}'
+	data-wp-context='{ "value": false }'
+>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"
 		data-testid="toggle trueValue"
@@ -19,6 +22,13 @@
 		data-testid="toggle falseValue"
 	>
 		Toggle falseValue
+	</button>
+
+	<button
+		data-wp-on--click="actions.toggleContextValue"
+		data-testid="toggle context value"
+	>
+		Toggle context value
 	</button>
 
 	<div
@@ -59,19 +69,11 @@
 		data-testid="can toggle class when class attribute is missing"
 	></div>
 
-	<div data-wp-context='{ "value": false }'>
-		<div
-			class="foo"
-			data-wp-class--foo="context.value"
-			data-testid="can use context values"
-		></div>
-		<button
-			data-wp-on--click="actions.toggleContextValue"
-			data-testid="toggle context false value"
-		>
-			Toggle context value
-		</button>
-	</div>
+	<div
+		class="foo"
+		data-wp-class--foo="context.value"
+		data-testid="can use context values"
+	></div>
 
 	<div
 		data-wp-class--block__element--modifier="state.trueValue"
@@ -83,16 +85,18 @@
 		data-testid="can use classes with several dashes"
 	></div>
 
-	<div data-wp-context='{ "value": false }'>
-		<div
-			data-wp-class--default="context.value"
-			data-testid="class name default"
-		></div>
-		<button
-			data-wp-on--click="actions.toggleContextValue"
-			data-testid="toggle class name default"
-		>
-			Toggle context val
-		</button>
-	</div>
+	<div
+		data-wp-class--default="context.value"
+		data-testid="class name default"
+	></div>
+
+	<div
+		data-wp-class--#[^+-]$="context.value"
+		data-testid="class name no-aplhanumeric"
+	></div>
+
+	<div
+		data-wp-class--class-name-attribute&#61;"&#70;&#79;&#79;&#32;bar&quot;="context.value"
+		data-testid="class name HTML entities"
+	></div>
 </div>

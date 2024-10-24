@@ -355,25 +355,65 @@ export default () => {
 	// data-wp-class--[classname]
 	directive(
 		'class',
-		( { directives: { class: classNames }, element, evaluate } ) => {
-			classNames
+		( { directives: { class: classDirectives }, element, evaluate } ) => {
+			// Create elements for processing class attribute changes.
+			const attributeParserEl = document.createElement( 'div' );
+			const classProxyElement = document.createElement( 'div' );
+
+			classDirectives
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
-					const className = entry.suffix;
 					const result = evaluate( entry );
-					const currentClass = element.props.class || '';
-					const classFinder = new RegExp(
-						`(^|\\s)${ className }(\\s|$)`,
-						'g'
-					);
+					const rawClassName = entry.suffix;
+
+					// Parse the class name to process HTML entities like the HTML Processor would.
+					attributeParserEl.innerHTML = `<div class="${ rawClassName.replaceAll(
+						'"',
+						'&quot;'
+					) }"></div>`;
+					const classNames = [
+						...attributeParserEl.firstElementChild!.classList,
+					];
+
+					// If the element already has a class, set it on the proxy element
+					// so we can manipulate it.
+					if ( 'string' === typeof element.props.class ) {
+						classProxyElement.className = element.props.class;
+					} else {
+						classProxyElement.removeAttribute( 'class' );
+					}
+
+					let modified = false;
+
+					// If the result is false it means we need to remove the class from
+					// the element.
 					if ( ! result ) {
-						element.props.class = currentClass
-							.replace( classFinder, ' ' )
-							.trim();
-					} else if ( ! classFinder.test( currentClass ) ) {
-						element.props.class = currentClass
-							? `${ currentClass } ${ className }`
-							: className;
+						for ( const className of classNames ) {
+							if (
+								classProxyElement.classList.contains(
+									className
+								)
+							) {
+								classProxyElement.classList.remove( className );
+								modified = true;
+							}
+						}
+					} else {
+						// Otherwise, if the result is true and the class is not already
+						// on the element, add it.
+						for ( const className of classNames ) {
+							if (
+								! classProxyElement.classList.contains(
+									className
+								)
+							) {
+								classProxyElement.classList.add( className );
+								modified = true;
+							}
+						}
+					}
+					if ( modified ) {
+						element.props.class = classProxyElement.className;
 					}
 
 					useInit( () => {
@@ -383,13 +423,17 @@ export default () => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							(
-								element.ref as RefObject< HTMLElement >
-							 ).current!.classList.remove( className );
+							for ( const className of classNames ) {
+								(
+									element.ref as RefObject< HTMLElement >
+								 ).current!.classList.remove( className );
+							}
 						} else {
-							(
-								element.ref as RefObject< HTMLElement >
-							 ).current!.classList.add( className );
+							for ( const className of classNames ) {
+								(
+									element.ref as RefObject< HTMLElement >
+								 ).current!.classList.add( className );
+							}
 						}
 					} );
 				} );
