@@ -24,6 +24,11 @@
 	.block-editor-default-block-appender__content {
 		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
 		opacity: 0.62;
+
+		// The following prevent user agent styles from applying margins to the appender's inner paragraph.
+		// Prevents Layout shift in the editor when single post's content block's inner block content width is unset.
+		margin-block-start: 0;
+		margin-block-end: 0;
 	}
 
 	// In "constrained" layout containers, the first and last paragraphs have their margins zeroed out.
