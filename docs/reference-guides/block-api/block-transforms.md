@@ -246,7 +246,7 @@ We want to tell the editor to allow the inner `h2` and `p` elements. We do this 
 a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on conversion.
 
 ```js
-schema = ({ phrasingContentSchema }) => {
+schema: ( { phrasingContentSchema } ) => ( {
     div: {
         required: true,
         attributes: [ 'data-post-id' ],
@@ -255,7 +255,7 @@ schema = ({ phrasingContentSchema }) => {
             p: { children: phrasingContentSchema }
         }
     }
-}
+} )
 ```
 
 When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
