@@ -1,0 +1,105 @@
+import { Meta } from '@storybook/blocks';
+import { TokensTable } from './components.tsx';
+
+<Meta title="Tokens/Radius" name="page" />
+
+# Radius
+
+This document outlines the various tokens relating to radius in the WordPress design system.
+
+## Values
+
+Tokens can be used in different ways, but regardless of which method is used, each one is meant to be used as the value of the CSS `border-radius` property, and references the following values:
+
+<TokensTable
+	tokenCategory="radius"
+	tokens={ [
+		{
+			name: 'Extra small',
+			valueShow: '1px',
+			valueCode: '1px',
+		},
+		{
+			name: 'Small',
+			valueShow: '2px',
+			valueCode: '2px',
+		},
+		{
+			name: 'Medium',
+			valueShow: '4px',
+			valueCode: '4px',
+		},
+		{
+			name: 'Large',
+			valueShow: '8px',
+			valueCode: '8px',
+		},
+		{
+			name: 'Full',
+			valueShow: '9999px',
+			valueCode: '9999px',
+		},
+		{
+			name: 'Round',
+			valueShow: '100%',
+			valueCode: '100%',
+		},
+	] }
+	applyTokenStyle={ ( valueCode ) => ( {
+		borderRadius: valueCode,
+		border: '1px solid #1e1e1e',
+	} ) }
+/>
+
+## CSS tokens
+
+Radius tokens are defined as SASS variables:
+
+-   `$radius-x-small`
+-   `$radius-small`
+-   `$radius-medium`
+-   `$radius-large`
+-   `$radius-full`
+-   `$radius-round`
+
+They can be used like so:
+
+```css
+.radius-extra-small {
+	border-radius: $radius-x-small;
+}
+.radius-small {
+	border-radius: $radius-small;
+}
+.radius-medium {
+	border-radius: $radius-medium;
+}
+.radius-large {
+	border-radius: $radius-large;
+}
+.radius-full {
+	border-radius: $radius-full;
+}
+.radius-round {
+	border-radius: $radius-round;
+}
+```
+
+## JS tokens
+
+When working in the `@wordpress/components` package, the radius tokens can also be consumed as JavaScript variables via the `CONFIG` object found in the `packages/components/src/utils/index.js` file:
+
+-   `CONFIG.radiusXSmall`
+-   `CONFIG.radiusSmall`
+-   `CONFIG.radiusMedium`
+-   `CONFIG.radiusLarge`
+-   `CONFIG.radiusFull`
+-   `CONFIG.radiusRound`
+
+```js
+// Note: the `CONFIG` object is only available within the `@wordpress/components` package.
+import { CONFIG } from '../utils';
+
+// Later in the code:
+border-radius: ${ CONFIG.radiusXSmall };
+```

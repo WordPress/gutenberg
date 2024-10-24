@@ -11,18 +11,26 @@ import {
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	BlockList,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	useSettings,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
-import { useMemo, useState, memo, useContext } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	memo,
+	useContext,
+	useEffect,
+} from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
@@ -51,6 +59,81 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
+/**
+ * Retrieves colors, gradients, and duotone filters from Global Styles.
+ * The inclusion of default (Core) palettes is controlled by the relevant
+ * theme.json property e.g. defaultPalette, defaultGradients, defaultDuotone.
+ *
+ * @return {Object} Object containing properties for each type of palette.
+ */
+function useMultiOriginPalettes() {
+	const { colors, gradients } = useMultipleOriginColorsAndGradients();
+
+	// Add duotone filters to the palettes data.
+	const [
+		shouldDisplayDefaultDuotones,
+		customDuotones,
+		themeDuotones,
+		defaultDuotones,
+	] = useSettings(
+		'color.defaultDuotone',
+		'color.duotone.custom',
+		'color.duotone.theme',
+		'color.duotone.default'
+	);
+
+	const palettes = useMemo( () => {
+		const result = { colors, gradients, duotones: [] };
+
+		if ( themeDuotones && themeDuotones.length ) {
+			result.duotones.push( {
+				name: _x(
+					'Theme',
+					'Indicates these duotone filters come from the theme.'
+				),
+				slug: 'theme',
+				duotones: themeDuotones,
+			} );
+		}
+
+		if (
+			shouldDisplayDefaultDuotones &&
+			defaultDuotones &&
+			defaultDuotones.length
+		) {
+			result.duotones.push( {
+				name: _x(
+					'Default',
+					'Indicates these duotone filters come from WordPress.'
+				),
+				slug: 'default',
+				duotones: defaultDuotones,
+			} );
+		}
+		if ( customDuotones && customDuotones.length ) {
+			result.duotones.push( {
+				name: _x(
+					'Custom',
+					'Indicates these doutone filters are created by the user.'
+				),
+				slug: 'custom',
+				duotones: customDuotones,
+			} );
+		}
+
+		return result;
+	}, [
+		colors,
+		gradients,
+		customDuotones,
+		themeDuotones,
+		defaultDuotones,
+		shouldDisplayDefaultDuotones,
+	] );
+
+	return palettes;
+}
+
 function StyleBook( {
 	enableResizing = true,
 	isSelected,
@@ -64,7 +147,8 @@ function StyleBook( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const [ examples ] = useState( getExamples );
+	const colors = useMultiOriginPalettes();
+	const [ examples, setExamples ] = useState( () => getExamples( colors ) );
 	const tabs = useMemo(
 		() =>
 			getTopLevelStyleBookCategories().filter( ( category ) =>
@@ -74,6 +158,12 @@ function StyleBook( {
 			),
 		[ examples ]
 	);
+
+	// Ensure color examples are kept in sync with Global Styles palette changes.
+	useEffect( () => {
+		setExamples( getExamples( colors ) );
+	}, [ colors ] );
+
 	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
@@ -274,6 +364,7 @@ const Examples = memo(
 							key={ example.name }
 							id={ `example-${ example.name }` }
 							title={ example.title }
+							content={ example.content }
 							blocks={ example.blocks }
 							isSelected={ isSelected( example.name ) }
 							onClick={ () => {
@@ -312,6 +403,7 @@ const Subcategory = ( { examples, isSelected, onSelect } ) => {
 				key={ example.name }
 				id={ `example-${ example.name }` }
 				title={ example.title }
+				content={ example.content }
 				blocks={ example.blocks }
 				isSelected={ isSelected( example.name ) }
 				onClick={ () => {
@@ -322,7 +414,9 @@ const Subcategory = ( { examples, isSelected, onSelect } ) => {
 	);
 };
 
-const Example = ( { id, title, blocks, isSelected, onClick } ) => {
+const disabledExamples = [ 'example-duotones' ];
+
+const Example = ( { id, title, blocks, isSelected, onClick, content } ) => {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -342,12 +436,20 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		[ blocks ]
 	);
 
+	const disabledProps = disabledExamples.includes( id )
+		? {
+				disabled: true,
+				accessibleWhenDisabled: true,
+		  }
+		: {};
+
 	return (
 		<div role="row">
 			<div role="gridcell">
 				<Composite.Item
 					className={ clsx( 'edit-site-style-book__example', {
 						'is-selected': isSelected,
+						'is-disabled-example': !! disabledProps?.disabled,
 					} ) }
 					id={ id }
 					aria-label={ sprintf(
@@ -358,6 +460,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 					render={ <div /> }
 					role="button"
 					onClick={ onClick }
+					{ ...disabledProps }
 				>
 					<span className="edit-site-style-book__example-title">
 						{ title }
@@ -367,12 +470,17 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 						aria-hidden
 					>
 						<Disabled className="edit-site-style-book__example-preview__content">
-							<ExperimentalBlockEditorProvider
-								value={ renderedBlocks }
-								settings={ settings }
-							>
-								<BlockList renderAppender={ false } />
-							</ExperimentalBlockEditorProvider>
+							{ content ? (
+								content
+							) : (
+								<ExperimentalBlockEditorProvider
+									value={ renderedBlocks }
+									settings={ settings }
+								>
+									<EditorStyles />
+									<BlockList renderAppender={ false } />
+								</ExperimentalBlockEditorProvider>
+							) }
 						</Disabled>
 					</div>
 				</Composite.Item>
