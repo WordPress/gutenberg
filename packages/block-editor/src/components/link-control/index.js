@@ -122,8 +122,8 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
-	searchInputLabel,
-	searchInputPlaceholder,
+	searchInputLabel = null,
+	searchInputPlaceholder = null,
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
