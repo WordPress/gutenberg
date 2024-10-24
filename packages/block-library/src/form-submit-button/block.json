@@ -4,7 +4,7 @@
 	"__experimental": true,
 	"name": "core/form-submit-button",
 	"title": "Form Submit Button",
-	"category": "common",
+	"category": "design",
 	"icon": "button",
 	"ancestor": [ "core/form" ],
 	"allowedBlocks": [ "core/buttons", "core/button" ],

@@ -4,7 +4,7 @@
 	"__experimental": true,
 	"name": "core/form-input",
 	"title": "Input Field",
-	"category": "common",
+	"category": "design",
 	"ancestor": [ "core/form" ],
 	"description": "The basic building block for forms.",
 	"keywords": [ "input", "form" ],
