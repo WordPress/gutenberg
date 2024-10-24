@@ -17,3 +17,9 @@ exports[`Spacer block transforms to Group block 1`] = `
 <!-- /wp:spacer --></div>
 <!-- /wp:group -->"
 `;
+
+exports[`Spacer block transforms to Separator block 1`] = `
+"<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->"
+`;
