@@ -191,3 +191,5 @@ add_action( 'enqueue_block_editor_assets', function() {
 	wp_add_inline_script( 'wp-widgets', 'wp.widgets.registerLegacyWidgetBlock()' );
 } );
 ```
+
+To load the styles and scripts on the editor for the Legacy Widget block, it's recommended to use constructore of the widget registration class or a widget method. It will ensure style and script being loaded on the iFrame as well.
