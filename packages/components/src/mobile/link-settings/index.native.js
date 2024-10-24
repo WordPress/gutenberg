@@ -101,6 +101,7 @@ function LinkSettings( {
 		if ( onHandleClosingBottomSheet ) {
 			onHandleClosingBottomSheet( onCloseSettingsSheet );
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
 
 	useEffect( () => {
@@ -112,6 +113,7 @@ function LinkSettings( {
 		if ( url !== urlInputValue ) {
 			setUrlInputValue( url || '' );
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ url ] );
 
 	useEffect( () => {
@@ -135,6 +137,7 @@ function LinkSettings( {
 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
 			onSetAttributes();
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ editorSidebarOpened, isVisible ] );
 
 	useEffect( () => {
@@ -147,6 +150,7 @@ function LinkSettings( {
 				url: prependHTTP( urlValue ),
 			} );
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ urlValue ] );
 
 	const onChangeURL = useCallback(
@@ -176,6 +180,7 @@ function LinkSettings( {
 				rel: linkRelInputValue,
 			} );
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
 	const onCloseSettingsSheet = useCallback( () => {
@@ -208,6 +213,7 @@ function LinkSettings( {
 				rel: updatedRel,
 			} );
 		},
+		// See https://github.com/WordPress/gutenberg/pull/41166
 		[ linkRelInputValue ]
 	);
 

@@ -35,6 +35,7 @@ const ColorSettingsMemo = memo(
 		useEffect( () => {
 			shouldEnableBottomSheetMaxHeight( true );
 			onHandleClosingBottomSheet( null );
+			// See https://github.com/WordPress/gutenberg/pull/41166
 		}, [] );
 		return (
 			<BottomSheet.NavigationContainer>

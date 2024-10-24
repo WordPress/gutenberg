@@ -28,6 +28,7 @@ const BottomSheetSubSheet = ( {
 		if ( showSheet ) {
 			setIsFullScreen( isFullScreen );
 		}
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ showSheet, isFullScreen ] );
 
 	return (

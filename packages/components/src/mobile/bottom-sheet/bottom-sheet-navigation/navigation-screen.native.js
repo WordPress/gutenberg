@@ -71,6 +71,8 @@ const BottomSheetNavigationScreen = ( {
 			 * callbacks triggered based upon which screen is currently active.
 			 *
 			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
+			 *
+			 * Also see https://github.com/WordPress/gutenberg/pull/41166.
 			 */
 		}, [] )
 	);
@@ -128,6 +130,7 @@ const BottomSheetNavigationScreen = ( {
 				</TouchableHighlight>
 			</ScrollView>
 		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [
 		children,
 		isFocused,

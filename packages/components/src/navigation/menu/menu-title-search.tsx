@@ -55,7 +55,8 @@ function MenuTitleSearch( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
+		// Not adding deps for now, as it would require either a larger refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44090
 	}, [ items, search ] );
 
 	const onClose = () => {

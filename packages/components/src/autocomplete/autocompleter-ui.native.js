@@ -69,6 +69,8 @@ export function getAutoCompleterUI( autocompleter ) {
 			} else if ( isVisible && text.length === 0 ) {
 				startAnimation( false );
 			}
+			// We want to avoid introducing unexpected side effects.
+			// See https://github.com/WordPress/gutenberg/pull/41820
 		}, [ items, isVisible, text ] );
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
@@ -109,6 +111,8 @@ export function getAutoCompleterUI( autocompleter ) {
 					}
 				} );
 			},
+			// We want to avoid introducing unexpected side effects.
+			// See https://github.com/WordPress/gutenberg/pull/41820
 			[ isVisible ]
 		);
 

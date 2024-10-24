@@ -262,14 +262,20 @@ function SandBox( {
 				checkMessageForResize
 			);
 		};
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
 	}, [] );
 
 	useEffect( () => {
 		trySandBox();
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
 	}, [ title, styles, scripts ] );
 
 	useEffect( () => {
 		trySandBox( true );
+		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44378
 	}, [ html, type ] );
 
 	return (

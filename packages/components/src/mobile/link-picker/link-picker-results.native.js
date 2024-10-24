@@ -75,6 +75,8 @@ export default function LinkPickerResults( {
 		return {
 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
 		};
+		// Not adding dependencies for now, to avoid introducing a regression
+		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
 	}, [] );
 
 	// Prevent setting state when unmounted.
@@ -87,6 +89,7 @@ export default function LinkPickerResults( {
 		setHasAllSuggestions( false );
 		setLinks( [ directEntry ] );
 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ query ] );
 
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );

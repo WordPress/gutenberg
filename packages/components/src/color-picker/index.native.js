@@ -107,6 +107,10 @@ function ColorPicker( {
 		if ( onHandleHardwareButtonPress ) {
 			onHandleHardwareButtonPress( onButtonPress );
 		}
+		// TODO: Revisit this to discover if there's a good reason for omitting
+		// the hook’s dependencies and running it a single time. Ideally there
+		// may be a way to refactor and obviate the disabled lint rule. If not,
+		// this comment should be replaced by one that explains the reasoning.
 	}, [] );
 
 	function onButtonPress( action ) {

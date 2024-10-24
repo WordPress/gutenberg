@@ -115,6 +115,8 @@ function ColorPalette( {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
 		}
+		// Not adding additional dependencies until the component can be refactored and updated safely.
+		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {

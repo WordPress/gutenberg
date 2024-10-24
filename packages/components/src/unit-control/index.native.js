@@ -47,6 +47,8 @@ function UnitControl( {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
 		}
+		// It would be great if the deps could be addressed in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
 	}, [ pickerRef?.current ] );
 
 	const currentInputValue = currentInput === null ? value : currentInput;
@@ -102,6 +104,8 @@ function UnitControl( {
 			anchorNodeRef?.current
 				? findNodeHandle( anchorNodeRef?.current )
 				: undefined,
+		// It would be great if the deps could be addressed in the context of
+		// https://github.com/WordPress/gutenberg/pull/39218
 		[ anchorNodeRef?.current ]
 	);
 

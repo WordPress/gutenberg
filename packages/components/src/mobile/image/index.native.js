@@ -112,6 +112,7 @@ const ImageComponent = ( {
 			}
 		}
 		return () => ( isCurrent = false );
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {

@@ -122,6 +122,7 @@ function SearchControl( {
 		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
 
 		setCurrentStyles( futureStyles );
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ isActive, isDark ] );
 
 	const clearInput = useCallback( () => {

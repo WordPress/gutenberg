@@ -43,6 +43,7 @@ const PickerScreen = () => {
 				onHandleHardwareButtonPress={ onHandleHardwareButtonPress }
 			/>
 		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [
 		setColor,
 		currentValue,

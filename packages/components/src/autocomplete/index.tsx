@@ -380,6 +380,8 @@ export function useAutocomplete( {
 				: AutocompleterUI
 		);
 		setFilterValue( query === null ? '' : query );
+		// We want to avoid introducing unexpected side effects.
+		// See https://github.com/WordPress/gutenberg/pull/41820
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};

@@ -336,6 +336,7 @@ const Sandbox = forwardRef( function Sandbox(
 
 	useEffect( () => {
 		updateContentHtml();
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {

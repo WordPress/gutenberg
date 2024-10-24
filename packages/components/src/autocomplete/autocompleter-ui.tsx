@@ -165,6 +165,8 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		useLayoutEffect( () => {
 			onChangeOptions( items );
 			announce( items );
+			// We want to avoid introducing unexpected side effects.
+			// See https://github.com/WordPress/gutenberg/pull/41820
 		}, [ items ] );
 
 		if ( items.length === 0 ) {

@@ -69,6 +69,7 @@ export const KeyboardAvoidingView = ( {
 			keyboardShowSubscription.remove();
 			keyboardHideSubscription.remove();
 		};
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {

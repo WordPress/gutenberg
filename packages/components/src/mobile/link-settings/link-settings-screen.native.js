@@ -37,6 +37,7 @@ const LinkSettingsScreen = ( props ) => {
 				urlValue={ inputValue }
 			/>
 		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ props, inputValue, navigation, route ] );
 };
 
