@@ -26,9 +26,6 @@ import {
 	isTemplateRemovable,
 	isTemplate,
 	isTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
 } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
@@ -45,8 +42,8 @@ const renamePost: Action< PostWithPermissions > = {
 		// Templates, template parts and patterns have special checks for renaming.
 		if (
 			! [
-				TEMPLATE_POST_TYPE,
-				TEMPLATE_PART_POST_TYPE,
+				'wp_template',
+				'wp_template_part',
 				...Object.values( PATTERN_TYPES ),
 			].includes( post.type )
 		) {
@@ -64,7 +61,7 @@ const renamePost: Action< PostWithPermissions > = {
 
 		if ( isTemplatePart( post ) ) {
 			return (
-				post.source === TEMPLATE_ORIGINS.custom &&
+				post.source === 'custom' &&
 				! post?.has_theme_file &&
 				post.permissions?.update
 			);
