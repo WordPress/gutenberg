@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useLayoutEffect,
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -20,7 +21,6 @@ import {
 	useMergeRefs,
 	useRefEffect,
 	useDisabled,
-	usePrevious,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -32,6 +32,9 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
+import cubicBezier from './bezier-easing';
+
+const scrollEasing = cubicBezier( 0.46, 0.03, 0.52, 0.96 );
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -129,8 +132,10 @@ function Iframe( {
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const [ containerResizeListener, { width: containerWidth } ] =
-		useResizeObserver();
+	const [
+		containerResizeListener,
+		{ width: containerWidth, height: containerHeight },
+	] = useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -253,11 +258,12 @@ function Iframe( {
 		containerWidth
 	);
 
+	const frameSizeValue = parseInt( frameSize );
+
 	const maxWidth = 750;
 	const scaleValue =
 		scale === 'default'
-			? ( Math.min( containerWidth, maxWidth ) -
-					parseInt( frameSize ) * 2 ) /
+			? ( Math.min( containerWidth, maxWidth ) - frameSizeValue * 2 ) /
 			  scaleContainerWidth
 			: scale;
 
@@ -423,7 +429,9 @@ function Iframe( {
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
-	const previousScale = usePrevious( scaleValue );
+	const prevScaleRef = useRef( scaleValue );
+	const prevFrameSizeRef = useRef( frameSizeValue );
+	const prevContainerHeightRef = useRef( containerHeight );
 
 	// Scroll based on the new scale
 	useEffect( () => {
@@ -431,13 +439,90 @@ function Iframe( {
 			return;
 		}
 
-		const { documentElement } = iframeDocument;
-		const { scrollTop, scrollLeft } = documentElement;
-		const delta = 1 + scaleValue - previousScale;
+		const scaleValuePrev = prevScaleRef.current;
+		const frameSizeValuePrev = prevFrameSizeRef.current;
+		const containerHeightPrev = prevContainerHeightRef.current;
 
-		documentElement.scrollTop = delta * scrollTop;
-		documentElement.scrollLeft = delta * scrollLeft;
-	}, [ scaleValue, previousScale, iframeDocument ] );
+		if ( containerHeightPrev === containerHeight ) {
+			return;
+		}
+
+		let raf = requestAnimationFrame( ( start ) => {
+			const { documentElement } = iframeDocument;
+			const { scrollTop } = documentElement;
+
+			// Convert previous values to the zoomed in scale.
+			const scrollTopOriginal = Math.floor(
+				( scrollTop + containerHeightPrev / 2 - frameSizeValuePrev ) /
+					scaleValuePrev -
+					containerHeightPrev / 2
+			);
+
+			// Convert the zoomed in value to the new scale.
+			const scrollTopNext = Math.floor(
+				( scrollTopOriginal + containerHeight / 2 ) * scaleValue +
+					frameSizeValue -
+					containerHeight / 2
+			);
+
+			console.log( {
+				scaleValue,
+				scaleValuePrev,
+			} );
+			console.log( {
+				frameSizeValue,
+				frameSizeValuePrev,
+			} );
+			console.log( {
+				containerHeight,
+				containerHeightPrev,
+			} );
+			console.log( {
+				scrollTop,
+				scrollTopOriginal,
+				scrollTopNext,
+			} );
+
+			const duration = 400; // Should match the CSS transition duration.
+			console.log( documentElement.scrollTop, '0.000', '0.000' );
+			const step = ( timestamp ) => {
+				const progress = Math.min(
+					( timestamp - start ) / duration,
+					1
+				);
+				const easing = scrollEasing( progress );
+				documentElement.scrollTop = Math.floor(
+					scrollTop + ( scrollTopNext - scrollTop ) * easing
+				);
+				console.log(
+					documentElement.scrollTop,
+					progress.toFixed( 3 ),
+					easing.toFixed( 3 )
+				);
+				if ( progress < 1 ) {
+					raf = requestAnimationFrame( step );
+				}
+			};
+			raf = requestAnimationFrame( step );
+		} );
+
+		if ( scaleValuePrev !== scaleValue ) {
+			console.log( 'scaleValue changed' );
+			prevScaleRef.current = scaleValue;
+		}
+		if ( frameSizeValuePrev !== frameSizeValue ) {
+			console.log( 'frameSizeValue changed' );
+			prevFrameSizeRef.current = frameSizeValue;
+		}
+		if ( containerHeightPrev !== containerHeight ) {
+			console.log( 'containerHeight changed' );
+			prevContainerHeightRef.current = containerHeight;
+		}
+
+		return () => {
+			cancelAnimationFrame( raf );
+		};
+	}, [ iframeDocument, scaleValue, frameSizeValue, containerHeight ] );
 
 	const iframe = (
 		<>
