@@ -14,15 +14,17 @@ import {
 	Warning,
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { ToggleControl, PanelBody, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useArchiveLabel } from './use-archive-label';
 
-const SUPPORTED_TYPES = [ 'archive', 'search' ];
+const SUPPORTED_TYPES = [ 'archive', 'search', 'blog' ];
 
 export default function QueryTitleEdit( {
 	attributes: {
@@ -32,10 +34,14 @@ export default function QueryTitleEdit( {
 		textAlign,
 		showPrefix,
 		showSearchTerm,
+		blogTitle,
 	},
 	setAttributes,
 } ) {
 	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
+	const currentTemplate = useSelect( ( select ) => {
+		return select( coreStore )?.getEditedPostType();
+	} );
 
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -44,7 +50,10 @@ export default function QueryTitleEdit( {
 		} ),
 	} );
 
-	if ( ! SUPPORTED_TYPES.includes( type ) ) {
+	if (
+		! SUPPORTED_TYPES.includes( type ) &&
+		! [ 'index', 'home' ].includes( currentTemplate )
+	) {
 		return (
 			<div { ...blockProps }>
 				<Warning>{ __( 'Provided type is not supported.' ) }</Warning>
@@ -103,9 +112,7 @@ export default function QueryTitleEdit( {
 				<TagName { ...blockProps }>{ title }</TagName>
 			</>
 		);
-	}
-
-	if ( type === 'search' ) {
+	} else if ( type === 'search' ) {
 		titleElement = (
 			<>
 				<InspectorControls>
@@ -130,6 +137,30 @@ export default function QueryTitleEdit( {
 				</TagName>
 			</>
 		);
+	} else if (
+		[ 'index', 'home' ].includes( currentTemplate ) ||
+		type === 'blog'
+	) {
+		titleElement = (
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Settings' ) }>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Blog Title' ) }
+							value={ blogTitle || __( 'Blog' ) }
+							onChange={ ( value ) =>
+								setAttributes( { blogTitle: value } )
+							}
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<TagName { ...blockProps }>
+					{ blogTitle || __( 'Blog' ) }
+				</TagName>
+			</>
+		);
 	}
 
 	return (
@@ -149,7 +180,13 @@ export default function QueryTitleEdit( {
 					} }
 				/>
 			</BlockControls>
-			{ titleElement }
+			{ titleElement || (
+				<div { ...blockProps }>
+					<Warning>
+						{ __( 'Unsupported template for Query Title block.' ) }
+					</Warning>
+				</div>
+			) }
 		</>
 	);
 }
