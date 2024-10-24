@@ -2,7 +2,7 @@
  * @param {string} nonce
  * @return {import('../types').APIFetchMiddleware & { nonce: string }} A middleware to enhance a request with a nonce.
  */
-function createNonceMiddleware( nonce ) {
+export function createNonceMiddleware( nonce ) {
 	/**
 	 * @type {import('../types').APIFetchMiddleware & { nonce: string }}
 	 */
@@ -33,5 +33,3 @@ function createNonceMiddleware( nonce ) {
 
 	return middleware;
 }
-
-export default createNonceMiddleware;

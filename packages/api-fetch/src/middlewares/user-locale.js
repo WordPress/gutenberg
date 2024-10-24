@@ -6,7 +6,7 @@ import { addQueryArgs, hasQueryArg } from '@wordpress/url';
 /**
  * @type {import('../types').APIFetchMiddleware}
  */
-const userLocaleMiddleware = ( options, next ) => {
+export const userLocaleMiddleware = ( options, next ) => {
 	if (
 		typeof options.url === 'string' &&
 		! hasQueryArg( options.url, '_locale' )
@@ -23,5 +23,3 @@ const userLocaleMiddleware = ( options, next ) => {
 
 	return next( options );
 };
-
-export default userLocaleMiddleware;

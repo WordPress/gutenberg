@@ -29,7 +29,7 @@ function isMediaUploadRequest( options ) {
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-const mediaUploadMiddleware = ( options, next ) => {
+export const mediaUploadMiddleware = ( options, next ) => {
 	if ( ! isMediaUploadRequest( options ) ) {
 		return next( options );
 	}
@@ -95,5 +95,3 @@ const mediaUploadMiddleware = ( options, next ) => {
 			parseResponseAndNormalizeError( response, options.parse )
 		);
 };
-
-export default mediaUploadMiddleware;

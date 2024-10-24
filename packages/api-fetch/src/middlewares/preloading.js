@@ -7,7 +7,7 @@ import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
  * @param {Record<string, any>} preloadedData
  * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
-function createPreloadingMiddleware( preloadedData ) {
+export function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.fromEntries(
 		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
 			normalizePath( path ),
@@ -78,5 +78,3 @@ function prepareResponse( responseData, parse ) {
 			  } )
 	);
 }
-
-export default createPreloadingMiddleware;

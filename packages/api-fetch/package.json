@@ -27,6 +27,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wpScriptModuleExports": "./build-module/module/index.js",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
 		"@wordpress/i18n": "*",
