@@ -1,0 +1,74 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/playlist",
+	"title": "Playlist",
+	"category": "media",
+	"description": "Embed a simple playlist.",
+	"keywords": [ "music", "sound" ],
+	"textdomain": "default",
+	"attributes": {
+		"ids": {
+			"type": "array"
+		},
+		"type": {
+			"type": "string",
+			"default": "audio"
+		},
+		"order": {
+			"type": "string",
+			"default": "ASC"
+		},
+		"tracklist": {
+			"type": "boolean",
+			"default": true
+		},
+		"tracknumbers": {
+			"type": "boolean",
+			"default": true
+		},
+		"images": {
+			"type": "boolean",
+			"default": true
+		},
+		"artists": {
+			"type": "boolean",
+			"default": true
+		},
+		"caption": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"interactivity": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorStyle": "wp-block-playlist-editor",
+	"style": "wp-block-playlist"
+}

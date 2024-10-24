@@ -543,6 +543,15 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** slug
 
+## Playlist
+
+Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist))
+
+-	**Name:** core/playlist
+-	**Category:** media
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
+-	**Attributes:** artists, ids, images, order, tracklist, tracknumbers, type
+
 ## Author
 
 Display post author details such as name, avatar, and bio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
