@@ -378,6 +378,13 @@ In the case where the plugin author wants to customize the files included in the
 
 It reuses the same logic as `npm pack` command to create an npm package tarball.
 
+This is how you create a custom root folder inside the zip file.
+- When updating a plugin, WordPress expects a folder in the root of the zip file which matches the plugin name. So be aware that this may affect the plugin update process.
+-   `--root-folder` - Add a custom root folder to the zip file.
+-   `npm run plugin-zip` - By default, unzipping your plugin will result in a folder with the same name as your plugin.
+-   `npm run plugin-zip --root-folder=''` - This will create a zip file that has no folder inside, your plugin files will be unzipped directly into the target directory.
+-   `npm run plugin-zip --root-folder='custom-directory'` - Your plugin will be unzipped into a folder named `custom-directory`.
+
 ### `start`
 
 Transforms your code according the configuration provided so it’s ready for development. The script will automatically rebuild if you make changes to the code, and you will see the build errors in the console.
