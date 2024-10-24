@@ -106,6 +106,24 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     }
     ```
 
+    If the block exposes a script module, it must be included in the package's `package.json` file
+    in the `wpScriptModules` object. This will include the script module when it's bundled for use
+    in WordPress. See [the packages README for more details.](../README.md):
+
+    ```json
+    {
+    	"name": "@wordpress/block-library",
+    	"wpScriptModuleExports": {
+    		"./file/view": "./build-module/file/view.js",
+    		"./image/view": "./build-module/image/view.js",
+    		"./navigation/view": "./build-module/navigation/view.js",
+    		"./query/view": "./build-module/query/view.js",
+    		"./search/view": "./build-module/search/view.js"
+    		// Add any new script modules here.
+    	}
+    }
+    ```
+
     This file will get automatically loaded when the static block is present on the front end. For dynamic block, you need to manually enqueue the view script in `render_callback` of the block, example:
 
     ```php
