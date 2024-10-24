@@ -62,12 +62,17 @@ export default function save( { attributes, className } ) {
 	// A title will no longer be assigned for new or updated button block links.
 
 	const wrapperClasses = clsx( className, {
-		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-width` ]: width,
 		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (
-		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+		<div
+			{ ...useBlockProps.save( {
+				className: wrapperClasses,
+				style: { width },
+			} ) }
+		>
 			<RichText.Content
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }
