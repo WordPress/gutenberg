@@ -107,6 +107,7 @@ function fromFormat( {
 		type: tagName || formatType.tagName,
 		object: formatType.object,
 		attributes: restoreOnAttributes( elementAttributes, isEditableTree ),
+		namespace: formatType.namespace,
 	};
 }
 

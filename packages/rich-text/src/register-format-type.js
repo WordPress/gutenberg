@@ -13,6 +13,7 @@ import { store as richTextStore } from './store';
  *                                       unique across all registered formats.
  * @property {string}        tagName     The HTML tag this format will wrap the
  *                                       selection with.
+ * @property {string}        [namespace] The namespace of the `tagName`.
  * @property {boolean}       interactive Whether format makes content interactive or not.
  * @property {string | null} [className] A class to match the format.
  * @property {string}        title       Name of the format.
@@ -57,6 +58,11 @@ export function registerFormatType( name, settings ) {
 
 	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
 		window.console.error( 'Format tag names must be a string.' );
+		return;
+	}
+
+	if ( 'namespace' in settings && typeof settings.namespace !== 'string' ) {
+		window.console.error( 'Format namespaces must be a string.' );
 		return;
 	}
 
