@@ -260,7 +260,7 @@ function VisualEditor( {
 		);
 	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
-	const { layout = {}, align = '' } = newestPostContentAttributes || {};
+	const { layout = {} } = newestPostContentAttributes || {};
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -271,8 +271,7 @@ function VisualEditor( {
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
-		themeSupportsLayout && postContentLayoutClasses,
-		align && ! [ 'wide', 'full' ].includes( align ) && `align${ align }`
+		themeSupportsLayout && postContentLayoutClasses
 	);
 
 	const postContentLayoutStyles = useLayoutStyles(
