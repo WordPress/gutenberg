@@ -7,18 +7,18 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { DropdownMenuContext } from './context';
+import { MenuContext } from './context';
 import { Text } from '../text';
-import type { DropdownMenuGroupLabelProps } from './types';
+import type { MenuGroupLabelProps } from './types';
 import * as Styled from './styles';
 
-export const DropdownMenuGroupLabel = forwardRef<
+export const MenuGroupLabel = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
->( function DropdownMenuGroup( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
+	WordPressComponentProps< MenuGroupLabelProps, 'div', false >
+>( function MenuGroup( props, ref ) {
+	const menuContext = useContext( MenuContext );
 	return (
-		<Styled.DropdownMenuGroupLabel
+		<Styled.MenuGroupLabel
 			ref={ ref }
 			render={
 				// @ts-expect-error The `children` prop is passed
@@ -31,7 +31,7 @@ export const DropdownMenuGroupLabel = forwardRef<
 				/>
 			}
 			{ ...props }
-			store={ dropdownMenuContext?.store }
+			store={ menuContext?.store }
 		/>
 	);
 } );

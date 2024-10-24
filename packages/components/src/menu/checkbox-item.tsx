@@ -13,33 +13,33 @@ import { Icon, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { DropdownMenuContext } from './context';
-import type { DropdownMenuCheckboxItemProps } from './types';
+import { MenuContext } from './context';
+import type { MenuCheckboxItemProps } from './types';
 import * as Styled from './styles';
 import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
 
-export const DropdownMenuCheckboxItem = forwardRef<
+export const MenuCheckboxItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
->( function DropdownMenuCheckboxItem(
+	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
+>( function MenuCheckboxItem(
 	{ suffix, children, onBlur, hideOnClick = false, ...props },
 	ref
 ) {
 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
-	const dropdownMenuContext = useContext( DropdownMenuContext );
+	const menuContext = useContext( MenuContext );
 
 	return (
-		<Styled.DropdownMenuCheckboxItem
+		<Styled.MenuCheckboxItem
 			ref={ ref }
 			{ ...props }
 			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
+			store={ menuContext?.store }
 		>
 			<Ariakit.MenuItemCheck
-				store={ dropdownMenuContext?.store }
+				store={ menuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
@@ -47,17 +47,17 @@ export const DropdownMenuCheckboxItem = forwardRef<
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
+			<Styled.MenuItemContentWrapper>
+				<Styled.MenuItemChildrenWrapper>
 					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
+				</Styled.MenuItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuCheckboxItem>
+			</Styled.MenuItemContentWrapper>
+		</Styled.MenuCheckboxItem>
 	);
 } );

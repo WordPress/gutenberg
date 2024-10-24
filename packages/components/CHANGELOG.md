@@ -19,6 +19,7 @@
 -   `Tabs`: update indicator more reactively ([#66207](https://github.com/WordPress/gutenberg/pull/66207)).
 -   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
 -   `Tabs`: override tablist's tabindex only when necessary ([#66209](https://github.com/WordPress/gutenberg/pull/66209)).
+-   `DropdownMenuV2`: rename to `Menu` ([#66289](https://github.com/WordPress/gutenberg/pull/66289)).
 
 ## 28.10.0 (2024-10-16)
 

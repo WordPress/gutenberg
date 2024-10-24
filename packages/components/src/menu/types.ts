@@ -4,9 +4,9 @@
 import type * as Ariakit from '@ariakit/react';
 import type { Placement } from '@floating-ui/react-dom';
 
-export interface DropdownMenuContext {
+export interface MenuContext {
 	/**
-	 * The ariakit store shared across all DropdownMenu subcomponents.
+	 * The ariakit store shared across all Menu subcomponents.
 	 */
 	store: Ariakit.MenuStore;
 	/**
@@ -15,7 +15,7 @@ export interface DropdownMenuContext {
 	variant?: 'toolbar';
 }
 
-export interface DropdownMenuProps {
+export interface MenuProps {
 	/**
 	 * The trigger button.
 	 */
@@ -80,21 +80,21 @@ export interface DropdownMenuProps {
 		  ) => boolean );
 }
 
-export interface DropdownMenuGroupProps {
+export interface MenuGroupProps {
 	/**
 	 * The contents of the dropdown menu group.
 	 */
 	children: React.ReactNode;
 }
 
-export interface DropdownMenuGroupLabelProps {
+export interface MenuGroupLabelProps {
 	/**
 	 * The contents of the dropdown menu group.
 	 */
 	children: React.ReactNode;
 }
 
-export interface DropdownMenuItemProps {
+export interface MenuItemProps {
 	/**
 	 * The contents of the menu item.
 	 */
@@ -119,8 +119,8 @@ export interface DropdownMenuItemProps {
 	disabled?: boolean;
 }
 
-export interface DropdownMenuCheckboxItemProps
-	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
+export interface MenuCheckboxItemProps
+	extends Omit< MenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
 	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
@@ -151,8 +151,8 @@ export interface DropdownMenuCheckboxItemProps
 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }
 
-export interface DropdownMenuRadioItemProps
-	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
+export interface MenuRadioItemProps
+	extends Omit< MenuItemProps, 'prefix' | 'hideOnClick' > {
 	/**
 	 * Whether to hide the dropdown menu when the item is clicked.
 	 *
@@ -182,4 +182,4 @@ export interface DropdownMenuRadioItemProps
 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
 }
 
-export interface DropdownMenuSeparatorProps {}
+export interface MenuSeparatorProps {}

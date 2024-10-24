@@ -18,7 +18,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 
-const { DropdownMenuV2, kebabCase } = unlock( componentsPrivateApis );
+const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
@@ -54,7 +54,7 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 	}, [ allActions, itemWithPermissions ] );
 
 	return (
-		<DropdownMenuV2
+		<Menu
 			open={ isActionsMenuOpen }
 			trigger={
 				<Button
@@ -79,7 +79,7 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 					setIsActionsMenuOpen( false );
 				} }
 			/>
-		</DropdownMenuV2>
+		</Menu>
 	);
 }
 
@@ -93,12 +93,9 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<DropdownMenuV2.Item
-			onClick={ onClick }
-			hideOnClick={ ! action.RenderModal }
-		>
-			<DropdownMenuV2.ItemLabel>{ label }</DropdownMenuV2.ItemLabel>
-		</DropdownMenuV2.Item>
+		<Menu.Item onClick={ onClick } hideOnClick={ ! action.RenderModal }>
+			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+		</Menu.Item>
 	);
 }
 
@@ -145,7 +142,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 // With an added onClose prop.
 function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 	return (
-		<DropdownMenuV2.Group>
+		<Menu.Group>
 			{ actions.map( ( action ) => {
 				if ( action.RenderModal ) {
 					return (
@@ -167,6 +164,6 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 					/>
 				);
 			} ) }
-		</DropdownMenuV2.Group>
+		</Menu.Group>
 	);
 }

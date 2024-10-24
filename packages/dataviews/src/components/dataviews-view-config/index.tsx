@@ -51,7 +51,7 @@ import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
@@ -69,7 +69,7 @@ function ViewTypeMenu( {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenuV2
+		<Menu
 			trigger={
 				<Button
 					size="compact"
@@ -84,7 +84,7 @@ function ViewTypeMenu( {
 					return null;
 				}
 				return (
-					<DropdownMenuV2.RadioItem
+					<Menu.RadioItem
 						key={ layout }
 						value={ layout }
 						name="view-actions-available-view"
@@ -104,13 +104,11 @@ function ViewTypeMenu( {
 							warning( 'Invalid dataview' );
 						} }
 					>
-						<DropdownMenuV2.ItemLabel>
-							{ config.label }
-						</DropdownMenuV2.ItemLabel>
-					</DropdownMenuV2.RadioItem>
+						<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
+					</Menu.RadioItem>
 				);
 			} ) }
-		</DropdownMenuV2>
+		</Menu>
 	);
 }
 

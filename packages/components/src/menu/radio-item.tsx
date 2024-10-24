@@ -13,8 +13,8 @@ import { Icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { DropdownMenuContext } from './context';
-import type { DropdownMenuRadioItemProps } from './types';
+import { MenuContext } from './context';
+import type { MenuRadioItemProps } from './types';
 import * as Styled from './styles';
 import { SVG, Circle } from '@wordpress/primitives';
 import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
@@ -25,28 +25,28 @@ const radioCheck = (
 	</SVG>
 );
 
-export const DropdownMenuRadioItem = forwardRef<
+export const MenuRadioItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
->( function DropdownMenuRadioItem(
+	WordPressComponentProps< MenuRadioItemProps, 'div', false >
+>( function MenuRadioItem(
 	{ suffix, children, onBlur, hideOnClick = false, ...props },
 	ref
 ) {
 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
-	const dropdownMenuContext = useContext( DropdownMenuContext );
+	const menuContext = useContext( MenuContext );
 
 	return (
-		<Styled.DropdownMenuRadioItem
+		<Styled.MenuRadioItem
 			ref={ ref }
 			{ ...props }
 			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
+			store={ menuContext?.store }
 		>
 			<Ariakit.MenuItemCheck
-				store={ dropdownMenuContext?.store }
+				store={ menuContext?.store }
 				render={ <Styled.ItemPrefixWrapper /> }
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
@@ -54,17 +54,17 @@ export const DropdownMenuRadioItem = forwardRef<
 				<Icon icon={ radioCheck } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
+			<Styled.MenuItemContentWrapper>
+				<Styled.MenuItemChildrenWrapper>
 					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
+				</Styled.MenuItemChildrenWrapper>
 
 				{ suffix && (
 					<Styled.ItemSuffixWrapper>
 						{ suffix }
 					</Styled.ItemSuffixWrapper>
 				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuRadioItem>
+			</Styled.MenuItemContentWrapper>
+		</Styled.MenuRadioItem>
 	);
 } );
