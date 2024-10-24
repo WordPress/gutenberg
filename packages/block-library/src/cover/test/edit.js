@@ -119,9 +119,7 @@ describe( 'Cover block', () => {
 				'min-height: 100vh;'
 			);
 
-			await userEvent.click(
-				screen.getByLabelText( 'Toggle full height' )
-			);
+			await userEvent.click( screen.getByLabelText( 'Full height' ) );
 
 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
 				'min-height: 100vh;'

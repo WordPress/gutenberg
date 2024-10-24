@@ -72,7 +72,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/toggle-list-view',
 			category: 'global',
-			description: __( 'Open the List View.' ),
+			description: __( 'Show or hide the List View.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
@@ -82,7 +82,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/toggle-distraction-free',
 			category: 'global',
-			description: __( 'Toggle distraction free mode.' ),
+			description: __( 'Enter or exit distraction free mode.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: '\\',
@@ -92,7 +92,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
+			description: __( 'Show or hide the Settings panel.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',

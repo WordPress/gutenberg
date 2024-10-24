@@ -22,7 +22,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-fullscreen',
 			category: 'global',
-			description: __( 'Toggle fullscreen mode.' ),
+			description: __( 'Enable or disable fullscreen mode.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'f',
