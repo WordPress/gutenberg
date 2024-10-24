@@ -178,6 +178,9 @@ const v12toV13BlockAttributes = {
 
 const v14BlockAttributes = {
 	...v12toV13BlockAttributes,
+	isUserOverlayColor: {
+		type: 'boolean',
+	},
 	sizeSlug: {
 		type: 'string',
 	},
@@ -251,10 +254,21 @@ const v12BlockSupports = {
 	},
 };
 
+const v14BlockSupports = {
+	...v12BlockSupports,
+	shadow: true,
+	dimensions: {
+		aspectRatio: true,
+	},
+	interactivity: {
+		clientNavigation: true,
+	},
+};
+
 // Deprecation for blocks that have z-index.
 const v14 = {
 	attributes: v14BlockAttributes,
-	supports: v12BlockSupports,
+	supports: v14BlockSupports,
 	save( { attributes } ) {
 		const {
 			backgroundType,
