@@ -2,7 +2,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 import clsx from 'clsx';
 
 /**
@@ -14,7 +13,6 @@ import {
 	useContext,
 	createContext,
 	forwardRef,
-	cloneElement,
 } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -94,7 +92,6 @@ function UnforwardedTooltip(
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
-	const mounted = useStoreState( tooltipStore, 'mounted' );
 
 	if ( isNestedInTooltip ) {
 		return isOnlyChild ? (
@@ -104,31 +101,12 @@ function UnforwardedTooltip(
 		);
 	}
 
-	// TODO: this is a temporary workaround to minimize the effects of the
-	// Ariakit upgrade. Ariakit doesn't pass the `aria-describedby` prop to
-	// the tooltip anchor anymore since 0.4.0, so we need to add it manually.
-	// The `aria-describedby` attribute is added only if the anchor doesn't have
-	// one already, and if the tooltip text is not the same as the anchor's
-	// `aria-label`
-	// See: https://github.com/WordPress/gutenberg/pull/64066
-	// See: https://github.com/WordPress/gutenberg/pull/65989
-	function addDescribedById( element: React.ReactElement ) {
-		return describedById &&
-			mounted &&
-			element.props[ 'aria-describedby' ] === undefined &&
-			element.props[ 'aria-label' ] !== text
-			? cloneElement( element, { 'aria-describedby': describedById } )
-			: element;
-	}
-
 	return (
 		<TooltipInternalContext.Provider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
-				render={
-					isOnlyChild ? addDescribedById( children ) : undefined
-				}
+				render={ isOnlyChild ? children : undefined }
 				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }

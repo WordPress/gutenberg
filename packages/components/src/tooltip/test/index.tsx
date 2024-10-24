@@ -64,36 +64,6 @@ describe( 'Tooltip', () => {
 			expectTooltipToBeHidden();
 		} );
 
-		it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
-			render( <Tooltip { ...props } /> );
-
-			// The anchor can not be found by querying for its description,
-			// since that is present only when the tooltip is visible
-			expect(
-				screen.queryByRole( 'button', { description: 'tooltip text' } )
-			).not.toBeInTheDocument();
-
-			// Hover the anchor. The tooltip shows and its text is used to describe
-			// the tooltip anchor
-			await hover(
-				screen.getByRole( 'button', {
-					name: 'Tooltip anchor',
-				} )
-			);
-			expect(
-				await screen.findByRole( 'button', {
-					description: 'tooltip text',
-				} )
-			).toBeInTheDocument();
-
-			// Hover outside of the anchor, tooltip should hide
-			await hoverOutside();
-			await waitExpectTooltipToHide();
-			expect(
-				screen.queryByRole( 'button', { description: 'tooltip text' } )
-			).not.toBeInTheDocument();
-		} );
-
 		it( 'should not leak Tooltip props to the tooltip anchor', () => {
 			render(
 				<Tooltip data-foo>
@@ -489,9 +459,7 @@ describe( 'Tooltip', () => {
 				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
 			).not.toBeInTheDocument();
 			expect(
-				screen.getByRole( 'button', {
-					description: 'Outer tooltip',
-				} )
+				screen.getByRole( 'tooltip', { name: 'Outer tooltip' } )
 			).toBeVisible();
 
 			// Hover outside of the anchor, tooltip should hide
@@ -514,84 +482,6 @@ describe( 'Tooltip', () => {
 			expect(
 				screen.getByRole( 'button', { name: 'Anchor' } )
 			).not.toHaveClass( 'components-tooltip' );
-		} );
-	} );
-
-	describe( 'aria-describedby', () => {
-		it( "should not override the anchor's aria-describedby attribute if specified", async () => {
-			render(
-				<>
-					<Tooltip { ...props }>
-						<button aria-describedby="tooltip-test-description">
-							Tooltip anchor
-						</button>
-					</Tooltip>
-					{ /* eslint-disable-next-line no-restricted-syntax */ }
-					<p id="tooltip-test-description">Tooltip description</p>
-					<button>focus trap outside</button>
-				</>
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
-			).toHaveAccessibleDescription( 'Tooltip description' );
-
-			// Focus the anchor, tooltip should show
-			await press.Tab();
-			expect(
-				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
-			).toHaveFocus();
-			await waitExpectTooltipToShow();
-
-			// The anchors should retain its previous accessible description,
-			// since the tooltip shouldn't override it.
-			expect(
-				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
-			).toHaveAccessibleDescription( 'Tooltip description' );
-
-			// Focus the other button, tooltip should hide
-			await press.Tab();
-			expect(
-				screen.getByRole( 'button', { name: 'focus trap outside' } )
-			).toHaveFocus();
-			await waitExpectTooltipToHide();
-		} );
-
-		it( "should not add the aria-describedby attribute to the anchor if the tooltip text matches the anchor's aria-label", async () => {
-			render(
-				<>
-					<Tooltip { ...props }>
-						<button aria-label={ props.text }>
-							Tooltip anchor
-						</button>
-					</Tooltip>
-					<button>focus trap outside</button>
-				</>
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: props.text } )
-			).not.toHaveAccessibleDescription();
-
-			// Focus the anchor, tooltip should show
-			await press.Tab();
-			expect(
-				screen.getByRole( 'button', { name: props.text } )
-			).toHaveFocus();
-			await waitExpectTooltipToShow();
-
-			// The anchor shouldn't have an aria-describedby prop
-			// because its aria-label matches the tooltip text.
-			expect(
-				screen.getByRole( 'button', { name: props.text } )
-			).not.toHaveAccessibleDescription();
-
-			// Focus the other button, tooltip should hide
-			await press.Tab();
-			expect(
-				screen.getByRole( 'button', { name: 'focus trap outside' } )
-			).toHaveFocus();
-			await waitExpectTooltipToHide();
 		} );
 	} );
 } );

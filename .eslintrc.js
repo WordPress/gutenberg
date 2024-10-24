@@ -147,6 +147,60 @@ const restrictedSyntaxComponents = [
 		message:
 			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
 	},
+	// Rules to find tooltip usage that needs reviewing.
+	{
+		// All tooltips
+		selector: `JSXOpeningElement[name.name="Tooltip"]`,
+		message:
+			'Tooltip needs to have its anchor checked to make sure it has an accessible description if needed',
+	},
+	...[
+		'Tooltip',
+		'ToolbarButton',
+		'ToolbarDropdownMenu',
+		'DropdownMenu',
+	].map( ( componentName ) => ( {
+		selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+		message:
+			componentName +
+			' needs to have its anchor checked to make sure it has an accessible description if needed.',
+	} ) ),
+	{
+		// All Button s with a `label` and no explicit `showTooltip={false}` (includes the ones with no children)
+		selector: `JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="showTooltip"][value.expression.value!=true])):has(JSXAttribute[name.name="label"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
+	{
+		// All Button s with a `shortcut`
+		selector: `JSXOpeningElement[name.name="Button"]:has(JSXAttribute[name.name="shortcut"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
+	{
+		// All Buttons with a description prop
+		selector: `JSXOpeningElement[name.name="Button"]:has(JSXAttribute[name.name="description"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
+	{
+		// All Buttons with a describedBy prop
+		selector: `JSXOpeningElement[name.name="Button"]:has(JSXAttribute[name.name="describedBy"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
+	{
+		// All Buttons with a aria-describedby prop
+		selector: `JSXOpeningElement[name.name="Button"]:has(JSXAttribute[name.name="aria-describedby"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
+	{
+		// All Buttons with a aria-label prop
+		selector: `JSXOpeningElement[name.name="Button"]:has(JSXAttribute[name.name="aria-label"])`,
+		message:
+			'Button needs to be checked to make sure it has an accessible description if needed',
+	},
 ];
 
 module.exports = {
