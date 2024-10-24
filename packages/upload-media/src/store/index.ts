@@ -12,9 +12,24 @@ import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
 import * as privateActions from './private-actions';
 import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
 
-export const STORE_NAME = 'core/upload-media';
+/**
+ * Media upload data store configuration.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
+ */
+export const storeConfig = {
+	reducer,
+	selectors,
+	actions,
+};
 
+/**
+ * Store definition for the media upload namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	selectors,
