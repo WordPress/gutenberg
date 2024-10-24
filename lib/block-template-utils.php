@@ -105,9 +105,9 @@ function gutenberg_generate_block_templates_export_file() {
 	preg_match_all( $pattern, $theme_json_encoded, $matches );
 
 	if ( ! empty( $matches ) ) {
-		$replacement              = '"file:./assets/$1"';
-		$replace_pattern          = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
-		$theme_json_encoded       = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
+		$replacement        = '"file:./assets/$1"';
+		$replace_pattern    = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
+		$theme_json_encoded = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
 
 		// Add each image to the assets directory.
 		foreach ( $matches[1] as $file ) {
