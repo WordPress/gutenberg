@@ -68,6 +68,7 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		hasParentPattern,
 		hasContentOnlyLocking,
+		hasFixedToolbar,
 		showShuffleButton,
 		showSlots,
 		showGroupButtons,
@@ -83,6 +84,7 @@ export function PrivateBlockToolbar( {
 			getBlockAttributes,
 			getBlockParentsByBlockName,
 			getTemplateLock,
+			getSettings,
 			getParentSectionBlock,
 			isZoomOut,
 		} = unlock( select( blockEditorStore ) );
@@ -117,6 +119,7 @@ export function PrivateBlockToolbar( {
 		const _hasTemplateLock = selectedBlockClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
 		);
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -137,6 +140,7 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
+			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showShuffleButton: isZoomOut(),
 			showSlots: ! isZoomOut(),
 			showGroupButtons: ! isZoomOut(),
@@ -167,11 +171,13 @@ export function PrivateBlockToolbar( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
+		'is-dark-toolbar': ! isDefaultEditingMode && ! hasFixedToolbar,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 		'is-connected': isUsingBindings,
+		'is-dark-toolbar': ! isDefaultEditingMode && ! hasFixedToolbar,
 	} );
 
 	return (
