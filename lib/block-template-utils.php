@@ -12,6 +12,7 @@
  *
  * @since 5.9.0
  * @since 6.0.0 Adds the whole theme to the export archive.
+ * @since 6.8.0 Adds uploaded files to the export archive.
  *
  * @global string $wp_version The WordPress version string.
  *
@@ -97,6 +98,34 @@ function gutenberg_generate_block_templates_export_file() {
 
 	// Convert to a string.
 	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+
+	// Find any uploaded files.
+	$uploads = wp_upload_dir();
+	$pattern = '/"(' . preg_quote( $uploads['baseurl'], '/' ) . '\/[^"]+)"/';
+	preg_match_all( $pattern, $theme_json_encoded, $matches );
+
+	if ( ! empty( $matches ) ) {
+		$replacement        = '"file:./assets/$1"';
+		$replace_pattern    = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
+		$theme_json_encoded = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
+
+		// Add each image to the assets directory.
+		foreach ( $matches[1] as $file ) {
+			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $file );
+			$file_content = file_get_contents( $file );
+			if ( ! $file_content ) {
+				continue;
+			}
+			if ( $zip->locateName( 'assets' ) === false ) {
+				// Directory doesn't exist, so add it
+				$zip->addEmptyDir( 'assets' );
+			}
+			$zip->addFromString(
+				'assets/' . basename( parse_url( $file, PHP_URL_PATH ) ),
+				$file_content
+			);
+		}
+	}
 
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
