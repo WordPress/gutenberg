@@ -81,7 +81,7 @@ export default function Layout( { route } ) {
 	return (
 		<>
 			<CommandMenu />
-			<KeyboardShortcutsRegister />
+			{ canvas === 'view' && <KeyboardShortcutsRegister /> }
 			<KeyboardShortcutsGlobal />
 			<div
 				{ ...navigateRegionsProps }
