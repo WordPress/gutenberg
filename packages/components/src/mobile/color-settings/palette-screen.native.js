@@ -27,15 +27,16 @@ import styles from './style.scss';
 
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
 
-const PaletteScreen = () => {
+const PaletteScreen = ( {
+	onColorChange,
+	onColorCleared,
+	onGradientChange,
+} ) => {
 	const route = useRoute();
 	const navigation = useNavigation();
 	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
 	const {
 		label,
-		onColorChange,
-		onGradientChange,
-		onColorCleared,
 		colorValue,
 		defaultSettings,
 		hideNavigation = false,

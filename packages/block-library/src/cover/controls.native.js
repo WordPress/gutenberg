@@ -3,6 +3,7 @@
  */
 import { View } from 'react-native';
 import Video from 'react-native-video';
+import { useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
@@ -20,7 +21,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-import { useState, useCallback, useRef } from '@wordpress/element';
+import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSettings, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -90,9 +91,12 @@ function Controls( {
 
 	const [ displayPlaceholder, setDisplayPlaceholder ] = useState( true );
 
-	function setFocalPoint( value ) {
-		setAttributes( { focalPoint: value } );
-	}
+	const route = useRoute();
+
+	// Persist focal point when navigating away from the focal point picker
+	useEffect( () => {
+		setAttributes( { focalPoint: route.params?.draftFocalPoint } );
+	}, [ route.params?.draftFocalPoint, setAttributes ] );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -224,7 +228,6 @@ function Controls( {
 					<FocalPointSettingsButton
 						disabled={ hasParallax }
 						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
-						onFocalPointChange={ setFocalPoint }
 						url={ url }
 					/>
 					{ IMAGE_BACKGROUND_TYPE === backgroundType && (

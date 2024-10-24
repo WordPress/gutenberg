@@ -16,8 +16,13 @@ import {
 /**
  * WordPress dependencies
  */
-
-import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
+import {
+	useRef,
+	useCallback,
+	useContext,
+	useMemo,
+	cloneElement,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,6 +37,7 @@ const BottomSheetNavigationScreen = ( {
 	isScrollable,
 	isNested,
 	name,
+	screenProps,
 } ) => {
 	const navigation = useNavigation();
 	const maxHeight = useRef( 0 );
@@ -102,12 +108,13 @@ const BottomSheetNavigationScreen = ( {
 	};
 
 	return useMemo( () => {
+		const childrenWithScreenProps = cloneElement( children, screenProps );
 		return isScrollable || isNested ? (
 			<View
 				onLayout={ onLayout }
 				testID={ `navigation-screen-${ name }` }
 			>
-				{ children }
+				{ childrenWithScreenProps }
 			</View>
 		) : (
 			<ScrollView { ...listProps }>
@@ -116,7 +123,7 @@ const BottomSheetNavigationScreen = ( {
 						onLayout={ onLayout }
 						testID={ `navigation-screen-${ name }` }
 					>
-						{ children }
+						{ childrenWithScreenProps }
 						{ ! isNested && (
 							<View
 								style={ {
@@ -142,6 +149,7 @@ const BottomSheetNavigationScreen = ( {
 		isScrollable,
 		isNested,
 		onLayout,
+		screenProps,
 	] );
 };
 

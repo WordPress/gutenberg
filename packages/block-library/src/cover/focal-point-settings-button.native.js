@@ -17,12 +17,7 @@ import { chevronRight } from '@wordpress/icons';
  */
 import styles from './style.scss';
 
-function FocalPointSettingsButton( {
-	disabled,
-	focalPoint,
-	onFocalPointChange,
-	url,
-} ) {
+function FocalPointSettingsButton( { disabled, focalPoint, url } ) {
 	const navigation = useNavigation();
 	return (
 		<BottomSheet.Cell
@@ -34,7 +29,6 @@ function FocalPointSettingsButton( {
 			onPress={ () => {
 				navigation.navigate( blockSettingsScreens.focalPoint, {
 					focalPoint,
-					onFocalPointChange,
 					url,
 				} );
 			} }
