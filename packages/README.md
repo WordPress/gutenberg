@@ -4,10 +4,11 @@ This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/w
 
 ## Creating a New Package
 
-When creating a new package, you need to provide at least the following:
+When creating a new package, you need to provide at least the following. Packages bundled in Gutenberg or WordPress must include a `wpScript` and or `wpScriptModuleExports` field in their `package.json` file. See the details below.
 
 1. `package.json` based on the template:
-    ```json
+
+    ```jsonc
     {
     	"name": "@wordpress/package-name",
     	"version": "1.0.0-prerelease",
@@ -32,10 +33,39 @@ When creating a new package, you need to provide at least the following:
     	},
     	"publishConfig": {
     		"access": "public"
+    	},
+    	// Include this line to include the package as a WordPress script.
+    	"wpScript": true,
+    	// Include this line to include the package as a WordPress script module.
+    	"wpScriptModuleExports": "./build-module/index.js"
+    }
+    ```
+
+    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+
+    For packages that should ship as a WordPress script, include `wpScript: true` in the `package.json` file. This tells the build system to bundle the package for use as a WordPress script.
+
+    For packages that should ship as a WordPress script module, include a `wpScriptModuleExports` field the `package.json` file. The value of this field can be a string to expose a single script module, or an object with a [shape like the standard `exports` object](https://nodejs.org/docs/latest-v20.x/api/packages.html#subpath-exports) to expose multiple script modules from a single package:
+
+    ```jsonc
+    {
+    	"name": "@wordpress/example",
+
+    	// The string form exposes the `@wordpress/example` script module.
+    	"wpScriptModuleExports": "./build-module/index.js",
+
+    	// Multiple sub-modules can be exposed by providing an object:
+    	"wpScriptModuleExports": {
+    		// Exposed as `@wordpress/example` script module.
+    		".": "./build-module/index.js",
+    		// Exposed as `@wordpress/example/demo-block/view` script module.
+    		"./demo-block/view": "./build-module/index.js"
     	}
     }
     ```
-    This assumes that your code is located in the `src` folder and will be transpiled with `Babel`.
+
+    Both `wpScript` and `wpScriptModuleExports` may be included if the package exposes both a script and a script module.
+
 1. `README.md` file containing at least:
     - Package name
     - Package description
