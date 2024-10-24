@@ -16,7 +16,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
@@ -106,7 +106,10 @@ function VisualEditor( {
 	contentRef,
 	className,
 } ) {
-	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ contentHeight, setContentHeight ] = useState( '' );
+	const effectContentHeight = useResizeObserver( ( [ entry ] ) => {
+		setContentHeight( entry.borderBoxSize[ 0 ].blockSize );
+	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		renderingMode,
@@ -323,21 +326,6 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
-	const localRef = useRef();
-	const typewriterRef = useTypewriter();
-	contentRef = useMergeRefs( [
-		localRef,
-		contentRef,
-		renderingMode === 'post-only' ? typewriterRef : null,
-		useFlashEditableBlocks( {
-			isEnabled: renderingMode === 'template-locked',
-		} ),
-		useSelectNearestEditableBlock( {
-			isEnabled: renderingMode === 'template-locked',
-		} ),
-		useZoomOutModeExit(),
-	] );
-
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
 		[
@@ -365,6 +353,24 @@ function VisualEditor( {
 		];
 	}, [ styles, enableResizing ] );
 
+	const localRef = useRef();
+	const typewriterRef = useTypewriter();
+	contentRef = useMergeRefs( [
+		localRef,
+		contentRef,
+		renderingMode === 'post-only' ? typewriterRef : null,
+		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
+		useSelectNearestEditableBlock( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
+		useZoomOutModeExit(),
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width.
+		enableResizing ? effectContentHeight : null,
+	] );
+
 	return (
 		<div
 			className={ clsx(
@@ -382,7 +388,7 @@ function VisualEditor( {
 			<ResizableEditor
 				enableResizing={ enableResizing }
 				height={
-					sizes.height && ! forceFullHeight ? sizes.height : '100%'
+					contentHeight && ! forceFullHeight ? contentHeight : '100%'
 				}
 			>
 				<BlockCanvas
@@ -476,12 +482,6 @@ function VisualEditor( {
 							/>
 						) }
 					</RecursionProvider>
-					{
-						// Avoid resize listeners when not needed,
-						// these will trigger unnecessary re-renders
-						// when animating the iframe width.
-						enableResizing && resizeObserver
-					}
 				</BlockCanvas>
 			</ResizableEditor>
 		</div>
