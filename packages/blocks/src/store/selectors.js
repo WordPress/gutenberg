@@ -295,6 +295,15 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 			return match || variation;
 		}
 	}
+
+	// If no variation matches the isActive condition, we return the default variation,
+	// but only if it doesn't have an isActive condition that wasn't matched.
+	if ( ! match ) {
+		match = variations.find(
+			( variation ) =>
+				variation?.isDefault && ! Object.hasOwn( variation, 'isActive' )
+		);
+	}
 	return match;
 }
 
