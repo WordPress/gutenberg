@@ -4,6 +4,14 @@
 import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
+	/**
+	 * Render the list item only if there is content.
+	 * This check is to eliminate empty list items from the front end.
+	 */
+	if ( RichText.isEmpty( attributes.content ) ) {
+		return null;
+	}
+
 	return (
 		<li { ...useBlockProps.save() }>
 			<RichText.Content value={ attributes.content } />
