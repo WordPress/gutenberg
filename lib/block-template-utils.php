@@ -98,6 +98,34 @@ function gutenberg_generate_block_templates_export_file() {
 	// Convert to a string.
 	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 
+	// Find any uploaded files.
+	$uploads = wp_upload_dir();
+	$pattern = '/"(' . preg_quote( $uploads['baseurl'], '/' ) . '\/[^"]+)"/';
+	preg_match_all( $pattern, $theme_json_encoded, $matches );
+
+	if ( ! empty( $matches ) ) {
+		$replacement     = '"file:./uploads/$1"';
+		$replace_pattern = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
+		// Find all uploaded file matches in theme_json_raw and replace them with the file name.
+		$theme_json_encoded = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
+
+		// Add an uploads directory to the zip if $files isn't empty.
+		$zip->addEmptyDir( 'uploads' );
+
+		// Add each image to the uploads directory.
+		foreach ( $matches[1] as $file ) {
+			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $file );
+			$file_content = file_get_contents( $file );
+			if ( ! $file_content ) {
+				continue;
+			}
+			$zip->addFromString(
+				'uploads/' . basename( parse_url( $file, PHP_URL_PATH ) ),
+				$file_content
+			);
+		}
+	}
+
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 
