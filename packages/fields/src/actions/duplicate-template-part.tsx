@@ -12,7 +12,6 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_POST_TYPE } from '../constants';
 import type { TemplatePart } from '../types';
 import { CreateTemplatePartModalContents } from '../components/create-template-part-modal';
 import { getItemTitle } from './utils';
@@ -20,7 +19,7 @@ import { getItemTitle } from './utils';
 const duplicateTemplatePart: Action< TemplatePart > = {
 	id: 'duplicate-template-part',
 	label: _x( 'Duplicate', 'action label' ),
-	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	isEligible: ( item ) => item.type === 'wp_template_part',
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;

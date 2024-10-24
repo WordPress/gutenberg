@@ -23,7 +23,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../constants';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (
@@ -34,7 +33,7 @@ const isTemplateRevertable = (
 	}
 
 	return (
-		templateOrTemplatePart.source === TEMPLATE_ORIGINS.custom &&
+		templateOrTemplatePart.source === 'custom' &&
 		( Boolean( templateOrTemplatePart?.plugin ) ||
 			templateOrTemplatePart?.has_theme_file )
 	);
@@ -182,7 +181,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	isEligible: ( item ) => {
 		return (
 			isTemplateOrTemplatePart( item ) &&
-			item?.source === TEMPLATE_ORIGINS.custom &&
+			item?.source === 'custom' &&
 			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
 				item?.has_theme_file )
 		);
@@ -227,7 +226,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 				);
 			} catch ( error ) {
 				let fallbackErrorMessage;
-				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
+				if ( items[ 0 ].type === 'wp_template' ) {
 					fallbackErrorMessage =
 						items.length === 1
 							? __(

@@ -43,11 +43,6 @@ import {
 	useExistingTemplateParts,
 } from './utils';
 
-import {
-	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../constants';
-
 type CreateTemplatePartModalContentsProps = {
 	defaultArea?: string;
 	blocks: any[];
@@ -73,7 +68,7 @@ export function CreateTemplatePartModal( {
 	const defaultModalTitle = useSelect(
 		( select ) =>
 			// @ts-ignore
-			select( coreStore ).getPostType( TEMPLATE_PART_POST_TYPE )?.labels
+			select( coreStore ).getPostType( 'wp_template_part' )?.labels
 				?.add_new_item,
 		[]
 	);
@@ -122,17 +117,17 @@ const getDefaultTemplatePartAreas = (
  * A React component that renders the content of a model for creating a template part.
  * This component should not live in this package; it should be moved to a dedicated package responsible for managing template.
  *
- * @param {Object}   props                                                   - The component props.
- * @param {string}   [props.defaultArea=TEMPLATE_PART_AREA_DEFAULT_CATEGORY] - The default area for the template part.
- * @param {Array}    [props.blocks=[]]                                       - The blocks to be included in the template part.
- * @param {string}   [props.confirmLabel='Add']                              - The label for the confirm button.
- * @param {Function} props.closeModal                                        - Function to close the modal.
- * @param {Function} props.onCreate                                          - Function to call when the template part is successfully created.
- * @param {Function} [props.onError]                                         - Function to call when there is an error creating the template part.
- * @param {string}   [props.defaultTitle='']                                 - The default title for the template part.
+ * @param {Object}   props                             - The component props.
+ * @param {string}   [props.defaultArea=uncategorized] - The default area for the template part.
+ * @param {Array}    [props.blocks=[]]                 - The blocks to be included in the template part.
+ * @param {string}   [props.confirmLabel='Add']        - The label for the confirm button.
+ * @param {Function} props.closeModal                  - Function to close the modal.
+ * @param {Function} props.onCreate                    - Function to call when the template part is successfully created.
+ * @param {Function} [props.onError]                   - Function to call when there is an error creating the template part.
+ * @param {string}   [props.defaultTitle='']           - The default title for the template part.
  */
 export function CreateTemplatePartModalContents( {
-	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	defaultArea = 'uncategorized',
 	blocks = [],
 	confirmLabel = __( 'Add' ),
 	closeModal,
@@ -172,7 +167,7 @@ export function CreateTemplatePartModalContents( {
 
 			const templatePart = await saveEntityRecord(
 				'postType',
-				TEMPLATE_PART_POST_TYPE,
+				'wp_template_part',
 				{
 					slug: cleanSlug,
 					title: uniqueTitle,
