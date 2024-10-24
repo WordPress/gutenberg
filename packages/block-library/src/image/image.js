@@ -370,14 +370,17 @@ export default function Image( {
 		);
 	}
 
+	const [ lightboxSetting, availableUnits ] = useSettings(
+		'lightbox',
+		'spacing.units'
+	);
+
 	// TODO: Can allow more units after figuring out how they should interact
 	// with the ResizableBox and ImageEditor components. Calculations later on
 	// for those components are currently assuming px units.
 	const dimensionsUnitsOptions = useCustomUnits( {
-		availableUnits: [ 'px' ],
+		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
-
-	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxSetting =
 		// If a block-level override is set, we should give users the option to
