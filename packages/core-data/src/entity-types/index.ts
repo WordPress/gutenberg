@@ -15,6 +15,7 @@ import type { PostRevision } from './post-revision';
 import type { Settings } from './settings';
 import type { Sidebar } from './sidebar';
 import type { Taxonomy } from './taxonomy';
+import type { Term } from './term';
 import type { Theme } from './theme';
 import type { User } from './user';
 import type { Type } from './type';
@@ -40,6 +41,7 @@ export type {
 	Settings,
 	Sidebar,
 	Taxonomy,
+	Term,
 	Theme,
 	Updatable,
 	User,
