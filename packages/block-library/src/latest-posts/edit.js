@@ -40,7 +40,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
-import { createInterpolateElement } from '@wordpress/element';
+import { createInterpolateElement, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -156,14 +156,14 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 	// If a user clicks to a link prevent redirection and show a warning.
 	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
-	let noticeId;
+	const noticeIdRef = useRef();
 	const showRedirectionPreventedNotice = ( event ) => {
 		event.preventDefault();
 		// Remove previous warning if any, to show one at a time per block.
-		removeNotice( noticeId );
-		noticeId = `block-library/core/latest-posts/redirection-prevented/${ instanceId }`;
+		removeNotice( noticeIdRef.current );
+		noticeIdRef.current = `block-library/core/latest-posts/redirection-prevented/${ instanceId }`;
 		createWarningNotice( __( 'Links are disabled in the editor.' ), {
-			id: noticeId,
+			id: noticeIdRef.current,
 			type: 'snackbar',
 		} );
 	};
