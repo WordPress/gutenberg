@@ -60,18 +60,39 @@ function PostEditForm( { postType, postId } ) {
 	);
 	const form = {
 		type: 'panel',
-		fields: [ 'title', 'status', 'date', 'author', 'comment_status' ],
+		fields: [
+			'featured_media',
+			'title',
+			'author',
+			'date',
+			'slug',
+			'comment_status',
+		],
 	};
+
+	const fieldsWithBulkEditSupport = [
+		'title',
+		'status',
+		'date',
+		'author',
+		'comment_status',
+	];
+
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
 			if (
+				edits.status &&
 				edits.status !== 'future' &&
-				record.status === 'future' &&
+				record?.status === 'future' &&
 				new Date( record.date ) > new Date()
 			) {
 				edits.date = null;
 			}
-			if ( edits.status === 'private' && record.password ) {
+			if (
+				edits.status &&
+				edits.status === 'private' &&
+				record.password
+			) {
 				edits.password = '';
 			}
 			editEntityRecord( 'postType', postType, id, edits );
@@ -95,7 +116,16 @@ function PostEditForm( { postType, postId } ) {
 			<DataForm
 				data={ ids.length === 1 ? record : multiEdits }
 				fields={ fields }
-				form={ form }
+				form={
+					ids.length === 1
+						? form
+						: {
+								...form,
+								fields: form.fields.filter( ( field ) =>
+									fieldsWithBulkEditSupport.includes( field )
+								),
+						  }
+				}
 				onChange={ onChange }
 			/>
 		</VStack>

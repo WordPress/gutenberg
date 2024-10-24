@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "5.8.0",
+	"version": "5.10.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,19 +26,19 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url"
+		"@babel/runtime": "7.25.7",
+		"@wordpress/a11y": "*",
+		"@wordpress/block-editor": "*",
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/data": "*",
+		"@wordpress/element": "*",
+		"@wordpress/html-entities": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/icons": "*",
+		"@wordpress/private-apis": "*",
+		"@wordpress/rich-text": "*",
+		"@wordpress/url": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
@@ -46,5 +46,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

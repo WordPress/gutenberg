@@ -1,12 +1,14 @@
 # AlignmentMatrixControl
 
+<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+
+<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-alignmentmatrixcontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+
 AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
 
-## Usage
-
 ```jsx
-import { useState } from 'react';
 import { AlignmentMatrixControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ alignment, setAlignment ] = useState( 'center center' );
@@ -14,63 +16,70 @@ const Example = () => {
 	return (
 		<AlignmentMatrixControl
 			value={ alignment }
-			onChange={ ( newAlignment ) => setAlignment( newAlignment ) }
+			onChange={ setAlignment }
 		/>
 	);
 };
 ```
-
 ## Props
 
-The component accepts the following props:
-
-### className
-
-The class that will be added to the classes of the underlying `grid` widget.
--   Type: `string`
--   Required: No
-
-### id
-
-Unique ID for the component.
-
--  Type: `string`
--  Required: No
-
-### label
-
-Accessible label. If provided, sets the `aria-label` attribute of the underlying `grid` widget.
-
--   Type: `string`
--   Required: No
--   Default: `Alignment Matrix Control`
-
-### defaultValue
+### `defaultValue`
 
 If provided, sets the default alignment value.
 
-- Type: `AlignmentMatrixControlValue`
-- Required: No
-- Default: `center center`
+ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+ - Required: No
+ - Default: `'center center'`
 
-### value
+### `label`
 
-The current alignment value.
+Accessible label. If provided, sets the `aria-label` attribute of the
+underlying `grid` widget.
 
-- Type: `AlignmentMatrixControlValue`
-- Required: No
+ - Type: `string`
+ - Required: No
+ - Default: `'Alignment Matrix Control'`
 
-### onChange
+### `onChange`
 
 A function that receives the updated alignment value.
 
--   Type: `( newValue: AlignmentMatrixControlValue ) => void`
--   Required: No
+ - Type: `(newValue: AlignmentMatrixControlValue) => void`
+ - Required: No
 
-### width
+### `value`
+
+The current alignment value.
+
+ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+ - Required: No
+
+### `width`
 
 If provided, sets the width of the control.
 
  - Type: `number`
  - Required: No
  - Default: `92`
+
+## Subcomponents
+
+### AlignmentMatrixControl.Icon
+
+#### Props
+
+##### `disablePointerEvents`
+
+If `true`, disables pointer events on the icon.
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `true`
+
+##### `value`
+
+The current alignment value.
+
+ - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+ - Required: No
+ - Default: `center`

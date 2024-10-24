@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "21.1.0",
+	"version": "21.3.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,11 +31,11 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@babel/eslint-parser": "^7.16.0",
+		"@babel/eslint-parser": "7.25.7",
 		"@typescript-eslint/eslint-plugin": "^6.4.1",
 		"@typescript-eslint/parser": "^6.4.1",
-		"@wordpress/babel-preset-default": "file:../babel-preset-default",
-		"@wordpress/prettier-config": "file:../prettier-config",
+		"@wordpress/babel-preset-default": "*",
+		"@wordpress/prettier-config": "*",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.2",

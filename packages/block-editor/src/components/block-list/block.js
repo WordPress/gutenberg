@@ -609,7 +609,6 @@ function BlockListBlockProvider( props ) {
 				isBlockBeingDragged,
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
-				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
@@ -630,8 +629,7 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const { supportsLayout, __unstableIsPreviewMode: isPreviewMode } =
-				getSettings();
+			const { supportsLayout, isPreviewMode } = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -680,8 +678,6 @@ function BlockListBlockProvider( props ) {
 				blocksWithSameName.length &&
 				blocksWithSameName[ 0 ] !== clientId;
 
-			const editorMode = __unstableGetEditorMode();
-
 			return {
 				...previewContext,
 				mode: getBlockMode( clientId ),
@@ -708,7 +704,6 @@ function BlockListBlockProvider( props ) {
 					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
-				editorMode,
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
 					isBlockSubtreeDisabled( clientId ),
@@ -755,7 +750,6 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
-		editorMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		index,
@@ -808,7 +802,6 @@ function BlockListBlockProvider( props ) {
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
-		editorMode,
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,

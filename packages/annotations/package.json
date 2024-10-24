@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "3.8.0",
+	"version": "3.10.0",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,11 +26,11 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/data": "file:../data",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/rich-text": "file:../rich-text",
+		"@babel/runtime": "7.25.7",
+		"@wordpress/data": "*",
+		"@wordpress/hooks": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/rich-text": "*",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
@@ -38,5 +38,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

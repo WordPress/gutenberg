@@ -16,6 +16,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -120,6 +121,7 @@ const UnforwardedTabPanel = (
 		orientation,
 		selectOnMove,
 		defaultSelectedId: prependInstanceId( initialTabName ),
+		rtl: isRTL(),
 	} );
 
 	const selectedTabName = extractTabName(

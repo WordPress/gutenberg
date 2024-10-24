@@ -20,11 +20,11 @@ export const CompositeRow = forwardRef<
 	WordPressComponentProps< CompositeRowProps, 'div', false >
 >( function CompositeRow( props, ref ) {
 	const context = useCompositeContext();
-	return (
-		<Ariakit.CompositeRow
-			store={ context.store as Ariakit.CompositeStore }
-			{ ...props }
-			ref={ ref }
-		/>
-	);
+
+	// @ts-expect-error The store prop is undocumented and only used by the
+	// legacy compat layer. The `store` prop is documented, but its type is
+	// obfuscated to discourage its use outside of the component's internals.
+	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+
+	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
 } );

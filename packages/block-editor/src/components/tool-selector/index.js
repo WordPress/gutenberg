@@ -18,7 +18,6 @@ import { Icon, edit as editIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const selectIcon = (
 	<SVG
@@ -36,9 +35,7 @@ function ToolSelector( props, ref ) {
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -67,7 +64,9 @@ function ToolSelector( props, ref ) {
 							value={
 								mode === 'navigation' ? 'navigation' : 'edit'
 							}
-							onSelect={ __unstableSetEditorMode }
+							onSelect={ ( newMode ) => {
+								__unstableSetEditorMode( newMode );
+							} }
 							choices={ [
 								{
 									value: 'navigation',
@@ -78,6 +77,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Focus on content.' ),
+									'aria-label': __( 'Write' ),
 								},
 								{
 									value: 'edit',
@@ -88,6 +88,7 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 									info: __( 'Edit layout and styles.' ),
+									'aria-label': __( 'Design' ),
 								},
 							] }
 						/>

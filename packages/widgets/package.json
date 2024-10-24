@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "4.8.0",
+	"version": "4.10.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,18 +24,18 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
+		"@babel/runtime": "7.25.7",
+		"@wordpress/api-fetch": "*",
+		"@wordpress/block-editor": "*",
+		"@wordpress/blocks": "*",
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/core-data": "*",
+		"@wordpress/data": "*",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/icons": "*",
+		"@wordpress/notices": "*",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
@@ -44,5 +44,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

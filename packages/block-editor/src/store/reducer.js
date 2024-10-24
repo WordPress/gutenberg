@@ -8,6 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
@@ -1660,17 +1661,30 @@ export function template( state = { isValid: true }, action ) {
  */
 export function settings( state = SETTINGS_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'UPDATE_SETTINGS':
-			if ( action.reset ) {
-				return {
-					...SETTINGS_DEFAULTS,
-					...action.settings,
-				};
-			}
-			return {
-				...state,
-				...action.settings,
-			};
+		case 'UPDATE_SETTINGS': {
+			const updatedSettings = action.reset
+				? {
+						...SETTINGS_DEFAULTS,
+						...action.settings,
+				  }
+				: {
+						...state,
+						...action.settings,
+				  };
+
+			Object.defineProperty( updatedSettings, '__unstableIsPreviewMode', {
+				get() {
+					deprecated( '__unstableIsPreviewMode', {
+						since: '6.8',
+						alternative: 'isPreviewMode',
+					} );
+
+					return this.isPreviewMode;
+				},
+			} );
+
+			return updatedSettings;
+		}
 	}
 
 	return state;
@@ -1785,22 +1799,6 @@ export const blockListSettings = ( state = {}, action ) => {
 	}
 	return state;
 };
-
-/**
- * Reducer returning which mode is enabled.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string} Updated state.
- */
-export function editorMode( state = 'edit', action ) {
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return action.mode;
-	}
-
-	return state;
-}
 
 /**
  * Reducer return an updated state representing the most recent block attribute
@@ -2117,7 +2115,6 @@ const combinedReducers = combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	lastFocus,
-	editorMode,
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,

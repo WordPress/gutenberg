@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "2.8.0",
+	"version": "2.10.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,21 +31,21 @@
 		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url"
+		"@babel/runtime": "7.25.7",
+		"@wordpress/a11y": "*",
+		"@wordpress/block-editor": "*",
+		"@wordpress/blocks": "*",
+		"@wordpress/components": "*",
+		"@wordpress/compose": "*",
+		"@wordpress/core-data": "*",
+		"@wordpress/data": "*",
+		"@wordpress/element": "*",
+		"@wordpress/html-entities": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/icons": "*",
+		"@wordpress/notices": "*",
+		"@wordpress/private-apis": "*",
+		"@wordpress/url": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
@@ -53,5 +53,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

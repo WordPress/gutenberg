@@ -877,9 +877,17 @@ updateBlockBindings( { url: undefined } );
 removeAllBlockBindings();
 ```
 
+_Parameters_
+
+-   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+
 _Returns_
 
 -   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
 
 ### useBlockCommands
 
@@ -1066,14 +1074,6 @@ _Parameters_
 -   _override_ `Object`: Override object.
 -   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
 -   _override.css_ `string`: CSS to apply.
-
-### useZoomOut
-
-A hook used to set the zoomed out view, invoking the hook sets the mode.
-
-_Parameters_
-
--   _zoomOut_ `boolean`: If we should zoom out or not.
 
 ### Warning
 

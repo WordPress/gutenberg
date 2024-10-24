@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/private-apis",
-	"version": "1.8.0",
+	"version": "1.10.0",
 	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,9 +29,10 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "7.25.7"
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

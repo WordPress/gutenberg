@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "5.8.0",
+	"version": "5.10.0",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,18 +29,18 @@
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
-		"@wordpress/components": "file:../components",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url"
+		"@babel/runtime": "7.25.7",
+		"@wordpress/block-editor": "*",
+		"@wordpress/blocks": "*",
+		"@wordpress/components": "*",
+		"@wordpress/core-data": "*",
+		"@wordpress/data": "*",
+		"@wordpress/element": "*",
+		"@wordpress/i18n": "*",
+		"@wordpress/icons": "*",
+		"@wordpress/notices": "*",
+		"@wordpress/private-apis": "*",
+		"@wordpress/url": "*"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
@@ -48,5 +48,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

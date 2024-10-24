@@ -13,9 +13,11 @@ import { useContext, useMemo } from '@wordpress/element';
  */
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
+import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Composite',
+	title: 'Components/Utilities/Composite',
+	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -351,5 +353,46 @@ const Fill = ( { children } ) => {
 				},
 			},
 		},
+	},
+};
+
+/**
+ * Combining the `Tooltip` and `Composite` component has a few caveats. And while there are a few ways to compose these two components, our recommendation is to render `Composite.Item` as a child of `Tooltip`.
+ *
+ * ```jsx
+ * // 🔴 Does not work
+ * <Composite.Item
+ *   render={
+ *     <Tooltip text="Tooltip">
+ *       <button>Item</button>
+ *     </Tooltip>
+ *   }
+ * />
+ *
+ * // 🟢 Good
+ * <Tooltip text="Tooltip one">
+ *   <Composite.Item>
+ *     Item one
+ *   </Composite.Item>
+ * </Tooltip>
+ * ```
+ */
+export const WithTooltips: StoryObj< typeof Composite > = {
+	...Default,
+	args: {
+		...Default.args,
+		children: (
+			<>
+				<Tooltip text="Tooltip one">
+					<Composite.Item>Item one</Composite.Item>
+				</Tooltip>
+				<Tooltip text="Tooltip two">
+					<Composite.Item>Item two</Composite.Item>
+				</Tooltip>
+				<Tooltip text="Tooltip three">
+					<Composite.Item>Item three</Composite.Item>
+				</Tooltip>
+			</>
+		),
 	},
 };

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/router",
-	"version": "1.8.0",
+	"version": "1.10.0",
 	"description": "Router API for WordPress pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,11 +25,12 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
-		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url",
+		"@babel/runtime": "7.25.7",
+		"@wordpress/element": "*",
+		"@wordpress/private-apis": "*",
+		"@wordpress/url": "*",
 		"history": "^5.3.0"
 	},
 	"peerDependencies": {
@@ -37,5 +38,6 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"wpScript": true
 }

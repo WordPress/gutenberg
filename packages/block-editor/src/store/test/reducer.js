@@ -32,6 +32,7 @@ import {
 	insertionPoint,
 	template,
 	blockListSettings,
+	settings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
 	blockEditingModes,
@@ -3067,6 +3068,28 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isValid: true, template: [] } );
+		} );
+	} );
+
+	describe( 'settings', () => {
+		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
+			const consoleWarn = jest
+				.spyOn( global.console, 'warn' )
+				.mockImplementation();
+
+			const settingsObject = settings( undefined, {
+				type: 'UPDATE_SETTINGS',
+				reset: true,
+			} );
+
+			expect( settingsObject.__unstableIsPreviewMode ).toBeDefined();
+			expect( settingsObject.isPreviewMode ).toBeDefined();
+
+			expect( consoleWarn ).toHaveBeenCalledWith(
+				'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
+			);
+
+			consoleWarn.mockRestore();
 		} );
 	} );
 

@@ -24,7 +24,9 @@
 		{ "path": "../core-data" },
 		{ "path": "../block-editor" },
 		{ "path": "../hooks" },
-		{ "path": "../html-entities" }
+		{ "path": "../html-entities" },
+		{ "path": "../media-utils" },
+		{ "path": "../router" }
 	],
 	"include": [ "src" ]
 }

@@ -6,6 +6,37 @@ This page is dedicated to the many ways you can disable specific functionality i
 
 There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](/docs/reference-guides/filters/block-filters.md#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](/docs/reference-guides/filters/block-filters.md#using-a-deny-list).
 
+## Curate heading levels
+
+Core WordPress blocks with a heading level dropdown include support for the `levelOptions` attribute. This applies to the Heading, Site Title, Site Tagline, Query Title, Post Title, and Comments Title blocks. The `levelOptions` attribute accepts an array of numbers corresponding to heading levels, where `1` represents H1, `2` represents H2, and so on.
+
+This attribute allows you to specify which heading levels should appear in the dropdown UI, providing a lightweight curation method that does not require block deprecations. Any existing heading levels are preserved in the markup, while `levelOptions` only affects the UI display.
+
+You can apply this attribute directly in the block markup, a technique that will be commonly used in block templates, template parts, and patterns. For example, the following markup disables H1, H2, and H6 in the Heading block by setting `"levelOptions":[3,4,5]`.
+
+```html
+<!-- wp:heading {"level":3,"levelOptions":[3,4,5],"className":"wp-block-heading"} -->
+<h3 class="wp-block-heading">Markup example</h3>
+<!-- /wp:heading -->
+```
+
+You can also use [block filters](/docs/reference-guides/filters/block-filters.md) to set the default value of this attribute globally or for specific blocks. The example below disables H1, H2, and H6 for all Heading blocks. You can further customize this by restricting certain heading levels based on conditions like user capabilities.
+
+```php
+function example_modify_heading_levels_globally( $args, $block_type ) {
+	
+	if ( 'core/heading' !== $block_type ) {
+		return $args;
+	}
+
+	// Remove H1, H2, and H6.
+	$args['attributes']['levelOptions']['default'] = [ 3, 4, 5 ];
+	
+	return $args;
+}
+add_filter( 'register_block_type_args', 'example_modify_heading_levels_globally', 10, 2 );
+```
+
 ## Disable the Pattern Directory
 
 To fully remove patterns bundled with WordPress core from being accessed in the Inserter, the following can be added to your `functions.php` file:
