@@ -14,7 +14,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { unlock } from '../../lock-unlock';
 
-const ZoomOutToggle = () => {
+const ZoomOutToggle = ( { disabled } ) => {
 	const { isZoomOut, showIconLabels } = useSelect( ( select ) => ( {
 		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
 		showIconLabels: select( preferencesStore ).get(
@@ -31,12 +31,14 @@ const ZoomOutToggle = () => {
 		if ( isZoomOut ) {
 			resetZoomLevel();
 		} else {
-			setZoomLevel( 50 );
+			setZoomLevel( 'auto-scaled' );
 		}
 	};
 
 	return (
 		<Button
+			accessibleWhenDisabled
+			disabled={ disabled }
 			onClick={ handleZoomOut }
 			icon={ zoomOutIcon }
 			label={ __( 'Zoom Out' ) }

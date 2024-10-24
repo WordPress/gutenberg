@@ -12,6 +12,7 @@ import { PinnedItems } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
+import CollabSidebar from '../collab-sidebar';
 import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
@@ -149,7 +150,7 @@ function Header( {
 				) }
 
 				{ canBeZoomedOut && isEditorIframed && isWideViewport && (
-					<ZoomOutToggle />
+					<ZoomOutToggle disabled={ forceDisableBlockTools } />
 				) }
 
 				<PreviewDropdown
@@ -174,6 +175,7 @@ function Header( {
 						}
 					/>
 				) }
+				<CollabSidebar />
 
 				{ customSaveButton }
 				<MoreMenu />

@@ -41,6 +41,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
+import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 
 const {
 	LayoutStyle,
@@ -48,7 +49,6 @@ const {
 	useLayoutStyles,
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
-	useZoomOutModeExit,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -108,7 +108,6 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
-	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -167,7 +166,7 @@ function VisualEditor( {
 			deviceType: getDeviceType(),
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
-			isPreview: editorSettings.__unstableIsPreviewMode,
+			isPreview: editorSettings.isPreviewMode,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -339,14 +338,6 @@ function VisualEditor( {
 		useZoomOutModeExit(),
 	] );
 
-	const zoomOutProps =
-		isZoomedOut && ! isTabletViewport
-			? {
-					scale: 'default',
-					frameSize: '40px',
-			  }
-			: {};
-
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =
 		[
@@ -360,8 +351,6 @@ function VisualEditor( {
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
 		! isZoomedOut;
-	const shouldIframe =
-		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
 
 	const iframeStyles = useMemo( () => {
 		return [
@@ -386,7 +375,7 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': shouldIframe,
+					'is-iframed': ! disableIframe,
 				}
 			) }
 		>
@@ -397,13 +386,12 @@ function VisualEditor( {
 				}
 			>
 				<BlockCanvas
-					shouldIframe={ shouldIframe }
+					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
-						...zoomOutProps,
 						style: {
 							...iframeProps?.style,
 							...deviceStyles,

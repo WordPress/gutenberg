@@ -76,7 +76,7 @@ export default function PostURL( { onClose } ) {
 		} );
 	} );
 	const postUrlSlugDescriptionId =
-		'editor-post-url__slug-descriotion-' + useInstanceId( PostURL );
+		'editor-post-url__slug-description-' + useInstanceId( PostURL );
 
 	return (
 		<div className="editor-post-url">

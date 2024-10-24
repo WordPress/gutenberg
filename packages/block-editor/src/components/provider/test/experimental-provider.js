@@ -5,7 +5,7 @@ import { render } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,6 +19,20 @@ const HasEditorSetting = ( props ) => {
 		props.setRegistry( registry );
 	}
 	return <p>Test.</p>;
+};
+
+const PreviewModeGetter = () => {
+	const previewModeKeys = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			// This property will be removed in the future. There is a test that asserts we're throwing a deprecation warning.
+			__unstableIsPreviewMode: settings.__unstableIsPreviewMode,
+			isPreviewMode: settings.isPreviewMode,
+		};
+	}, [] );
+
+	return <>{ JSON.stringify( previewModeKeys ) }</>;
 };
 
 describe( 'BlockEditorProvider', () => {
@@ -57,6 +71,34 @@ describe( 'BlockEditorProvider', () => {
 		);
 		const settings = registry.select( blockEditorStore ).getSettings();
 		expect( settings ).toHaveProperty( 'stableSetting' );
+	} );
+	it( 'preserves deprecated getters incoming from the settings reducer', async () => {
+		const consoleWarn = jest
+			.spyOn( global.console, 'warn' )
+			.mockImplementation();
+
+		const { container } = render(
+			<BlockEditorProvider
+				settings={ {
+					isPreviewMode: true,
+				} }
+			>
+				<PreviewModeGetter />
+			</BlockEditorProvider>
+		);
+
+		expect( container ).toHaveTextContent(
+			JSON.stringify( {
+				__unstableIsPreviewMode: true,
+				isPreviewMode: true,
+			} )
+		);
+
+		expect( consoleWarn ).toHaveBeenCalledWith(
+			'__unstableIsPreviewMode is deprecated since version 6.8. Please use isPreviewMode instead.'
+		);
+
+		consoleWarn.mockRestore();
 	} );
 } );
 

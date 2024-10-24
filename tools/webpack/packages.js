@@ -4,6 +4,7 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
+const { readdirSync } = require( 'node:fs' );
 
 /**
  * WordPress dependencies
@@ -16,7 +17,12 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 /**
  * Internal dependencies
  */
-const { dependencies } = require( '../../package' );
+const packageDirs = readdirSync(
+	new URL( '../packages', `file://${ __dirname }` ),
+	{
+		withFileTypes: true,
+	}
+).flatMap( ( dirent ) => ( dirent.isDirectory() ? [ dirent.name ] : [] ) );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
@@ -82,15 +88,23 @@ const bundledPackagesPhpConfig = [
 	},
 } ) );
 
-const gutenbergPackages = Object.keys( dependencies )
-	.filter(
-		( packageName ) =>
-			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'interactivity' )
-	)
-	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
+/** @type {Array<string>} */
+const gutenbergScripts = [];
+for ( const packageDir of packageDirs ) {
+	const packageJson = require(
+		`${ WORDPRESS_NAMESPACE }${ packageDir }/package.json`
+	);
+
+	if ( ! packageJson.wpScript ) {
+		continue;
+	}
+
+	if ( BUNDLED_PACKAGES.includes( packageJson.name ) ) {
+		continue;
+	}
+
+	gutenbergScripts.push( packageDir );
+}
 
 const exportDefaultPackages = [
 	'api-fetch',
@@ -114,7 +128,7 @@ module.exports = {
 	...baseConfig,
 	name: 'packages',
 	entry: Object.fromEntries(
-		gutenbergPackages.map( ( packageName ) => [
+		gutenbergScripts.map( ( packageName ) => [
 			packageName,
 			{
 				import: `./packages/${ packageName }`,
@@ -141,6 +155,20 @@ module.exports = {
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
+	module: {
+		rules: [
+			...baseConfig.module.rules,
+			{
+				test: /\.wasm$/,
+				type: 'asset/resource',
+				generator: {
+					// FIXME: Do not hardcode path.
+					filename: './build/vips/[name].wasm',
+					publicPath: '',
+				},
+			},
+		],
+	},
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},
@@ -148,7 +176,7 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergPackages
+			patterns: gutenbergScripts
 				.map( ( packageName ) => ( {
 					from: '*.css',
 					context: `./packages/${ packageName }/build-style`,

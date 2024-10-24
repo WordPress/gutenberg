@@ -25,11 +25,7 @@
 		z-index: z-index(".interface-complementary-area .components-panel__header");
 
 		&.editor-sidebar__panel-tabs {
-			top: $panel-header-height;
-
-			@include break-medium() {
-				top: 0;
-			}
+			top: 0;
 		}
 	}
 
