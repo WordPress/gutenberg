@@ -63,6 +63,10 @@
 				"width": true,
 				"style": true
 			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true
 		}
 	},
 	"editorStyle": "wp-block-page-list-editor",
