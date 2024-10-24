@@ -46,6 +46,22 @@
 		"html": false,
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
 		}
 	},
 	"editorStyle": "wp-block-rss-editor",
