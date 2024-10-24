@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useEffect } from '@wordpress/element';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
@@ -11,18 +16,37 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { store as editSiteStore } from '../../store';
 
+const shortCutName = 'core/edit-site/save';
+
 /**
  * Register the save keyboard shortcut in view mode.
  *
  * @return {null} Returns null.
  */
-function KeyboardShortcutsGlobal() {
+export default function SaveKeyboardShortcut() {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
 	const { hasNonPostEntityChanges, isPostSavingLocked } =
 		useSelect( editorStore );
 	const { savePost } = useDispatch( editorStore );
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const { registerShortcut, unregisterShortcut } = useDispatch(
+		keyboardShortcutsStore
+	);
+	useEffect( () => {
+		registerShortcut( {
+			name: shortCutName,
+			category: 'global',
+			description: __( 'Save your changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 's',
+			},
+		} );
+		return () => {
+			unregisterShortcut( shortCutName );
+		};
+	}, [ registerShortcut, unregisterShortcut ] );
 
 	useShortcut( 'core/edit-site/save', ( event ) => {
 		event.preventDefault();
@@ -43,5 +67,3 @@ function KeyboardShortcutsGlobal() {
 
 	return null;
 }
-
-export default KeyboardShortcutsGlobal;

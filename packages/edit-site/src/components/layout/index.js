@@ -35,8 +35,7 @@ import ErrorBoundary from '../error-boundary';
 import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
-import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
-import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
+import SaveKeyboardShortcut from '../save-keyboard-shortcut';
 import { useIsSiteEditorLoading } from './hooks';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
@@ -81,8 +80,7 @@ export default function Layout( { route } ) {
 	return (
 		<>
 			<CommandMenu />
-			{ canvas === 'view' && <KeyboardShortcutsRegister /> }
-			<KeyboardShortcutsGlobal />
+			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
