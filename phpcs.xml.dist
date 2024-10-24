@@ -51,6 +51,7 @@
 	<file>./packages</file>
 	<file>./phpunit</file>
 	<file>./post-content.php</file>
+	<file>./test</file>
 
 	<!-- Exclude generated files -->
 	<exclude-pattern>/packages/block-serialization-spec-parser/parser\.php$</exclude-pattern>
