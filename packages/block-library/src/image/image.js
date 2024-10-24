@@ -18,7 +18,7 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch, dispatch, select } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -39,7 +39,7 @@ import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -130,7 +130,6 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
-		isFeatureImage,
 	} = attributes;
 
 	// The only supported unit is px, so we can parseInt to strip the px here.
@@ -142,7 +141,6 @@ export default function Image( {
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 
 	const image = useSelect(
-		// eslint-disable-next-line no-shadow
 		( select ) =>
 			id && isSingleSelected
 				? select( coreStore ).getMedia( id, { context: 'view' } )
@@ -151,7 +149,6 @@ export default function Image( {
 	);
 
 	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
-		// eslint-disable-next-line no-shadow
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType } =
 				select( blockEditorStore );
@@ -477,7 +474,6 @@ export default function Image( {
 		lockTitleControlsMessage,
 		lockCaption = false,
 	} = useSelect(
-		// eslint-disable-next-line no-shadow
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
@@ -848,6 +844,22 @@ export default function Image( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
+	/**
+	 * Get the post type, post ID, and query ID from the context for featured image control.
+	 */
+	const { postType: postTypeSlug, postId, queryId } = context;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+
+	/**
+	 * Get feature image from current post.
+	 */
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'featured_media',
+		postId
+	);
+
 	let img =
 		temporaryURL && hasImageErrored ? (
 			// Show a placeholder during upload when the blob URL can't be loaded. This can
@@ -1050,57 +1062,29 @@ export default function Image( {
 	}
 
 	/**
-	 * Set attribute to make post featured image.
-	 *
-	 * @param {boolean} value - current value of isFeatureImage.
-	 *
-	 * @return {void} - Success notice for setting featured image.
+	 * Set the post's featured image with the current image.
 	 */
-	const setAttributeForFeatureImage = ( value ) => {
-		const currentFeatureImage =
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
-
-		if ( currentFeatureImage === attributes.id ) {
-			// dispatch notice that featured image is set.
-			createSuccessNotice(
-				__( 'Current Image is Feature Image Already.' ),
-				{
-					type: 'snackbar',
-				}
-			);
-			return;
-		}
-		// set post featured image as current image.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		dispatch( 'core/editor' ).editPost( { featured_media: attributes.id } );
-
-		// dispatch notice that featured image is set.
-		createSuccessNotice( __( 'Featured image set.' ), {
-			type: 'snackbar',
-		} );
-
-		setAttributes( { isFeatureImage: ! value } );
+	const setPostFeatureImage = () => {
+		setFeaturedImage( id );
 	};
 
 	/**
-	 * Block settings menu control to make image feature image.
+	 * Create a menu item to set the image as the post's featured image.
 	 *
 	 * @param {Object} props                   - Props for block settings menu control.
 	 * @param {Object} props.selectedClientIds - Selected client ids.
-	 * @return {void} - Make image feature control.
+	 *
+	 * @return {void} - Menu item to set the image as the post's featured image.
 	 */
 	const featureImageSettingsControl = (
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds } ) =>
 				( selectedClientIds.length === 1 &&
+					( ! isDescendentOfQueryLoop || postId ) &&
+					storedFeaturedImage !== id &&
 					clientId === selectedClientIds[ 0 ] && (
-						<MenuItem
-							onClick={ () =>
-								setAttributeForFeatureImage( isFeatureImage )
-							}
-						>
-							{ __( 'Make Feature Image' ) }
+						<MenuItem onClick={ () => setPostFeatureImage() }>
+							{ __( 'Set feature image' ) }
 						</MenuItem>
 					) ) ||
 				null
