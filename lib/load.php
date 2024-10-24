@@ -34,6 +34,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
+	require_once __DIR__ . '/experimental/class-wp-rest-block-editor-assets-controller.php';
 
 	// WordPress 6.6 compat.
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-global-styles-revisions-controller-6-6.php';
