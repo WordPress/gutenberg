@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
+// import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -19,13 +20,36 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+/**
+ * Holds all elements that are made inert when the lightbox is open; used to
+ * remove inert attribute of only those elements explicitly made inert.
+ *
+ * @type {Array}
+ */
+let inertElements = [];
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
-			currentImageId: null,
+			images: [],
+			currentImageIndex: -1,
+			get currentImageId() {
+				return state.currentImageIndex > -1 && state.images.length > 0
+					? state.images[ state.currentImageIndex ]
+					: null;
+			},
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
+			},
+			get hasNavigation() {
+				return state.images.length > 1;
+			},
+			get hasNextImage() {
+				return state.currentImageIndex + 1 < state.images.length;
+			},
+			get hasPreviousImage() {
+				return state.currentImageIndex - 1 >= 0;
 			},
 			get overlayOpened() {
 				return state.currentImageId !== null;
@@ -96,12 +120,32 @@ const { state, actions, callbacks } = store(
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
+				const { state: galleryState } = store( 'core/gallery' );
+				const { lightbox, galleryId } =
+					getContext( 'core/gallery' ) || {};
+				state.images = lightbox
+					? galleryState.images[ galleryId ] || []
+					: [ imageId ];
+
+				// Sets the current image index to the one that was clicked.
+				callbacks.setCurrentImageIndex( imageId );
+
 				// Sets the current expanded image in the state and enables the overlay.
 				state.overlayEnabled = true;
-				state.currentImageId = imageId;
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
+
+				// make all children of the document inert exempt .wp-lightbox-overlay
+				inertElements = [];
+				document
+					.querySelectorAll( 'body > :not(.wp-lightbox-overlay)' )
+					.forEach( ( el ) => {
+						if ( ! el.hasAttribute( 'inert' ) ) {
+							el.setAttribute( 'inert', '' );
+							inertElements.push( el );
+						}
+					} );
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
@@ -123,22 +167,53 @@ const { state, actions, callbacks } = store(
 							preventScroll: true,
 						} );
 
-						// Resets the current image id to mark the overlay as closed.
-						state.currentImageId = null;
+						// Resets the current image index to mark the overlay as closed.
+						state.currentImageIndex = -1;
+						state.images = [];
 					}, 450 );
+
+					// remove inert attribute from all children of the document
+					inertElements.forEach( ( el ) => {
+						el.removeAttribute( 'inert' );
+					} );
+					inertElements = [];
 				}
+			},
+			showPreviousImage( e ) {
+				if ( ! state.hasNavigation ) {
+					return;
+				}
+
+				e.stopPropagation();
+				if ( state.currentImageIndex - 1 < 0 ) {
+					return;
+				}
+				state.currentImageIndex = state.currentImageIndex - 1;
+				callbacks.setOverlayStyles();
+			},
+			showNextImage( e ) {
+				if ( ! state.hasNavigation ) {
+					return;
+				}
+
+				e.stopPropagation();
+				if ( state.currentImageIndex + 1 >= state.images.length ) {
+					return;
+				}
+				state.currentImageIndex = state.currentImageIndex + 1;
+				callbacks.setOverlayStyles();
 			},
 			handleKeydown( event ) {
 				if ( state.overlayEnabled ) {
-					// Focuses the close button when the user presses the tab key.
-					if ( event.key === 'Tab' ) {
-						event.preventDefault();
-						const { ref } = getElement();
-						ref.querySelector( 'button' ).focus();
-					}
 					// Closes the lightbox when the user presses the escape key.
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
+					}
+
+					if ( event.key === 'ArrowLeft' ) {
+						actions.showPreviousImage( event );
+					} else if ( event.key === 'ArrowRight' ) {
+						actions.showNextImage( event );
 					}
 				}
 			},
@@ -187,6 +262,12 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
+			setCurrentImageIndex( imageId ) {
+				const currentIndex = state.images.findIndex(
+					( id ) => id === imageId
+				);
+				state.currentImageIndex = currentIndex;
+			},
 			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;
@@ -229,12 +310,14 @@ const { state, actions, callbacks } = store(
 				// size), the image's dimensions in the lightbox are the same
 				// as those of the image in the content.
 				let imgMaxWidth = parseFloat(
-					state.currentImage.targetWidth !== 'none'
+					state.currentImage.targetWidth &&
+						state.currentImage.targetWidth !== 'none'
 						? state.currentImage.targetWidth
 						: naturalWidth
 				);
 				let imgMaxHeight = parseFloat(
-					state.currentImage.targetHeight !== 'none'
+					state.currentImage.targetHeight &&
+						state.currentImage.targetHeight !== 'none'
 						? state.currentImage.targetHeight
 						: naturalHeight
 				);
@@ -302,7 +385,7 @@ const { state, actions, callbacks } = store(
 				// the image resolution.
 				let horizontalPadding = 0;
 				if ( window.innerWidth > 480 ) {
-					horizontalPadding = 80;
+					horizontalPadding = state.hasNavigation ? 140 : 80;
 				} else if ( window.innerWidth > 1920 ) {
 					horizontalPadding = 160;
 				}
@@ -354,6 +437,14 @@ const { state, actions, callbacks } = store(
 					}px;
 				}
 			`;
+			},
+			setScreenReaderText() {
+				const { ref } = getElement();
+				if ( ! state.overlayEnabled ) {
+					ref.textContent = '';
+				} else {
+					ref.textContent = state.currentImage.screenReaderText;
+				}
 			},
 			setButtonStyles() {
 				const { imageId } = getContext();
