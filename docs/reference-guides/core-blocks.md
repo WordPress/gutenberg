@@ -616,7 +616,7 @@ Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/t
 
 -	**Name:** core/playlist
 -	**Category:** media
--	**Supports:** align, anchor, color (background, gradients, link, text), spacing (margin, padding)
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
 -	**Attributes:** artists, ids, images, order, tracklist, tracknumbers, type
 
 ## Author (deprecated)
