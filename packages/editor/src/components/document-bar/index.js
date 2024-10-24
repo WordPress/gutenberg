@@ -187,19 +187,15 @@ export default function DocumentBar( props ) {
 									? decodeEntities( title )
 									: __( 'No title' ) }
 							</span>
-							{ pageTypeBadge && ! props.title && (
-								<span className="editor-document-bar__post-type-label">
-									{ '. ' + pageTypeBadge }
-								</span>
-							) }
-							{ postTypeLabel &&
-								! props.title &&
-								! pageTypeBadge && (
-									<span className="editor-document-bar__post-type-label">
-										{ '· ' +
-											decodeEntities( postTypeLabel ) }
-									</span>
-								) }
+							<span className="editor-document-bar__post-type-label">
+								{ `. ${
+									postTypeLabel &&
+									! props.title &&
+									! pageTypeBadge
+										? decodeEntities( postTypeLabel )
+										: pageTypeBadge
+								}` }
+							</span>
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
