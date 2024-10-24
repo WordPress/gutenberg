@@ -144,16 +144,6 @@ function EditorKeyboardShortcutsRegister() {
 				},
 			],
 		} );
-
-		registerShortcut( {
-			name: 'core/editor/zoom',
-			category: 'global',
-			description: __( 'Enter or exit zoom out.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: 'z',
-			},
-		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;

@@ -3,11 +3,15 @@
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
 import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -26,6 +30,32 @@ const ZoomOutToggle = ( { disabled } ) => {
 	const { resetZoomLevel, setZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const { registerShortcut, unregisterShortcut } = useDispatch(
+		keyboardShortcutsStore
+	);
+
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/editor/zoom',
+			category: 'global',
+			description: __( 'Enter or exit zoom out.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'z',
+			},
+		} );
+		return () => {
+			unregisterShortcut( 'core/editor/zoom' );
+		};
+	}, [ registerShortcut, unregisterShortcut ] );
+
+	useShortcut( 'core/editor/zoom', () => {
+		if ( isZoomOut ) {
+			resetZoomLevel();
+		} else {
+			setZoomLevel( 'auto-scaled' );
+		}
+	} );
 
 	const handleZoomOut = () => {
 		if ( isZoomOut ) {

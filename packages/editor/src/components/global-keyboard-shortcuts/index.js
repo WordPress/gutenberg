@@ -10,7 +10,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -25,12 +24,7 @@ export default function EditorKeyboardShortcuts() {
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
-	const { getBlockSelectionStart, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
-	const { setZoomLevel, resetZoomLevel } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
@@ -121,14 +115,6 @@ export default function EditorKeyboardShortcuts() {
 				? 'edit-post/block'
 				: 'edit-post/document';
 			enableComplementaryArea( 'core', sidebarToOpen );
-		}
-	} );
-
-	useShortcut( 'core/editor/zoom', () => {
-		if ( isZoomOut() ) {
-			resetZoomLevel();
-		} else {
-			setZoomLevel( 'auto-scaled' );
 		}
 	} );
 
