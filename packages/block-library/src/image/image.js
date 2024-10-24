@@ -15,6 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 	Placeholder,
+	MenuItem,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -29,6 +30,7 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
+	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -37,7 +39,7 @@ import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -842,6 +844,22 @@ export default function Image( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const isRounded = attributes.className?.includes( 'is-style-rounded' );
 
+	/**
+	 * Get the post type, post ID, and query ID from the context for featured image control.
+	 */
+	const { postType: postTypeSlug, postId, queryId } = context;
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+
+	/**
+	 * Get feature image from current post.
+	 */
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'featured_media',
+		postId
+	);
+
 	let img =
 		temporaryURL && hasImageErrored ? (
 			// Show a placeholder during upload when the blob URL can't be loaded. This can
@@ -1043,10 +1061,43 @@ export default function Image( {
 		);
 	}
 
+	/**
+	 * Set the post's featured image with the current image.
+	 */
+	const setPostFeatureImage = () => {
+		setFeaturedImage( id );
+	};
+
+	/**
+	 * Create a menu item to set the image as the post's featured image.
+	 *
+	 * @param {Object} props                   - Props for block settings menu control.
+	 * @param {Object} props.selectedClientIds - Selected client ids.
+	 *
+	 * @return {void} - Menu item to set the image as the post's featured image.
+	 */
+	const featureImageControl = (
+		<BlockSettingsMenuControls>
+			{ ( { selectedClientIds } ) =>
+				( selectedClientIds.length === 1 &&
+					! isDescendentOfQueryLoop &&
+					postId &&
+					storedFeaturedImage !== id &&
+					clientId === selectedClientIds[ 0 ] && (
+						<MenuItem onClick={ () => setPostFeatureImage() }>
+							{ __( 'Set featured image' ) }
+						</MenuItem>
+					) ) ||
+				null
+			}
+		</BlockSettingsMenuControls>
+	);
+
 	return (
 		<>
 			{ mediaReplaceFlow }
 			{ controls }
+			{ featureImageControl }
 			{ img }
 
 			<Caption
