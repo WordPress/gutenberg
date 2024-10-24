@@ -65,7 +65,7 @@ import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
-let linkOptions = [
+const LINK_OPTIONS = [
 	{
 		icon: customLink,
 		label: __( 'Link images to attachment pages' ),
@@ -117,13 +117,13 @@ export default function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const lightboxSetting = useSettings( 'blocks.core/image.lightbox' )[ 0 ];
+	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
 
-	if ( ! lightboxSetting?.allowEditing ) {
-		linkOptions = linkOptions.filter(
-			( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-		);
-	}
+	const linkOptions = ! lightboxSetting?.allowEditing
+		? LINK_OPTIONS.filter(
+				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
+		  )
+		: LINK_OPTIONS;
 
 	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
 		attributes;
