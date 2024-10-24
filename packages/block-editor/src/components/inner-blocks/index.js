@@ -207,7 +207,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				const sectionRootClientId = getSectionRootClientId();
 				// Disable the root drop zone when zoomed out and the section root client id
 				// is not the root block list (represented by an empty string).
-				// This avoids drag handling bugs caused by having two block lists acting as 
+				// This avoids drag handling bugs caused by having two block lists acting as
 				// drop zones - the actual 'root' block list and the section root.
 				return {
 					isDropZoneDisabled:
