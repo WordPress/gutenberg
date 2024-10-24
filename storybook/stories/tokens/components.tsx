@@ -36,7 +36,7 @@ export const TokensTable = ( { tokenCategory, tokens, applyTokenStyle } ) => {
 						</td>
 						<td style={ { padding: '24px' } }>
 							<div
-								aria-label={ `A square showing an example of the '${ name }' ${ tokenCategory } token` }
+								aria-label={ `A shape showing an example of the '${ name }' ${ tokenCategory } token` }
 								style={ {
 									width: '100px',
 									height: '100px',
