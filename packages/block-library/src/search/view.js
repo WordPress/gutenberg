@@ -3,6 +3,9 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
+/** @type {( () => void ) | null} */
+let supersedePreviousSearch = null;
+
 const { state, actions } = store(
 	'core/search',
 	{
@@ -80,27 +83,48 @@ const { state, actions } = store(
 			*updateSearch( e ) {
 				const { value } = e.target;
 
+				const ctx = getContext();
+
 				// Don't navigate if the search didn't really change.
-				if ( value === state.search ) {
+				if ( value === ctx.search ) {
 					return;
 				}
 
-				state.search = value;
+				ctx.search = value;
 
 				// Debounce the search by 300ms to prevent multiple navigations.
-				// We can do this by yielding a promise that resolves after 300ms and
-				// then bailing out if the search has changed.
-				yield new Promise( ( resolve ) => setTimeout( resolve, 300 ) );
-				if ( value !== state.search ) {
+				supersedePreviousSearch?.();
+				const { promise, resolve, reject } = Promise.withResolvers();
+				const timeout = setTimeout( resolve, 300 );
+				supersedePreviousSearch = () => {
+					clearTimeout( timeout );
+					reject();
+				};
+				try {
+					yield promise;
+				} catch {
 					return;
 				}
 
 				const url = new URL( window.location.href );
 				url.searchParams.delete( 'paged' );
+
 				if ( value ) {
-					url.searchParams.set( 'instant-search', value );
+					if ( ctx.isInherited ) {
+						url.searchParams.set( 'instant-search', value );
+					} else {
+						// Set the instant-search parameter using the query ID and search value
+						const queryId = ctx.queryId;
+						url.searchParams.set(
+							`instant-search-${ queryId }`,
+							value
+						);
+					}
 				} else {
 					url.searchParams.delete( 'instant-search' );
+					url.searchParams.delete(
+						`instant-search-${ ctx.queryId }`
+					);
 				}
 
 				const { actions: routerActions } = yield import(

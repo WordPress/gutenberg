@@ -172,6 +172,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 		array( 'class' => $classnames )
 	);
 	$form_directives      = '';
+	$form_context         = array();
 
 	// If it's interactive, add the directives.
 	if ( $is_expandable_searchfield || $enhanced_pagination ) {
@@ -182,25 +183,31 @@ function render_block_core_search( $attributes, $content, $block ) {
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
 		$aria_label_collapsed = __( 'Expand search field' );
-		$form_context         = wp_interactivity_data_wp_context(
-			array(
-				'isSearchInputInitiallyVisible' => $open_by_default,
-				'inputId'                       => $input_id,
-				'ariaLabelExpanded'             => $aria_label_expanded,
-				'ariaLabelCollapsed'            => $aria_label_collapsed,
-				'search'                        => empty( $_GET[ 'instant-search-' . $block->context['queryId'] ] ) ? '' : sanitize_text_field( $_GET[ 'instant-search-' . $block->context['queryId'] ] ),
-				'isInherited'                   => isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'],
-				'queryId'                       => $block->context['queryId'],
-			)
+		$form_context         = array(
+			'isSearchInputInitiallyVisible' => $open_by_default,
+			'inputId'                       => $input_id,
+			'ariaLabelExpanded'             => $aria_label_expanded,
+			'ariaLabelCollapsed'            => $aria_label_collapsed,
 		);
-		$form_directives    = '
-		 	data-wp-interactive="core/search"'
-			. $form_context .
+		$form_directives    .=
 			'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
 			data-wp-on-async--keydown="actions.handleSearchKeydown"
 			data-wp-on-async--focusout="actions.handleSearchFocusout"
 		';
 	}
+
+	if ( $enhanced_pagination ) {
+		$form_context = array_merge(
+			$form_context,
+			array(
+				'search'      => empty( $_GET[ 'instant-search-' . $block->context['queryId'] ] ) ? '' : sanitize_text_field( $_GET[ 'instant-search-' . $block->context['queryId'] ] ),
+				'isInherited' => isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'],
+				'queryId'     => $block->context['queryId'],
+			)
+		);
+	}
+
+	$form_directives .= wp_interactivity_data_wp_context( $form_context );
 
 	return sprintf(
 		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',

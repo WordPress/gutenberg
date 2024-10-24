@@ -47,10 +47,11 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
-	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
-	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
-	$search_query        = empty( $_GET['instant-search'] ) ? '' : sanitize_text_field( $_GET['instant-search'] );
+	$page_key               = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination    = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                   = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$search_query_inherited = empty( $_GET['instant-search'] ) ? '' : sanitize_text_field( $_GET['instant-search'] );
+	$search_query_direct    = empty( $_GET[ 'instant-search-' . $block->context['queryId'] ] ) ? '' : sanitize_text_field( $_GET[ 'instant-search-' . $block->context['queryId'] ] );
 
 	// Check if the Instant Search experiment is enabled.
 	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
@@ -80,16 +81,16 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		 * 3. The search query is not empty.
 		 * 4. The query already has posts.
 		 */
-		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) && $query->have_posts() ) {
-			$args  = array_merge( $query->query_vars, array( 's' => $search_query ) );
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query_inherited ) && $query->have_posts() ) {
+			$args  = array_merge( $query->query_vars, array( 's' => $search_query_inherited ) );
 			$query = new WP_Query( $args );
 		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 
 		// Add search parameter if enhanced pagination is on and search query exists
-		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query ) ) {
-			$query_args['s'] = $search_query;
+		if ( $enhanced_pagination && $instant_search_enabled && ! empty( $search_query_direct ) ) {
+			$query_args['s'] = $search_query_direct;
 		}
 
 		$query = new WP_Query( $query_args );
