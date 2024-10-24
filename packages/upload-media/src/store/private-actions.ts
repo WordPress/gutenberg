@@ -51,9 +51,11 @@ import type {
 	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
+	Settings,
 	SideloadAdditionalData,
 	State,
 	ThumbnailGeneration,
+	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
 import type { cancelItem } from './actions';
@@ -985,5 +987,23 @@ export function revokeBlobUrls( id: QueueItemId ) {
 			type: Type.RevokeBlobUrls,
 			id,
 		} );
+	};
+}
+
+
+/**
+ * Returns an action object that pauses all processing in the queue.
+ *
+ * Useful for testing purposes.
+ *
+ * @param settings
+ * @return Action object.
+ */
+export function updateSettings(
+	settings: Partial< Settings >
+): UpdateSettingsAction {
+	return {
+		type: Type.UpdateSettings,
+		settings,
 	};
 }

@@ -22,9 +22,7 @@ import type {
 	OnSuccessHandler,
 	QueueItem,
 	QueueItemId,
-	Settings,
 	State,
-	UpdateSettingsAction,
 } from './types';
 import { Type } from './types';
 import type {
@@ -58,23 +56,6 @@ type ThunkArgs = {
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
 };
-
-/**
- * Returns an action object that pauses all processing in the queue.
- *
- * Useful for testing purposes.
- *
- * @param settings
- * @return Action object.
- */
-export function updateSettings(
-	settings: Partial< Settings >
-): UpdateSettingsAction {
-	return {
-		type: Type.UpdateSettings,
-		settings,
-	};
-}
 
 interface AddItemsArgs {
 	files: File[];
