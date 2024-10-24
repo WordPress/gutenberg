@@ -63,6 +63,10 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,
