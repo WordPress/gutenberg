@@ -26,6 +26,7 @@
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
 		{ "path": "../notices" },
+		{ "path": "../preferences" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
 		{ "path": "../token-list" },
