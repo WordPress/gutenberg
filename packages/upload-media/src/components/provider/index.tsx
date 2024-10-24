@@ -8,11 +8,12 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
+import { unlock } from '../../lock-unlock';
 import { store as uploadStore } from '../../store';
 
 const MediaUploadProvider = withRegistryProvider( ( props: any ) => {
 	const { children, settings } = props;
-	const { updateSettings } = useDispatch( uploadStore );
+	const { updateSettings } = unlock( useDispatch( uploadStore ) );
 
 	useEffect( () => {
 		updateSettings( settings );
