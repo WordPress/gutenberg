@@ -4,9 +4,9 @@
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import React from 'react';
 
-export const ElevationTable = ( { tokens } ) => {
+export const TokensTable = ( { tokenCategory, tokens, applyTokenStyle } ) => {
 	return (
-		<table>
+		<table style={ { width: '100%' } }>
 			<thead>
 				<tr>
 					<th>Token</th>
@@ -36,12 +36,12 @@ export const ElevationTable = ( { tokens } ) => {
 						</td>
 						<td style={ { padding: '24px' } }>
 							<div
-								aria-label={ `An square showing an example of the '${ name }' elevation styles` }
+								aria-label={ `A shape showing an example of the '${ name }' ${ tokenCategory } token` }
 								style={ {
 									width: '100px',
 									height: '100px',
-									boxShadow: valueCode,
 									background: 'white',
+									...applyTokenStyle( valueCode ),
 								} }
 							></div>
 						</td>
