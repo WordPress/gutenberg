@@ -6,11 +6,6 @@
 }
 
 .wp-block-site-logo {
-	// Make the block selectable.
-	a {
-		pointer-events: none;
-	}
-
 	.custom-logo-link {
 		cursor: inherit;
 
@@ -21,8 +16,10 @@
 
 	img {
 		display: block;
-		height: auto;
-		max-width: 100%;
+	}
+
+	.wp-block-image__crop-area {
+		pointer-events: auto;
 	}
 
 	&.is-transient {
@@ -52,11 +49,13 @@
 		width: 60px;
 	}
 
+	/**
 	// Inherit radius.
 	> div, // A 60px width div shown only in the editor on mobile.
 	.components-resizable-box__container {
 		border-radius: inherit;
 	}
+	*/
 
 	// Style the placeholder.
 	.components-placeholder {
@@ -64,7 +63,6 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0;
-		border-radius: inherit;
 
 		// Provide a minimum size for the placeholder, for when the logo is resized.
 		// @todo resizing is currently only possible by adding an image, resizing,
@@ -106,6 +104,18 @@
 			}
 		}
 	}
+}
+
+// Reduced specificity for the placeholder border radius,
+// so that border-radius from global styles can be applied.
+:root :where(.wp-block-site-logo .components-placeholder) {
+	border-radius: inherit;
+}
+
+// Reset the box-sizing for the placeholder to prevent the border
+// from covering the logo upload button.
+.wp-block-site-logo .components-placeholder.components-placeholder {
+	box-sizing: initial;
 }
 
 .block-library-site-logo__inspector-upload-container {
@@ -163,5 +173,23 @@
 		padding: 6px 12px;
 		display: flex;
 		height: $grid-unit-50;
+	}
+}
+
+// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized logo.
+.wp-block-site-logo .components-resizable-box__container {
+	// Using "display: table" because:
+	// - it visually hides empty white space in between elements
+	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
+	display: table;
+	img {
+		display: block;
+		width: inherit;
+	}
+}
+
+.wp-block-site-logo.has-custom-border {
+	.wp-block-image__crop-area {
+		box-sizing: border-box;
 	}
 }
