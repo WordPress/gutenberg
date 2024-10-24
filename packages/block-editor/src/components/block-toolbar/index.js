@@ -255,9 +255,7 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				{ isDefaultEditingMode && (
-					<BlockSettingsMenu clientIds={ blockClientIds } />
-				) }
+				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
 	);
