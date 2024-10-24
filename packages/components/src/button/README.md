@@ -140,9 +140,16 @@ An optional additional class name to apply to the rendered button.
 
 #### `description`: `string`
 
-An accessible description for the button.
+A visually hidden accessible description for the button.
 
 -   Required: No
+
+#### `showDescription`: `boolean`
+
+Whether to show the accessible description.
+
+-   Required: No
+-   Default: `false`
 
 #### `disabled`: `boolean`
 
@@ -164,7 +171,7 @@ If provided, renders an [Icon](/packages/components/src/icon/README.md) componen
 
 -   Required: No
 
-#### `iconPosition`: `'left' | 'right'`
+#### `iconPosition`: `'left' | 'right' | 'top'`
 
 If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
 
