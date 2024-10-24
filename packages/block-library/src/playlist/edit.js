@@ -23,9 +23,19 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { safeHTML, __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { Caption } from '../utils/caption';
+
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
+const PlaylistEdit = ( {
+	attributes,
+	setAttributes,
+	isSelected,
+	insertBlocksAfter,
+} ) => {
 	const {
 		ids,
 		order,
@@ -153,7 +163,7 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={ __( 'Show artists in Tracklist' ) }
+								label={ __( 'Show artist name in Tracklist' ) }
 								onChange={ toggleAttribute( 'artists' ) }
 								checked={ artists }
 							/>
@@ -341,6 +351,14 @@ const PlaylistEdit = ( { attributes, setAttributes, isSelected } ) => {
 						) ) }
 					</TagName>
 				</Disabled>
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Playlist caption text' ) }
+					showToolbarButton={ isSelected }
+				/>
 			</figure>
 		</>
 	);
