@@ -7,6 +7,13 @@
 	// like the "focused entities".
 	background-color: $gray-300;
 
+	// This overrides the iframe background since it's applied again here
+	// It also prevents some style glitches if `editor-visual-editor`
+	// like when hovering the preview in the site editor.
+	iframe[name="editor-canvas"] {
+		background-color: transparent;
+	}
+
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
 
