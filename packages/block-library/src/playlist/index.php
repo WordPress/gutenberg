@@ -27,16 +27,17 @@ function render_block_core_playlist( $attributes ) {
 	$tracklist    = isset( $attributes['tracklist'] ) ? $attributes['tracklist'] : true;
 	$tracknumbers = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
 	$artists      = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
-	$images		  = isset( $attributes['images'] ) ? $attributes['images'] : true;
+	$images       = isset( $attributes['images'] ) ? $attributes['images'] : true;
 	$tagname      = $tracknumbers ? 'ol' : 'ul';
 
 	/**
 	 * Assign the current track information to variables.
+	 * The current track is the first one in the list.
 	 */
-	$current_id         = $attributes['ids'][0]['id']; // The current track is the first one in the list.
-	$current_title      = isset( $attributes['ids'][0]['title'] ) ? $attributes['ids'][0]['title'] : '';
-	$current_album      = isset( $attributes['ids'][0]['album'] ) ? $attributes['ids'][0]['album'] : '';
-	$current_artist     = isset( $attributes['ids'][0]['artist'] ) ? $attributes['ids'][0]['artist'] : '';
+	$current_id     = $attributes['ids'][0]['id'];
+	$current_title  = isset( $attributes['ids'][0]['title'] ) ? $attributes['ids'][0]['title'] : '';
+	$current_album  = isset( $attributes['ids'][0]['album'] ) ? $attributes['ids'][0]['album'] : '';
+	$current_artist = isset( $attributes['ids'][0]['artist'] ) ? $attributes['ids'][0]['artist'] : '';
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$placeholder_image  = '/wp-includes/images/media/audio.png';
@@ -113,7 +114,7 @@ function render_block_core_playlist( $attributes ) {
 			$html .= '<button '. $contexts . 'data-wp-on--click="actions.changeTrack">';
 
 			/**
-			 * Use quotation marks for song titles when they are combined with the artist name,
+			 * Use quotation marks for song titles when they are combined with the artist name.
 			 *
 			 * @see https://core.trac.wordpress.org/changeset/55251
 			*/
