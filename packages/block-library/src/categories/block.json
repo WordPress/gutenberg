@@ -44,6 +44,15 @@
 	"usesContext": [ "enhancedPagination" ],
 	"supports": {
 		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
