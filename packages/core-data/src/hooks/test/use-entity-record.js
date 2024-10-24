@@ -54,6 +54,8 @@ describe( 'useEntityRecord', () => {
 			hasResolved: false,
 			hasStarted: false,
 			isResolving: false,
+			isSaving: false,
+			isDeleting: false,
 			status: 'IDLE',
 		} );
 
@@ -75,6 +77,8 @@ describe( 'useEntityRecord', () => {
 			hasResolved: true,
 			hasStarted: true,
 			isResolving: false,
+			isSaving: false,
+			isDeleting: false,
 			status: 'SUCCESS',
 		} );
 	} );
@@ -105,6 +109,8 @@ describe( 'useEntityRecord', () => {
 				hasResolved: true,
 				hasStarted: true,
 				isResolving: false,
+				isSaving: false,
+				isDeleting: false,
 				status: 'SUCCESS',
 			} )
 		);
@@ -150,6 +156,8 @@ describe( 'useEntityRecord', () => {
 			hasEdits: false,
 			edits: {},
 			record: null,
+			isSaving: false,
+			isDeleting: false,
 			save: expect.any( Function ),
 		} );
 
