@@ -868,8 +868,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$resolved_theme_uris_cache[ $resolved_theme_uris_cache_key ];
 		}
 
-		$theme_json_data = $theme_json->get_raw_data();
-
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
 		$placeholder = 'file:./';
 
