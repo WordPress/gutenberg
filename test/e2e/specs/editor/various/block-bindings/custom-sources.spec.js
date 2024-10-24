@@ -636,7 +636,7 @@ test.describe( 'Registered sources', () => {
 				.getByRole( 'button', { name: 'Edit link', exact: true } )
 				.click();
 			await page
-				.getByPlaceholder( 'Search or type URL' )
+				.getByLabel( 'Search or type URL' )
 				.fill( '#url-custom-field-modified' );
 			await pageUtils.pressKeys( 'Enter' );
 
@@ -693,9 +693,7 @@ test.describe( 'Registered sources', () => {
 			await page
 				.getByRole( 'button', { name: 'Edit link', exact: true } )
 				.click();
-			await page
-				.getByPlaceholder( 'Search or type URL' )
-				.fill( testingImgSrc );
+			await page.getByLabel( 'Search or type URL' ).fill( testingImgSrc );
 			await pageUtils.pressKeys( 'Enter' );
 
 			// Check that the image url attribute didn't change and still uses the placeholder.
