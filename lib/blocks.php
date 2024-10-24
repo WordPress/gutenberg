@@ -22,6 +22,7 @@ function gutenberg_reregister_core_block_types() {
 				'column',
 				'columns',
 				'details',
+				'formula',
 				'form-input',
 				'form-submit-button',
 				'group',

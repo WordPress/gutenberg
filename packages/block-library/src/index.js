@@ -49,6 +49,7 @@ import * as details from './details';
 import * as embed from './embed';
 import * as file from './file';
 import * as form from './form';
+import * as formula from './formula';
 import * as formInput from './form-input';
 import * as formSubmitButton from './form-submit-button';
 import * as formSubmissionNotification from './form-submission-notification';
@@ -154,6 +155,7 @@ const getAllBlocks = () => {
 		details,
 		embed,
 		file,
+		formula,
 		group,
 		html,
 		latestComments,

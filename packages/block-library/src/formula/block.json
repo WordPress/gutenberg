@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/formula",
+	"title": "Formula",
+	"category": "text",
+	"description": "Render mathematical formulæ.",
+	"textdomain": "default",
+	"attributes": {
+		"formulaSource": {
+			"type": "string",
+			"selector": "img",
+			"source": "attribute",
+			"attribute": "data-formula"
+		},
+		"alt": {
+			"type": "string",
+			"selector": "img",
+			"source": "attribute",
+			"attribute": "alt"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"html": false,
+		"spacing": {
+			"padding": true,
+			"margin": [ "top", "bottom" ],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"blockGap": true
+			}
+		}
+	},
+	"editorStyle": "wp-block-formula",
+	"style": "wp-block-formula"
+}
