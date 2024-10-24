@@ -223,6 +223,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
+	 * @since 6.7.0 Added `text-shadow` property.
 	 *
 	 * @var array
 	 */
@@ -288,6 +289,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
+		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'writing-mode'                      => array( 'typography', 'writingMode' ),
 	);
 
@@ -376,6 +378,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Removed `layout.definitions`. Added `typography.writingMode`.
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
+	 * @since 6.7.0 Added `typography.textShadow`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -458,6 +461,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'      => null,
 			'textDecoration'   => null,
 			'textTransform'    => null,
+			'textShadow'       => null,
 			'writingMode'      => null,
 		),
 	);
@@ -555,6 +559,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'textShadow'     => null,
 			'writingMode'    => null,
 		),
 		'css'        => null,

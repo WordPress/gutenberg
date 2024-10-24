@@ -112,6 +112,18 @@ const textTransform = {
 	},
 };
 
+const textShadow = {
+	name: 'textShadow',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textShadow' ],
+			'textShadow'
+		);
+	},
+};
+
 const writingMode = {
 	name: 'writingMode',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -134,5 +146,6 @@ export default [
 	textColumns,
 	textDecoration,
 	textTransform,
+	textShadow,
 	writingMode,
 ];
