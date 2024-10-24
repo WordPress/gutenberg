@@ -272,6 +272,7 @@ function Iframe( {
 <html>
 	<head>
 		<meta charset="utf-8">
+  		<base href="${ window.location.origin }">
 		<script>window.frameElement._load()</script>
 		<style>
 			html{
