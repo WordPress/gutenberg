@@ -490,6 +490,10 @@ export const getContentLockingParent = ( state, clientId ) => {
 	return result;
 };
 
+export function getContentOnlyControlsBlocks( state ) {
+	return state.contentOnlyControlsBlocks;
+}
+
 /**
  * Retrieves the client ID of the parent section block.
  *

@@ -380,6 +380,20 @@ export function expandBlock( clientId ) {
 	};
 }
 
+export function addContentOnlyControlsBlock( clientId ) {
+	return {
+		type: 'ADD_CONTENT_ONLY_CONTROLS_BLOCK',
+		clientId,
+	};
+}
+
+export function removeContentOnlyControlsBlock( clientId ) {
+	return {
+		type: 'REMOVE_CONTENT_ONLY_CONTROLS_BLOCK',
+		clientId,
+	};
+}
+
 /**
  * @param {Object} value
  * @param {string} value.rootClientId The root client ID to insert at.

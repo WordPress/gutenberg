@@ -10,7 +10,6 @@ import {
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
-	Dropdown,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -32,7 +31,6 @@ import {
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
-import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
@@ -623,49 +621,31 @@ export default function Image( {
 			) }
 			{ isContentOnlyMode && (
 				// Add some extra controls for content attributes when content only mode is active.
-				// With content only mode active, the inspector is hidden, so users need another way
-				// to edit these attributes.
-				<BlockControls group="other">
-					<Dropdown
-						popoverProps={ { position: 'bottom right' } }
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<ToolbarButton
-								onClick={ onToggle }
-								aria-haspopup="true"
-								aria-expanded={ isOpen }
-								onKeyDown={ ( event ) => {
-									if ( ! isOpen && event.keyCode === DOWN ) {
-										event.preventDefault();
-										onToggle();
-									}
-								} }
-							>
-								{ _x(
-									'Alternative text',
-									'Alternative text for an image. Block toolbar label, a low character count is preferred.'
-								) }
-							</ToolbarButton>
-						) }
-						renderContent={ () => (
+				<InspectorControls group="contentOnly">
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ resetAll }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							label={ __( 'Alternative text' ) }
+							isShownByDefault
+							hasValue={ () => !! alt }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
+							}
+						>
 							<TextareaControl
-								className="wp-block-image__toolbar_content_textarea"
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
-								disabled={ lockAltControls }
+								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink
-												href={
-													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-													__(
-														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-													)
-												}
-											>
+											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -679,59 +659,41 @@ export default function Image( {
 								}
 								__nextHasNoMarginBottom
 							/>
-						) }
-					/>
-					{ title && (
-						<Dropdown
-							popoverProps={ { position: 'bottom right' } }
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									onClick={ onToggle }
-									aria-haspopup="true"
-									aria-expanded={ isOpen }
-									onKeyDown={ ( event ) => {
-										if (
-											! isOpen &&
-											event.keyCode === DOWN
-										) {
-											event.preventDefault();
-											onToggle();
-										}
-									} }
-								>
-									{ __( 'Title' ) }
-								</ToolbarButton>
-							) }
-							renderContent={ () => (
-								<TextControl
-									__next40pxDefaultSize
-									className="wp-block-image__toolbar_content_textarea"
-									__nextHasNoMarginBottom
-									label={ __( 'Title attribute' ) }
-									value={ title || '' }
-									onChange={ onSetTitle }
-									disabled={ lockTitleControls }
-									help={
-										lockTitleControls ? (
-											<>{ lockTitleControlsMessage }</>
-										) : (
-											<>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={ __( 'Title attribute' ) }
+							hasValue={ () => !! title }
+							onDeselect={ () =>
+								setAttributes( { title: undefined } )
+							}
+						>
+							<TextControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Title attribute' ) }
+								value={ title || '' }
+								onChange={ onSetTitle }
+								readOnly={ lockTitleControls }
+								help={
+									lockTitleControls ? (
+										<>{ lockTitleControlsMessage }</>
+									) : (
+										<>
+											{ __(
+												'Describe the role of this image on the page.'
+											) }
+											<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
 												{ __(
-													'Describe the role of this image on the page.'
+													'(Note: many devices and browsers do not display this text.)'
 												) }
-												<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-													{ __(
-														'(Note: many devices and browsers do not display this text.)'
-													) }
-												</ExternalLink>
-											</>
-										)
-									}
-								/>
-							) }
-						/>
-					) }
-				</BlockControls>
+											</ExternalLink>
+										</>
+									)
+								}
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
 			) }
 			<InspectorControls>
 				<ToolsPanel
