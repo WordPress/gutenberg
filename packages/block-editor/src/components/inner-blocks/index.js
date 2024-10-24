@@ -73,13 +73,11 @@ function UncontrolledInnerBlocks( props ) {
 		layout,
 		name,
 		blockType,
-		parentLock,
 		defaultLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
 		clientId,
-		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -196,7 +194,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const {
 				getBlockName,
 				isZoomOut,
-				getTemplateLock,
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getBlockSettings,
@@ -239,7 +236,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				),
 				name: blockName,
 				blockType: getBlockType( blockName ),
-				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
 				isDropZoneDisabled: _isDropZoneDisabled,
 				defaultLayout,
@@ -251,7 +247,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__experimentalCaptureToolbars,
 		name,
 		blockType,
-		parentLock,
 		parentClientId,
 		isDropZoneDisabled,
 		defaultLayout,
@@ -278,7 +273,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		layout,
 		name,
 		blockType,
-		parentLock,
 		defaultLayout,
 		...options,
 	};

@@ -69,7 +69,6 @@ export function PrivateBlockToolbar( {
 		hasParentPattern,
 		hasContentOnlyLocking,
 		showShuffleButton,
-		showSlots,
 		showGroupButtons,
 		showLockButtons,
 	} = useSelect( ( select ) => {
@@ -138,7 +137,6 @@ export function PrivateBlockToolbar( {
 			hasParentPattern: _hasParentPattern,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: isZoomOut(),
-			showSlots: ! isZoomOut(),
 			showGroupButtons: ! isZoomOut(),
 			showLockButtons: ! isZoomOut(),
 		};
@@ -227,7 +225,7 @@ export function PrivateBlockToolbar( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ shouldShowVisualToolbar && showSlots && (
+				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot
 							group="parent"

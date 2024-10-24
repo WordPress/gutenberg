@@ -24,6 +24,13 @@ test.describe( 'Content-only lock', () => {
 <!-- /wp:group -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
+
+		// First click selects the section.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+
+		// Second click selects the content.
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.click();
@@ -50,9 +57,18 @@ test.describe( 'Content-only lock', () => {
 <!-- /wp:group -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
+
+		// First click selects the section.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.first()
+			.click();
+
+		// Second click selects the content.
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.click();
+
 		await page.keyboard.type( ' WP' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
