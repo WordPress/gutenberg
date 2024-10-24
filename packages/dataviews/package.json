@@ -28,7 +28,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.10",
+		"@ariakit/react": "^0.4.13",
 		"@babel/runtime": "7.25.7",
 		"@wordpress/components": "*",
 		"@wordpress/compose": "*",

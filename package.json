@@ -25,7 +25,7 @@
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
 		"@apidevtools/json-schema-ref-parser": "11.6.4",
-		"@ariakit/test": "^0.4.2",
+		"@ariakit/test": "^0.4.5",
 		"@babel/core": "7.25.7",
 		"@babel/plugin-syntax-jsx": "7.25.7",
 		"@babel/runtime-corejs3": "7.25.7",
