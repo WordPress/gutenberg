@@ -3,7 +3,10 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { actions } = store(
+/** @type {( () => void ) | null} */
+let supersedePreviousSearch = null;
+
+const { state, actions } = store(
 	'core/search',
 	{
 		state: {
@@ -29,14 +32,25 @@ const { actions } = store(
 				const { isSearchInputVisible } = getContext();
 				return isSearchInputVisible ? '0' : '-1';
 			},
+			get isSearchInputVisible() {
+				const ctx = getContext();
+
+				// `ctx.isSearchInputVisible` is a client-side-only context value, so
+				// if it's not set, it means that it's an initial page load, so we need
+				// to return the value of `ctx.isSearchInputInitiallyVisible`.
+				if ( typeof ctx.isSearchInputVisible === 'undefined' ) {
+					return ctx.isSearchInputInitiallyVisible;
+				}
+				return ctx.isSearchInputVisible;
+			},
 		},
 		actions: {
 			openSearchInput( event ) {
-				const ctx = getContext();
-				const { ref } = getElement();
-				if ( ! ctx.isSearchInputVisible ) {
+				if ( ! state.isSearchInputVisible ) {
 					event.preventDefault();
+					const ctx = getContext();
 					ctx.isSearchInputVisible = true;
+					const { ref } = getElement();
 					ref.parentElement.querySelector( 'input' ).focus();
 				}
 			},
@@ -65,6 +79,59 @@ const { actions } = store(
 				) {
 					actions.closeSearchInput();
 				}
+			},
+			*updateSearch( e ) {
+				const { value } = e.target;
+
+				const ctx = getContext();
+
+				// Don't navigate if the search didn't really change.
+				if ( value === ctx.search ) {
+					return;
+				}
+
+				ctx.search = value;
+
+				// Debounce the search by 300ms to prevent multiple navigations.
+				supersedePreviousSearch?.();
+				const { promise, resolve, reject } = Promise.withResolvers();
+				const timeout = setTimeout( resolve, 300 );
+				supersedePreviousSearch = () => {
+					clearTimeout( timeout );
+					reject();
+				};
+				try {
+					yield promise;
+				} catch {
+					return;
+				}
+
+				const url = new URL( window.location.href );
+				url.searchParams.delete( 'paged' );
+
+				if ( value ) {
+					if ( ctx.isInherited ) {
+						url.searchParams.set( 'instant-search', value );
+					} else {
+						// Set the instant-search parameter using the query ID and search value
+						const queryId = ctx.queryId;
+						url.searchParams.set(
+							`instant-search-${ queryId }`,
+							value
+						);
+					}
+				} else {
+					url.searchParams.delete( 'instant-search' );
+					url.searchParams.delete(
+						`instant-search-${ ctx.queryId }`
+					);
+				}
+
+				const { actions: routerActions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+
+				routerActions.navigate( url.href );
 			},
 		},
 	},
