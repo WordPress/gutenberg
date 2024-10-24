@@ -48,7 +48,7 @@
 			"default": false
 		}
 	},
-	"usesContext": [ "enhancedPagination" ],
+	"usesContext": [ "enhancedPagination", "query", "queryId" ],
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"color": {
