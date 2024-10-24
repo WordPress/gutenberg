@@ -990,7 +990,6 @@ export function revokeBlobUrls( id: QueueItemId ) {
 	};
 }
 
-
 /**
  * Returns an action object that pauses all processing in the queue.
  *
