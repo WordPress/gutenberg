@@ -17,7 +17,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { renderToString, useRef } from '@wordpress/element';
+import { renderToString } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { store as noticeStore } from '@wordpress/notices';
@@ -58,15 +58,11 @@ export default function TableOfContentsEdit( {
 	);
 
 	// If a user clicks to a link prevent redirection and show a warning.
-	const { createWarningNotice, removeNotice } = useDispatch( noticeStore );
-	const noticeIdRef = useRef();
+	const { createWarningNotice } = useDispatch( noticeStore );
 	const showRedirectionPreventedNotice = ( event ) => {
 		event.preventDefault();
-		// Remove previous warning if any, to show one at a time per block.
-		removeNotice( noticeIdRef.current );
-		noticeIdRef.current = `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`;
 		createWarningNotice( __( 'Links are disabled in the editor.' ), {
-			id: noticeIdRef.current,
+			id: `block-library/core/table-of-contents/redirection-prevented/${ instanceId }`,
 			type: 'snackbar',
 		} );
 	};
