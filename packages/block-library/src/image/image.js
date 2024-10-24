@@ -1076,7 +1076,7 @@ export default function Image( {
 	 *
 	 * @return {void} - Menu item to set the image as the post's featured image.
 	 */
-	const featureImageSettingsControl = (
+	const featureImageControl = (
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds } ) =>
 				( selectedClientIds.length === 1 &&
@@ -1096,7 +1096,7 @@ export default function Image( {
 		<>
 			{ mediaReplaceFlow }
 			{ controls }
-			{ featureImageSettingsControl }
+			{ featureImageControl }
 			{ img }
 
 			<Caption
