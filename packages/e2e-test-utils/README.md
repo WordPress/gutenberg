@@ -182,12 +182,12 @@ _Parameters_
 
 ### createURL
 
-Creates new URL by parsing base URL, WPPath and query string.
+Creates new URL by parsing given WPPath and query string, relative to the WP base.
 
 _Parameters_
 
--   _WPPath_ `string`: String to be serialized as pathname.
--   _query_ `?string`: String to be serialized as query portion of URL.
+-   _WPPath_ `[string]`: String to be serialized as pathname.
+-   _query_ `[string]`: String to be serialized as query portion of URL.
 
 _Returns_
 
