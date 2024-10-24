@@ -22,6 +22,18 @@
 		"type": {
 			"type": "string",
 			"default": "monthly"
+		},
+		"label": {
+			"type": "string",
+			"default": "Archives"
+		},
+		"isEdit": {
+			"type": "boolean",
+			"default": false
+		},
+		"uniqueId": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
