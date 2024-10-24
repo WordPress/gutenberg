@@ -10,6 +10,8 @@ import {
 import deprecated from '@wordpress/deprecated';
 import { addAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -508,4 +510,46 @@ export const toggleDistractionFree =
 			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
 		registry.dispatch( editorStore ).toggleDistractionFree();
+	};
+
+/**
+ * Action that toggles the Fullscreen Mode view option.
+ * Shows a notice when option is toggled.
+ */
+export const toggleFullscreenMode =
+	() =>
+	( { registry } ) => {
+		// Determine the current state of the Fullscreen Mode option.
+		const isFullscreen = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'fullscreenMode' );
+
+		// Toggle the Fullscreen Mode option.
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-post', 'fullscreenMode' );
+
+		// Show a notice when the Fullscreen Mode option is toggled for visual feedback.
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFullscreen ? __( 'Fullscreen off.' ) : __( 'Fullscreen on.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle(
+										'core/edit-post',
+										'fullscreenMode'
+									);
+							},
+						},
+					],
+				}
+			);
 	};

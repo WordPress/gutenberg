@@ -1619,6 +1619,14 @@ _Related_
 
 -   toggleSelection in core/block-editor store.
 
+### toggleSpotlightMode
+
+Action that toggles the Spotlight Mode view option. Shows a notice when option is toggled.
+
+### toggleTopToolbar
+
+Action that toggles the Top Toolbar view option. Shows a notice when option is toggled.
+
 ### trashPost
 
 Action for trashing the current post in the editor.
