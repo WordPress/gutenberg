@@ -25,6 +25,7 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		textdomain,
 		attributes,
 		supports,
 		author,
@@ -93,7 +94,7 @@ module.exports = async (
 		customPackageJSON,
 		customBlockJSON,
 		example,
-		textdomain: slug,
+		textdomain,
 	} );
 
 	const view = {
