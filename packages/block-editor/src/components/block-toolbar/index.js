@@ -155,11 +155,6 @@ export function PrivateBlockToolbar( {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
-	const hasBlockToolbar = useHasBlockToolbar();
-	if ( ! hasBlockToolbar ) {
-		return null;
-	}
-
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
@@ -270,6 +265,11 @@ export function PrivateBlockToolbar( {
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
 export default function BlockToolbar( { hideDragHandle, variant } ) {
+	const hasBlockToolbar = useHasBlockToolbar();
+	if ( ! hasBlockToolbar ) {
+		return null;
+	}
+
 	return (
 		<PrivateBlockToolbar
 			hideDragHandle={ hideDragHandle }
