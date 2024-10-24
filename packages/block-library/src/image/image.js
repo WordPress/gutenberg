@@ -1080,7 +1080,8 @@ export default function Image( {
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds } ) =>
 				( selectedClientIds.length === 1 &&
-					( ! isDescendentOfQueryLoop || postId ) &&
+					! isDescendentOfQueryLoop &&
+					postId &&
 					storedFeaturedImage !== id &&
 					clientId === selectedClientIds[ 0 ] && (
 						<MenuItem onClick={ () => setPostFeatureImage() }>
