@@ -81,11 +81,9 @@ function render_block_core_search( $attributes, $content, $block ) {
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
-		if ( $is_expandable_searchfield || $enhanced_pagination ) {
+		if ( $is_expandable_searchfield ) {
 			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 
-		}
-		if ( $is_expandable_searchfield ) {
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
 
@@ -94,8 +92,10 @@ function render_block_core_search( $attributes, $content, $block ) {
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
 		}
+
 		// Instant search is only available when using the enhanced pagination.
 		if ( $enhanced_pagination ) {
+			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 			$input->set_attribute( 'data-wp-bind--value', 'context.search' );
 			$input->set_attribute( 'data-wp-on-async--input', 'actions.updateSearch' );
 		}
