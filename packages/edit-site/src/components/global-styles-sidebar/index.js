@@ -22,9 +22,8 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
 import { store as coreStore } from '@wordpress/core-data';
-import DefaultSidebar from './default-sidebar';
 
-const { interfaceStore } = unlock( editorPrivateApis );
+const { interfaceStore, ComplementaryArea } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function GlobalStylesSidebar() {
@@ -129,7 +128,8 @@ export default function GlobalStylesSidebar() {
 	};
 
 	return (
-		<DefaultSidebar
+		<ComplementaryArea
+			scope="core"
 			className="edit-site-global-styles-sidebar"
 			identifier="edit-site/global-styles"
 			title={ __( 'Styles' ) }
@@ -187,6 +187,6 @@ export default function GlobalStylesSidebar() {
 			}
 		>
 			<GlobalStylesUI />
-		</DefaultSidebar>
+		</ComplementaryArea>
 	);
 }
