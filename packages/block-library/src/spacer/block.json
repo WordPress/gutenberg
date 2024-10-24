@@ -24,6 +24,11 @@
 				"margin": true
 			}
 		},
+		"color": {
+			"text": false,
+			"background": true,
+			"gradients": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
