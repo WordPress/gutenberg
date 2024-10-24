@@ -271,6 +271,10 @@ export function applySelection( { startPath, endPath }, current ) {
 	range.setEnd( endContainer, endOffset );
 
 	const { activeElement } = ownerDocument;
+	const { frameElement } = activeElement.ownerDocument.defaultView;
+	const isInsideFrame = frameElement
+		? frameElement === frameElement.ownerDocument.activeElement
+		: true;
 
 	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
@@ -287,7 +291,10 @@ export function applySelection( { startPath, endPath }, current ) {
 	// This function is not intended to cause a shift in focus. Since the above
 	// selection manipulations may shift focus, ensure that focus is restored to
 	// its previous state.
-	if ( activeElement !== ownerDocument.activeElement ) {
+	// Do not take focus if user is not in iFrame editing canvas.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/61315
+	if ( isInsideFrame && activeElement !== ownerDocument.activeElement ) {
 		// The `instanceof` checks protect against edge cases where the focused
 		// element is not of the interface HTMLElement (does not have a `focus`
 		// or `blur` property).
