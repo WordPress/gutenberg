@@ -202,10 +202,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockSettings,
 				getSectionRootClientId,
 			} = unlock( select( blockEditorStore ) );
-			let _isDropZoneDisabled;
 
 			if ( ! clientId ) {
-				return { isDropZoneDisabled: _isDropZoneDisabled };
+				// Disable the root drop zone when zoomed out.
+				return { isDropZoneDisabled: isZoomOut() };
 			}
 
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
@@ -214,7 +214,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 
-			_isDropZoneDisabled = blockEditingMode === 'disabled';
+			let _isDropZoneDisabled = blockEditingMode === 'disabled';
 
 			if ( isZoomOut() ) {
 				// In zoom out mode, we want to disable the drop zone for the sections.
