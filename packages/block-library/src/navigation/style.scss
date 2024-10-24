@@ -46,6 +46,7 @@ $navigation-icon-size: 24px;
 	// but still allow them to be overridden by user-set colors.
 	.wp-block-navigation-item__content {
 		display: block;
+		font-size: inherit;
 	}
 
 	// This rule needs extra specificity so that it inherits the correct color from its parent.
