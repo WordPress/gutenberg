@@ -31,7 +31,8 @@
 		"@wordpress/api-fetch": "*",
 		"@wordpress/blob": "*",
 		"@wordpress/element": "*",
-		"@wordpress/i18n": "*"
+		"@wordpress/i18n": "*",
+		"@wordpress/private-apis": "*"
 	},
 	"publishConfig": {
 		"access": "public"

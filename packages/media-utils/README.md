@@ -25,6 +25,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### privateApis
+
+Private @wordpress/media-utils APIs.
+
 ### RestAttachment
 
 Undocumented declaration.
