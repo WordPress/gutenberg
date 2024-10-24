@@ -21,15 +21,23 @@ function render_block_core_playlist( $attributes ) {
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
-	$tracklist          = isset( $attributes['tracklist'] ) ? $attributes['tracklist'] : true;
-	$tracknumbers       = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
-	$images             = isset( $attributes['images'] ) ? $attributes['images'] : true;
-	$artists            = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
-	$tagname            = $tracknumbers ? 'ol' : 'ul';
+	/**
+	 * Wether to display specific parts of the playlist, depending on the block options:
+	 */
+	$tracklist    = isset( $attributes['tracklist'] ) ? $attributes['tracklist'] : true;
+	$tracknumbers = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
+	$artists      = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
+	$images		  = isset( $attributes['images'] ) ? $attributes['images'] : true;
+	$tagname      = $tracknumbers ? 'ol' : 'ul';
+
+	/**
+	 * Assign the current track information to variables.
+	 */
 	$current_id         = $attributes['ids'][0]['id']; // The current track is the first one in the list.
 	$current_title      = isset( $attributes['ids'][0]['title'] ) ? $attributes['ids'][0]['title'] : '';
 	$current_album      = isset( $attributes['ids'][0]['album'] ) ? $attributes['ids'][0]['album'] : '';
 	$current_artist     = isset( $attributes['ids'][0]['artist'] ) ? $attributes['ids'][0]['artist'] : '';
+
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$placeholder_image  = '/wp-includes/images/media/audio.png';
 	$aria_label         = $current_title;
@@ -49,7 +57,7 @@ function render_block_core_playlist( $attributes ) {
 		array(
 			'currentID'     => $current_id,
 			'currentURL'    => $attributes['ids'][0]['url'],
-			'currentTitle'  => $current_title ,
+			'currentTitle'  => $current_title,
 			'currentAlbum ' => $current_album,
 			'currentArtist' => $current_artist,
 			'currentImage'  => isset( $attributes['ids'][0]['image']['src'] ) ? $attributes['ids'][0]['image']['src'] : $placeholder_image,
@@ -59,12 +67,23 @@ function render_block_core_playlist( $attributes ) {
 
 	$html  = '<figure ' . $wrapper_attributes . 'data-wp-interactive="core/playlist">';
 	$html .= '<div class="wp-block-playlist__current-item">';
-	$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="48px" height="64px">';
-	$html .= '<ul>';
-	$html .= '<li class="wp-block-playlist__item-title" data-wp-text="state.currentTitle"></li>';
-	$html .= '<li class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></li>';
-	$html .= '<li class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></li>';
-	$html .= '</ul>';
+	// Images, titles, etc are only displayed if the options are enabled.
+	if ( $images ) {
+		$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="48px" height="64px">';
+	}
+	if ( isset( $current_title ) || isset( $current_album ) || isset( $current_artist ) ) {
+		$html .= '<ul>';
+		if ( isset( $current_title ) ) {
+			$html .= '<li class="wp-block-playlist__item-title" data-wp-text="state.currentTitle"></li>';
+		}
+		if ( isset( $current_album ) ) {
+			$html .= '<li class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></li>';
+		}
+		if ( isset( $current_artist ) ) {
+			$html .= '<li class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></li>';
+		}
+		$html .= '</ul>';
+	}
 	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel"></audio>';
 	$html .= '</div>'; // End of current track information.
 
