@@ -300,7 +300,8 @@ wp-env stop
 Stops running WordPress for development and tests and frees the ports.
 
 Options:
-  --debug            Enable debug output.             [boolean] [default: false]
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
 ### `wp-env clean [environment]`
@@ -568,6 +569,7 @@ example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be 
 build won't break on subsequent executions.
 
 * `afterStart`: Runs after `wp-env start` has finished setting up the environment.
+* `afterStop`: Runs after `wp-env stop` has finished stopping the environment.
 * `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
 * `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 

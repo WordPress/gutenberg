@@ -49,6 +49,7 @@ const DEFAULT_CONFIG = {
 	mappings: {},
 	lifecycleScripts: {
 		afterStart: null,
+		afterStop: null,
 		afterClean: null,
 		afterDestroy: null,
 	},

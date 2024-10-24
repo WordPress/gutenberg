@@ -152,7 +152,13 @@ module.exports = function cli() {
 		wpRed(
 			'Stops running WordPress for development and tests and frees the ports.'
 		),
-		() => {},
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
 		withSpinner( env.stop )
 	);
 	yargs.command(
