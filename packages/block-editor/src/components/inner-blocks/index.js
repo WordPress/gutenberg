@@ -204,6 +204,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockSettings,
 				isDragging,
 				getSectionRootClientId,
+				isZoomOutMode: isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 
 			if ( ! clientId ) {
