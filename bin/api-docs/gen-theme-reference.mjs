@@ -9,7 +9,7 @@
  */
 import fs from 'node:fs/promises';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'node:url'
 
 /**
  * @typedef {import('@apidevtools/json-schema-ref-parser').JSONSchema} JSONSchema
