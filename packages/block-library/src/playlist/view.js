@@ -59,7 +59,45 @@ const { state } = store(
 					.closest( '.wp-block-playlist' )
 					.querySelector( 'audio' );
 				if ( audio ) {
-					audio.play();
+					// Wait a momet before changing the track, since immediately changing the track can be jarring.
+					setTimeout( () => {
+						audio.load();
+						audio.play();
+					}, 1000 );
+				}
+			},
+		},
+		callbacks: {
+			init() {
+				const { ref } = getElement();
+				const audio = ref
+					.closest( '.wp-block-playlist' )
+					.querySelector( 'audio' );
+
+				if ( audio ) {
+					audio.addEventListener( 'ended', () => {
+						const currentTrackListItem = ref
+							.closest( '.wp-block-playlist' )
+							.querySelector(
+								'.wp-block-playlist__item button[aria-current="true"]'
+							)
+							?.closest( '.wp-block-playlist__item' );
+
+						if ( currentTrackListItem ) {
+							const nextTrackListItem =
+								currentTrackListItem.nextElementSibling;
+							if ( nextTrackListItem !== null ) {
+								const nextTrackButton =
+									nextTrackListItem.querySelector( 'button' );
+								if ( nextTrackButton ) {
+									// Wait a momet before changing the track, since immediately changing the track can be jarring.
+									setTimeout( () => {
+										nextTrackButton.click();
+									}, 1000 );
+								}
+							}
+						}
+					} );
 				}
 			},
 		},

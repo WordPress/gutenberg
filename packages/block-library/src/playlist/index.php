@@ -86,7 +86,7 @@ function render_block_core_playlist( $attributes ) {
 		}
 		$html .= '</ul>';
 	}
-	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel"></audio>';
+	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel" data-wp-watch="callbacks.init"></audio>';
 	$html .= '</div>'; // End of current track information.
 
 	if ( $tracklist ) {
@@ -110,6 +110,9 @@ function render_block_core_playlist( $attributes ) {
 					'trackImageSrc' => $image,
 				)
 			);
+			if ( 0 === $key ) {
+				$contexts .= 'aria-current="true"';
+			}
 
 			$html .= '<li class="wp-block-playlist__item">';
 			$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack">';
