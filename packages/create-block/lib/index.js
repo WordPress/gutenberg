@@ -59,7 +59,10 @@ program
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.option( '--no-plugin', 'scaffold only block files' )
 	.option( '--variant <variant>', 'the variant of the template to use' )
-	.option( '--target-dir <directory>', 'the variant of the template to use' )
+	.option(
+		'--target-dir <directory>',
+		'the directory where the files will be added'
+	)
 	.action(
 		async (
 			slug,
