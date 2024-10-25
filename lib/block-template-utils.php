@@ -112,6 +112,8 @@ function gutenberg_generate_block_templates_export_file() {
 			if ( ! $file_content ) {
 				continue;
 			}
+			// @TODO: Handle setting in WP_Theme_JSON_Resolver_Gutenberg, something akin to ::resolve_theme_file_uris().
+			// Reason is, we want to strip any superfluous information from backgroundImage object such as upload "id", "source", and "title".
 			_wp_array_set( $theme_json_raw, $path, $uri['href'] );
 			if ( $zip->locateName( 'assets' ) === false ) {
 				// Directory doesn't exist, so add it
