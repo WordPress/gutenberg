@@ -823,6 +823,106 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $variations;
 	}
 
+	private static function process_theme_uris( $theme_json, $options = array() ) {
+		$processed_theme_uris = array();
+
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+			return $processed_theme_uris;
+		}
+
+		$options = wp_parse_args(
+			$options,
+			array(
+				'should_process' => array(
+					'background_images' => true,
+				),
+				'placeholder'    => 'file:./',
+			)
+		);
+
+		$should_process  = $options['should_process'] ?? array();
+		$theme_json_data = $theme_json->get_raw_data();
+		$placeholder     = $options['placeholder'] ?? '';
+
+		if ( ! empty( $should_process['background_images'] ) ) {
+			// Top level styles.
+			$background_image_url_path = array( 'styles', 'background', 'backgroundImage', 'url' );
+			$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
+			if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $placeholder ) ) {
+				$processed_theme_uris[] = call_user_func( $options['value_func'], $background_image_url_path, $placeholder, $background_image_url );
+			}
+
+			// Block styles.
+			if ( ! empty( $theme_json_data['styles']['blocks'] ) ) {
+				foreach ( $theme_json_data['styles']['blocks'] as $block_name => $block_styles ) {
+					if ( ! isset( $block_styles['background']['backgroundImage']['url'] ) ) {
+						continue;
+					}
+					$background_image_url_path = array( 'styles', 'blocks', $block_name, 'background', 'backgroundImage', 'url' );
+					$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
+					if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $placeholder ) ) {
+						if ( isset( $options['value_func'] ) && is_callable( $options['value_func'] ) ) {
+							$processed_theme_uris[] = call_user_func( $options['value_func'], $background_image_url_path, $placeholder, $background_image_url );
+						}
+					}
+				}
+			}
+		}
+
+		// Add font URIs.
+		if ( ! empty( $should_process['font_faces'] ) && ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
+			$font_families = array_merge(
+				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
+				$theme_json_data['settings']['typography']['fontFamilies']['default'] ?? array()
+			);
+			foreach ( $font_families as $font_family_key => $font_family ) {
+				if ( ! empty( $font_family['fontFace'] ) ) {
+					foreach ( $font_family['fontFace'] as  $font_face_key => $font_face ) {
+						if ( ! empty( $font_face['src'] ) ) {
+							$sources = is_string( $font_face['src'] )
+								? array( $font_face['src'] )
+								: $font_face['src'];
+							foreach ( $sources as $source_key => $source ) {
+								if ( str_starts_with( $source, $placeholder ) ) {
+									$font_url_path          = is_string( $font_face['src'] ) ? array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src' ) : array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src', $source_key );
+									$processed_theme_uris[] = call_user_func( $options['value_func'], $font_url_path, $placeholder, $source );
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $processed_theme_uris;
+	}
+
+	private static function resolve_uri( $background_image_url_path, $placeholder, $background_image_url ) {
+		$file_type           = wp_check_filetype( $background_image_url );
+		$src_url             = str_replace( $placeholder, '', $background_image_url );
+		$processed_theme_uri = array(
+			'name'   => $background_image_url,
+			'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+			'target' => implode( '.', $background_image_url_path ),
+		);
+
+		if ( isset( $file_type['type'] ) ) {
+			$processed_theme_uri['type'] = $file_type['type'];
+		}
+
+		return $processed_theme_uri;
+	}
+
+	private static function migrate_uri( $background_image_url_path, $placeholder, $background_image_url ) {
+		$processed_theme_uri = array(
+			'name'   => $background_image_url,
+			'href'   => basename( parse_url( $background_image_url, PHP_URL_PATH ) ),
+			'target' => implode( '.', $background_image_url_path ),
+		);
+
+		return $processed_theme_uri;
+	}
 
 	/**
 	 * Resolves relative paths in theme.json styles to theme absolute paths
@@ -836,65 +936,28 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
-		$resolved_theme_uris = array();
+		// Using the same file convention 'file:./' when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
+		return static::process_theme_uris(
+			$theme_json,
+			array(
+				'value_func' => array( static::class, 'resolve_uri' ),
+			)
+		);
+	}
 
-		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
-			return $resolved_theme_uris;
-		}
-
-		$theme_json_data = $theme_json->get_raw_data();
-
-		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
-		$placeholder = 'file:./';
-
-		// Top level styles.
-		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
-		if (
-			isset( $background_image_url ) &&
-			is_string( $background_image_url ) &&
-			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
-			str_starts_with( $background_image_url, $placeholder ) ) {
-				$file_type          = wp_check_filetype( $background_image_url );
-				$src_url            = str_replace( $placeholder, '', $background_image_url );
-				$resolved_theme_uri = array(
-					'name'   => $background_image_url,
-					'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
-					'target' => 'styles.background.backgroundImage.url',
-				);
-				if ( isset( $file_type['type'] ) ) {
-					$resolved_theme_uri['type'] = $file_type['type'];
-				}
-				$resolved_theme_uris[] = $resolved_theme_uri;
-		}
-
-		// Block styles.
-		if ( ! empty( $theme_json_data['styles']['blocks'] ) ) {
-			foreach ( $theme_json_data['styles']['blocks'] as $block_name => $block_styles ) {
-				if ( ! isset( $block_styles['background']['backgroundImage']['url'] ) ) {
-					continue;
-				}
-				$background_image_url = $block_styles['background']['backgroundImage']['url'] ?? null;
-				if (
-					isset( $background_image_url ) &&
-					is_string( $background_image_url ) &&
-					// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
-					str_starts_with( $background_image_url, $placeholder ) ) {
-					$file_type          = wp_check_filetype( $background_image_url );
-					$src_url            = str_replace( $placeholder, '', $background_image_url );
-					$resolved_theme_uri = array(
-						'name'   => $background_image_url,
-						'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
-						'target' => "styles.blocks.{$block_name}.background.backgroundImage.url",
-					);
-					if ( isset( $file_type['type'] ) ) {
-						$resolved_theme_uri['type'] = $file_type['type'];
-					}
-					$resolved_theme_uris[] = $resolved_theme_uri;
-				}
-			}
-		}
-
-		return $resolved_theme_uris;
+	public static function get_migrated_relative_theme_uris( $theme_json, $options = array() ) {
+		$placeholder = wp_upload_dir()['baseurl'];
+		return static::process_theme_uris(
+			$theme_json,
+			array(
+				'should_process' => array(
+					'background_images' => true,
+					'font_faces'        => true,
+				),
+				'placeholder'    => $placeholder,
+				'value_func'     => array( static::class, 'migrate_uri' ),
+			)
+		);
 	}
 
 	/**

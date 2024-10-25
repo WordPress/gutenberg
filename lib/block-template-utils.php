@@ -96,26 +96,18 @@ function gutenberg_generate_block_templates_export_file() {
 		$theme_json_raw     = array_merge( $schema, $theme_json_raw );
 	}
 
-	// Convert to a string.
-	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-
 	// Find any uploaded files.
-	$uploads = wp_upload_dir();
-	$pattern = '/"(' . preg_quote( $uploads['baseurl'], '/' ) . '\/[^"]+)"/';
-	preg_match_all( $pattern, $theme_json_encoded, $matches );
-
-	if ( ! empty( $matches ) ) {
-		$replacement        = '"file:./assets/$1"';
-		$replace_pattern    = '/"' . preg_quote( $uploads['baseurl'], '/' ) . '\/.*?\/([^\/"\s]+)"/';
-		$theme_json_encoded = preg_replace( $replace_pattern, $replacement, $theme_json_encoded );
-
-		// Add each image to the assets directory.
-		foreach ( $matches[1] as $file ) {
-			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $file );
+	$uris_to_migrate = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( $tree );
+	if ( ! empty( $uris_to_migrate ) ) {
+		$uploads = wp_upload_dir();
+		foreach ( $uris_to_migrate as $uri ) {
+			$path         = explode( '.', $uri['target'] );
+			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $uri['name'] );
 			$file_content = file_get_contents( $file );
 			if ( ! $file_content ) {
 				continue;
 			}
+			_wp_array_set( $theme_json_raw, $path, 'file:./assets/' . $uri['href'] );
 			if ( $zip->locateName( 'assets' ) === false ) {
 				// Directory doesn't exist, so add it
 				$zip->addEmptyDir( 'assets' );
@@ -127,6 +119,8 @@ function gutenberg_generate_block_templates_export_file() {
 		}
 	}
 
+	// Convert to a string.
+	$theme_json_encoded = wp_json_encode( $theme_json_raw, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 	// Replace 4 spaces with a tab.
 	$theme_json_tabbed = preg_replace( '~(?:^|\G)\h{4}~m', "\t", $theme_json_encoded );
 
