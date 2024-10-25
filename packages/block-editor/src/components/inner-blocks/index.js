@@ -196,6 +196,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const {
 				getBlockName,
 				isBlockSelected,
+				isZoomOut,
 				hasSelectedInnerBlock,
 				__unstableGetEditorMode,
 				getTemplateLock,
