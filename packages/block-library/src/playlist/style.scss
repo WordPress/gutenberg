@@ -1,35 +1,58 @@
 .wp-block-playlist {
+	border: 1px solid $gray-200;
+	border-radius: 2px;
+	padding: $grid-unit-20;
 
 	.wp-block-playlist__current-item {
-		audio {
-			width: 100%;
-			margin-top: 10px;
-		}
+		display: flex;
+		align-items: center;
+		gap: var(--Spacing-6, 24px);
+		align-self: stretch;
+		padding-bottom: $grid-unit-20;
+		border-bottom: 1px solid $gray-200;
+		margin-bottom: $grid-unit-20;
+
 		img {
-			float: left;
-			margin-right: 10px;
+			border-radius: 2px;
 		}
-		ul {
-			display: block;
-			padding: 0;
-			margin: 0;
-			min-height: 70px;
-			li {
-				list-style: none;
-			}
+
+		div {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
 		}
 		.wp-block-playlist__item-album {
-			font-style: italic;
+			font-size: 16px;
+			font-weight: 600;
+		}
+		.wp-block-playlist__item-artist {
+			font-size: 13px;
+			font-weight: 400;
+			color: $gray-700;
 		}
 	}
 
-	.wp-block-playlist__item {
-		border-bottom: 1px solid #ccc;
+	audio {
+		width: 100%;
+		margin-top: 10px;
+	}
+
+	.wp-block-playlist__tracks {
+		margin-top: $grid-unit-20;
+		border-top: 1px solid $gray-200;
+		font-size: 14px;
 	}
 
 	ol.wp-block-playlist__tracks {
-		padding-left: 20px;
+		padding-left: $grid-unit-20;
 	}
+
+	.wp-block-playlist__item {
+		border-bottom: 1px solid $gray-200;
+		padding: $grid-unit-10;
+	}
+
 	ul.wp-block-playlist__tracks {
 		padding-left: 0;
 		li {
@@ -54,7 +77,7 @@
 			margin-left: auto;
 		}
 		&[aria-current="true"] {
-			font-weight: bold;
+			font-weight: 600;
 		}
 	}
 }
