@@ -197,41 +197,45 @@ const PlaylistEdit = ( {
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					{ !! ids[ trackListIndex ]?.id && (
-						<div className="wp-block-playlist__current-item">
-							{ images && (
-								<img
-									src={
-										ids[ trackListIndex ]?.image.src
-											? ids[ trackListIndex ]?.image.src
-											: '/wp-includes/images/media/audio.png'
-									}
-									width="48px"
-									height="64px"
-									alt=""
-								/>
-							) }
-							<ul>
-								{ ids[ trackListIndex ]?.album && (
-									<li
-										className="wp-block-playlist__item-album"
-										dangerouslySetInnerHTML={ {
-											__html: safeHTML(
-												ids[ trackListIndex ]?.album
-											),
-										} }
+						<>
+							<div className="wp-block-playlist__current-item">
+								{ images && (
+									<img
+										src={
+											ids[ trackListIndex ]?.image.src
+												? ids[ trackListIndex ]?.image
+														.src
+												: '/wp-includes/images/media/audio.png'
+										}
+										width="48px"
+										height="64px"
+										alt=""
 									/>
 								) }
-								{ ids[ trackListIndex ]?.artist && (
-									<li
-										className="wp-block-playlist__item-artist"
-										dangerouslySetInnerHTML={ {
-											__html: safeHTML(
-												ids[ trackListIndex ]?.artist
-											),
-										} }
-									/>
-								) }
-							</ul>
+								<div>
+									{ ids[ trackListIndex ]?.album && (
+										<span
+											className="wp-block-playlist__item-album"
+											dangerouslySetInnerHTML={ {
+												__html: safeHTML(
+													ids[ trackListIndex ]?.album
+												),
+											} }
+										/>
+									) }
+									{ ids[ trackListIndex ]?.artist && (
+										<span
+											className="wp-block-playlist__item-artist"
+											dangerouslySetInnerHTML={ {
+												__html: safeHTML(
+													ids[ trackListIndex ]
+														?.artist
+												),
+											} }
+										/>
+									) }
+								</div>
+							</div>
 							<audio
 								controls="controls"
 								src={ ids[ trackListIndex ].url }
@@ -254,7 +258,7 @@ const PlaylistEdit = ( {
 								) }
 								tabIndex={ 0 }
 							/>
-						</div>
+						</>
 					) }
 					<TagName
 						className="wp-block-playlist__tracks"

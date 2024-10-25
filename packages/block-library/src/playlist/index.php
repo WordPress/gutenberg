@@ -69,22 +69,23 @@ function render_block_core_playlist( $attributes ) {
 
 	$html  = '<figure ' . $wrapper_attributes . 'data-wp-interactive="core/playlist">';
 	$html .= '<div class="wp-block-playlist__current-item">';
-	// Images, titles, etc are only displayed if the options are enabled.
+	// Images, albums, etc are only displayed if the options are enabled.
 	if ( $images ) {
-		$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="48px" height="64px">';
+		$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="70px" height="70px">';
 	}
 	if ( isset( $current_album ) || isset( $current_artist ) ) {
-		$html .= '<ul>';
+		$html .= '<div>';
 		if ( isset( $current_album ) ) {
-			$html .= '<li class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></li>';
+			$html .= '<span class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></span>';
 		}
 		if ( isset( $current_artist ) ) {
-			$html .= '<li class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></li>';
+			$html .= '<span class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></span>';
 		}
-		$html .= '</ul>';
+		$html .= '</div>';
 	}
+	$html .= '</div>';
 	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel" data-wp-watch="callbacks.init"></audio>';
-	$html .= '</div>'; // End of current track information.
+	// End of current track information.
 
 	if ( $tracklist ) {
 		$html .= '<' . $tagname . ' class="wp-block-playlist__tracks">';
