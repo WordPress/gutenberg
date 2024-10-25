@@ -1350,6 +1350,69 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_data, $actual );
 	}
 
+	public function test_get_migrated_relative_theme_uris() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.org/wp-content/uploads/img/image.png',
+						),
+					),
+					'blocks'     => array(
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'https://example.org/wp-content/uploads/img/quote.jpg',
+								),
+							),
+						),
+						'core/verse' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'https://example.org/wp-content/uploads/img/verse.gif',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected_data = array(
+			array(
+				'name'   => 'https://example.org/wp-content/uploads/img/image.png',
+				'href'   => 'file:./image.png',
+				'target' => 'styles.background.backgroundImage.url',
+			),
+			array(
+				'name'   => 'https://example.org/wp-content/uploads/img/quote.jpg',
+				'href'   => 'file:./quote.jpg',
+				'target' => 'styles.blocks.core/quote.background.backgroundImage.url',
+			),
+			array(
+				'name'   => 'https://example.org/wp-content/uploads/img/verse.gif',
+				'href'   => 'file:./verse.gif',
+				'target' => 'styles.blocks.core/verse.background.backgroundImage.url',
+			),
+		);
+
+		/*
+		 * This filter callback normalizes the return value from `wp_upload_dir`
+		 * to guard against changes in test environments.
+		 */
+		$filter_upload_dir_callback = function ( $param ) {
+			$param['baseurl'] = 'https://example.org/wp-content/uploads';
+			return $param;
+		};
+		add_filter( 'upload_dir', $filter_upload_dir_callback );
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( $theme_json );
+		remove_filter( 'upload_dir', $filter_upload_dir_callback );
+
+		$this->assertSame( $expected_data, $actual );
+	}
+
 	/**
 	 * Tests that block style variations data gets merged in the following
 	 * priority order, from highest priority to lowest.

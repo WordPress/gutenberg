@@ -869,13 +869,12 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		if ( ! empty( $should_process['images'] ) ) {
 			// Top level styles.
-			$background_image_url_path = array( 'styles', 'background', 'backgroundImage', 'url' );
-			$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
+			$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 			if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $base_url ) ) {
 				$processed_theme_uris[] = call_user_func(
 					$options['value_func'],
 					array(
-						'theme_path'           => $background_image_url_path,
+						'theme_path'           => 'styles.background.backgroundImage.url',
 						'theme_value_prefix'   => $base_url,
 						'theme_value'          => $background_image_url,
 						'relative_path_prefix' => $relative_path_prefix,
@@ -889,14 +888,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					if ( ! isset( $block_styles['background']['backgroundImage']['url'] ) ) {
 						continue;
 					}
-					$background_image_url_path = array( 'styles', 'blocks', $block_name, 'background', 'backgroundImage', 'url' );
-					$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
+					$background_image_url = $block_styles['background']['backgroundImage']['url'] ?? null;
 					if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $base_url ) ) {
 						if ( isset( $options['value_func'] ) && is_callable( $options['value_func'] ) ) {
 							$processed_theme_uris[] = call_user_func(
 								$options['value_func'],
 								array(
-									'theme_path'           => $background_image_url_path,
+									'theme_path'           => "styles.blocks.{$block_name}.background.backgroundImage.url",
 									'theme_value_prefix'   => $base_url,
 									'theme_value'          => $background_image_url,
 									'relative_path_prefix' => $relative_path_prefix,
@@ -920,26 +918,24 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					foreach ( $font_family['fontFace'] as  $font_face_key => $font_face ) {
 						if ( ! empty( $font_face['src'] ) ) {
 							if ( is_string( $font_face['src'] ) && str_starts_with( $font_face['src'], $base_url ) ) {
-								$font_url_path          = array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src' );
 								$processed_theme_uris[] = call_user_func(
 									$options['value_func'],
 									array(
-										'theme_path'  => $font_url_path,
-										'theme_value_prefix' => $base_url,
-										'theme_value' => $font_face['src'],
+										'theme_path'           => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src",
+										'theme_value_prefix'   => $base_url,
+										'theme_value'          => $font_face['src'],
 										'relative_path_prefix' => $relative_path_prefix,
 									)
 								);
 							} elseif ( is_array( $font_face['src'] ) ) {
 								foreach ( $font_face['src'] as $source_key => $source ) {
 									if ( str_starts_with( $source, $base_url ) ) {
-										$font_url_path          = array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src', $source_key );
 										$processed_theme_uris[] = call_user_func(
 											$options['value_func'],
 											array(
-												'theme_path' => $font_url_path,
-												'theme_value_prefix' => $base_url,
-												'theme_value' => $source,
+												'theme_path'           => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src.{$source_key}",
+												'theme_value_prefix'   => $base_url,
+												'theme_value'          => $source,
 												'relative_path_prefix' => $relative_path_prefix,
 											)
 										);
@@ -973,7 +969,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$processed_theme_uri = array(
 			'name'   => $args['theme_value'],
 			'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
-			'target' => implode( '.', $args['theme_path'] ),
+			'target' => $args['theme_path'],
 		);
 
 		$file_type = wp_check_filetype( $args['theme_value'] );
@@ -1001,7 +997,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return array(
 			'name'   => $args['theme_value'],
 			'href'   => $args['relative_path_prefix'] . basename( parse_url( $args['theme_value'], PHP_URL_PATH ) ),
-			'target' => implode( '.', $args['theme_path'] ),
+			'target' => $args['theme_path'],
 		);
 	}
 
