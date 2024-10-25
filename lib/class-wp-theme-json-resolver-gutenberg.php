@@ -921,9 +921,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 								$processed_theme_uris[] = call_user_func(
 									$options['value_func'],
 									array(
-										'theme_path'           => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src",
-										'theme_value_prefix'   => $base_url,
-										'theme_value'          => $font_face['src'],
+										'theme_path'  => "settings.typography.fontFamilies.{$font_family_key}.fontFace.{$font_face_key}.src",
+										'theme_value_prefix' => $base_url,
+										'theme_value' => $font_face['src'],
 										'relative_path_prefix' => $relative_path_prefix,
 									)
 								);
