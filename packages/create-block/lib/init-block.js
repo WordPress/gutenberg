@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { dirname, join } = require( 'path' );
+const { join } = require( 'path' );
 const makeDir = require( 'make-dir' );
 const { writeFile } = require( 'fs' ).promises;
 
@@ -14,7 +14,6 @@ const { writeOutputTemplate } = require( './output' );
 async function initBlockJSON( {
 	$schema,
 	apiVersion,
-	plugin,
 	slug,
 	namespace,
 	title,
@@ -25,7 +24,6 @@ async function initBlockJSON( {
 	supports,
 	dashicon,
 	textdomain,
-	folderName,
 	editorScript,
 	editorStyle,
 	style,
@@ -35,14 +33,14 @@ async function initBlockJSON( {
 	viewScript,
 	customBlockJSON,
 	example,
+	pathToBlockFiles,
 } ) {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
 
-	const outputFile = plugin
-		? join( process.cwd(), slug, folderName, 'block.json' )
-		: join( process.cwd(), slug, 'block.json' );
-	await makeDir( dirname( outputFile ) );
+	const outputFile = join( pathToBlockFiles, 'block.json' );
+
+	await makeDir( pathToBlockFiles );
 	await writeFile(
 		outputFile,
 		JSON.stringify(
@@ -79,14 +77,11 @@ async function initBlockJSON( {
 module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
-			const pathName = view.plugin
-				? join( view.folderName, outputFile )
-				: join( process.cwd(), view.slug, outputFile );
-
 			await writeOutputTemplate(
 				outputTemplates[ outputFile ],
-				pathName,
-				view
+				outputFile,
+				view,
+				view.pathToBlockFiles
 			);
 		} )
 	);

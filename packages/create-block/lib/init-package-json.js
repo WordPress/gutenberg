@@ -3,7 +3,6 @@
  */
 const { command } = require( 'execa' );
 const npmPackageArg = require( 'npm-package-arg' );
-const { join } = require( 'path' );
 const writePkg = require( 'write-pkg' );
 
 /**
@@ -25,14 +24,13 @@ module.exports = async ( {
 	customScripts,
 	isDynamicVariant,
 	customPackageJSON,
+	rootDirectory,
 } ) => {
-	const cwd = join( process.cwd(), slug );
-
 	info( '' );
 	info( 'Creating a "package.json" file.' );
 
 	await writePkg(
-		cwd,
+		rootDirectory,
 		Object.fromEntries(
 			Object.entries( {
 				name: slug,
@@ -92,7 +90,7 @@ module.exports = async ( {
 					info( '' );
 					info( `Installing "${ packageArg }".` );
 					await command( `npm install ${ packageArg }`, {
-						cwd,
+						cwd: rootDirectory,
 					} );
 				} catch ( { message } ) {
 					info( '' );
@@ -115,7 +113,7 @@ module.exports = async ( {
 					info( '' );
 					info( `Installing "${ packageArg }".` );
 					await command( `npm install ${ packageArg } --save-dev`, {
-						cwd,
+						cwd: rootDirectory,
 					} );
 				} catch ( { message } ) {
 					info( '' );
