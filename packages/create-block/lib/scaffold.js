@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { pascalCase, snakeCase } = require( 'change-case' );
+const { join, basename } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -57,14 +58,26 @@ module.exports = async (
 ) => {
 	slug = slug.toLowerCase();
 	namespace = namespace.toLowerCase();
+	let pathToBlockFiles;
+	let rootDirectory;
+	// targetDir default is the current directory so we can rely on it.
+	if ( targetDir === './' ) {
+		rootDirectory = join( process.cwd(), targetDir, slug );
+	} else {
+		rootDirectory = plugin
+			? join( process.cwd(), targetDir, slug )
+			: join( process.cwd(), targetDir );
+	}
 
-	// We need values to store the paths to the root of the plugin. This could be the slug or the targetDir if passed.
-	// Once we have them, we can pass them to the functions that use that as part of the view rather than rebuilding it in each function.
-
-	//const pathToRoot = targetDir || slug;
-
-	// create-block --target-dir my-plugin would make the root my-plugin and the files would be in my-plugin/src
-	// create-block my-plugin would make the root my-plugin and the files would be in my-plugin/my-plugin
+	if ( targetDir === './' ) {
+		pathToBlockFiles = plugin
+			? join( rootDirectory, folderName )
+			: rootDirectory;
+	} else {
+		pathToBlockFiles = plugin
+			? join( rootDirectory, folderName )
+			: join( rootDirectory, folderName, slug );
+	}
 
 	const transformedValues = transformer( {
 		$schema,
@@ -104,6 +117,8 @@ module.exports = async (
 		customBlockJSON,
 		example,
 		textdomain: slug,
+		rootDirectory,
+		pathToBlockFiles,
 	} );
 
 	const view = {
@@ -141,7 +156,8 @@ module.exports = async (
 					await writeOutputTemplate(
 						pluginOutputTemplates[ outputFile ],
 						outputFile,
-						view
+						view,
+						rootDirectory
 					)
 			)
 		);
@@ -153,7 +169,8 @@ module.exports = async (
 				await writeOutputAsset(
 					outputAssets[ outputFile ],
 					outputFile,
-					view
+					view,
+					rootDirectory
 				)
 		)
 	);
@@ -175,8 +192,12 @@ module.exports = async (
 
 	success(
 		plugin
-			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
-			: `Done: Block "${ title }" bootstrapped in the ${ slug } directory.`
+			? `Done: WordPress plugin ${ title } bootstrapped in the ${ basename(
+					rootDirectory
+			  ) } directory.`
+			: `Done: Block "${ title }" bootstrapped in the ${ basename(
+					rootDirectory
+			  ) } directory.`
 	);
 
 	if ( plugin && wpScripts ) {
