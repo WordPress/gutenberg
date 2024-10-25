@@ -73,11 +73,8 @@ function render_block_core_playlist( $attributes ) {
 	if ( $images ) {
 		$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="48px" height="64px">';
 	}
-	if ( isset( $current_title ) || isset( $current_album ) || isset( $current_artist ) ) {
+	if ( isset( $current_album ) || isset( $current_artist ) ) {
 		$html .= '<ul>';
-		if ( isset( $current_title ) ) {
-			$html .= '<li class="wp-block-playlist__item-title" data-wp-text="state.currentTitle"></li>';
-		}
 		if ( isset( $current_album ) ) {
 			$html .= '<li class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></li>';
 		}

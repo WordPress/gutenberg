@@ -211,16 +211,6 @@ const PlaylistEdit = ( {
 								/>
 							) }
 							<ul>
-								{ ids[ trackListIndex ]?.title && (
-									<li
-										className="wp-block-playlist__item-title"
-										dangerouslySetInnerHTML={ {
-											__html: safeHTML(
-												ids[ trackListIndex ]?.title
-											),
-										} }
-									/>
-								) }
 								{ ids[ trackListIndex ]?.album && (
 									<li
 										className="wp-block-playlist__item-album"
