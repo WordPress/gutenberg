@@ -97,7 +97,12 @@ function gutenberg_generate_block_templates_export_file() {
 	}
 
 	// Find any uploaded files.
-	$uris_to_migrate = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris( $tree );
+	$uris_to_migrate = WP_Theme_JSON_Resolver_Gutenberg::get_migrated_relative_theme_uris(
+		$tree,
+		array(
+			'relative_path_prefix' => 'file:./assets/',
+		)
+	);
 	if ( ! empty( $uris_to_migrate ) ) {
 		$uploads = wp_upload_dir();
 		foreach ( $uris_to_migrate as $uri ) {
@@ -107,7 +112,7 @@ function gutenberg_generate_block_templates_export_file() {
 			if ( ! $file_content ) {
 				continue;
 			}
-			_wp_array_set( $theme_json_raw, $path, 'file:./assets/' . $uri['href'] );
+			_wp_array_set( $theme_json_raw, $path, $uri['href'] );
 			if ( $zip->locateName( 'assets' ) === false ) {
 				// Directory doesn't exist, so add it
 				$zip->addEmptyDir( 'assets' );

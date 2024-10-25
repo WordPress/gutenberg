@@ -823,6 +823,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $variations;
 	}
 
+	/**
+	 * Processes theme URIs according to provided options.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @param array                   $options    {
+	 *   Optional. An array of options to process theme URIs.
+	 *   @type array $should_process {
+	 *      Optional. An array of booleans to determine which URIs to process.
+	 *      @type bool $images Whether to process image URIs. Default true.
+	 *      @type bool $fonts  Whether to process font URIs. Default false.
+	 *  }
+	 *  @type string $base_url      The base URL to resolve URIs.
+	 *  @type string $relative_path_prefix The relative path to resolve URIs.
+	 *  @type callable $value_func  The function to resolve URIs.
+	 * }
+	 * @return array An array of resolved paths.
+	 */
 	private static function process_theme_uris( $theme_json, $options = array() ) {
 		$processed_theme_uris = array();
 
@@ -833,23 +852,35 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$options = wp_parse_args(
 			$options,
 			array(
-				'should_process' => array(
-					'background_images' => true,
+				'should_process'       => array(
+					'images' => true,
+					'fonts'  => false,
 				),
-				'placeholder'    => 'file:./',
+				'base_url'             => 'file:./',
+				'relative_path_prefix' => '',
+				'value_func'           => array( static::class, 'resolve_relative_path_to_absolute_uri' ),
 			)
 		);
 
-		$should_process  = $options['should_process'] ?? array();
-		$theme_json_data = $theme_json->get_raw_data();
-		$placeholder     = $options['placeholder'] ?? '';
+		$should_process       = $options['should_process'] ?? array();
+		$theme_json_data      = $theme_json->get_raw_data();
+		$base_url             = $options['base_url'];
+		$relative_path_prefix = $options['relative_path_prefix'];
 
-		if ( ! empty( $should_process['background_images'] ) ) {
+		if ( ! empty( $should_process['images'] ) ) {
 			// Top level styles.
 			$background_image_url_path = array( 'styles', 'background', 'backgroundImage', 'url' );
 			$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
-			if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $placeholder ) ) {
-				$processed_theme_uris[] = call_user_func( $options['value_func'], $background_image_url_path, $placeholder, $background_image_url );
+			if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $base_url ) ) {
+				$processed_theme_uris[] = call_user_func(
+					$options['value_func'],
+					array(
+						'theme_path'           => $background_image_url_path,
+						'theme_value_prefix'   => $base_url,
+						'theme_value'          => $background_image_url,
+						'relative_path_prefix' => $relative_path_prefix,
+					)
+				);
 			}
 
 			// Block styles.
@@ -860,17 +891,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					}
 					$background_image_url_path = array( 'styles', 'blocks', $block_name, 'background', 'backgroundImage', 'url' );
 					$background_image_url      = _wp_array_get( $theme_json_data, $background_image_url_path, null );
-					if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $placeholder ) ) {
+					if ( is_string( $background_image_url ) && str_starts_with( $background_image_url, $base_url ) ) {
 						if ( isset( $options['value_func'] ) && is_callable( $options['value_func'] ) ) {
-							$processed_theme_uris[] = call_user_func( $options['value_func'], $background_image_url_path, $placeholder, $background_image_url );
+							$processed_theme_uris[] = call_user_func(
+								$options['value_func'],
+								array(
+									'theme_path'           => $background_image_url_path,
+									'theme_value_prefix'   => $base_url,
+									'theme_value'          => $background_image_url,
+									'relative_path_prefix' => $relative_path_prefix,
+								)
+							);
 						}
 					}
 				}
 			}
 		}
 
-		// Add font URIs.
-		if ( ! empty( $should_process['font_faces'] ) && ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
+		// Font URIs.
+		if ( ! empty( $should_process['fonts'] ) && ! empty( $theme_json_data['settings']['typography']['fontFamilies'] ) ) {
 			$font_families = array_merge(
 				$theme_json_data['settings']['typography']['fontFamilies']['theme'] ?? array(),
 				$theme_json_data['settings']['typography']['fontFamilies']['custom'] ?? array(),
@@ -880,13 +919,31 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				if ( ! empty( $font_family['fontFace'] ) ) {
 					foreach ( $font_family['fontFace'] as  $font_face_key => $font_face ) {
 						if ( ! empty( $font_face['src'] ) ) {
-							$sources = is_string( $font_face['src'] )
-								? array( $font_face['src'] )
-								: $font_face['src'];
-							foreach ( $sources as $source_key => $source ) {
-								if ( str_starts_with( $source, $placeholder ) ) {
-									$font_url_path          = is_string( $font_face['src'] ) ? array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src' ) : array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src', $source_key );
-									$processed_theme_uris[] = call_user_func( $options['value_func'], $font_url_path, $placeholder, $source );
+							if ( is_string( $font_face['src'] ) && str_starts_with( $font_face['src'], $base_url ) ) {
+								$font_url_path          = array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src' );
+								$processed_theme_uris[] = call_user_func(
+									$options['value_func'],
+									array(
+										'theme_path'  => $font_url_path,
+										'theme_value_prefix' => $base_url,
+										'theme_value' => $font_face['src'],
+										'relative_path_prefix' => $relative_path_prefix,
+									)
+								);
+							} elseif ( is_array( $font_face['src'] ) ) {
+								foreach ( $font_face['src'] as $source_key => $source ) {
+									if ( str_starts_with( $source, $base_url ) ) {
+										$font_url_path          = array( 'settings', 'typography', 'fontFamilies', $font_family_key, 'fontFace', $font_face_key, 'src', $source_key );
+										$processed_theme_uris[] = call_user_func(
+											$options['value_func'],
+											array(
+												'theme_path' => $font_url_path,
+												'theme_value_prefix' => $base_url,
+												'theme_value' => $source,
+												'relative_path_prefix' => $relative_path_prefix,
+											)
+										);
+									}
 								}
 							}
 						}
@@ -898,15 +955,28 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $processed_theme_uris;
 	}
 
-	private static function resolve_uri( $background_image_url_path, $placeholder, $background_image_url ) {
-		$file_type           = wp_check_filetype( $background_image_url );
-		$src_url             = str_replace( $placeholder, '', $background_image_url );
+	/**
+	 * A helper function to resolve a relative path in theme.json to a theme absolute path.
+	 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
+	 *
+	 * @param {array} $args {
+	 *  An array of arguments to resolve URIs.
+	 * @type array  $theme_path         The path to the theme value.
+	 * @type string $theme_value_prefix The prefix of the theme value.
+	 * @type string $theme_value        The theme value.
+	 * @type string $relative_prefix    The relative prefix to append to the file.
+	 * }
+	 * @return array
+	 */
+	private static function resolve_relative_path_to_absolute_uri( $args ) {
+		$src_url             = str_replace( $args['theme_value_prefix'], '', $args['theme_value'] );
 		$processed_theme_uri = array(
-			'name'   => $background_image_url,
+			'name'   => $args['theme_value'],
 			'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
-			'target' => implode( '.', $background_image_url_path ),
+			'target' => implode( '.', $args['theme_path'] ),
 		);
 
+		$file_type = wp_check_filetype( $args['theme_value'] );
 		if ( isset( $file_type['type'] ) ) {
 			$processed_theme_uri['type'] = $file_type['type'];
 		}
@@ -914,14 +984,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		return $processed_theme_uri;
 	}
 
-	private static function migrate_uri( $background_image_url_path, $placeholder, $background_image_url ) {
-		$processed_theme_uri = array(
-			'name'   => $background_image_url,
-			'href'   => basename( parse_url( $background_image_url, PHP_URL_PATH ) ),
-			'target' => implode( '.', $background_image_url_path ),
+	/**
+	 * A helper function to migrate an absolute paths in theme.json to a theme relative path.
+	 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
+	 *
+	 * @param {array} $args {
+	 *  An array of arguments to resolve URIs.
+	 * @type array  $theme_path         The path to the theme value.
+	 * @type string $theme_value_prefix The prefix of the theme value.
+	 * @type string $theme_value        The theme value.
+	 * @type string $relative_prefix    The relative prefix to append to the file.
+	 * }
+	 * @return array
+	 */
+	private static function migrate_absolute_uri_to_relative_path( $args ) {
+		return array(
+			'name'   => $args['theme_value'],
+			'href'   => $args['relative_path_prefix'] . basename( parse_url( $args['theme_value'], PHP_URL_PATH ) ),
+			'target' => implode( '.', $args['theme_path'] ),
 		);
-
-		return $processed_theme_uri;
 	}
 
 	/**
@@ -931,31 +1012,39 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 * @since 6.7.0 Added support for resolving block styles.
+	 * @since 6.8.0 Abstracting the process of resolving theme URIs.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
 		// Using the same file convention 'file:./' when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
-		return static::process_theme_uris(
-			$theme_json,
-			array(
-				'value_func' => array( static::class, 'resolve_uri' ),
-			)
-		);
+		return static::process_theme_uris( $theme_json );
 	}
 
+	/**
+	 * Migrates absolute paths that begin with a baseurl in theme.json styles to theme relative paths
+	 * and returns them in an array. In conjunction with copying the corresponding files to
+	 * a theme directory, migrating to relative paths is useful for migrating theme json to a new location.
+	 * The default is to migrate URIs from the site's uploads directory.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @param {array}                 $options    Optional. A 'base_url' to find the target URI in theme.json, and a 'relative_path_prefix' to append to the file.
+	 * @return array An array of migrated paths.
+	 */
 	public static function get_migrated_relative_theme_uris( $theme_json, $options = array() ) {
-		$placeholder = wp_upload_dir()['baseurl'];
 		return static::process_theme_uris(
 			$theme_json,
 			array(
-				'should_process' => array(
-					'background_images' => true,
-					'font_faces'        => true,
+				'should_process'       => array(
+					'images' => true,
+					'fonts'  => true,
 				),
-				'placeholder'    => $placeholder,
-				'value_func'     => array( static::class, 'migrate_uri' ),
+				'base_url'             => $options['base_url'] ?? wp_upload_dir()['baseurl'],
+				'value_func'           => array( static::class, 'migrate_absolute_uri_to_relative_path' ),
+				'relative_path_prefix' => $options['relative_path_prefix'] ?? 'file:./',
 			)
 		);
 	}
