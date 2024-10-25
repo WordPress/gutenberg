@@ -24,6 +24,7 @@ import {
 	useLayoutClasses,
 	useLayoutStyles,
 	__unstableBlockStyleVariationOverridesWithConfig,
+	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
@@ -32,7 +33,6 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
-import { useZoomOutModeExit } from './components/block-list/use-block-props/use-zoom-out-mode-exit';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
@@ -48,7 +48,8 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
-
+import __unstableCommentIconFill from './components/collab/block-comment-icon-slot';
+import __unstableCommentIconToolbarFill from './components/collab/block-comment-icon-toolbar-slot';
 /**
  * Private @wordpress/block-editor APIs.
  */
@@ -79,7 +80,7 @@ lock( privateApis, {
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
-	useZoomOutModeExit,
+	useZoomOut,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
@@ -94,4 +95,6 @@ lock( privateApis, {
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
+	__unstableCommentIconFill,
+	__unstableCommentIconToolbarFill,
 } );

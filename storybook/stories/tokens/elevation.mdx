@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { ElevationTable } from './components.tsx';
+import { TokensTable } from './components.tsx';
 
 <Meta title="Tokens/Elevation" name="page" />
 
@@ -11,7 +11,8 @@ This document outlines the various tokens relating to [elevation](?path=/docs/fo
 
 Tokens can be used in different ways, but regardless of which method is used, each one is meant to be used as the value of the CSS `box-shadow` property, and references the following values:
 
-<ElevationTable
+<TokensTable
+	tokenCategory="elevation"
 	tokens={ [
 		{
 			name: 'Extra small',
@@ -42,6 +43,7 @@ Tokens can be used in different ways, but regardless of which method is used, ea
 				'0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)',
 		},
 	] }
+	applyTokenStyle={ ( valueCode ) => ( { boxShadow: valueCode } ) }
 />
 
 ## CSS tokens

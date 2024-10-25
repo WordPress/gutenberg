@@ -38,6 +38,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### featuredImageField
+
+Undocumented declaration.
+
 ### orderField
 
 Undocumented declaration.
@@ -63,6 +67,10 @@ Undocumented declaration.
 Undocumented declaration.
 
 ### restorePost
+
+Undocumented declaration.
+
+### slugField
 
 Undocumented declaration.
 

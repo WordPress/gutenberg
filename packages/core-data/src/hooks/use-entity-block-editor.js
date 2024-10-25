@@ -91,11 +91,6 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		getEntityRecordEdits,
 	] );
 
-	const updateFootnotes = useCallback(
-		( _blocks ) => updateFootnotesFromMeta( _blocks, meta ),
-		[ meta ]
-	);
-
 	const onChange = useCallback(
 		( newBlocks, options ) => {
 			const noChange = blocks === newBlocks;
@@ -111,7 +106,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				selection,
 				content: ( { blocks: blocksForSerialization = [] } ) =>
 					__unstableSerializeAndClean( blocksForSerialization ),
-				...updateFootnotes( newBlocks ),
+				...updateFootnotesFromMeta( newBlocks, meta ),
 			};
 
 			editEntityRecord( kind, name, id, edits, {
@@ -124,7 +119,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			name,
 			id,
 			blocks,
-			updateFootnotes,
+			meta,
 			__unstableCreateUndoLevel,
 			editEntityRecord,
 		]
@@ -133,7 +128,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection, ...rest } = options;
-			const footnotesChanges = updateFootnotes( newBlocks );
+			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
 			const edits = { selection, ...footnotesChanges };
 
 			editEntityRecord( kind, name, id, edits, {
@@ -141,7 +136,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 				...rest,
 			} );
 		},
-		[ kind, name, id, updateFootnotes, editEntityRecord ]
+		[ kind, name, id, meta, editEntityRecord ]
 	);
 
 	return [ blocks, onInput, onChange ];

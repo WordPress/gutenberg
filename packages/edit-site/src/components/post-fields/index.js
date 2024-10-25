@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { featuredImageField, slugField } from '@wordpress/fields';
 import {
 	createInterpolateElement,
 	useMemo,
@@ -33,11 +34,9 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
-	LAYOUT_LIST,
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
-import { default as Link, useLink } from '../routes/link';
-import Media from '../media';
+import { default as Link } from '../routes/link';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -80,46 +79,6 @@ const getFormattedDate = ( dateToDisplay ) =>
 		getSettings().formats.datetimeAbbreviated,
 		getDate( dateToDisplay )
 	);
-
-function FeaturedImage( { item, viewType } ) {
-	const isDisabled = item.status === 'trash';
-	const { onClick } = useLink( {
-		postId: item.id,
-		postType: item.type,
-		canvas: 'edit',
-	} );
-	const hasMedia = !! item.featured_media;
-	const size =
-		viewType === LAYOUT_GRID
-			? [ 'large', 'full', 'medium', 'thumbnail' ]
-			: [ 'thumbnail', 'medium', 'large', 'full' ];
-	const media = hasMedia ? (
-		<Media
-			className="edit-site-post-list__featured-image"
-			id={ item.featured_media }
-			size={ size }
-		/>
-	) : null;
-	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
-	return (
-		<div
-			className={ `edit-site-post-list__featured-image-wrapper is-layout-${ viewType }` }
-		>
-			{ renderButton ? (
-				<button
-					className="edit-site-post-list__featured-image-button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || __( '(no title)' ) }
-				>
-					{ media }
-				</button>
-			) : (
-				media
-			) }
-		</div>
-	);
-}
 
 function PostStatusField( { item } ) {
 	const status = STATUSES.find( ( { value } ) => value === item.status );
@@ -190,15 +149,7 @@ function usePostFields( viewType ) {
 
 	const fields = useMemo(
 		() => [
-			{
-				id: 'featured-image',
-				label: __( 'Featured Image' ),
-				getValue: ( { item } ) => item.featured_media,
-				render: ( { item } ) => (
-					<FeaturedImage item={ item } viewType={ viewType } />
-				),
-				enableSorting: false,
-			},
+			featuredImageField,
 			{
 				label: __( 'Title' ),
 				id: 'title',
@@ -369,6 +320,7 @@ function usePostFields( viewType ) {
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
+			slugField,
 			{
 				id: 'comment_status',
 				label: __( 'Discussion' ),

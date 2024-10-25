@@ -60,24 +60,7 @@ export function saveViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_SAVE_VIEW_OPENED':
 			return action.isOpen;
-		case 'SET_CANVAS_MODE':
-			return false;
 	}
-	return state;
-}
-
-/**
- * Reducer used to track the site editor canvas mode (edit or view).
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- */
-function canvasMode( state = 'init', action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_MODE':
-			return action.mode;
-	}
-
 	return state;
 }
 
@@ -111,7 +94,6 @@ export default combineReducers( {
 	settings,
 	editedPost,
 	saveViewPanel,
-	canvasMode,
 	editorCanvasContainerView,
 	routes,
 } );

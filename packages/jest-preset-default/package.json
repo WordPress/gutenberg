@@ -31,7 +31,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@wordpress/jest-console": "file:../jest-console",
+		"@wordpress/jest-console": "*",
 		"babel-jest": "29.7.0"
 	},
 	"peerDependencies": {

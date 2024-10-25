@@ -6,7 +6,52 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { StyleBookCategory } from './types';
+import type { StyleBookCategory, StyleBookColorGroup } from './types';
+
+export const STYLE_BOOK_COLOR_GROUPS: StyleBookColorGroup[] = [
+	{
+		slug: 'theme-colors',
+		title: __( 'Theme Colors' ),
+		origin: 'theme',
+		type: 'colors',
+	},
+	{
+		slug: 'theme-gradients',
+		title: __( 'Theme Gradients' ),
+		origin: 'theme',
+		type: 'gradients',
+	},
+	{
+		slug: 'custom-colors',
+		title: __( 'Custom Colors' ),
+		origin: 'custom',
+		type: 'colors',
+	},
+	{
+		slug: 'custom-gradients',
+		title: __( 'Custom Gradients' ),
+		origin: 'custom', // User.
+		type: 'gradients',
+	},
+	{
+		slug: 'duotones',
+		title: __( 'Duotones' ),
+		origin: 'theme',
+		type: 'duotones',
+	},
+	{
+		slug: 'default-colors',
+		title: __( 'Default Colors' ),
+		origin: 'default',
+		type: 'colors',
+	},
+	{
+		slug: 'default-gradients',
+		title: __( 'Default Gradients' ),
+		origin: 'default',
+		type: 'gradients',
+	},
+];
 
 export const STYLE_BOOK_THEME_SUBCATEGORIES: Omit<
 	StyleBookCategory,
@@ -74,7 +119,7 @@ export const STYLE_BOOK_CATEGORIES: StyleBookCategory[] = [
 	{
 		slug: 'colors',
 		title: __( 'Colors' ),
-		blocks: [ 'custom/colors' ],
+		blocks: [],
 	},
 	{
 		slug: 'theme',
@@ -111,7 +156,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	.is-root-container {
 		display: flow-root;
 	}
-	
+
 	body {
 		position: relative;
 		padding: 32px !important;
@@ -141,15 +186,40 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		box-shadow: 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 	}
 
+	.edit-site-style-book__example.is-disabled-example {
+		pointer-events: none;
+	}
+
 	.edit-site-style-book__example:focus:not(:disabled) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
 		outline: 3px solid transparent;
 	}
 
+	.edit-site-style-book__duotone-example > div:first-child {
+		display: flex;
+		aspect-ratio: 16 / 9;
+		grid-row: span 1;
+		grid-column: span 2;
+	}
+	.edit-site-style-book__duotone-example img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.edit-site-style-book__duotone-example > div:not(:first-child) {
+		height: 20px;
+		border: 1px solid #ddd;
+	}
+
+	.edit-site-style-book__color-example {
+		height: 52px;
+		border: 1px solid #ddd;
+	}
+
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
 		flex-direction: row;
 	}
-	
+
 	.edit-site-style-book__subcategory-title,
 	.edit-site-style-book__example-title {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
@@ -160,7 +230,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 		text-align: left;
 		text-transform: uppercase;
 	}
-	
+
 	.edit-site-style-book__subcategory-title {
 		font-size: 16px;
 		margin-bottom: 40px;

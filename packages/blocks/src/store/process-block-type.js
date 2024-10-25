@@ -197,5 +197,41 @@ export const processBlockType =
 			return;
 		}
 
+		if (
+			typeof settings?.parent === 'string' ||
+			settings?.parent instanceof String
+		) {
+			settings.parent = [ settings.parent ];
+			warning(
+				'Parent must be undefined or an array of strings (block types), but it is a string.'
+			);
+			// Intentionally continue:
+			//
+			// While string values were never supported, they appeared to work with some unintended side-effects
+			// that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250).
+			//
+			// To be backwards-compatible, this code that automatically migrates strings to arrays.
+		}
+
+		if (
+			! Array.isArray( settings?.parent ) &&
+			settings?.parent !== undefined
+		) {
+			warning(
+				'Parent must be undefined or an array of block types, but it is ',
+				settings.parent
+			);
+			return;
+		}
+
+		if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
+			warning(
+				'Block "' +
+					name +
+					'" cannot be a parent of itself. Please remove the block name from the parent list.'
+			);
+			return;
+		}
+
 		return settings;
 	};
