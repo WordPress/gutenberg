@@ -615,9 +615,10 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist))
 
 -	**Name:** core/playlist
+-	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
--	**Attributes:** artists, ids, images, order, tracklist, tracknumbers, type
+-	**Attributes:** artists, caption, ids, images, order, tracklist, tracknumbers, type
 
 ## Author (deprecated)
 
