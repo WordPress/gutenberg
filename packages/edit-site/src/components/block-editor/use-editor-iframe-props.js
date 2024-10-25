@@ -20,7 +20,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-export default function useEditorIframeProps() {
+export default function useEditorIframeProps( isPreviewOnly ) {
 	const { params } = useLocation();
 	const history = useHistory();
 	const { canvas = 'view' } = params;
@@ -51,6 +51,7 @@ export default function useEditorIframeProps() {
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
 			if (
+				! isPreviewOnly &&
 				( keyCode === ENTER || keyCode === SPACE ) &&
 				! currentPostIsTrashed
 			) {
@@ -61,9 +62,11 @@ export default function useEditorIframeProps() {
 			}
 		},
 		onClick: () => {
-			history.push( { ...params, canvas: 'edit' }, undefined, {
-				transition: 'canvas-mode-edit-transition',
-			} );
+			if ( ! isPreviewOnly ) {
+				history.push( { ...params, canvas: 'edit' }, undefined, {
+					transition: 'canvas-mode-edit-transition',
+				} );
+			}
 		},
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {

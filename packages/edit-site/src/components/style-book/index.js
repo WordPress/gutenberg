@@ -30,6 +30,8 @@ import {
 	memo,
 	useContext,
 	useEffect,
+	useRef,
+	useLayoutEffect,
 } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
@@ -54,10 +56,47 @@ const {
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
-
+const noop = () => {};
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
+
+/**
+ * Scrolls to a section within an iframe.
+ *
+ * @param {string}            anchorId The id of the element to scroll to.
+ * @param {HTMLIFrameElement} iframe   The target iframe.
+ */
+const scrollToSection = ( anchorId, iframe ) => {
+	if ( ! iframe || ! iframe?.contentDocument ) {
+		return;
+	}
+
+	const element = iframe.contentDocument.getElementById( anchorId );
+	if ( element ) {
+		element.scrollIntoView( {
+			behavior: 'smooth',
+		} );
+	}
+};
+
+/**
+ * Parses a Block Editor navigation path to extract the block name and
+ * build a style book navigation path. The object can be extended to include a category,
+ * representing a style book tab/section.
+ *
+ * @param {string} path An internal Block Editor navigation path.
+ * @return {null|{block: string}} An object containing the example to navigate to.
+ */
+const getStyleBookNavigationFromPath = ( path ) => {
+	if ( path && typeof path === 'string' && path.includes( '/blocks/' ) ) {
+		const block = decodeURIComponent( path.split( '/blocks/' )[ 1 ] );
+		return {
+			block,
+		};
+	}
+	return null;
+};
 
 /**
  * Retrieves colors, gradients, and duotone filters from Global Styles.
@@ -137,12 +176,13 @@ function useMultiOriginPalettes() {
 function StyleBook( {
 	enableResizing = true,
 	isSelected,
-	onClick,
-	onSelect,
+	onClick = noop,
+	onSelect = noop,
 	showCloseButton = true,
-	onClose,
+	onClose = noop,
 	showTabs = true,
 	userConfig = {},
+	path = '',
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
@@ -165,6 +205,7 @@ function StyleBook( {
 	}, [ colors ] );
 
 	const { base: baseConfig } = useContext( GlobalStylesContext );
+	const goTo = getStyleBookNavigationFromPath( path );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
@@ -241,6 +282,7 @@ function StyleBook( {
 									settings={ settings }
 									sizes={ sizes }
 									title={ tab.title }
+									goTo={ goTo }
 								/>
 							</Tabs.TabPanel>
 						) ) }
@@ -253,6 +295,7 @@ function StyleBook( {
 						onSelect={ onSelect }
 						settings={ settings }
 						sizes={ sizes }
+						goTo={ goTo }
 					/>
 				) }
 			</div>
@@ -269,9 +312,11 @@ const StyleBookBody = ( {
 	settings,
 	sizes,
 	title,
+	goTo,
 } ) => {
 	const [ isFocused, setIsFocused ] = useState( false );
-
+	const [ hasIframeLoaded, setHasIframeLoaded ] = useState( false );
+	const iframeRef = useRef( null );
 	// The presence of an `onClick` prop indicates that the Style Book is being used as a button.
 	// In this case, add additional props to the iframe to make it behave like a button.
 	const buttonModeProps = {
@@ -300,8 +345,17 @@ const StyleBookBody = ( {
 		readonly: true,
 	};
 
+	const handleLoad = () => setHasIframeLoaded( true );
+	useLayoutEffect( () => {
+		if ( goTo?.block && hasIframeLoaded && iframeRef?.current ) {
+			scrollToSection( `example-${ goTo?.block }`, iframeRef?.current );
+		}
+	}, [ iframeRef?.current, goTo?.block, scrollToSection, hasIframeLoaded ] );
+
 	return (
 		<Iframe
+			onLoad={ handleLoad }
+			ref={ iframeRef }
 			className={ clsx( 'edit-site-style-book__iframe', {
 				'is-focused': isFocused && !! onClick,
 				'is-button': !! onClick,
