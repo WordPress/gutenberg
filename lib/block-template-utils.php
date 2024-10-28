@@ -106,15 +106,29 @@ function gutenberg_generate_block_templates_export_file() {
 	if ( ! empty( $uris_to_migrate ) ) {
 		$uploads = wp_upload_dir();
 		foreach ( $uris_to_migrate as $uri ) {
-			$path         = explode( '.', $uri['target'] );
+			$href   = $uri['href'];
+			$target = $uri['target'];
+			if ( str_ends_with( $target, 'background.backgroundImage.url' ) ) {
+				/*
+				 * For background images, reset the backgroundImage object
+				 * to remove upload "id", "source", and "title".
+				 * Done by removing .url from the path to get the target, and setting
+				 * href to replace the `background.backgroundImage` object.
+				 */
+				$target = rtrim( $target, '.url' );
+				$href   = array(
+					'url' => $href,
+				);
+			}
+			$path         = explode( '.', $target );
 			$file         = str_replace( $uploads['baseurl'], $uploads['basedir'], $uri['name'] );
 			$file_content = file_get_contents( $file );
 			if ( ! $file_content ) {
 				continue;
 			}
-			// @TODO: Handle setting in WP_Theme_JSON_Resolver_Gutenberg, something akin to ::resolve_theme_file_uris().
-			// Reason is, we want to strip any superfluous information from backgroundImage object such as upload "id", "source", and "title".
-			_wp_array_set( $theme_json_raw, $path, $uri['href'] );
+
+			_wp_array_set( $theme_json_raw, $path, $href );
+
 			if ( $zip->locateName( 'assets' ) === false ) {
 				// Directory doesn't exist, so add it
 				$zip->addEmptyDir( 'assets' );

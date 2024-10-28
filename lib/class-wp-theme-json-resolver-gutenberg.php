@@ -953,56 +953,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * A helper function to resolve a relative path in theme.json to a theme absolute path.
-	 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
-	 *
-	 * @param {array} $args {
-	 *  An array of arguments to resolve URIs.
-	 * @type array  $theme_path         The path to the theme value.
-	 * @type string $theme_value_prefix The prefix of the theme value.
-	 * @type string $theme_value        The theme value.
-	 * @type string $relative_prefix    The relative prefix to append to the file.
-	 * }
-	 * @return array
-	 */
-	private static function resolve_relative_path_to_absolute_uri( $args ) {
-		$src_url             = str_replace( $args['theme_value_prefix'], '', $args['theme_value'] );
-		$processed_theme_uri = array(
-			'name'   => $args['theme_value'],
-			'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
-			'target' => $args['theme_path'],
-		);
-
-		$file_type = wp_check_filetype( $args['theme_value'] );
-		if ( isset( $file_type['type'] ) ) {
-			$processed_theme_uri['type'] = $file_type['type'];
-		}
-
-		return $processed_theme_uri;
-	}
-
-	/**
-	 * A helper function to migrate an absolute paths in theme.json to a theme relative path.
-	 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
-	 *
-	 * @param {array} $args {
-	 *  An array of arguments to resolve URIs.
-	 * @type array  $theme_path         The path to the theme value.
-	 * @type string $theme_value_prefix The prefix of the theme value.
-	 * @type string $theme_value        The theme value.
-	 * @type string $relative_prefix    The relative prefix to append to the file.
-	 * }
-	 * @return array
-	 */
-	private static function migrate_absolute_uri_to_relative_path( $args ) {
-		return array(
-			'name'   => $args['theme_value'],
-			'href'   => $args['relative_path_prefix'] . basename( parse_url( $args['theme_value'], PHP_URL_PATH ) ),
-			'target' => $args['theme_path'],
-		);
-	}
-
-	/**
 	 * Resolves relative paths in theme.json styles to theme absolute paths
 	 * and returns them in an array that can be embedded
 	 * as the value of `_link` object in REST API responses.
@@ -1015,7 +965,47 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
-		return static::process_theme_uris( $theme_json );
+		/**
+		 * A helper function to resolve a relative path in theme.json to a theme absolute path.
+		 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
+		 *
+		 * @param {array} $args {
+		 *  An array of arguments to resolve URIs.
+		 * @type array  $theme_path         The path to the theme value.
+		 * @type string $theme_value_prefix The prefix of the theme value.
+		 * @type string $theme_value        The theme value.
+		 * @type string $relative_prefix    The relative prefix to append to the file.
+		 * }
+		 * @return array
+		 */
+		$resolve_relative_path_to_absolute_uri = function ( $args ) {
+			$src_url             = str_replace( $args['theme_value_prefix'], '', $args['theme_value'] );
+			$processed_theme_uri = array(
+				'name'   => $args['theme_value'],
+				'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+				'target' => $args['theme_path'],
+			);
+
+			$file_type = wp_check_filetype( $args['theme_value'] );
+			if ( isset( $file_type['type'] ) ) {
+				$processed_theme_uri['type'] = $file_type['type'];
+			}
+
+			return $processed_theme_uri;
+		};
+
+		return static::process_theme_uris(
+			$theme_json,
+			array(
+				'should_process'     => array(
+					'images' => true,
+					'fonts'  => false,
+				),
+				'theme_value_prefix' => 'file:./',
+				// Resolves relative paths in theme.json styles to theme absolute paths.
+				'value_func'         => $resolve_relative_path_to_absolute_uri,
+			)
+		);
 	}
 
 	/**
@@ -1031,6 +1021,27 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array An array of migrated paths.
 	 */
 	public static function get_migrated_relative_theme_uris( $theme_json, $options = array() ) {
+		/**
+		 * A helper function to migrate an absolute paths in theme.json to a theme relative path.
+		 * Returns an array with keys based on link attributes for compatibility with REST API _link responses.
+		 *
+		 * @param {array} $args {
+		 *  An array of arguments to resolve URIs.
+		 * @type array  $theme_path         The path to the theme value.
+		 * @type string $theme_value_prefix The prefix of the theme value.
+		 * @type string $theme_value        The theme value.
+		 * @type string $relative_prefix    The relative prefix to append to the file.
+		 * }
+		 * @return array
+		 */
+		$migrate_absolute_uri_to_relative_path = function ( $args ) {
+			return array(
+				'name'   => $args['theme_value'],
+				'href'   => $args['relative_path_prefix'] . basename( parse_url( $args['theme_value'], PHP_URL_PATH ) ),
+				'target' => $args['theme_path'],
+			);
+		};
+
 		return static::process_theme_uris(
 			$theme_json,
 			array(
@@ -1039,7 +1050,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'fonts'  => true,
 				),
 				'theme_value_prefix'   => $options['theme_value_prefix'] ?? wp_upload_dir()['baseurl'],
-				'value_func'           => array( static::class, 'migrate_absolute_uri_to_relative_path' ),
+				'value_func'           => $migrate_absolute_uri_to_relative_path,
 				'relative_path_prefix' => $options['relative_path_prefix'] ?? 'file:./',
 			)
 		);
