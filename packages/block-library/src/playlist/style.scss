@@ -1,5 +1,5 @@
 .wp-block-playlist {
-	border: 1px solid $gray-200;
+	border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 	border-radius: 2px;
 	padding: $grid-unit-20;
 
@@ -9,7 +9,7 @@
 		gap: var(--Spacing-6, 24px);
 		align-self: stretch;
 		padding-bottom: $grid-unit-20;
-		border-bottom: 1px solid $gray-200;
+		border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 		margin-bottom: $grid-unit-20;
 
 		img {
@@ -29,7 +29,6 @@
 		.wp-block-playlist__item-artist {
 			font-size: 13px;
 			font-weight: 400;
-			color: $gray-700;
 		}
 	}
 
@@ -40,7 +39,7 @@
 
 	.wp-block-playlist__tracks {
 		margin-top: $grid-unit-20;
-		border-top: 1px solid $gray-200;
+		border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 		font-size: 14px;
 	}
 
@@ -49,7 +48,7 @@
 	}
 
 	.wp-block-playlist__item {
-		border-bottom: 1px solid $gray-200;
+		border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 		padding: $grid-unit-10;
 	}
 
