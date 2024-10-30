@@ -41,7 +41,6 @@ function render_block_core_playlist( $attributes ) {
 	$current_artist = isset( $attributes['ids'][0]['artist'] ) ? $attributes['ids'][0]['artist'] : '';
 
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$placeholder_image  = '/wp-includes/images/media/audio.png';
 	$aria_label         = $current_title;
 
 	if ( $current_title && $current_artist && $current_album ) {
@@ -62,7 +61,7 @@ function render_block_core_playlist( $attributes ) {
 			'currentTitle'  => $current_title,
 			'currentAlbum ' => $current_album,
 			'currentArtist' => $current_artist,
-			'currentImage'  => isset( $attributes['ids'][0]['image']['src'] ) ? $attributes['ids'][0]['image']['src'] : $placeholder_image,
+			'currentImage'  => $attributes['ids'][0]['image']['src'] ?? null,
 			'ariaLabel'     => $aria_label,
 		)
 	);
@@ -70,8 +69,8 @@ function render_block_core_playlist( $attributes ) {
 	$html  = '<figure ' . $wrapper_attributes . 'data-wp-interactive="core/playlist">';
 	$html .= '<div class="wp-block-playlist__current-item">';
 	// Images, albums, etc are only displayed if the options are enabled.
-	if ( $images ) {
-		$html .= '<img data-wp-bind--src="state.currentImage" alt=" width="70px" height="70px">';
+	if ( $images && isset( $attributes['ids'][0]['image']['src'] ) ) {
+		$html .= '<img data-wp-bind--src="state.currentImage" alt="" width="70px" height="70px">';
 	}
 	if ( isset( $current_album ) || isset( $current_artist ) ) {
 		$html .= '<div>';
@@ -95,7 +94,7 @@ function render_block_core_playlist( $attributes ) {
 			$title  = isset( $attributes['ids'][ $key ]['title'] ) ? $attributes['ids'][ $key ]['title'] : '';
 			$artist = isset( $attributes['ids'][ $key ]['artist'] ) ? $attributes['ids'][ $key ]['artist'] : '';
 			$album  = isset( $attributes['ids'][ $key ]['album'] ) ? $attributes['ids'][ $key ]['album'] : '';
-			$image  = isset( $attributes['ids'][ $key ]['image']['src'] ) ? $attributes['ids'][ $key ]['image']['src'] : $placeholder_image;
+			$image  = isset( $attributes['ids'][ $key ]['image']['src'] ) ?? null;
 			$length = isset( $attributes['ids'][ $key ]['length'] ) ? $attributes['ids'][ $key ]['length'] : '';
 
 			$contexts = wp_interactivity_data_wp_context(

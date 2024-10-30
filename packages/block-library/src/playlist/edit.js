@@ -68,11 +68,16 @@ const PlaylistEdit = ( {
 				id: track.id ? track.id : track.url,
 				url: track.url,
 				title: track.title,
-				artist: track.artist,
-				album: track.album,
+				artist: track.artist ? track.artist : __( 'Unknown artist' ),
+				album: track.album ? track.album : __( 'Unknown album' ),
 				caption: track.caption,
 				length: track.fileLength,
-				image: track.image ? track.image : '',
+				// Prevent using the default media attachment icon as the track image.
+				image:
+					track.image.src &&
+					track.image.src.endsWith( '/images/media/audio.svg' )
+						? ''
+						: track.image.src,
 			} ) );
 			setAttributes( { ids: trackList } );
 		},
@@ -199,17 +204,12 @@ const PlaylistEdit = ( {
 					{ !! ids[ trackListIndex ]?.id && (
 						<>
 							<div className="wp-block-playlist__current-item">
-								{ images && (
+								{ images && ids[ trackListIndex ]?.image && (
 									<img
-										src={
-											ids[ trackListIndex ]?.image.src
-												? ids[ trackListIndex ]?.image
-														.src
-												: '/wp-includes/images/media/audio.png'
-										}
-										width="48px"
-										height="64px"
+										src={ ids[ trackListIndex ].image }
 										alt=""
+										width="70px"
+										height="70px"
 									/>
 								) }
 								<div>
@@ -285,9 +285,7 @@ const PlaylistEdit = ( {
 										track.album
 									) }
 									data-playlist-track-image-src={
-										track.image.src
-											? track.image.src
-											: '/wp-includes/images/media/audio.png'
+										track.image ?? null
 									}
 									onClick={ () => onChangeTrack( index ) }
 								>
