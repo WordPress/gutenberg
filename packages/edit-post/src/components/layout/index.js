@@ -237,26 +237,30 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 	}, [ isShort ] );
 
+	// useDrag includes keyboard support with arrow keys emulating a drag.
+	// TODO: Support more/all keyboard interactions from the window splitter pattern:
+	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 	const bindDragGesture = useDrag(
 		( { movement, first, last, memo } ) => {
 			const pane = metaBoxesMainRef.current;
+			const [ , yMovement ] = movement;
 			if ( first ) {
 				pane.classList.add( 'is-resizing' );
 				didDragGestureRef.current = true;
-
-				if ( heightRef.current === undefined ) {
-					const fromHeight = metaBoxesMainRef.current.offsetHeight;
-					return { fromHeight };
-				}
-				if ( heightRef.current > max ) {
+				let fromHeight = heightRef.current ?? pane.offsetHeight;
+				if ( isOpen ) {
 					// Starts from max in case shortening the window has imposed it.
-					return { fromHeight: max };
+					if ( fromHeight > max ) {
+						fromHeight = max;
+					}
+				} else {
+					fromHeight = min;
 				}
-				return { fromHeight: isOpen ? heightRef.current : min };
+				applyHeight( fromHeight - yMovement );
+				return { fromHeight };
 			}
 
 			if ( ! first && ! last ) {
-				const [ , yMovement ] = movement;
 				applyHeight( memo.fromHeight - yMovement );
 				return memo;
 			}
@@ -271,7 +275,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			// separator won’t set the persisted height to the closed height.
 			applyHeight( heightRef.current, nextIsOpen );
 		},
-		{ delay: 200, threshold: 5 }
+		{ delay: 200, threshold: 5, keyboardDisplacement: 20 }
 	);
 
 	if ( ! hasAnyVisible ) {
@@ -303,24 +307,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	const persistIsOpen = ( to = ! isOpen ) =>
 		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
-	// TODO: Support more/all keyboard interactions from the window splitter pattern:
-	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
-	const onSeparatorKeyDown = ( event ) => {
-		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
-		if ( delta ) {
-			const pane = metaBoxesMainRef.current;
-			let fromHeight;
-			if ( isOpen ) {
-				fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
-			} else {
-				fromHeight = min;
-			}
-			const nextHeight = delta + fromHeight;
-			applyHeight( nextHeight, true );
-			persistIsOpen( nextHeight > min );
-			event.preventDefault();
-		}
-	};
 	const paneLabel = __( 'Meta Boxes' );
 
 	let toggleDragProps;
@@ -366,9 +352,6 @@ function MetaBoxesMain( { isLegacy } ) {
 					aria-label={ __( 'Drag to resize' ) }
 					aria-describedby={ separatorHelpId }
 					{ ...bindDragGesture() }
-					// The drag gesture handlers include one for key down but it doesn’t seem necessary
-					// to call that handler (for now) so it’s simply overriden.
-					onKeyDown={ onSeparatorKeyDown }
 				/>
 			</Tooltip>
 			<VisuallyHidden id={ separatorHelpId }>
