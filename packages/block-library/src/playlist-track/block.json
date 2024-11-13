@@ -38,7 +38,10 @@
 		}
 	},
 	"supports": {
-		"interactivity": true
+		"interactivity": true,
+		"reusable": false,
+		"html": false,
+		"inserter": false
 	},
 	"editorStyle": "wp-block-playlist-track-editor",
 	"style": "wp-block-playlist-track"
