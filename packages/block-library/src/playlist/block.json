@@ -9,7 +9,7 @@
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
 	"attributes": {
-		"ids": {
+		"tracks": {
 			"type": "array"
 		},
 		"type": {
@@ -24,21 +24,24 @@
 			"type": "boolean",
 			"default": true
 		},
-		"tracknumbers": {
-			"type": "boolean",
-			"default": true
-		},
 		"images": {
 			"type": "boolean",
 			"default": true
 		},
-		"artists": {
+		"showArtists": {
+			"type": "boolean",
+			"default": true
+		},
+		"showNumbers": {
 			"type": "boolean",
 			"default": true
 		},
 		"caption": {
 			"type": "string"
 		}
+	},
+	"providesContext": {
+		"showArtists": "showArtists"
 	},
 	"supports": {
 		"anchor": true,

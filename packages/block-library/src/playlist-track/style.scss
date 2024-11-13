@@ -1,0 +1,25 @@
+.wp-block-playlist-track {
+	border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+	padding: $grid-unit-10;
+
+	button {
+		display: flex;
+		min-width: 100%;
+		padding: 0;
+		font-size: 14px;
+		line-height: 1.5;
+		background-color: transparent;
+		color: inherit;
+		border: 0;
+
+		span {
+			margin-right: $grid-unit-10;
+		}
+		.wp-block-playlist-track__length {
+			margin-left: auto;
+		}
+		&[aria-current="true"] {
+			font-weight: 600;
+		}
+	}
+}

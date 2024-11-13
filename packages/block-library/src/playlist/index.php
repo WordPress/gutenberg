@@ -8,40 +8,28 @@
 /**
  * Renders the `core/playlist` block on server.
  *
- * @since 6.7.0
+ * @since 6.8.0
  *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the Playlist.
  */
-function render_block_core_playlist( $attributes ) {
-	if ( empty( $attributes['ids'] ) ) {
+function render_block_core_playlist( $attributes, $content ) {
+	if ( empty( $attributes['tracks'] ) ) {
 		return '';
 	}
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
 	/**
-	 * Wether to display specific parts of the playlist, depending on the block options:
-	 */
-	$tracklist    = isset( $attributes['tracklist'] ) ? $attributes['tracklist'] : true;
-	$tracknumbers = isset( $attributes['tracknumbers'] ) ? $attributes['tracknumbers'] : true;
-	$artists      = isset( $attributes['artists'] ) ? $attributes['artists'] : true;
-	$images       = isset( $attributes['images'] ) ? $attributes['images'] : true;
-	$tagname      = $tracknumbers ? 'ol' : 'ul';
-	$caption      = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
-
-	/**
 	 * Assign the current track information to variables.
 	 * The current track is the first one in the list.
 	 */
-	$current_id     = $attributes['ids'][0]['id'];
-	$current_title  = isset( $attributes['ids'][0]['title'] ) ? $attributes['ids'][0]['title'] : '';
-	$current_album  = isset( $attributes['ids'][0]['album'] ) ? $attributes['ids'][0]['album'] : '';
-	$current_artist = isset( $attributes['ids'][0]['artist'] ) ? $attributes['ids'][0]['artist'] : '';
-
-	$wrapper_attributes = get_block_wrapper_attributes();
-	$aria_label         = $current_title;
+	$current_id     = $attributes['tracks'][0]['id'];
+	$current_title  = isset( $attributes['tracks'][0]['title'] ) ? $attributes['tracks'][0]['title'] : '';
+	$current_album  = isset( $attributes['tracks'][0]['album'] ) ? $attributes['tracks'][0]['album'] : '';
+	$current_artist = isset( $attributes['tracks'][0]['artist'] ) ? $attributes['tracks'][0]['artist'] : '';
+	$aria_label     = $current_title;
 
 	if ( $current_title && $current_artist && $current_album ) {
 		$aria_label = sprintf(
@@ -57,108 +45,50 @@ function render_block_core_playlist( $attributes ) {
 		'core/playlist',
 		array(
 			'currentID'     => $current_id,
-			'currentURL'    => $attributes['ids'][0]['url'],
+			'currentURL'    => $attributes['tracks'][0]['url'],
 			'currentTitle'  => $current_title,
-			'currentAlbum ' => $current_album,
+			'currentAlbum' => $current_album,
 			'currentArtist' => $current_artist,
-			'currentImage'  => $attributes['ids'][0]['image']['src'] ?? null,
+			'currentImage'  => $attributes['tracks'][0]['image']['src'] ?? null,
 			'ariaLabel'     => $aria_label,
 		)
 	);
 
-	$html  = '<figure ' . $wrapper_attributes . 'data-wp-interactive="core/playlist">';
-	$html .= '<div class="wp-block-playlist__current-item">';
-	// Images, albums, etc are only displayed if the options are enabled.
-	if ( $images && isset( $attributes['ids'][0]['image']['src'] ) ) {
-		$html .= '<img data-wp-bind--src="state.currentImage" alt="" width="70px" height="70px">';
+	$processor = new WP_HTML_Tag_Processor( $content );
+	$processor->next_tag( 'figure' );
+	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
+
+	/*
+	This breaks the locating of the next span tag, so I have commented it out of now.
+	if ( $processor->next_tag( 'img' ) ) {
+		$processor->set_attribute( 'data-wp-bind--src', 'state.currentImage' );
 	}
-	if ( isset( $current_album ) || isset( $current_artist ) ) {
-		$html .= '<div>';
-		if ( isset( $current_album ) ) {
-			$html .= '<span class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum"></span>';
+	*/
+
+	$processor->next_tag( 'span', 'wp-block-playlist__item-album' );
+	$processor->set_attribute( 'data-wp-text', 'state.currentAlbum' );
+	$processor->next_tag( 'span', 'wp-block-playlist__item-artist' );
+	$processor->set_attribute( 'data-wp-text', 'state.currentArtist' );
+	$processor->next_tag( 'audio' );
+	$processor->set_attribute( 'data-wp-bind--src', 'state.currentURL' );
+	$processor->set_attribute( 'data-wp-bind--aria-label', 'state.ariaLabel' );
+	$processor->set_attribute( 'data-wp-watch', 'callbacks.init' );
+
+	while ( $processor->next_tag( 'button' ) ) {
+		$context = $processor->get_attribute( 'data-wp-context' );
+		$context = json_decode( $context, true ) ? : [];
+		if ( isset( $context['trackID'] ) && $context['trackID'] === $current_id ) {
+			$processor->set_attribute( 'aria-current', 'true' );
 		}
-		if ( isset( $current_artist ) ) {
-			$html .= '<span class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist"></span>';
-		}
-		$html .= '</div>';
-	}
-	$html .= '</div>';
-	$html .= '<audio controls="controls" data-wp-bind--src="state.currentURL" data-wp-bind--aria-label="state.ariaLabel" data-wp-watch="callbacks.init"></audio>';
-	// End of current track information.
-
-	if ( $tracklist ) {
-		$html .= '<' . $tagname . ' class="wp-block-playlist__tracks">';
-		foreach ( $attributes['ids'] as $key => $value ) {
-			$id     = isset( $attributes['ids'][ $key ]['id'] ) ? $attributes['ids'][ $key ]['id'] : '';
-			$url    = isset( $attributes['ids'][ $key ]['url'] ) ? $attributes['ids'][ $key ]['url'] : '';
-			$title  = isset( $attributes['ids'][ $key ]['title'] ) ? $attributes['ids'][ $key ]['title'] : '';
-			$artist = isset( $attributes['ids'][ $key ]['artist'] ) ? $attributes['ids'][ $key ]['artist'] : '';
-			$album  = isset( $attributes['ids'][ $key ]['album'] ) ? $attributes['ids'][ $key ]['album'] : '';
-			$image  = isset( $attributes['ids'][ $key ]['image']['src'] ) ?? null;
-			$length = isset( $attributes['ids'][ $key ]['length'] ) ? $attributes['ids'][ $key ]['length'] : '';
-
-			$contexts = wp_interactivity_data_wp_context(
-				array(
-					'trackID'       => $id,
-					'trackURL'      => $url,
-					'trackTitle'    => $title,
-					'trackArtist'   => $artist,
-					'trackAlbum'    => $album,
-					'trackImageSrc' => $image,
-				)
-			);
-			if ( 0 === $key ) {
-				$contexts .= 'aria-current="true"';
-			}
-
-			$html .= '<li class="wp-block-playlist__item">';
-			$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack">';
-
-			/**
-			 * Use quotation marks for song titles when they are combined with the artist name.
-			 *
-			 * @see https://core.trac.wordpress.org/changeset/55251
-			*/
-			if ( $artists && $artist && $title ) {
-				$html .= '<span class="wp-block-playlist__item-title">"' . wp_kses_post( $title ) . '"</span>';
-			} else {
-				$html .= '<span class="wp-block-playlist__item-title">' . wp_kses_post( $title ) . '</span>';
-			}
-
-			if ( $artists && $artist ) {
-				$html .= '<span class="wp-block-playlist__item-artist">— ' . wp_kses_post( $artist ) . '</span>';
-			}
-
-			if ( $length ) {
-				$html .= '<span class="wp-block-playlist__item-length">' .
-				sprintf(
-					/* translators: %s: track length in minutes:seconds */
-					'<span class="screen-reader-text">' . esc_html__( 'Length:' ) . ' </span>%s',
-					$length
-				);
-				$html .= '</span>';
-			}
-
-			$html .= '<span class="screen-reader-text">' . esc_html__( 'Select to play this track' ) . '</span>';
-			$html .= '</button>';
-			$html .= '</li>';
-		}
-		$html .= '</' . $tagname . '>';
 	}
 
-	if ( $caption ) {
-		$html .= '<figcaption class="wp-element-caption">' . wp_kses_post( $caption ) . '</figcaption>';
-	}
-
-	$html .= '</figure>';
-
-	return $html;
+	return $processor->get_updated_html();
 }
 
 /**
  * Registers the `core/playlist` block on server.
  *
- * @since 6.7.0
+ * @since 6.8.0
  */
 function register_block_core_playlist() {
 	register_block_type_from_metadata(

@@ -24,7 +24,7 @@ const { state } = store(
 				if ( ref ) {
 					const trackListButtons = ref
 						.closest( '.wp-block-playlist' )
-						.querySelectorAll( '.wp-block-playlist__item button' );
+						.querySelectorAll( '.wp-block-playlist-track button' );
 
 					trackListButtons.forEach( ( buttons ) => {
 						buttons.removeAttribute( 'aria-current' );
@@ -79,9 +79,9 @@ const { state } = store(
 						const currentTrackListItem = ref
 							.closest( '.wp-block-playlist' )
 							.querySelector(
-								'.wp-block-playlist__item button[aria-current="true"]'
+								'.wp-block-playlist-track button[aria-current="true"]'
 							)
-							?.closest( '.wp-block-playlist__item' );
+							?.closest( '.wp-block-playlist-track' );
 
 						if ( currentTrackListItem ) {
 							const nextTrackListItem =
