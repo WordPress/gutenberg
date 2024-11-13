@@ -86,7 +86,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		<>
 			<BlockControls group="other">
 				<MediaReplaceFlow
-					name={ __( 'Edit' ) }
+					name={ __( 'Replace' ) }
 					onSelect={ ( value ) => onSelectTrack( value ) }
 					accept="audio/*"
 					addToPlaylist
