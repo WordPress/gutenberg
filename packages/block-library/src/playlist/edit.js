@@ -11,6 +11,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -174,6 +175,7 @@ const PlaylistEdit = ( {
 		defaultBlock: DEFAULT_BLOCK,
 		allowedBlocks: DEFAULT_BLOCK,
 		directInsert: true,
+		renderAppender: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
