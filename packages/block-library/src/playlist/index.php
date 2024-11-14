@@ -66,10 +66,10 @@ function render_block_core_playlist( $attributes, $content ) {
 
 	$processor->next_tag( 'span', 'wp-block-playlist__item-title' );
 	$processor->set_attribute( 'data-wp-text', 'state.currentTitle' );
-	$processor->next_tag( 'span', 'wp-block-playlist__item-album' );
-	$processor->set_attribute( 'data-wp-text', 'state.currentAlbum' );
 	$processor->next_tag( 'span', 'wp-block-playlist__item-artist' );
 	$processor->set_attribute( 'data-wp-text', 'state.currentArtist' );
+	$processor->next_tag( 'span', 'wp-block-playlist__item-album' );
+	$processor->set_attribute( 'data-wp-text', 'state.currentAlbum' );
 
 	$processor->next_tag( 'audio' );
 	$processor->set_attribute( 'data-wp-bind--src', 'state.currentURL' );
