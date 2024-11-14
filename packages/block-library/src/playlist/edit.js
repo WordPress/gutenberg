@@ -89,7 +89,7 @@ const PlaylistEdit = ( {
 		if (
 			innerBlockTracks.some(
 				( innerTrack, index ) =>
-					innerTrack.attributes.id !== tracks[ index ].id
+					innerTrack.attributes.id !== tracks[ index ]?.id
 			)
 		) {
 			const sortedTracks = innerBlockTracks.map(
