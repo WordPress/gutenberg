@@ -22,13 +22,17 @@
 			align-items: flex-start;
 			gap: 8px;
 		}
-		.wp-block-playlist__item-album {
+		& .wp-block-playlist__current-item-artist-album {
+			flex-direction: row;
+			align-items: flex-end;
+			font-weight: 400;
 			font-size: 16px;
+		}
+		.wp-block-playlist__item-title {
 			font-weight: 600;
 		}
-		.wp-block-playlist__item-artist {
-			font-size: 13px;
-			font-weight: 400;
+		.wp-block-playlist__item-album {
+			font-style: italic;
 		}
 	}
 

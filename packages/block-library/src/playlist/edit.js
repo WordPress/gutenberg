@@ -87,7 +87,6 @@ const PlaylistEdit = ( {
 
 		// If the tracks have been repositioned, update the `tracks` block attribute.
 		if (
-			innerBlockTracks.length === tracks.length &&
 			innerBlockTracks.some(
 				( innerTrack, index ) =>
 					innerTrack.attributes.id !== tracks[ index ].id
@@ -291,28 +290,41 @@ const PlaylistEdit = ( {
 										/>
 									) }
 								<div>
-									{ tracks[ trackListIndex ]?.album && (
+									{ tracks[ trackListIndex ]?.title && (
 										<span
-											className="wp-block-playlist__item-album"
+											className="wp-block-playlist__item-title"
 											dangerouslySetInnerHTML={ {
 												__html: safeHTML(
 													tracks[ trackListIndex ]
-														?.album
+														?.title
 												),
 											} }
 										/>
 									) }
-									{ tracks[ trackListIndex ]?.artist && (
-										<span
-											className="wp-block-playlist__item-artist"
-											dangerouslySetInnerHTML={ {
-												__html: safeHTML(
-													tracks[ trackListIndex ]
-														?.artist
-												),
-											} }
-										/>
-									) }
+									<div className="wp-block-playlist__current-item-artist-album">
+										{ tracks[ trackListIndex ]?.artist && (
+											<span
+												className="wp-block-playlist__item-artist"
+												dangerouslySetInnerHTML={ {
+													__html: safeHTML(
+														tracks[ trackListIndex ]
+															?.artist
+													),
+												} }
+											/>
+										) }
+										{ tracks[ trackListIndex ]?.album && (
+											<span
+												className="wp-block-playlist__item-album"
+												dangerouslySetInnerHTML={ {
+													__html: safeHTML(
+														tracks[ trackListIndex ]
+															?.album
+													),
+												} }
+											/>
+										) }
+									</div>
 								</div>
 							</div>
 							<audio

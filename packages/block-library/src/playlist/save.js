@@ -35,16 +35,23 @@ export default function saveWithInnerBlocks( { attributes } ) {
 								/>
 							) }
 							<div>
-								{ tracks[ 0 ]?.album && (
-									<span className="wp-block-playlist__item-album">
-										{ tracks[ 0 ]?.album }
+								{ tracks[ 0 ]?.title && (
+									<span className="wp-block-playlist__item-title">
+										{ tracks[ 0 ]?.title }
 									</span>
 								) }
-								{ tracks[ 0 ]?.artist && (
-									<span className="wp-block-playlist__item-artist">
-										{ tracks[ 0 ]?.artist }
-									</span>
-								) }
+								<div className="wp-block-playlist__current-item-artist-album">
+									{ tracks[ 0 ]?.artist && (
+										<span className="wp-block-playlist__item-artist">
+											{ tracks[ 0 ]?.artist }
+										</span>
+									) }
+									{ tracks[ 0 ]?.album && (
+										<span className="wp-block-playlist__item-album">
+											{ tracks[ 0 ]?.album }
+										</span>
+									) }
+								</div>
 							</div>
 						</div>
 						<audio
