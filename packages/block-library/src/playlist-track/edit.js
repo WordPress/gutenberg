@@ -6,17 +6,24 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	MediaUpload,
+	MediaUploadCheck,
 	BlockIcon,
 	useBlockProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
 } from '@wordpress/block-editor';
-import { Button, PanelBody, TextControl } from '@wordpress/components';
+import {
+	Button,
+	PanelBody,
+	TextControl,
+	BaseControl,
+} from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
@@ -24,10 +31,12 @@ import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 	const { id, album, artist, image, length, title, url } = attributes;
 	const showArtists = context?.showArtists;
+	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
@@ -60,6 +69,17 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		},
 		[ setAttributes ]
 	);
+
+	function onSelectAlbumCoverImage( coverImage ) {
+		setAttributes( { image: coverImage.url } );
+	}
+
+	function onRemoveAlbumCoverImage() {
+		setAttributes( { image: undefined } );
+
+		// Move focus back to the Media Upload button.
+		imageButton.current.focus();
+	}
 
 	if ( ! id ) {
 		return (
@@ -125,6 +145,47 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 							setAttributes( { title: titleValue } );
 						} }
 					/>
+					<MediaUploadCheck>
+						<div className="editor-video-poster-control">
+							<BaseControl.VisualLabel>
+								{ __( 'Album cover image' ) }
+							</BaseControl.VisualLabel>
+							{ !! image && (
+								<img
+									src={ image }
+									alt={ __(
+										'Preview of the album cover image'
+									) }
+								/>
+							) }
+							<MediaUpload
+								title={ __( 'Select image' ) }
+								onSelect={ onSelectAlbumCoverImage }
+								allowedTypes={ ALBUM_COVER_ALLOWED_MEDIA_TYPES }
+								render={ ( { open } ) => (
+									<Button
+										__next40pxDefaultSize
+										variant="primary"
+										onClick={ open }
+										ref={ imageButton }
+									>
+										{ ! image
+											? __( 'Select' )
+											: __( 'Replace' ) }
+									</Button>
+								) }
+							/>
+							{ !! image && (
+								<Button
+									__next40pxDefaultSize
+									onClick={ onRemoveAlbumCoverImage }
+									variant="tertiary"
+								>
+									{ __( 'Remove' ) }
+								</Button>
+							) }
+						</div>
+					</MediaUploadCheck>
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
