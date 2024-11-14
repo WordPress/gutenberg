@@ -47,7 +47,7 @@ const PlaylistEdit = ( {
 		order,
 		tracklist,
 		showNumbers,
-		images,
+		showImages,
 		showArtists,
 		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
@@ -296,8 +296,8 @@ const PlaylistEdit = ( {
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show images' ) }
-						onChange={ toggleAttribute( 'images' ) }
-						checked={ images }
+						onChange={ toggleAttribute( 'showImages' ) }
+						checked={ showImages }
 					/>
 					<SelectControl
 						__next40pxDefaultSize
@@ -317,14 +317,17 @@ const PlaylistEdit = ( {
 					{ !! tracks[ trackListIndex ]?.id && (
 						<>
 							<div className="wp-block-playlist__current-item">
-								{ images && tracks[ trackListIndex ]?.image && (
-									<img
-										src={ tracks[ trackListIndex ].image }
-										alt=""
-										width="70px"
-										height="70px"
-									/>
-								) }
+								{ showImages &&
+									tracks[ trackListIndex ]?.image && (
+										<img
+											src={
+												tracks[ trackListIndex ].image
+											}
+											alt=""
+											width="70px"
+											height="70px"
+										/>
+									) }
 								<div>
 									{ tracks[ trackListIndex ]?.album && (
 										<span

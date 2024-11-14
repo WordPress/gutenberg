@@ -24,7 +24,7 @@
 			"type": "boolean",
 			"default": true
 		},
-		"images": {
+		"showImages": {
 			"type": "boolean",
 			"default": true
 		},
