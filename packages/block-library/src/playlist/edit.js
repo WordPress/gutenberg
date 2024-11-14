@@ -45,7 +45,7 @@ const PlaylistEdit = ( {
 	const {
 		tracks,
 		order,
-		tracklist,
+		showTracklist,
 		showNumbers,
 		showImages,
 		showArtists,
@@ -224,10 +224,10 @@ const PlaylistEdit = ( {
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show Tracklist' ) }
-						onChange={ toggleAttribute( 'tracklist' ) }
-						checked={ tracklist }
+						onChange={ toggleAttribute( 'showTracklist' ) }
+						checked={ showTracklist }
 					/>
-					{ tracklist && (
+					{ showTracklist && (
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
@@ -329,7 +329,7 @@ const PlaylistEdit = ( {
 						</>
 					) }
 				</Disabled>
-				{ tracklist && (
+				{ showTracklist && (
 					<>
 						<TagName className="wp-block-playlist__tracklist">
 							{ innerBlocksProps.children }

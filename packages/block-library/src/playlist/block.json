@@ -20,7 +20,7 @@
 			"type": "string",
 			"default": "ASC"
 		},
-		"tracklist": {
+		"showTracklist": {
 			"type": "boolean",
 			"default": true
 		},
