@@ -84,6 +84,20 @@ const PlaylistEdit = ( {
 			);
 			setAttributes( { tracks: newTracks } );
 		}
+
+		// If the tracks have been repositioned, update the `tracks` block attribute.
+		if (
+			innerBlockTracks.length === tracks.length &&
+			innerBlockTracks.some(
+				( innerTrack, index ) =>
+					innerTrack.attributes.id !== tracks[ index ].id
+			)
+		) {
+			const sortedTracks = innerBlockTracks.map(
+				( track ) => track.attributes
+			);
+			setAttributes( { tracks: sortedTracks } );
+		}
 	}, [
 		clientId,
 		createErrorNotice,
@@ -154,8 +168,6 @@ const PlaylistEdit = ( {
 		}
 	}, [ trackListIndex, tracks ] );
 
-	// Todo: It is also possible for users to reposition the tracks.
-	// When that happens, the "curren track" should be updated.
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
 			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
