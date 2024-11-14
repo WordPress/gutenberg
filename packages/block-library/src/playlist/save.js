@@ -9,7 +9,13 @@ import {
 } from '@wordpress/block-editor';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	const { caption, tracks, images } = attributes;
+	const {
+		caption,
+		tracks,
+		images,
+		showNumbers,
+		tagName: TagName = showNumbers ? 'ol' : 'ul',
+	} = attributes;
 
 	const blockProps = useBlockProps.save();
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
@@ -49,7 +55,9 @@ export default function saveWithInnerBlocks( { attributes } ) {
 					</>
 				) }
 			</>
-			{ innerBlocksProps.children }
+			<TagName className="wp-block-playlist__tracklist">
+				{ innerBlocksProps.children }
+			</TagName>
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
