@@ -378,15 +378,15 @@ const PlaylistEdit = ( {
 							/>
 						</>
 					) }
-					{ tracklist && (
-						<>
-							<TagName className="wp-block-playlist__tracklist">
-								{ innerBlocksProps.children }
-							</TagName>
-							<InnerBlocks.ButtonBlockAppender />
-						</>
-					) }
 				</Disabled>
+				{ tracklist && (
+					<>
+						<TagName className="wp-block-playlist__tracklist">
+							{ innerBlocksProps.children }
+						</TagName>
+						<InnerBlocks.ButtonBlockAppender />
+					</>
+				) }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
