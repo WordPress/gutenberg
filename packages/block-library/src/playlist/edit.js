@@ -70,8 +70,9 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
-	// Update the `tracks` block attribute when an inner block is removed.
+	// Monitor changes to the inner blocks.
 	useEffect( () => {
+		// Update the `tracks` block attribute when an inner block is removed.
 		if (
 			Array.isArray( tracks ) &&
 			tracks.length > innerBlockTracks.length
@@ -83,7 +84,40 @@ const PlaylistEdit = ( {
 			);
 			setAttributes( { tracks: newTracks } );
 		}
-	}, [ innerBlockTracks, setAttributes, tracks ] );
+
+		// Prevent duplcate tracks when a new inner block is added.
+		if (
+			Array.isArray( tracks ) &&
+			tracks.length < innerBlockTracks.length
+		) {
+			// Find the track id of the new block
+			const newBlock = innerBlockTracks[ innerBlockTracks.length - 1 ];
+			const newTrackId = newBlock.attributes.id;
+			const isDuplicate = tracks.some(
+				( track ) => track.id === newTrackId
+			);
+			if ( isDuplicate ) {
+				// Display an error notice if the track is a duplicate
+				createErrorNotice(
+					sprintf(
+						// translators: %s: track title
+						__( '%s is already in the playlist.' ),
+						newBlock.attributes.title || __( 'Track' )
+					),
+					{ type: 'snackbar' }
+				);
+				// Remove the duplicate track
+				replaceInnerBlocks( clientId, innerBlockTracks.slice( 0, -1 ) );
+			}
+		}
+	}, [
+		clientId,
+		createErrorNotice,
+		innerBlockTracks,
+		replaceInnerBlocks,
+		setAttributes,
+		tracks,
+	] );
 
 	const onSelectTracks = useCallback(
 		( media ) => {
@@ -116,10 +150,33 @@ const PlaylistEdit = ( {
 						: track?.image?.src,
 			} );
 
-			const trackList = media.map( trackAttributes );
-			setAttributes( { tracks: trackList } );
+			const currentTracks = tracks || [];
+			const newTracks = [];
 
-			const newBlocks = trackList.map( ( track ) =>
+			media.forEach( ( track ) => {
+				const trackData = trackAttributes( track );
+				const isDuplicate = currentTracks.some(
+					( existingTrack ) => existingTrack.id === trackData.id
+				);
+
+				if ( isDuplicate ) {
+					// Display an error notice if the track is a duplicate
+					createErrorNotice(
+						sprintf(
+							// translators: %s: track title
+							__( '%s is already in the playlist.' ),
+							trackData.title || __( 'Track' )
+						),
+						{ type: 'snackbar' }
+					);
+				} else {
+					newTracks.push( trackData );
+				}
+			} );
+
+			const updatedTracks = [ ...currentTracks, ...newTracks ];
+			setAttributes( { tracks: updatedTracks } );
+			const newBlocks = newTracks.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
 			// Replace the inner blocks with the new tracks.
@@ -129,11 +186,12 @@ const PlaylistEdit = ( {
 			);
 		},
 		[
-			clientId,
 			tracks,
-			innerBlockTracks,
-			replaceInnerBlocks,
 			setAttributes,
+			replaceInnerBlocks,
+			clientId,
+			innerBlockTracks,
+			createErrorNotice,
 		]
 	);
 
