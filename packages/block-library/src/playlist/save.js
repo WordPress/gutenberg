@@ -12,7 +12,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	const {
 		caption,
 		tracks,
-		images,
+		showImages,
 		showNumbers,
 		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
@@ -26,7 +26,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 				{ !! tracks && !! tracks[ 0 ]?.id && (
 					<>
 						<div className="wp-block-playlist__current-item">
-							{ images && tracks[ 0 ]?.image && (
+							{ showImages && tracks[ 0 ]?.image && (
 								<img
 									src={ tracks[ 0 ].image }
 									alt=""

@@ -49,21 +49,20 @@ function render_block_core_playlist( $attributes, $content ) {
 			'currentTitle'  => $current_title,
 			'currentAlbum'  => $current_album,
 			'currentArtist' => $current_artist,
-			'currentImage'  => $attributes['tracks'][0]['image']['src'] ?? null,
+			'currentImage'  => $attributes['tracks'][0]['image'],
 			'ariaLabel'     => $aria_label,
 		)
 	);
 
+	// Bind the image source
+	$bind_image = new WP_HTML_Tag_Processor( $content );
+	$bind_image->next_tag( 'img' );
+	$bind_image->set_attribute( 'data-wp-bind--src', 'state.currentImage' );
+	$content = $bind_image->get_updated_html();
+
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-
-	/*
-	This breaks the locating of the next span tag, so I have commented it out of now.
-	if ( $processor->next_tag( 'img' ) ) {
-		$processor->set_attribute( 'data-wp-bind--src', 'state.currentImage' );
-	}
-	*/
 
 	$processor->next_tag( 'span', 'wp-block-playlist__item-album' );
 	$processor->set_attribute( 'data-wp-text', 'state.currentAlbum' );
