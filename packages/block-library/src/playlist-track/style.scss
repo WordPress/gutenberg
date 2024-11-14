@@ -2,7 +2,7 @@
 	border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
 	padding: $grid-unit-10;
 
-	button {
+	.wp-block-playlist-track__button {
 		display: flex;
 		min-width: 100%;
 		padding: 0;

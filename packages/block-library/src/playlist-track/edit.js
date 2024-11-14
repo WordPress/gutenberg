@@ -129,6 +129,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			</InspectorControls>
 			<li { ...blockProps }>
 				<Button
+					className="wp-block-playlist-track__button"
 					__next40pxDefaultSize
 					data-playlist-track-url={ url }
 					data-playlist-track-title={ stripHTML( title ) }

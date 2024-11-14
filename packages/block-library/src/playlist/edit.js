@@ -175,7 +175,6 @@ const PlaylistEdit = ( {
 		defaultBlock: DEFAULT_BLOCK,
 		allowedBlocks: DEFAULT_BLOCK,
 		directInsert: true,
-		renderAppender: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
@@ -320,9 +319,12 @@ const PlaylistEdit = ( {
 					) }
 				</Disabled>
 				{ tracklist && (
-					<TagName className="wp-block-playlist__tracklist">
-						{ innerBlocksProps.children }
-					</TagName>
+					<>
+						<TagName className="wp-block-playlist__tracklist">
+							{ innerBlocksProps.children }
+						</TagName>
+						<InnerBlocks.ButtonBlockAppender />
+					</>
 				) }
 				<Caption
 					attributes={ attributes }
@@ -331,6 +333,7 @@ const PlaylistEdit = ( {
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Playlist caption text' ) }
 					showToolbarButton={ isSelected }
+					style={ { marginTop: 16 } }
 				/>
 			</figure>
 		</>

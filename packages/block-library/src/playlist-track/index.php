@@ -41,7 +41,7 @@ function render_block_core_playlist_track( $attributes ) {
 	);
 
 	$html  = '<li ' . $wrapper_attributes . '>';
-	$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack">';
+	$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack" class="wp-block-playlist-track__button">';
 
 	if ( $title ) {
 		$html .= '<span class="wp-block-playlist-track__title">' . wp_kses_post( $title ) . '</span>';

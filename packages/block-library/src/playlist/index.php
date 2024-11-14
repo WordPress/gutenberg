@@ -47,7 +47,7 @@ function render_block_core_playlist( $attributes, $content ) {
 			'currentID'     => $current_id,
 			'currentURL'    => $attributes['tracks'][0]['url'],
 			'currentTitle'  => $current_title,
-			'currentAlbum' => $current_album,
+			'currentAlbum'  => $current_album,
 			'currentArtist' => $current_artist,
 			'currentImage'  => $attributes['tracks'][0]['image']['src'] ?? null,
 			'ariaLabel'     => $aria_label,
@@ -76,7 +76,7 @@ function render_block_core_playlist( $attributes, $content ) {
 
 	while ( $processor->next_tag( 'button' ) ) {
 		$context = $processor->get_attribute( 'data-wp-context' );
-		$context = json_decode( $context, true ) ? : [];
+		$context = json_decode( $context, true ) ? json_decode( $context, true ) : array();
 		if ( isset( $context['trackID'] ) && $context['trackID'] === $current_id ) {
 			$processor->set_attribute( 'aria-current', 'true' );
 		}
