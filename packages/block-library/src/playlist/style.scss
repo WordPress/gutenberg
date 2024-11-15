@@ -55,4 +55,9 @@
 	ol.wp-block-playlist__tracklist {
 		padding-left: $grid-unit-20;
 	}
+
+	li.block-list-appender.block-list-appender {
+		position: initial;
+		margin-top: $grid-unit-20;
+	}
 }

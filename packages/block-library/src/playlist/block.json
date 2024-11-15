@@ -8,6 +8,7 @@
 	"description": "Embed a simple playlist.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
+	"allowedBlocks": [ "core/playlist-track" ],
 	"attributes": {
 		"tracks": {
 			"type": "array"

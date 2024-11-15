@@ -32,7 +32,6 @@ import { createBlock } from '@wordpress/blocks';
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const DEFAULT_BLOCK = { name: 'core/playlist-track' };
 const EMPTY_ARRAY = [];
 
 const PlaylistEdit = ( {
@@ -228,10 +227,17 @@ const PlaylistEdit = ( {
 		};
 	}
 
+	const hasSelectedChild = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
-		allowedBlocks: DEFAULT_BLOCK,
-		directInsert: true,
+		__experimentalAppenderTagName: 'li',
+		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
@@ -396,7 +402,6 @@ const PlaylistEdit = ( {
 						<TagName className="wp-block-playlist__tracklist">
 							{ innerBlocksProps.children }
 						</TagName>
-						<InnerBlocks.ButtonBlockAppender />
 					</>
 				) }
 				<Caption
