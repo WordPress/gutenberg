@@ -31,6 +31,7 @@ const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 	const { id, album, artist, image, length, title, url } = attributes;
 	const showArtists = context?.showArtists;
+	const currentTrack = context?.currentTrack;
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -192,6 +193,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					data-playlist-track-artist={ stripHTML( artist ) }
 					data-playlist-track-album={ stripHTML( album ) }
 					data-playlist-track-image-src={ image ?? null }
+					aria-current={ currentTrack === id ? 'true' : 'false' }
 				>
 					<RichText
 						tagName="span"

@@ -49,6 +49,7 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
+		currentTrack,
 		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
@@ -82,7 +83,15 @@ const PlaylistEdit = ( {
 			const sortedTracks = innerBlockTracks.map(
 				( track ) => track.attributes
 			);
-			setAttributes( { tracks: sortedTracks } );
+			setAttributes( {
+				tracks: sortedTracks,
+				currentTrack:
+					sortedTracks.length > 0 &&
+					// If the first track has changed, update the `currentTrack` block attribute.
+					sortedTracks[ 0 ].id !== currentTrack
+						? sortedTracks[ 0 ].id
+						: currentTrack,
+			} );
 		}
 
 		const updatedTracks = innerBlockTracks.map(
@@ -95,12 +104,21 @@ const PlaylistEdit = ( {
 					( key ) => updatedTrack[ key ] !== tracks[ index ]?.[ key ]
 				)
 		);
-		if ( hasChanges || updatedTracks.length !== tracks.length ) {
-			setAttributes( { tracks: updatedTracks } );
+		if ( hasChanges || updatedTracks.length !== tracks?.length ) {
+			setAttributes( {
+				tracks: updatedTracks,
+				currentTrack:
+					updatedTracks.length > 0 &&
+					// If the first track has changed, update the `currentTrack` block attribute.
+					updatedTracks[ 0 ].id !== currentTrack
+						? updatedTracks[ 0 ].id
+						: currentTrack,
+			} );
 		}
 	}, [
 		clientId,
 		createErrorNotice,
+		currentTrack,
 		innerBlockTracks,
 		replaceInnerBlocks,
 		setAttributes,
@@ -139,7 +157,10 @@ const PlaylistEdit = ( {
 			} );
 
 			const trackList = media.map( trackAttributes );
-			setAttributes( { tracks: trackList } );
+			setAttributes( {
+				tracks: trackList,
+				currentTrack: trackList.length > 0 ? trackList[ 0 ].id : null,
+			} );
 
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
@@ -163,10 +184,12 @@ const PlaylistEdit = ( {
 		/* If there are tracks left, play the next track */
 		if ( trackListIndex < tracks.length - 1 ) {
 			setTrackListIndex( trackListIndex + 1 );
+			setAttributes( { currentTrack: tracks[ trackListIndex + 1 ].id } );
 		} else {
 			setTrackListIndex( 0 );
+			setAttributes( { currentTrack: tracks[ 0 ].id } );
 		}
-	}, [ trackListIndex, tracks ] );
+	}, [ setAttributes, trackListIndex, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -176,13 +199,27 @@ const PlaylistEdit = ( {
 				}
 				return b.attributes.id - a.attributes.id;
 			} );
+			const sortedTracks = sortedBlocks.map(
+				( block ) => block.attributes
+			);
 			replaceInnerBlocks( clientId, sortedBlocks );
 			setAttributes( {
 				order: trackOrder,
-				tracks: sortedBlocks.map( ( block ) => block.attributes ),
+				tracks: sortedTracks,
+				currentTrack:
+					sortedTracks.length > 0 &&
+					sortedTracks[ 0 ].id !== currentTrack
+						? sortedTracks[ 0 ].id
+						: currentTrack,
 			} );
 		},
-		[ clientId, innerBlockTracks, replaceInnerBlocks, setAttributes ]
+		[
+			clientId,
+			currentTrack,
+			innerBlockTracks,
+			replaceInnerBlocks,
+			setAttributes,
+		]
 	);
 
 	function toggleAttribute( attribute ) {

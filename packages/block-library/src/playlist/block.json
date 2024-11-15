@@ -12,6 +12,9 @@
 		"tracks": {
 			"type": "array"
 		},
+		"currentTrack": {
+			"type": "number"
+		},
 		"type": {
 			"type": "string",
 			"default": "audio"
@@ -41,7 +44,8 @@
 		}
 	},
 	"providesContext": {
-		"showArtists": "showArtists"
+		"showArtists": "showArtists",
+		"currentTrack": "currentTrack"
 	},
 	"supports": {
 		"anchor": true,

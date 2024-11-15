@@ -618,7 +618,7 @@ Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
--	**Attributes:** caption, order, showArtists, showImages, showNumbers, showTracklist, tracks, type
+-	**Attributes:** caption, currentTrack, order, showArtists, showImages, showNumbers, showTracklist, tracks, type
 
 ## Playlist track
 
