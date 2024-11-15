@@ -72,19 +72,6 @@ const PlaylistEdit = ( {
 
 	// Monitor changes to the inner blocks.
 	useEffect( () => {
-		// Update the `tracks` block attribute when an inner block is removed.
-		if (
-			Array.isArray( tracks ) &&
-			tracks.length > innerBlockTracks.length
-		) {
-			const newTracks = tracks.filter( ( track ) =>
-				innerBlockTracks.some(
-					( innerTrack ) => innerTrack.attributes.id === track.id
-				)
-			);
-			setAttributes( { tracks: newTracks } );
-		}
-
 		// If the tracks have been repositioned, update the `tracks` block attribute.
 		if (
 			innerBlockTracks.some(
@@ -96,6 +83,20 @@ const PlaylistEdit = ( {
 				( track ) => track.attributes
 			);
 			setAttributes( { tracks: sortedTracks } );
+		}
+
+		const updatedTracks = innerBlockTracks.map(
+			( block ) => block.attributes
+		);
+		const hasChanges = updatedTracks.some(
+			( updatedTrack, index ) =>
+				! tracks[ index ] ||
+				Object.keys( updatedTrack ).some(
+					( key ) => updatedTrack[ key ] !== tracks[ index ]?.[ key ]
+				)
+		);
+		if ( hasChanges || updatedTracks.length !== tracks.length ) {
+			setAttributes( { tracks: updatedTracks } );
 		}
 	}, [
 		clientId,

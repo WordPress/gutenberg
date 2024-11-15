@@ -1,9 +1,4 @@
 /**
- * To do: Enable uploading a track or album image.
- * To do: Save updated track data to the post in the media library.
- */
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
