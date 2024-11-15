@@ -25,10 +25,12 @@ function render_block_core_playlist( $attributes, $content ) {
 	 * Assign the current track information to variables.
 	 * The current track is the first one in the list.
 	 */
-	$current_id     = $attributes['tracks'][0]['id'];
+	$current_id     = isset( $attributes['tracks'][0]['id'] ) ? $attributes['tracks'][0]['id'] : '';
 	$current_title  = isset( $attributes['tracks'][0]['title'] ) ? $attributes['tracks'][0]['title'] : '';
 	$current_album  = isset( $attributes['tracks'][0]['album'] ) ? $attributes['tracks'][0]['album'] : '';
 	$current_artist = isset( $attributes['tracks'][0]['artist'] ) ? $attributes['tracks'][0]['artist'] : '';
+	$current_url    = isset( $attributes['tracks'][0]['url'] ) ? $attributes['tracks'][0]['url'] : '';
+	$current_image  = isset( $attributes['tracks'][0]['image'] ) ? $attributes['tracks'][0]['image'] : '';
 	$aria_label     = $current_title;
 
 	if ( $current_title && $current_artist && $current_album ) {
@@ -45,11 +47,11 @@ function render_block_core_playlist( $attributes, $content ) {
 		'core/playlist',
 		array(
 			'currentID'     => $current_id,
-			'currentURL'    => $attributes['tracks'][0]['url'],
+			'currentURL'    => $current_url,
 			'currentTitle'  => $current_title,
 			'currentAlbum'  => $current_album,
 			'currentArtist' => $current_artist,
-			'currentImage'  => $attributes['tracks'][0]['image'],
+			'currentImage'  => $current_image,
 			'ariaLabel'     => $aria_label,
 		)
 	);
