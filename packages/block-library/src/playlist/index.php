@@ -19,18 +19,35 @@ function render_block_core_playlist( $attributes, $content ) {
 		return '';
 	}
 
-	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
-
 	/**
 	 * Assign the current track information to variables.
-	 * The current track is the first one in the list.
 	 */
-	$current_id     = isset( $attributes['tracks'][0]['id'] ) ? $attributes['tracks'][0]['id'] : '';
-	$current_title  = isset( $attributes['tracks'][0]['title'] ) ? $attributes['tracks'][0]['title'] : '';
-	$current_album  = isset( $attributes['tracks'][0]['album'] ) ? $attributes['tracks'][0]['album'] : '';
-	$current_artist = isset( $attributes['tracks'][0]['artist'] ) ? $attributes['tracks'][0]['artist'] : '';
-	$current_url    = isset( $attributes['tracks'][0]['url'] ) ? $attributes['tracks'][0]['url'] : '';
-	$current_image  = isset( $attributes['tracks'][0]['image'] ) ? $attributes['tracks'][0]['image'] : '';
+	$current_id         = '';
+	$tracklist_position = null;
+
+	foreach ( $attributes['tracks'] as $index => $track ) {
+		if ( isset( $track['id'] ) && ! empty( $track['id'] ) ) {
+			$current_id         = $track['id'];
+			$tracklist_position = $index;
+			break;
+		}
+	}
+
+	/**
+	 * Return early if no valid track ID is found.
+	 * This can happen if the user deleted all tracks but kept an empty inner block, such as the media upload placeholder.
+	 */
+	if ( empty( $current_id ) ) {
+		return '';
+	}
+
+	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
+
+	$current_title  = isset( $attributes['tracks'][ $tracklist_position ]['title'] ) ? $attributes['tracks'][ $tracklist_position ]['title'] : '';
+	$current_album  = isset( $attributes['tracks'][ $tracklist_position ]['album'] ) ? $attributes['tracks'][ $tracklist_position ]['album'] : '';
+	$current_artist = isset( $attributes['tracks'][ $tracklist_position ]['artist'] ) ? $attributes['tracks'][ $tracklist_position ]['artist'] : '';
+	$current_url    = isset( $attributes['tracks'][ $tracklist_position ]['url'] ) ? $attributes['tracks'][ $tracklist_position ]['url'] : '';
+	$current_image  = isset( $attributes['tracks'][ $tracklist_position ]['image'] ) ? $attributes['tracks'][ $tracklist_position ]['image'] : '';
 	$aria_label     = $current_title;
 
 	if ( $current_title && $current_artist && $current_album ) {

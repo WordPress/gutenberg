@@ -170,13 +170,15 @@ const PlaylistEdit = ( {
 			);
 			setAttributes( {
 				tracks: sortedTracks,
-				currentTrack:
-					sortedTracks.length > 0 &&
-					// If the first track has changed, update the `currentTrack` block attribute.
-					sortedTracks[ 0 ].id !== currentTrack
-						? sortedTracks[ 0 ].id
-						: currentTrack,
 			} );
+			// Update the current track if the first track has changed, and there is a track id.
+			if (
+				sortedTracks.length > 0 &&
+				sortedTracks[ 0 ].id &&
+				sortedTracks[ 0 ].id !== currentTrack
+			) {
+				setAttributes( { currentTrack: sortedTracks[ 0 ].id } );
+			}
 		}
 
 		const updatedTracks = innerBlockTracks.map(
@@ -268,11 +270,24 @@ const PlaylistEdit = ( {
 	const onTrackEnd = useCallback( () => {
 		/* If there are tracks left, play the next track */
 		if ( trackListIndex < tracks.length - 1 ) {
-			setTrackListIndex( trackListIndex + 1 );
-			setAttributes( { currentTrack: tracks[ trackListIndex + 1 ].id } );
+			if ( tracks[ trackListIndex + 1 ]?.id ) {
+				setTrackListIndex( trackListIndex + 1 );
+				setAttributes( {
+					currentTrack: tracks[ trackListIndex + 1 ].id,
+				} );
+			}
 		} else {
 			setTrackListIndex( 0 );
-			setAttributes( { currentTrack: tracks[ 0 ].id } );
+			if ( tracks[ 0 ].id ) {
+				setAttributes( { currentTrack: tracks[ 0 ].id } );
+			} else if ( tracks.length > 0 ) {
+				const validTrack = tracks.find(
+					( track ) => track.id !== undefined
+				);
+				if ( validTrack ) {
+					setAttributes( { currentTrack: validTrack.id } );
+				}
+			}
 		}
 	}, [ setAttributes, trackListIndex, tracks ] );
 
@@ -306,6 +321,17 @@ const PlaylistEdit = ( {
 			setAttributes,
 		]
 	);
+
+	useEffect( () => {
+		if ( ! currentTrack && tracks?.length > 0 ) {
+			const validTrack = tracks.find(
+				( track ) => track.id !== undefined
+			);
+			if ( validTrack ) {
+				setAttributes( { currentTrack: validTrack.id } );
+			}
+		}
+	}, [ currentTrack, tracks, setAttributes ] );
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
