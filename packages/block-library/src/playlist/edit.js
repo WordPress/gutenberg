@@ -37,7 +37,6 @@ import { createBlock } from '@wordpress/blocks';
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-const EMPTY_ARRAY = [];
 
 const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 	const trackTitle = {
@@ -149,8 +148,7 @@ const PlaylistEdit = ( {
 		( select ) => {
 			const { getBlock: _getBlock } = select( blockEditorStore );
 			return {
-				innerBlockTracks:
-					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+				innerBlockTracks: _getBlock( clientId )?.innerBlocks ?? [],
 			};
 		},
 		[ clientId ]
