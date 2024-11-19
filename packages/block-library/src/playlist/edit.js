@@ -40,8 +40,44 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const EMPTY_ARRAY = [];
 
 const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
-	if ( ! track?.id ) {
-		return null;
+	const trackTitle = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
+		},
+	};
+	const trackArtist = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML(
+				track?.artist ? track.artist : __( 'Unknown artist' )
+			),
+		},
+	};
+	const trackAlbum = {
+		dangerouslySetInnerHTML: {
+			__html: safeHTML(
+				track?.album ? track.album : __( 'Unknown album' )
+			),
+		},
+	};
+
+	let ariaLabel;
+	if ( track?.title && track?.artist && track?.album ) {
+		ariaLabel = stripHTML(
+			sprintf(
+				/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+				_x(
+					'%1$s by %2$s from the album %3$s',
+					'track title, artist name, album name'
+				),
+				track?.title,
+				track?.artist,
+				track?.album
+			)
+		);
+	} else if ( track?.title ) {
+		ariaLabel = stripHTML( track.title );
+	} else {
+		ariaLabel = stripHTML( __( 'Untitled' ) );
 	}
 
 	return (
@@ -49,6 +85,7 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 			<div className="wp-block-playlist__current-item">
 				{ showImages && track?.image && (
 					<img
+						className="wp-block-playlist__item-image"
 						src={ track.image }
 						alt=""
 						width="70px"
@@ -56,52 +93,27 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 					/>
 				) }
 				<div>
-					{ track?.title && (
-						<span
-							className="wp-block-playlist__item-title"
-							dangerouslySetInnerHTML={ {
-								__html: safeHTML( track?.title ),
-							} }
-						/>
-					) }
+					<span
+						className="wp-block-playlist__item-title"
+						{ ...trackTitle }
+					/>
 					<div className="wp-block-playlist__current-item-artist-album">
-						{ track?.artist && (
-							<span
-								className="wp-block-playlist__item-artist"
-								dangerouslySetInnerHTML={ {
-									__html: safeHTML( track?.artist ),
-								} }
-							/>
-						) }
-						{ track?.album && (
-							<span
-								className="wp-block-playlist__item-album"
-								dangerouslySetInnerHTML={ {
-									__html: safeHTML( track?.album ),
-								} }
-							/>
-						) }
+						<span
+							className="wp-block-playlist__item-artist"
+							{ ...trackArtist }
+						/>
+						<span
+							className="wp-block-playlist__item-album"
+							{ ...trackAlbum }
+						/>
 					</div>
 				</div>
 			</div>
 			<audio
 				controls="controls"
-				src={ track.url }
+				src={ track?.url ? track.url : '' }
 				onEnded={ onTrackEnd }
-				aria-label={ stripHTML(
-					track?.title && track?.artist && track?.album
-						? sprintf(
-								/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-								_x(
-									'%1$s by %2$s from the album %3$s',
-									'track title, artist name, album name'
-								),
-								track?.title,
-								track?.artist,
-								track?.album
-						  )
-						: track?.title
-				) }
+				aria-label={ ariaLabel }
 				tabIndex={ 0 }
 			/>
 		</>
