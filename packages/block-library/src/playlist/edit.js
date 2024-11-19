@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useState, useCallback, useEffect } from '@wordpress/element';
@@ -311,7 +316,10 @@ const PlaylistEdit = ( {
 
 	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
 		return (
-			<div { ...blockProps }>
+			<div
+				{ ...blockProps }
+				className={ clsx( 'is-placeholder', blockProps.className ) }
+			>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
