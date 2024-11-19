@@ -39,6 +39,10 @@ import { Caption } from '../utils/caption';
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
+	/**
+	 * dangerouslySetInnerHTML and safeHTML are used because
+	 * the media library allows using some HTML tags in the title, artist, and album fields.
+	 */
 	const trackTitle = {
 		dangerouslySetInnerHTML: {
 			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
