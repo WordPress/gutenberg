@@ -34,6 +34,75 @@ import { Caption } from '../utils/caption';
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const EMPTY_ARRAY = [];
 
+const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
+	if ( ! track?.id ) {
+		return null;
+	}
+
+	return (
+		<>
+			<div className="wp-block-playlist__current-item">
+				{ showImages && track?.image && (
+					<img
+						src={ track.image }
+						alt=""
+						width="70px"
+						height="70px"
+					/>
+				) }
+				<div>
+					{ track?.title && (
+						<span
+							className="wp-block-playlist__item-title"
+							dangerouslySetInnerHTML={ {
+								__html: safeHTML( track?.title ),
+							} }
+						/>
+					) }
+					<div className="wp-block-playlist__current-item-artist-album">
+						{ track?.artist && (
+							<span
+								className="wp-block-playlist__item-artist"
+								dangerouslySetInnerHTML={ {
+									__html: safeHTML( track?.artist ),
+								} }
+							/>
+						) }
+						{ track?.album && (
+							<span
+								className="wp-block-playlist__item-album"
+								dangerouslySetInnerHTML={ {
+									__html: safeHTML( track?.album ),
+								} }
+							/>
+						) }
+					</div>
+				</div>
+			</div>
+			<audio
+				controls="controls"
+				src={ track.url }
+				onEnded={ onTrackEnd }
+				aria-label={ stripHTML(
+					track?.title && track?.artist && track?.album
+						? sprintf(
+								/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+								_x(
+									'%1$s by %2$s from the album %3$s',
+									'track title, artist name, album name'
+								),
+								track?.title,
+								track?.artist,
+								track?.album
+						  )
+						: track?.title
+				) }
+				tabIndex={ 0 }
+			/>
+		</>
+	);
+};
+
 const PlaylistEdit = ( {
 	attributes,
 	setAttributes,
@@ -319,83 +388,11 @@ const PlaylistEdit = ( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					{ !! tracks[ trackListIndex ]?.id && (
-						<>
-							<div className="wp-block-playlist__current-item">
-								{ showImages &&
-									tracks[ trackListIndex ]?.image && (
-										<img
-											src={
-												tracks[ trackListIndex ].image
-											}
-											alt=""
-											width="70px"
-											height="70px"
-										/>
-									) }
-								<div>
-									{ tracks[ trackListIndex ]?.title && (
-										<span
-											className="wp-block-playlist__item-title"
-											dangerouslySetInnerHTML={ {
-												__html: safeHTML(
-													tracks[ trackListIndex ]
-														?.title
-												),
-											} }
-										/>
-									) }
-									<div className="wp-block-playlist__current-item-artist-album">
-										{ tracks[ trackListIndex ]?.artist && (
-											<span
-												className="wp-block-playlist__item-artist"
-												dangerouslySetInnerHTML={ {
-													__html: safeHTML(
-														tracks[ trackListIndex ]
-															?.artist
-													),
-												} }
-											/>
-										) }
-										{ tracks[ trackListIndex ]?.album && (
-											<span
-												className="wp-block-playlist__item-album"
-												dangerouslySetInnerHTML={ {
-													__html: safeHTML(
-														tracks[ trackListIndex ]
-															?.album
-													),
-												} }
-											/>
-										) }
-									</div>
-								</div>
-							</div>
-							<audio
-								controls="controls"
-								src={ tracks[ trackListIndex ].url }
-								onEnded={ onTrackEnd }
-								aria-label={ stripHTML(
-									!! tracks[ trackListIndex ]?.title &&
-										!! tracks[ trackListIndex ]?.artist &&
-										!! tracks[ trackListIndex ]?.album
-										? sprintf(
-												/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-												_x(
-													'%1$s by %2$s from the album %3$s',
-													'track title, artist name, album name'
-												),
-												tracks[ trackListIndex ]?.title,
-												tracks[ trackListIndex ]
-													?.artist,
-												tracks[ trackListIndex ]?.album
-										  )
-										: tracks[ trackListIndex ]?.title
-								) }
-								tabIndex={ 0 }
-							/>
-						</>
-					) }
+					<CurrentTrack
+						track={ tracks[ trackListIndex ] }
+						showImages={ showImages }
+						onTrackEnd={ onTrackEnd }
+					/>
 				</Disabled>
 				{ showTracklist && (
 					<>
