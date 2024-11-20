@@ -391,6 +391,9 @@ const PlaylistEdit = ( {
 					onSelect={ ( value ) => onSelectTracks( value ) }
 					accept="audio/*"
 					multiple
+					mediaIds={ tracks
+						.filter( ( track ) => track.id )
+						.map( ( track ) => track.id ) }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
