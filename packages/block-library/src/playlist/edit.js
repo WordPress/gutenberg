@@ -232,10 +232,15 @@ const PlaylistEdit = ( {
 				artist:
 					track.artist ||
 					track?.meta?.artist ||
+					track?.media_details?.artist ||
 					__( 'Unknown artist' ),
 				album:
-					track.album || track?.meta?.album || __( 'Unknown album' ),
-				length: track.fileLength,
+					track.album ||
+					track?.meta?.album ||
+					track?.media_details?.album ||
+					__( 'Unknown album' ),
+				length:
+					track?.fileLength || track?.media_details?.length_formatted,
 				// Prevent using the default media attachment icon as the track image.
 				// Note: Image is not available when a new track is uploaded.
 				image:

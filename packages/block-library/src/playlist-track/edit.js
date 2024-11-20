@@ -49,16 +49,21 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 				artist:
 					media.artist ||
 					media?.meta?.artist ||
+					media?.media_details?.artist ||
 					__( 'Unknown artist' ),
 				album:
-					media.album || media?.meta?.album || __( 'Unknown album' ),
+					media.album ||
+					media?.meta?.album ||
+					media?.media_details?.album ||
+					__( 'Unknown album' ),
 				// Prevent using the default media attachment icon as the track image.
 				image:
 					media?.image?.src &&
 					media?.image?.src.endsWith( '/images/media/audio.svg' )
 						? ''
 						: media?.image?.src,
-				length: media.fileLength,
+				length:
+					media?.fileLength || media?.media_details?.length_formatted,
 				title: media.title,
 				url: media.url,
 			} );
