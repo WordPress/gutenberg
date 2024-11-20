@@ -110,8 +110,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					name={ __( 'Replace' ) }
 					onSelect={ ( value ) => onSelectTrack( value ) }
 					accept="audio/*"
-					addToPlaylist
-					mediaIds={ id }
+					mediaId={ id }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
