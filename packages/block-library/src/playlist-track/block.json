@@ -11,6 +11,10 @@
 	"textdomain": "default",
 	"usesContext": [ "showArtists", "currentTrack" ],
 	"attributes": {
+		"blob": {
+			"type": "string",
+			"role": "local"
+		},
 		"id": {
 			"type": "number"
 		},

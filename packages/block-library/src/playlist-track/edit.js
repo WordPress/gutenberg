@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { isBlobURL } from '@wordpress/blob';
+import { useRef, useState } from '@wordpress/element';
 import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
@@ -18,6 +19,7 @@ import {
 	PanelBody,
 	TextControl,
 	BaseControl,
+	Spinner,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -25,11 +27,17 @@ import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
+
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 	const { id, album, artist, image, length, title, url } = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const currentTrack = context?.currentTrack;
 	const imageButton = useRef();
@@ -39,37 +47,61 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
-	const onSelectTrack = useCallback(
-		( media ) => {
-			if ( ! media ) {
-				return;
-			}
+	useUploadMediaFromBlobURL( {
+		url: temporaryURL,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectTrack,
+		onError: onUploadError,
+	} );
+
+	function onSelectTrack( media ) {
+		if ( ! media || ! media.url ) {
+			// In this case there was an error and we should continue in the editing state
+			// previous attributes should be removed because they may be temporary blob urls.
 			setAttributes( {
-				id: media.id,
-				artist:
-					media.artist ||
-					media?.meta?.artist ||
-					media?.media_details?.artist ||
-					__( 'Unknown artist' ),
-				album:
-					media.album ||
-					media?.meta?.album ||
-					media?.media_details?.album ||
-					__( 'Unknown album' ),
-				// Prevent using the default media attachment icon as the track image.
-				image:
-					media?.image?.src &&
-					media?.image?.src.endsWith( '/images/media/audio.svg' )
-						? ''
-						: media?.image?.src,
-				length:
-					media?.fileLength || media?.media_details?.length_formatted,
-				title: media.title,
-				url: media.url,
+				blob: undefined,
+				id: undefined,
+				artist: undefined,
+				album: undefined,
+				image: undefined,
+				length: undefined,
+				title: undefined,
+				url: undefined,
 			} );
-		},
-		[ setAttributes ]
-	);
+			setTemporaryURL();
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
+		}
+
+		setAttributes( {
+			blob: undefined,
+			id: media.id,
+			artist:
+				media.artist ||
+				media?.meta?.artist ||
+				media?.media_details?.artist ||
+				__( 'Unknown artist' ),
+			album:
+				media.album ||
+				media?.meta?.album ||
+				media?.media_details?.album ||
+				__( 'Unknown album' ),
+			// Prevent using the default media attachment icon as the track image.
+			image:
+				media?.image?.src &&
+				media?.image?.src.endsWith( '/images/media/audio.svg' )
+					? ''
+					: media?.image?.src,
+			length: media?.fileLength || media?.media_details?.length_formatted,
+			title: media.title,
+			url: media.url,
+		} );
+		setTemporaryURL();
+	}
 
 	function onSelectAlbumCoverImage( coverImage ) {
 		setAttributes( { image: coverImage.url } );
@@ -82,7 +114,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		imageButton.current.focus();
 	}
 
-	if ( ! id ) {
+	if ( ! url && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -108,11 +140,11 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Replace' ) }
-					onSelect={ ( value ) => onSelectTrack( value ) }
+					onSelect={ onSelectTrack }
 					accept="audio/*"
 					mediaId={ id }
+					mediaURL={ url }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ attributes }
 					onError={ onUploadError }
 				/>
 			</BlockControls>
@@ -189,6 +221,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
+				{ !! temporaryURL && <Spinner /> }
 				<Button
 					className="wp-block-playlist-track__button"
 					__next40pxDefaultSize
