@@ -396,14 +396,13 @@ const PlaylistEdit = ( {
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					name={ __( 'Edit' ) }
-					onSelect={ ( value ) => onSelectTracks( value ) }
+					onSelect={ onSelectTracks }
 					accept="audio/*"
 					multiple
 					mediaIds={ tracks
 						.filter( ( track ) => track.id )
 						.map( ( track ) => track.id ) }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ attributes }
 					onError={ onUploadError }
 				/>
 			</BlockControls>
