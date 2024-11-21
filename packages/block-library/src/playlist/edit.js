@@ -225,8 +225,7 @@ const PlaylistEdit = ( {
 			}
 
 			if ( ! Array.isArray( media ) ) {
-				const currentIds = [ ...tracks ];
-				media = [ ...currentIds, media ];
+				media = [ media ];
 			}
 
 			const trackAttributes = ( track ) => ( {
@@ -333,20 +332,6 @@ const PlaylistEdit = ( {
 			setAttributes,
 		]
 	);
-
-	/*
-	This may no longer be needed, I am commenting it out while testing.
-	useEffect( () => {
-		if ( ! currentTrack && tracks?.length > 0 ) {
-			const validTrack = tracks.find(
-				( track ) => track.id !== undefined
-			);
-			if ( validTrack ) {
-				setAttributes( { currentTrack: validTrack.id } );
-			}
-		}
-	}, [ currentTrack, tracks, setAttributes ] );
-	*/
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
