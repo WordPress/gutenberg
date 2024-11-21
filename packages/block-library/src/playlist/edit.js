@@ -142,7 +142,8 @@ const PlaylistEdit = ( {
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
 	const blockProps = useBlockProps();
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -170,6 +171,7 @@ const PlaylistEdit = ( {
 			const sortedTracks = innerBlockTracks.map(
 				( track ) => track.attributes
 			);
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				tracks: sortedTracks,
 			} );
@@ -179,6 +181,7 @@ const PlaylistEdit = ( {
 				sortedTracks[ 0 ].id &&
 				sortedTracks[ 0 ].id !== currentTrack
 			) {
+				__unstableMarkNextChangeAsNotPersistent();
 				setAttributes( { currentTrack: sortedTracks[ 0 ].id } );
 			}
 		}
@@ -194,6 +197,7 @@ const PlaylistEdit = ( {
 				)
 		);
 		if ( hasChanges || updatedTracks.length !== tracks?.length ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				tracks: updatedTracks,
 				currentTrack:
@@ -251,6 +255,7 @@ const PlaylistEdit = ( {
 			} );
 
 			const trackList = media.map( trackAttributes );
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				tracks: trackList,
 				currentTrack: trackList.length > 0 ? trackList[ 0 ].id : null,
@@ -329,6 +334,8 @@ const PlaylistEdit = ( {
 		]
 	);
 
+	/*
+	This may no longer be needed, I am commenting it out while testing.
 	useEffect( () => {
 		if ( ! currentTrack && tracks?.length > 0 ) {
 			const validTrack = tracks.find(
@@ -339,6 +346,7 @@ const PlaylistEdit = ( {
 			}
 		}
 	}, [ currentTrack, tracks, setAttributes ] );
+	*/
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
