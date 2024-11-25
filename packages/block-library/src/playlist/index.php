@@ -19,19 +19,7 @@ function render_block_core_playlist( $attributes, $content ) {
 		return '';
 	}
 
-	/**
-	 * Assign the current track information to variables.
-	 */
-	$current_id         = '';
-	$tracklist_position = null;
-
-	foreach ( $attributes['tracks'] as $index => $track ) {
-		if ( isset( $track['id'] ) && ! empty( $track['id'] ) ) {
-			$current_id         = $track['id'];
-			$tracklist_position = $index;
-			break;
-		}
-	}
+	$current_id = $attributes['currentTrack'];
 
 	/**
 	 * Return early if no valid track ID is found.
@@ -43,12 +31,13 @@ function render_block_core_playlist( $attributes, $content ) {
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
-	$current_title  = isset( $attributes['tracks'][ $tracklist_position ]['title'] ) ? $attributes['tracks'][ $tracklist_position ]['title'] : '';
-	$current_album  = isset( $attributes['tracks'][ $tracklist_position ]['album'] ) ? $attributes['tracks'][ $tracklist_position ]['album'] : '';
-	$current_artist = isset( $attributes['tracks'][ $tracklist_position ]['artist'] ) ? $attributes['tracks'][ $tracklist_position ]['artist'] : '';
-	$current_url    = isset( $attributes['tracks'][ $tracklist_position ]['url'] ) ? $attributes['tracks'][ $tracklist_position ]['url'] : '';
-	$current_image  = isset( $attributes['tracks'][ $tracklist_position ]['image'] ) ? $attributes['tracks'][ $tracklist_position ]['image'] : '';
-	$aria_label     = $current_title;
+	$attachment_meta = wp_get_attachment_metadata( $current_id );
+	$current_title   = isset( $attachment_meta['title'] ) ? $attachment_meta['title'] : '';
+	$current_artist  = isset( $attachment_meta['artist'] ) ? $attachment_meta['artist'] : '';
+	$current_album   = isset( $attachment_meta['album'] ) ? $attachment_meta['album'] : '';
+	$current_image   = isset( $attachment_meta['poster'] ) ? $attachment_meta['poster'] : '';
+	$current_url     = wp_get_attachment_url( $current_id );
+	$aria_label      = $current_title;
 
 	if ( $current_title && $current_artist && $current_album ) {
 		$aria_label = sprintf(

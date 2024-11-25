@@ -23,8 +23,10 @@ import {
 	ToggleControl,
 	Disabled,
 	SelectControl,
+	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -38,30 +40,41 @@ import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
+const CurrentTrack = ( { trackData, showImages, onTrackEnd } ) => {
+	const id = trackData?.id;
 	/**
 	 * dangerouslySetInnerHTML and safeHTML are used because
 	 * the media library allows using some HTML tags in the title, artist, and album fields.
 	 */
-	const trackTitle = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
+	const track = useSelect(
+		( select ) => {
+			const media = id && select( coreStore ).getMedia( id );
+			return {
+				artist:
+					media?.artist ||
+					media?.meta?.artist ||
+					media?.media_details?.artist ||
+					__( 'Unknown artist' ),
+				album:
+					media?.album ||
+					media?.meta?.album ||
+					media?.media_details?.album ||
+					__( 'Unknown album' ),
+				// Prevent using the default media attachment icon as the track image.
+				image:
+					media?.image?.src &&
+					media?.image?.src.endsWith( '/images/media/audio.svg' )
+						? ''
+						: media?.image?.src,
+				fileLength:
+					media?.fileLength || media?.media_details?.length_formatted,
+				// Important: This is not the media details title, but the title of the attachment.
+				title: media?.title.rendered,
+				url: media?.url,
+			};
 		},
-	};
-	const trackArtist = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.artist ? track.artist : __( 'Unknown artist' )
-			),
-		},
-	};
-	const trackAlbum = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.album ? track.album : __( 'Unknown album' )
-			),
-		},
-	};
+		[ id ]
+	);
 
 	let ariaLabel;
 	if ( track?.title && track?.artist && track?.album ) {
@@ -96,18 +109,30 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 					/>
 				) }
 				<div>
-					<span
-						className="wp-block-playlist__item-title"
-						{ ...trackTitle }
-					/>
+					{ ! track?.title ? (
+						<span className="wp-block-playlist__item-title">
+							<Spinner />
+						</span>
+					) : (
+						<span
+							className="wp-block-playlist__item-title"
+							dangerouslySetInnerHTML={ {
+								__html: safeHTML( track?.title ),
+							} }
+						/>
+					) }
 					<div className="wp-block-playlist__current-item-artist-album">
 						<span
 							className="wp-block-playlist__item-artist"
-							{ ...trackArtist }
+							dangerouslySetInnerHTML={ {
+								__html: safeHTML( track?.artist ),
+							} }
 						/>
 						<span
 							className="wp-block-playlist__item-album"
-							{ ...trackAlbum }
+							dangerouslySetInnerHTML={ {
+								__html: safeHTML( track?.album ),
+							} }
 						/>
 					</div>
 				</div>
@@ -209,6 +234,7 @@ const PlaylistEdit = ( {
 			} );
 		}
 	}, [
+		__unstableMarkNextChangeAsNotPersistent,
 		clientId,
 		createErrorNotice,
 		currentTrack,
@@ -230,27 +256,7 @@ const PlaylistEdit = ( {
 
 			const trackAttributes = ( track ) => ( {
 				id: track.id || track.url,
-				url: track.url,
-				title: track.title,
-				artist:
-					track.artist ||
-					track?.meta?.artist ||
-					track?.media_details?.artist ||
-					__( 'Unknown artist' ),
-				album:
-					track.album ||
-					track?.meta?.album ||
-					track?.media_details?.album ||
-					__( 'Unknown album' ),
-				length:
-					track?.fileLength || track?.media_details?.length_formatted,
-				// Prevent using the default media attachment icon as the track image.
-				// Note: Image is not available when a new track is uploaded.
-				image:
-					track?.image?.src &&
-					track?.image?.src.endsWith( '/images/media/audio.svg' )
-						? ''
-						: track?.image?.src,
+				src: track.url,
 			} );
 
 			const trackList = media.map( trackAttributes );
@@ -270,7 +276,7 @@ const PlaylistEdit = ( {
 			);
 		},
 		[
-			tracks,
+			__unstableMarkNextChangeAsNotPersistent,
 			setAttributes,
 			replaceInnerBlocks,
 			clientId,
@@ -437,7 +443,7 @@ const PlaylistEdit = ( {
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
 					<CurrentTrack
-						track={ tracks[ trackListIndex ] }
+						trackData={ tracks[ trackListIndex ] }
 						showImages={ showImages }
 						onTrackEnd={ onTrackEnd }
 					/>

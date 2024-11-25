@@ -630,7 +630,7 @@ Playlist track. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pack
 -	**Category:** media
 -	**Parent:** core/playlist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
--	**Attributes:** album, artist, blob, id, image, length, title, type, url
+-	**Attributes:** blob, id, src
 
 ## Author (deprecated)
 

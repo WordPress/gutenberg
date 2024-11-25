@@ -19,15 +19,15 @@ function render_block_core_playlist_track( $attributes ) {
 		return '';
 	}
 
-	$id     = $attributes['id'];
-	$album  = isset( $attributes['album'] ) ? $attributes['album'] : '';
-	$artist = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
-	$image  = isset( $attributes['image'] ) ? $attributes['image'] : '';
-	$length = isset( $attributes['length'] ) ? $attributes['length'] : '';
-	$title  = isset( $attributes['title'] ) ? $attributes['title'] : '';
-	$url    = isset( $attributes['url'] ) ? $attributes['url'] : '';
-
+	$id                 = $attributes['id'];
+	$attachment_meta    = wp_get_attachment_metadata( $id );
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$url                = isset( $attatchment_meta['url'] ) ? $attachment_meta['url'] : '';
+	$title              = get_the_title( $id ) ? get_the_title( $id ) : '';
+	$artist             = isset( $attachment_meta['artist'] ) ? $attachment_meta['artist'] : '';
+	$album              = isset( $attachment_meta['album'] ) ? $attachment_meta['album'] : '';
+	$image              = isset( $attachment_meta['poster'] ) ? $attachment_meta['poster'] : '';
+	$length             = isset( $attachment_meta['length_formatted'] ) ? $attachment_meta['length_formatted'] : '';
 
 	$contexts = wp_interactivity_data_wp_context(
 		array(

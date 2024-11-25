@@ -21,7 +21,8 @@ import {
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -36,7 +37,7 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
-	const { id, album, artist, image, length, title, url } = attributes;
+	const { id, src } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const currentTrack = context?.currentTrack;
@@ -47,8 +48,46 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
+	const track = useSelect(
+		( select ) => {
+			const media = id && select( coreStore ).getMedia( id );
+			const _isRequestingMedia =
+				!! id &&
+				! select( coreStore ).hasFinishedResolution( 'getMedia', [
+					id,
+					{ context: 'view' },
+				] );
+
+			return {
+				artist:
+					media?.artist ||
+					media?.meta?.artist ||
+					media?.media_details?.artist ||
+					__( 'Unknown artist' ),
+				album:
+					media?.album ||
+					media?.meta?.album ||
+					media?.media_details?.album ||
+					__( 'Unknown album' ),
+				// Prevent using the default media attachment icon as the track image.
+				image:
+					media?.image?.src &&
+					media?.image?.src.endsWith( '/images/media/audio.svg' )
+						? ''
+						: media?.image?.src,
+				fileLength:
+					media?.fileLength || media?.media_details?.length_formatted,
+				// Important: This is not the media details title, but the title of the attachment.
+				title: media?.title.rendered,
+				url: media?.url,
+				isRequestingMedia: _isRequestingMedia,
+			};
+		},
+		[ id ]
+	);
+
 	useUploadMediaFromBlobURL( {
-		url: temporaryURL,
+		src: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectTrack,
 		onError: onUploadError,
@@ -61,12 +100,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			setAttributes( {
 				blob: undefined,
 				id: undefined,
-				artist: undefined,
-				album: undefined,
-				image: undefined,
-				length: undefined,
-				title: undefined,
-				url: undefined,
 			} );
 			setTemporaryURL();
 			return;
@@ -80,25 +113,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		setAttributes( {
 			blob: undefined,
 			id: media.id,
-			artist:
-				media.artist ||
-				media?.meta?.artist ||
-				media?.media_details?.artist ||
-				__( 'Unknown artist' ),
-			album:
-				media.album ||
-				media?.meta?.album ||
-				media?.media_details?.album ||
-				__( 'Unknown album' ),
-			// Prevent using the default media attachment icon as the track image.
-			image:
-				media?.image?.src &&
-				media?.image?.src.endsWith( '/images/media/audio.svg' )
-					? ''
-					: media?.image?.src,
-			length: media?.fileLength || media?.media_details?.length_formatted,
-			title: media.title,
-			url: media.url,
+			src: media.url,
 		} );
 		setTemporaryURL();
 	}
@@ -114,7 +129,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		imageButton.current.focus();
 	}
 
-	if ( ! url && ! temporaryURL ) {
+	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -143,7 +158,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					onSelect={ onSelectTrack }
 					accept="audio/*"
 					mediaId={ id }
-					mediaURL={ url }
+					mediaURL={ src }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onError={ onUploadError }
 				/>
@@ -154,7 +169,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Artist' ) }
-						value={ artist ? stripHTML( artist ) : '' }
+						value={ track.artist ? stripHTML( track.artist ) : '' }
 						onChange={ ( artistValue ) => {
 							setAttributes( { artist: artistValue } );
 						} }
@@ -163,7 +178,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Album' ) }
-						value={ album ? stripHTML( album ) : '' }
+						value={ track.album ? stripHTML( track.album ) : '' }
 						onChange={ ( albumValue ) => {
 							setAttributes( { album: albumValue } );
 						} }
@@ -172,7 +187,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
-						value={ title ? stripHTML( title ) : '' }
+						value={ track.title ? stripHTML( track.title ) : '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }
@@ -182,9 +197,9 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 							<BaseControl.VisualLabel>
 								{ __( 'Album cover image' ) }
 							</BaseControl.VisualLabel>
-							{ !! image && (
+							{ !! track.image && (
 								<img
-									src={ image }
+									src={ track.image }
 									alt={ __(
 										'Preview of the album cover image'
 									) }
@@ -201,13 +216,13 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 										onClick={ open }
 										ref={ imageButton }
 									>
-										{ ! image
+										{ ! track.image
 											? __( 'Select' )
 											: __( 'Replace' ) }
 									</Button>
 								) }
 							/>
-							{ !! image && (
+							{ !! track.image && (
 								<Button
 									__next40pxDefaultSize
 									onClick={ onRemoveAlbumCoverImage }
@@ -225,17 +240,17 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 				<Button
 					className="wp-block-playlist-track__button"
 					__next40pxDefaultSize
-					data-playlist-track-url={ url }
-					data-playlist-track-title={ stripHTML( title ) }
-					data-playlist-track-artist={ stripHTML( artist ) }
-					data-playlist-track-album={ stripHTML( album ) }
-					data-playlist-track-image-src={ image ?? null }
+					data-playlist-track-url={ src }
+					data-playlist-track-title={ stripHTML( track.title ) }
+					data-playlist-track-artist={ stripHTML( track.artist ) }
+					data-playlist-track-album={ stripHTML( track.album ) }
+					data-playlist-track-image-src={ track.image ?? null }
 					aria-current={ currentTrack === id ? 'true' : 'false' }
 				>
 					<RichText
 						tagName="span"
 						className="wp-block-playlist-track__title"
-						value={ title }
+						value={ track.title }
 						placeholder={ __( 'Add title' ) }
 						onChange={ ( value ) =>
 							setAttributes( { title: value } )
@@ -248,7 +263,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						<RichText
 							tagName="span"
 							className="wp-block-playlist-track__artist"
-							value={ artist }
+							value={ track.artist }
 							placeholder={ __( 'Add artist' ) }
 							onChange={ ( value ) =>
 								setAttributes( { artist: value } )
@@ -259,7 +274,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						/>
 					) }
 					<span className="wp-block-playlist-track__length">
-						{ length && (
+						{ track.fileLength && (
 							<span className="screen-reader-text">
 								{
 									/* translators: %s: Visually hidden label for the track length (screen reader text). */
@@ -267,7 +282,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 								}
 							</span>
 						) }
-						{ length }
+						{ track.fileLength }
 					</span>
 					<span className="screen-reader-text">
 						{ __( 'Select to play this track' ) }
