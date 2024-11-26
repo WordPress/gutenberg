@@ -22,7 +22,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityProp } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -129,6 +129,8 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		imageButton.current.focus();
 	}
 
+	const [ title, setTitle ] = useEntityProp( 'root', 'media', 'title', id );
+
 	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
@@ -187,10 +189,11 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
-						value={ track.title ? stripHTML( track.title ) : '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
+						value={ title }
+						placeholder={
+							track.title ? stripHTML( track.title ) : ''
+						}
+						onChange={ setTitle }
 					/>
 					<MediaUploadCheck>
 						<div className="editor-video-poster-control">
@@ -250,11 +253,9 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					<RichText
 						tagName="span"
 						className="wp-block-playlist-track__title"
-						value={ track.title }
+						value={ title }
 						placeholder={ __( 'Add title' ) }
-						onChange={ ( value ) =>
-							setAttributes( { title: value } )
-						}
+						onChange={ setTitle }
 						keepPlaceholderOnFocus
 						allowedFormats={ [] }
 						withoutInteractiveFormatting
