@@ -6,13 +6,14 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
+import { starFilled } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import RadioControl from '..';
-import { Path, SVG } from '@wordpress/primitives';
+import Icon from '../../icon';
 
 const meta: Meta< typeof RadioControl > = {
 	component: RadioControl,
@@ -94,27 +95,21 @@ WithOptionDescriptions.args = {
 	],
 };
 
+/**
+ * When the label is not a string,
+ * make sure that the element is accessibly labeled.
+ */
 export const WithComponentLabels: StoryFn< typeof RadioControl > =
 	Template.bind( {} );
 
-function Rating( { stars, ariaLabel }: { stars: number; ariaLabel: string } ) {
-	const starPath =
-		'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z';
+function Rating( {
+	stars,
+	...restProps
+}: { stars: number } & JSX.IntrinsicElements[ 'div' ] ) {
 	return (
-		<div
-			style={ { display: 'flex' } }
-			aria-label={ ariaLabel }
-			title={ ariaLabel }
-		>
+		<div style={ { display: 'flex' } } { ...restProps }>
 			{ Array.from( { length: stars }, ( _, index ) => (
-				<SVG
-					key={ index }
-					width={ 24 }
-					height={ 24 }
-					viewBox="0 0 24 24"
-				>
-					<Path d={ starPath } />
-				</SVG>
+				<Icon key={ index } icon={ starFilled } />
 			) ) }
 		</div>
 	);
@@ -124,23 +119,15 @@ WithComponentLabels.args = {
 	label: 'Rating',
 	options: [
 		{
-			label: <Rating stars={ 5 } ariaLabel="Five Stars" />,
-			value: '5',
-		},
-		{
-			label: <Rating stars={ 4 } ariaLabel="Four Stars" />,
-			value: '4',
-		},
-		{
-			label: <Rating stars={ 3 } ariaLabel="Three Stars" />,
+			label: <Rating stars={ 3 } aria-label="Three Stars" />,
 			value: '3',
 		},
 		{
-			label: <Rating stars={ 2 } ariaLabel="Two Stars" />,
+			label: <Rating stars={ 2 } aria-label="Two Stars" />,
 			value: '2',
 		},
 		{
-			label: <Rating stars={ 1 } ariaLabel="One Star" />,
+			label: <Rating stars={ 1 } aria-label="One Star" />,
 			value: '1',
 		},
 	],
