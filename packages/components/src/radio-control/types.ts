@@ -21,7 +21,7 @@ export type RadioControlProps = Pick<
 		 *
 		 * When the label is not a string, make sure that the element is accessibly labeled.
 		 */
-		label: React.ReactNode;
+		label: string | React.ReactElement;
 		/**
 		 * The internal value compared against select and passed to onChange
 		 */
