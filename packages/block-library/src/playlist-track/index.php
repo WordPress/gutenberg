@@ -10,7 +10,7 @@
  *
  * @since 6.8.0
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes     The block attributes.
  *
  * @return string Returns the Playlist Track.
  */
@@ -19,29 +19,50 @@ function render_block_core_playlist_track( $attributes ) {
 		return '';
 	}
 
-	$id                 = $attributes['id'];
-	$attachment_meta    = wp_get_attachment_metadata( $id );
+	$unique_id          = wp_unique_prefixed_id( 'playlist-track-' );
+	$media_id           = $attributes['id'];
+	$attachment_meta    = wp_get_attachment_metadata( $media_id );
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$url                = isset( $attatchment_meta['url'] ) ? $attachment_meta['url'] : '';
-	$title              = get_the_title( $id ) ? get_the_title( $id ) : '';
+	$url                = wp_get_attachment_url( $media_id );
+	$title              = get_the_title( $media_id ) ? get_the_title( $media_id ) : '';
 	$artist             = isset( $attachment_meta['artist'] ) ? $attachment_meta['artist'] : '';
 	$album              = isset( $attachment_meta['album'] ) ? $attachment_meta['album'] : '';
 	$image              = isset( $attachment_meta['poster'] ) ? $attachment_meta['poster'] : '';
 	$length             = isset( $attachment_meta['length_formatted'] ) ? $attachment_meta['length_formatted'] : '';
+	$aria_label         = $title;
 
-	$contexts = wp_interactivity_data_wp_context(
+	if ( $title && $artist && $album ) {
+		$aria_label = sprintf(
+			/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+			_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
+			$title,
+			$artist,
+			$album
+		);
+	}
+
+	$context = wp_interactivity_data_wp_context( array( 'id' => $unique_id ) );
+
+	wp_interactivity_state(
+		'core/playlist',
 		array(
-			'trackID'       => $id,
-			'trackURL'      => $url,
-			'trackTitle'    => $title,
-			'trackArtist'   => $artist,
-			'trackAlbum'    => $album,
-			'trackImageSrc' => $image,
+			'tracks' => array(
+				$unique_id => array(
+					'media_id'  => $media_id,
+					'url'       => $url,
+					'title'     => $title,
+					'artist'    => $artist,
+					'album'     => $album,
+					'image'     => $image,
+					'length'    => $length,
+					'ariaLabel' => $aria_label,
+				),
+			),
 		)
 	);
 
 	$html  = '<li ' . $wrapper_attributes . '>';
-	$html .= '<button ' . $contexts . 'data-wp-on--click="actions.changeTrack" class="wp-block-playlist-track__button">';
+	$html .= '<button ' . $context . 'data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
 
 	if ( $title ) {
 		$html .= '<span class="wp-block-playlist-track__title">' . wp_kses_post( $title ) . '</span>';

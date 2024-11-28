@@ -19,76 +19,80 @@ function render_block_core_playlist( $attributes, $content ) {
 		return '';
 	}
 
-	$current_id = $attributes['currentTrack'];
+	$current_media_id = $attributes['currentTrack'];
 
 	/**
-	 * Return early if no valid track ID is found.
-	 * This can happen if the user deleted all tracks but kept an empty inner block, such as the media upload placeholder.
+	 * Returns early if no valid track ID is found.
+	 * This can happen if the user deleted all tracks but kept an empty inner
+	 * block, such as the media upload placeholder.
 	 */
-	if ( empty( $current_id ) ) {
+	if ( empty( $current_media_id ) ) {
 		return '';
 	}
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
-	$attachment_meta = wp_get_attachment_metadata( $current_id );
-	$current_title   = get_the_title( $current_id ) ? get_the_title( $current_id ) : '';
-	$current_artist  = isset( $attachment_meta['artist'] ) ? $attachment_meta['artist'] : '';
-	$current_album   = isset( $attachment_meta['album'] ) ? $attachment_meta['album'] : '';
-	$current_image   = isset( $attachment_meta['poster'] ) ? $attachment_meta['poster'] : '';
-	$current_url     = wp_get_attachment_url( $current_id );
-	$show_images     = isset( $attributes['showImages'] ) ? $attributes['showImages'] : false;
-	$aria_label      = $current_title;
-
-	if ( $current_title && $current_artist && $current_album ) {
-		$aria_label = sprintf(
-			/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-			_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
-			$current_title,
-			$current_artist,
-			$current_album
-		);
-	}
-
 	wp_interactivity_state(
 		'core/playlist',
 		array(
-			'currentID'     => $current_id,
-			'currentURL'    => $current_url,
-			'currentTitle'  => $current_title,
-			'currentAlbum'  => $current_album,
-			'currentArtist' => $current_artist,
-			'currentImage'  => $current_image,
-			'ariaLabel'     => $aria_label,
+			'currentTrack' => function () {
+				$state = wp_interactivity_state();
+				$context = wp_interactivity_get_context();
+				return $state['tracks'][ $context['currentId'] ];
+			},
 		)
 	);
 
-	// Add the markup for the current track
-	$html = '<div><div class="wp-block-playlist__current-item">';
-	if ( $show_images && $current_image ) {
+	// Finds the unique id of the current track and populates the playlist array.
+	$p               = new WP_HTML_Tag_Processor( $content );
+	$playlist_tracks = array();
+	while ( $p->next_tag( 'button' ) ) {
+		$track_context     = $p->get_attribute( 'data-wp-context' );
+		$track_unique_id   = json_decode( $track_context, true )['id'];
+		$state             = wp_interactivity_state( 'core/playlist' );
+		$playlist_tracks[] = $track_unique_id;
+		if (
+			isset( $state['tracks'][ $track_unique_id ]['media_id'] ) &&
+			$state['tracks'][ $track_unique_id ]['media_id'] === $current_media_id
+		) {
+			$current_unique_id = $track_unique_id;
+		}
+	}
+
+	// Adds the markup for the current track.
+	$html = '<div class="wp-block-playlist__current-item">';
+
+	if ( isset( $attributes['showImages'] ) ? $attributes['showImages'] : false ) {
 		$html .=
 		'<img
 			class="wp-block-playlist__item-image"
-			src={ ' . esc_url( $current_image ) . '}
 			alt=""
 			width="70px"
 			height="70px"
-			data-wp-bind--src="state.currentImage"
+			data-wp-bind--src="state.currentTrack.image"
+			data-wp-bind--hidden="!state.currentTrack.image"
 		/>';
 	}
+
 	$html .= '
 		<div>
-			<span class="wp-block-playlist__item-title" data-wp-text="state.currentTitle">' . $current_title . '</span>
+			<span class="wp-block-playlist__item-title" data-wp-text="state.currentTrack.title"></span>
 			<div class="wp-block-playlist__current-item-artist-album">
-				<span class="wp-block-playlist__item-artist" data-wp-text="state.currentArtist">' . $current_artist . '</span>
-				<span class="wp-block-playlist__item-album" data-wp-text="state.currentAlbum">' . $current_album . '</span>
+				<span class="wp-block-playlist__item-artist" data-wp-text="state.currentTrack.artist"></span>
+				<span class="wp-block-playlist__item-album" data-wp-text="state.currentTrack.album"></span>
 			</div>
-		</div>';
-	$html .= '</div><audio controls="controls" src="' . esc_url( $current_url ) . '"
-		data-wp-bind--src="state.currentURL"
-		data-wp-bind--aria-label="state.ariaLabel"
-		data-wp-watch="callbacks.init"
-		"/></audio></div>';
+		</div>
+	</div>
+		<audio 
+			controls="controls"
+			data-wp-on--ended="actions.nextSong"
+			data-wp-on--play="actions.isPlaying"
+			data-wp-on--pause="actions.isPaused"
+			data-wp-bind--src="state.currentTrack.url"
+			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
+			data-wp-watch="callbacks.autoPlay"
+		></audio>
+	';
 
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
@@ -99,14 +103,16 @@ function render_block_core_playlist( $attributes, $content ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-
-	while ( $processor->next_tag( 'button' ) ) {
-		$context = $processor->get_attribute( 'data-wp-context' );
-		$context = json_decode( $context, true ) ? json_decode( $context, true ) : array();
-		if ( isset( $context['trackID'] ) && $context['trackID'] === $current_id ) {
-			$processor->set_attribute( 'aria-current', 'true' );
-		}
-	}
+	$processor->set_attribute(
+		'data-wp-context',
+		json_encode(
+			array(
+				'currentId' => $current_unique_id,
+				'tracks'    => $playlist_tracks,
+				'isPlaying' => false,
+			)
+		)
+	);
 
 	return $processor->get_updated_html();
 }
