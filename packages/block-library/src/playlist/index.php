@@ -35,10 +35,14 @@ function render_block_core_playlist( $attributes, $content ) {
 	wp_interactivity_state(
 		'core/playlist',
 		array(
-			'currentTrack' => function () {
+			'currentTrack'   => function () {
 				$state = wp_interactivity_state();
 				$context = wp_interactivity_get_context();
 				return $state['tracks'][ $context['currentId'] ];
+			},
+			'isCurrentTrack' => function () {
+				$context = wp_interactivity_get_context();
+				return $context['currentId'] === $context['id'];
 			},
 		)
 	);
