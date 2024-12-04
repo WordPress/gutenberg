@@ -504,6 +504,10 @@ describe( 'private selectors', () => {
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
+				] ),
 				blockListSettings: {},
 			};
 			expect(
