@@ -127,7 +127,7 @@ export function createLinkFormat( {
 	const trimmedCssClasses = cssClasses?.trim();
 
 	if ( trimmedCssClasses?.length ) {
-		format.attributes.className = trimmedCssClasses;
+		format.attributes.class = trimmedCssClasses;
 	}
 
 	return format;

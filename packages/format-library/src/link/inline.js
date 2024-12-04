@@ -97,10 +97,10 @@ function InlineLinkUI( {
 			opensInNewTab: activeAttributes.target === '_blank',
 			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
 			title: richTextText,
-			cssClasses: activeAttributes.className,
+			cssClasses: activeAttributes.class,
 		} ),
 		[
-			activeAttributes.className,
+			activeAttributes.class,
 			activeAttributes.id,
 			activeAttributes.rel,
 			activeAttributes.target,
