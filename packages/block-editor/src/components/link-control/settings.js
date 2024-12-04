@@ -18,17 +18,26 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
 		} );
 	};
 
-	const theSettings = settings.map( ( setting ) => (
-		<CheckboxControl
-			__nextHasNoMarginBottom
-			className="block-editor-link-control__setting"
-			key={ setting.id }
-			label={ setting.title }
-			onChange={ handleSettingChange( setting ) }
-			checked={ value ? !! value[ setting.id ] : false }
-			help={ setting?.help }
-		/>
-	) );
+	const theSettings = settings.map( ( setting ) =>
+		setting.render ? (
+			<div
+				key={ setting.id }
+				className="block-editor-link-control__setting"
+			>
+				{ setting.render( setting, value, onChange ) }
+			</div>
+		) : (
+			<CheckboxControl
+				__nextHasNoMarginBottom
+				className="block-editor-link-control__setting"
+				key={ setting.id }
+				label={ setting.title }
+				onChange={ handleSettingChange( setting ) }
+				checked={ value ? !! value[ setting.id ] : false }
+				help={ setting?.help }
+			/>
+		)
+	);
 
 	return (
 		<fieldset className="block-editor-link-control__settings">

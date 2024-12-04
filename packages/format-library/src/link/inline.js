@@ -4,7 +4,10 @@
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { Popover } from '@wordpress/components';
+import {
+	Popover,
+	__experimentalInputControl as InputControl,
+} from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 import {
 	create,
@@ -35,6 +38,22 @@ const LINK_SETTINGS = [
 	{
 		id: 'nofollow',
 		title: __( 'Mark as nofollow' ),
+	},
+	{
+		id: 'cssClasses',
+		title: __( 'Additional CSS Classes' ),
+		render: ( setting, value, onChange ) => (
+			<InputControl
+				label={ setting.title }
+				value={ value?.cssClasses }
+				onChange={ ( cssClasses ) =>
+					onChange( { ...value, cssClasses } )
+				}
+				help={ setting?.help }
+				__next40pxDefaultSize
+				__unstableInputWidth="100%"
+			/>
+		),
 	},
 ];
 
@@ -78,8 +97,10 @@ function InlineLinkUI( {
 			opensInNewTab: activeAttributes.target === '_blank',
 			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
 			title: richTextText,
+			cssClasses: activeAttributes.className,
 		} ),
 		[
+			activeAttributes.className,
 			activeAttributes.id,
 			activeAttributes.rel,
 			activeAttributes.target,
@@ -116,6 +137,7 @@ function InlineLinkUI( {
 					: undefined,
 			opensInNewWindow: nextValue.opensInNewTab,
 			nofollow: nextValue.nofollow,
+			cssClasses: nextValue.cssClasses,
 		} );
 
 		const newText = nextValue.title || newUrl;
