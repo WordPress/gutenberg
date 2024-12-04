@@ -19,17 +19,17 @@ function render_block_core_playlist_track( $attributes ) {
 		return '';
 	}
 
-	$unique_id          = wp_unique_prefixed_id( 'playlist-track-' );
-	$media_id           = $attributes['id'];
-	$attachment_meta    = wp_get_attachment_metadata( $media_id );
 	$wrapper_attributes = get_block_wrapper_attributes();
-	$url                = wp_get_attachment_url( $media_id );
-	$title              = get_the_title( $media_id ) ? get_the_title( $media_id ) : '';
-	$artist             = isset( $attachment_meta['artist'] ) ? $attachment_meta['artist'] : '';
-	$album              = isset( $attachment_meta['album'] ) ? $attachment_meta['album'] : '';
-	$image              = isset( $attachment_meta['poster'] ) ? $attachment_meta['poster'] : '';
-	$length             = isset( $attachment_meta['length_formatted'] ) ? $attachment_meta['length_formatted'] : '';
-	$aria_label         = $title;
+
+	$unique_id  = wp_unique_prefixed_id( 'playlist-track-' );
+	$media_id   = $attributes['id'];
+	$album      = isset( $attributes['album'] ) ? $attributes['album'] : '';
+	$artist     = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
+	$image      = isset( $attributes['image'] ) ? $attributes['image'] : '';
+	$length     = isset( $attributes['length'] ) ? $attributes['length'] : '';
+	$title      = isset( $attributes['title'] ) ? $attributes['title'] : '';
+	$url        = isset( $attributes['src'] ) ? $attributes['src'] : '';
+	$aria_label = $title;
 
 	if ( $title && $artist && $album ) {
 		$aria_label = sprintf(

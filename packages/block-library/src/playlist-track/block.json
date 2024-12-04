@@ -20,6 +20,25 @@
 		},
 		"src": {
 			"type": "string"
+		},
+		"type": {
+			"type": "string",
+			"default": "audio"
+		},
+		"album": {
+			"type": "string"
+		},
+		"artist": {
+			"type": "string"
+		},
+		"image": {
+			"type": "string"
+		},
+		"length": {
+			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	},
 	"supports": {
