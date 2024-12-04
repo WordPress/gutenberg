@@ -3575,6 +3575,7 @@ describe( 'state', () => {
 				blocks,
 				settings,
 				zoomLevel,
+				blockListSettings,
 				blockEditingModes,
 			} )
 		);
@@ -3879,6 +3880,210 @@ describe( 'state', () => {
 							'nested-paragraph': 'disabled',
 							'nested-group': 'disabled',
 							'nested-paragraph-with-overrides': 'disabled',
+						} )
+					)
+				);
+			} );
+		} );
+
+		describe( 'contentOnly template locking', () => {
+			let initialState;
+			beforeAll( () => {
+				select.mockImplementation( ( storeName ) => {
+					if ( storeName === preferencesStore ) {
+						return {
+							get: jest.fn( () => 'edit' ),
+						};
+					}
+					return select( storeName );
+				} );
+
+				// Simulates how the editor typically inserts controlled blocks,
+				// - first the pattern is inserted with no inner blocks.
+				// - next the pattern is marked as a controlled block.
+				// - finally, once the inner blocks of the pattern are received, they're inserted.
+				// This process is repeated for the two patterns in this test.
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'group-1',
+							settings: {
+								templateLock: 'contentOnly',
+							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+			} );
+
+			afterAll( () => {
+				select.mockRestore();
+			} );
+
+			it( 'returns the expected block editing modes for a parent block with contentOnly template locking', () => {
+				// Only the parent pattern and its own children that have bindings
+				// are in contentOnly mode. All other blocks are disabled.
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'removes block editing modes when template locking is removed', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_LIST_SETTINGS',
+							clientId: 'group-1',
+							settings: {
+								templateLock: false,
+							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'allows explicitly set blockEditingModes to override the contentOnly template locking', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'group-1',
+							mode: 'disabled',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'paragraph-2',
+							mode: 'disabled',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'returns the expected block editing modes for synced patterns when switching to navigation mode', () => {
+				select.mockImplementation( ( storeName ) => {
+					if ( storeName === preferencesStore ) {
+						return {
+							get: jest.fn( () => 'navigation' ),
+						};
+					}
+					return select( storeName );
+				} );
+
+				const { derivedNavModeBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'SET_EDITOR_MODE',
+							mode: 'navigation',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							// Group 1 is now a section, so is set to contentOnly.
+							'group-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-1': 'contentOnly',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+
+				select.mockImplementation( ( storeName ) => {
+					if ( storeName === preferencesStore ) {
+						return {
+							get: jest.fn( () => 'edit' ),
+						};
+					}
+					return select( storeName );
+				} );
+			} );
+
+			it( 'returns the expected block editing modes for synced patterns when switching to zoomed out mode', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'SET_ZOOM_LEVEL',
+							zoom: 'auto-scaled',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section.
+							'group-2': 'disabled',
+							'paragraph-1': 'disabled',
+							'paragraph-2': 'disabled',
 						} )
 					)
 				);

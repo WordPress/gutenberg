@@ -3076,62 +3076,36 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
-export const getBlockEditingMode = createRegistrySelector(
-	( select ) =>
-		( state, clientId = '' ) => {
-			// Some selectors that call this provide `null` as the default
-			// rootClientId, but the default rootClientId is actually `''`.
-			if ( clientId === null ) {
-				clientId = '';
-			}
+export function getBlockEditingMode( state, clientId = '' ) {
+	// Some selectors that call this provide `null` as the default
+	// rootClientId, but the default rootClientId is actually `''`.
+	if ( clientId === null ) {
+		clientId = '';
+	}
 
-			const isNavMode = isNavigationMode( state );
+	const isNavMode = isNavigationMode( state );
 
-			// If the editor is currently not in navigation mode, check if the clientId
-			// has an editing mode set in the regular derived map.
-			// There may be an editing mode set here for synced patterns or in zoomed out
-			// mode.
-			if (
-				! isNavMode &&
-				state.derivedBlockEditingModes?.has( clientId )
-			) {
-				return state.derivedBlockEditingModes.get( clientId );
-			}
+	// If the editor is currently not in navigation mode, check if the clientId
+	// has an editing mode set in the regular derived map.
+	// There may be an editing mode set here for synced patterns or in zoomed out
+	// mode.
+	if ( ! isNavMode && state.derivedBlockEditingModes?.has( clientId ) ) {
+		return state.derivedBlockEditingModes.get( clientId );
+	}
 
-			// If the editor *is* in navigation mode, the block editing mode states
-			// are stored in the derivedNavModeBlockEditingModes map.
-			if (
-				isNavMode &&
-				state.derivedNavModeBlockEditingModes?.has( clientId )
-			) {
-				return state.derivedNavModeBlockEditingModes.get( clientId );
-			}
+	// If the editor *is* in navigation mode, the block editing mode states
+	// are stored in the derivedNavModeBlockEditingModes map.
+	if ( isNavMode && state.derivedNavModeBlockEditingModes?.has( clientId ) ) {
+		return state.derivedNavModeBlockEditingModes.get( clientId );
+	}
 
-			// In normal mode, consider that an explicitly set editing mode takes over.
-			const blockEditingMode = state.blockEditingModes.get( clientId );
-			if ( blockEditingMode ) {
-				return blockEditingMode;
-			}
+	// In normal mode, consider that an explicitly set editing mode takes over.
+	if ( state.blockEditingModes.has( clientId ) ) {
+		return state.blockEditingModes.get( clientId );
+	}
 
-			// In normal mode, top level is default mode.
-			if ( clientId === '' ) {
-				return 'default';
-			}
-
-			const rootClientId = getBlockRootClientId( state, clientId );
-			const templateLock = getTemplateLock( state, rootClientId );
-			// If the parent of the block is contentOnly locked, check whether it's a content block.
-			if ( templateLock === 'contentOnly' ) {
-				const name = getBlockName( state, clientId );
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContent = hasContentRoleAttribute( name );
-				return isContent ? 'contentOnly' : 'disabled';
-			}
-			return 'default';
-		}
-);
+	return 'default';
+}
 
 /**
  * Indicates if a block is ungroupable.

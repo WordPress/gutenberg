@@ -2267,6 +2267,12 @@ function getDerivedBlockEditingModesForTree(
 			syncedPatternClientIds.push( clientId );
 		}
 	} );
+	const contentOnlyTemplateLockedClientIds = Object.keys(
+		state.blockListSettings
+	).filter(
+		( clientId ) =>
+			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
+	);
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
@@ -2457,6 +2463,64 @@ function getDerivedBlockEditingModesForTree(
 				derivedBlockEditingModes.set( clientId, 'disabled' );
 			}
 		}
+
+		// Explicitly set block editing modes take precedence over template lock.
+		if ( state.blockEditingModes.has( clientId ) ) {
+			return;
+		}
+
+		if ( contentOnlyTemplateLockedClientIds.length ) {
+			const hasContentOnlyTemplateLockedParent =
+				!! findParentInClientIdsList(
+					state,
+					clientId,
+					contentOnlyTemplateLockedClientIds
+				);
+			if ( hasContentOnlyTemplateLockedParent ) {
+				if ( isContentBlock( blockName ) ) {
+					derivedBlockEditingModes.set( clientId, 'contentOnly' );
+				} else {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+				}
+			}
+		}
+
+		// Disabled block editing modes cascade to all children,
+		// but contentOnly can override this, so this is the last
+		// thing to check.
+		if ( state.blockEditingModes.size ) {
+			let parent = state.blocks.parents.get( clientId );
+			// Look for the first parent with an explicit block editing mode.
+			while ( parent ) {
+				const parentBlockEditingMode =
+					state.blockEditingModes.get( parent );
+
+				// If the parent is disabled, this block should be disabled.
+				if ( parentBlockEditingMode === 'disabled' ) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					break;
+				}
+
+				// If the parent is contentOnly, this block should be contentOnly if it's a content block.
+				if ( parentBlockEditingMode === 'contentOnly' ) {
+					if ( isContentBlock( blockName ) ) {
+						derivedBlockEditingModes.set( clientId, 'contentOnly' );
+					} else {
+						derivedBlockEditingModes.set( clientId, 'disabled' );
+					}
+
+					break;
+				}
+
+				if ( parentBlockEditingMode === 'default' ) {
+					// If the parent is default, this block should be default.
+					// We can do nothing, but skip searching any further.
+					break;
+				}
+
+				parent = state.blocks.parents.get( parent );
+			}
+		}
 	} );
 
 	return derivedBlockEditingModes;
@@ -2609,6 +2673,75 @@ export function withDerivedBlockEditingModes( reducer ) {
 						prevState: state,
 						nextState,
 						addedBlocks: action.blocks,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'UPDATE_BLOCK_LIST_SETTINGS': {
+				// Handle the addition and removal of contentOnly template locked blocks.
+				const addedBlocks = [];
+				const removedClientIds = [];
+
+				const updates =
+					typeof action.clientId === 'string'
+						? { [ action.clientId ]: action.settings }
+						: action.clientId;
+
+				for ( const clientId in updates ) {
+					const isNewContentOnlyBlock =
+						state.blockListSettings[ clientId ]?.templateLock !==
+							'contentOnly' &&
+						nextState.blockListSettings[ clientId ]
+							?.templateLock === 'contentOnly';
+
+					const wasContentOnlyBlock =
+						state.blockListSettings[ clientId ]?.templateLock ===
+							'contentOnly' &&
+						nextState.blockListSettings[ clientId ]
+							?.templateLock !== 'contentOnly';
+
+					if ( isNewContentOnlyBlock ) {
+						addedBlocks.push(
+							nextState.blocks.tree.get( clientId )
+						);
+					} else if ( wasContentOnlyBlock ) {
+						removedClientIds.push( clientId );
+					}
+				}
+
+				if ( ! addedBlocks.length && ! removedClientIds.length ) {
+					break;
+				}
+
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
 						isNavMode: true,
 					} );
 
