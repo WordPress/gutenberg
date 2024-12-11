@@ -1,17 +1,30 @@
-/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
+/**
+ * External dependencies
+ */
+import type { Middleware } from 'redux';
+/**
+ * Internal dependencies
+ */
+import type { WPDataRegistry } from './registry';
 
 /**
  * Creates a middleware handling resolvers cache invalidation.
  *
- * @param {WPDataRegistry} registry  Registry for which to create the middleware.
- * @param {string}         storeName Name of the store for which to create the middleware.
+ * @param registry  Registry for which to create the middleware.
+ * @param storeName Name of the store for which to create the middleware.
  *
- * @return {Function} Middleware function.
+ * @return Middleware function.
  */
 const createResolversCacheMiddleware =
-	( registry, storeName ) => () => ( next ) => ( action ) => {
+	( registry: WPDataRegistry, storeName: string ): Middleware =>
+	() =>
+	( next ) =>
+	( action ) => {
 		const resolvers = registry.select( storeName ).getCachedResolvers();
-		const resolverEntries = Object.entries( resolvers );
+		const resolverEntries =
+			Object.entries< Map< string, { status: 'finished' | 'error' } > >(
+				resolvers
+			);
 		resolverEntries.forEach( ( [ selectorName, resolversByArgs ] ) => {
 			const resolver =
 				registry.stores[ storeName ]?.resolvers?.[ selectorName ];

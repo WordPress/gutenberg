@@ -31,6 +31,7 @@ import { lock, unlock } from './lock-unlock';
  * @property {Function} dispatch             Given a namespace key, returns an
  *                                           object of the store's registered
  *                                           action dispatchers.
+ * @property {any}      stores               An object of registered stores.
  */
 
 /**
