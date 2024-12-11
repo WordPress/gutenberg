@@ -68,9 +68,10 @@ module.exports = async function loadConfig(
 		}
 	}
 
+	const directory = path.dirname( configFilePath ).replace( /^.*[\\/]/, '' );
 	const cacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
-		md5( configFilePath )
+		'wp-env-' + directory + '-' + md5( configFilePath )
 	);
 
 	// Parse any configuration we found in the given directory.
