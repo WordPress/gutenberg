@@ -41,7 +41,7 @@ const LINK_SETTINGS = [
 	},
 	{
 		id: 'cssClasses',
-		title: __( 'Additional CSS Classes' ),
+		title: __( 'Additional CSS class(es)' ),
 		render: ( setting, value, onChange ) => (
 			<InputControl
 				label={ setting.title }
@@ -49,9 +49,9 @@ const LINK_SETTINGS = [
 				onChange={ ( cssClasses ) =>
 					onChange( { ...value, cssClasses } )
 				}
-				help={ setting?.help }
-				__next40pxDefaultSize
+				help={ __( 'Separate multiple classes with spaces.' ) }
 				__unstableInputWidth="100%"
+				__next40pxDefaultSize
 			/>
 		),
 	},
