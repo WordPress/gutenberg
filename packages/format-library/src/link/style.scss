@@ -17,3 +17,9 @@
 		color: $alert-red;
 	}
 }
+
+.block-editor-link-control__toggleable-setting {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20 0;
+}
