@@ -7,7 +7,7 @@ import { useObservableValue } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import SlotFillContext from './slot-fill-context';
+import SlotFillContext from '../context';
 import type { SlotKey } from '../types';
 
 export default function useSlotFills( name: SlotKey ) {
