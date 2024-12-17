@@ -104,7 +104,7 @@ A function that receives the value of the new option that is being selected as i
 
 An array of objects containing the value and label of the options.
 
--   `label`: `ReactNode` The label to be shown to the user. When the label is not a string, make sure that the element is accessibly labeled.
+-   `label`: `string` | `React.ReactElement` The label to be shown to the user. When the label is not a string, make sure that the element is accessibly labeled.
 - ```
 -   `value`: `string` The internal value compared against select and passed to onChange.
 
