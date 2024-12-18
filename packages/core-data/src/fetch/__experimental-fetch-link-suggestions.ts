@@ -62,6 +62,7 @@ type PostTypesAPIResult = {
 	slug: string;
 	name: string;
 	archive_link: string;
+	has_archive: boolean;
 };
 
 export type SearchResult = {
@@ -254,7 +255,7 @@ export default async function fetchLinkSuggestions(
 				.then( ( results ) => {
 					const resultValues = Object.values( results );
 					return resultValues
-						.filter( ( result ) => !! result.archive_link ) // Filter out results with falsy archive_link, including empty strings
+						.filter( ( result ) => result.has_archive ) // Filter out results with falsy archive_link, including empty strings
 						.map( ( result, index ) => {
 							return {
 								id: index + 1, // avoid results being filtered due to falsy id
