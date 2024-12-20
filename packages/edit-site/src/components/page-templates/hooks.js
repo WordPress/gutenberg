@@ -98,3 +98,31 @@ export function useAddedBy( postType, postId ) {
 		[ postType, postId ]
 	);
 }
+
+/**
+ * Returns the template part title.
+ *
+ * @param {?string} slug The template part slug.
+ * @return {?string} The template part title.
+ */
+export function useTemplatePartTitle( slug ) {
+	return useSelect(
+		( select ) => {
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			const theme = getCurrentTheme()?.stylesheet;
+			if ( ! theme ) {
+				return;
+			}
+			const templatePart = getEntityRecord(
+				'postType',
+				'wp_template_part',
+				`${ theme }//${ slug }`
+			);
+			if ( ! templatePart ) {
+				return;
+			}
+			return templatePart.title?.rendered;
+		},
+		[ slug ]
+	);
+}

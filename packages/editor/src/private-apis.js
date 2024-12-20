@@ -30,6 +30,7 @@ import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
+import useTemplatesFilteredByTemplatePart from './utils/use-templates-filtered-by-template-part';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -61,4 +62,5 @@ lock( privateApis, {
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,
+	useTemplatesFilteredByTemplatePart,
 } );
