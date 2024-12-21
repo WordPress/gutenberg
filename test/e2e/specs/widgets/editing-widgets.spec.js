@@ -116,6 +116,7 @@ test.describe( 'Widgets screen', () => {
 			secondWidgetArea.getByRole( 'document', {
 				name: /^Empty block/,
 			} );
+
 		await addedParagraphBlockInSecondWidgetArea.focus();
 		await page.keyboard.type( 'Third Paragraph' );
 
@@ -143,6 +144,25 @@ test.describe( 'Widgets screen', () => {
 				},
 			],
 		} );
+	} );
+
+	test( 'Should focus the global inserter toggle when the global inserter is closed', async ( {
+		page,
+	} ) => {
+		const blockInserterToggle = page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } );
+		await blockInserterToggle.click();
+		await page
+			.getByRole( 'button', { name: 'Close Block Inserter' } )
+			.click();
+
+		await expect( blockInserterToggle ).toBeFocused();
+
+		await blockInserterToggle.click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect( blockInserterToggle ).toBeFocused();
 	} );
 
 	test( 'Should insert content using the inline inserter', async ( {
