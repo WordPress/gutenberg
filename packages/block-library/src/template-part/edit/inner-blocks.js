@@ -100,9 +100,16 @@ function EditableTemplatePartInnerBlocks( {
 	tagName: TagName,
 	blockProps,
 } ) {
-	const onNavigateToEntityRecord = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+	const { onNavigateToEntityRecord, isNavigationMode } = useSelect(
+		( select ) => {
+			const { getSettings, isNavigationMode: _isNavigationMode } =
+				select( blockEditorStore );
+			return {
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				isNavigationMode: _isNavigationMode(),
+			};
+		},
 		[]
 	);
 
@@ -123,7 +130,9 @@ function EditableTemplatePartInnerBlocks( {
 	const blockEditingMode = useBlockEditingMode();
 
 	const customProps =
-		blockEditingMode === 'contentOnly' && onNavigateToEntityRecord
+		! isNavigationMode &&
+		blockEditingMode === 'contentOnly' &&
+		onNavigateToEntityRecord
 			? {
 					onDoubleClick: () =>
 						onNavigateToEntityRecord( {
