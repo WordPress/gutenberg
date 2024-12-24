@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
@@ -27,7 +28,12 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
+	const {
+		onNavigateToEntityRecord,
+		templateId,
+		canEditTemplate,
+		isNavigationMode,
+	} = useSelect( ( select ) => {
 		const { getEditorSettings, getCurrentTemplateId } =
 			select( editorStore );
 
@@ -35,26 +41,35 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			onNavigateToEntityRecord:
 				getEditorSettings().onNavigateToEntityRecord,
 			templateId: getCurrentTemplateId(),
-		};
-	}, [] );
-
-	const canEditTemplate = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'create', {
+			canEditTemplate: !! select( coreStore ).canUser( 'create', {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
-		[]
+			isNavigationMode: select( blockEditorStore ).isNavigationMode(),
+		};
+	}, [] );
+
+	if ( ! canEditTemplate || isNavigationMode ) {
+		return null;
+	}
+
+	return (
+		<EditTemplateBlocksDialog
+			contentRef={ contentRef }
+			onNavigateToEntityRecord={ onNavigateToEntityRecord }
+			templateId={ templateId }
+		/>
 	);
+}
 
+function EditTemplateBlocksDialog( {
+	contentRef,
+	onNavigateToEntityRecord,
+	templateId,
+} ) {
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
-
 	useEffect( () => {
 		const handleDblClick = ( event ) => {
-			if ( ! canEditTemplate ) {
-				return;
-			}
-
 			if (
 				! event.target.classList.contains( 'is-root-container' ) ||
 				event.target.dataset?.type === 'core/template-part'
@@ -73,11 +88,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		return () => {
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ contentRef, canEditTemplate ] );
-
-	if ( ! canEditTemplate ) {
-		return null;
-	}
+	}, [ contentRef ] );
 
 	return (
 		<ConfirmDialog
