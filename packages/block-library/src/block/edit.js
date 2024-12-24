@@ -111,19 +111,24 @@ function ReusableBlockControl( {
 	handleEditOriginal,
 	resetContent,
 } ) {
-	const canUserEdit = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'wp_block',
-				id: recordId,
-			} ),
+	const { canUserEdit, isNavigationMode } = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			return {
+				canUserEdit: !! canUser( 'update', {
+					kind: 'postType',
+					name: 'wp_block',
+					id: recordId,
+				} ),
+				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
+			};
+		},
 		[ recordId ]
 	);
 
 	return (
 		<>
-			{ canUserEdit && !! handleEditOriginal && (
+			{ canUserEdit && ! isNavigationMode && !! handleEditOriginal && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton onClick={ handleEditOriginal }>

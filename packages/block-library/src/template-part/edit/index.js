@@ -126,11 +126,16 @@ export default function TemplatePartEdit( {
 		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
+		isNavigationMode,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings } = select( blockEditorStore );
+			const {
+				getBlockCount,
+				getSettings,
+				isNavigationMode: _isNavigationMode,
+			} = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -168,6 +173,7 @@ export default function TemplatePartEdit( {
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
+				isNavigationMode: _isNavigationMode(),
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -236,6 +242,7 @@ export default function TemplatePartEdit( {
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
 				{ isEntityAvailable &&
+					! isNavigationMode &&
 					onNavigateToEntityRecord &&
 					canUserEdit && (
 						<BlockControls group="other">
