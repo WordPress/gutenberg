@@ -36,7 +36,7 @@
 .block-library-query__toolbar-popover-content-wrapper {
 	padding: $grid-unit-15;
 	width: auto;
-	@include break-small() {
+	@include break-medium() {
 		width: 320px;
 	}
 	.block-editor-block-patterns-list {
@@ -54,12 +54,6 @@
 			min-height: 100px;
 		}
 	}
-}
-
-// Provide special styling for the placeholder.
-// @todo this particular minimal style of placeholder could be componentized further.
-.wp-block-query > .block-editor-media-placeholder.is-small {
-	min-height: 60px;
 }
 
 // Provide special styling for the placeholder.
