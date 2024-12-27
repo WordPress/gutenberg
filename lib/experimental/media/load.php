@@ -247,6 +247,8 @@ add_action( 'load-widgets.php', 'gutenberg_set_up_cross_origin_isolation' );
  * Uses an output buffer to add crossorigin="anonymous" where needed.
  *
  * @link https://web.dev/coop-coep/
+ *
+ * @global bool $is_safari
  */
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	global $is_safari;

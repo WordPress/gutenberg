@@ -11,6 +11,7 @@ import path from 'path';
  */
 import { generateMarkdownDocs } from './markdown/index.mjs';
 import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
+import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
 
 const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
 
@@ -113,9 +114,17 @@ await Promise.all(
 			} ) ?? []
 		);
 
+		const tags = await getTagsFromStorybook(
+			path.resolve(
+				path.dirname( manifestPath ),
+				'stories/index.story.tsx'
+			)
+		);
+
 		const docs = generateMarkdownDocs( {
 			typeDocs,
 			subcomponentTypeDocs,
+			tags,
 		} );
 		const outputFile = path.resolve(
 			path.dirname( manifestPath ),

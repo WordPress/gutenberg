@@ -10,7 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { NavigableToolbar, ToolSelector } from '@wordpress/block-editor';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -118,9 +118,8 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 		>
 			<div className="editor-document-tools__left">
 				{ ! isDistractionFree && (
-					<ToolbarItem
+					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
-						as={ Button }
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpened }
@@ -159,8 +158,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 							size="compact"
 						/>
 						{ ! isDistractionFree && (
-							<ToolbarItem
-								as={ Button }
+							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"
 								icon={ listView }
 								disabled={ disableBlockTools }
@@ -175,7 +173,6 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 								}
 								aria-expanded={ isListViewOpen }
 								ref={ listViewToggleRef }
-								size="compact"
 							/>
 						) }
 					</>

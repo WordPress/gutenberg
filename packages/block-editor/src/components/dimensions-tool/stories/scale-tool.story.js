@@ -13,8 +13,9 @@ import {
 import ScaleTool from '../scale-tool';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsTool/ScaleTool',
+	title: 'BlockEditor/DimensionsTool/ScaleTool',
 	component: ScaleTool,
+	tags: [ 'status-private' ],
 	argTypes: {
 		panelId: { control: false },
 		onChange: { action: 'changed' },

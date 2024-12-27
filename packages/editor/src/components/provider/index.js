@@ -163,6 +163,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
+		const hasTemplate = !! template;
 		const {
 			editorSettings,
 			selection,
@@ -195,7 +196,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					isReady: __unstableIsEditorReady(),
 					mode: getRenderingMode(),
 					defaultMode:
-						postTypeObject?.default_rendering_mode ?? 'post-only',
+						hasTemplate && postTypeObject?.default_rendering_mode
+							? postTypeObject?.default_rendering_mode
+							: 'post-only',
 					selection: getEditorSelection(),
 					postTypeEntities:
 						post.type === 'wp_template'
@@ -203,7 +206,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							: null,
 				};
 			},
-			[ post.type ]
+			[ post.type, hasTemplate ]
 		);
 
 		const shouldRenderTemplate = !! template && mode !== 'post-only';

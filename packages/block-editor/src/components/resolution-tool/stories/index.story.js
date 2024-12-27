@@ -13,8 +13,9 @@ import {
 import ResolutionTool from '..';
 
 export default {
-	title: 'BlockEditor (Private APIs)/ResolutionControl',
+	title: 'BlockEditor/ResolutionControl',
 	component: ResolutionTool,
+	tags: [ 'status-private' ],
 	argTypes: {
 		panelId: { control: false },
 		onChange: { action: 'changed' },

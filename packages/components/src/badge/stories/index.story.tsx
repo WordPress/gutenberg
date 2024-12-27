@@ -8,12 +8,12 @@ import type { Meta, StoryObj } from '@storybook/react';
  */
 import Badge from '..';
 
-const meta = {
+const meta: Meta< typeof Badge > = {
 	component: Badge,
 	title: 'Components/Containers/Badge',
 	id: 'components-badge',
 	tags: [ 'status-private' ],
-} satisfies Meta< typeof Badge >;
+};
 
 export default meta;
 

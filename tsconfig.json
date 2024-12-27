@@ -59,7 +59,9 @@
 		{ "path": "packages/url" },
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
-		{ "path": "packages/wordcount" }
+		{ "path": "packages/wordcount" },
+		{ "path": "test/e2e" },
+		{ "path": "test/performance" }
 	],
 	"files": []
 }

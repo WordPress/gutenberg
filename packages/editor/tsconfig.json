@@ -2,8 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"checkJs": false
 	},
 	"references": [
@@ -34,6 +32,5 @@
 		{ "path": "../url" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
-	],
-	"include": [ "src" ]
+	]
 }

@@ -11,6 +11,7 @@ import TextAlignmentControl from '../';
 const meta = {
 	title: 'BlockEditor/TextAlignmentControl',
 	component: TextAlignmentControl,
+	tags: [ 'status-private' ],
 	parameters: {
 		docs: {
 			canvas: { sourceState: 'shown' },

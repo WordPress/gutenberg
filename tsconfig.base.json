@@ -31,8 +31,12 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+
+		"rootDir": "${configDir}/src",
+		"declarationDir": "${configDir}/build-types"
 	},
+	"include": [ "${configDir}/src" ],
 	"exclude": [
 		"**/*.android.js",
 		"**/*.ios.js",

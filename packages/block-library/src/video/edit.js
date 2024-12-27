@@ -8,25 +8,21 @@ import clsx from 'clsx';
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	BaseControl,
-	Button,
 	Disabled,
-	PanelBody,
 	Spinner,
 	Placeholder,
+	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
 	MediaReplaceFlow,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
@@ -35,15 +31,18 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
+import PosterImage from './poster-image';
 import { createUpgradedEmbedBlock } from '../embed/util';
-import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import {
+	useUploadMediaFromBlobURL,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
-const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
 	isSelected: isSingleSelected,
@@ -55,9 +54,9 @@ function VideoEdit( {
 } ) {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
-	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -174,19 +173,6 @@ function VideoEdit( {
 		);
 	}
 
-	function onSelectPoster( image ) {
-		setAttributes( { poster: image.url } );
-	}
-
-	function onRemovePoster() {
-		setAttributes( { poster: undefined } );
-
-		// Move focus back to the Media Upload button.
-		posterImageButton.current.focus();
-	}
-
-	const videoPosterDescription = `video-block__poster-image-description-${ instanceId }`;
-
 	return (
 		<>
 			{ isSingleSelected && (
@@ -214,63 +200,31 @@ function VideoEdit( {
 				</>
 			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							controls: true,
+							loop: false,
+							muted: false,
+							playsInline: false,
+							preload: 'metadata',
+							poster: '',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
 					<VideoCommonSettings
 						setAttributes={ setAttributes }
 						attributes={ attributes }
 					/>
-					<MediaUploadCheck>
-						<div className="editor-video-poster-control">
-							<BaseControl.VisualLabel>
-								{ __( 'Poster image' ) }
-							</BaseControl.VisualLabel>
-							<MediaUpload
-								title={ __( 'Select poster image' ) }
-								onSelect={ onSelectPoster }
-								allowedTypes={
-									VIDEO_POSTER_ALLOWED_MEDIA_TYPES
-								}
-								render={ ( { open } ) => (
-									<Button
-										__next40pxDefaultSize
-										variant="primary"
-										onClick={ open }
-										ref={ posterImageButton }
-										aria-describedby={
-											videoPosterDescription
-										}
-									>
-										{ ! poster
-											? __( 'Select' )
-											: __( 'Replace' ) }
-									</Button>
-								) }
-							/>
-							<p id={ videoPosterDescription } hidden>
-								{ poster
-									? sprintf(
-											/* translators: %s: poster image URL. */
-											__(
-												'The current poster image url is %s'
-											),
-											poster
-									  )
-									: __(
-											'There is no poster image currently selected'
-									  ) }
-							</p>
-							{ !! poster && (
-								<Button
-									__next40pxDefaultSize
-									onClick={ onRemovePoster }
-									variant="tertiary"
-								>
-									{ __( 'Remove' ) }
-								</Button>
-							) }
-						</div>
-					</MediaUploadCheck>
-				</PanelBody>
+					<PosterImage
+						poster={ poster }
+						setAttributes={ setAttributes }
+						instanceId={ instanceId }
+					/>
+				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*

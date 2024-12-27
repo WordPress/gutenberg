@@ -16,6 +16,7 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
+	"include": [],
 	"files": [
 		"./api-docs/update-api-docs.js",
 		"./plugin/config.js",

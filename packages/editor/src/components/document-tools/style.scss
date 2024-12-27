@@ -74,14 +74,8 @@
 }
 
 .editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
-	min-width: $button-size-compact;
-	width: $button-size-compact;
-	height: $button-size-compact;
-	padding: 0;
-
 	.show-icon-labels & {
 		width: auto;
-		height: $button-size-compact;
 		padding: 0 $grid-unit-10;
 	}
 }
