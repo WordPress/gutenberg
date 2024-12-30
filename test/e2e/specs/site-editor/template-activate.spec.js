@@ -63,10 +63,10 @@ test.describe( 'Template Activate', () => {
 		await activateButton.click();
 
 		await page.waitForSelector(
-			'.dataviews-view-grid__field-value .is-active'
+			'.dataviews-view-grid__badge-fields .is-success'
 		);
 
-		await page.getByRole( 'button', { name: 'Index (Copy)' } ).click();
+		await page.getByLabel( 'Index (Copy)', { exact: true } ).click();
 
 		await expect( editor.canvas.getByText( 'gutenberg' ) ).toBeVisible();
 
@@ -113,7 +113,7 @@ test.describe( 'Template Activate', () => {
 
 		await expect(
 			page.locator(
-				'.dataviews-view-grid__card:has-text("Index (Copy)") .is-active'
+				'.dataviews-view-grid__card:has-text("Index (Copy)") .is-success'
 			)
 		).toBeHidden();
 
