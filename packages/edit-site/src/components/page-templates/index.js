@@ -319,8 +319,10 @@ export default function PageTemplates() {
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
-				onClickItem={ ( { id } ) => {
-					history.navigate( `/wp_template/${ id }?canvas=edit` );
+				onClickItem={ ( item ) => {
+					history.navigate(
+						`/${ item.type }/${ item.id }?canvas=edit`
+					);
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
