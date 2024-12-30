@@ -222,15 +222,18 @@ function GridItem< Item >( {
 						justify="flex-start"
 					>
 						{ badgeFields.map( ( field ) => {
+							const out = (
+								<field.render item={ item } field={ field } />
+							);
+							if ( field.__returnsBadge ) {
+								return out;
+							}
 							return (
 								<Badge
 									key={ field.id }
 									className="dataviews-view-grid__field-value"
 								>
-									<field.render
-										item={ item }
-										field={ field }
-									/>
+									{ out }
 								</Badge>
 							);
 						} ) }
