@@ -102,8 +102,6 @@ export default function PageTemplates() {
 	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
 
-	console.log( view );
-
 	// Sync the layout from the URL to the view state.
 	useEffect( () => {
 		setView( ( currentView ) => ( {

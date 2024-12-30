@@ -128,3 +128,39 @@ function gutenberg_set_active_template_theme( $changes, $request ) {
 	);
 	return $changes;
 }
+
+// Migrate existing "edited" templates. By existing, it means that the template
+// is active.
+add_action( 'init', 'gutenberg_migrate_existing_templates' );
+function gutenberg_migrate_existing_templates() {
+	$active_templates = get_option( 'active_templates' );
+
+	if ( $active_templates ) {
+		return;
+	}
+
+	// Query all templates in the database. See `get_block_templates`.
+	$wp_query_args = array(
+		'post_status'         => 'publish',
+		'post_type'           => 'wp_template',
+		'posts_per_page'      => -1,
+		'no_found_rows'       => true,
+		'lazy_load_term_meta' => false,
+		'tax_query'           => array(
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => get_stylesheet(),
+			),
+		),
+	);
+
+	$template_query   = new WP_Query( $wp_query_args );
+	$active_templates = array();
+
+	foreach ( $template_query->posts as $post ) {
+		$active_templates[ $post->post_name ] = $post->ID;
+	}
+
+	update_option( 'active_templates', $active_templates );
+}
