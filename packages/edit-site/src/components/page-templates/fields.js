@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Icon,
+	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -26,6 +30,7 @@ import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { Badge } = unlock( componentsPrivateApis );
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
@@ -116,12 +121,13 @@ export const activeField = {
 	label: __( 'Active' ),
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
+	__returnsBadge: true,
 	render: function Render( { item } ) {
 		const isActive = item._isActive;
 		return (
-			<span className={ `is-${ isActive ? 'active' : 'inactive' }` }>
+			<Badge intent={ isActive ? 'success' : 'default' }>
 				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
-			</span>
+			</Badge>
 		);
 	},
 };
