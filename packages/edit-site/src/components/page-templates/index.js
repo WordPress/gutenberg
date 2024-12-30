@@ -205,15 +205,12 @@ export default function PageTemplates() {
 			_isActive:
 				typeof record.id === 'string'
 					? activeTemplatesOption[ record.slug ] === record.id ||
-					  ( activeTemplatesOption[ record.slug ] === undefined &&
-							defaultTemplateTypes.find(
-								( { slug } ) => slug === record.slug
-							) )
+					  activeTemplatesOption[ record.slug ] === undefined
 					: Object.values( activeTemplatesOption ).includes(
 							record.id
 					  ),
 		} ) );
-	}, [ _records, activeTemplatesOption, defaultTemplateTypes ] );
+	}, [ _records, activeTemplatesOption ] );
 
 	const users = useSelect(
 		( select ) => {
