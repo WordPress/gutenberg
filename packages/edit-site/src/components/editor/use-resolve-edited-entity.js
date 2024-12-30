@@ -25,13 +25,12 @@ const postTypesWithoutParentTemplate = [
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
+	'_wp_static_template',
 ];
 
 const authorizedPostTypes = [ 'page', 'post' ];
 
-export function useResolveEditedEntity() {
-	const { name, params = {}, query } = useLocation();
-	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+function getPostType( name, postId ) {
 	let postType;
 	if ( name === 'navigation-item' ) {
 		postType = NAVIGATION_POST_TYPE;
@@ -39,18 +38,47 @@ export function useResolveEditedEntity() {
 		postType = PATTERN_TYPES.user;
 	} else if ( name === 'template-part-item' ) {
 		postType = TEMPLATE_PART_POST_TYPE;
-	} else if ( name === 'template-item' || name === 'templates' ) {
+	} else if ( name === 'templates' ) {
+		postType = /^\d+$/.test( postId )
+			? TEMPLATE_POST_TYPE
+			: '_wp_static_template';
+	} else if ( name === 'template-item' ) {
 		postType = TEMPLATE_POST_TYPE;
+	} else if ( name === 'static-template-item' ) {
+		postType = '_wp_static_template';
 	} else if ( name === 'page-item' || name === 'pages' ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
 		postType = 'post';
 	}
 
+	return postType;
+}
+
+export function useResolveEditedEntity() {
+	const { name, params = {}, query } = useLocation();
+	const { postId: _postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+	const _postType = getPostType( name, _postId );
+
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
 		return getHomePage();
 	}, [] );
+
+	const [ postType, postId ] = useSelect(
+		( select ) => {
+			if ( _postType !== '_wp_static_template' ) {
+				return [ _postType, _postId ];
+			}
+			return [
+				TEMPLATE_POST_TYPE,
+				unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
+					_postId
+				),
+			];
+		},
+		[ _postType, _postId ]
+	);
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -98,6 +126,18 @@ export function useResolveEditedEntity() {
 		[ homePage, postId, postType ]
 	);
 
+	const editableResolvedTemplateId = useSelect(
+		( select ) => {
+			if ( typeof resolvedTemplateId !== 'string' ) {
+				return resolvedTemplateId;
+			}
+			return unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
+				resolvedTemplateId
+			);
+		},
+		[ resolvedTemplateId ]
+	);
+
 	const context = useMemo( () => {
 		if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 			return {};
@@ -121,9 +161,9 @@ export function useResolveEditedEntity() {
 
 	if ( !! homePage ) {
 		return {
-			isReady: resolvedTemplateId !== undefined,
+			isReady: editableResolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
-			postId: resolvedTemplateId,
+			postId: editableResolvedTemplateId,
 			context,
 		};
 	}
