@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -141,6 +141,10 @@ export const slugField = {
 		const defaultTemplateType = defaultTemplateTypes.find(
 			( type ) => type.slug === item.slug
 		);
-		return defaultTemplateType?.title || item.slug;
+		return (
+			defaultTemplateType?.title ||
+			// translators: %s is the slug of a custom template.
+			sprintf( __( 'Custom: %s' ), item.slug )
+		);
 	},
 };
