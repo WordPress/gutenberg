@@ -21,7 +21,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_template',
+			postType: '_wp_static_template',
 			canvas: 'edit',
 		} );
 	} );
@@ -45,9 +45,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		await editor.saveSiteEditorEntities();
 		const saveButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } );
@@ -76,9 +74,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		// Change font size.
 		await fontSizePicker.getByRole( 'radio', { name: 'Small' } ).click();
 
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		await editor.saveSiteEditorEntities();
 
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();

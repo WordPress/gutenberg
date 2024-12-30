@@ -32,6 +32,12 @@
 	.dataviews-pagination {
 		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
 	}
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.is-active) {
+			background: var(--wp-admin-theme-color);
+			color: $white;
+		}
+	}
 }
 
 .page-templates-author-field__avatar {

@@ -38,14 +38,14 @@ describe( 'editEntityRecord', () => {
 		const select = {
 			getEntityConfig: jest.fn(),
 		};
-		const fulfillment = () =>
+		const fulfillment = async () =>
 			editEntityRecord(
 				entityConfig.kind,
 				entityConfig.name,
 				entityConfig.id,
 				{}
 			)( { select } );
-		expect( fulfillment ).toThrow(
+		await expect( fulfillment ).rejects.toThrow(
 			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
