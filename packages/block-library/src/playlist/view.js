@@ -20,6 +20,7 @@ const { state } = store(
 			changeTrack() {
 				const context = getContext();
 				context.currentId = context.id;
+				context.isPlaying = true;
 			},
 			isPlaying() {
 				const context = getContext();
