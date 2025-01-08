@@ -27,7 +27,7 @@ function render_block_core_playlist_track( $attributes ) {
 	$artist     = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
 	$image      = isset( $attributes['image'] ) ? $attributes['image'] : '';
 	$length     = isset( $attributes['length'] ) ? $attributes['length'] : '';
-	$title      = isset( $attributes['title'] ) ? $attributes['title'] : '';
+	$title      = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 	$url        = isset( $attributes['src'] ) ? $attributes['src'] : '';
 	$aria_label = $title;
 
