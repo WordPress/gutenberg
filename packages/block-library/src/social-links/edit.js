@@ -129,7 +129,7 @@ export function SocialLinksEdit( props ) {
 				setIconColor( colorValue );
 				setAttributes( { iconColorValue: colorValue } );
 			},
-			label: showLabels ? __( 'Icon & label color' ) : __( 'Icon color' ),
+			label: showLabels ? __( 'Icon & text color' ) : __( 'Icon color' ),
 			resetAllFilter: () => {
 				setIconColor( undefined );
 				setAttributes( { iconColorValue: undefined } );
@@ -148,7 +148,9 @@ export function SocialLinksEdit( props ) {
 					iconBackgroundColorValue: colorValue,
 				} );
 			},
-			label: __( 'Icon background' ),
+			label: showLabels
+				? __( 'Icon & text background' )
+				: __( 'Icon background' ),
 			resetAllFilter: () => {
 				setIconBackgroundColor( undefined );
 				setAttributes( { iconBackgroundColorValue: undefined } );
