@@ -87,6 +87,10 @@ const getEditorCommandLoader = () =>
 			toggleSpotlightMode,
 			toggleTopToolbar,
 		} = useDispatch( editorStore );
+
+		// We need to use unlock here because the `useDispatch` hook is used before the `useSelect` hook.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const { setListViewTab } = unlock( useDispatch( editorStore ) ); // disabled eslint due to error "Variables should not be assigned until just prior its first reference".
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
@@ -158,6 +162,28 @@ const getEditorCommandLoader = () =>
 						type: 'snackbar',
 					}
 				);
+			},
+		} );
+
+		commands.push( {
+			name: 'core/show-outline',
+			label: __( 'Show document outline' ),
+			icon: listView,
+			keywords: [
+				'structure',
+				'hierarchy',
+				'organization',
+				'sections',
+				'outline',
+			],
+			callback: ( { close } ) => {
+				setIsListViewOpened( true );
+				setListViewTab( 'outline' );
+				close();
+				createInfoNotice( __( 'Document outline opened.' ), {
+					id: 'core/editor/show-outline/notice',
+					type: 'snackbar',
+				} );
 			},
 		} );
 

@@ -26,6 +26,12 @@ export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
 	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
 
+	// Tracks our current tab.
+	const { listViewTab: tab } = useSelect( ( select ) => ( {
+		listViewTab: unlock( select( editorStore ) ).getListViewTab(),
+	} ) );
+	const { setListViewTab: setTab } = unlock( useDispatch( editorStore ) );
+
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
@@ -48,8 +54,6 @@ export default function ListViewSidebar() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
-	// Tracks our current tab.
-	const [ tab, setTab ] = useState( 'list-view' );
 
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
@@ -146,7 +150,7 @@ export default function ListViewSidebar() {
 				] }
 				onClose={ closeListView }
 				onSelect={ ( tabName ) => setTab( tabName ) }
-				defaultTabId="list-view"
+				defaultTabId={ tab }
 				ref={ tabsRef }
 				closeButtonLabel={ __( 'Close' ) }
 			/>
