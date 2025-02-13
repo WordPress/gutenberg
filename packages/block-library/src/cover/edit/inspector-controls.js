@@ -116,6 +116,7 @@ export default function CoverInspectorControls( {
 	const {
 		isVideoBackground,
 		isImageBackground,
+		isSiteEditor,
 		mediaElement,
 		url,
 		overlayColor,
@@ -196,7 +197,7 @@ export default function CoverInspectorControls( {
 	return (
 		<>
 			<InspectorControls>
-				{ !! url && (
+				{ ( !! url || isSiteEditor ) && (
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
