@@ -276,7 +276,7 @@ test.describe( 'Navigation block', () => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 
 			// remove the child link
-			await pageUtils.pressKeys( 'shift+Backspace' );
+			await pageUtils.pressKeys( 'primaryShift+Backspace' );
 
 			const submenuBlock2 = editor.canvas.getByRole( 'document', {
 				name: 'Block: Submenu',
@@ -494,7 +494,7 @@ test.describe( 'Navigation block', () => {
 		await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 		await navigation.checkLabelFocus( 'wordpress.org' );
 		// Delete the nav link
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'primaryShift+Backspace' );
 		// Focus moved to sibling
 		await navigation.checkLabelFocus( 'Dog' );
 		// Add a link back so we can delete the first submenu link and see if focus returns to the parent submenu item
@@ -507,15 +507,15 @@ test.describe( 'Navigation block', () => {
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await navigation.checkLabelFocus( 'Dog' );
 		// Delete the nav link
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'primaryShift+Backspace' );
 		await pageUtils.pressKeys( 'ArrowDown' );
 		// Focus moved to parent submenu item
 		await navigation.checkLabelFocus( 'example.com' );
 		// Deleting this should move focus to the sibling item
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'primaryShift+Backspace' );
 		await navigation.checkLabelFocus( 'Cat' );
 		// Deleting with no more siblings should focus the navigation block again
-		await pageUtils.pressKeys( 'shift+Backspace' );
+		await pageUtils.pressKeys( 'primaryShift+Backspace' );
 		await expect( navBlock ).toBeFocused();
 		// Wait until the nav block inserter is visible before we continue.
 		await expect( navBlockInserter ).toBeVisible();

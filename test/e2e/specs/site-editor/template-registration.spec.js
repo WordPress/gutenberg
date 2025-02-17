@@ -275,7 +275,7 @@ test.describe( 'Block template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await page.getByLabel( 'Add New Template' ).click();
+		await page.getByLabel( 'Add template' ).click();
 		await page.getByRole( 'button', { name: 'Author Archives' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Author For a specific item' } )

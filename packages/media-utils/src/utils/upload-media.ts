@@ -42,6 +42,8 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Whether to allow multiple files to be uploaded.
+	multiple?: boolean;
 }
 
 /**
@@ -57,6 +59,7 @@ interface UploadMediaArgs {
  * @param $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  * @param $0.signal             Abort signal.
+ * @param $0.multiple           Whether to allow multiple files to be uploaded.
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
@@ -67,7 +70,13 @@ export function uploadMedia( {
 	onError,
 	onFileChange,
 	signal,
+	multiple = true,
 }: UploadMediaArgs ) {
+	if ( ! multiple && filesList.length > 1 ) {
+		onError?.( new Error( __( 'Only one file can be used here.' ) ) );
+		return;
+	}
+
 	const validFiles = [];
 
 	const filesSet: Array< Partial< Attachment > | null > = [];

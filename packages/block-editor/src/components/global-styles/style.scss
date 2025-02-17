@@ -58,6 +58,11 @@
 	}
 }
 
+.block-editor-global-styles-filters-panel__dropdown {
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
+
 // These styles are similar to the color palette.
 .block-editor-global-styles__shadow-indicator {
 	appearance: none;
@@ -99,4 +104,26 @@
 	// CSS input is always LTR regardless of language.
 	/*rtl:ignore*/
 	direction: ltr;
+}
+
+.block-editor-panel-duotone-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles-filters-panel__dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
 }

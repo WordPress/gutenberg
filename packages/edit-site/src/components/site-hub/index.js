@@ -28,8 +28,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../lock-unlock';
-const { useHistory } = unlock( routerPrivateApis );
 import { SidebarNavigationContext } from '../sidebar';
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SiteHub = memo(
 	forwardRef( ( { isTransparent }, ref ) => {
@@ -117,29 +117,25 @@ export default SiteHub;
 
 export const SiteHubMobile = memo(
 	forwardRef( ( { isTransparent }, ref ) => {
+		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
 
-		const { dashboardLink, isBlockTheme, homeUrl, siteTitle } = useSelect(
-			( select ) => {
-				const { getSettings } = unlock( select( editSiteStore ) );
-
-				const { getEntityRecord, getCurrentTheme } =
-					select( coreStore );
-				const _site = getEntityRecord( 'root', 'site' );
-				return {
-					dashboardLink: getSettings().__experimentalDashboardLink,
-					isBlockTheme: getCurrentTheme()?.is_block_theme,
-					homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
-					siteTitle:
-						! _site?.title && !! _site?.url
-							? filterURLForDisplay( _site?.url )
-							: _site?.title,
-				};
-			},
-			[]
-		);
+		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
+			return {
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
+			};
+		}, [] );
 		const { open: openCommandCenter } = useDispatch( commandsStore );
+		const isRoot = path === '/';
 
 		return (
 			<div className="edit-site-site-hub">
@@ -160,7 +156,7 @@ export const SiteHubMobile = memo(
 								transform: 'scale(0.5)',
 								borderRadius: 4,
 							} }
-							{ ...( ! isBlockTheme
+							{ ...( isRoot
 								? {
 										href: dashboardLink,
 										label: __( 'Go to the Dashboard' ),

@@ -257,7 +257,7 @@ function LayoutPanelPure( {
 												'Nested blocks use content width with options for full and wide widths.'
 										  )
 										: __(
-												'Nested blocks will fill the width of this container. Toggle to constrain.'
+												'Nested blocks will fill the width of this container.'
 										  )
 								}
 							/>

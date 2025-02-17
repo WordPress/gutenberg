@@ -64,6 +64,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					}
 					checked={ checked }
 					onChange={ onChange }
+					className="entities-saved-states__change-control"
 				/>
 			</PanelRow>
 			{ hasPostMetaChanges && (

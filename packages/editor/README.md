@@ -402,6 +402,7 @@ _Parameters_
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
 -   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
 
@@ -500,6 +501,7 @@ _Parameters_
 -   _$0.onError_ `Function`: Function called when an error happens.
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
+-   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
 
 ### MediaUploadCheck
 

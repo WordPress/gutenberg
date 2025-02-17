@@ -169,7 +169,7 @@ jobs:
         steps:
             - name: Install Subversion
               run: |
-                  apt-get update -y && apt-get install -y subversion
+                  sudo apt-get update -y && sudo apt-get install -y subversion
 
             - name: Check out Gutenberg trunk from WP.org plugin repo
               run: |
@@ -228,7 +228,7 @@ jobs:
         steps:
             - name: Install Subversion
               run: |
-                  apt-get update -y && apt-get install -y subversion
+                  sudo apt-get update -y && sudo apt-get install -y subversion
 
             - name: Download and unzip Gutenberg plugin asset into tags folder
               env:

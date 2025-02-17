@@ -1,20 +1,14 @@
 /**
  * WordPress dependencies
  */
-import {
-	CheckboxControl,
-	Flex,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { useId } from '@wordpress/element';
+import { CheckboxControl, Flex } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getFontFaceVariantName } from './utils';
 import FontDemo from './font-demo';
-import { unlock } from '../../../lock-unlock';
-
-const { kebabCase } = unlock( componentsPrivateApis );
 
 function CollectionFontVariant( {
 	face,
@@ -31,9 +25,7 @@ function CollectionFontVariant( {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const checkboxId = kebabCase(
-		`${ font.slug }-${ getFontFaceVariantName( face ) }`
-	);
+	const checkboxId = useId();
 
 	return (
 		<div className="font-library-modal__font-card">

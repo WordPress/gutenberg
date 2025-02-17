@@ -22,7 +22,7 @@ const SidebarHeader = ( _, ref ) => {
 		return {
 			documentLabel:
 				// translators: Default label for the Document sidebar tab, not selected.
-				getPostTypeLabel() || _x( 'Document', 'noun, sidebar' ),
+				getPostTypeLabel() || _x( 'Document', 'noun, panel' ),
 		};
 	}, [] );
 

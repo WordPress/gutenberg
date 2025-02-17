@@ -6,7 +6,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import { unlock } from '../../lock-unlock';
@@ -20,9 +19,7 @@ function MobileNavigationItemView() {
 	return canvas === 'edit' ? (
 		<Editor />
 	) : (
-		<SidebarNavigationScreenNavigationMenu
-			backPath={ { postType: NAVIGATION_POST_TYPE } }
-		/>
+		<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
 	);
 }
 

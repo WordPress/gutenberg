@@ -302,7 +302,7 @@ class SiteEditorBlockStyleVariations {
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft new: page"i]' )
 		.locator( 'role=textbox[name="title"i]' )

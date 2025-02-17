@@ -23,6 +23,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Icon, arrowUpLeft } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -53,7 +54,7 @@ import {
 	useResolveEditedEntity,
 	useSyncDeprecatedEntityIntoState,
 } from './use-resolve-edited-entity';
-import { addQueryArgs } from '@wordpress/url';
+import SitePreview from './site-preview';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -117,7 +118,10 @@ function getNavigationPath( location, postType ) {
 	return addQueryArgs( path, { canvas: undefined } );
 }
 
-export default function EditSiteEditor( { isPostsList = false } ) {
+export default function EditSiteEditor( {
+	isHomeRoute = false,
+	isPostsList = false,
+} ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
 	const { canvas = 'view' } = location.query;
@@ -128,7 +132,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 	useSyncDeprecatedEntityIntoState( entity );
 	const { postType, postId, context } = entity;
 	const {
-		supportsGlobalStyles,
+		isBlockBasedTheme,
 		editorCanvasView,
 		currentPostIsTrashed,
 		hasSiteIcon,
@@ -140,7 +144,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		return {
-			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			editorCanvasView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
@@ -244,7 +248,9 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
-	return (
+	return ! isBlockBasedTheme && isHomeRoute ? (
+		<SitePreview />
+	) : (
 		<>
 			<GlobalStylesRenderer
 				disableRootPadding={ postType !== TEMPLATE_POST_TYPE }
@@ -349,7 +355,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						</BackButton>
 					) }
 					<SiteEditorMoreMenu />
-					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
+					{ isBlockBasedTheme && <GlobalStylesSidebar /> }
 				</Editor>
 			) }
 		</>

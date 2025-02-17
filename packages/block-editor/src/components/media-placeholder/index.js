@@ -227,6 +227,7 @@ export function MediaPlaceholder( {
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
+			multiple,
 		} );
 	};
 

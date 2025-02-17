@@ -94,7 +94,11 @@ export default function EntityTypeList( {
 	}
 
 	return (
-		<PanelBody title={ entityLabel } initialOpen>
+		<PanelBody
+			title={ entityLabel }
+			initialOpen
+			className="entities-saved-states__panel-body"
+		>
 			<EntityDescription record={ firstRecord } count={ count } />
 			{ list.map( ( record ) => {
 				return (

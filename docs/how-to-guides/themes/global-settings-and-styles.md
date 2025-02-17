@@ -111,7 +111,7 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via a user interface that is being worked on.
 
 ```json
 {

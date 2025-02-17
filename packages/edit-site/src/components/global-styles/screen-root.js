@@ -55,6 +55,7 @@ function ScreenRoot() {
 	return (
 		<Card
 			size="small"
+			isBorderless
 			className="edit-site-global-styles-screen-root"
 			isRounded={ false }
 		>

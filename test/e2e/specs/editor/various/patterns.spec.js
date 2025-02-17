@@ -37,7 +37,7 @@ test.describe( 'Unsynced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -136,7 +136,7 @@ test.describe( 'Synced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -376,7 +376,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -426,7 +426,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -610,7 +610,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )

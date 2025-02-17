@@ -10,7 +10,7 @@ runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+          uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
           with:
               node-version-file: '.nvmrc'
               node-version: ${{ inputs.node-version }}
@@ -25,7 +25,7 @@ runs:
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+          uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
           with:
               path: '**/node_modules'
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
@@ -36,7 +36,7 @@ runs:
               npm ci
           shell: bash
         - name: Upload npm logs as an artifact on failure
-          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+          uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
           if: failure()
           with:
               name: npm-logs

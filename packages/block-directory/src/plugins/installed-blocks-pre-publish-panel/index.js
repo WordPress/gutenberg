@@ -3,7 +3,6 @@
  */
 import { _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { blockDefault } from '@wordpress/icons';
 import { PluginPrePublishPanel } from '@wordpress/editor';
 
 /**
@@ -24,7 +23,6 @@ export default function InstalledBlocksPrePublishPanel() {
 
 	return (
 		<PluginPrePublishPanel
-			icon={ blockDefault }
 			title={ sprintf(
 				// translators: %d: number of blocks (number).
 				_n(

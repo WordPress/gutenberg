@@ -23,11 +23,14 @@ import { AUTHORS_QUERY } from './constants';
 export default function PostAuthorCheck( { children } ) {
 	const { hasAssignAuthorAction, hasAuthors } = useSelect( ( select ) => {
 		const post = select( editorStore ).getCurrentPost();
-		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );
+		const canAssignAuthor = post?._links?.[ 'wp:action-assign-author' ]
+			? true
+			: false;
 		return {
-			hasAssignAuthorAction:
-				post._links?.[ 'wp:action-assign-author' ] ?? false,
-			hasAuthors: authors?.length >= 1,
+			hasAssignAuthorAction: canAssignAuthor,
+			hasAuthors: canAssignAuthor
+				? select( coreStore ).getUsers( AUTHORS_QUERY )?.length >= 1
+				: false,
 		};
 	}, [] );
 

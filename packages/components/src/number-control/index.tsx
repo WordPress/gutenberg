@@ -229,8 +229,8 @@ function UnforwardedNumberControl(
 			hideHTMLArrows={ spinControls !== 'native' }
 			isDragEnabled={ isDragEnabled }
 			label={ label }
-			max={ max }
-			min={ min }
+			max={ max === Infinity ? undefined : max }
+			min={ min === -Infinity ? undefined : min }
 			ref={ mergedRef }
 			required={ required }
 			step={ step }

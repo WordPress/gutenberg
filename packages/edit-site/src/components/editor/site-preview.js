@@ -1,32 +1,19 @@
 /**
  * WordPress dependencies
  */
-
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-
-import Editor from '../editor';
-
-export function MaybeEditor( { showEditor = true } ) {
-	const { isBlockBasedTheme, siteUrl } = useSelect( ( select ) => {
-		const { getEntityRecord, getCurrentTheme } = select( coreStore );
+export default function SitePreview() {
+	const siteUrl = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
-
-		return {
-			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-			siteUrl: siteData?.home,
-		};
+		return siteData?.home;
 	}, [] );
 
 	// If theme is block based, return the Editor, otherwise return the site preview.
-	return isBlockBasedTheme || showEditor ? (
-		<Editor />
-	) : (
+	return (
 		<iframe
 			src={ siteUrl }
 			title={ __( 'Site Preview' ) }

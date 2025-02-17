@@ -6,7 +6,7 @@ import { isCollapsed, isEmpty } from '@wordpress/rich-text';
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
-		const { keyCode, shiftKey } = event;
+		const { keyCode, shiftKey, ctrlKey, metaKey } = event;
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -30,8 +30,8 @@ export default ( props ) => ( element ) => {
 				return;
 			}
 
-			// Exclude shift+backspace as they are shortcuts for deleting blocks.
-			if ( shiftKey ) {
+			// Exclude (command|ctrl)+shift+backspace as they are shortcuts for deleting blocks.
+			if ( shiftKey && ( ctrlKey || metaKey ) ) {
 				return;
 			}
 

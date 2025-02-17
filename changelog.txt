@@ -1,7 +1,199 @@
 == Changelog ==
 
-= 20.2.0-rc.1 =
+= 20.3.0-rc.1 =
 
+
+## Changelog
+
+### Enhancements
+
+- Disable hover animation on preview frame for classic themes. ([68976](https://github.com/WordPress/gutenberg/pull/68976))
+
+#### Block Library
+- Added discord in social links. ([68848](https://github.com/WordPress/gutenberg/pull/68848))
+- Featured Image block: Use resolution tool component. ([68471](https://github.com/WordPress/gutenberg/pull/68471))
+- Query block: Add option to ignore sticky posts behavior. ([69057](https://github.com/WordPress/gutenberg/pull/69057))
+- RSS: Border & Spacing support. ([66411](https://github.com/WordPress/gutenberg/pull/66411))
+
+#### Global Styles
+- Disable Clear button if there's no shadow. ([69092](https://github.com/WordPress/gutenberg/pull/69092))
+- Duotone Settings: Add `reset` button and improve toggle rendering in FiltersPanel. ([68672](https://github.com/WordPress/gutenberg/pull/68672))
+- Shadow Panel: Add reset button. ([68981](https://github.com/WordPress/gutenberg/pull/68981))
+
+#### Post Editor
+- Editor: Add loading state to the 'PageAttributesParent' component. ([69062](https://github.com/WordPress/gutenberg/pull/69062))
+- Editor: Add loading state to the 'PostAuthorCombobox' component. ([68991](https://github.com/WordPress/gutenberg/pull/68991))
+- Editor: Display error message when loading current post fails. ([68999](https://github.com/WordPress/gutenberg/pull/68999))
+
+#### Block Editor
+- Quick Inserter: Restore pattern search and insertion. ([69028](https://github.com/WordPress/gutenberg/pull/69028))
+- Update keyboard shortcuts to use `primaryShift+backspace` for block deletion. ([69074](https://github.com/WordPress/gutenberg/pull/69074))
+
+#### Design Tools
+- Archives: Add Color Support. ([68685](https://github.com/WordPress/gutenberg/pull/68685))
+- Categories: Add Color Support. ([68686](https://github.com/WordPress/gutenberg/pull/68686))
+
+#### Components
+- ComboboxControl: Add an `isLoading` prop to show a loading spinner. ([68990](https://github.com/WordPress/gutenberg/pull/68990))
+
+
+### Bug Fixes
+
+- Exclude Iterator helpers from polyfills. ([69070](https://github.com/WordPress/gutenberg/pull/69070))
+- Fix Dependabot ignore statements. ([69144](https://github.com/WordPress/gutenberg/pull/69144))
+
+#### Block Editor
+- Block popover: Fix scrolling over. ([68075](https://github.com/WordPress/gutenberg/pull/68075))
+- Display root appender when default block is disabled. ([68951](https://github.com/WordPress/gutenberg/pull/68951))
+- Fix regression for root appender logic. ([68994](https://github.com/WordPress/gutenberg/pull/68994))
+- Inserter: Remove block default icon from no results message. ([68693](https://github.com/WordPress/gutenberg/pull/68693))
+- Rename `aspect` property to `ratio` to carry the `defaultAspect` in `AspectRatioDropdown`. ([69085](https://github.com/WordPress/gutenberg/pull/69085))
+- Writing Flow: Restore early return for no block selection in tab nav hook. ([69079](https://github.com/WordPress/gutenberg/pull/69079))
+
+#### Site Editor
+- Edit Site: Fix Fields package private APIs error. ([68964](https://github.com/WordPress/gutenberg/pull/68964))
+- Fix: Site Editor should display a 404 message. ([69009](https://github.com/WordPress/gutenberg/pull/69009))
+- Use the same editor component for all routes. ([69093](https://github.com/WordPress/gutenberg/pull/69093))
+
+#### Global Styles
+- Fix: Additional CSS button not working after back navigation. ([68954](https://github.com/WordPress/gutenberg/pull/68954))
+- Fix: Missing 'No blocks found.' message for block search in editor. ([69036](https://github.com/WordPress/gutenberg/pull/69036))
+
+#### Block Library
+- Query Block: Fix 'parents' argument validation. ([68983](https://github.com/WordPress/gutenberg/pull/68983))
+- Social Links: Fix appender size in non-iframe editor. ([68215](https://github.com/WordPress/gutenberg/pull/68215))
+
+#### REST API
+- Add support for the 'ignore_sticky_posts' argument. ([68970](https://github.com/WordPress/gutenberg/pull/68970))
+- Fix: Prevent Errors in Header Processing and Encode URLs Properly. ([67780](https://github.com/WordPress/gutenberg/pull/67780))
+
+#### Icons
+- Fix the background, arrowUpLeft, keyboardReturn and square icons. ([69076](https://github.com/WordPress/gutenberg/pull/69076))
+
+#### Font Library
+- Refactor font variant components to use useId for checkbox IDs. ([69050](https://github.com/WordPress/gutenberg/pull/69050))
+
+#### Block Directory
+- Remove block icon from InstalledBlocksPrePublishPanel. ([69046](https://github.com/WordPress/gutenberg/pull/69046))
+
+#### DataViews
+- Fixed: Empty Pattern Overlap in Pattern Title in Dataviews Table Layout. ([68997](https://github.com/WordPress/gutenberg/pull/68997))
+
+#### Media
+- Add optional chain to sizes indexing of media details in edit-site. ([68995](https://github.com/WordPress/gutenberg/pull/68995))
+
+#### CSS & Styling
+- Enabled Full height in Additional CSS. ([68993](https://github.com/WordPress/gutenberg/pull/68993))
+
+#### Block hooks
+- Fix truncation of post content. ([68926](https://github.com/WordPress/gutenberg/pull/68926))
+
+#### Interactivity API
+- iAPI Router: Fix CSS rule order in some constructed style sheets. ([68923](https://github.com/WordPress/gutenberg/pull/68923))
+
+
+### Accessibility
+
+#### Components
+- Font Size Picker: Remove Custom option from FontSizePickerSelect dropdown. ([69038](https://github.com/WordPress/gutenberg/pull/69038))
+
+#### Global Styles
+- Add missing list role to the list of blocks in the global Styles. ([69027](https://github.com/WordPress/gutenberg/pull/69027))
+
+#### Block API
+- Block support: Preserve aria-label value in comment delimiter. ([69002](https://github.com/WordPress/gutenberg/pull/69002))
+
+#### Block Editor
+- [Block Editor]: A11y - Add and Update missing reduce-motion mixing. ([68417](https://github.com/WordPress/gutenberg/pull/68417))
+
+
+### Performance
+
+#### Post Editor
+- Editor: Don't use selector shortcuts for the taxonomy queries. ([68998](https://github.com/WordPress/gutenberg/pull/68998))
+- Editor: Optimize 'PostAuthorCheck' component data selection. ([69105](https://github.com/WordPress/gutenberg/pull/69105))
+
+#### Style Book
+- Improve StyleBook resize responsiveness for Classic Theme. ([68980](https://github.com/WordPress/gutenberg/pull/68980))
+
+
+### Documentation
+
+- Added Missing Global Documentation. ([69104](https://github.com/WordPress/gutenberg/pull/69104))
+- Changed Inline Document Order. ([68992](https://github.com/WordPress/gutenberg/pull/68992))
+- wp-env: Add lifecycleScripts to the schema. ([68724](https://github.com/WordPress/gutenberg/pull/68724))
+
+
+### Code Quality
+
+- Core Data: Add type for term entity. ([69151](https://github.com/WordPress/gutenberg/pull/69151))
+- iAPI Router: Add missing changelog entry for #68923. ([68945](https://github.com/WordPress/gutenberg/pull/68945))
+
+#### Block Library
+- E2E: Add regression test for spacer block in themes without spacing units. ([68913](https://github.com/WordPress/gutenberg/pull/68913))
+- Navigation Link Block: Use stable variable for underline color styling. ([68953](https://github.com/WordPress/gutenberg/pull/68953))
+- Regenerate block fixtures. ([68982](https://github.com/WordPress/gutenberg/pull/68982))
+- Social Links: Remove redundant reduce-motion mixin. ([69000](https://github.com/WordPress/gutenberg/pull/69000))
+
+#### Site Editor
+- Fast follow: Redirections of deprecated site editor URLs. ([68971](https://github.com/WordPress/gutenberg/pull/68971))
+- Quality: Remove unused props and styles from SidebarNavigationScreen. ([68972](https://github.com/WordPress/gutenberg/pull/68972))
+
+#### Block Editor
+- Inserter: Remove unused no-results-icon styles. ([69018](https://github.com/WordPress/gutenberg/pull/69018))
+
+
+### Tools
+
+- PR Template: Suggest linking the issue. ([68924](https://github.com/WordPress/gutenberg/pull/68924))
+- Relocate changelog file for WP#6910 to 6.9 backports. ([69068](https://github.com/WordPress/gutenberg/pull/69068))
+
+#### Build Tooling
+- Fix installing svn during deploys. ([69047](https://github.com/WordPress/gutenberg/pull/69047))
+- Remove `react-native` dependabot group. ([69118](https://github.com/WordPress/gutenberg/pull/69118))
+
+#### Testing
+- e2e: Fix "add new" selector. ([69111](https://github.com/WordPress/gutenberg/pull/69111))
+
+
+### Various
+
+- Remove react-native dependabot group - Take 2. ([69122](https://github.com/WordPress/gutenberg/pull/69122))
+
+#### Plugin
+- Code Quality: Delete unused function from PHP Sync Issue generation script. ([68947](https://github.com/WordPress/gutenberg/pull/68947))
+- npm scripts: Use `node -p` instead of `echo`. ([68946](https://github.com/WordPress/gutenberg/pull/68946))
+
+
+## First-time contributors
+
+The following PRs were merged by first-time contributors:
+
+- @benazeer-ben: RSS: Border & Spacing support. ([66411](https://github.com/WordPress/gutenberg/pull/66411))
+- @grgar: Add optional chain to sizes indexing of media details in edit-site. ([68995](https://github.com/WordPress/gutenberg/pull/68995))
+- @Gulamdastgir-Momin: Added discord in social links. ([68848](https://github.com/WordPress/gutenberg/pull/68848))
+- @Juzar10: Fix: Prevent Errors in Header Processing and Encode URLs Properly. ([67780](https://github.com/WordPress/gutenberg/pull/67780))
+- @singhakanshu00: Disable hover animation on preview frame for classic themes. ([68976](https://github.com/WordPress/gutenberg/pull/68976))
+- @srtfisher: wp-env: Add lifecycleScripts to the schema. ([68724](https://github.com/WordPress/gutenberg/pull/68724))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein @afercia @akasunil @benazeer-ben @carolinan @DAreRodz @desrosj @ellatrix @grgar @Gulamdastgir-Momin @himanshupathak95 @Infinite-Null @joemcgill @Juzar10 @Mamaduka @Mayank-Tripathi32 @ockham @peterwilsoncc @Rishit30G @SainathPoojary @shail-mehta @shimotmk @singhakanshu00 @srtfisher @swissspidy @t-hamano @torounit @yogeshbhutkar
+
+
+= 20.0.1 =
+
+## Changelog
+
+### Bug Fixes
+
+- iAPI Router: add missing changelog entry for [#68923](https://github.com/WordPress/gutenberg/pull/68945)
+
+
+= 20.2.0 =
 
 ## Changelog
 
@@ -141,6 +333,8 @@
 The following contributors merged PRs in this release:
 
 @afercia @benazeer-ben @fabiankaegy @himanshupathak95 @im3dabasia @Infinite-Null @justlevine @karthick-murugan @Mamaduka @Mayank-Tripathi32 @SainathPoojary @shail-mehta @shimotmk @Soean @spacedmonkey @stokesman @Sukhendu2002 @t-hamano @yogeshbhutkar
+
+
 
 
 = 20.1.0 =

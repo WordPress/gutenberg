@@ -1088,7 +1088,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )

@@ -125,6 +125,10 @@ export default function useTabNav() {
 				return;
 			}
 
+			if ( ! hasMultiSelection() && ! getSelectedBlockClientId() ) {
+				return;
+			}
+
 			const isShift = event.shiftKey;
 			const direction = isShift ? 'findPrevious' : 'findNext';
 			const nextTabbable = focus.tabbable[ direction ]( event.target );

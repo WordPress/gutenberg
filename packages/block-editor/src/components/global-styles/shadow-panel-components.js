@@ -46,6 +46,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
+						disabled={ ! shadow }
+						accessibleWhenDisabled
 					>
 						{ __( 'Clear' ) }
 					</Button>

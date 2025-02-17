@@ -126,6 +126,7 @@ export default function CreateNewTemplateModal( { onClose } ) {
 						placeholder={ DEFAULT_TITLE }
 						disabled={ isBusy }
 						help={ __(
+							// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 							'Describe the template, e.g. "Post with sidebar". A custom template can be manually applied to any post or page.'
 						) }
 					/>

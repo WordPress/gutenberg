@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
@@ -32,15 +37,21 @@ function identity( values ) {
  * @param {Object}   props              The component props.
  * @param {Function} props.close        The function to close the dialog.
  * @param {boolean}  props.renderDialog Whether to render the component with modal dialog behavior.
+ * @param {string}   props.variant      Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
  *
  * @return {React.ReactNode} The rendered component.
  */
-export default function EntitiesSavedStates( { close, renderDialog } ) {
+export default function EntitiesSavedStates( {
+	close,
+	renderDialog,
+	variant,
+} ) {
 	const isDirtyProps = useIsDirty();
 	return (
 		<EntitiesSavedStatesExtensible
 			close={ close }
 			renderDialog={ renderDialog }
+			variant={ variant }
 			{ ...isDirtyProps }
 		/>
 	);
@@ -60,6 +71,7 @@ export default function EntitiesSavedStates( { close, renderDialog } ) {
  * @param {boolean}  props.isDirty               Flag indicating if there are dirty entities.
  * @param {Function} props.setUnselectedEntities Function to set unselected entities.
  * @param {Array}    props.unselectedEntities    Array of unselected entities.
+ * @param {string}   props.variant               Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
  *
  * @return {React.ReactNode} The rendered component.
  */
@@ -74,6 +86,7 @@ export function EntitiesSavedStatesExtensible( {
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
+	variant = 'default',
 } ) {
 	const saveButtonRef = useRef();
 	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
@@ -109,83 +122,100 @@ export function EntitiesSavedStatesExtensible( {
 	const [ saveDialogRef, saveDialogProps ] = useDialog( {
 		onClose: () => dismissPanel(),
 	} );
-	const dialogLabel = useInstanceId( EntitiesSavedStatesExtensible, 'label' );
-	const dialogDescription = useInstanceId(
+	const dialogLabelId = useInstanceId(
 		EntitiesSavedStatesExtensible,
-		'description'
+		'entities-saved-states__panel-label'
+	);
+	const dialogDescriptionId = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'entities-saved-states__panel-description'
 	);
 
 	const selectItemsToSaveDescription = !! dirtyEntityRecords.length
 		? __( 'Select the items you want to save.' )
 		: undefined;
 
+	const isInline = variant === 'inline';
+
+	const actionButtons = (
+		<>
+			<FlexItem
+				isBlock={ isInline ? false : true }
+				as={ Button }
+				variant={ isInline ? 'tertiary' : 'secondary' }
+				size={ isInline ? undefined : 'compact' }
+				onClick={ dismissPanel }
+			>
+				{ __( 'Cancel' ) }
+			</FlexItem>
+			<FlexItem
+				isBlock={ isInline ? false : true }
+				as={ Button }
+				ref={ saveButtonRef }
+				variant="primary"
+				size={ isInline ? undefined : 'compact' }
+				disabled={ ! saveEnabled }
+				accessibleWhenDisabled
+				onClick={ () =>
+					saveDirtyEntities( {
+						onSave,
+						dirtyEntityRecords,
+						entitiesToSkip: unselectedEntities,
+						close,
+					} )
+				}
+				className="editor-entities-saved-states__save-button"
+			>
+				{ saveLabel }
+			</FlexItem>
+		</>
+	);
+
 	return (
 		<div
 			ref={ renderDialog ? saveDialogRef : undefined }
 			{ ...( renderDialog && saveDialogProps ) }
-			className="entities-saved-states__panel"
+			className={ clsx( 'entities-saved-states__panel', {
+				'is-inline': isInline,
+			} ) }
 			role={ renderDialog ? 'dialog' : undefined }
-			aria-labelledby={ renderDialog ? dialogLabel : undefined }
-			aria-describedby={ renderDialog ? dialogDescription : undefined }
+			aria-labelledby={ renderDialog ? dialogLabelId : undefined }
+			aria-describedby={ renderDialog ? dialogDescriptionId : undefined }
 		>
-			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
-				<FlexItem
-					isBlock
-					as={ Button }
-					variant="secondary"
-					size="compact"
-					onClick={ dismissPanel }
-				>
-					{ __( 'Cancel' ) }
-				</FlexItem>
-				<FlexItem
-					isBlock
-					as={ Button }
-					ref={ saveButtonRef }
-					variant="primary"
-					size="compact"
-					disabled={ ! saveEnabled }
-					accessibleWhenDisabled
-					onClick={ () =>
-						saveDirtyEntities( {
-							onSave,
-							dirtyEntityRecords,
-							entitiesToSkip: unselectedEntities,
-							close,
-						} )
-					}
-					className="editor-entities-saved-states__save-button"
-				>
-					{ saveLabel }
-				</FlexItem>
-			</Flex>
+			{ ! isInline && (
+				<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+					{ actionButtons }
+				</Flex>
+			) }
 
 			<div className="entities-saved-states__text-prompt">
-				<div
-					className="entities-saved-states__text-prompt--header-wrapper"
-					id={ renderDialog ? dialogLabel : undefined }
-				>
-					<strong className="entities-saved-states__text-prompt--header">
+				<div className="entities-saved-states__text-prompt--header-wrapper">
+					<strong
+						id={ renderDialog ? dialogLabelId : undefined }
+						className="entities-saved-states__text-prompt--header"
+					>
 						{ __( 'Are you ready to save?' ) }
 					</strong>
-					{ additionalPrompt }
 				</div>
-				<p id={ renderDialog ? dialogDescription : undefined }>
-					{ isDirty
-						? createInterpolateElement(
-								sprintf(
-									/* translators: %d: number of site changes waiting to be saved. */
-									_n(
-										'There is <strong>%d site change</strong> waiting to be saved.',
-										'There are <strong>%d site changes</strong> waiting to be saved.',
+				<div id={ renderDialog ? dialogDescriptionId : undefined }>
+					{ additionalPrompt }
+					<p className="entities-saved-states__text-prompt--changes-count">
+						{ isDirty
+							? createInterpolateElement(
+									sprintf(
+										/* translators: %d: number of site changes waiting to be saved. */
+										_n(
+											'There is <strong>%d site change</strong> waiting to be saved.',
+											'There are <strong>%d site changes</strong> waiting to be saved.',
+											dirtyEntityRecords.length
+										),
 										dirtyEntityRecords.length
 									),
-									dirtyEntityRecords.length
-								),
-								{ strong: <strong /> }
-						  )
-						: selectItemsToSaveDescription }
-				</p>
+									{ strong: <strong /> }
+							  )
+							: selectItemsToSaveDescription }
+					</p>
+				</div>
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {
@@ -198,6 +228,16 @@ export function EntitiesSavedStatesExtensible( {
 					/>
 				);
 			} ) }
+
+			{ isInline && (
+				<Flex
+					direction="row"
+					justify="flex-end"
+					className="entities-saved-states__panel-footer"
+				>
+					{ actionButtons }
+				</Flex>
+			) }
 		</div>
 	);
 }

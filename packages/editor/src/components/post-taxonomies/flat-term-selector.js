@@ -100,10 +100,10 @@ export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getEntityRecords, getTaxonomy, hasFinishedResolution } =
+			const { getEntityRecords, getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const post = getCurrentPost();
-			const _taxonomy = getTaxonomy( slug );
+			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const _termIds = _taxonomy
 				? getEditedPostAttribute( _taxonomy.rest_base )
 				: EMPTY_ARRAY;

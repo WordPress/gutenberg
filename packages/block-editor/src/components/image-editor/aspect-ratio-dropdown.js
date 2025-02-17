@@ -93,7 +93,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							{
 								slug: 'original',
 								name: __( 'Original' ),
-								aspect: defaultAspect,
+								ratio: defaultAspect,
 							},
 							...( showDefaultRatios
 								? defaultRatios

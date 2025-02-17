@@ -125,6 +125,7 @@ function PostFeaturedImage( {
 				noticeOperations.removeAllNotices();
 				noticeOperations.createErrorNotice( message );
 			},
+			multiple: false,
 		} );
 	}
 
@@ -345,6 +346,7 @@ const applyWithDispatch = withDispatch(
 							noticeOperations.removeAllNotices();
 							noticeOperations.createErrorNotice( message );
 						},
+						multiple: false,
 					} );
 			},
 			onRemoveImage() {

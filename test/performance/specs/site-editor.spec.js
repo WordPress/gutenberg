@@ -62,12 +62,14 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.setRenderingMode( 'post-only' );
-			await perfUtils.loadBlocksForLargePost();
+		test( 'Setup the test page', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		const samples = 10;
@@ -121,13 +123,15 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Typing', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.setRenderingMode( 'post-only' );
-			await perfUtils.loadBlocksForLargePost();
-			await editor.insertBlock( { name: 'core/paragraph' } );
+		test( 'Setup the test post', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content:
+					content + `<!-- wp:paragraph --><!-- /wp:paragraph -->`,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {

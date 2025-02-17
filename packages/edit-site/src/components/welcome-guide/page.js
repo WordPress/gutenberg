@@ -57,6 +57,7 @@ export default function WelcomeGuidePage() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
+									// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 									'It’s now possible to edit page content in the site editor. To customise other parts of the page like the header and footer switch to editing the template using the settings sidebar.'
 								) }
 							</p>

@@ -127,7 +127,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
 			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
@@ -135,7 +135,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
 			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
 			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
 		} );
 
 		test.each( [
@@ -186,7 +185,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -231,7 +229,7 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
 			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
@@ -239,7 +237,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
 			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
 			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
 		} );
 
 		test.each( [
@@ -327,7 +324,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -521,24 +517,6 @@ describe( 'FontSizePicker', () => {
 				).not.toBeInTheDocument();
 			}
 		);
-	}
-
-	function commonSelectTests( fontSizes: FontSize[] ) {
-		it( 'shows custom input when Custom is selected', async () => {
-			const user = userEvent.setup();
-			const onChange = jest.fn();
-			await render(
-				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
-			);
-			await user.click(
-				screen.getByRole( 'combobox', { name: 'Font size' } )
-			);
-			await user.click(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
-			expect( onChange ).not.toHaveBeenCalled();
-		} );
 	}
 
 	function commonTests( fontSizes: FontSize[] ) {

@@ -100,6 +100,10 @@
 .wp-block-social-links .block-list-appender {
 	position: static; // display inline.
 
+	.block-editor-inserter {
+		font-size: inherit;
+	}
+
 	.block-editor-button-block-appender {
 		height: 1.5em;
 		width: 1.5em;

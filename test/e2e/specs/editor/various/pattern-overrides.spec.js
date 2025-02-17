@@ -40,16 +40,16 @@ test.describe( 'Pattern Overrides', () => {
 
 			await page
 				.getByRole( 'region', { name: 'Patterns content' } )
-				.getByRole( 'button', { name: 'add new pattern' } )
+				.getByRole( 'button', { name: 'add pattern' } )
 				.click();
 
 			await page
-				.getByRole( 'menu', { name: 'add new pattern' } )
-				.getByRole( 'menuitem', { name: 'add new pattern' } )
+				.getByRole( 'menu', { name: 'add pattern' } )
+				.getByRole( 'menuitem', { name: 'add pattern' } )
 				.click();
 
 			const createPatternDialog = page.getByRole( 'dialog', {
-				name: 'add new pattern',
+				name: 'add pattern',
 			} );
 			await createPatternDialog
 				.getByRole( 'textbox', { name: 'Name' } )

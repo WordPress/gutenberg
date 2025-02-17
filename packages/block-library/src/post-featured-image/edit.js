@@ -27,6 +27,8 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -40,12 +42,37 @@ import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
-function getMediaSourceUrlBySizeSlug( media, slug ) {
+function FeaturedImageResolutionTool( { image, value, onChange } ) {
+	const { imageSizes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			imageSizes: getSettings().imageSizes,
+		};
+	}, [] );
+
+	if ( ! imageSizes?.length ) {
+		return null;
+	}
+
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+
 	return (
-		media?.media_details?.sizes?.[ slug ]?.source_url || media?.source_url
+		<ResolutionTool
+			value={ value }
+			defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+			options={ imageSizeOptions }
+			onChange={ onChange }
+		/>
 	);
 }
 
@@ -125,7 +152,9 @@ export default function PostFeaturedImageEdit( {
 		[ featuredImage, postTypeSlug, postId ]
 	);
 
-	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
+	const mediaUrl =
+		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
+		media?.source_url;
 
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
@@ -291,6 +320,13 @@ export default function PostFeaturedImageEdit( {
 							/>
 						</ToolsPanelItem>
 					) }
+					<FeaturedImageResolutionTool
+						image={ media }
+						value={ sizeSlug }
+						onChange={ ( nextSizeSlug ) =>
+							setAttributes( { sizeSlug: nextSizeSlug } )
+						}
+					/>
 				</ToolsPanel>
 			</InspectorControls>
 		</>

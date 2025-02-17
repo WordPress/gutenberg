@@ -196,4 +196,18 @@ describe( 'uploadMedia', () => {
 		);
 		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
+
+	it( 'should throw error when multiple files are selected in single file upload mode', async () => {
+		const onError = jest.fn();
+		await uploadMedia( {
+			filesList: [ imageFile, xmlFile ],
+			onError,
+			multiple: false,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith(
+			new Error( 'Only one file can be used here.' )
+		);
+		expect( uploadToServer ).not.toHaveBeenCalled();
+	} );
 } );

@@ -262,6 +262,10 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 }
 
+.edit-site-layout__area__404 {
+	margin: $canvas-padding;
+}
+
 .edit-site .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;

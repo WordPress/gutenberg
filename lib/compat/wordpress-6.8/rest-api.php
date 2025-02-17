@@ -80,7 +80,7 @@ add_filter( 'rest_index', 'gutenberg_add_default_template_types_to_index' );
  * @param WP_Post_Type $post_type    Post type object.
  * @return array
  */
-function gutenberg_modify_post_collection_paramt( $query_params, WP_Post_Type $post_type ) {
+function gutenberg_modify_post_collection_param( $query_params, WP_Post_Type $post_type ) {
 	if ( 'post' === $post_type->name && ! isset( $query_params['ignore_sticky'] ) ) {
 		$query_params['ignore_sticky'] = array(
 			'description' => __( 'Whether to ignore sticky posts or not.' ),
@@ -91,7 +91,7 @@ function gutenberg_modify_post_collection_paramt( $query_params, WP_Post_Type $p
 
 	return $query_params;
 }
-add_filter( 'rest_post_collection_params', 'gutenberg_modify_post_collection_paramt', 10, 2 );
+add_filter( 'rest_post_collection_params', 'gutenberg_modify_post_collection_param', 10, 2 );
 
 /**
  * Modify posts query based on `ignore_sticky` parameter.

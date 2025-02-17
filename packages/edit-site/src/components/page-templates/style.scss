@@ -23,6 +23,8 @@
 		position: relative;
 		width: 120px;
 		max-height: 160px;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
 
 		&::after {
 			content: "";
