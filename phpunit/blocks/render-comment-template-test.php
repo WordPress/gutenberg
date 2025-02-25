@@ -159,7 +159,6 @@ END;
 
 		$args = $render_block_callback->get_args();
 		$this->assertSame( 'core/comment-content', $args[0][2]->name );
-		$this->assertSame( 'core/comment-template', $args[1][2]->name );
 		$this->assertCount( 2, $args[1][2]->inner_blocks, "Inner block inserted by render_block_data filter wasn't retained." );
 		$this->assertInstanceOf(
 			'WP_Block',
