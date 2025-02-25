@@ -36,6 +36,9 @@
 		}
 	},
 	"supports": {
+		"layout": {
+			"allowEditing": false
+		},
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -84,8 +87,10 @@
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"margin": false,
-				"padding": false
-			}
+				"padding": false,
+				"blockGap": true
+			},
+			"blockGap": true
 		},
 		"shadow": true,
 		"__unstablePasteTextInline": true,
@@ -96,6 +101,7 @@
 		},
 		"listView": true
 	},
+
 	"selectors": {
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list)",
 		"dimensions": ".wp-block-list:not(.wp-block-list .wp-block-list)",
