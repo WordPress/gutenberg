@@ -51,7 +51,7 @@ function block_core_comment_template_render_comments( $comments, $block ) {
 		$block_instance['blockName'] = 'core/null';
 
 		/*
-		 * We construct a new WP_Block instance from the parsed block so that
+		 * We construct a new WP_Block instance from the block instance so that
 		 * it'll receive any changes made by the `render_block_data` filter.
 		 */
 		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
