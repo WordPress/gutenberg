@@ -16,12 +16,15 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	background: #333;
 	aspect-ratio: 1 / 1;
 
 	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
 	}
+}
+
+.edit-site-site-icon__image_background {
+	background: #333;
 }
 
 .edit-site-editor__view-mode-toggle button:focus {

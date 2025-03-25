@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { store as coreDataStore } from '@wordpress/core-data';
 
-function SiteIcon( { className } ) {
+function SiteIcon( { className, style } ) {
 	const { isRequestingSite, siteIconUrl } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreDataStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
@@ -29,7 +29,10 @@ function SiteIcon( { className } ) {
 
 	const icon = siteIconUrl ? (
 		<img
-			className="edit-site-site-icon__image"
+			className={ clsx(
+				'edit-site-site-icon__image',
+				! style?.background && 'edit-site-site-icon__image_background'
+			) }
 			alt={ __( 'Site Icon' ) }
 			src={ siteIconUrl }
 		/>
@@ -42,7 +45,10 @@ function SiteIcon( { className } ) {
 	);
 
 	return (
-		<div className={ clsx( className, 'edit-site-site-icon' ) }>
+		<div
+			className={ clsx( className, 'edit-site-site-icon' ) }
+			style={ style }
+		>
 			{ icon }
 		</div>
 	);
