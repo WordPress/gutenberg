@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Notice`: Fix notice component spacing issue. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+
 ## 30.9.0 (2025-11-26)
 
 ### Bug Fixes
@@ -20,7 +24,6 @@
 -   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
 -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
 -   `Modal`: Fix full-screen modal height to allow contents to scroll properly ([#73150](https://github.com/WordPress/gutenberg/pull/73150)).
-
 
 ### Internal
 
