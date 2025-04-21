@@ -17,6 +17,7 @@ jest.mock( 'fs', () => ( {
 		stat: jest.fn().mockResolvedValue( true ),
 		mkdir: jest.fn(),
 		writeFile: jest.fn(),
+		access: jest.fn().mockRejectedValue( { code: 'ENOENT' } ),
 	},
 } ) );
 
