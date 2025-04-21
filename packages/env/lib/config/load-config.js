@@ -76,7 +76,7 @@ module.exports = async function loadConfig(
 
 	// Descriptive cache directory name
 	const directory = path.dirname( configFilePath ).replace( /^.*[\\/]/, '' );
-	const verboseCacheDirectoryPath = path.resolve(
+	const descriptiveCacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
 		'wp-env-' + directory + '-' + md5( configFilePath )
 	);
@@ -84,7 +84,7 @@ module.exports = async function loadConfig(
 	// If cache doesn't exist, create with new name
 	const cacheDirectoryPath = existsSync( md5CacheDirectoryPath )
 		? md5CacheDirectoryPath
-		: verboseCacheDirectoryPath;
+		: descriptiveCacheDirectoryPath;
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
