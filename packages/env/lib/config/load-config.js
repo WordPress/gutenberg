@@ -3,7 +3,7 @@
  * External dependencies
  */
 const path = require( 'path' );
-const fs = require( 'fs' ).promises;
+const { existsSync, promises: fsPromises } = require( 'fs' );
 
 /**
  * Internal dependencies
@@ -82,10 +82,9 @@ module.exports = async function loadConfig(
 	);
 
 	// If cache doesn't exist, create with new name
-	const cacheDirectoryPath = await fs
-		.access( md5CacheDirectoryPath )
-		.then( () => md5CacheDirectoryPath )
-		.catch( () => verboseCacheDirectoryPath );
+	const cacheDirectoryPath = existsSync( md5CacheDirectoryPath )
+		? md5CacheDirectoryPath
+		: verboseCacheDirectoryPath;
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
@@ -148,7 +147,7 @@ module.exports = async function loadConfig(
 async function hasLocalConfig( configFilePaths ) {
 	for ( const filePath of configFilePaths ) {
 		try {
-			await fs.stat( filePath );
+			await fsPromises.stat( filePath );
 			return true;
 		} catch {}
 	}

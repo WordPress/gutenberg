@@ -17,8 +17,8 @@ jest.mock( 'fs', () => ( {
 		stat: jest.fn().mockResolvedValue( true ),
 		mkdir: jest.fn(),
 		writeFile: jest.fn(),
-		access: jest.fn().mockRejectedValue( { code: 'ENOENT' } ),
 	},
+	existsSync: jest.fn().mockReturnValue( false ),
 } ) );
 
 // This mocks a small response with a format matching the stable-check API.
