@@ -10,13 +10,13 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressComponent, WordPressComponentProps } from '../context';
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 
 export { useBaseControlProps } from './hooks';
 
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressComponentProps< BaseControlProps, null, false >
 ) => {
 	const {
 		id,
@@ -84,6 +84,17 @@ const UnforwardedVisualLabel = (
 
 export const VisualLabel = forwardRef( UnforwardedVisualLabel );
 
+// `BaseControl` renders its own wrapper and doesn't forward props to an
+// underlying element, so the connected component is typed explicitly. Without
+// it, the non-polymorphic flag can't be recovered from a props type built with
+// a `null` element type, and the unsupported `as` prop leaks back into the
+// public type.
+const ConnectedBaseControl: WordPressComponent<
+	null,
+	BaseControlProps,
+	false
+> = contextConnectWithoutRef( UnconnectedBaseControl, 'BaseControl' );
+
 /**
  * `BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
  *
@@ -108,7 +119,7 @@ export const VisualLabel = forwardRef( UnforwardedVisualLabel );
  * ```
  */
 export const BaseControl = Object.assign(
-	contextConnectWithoutRef( UnconnectedBaseControl, 'BaseControl' ),
+	ConnectedBaseControl,
 
 	{
 		/**
