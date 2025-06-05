@@ -30,7 +30,7 @@ declare global {
 	}
 }
 
-interface SyncAwareFunction extends Function {
+export interface SyncAwareFunction extends Function {
 	sync?: boolean;
 }
 
