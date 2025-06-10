@@ -214,18 +214,24 @@ Returns the ID of the post currently being edited, or null if the post has not y
 
 _Usage_
 
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 
-function MyComponent() {
-const postId = useSelect( ( select ) => {
-return select( 'core/editor' ).getCurrentPostId();
-}, \[] );
+const ExampleComponent = () => {
+	const postId = useSelect(
+		( select ) => select( editorStore ).getCurrentPostId(),
+		[]
+	);
 
-if ( postId !== null ) {
-return <div>Editing post with ID: { postId }</div>;
-}
-return <div>Creating new post</div>;
-}
+	return postId !== null ? (
+		<p>{ __( 'Current post ID: ' ) + postId }</p>
+	) : (
+		<p>{ __( 'No current post ID found.' ) }</p>
+	);
+};
+```
 
 _Parameters_
 
