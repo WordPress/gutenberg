@@ -212,6 +212,21 @@ _Returns_
 
 Returns the ID of the post currently being edited, or null if the post has not yet been saved.
 
+_Usage_
+
+import { useSelect } from '@wordpress/data';
+
+function MyComponent() {
+const postId = useSelect( ( select ) => {
+return select( 'core/editor' ).getCurrentPostId();
+}, \[] );
+
+if ( postId !== null ) {
+return <div>Editing post with ID: { postId }</div>;
+}
+return <div>Creating new post</div>;
+}
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
