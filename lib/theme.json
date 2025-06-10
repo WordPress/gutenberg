@@ -395,6 +395,30 @@
 					"width": "0"
 				}
 			},
+			"textInput": {
+				"border": {
+					"width": "1px",
+					"style": "solid"
+				},
+				"typography": {
+					"lineHeight": "2",
+					"fontSize": "1em"
+				},
+				"dimensions": {
+					"minHeight": "2em"
+				},
+				"spacing": {
+					"margin": {
+						"bottom": "0.5em"
+					},
+					"padding": {
+						"top": "0",
+						"right": "0.5em",
+						"bottom": "0",
+						"left": "0.5em"
+					}
+				}
+			},
 			"link": {
 				"typography": {
 					"textDecoration": "underline"

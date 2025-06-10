@@ -43,6 +43,13 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	// Note: radio inputs aren't implemented yet.
 	const isCheckboxOrRadio = type === 'checkbox' || type === 'radio';
+	const isTextInput =
+		type === 'textarea' ||
+		type === 'text' ||
+		type === 'email' ||
+		type === 'url' ||
+		type === 'number' ||
+		type === 'tel';
 
 	const controls = (
 		<>
@@ -170,6 +177,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					className={ clsx(
 						className,
 						'wp-block-form-input__input',
+						isTextInput && 'wp-element-text-input',
 						colorProps.className,
 						borderProps.className
 					) }

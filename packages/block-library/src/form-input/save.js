@@ -46,8 +46,17 @@ export default function save( { attributes } ) {
 		...colorProps.style,
 	};
 
+	const isTextInput =
+		type === 'textarea' ||
+		type === 'text' ||
+		type === 'email' ||
+		type === 'url' ||
+		type === 'number' ||
+		type === 'tel';
+
 	const inputClasses = clsx(
 		'wp-block-form-input__input',
+		isTextInput && 'wp-element-text-input',
 		colorProps.className,
 		borderProps.className
 	);

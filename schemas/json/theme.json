@@ -1839,6 +1839,9 @@
 				},
 				"select": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"textInput": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
 			"additionalProperties": false
