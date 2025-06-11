@@ -365,6 +365,20 @@
 						}
 					}
 				}
+			},
+			"core/post-comments-form": {
+				"elements": {
+					"textInput": {
+						"spacing": {
+							"padding": {
+								"top": "calc(0.667em + 2px)",
+								"right": "calc(0.667em + 2px)",
+								"bottom": "calc(0.667em + 2px)",
+								"left": "calc(0.667em + 2px)"
+							}
+						}
+					}
+				}
 			}
 		},
 		"elements": {
