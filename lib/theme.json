@@ -366,6 +366,7 @@
 					}
 				}
 			},
+
 			"core/post-comments-form": {
 				"elements": {
 					"textInput": {
@@ -375,6 +376,20 @@
 								"right": "calc(0.667em + 2px)",
 								"bottom": "calc(0.667em + 2px)",
 								"left": "calc(0.667em + 2px)"
+							}
+						}
+					}
+				}
+			},
+			"core/search": {
+				"elements": {
+					"textInput": {
+						"spacing": {
+							"padding": {
+								"top": "8px",
+								"right": "8px",
+								"bottom": "8px",
+								"left": "8px"
 							}
 						}
 					}
