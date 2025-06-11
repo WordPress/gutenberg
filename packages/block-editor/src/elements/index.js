@@ -1,7 +1,6 @@
 const ELEMENT_CLASS_NAMES = {
 	button: 'wp-element-button',
 	caption: 'wp-element-caption',
-	textInput: 'wp-element-text-input',
 };
 
 export const __experimentalGetElementClassName = ( element ) => {

@@ -42,7 +42,6 @@ import { unlock } from '../../lock-unlock';
 const ELEMENT_CLASS_NAMES = {
 	button: 'wp-element-button',
 	caption: 'wp-element-caption',
-	textInput: 'wp-element-text-input',
 };
 
 // List of block support features that can have their related styles
