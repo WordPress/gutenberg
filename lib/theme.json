@@ -412,7 +412,8 @@
 			"textInput": {
 				"border": {
 					"width": "1px",
-					"style": "solid"
+					"style": "solid",
+					"color": "#949494"
 				},
 				"typography": {
 					"lineHeight": "2",
