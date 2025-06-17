@@ -254,8 +254,10 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$processor->set_attribute( 'data-wp-on-window--resize', 'callbacks.setButtonStyles' );
 
 	// Set an event to prefetch the image on pointerenter and pointerdown(mobile).
-	$processor->set_attribute( 'data-wp-on--pointerenter', 'actions.prefetchImage' );
+	$processor->set_attribute( 'data-wp-on--pointerenter', 'actions.prefetchImageWithDelay' );
 	$processor->set_attribute( 'data-wp-on--pointerdown', 'actions.prefetchImage' );
+	$processor->set_attribute( 'data-wp-on--pointerleave', 'actions.cancelPrefetch' );
+
 	// Sets an event callback on the `img` because the `figure` element can also
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.

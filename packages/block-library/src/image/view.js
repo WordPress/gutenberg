@@ -6,6 +6,7 @@ import {
 	getContext,
 	getElement,
 	withSyncEvent,
+	withScope,
 } from '@wordpress/interactivity';
 
 /**
@@ -50,6 +51,7 @@ const { state, actions, callbacks } = store(
 	{
 		state: {
 			currentImageId: null,
+			prefetchTimers: {},
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
@@ -209,19 +211,42 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			prefetchImage() {
-				const ctx = getContext();
-				if ( ! isValidLink( ctx.uploadedSrc ) ) {
+				const { imageId } = getContext();
+				const uploadedSrc = state.metadata[ imageId ].uploadedSrc;
+
+				if ( ! isValidLink( uploadedSrc ) ) {
 					return;
 				}
 
-				// Creates a link element to prefetch the image.
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'prefetch';
 				imageLink.as = 'image';
-				imageLink.href = ctx.uploadedSrc;
+				imageLink.href = uploadedSrc;
 
-				// Appends the link element to the head of the document to start the prefetch.
+				// Appends the link element to start the prefetch.
 				document.head.appendChild( imageLink );
+			},
+			prefetchImageWithDelay() {
+				const { imageId } = getContext();
+
+				if ( state.prefetchTimers && state.prefetchTimers[ imageId ] ) {
+					clearTimeout( state.prefetchTimers[ imageId ] );
+				}
+
+				state.prefetchTimers[ imageId ] = setTimeout(
+					withScope( () => {
+						actions.prefetchImage();
+						delete state.prefetchTimers[ imageId ];
+					} ),
+					200
+				);
+			},
+			cancelPrefetch() {
+				const { imageId } = getContext();
+				if ( state.prefetchTimers && state.prefetchTimers[ imageId ] ) {
+					clearTimeout( state.prefetchTimers[ imageId ] );
+					delete state.prefetchTimers[ imageId ];
+				}
 			},
 		},
 		callbacks: {
