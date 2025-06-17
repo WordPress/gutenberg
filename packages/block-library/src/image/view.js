@@ -223,7 +223,6 @@ const { state, actions, callbacks } = store(
 				imageLink.as = 'image';
 				imageLink.href = uploadedSrc;
 
-				// Appends the link element to start the prefetch.
 				document.head.appendChild( imageLink );
 			},
 			prefetchImageWithDelay() {
