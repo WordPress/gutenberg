@@ -215,6 +215,7 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 				const uploadedSrc = state.metadata[ imageId ].uploadedSrc;
 
+				// Bails if the image is not valid or if it has already been prefetched.
 				if (
 					! isValidLink( uploadedSrc ) ||
 					state.prefetchedImageIds.has( imageId )
@@ -233,10 +234,12 @@ const { state, actions, callbacks } = store(
 			prefetchImageWithDelay() {
 				const { imageId } = getContext();
 
+				// Cancels any previous prefetch timer for the same image.
 				if ( state.prefetchTimers && state.prefetchTimers[ imageId ] ) {
 					clearTimeout( state.prefetchTimers[ imageId ] );
 				}
 
+				// Set a new timer to prefetch the image after a short delay.
 				state.prefetchTimers[ imageId ] = setTimeout(
 					withScope( () => {
 						actions.prefetchImage();
