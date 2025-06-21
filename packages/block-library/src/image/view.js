@@ -52,6 +52,7 @@ const { state, actions, callbacks } = store(
 		state: {
 			currentImageId: null,
 			prefetchTimers: {},
+			prefetchedImageIds: new Set(),
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
@@ -214,7 +215,10 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 				const uploadedSrc = state.metadata[ imageId ].uploadedSrc;
 
-				if ( ! isValidLink( uploadedSrc ) ) {
+				if (
+					! isValidLink( uploadedSrc ) ||
+					state.prefetchedImageIds.has( imageId )
+				) {
 					return;
 				}
 
@@ -224,6 +228,7 @@ const { state, actions, callbacks } = store(
 				imageLink.href = uploadedSrc;
 
 				document.head.appendChild( imageLink );
+				state.prefetchedImageIds.add( imageId );
 			},
 			prefetchImageWithDelay() {
 				const { imageId } = getContext();
