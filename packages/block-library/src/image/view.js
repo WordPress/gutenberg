@@ -71,6 +71,12 @@ const { state, actions, callbacks } = store(
 					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 				);
 			},
+			get enlargedSrcset() {
+				return state.currentImage.lightboxSrcset || '';
+			},
+			get enlargedSizes() {
+				return state.currentImage.lightboxSizes || '100vw';
+			},
 			get figureStyles() {
 				return (
 					state.overlayOpened &&
@@ -213,7 +219,8 @@ const { state, actions, callbacks } = store(
 			},
 			prefetchImage() {
 				const { imageId } = getContext();
-				const uploadedSrc = state.metadata[ imageId ].uploadedSrc;
+				const imageMetadata = state.metadata[ imageId ];
+				const uploadedSrc = imageMetadata.uploadedSrc;
 
 				// Bails if the image is not valid or if it has already been prefetched.
 				if (
@@ -223,10 +230,19 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// Get the original img element's srcset
+				const srcset = imageMetadata.lightboxSrcset;
+
 				const imageLink = document.createElement( 'link' );
-				imageLink.rel = 'prefetch';
+				imageLink.rel = 'preload';
 				imageLink.as = 'image';
 				imageLink.href = uploadedSrc;
+
+				// Apply srcset if available for better responsive prefetching
+				if ( srcset ) {
+					imageLink.setAttribute( 'imagesrcset', srcset );
+					imageLink.setAttribute( 'imagesizes', '100vw' );
+				}
 
 				document.head.appendChild( imageLink );
 				state.prefetchedImageIds.add( imageId );
