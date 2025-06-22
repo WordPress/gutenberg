@@ -51,8 +51,8 @@ const { state, actions, callbacks } = store(
 	{
 		state: {
 			currentImageId: null,
-			prefetchTimers: {},
-			prefetchedImageIds: new Set(),
+			preloadTimers: {},
+			preloadedImageIds: new Set(),
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
@@ -217,15 +217,15 @@ const { state, actions, callbacks } = store(
 					}
 				}
 			},
-			prefetchImage() {
+			preloadImage() {
 				const { imageId } = getContext();
 				const imageMetadata = state.metadata[ imageId ];
 				const uploadedSrc = imageMetadata.uploadedSrc;
 
-				// Bails if the image is not valid or if it has already been prefetched.
+				// Bails if the image is not valid or if it has already been preloaded.
 				if (
 					! isValidLink( uploadedSrc ) ||
-					state.prefetchedImageIds.has( imageId )
+					state.preloadedImageIds.has( imageId )
 				) {
 					return;
 				}
@@ -238,37 +238,37 @@ const { state, actions, callbacks } = store(
 				imageLink.as = 'image';
 				imageLink.href = uploadedSrc;
 
-				// Apply srcset if available for better responsive prefetching
+				// Apply srcset if available for better responsive preloading
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
 					imageLink.setAttribute( 'imagesizes', '100vw' );
 				}
 
 				document.head.appendChild( imageLink );
-				state.prefetchedImageIds.add( imageId );
+				state.preloadedImageIds.add( imageId );
 			},
-			prefetchImageWithDelay() {
+			preloadImageWithDelay() {
 				const { imageId } = getContext();
 
-				// Cancels any previous prefetch timer for the same image.
-				if ( state.prefetchTimers && state.prefetchTimers[ imageId ] ) {
-					clearTimeout( state.prefetchTimers[ imageId ] );
+				// Cancels any previous preload timer for the same image.
+				if ( state.preloadTimers && state.preloadTimers[ imageId ] ) {
+					clearTimeout( state.preloadTimers[ imageId ] );
 				}
 
-				// Set a new timer to prefetch the image after a short delay.
-				state.prefetchTimers[ imageId ] = setTimeout(
+				// Set a new timer to preload the image after a short delay.
+				state.preloadTimers[ imageId ] = setTimeout(
 					withScope( () => {
-						actions.prefetchImage();
-						delete state.prefetchTimers[ imageId ];
+						actions.preloadImage();
+						delete state.preloadTimers[ imageId ];
 					} ),
 					200
 				);
 			},
 			cancelPrefetch() {
 				const { imageId } = getContext();
-				if ( state.prefetchTimers && state.prefetchTimers[ imageId ] ) {
-					clearTimeout( state.prefetchTimers[ imageId ] );
-					delete state.prefetchTimers[ imageId ];
+				if ( state.preloadTimers && state.preloadTimers[ imageId ] ) {
+					clearTimeout( state.preloadTimers[ imageId ] );
+					delete state.preloadTimers[ imageId ];
 				}
 			},
 		},
