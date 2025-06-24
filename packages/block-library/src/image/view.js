@@ -203,8 +203,6 @@ const { state, actions, callbacks } = store(
 			},
 			preloadImage() {
 				const { imageId } = getContext();
-				const imageMetadata = state.metadata[ imageId ];
-				const uploadedSrc = imageMetadata.uploadedSrc;
 
 				// Bails if it has already been preloaded. This could help
 				// prevent unnecessary preloading of the same image multiple times,
@@ -213,10 +211,12 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// Link element to preload the image.
+				const imageMetadata = state.metadata[ imageId ];
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
-				imageLink.href = uploadedSrc;
+				imageLink.href = imageMetadata.uploadedSrc;
 
 				// Apply srcset if available for responsive preloading
 				const srcset = imageMetadata.lightboxSrcset;
