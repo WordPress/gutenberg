@@ -206,15 +206,13 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				// Get the original img element's srcset
-				const srcset = imageMetadata.lightboxSrcset;
-
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
 				imageLink.href = uploadedSrc;
 
-				// Apply srcset if available for better responsive preloading
+				// Apply srcset if available for responsive preloading
+				const srcset = imageMetadata.lightboxSrcset;
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
 					imageLink.setAttribute( 'imagesizes', '100vw' );
