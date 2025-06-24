@@ -201,7 +201,9 @@ const { state, actions, callbacks } = store(
 				const imageMetadata = state.metadata[ imageId ];
 				const uploadedSrc = imageMetadata.uploadedSrc;
 
-				// Bails if it has already been preloaded.
+				// Bails if it has already been preloaded. This could help
+				// prevent unnecessary preloading of the same image multiple times,
+				// leading to duplicate link elements in the document head.
 				if ( state.preloadedImageIds.has( imageId ) ) {
 					return;
 				}
