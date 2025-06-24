@@ -10,6 +10,11 @@ import {
 } from '@wordpress/interactivity';
 
 /**
+ * Internal dependencies
+ */
+import { IMAGE_PRELOAD_DELAY } from './constants';
+
+/**
  * Tracks whether user is touching screen; used to differentiate behavior for
  * touch and mouse input.
  *
@@ -30,7 +35,7 @@ const { state, actions, callbacks } = store(
 	{
 		state: {
 			currentImageId: null,
-			preloadTimers: {},
+			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
@@ -227,24 +232,25 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 
 				// Cancels any previous preload timer for the same image.
-				if ( state.preloadTimers && state.preloadTimers[ imageId ] ) {
-					clearTimeout( state.preloadTimers[ imageId ] );
+				if ( state.preloadTimers.has( imageId ) ) {
+					clearTimeout( state.preloadTimers.get( imageId ) );
 				}
 
 				// Set a new timer to preload the image after a short delay.
-				state.preloadTimers[ imageId ] = setTimeout(
+				const timerId = setTimeout(
 					withScope( () => {
 						actions.preloadImage();
-						delete state.preloadTimers[ imageId ];
+						state.preloadTimers.delete( imageId );
 					} ),
-					200
+					IMAGE_PRELOAD_DELAY
 				);
+				state.preloadTimers.set( imageId, timerId );
 			},
 			cancelPrefetch() {
 				const { imageId } = getContext();
-				if ( state.preloadTimers && state.preloadTimers[ imageId ] ) {
-					clearTimeout( state.preloadTimers[ imageId ] );
-					delete state.preloadTimers[ imageId ];
+				if ( state.preloadTimers.has( imageId ) ) {
+					clearTimeout( state.preloadTimers.get( imageId ) );
+					state.preloadTimers.delete( imageId );
 				}
 			},
 		},
