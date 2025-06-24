@@ -25,27 +25,6 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
-/**
- * Checks if the given url is a valid.
- *
- * @param {string} url The url to check.
- */
-const isValidLink = ( url ) => {
-	try {
-		const imageUrl = new URL( url );
-		if (
-			imageUrl.origin !== window.location.origin &&
-			! imageUrl.pathname.startsWith( '/wp-admin' ) &&
-			! imageUrl.pathname.startsWith( '/wp-login.php' )
-		) {
-			return false;
-		}
-		return true;
-	} catch {
-		return false;
-	}
-};
-
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -222,11 +201,8 @@ const { state, actions, callbacks } = store(
 				const imageMetadata = state.metadata[ imageId ];
 				const uploadedSrc = imageMetadata.uploadedSrc;
 
-				// Bails if the image is not valid or if it has already been preloaded.
-				if (
-					! isValidLink( uploadedSrc ) ||
-					state.preloadedImageIds.has( imageId )
-				) {
+				// Bails if it has already been preloaded.
+				if ( state.preloadedImageIds.has( imageId ) ) {
 					return;
 				}
 
