@@ -222,7 +222,10 @@ const { state, actions, callbacks } = store(
 				const srcset = imageMetadata.lightboxSrcset;
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
-					imageLink.setAttribute( 'imagesizes', '100vw' );
+					imageLink.setAttribute(
+						'imagesizes',
+						imageMetadata.lightboxSizes || '100vw'
+					);
 				}
 
 				document.head.appendChild( imageLink );
