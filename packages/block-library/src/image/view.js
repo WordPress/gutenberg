@@ -30,6 +30,39 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+/**
+ * Returns the appropriate src URL for an image
+ *
+ * @param {Object} imageMetadata Image metadata object
+ * @return {string} The source URL
+ */
+function getImageSrc( imageMetadata ) {
+	return (
+		imageMetadata.uploadedSrc ||
+		'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+	);
+}
+
+/**
+ * Returns the appropriate srcset for an image
+ *
+ * @param {Object} imageMetadata Image metadata object
+ * @return {string} The srcset value
+ */
+function getImageSrcset( imageMetadata ) {
+	return imageMetadata.lightboxSrcset || '';
+}
+
+/**
+ * Returns the appropriate sizes attribute for an image
+ *
+ * @param {Object} imageMetadata Image metadata object
+ * @return {string} The sizes value, defaulting to 100vw
+ */
+function getImageSizes( imageMetadata ) {
+	return imageMetadata.lightboxSizes || '100vw';
+}
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -50,16 +83,13 @@ const { state, actions, callbacks } = store(
 				return state.overlayOpened ? 'true' : null;
 			},
 			get enlargedSrc() {
-				return (
-					state.currentImage.uploadedSrc ||
-					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
-				);
+				return getImageSrc( state.currentImage );
 			},
 			get enlargedSrcset() {
-				return state.currentImage.lightboxSrcset || '';
+				return getImageSrcset( state.currentImage );
 			},
 			get enlargedSizes() {
-				return state.currentImage.lightboxSizes || '100vw';
+				return getImageSizes( state.currentImage );
 			},
 			get figureStyles() {
 				return (
@@ -216,15 +246,15 @@ const { state, actions, callbacks } = store(
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
-				imageLink.href = imageMetadata.uploadedSrc;
+				imageLink.href = getImageSrc( imageMetadata );
 
 				// Apply srcset if available for responsive preloading
-				const srcset = imageMetadata.lightboxSrcset;
+				const srcset = getImageSrcset( imageMetadata );
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
 					imageLink.setAttribute(
 						'imagesizes',
-						imageMetadata.lightboxSizes || '100vw'
+						getImageSizes( imageMetadata )
 					);
 				}
 
