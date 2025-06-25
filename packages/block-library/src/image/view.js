@@ -211,28 +211,22 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				// Sets the current image ID to preload.
-				state.currentImageId = imageId;
-
-				// Create link element to preload the image.
+				// Link element to preload the image.
+				const imageMetadata = state.metadata[ imageId ];
 				const imageLink = document.createElement( 'link' );
 				imageLink.rel = 'preload';
 				imageLink.as = 'image';
-				imageLink.href = state.enlargedSrc;
+				imageLink.href = imageMetadata.uploadedSrc;
 
-				// Apply srcset if available for responsive preloading.
-				const srcset = state.enlargedSrcset;
+				// Apply srcset if available for responsive preloading
+				const srcset = imageMetadata.lightboxSrcset;
 				if ( srcset ) {
 					imageLink.setAttribute( 'imagesrcset', srcset );
-					imageLink.setAttribute( 'imagesizes', state.enlargedSizes );
+					imageLink.setAttribute( 'imagesizes', '100vw' );
 				}
 
-				// Append the link element to the document head to trigger preloading.
 				document.head.appendChild( imageLink );
 				state.preloadedImageIds.add( imageId );
-
-				// Reset state after preloading the image.
-				state.currentImageId = null;
 			},
 			preloadImageWithDelay() {
 				const { imageId } = getContext();
