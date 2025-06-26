@@ -31,36 +31,36 @@ let isTouching = false;
 let lastTouchTime = 0;
 
 /**
- * Returns the appropriate src URL for an image
+ * Returns the appropriate src URL for an image.
  *
- * @param {Object} imageMetadata Image metadata object
- * @return {string} The source URL
+ * @param {string} uploadedSrc - Full size image src.
+ * @return {string} The source URL.
  */
-function getImageSrc( imageMetadata ) {
+function getImageSrc( { uploadedSrc } ) {
 	return (
-		imageMetadata.uploadedSrc ||
+		uploadedSrc ||
 		'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 	);
 }
 
 /**
- * Returns the appropriate srcset for an image
+ * Returns the appropriate srcset for an image.
  *
- * @param {Object} imageMetadata Image metadata object
- * @return {string} The srcset value
+ * @param {string} lightboxSrcset - Image srcset.
+ * @return {string} The srcset value.
  */
-function getImageSrcset( imageMetadata ) {
-	return imageMetadata.lightboxSrcset || '';
+function getImageSrcset( { lightboxSrcset } ) {
+	return lightboxSrcset || '';
 }
 
 /**
- * Returns the appropriate sizes attribute for an image
+ * Returns the appropriate sizes attribute for an image.
  *
- * @param {Object} imageMetadata Image metadata object
- * @return {string} The sizes value, defaulting to 100vw
+ * @param {string} lightboxSizes - Image responsive sizes attribute.
+ * @return {string} The sizes value, defaulting to 100vw.
  */
-function getImageSizes( imageMetadata ) {
-	return imageMetadata.lightboxSizes || '100vw';
+function getImageSizes( { lightboxSizes } ) {
+	return lightboxSizes || '100vw';
 }
 
 const { state, actions, callbacks } = store(
