@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
@@ -36,7 +41,8 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
-	const { id, src, album, artist, image, length, title } = attributes;
+	const { id, uniqueId, src, album, artist, image, length, title } =
+		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const showArtists = context?.showArtists;
 	const currentTrack = context?.currentTrack;
@@ -61,6 +67,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			setAttributes( {
 				blob: undefined,
 				id: undefined,
+				uniqueId: undefined,
 				artist: undefined,
 				album: undefined,
 				image: undefined,
@@ -80,6 +87,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 		setAttributes( {
 			blob: undefined,
 			id: media.id,
+			uniqueId: uuid(),
 			src: media.url,
 			artist:
 				media.artist ||
@@ -231,7 +239,10 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					data-playlist-track-artist={ stripHTML( artist ) }
 					data-playlist-track-album={ stripHTML( album ) }
 					data-playlist-track-image-src={ image ?? null }
-					aria-current={ currentTrack === id ? 'true' : 'false' }
+					data-wp-context={ JSON.stringify( { id: uniqueId } ) }
+					aria-current={
+						currentTrack === uniqueId ? 'true' : 'false'
+					}
 				>
 					<RichText
 						tagName="span"

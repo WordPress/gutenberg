@@ -14,7 +14,7 @@
 			"type": "array"
 		},
 		"currentTrack": {
-			"type": "number"
+			"type": "string"
 		},
 		"type": {
 			"type": "string",

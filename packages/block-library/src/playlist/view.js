@@ -12,14 +12,14 @@ const { state } = store(
 				return state.tracks[ currentId ];
 			},
 			get isCurrentTrack() {
-				const { currentId, id } = getContext();
-				return currentId === id;
+				const { currentId, uniqueId } = getContext();
+				return currentId === uniqueId;
 			},
 		},
 		actions: {
 			changeTrack() {
 				const context = getContext();
-				context.currentId = context.id;
+				context.currentId = context.uniqueId;
 				context.isPlaying = true;
 			},
 			isPlaying() {
@@ -33,7 +33,7 @@ const { state } = store(
 			nextSong() {
 				const context = getContext();
 				const currentIndex = context.tracks.findIndex(
-					( id ) => id === context.currentId
+					( uniqueId ) => uniqueId === context.currentId
 				);
 				const nextTrack = context.tracks[ currentIndex + 1 ];
 				if ( nextTrack ) {

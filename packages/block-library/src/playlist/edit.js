@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -172,7 +173,7 @@ const PlaylistEdit = ( {
 		if (
 			innerBlockTracks.some(
 				( innerTrack, index ) =>
-					innerTrack.attributes.id !== tracks[ index ]?.id
+					innerTrack.attributes.uniqueId !== tracks[ index ]?.uniqueId
 			)
 		) {
 			const sortedTracks = innerBlockTracks.map(
@@ -185,11 +186,11 @@ const PlaylistEdit = ( {
 			// Update the current track if the first track has changed, and there is a track id.
 			if (
 				sortedTracks.length > 0 &&
-				sortedTracks[ 0 ].id &&
-				sortedTracks[ 0 ].id !== currentTrack
+				sortedTracks[ 0 ].uniqueId &&
+				sortedTracks[ 0 ].uniqueId !== currentTrack
 			) {
 				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( { currentTrack: sortedTracks[ 0 ].id } );
+				setAttributes( { currentTrack: sortedTracks[ 0 ].uniqueId } );
 			}
 		}
 
@@ -210,8 +211,8 @@ const PlaylistEdit = ( {
 				currentTrack:
 					updatedTracks.length > 0 &&
 					// If the first track has changed, update the `currentTrack` block attribute.
-					updatedTracks[ 0 ].id !== currentTrack
-						? updatedTracks[ 0 ].id
+					updatedTracks[ 0 ].uniqueId !== currentTrack
+						? updatedTracks[ 0 ].uniqueId
 						: currentTrack,
 			} );
 		}
@@ -237,7 +238,8 @@ const PlaylistEdit = ( {
 			}
 
 			const trackAttributes = ( track ) => ( {
-				id: track.id || track.url,
+				id: track.id || track.url, // Attachment ID or URL.
+				uniqueId: uuid(), // Unique ID for the track.
 				src: track.url,
 				title: track.title,
 				artist:
@@ -265,7 +267,8 @@ const PlaylistEdit = ( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				tracks: trackList,
-				currentTrack: trackList.length > 0 ? trackList[ 0 ].id : null,
+				currentTrack:
+					trackList.length > 0 ? trackList[ 0 ].uniqueId : null,
 			} );
 
 			const newBlocks = trackList.map( ( track ) =>
@@ -289,22 +292,22 @@ const PlaylistEdit = ( {
 	const onTrackEnd = useCallback( () => {
 		/* If there are tracks left, play the next track */
 		if ( trackListIndex < tracks.length - 1 ) {
-			if ( tracks[ trackListIndex + 1 ]?.id ) {
+			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
 				setTrackListIndex( trackListIndex + 1 );
 				setAttributes( {
-					currentTrack: tracks[ trackListIndex + 1 ].id,
+					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
 				} );
 			}
 		} else {
 			setTrackListIndex( 0 );
-			if ( tracks[ 0 ].id ) {
-				setAttributes( { currentTrack: tracks[ 0 ].id } );
+			if ( tracks[ 0 ].uniqueId ) {
+				setAttributes( { currentTrack: tracks[ 0 ].uniqueId } );
 			} else if ( tracks.length > 0 ) {
 				const validTrack = tracks.find(
-					( track ) => track.id !== undefined
+					( track ) => track.uniqueId !== undefined
 				);
 				if ( validTrack ) {
-					setAttributes( { currentTrack: validTrack.id } );
+					setAttributes( { currentTrack: validTrack.uniqueId } );
 				}
 			}
 		}
@@ -314,9 +317,13 @@ const PlaylistEdit = ( {
 		( trackOrder ) => {
 			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
 				if ( trackOrder === 'ASC' ) {
-					return a.attributes.id - b.attributes.id;
+					return a.attributes.uniqueId.localeCompare(
+						b.attributes.uniqueId
+					);
 				}
-				return b.attributes.id - a.attributes.id;
+				return b.attributes.uniqueId.localeCompare(
+					a.attributes.uniqueId
+				);
 			} );
 			const sortedTracks = sortedBlocks.map(
 				( block ) => block.attributes
@@ -327,8 +334,8 @@ const PlaylistEdit = ( {
 				tracks: sortedTracks,
 				currentTrack:
 					sortedTracks.length > 0 &&
-					sortedTracks[ 0 ].id !== currentTrack
-						? sortedTracks[ 0 ].id
+					sortedTracks[ 0 ].uniqueId !== currentTrack
+						? sortedTracks[ 0 ].uniqueId
 						: currentTrack,
 			} );
 		},
@@ -451,11 +458,9 @@ const PlaylistEdit = ( {
 					/>
 				</Disabled>
 				{ showTracklist && (
-					<>
-						<TagName className="wp-block-playlist__tracklist">
-							{ innerBlocksProps.children }
-						</TagName>
-					</>
+					<TagName className="wp-block-playlist__tracklist">
+						{ innerBlocksProps.children }
+					</TagName>
 				) }
 				<Caption
 					attributes={ attributes }

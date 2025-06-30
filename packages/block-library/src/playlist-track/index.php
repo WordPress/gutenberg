@@ -21,7 +21,7 @@ function render_block_core_playlist_track( $attributes ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	$unique_id  = wp_unique_prefixed_id( 'playlist-track-' );
+	$unique_id  = isset( $attributes['uniqueId'] ) ? $attributes['uniqueId'] : wp_generate_uuid4();
 	$media_id   = $attributes['id'];
 	$album      = isset( $attributes['album'] ) ? $attributes['album'] : '';
 	$artist     = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
@@ -41,7 +41,7 @@ function render_block_core_playlist_track( $attributes ) {
 		);
 	}
 
-	$context = wp_interactivity_data_wp_context( array( 'id' => $unique_id ) );
+	$context = wp_interactivity_data_wp_context( array( 'uniqueId' => $unique_id ) );
 
 	wp_interactivity_state(
 		'core/playlist',

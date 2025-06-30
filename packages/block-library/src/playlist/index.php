@@ -19,6 +19,15 @@ function render_block_core_playlist( $attributes, $content ) {
 		return '';
 	}
 
+	$tracks = $attributes['tracks'];
+	foreach ( $tracks as $index => $track ) {
+		// Manage edge cases where the block may have been edited in the code editor mode.
+		if ( empty( $track['uniqueId'] ) ) {
+			$tracks[ $index ]['uniqueId'] = wp_generate_uuid4();
+		}
+	}
+	$attributes['tracks'] = $tracks;
+
 	$current_media_id = $attributes['currentTrack'];
 
 	/**
@@ -42,7 +51,7 @@ function render_block_core_playlist( $attributes, $content ) {
 			},
 			'isCurrentTrack' => function () {
 				$context = wp_interactivity_get_context();
-				return $context['currentId'] === $context['id'];
+				return $context['currentId'] === $context['uniqueId'];
 			},
 		)
 	);
@@ -50,15 +59,13 @@ function render_block_core_playlist( $attributes, $content ) {
 	// Finds the unique id of the current track and populates the playlist array.
 	$p               = new WP_HTML_Tag_Processor( $content );
 	$playlist_tracks = array();
+	$current_unique_id = null;
 	while ( $p->next_tag( 'button' ) ) {
 		$track_context     = $p->get_attribute( 'data-wp-context' );
-		$track_unique_id   = json_decode( $track_context, true )['id'];
+		$track_unique_id   = json_decode( $track_context, true )['uniqueId'];
 		$state             = wp_interactivity_state( 'core/playlist' );
 		$playlist_tracks[] = $track_unique_id;
-		if (
-			isset( $state['tracks'][ $track_unique_id ]['media_id'] ) &&
-			$state['tracks'][ $track_unique_id ]['media_id'] === $current_media_id
-		) {
+		if ( $track_unique_id === $current_media_id ) {
 			$current_unique_id = $track_unique_id;
 		}
 	}
@@ -87,7 +94,7 @@ function render_block_core_playlist( $attributes, $content ) {
 			</div>
 		</div>
 	</div>
-		<audio 
+		<audio
 			controls="controls"
 			data-wp-on--ended="actions.nextSong"
 			data-wp-on--play="actions.isPlaying"

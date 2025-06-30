@@ -18,6 +18,9 @@
 		"id": {
 			"type": "number"
 		},
+		"uniqueId": {
+			"type": "string"
+		},
 		"src": {
 			"type": "string"
 		},
