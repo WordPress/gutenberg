@@ -57,13 +57,12 @@ function render_block_core_playlist( $attributes, $content ) {
 	);
 
 	// Finds the unique id of the current track and populates the playlist array.
-	$p               = new WP_HTML_Tag_Processor( $content );
-	$playlist_tracks = array();
+	$p                 = new WP_HTML_Tag_Processor( $content );
+	$playlist_tracks   = array();
 	$current_unique_id = null;
 	while ( $p->next_tag( 'button' ) ) {
 		$track_context     = $p->get_attribute( 'data-wp-context' );
 		$track_unique_id   = json_decode( $track_context, true )['uniqueId'];
-		$state             = wp_interactivity_state( 'core/playlist' );
 		$playlist_tracks[] = $track_unique_id;
 		if ( $track_unique_id === $current_media_id ) {
 			$current_unique_id = $track_unique_id;
