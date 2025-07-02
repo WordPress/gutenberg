@@ -2,6 +2,7 @@
  * External dependencies
  */
 import blockLibraryStyles from '!!raw-loader!../../../../../block-library/build-style/style.css';
+import { fn } from '@storybook/test';
 
 /**
  * Internal dependencies
@@ -32,6 +33,8 @@ export const Default = {
 		isDraggable: false,
 		label: 'Block patterns story',
 		showTitlesAsTooltip: false,
+		onClickPattern: fn(),
+		onHover: fn(),
 	},
 	argTypes: {
 		blockPatterns: { description: 'The patterns to render.' },
@@ -58,7 +61,6 @@ export const Default = {
 		},
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 	},
 };

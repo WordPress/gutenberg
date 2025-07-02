@@ -3,6 +3,7 @@
  */
 import type { StoryObj, Meta } from '@storybook/react';
 import { css } from '@emotion/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -52,12 +53,14 @@ const meta: Meta< typeof Menu > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Popover: Menu.Popover,
 	},
+	args: {
+		onOpenChange: fn(),
+	},
 	argTypes: {
 		children: { control: false },
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
