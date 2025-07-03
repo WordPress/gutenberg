@@ -15,29 +15,14 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content ) {
-	if ( empty( $attributes['tracks'] ) ) {
+
+	print_r( $attributes );
+	if ( empty( $attributes['currentTrack'] ) ) {
 		return '';
 	}
-
-	$tracks = $attributes['tracks'];
-	foreach ( $tracks as $index => $track ) {
-		// Manage edge cases where the block may have been edited in the code editor mode.
-		if ( empty( $track['uniqueId'] ) ) {
-			$tracks[ $index ]['uniqueId'] = wp_generate_uuid4();
-		}
-	}
-	$attributes['tracks'] = $tracks;
 
 	$current_media_id = $attributes['currentTrack'];
-
-	/**
-	 * Returns early if no valid track ID is found.
-	 * This can happen if the user deleted all tracks but kept an empty inner
-	 * block, such as the media upload placeholder.
-	 */
-	if ( empty( $current_media_id ) ) {
-		return '';
-	}
+	$show_tracklist = isset( $attributes['showTracklist'] ) ? $attributes['showTracklist'] : true;
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
@@ -47,6 +32,9 @@ function render_block_core_playlist( $attributes, $content ) {
 			'currentTrack'   => function () {
 				$state = wp_interactivity_state();
 				$context = wp_interactivity_get_context();
+				if ( ! isset( $state['tracks'][ $context['currentId'] ] ) ) {
+					return array();
+				}
 				return $state['tracks'][ $context['currentId'] ];
 			},
 			'isCurrentTrack' => function () {
@@ -56,17 +44,26 @@ function render_block_core_playlist( $attributes, $content ) {
 		)
 	);
 
-	// Finds the unique id of the current track and populates the playlist array.
-	$p                 = new WP_HTML_Tag_Processor( $content );
+	// Each track in the playlist is represented by a button.
+	// Process the $content to find all buttons and add the tracks to the $playlist_tracks array.
+	// Use the $current_unique_id to identify the current track.
+	$process_buttons   = new WP_HTML_Tag_Processor( $content );
 	$playlist_tracks   = array();
 	$current_unique_id = null;
-	while ( $p->next_tag( 'button' ) ) {
-		$track_context     = $p->get_attribute( 'data-wp-context' );
+	while ( $process_buttons->next_tag( 'button' ) ) {
+		$track_context     = $process_buttons->get_attribute( 'data-wp-context' );
 		$track_unique_id   = json_decode( $track_context, true )['uniqueId'];
 		$playlist_tracks[] = $track_unique_id;
 		if ( $track_unique_id === $current_media_id ) {
 			$current_unique_id = $track_unique_id;
 		}
+	}
+
+	// If there are no tracks but there is a currentTrack set, do not render the block.
+	// This can happen for example if the currentTrack was not deleted correctly
+	// or if the block is manually edited in the code editor mode.
+	if ( empty( $playlist_tracks ) || ! in_array( $current_media_id, $playlist_tracks, true ) ) {
+	//	return '';
 	}
 
 	// Adds the markup for the current track.
@@ -104,6 +101,7 @@ function render_block_core_playlist( $attributes, $content ) {
 		></audio>
 	';
 
+	// Add the HTML for the current track inside the figure.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {

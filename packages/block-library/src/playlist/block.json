@@ -10,9 +10,6 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/playlist-track" ],
 	"attributes": {
-		"tracks": {
-			"type": "array"
-		},
 		"currentTrack": {
 			"type": "string"
 		},

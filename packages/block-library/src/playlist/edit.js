@@ -139,7 +139,6 @@ const PlaylistEdit = ( {
 	clientId,
 } ) => {
 	const {
-		tracks,
 		order,
 		showTracklist,
 		showNumbers,
@@ -156,6 +155,7 @@ const PlaylistEdit = ( {
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const { innerBlockTracks } = useSelect(
 		( select ) => {
@@ -167,64 +167,32 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
-	// Monitor changes to the inner blocks.
-	useEffect( () => {
-		// If the tracks have been repositioned, update the `tracks` block attribute.
-		if (
-			innerBlockTracks.some(
-				( innerTrack, index ) =>
-					innerTrack.attributes.uniqueId !== tracks[ index ]?.uniqueId
-			)
-		) {
-			const sortedTracks = innerBlockTracks.map(
-				( track ) => track.attributes
-			);
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				tracks: sortedTracks,
-			} );
-			// Update the current track if the first track has changed, and there is a track id.
-			if (
-				sortedTracks.length > 0 &&
-				sortedTracks[ 0 ].uniqueId &&
-				sortedTracks[ 0 ].uniqueId !== currentTrack
-			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( { currentTrack: sortedTracks[ 0 ].uniqueId } );
-			}
-		}
+	// Create a list of tracks from the inner blocks.
+	const tracks = innerBlockTracks.map( ( block ) => block.attributes );
+	const firstTrackId = innerBlockTracks[ 0 ]?.attributes?.uniqueId;
 
-		const updatedTracks = innerBlockTracks.map(
-			( block ) => block.attributes
-		);
-		const hasChanges = updatedTracks.some(
-			( updatedTrack, index ) =>
-				! tracks[ index ] ||
-				Object.keys( updatedTrack ).some(
-					( key ) => updatedTrack[ key ] !== tracks[ index ]?.[ key ]
-				)
-		);
-		if ( hasChanges || updatedTracks.length !== tracks?.length ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				tracks: updatedTracks,
-				currentTrack:
-					updatedTracks.length > 0 &&
-					// If the first track has changed, update the `currentTrack` block attribute.
-					updatedTracks[ 0 ].uniqueId !== currentTrack
-						? updatedTracks[ 0 ].uniqueId
-						: currentTrack,
-			} );
+	// updateBlockAttributes is used to force updating the parent playlist block
+	// when the currentTrack changes. Using setAttributes directly does not update
+	// the currentTrack when multiple tracks are moved at the same time.
+	useEffect( () => {
+		if ( tracks.length === 0 ) {
+			// If there are no tracks but currentTrack is set, set it to null.
+			if ( currentTrack !== null ) {
+				updateBlockAttributes( clientId, { currentTrack: null } );
+			}
+		} else if (
+			// If the currentTrack is not the first track, update it to the first track.
+			firstTrackId &&
+			firstTrackId !== currentTrack
+		) {
+			updateBlockAttributes( clientId, { currentTrack: firstTrackId } );
 		}
 	}, [
-		__unstableMarkNextChangeAsNotPersistent,
-		clientId,
-		createErrorNotice,
-		currentTrack,
-		innerBlockTracks,
-		replaceInnerBlocks,
-		setAttributes,
 		tracks,
+		currentTrack,
+		firstTrackId,
+		clientId,
+		updateBlockAttributes,
 	] );
 
 	const onSelectTracks = useCallback(
@@ -266,7 +234,6 @@ const PlaylistEdit = ( {
 			const trackList = media.map( trackAttributes );
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				tracks: trackList,
 				currentTrack:
 					trackList.length > 0 ? trackList[ 0 ].uniqueId : null,
 			} );
@@ -275,17 +242,13 @@ const PlaylistEdit = ( {
 				createBlock( 'core/playlist-track', track )
 			);
 			// Replace the inner blocks with the new tracks.
-			replaceInnerBlocks(
-				clientId,
-				innerBlockTracks.concat( newBlocks )
-			);
+			replaceInnerBlocks( clientId, newBlocks );
 		},
 		[
 			__unstableMarkNextChangeAsNotPersistent,
 			setAttributes,
 			replaceInnerBlocks,
 			clientId,
-			innerBlockTracks,
 		]
 	);
 
@@ -331,7 +294,6 @@ const PlaylistEdit = ( {
 			replaceInnerBlocks( clientId, sortedBlocks );
 			setAttributes( {
 				order: trackOrder,
-				tracks: sortedTracks,
 				currentTrack:
 					sortedTracks.length > 0 &&
 					sortedTracks[ 0 ].uniqueId !== currentTrack
@@ -458,9 +420,10 @@ const PlaylistEdit = ( {
 					/>
 				</Disabled>
 				{ showTracklist && (
-					<TagName className="wp-block-playlist__tracklist">
-						{ innerBlocksProps.children }
-					</TagName>
+					<TagName
+						{ ...innerBlocksProps }
+						className="wp-block-playlist__tracklist"
+					/>
 				) }
 				<Caption
 					attributes={ attributes }
