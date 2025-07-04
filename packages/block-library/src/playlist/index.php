@@ -15,8 +15,6 @@
  * @return string Returns the Playlist.
  */
 function render_block_core_playlist( $attributes, $content ) {
-
-	print_r( $attributes );
 	if ( empty( $attributes['currentTrack'] ) ) {
 		return '';
 	}
