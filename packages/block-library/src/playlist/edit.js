@@ -167,6 +167,30 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
+	// Ensure that each inner block has a unique ID,
+	// even if a track is duplicated.
+	useEffect( () => {
+		const seen = new Set();
+		let hasDuplicates = false;
+		const updatedBlocks = innerBlockTracks.map( ( block ) => {
+			if ( seen.has( block.attributes.uniqueId ) ) {
+				hasDuplicates = true;
+				return {
+					...block,
+					attributes: {
+						...block.attributes,
+						uniqueId: uuid(),
+					},
+				};
+			}
+			seen.add( block.attributes.uniqueId );
+			return block;
+		} );
+		if ( hasDuplicates ) {
+			replaceInnerBlocks( clientId, updatedBlocks );
+		}
+	}, [ innerBlockTracks, clientId, replaceInnerBlocks ] );
+
 	// Create a list of tracks from the inner blocks.
 	const tracks = innerBlockTracks.map( ( block ) => block.attributes );
 	const firstTrackId = innerBlockTracks[ 0 ]?.attributes?.uniqueId;
