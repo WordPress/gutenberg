@@ -46,6 +46,14 @@
 
 	.wp-block-playlist__tracklist {
 		font-size: 14px;
+
+		&.wp-block-playlist__tracklist-is-hidden,
+		&.wp-block-playlist__tracklist-artist-is-hidden {
+			// Hide the artist name, which is in the playlist-track block.
+			.wp-block-playlist-track__artist {
+				display: none;
+			}
+		}
 	}
 
 	ul.wp-block-playlist__tracklist {

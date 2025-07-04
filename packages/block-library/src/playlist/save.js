@@ -12,6 +12,8 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	const {
 		caption,
 		showNumbers,
+		showTracklist,
+		showArtists,
 		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
 
@@ -19,7 +21,17 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 	return (
 		<figure { ...innerBlocksProps }>
-			<TagName className="wp-block-playlist__tracklist">
+			<TagName
+				className={
+					'wp-block-playlist__tracklist' +
+					( ! showTracklist
+						? ' wp-block-playlist__tracklist-is-hidden'
+						: '' ) +
+					( ! showArtists
+						? ' wp-block-playlist__tracklist-artist-is-hidden'
+						: '' )
+				}
+			>
 				{ innerBlocksProps.children }
 			</TagName>
 			{ ! RichText.isEmpty( caption ) && (

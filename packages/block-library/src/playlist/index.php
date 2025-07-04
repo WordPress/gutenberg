@@ -20,7 +20,6 @@ function render_block_core_playlist( $attributes, $content ) {
 	}
 
 	$current_media_id = $attributes['currentTrack'];
-	$show_tracklist = isset( $attributes['showTracklist'] ) ? $attributes['showTracklist'] : true;
 
 	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
 
