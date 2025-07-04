@@ -191,9 +191,13 @@ const PlaylistEdit = ( {
 		}
 	}, [ innerBlockTracks, clientId, replaceInnerBlocks ] );
 
-	// Create a list of tracks from the inner blocks.
-	const tracks = innerBlockTracks.map( ( block ) => block.attributes );
-	const firstTrackId = innerBlockTracks[ 0 ]?.attributes?.uniqueId;
+	// Create a list of tracks from the inner blocks,
+	// but skip blocks that do not have a uniqueId attribute, such as the media placeholder.
+	const validTracks = innerBlockTracks.filter(
+		( block ) => !! block.attributes.uniqueId
+	);
+	const tracks = validTracks.map( ( block ) => block.attributes );
+	const firstTrackId = validTracks[ 0 ]?.attributes?.uniqueId;
 
 	// updateBlockAttributes is used to force updating the parent playlist block
 	// when the currentTrack changes. Using setAttributes directly does not update
