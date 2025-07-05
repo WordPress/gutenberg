@@ -60,7 +60,7 @@ function render_block_core_playlist( $attributes, $content ) {
 	// This can happen for example if the currentTrack was not deleted correctly
 	// or if the block is manually edited in the code editor mode.
 	if ( empty( $playlist_tracks ) || ! in_array( $current_media_id, $playlist_tracks, true ) ) {
-	//	return '';
+		return '';
 	}
 
 	// Adds the markup for the current track.
