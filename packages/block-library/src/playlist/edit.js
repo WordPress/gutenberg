@@ -448,10 +448,9 @@ const PlaylistEdit = ( {
 					/>
 				</Disabled>
 				{ showTracklist && (
-					<TagName
-						{ ...innerBlocksProps }
-						className="wp-block-playlist__tracklist"
-					/>
+					<TagName className="wp-block-playlist__tracklist">
+						{ innerBlocksProps.children }
+					</TagName>
 				) }
 				<Caption
 					attributes={ attributes }
