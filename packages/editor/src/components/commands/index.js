@@ -163,7 +163,7 @@ const getEditorCommandLoader = () =>
 						id: 'core/editor/toggle-list-view/notice',
 						type: 'snackbar',
 					} );
-				} else if ( 'list-view' !== currentListViewTab ) {
+				} else if ( currentListViewTab !== 'list-view' ) {
 					// When closing
 					setListViewTab( 'list-view' );
 					createInfoNotice( __( 'List View opened.' ), {
@@ -188,13 +188,6 @@ const getEditorCommandLoader = () =>
 					? __( 'Hide document outline' )
 					: __( 'Show document outline' ),
 			icon: listView,
-			keywords: [
-				'structure',
-				'hierarchy',
-				'organization',
-				'sections',
-				'outline',
-			],
 			callback: ( { close } ) => {
 				// If list view is closed, open it with outline tab
 				if ( ! isListViewOpen ) {
@@ -204,7 +197,7 @@ const getEditorCommandLoader = () =>
 						id: 'core/editor/show-outline/notice',
 						type: 'snackbar',
 					} );
-				} else if ( 'outline' !== currentListViewTab ) {
+				} else if ( currentListViewTab !== 'outline' ) {
 					// Currently on list-view tab, so switch to outline tab
 					setListViewTab( 'outline' );
 					createInfoNotice( __( 'Document outline opened.' ), {
