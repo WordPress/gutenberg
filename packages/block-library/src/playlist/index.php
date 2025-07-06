@@ -10,49 +10,67 @@
  *
  * @since 6.9.0
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      The block instance.
  *
  * @return string Returns the Playlist.
  */
-function render_block_core_playlist( $attributes, $content ) {
+function render_block_core_playlist( $attributes, $content, $block ) {
 	if ( empty( $attributes['currentTrack'] ) ) {
 		return '';
 	}
 
-	$current_media_id = $attributes['currentTrack'];
-
-	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
-
-	wp_interactivity_state(
-		'core/playlist',
-		array(
-			'currentTrack'   => function () {
-				$state = wp_interactivity_state();
-				$context = wp_interactivity_get_context();
-				if ( ! isset( $state['tracks'][ $context['currentId'] ] ) ) {
-					return array();
-				}
-				return $state['tracks'][ $context['currentId'] ];
-			},
-			'isCurrentTrack' => function () {
-				$context = wp_interactivity_get_context();
-				return $context['currentId'] === $context['uniqueId'];
-			},
-		)
-	);
-
-	// Each track in the playlist is represented by a button.
-	// Process the $content to find all buttons and add the tracks to the $playlist_tracks array.
-	// Use the $current_unique_id to identify the current track.
-	$process_buttons   = new WP_HTML_Tag_Processor( $content );
+	$current_media_id  = $attributes['currentTrack'];
+	$playlist_id       = 'playlist-' . wp_generate_uuid4();
 	$playlist_tracks   = array();
+	$tracks_data       = array();
 	$current_unique_id = null;
-	while ( $process_buttons->next_tag( 'button' ) ) {
-		$track_context     = $process_buttons->get_attribute( 'data-wp-context' );
-		$track_unique_id   = json_decode( $track_context, true )['uniqueId'];
-		$playlist_tracks[] = $track_unique_id;
-		if ( $track_unique_id === $current_media_id ) {
-			$current_unique_id = $track_unique_id;
+
+	// Parse inner blocks to extract track data.
+	// This approach avoids duplicating track data in the HTML output.
+	if ( ! empty( $block->inner_blocks ) ) {
+		foreach ( $block->inner_blocks as $inner_block ) {
+			if ( 'core/playlist-track' === $inner_block->name ) {
+				$inner_block->context['playlistId'] = $playlist_id;
+
+				$track_attributes  = $inner_block->attributes;
+				$unique_id         = isset( $track_attributes['uniqueId'] ) ? $track_attributes['uniqueId'] : wp_generate_uuid4();
+				$playlist_tracks[] = $unique_id;
+
+				$inner_block->attributes['uniqueId'] = $unique_id;
+
+				// Extract track metadata from block attributes.
+				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
+				$artist     = isset( $track_attributes['artist'] ) ? $track_attributes['artist'] : '';
+				$album      = isset( $track_attributes['album'] ) ? $track_attributes['album'] : '';
+				$image      = isset( $track_attributes['image'] ) ? $track_attributes['image'] : '';
+				$url        = isset( $track_attributes['src'] ) ? $track_attributes['src'] : '';
+				$aria_label = $title;
+
+				if ( $title && $artist && $album ) {
+					$aria_label = sprintf(
+						/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+						_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
+						$title,
+						$artist,
+						$album
+					);
+				}
+
+				$tracks_data[ $unique_id ] = array(
+					'url'       => $url,
+					'title'     => $title,
+					'artist'    => $artist,
+					'album'     => $album,
+					'image'     => $image,
+					'ariaLabel' => $aria_label,
+				);
+
+				if ( $unique_id === $current_media_id ) {
+					$current_unique_id = $unique_id;
+				}
+			}
 		}
 	}
 
@@ -63,9 +81,25 @@ function render_block_core_playlist( $attributes, $content ) {
 		return '';
 	}
 
-	// Adds the markup for the current track.
+	wp_enqueue_script_module( '@wordpress/block-library/playlist/view' );
+
+	// Add the playlist tracks to the global state,
+	// but keep them isolated from other playlists with the help of playlistId.
+	wp_interactivity_state(
+		'core/playlist',
+		array(
+			'playlists' => array(
+				$playlist_id => array(
+					'tracks' => $tracks_data,
+				),
+			),
+		)
+	);
+
+	// Create the HTML for the current track which shows above the tracklist.
 	$html = '<div class="wp-block-playlist__current-item">';
 
+	// The alt attribute is intentionally left empty, as the image is decorative.
 	if ( isset( $attributes['showImages'] ) ? $attributes['showImages'] : false ) {
 		$html .=
 		'<img
@@ -112,9 +146,10 @@ function render_block_core_playlist( $attributes, $content ) {
 		'data-wp-context',
 		json_encode(
 			array(
-				'currentId' => $current_unique_id,
-				'tracks'    => $playlist_tracks,
-				'isPlaying' => false,
+				'playlistId' => $playlist_id,
+				'currentId'  => $current_unique_id,
+				'tracks'     => $playlist_tracks,
+				'isPlaying'  => false,
 			)
 		)
 	);

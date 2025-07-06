@@ -3,13 +3,21 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { state } = store(
+store(
 	'core/playlist',
 	{
 		state: {
+			playlists: {},
 			get currentTrack() {
-				const { currentId } = getContext();
-				return state.tracks[ currentId ];
+				const { currentId, playlistId } = getContext();
+				if ( ! currentId || ! playlistId ) {
+					return {};
+				}
+				const playlist = this.playlists[ playlistId ];
+				if ( ! playlist ) {
+					return {};
+				}
+				return playlist.tracks[ currentId ] || {};
 			},
 			get isCurrentTrack() {
 				const { currentId, uniqueId } = getContext();
@@ -39,7 +47,7 @@ const { state } = store(
 				if ( nextTrack ) {
 					context.currentId = nextTrack;
 					const { ref } = getElement();
-					// Waits a momet before changing the track, since
+					// Waits a moment before changing the track, since
 					// immediately changing the track can be jarring.
 					setTimeout( () => {
 						ref.play();

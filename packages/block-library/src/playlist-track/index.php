@@ -10,7 +10,7 @@
  *
  * @since 6.9.0
  *
- * @param array    $attributes     The block attributes.
+ * @param array $attributes The block attributes.
  *
  * @return string Returns the Playlist Track.
  */
@@ -21,43 +21,14 @@ function render_block_core_playlist_track( $attributes ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	$unique_id  = isset( $attributes['uniqueId'] ) ? $attributes['uniqueId'] : wp_generate_uuid4();
-	$media_id   = $attributes['id'];
-	$album      = isset( $attributes['album'] ) ? $attributes['album'] : '';
-	$artist     = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
-	$image      = isset( $attributes['image'] ) ? $attributes['image'] : '';
-	$length     = isset( $attributes['length'] ) ? $attributes['length'] : '';
-	$title      = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
-	$url        = isset( $attributes['src'] ) ? $attributes['src'] : '';
-	$aria_label = $title;
+	$unique_id = isset( $attributes['uniqueId'] ) ? $attributes['uniqueId'] : wp_generate_uuid4();
+	$artist    = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
+	$length    = isset( $attributes['length'] ) ? $attributes['length'] : '';
+	$title     = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
-	if ( $title && $artist && $album ) {
-		$aria_label = sprintf(
-			/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-			_x( '%1$s by %2$s from the album %3$s', 'track title, artist name, album name' ),
-			$title,
-			$artist,
-			$album
-		);
-	}
-
-	$context = wp_interactivity_data_wp_context( array( 'uniqueId' => $unique_id ) );
-
-	wp_interactivity_state(
-		'core/playlist',
+	$context = wp_interactivity_data_wp_context(
 		array(
-			'tracks' => array(
-				$unique_id => array(
-					'media_id'  => $media_id,
-					'url'       => $url,
-					'title'     => $title,
-					'artist'    => $artist,
-					'album'     => $album,
-					'image'     => $image,
-					'length'    => $length,
-					'ariaLabel' => $aria_label,
-				),
-			),
+			'uniqueId' => $unique_id,
 		)
 	);
 
@@ -70,7 +41,6 @@ function render_block_core_playlist_track( $attributes ) {
 	if ( $artist ) {
 		$html .= '<span class="wp-block-playlist-track__artist">' . wp_kses_post( $artist ) . '</span>';
 	}
-
 	if ( $length ) {
 		$html .= '<span class="wp-block-playlist-track__length">' .
 		sprintf(
