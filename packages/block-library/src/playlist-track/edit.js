@@ -41,6 +41,8 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
+	// Note that 'id' is the media attachment ID, while 'uniqueId' is a unique identifier.
+	// This is to make sure that the same media can be used in more than one track.
 	const { id, uniqueId, src, album, artist, image, length, title } =
 		attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
@@ -239,7 +241,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					data-playlist-track-artist={ stripHTML( artist ) }
 					data-playlist-track-album={ stripHTML( album ) }
 					data-playlist-track-image-src={ image ?? null }
-					data-wp-context={ JSON.stringify( { id: uniqueId } ) }
+					data-wp-context={ JSON.stringify( { uniqueId } ) }
 					aria-current={
 						currentTrack === uniqueId ? 'true' : 'false'
 					}
