@@ -167,7 +167,7 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/show-outline',
-			label: __( 'Show document outline' ),
+			label: __( 'Show or hide document outline' ),
 			icon: listView,
 			keywords: [
 				'structure',
@@ -177,13 +177,23 @@ const getEditorCommandLoader = () =>
 				'outline',
 			],
 			callback: ( { close } ) => {
-				setIsListViewOpened( true );
-				setListViewTab( 'outline' );
+				// If list view is closed, open it with outline tab
+				if ( ! isListViewOpen ) {
+					setIsListViewOpened( true );
+					setListViewTab( 'outline' );
+					createInfoNotice( __( 'Document outline opened.' ), {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
+				} else {
+					// If list view is open, close it
+					setIsListViewOpened( false );
+					createInfoNotice( __( 'Document outline closed.' ), {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
+				}
 				close();
-				createInfoNotice( __( 'Document outline opened.' ), {
-					id: 'core/editor/show-outline/notice',
-					type: 'snackbar',
-				} );
 			},
 		} );
 
