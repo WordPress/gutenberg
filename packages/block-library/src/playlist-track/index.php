@@ -8,7 +8,7 @@
 /**
  * Renders the `core/playlist-track` block on server.
  *
- * @since 6.8.0
+ * @since 6.9.0
  *
  * @param array    $attributes     The block attributes.
  *
@@ -91,7 +91,7 @@ function render_block_core_playlist_track( $attributes ) {
 /**
  * Registers the `core/playlist-track` block on server.
  *
- * @since 6.8.0
+ * @since 6.9.0
  */
 function register_block_core_playlist_track() {
 	register_block_type_from_metadata(
