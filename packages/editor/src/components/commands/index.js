@@ -54,10 +54,12 @@ const getEditorCommandLoader = () =>
 			isCodeEditingEnabled,
 			isRichEditingEnabled,
 			isPublishSidebarEnabled,
+			currentListViewTab,
 		} = useSelect( ( select ) => {
 			const { get } = select( preferencesStore );
 			const { isListViewOpened, getCurrentPostType, getEditorSettings } =
 				select( editorStore );
+			const { getListViewTab } = unlock( select( editorStore ) );
 			const { getSettings } = select( blockEditorStore );
 			const { getPostType } = select( coreStore );
 
@@ -74,6 +76,7 @@ const getEditorCommandLoader = () =>
 				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
+				currentListViewTab: getListViewTab(),
 			};
 		}, [] );
 		const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -146,28 +149,44 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/toggle-list-view',
-			label: isListViewOpen
-				? __( 'Close List View' )
-				: __( 'Open List View' ),
+			label:
+				isListViewOpen && currentListViewTab === 'list-view'
+					? __( 'Close List View' )
+					: __( 'Open List View' ),
 			icon: listView,
 			callback: ( { close } ) => {
-				setIsListViewOpened( ! isListViewOpen );
-				close();
-				createInfoNotice(
-					isListViewOpen
-						? __( 'List View off.' )
-						: __( 'List View on.' ),
-					{
+				if ( ! isListViewOpen ) {
+					// When opening the list view, always reset to the list-view tab
+					setIsListViewOpened( true );
+					setListViewTab( 'list-view' );
+					createInfoNotice( __( 'List View opened.' ), {
 						id: 'core/editor/toggle-list-view/notice',
 						type: 'snackbar',
-					}
-				);
+					} );
+				} else if ( 'list-view' !== currentListViewTab ) {
+					// When closing
+					setListViewTab( 'list-view' );
+					createInfoNotice( __( 'List View opened.' ), {
+						id: 'core/editor/toggle-list-view/notice',
+						type: 'snackbar',
+					} );
+				} else {
+					setIsListViewOpened( false );
+					createInfoNotice( __( 'List View closed.' ), {
+						id: 'core/editor/toggle-list-view/notice',
+						type: 'snackbar',
+					} );
+				}
+				close();
 			},
 		} );
 
 		commands.push( {
 			name: 'core/show-outline',
-			label: __( 'Show or hide document outline' ),
+			label:
+				currentListViewTab === 'outline' && isListViewOpen
+					? __( 'Hide document outline' )
+					: __( 'Show document outline' ),
 			icon: listView,
 			keywords: [
 				'structure',
@@ -185,8 +204,15 @@ const getEditorCommandLoader = () =>
 						id: 'core/editor/show-outline/notice',
 						type: 'snackbar',
 					} );
+				} else if ( 'outline' !== currentListViewTab ) {
+					// Currently on list-view tab, so switch to outline tab
+					setListViewTab( 'outline' );
+					createInfoNotice( __( 'Document outline opened.' ), {
+						id: 'core/editor/show-outline/notice',
+						type: 'snackbar',
+					} );
 				} else {
-					// If list view is open, close it
+					// Currently on outline tab, so close the list view
 					setIsListViewOpened( false );
 					createInfoNotice( __( 'Document outline closed.' ), {
 						id: 'core/editor/show-outline/notice',

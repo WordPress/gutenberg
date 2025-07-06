@@ -150,7 +150,7 @@ export default function ListViewSidebar() {
 				] }
 				onClose={ closeListView }
 				onSelect={ ( tabName ) => setTab( tabName ) }
-				defaultTabId={ tab }
+				selectedTab={ tab }
 				ref={ tabsRef }
 				closeButtonLabel={ __( 'Close' ) }
 			/>
