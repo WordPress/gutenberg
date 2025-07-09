@@ -208,3 +208,11 @@
 		outline-offset: -2px;
 	}
 }
+
+// Children container for modal content.
+.components-modal__children-container {
+	// When the modal has fill size, make the children container take up the full available height
+	&.is-fill-size {
+		height: 100%;
+	}
+}

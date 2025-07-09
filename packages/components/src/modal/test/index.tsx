@@ -486,4 +486,52 @@ describe( 'Modal', () => {
 			expect( baseElement ).not.toHaveClass( 'is-A-open' );
 		} );
 	} );
+
+	it( 'should apply fill size class to children container when size is fill', () => {
+		render(
+			<Modal size="fill" onRequestClose={ noop }>
+				<p>Modal content</p>
+			</Modal>
+		);
+
+		const dialog = screen.getByRole( 'dialog' );
+		// Disable reason: No semantic query can reach the children container class.
+		// eslint-disable-next-line testing-library/no-node-access
+		const childrenContainer = dialog.querySelector(
+			'.components-modal__children-container'
+		);
+		expect( childrenContainer ).toHaveClass( 'is-fill-size' );
+	} );
+
+	it( 'should apply fill size class to children container when isFullScreen is true', () => {
+		render(
+			<Modal isFullScreen onRequestClose={ noop }>
+				<p>Modal content</p>
+			</Modal>
+		);
+
+		const dialog = screen.getByRole( 'dialog' );
+		// Disable reason: No semantic query can reach the children container class.
+		// eslint-disable-next-line testing-library/no-node-access
+		const childrenContainer = dialog.querySelector(
+			'.components-modal__children-container'
+		);
+		expect( childrenContainer ).toHaveClass( 'is-fill-size' );
+	} );
+
+	it( 'should not apply fill size class to children container when size is not fill', () => {
+		render(
+			<Modal size="medium" onRequestClose={ noop }>
+				<p>Modal content</p>
+			</Modal>
+		);
+
+		const dialog = screen.getByRole( 'dialog' );
+		// Disable reason: No semantic query can reach the children container class.
+		// eslint-disable-next-line testing-library/no-node-access
+		const childrenContainer = dialog.querySelector(
+			'.components-modal__children-container'
+		);
+		expect( childrenContainer ).not.toHaveClass( 'is-fill-size' );
+	} );
 } );
