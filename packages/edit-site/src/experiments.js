@@ -8,9 +8,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -22,18 +20,21 @@ import {
  */
 import './hooks';
 import { store as editSiteStore } from './store';
-import { unlock } from './lock-unlock';
-import App from './components/app';
-
-const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
- * Initializes the site editor screen.
- *
+ * Internal dependencies
+ */
+import ExperimentsApp from './components/experiments-app';
+
+/**
+ * Initializes the "Posts Dashboard"
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Editor settings.
  */
-export function initializeEditor( id, settings ) {
+export function initializeExperiments( id, settings ) {
+	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+		return;
+	}
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
@@ -42,7 +43,6 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
-	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
@@ -55,10 +55,10 @@ export function initializeEditor( id, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
-		welcomeGuide: true,
-		welcomeGuideStyles: true,
-		welcomeGuidePage: true,
-		welcomeGuideTemplate: true,
+		welcomeGuide: false,
+		welcomeGuideStyles: false,
+		welcomeGuidePage: false,
+		welcomeGuideTemplate: false,
 	} );
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
@@ -73,15 +73,8 @@ export function initializeEditor( id, settings ) {
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
-		enableChoosePatternModal: true,
+		enableChoosePatternModal: false,
 	} );
-
-	if ( window.__experimentalMediaProcessing ) {
-		dispatch( preferencesStore ).setDefaults( 'core/media', {
-			requireApproval: true,
-			optimizeOnUpload: true,
-		} );
-	}
 
 	dispatch( editSiteStore ).updateSettings( settings );
 
@@ -91,28 +84,9 @@ export function initializeEditor( id, settings ) {
 
 	root.render(
 		<StrictMode>
-			<App />
+			<ExperimentsApp />
 		</StrictMode>
 	);
 
 	return root;
 }
-
-export function reinitializeEditor() {
-	deprecated( 'wp.editSite.reinitializeEditor', {
-		since: '6.2',
-		version: '6.3',
-	} );
-}
-
-export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
-export { store } from './store';
-export * from './deprecated';
-
-// Temporary: While the posts dashboard is being iterated on
-// it's being built in the same package as the site editor.
-export { initializePostsDashboard } from './posts';
-
-// Temporary: While the experiments page is being iterated on
-// it's being built in the same package as the site editor.
-export { initializeExperiments } from './experiments';
