@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Button, Spinner } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
@@ -31,7 +35,18 @@ export default function ExperimentsPage() {
 		} );
 	};
 
+	const resetSettings = () => {
+		edit( {
+			'gutenberg-experiments': null,
+		} );
+		saveSettings();
+	};
+
 	const hasChanges = Object.keys( edits || {} ).length > 0;
+
+	const allSettingsAreDisabled = Object.values( settings ).every(
+		( value ) => value === false
+	);
 
 	if ( ! settings ) {
 		return <Spinner />;
@@ -41,18 +56,33 @@ export default function ExperimentsPage() {
 		<Page
 			title={ __( 'Experimental settings' ) }
 			actions={
-				<Button
-					variant="primary"
-					onClick={ () => {
-						saveSettings();
-					} }
-					__next40pxDefaultSize
-					disabled={ ! hasChanges || isSaving }
-					accessibleWhenDisabled
-					isBusy={ isSaving }
-				>
-					{ __( 'Save' ) }
-				</Button>
+				<HStack>
+					<Button
+						variant="tertiary"
+						isDestructive
+						onClick={ () => {
+							resetSettings();
+						} }
+						__next40pxDefaultSize
+						disabled={ isSaving || allSettingsAreDisabled }
+						accessibleWhenDisabled
+						isBusy={ isSaving }
+					>
+						{ __( 'Reset to default' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ () => {
+							saveSettings();
+						} }
+						__next40pxDefaultSize
+						disabled={ ! hasChanges || isSaving }
+						accessibleWhenDisabled
+						isBusy={ isSaving }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
 			}
 		>
 			<div className="experiments-page__form">
