@@ -104,7 +104,7 @@ function gutenberg_initialize_experiments_settings() {
 				),
 			),
 			'default'      => array(),
-		),
+		)
 	);
 }
 
