@@ -80,31 +80,31 @@ function gutenberg_initialize_experiments_settings() {
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments',
-		[
+		array(
 			'label'        => __( 'Gutenberg Experiments' ),
 			'description'  => __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production." ),
-			'show_in_rest' => [
-				'schema' => [
+			'show_in_rest' => array(
+				'schema' => array(
 					'type'       => 'object',
-					'properties' => [
-						'gutenberg-block-experiments'    => [ 'type' => 'boolean' ],
-						'gutenberg-form-blocks'          => [ 'type' => 'boolean' ],
-						'gutenberg-grid-interactivity'   => [ 'type' => 'boolean' ],
-						'gutenberg-no-tinymce'           => [ 'type' => 'boolean' ],
-						'gutenberg-media-processing'     => [ 'type' => 'boolean' ],
-						'gutenberg-block-comments'       => [ 'type' => 'boolean' ],
-						'gutenberg-sync-collaboration'   => [ 'type' => 'boolean' ],
-						'gutenberg-custom-dataviews'     => [ 'type' => 'boolean' ],
-						'gutenberg-new-posts-dashboard'  => [ 'type' => 'boolean' ],
-						'gutenberg-quick-edit-dataviews' => [ 'type' => 'boolean' ],
-						'gutenberg-editor-write-mode'    => [ 'type' => 'boolean' ],
-						'gutenberg-full-page-client-side-navigation' => [ 'type' => 'boolean' ],
-						'gutenberg-color-randomizer'     => [ 'type' => 'boolean' ],
-					],
-				],
-			],
-			'default'      => [],
-		],
+					'properties' => array(
+						'gutenberg-block-experiments'    => array( 'type' => 'boolean' ),
+						'gutenberg-form-blocks'          => array( 'type' => 'boolean' ),
+						'gutenberg-grid-interactivity'   => array( 'type' => 'boolean' ),
+						'gutenberg-no-tinymce'           => array( 'type' => 'boolean' ),
+						'gutenberg-media-processing'     => array( 'type' => 'boolean' ),
+						'gutenberg-block-comments'       => array( 'type' => 'boolean' ),
+						'gutenberg-sync-collaboration'   => array( 'type' => 'boolean' ),
+						'gutenberg-custom-dataviews'     => array( 'type' => 'boolean' ),
+						'gutenberg-new-posts-dashboard'  => array( 'type' => 'boolean' ),
+						'gutenberg-quick-edit-dataviews' => array( 'type' => 'boolean' ),
+						'gutenberg-editor-write-mode'    => array( 'type' => 'boolean' ),
+						'gutenberg-full-page-client-side-navigation' => array( 'type' => 'boolean' ),
+						'gutenberg-color-randomizer'     => array( 'type' => 'boolean' ),
+					),
+				),
+			),
+			'default'      => array(),
+		),
 	);
 }
 
