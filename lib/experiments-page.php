@@ -81,8 +81,8 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg-experiments',
 		array(
-			'label'        => __( 'Gutenberg Experiments' ),
-			'description'  => __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production." ),
+			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
+			'description'  => __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ),
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'       => 'object',
