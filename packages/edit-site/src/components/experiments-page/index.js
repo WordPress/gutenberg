@@ -4,93 +4,7 @@
 import { Button, Spinner } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
-
-const useSiteSettings = ( optionName ) => {
-	const { saveEntityRecord, editEntityRecord } = useDispatch( coreDataStore );
-
-	const { record, editedEntities, isSaving } = useSelect( ( select ) => {
-		const _record = select( coreDataStore ).getEntityRecord(
-			'root',
-			'site'
-		);
-		const edits = select( coreDataStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		// we care only about settings under our optionName.
-		return {
-			record:
-				_record && typeof _record[ optionName ] !== 'undefined'
-					? _record[ optionName ]
-					: null,
-			editedEntities:
-				edits && typeof edits[ optionName ] !== 'undefined'
-					? edits[ optionName ]
-					: null,
-			isSaving: select( coreDataStore ).isSavingEntityRecord(
-				'root',
-				'site'
-			),
-		};
-	} );
-
-	const mergedData = { ...record, ...editedEntities };
-
-	const getSetting = ( settingId ) => {
-		if (
-			isSaving ||
-			typeof mergedData === 'undefined' ||
-			Object.keys( mergedData ).length < 1
-		) {
-			return null;
-		}
-
-		if ( typeof mergedData[ settingId ] === 'undefined' ) {
-			return null;
-		}
-
-		return mergedData[ settingId ];
-	};
-
-	const setSetting = ( settingId, value ) => {
-		const edits = {
-			[ optionName ]: {
-				...mergedData, // @TODO meh
-				[ settingId ]: value,
-			},
-		};
-		editEntityRecord( 'root', 'site', undefined, edits );
-	};
-
-	const setSettings = ( values ) => {
-		const edits = {
-			[ optionName ]: {
-				...mergedData,
-				...values,
-			},
-		};
-		editEntityRecord( 'root', 'site', undefined, edits );
-	};
-
-	const saveSettings = () => {
-		return saveEntityRecord( 'root', 'site', {
-			[ optionName ]: mergedData,
-		} );
-	};
-
-	return {
-		saveSettings,
-		getSetting,
-		settings: mergedData,
-		setSetting,
-		setSettings,
-		isSaving,
-		hasChanges: Object.keys( editedEntities || {} ).length > 0,
-	};
-};
+import { useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -98,8 +12,26 @@ const useSiteSettings = ( optionName ) => {
 import Page from '../page';
 
 export default function ExperimentsPage() {
-	const { saveSettings, settings, setSettings, isSaving, hasChanges } =
-		useSiteSettings( 'gutenberg-experiments' );
+	const {
+		editedRecord: siteSettings,
+		save: saveSettings,
+		edit,
+		isSaving,
+		edits,
+	} = useEntityRecord( 'root', 'site' );
+
+	const settings = siteSettings[ 'gutenberg-experiments' ] || {};
+
+	const setSettings = ( values ) => {
+		edit( {
+			'gutenberg-experiments': {
+				...settings,
+				...values,
+			},
+		} );
+	};
+
+	const hasChanges = Object.keys( edits || {} ).length > 0;
 
 	if ( ! settings ) {
 		return <Spinner />;
