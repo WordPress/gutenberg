@@ -13,27 +13,18 @@ async function setGutenbergExperiments(
 	this: RequestUtils,
 	experiments: string[]
 ) {
-	const response = await this.request.get(
-		'/wp-admin/admin.php?page=gutenberg-experiments'
+	// Prepare experiments data as an object
+	const experimentsData = Object.fromEntries(
+		experiments.map( ( experiment ) => [ experiment, true ] )
 	);
-	const html = await response.text();
-	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
-	await this.request.post( '/wp-admin/options.php', {
-		form: {
-			option_page: 'gutenberg-experiments',
-			action: 'update',
-			_wpnonce: nonce,
-			_wp_http_referer: '/wp-admin/admin.php?page=gutenberg-experiments',
-			...Object.fromEntries(
-				experiments.map( ( experiment ) => [
-					`gutenberg-experiments[${ experiment }]`,
-					1,
-				] )
-			),
-			submit: 'Save Changes',
+	// Update settings via REST API
+	await this.rest( {
+		path: '/wp/v2/settings',
+		method: 'PUT',
+		data: {
+			'gutenberg-experiments': experimentsData,
 		},
-		failOnStatusCode: true,
 	} );
 }
 
