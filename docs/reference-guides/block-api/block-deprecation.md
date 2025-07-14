@@ -202,4 +202,28 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 
 In the example above we updated the block to use an inner Paragraph block with a title instead of a title attribute.
 
+## Handling Class Name Mismatches with `apiVersion`
+
+When defining deprecated versions of a block, it is important to explicitly set `apiVersion` in each deprecation entry.
+
+If `apiVersion` is missing or less than 1, Gutenberg applies the `blocks.getSaveContent.extraProps` filter, which can add class names like `wp-block-{block-name}` or `is-loading` to the saved HTML. Since these are usually not present in the original content, the block validation may fail to recognize the deprecated version, preventing migration and block recovery from working as expected.
+
+**Example**
+
+```js
+deprecated: [
+  {
+    attributes: {
+      content: { type: 'string' }
+    },
+    save: ({ attributes }) => {
+      return <div className="is-loading">{ attributes.content }</div>;
+    },
+    apiVersion: 2 // Explicitly provide an apiVersion
+  }
+]
+```
+
+In the example above, we explicitly defined `apiVersion` in the deprecated block to prevent unwanted class names from affecting block validation.
+
 _Above are example cases of block deprecation. For more, real-world examples, check for deprecations in the [core block library](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src). Core blocks have been updated across releases and contain simple and complex deprecations._
