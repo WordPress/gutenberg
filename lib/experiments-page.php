@@ -74,16 +74,39 @@ if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
 /**
  * Set up the experiments settings.
  *
- * @since 6.3.0
+ * @since 6.8.0
  */
 function gutenberg_initialize_experiments_settings() {
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments',
 		[
-			'show_in_rest' => true,
+			'label'        => __( 'Gutenberg Experiments' ),
+			'description'  => __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production." ),
+			'show_in_rest' => [
+				'schema' => [
+					'type'       => 'object',
+					'properties' => [
+						'gutenberg-block-experiments'    => [ 'type' => 'boolean' ],
+						'gutenberg-form-blocks'          => [ 'type' => 'boolean' ],
+						'gutenberg-grid-interactivity'   => [ 'type' => 'boolean' ],
+						'gutenberg-no-tinymce'           => [ 'type' => 'boolean' ],
+						'gutenberg-media-processing'     => [ 'type' => 'boolean' ],
+						'gutenberg-block-comments'       => [ 'type' => 'boolean' ],
+						'gutenberg-sync-collaboration'   => [ 'type' => 'boolean' ],
+						'gutenberg-custom-dataviews'     => [ 'type' => 'boolean' ],
+						'gutenberg-new-posts-dashboard'  => [ 'type' => 'boolean' ],
+						'gutenberg-quick-edit-dataviews' => [ 'type' => 'boolean' ],
+						'gutenberg-editor-write-mode'    => [ 'type' => 'boolean' ],
+						'gutenberg-full-page-client-side-navigation' => [ 'type' => 'boolean' ],
+						'gutenberg-color-randomizer'     => [ 'type' => 'boolean' ],
+					],
+				],
+			],
+			'default'      => [],
 		],
 	);
 }
 
 add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
+add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );

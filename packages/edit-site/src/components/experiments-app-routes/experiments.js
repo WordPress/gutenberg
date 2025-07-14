@@ -20,7 +20,7 @@ export const experimentsRoute = {
 				content={
 					<p>
 						{ __(
-							"The block editor includes experimental features that are usable while they're in development.Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
+							"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
 						) }
 					</p>
 				}
