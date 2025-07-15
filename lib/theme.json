@@ -367,6 +367,7 @@
 						},
 						"typography": {
 							"lineHeight": "1.6",
+							"fontFamily": "inherit",
 							"fontSize": "1em"
 						},
 						"dimensions": {
@@ -393,6 +394,10 @@
 							"width": "1px",
 							"style": "solid",
 							"color": "#949494"
+						},
+						"typography": {
+							"fontFamily": "inherit",
+							"fontSize": "1em"
 						},
 						"spacing": {
 							"padding": {
