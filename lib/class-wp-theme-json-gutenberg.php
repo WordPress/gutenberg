@@ -616,8 +616,8 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(
-		'button'    => 'wp-element-button',
-		'caption'   => 'wp-element-caption',
+		'button'  => 'wp-element-button',
+		'caption' => 'wp-element-caption',
 	);
 
 	/**
