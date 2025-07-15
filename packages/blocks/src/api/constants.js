@@ -286,7 +286,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	cite: 'cite',
 	select: 'select',
 	textInput:
-		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=tel],[type=url])',
+		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',
 };
 
 // These paths may have three origins, custom, theme, and default,
