@@ -359,3 +359,37 @@ describe( 'normalizing args', () => {
 		] );
 	} );
 } );
+
+describe( 'isFulfilled', () => {
+	describe( 'resolveSelect', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistry();
+
+			const fulfilledResolver = () => {};
+			fulfilledResolver.isFulfilled = () => true;
+
+			const resolvedState = {
+				items: [ 'item' ],
+			};
+
+			registry.registerStore( 'store', {
+				reducer: ( state = { items: resolvedState } ) => {
+					return state;
+				},
+				selectors: {
+					getItems: ( state ) => state.items,
+				},
+				resolvers: {
+					getItems: fulfilledResolver,
+				},
+			} );
+		} );
+
+		it( 'should resolve when a resolver implements isFulfilled', async () => {
+			const result = await registry.resolveSelect( 'store' ).getItems();
+			expect( result ).toEqual( { items: [ 'item' ] } );
+		} );
+	} );
+} );
