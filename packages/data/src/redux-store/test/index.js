@@ -368,7 +368,7 @@ describe( 'isFulfilled', () => {
 			registry = createRegistry();
 
 			const fulfilledResolver = () => {};
-			fulfilledResolver.isFulfilled = () => true;
+			fulfilledResolver.isFulfilled = ( state ) => !! state.items;
 
 			const resolvedState = {
 				items: [ 'item' ],
