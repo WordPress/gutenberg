@@ -700,19 +700,29 @@ function mapSelectorWithResolver(
 	boundMetadataSelectors
 ) {
 	function fulfillSelector( args ) {
-		const state = store.getState();
-
-		if (
-			resolversCache.isRunning( selectorName, args ) ||
-			( typeof resolver.isFulfilled === 'function' &&
-				resolver.isFulfilled( state, ...args ) )
-		) {
+		if ( resolversCache.isRunning( selectorName, args ) ) {
 			return;
 		}
 
 		if (
 			boundMetadataSelectors.hasStartedResolution( selectorName, args )
 		) {
+			return;
+		}
+
+		const state = store.getState();
+
+		if (
+			typeof resolver.isFulfilled === 'function' &&
+			resolver.isFulfilled( state, ...args )
+		) {
+			setTimeout( async () => {
+				resolversCache.clear( selectorName, args );
+				store.dispatch(
+					metadataActions.finishResolution( selectorName, args )
+				);
+			}, 0 );
+
 			return;
 		}
 
