@@ -375,7 +375,7 @@ describe( 'isFulfilled', () => {
 			};
 
 			registry.registerStore( 'store', {
-				reducer: ( state = { items: resolvedState } ) => {
+				reducer: ( state = resolvedState ) => {
 					return state;
 				},
 				selectors: {
@@ -389,7 +389,7 @@ describe( 'isFulfilled', () => {
 
 		it( 'should resolve when a resolver implements isFulfilled', async () => {
 			const result = await registry.resolveSelect( 'store' ).getItems();
-			expect( result ).toEqual( { items: [ 'item' ] } );
+			expect( result ).toEqual( [ 'item' ] );
 		} );
 	} );
 } );
