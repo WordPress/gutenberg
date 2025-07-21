@@ -48,8 +48,8 @@ type DataViewsContextType< Item > = {
 	containerWidth: number;
 	containerRef: React.MutableRefObject< HTMLDivElement | null >;
 	resizeObserverRef:
-		| ( ( element?: HTMLDivElement | null ) => void )
-		| React.RefObject< HTMLDivElement >;
+		| ( ( element?: HTMLElement | null ) => void )
+		| React.RefObject< HTMLElement >;
 	defaultLayouts: SupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;

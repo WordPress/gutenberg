@@ -380,7 +380,9 @@ function ViewGrid< Item >( {
 												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
 										} }
 										aria-busy={ isLoading }
-										ref={ resizeObserverRef }
+										ref={
+											resizeObserverRef as React.RefObject< HTMLDivElement >
+										}
 									>
 										{ groupItems.map( ( item ) => {
 											return (
@@ -438,8 +440,10 @@ function ViewGrid< Item >( {
 								`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
 						} }
 						aria-busy={ isLoading }
-						ref={ resizeObserverRef }
 						role={ isInfiniteScroll ? 'feed' : undefined }
+						ref={
+							resizeObserverRef as React.RefObject< HTMLDivElement >
+						}
 					>
 						{ data.map( ( item, index ) => {
 							return (

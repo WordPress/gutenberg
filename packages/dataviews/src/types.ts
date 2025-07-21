@@ -515,7 +515,18 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'picker-grid';
+
+	layout?: {
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -669,6 +680,7 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
 
 /**
