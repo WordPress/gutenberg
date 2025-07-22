@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
-	useInstanceId,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
 
@@ -234,9 +233,6 @@ export function FocalPointPicker( {
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
 
-	const instanceId = useInstanceId( FocalPointPicker );
-	const id = `inspector-focal-point-picker-control-${ instanceId }`;
-
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
 		const timeout = window.setTimeout( () => {
@@ -252,7 +248,9 @@ export function FocalPointPicker( {
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			__associatedWPComponentName="FocalPointPicker"
 			label={ label }
-			id={ id }
+			// Displays text visually similar to label element.
+			// A temp hack for `@wordpress/no-base-control-with-label-without-id`.
+			id={ undefined }
 			help={ help }
 			className={ classes }
 		>
