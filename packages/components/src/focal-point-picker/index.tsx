@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { KeyboardEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -16,12 +17,12 @@ import {
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
 import {
+	Container,
 	MediaWrapper,
 	MediaContainer,
 } from './styles/focal-point-picker-style';
@@ -32,7 +33,11 @@ import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
 } from './types';
-import type { KeyboardEventHandler } from 'react';
+import {
+	StyledLabel,
+	StyledHelp,
+} from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
 
 const GRID_OVERLAY_TIMEOUT = 600;
 
@@ -87,6 +92,7 @@ export function FocalPointPicker( {
 	autoPlay = true,
 	className,
 	help,
+	hideLabelFromVision,
 	label,
 	onChange,
 	onDrag,
@@ -232,6 +238,7 @@ export function FocalPointPicker( {
 	};
 
 	const classes = clsx( 'components-focal-point-picker-control', className );
+	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -243,17 +250,8 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<BaseControl
-			{ ...restProps }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			__associatedWPComponentName="FocalPointPicker"
-			label={ label }
-			// Displays text visually similar to label element.
-			// A temp hack for `@wordpress/no-base-control-with-label-without-id`.
-			id={ undefined }
-			help={ help }
-			className={ classes }
-		>
+		<Container { ...restProps } as="fieldset" className={ classes }>
+			{ !! label && <Label as="legend">{ label }</Label> }
 			<MediaWrapper className="components-focal-point-picker-wrapper">
 				<MediaContainer
 					className="components-focal-point-picker"
@@ -289,7 +287,12 @@ export function FocalPointPicker( {
 					onChange?.( getFinalValue( value ) );
 				} }
 			/>
-		</BaseControl>
+			{ !! help && (
+				<StyledHelp __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+					{ help }
+				</StyledHelp>
+			) }
+		</Container>
 	);
 }
 
