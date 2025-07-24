@@ -30,6 +30,7 @@
 		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
 		{ "path": "../upload-media" },

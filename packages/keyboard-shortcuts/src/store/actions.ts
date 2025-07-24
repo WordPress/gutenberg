@@ -1,25 +1,42 @@
-/** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
+/**
+ * WordPress dependencies
+ */
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
 /**
  * Keyboard key combination.
- *
- * @typedef {Object} WPShortcutKeyCombination
- *
- * @property {string}                      character Character.
- * @property {WPKeycodeModifier|undefined} modifier  Modifier.
  */
+export interface WPShortcutKeyCombination {
+	character: string;
+	modifier: WPKeycodeModifier | undefined;
+}
 
 /**
  * Configuration of a registered keyboard shortcut.
- *
- * @typedef {Object} WPShortcutConfig
- *
- * @property {string}                     name           Shortcut name.
- * @property {string}                     category       Shortcut category.
- * @property {string}                     description    Shortcut description.
- * @property {WPShortcutKeyCombination}   keyCombination Shortcut key combination.
- * @property {WPShortcutKeyCombination[]} [aliases]      Shortcut aliases.
  */
+export interface WPShortcutConfig {
+	name: string;
+	category: string;
+	description: string;
+	keyCombination: WPShortcutKeyCombination;
+	aliases?: WPShortcutKeyCombination[];
+}
+
+export interface RegisterShortcutAction {
+	type: 'REGISTER_SHORTCUT';
+	name: string;
+	category: string;
+	keyCombination: WPShortcutKeyCombination;
+	aliases?: WPShortcutKeyCombination[];
+	description: string;
+}
+
+export interface UnregisterShortcutAction {
+	type: 'UNREGISTER_SHORTCUT';
+	name: string;
+}
+
+export type ShortcutAction = RegisterShortcutAction | UnregisterShortcutAction;
 
 /**
  * Returns an action object used to register a new keyboard shortcut.
@@ -72,7 +89,7 @@ export function registerShortcut( {
 	description,
 	keyCombination,
 	aliases,
-} ) {
+}: WPShortcutConfig ): RegisterShortcutAction {
 	return {
 		type: 'REGISTER_SHORTCUT',
 		name,
@@ -120,7 +137,7 @@ export function registerShortcut( {
  *```
  * @return {Object} action.
  */
-export function unregisterShortcut( name ) {
+export function unregisterShortcut( name: string ): UnregisterShortcutAction {
 	return {
 		type: 'UNREGISTER_SHORTCUT',
 		name,

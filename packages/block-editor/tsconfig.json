@@ -27,6 +27,7 @@
 		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },

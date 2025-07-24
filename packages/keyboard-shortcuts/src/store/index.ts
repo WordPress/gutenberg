@@ -9,6 +9,7 @@ import { createReduxStore, register } from '@wordpress/data';
 import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
+import type { ShortcutAction } from './actions';
 
 const STORE_NAME = 'core/keyboard-shortcuts';
 
@@ -16,8 +17,6 @@ const STORE_NAME = 'core/keyboard-shortcuts';
  * Store definition for the keyboard shortcuts namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
@@ -26,3 +25,5 @@ export const store = createReduxStore( STORE_NAME, {
 } );
 
 register( store );
+
+export type { ShortcutAction };

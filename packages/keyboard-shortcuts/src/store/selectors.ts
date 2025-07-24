@@ -8,24 +8,28 @@ import {
 	rawShortcut,
 } from '@wordpress/keycodes';
 
-/** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
+/**
+ * Internal dependencies
+ */
+import type { WPShortcutKeyCombination } from './actions';
 
-/** @typedef {import('@wordpress/keycodes').WPKeycodeHandlerByModifier} WPKeycodeHandlerByModifier */
+interface ShortcutState {
+	category: string;
+	keyCombination: WPShortcutKeyCombination;
+	aliases?: WPShortcutKeyCombination[];
+	description: string;
+}
+
+type ShortcutsState = Record< string, ShortcutState >;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
- *
- * @type {Array<any>}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: WPShortcutKeyCombination[] = [];
 
 /**
  * Shortcut formatting methods.
- *
- * @property {WPKeycodeHandlerByModifier} display     Display formatting.
- * @property {WPKeycodeHandlerByModifier} rawShortcut Raw shortcut formatting.
- * @property {WPKeycodeHandlerByModifier} ariaLabel   ARIA label formatting.
  */
 const FORMATTING_METHODS = {
 	display: displayShortcut,
@@ -36,13 +40,16 @@ const FORMATTING_METHODS = {
 /**
  * Returns a string representing the key combination.
  *
- * @param {?WPShortcutKeyCombination} shortcut       Key combination.
- * @param {keyof FORMATTING_METHODS}  representation Type of representation
- *                                                   (display, raw, ariaLabel).
+ * @param shortcut       Key combination.
+ * @param representation Type of representation
+ *                       (display, raw, ariaLabel).
  *
- * @return {?string} Shortcut representation.
+ * @return Shortcut representation.
  */
-function getKeyCombinationRepresentation( shortcut, representation ) {
+function getKeyCombinationRepresentation(
+	shortcut: WPShortcutKeyCombination | null,
+	representation: keyof typeof FORMATTING_METHODS
+): string | null {
 	if ( ! shortcut ) {
 		return null;
 	}
@@ -95,7 +102,10 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  *
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-export function getShortcutKeyCombination( state, name ) {
+export function getShortcutKeyCombination(
+	state: ShortcutsState,
+	name: string
+): WPShortcutKeyCombination | null {
 	return state[ name ] ? state[ name ].keyCombination : null;
 }
 
@@ -138,10 +148,10 @@ export function getShortcutKeyCombination( state, name ) {
  * @return {?string} Shortcut representation.
  */
 export function getShortcutRepresentation(
-	state,
-	name,
-	representation = 'display'
-) {
+	state: ShortcutsState,
+	name: string,
+	representation: keyof typeof FORMATTING_METHODS = 'display'
+): string | null {
 	const shortcut = getShortcutKeyCombination( state, name );
 	return getKeyCombinationRepresentation( shortcut, representation );
 }
@@ -174,7 +184,10 @@ export function getShortcutRepresentation(
  *```
  * @return {?string} Shortcut description.
  */
-export function getShortcutDescription( state, name ) {
+export function getShortcutDescription(
+	state: ShortcutsState,
+	name: string
+): string | null {
 	return state[ name ] ? state[ name ].description : null;
 }
 
@@ -224,9 +237,12 @@ export function getShortcutDescription( state, name ) {
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
-export function getShortcutAliases( state, name ) {
+export function getShortcutAliases(
+	state: ShortcutsState,
+	name: string
+): WPShortcutKeyCombination[] {
 	return state[ name ] && state[ name ].aliases
-		? state[ name ].aliases
+		? state[ name ].aliases!
 		: EMPTY_ARRAY;
 }
 
@@ -382,10 +398,13 @@ export const getAllShortcutRawKeyCombinations = createSelector(
  * @return {string[]} Shortcut names.
  */
 export const getCategoryShortcuts = createSelector(
-	( state, categoryName ) => {
+	( state: ShortcutsState, categoryName: string ): string[] => {
 		return Object.entries( state )
-			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
+			.filter(
+				( entry ): entry is [ string, ShortcutState ] =>
+					( entry[ 1 ] as ShortcutState ).category === categoryName
+			)
 			.map( ( [ name ] ) => name );
 	},
-	( state ) => [ state ]
+	( state: ShortcutsState ) => [ state ]
 );
