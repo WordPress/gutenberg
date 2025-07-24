@@ -37,11 +37,14 @@ export default function useShortcutEventMatch(): (
 	function isMatch( name: string, event: KeyboardEvent ): boolean {
 		return getAllShortcutKeyCombinations( name ).some(
 			( combination: WPShortcutKeyCombination | null ) => {
-				if ( ! combination || ! combination.modifier ) {
+				if ( ! combination ) {
 					return false;
 				}
 				const { modifier, character } = combination;
-				return isKeyboardEvent[ modifier ]( event, character );
+				return isKeyboardEvent[ modifier || 'undefined' ](
+					event,
+					character
+				);
 			}
 		);
 	}
