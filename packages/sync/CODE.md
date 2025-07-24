@@ -8,9 +8,27 @@ Relevant docs:
 - https://github.com/WordPress/gutenberg/issues/52593
 - https://docs.yjs.dev/
 
-## Enable the experiment
+## Enable the experiments
 
-The experiment can be enabled in the "Guteberg > Experiments" page. When it is enabled (search for `gutenberg-sync-collaboration` in the codebase), the client receives two new pieces of data:
+There are two experiments that must be enabled in the "Guteberg > Experiments" page:
+
+- Collaboration: enable real-time collaboration
+- Collaboration: WebRTC provider
+
+Alternatively, you can enable just the "Collaboration: enable real-time collaboration" experiment and load a custom provider (transport) via a filter:
+
+```js
+addFilter( 'core.getSyncProvider', 'my-plugin/custom-sync-provider', ( getSyncProvider ) => {
+	return {
+		// Custom sync provider implementation
+		bootstrap: () => {},
+		discard: () => {},
+		update: () => {},
+	};
+} );
+```
+
+When it is enabled (search for `gutenberg-sync-collaboration` in the codebase), the client receives two new pieces of data:
 
 - `window.__experimentalEnableSync`: boolean. Used by the `core-data` package to determine whether to bootstrap and use the sync provider offered by the `sync` package.
 - `window.__experimentalCollaborativeEditingSecret`: string. A secret used by the `sync` package to create a secure connection among peers.

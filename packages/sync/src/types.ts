@@ -1,11 +1,28 @@
+/**
+ * External dependencies
+ */
+import type * as Y from 'yjs';
+
+declare global {
+	interface Window {
+		__experimentalCollaborativeEditingSecret?: string;
+		wp: {
+			ajax: {
+				settings: {
+					url: string;
+				};
+			};
+		};
+	}
+}
+
 export type ObjectID = string;
 export type ObjectType = string;
-export type ObjectData = any;
-export type CRDTDoc = any;
+export type CRDTDoc = Y.Doc;
 
 export type ObjectConfig = {
-	fetch: ( id: ObjectID ) => Promise< ObjectData >;
-	applyChangesToDoc: ( doc: CRDTDoc, data: any ) => void;
+	applyChangesToDoc: ( doc: CRDTDoc, data: object ) => void;
+	fetch: ( id: ObjectID ) => Promise< object >;
 	fromCRDTDoc: ( doc: CRDTDoc ) => any;
 };
 
@@ -16,12 +33,11 @@ export type ConnectDoc = (
 ) => Promise< () => void >;
 
 export type SyncProvider = {
-	register: ( type: ObjectType, config: ObjectConfig ) => void;
 	bootstrap: (
 		type: ObjectType,
 		id: ObjectID,
-		handleChanges: ( data: any ) => void
-	) => Promise< CRDTDoc >;
-	update: ( type: ObjectType, id: ObjectID, data: any ) => void;
-	discard: ( type: ObjectType, id: ObjectID ) => Promise< CRDTDoc >;
+		handleChanges: ( data: object ) => void
+	) => Promise< void >;
+	discard: ( type: ObjectType, id: ObjectID ) => Promise< void >;
+	update: ( type: ObjectType, id: ObjectID, data: object ) => void;
 };
