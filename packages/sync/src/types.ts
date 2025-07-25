@@ -39,5 +39,6 @@ export type SyncProvider = {
 		handleChanges: ( data: object ) => void
 	) => Promise< void >;
 	discard: ( type: ObjectType, id: ObjectID ) => Promise< void >;
+	register: ( type: ObjectType, config: ObjectConfig ) => void;
 	update: ( type: ObjectType, id: ObjectID, data: object ) => void;
 };
