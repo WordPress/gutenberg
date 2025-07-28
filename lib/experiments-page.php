@@ -122,20 +122,8 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables real-time collaboration between peers (requires provider).', 'gutenberg' ),
+			'label' => __( 'Enables real-time collaboration between peers.', 'gutenberg' ),
 			'id'    => 'gutenberg-sync-collaboration',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-sync-collaboration-webrtc-provider',
-		__( 'Collaboration: WebRTC provider', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables the WebRTC provider for real-time collaboration.', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration-webrtc-provider',
 		)
 	);
 
