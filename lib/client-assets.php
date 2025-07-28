@@ -212,15 +212,6 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				}
 				break;
 
-			case 'wp-core-data':
-				if (
-					gutenberg_is_experiment_enabled( 'gutenberg-sync-collaboration' ) &&
-					gutenberg_is_experiment_enabled( 'gutenberg-sync-collaboration-webrtc-provider' )
-				) {
-					array_push( $dependencies, 'wp-sync' );
-				}
-				break;
-
 			case 'wp-edit-post':
 				array_push( $dependencies, 'media-models', 'media-views', 'postbox' );
 				break;

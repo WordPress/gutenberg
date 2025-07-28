@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -16,25 +15,20 @@ export { createWebRTCConnection } from './create-webrtc-connection';
 export { createSyncProvider } from './provider';
 export * from './types';
 
-addFilter(
-	'core.getSyncProvider',
-	'wordpress-sync-webrtc/get-sync-provider',
-	( provider: SyncProvider | null ): SyncProvider => {
-		// Do not override an already defined sync provider.
-		if ( provider ) {
-			return provider;
-		}
-
-		return createSyncProvider(
-			connectIndexDb,
-			createWebRTCConnection( {
-				password: window?.__experimentalCollaborativeEditingSecret,
-				signaling: [
-					//'ws://localhost:4444',
-					window?.wp?.ajax?.settings?.url,
-				],
-			} )
-		);
-	},
-	10
-);
+/**
+ * Returns a WebRTC sync provider. This is the curent default sync provider.
+ *
+ * @return {SyncProvider} The WebRTC sync provider.
+ */
+export function getWebRTCSyncProvider(): SyncProvider {
+	return createSyncProvider(
+		connectIndexDb,
+		createWebRTCConnection( {
+			password: window?.__experimentalCollaborativeEditingSecret,
+			signaling: [
+				//'ws://localhost:4444',
+				window?.wp?.ajax?.settings?.url,
+			],
+		} )
+	);
+}

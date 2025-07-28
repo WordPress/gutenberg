@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * IMPORTANT: Ensure that we only import types from `@wordpress/sync` and not
- * code. The code is loaded only behind an experimental flag, which allows
- * other plugins to load their own sync provider.
- */
+import { getWebRTCSyncProvider } from '@wordpress/sync';
 import type { SyncProvider } from '@wordpress/sync';
+
+declare global {
+	interface Window {
+		__experimentalEnableSync?: boolean;
+	}
+}
 
 let syncProvider: SyncProvider;
 
@@ -38,6 +39,12 @@ export function getSyncProvider(): SyncProvider {
 			'core.getSyncProvider',
 			null
 		) as SyncProvider | null ) ?? fallbackNoOpSyncProvider;
+
+	// If the filter does not produce a provider and the experimental flag is set,
+	// get the WebRTC sync provider.
+	if ( ! syncProvider && window.__experimentalEnableSync ) {
+		syncProvider = getWebRTCSyncProvider();
+	}
 
 	return syncProvider;
 }
