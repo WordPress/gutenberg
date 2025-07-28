@@ -11,7 +11,7 @@ declare global {
 	}
 }
 
-let syncProvider: SyncProvider;
+let syncProvider: SyncProvider | null = null;
 
 /**
  * Returns the current sync provider, filterable by external code.
@@ -34,16 +34,20 @@ export function getSyncProvider(): SyncProvider {
 		update: () => {},
 	};
 
-	syncProvider =
-		( applyFilters(
-			'core.getSyncProvider',
-			null
-		) as SyncProvider | null ) ?? fallbackNoOpSyncProvider;
+	syncProvider = applyFilters(
+		'core.getSyncProvider',
+		null
+	) as SyncProvider | null;
 
 	// If the filter does not produce a provider and the experimental flag is set,
 	// get the WebRTC sync provider.
 	if ( ! syncProvider && window.__experimentalEnableSync ) {
 		syncProvider = getWebRTCSyncProvider();
+	}
+
+	// If no sync provider is set, use the fallback no-op sync provider.
+	if ( ! syncProvider ) {
+		syncProvider = fallbackNoOpSyncProvider;
 	}
 
 	return syncProvider;
