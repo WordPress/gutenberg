@@ -48,7 +48,9 @@ function gutenberg_setup_static_template() {
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'                 => 'object',
-					'additionalProperties' => true,
+					'additionalProperties' => array(
+						'type' => 'integer',
+					),
 				),
 			),
 			'default'      => array(),
