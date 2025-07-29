@@ -66,7 +66,10 @@ test.describe( 'Template Activate', () => {
 			'.dataviews-view-grid__badge-fields .is-success'
 		);
 
-		await page.getByLabel( 'Index (Copy)', { exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Index (Copy)', exact: true } )
+			.first()
+			.click();
 
 		await expect( editor.canvas.getByText( 'gutenberg' ) ).toBeVisible();
 
@@ -79,21 +82,20 @@ test.describe( 'Template Activate', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 
-		// Visit the front end.
-		const previewButton = page.getByRole( 'button', {
-			name: 'View',
-			exact: true,
-		} );
-
-		await previewButton.click();
-
-		const previewMenuItem = page.getByRole( 'menuitem', {
-			name: 'View site',
-		} );
+		await page
+			.getByRole( 'button', {
+				name: 'View',
+				exact: true,
+			} )
+			.click();
 
 		const [ previewPage ] = await Promise.all( [
 			page.context().waitForEvent( 'page' ),
-			previewMenuItem.click(),
+			page
+				.getByRole( 'menuitem', {
+					name: 'View site',
+				} )
+				.click(),
 		] );
 
 		await expect( previewPage.locator( 'body' ) ).toContainText(
