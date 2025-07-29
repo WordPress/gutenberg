@@ -10,10 +10,24 @@ import { createWebRTCConnection } from './create-webrtc-connection';
 import { createSyncProvider } from './provider';
 import type { SyncProvider } from './types';
 
+export * as Y from 'yjs';
 export { connectIndexDb } from './connect-indexdb';
 export { createWebRTCConnection } from './create-webrtc-connection';
 export { createSyncProvider } from './provider';
 export * from './types';
+
+declare global {
+	interface Window {
+		__experimentalCollaborativeEditingSecret?: string;
+		wp: {
+			ajax: {
+				settings: {
+					url: string;
+				};
+			};
+		};
+	}
+}
 
 /**
  * Returns a WebRTC sync provider. This is the curent default sync provider.

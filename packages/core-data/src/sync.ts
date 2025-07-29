@@ -26,11 +26,11 @@ export function getSyncProvider(): SyncProvider {
 		return syncProvider;
 	}
 
-	const fallbackNoOpSyncProvider = {
+	const fallbackNoOpSyncProvider: SyncProvider = {
 		__fallback: true,
 		bootstrap: async () => {},
+		configs: new Map(),
 		discard: async () => {},
-		register: () => {},
 		update: () => {},
 	};
 

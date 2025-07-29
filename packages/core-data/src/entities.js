@@ -2,16 +2,105 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-
+import { v4 as uuidv4 } from 'uuid';
+import * as string from 'lib0/string';
+import * as sha256 from 'lib0/hash/sha256';
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { RichTextData } from '@wordpress/rich-text';
+import { parse } from '@wordpress/blocks';
+import { Y } from '@wordpress/sync';
+import * as math from 'lib0/math';
+import * as fun from 'lib0/function';
+
+/**
+ * Internal dependencies
+ */
+import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
+// @todo refactor `applyChangesToDoc` implementations this to have less repetition (there are
+// multiple similar implementations)
+
+/**
+ * Similar to `parse`, but only reads the Yjs document if available.
+ * @param {string} postType
+ * @param {string} content
+ */
+export function parseContentYdoc( postType, content ) {
+	const newClientId = new Uint32Array(
+		sha256.digest( string.encodeUtf8( content ) ).buffer
+	);
+	const syncProvider = getSyncProvider();
+
+	// It is important that this is a fresh document - don't use the document from the sync package!
+	const ydoc = new Y.Doc( { meta: new Map() } );
+
+	const knownUpdateGuids = new Set();
+	ydoc.meta.set( 'knownRemoteUpdates', knownUpdateGuids );
+	// Changing the Yjs clientid may lead to very weird bugs if done incorrectly.
+	// Please handle the following code-portion with great care!
+	const prevClientId = ydoc.clientID;
+	ydoc.clientID = newClientId;
+	const prevClock = ( ydoc.store.clients.get( newClientId ) || [
+		{ id: { clock: 0 } },
+	] )[ 0 ].id.clock;
+	const blocks = parse( content );
+	syncProvider.configs.get( postType ).applyChangesToDoc( ydoc, {
+		blocks,
+	} );
+	ydoc.clientID = prevClientId;
+	const newClock = ( ydoc.store.clients.get( newClientId ) ?? [
+		{ id: { clock: 0 } },
+	] )[ 0 ].id.clock;
+	if ( prevClock !== newClock ) {
+		// eslint-disable-next-line no-console
+		console.info(
+			'[Yjs Collab] Yjs document was updated to reflect changes to the HTML document.'
+		);
+	}
+	return ydoc;
+}
+
+// only sync what is necessary!
+const filteredAttributes = new Set( [
+	'content',
+	'selection',
+	'excerpt',
+	'date',
+	'date_gmt',
+	'format',
+	'generated_slug',
+	'link',
+	'meta',
+	'modified',
+	'modified_gmt',
+	'slug',
+	'status',
+	'sticky',
+	'tags',
+	'template',
+	'_links',
+	'id',
+	'password',
+	'featured_media',
+] );
+
+/**
+ * @param {Y.Doc} ydoc
+ */
+const defaultYdocTransformer = ( ydoc ) => {
+	const json = ydoc.getMap( 'document' ).toJSON();
+	if ( json.title?.raw ) {
+		json.title = json.title.raw;
+	}
+	return json;
+};
 
 export const rootEntitiesConfig = [
 	{
@@ -41,23 +130,43 @@ export const rootEntitiesConfig = [
 		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
 		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/' } );
-			},
 			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
+				const content = changes.content?.raw || changes.content;
+				const parsedYdoc =
+					typeof content === 'string'
+						? parseContentYdoc( 'root/base', content )
+						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
+				if ( parsedYdoc !== null ) {
+					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
+					Y.transact(
+						doc,
+						() => {
+							// apply remote changes
+							Y.applyUpdate(
+								doc,
+								Y.encodeStateAsUpdate( parsedYdoc )
+							);
+						},
+						'applyChangesToDoc',
+						false
+					);
+				} else {
+					// local changes happened. Apply the differences to the ydoc
+					const ycontent = doc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if (
+							! filteredAttributes.has( key ) &&
+							! fun.equalityDeep( ycontent.get( key ), value )
+						) {
+							ycontent.set( key, value );
+						}
+					} );
+				}
 			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
+			fromCRDTDoc: defaultYdocTransformer,
+			getObjectId: () => 'index',
+			objectType: 'root/base',
 		},
-		syncObjectType: 'root/base',
-		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -68,25 +177,43 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'postTypes',
 		syncConfig: {
-			fetch: async ( id ) => {
-				return apiFetch( {
-					path: `/wp/v2/types/${ id }?context=edit`,
-				} );
+			applyChangesToDoc: ( ydoc, changes ) => {
+				const content = changes.content?.raw || changes.content;
+				const parsedYdoc =
+					typeof content === 'string'
+						? parseContentYdoc( 'root/postType', content )
+						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
+				if ( parsedYdoc !== null ) {
+					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
+					Y.transact(
+						ydoc,
+						() => {
+							// apply remote changes
+							Y.applyUpdate(
+								ydoc,
+								Y.encodeStateAsUpdate( parsedYdoc )
+							);
+						},
+						'applyChangesToDoc',
+						false
+					);
+				} else {
+					// local changes happened. Apply the differences to the ydoc
+					const ycontent = ydoc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if (
+							! filteredAttributes.has( key ) &&
+							! fun.equalityDeep( ycontent.get( key ), value )
+						) {
+							ycontent.set( key, value );
+						}
+					} );
+				}
 			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
+			fromCRDTDoc: defaultYdocTransformer,
+			getObjectId: ( { id } ) => id,
+			objectType: 'root/postType',
 		},
-		syncObjectType: 'root/postType',
-		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -291,6 +418,9 @@ function makeBlockAttributesSerializable( attributes ) {
 function makeBlocksSerializable( blocks ) {
 	return blocks.map( ( block ) => {
 		const { innerBlocks, attributes, ...rest } = block;
+		delete rest.validationIssues;
+		delete rest.originalContent;
+		// delete rest.isValid
 		return {
 			...rest,
 			attributes: makeBlockAttributesSerializable( attributes ),
@@ -334,39 +464,274 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
-				fetch: async ( id ) => {
-					return apiFetch( {
-						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
-					} );
-				},
-				applyChangesToDoc: ( doc, changes ) => {
-					const document = doc.getMap( 'document' );
-
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
+				/**
+				 * @param {Y.Doc} ydoc
+				 * @param {any}   changes
+				 */
+				applyChangesToDoc: ( ydoc, changes ) => {
+					const content = changes.content?.raw || changes.content;
+					const parsedYdoc =
+						typeof content === 'string'
+							? parseContentYdoc(
+									'postType/' + postType.name,
+									content
+							  )
+							: null; // Note: always use the same 'postType' as this object's config.syncObjectType
+					if ( parsedYdoc !== null ) {
+						// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
+						Y.transact(
+							ydoc,
+							() => {
+								// apply remote changes
+								Y.applyUpdate(
+									ydoc,
+									Y.encodeStateAsUpdate( parsedYdoc )
+								);
+							},
+							'applyChangesToDoc',
+							false
+						);
+					} else {
+						// local changes happened. Apply the differences to the ydoc
+						const ycontent = ydoc.getMap( 'document' );
+						ydoc.transact( () => {
+							Object.entries( changes ).forEach(
+								( [ key, value ] ) => {
+									if ( typeof value !== 'function' ) {
+										if ( key === 'blocks' ) {
+											if (
+												! serialisableBlocksCache.has(
+													value
+												)
+											) {
+												serialisableBlocksCache.set(
+													value,
+													makeBlocksSerializable(
+														value
+													)
+												);
+											}
+											const blocks =
+												serialisableBlocksCache.get(
+													value
+												);
+											// This is a rudimentary diff implementation similar to the y-prosemirror diffing
+											// approach.
+											// A better implementation would also diff the textual content and represent it
+											// using a Y.Text type.
+											// However, at this time it makes more sense to keep this algorithm generic to
+											// support all kinds of block types.
+											// Ideally, we ensure that block data structure have a consistent data format.
+											// E.g.:
+											//   - textual content (using rich-text formatting?) may always be stored under `block.text`
+											//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
+											if (
+												! ycontent.has( key ) ||
+												ycontent.get( key ) instanceof
+													Array
+											) {
+												// @todo remove the array check
+												ycontent.set(
+													key,
+													new Y.Array()
+												);
+											}
+											/**
+											 * @type {Y.Array<Y.Map<any>>}
+											 */
+											const yblocks = ycontent.get( key );
+											const numOfCommonEntries = math.min(
+												blocks.length,
+												yblocks.length
+											);
+											let left = 0;
+											let right = 0;
+											/**
+											 * @param {any}   gblock
+											 * @param {Y.Map} yblock
+											 */
+											const blocksEqual = (
+												gblock,
+												yblock
+											) => {
+												if ( yblock.toJSON ) {
+													yblock = yblock.toJSON();
+												}
+												// we must not sync clientId, as this can't be generated consistenctly and
+												// hence will lead to merge conflicts.
+												const overwrites = {
+													innerBlocks: null,
+													clientId: null,
+												};
+												const res = fun.equalityDeep(
+													Object.assign(
+														{},
+														gblock,
+														overwrites
+													),
+													Object.assign(
+														{},
+														yblock,
+														overwrites
+													)
+												);
+												const inners =
+													gblock.innerBlocks || [];
+												const yinners =
+													yblock.innerBlocks || [];
+												return (
+													res &&
+													inners.length ===
+														yinners.length &&
+													inners.every(
+														( block, i ) =>
+															blocksEqual(
+																block,
+																yinners[ i ]
+															)
+													)
+												);
+											};
+											// skip equal blocks from left
+											for (
+												;
+												left < numOfCommonEntries &&
+												blocksEqual(
+													blocks[ left ],
+													yblocks.get( left )
+												);
+												left++
+											) {
+												/* nop */
+											}
+											// skip equal blocks from right
+											for (
+												;
+												right <
+													numOfCommonEntries - left &&
+												blocksEqual(
+													blocks[
+														blocks.length -
+															right -
+															1
+													],
+													yblocks.get(
+														yblocks.length -
+															right -
+															1
+													)
+												);
+												right++
+											) {
+												/* nop */
+											}
+											const numOfUpdatesNeeded =
+												numOfCommonEntries -
+												left -
+												right;
+											const numOfInsertionsNeeded =
+												math.max(
+													0,
+													blocks.length -
+														yblocks.length
+												);
+											const numOfDeletionsNeeded =
+												math.max(
+													0,
+													yblocks.length -
+														blocks.length
+												);
+											// updates
+											for (
+												let i = 0;
+												i < numOfUpdatesNeeded;
+												i++, left++
+											) {
+												const block = blocks[ left ];
+												const yblock =
+													yblocks.get( left );
+												Object.entries( block ).forEach(
+													( [ k, v ] ) => {
+														if (
+															! fun.equalityDeep(
+																block[ k ],
+																yblock.get( k )
+															)
+														) {
+															yblock.set( k, v );
+														}
+													}
+												);
+												yblock.forEach( ( _v, k ) => {
+													if (
+														! block.hasOwnProperty(
+															k
+														)
+													) {
+														yblock.delete( k );
+													}
+												} );
+											}
+											// deletes
+											yblocks.delete(
+												left,
+												numOfDeletionsNeeded
+											);
+											// inserts
+											for (
+												let i = 0;
+												i < numOfInsertionsNeeded;
+												i++, left++
+											) {
+												yblocks.insert( left, [
+													new Y.Map(
+														Object.entries(
+															blocks[ left ]
+														)
+													),
+												] );
+											}
+											const knownClientIds = new Set();
+											// remove duplicate clientids
+											for (
+												let j = 0;
+												j < yblocks.length;
+												j++
+											) {
+												const yblock = yblocks.get( j );
+												if (
+													knownClientIds.has(
+														yblock.get( 'clientId' )
+													)
+												) {
+													yblock.set(
+														'clientId',
+														uuidv4()
+													);
+												}
+												knownClientIds.add(
+													yblock.get( 'clientId' )
+												);
+											}
+										} else if (
+											! filteredAttributes.has( key ) &&
+											! fun.equalityDeep(
+												ycontent.get( key ),
+												value
+											)
+										) {
+											ycontent.set( key, value );
+										}
+									}
 								}
-
-								value = serialisableBlocksCache.get( value );
-							}
-
-							if ( document.get( key ) !== value ) {
-								document.set( key, value );
-							}
-						}
-					} );
+							);
+						}, 'gutenberg' );
+					}
 				},
-				fromCRDTDoc: ( doc ) => {
-					return doc.getMap( 'document' ).toJSON();
-				},
+				fromCRDTDoc: defaultYdocTransformer,
+				getObjectId: ( { id } ) => id,
+				objectType: 'postType/' + postType.name,
 			},
-			syncObjectType: 'postType/' + postType.name,
-			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
@@ -414,23 +779,43 @@ async function loadSiteEntity() {
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
 		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
 			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
+				const content = changes.content?.raw || changes.content;
+				const parsedYdoc =
+					typeof content === 'string'
+						? parseContentYdoc( 'root/site', content )
+						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
+				if ( parsedYdoc !== null ) {
+					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
+					Y.transact(
+						doc,
+						() => {
+							// apply remote changes
+							Y.applyUpdate(
+								doc,
+								Y.encodeStateAsUpdate( parsedYdoc )
+							);
+						},
+						'applyChangesToDoc',
+						false
+					);
+				} else {
+					// local changes happened. Apply the differences to the ydoc
+					const ycontent = doc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if (
+							! filteredAttributes.has( key ) &&
+							! fun.equalityDeep( ycontent.get( key ), value )
+						) {
+							ycontent.set( key, value );
+						}
+					} );
+				}
 			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
+			fromCRDTDoc: defaultYdocTransformer,
+			getObjectId: () => 'index',
+			objectType: 'root/site',
 		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
 		meta: {},
 	};
 

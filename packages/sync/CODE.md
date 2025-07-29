@@ -1,6 +1,6 @@
 # Status of the sync experiment in Gutenberg
 
-The sync package is part of an ongoing research effort to lay the groundwork of Real-Time Collaboration in Gutenberg.
+The sync package is part of an ongoing effort to lay the groundwork of Real-Time Collaboration in Gutenberg.
 
 Relevant docs:
 
