@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { Awareness } from 'y-protocols/awareness';
 import type * as Y from 'yjs';
 
 export type * as Y from 'yjs';
@@ -10,23 +9,9 @@ export type ObjectType = string;
 export type ObjectData = object;
 export type UndoManager = Y.UndoManager;
 
-export type AwarenessClientID = number;
-
-export type AwarenessEventListener = ( params: {
-	added: AwarenessClientID[];
-	updated: AwarenessClientID[];
-	removed: AwarenessClientID[];
-} ) => void;
-
-export type AwarenessStates = Map<
-	AwarenessClientID,
-	Record< string, unknown >
->;
-
 export type CRDTDoc = Y.Doc;
 
 export type ConnectDocResult = {
-	awareness: Awareness | null;
 	destroy: () => void;
 };
 
@@ -58,14 +43,4 @@ export type SyncProvider = {
 		changes: Partial< ObjectData >,
 		origin: string
 	) => void;
-
-	awarenessManager?: {
-		addListener: (
-			eventType: 'update' | 'change',
-			listener: AwarenessEventListener
-		) => void;
-		getStates: () => AwarenessStates;
-		setLocalState: ( field: string, value: unknown ) => void;
-		removeStates: () => void;
-	};
 };
