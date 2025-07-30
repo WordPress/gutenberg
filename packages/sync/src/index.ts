@@ -7,13 +7,12 @@
  */
 import { connectIndexDb } from './connect-indexdb';
 import { createWebRTCConnection } from './create-webrtc-connection';
-import { createSyncProvider } from './provider';
-import type { SyncProvider } from './types';
+import { SyncProvider } from './provider';
 
 export * as Y from 'yjs';
 export { connectIndexDb } from './connect-indexdb';
 export { createWebRTCConnection } from './create-webrtc-connection';
-export { createSyncProvider } from './provider';
+export { SyncProvider } from './provider';
 export * from './types';
 
 declare global {
@@ -35,7 +34,7 @@ declare global {
  * @return {SyncProvider} The WebRTC sync provider.
  */
 export function getWebRTCSyncProvider(): SyncProvider {
-	return createSyncProvider(
+	return new SyncProvider(
 		connectIndexDb,
 		createWebRTCConnection( {
 			password: window?.__experimentalCollaborativeEditingSecret,

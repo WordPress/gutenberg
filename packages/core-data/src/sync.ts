@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { getWebRTCSyncProvider } from '@wordpress/sync';
-import type { SyncProvider } from '@wordpress/sync';
+import { getWebRTCSyncProvider, SyncProvider } from '@wordpress/sync';
 
 declare global {
 	interface Window {
@@ -26,13 +25,7 @@ export function getSyncProvider(): SyncProvider {
 		return syncProvider;
 	}
 
-	const fallbackNoOpSyncProvider: SyncProvider = {
-		__fallback: true,
-		bootstrap: async () => {},
-		configs: new Map(),
-		discard: async () => {},
-		update: () => {},
-	};
+	const fallbackNoOpSyncProvider = new SyncProvider( null, null );
 
 	syncProvider = applyFilters(
 		'core.getSyncProvider',

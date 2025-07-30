@@ -1,8 +1,4 @@
 /**
- * WordPress dependencies
- */
-
-/**
  * External dependencies
  */
 import * as Y from 'yjs';
@@ -13,37 +9,45 @@ import * as Y from 'yjs';
 import type {
 	ConnectDoc,
 	ConnectDocResult,
+	CRDTDoc,
 	ObjectID,
 	ObjectData,
 	ObjectType,
 	SyncConfig,
-	SyncProvider,
 } from './types';
 
 interface EntityState {
 	destroy: () => void;
-	ydoc: Y.Doc;
+	ydoc: CRDTDoc;
 }
 
-/**
- * Create a sync provider.
- *
- * @param {ConnectDoc | null} connectLocal  Connect the document to a local database.
- * @param {ConnectDoc | null} connectRemote Connect the document to a remote sync connection.
- * @return {SyncProvider} Sync provider.
- */
-export const createSyncProvider = (
-	connectLocal: ConnectDoc | null,
-	connectRemote: ConnectDoc | null
-): SyncProvider => {
-	const configs: Map< ObjectType, SyncConfig > = new Map<
+export class SyncProvider {
+	protected connectLocal: ConnectDoc | null;
+	protected connectRemote: ConnectDoc | null;
+
+	protected configs: Map< ObjectType, SyncConfig > = new Map<
 		ObjectType,
 		SyncConfig
 	>();
-	const entityStates: Map< string, EntityState > = new Map<
+
+	protected entityStates: Map< string, EntityState > = new Map<
 		string,
 		EntityState
 	>();
+
+	/**
+	 * Constructor.
+	 *
+	 * @param {ConnectDoc | null} connectLocal  Connect the document to a local database.
+	 * @param {ConnectDoc | null} connectRemote Connect the document to a remote sync connection.
+	 */
+	public constructor(
+		connectLocal: ConnectDoc | null,
+		connectRemote: ConnectDoc | null
+	) {
+		this.connectLocal = connectLocal;
+		this.connectRemote = connectRemote;
+	}
 
 	/**
 	 * Fetch data from local database or remote source.
@@ -52,7 +56,7 @@ export const createSyncProvider = (
 	 * @param {ObjectData} initialData   Initial data to apply to the document.
 	 * @param {Function}   handleChanges Callback to call when data changes.
 	 */
-	async function bootstrap(
+	public async bootstrap(
 		syncConfig: SyncConfig,
 		initialData: ObjectData,
 		handleChanges: ( data: Partial< ObjectData > ) => void
@@ -60,9 +64,9 @@ export const createSyncProvider = (
 		const ydoc = new Y.Doc( { meta: new Map() } );
 		const objectId = syncConfig.getObjectId( initialData );
 		const objectType = syncConfig.objectType;
-		const entityId = `${ objectType }_${ objectId }`;
+		const entityId = this.getEntityId( objectType, objectId );
 
-		configs.set( objectType, syncConfig );
+		this.configs.set( objectType, syncConfig );
 
 		const updateHandler: ( _update: Uint8Array, origin: string ) => void = (
 			_update,
@@ -77,9 +81,10 @@ export const createSyncProvider = (
 		ydoc.on( 'update', updateHandler );
 
 		const connectLocalResult: ConnectDocResult | null =
-			( await connectLocal?.( objectId, objectType, ydoc ) ) ?? null;
+			( await this.connectLocal?.( objectId, objectType, ydoc ) ) ?? null;
 		const connectRemoteResult =
-			( await connectRemote?.( objectId, objectType, ydoc ) ) ?? null;
+			( await this.connectRemote?.( objectId, objectType, ydoc ) ) ??
+			null;
 
 		const entityState: EntityState = {
 			destroy: () => {
@@ -88,14 +93,43 @@ export const createSyncProvider = (
 
 				ydoc.off( 'update', updateHandler );
 				ydoc.destroy();
-				entityStates.delete( entityId );
+				this.entityStates.delete( entityId );
 			},
 			ydoc,
 		};
 
-		entityStates.set( entityId, entityState );
+		this.entityStates.set( entityId, entityState );
 
-		update( objectType, initialData, initialData, 'gutenberg' );
+		this.update( objectType, initialData, initialData, 'gutenberg' );
+	}
+
+	/**
+	 * Get the entity ID for the given object type and object ID.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	protected getEntityId(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): string {
+		return `${ objectType }_${ objectId }`;
+	}
+
+	/**
+	 * Get the entity state for the given object type and object ID.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	protected getEntityState(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): EntityState | null {
+		return (
+			this.entityStates.get( this.getEntityId( objectType, objectId ) ) ??
+			null
+		);
 	}
 
 	/**
@@ -106,24 +140,22 @@ export const createSyncProvider = (
 	 * @param {Partial< ObjectData >} changes    Updates to make.
 	 * @param {string}                origin     The source of change.
 	 */
-	function update(
+	public update(
 		objectType: ObjectType,
 		record: ObjectData,
 		changes: Partial< ObjectData >,
 		origin: string
-	) {
-		const objectId = configs.get( objectType )?.getObjectId( record );
-		const entityId = `${ objectType }_${ objectId }`;
-		const entityState = entityStates.get( entityId );
+	): void {
+		const objectId = this.configs.get( objectType )?.getObjectId( record );
 
-		if ( ! entityState ) {
-			throw new Error(
-				`Entity ${ objectType }:${ objectId } not found `
-			);
+		if ( ! objectId ) {
+			return;
 		}
 
-		entityState.ydoc.transact( () => {
-			configs
+		const entityState = this.getEntityState( objectType, objectId );
+
+		entityState?.ydoc.transact( () => {
+			this.configs
 				.get( objectType )
 				?.applyChangesToDoc( entityState.ydoc, changes );
 		}, origin );
@@ -132,20 +164,13 @@ export const createSyncProvider = (
 	/**
 	 * Stop updating a document and discard it.
 	 *
-	 * @param {ObjectType} objectType Object type to load.
-	 * @param {ObjectID}   objectId   Object ID to load.
+	 * @param {ObjectType} objectType Object type to discard.
+	 * @param {ObjectID}   objectId   Object ID to discard.
 	 */
-	function discard( objectType: ObjectType, objectId: ObjectID ) {
+	public discard( objectType: ObjectType, objectId: ObjectID ): void {
 		const entityId = `${ objectType }_${ objectId }`;
 
-		entityStates.get( entityId )?.destroy();
-		entityStates.delete( entityId );
+		this.getEntityState( objectType, objectId )?.destroy();
+		this.entityStates.delete( entityId );
 	}
-
-	return {
-		bootstrap,
-		configs,
-		discard,
-		update,
-	};
-};
+}

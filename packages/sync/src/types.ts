@@ -27,20 +27,3 @@ export type SyncConfig = {
 	getObjectId: ( data: ObjectData ) => ObjectID;
 	objectType: ObjectType;
 };
-
-export type SyncProvider = {
-	__fallback?: boolean;
-	bootstrap: (
-		syncConfig: SyncConfig,
-		initialData: ObjectData,
-		handleChanges: ( data: Partial< ObjectData > ) => void
-	) => Promise< void >;
-	configs: Map< ObjectType, SyncConfig >;
-	discard: ( type: ObjectType, id: ObjectID ) => void;
-	update: (
-		type: ObjectType,
-		record: ObjectData,
-		changes: Partial< ObjectData >,
-		origin: string
-	) => void;
-};
