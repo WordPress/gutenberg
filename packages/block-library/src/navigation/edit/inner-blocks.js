@@ -6,6 +6,7 @@ import {
 	useInnerBlocksProps,
 	InnerBlocks,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -22,6 +23,7 @@ export default function NavigationInnerBlocks( {
 	orientation,
 	templateLock,
 } ) {
+	const blockEditingMode = useBlockEditingMode();
 	const {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasChildren,
@@ -92,14 +94,21 @@ export default function NavigationInnerBlocks( {
 			// This should be a temporary fix, to be replaced by improvements to
 			// the sibling inserter.
 			// See https://github.com/WordPress/gutenberg/issues/37572.
-			renderAppender:
-				isSelected ||
-				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasChildren ) ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				parentOrChildHasSelection
-					? InnerBlocks.ButtonBlockAppender
-					: false,
+			renderAppender: ( () => {
+				if ( blockEditingMode === 'contentOnly' ) {
+					return false;
+				}
+				if (
+					isSelected ||
+					( isImmediateParentOfSelectedBlock &&
+						! selectedBlockHasChildren ) ||
+					// Show the appender while dragging to allow inserting element between item and the appender.
+					parentOrChildHasSelection
+				) {
+					return InnerBlocks.ButtonBlockAppender;
+				}
+				return false;
+			} )(),
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,
 			__unstableDisableLayoutClassNames: true,

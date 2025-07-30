@@ -15,6 +15,7 @@ import {
 } from '@wordpress/element';
 import {
 	InspectorControls,
+	BlockControls,
 	useBlockProps,
 	RecursionProvider,
 	useHasRecursion,
@@ -26,11 +27,12 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
-	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { store as interfaceStore } from '@wordpress/interface';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -39,9 +41,9 @@ import {
 	__experimentalVStack as VStack,
 	ToggleControl,
 	Button,
+	ToolbarButton,
 	Spinner,
 	Notice,
-	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -89,10 +91,12 @@ import { DEFAULT_BLOCK } from '../constants';
  * @return {JSX.Element|null} The Add page button component or null if not applicable.
  */
 function NavigationAddPageButton( { clientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
 	const { getBlockCount } = useSelect( blockEditorStore );
+	const { insertBlock } = useDispatch( blockEditorStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const onAddPage = useCallback( () => {
+		enableComplementaryArea( 'core', 'edit-post/block' );
 		// Get the current number of blocks to insert at the end
 		const blockCount = getBlockCount( clientId );
 

@@ -2992,7 +2992,14 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// 'disabled' then the overlay is redundant since the block can't be
 	// selected. If the mode is 'contentOnly' then the overlay is redundant
 	// since there will be no controls to interact with once selected.
-	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
+
+	// Exception: Navigation blocks should show overlays in contentOnly mode
+	// to provide visual feedback for the View button functionality.
+	// Todo: consider a supports.__experimentalForceBlockOverlay which blocks
+	// can opt into. We can make this a private API.
+	const blockName = getBlockName( state, clientId );
+	const blockEditingMode = getBlockEditingMode( state, clientId );
+	if ( blockEditingMode !== 'default' && blockName !== 'core/navigation' ) {
 		return false;
 	}
 

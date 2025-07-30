@@ -73,29 +73,63 @@ function BlockCard( {
 		( { title, icon, description } = blockType );
 	}
 
-	const { parentNavBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+	const { backButtonTarget, showBackButton, buttonLabel } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getBlockParentsByBlockName,
+				getBlockName,
+				getBlockEditingMode,
+				getParentSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 
-		const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockClientId = getSelectedBlockClientId();
+			const selectedBlockName =
+				_selectedBlockClientId &&
+				getBlockName( _selectedBlockClientId );
+			const blockEditingMode =
+				_selectedBlockClientId &&
+				getBlockEditingMode( _selectedBlockClientId );
 
-		return {
-			parentNavBlockClientId: getBlockParentsByBlockName(
+			// If we're in a Navigation block and in contentOnly mode, go to parent section
+			if (
+				selectedBlockName === 'core/navigation' &&
+				blockEditingMode === 'contentOnly'
+			) {
+				const parentSection = getParentSectionBlock(
+					_selectedBlockClientId
+				);
+				return {
+					backButtonTarget: parentSection,
+					showBackButton: !! parentSection,
+					buttonLabel: __( 'Go to parent section' ),
+				};
+			}
+
+			// Otherwise, use the existing logic for parent Navigation block
+			const parentNav = getBlockParentsByBlockName(
 				_selectedBlockClientId,
 				'core/navigation',
 				true
-			)[ 0 ],
-		};
-	}, [] );
+			)[ 0 ];
+
+			return {
+				backButtonTarget: parentNav,
+				showBackButton: !! parentNav,
+				buttonLabel: __( 'Go to parent Navigation block' ),
+			};
+		},
+		[]
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
 		<div className={ clsx( 'block-editor-block-card', className ) }>
-			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
+			{ showBackButton && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
 				<Button
-					onClick={ () => selectBlock( parentNavBlockClientId ) }
-					label={ __( 'Go to parent Navigation block' ) }
+					onClick={ () => selectBlock( backButtonTarget ) }
+					label={ buttonLabel }
 					style={
 						// TODO: This style override is also used in ToolsPanelHeader.
 						// It should be supported out-of-the-box by Button.

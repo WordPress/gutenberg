@@ -100,9 +100,35 @@ function EditableTemplatePartInnerBlocks( {
 	tagName: TagName,
 	blockProps,
 } ) {
-	const onNavigateToEntityRecord = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+	const { onNavigateToEntityRecord, isNavigationContext } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getBlockName,
+				getBlockParentsByBlockName,
+			} = select( blockEditorStore );
+			const selectedBlockId = getSelectedBlockClientId();
+			const selectedBlockName =
+				selectedBlockId && getBlockName( selectedBlockId );
+
+			// Check if selected block is a Navigation block or a descendant of one
+			const navigationParents = getBlockParentsByBlockName(
+				selectedBlockId,
+				'core/navigation',
+				true
+			);
+			const isDescendantOfNavigation = navigationParents.length > 0;
+			const isNavigationBlock = selectedBlockName === 'core/navigation';
+			const isInNavigationContext =
+				isNavigationBlock || isDescendantOfNavigation;
+
+			return {
+				onNavigateToEntityRecord:
+					select( blockEditorStore ).getSettings()
+						.onNavigateToEntityRecord,
+				isNavigationContext: isInNavigationContext,
+			};
+		},
 		[]
 	);
 
@@ -123,13 +149,16 @@ function EditableTemplatePartInnerBlocks( {
 	const blockEditingMode = useBlockEditingMode();
 
 	const customProps =
-		blockEditingMode === 'contentOnly' && onNavigateToEntityRecord
+		blockEditingMode === 'contentOnly' &&
+		onNavigateToEntityRecord &&
+		! isNavigationContext
 			? {
-					onDoubleClick: () =>
+					onDoubleClick: () => {
 						onNavigateToEntityRecord( {
 							postId: id,
 							postType: 'wp_template_part',
-						} ),
+						} );
+					},
 			  }
 			: {};
 

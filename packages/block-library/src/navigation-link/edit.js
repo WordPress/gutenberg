@@ -11,6 +11,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
+	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
@@ -30,7 +32,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
@@ -44,6 +46,7 @@ import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { ViewPageSidebarButton } from './shared-view-page-button';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -193,6 +196,8 @@ function Controls( { attributes, setAttributes, setIsEditingControl } ) {
 			} }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
+			<ViewPageSidebarButton attributes={ attributes } />
+
 			<ToolsPanelItem
 				hasValue={ () => !! label }
 				label={ __( 'Text' ) }

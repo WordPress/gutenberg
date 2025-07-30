@@ -10,6 +10,7 @@ import {
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
+import { chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -42,15 +43,16 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected } = useSelect(
+	const { isSelected, blockName } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
+			const { isBlockSelected, hasSelectedInnerBlock, getBlockName } =
 				select( blockEditorStore );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				blockName: getBlockName( clientId ),
 			};
 		},
 		[ clientId ]
@@ -75,6 +77,11 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				<FlexBlock style={ { textAlign: 'left' } }>
 					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
+				{ blockName === 'core/navigation' && (
+					<FlexItem>
+						<BlockIcon icon={ chevronRight } />
+					</FlexItem>
+				) }
 			</Flex>
 		</Button>
 	);
