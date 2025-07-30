@@ -17,6 +17,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/image': [ 'id', 'url', 'title', 'alt', 'caption' ],
 	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 	'core/post-date': [ 'datetime' ],
+	'core/pullquote': [ 'citation', 'value' ],
 };
 
 /**
