@@ -61,6 +61,89 @@ const withSpinner =
 				) {
 					// Error is a docker compose error. That means something docker-related failed.
 					// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
+
+					// Enhanced debugging for database connection issues
+					console.error(
+						'\n=== Docker Compose Error Debug Information ==='
+					);
+					console.error( `Exit Code: ${ error.exitCode }` );
+
+					// Check if this is likely a database connection issue
+					if (
+						error.out &&
+						error.out.includes( 'database connection' )
+					) {
+						console.error(
+							'\n🔍 Database Connection Issue Detected'
+						);
+
+						try {
+							// Check container status
+							const containerStatus = execSync(
+								'docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}" | grep -E "(mysql|wordpress)"',
+								{ encoding: 'utf8' }
+							);
+							console.error( '📋 Container Status:' );
+							console.error( containerStatus );
+						} catch ( containerError ) {
+							console.error(
+								'❌ Failed to get container status:',
+								containerError.message
+							);
+						}
+
+						try {
+							// Check MySQL container logs
+							const mysqlLogs = execSync(
+								'docker logs --tail=20 $(docker ps -q --filter "name=tests-mysql") 2>&1 || echo "No MySQL container found"',
+								{ encoding: 'utf8' }
+							);
+							console.error(
+								'\n📝 Recent MySQL Container Logs:'
+							);
+							console.error( mysqlLogs );
+						} catch ( logError ) {
+							console.error(
+								'❌ Failed to get MySQL logs:',
+								logError.message
+							);
+						}
+
+						try {
+							// Check WordPress container logs
+							const wpLogs = execSync(
+								'docker logs --tail=10 $(docker ps -q --filter "name=tests-wordpress") 2>&1 || echo "No WordPress container found"',
+								{ encoding: 'utf8' }
+							);
+							console.error(
+								'\n📝 Recent WordPress Container Logs:'
+							);
+							console.error( wpLogs );
+						} catch ( logError ) {
+							console.error(
+								'❌ Failed to get WordPress logs:',
+								logError.message
+							);
+						}
+
+						try {
+							// Check network connectivity
+							const networkTest = execSync(
+								'docker exec $(docker ps -q --filter "name=tests-wordpress") ping -c 3 tests-mysql 2>&1 || echo "Network test failed"',
+								{ encoding: 'utf8' }
+							);
+							console.error( '\n🌐 Network Connectivity Test:' );
+							console.error( networkTest );
+						} catch ( networkError ) {
+							console.error(
+								'❌ Network test failed:',
+								networkError.message
+							);
+						}
+
+						console.error( '\n=== End Debug Information ===\n' );
+					}
+
 					spinner.fail(
 						'Error while running docker compose command.'
 					);
