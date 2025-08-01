@@ -34,9 +34,9 @@
 		"@wordpress/url": "file:../url",
 		"lib0": "^0.2.99",
 		"simple-peer": "^9.11.0",
-		"y-indexeddb": "^9.0.11",
-		"y-protocols": "^1.0.5",
-		"y-webrtc": "^10.2.5",
+		"y-indexeddb": "^9.0.12",
+		"y-protocols": "^1.0.6",
+		"y-webrtc": "^10.3.0",
 		"yjs": "13.6.27"
 	},
 	"publishConfig": {
