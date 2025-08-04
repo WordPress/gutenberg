@@ -28,7 +28,7 @@ import {
 	LAYOUT_PICKER_TABLE,
 } from '../../constants';
 import PreviewSizePicker from './utils/preview-size-picker';
-import DensityPicker from './table/density-picker';
+import DensityPicker from './utils/density-picker';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -50,6 +50,7 @@ export const VIEW_LAYOUTS = [
 		label: __( 'List' ),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
+		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_ACTIVITY,

@@ -12,11 +12,11 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViewsContext from '../../dataviews-context';
-import type { ViewTable, Density } from '../../../types';
+import type { ViewTable, ViewList, Density } from '../../../types';
 
 export default function DensityPicker() {
 	const context = useContext( DataViewsContext );
-	const view = context.view as ViewTable;
+	const view = context.view as ViewTable | ViewList;
 	return (
 		<ToggleGroupControl
 			size="__unstable-large"
