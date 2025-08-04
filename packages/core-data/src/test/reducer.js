@@ -12,7 +12,9 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
+	entitiesConfig,
 } from '../reducer';
+import { rootEntitiesConfig } from '../entities';
 
 describe( 'entities', () => {
 	// See also unit tests at `queried-data/test/reducer.js`, which are more
@@ -529,5 +531,95 @@ describe( 'currentUser', () => {
 		);
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'entitiesConfig', () => {
+	it( 'returns the default state by default', () => {
+		const state = entitiesConfig( undefined, {} );
+		expect( state ).toEqual( rootEntitiesConfig );
+	} );
+
+	it( 'adds new entities', () => {
+		const initialState = [
+			{
+				kind: 'root',
+				name: 'postType',
+				baseURL: '/wp/v2/types',
+				label: 'Post Type',
+			},
+		];
+
+		const newEntities = [
+			{
+				kind: 'root',
+				name: 'media',
+				baseURL: '/wp/v2/media',
+				label: 'Media',
+			},
+		];
+
+		const state = entitiesConfig( initialState, {
+			type: 'ADD_ENTITIES',
+			entities: newEntities,
+		} );
+
+		expect( state ).toHaveLength( 2 );
+		expect( state[ 0 ].name ).toBe( 'postType' );
+		expect( state[ 1 ].name ).toBe( 'media' );
+	} );
+
+	it( 'overwrites existing entities with the same baseURL', () => {
+		const initialState = [
+			{
+				kind: 'root',
+				name: 'postType',
+				baseURL: '/wp/v2/types',
+				label: 'Original Post Type',
+			},
+			{
+				kind: 'root',
+				name: 'media',
+				baseURL: '/wp/v2/media',
+				label: 'Media',
+			},
+		];
+
+		const newEntities = [
+			{
+				kind: 'root',
+				name: 'postType',
+				baseURL: '/wp/v2/types',
+				label: 'Updated Post Type',
+			},
+			{
+				kind: 'root',
+				name: 'user',
+				baseURL: '/wp/v2/users',
+				label: 'Users',
+			},
+		];
+
+		const state = entitiesConfig( initialState, {
+			type: 'ADD_ENTITIES',
+			entities: newEntities,
+		} );
+
+		expect( state ).toHaveLength( 3 );
+
+		const updatedPostType = state.find(
+			( entity ) => entity.baseURL === '/wp/v2/types'
+		);
+		expect( updatedPostType.label ).toBe( 'Updated Post Type' );
+
+		const media = state.find(
+			( entity ) => entity.baseURL === '/wp/v2/media'
+		);
+		expect( media.label ).toBe( 'Media' );
+
+		const user = state.find(
+			( entity ) => entity.baseURL === '/wp/v2/users'
+		);
+		expect( user.label ).toBe( 'Users' );
 	} );
 } );
