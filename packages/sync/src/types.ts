@@ -5,6 +5,7 @@ import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
 export type * as Y from 'yjs';
+export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
 export type ObjectData = object;

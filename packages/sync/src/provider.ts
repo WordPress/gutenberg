@@ -10,6 +10,7 @@ import type {
 	ConnectDoc,
 	ConnectDocResult,
 	CRDTDoc,
+	EntityID,
 	ObjectID,
 	ObjectData,
 	ObjectType,
@@ -22,18 +23,12 @@ interface EntityState {
 }
 
 export class SyncProvider {
-	protected connectLocal: ConnectDoc | null;
-	protected connectRemote: ConnectDoc | null;
+	private connectLocal: ConnectDoc | null;
+	private connectRemote: ConnectDoc | null;
 
-	protected configs: Map< ObjectType, SyncConfig > = new Map<
-		ObjectType,
-		SyncConfig
-	>();
-
-	protected entityStates: Map< string, EntityState > = new Map<
-		string,
-		EntityState
-	>();
+	protected configs: Map< ObjectType, SyncConfig > = new Map();
+	protected connections: Map< EntityID, ConnectDocResult[] > = new Map();
+	protected entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
 	 * Constructor.
@@ -47,6 +42,26 @@ export class SyncProvider {
 	) {
 		this.connectLocal = connectLocal;
 		this.connectRemote = connectRemote;
+	}
+
+	/**
+	 * Connect to a document.
+	 *
+	 * @param {ObjectID}   objectId   Object ID to connect.
+	 * @param {ObjectType} objectType Object type to connect.
+	 * @param {CRDTDoc}    ydoc       Yjs document for the object.
+	 */
+	private async connect(
+		objectId: ObjectID,
+		objectType: ObjectType,
+		ydoc: CRDTDoc
+	): Promise< ConnectDocResult[] > {
+		return (
+			await Promise.all( [
+				this.connectLocal?.( objectId, objectType, ydoc ),
+				this.connectRemote?.( objectId, objectType, ydoc ),
+			] )
+		).filter( ( result ): result is ConnectDocResult => Boolean( result ) );
 	}
 
 	/**
@@ -64,41 +79,31 @@ export class SyncProvider {
 		const ydoc = new Y.Doc( { meta: new Map() } );
 		const objectId = syncConfig.getObjectId( initialData );
 		const objectType = syncConfig.objectType;
+		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
 
-		this.configs.set( objectType, syncConfig );
+		const onDestroy = (): void => {
+			connections.forEach( ( result ) => result.destroy() );
+			ydoc.off( 'update', onUpdate );
+			ydoc.destroy();
+			this.entityStates.delete( entityId );
+		};
 
-		const updateHandler: ( _update: Uint8Array, origin: string ) => void = (
-			_update,
-			origin
-		): void => {
+		const onUpdate = ( _update: Uint8Array, origin: string ): void => {
 			if ( origin !== 'gutenberg' ) {
 				const data = syncConfig.fromCRDTDoc( ydoc );
 				handleChanges( data );
 			}
 		};
 
-		ydoc.on( 'update', updateHandler );
+		ydoc.on( 'update', onUpdate );
 
-		const connectLocalResult: ConnectDocResult | null =
-			( await this.connectLocal?.( objectId, objectType, ydoc ) ) ?? null;
-		const connectRemoteResult =
-			( await this.connectRemote?.( objectId, objectType, ydoc ) ) ??
-			null;
-
-		const entityState: EntityState = {
-			destroy: () => {
-				connectLocalResult?.destroy?.();
-				connectRemoteResult?.destroy?.();
-
-				ydoc.off( 'update', updateHandler );
-				ydoc.destroy();
-				this.entityStates.delete( entityId );
-			},
+		this.configs.set( objectType, syncConfig );
+		this.connections.set( entityId, connections );
+		this.entityStates.set( entityId, {
 			ydoc,
-		};
-
-		this.entityStates.set( entityId, entityState );
+			destroy: onDestroy,
+		} );
 
 		this.update( objectType, initialData, initialData, 'gutenberg' );
 	}
@@ -112,7 +117,7 @@ export class SyncProvider {
 	protected getEntityId(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): string {
+	): EntityID {
 		return `${ objectType }_${ objectId }`;
 	}
 
@@ -168,9 +173,6 @@ export class SyncProvider {
 	 * @param {ObjectID}   objectId   Object ID to discard.
 	 */
 	public discard( objectType: ObjectType, objectId: ObjectID ): void {
-		const entityId = `${ objectType }_${ objectId }`;
-
 		this.getEntityState( objectType, objectId )?.destroy();
-		this.entityStates.delete( entityId );
 	}
 }
