@@ -361,28 +361,27 @@ function entity( entityConfig ) {
 export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES': {
-			const existingEntitiesMap = new Map();
-
+			const existingEntitiesByKey = new Map();
 			state.forEach( ( currentEntity ) => {
-				if ( currentEntity.baseURL ) {
-					existingEntitiesMap.set(
-						currentEntity.baseURL,
-						currentEntity
-					);
-				}
+				const entityKey = `${ currentEntity.kind }:${ currentEntity.name }`;
+				existingEntitiesByKey.set( entityKey, currentEntity );
 			} );
 
+			const newEntitiesToAdd = [];
 			action.entities.forEach( ( newEntity ) => {
-				if (
-					newEntity.baseURL &&
-					existingEntitiesMap.has( newEntity.baseURL )
-				) {
-					existingEntitiesMap.delete( newEntity.baseURL );
+				const entityKey = `${ newEntity.kind }:${ newEntity.name }`;
+
+				if ( existingEntitiesByKey.has( entityKey ) ) {
+					existingEntitiesByKey.set( entityKey, newEntity );
+				} else {
+					newEntitiesToAdd.push( newEntity );
 				}
 			} );
 
-			const existingEntities = Array.from( existingEntitiesMap.values() );
-			return [ ...existingEntities, ...action.entities ];
+			const existingEntities = Array.from(
+				existingEntitiesByKey.values()
+			);
+			return [ ...existingEntities, ...newEntitiesToAdd ];
 		}
 	}
 
