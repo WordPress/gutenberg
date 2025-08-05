@@ -36,7 +36,6 @@ export function createWebRTCConnection( {
 		} );
 
 		return Promise.resolve( {
-			awareness: null,
 			destroy: () => {},
 		} );
 	};

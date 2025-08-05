@@ -24,7 +24,6 @@ export function connectIndexDb( objectId, objectType, doc ) {
 	const provider = new IndexeddbPersistence( roomName, doc );
 
 	return Promise.resolve( {
-		awareness: null,
 		destroy: () => provider.destroy(),
 	} );
 }

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 export type * as Y from 'yjs';
 export type ObjectID = string;
@@ -12,6 +13,7 @@ export type UndoManager = Y.UndoManager;
 export type CRDTDoc = Y.Doc;
 
 export type ConnectDocResult = {
+	awareness?: Awareness;
 	destroy: () => void;
 };
 
