@@ -29,5 +29,6 @@ export type SyncConfig = {
 	fromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
 	getObjectId: ( data: ObjectData ) => ObjectID;
 	objectType: ObjectType;
+	supportsAwareness?: boolean;
 	supportsUndo?: boolean;
 };
