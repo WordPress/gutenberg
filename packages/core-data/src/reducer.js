@@ -453,6 +453,9 @@ export const entities = ( state = {}, action ) => {
  * @type {UndoManager}
  */
 export function undoManager( state = createUndoManager() ) {
+	if ( window.__experimentalEnableSync ) {
+		// Replace the undo manager with the one provided by the sync provider.
+	}
 	return state;
 }
 

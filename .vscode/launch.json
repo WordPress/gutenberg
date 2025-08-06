@@ -15,7 +15,7 @@
 			"type": "msedge",
 			"request": "launch",
 			"url": "http://localhost:8888/wp-admin",
-			"runtimeExecutable": "/Applications/Vivaldi.app/Contents/MacOS/Vivaldi",
+			"runtimeExecutable": "/Applications/Vivaldi.app/Contents/MacOS/Vivaldi"
 		},
 		{
 			"type": "node",

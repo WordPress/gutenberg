@@ -6,6 +6,7 @@ import * as Y from 'yjs';
 /**
  * Internal dependencies
  */
+import { UndoManager } from './undo-manager';
 import type {
 	ConnectDoc,
 	ConnectDocResult,
@@ -18,7 +19,7 @@ import type {
 } from './types';
 
 interface EntityState {
-	undoManager: Y.UndoManager;
+	undoManager: UndoManager;
 	destroy: () => void;
 	ydoc: CRDTDoc;
 }
@@ -83,7 +84,7 @@ export class SyncProvider {
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
 
-		const undoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
+		const yjsUndoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
 			// Ensure we undo and redo one character at a time.
 			captureTimeout: 0,
 			// Ensure that we only scope the undo/redo to the current client, and Gutenberg origins.
@@ -94,11 +95,12 @@ export class SyncProvider {
 			ignoreRemoteMapChanges: true,
 		} );
 
+		const undoManager = new UndoManager( yjsUndoManager );
+
 		const onDestroy = (): void => {
 			connections.forEach( ( result ) => result.destroy() );
 			ydoc.off( 'update', onUpdate );
 			ydoc.destroy();
-			undoManager.destroy();
 			this.entityStates.delete( entityId );
 		};
 
@@ -161,7 +163,7 @@ export class SyncProvider {
 	public getUndoManager(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): Y.UndoManager | null {
+	): UndoManager | null {
 		const entityState = this.getEntityState( objectType, objectId );
 		return entityState ? entityState.undoManager : null;
 	}
