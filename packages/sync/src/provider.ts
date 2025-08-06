@@ -19,8 +19,8 @@ import type {
 } from './types';
 
 interface EntityState {
-	undoManager: UndoManager;
 	destroy: () => void;
+	undoManager: UndoManager;
 	ydoc: CRDTDoc;
 }
 
@@ -79,23 +79,11 @@ export class SyncProvider {
 		handleChanges: ( data: Partial< ObjectData > ) => void
 	): Promise< void > {
 		const ydoc = new Y.Doc( { meta: new Map() } );
+		const undoManager = new UndoManager( ydoc );
 		const objectId = syncConfig.getObjectId( initialData );
 		const objectType = syncConfig.objectType;
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
-
-		const yjsUndoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
-			// Ensure we undo and redo one character at a time.
-			captureTimeout: 0,
-			// Ensure that we only scope the undo/redo to the current client, and Gutenberg origins.
-			// ToDo: Keep an eye on this, as it needs to be battle tested.
-			trackedOrigins: new Set( [ 'gutenberg', ydoc.clientID ] ),
-			// This ensures that are able to improve the client specific undo/redo experience.
-			// This reduces the bugs we see, but it doesn't eliminate them entirely.
-			ignoreRemoteMapChanges: true,
-		} );
-
-		const undoManager = new UndoManager( yjsUndoManager );
 
 		const onDestroy = (): void => {
 			connections.forEach( ( result ) => result.destroy() );
@@ -116,9 +104,9 @@ export class SyncProvider {
 		this.configs.set( objectType, syncConfig );
 		this.connections.set( entityId, connections );
 		this.entityStates.set( entityId, {
+			destroy: onDestroy,
 			undoManager,
 			ydoc,
-			destroy: onDestroy,
 		} );
 
 		this.update( objectType, initialData, initialData, 'gutenberg' );

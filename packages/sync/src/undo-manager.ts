@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type * as Y from 'yjs';
+import * as Y from 'yjs';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import type {
 /**
  * Internal dependencies
  */
-import type { ObjectData } from './types';
+import type { CRDTDoc, ObjectData } from './types';
 
 /**
  * Wrapper class that provides the WordPress UndoManager interface while using Y.UndoManager internally.
@@ -23,13 +23,17 @@ import type { ObjectData } from './types';
 export class UndoManager implements WPUndoManager< ObjectData > {
 	private undoManager: Y.UndoManager;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param undoManager The Y.UndoManager instance to wrap.
-	 */
-	constructor( undoManager: Y.UndoManager ) {
-		this.undoManager = undoManager;
+	public constructor( ydoc: CRDTDoc ) {
+		this.undoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
+			// Ensure we undo and redo one character at a time.
+			captureTimeout: 0,
+			// Ensure that we only scope the undo/redo to the current client, and Gutenberg origins.
+			// ToDo: Keep an eye on this, as it needs to be battle tested.
+			trackedOrigins: new Set( [ 'gutenberg', ydoc.clientID ] ),
+			// This ensures that are able to improve the client specific undo/redo experience.
+			// This reduces the bugs we see, but it doesn't eliminate them entirely.
+			ignoreRemoteMapChanges: true,
+		} );
 	}
 
 	/**
@@ -37,11 +41,13 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 * Since Yjs automatically tracks changes, this method translates the WordPress
 	 * HistoryRecord format into Yjs operations.
 	 *
-	 * @param record   A record of changes to record.
-	 * @param isStaged Whether to immediately create an undo point or not.
+	 * @param _record   A record of changes to record.
+	 * @param _isStaged Whether to immediately create an undo point or not.
 	 */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	addRecord( record?: HistoryRecord< ObjectData >, isStaged = false ): void {
+	public addRecord(
+		_record?: HistoryRecord< ObjectData >,
+		_isStaged = false // eslint-disable-line @typescript-eslint/no-unused-vars
+	): void {
 		// This is a no-op for Yjs since it automatically tracks changes.
 		// If needed, we could implement custom logic to handle specific records.
 	}
@@ -51,7 +57,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 *
 	 * @return The undone record or undefined if nothing to undo.
 	 */
-	undo(): HistoryRecord< ObjectData > | undefined {
+	public undo(): HistoryRecord< ObjectData > | undefined {
 		if ( ! this.hasUndo() ) {
 			return undefined;
 		}
@@ -59,7 +65,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 		// Perform the undo operation
 		this.undoManager.undo();
 
-		// ToDo: See if the undo operation can return a record from Yjs.
+		// @TODO See if the undo operation can return a record from Yjs.
 		return [];
 	}
 
@@ -68,15 +74,15 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 *
 	 * @return The redone record or undefined if nothing to redo.
 	 */
-	redo(): HistoryRecord< ObjectData > | undefined {
+	public redo(): HistoryRecord< ObjectData > | undefined {
 		if ( ! this.hasRedo() ) {
-			return undefined;
+			return;
 		}
 
 		// Perform the redo operation
 		this.undoManager.redo();
 
-		// ToDo: See if the redo operation can return a record from Yjs.
+		// @TODO See if the redo operation can return a record from Yjs.
 		return [];
 	}
 
@@ -85,7 +91,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 *
 	 * @return Whether there are changes to undo.
 	 */
-	hasUndo(): boolean {
+	public hasUndo(): boolean {
 		return this.undoManager.canUndo();
 	}
 
@@ -94,7 +100,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 *
 	 * @return Whether there are changes to redo.
 	 */
-	hasRedo(): boolean {
+	public hasRedo(): boolean {
 		return this.undoManager.canRedo();
 	}
 }
