@@ -18,6 +18,7 @@ import type {
 } from './types';
 
 interface EntityState {
+	undoManager: Y.UndoManager;
 	destroy: () => void;
 	ydoc: CRDTDoc;
 }
@@ -82,10 +83,22 @@ export class SyncProvider {
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
 
+		const undoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
+			// Ensure we undo and redo one character at a time.
+			captureTimeout: 0,
+			// Ensure that we only scope the undo/redo to the current client, and Gutenberg origins.
+			// ToDo: Keep an eye on this, as it needs to be battle tested.
+			trackedOrigins: new Set( [ 'gutenberg', ydoc.clientID ] ),
+			// This ensures that are able to improve the client specific undo/redo experience.
+			// This reduces the bugs we see, but it doesn't eliminate them entirely.
+			ignoreRemoteMapChanges: true,
+		} );
+
 		const onDestroy = (): void => {
 			connections.forEach( ( result ) => result.destroy() );
 			ydoc.off( 'update', onUpdate );
 			ydoc.destroy();
+			undoManager.destroy();
 			this.entityStates.delete( entityId );
 		};
 
@@ -101,6 +114,7 @@ export class SyncProvider {
 		this.configs.set( objectType, syncConfig );
 		this.connections.set( entityId, connections );
 		this.entityStates.set( entityId, {
+			undoManager,
 			ydoc,
 			destroy: onDestroy,
 		} );
@@ -135,6 +149,21 @@ export class SyncProvider {
 			this.entityStates.get( this.getEntityId( objectType, objectId ) ) ??
 			null
 		);
+	}
+
+	/**
+	 * Get the undo manager for the given object type and object ID.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @return {Y.UndoManager | null} The undo manager, or null if not found.
+	 */
+	public getUndoManager(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): Y.UndoManager | null {
+		const entityState = this.getEntityState( objectType, objectId );
+		return entityState ? entityState.undoManager : null;
 	}
 
 	/**
