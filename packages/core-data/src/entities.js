@@ -731,6 +731,7 @@ async function loadPostTypeEntities() {
 				fromCRDTDoc: defaultYdocTransformer,
 				getObjectId: ( { id } ) => id,
 				objectType: 'postType/' + postType.name,
+				supportsUndo: true,
 			},
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>

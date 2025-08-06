@@ -20,13 +20,26 @@ import type {
 
 interface EntityState {
 	destroy: () => void;
-	undoManager: UndoManager;
 	ydoc: CRDTDoc;
 }
 
 export class SyncProvider {
 	private connectLocal: ConnectDoc | null;
 	private connectRemote: ConnectDoc | null;
+
+	/**
+	 * CAUTION: We currently store a single UndoManager instance under these
+	 * assumptions:
+	 *
+	 * 1. Only entities loaded by the block editor support an undo manager.
+	 * 2. Only one such entity is loaded at a time.
+	 * 3. The entity's SyncConfig has `supportsUndo` set to true.
+	 *
+	 * If these assumptions fail, we will need to refactor the selectors provided
+	 * by `@wordpress/core-data` (e.g., `getUndoManager`) to support multiple
+	 * UndoManager instances by requiring the entity type and ID as parameters.
+	 */
+	private undoManager: UndoManager | null = null;
 
 	protected configs: Map< ObjectType, SyncConfig > = new Map();
 	protected connections: Map< EntityID, ConnectDocResult[] > = new Map();
@@ -79,7 +92,6 @@ export class SyncProvider {
 		handleChanges: ( data: Partial< ObjectData > ) => void
 	): Promise< void > {
 		const ydoc = new Y.Doc( { meta: new Map() } );
-		const undoManager = new UndoManager( ydoc );
 		const objectId = syncConfig.getObjectId( initialData );
 		const objectType = syncConfig.objectType;
 		const connections = await this.connect( objectId, objectType, ydoc );
@@ -101,11 +113,14 @@ export class SyncProvider {
 
 		ydoc.on( 'update', onUpdate );
 
+		if ( syncConfig.supportsUndo ) {
+			this.undoManager = new UndoManager( ydoc );
+		}
+
 		this.configs.set( objectType, syncConfig );
 		this.connections.set( entityId, connections );
 		this.entityStates.set( entityId, {
 			destroy: onDestroy,
-			undoManager,
 			ydoc,
 		} );
 
@@ -142,18 +157,12 @@ export class SyncProvider {
 	}
 
 	/**
-	 * Get the undo manager for the given object type and object ID.
+	 * Get the undo manager.
 	 *
-	 * @param {ObjectType} objectType Object type.
-	 * @param {ObjectID}   objectId   Object ID.
-	 * @return {Y.UndoManager | null} The undo manager, or null if not found.
+	 * @return {Y.UndoManager | null} The undo manager, or null if unsupported.
 	 */
-	public getUndoManager(
-		objectType: ObjectType,
-		objectId: ObjectID
-	): UndoManager | null {
-		const entityState = this.getEntityState( objectType, objectId );
-		return entityState ? entityState.undoManager : null;
+	public getUndoManager(): UndoManager | null {
+		return this.undoManager;
 	}
 
 	/**
