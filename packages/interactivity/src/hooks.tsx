@@ -201,6 +201,8 @@ export const directive = (
 	directivePriorities[ name ] = priority;
 };
 
+export const NOT_RESOLVED = Symbol( 'NOT_RESOLVED' );
+
 // Resolve the path to some property of the store object.
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
@@ -224,8 +226,13 @@ const resolve = ( path: string, namespace: string ) => {
 		context: getScope().context[ namespace ],
 	};
 	try {
-		// TODO: Support lazy/dynamically initialized stores
-		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
+		return path
+			.split( '.' )
+			.reduce(
+				( acc, key ) =>
+					key in acc ? acc[ key ] : acc[ key ] || NOT_RESOLVED,
+				current
+			);
 	} catch ( e ) {}
 };
 
@@ -273,7 +280,9 @@ export const getEvaluate: GetEvaluate =
 		}
 		const result = value;
 		resetScope();
-		return hasNegationOperator ? ! result : result;
+		return hasNegationOperator && value !== NOT_RESOLVED
+			? ! result
+			: result;
 	};
 
 // Separate directives by priority. The resulting array contains objects

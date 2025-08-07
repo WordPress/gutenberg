@@ -30,6 +30,7 @@ import {
 	getEvaluate,
 	isDefaultDirectiveSuffix,
 	isNonDefaultDirectiveSuffix,
+	NOT_RESOLVED,
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
@@ -205,6 +206,9 @@ const getGlobalEventDirective = (
 				useInit( () => {
 					const cb = ( event: Event ) => {
 						const result = evaluate( entry );
+						if ( result === NOT_RESOLVED ) {
+							return;
+						}
 						if ( typeof result === 'function' ) {
 							if ( ! result?.sync ) {
 								event = wrapEventAsync( event );
@@ -241,6 +245,9 @@ const getGlobalAsyncEventDirective = (
 					const cb = async ( event: Event ) => {
 						await splitTask();
 						const result = evaluate( entry );
+						if ( result === NOT_RESOLVED ) {
+							return;
+						}
 						if ( typeof result === 'function' ) {
 							result( event );
 						}
@@ -371,6 +378,9 @@ export default () => {
 					}
 				}
 				let result = evaluate( entry );
+				if ( result === NOT_RESOLVED ) {
+					return;
+				}
 				if ( typeof result === 'function' ) {
 					result = result();
 				}
@@ -412,6 +422,9 @@ export default () => {
 					}
 				}
 				let result = evaluate( entry );
+				if ( result === NOT_RESOLVED ) {
+					return;
+				}
 				if ( typeof result === 'function' ) {
 					result = result();
 				}
@@ -471,6 +484,9 @@ export default () => {
 						}
 					}
 					const result = evaluate( entry );
+					if ( result === NOT_RESOLVED ) {
+						return;
+					}
 					if ( typeof result === 'function' ) {
 						if ( ! result?.sync ) {
 							event = wrapEventAsync( event );
@@ -526,6 +542,9 @@ export default () => {
 					entries.forEach( async ( entry ) => {
 						await splitTask();
 						const result = evaluate( entry );
+						if ( result === NOT_RESOLVED ) {
+							return;
+						}
 						if ( typeof result === 'function' ) {
 							result( event );
 						}
@@ -559,6 +578,9 @@ export default () => {
 						? `${ entry.suffix }---${ entry.uniqueId }`
 						: entry.suffix;
 					let result = evaluate( entry );
+					if ( result === NOT_RESOLVED ) {
+						return;
+					}
 					if ( typeof result === 'function' ) {
 						result = result();
 					}
@@ -608,6 +630,9 @@ export default () => {
 			}
 			const styleProp = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === NOT_RESOLVED ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -651,6 +676,9 @@ export default () => {
 			}
 			const attribute = entry.suffix;
 			let result = evaluate( entry );
+			if ( result === NOT_RESOLVED ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -772,6 +800,9 @@ export default () => {
 			}
 			try {
 				let result = evaluate( entry );
+				if ( result === NOT_RESOLVED ) {
+					return;
+				}
 				if ( typeof result === 'function' ) {
 					result = result();
 				}
@@ -792,6 +823,9 @@ export default () => {
 				}
 			}
 			let result = evaluate( entry );
+			if ( result === NOT_RESOLVED ) {
+				return;
+			}
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
@@ -840,6 +874,9 @@ export default () => {
 			}
 
 			let iterable = evaluate( entry );
+			if ( iterable === NOT_RESOLVED ) {
+				return;
+			}
 			if ( typeof iterable === 'function' ) {
 				iterable = iterable();
 			}
