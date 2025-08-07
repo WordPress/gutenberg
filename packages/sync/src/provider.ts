@@ -159,7 +159,7 @@ export class SyncProvider {
 	/**
 	 * Get the undo manager.
 	 *
-	 * @return {Y.UndoManager | null} The undo manager, or null if unsupported.
+	 * @return {UndoManager | null} The undo manager, or null if unsupported.
 	 */
 	public getUndoManager(): UndoManager | null {
 		return this.undoManager;

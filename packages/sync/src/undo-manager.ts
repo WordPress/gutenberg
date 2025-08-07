@@ -59,7 +59,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 */
 	public undo(): HistoryRecord< ObjectData > | undefined {
 		if ( ! this.hasUndo() ) {
-			return undefined;
+			return;
 		}
 
 		// Perform the undo operation
