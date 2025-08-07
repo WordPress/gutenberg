@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -8,13 +13,18 @@ import {
 } from '@wordpress/compose';
 
 /**
+ * Internal dependencies
+ */
+import type { ViewportQueries } from './types';
+
+/**
  * Higher-order component creator, creating a new component which renders with
  * the given prop names, where the value passed to the underlying component is
  * the result of the query assigned as the object's value.
  *
  * @see isViewportMatch
  *
- * @param {Object} queries Object of prop name to viewport query.
+ * @param queries Object of prop name to viewport query.
  *
  * @example
  *
@@ -28,9 +38,9 @@ import {
  * MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
  * ```
  *
- * @return {Function} Higher-order component.
+ * @return Higher-order component.
  */
-const withViewportMatch = ( queries ) => {
+const withViewportMatch = ( queries: ViewportQueries ) => {
 	const queryEntries = Object.entries( queries );
 	const useViewPortQueriesResult = () =>
 		Object.fromEntries(
@@ -44,15 +54,24 @@ const withViewportMatch = ( queries ) => {
 				// we are respecting that as from the static query of the HOC we generate
 				// a hook that calls other hooks always in the same order (because the query never changes).
 				// eslint-disable-next-line react-hooks/rules-of-hooks
-				return [ key, useViewportMatch( breakpointName, operator ) ];
+				return [
+					key,
+					( useViewportMatch as any )( breakpointName, operator ),
+				];
 			} )
 		);
-	return createHigherOrderComponent( ( WrappedComponent ) => {
-		return pure( ( props ) => {
-			const queriesResult = useViewPortQueriesResult();
-			return <WrappedComponent { ...props } { ...queriesResult } />;
-		} );
-	}, 'withViewportMatch' );
+	return createHigherOrderComponent(
+		( WrappedComponent: ComponentType< any > ) => {
+			return ( pure as any )( ( props: any ) => {
+				const queriesResult = useViewPortQueriesResult();
+				return ( WrappedComponent as any )( {
+					...props,
+					...queriesResult,
+				} );
+			} );
+		},
+		'withViewportMatch'
+	);
 };
 
 export default withViewportMatch;

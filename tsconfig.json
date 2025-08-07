@@ -75,6 +75,7 @@
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
 		{ "path": "packages/url" },
+		{ "path": "packages/viewport" },
 		{ "path": "packages/views" },
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
