@@ -4,6 +4,7 @@
 import { createContext } from '@wordpress/element';
 
 export const Context = createContext( false );
+Context.displayName = 'AsyncModeContext';
 
 const { Consumer, Provider } = Context;
 
