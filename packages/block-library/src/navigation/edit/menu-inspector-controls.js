@@ -37,10 +37,24 @@ const { PrivateListView } = unlock( blockEditorPrivateApis );
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-		insertedBlock?.name
+	// Get the full block details using the clientId from insertedBlock
+	const insertedBlockDetails = useSelect(
+		( select ) => {
+			if ( ! insertedBlock?.clientId ) {
+				return null;
+			}
+			return select( blockEditorStore ).getBlock(
+				insertedBlock.clientId
+			);
+		},
+		[ insertedBlock?.clientId ]
 	);
-	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
+		insertedBlockDetails?.name
+	);
+	const blockWasJustInserted =
+		insertedBlockDetails?.clientId === block.clientId;
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
 
 	if ( ! showLinkControls ) {
@@ -57,16 +71,18 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 
 	return (
 		<LinkUI
-			clientId={ insertedBlock?.clientId }
-			link={ insertedBlock?.attributes }
+			clientId={ insertedBlockDetails?.clientId }
+			link={ insertedBlockDetails?.attributes }
 			onClose={ () => {
 				setInsertedBlock( null );
 			} }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
 					updatedValue,
-					setInsertedBlockAttributes( insertedBlock?.clientId ),
-					insertedBlock?.attributes
+					setInsertedBlockAttributes(
+						insertedBlockDetails?.clientId
+					),
+					insertedBlockDetails?.attributes
 				);
 				setInsertedBlock( null );
 			} }
@@ -127,6 +143,7 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
+				directInsert
 			/>
 		</div>
 	);

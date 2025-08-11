@@ -19,7 +19,8 @@ import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { insertedBlock, setInsertedBlock } = useListViewContext();
+		const { insertedBlock, setInsertedBlock, directInsert } =
+			useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
 		const hideInserter = useSelect(
@@ -79,7 +80,7 @@ export const Appender = forwardRef(
 					position="bottom right"
 					isAppender
 					selectBlockOnInsert={ false }
-					shouldDirectInsert={ false }
+					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }

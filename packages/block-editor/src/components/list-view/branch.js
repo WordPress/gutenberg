@@ -101,6 +101,8 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
+	const { directInsert } = useListViewContext();
+
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
 
@@ -265,6 +267,7 @@ function ListViewBranch( props ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
+								directInsert={ directInsert }
 								{ ...treeGridCellProps }
 							/>
 						) }
