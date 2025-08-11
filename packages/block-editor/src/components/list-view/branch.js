@@ -101,17 +101,6 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const {
-		blockDropPosition,
-		blockDropTargetIndex,
-		firstDraggedBlockIndex,
-		blockIndexes,
-		expandedState,
-		draggedClientIds,
-	} = useListViewContext();
-
-	const nextPositionRef = useRef();
-
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
 
@@ -124,6 +113,17 @@ function ListViewBranch( props ) {
 		},
 		[ parentId ]
 	);
+
+	const {
+		blockDropPosition,
+		blockDropTargetIndex,
+		firstDraggedBlockIndex,
+		blockIndexes,
+		expandedState,
+		draggedClientIds,
+	} = useListViewContext();
+
+	const nextPositionRef = useRef();
 
 	if ( ! canParentExpand ) {
 		return null;
