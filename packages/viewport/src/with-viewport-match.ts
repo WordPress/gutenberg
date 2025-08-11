@@ -6,6 +6,7 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
+import { createElement } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	pure,
@@ -15,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import type { ViewportQueries } from './types';
+import type { ViewportQueries, BreakpointName, QueryOperator } from './types';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -42,6 +43,7 @@ import type { ViewportQueries } from './types';
  */
 const withViewportMatch = ( queries: ViewportQueries ) => {
 	const queryEntries = Object.entries( queries );
+
 	const useViewPortQueriesResult = () =>
 		Object.fromEntries(
 			queryEntries.map( ( [ key, query ] ) => {
@@ -56,19 +58,28 @@ const withViewportMatch = ( queries: ViewportQueries ) => {
 				// eslint-disable-next-line react-hooks/rules-of-hooks
 				return [
 					key,
-					( useViewportMatch as any )( breakpointName, operator ),
+					// eslint-disable-next-line react-hooks/rules-of-hooks
+					useViewportMatch(
+						breakpointName as BreakpointName,
+						operator as QueryOperator
+					),
 				];
 			} )
 		);
+
 	return createHigherOrderComponent(
-		( WrappedComponent: ComponentType< any > ) => {
-			return ( pure as any )( ( props: any ) => {
+		< T extends Record< string, unknown > >(
+			WrappedComponent: ComponentType< T >
+		) => {
+			const WrappedWithViewport = ( props: T ) => {
 				const queriesResult = useViewPortQueriesResult();
-				return ( WrappedComponent as any )( {
+				return createElement( WrappedComponent, {
 					...props,
 					...queriesResult,
 				} );
-			} );
+			};
+
+			return pure( WrappedWithViewport );
 		},
 		'withViewportMatch'
 	);

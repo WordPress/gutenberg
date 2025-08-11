@@ -39,7 +39,9 @@ const ifViewportMatches = ( query: ViewportQuery ) =>
 			withViewportMatch( {
 				isViewportMatch: query,
 			} ),
-			ifCondition( ( props: any ) => props.isViewportMatch ),
+			ifCondition(
+				( props: { isViewportMatch: boolean } ) => props.isViewportMatch
+			),
 		] ),
 		'ifViewportMatches'
 	);
