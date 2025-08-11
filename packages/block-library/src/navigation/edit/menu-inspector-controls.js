@@ -39,24 +39,10 @@ const { PrivateListView } = unlock( blockEditorPrivateApis );
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// Get the full block details using the clientId from insertedBlock
-	const insertedBlockDetails = useSelect(
-		( select ) => {
-			if ( ! insertedBlock?.clientId ) {
-				return null;
-			}
-			return select( blockEditorStore ).getBlock(
-				insertedBlock.clientId
-			);
-		},
-		[ insertedBlock?.clientId ]
-	);
-
 	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
-		insertedBlockDetails?.name
+		insertedBlock?.name
 	);
-	const blockWasJustInserted =
-		insertedBlockDetails?.clientId === block.clientId;
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
 
 	if ( ! showLinkControls ) {
@@ -73,18 +59,16 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 
 	return (
 		<LinkUI
-			clientId={ insertedBlockDetails?.clientId }
-			link={ insertedBlockDetails?.attributes }
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
 			onClose={ () => {
 				setInsertedBlock( null );
 			} }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
 					updatedValue,
-					setInsertedBlockAttributes(
-						insertedBlockDetails?.clientId
-					),
-					insertedBlockDetails?.attributes
+					setInsertedBlockAttributes( insertedBlock?.clientId ),
+					insertedBlock?.attributes
 				);
 				setInsertedBlock( null );
 			} }
