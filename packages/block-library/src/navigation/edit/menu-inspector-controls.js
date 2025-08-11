@@ -60,6 +60,7 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
+			setInsertedBlock={ setInsertedBlock }
 			onClose={ () => {
 				// Follows the exact same pattern as Navigation Link block's onClose handler
 				// If there is no URL then remove the auto-inserted block to avoid empty blocks

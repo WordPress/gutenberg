@@ -75,7 +75,7 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-function LinkUIBlockInserter( { clientId, onBack } ) {
+function LinkUIBlockInserter( { clientId, onBack, setInsertedBlock } ) {
 	const { rootBlockClientId } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -135,7 +135,8 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 				clientId={ clientId }
 				isAppender={ false }
 				prioritizePatterns={ false }
-				selectBlockOnInsert
+				selectBlockOnInsert={ ! setInsertedBlock }
+				onSelect={ setInsertedBlock ? setInsertedBlock : undefined }
 				hasSearch={ false }
 			/>
 		</div>
@@ -250,6 +251,7 @@ function UnforwardedLinkUI( props, ref ) {
 						setFocusAddBlockButton( true );
 						setFocusAddPageButton( false );
 					} }
+					setInsertedBlock={ props?.setInsertedBlock }
 				/>
 			) }
 
