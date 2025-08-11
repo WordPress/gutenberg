@@ -26,14 +26,12 @@ import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
 
-// Define blocks that support link UI controls
+const actionLabel =
+	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
-
-const actionLabel =
-	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
