@@ -35,7 +35,8 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, removeBlock } =
+		useDispatch( blockEditorStore );
 
 	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
 		insertedBlock?.name
@@ -60,6 +61,16 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
 			onClose={ () => {
+				// Follows the exact same pattern as Navigation Link block's onClose handler
+				// If there is no URL then remove the auto-inserted block to avoid empty blocks
+				if (
+					! insertedBlock?.attributes?.url &&
+					insertedBlock?.clientId
+				) {
+					// Remove the block entirely to avoid poor UX
+					// This matches the Navigation Link block's behavior
+					removeBlock( insertedBlock.clientId );
+				}
 				setInsertedBlock( null );
 			} }
 			onChange={ ( updatedValue ) => {
@@ -68,9 +79,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 					setInsertedBlockAttributes( insertedBlock?.clientId ),
 					insertedBlock?.attributes
 				);
-				setInsertedBlock( null );
-			} }
-			onCancel={ () => {
 				setInsertedBlock( null );
 			} }
 		/>
