@@ -101,16 +101,16 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const { rootClientId } = useListViewContext();
+	const {
+		blockDropPosition,
+		blockDropTargetIndex,
+		firstDraggedBlockIndex,
+		blockIndexes,
+		expandedState,
+		draggedClientIds,
+	} = useListViewContext();
 
-	const directInsert = useSelect(
-		( select ) => {
-			const { getBlockListSettings } = select( blockEditorStore );
-			const settings = getBlockListSettings( rootClientId );
-			return settings?.directInsert || false;
-		},
-		[ rootClientId ]
-	);
+	const nextPositionRef = useRef();
 
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;
@@ -124,17 +124,6 @@ function ListViewBranch( props ) {
 		},
 		[ parentId ]
 	);
-
-	const {
-		blockDropPosition,
-		blockDropTargetIndex,
-		firstDraggedBlockIndex,
-		blockIndexes,
-		expandedState,
-		draggedClientIds,
-	} = useListViewContext();
-
-	const nextPositionRef = useRef();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -276,7 +265,6 @@ function ListViewBranch( props ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
-								directInsert={ directInsert }
 								{ ...treeGridCellProps }
 							/>
 						) }
