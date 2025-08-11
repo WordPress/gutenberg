@@ -26,12 +26,14 @@ import LeafMoreMenu from './leaf-more-menu';
 import { updateAttributes } from '../../navigation-link/update-attributes';
 import { LinkUI } from '../../navigation-link/link-ui';
 
-const actionLabel =
-	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
+// Define blocks that support link UI controls
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
+
+const actionLabel =
+	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
@@ -93,13 +95,13 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	);
 }
 
-const MainContent = ( {
+function MainContent( {
 	clientId,
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
 	onCreateNew,
-} ) => {
+} ) {
 	const hasChildren = useSelect(
 		( select ) => {
 			return !! select( blockEditorStore ).getBlockCount( clientId );
@@ -143,11 +145,10 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
-				directInsert
 			/>
 		</div>
 	);
-};
+}
 
 const MenuInspectorControls = ( props ) => {
 	const {

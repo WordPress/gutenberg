@@ -84,7 +84,6 @@ export const BLOCK_LIST_ITEM_HEIGHT = 32;
  * @param {string}         props.description            Optional accessible description for the tree grid component.
  * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
  * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
- * @param {boolean}        props.directInsert           Whether to enable direct insertion mode for the appender.
  * @param {Ref}            ref                          Forwarded ref
  */
 function ListViewComponent(
@@ -100,8 +99,6 @@ function ListViewComponent(
 		description,
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
-		// New props for custom appender behavior
-		directInsert = false,
 	},
 	ref
 ) {
@@ -189,7 +186,7 @@ function ListViewComponent(
 			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
 		}
 		// Only focus on the selected item when the list view is mounted.
-	}, [] );
+	}, [ selectedClientIds ] );
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -303,7 +300,6 @@ function ListViewComponent(
 			setInsertedBlock,
 			treeGridElementRef: elementRef,
 			rootClientId,
-			directInsert,
 		} ),
 		[
 			blockDropPosition,
@@ -321,7 +317,6 @@ function ListViewComponent(
 			insertedBlock,
 			setInsertedBlock,
 			rootClientId,
-			directInsert,
 		]
 	);
 
@@ -398,7 +393,6 @@ function ListViewComponent(
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						showAppender={ showAppender }
-						directInsert={ directInsert }
 					/>
 				</ListViewContext.Provider>
 			</TreeGrid>

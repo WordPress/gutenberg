@@ -101,7 +101,16 @@ function ListViewBranch( props ) {
 		showAppender: showAppenderProp = true,
 	} = props;
 
-	const { directInsert } = useListViewContext();
+	const { rootClientId } = useListViewContext();
+
+	const directInsert = useSelect(
+		( select ) => {
+			const { getBlockListSettings } = select( blockEditorStore );
+			const settings = getBlockListSettings( rootClientId );
+			return settings?.directInsert || false;
+		},
+		[ rootClientId ]
+	);
 
 	const parentBlockInformation = useBlockDisplayInformation( parentId );
 	const syncedBranch = isSyncedBranch || !! parentBlockInformation?.isSynced;

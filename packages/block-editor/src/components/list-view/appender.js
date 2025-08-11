@@ -18,9 +18,11 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 
 export const Appender = forwardRef(
-	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		const { insertedBlock, setInsertedBlock, directInsert } =
-			useListViewContext();
+	(
+		{ nestingLevel, blockCount, clientId, directInsert = false, ...props },
+		ref
+	) => {
+		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
 		const hideInserter = useSelect(
