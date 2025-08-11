@@ -186,7 +186,7 @@ function ListViewComponent(
 			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
 		}
 		// Only focus on the selected item when the list view is mounted.
-	}, [ selectedClientIds ] );
+	}, [] );
 
 	const expand = useCallback(
 		( clientId ) => {
