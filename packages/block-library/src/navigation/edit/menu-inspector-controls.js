@@ -95,13 +95,13 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	);
 }
 
-function MainContent( {
+const MainContent = ( {
 	clientId,
 	currentMenuId,
 	isLoading,
 	isNavigationMenuMissing,
 	onCreateNew,
-} ) {
+} ) => {
 	const hasChildren = useSelect(
 		( select ) => {
 			return !! select( blockEditorStore ).getBlockCount( clientId );
@@ -148,7 +148,7 @@ function MainContent( {
 			/>
 		</div>
 	);
-}
+};
 
 const MenuInspectorControls = ( props ) => {
 	const {
