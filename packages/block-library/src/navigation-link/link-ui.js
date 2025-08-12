@@ -7,10 +7,8 @@ import {
 	Button,
 	VisuallyHidden,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-	TextControl,
 } from '@wordpress/components';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	LinkControl,
 	store as blockEditorStore,
@@ -24,12 +22,8 @@ import {
 	useEffect,
 	forwardRef,
 } from '@wordpress/element';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useResourcePermissions } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import {
 	chevronLeftSmall,
 	chevronRightSmall,
@@ -42,6 +36,7 @@ import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { LinkUIPageCreator } from './page-creator';
 
 const { PrivateQuickInserter: QuickInserter } = unlock(
 	blockEditorPrivateApis
@@ -148,152 +143,6 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 				selectBlockOnInsert
 				hasSearch={ false }
 			/>
-		</div>
-	);
-}
-
-function LinkUIPageCreator( { postType, onBack, onPageCreated } ) {
-	const labels = useSelect(
-		( select ) => select( coreStore ).getPostType( postType )?.labels,
-		[ postType ]
-	);
-	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-	const [ title, setTitle ] = useState( '' );
-	const [ errorMessage, setErrorMessage ] = useState( '' );
-
-	const { saveEntityRecord } = useDispatch( coreStore );
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-
-	const dialogTitleId = useInstanceId(
-		LinkControl,
-		`link-ui-page-creator__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		LinkControl,
-		`link-ui-page-creator__description`
-	);
-
-	async function createPage( event ) {
-		event.preventDefault();
-
-		if ( isCreatingPage ) {
-			return;
-		}
-
-		if ( ! title.trim() ) {
-			setErrorMessage( __( 'Please enter a title.' ) );
-			return;
-		}
-
-		setIsCreatingPage( true );
-		setErrorMessage( '' );
-
-		try {
-			const newPage = await saveEntityRecord(
-				'postType',
-				postType,
-				{
-					status: 'draft',
-					title: title.trim(),
-					slug: title.trim(),
-				},
-				{ throwOnError: true }
-			);
-
-			// Create the link value in the same format as the existing handleCreate function
-			const pageLink = {
-				id: newPage.id,
-				type: postType,
-				title: decodeEntities( newPage.title.rendered ),
-				url: newPage.link,
-				kind: 'post-type',
-			};
-
-			onPageCreated( pageLink );
-		} catch ( error ) {
-			const errorMsg =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while creating the page.' );
-
-			setErrorMessage( errorMsg );
-		} finally {
-			setIsCreatingPage( false );
-		}
-	}
-
-	return (
-		<div
-			className="link-ui-page-creator"
-			role="dialog"
-			aria-labelledby={ dialogTitleId }
-			aria-describedby={ dialogDescriptionId }
-			ref={ focusOnMountRef }
-		>
-			<VisuallyHidden>
-				<h2 id={ dialogTitleId }>
-					{ sprintf(
-						/* translators: %s: post type singular name, e.g. "page" */
-						__( 'Create new %s' ),
-						labels?.singular_name?.toLowerCase() || 'page'
-					) }
-				</h2>
-				<p id={ dialogDescriptionId }>
-					{ sprintf(
-						/* translators: %s: post type singular name, e.g. "page" */
-						__( 'Create a new %s to link to.' ),
-						labels?.singular_name?.toLowerCase() || 'page'
-					) }
-				</p>
-			</VisuallyHidden>
-
-			<Button
-				className="link-ui-page-creator__back"
-				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					onBack();
-				} }
-				size="small"
-			>
-				{ __( 'Back' ) }
-			</Button>
-
-			<form onSubmit={ createPage }>
-				<VStack spacing={ 4 }>
-					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Title' ) }
-						onChange={ setTitle }
-						placeholder={ __( 'No title' ) }
-						value={ title }
-					/>
-					{ errorMessage && (
-						<div className="link-ui-page-creator__error">
-							{ errorMessage }
-						</div>
-					) }
-					<HStack spacing={ 2 } justify="end">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ onBack }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-							isBusy={ isCreatingPage }
-							aria-disabled={ isCreatingPage }
-						>
-							{ __( 'Create draft' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
 		</div>
 	);
 }
@@ -413,6 +262,7 @@ function UnforwardedLinkUI( props, ref ) {
 						setFocusAddPageButton( true );
 					} }
 					onPageCreated={ handlePageCreated }
+					initialTitle={ link?.url || '' }
 				/>
 			) }
 		</Popover>

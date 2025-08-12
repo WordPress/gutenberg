@@ -135,9 +135,8 @@
 		z-index: 1;
 	}
 
-	&__error {
-		color: #d63638;
-		font-size: 12px;
-		margin-top: -8px;
+	// Add top margin to the form to prevent overlap with the back button
+	form {
+		margin-top: 40px;
 	}
 }
