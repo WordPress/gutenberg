@@ -143,15 +143,26 @@ export function LinkUIPageCreator( {
 						{ lastError.message }
 					</Notice>
 				) }
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					type="submit"
-					isBusy={ isSaving }
-					aria-disabled={ isSubmitDisabled }
-				>
-					{ submitButtonText }
-				</Button>
+				<div className="link-ui-page-creator__buttons">
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ onBack }
+						disabled={ isSaving }
+						accessibleWhenDisabled
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						isBusy={ isSaving }
+						aria-disabled={ isSubmitDisabled }
+					>
+						{ submitButtonText }
+					</Button>
+				</div>
 			</form>
 		</div>
 	);

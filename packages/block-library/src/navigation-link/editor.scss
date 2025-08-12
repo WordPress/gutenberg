@@ -139,4 +139,24 @@
 	form {
 		margin-top: 40px;
 	}
+
+	// Add proper spacing between form elements
+	.components-text-control {
+		margin-bottom: 16px;
+	}
+
+	.components-checkbox-control {
+		margin-bottom: 24px;
+	}
+
+	.components-notice {
+		margin-bottom: 24px;
+	}
+
+	&__buttons {
+		display: flex;
+		gap: 8px;
+		justify-content: flex-end;
+		margin-top: 24px;
+	}
 }
