@@ -6,8 +6,10 @@ import {
 	TextControl,
 	Notice,
 	CheckboxControl,
+	VStack,
+	HStack,
 } from '@wordpress/components';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -29,10 +31,6 @@ export function LinkUIPageCreator( {
 	onPageCreated,
 	initialTitle = '',
 } ) {
-	const labels = useSelect(
-		( select ) => select( coreStore ).getPostType( postType )?.labels,
-		[ postType ]
-	);
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( false );
 
@@ -109,62 +107,57 @@ export function LinkUIPageCreator( {
 				{ __( 'Back' ) }
 			</Button>
 
-			<h2>
-				{ sprintf(
-					/* translators: %s: post type label */
-					__( 'Add new %s' ),
-					labels?.singular_name || postType
-				) }
-			</h2>
+			<VStack spacing={ 4 }>
+				<form onSubmit={ createPage }>
+					<VStack spacing={ 4 }>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Title' ) }
+							onChange={ setTitle }
+							placeholder={ __( 'No title' ) }
+							value={ title }
+						/>
 
-			<form onSubmit={ createPage }>
-				<TextControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Title' ) }
-					onChange={ setTitle }
-					placeholder={ __( 'No title' ) }
-					value={ title }
-				/>
-				<CheckboxControl
-					__nextHasNoMarginBottom
-					label={ __( 'Publish immediately' ) }
-					help={ __(
-						'If unchecked, the page will be created as a draft.'
-					) }
-					checked={ shouldPublish }
-					onChange={ setShouldPublish }
-				/>
-				{ lastError && (
-					<Notice
-						status="error"
-						isDismissible={ false }
-						className="link-ui-page-creator__error"
-					>
-						{ lastError.message }
-					</Notice>
-				) }
-				<div className="link-ui-page-creator__buttons">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ onBack }
-						disabled={ isSaving }
-						accessibleWhenDisabled
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						type="submit"
-						isBusy={ isSaving }
-						aria-disabled={ isSubmitDisabled }
-					>
-						{ submitButtonText }
-					</Button>
-				</div>
-			</form>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Publish immediately' ) }
+							help={ __(
+								'If unchecked, the page will be created as a draft.'
+							) }
+							checked={ shouldPublish }
+							onChange={ setShouldPublish }
+						/>
+
+						{ lastError && (
+							<Notice status="error" isDismissible={ false }>
+								{ lastError.message }
+							</Notice>
+						) }
+
+						<HStack spacing={ 2 } justify="flex-end">
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ onBack }
+								disabled={ isSaving }
+								accessibleWhenDisabled
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								type="submit"
+								isBusy={ isSaving }
+								aria-disabled={ isSubmitDisabled }
+							>
+								{ submitButtonText }
+							</Button>
+						</HStack>
+					</VStack>
+				</form>
+			</VStack>
 		</div>
 	);
 }
