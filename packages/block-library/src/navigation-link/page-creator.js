@@ -64,10 +64,15 @@ export function LinkUIPageCreator( {
 		}
 
 		try {
-			const savedRecord = await saveEntityRecord( 'postType', postType, {
-				title,
-				status: shouldPublish ? 'publish' : 'draft',
-			} );
+			const savedRecord = await saveEntityRecord(
+				'postType',
+				postType,
+				{
+					title,
+					status: shouldPublish ? 'publish' : 'draft',
+				},
+				{ throwOnError: true }
+			);
 
 			if ( savedRecord ) {
 				// Create the page link object from the saved record
