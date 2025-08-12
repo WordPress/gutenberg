@@ -55,64 +55,7 @@ export function LinkUIPageCreator( {
 		[ postType ]
 	);
 
-	// Check if we have a newly created page and it's resolved
-	const newPage = useSelect(
-		( select ) => {
-			// Only check for new pages if we're not currently saving and there's no error
-			if ( isSaving || lastError ) {
-				return null;
-			}
-
-			// Get the most recent entity record for this post type
-			const recentRecords = select( coreStore ).getEntityRecords(
-				'postType',
-				postType,
-				{ per_page: 1, orderby: 'date', order: 'desc' }
-			);
-
-			if ( ! recentRecords || recentRecords.length === 0 ) {
-				return null;
-			}
-
-			const mostRecent = recentRecords[ 0 ];
-
-			// Check if this record was created recently (within the last few seconds)
-			const now = Date.now();
-			const createdTime = new Date( mostRecent.date ).getTime();
-			const isRecent = now - createdTime < 10000; // Within 10 seconds
-
-			if ( isRecent ) {
-				// Check if this specific record is resolved
-				const isResolved = select( coreStore ).hasResolved(
-					'postType',
-					'getEntityRecord',
-					[ 'postType', postType, mostRecent.id ]
-				);
-
-				if ( isResolved ) {
-					return mostRecent;
-				}
-			}
-
-			return null;
-		},
-		[ isSaving, lastError, postType ]
-	);
-
 	const { saveEntityRecord } = useDispatch( coreStore );
-
-	// If we have a resolved new page, call the callback and reset
-	if ( newPage ) {
-		const pageLink = {
-			id: newPage.id,
-			type: postType,
-			title: decodeEntities( newPage.title.rendered ),
-			url: newPage.link,
-			kind: 'post-type',
-		};
-		onPageCreated( pageLink );
-		return null; // Don't render anything while transitioning
-	}
 
 	async function createPage( event ) {
 		event.preventDefault();
@@ -121,12 +64,23 @@ export function LinkUIPageCreator( {
 		}
 
 		try {
-			await saveEntityRecord( 'postType', postType, {
+			const savedRecord = await saveEntityRecord( 'postType', postType, {
 				title,
 				status: shouldPublish ? 'publish' : 'draft',
 			} );
-			// No need to manually handle success - the data store will update
-			// and our useSelect hooks will detect the new entity
+
+			if ( savedRecord ) {
+				// Create the page link object from the saved record
+				const pageLink = {
+					id: savedRecord.id,
+					type: postType,
+					title: decodeEntities( savedRecord.title.rendered ),
+					url: savedRecord.link,
+					kind: 'post-type',
+				};
+
+				onPageCreated( pageLink );
+			}
 		} catch ( error ) {
 			// Error handling is done via the data store selectors
 		}
