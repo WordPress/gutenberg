@@ -41,7 +41,7 @@ export function LinkUIPageCreator( {
 	const isTitleValid = title.trim().length > 0;
 
 	// Get the last created entity record (without ID) to track creation state
-	const { lastError, isSaving, lastCreatedRecord } = useSelect(
+	const { lastError, isSaving } = useSelect(
 		( select ) => ( {
 			lastError: select( coreStore ).getLastEntitySaveError(
 				'postType',
@@ -51,42 +51,52 @@ export function LinkUIPageCreator( {
 				'postType',
 				postType
 			),
-			lastCreatedRecord: select( coreStore ).getLastEntityRecord(
-				'postType',
-				postType
-			),
 		} ),
 		[ postType ]
 	);
 
 	// Check if we have a newly created page and it's resolved
-	const hasNewPageResolved = useSelect(
-		( select ) => {
-			if ( ! lastCreatedRecord?.id ) {
-				return false;
-			}
-			return select( coreStore ).hasResolved(
-				'postType',
-				'getEntityRecord',
-				[ 'postType', postType, lastCreatedRecord.id ]
-			);
-		},
-		[ lastCreatedRecord?.id, postType ]
-	);
-
-	// Get the full page data once it's resolved
 	const newPage = useSelect(
 		( select ) => {
-			if ( ! lastCreatedRecord?.id || ! hasNewPageResolved ) {
+			// Only check for new pages if we're not currently saving and there's no error
+			if ( isSaving || lastError ) {
 				return null;
 			}
-			return select( coreStore ).getEntityRecord(
+
+			// Get the most recent entity record for this post type
+			const recentRecords = select( coreStore ).getEntityRecords(
 				'postType',
 				postType,
-				lastCreatedRecord.id
+				{ per_page: 1, orderby: 'date', order: 'desc' }
 			);
+
+			if ( ! recentRecords || recentRecords.length === 0 ) {
+				return null;
+			}
+
+			const mostRecent = recentRecords[ 0 ];
+
+			// Check if this record was created recently (within the last few seconds)
+			const now = Date.now();
+			const createdTime = new Date( mostRecent.date ).getTime();
+			const isRecent = now - createdTime < 10000; // Within 10 seconds
+
+			if ( isRecent ) {
+				// Check if this specific record is resolved
+				const isResolved = select( coreStore ).hasResolved(
+					'postType',
+					'getEntityRecord',
+					[ 'postType', postType, mostRecent.id ]
+				);
+
+				if ( isResolved ) {
+					return mostRecent;
+				}
+			}
+
+			return null;
 		},
-		[ lastCreatedRecord?.id, hasNewPageResolved, postType ]
+		[ isSaving, lastError, postType ]
 	);
 
 	const { saveEntityRecord } = useDispatch( coreStore );
