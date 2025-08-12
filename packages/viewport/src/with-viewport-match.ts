@@ -52,12 +52,11 @@ const withViewportMatch = ( queries: ViewportQueries ) => {
 					breakpointName = operator;
 					operator = '>=';
 				}
-				// Hooks should unconditionally execute in the same order,
-				// we are respecting that as from the static query of the HOC we generate
-				// a hook that calls other hooks always in the same order (because the query never changes).
-				// eslint-disable-next-line react-hooks/rules-of-hooks
 				return [
 					key,
+					// Hooks should unconditionally execute in the same order,
+					// we are respecting that as from the static query of the HOC we generate
+					// a hook that calls other hooks always in the same order (because the query never changes).
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					useViewportMatch(
 						breakpointName as BreakpointName,
