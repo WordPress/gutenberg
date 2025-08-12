@@ -129,10 +129,8 @@
 	min-width: 300px;
 
 	&__back {
-		position: absolute;
-		top: 16px;
-		left: 16px;
-		z-index: 1;
+		margin-left: $grid-unit-10;
+		text-transform: uppercase;
 	}
 
 	// Add top margin to the form to prevent overlap with the back button

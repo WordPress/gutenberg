@@ -3,7 +3,6 @@
  */
 import {
 	Button,
-	VisuallyHidden,
 	TextControl,
 	Notice,
 	CheckboxControl,
@@ -99,13 +98,15 @@ export function LinkUIPageCreator( {
 	return (
 		<div className="link-ui-page-creator">
 			<Button
-				__next40pxDefaultSize
-				variant="tertiary"
-				onClick={ onBack }
 				className="link-ui-page-creator__back"
+				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+				onClick={ ( e ) => {
+					e.preventDefault();
+					onBack();
+				} }
+				size="small"
 			>
-				{ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				<VisuallyHidden>{ __( 'Go back' ) }</VisuallyHidden>
+				{ __( 'Back' ) }
 			</Button>
 
 			<h2>
