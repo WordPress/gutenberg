@@ -7,6 +7,8 @@ import {
 	Button,
 	VisuallyHidden,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	TextControl,
 } from '@wordpress/components';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
@@ -16,7 +18,6 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
-	createInterpolateElement,
 	useMemo,
 	useState,
 	useRef,
@@ -29,7 +30,12 @@ import {
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
+import {
+	chevronLeftSmall,
+	chevronRightSmall,
+	plus,
+	page,
+} from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
 /**
@@ -146,46 +152,164 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 	);
 }
 
+function LinkUIPageCreator( { postType, onBack, onPageCreated } ) {
+	const labels = useSelect(
+		( select ) => select( coreStore ).getPostType( postType )?.labels,
+		[ postType ]
+	);
+	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+	const [ title, setTitle ] = useState( '' );
+	const [ errorMessage, setErrorMessage ] = useState( '' );
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+
+	const dialogTitleId = useInstanceId(
+		LinkControl,
+		`link-ui-page-creator__title`
+	);
+	const dialogDescriptionId = useInstanceId(
+		LinkControl,
+		`link-ui-page-creator__description`
+	);
+
+	async function createPage( event ) {
+		event.preventDefault();
+
+		if ( isCreatingPage ) {
+			return;
+		}
+
+		if ( ! title.trim() ) {
+			setErrorMessage( __( 'Please enter a title.' ) );
+			return;
+		}
+
+		setIsCreatingPage( true );
+		setErrorMessage( '' );
+
+		try {
+			const newPage = await saveEntityRecord(
+				'postType',
+				postType,
+				{
+					status: 'draft',
+					title: title.trim(),
+					slug: title.trim(),
+				},
+				{ throwOnError: true }
+			);
+
+			// Create the link value in the same format as the existing handleCreate function
+			const pageLink = {
+				id: newPage.id,
+				type: postType,
+				title: decodeEntities( newPage.title.rendered ),
+				url: newPage.link,
+				kind: 'post-type',
+			};
+
+			onPageCreated( pageLink );
+		} catch ( error ) {
+			const errorMsg =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the page.' );
+
+			setErrorMessage( errorMsg );
+		} finally {
+			setIsCreatingPage( false );
+		}
+	}
+
+	return (
+		<div
+			className="link-ui-page-creator"
+			role="dialog"
+			aria-labelledby={ dialogTitleId }
+			aria-describedby={ dialogDescriptionId }
+			ref={ focusOnMountRef }
+		>
+			<VisuallyHidden>
+				<h2 id={ dialogTitleId }>
+					{ sprintf(
+						/* translators: %s: post type singular name, e.g. "page" */
+						__( 'Create new %s' ),
+						labels?.singular_name?.toLowerCase() || 'page'
+					) }
+				</h2>
+				<p id={ dialogDescriptionId }>
+					{ sprintf(
+						/* translators: %s: post type singular name, e.g. "page" */
+						__( 'Create a new %s to link to.' ),
+						labels?.singular_name?.toLowerCase() || 'page'
+					) }
+				</p>
+			</VisuallyHidden>
+
+			<Button
+				className="link-ui-page-creator__back"
+				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+				onClick={ ( e ) => {
+					e.preventDefault();
+					onBack();
+				} }
+				size="small"
+			>
+				{ __( 'Back' ) }
+			</Button>
+
+			<form onSubmit={ createPage }>
+				<VStack spacing={ 4 }>
+					<TextControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Title' ) }
+						onChange={ setTitle }
+						placeholder={ __( 'No title' ) }
+						value={ title }
+					/>
+					{ errorMessage && (
+						<div className="link-ui-page-creator__error">
+							{ errorMessage }
+						</div>
+					) }
+					<HStack spacing={ 2 } justify="end">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onBack }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+							isBusy={ isCreatingPage }
+							aria-disabled={ isCreatingPage }
+						>
+							{ __( 'Create draft' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		</div>
+	);
+}
+
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind } = props.link;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
-
-	// Check if we're in contentOnly mode
-	const blockEditingMode = useBlockEditingMode();
-	const isDefaultBlockEditingMode = blockEditingMode === 'default';
-
-	async function handleCreate( pageTitle ) {
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
-	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
@@ -197,6 +321,13 @@ function UnforwardedLinkUI( props, ref ) {
 		} ),
 		[ label, opensInNewTab, url ]
 	);
+
+	const handlePageCreated = ( pageLink ) => {
+		// Set the new page as the current link
+		props.onChange( pageLink );
+		// Return to main Link UI
+		setAddingPage( false );
+	};
 
 	const dialogTitleId = useInstanceId(
 		LinkUI,
@@ -215,7 +346,7 @@ function UnforwardedLinkUI( props, ref ) {
 			anchor={ props.anchor }
 			shift
 		>
-			{ ! addingBlock && (
+			{ ! addingBlock && ! addingPage && (
 				<div
 					role="dialog"
 					aria-labelledby={ dialogTitleId }
@@ -235,30 +366,7 @@ function UnforwardedLinkUI( props, ref ) {
 						hasRichPreviews
 						value={ link }
 						showInitialSuggestions
-						withCreateSuggestion={ permissions.canCreate }
-						createSuggestion={ handleCreate }
-						createSuggestionButtonText={ ( searchTerm ) => {
-							let format;
-
-							if ( type === 'post' ) {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft post: <mark>%s</mark>'
-								);
-							} else {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft page: <mark>%s</mark>'
-								);
-							}
-
-							return createInterpolateElement(
-								sprintf( format, searchTerm ),
-								{
-									mark: <mark />,
-								}
-							);
-						} }
+						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
@@ -270,10 +378,16 @@ function UnforwardedLinkUI( props, ref ) {
 							isDefaultBlockEditingMode && (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
+									focusAddPageButton={ focusAddPageButton }
 									setAddingBlock={ () => {
 										setAddingBlock( true );
 										setFocusAddBlockButton( false );
 									} }
+									setAddingPage={ () => {
+										setAddingPage( true );
+										setFocusAddPageButton( false );
+									} }
+									canCreatePage={ permissions.canCreate }
 								/>
 							)
 						}
@@ -290,15 +404,33 @@ function UnforwardedLinkUI( props, ref ) {
 					} }
 				/>
 			) }
+
+			{ addingPage && (
+				<LinkUIPageCreator
+					postType={ postType }
+					onBack={ () => {
+						setAddingPage( false );
+						setFocusAddPageButton( true );
+					} }
+					onPageCreated={ handlePageCreated }
+				/>
+			) }
 		</Popover>
 	);
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
-const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
+const LinkUITools = ( {
+	setAddingBlock,
+	setAddingPage,
+	focusAddBlockButton,
+	focusAddPageButton,
+	canCreatePage,
+} ) => {
 	const blockInserterAriaRole = 'listbox';
 	const addBlockButtonRef = useRef();
+	const addPageButtonRef = useRef();
 
 	// Focus the add block button when the popover is opened.
 	useEffect( () => {
@@ -307,8 +439,29 @@ const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 		}
 	}, [ focusAddBlockButton ] );
 
+	// Focus the add page button when the popover is opened.
+	useEffect( () => {
+		if ( focusAddPageButton ) {
+			addPageButtonRef.current?.focus();
+		}
+	}, [ focusAddPageButton ] );
+
 	return (
 		<VStack className="link-ui-tools">
+			{ canCreatePage && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addPageButtonRef }
+					icon={ page }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingPage( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Add page' ) }
+				</Button>
+			) }
 			<Button
 				__next40pxDefaultSize
 				ref={ addBlockButtonRef }

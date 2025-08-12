@@ -122,3 +122,22 @@
 	gap: $grid-unit-10;
 	height: auto;
 }
+
+.link-ui-page-creator {
+	position: relative;
+	padding: 16px;
+	min-width: 300px;
+
+	&__back {
+		position: absolute;
+		top: 16px;
+		left: 16px;
+		z-index: 1;
+	}
+
+	&__error {
+		color: #d63638;
+		font-size: 12px;
+		margin-top: -8px;
+	}
+}
