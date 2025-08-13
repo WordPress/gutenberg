@@ -89,9 +89,6 @@ export function LinkUIPageCreator( {
 	}
 
 	const isSubmitDisabled = isSaving || ! isTitleValid;
-	const submitButtonText = shouldPublish
-		? __( 'Publish page' )
-		: __( 'Create draft' );
 
 	return (
 		<div className="link-ui-page-creator">
@@ -152,7 +149,7 @@ export function LinkUIPageCreator( {
 								isBusy={ isSaving }
 								aria-disabled={ isSubmitDisabled }
 							>
-								{ submitButtonText }
+								{ __( 'Create page' ) }
 							</Button>
 						</HStack>
 					</VStack>
