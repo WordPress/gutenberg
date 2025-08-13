@@ -6,8 +6,8 @@ import {
 	TextControl,
 	Notice,
 	CheckboxControl,
-	VStack,
-	HStack,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -107,7 +107,7 @@ export function LinkUIPageCreator( {
 				{ __( 'Back' ) }
 			</Button>
 
-			<VStack spacing={ 4 }>
+			<VStack className="link-ui-page-creator__inner" spacing={ 4 }>
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
 						<TextControl
