@@ -8,11 +8,12 @@ import { __ } from '@wordpress/i18n';
 import {
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { plus } from '@wordpress/icons';
+import { page } from '@wordpress/icons';
 
 // Target block that should have the Add page button.
 const SUPPORTED_BLOCK = 'core/navigation';
@@ -27,6 +28,7 @@ const SUPPORTED_BLOCK = 'core/navigation';
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const { getBlockCount } = useSelect( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
 
 	const onAddPage = useCallback( () => {
 		// Get the current number of blocks to insert at the end
@@ -40,16 +42,16 @@ function NavigationAddPageButton( { clientId } ) {
 	}, [ clientId, insertBlock, getBlockCount ] );
 
 	// Only show when in contentOnly mode
-	// if ( blockEditingMode !== 'contentOnly' ) {
-	// 	return null;
-	// }
+	if ( blockEditingMode !== 'contentOnly' ) {
+		return null;
+	}
 
 	return (
 		<BlockToolbarLastItem>
 			<ToolbarGroup>
 				<ToolbarButton
 					name="add-page"
-					icon={ plus }
+					icon={ page }
 					title={ __( 'Add page' ) }
 					onClick={ onAddPage }
 				>
