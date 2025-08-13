@@ -6,4 +6,3 @@ import './default-autocompleters';
 import './media-upload';
 import './pattern-overrides';
 import './navigation-link-view-button';
-import './navigation-add-page-button';
