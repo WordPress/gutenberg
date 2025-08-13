@@ -28,7 +28,7 @@ import {
 	chevronLeftSmall,
 	chevronRightSmall,
 	plus,
-	page,
+	addTemplate as page,
 } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
