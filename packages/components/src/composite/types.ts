@@ -190,6 +190,11 @@ export type CompositeProps = CompositeStoreProps & {
 	 */
 	onFocusVisible?: Ariakit.CompositeProps[ 'onFocusVisible' ];
 	/**
+	 * Whether the composite component is active. When `false` the component will
+	 * not handle keyboard navigation and focus for itself and its children.
+	 */
+	composite?: Ariakit.CompositeProps[ 'composite' ];
+	/**
 	 * The contents of the component.
 	 */
 	children?: Ariakit.CompositeProps[ 'children' ];

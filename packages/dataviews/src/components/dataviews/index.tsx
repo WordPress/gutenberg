@@ -70,6 +70,8 @@ type DataViewsProps< Item > = {
 		perPageSizes: number[];
 	};
 	empty?: ReactNode;
+	picker?: boolean;
+	label?: string;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -145,6 +147,8 @@ function DataViews< Item >( {
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
+	picker,
+	label,
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
@@ -173,11 +177,19 @@ function DataViews< Item >( {
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
+	const isPicker = Boolean( picker );
 	const _selection = useMemo( () => {
-		return selection.filter( ( id ) =>
-			data.some( ( item ) => getItemId( item ) === id )
-		);
-	}, [ selection, data, getItemId ] );
+		// The selection is filtered here to known `data` to ensure items that
+		// may have been deleted are not present in the selection.
+		// The filtering is only done when `isPicker` is `false`, because
+		// in picker mode, this prevents selecting items that might be on
+		// different pages, since `data` only contains the current paginated view.
+		return isPicker
+			? selection
+			: selection.filter( ( id ) =>
+					data.some( ( item ) => getItemId( item ) === id )
+			  );
+	}, [ selection, data, getItemId, isPicker ] );
 
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
@@ -253,6 +265,8 @@ function DataViews< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				picker,
+				label,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>

@@ -424,6 +424,42 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 
 A message or element to be displayed instead of the dataview's default empty message.
 
+#### `picker`: `boolean` | `undefined`
+
+Switches the DataView into picking mode, optimized for selection. This option is currently only supported for the `Grid` layout.
+
+This option has the following results:
+
+-   The `DataViews` items are rendered with a `listbox` role.
+-   Keyboard navigation is supported. The grid becomes a single tab stop, with arrow keys used to navigate items, and Enter/Space used to toggle the selection of items.
+-   All action buttons are rendered in the footer.
+-   To enable multi-selection, pass only `bulk` actions to the dataview.
+-   `isEligible` is not supported for actions.
+-   Both `groupByField` and infinite scroll features are supported when `picking` is enabled, but not both at the same time.
+-   For action callbacks:
+    -   The `items` array provided in the first parameter only contains items presently visible. If the user selected items on another page, they may not be present in this array.
+    -   The `context.selection` array contains the full selection, including items from pages not visible. This is an array of `ids`.
+
+```jsx
+callback( items, { selection } ) {
+	// The `items` argument only contains shown items from the current page.
+	console.log( items );
+	// The `selection` property of the `context` argument contains the full selection, but only contains the `ids` of the items.
+	console.log( selection );
+}
+```
+
+Good accessibility practices when using this option:
+
+-   Supply a `label` whenever there's no clear existing heading element.
+-   Specify as few default fields as possible to reduce the amount of announced information for each item, but each item should still be clearly distinguishable.
+
+#### `label`: `string` | `undefined`
+
+Specify an aria-label for the DataViews items wrapper.
+
+This is currently only supported for the `grid` layout when the `picking` option is enabled.
+
 ### Composition modes
 
 The `DataViews` component supports two composition modes:

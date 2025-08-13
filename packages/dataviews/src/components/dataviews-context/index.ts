@@ -48,8 +48,8 @@ type DataViewsContextType< Item > = {
 	containerWidth: number;
 	containerRef: React.MutableRefObject< HTMLDivElement | null >;
 	resizeObserverRef:
-		| ( ( element?: HTMLElement | null ) => void )
-		| React.RefObject< HTMLElement >;
+		| ( ( element?: HTMLDivElement | null ) => void )
+		| React.RefObject< HTMLDivElement >;
 	defaultLayouts: SupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
@@ -57,6 +57,8 @@ type DataViewsContextType< Item > = {
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
+	picker?: boolean;
+	label?: string;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {

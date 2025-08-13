@@ -30,6 +30,7 @@ export interface ActionTriggerProps< Item > {
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
+	isTextButton?: boolean;
 }
 
 export interface ActionModalProps< Item > {

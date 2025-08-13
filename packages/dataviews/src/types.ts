@@ -618,9 +618,10 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 		items: Item[],
 		context: {
 			registry: any;
+			selection?: string[];
 			onActionPerformed?: ( items: Item[] ) => void;
 		}
-	) => void;
+	) => void | Promise< void >;
 }
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
@@ -646,6 +647,8 @@ export interface ViewBaseProps< Item > {
 	isItemClickable: ( item: Item ) => boolean;
 	view: View;
 	empty: ReactNode;
+	picker?: boolean;
+	label?: string;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

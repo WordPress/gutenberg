@@ -31,12 +31,14 @@ interface ActionWithModalProps< Item > {
 	ActionTriggerComponent: (
 		props: ActionTriggerProps< Item >
 	) => ReactElement;
+	isTextButton?: boolean;
 }
 
 function ActionWithModal< Item >( {
 	action,
 	items,
 	ActionTriggerComponent,
+	isTextButton,
 }: ActionWithModalProps< Item > ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
@@ -45,6 +47,7 @@ function ActionWithModal< Item >( {
 			setIsModalOpen( true );
 		},
 		items,
+		isTextButton,
 	};
 	return (
 		<>
@@ -90,12 +93,25 @@ export function useSomeItemHasAPossibleBulkAction< Item >(
 	}, [ actions, data ] );
 }
 
+export function useIsMultiselectPicker< Item >(
+	picker: boolean,
+	actions: Action< Item >[]
+) {
+	return useMemo( () => {
+		if ( ! picker ) {
+			return undefined;
+		}
+		return actions.every( ( action ) => action.supportsBulk );
+	}, [ picker, actions ] );
+}
+
 interface BulkSelectionCheckboxProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	picker?: boolean;
 }
 
 export function BulkSelectionCheckbox< Item >( {
@@ -104,7 +120,13 @@ export function BulkSelectionCheckbox< Item >( {
 	data,
 	actions,
 	getItemId,
+	picker,
 }: BulkSelectionCheckboxProps< Item > ) {
+	const isMultiselectPicker = useIsMultiselectPicker(
+		Boolean( picker ),
+		actions
+	);
+
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return actions.some(
@@ -114,6 +136,11 @@ export function BulkSelectionCheckbox< Item >( {
 			);
 		} );
 	}, [ data, actions ] );
+
+	if ( picker && ! isMultiselectPicker ) {
+		return;
+	}
+
 	const selectedItems = data.filter(
 		( item ) =>
 			selection.includes( getItemId( item ) ) &&
@@ -128,7 +155,29 @@ export function BulkSelectionCheckbox< Item >( {
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
-					onChangeSelection( [] );
+					if ( picker ) {
+						// In picker mode, selections can span multiple pages.
+						// Partially remove the current page from the total selection.
+						onChangeSelection(
+							selection.filter(
+								( id ) =>
+									! data.some(
+										( item ) => id === getItemId( item )
+									)
+							)
+						);
+					} else {
+						// Outside of picker mode, remove the entire selection.
+						onChangeSelection( [] );
+					}
+				} else if ( picker ) {
+					// When in picker mode, merge the additional selection into the existing selecting
+					// to ensure items selected on other pages aren't deselected.
+					const selectionSet = new Set( [
+						...selection,
+						...selectableItems.map( ( item ) => getItemId( item ) ),
+					] );
+					onChangeSelection( Array.from( selectionSet ) );
 				} else {
 					onChangeSelection(
 						selectableItems.map( ( item ) => getItemId( item ) )
@@ -144,9 +193,11 @@ export function BulkSelectionCheckbox< Item >( {
 
 interface ActionButtonProps< Item > {
 	action: Action< Item >;
+	selection: string[];
 	selectedItems: Item[];
 	actionInProgress: string | null;
 	setActionInProgress: ( actionId: string | null ) => void;
+	picker?: boolean;
 }
 
 interface ToolbarContentProps< Item > {
@@ -155,6 +206,7 @@ interface ToolbarContentProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
+	picker?: boolean;
 }
 
 function ActionTrigger< Item >( {
@@ -162,20 +214,25 @@ function ActionTrigger< Item >( {
 	onClick,
 	isBusy,
 	items,
+	isTextButton,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+	const textButtonVariant = action.isPrimary ? 'primary' : 'secondary';
+
 	return (
 		<Button
 			disabled={ isBusy }
 			accessibleWhenDisabled
 			label={ label }
+			text={ isTextButton ? label : undefined }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			tooltipPosition="top"
+			tooltipPosition={ isTextButton ? undefined : 'top' }
+			variant={ isTextButton ? textButtonVariant : undefined }
 		/>
 	);
 }
@@ -184,9 +241,11 @@ const EMPTY_ARRAY: [] = [];
 
 function ActionButton< Item >( {
 	action,
+	selection,
 	selectedItems,
 	actionInProgress,
 	setActionInProgress,
+	picker,
 }: ActionButtonProps< Item > ) {
 	const registry = useRegistry();
 	const selectedEligibleItems = useMemo( () => {
@@ -201,6 +260,7 @@ function ActionButton< Item >( {
 				action={ action }
 				items={ selectedEligibleItems }
 				ActionTriggerComponent={ ActionTrigger }
+				isTextButton={ picker }
 			/>
 		);
 	}
@@ -212,11 +272,13 @@ function ActionButton< Item >( {
 				setActionInProgress( action.id );
 				await action.callback( selectedItems, {
 					registry,
+					selection,
 				} );
 				setActionInProgress( null );
 			} }
 			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }
+			isTextButton={ picker }
 		/>
 	);
 }
@@ -230,18 +292,24 @@ function renderFooterContent< Item >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onChangeSelection: SetSelection
+	onChangeSelection: SetSelection,
+	picker?: boolean
 ) {
+	// When in picker mode, the selection can span multiple pages,
+	// the selectionCount and total are presented differently to
+	// reflect that.
+	const selectionCount = picker ? selection.length : selectedItems.length;
+
 	const message =
-		selectedItems.length > 0
+		selectionCount > 0
 			? sprintf(
 					/* translators: %d: number of items. */
 					_n(
 						'%d Item selected',
 						'%d Items selected',
-						selectedItems.length
+						selectionCount
 					),
-					selectedItems.length
+					selectionCount
 			  )
 			: sprintf(
 					/* translators: %d: number of items. */
@@ -260,6 +328,7 @@ function renderFooterContent< Item >(
 				data={ data }
 				actions={ actions }
 				getItemId={ getItemId }
+				picker={ picker }
 			/>
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ message }
@@ -274,13 +343,15 @@ function renderFooterContent< Item >(
 						<ActionButton
 							key={ action.id }
 							action={ action }
+							selection={ selection }
 							selectedItems={ selectedItems }
 							actionInProgress={ actionInProgress }
 							setActionInProgress={ setActionInProgress }
+							picker={ picker }
 						/>
 					);
 				} ) }
-				{ selectedItems.length > 0 && (
+				{ selectionCount > 0 && (
 					<Button
 						icon={ closeSmall }
 						showTooltip
@@ -305,23 +376,32 @@ function FooterContent< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	picker,
 }: ToolbarContentProps< Item > ) {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
 	const footerContentRef = useRef< JSX.Element | null >( null );
 
-	const bulkActions = useMemo(
-		() => actions.filter( ( action ) => action.supportsBulk ),
-		[ actions ]
-	);
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
-			return bulkActions.some(
-				( action ) => ! action.isEligible || action.isEligible( item )
+			// When in picker mode, both non-bulk and bulk actions
+			// are shown in the footer.
+			if ( picker ) {
+				return actions.some(
+					( action ) =>
+						! action.isEligible || action.isEligible( item )
+				);
+			}
+
+			// When outside of picker mode, only bulk actions are shown.
+			return actions.some(
+				( action ) =>
+					action.supportsBulk &&
+					( ! action.isEligible || action.isEligible( item ) )
 			);
 		} );
-	}, [ data, bulkActions ] );
+	}, [ data, picker, actions ] );
 
 	const selectedItems = useMemo( () => {
 		return data.filter(
@@ -334,6 +414,13 @@ function FooterContent< Item >( {
 	const actionsToShow = useMemo(
 		() =>
 			actions.filter( ( action ) => {
+				// In picker mode, action.isEligible can't be used since the selected item
+				// might be outside of the provided `data`.
+				// `icon` and `supportsBulk` are also not requirements.
+				if ( picker ) {
+					return Boolean( selection.length );
+				}
+
 				return (
 					action.supportsBulk &&
 					action.icon &&
@@ -343,7 +430,7 @@ function FooterContent< Item >( {
 					)
 				);
 			} ),
-		[ actions, selectedItems ]
+		[ picker, actions, selectedItems, selection ]
 	);
 	if ( ! actionInProgress ) {
 		if ( footerContentRef.current ) {
@@ -358,7 +445,8 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection
+			onChangeSelection,
+			picker
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -370,7 +458,8 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection
+			onChangeSelection,
+			picker
 		);
 	}
 	return footerContentRef.current;
@@ -383,6 +472,7 @@ export function BulkActionsFooter() {
 		actions = EMPTY_ARRAY,
 		onChangeSelection,
 		getItemId,
+		picker,
 	} = useContext( DataViewsContext );
 	return (
 		<FooterContent
@@ -391,6 +481,7 @@ export function BulkActionsFooter() {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
+			picker={ picker }
 		/>
 	);
 }

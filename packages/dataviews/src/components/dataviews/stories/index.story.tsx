@@ -39,7 +39,7 @@ import {
 } from './fixtures';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { Field, View } from '../../../types';
+import type { Field, View, Action } from '../../../types';
 
 import './style.css';
 
@@ -426,23 +426,26 @@ export const GroupByLayout = () => {
 	);
 };
 
-export const InfiniteScroll = () => {
-	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_GRID,
-		search: '',
-		page: 1,
-		perPage: 6, // Start with a small number to demonstrate pagination
-		filters: [],
-		fields: [ 'satellites' ],
-		titleField: 'title',
-		descriptionField: 'description',
-		mediaField: 'image',
-		infiniteScrollEnabled: true, // Enable infinite scroll by default
-	} );
-	const { data: shownData } = useMemo( () => {
-		return filterSortAndPaginate( data, view, fields );
-	}, [ view ] );
-
+function useInfiniteScroll( {
+	view,
+	setView,
+	data: shownData,
+	getItemId,
+}: {
+	view: View;
+	setView: ( view: View ) => void;
+	data: SpaceObject[];
+	getItemId: ( item: SpaceObject ) => string;
+} ): {
+	data: SpaceObject[];
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+		infiniteScrollHandler?: ( () => void ) | undefined;
+	};
+	isLoadingMore: boolean;
+	hasMoreData: boolean;
+} {
 	// Custom pagination handler that simulates server-side pagination
 	const [ allLoadedRecords, setAllLoadedRecords ] = useState< SpaceObject[] >(
 		[]
@@ -453,19 +456,6 @@ export const InfiniteScroll = () => {
 	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
 	const currentPage = view.page || 1;
 	const hasMoreData = currentPage < totalPages;
-	const getItemId = ( item: {
-		id: any;
-		title?: string;
-		description?: string;
-		image?: string;
-		type?: string;
-		isPlanet?: boolean;
-		categories?: string[];
-		satellites?: number;
-		date?: string;
-		datetime?: string;
-		email?: string;
-	} ) => item.id.toString();
 
 	const infiniteScrollHandler = useCallback( () => {
 		if ( isLoadingMore || currentPage >= totalPages ) {
@@ -510,6 +500,43 @@ export const InfiniteScroll = () => {
 		infiniteScrollHandler,
 	};
 
+	return {
+		data: allLoadedRecords,
+		paginationInfo,
+		isLoadingMore,
+		hasMoreData,
+	};
+}
+
+export const InfiniteScroll = () => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_GRID,
+		search: '',
+		page: 1,
+		perPage: 6, // Start with a small number to demonstrate pagination
+		filters: [],
+		fields: [ 'satellites' ],
+		titleField: 'title',
+		descriptionField: 'description',
+		mediaField: 'image',
+		infiniteScrollEnabled: true, // Enable infinite scroll by default
+	} );
+	const { data: shownData } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+
+	const {
+		data: allLoadedRecords,
+		paginationInfo,
+		isLoadingMore,
+		hasMoreData,
+	} = useInfiniteScroll( {
+		view,
+		setView,
+		data: shownData,
+		getItemId: ( item ) => item.id.toString(),
+	} );
+
 	return (
 		<>
 			<style>{ `
@@ -528,7 +555,7 @@ export const InfiniteScroll = () => {
 				} }
 			>
 				{ __( 'Infinite Scroll Demo' ) }: { allLoadedRecords.length } of{ ' ' }
-				{ totalItems } items loaded.
+				{ paginationInfo.totalItems } items loaded.
 				{ isLoadingMore && __( 'Loading more…' ) }
 				{ ! hasMoreData && __( 'All items loaded!' ) }
 			</Text>
@@ -549,4 +576,130 @@ export const InfiniteScroll = () => {
 			/>
 		</>
 	);
+};
+
+export const Picker = ( {
+	perPageSizes = [ 10, 25, 50, 100 ],
+	isMultiselectable,
+	isGrouped,
+	infiniteScrollEnabled,
+}: {
+	perPageSizes: number[];
+	isMultiselectable: boolean;
+	isGrouped: boolean;
+	infiniteScrollEnabled: boolean;
+} ) => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_GRID,
+		fields: [],
+		titleField: 'title',
+		mediaField: 'image',
+		search: '',
+		page: 1,
+		perPage: 10,
+		filters: [],
+		groupByField: isGrouped ? 'type' : undefined,
+		infiniteScrollEnabled,
+	} );
+	const { data: shownData, paginationInfo: normalPaginationInfo } =
+		useMemo( () => {
+			return filterSortAndPaginate( data, view, fields );
+		}, [ view ] );
+
+	useEffect( () => {
+		setView( ( prevView ) => ( {
+			...prevView,
+			groupByField:
+				isGrouped && ! infiniteScrollEnabled ? 'type' : undefined,
+			infiniteScrollEnabled,
+		} ) );
+	}, [ isGrouped, infiniteScrollEnabled ] );
+
+	const {
+		data: infiniteScrollData,
+		paginationInfo: infiniteScrollPaginationInfo,
+		isLoadingMore,
+	} = useInfiniteScroll( {
+		view,
+		setView,
+		data: shownData,
+		getItemId: ( item ) => item.id.toString(),
+	} );
+
+	const pickerActions: Action< SpaceObject >[] = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: isMultiselectable,
+			callback( _items, { selection } ) {
+				const selectedItemNames = data
+					.filter(
+						( item ) => selection?.includes( String( item.id ) )
+					)
+					.map( ( item ) => item.title )
+					.join( ',' );
+				// eslint-disable-next-line no-alert
+				window.alert( selectedItemNames );
+			},
+		},
+	];
+	return (
+		<>
+			{ infiniteScrollEnabled && (
+				<style>{ `
+					.dataviews-wrapper {
+						height: 600px;
+						overflow: auto;
+					}
+				` }</style>
+			) }
+			<DataViews
+				picker
+				actions={ pickerActions }
+				getItemId={ ( item ) => item.id.toString() }
+				paginationInfo={
+					infiniteScrollEnabled
+						? infiniteScrollPaginationInfo
+						: normalPaginationInfo
+				}
+				data={ infiniteScrollEnabled ? infiniteScrollData : shownData }
+				isLoading={ infiniteScrollEnabled ? isLoadingMore : undefined }
+				view={ view }
+				fields={ fields }
+				onChangeView={ setView }
+				defaultLayouts={ {
+					[ LAYOUT_GRID ]: {},
+				} }
+				config={ { perPageSizes } }
+				label="Galactic bodies"
+			/>
+		</>
+	);
+};
+
+Picker.args = {
+	perPageSizes: [ 10, 25, 50, 100 ],
+	isMultiselectable: false,
+	isGrouped: false,
+};
+
+Picker.argTypes = {
+	isMultiselectable: {
+		control: 'boolean',
+		description: 'Whether multiselection is supported',
+	},
+	perPageSizes: {
+		control: 'object',
+		description: 'Array of available page sizes',
+	},
+	isGrouped: {
+		control: 'boolean',
+		description: 'Whether the items are grouped or ungrouped',
+	},
+	infiniteScrollEnabled: {
+		control: 'boolean',
+		description:
+			'Whether the infinite scroll is enabled. Enabling this disables the "Is grouped" option',
+	},
 };
