@@ -299,7 +299,7 @@ const LinkUITools = ( {
 	}, [ focusAddPageButton ] );
 
 	return (
-		<VStack className="link-ui-tools">
+		<VStack spacing={ 0 } className="link-ui-tools">
 			{ canCreatePage && (
 				<Button
 					__next40pxDefaultSize
