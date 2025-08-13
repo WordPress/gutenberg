@@ -97,7 +97,10 @@ function NavigationAddPageButton( { clientId } ) {
 		const blockCount = getBlockCount( clientId );
 
 		// Create a new navigation link block (default block)
-		const newBlock = createBlock( DEFAULT_BLOCK.name );
+		const newBlock = createBlock( DEFAULT_BLOCK.name, {
+			kind: DEFAULT_BLOCK.kind,
+			type: DEFAULT_BLOCK.type,
+		} );
 
 		// Insert the block at the end of the navigation
 		insertBlock( newBlock, blockCount, clientId );
