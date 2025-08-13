@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
+import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Component for creating new pages within the Navigation Link UI.
@@ -33,6 +34,9 @@ export function LinkUIPageCreator( {
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( false );
+
+	// Focus the first element when the component mounts
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	// Check if the title is valid for submission
 	const isTitleValid = title.trim().length > 0;
@@ -91,7 +95,7 @@ export function LinkUIPageCreator( {
 	const isSubmitDisabled = isSaving || ! isTitleValid;
 
 	return (
-		<div className="link-ui-page-creator">
+		<div className="link-ui-page-creator" ref={ focusOnMountRef }>
 			<Button
 				className="link-ui-page-creator__back"
 				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
