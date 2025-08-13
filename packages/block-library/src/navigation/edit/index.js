@@ -26,7 +26,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
-	__unstableBlockToolbarLastItem,
+	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
@@ -79,6 +79,7 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { DEFAULT_BLOCK } from '../constants';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -90,26 +91,20 @@ import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const { getBlockCount } = useSelect( blockEditorStore );
-	const blockEditingMode = useBlockEditingMode();
 
 	const onAddPage = useCallback( () => {
 		// Get the current number of blocks to insert at the end
 		const blockCount = getBlockCount( clientId );
 
 		// Create a new navigation link block (default block)
-		const newBlock = createBlock( 'core/navigation-link' );
+		const newBlock = createBlock( DEFAULT_BLOCK.name );
 
 		// Insert the block at the end of the navigation
 		insertBlock( newBlock, blockCount, clientId );
 	}, [ clientId, insertBlock, getBlockCount ] );
 
-	// Only show when in contentOnly mode
-	if ( blockEditingMode !== 'contentOnly' ) {
-		return null;
-	}
-
 	return (
-		<__unstableBlockToolbarLastItem>
+		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
 					name="add-page"
@@ -120,7 +115,7 @@ function NavigationAddPageButton( { clientId } ) {
 					{ __( 'Add page' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
-		</__unstableBlockToolbarLastItem>
+		</BlockControls>
 	);
 }
 
@@ -985,7 +980,7 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
-				{ isEntityAvailable && (
+				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
 					<NavigationAddPageButton clientId={ clientId } />
 				) }
 				{ blockEditingMode === 'default' && isEntityAvailable && (
