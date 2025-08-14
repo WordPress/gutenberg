@@ -3,8 +3,7 @@
  */
 import { capitalCase, pascalCase } from 'change-case';
 import { v4 as uuidv4 } from 'uuid';
-import * as string from 'lib0/string';
-import * as sha256 from 'lib0/hash/sha256';
+
 /**
  * WordPress dependencies
  */
@@ -19,82 +18,15 @@ import * as fun from 'lib0/function';
 /**
  * Internal dependencies
  */
-import { getSyncProvider } from './sync';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-// @todo refactor `applyChangesToDoc` implementations this to have less repetition (there are
-// multiple similar implementations)
-
-/**
- * Similar to `parse`, but only reads the Yjs document if available.
- * @param {string} postType
- * @param {string} content
- */
-export function parseContentYdoc( postType, content ) {
-	const newClientId = new Uint32Array(
-		sha256.digest( string.encodeUtf8( content ) ).buffer
-	);
-	const syncProvider = getSyncProvider();
-
-	// It is important that this is a fresh document - don't use the document from the sync package!
-	const ydoc = new Y.Doc( { meta: new Map() } );
-
-	const knownUpdateGuids = new Set();
-	ydoc.meta.set( 'knownRemoteUpdates', knownUpdateGuids );
-	// Changing the Yjs clientid may lead to very weird bugs if done incorrectly.
-	// Please handle the following code-portion with great care!
-	const prevClientId = ydoc.clientID;
-	ydoc.clientID = newClientId;
-	const prevClock = ( ydoc.store.clients.get( newClientId ) || [
-		{ id: { clock: 0 } },
-	] )[ 0 ].id.clock;
-	const blocks = parse( content );
-	syncProvider.configs.get( postType ).applyChangesToDoc( ydoc, {
-		blocks,
-	} );
-	ydoc.clientID = prevClientId;
-	const newClock = ( ydoc.store.clients.get( newClientId ) ?? [
-		{ id: { clock: 0 } },
-	] )[ 0 ].id.clock;
-	if ( prevClock !== newClock ) {
-		// eslint-disable-next-line no-console
-		console.info(
-			'[Yjs Collab] Yjs document was updated to reflect changes to the HTML document.'
-		);
-	}
-	return ydoc;
-}
-
-// only sync what is necessary!
-const filteredAttributes = new Set( [
-	'content',
-	'selection',
-	'excerpt',
-	'date',
-	'date_gmt',
-	'format',
-	'generated_slug',
-	'link',
-	'meta',
-	'modified',
-	'modified_gmt',
-	'slug',
-	'status',
-	'sticky',
-	'tags',
-	'template',
-	'_links',
-	'id',
-	'password',
-	'featured_media',
-] );
-
 /**
  * @param {Y.Doc} ydoc
+ * @return {import('@wordpress/sync').ObjectData} The JSON representation of the document.
  */
-const defaultYdocTransformer = ( ydoc ) => {
+const defaultFromCRDTDoc = ( ydoc ) => {
 	const json = ydoc.getMap( 'document' ).toJSON();
 	if ( json.title?.raw ) {
 		json.title = json.title.raw;
@@ -359,6 +291,20 @@ function makeBlocksSerializable( blocks ) {
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
+	const syncedProperties = new Set( [
+		'blocks',
+		'content',
+		'excerpt',
+		'featured_media',
+		'format',
+		'generated_slug',
+		'password',
+		'slug',
+		'sticky',
+		'tags',
+		'template',
+	] );
+
 	const postTypes = await apiFetch( {
 		path: '/wp/v2/types?context=view',
 	} );
@@ -392,267 +338,197 @@ async function loadPostTypeEntities() {
 				 * @param {Y.Doc} ydoc
 				 * @param {any}   changes
 				 */
-				applyChangesToDoc: ( ydoc, changes ) => {
-					const content = changes.content?.raw || changes.content;
-					const parsedYdoc =
-						typeof content === 'string'
-							? parseContentYdoc(
-									'postType/' + postType.name,
-									content
-							  )
-							: null; // Note: always use the same 'postType' as this object's config.syncObjectType
-					if ( parsedYdoc !== null ) {
-						// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
-						Y.transact(
-							ydoc,
-							() => {
-								// apply remote changes
-								Y.applyUpdate(
-									ydoc,
-									Y.encodeStateAsUpdate( parsedYdoc )
+				applyChangesToCRDTDoc: ( ydoc, changes ) => {
+					// local changes happened. Apply the differences to the ydoc
+					const ycontent = ydoc.getMap( 'document' );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+								const blocks =
+									serialisableBlocksCache.get( value );
+								// This is a rudimentary diff implementation similar to the y-prosemirror diffing
+								// approach.
+								// A better implementation would also diff the textual content and represent it
+								// using a Y.Text type.
+								// However, at this time it makes more sense to keep this algorithm generic to
+								// support all kinds of block types.
+								// Ideally, we ensure that block data structure have a consistent data format.
+								// E.g.:
+								//   - textual content (using rich-text formatting?) may always be stored under `block.text`
+								//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
+								if (
+									! ycontent.has( key ) ||
+									ycontent.get( key ) instanceof Array
+								) {
+									// @todo remove the array check
+									ycontent.set( key, new Y.Array() );
+								}
+								/**
+								 * @type {Y.Array<Y.Map<any>>}
+								 */
+								const yblocks = ycontent.get( key );
+								const numOfCommonEntries = math.min(
+									blocks.length,
+									yblocks.length
 								);
-							},
-							'applyChangesToDoc',
-							false
-						);
-					} else {
-						// local changes happened. Apply the differences to the ydoc
-						const ycontent = ydoc.getMap( 'document' );
-						ydoc.transact( () => {
-							Object.entries( changes ).forEach(
-								( [ key, value ] ) => {
-									if ( typeof value !== 'function' ) {
-										if ( key === 'blocks' ) {
+								let left = 0;
+								let right = 0;
+								/**
+								 * @param {any}   gblock
+								 * @param {Y.Map} yblock
+								 */
+								const blocksEqual = ( gblock, yblock ) => {
+									if ( yblock.toJSON ) {
+										yblock = yblock.toJSON();
+									}
+									// we must not sync clientId, as this can't be generated consistenctly and
+									// hence will lead to merge conflicts.
+									const overwrites = {
+										innerBlocks: null,
+										clientId: null,
+									};
+									const res = fun.equalityDeep(
+										Object.assign( {}, gblock, overwrites ),
+										Object.assign( {}, yblock, overwrites )
+									);
+									const inners = gblock.innerBlocks || [];
+									const yinners = yblock.innerBlocks || [];
+									return (
+										res &&
+										inners.length === yinners.length &&
+										inners.every( ( block, i ) =>
+											blocksEqual( block, yinners[ i ] )
+										)
+									);
+								};
+								// skip equal blocks from left
+								for (
+									;
+									left < numOfCommonEntries &&
+									blocksEqual(
+										blocks[ left ],
+										yblocks.get( left )
+									);
+									left++
+								) {
+									/* nop */
+								}
+								// skip equal blocks from right
+								for (
+									;
+									right < numOfCommonEntries - left &&
+									blocksEqual(
+										blocks[ blocks.length - right - 1 ],
+										yblocks.get(
+											yblocks.length - right - 1
+										)
+									);
+									right++
+								) {
+									/* nop */
+								}
+								const numOfUpdatesNeeded =
+									numOfCommonEntries - left - right;
+								const numOfInsertionsNeeded = math.max(
+									0,
+									blocks.length - yblocks.length
+								);
+								const numOfDeletionsNeeded = math.max(
+									0,
+									yblocks.length - blocks.length
+								);
+								// updates
+								for (
+									let i = 0;
+									i < numOfUpdatesNeeded;
+									i++, left++
+								) {
+									const block = blocks[ left ];
+									const yblock = yblocks.get( left );
+									Object.entries( block ).forEach(
+										( [ k, v ] ) => {
 											if (
-												! serialisableBlocksCache.has(
-													value
+												! fun.equalityDeep(
+													block[ k ],
+													yblock.get( k )
 												)
 											) {
-												serialisableBlocksCache.set(
-													value,
-													makeBlocksSerializable(
-														value
-													)
-												);
+												yblock.set( k, v );
 											}
-											const blocks =
-												serialisableBlocksCache.get(
-													value
-												);
-											// This is a rudimentary diff implementation similar to the y-prosemirror diffing
-											// approach.
-											// A better implementation would also diff the textual content and represent it
-											// using a Y.Text type.
-											// However, at this time it makes more sense to keep this algorithm generic to
-											// support all kinds of block types.
-											// Ideally, we ensure that block data structure have a consistent data format.
-											// E.g.:
-											//   - textual content (using rich-text formatting?) may always be stored under `block.text`
-											//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
-											if (
-												! ycontent.has( key ) ||
-												ycontent.get( key ) instanceof
-													Array
-											) {
-												// @todo remove the array check
-												ycontent.set(
-													key,
-													new Y.Array()
-												);
-											}
-											/**
-											 * @type {Y.Array<Y.Map<any>>}
-											 */
-											const yblocks = ycontent.get( key );
-											const numOfCommonEntries = math.min(
-												blocks.length,
-												yblocks.length
-											);
-											let left = 0;
-											let right = 0;
-											/**
-											 * @param {any}   gblock
-											 * @param {Y.Map} yblock
-											 */
-											const blocksEqual = (
-												gblock,
-												yblock
-											) => {
-												if ( yblock.toJSON ) {
-													yblock = yblock.toJSON();
-												}
-												// we must not sync clientId, as this can't be generated consistenctly and
-												// hence will lead to merge conflicts.
-												const overwrites = {
-													innerBlocks: null,
-													clientId: null,
-												};
-												const res = fun.equalityDeep(
-													Object.assign(
-														{},
-														gblock,
-														overwrites
-													),
-													Object.assign(
-														{},
-														yblock,
-														overwrites
-													)
-												);
-												const inners =
-													gblock.innerBlocks || [];
-												const yinners =
-													yblock.innerBlocks || [];
-												return (
-													res &&
-													inners.length ===
-														yinners.length &&
-													inners.every(
-														( block, i ) =>
-															blocksEqual(
-																block,
-																yinners[ i ]
-															)
-													)
-												);
-											};
-											// skip equal blocks from left
-											for (
-												;
-												left < numOfCommonEntries &&
-												blocksEqual(
-													blocks[ left ],
-													yblocks.get( left )
-												);
-												left++
-											) {
-												/* nop */
-											}
-											// skip equal blocks from right
-											for (
-												;
-												right <
-													numOfCommonEntries - left &&
-												blocksEqual(
-													blocks[
-														blocks.length -
-															right -
-															1
-													],
-													yblocks.get(
-														yblocks.length -
-															right -
-															1
-													)
-												);
-												right++
-											) {
-												/* nop */
-											}
-											const numOfUpdatesNeeded =
-												numOfCommonEntries -
-												left -
-												right;
-											const numOfInsertionsNeeded =
-												math.max(
-													0,
-													blocks.length -
-														yblocks.length
-												);
-											const numOfDeletionsNeeded =
-												math.max(
-													0,
-													yblocks.length -
-														blocks.length
-												);
-											// updates
-											for (
-												let i = 0;
-												i < numOfUpdatesNeeded;
-												i++, left++
-											) {
-												const block = blocks[ left ];
-												const yblock =
-													yblocks.get( left );
-												Object.entries( block ).forEach(
-													( [ k, v ] ) => {
-														if (
-															! fun.equalityDeep(
-																block[ k ],
-																yblock.get( k )
-															)
-														) {
-															yblock.set( k, v );
-														}
-													}
-												);
-												yblock.forEach( ( _v, k ) => {
-													if (
-														! block.hasOwnProperty(
-															k
-														)
-													) {
-														yblock.delete( k );
-													}
-												} );
-											}
-											// deletes
-											yblocks.delete(
-												left,
-												numOfDeletionsNeeded
-											);
-											// inserts
-											for (
-												let i = 0;
-												i < numOfInsertionsNeeded;
-												i++, left++
-											) {
-												yblocks.insert( left, [
-													new Y.Map(
-														Object.entries(
-															blocks[ left ]
-														)
-													),
-												] );
-											}
-											const knownClientIds = new Set();
-											// remove duplicate clientids
-											for (
-												let j = 0;
-												j < yblocks.length;
-												j++
-											) {
-												const yblock = yblocks.get( j );
-												if (
-													knownClientIds.has(
-														yblock.get( 'clientId' )
-													)
-												) {
-													yblock.set(
-														'clientId',
-														uuidv4()
-													);
-												}
-												knownClientIds.add(
-													yblock.get( 'clientId' )
-												);
-											}
-										} else if (
-											! filteredAttributes.has( key ) &&
-											! fun.equalityDeep(
-												ycontent.get( key ),
-												value
-											)
-										) {
-											ycontent.set( key, value );
 										}
-									}
+									);
+									yblock.forEach( ( _v, k ) => {
+										if ( ! block.hasOwnProperty( k ) ) {
+											yblock.delete( k );
+										}
+									} );
 								}
-							);
-						}, 'gutenberg' );
-					}
+								// deletes
+								yblocks.delete( left, numOfDeletionsNeeded );
+								// inserts
+								for (
+									let i = 0;
+									i < numOfInsertionsNeeded;
+									i++, left++
+								) {
+									yblocks.insert( left, [
+										new Y.Map(
+											Object.entries( blocks[ left ] )
+										),
+									] );
+								}
+								const knownClientIds = new Set();
+								// remove duplicate clientids
+								for ( let j = 0; j < yblocks.length; j++ ) {
+									const yblock = yblocks.get( j );
+									if (
+										knownClientIds.has(
+											yblock.get( 'clientId' )
+										)
+									) {
+										yblock.set( 'clientId', uuidv4() );
+									}
+									knownClientIds.add(
+										yblock.get( 'clientId' )
+									);
+								}
+							} else if (
+								! syncedProperties.has( key ) &&
+								! fun.equalityDeep( ycontent.get( key ), value )
+							) {
+								ycontent.set( key, value );
+							}
+						}
+					} );
 				},
-				fromCRDTDoc: defaultYdocTransformer,
+				fromCRDTDoc: defaultFromCRDTDoc,
+				/**
+				 * This initial object data represents the data that will be synced via
+				 * the CRDT document, which may differ from the entity record. There may
+				 * be properties that should not be synced, or properties that are
+				 * derived from the record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectData} The initial data
+				 */
+				getInitialObjectData: ( record ) => {
+					// Mix in the parsed blocks into the record. Only allow properties in
+					// the synced properties set.
+					const content = record.content?.raw ?? record.content ?? '';
+					const blocks = parse( content );
+
+					return Object.fromEntries(
+						Object.entries( { ...record, blocks } ).filter(
+							( [ key ] ) => syncedProperties.has( key )
+						)
+					);
+				},
 				getObjectId: ( { id } ) => id,
 				objectType: 'postType/' + postType.name,
 				supportsAwareness: true,

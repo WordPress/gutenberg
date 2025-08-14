@@ -25,8 +25,9 @@ export type ConnectDoc = (
 ) => Promise< ConnectDocResult >;
 
 export type SyncConfig = {
-	applyChangesToDoc: ( ydoc: Y.Doc, data: Partial< ObjectData > ) => void;
+	applyChangesToCRDTDoc: ( ydoc: Y.Doc, data: Partial< ObjectData > ) => void;
 	fromCRDTDoc: ( ydoc: Y.Doc ) => ObjectData;
+	getInitialObjectData: ( record: ObjectData ) => ObjectData;
 	getObjectId: ( data: ObjectData ) => ObjectID;
 	objectType: ObjectType;
 	supportsAwareness?: boolean;

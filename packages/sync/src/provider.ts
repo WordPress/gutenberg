@@ -83,16 +83,16 @@ export class SyncProvider {
 	 * Fetch data from local database or remote source.
 	 *
 	 * @param {SyncConfig} syncConfig    Sync configuration for the object type.
-	 * @param {ObjectData} initialData   Initial data to apply to the document.
+	 * @param {ObjectData} record        Record representing this object type.
 	 * @param {Function}   handleChanges Callback to call when data changes.
 	 */
 	public async bootstrap(
 		syncConfig: SyncConfig,
-		initialData: ObjectData,
+		record: ObjectData,
 		handleChanges: ( data: Partial< ObjectData > ) => void
 	): Promise< void > {
 		const ydoc = new Y.Doc( { meta: new Map() } );
-		const objectId = syncConfig.getObjectId( initialData );
+		const objectId = syncConfig.getObjectId( record );
 		const objectType = syncConfig.objectType;
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
@@ -124,7 +124,19 @@ export class SyncProvider {
 			ydoc,
 		} );
 
-		this.update( objectType, initialData, initialData, 'gutenberg' );
+		// Get the initial data to be synced for this record.
+		const initialCRDTDoc = await this.getCRDTDoc( syncConfig, record );
+
+		// Create the initial document, possible from persisted doc.
+		Y.transact(
+			ydoc,
+			() => {
+				// apply remote changes
+				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialCRDTDoc ) );
+			},
+			'syncProvider.bootstrap',
+			false
+		);
 	}
 
 	/**
@@ -157,6 +169,27 @@ export class SyncProvider {
 	}
 
 	/**
+	 * Get the CRDTDoc that represents the initial state of the object data. Custom
+	 * sync providers can override this method to provide a custom initial state.
+	 *
+	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} record     Initial data to apply to the document.
+	 */
+	protected async getCRDTDoc(
+		syncConfig: SyncConfig,
+		record: ObjectData
+	): Promise< CRDTDoc > {
+		// IMPORTANT: We use a new Yjs document so that the initial state can be
+		// applied to the "real" Yjs document as a singular update.
+		const initialStateDoc = new Y.Doc( { meta: new Map() } );
+
+		const initialData = syncConfig.getInitialObjectData( record );
+		syncConfig.applyChangesToCRDTDoc( initialStateDoc, initialData );
+
+		return initialStateDoc;
+	}
+
+	/**
 	 * Get the undo manager.
 	 *
 	 * @return {UndoManager | null} The undo manager, or null if unsupported.
@@ -179,18 +212,17 @@ export class SyncProvider {
 		changes: Partial< ObjectData >,
 		origin: string
 	): void {
-		const objectId = this.configs.get( objectType )?.getObjectId( record );
+		const syncConfig = this.configs.get( objectType );
+		const objectId = syncConfig?.getObjectId( record );
 
-		if ( ! objectId ) {
+		if ( ! syncConfig || ! objectId ) {
 			return;
 		}
 
 		const entityState = this.getEntityState( objectType, objectId );
 
 		entityState?.ydoc.transact( () => {
-			this.configs
-				.get( objectType )
-				?.applyChangesToDoc( entityState.ydoc, changes );
+			syncConfig.applyChangesToCRDTDoc( entityState.ydoc, changes );
 		}, origin );
 	}
 
