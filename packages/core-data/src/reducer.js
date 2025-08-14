@@ -361,27 +361,15 @@ function entity( entityConfig ) {
 export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES': {
-			const existingEntitiesByKey = new Map();
-			state.forEach( ( currentEntity ) => {
-				const entityKey = `${ currentEntity.kind }:${ currentEntity.name }`;
-				existingEntitiesByKey.set( entityKey, currentEntity );
-			} );
-
-			const newEntitiesToAdd = [];
-			action.entities.forEach( ( newEntity ) => {
-				const entityKey = `${ newEntity.kind }:${ newEntity.name }`;
-
-				if ( existingEntitiesByKey.has( entityKey ) ) {
-					existingEntitiesByKey.set( entityKey, newEntity );
-				} else {
-					newEntitiesToAdd.push( newEntity );
-				}
-			} );
-
-			const existingEntities = Array.from(
-				existingEntitiesByKey.values()
+			const filteredState = state.filter(
+				( currentEntity ) =>
+					! action.entities.some(
+						( newEntity ) =>
+							currentEntity.kind === newEntity.kind &&
+							currentEntity.name === newEntity.name
+					)
 			);
-			return [ ...existingEntities, ...newEntitiesToAdd ];
+			return [ ...filteredState, ...action.entities ];
 		}
 	}
 
