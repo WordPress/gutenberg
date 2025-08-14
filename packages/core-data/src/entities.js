@@ -129,44 +129,6 @@ export const rootEntitiesConfig = [
 		// The entity doesn't support selecting multiple records.
 		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
-		syncConfig: {
-			applyChangesToDoc: ( doc, changes ) => {
-				const content = changes.content?.raw || changes.content;
-				const parsedYdoc =
-					typeof content === 'string'
-						? parseContentYdoc( 'root/base', content )
-						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
-				if ( parsedYdoc !== null ) {
-					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
-					Y.transact(
-						doc,
-						() => {
-							// apply remote changes
-							Y.applyUpdate(
-								doc,
-								Y.encodeStateAsUpdate( parsedYdoc )
-							);
-						},
-						'applyChangesToDoc',
-						false
-					);
-				} else {
-					// local changes happened. Apply the differences to the ydoc
-					const ycontent = doc.getMap( 'document' );
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							! filteredAttributes.has( key ) &&
-							! fun.equalityDeep( ycontent.get( key ), value )
-						) {
-							ycontent.set( key, value );
-						}
-					} );
-				}
-			},
-			fromCRDTDoc: defaultYdocTransformer,
-			getObjectId: () => 'index',
-			objectType: 'root/base',
-		},
 	},
 	{
 		label: __( 'Post Type' ),
@@ -176,44 +138,6 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
 		plural: 'postTypes',
-		syncConfig: {
-			applyChangesToDoc: ( ydoc, changes ) => {
-				const content = changes.content?.raw || changes.content;
-				const parsedYdoc =
-					typeof content === 'string'
-						? parseContentYdoc( 'root/postType', content )
-						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
-				if ( parsedYdoc !== null ) {
-					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
-					Y.transact(
-						ydoc,
-						() => {
-							// apply remote changes
-							Y.applyUpdate(
-								ydoc,
-								Y.encodeStateAsUpdate( parsedYdoc )
-							);
-						},
-						'applyChangesToDoc',
-						false
-					);
-				} else {
-					// local changes happened. Apply the differences to the ydoc
-					const ycontent = ydoc.getMap( 'document' );
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							! filteredAttributes.has( key ) &&
-							! fun.equalityDeep( ycontent.get( key ), value )
-						) {
-							ycontent.set( key, value );
-						}
-					} );
-				}
-			},
-			fromCRDTDoc: defaultYdocTransformer,
-			getObjectId: ( { id } ) => id,
-			objectType: 'root/postType',
-		},
 	},
 	{
 		name: 'media',
@@ -780,44 +704,6 @@ async function loadSiteEntity() {
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
-		syncConfig: {
-			applyChangesToDoc: ( doc, changes ) => {
-				const content = changes.content?.raw || changes.content;
-				const parsedYdoc =
-					typeof content === 'string'
-						? parseContentYdoc( 'root/site', content )
-						: null; // Note: always use the same 'postType' as this object's config.syncObjectType
-				if ( parsedYdoc !== null ) {
-					// parse content which contains a ydoc, and apply it to the current ydoc. The rest of the attributes can be ignored.
-					Y.transact(
-						doc,
-						() => {
-							// apply remote changes
-							Y.applyUpdate(
-								doc,
-								Y.encodeStateAsUpdate( parsedYdoc )
-							);
-						},
-						'applyChangesToDoc',
-						false
-					);
-				} else {
-					// local changes happened. Apply the differences to the ydoc
-					const ycontent = doc.getMap( 'document' );
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							! filteredAttributes.has( key ) &&
-							! fun.equalityDeep( ycontent.get( key ), value )
-						) {
-							ycontent.set( key, value );
-						}
-					} );
-				}
-			},
-			fromCRDTDoc: defaultYdocTransformer,
-			getObjectId: () => 'index',
-			objectType: 'root/site',
-		},
 		meta: {},
 	};
 
