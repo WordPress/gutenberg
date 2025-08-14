@@ -58,10 +58,14 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 
 	// Wrapper function to clean up original block when a new block is selected
 	const handleSetInsertedBlock = ( newBlock ) => {
+		// Prevent automatic block selection when removing blocks in list view context
+		// This avoids focus stealing that would close the list view and switch to canvas
+		const preventBlockSelection = false;
+
 		// If we have an existing inserted block and a new block is being set,
 		// remove the original block to avoid duplicates
 		if ( insertedBlock?.clientId && newBlock ) {
-			removeBlock( insertedBlock.clientId );
+			removeBlock( insertedBlock.clientId, preventBlockSelection );
 		}
 		setInsertedBlock( newBlock );
 	};
@@ -72,6 +76,10 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			link={ insertedBlock?.attributes }
 			setInsertedBlock={ handleSetInsertedBlock }
 			onClose={ () => {
+				// Prevent automatic block selection when removing blocks in list view context
+				// This avoids focus stealing that would close the list view and switch to canvas
+				const preventBlockSelection = false;
+
 				// Follows the exact same pattern as Navigation Link block's onClose handler
 				// If there is no URL then remove the auto-inserted block to avoid empty blocks
 				if (
@@ -80,7 +88,10 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 				) {
 					// Remove the block entirely to avoid poor UX
 					// This matches the Navigation Link block's behavior
-					removeBlock( insertedBlock.clientId );
+					removeBlock(
+						insertedBlock.clientId,
+						preventBlockSelection
+					);
 				}
 				setInsertedBlock( null );
 			} }
