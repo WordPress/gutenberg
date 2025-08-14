@@ -36,6 +36,31 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 /**
+ * Shared cleanup function for auto-inserted Navigation Link blocks.
+ *
+ * Removes the block if it has no URL and clears the inserted block state.
+ * This ensures consistent cleanup behavior across different contexts.
+ *
+ * @param {Object}   insertedBlock    - The currently inserted block data
+ * @param {Function} removeBlock      - Function to remove a block
+ * @param {Function} setInsertedBlock - Function to clear the inserted block state
+ */
+function cleanupInsertedBlock( insertedBlock, removeBlock, setInsertedBlock ) {
+	// Prevent automatic block selection when removing blocks in list view context
+	// This avoids focus stealing that would close the list view and switch to canvas
+	const shouldAutoSelectBlock = false;
+
+	// Follows the exact same pattern as Navigation Link block's onClose handler
+	// If there is no URL then remove the auto-inserted block to avoid empty blocks
+	if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+		// Remove the block entirely to avoid poor UX
+		// This matches the Navigation Link block's behavior
+		removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+	}
+	setInsertedBlock( null );
+}
+
+/**
  * Custom hook to handle iframe interaction cleanup for LinkUI in List View context.
  *
  * PROBLEM: When LinkUI is open in the List View and the user clicks on a block in the
@@ -44,20 +69,13 @@ const { PrivateListView } = unlock( blockEditorPrivateApis );
  * auto-inserted Navigation Link block to remain in the canvas instead of being cleaned up.
  *
  * SOLUTION: When LinkUI is open, we add a mousedown listener to the editor canvas iframe.
- * When triggered, we clean up the auto-inserted block if it has no URL, ensuring consistent
- * behavior between Canvas and List View contexts.
+ * When triggered, we call the provided cleanup function to handle block removal.
  *
- * @param {boolean}  isLinkUIOpen     - Whether the LinkUI is currently rendered
- * @param {Object}   insertedBlock    - The currently inserted block data
- * @param {Function} removeBlock      - Function to remove a block
- * @param {Function} setInsertedBlock - Function to clear the inserted block state
+ * @param {boolean}  isLinkUIOpen   - Whether the LinkUI is currently rendered
+ * @param {Object}   insertedBlock  - The currently inserted block data
+ * @param {Function} cleanupFn      - Function to call for cleanup when iframe is clicked
  */
-function useEditorCanvasCleanup(
-	isLinkUIOpen,
-	insertedBlock,
-	removeBlock,
-	setInsertedBlock
-) {
+function useEditorCanvasCleanup( isLinkUIOpen, insertedBlock, cleanupFn ) {
 	useEffect( () => {
 		// Only add listeners when LinkUI is actually rendered
 		if ( ! isLinkUIOpen ) {
@@ -67,12 +85,8 @@ function useEditorCanvasCleanup(
 		const handleIframeClick = () => {
 			// Check if the LinkUI is still open (insertedBlock still exists)
 			if ( insertedBlock?.clientId ) {
-				// Call onClose to trigger cleanup
-				// This will remove the auto-inserted block
-				if ( ! insertedBlock?.attributes?.url ) {
-					removeBlock( insertedBlock.clientId, false );
-				}
-				setInsertedBlock( null );
+				// Call the provided cleanup function
+				cleanupFn();
 			}
 		};
 
@@ -94,7 +108,7 @@ function useEditorCanvasCleanup(
 				);
 			}
 		};
-	}, [ isLinkUIOpen, insertedBlock, removeBlock, setInsertedBlock ] );
+	}, [ isLinkUIOpen, insertedBlock, cleanupFn ] );
 }
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
@@ -108,11 +122,8 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
 
 	// Use the editor canvas cleanup hook to handle canvas interactions
-	useEditorCanvasCleanup(
-		showLinkControls,
-		insertedBlock,
-		removeBlock,
-		setInsertedBlock
+	useEditorCanvasCleanup( showLinkControls, insertedBlock, () =>
+		cleanupInsertedBlock( insertedBlock, removeBlock, setInsertedBlock )
 	);
 
 	if ( ! showLinkControls ) {
@@ -131,12 +142,12 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const handleSetInsertedBlock = ( newBlock ) => {
 		// Prevent automatic block selection when removing blocks in list view context
 		// This avoids focus stealing that would close the list view and switch to canvas
-		const preventBlockSelection = false;
+		const shouldAutoSelectBlock = false;
 
 		// If we have an existing inserted block and a new block is being set,
 		// remove the original block to avoid duplicates
 		if ( insertedBlock?.clientId && newBlock ) {
-			removeBlock( insertedBlock.clientId, preventBlockSelection );
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
 		}
 		setInsertedBlock( newBlock );
 	};
@@ -147,24 +158,12 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			link={ insertedBlock?.attributes }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
-				// Prevent automatic block selection when removing blocks in list view context
-				// This avoids focus stealing that would close the list view and switch to canvas
-				const preventBlockSelection = false;
-
-				// Follows the exact same pattern as Navigation Link block's onClose handler
-				// If there is no URL then remove the auto-inserted block to avoid empty blocks
-				if (
-					! insertedBlock?.attributes?.url &&
-					insertedBlock?.clientId
-				) {
-					// Remove the block entirely to avoid poor UX
-					// This matches the Navigation Link block's behavior
-					removeBlock(
-						insertedBlock.clientId,
-						preventBlockSelection
-					);
-				}
-				setInsertedBlock( null );
+				// Use shared cleanup function
+				cleanupInsertedBlock(
+					insertedBlock,
+					removeBlock,
+					setInsertedBlock
+				);
 			} }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
