@@ -56,11 +56,21 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
+	// Wrapper function to clean up original block when a new block is selected
+	const handleSetInsertedBlock = ( newBlock ) => {
+		// If we have an existing inserted block and a new block is being set,
+		// remove the original block to avoid duplicates
+		if ( insertedBlock?.clientId && newBlock ) {
+			removeBlock( insertedBlock.clientId );
+		}
+		setInsertedBlock( newBlock );
+	};
+
 	return (
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
-			setInsertedBlock={ setInsertedBlock }
+			setInsertedBlock={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Follows the exact same pattern as Navigation Link block's onClose handler
 				// If there is no URL then remove the auto-inserted block to avoid empty blocks
