@@ -146,10 +146,9 @@ export default function LeafMoreMenu( props ) {
 						<AddSubmenuItem
 							block={ block }
 							onClose={ onClose }
-							expanded
 							expandedState={ props.expandedState }
 							expand={ props.expand }
-							setInsertedBlock={ props.setInsertedBlock }
+							onBlockInsert={ props.setInsertedBlock }
 						/>
 					</MenuGroup>
 					<MenuGroup>

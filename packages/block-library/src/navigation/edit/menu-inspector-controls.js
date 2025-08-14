@@ -74,7 +74,7 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
-			setInsertedBlock={ handleSetInsertedBlock }
+			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Prevent automatic block selection when removing blocks in list view context
 				// This avoids focus stealing that would close the list view and switch to canvas
