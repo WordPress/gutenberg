@@ -125,7 +125,10 @@ export class SyncProvider {
 		} );
 
 		// Get the initial data to be synced for this record.
-		const initialCRDTDoc = await this.getCRDTDoc( syncConfig, record );
+		const initialCRDTDoc = await this.getInitialCRDTDoc(
+			syncConfig,
+			record
+		);
 
 		// Create the initial document, possible from persisted doc.
 		Y.transact(
@@ -175,7 +178,7 @@ export class SyncProvider {
 	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
 	 * @param {ObjectData} record     Initial data to apply to the document.
 	 */
-	protected async getCRDTDoc(
+	protected async getInitialCRDTDoc(
 		syncConfig: SyncConfig,
 		record: ObjectData
 	): Promise< CRDTDoc > {
