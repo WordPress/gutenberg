@@ -479,16 +479,8 @@ test.describe( 'Navigation block - List view editing', () => {
 			} )
 			.click();
 
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Select the Page Link option.
-		await blockResultOptions.nth( 0 ).click();
+		// Expect the Link UI to be focused.
+		await expect( linkControl.getSearchInput() ).toBeFocused();
 
 		// Immediately dismiss the Link UI thereby not populating the `url` attribute
 		// of the block.

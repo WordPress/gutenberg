@@ -148,7 +148,7 @@ export default function LeafMoreMenu( props ) {
 							onClose={ onClose }
 							expandedState={ props.expandedState }
 							expand={ props.expand }
-							onBlockInsert={ props.setInsertedBlock }
+							setInsertedBlock={ props.setInsertedBlock }
 						/>
 					</MenuGroup>
 					<MenuGroup>
