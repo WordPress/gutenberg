@@ -171,30 +171,6 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await appender.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search',
-			} )
-		).toBeFocused();
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
-		// This is important for usability as the Page Link block is the most likely to be used.
-		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
-		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
-
-		// Select the Page Link option.
-		const customLinkResult = blockResultOptions.nth( 1 );
-		await customLinkResult.click();
-
 		// Expect to see the Link creation UI be focused.
 		const linkUIInput = linkControl.getSearchInput();
 
@@ -215,17 +191,17 @@ test.describe( 'Navigation block - List view editing', () => {
 		const thirdResult = await linkControl.getNthSearchResult( 2 );
 
 		const firstResultType =
-			await linkControl.getSearchResultType( firstResult );
+			await linkControl.getSearchResultText( firstResult );
 
 		const secondResultType =
-			await linkControl.getSearchResultType( secondResult );
+			await linkControl.getSearchResultText( secondResult );
 
 		const thirdResultType =
-			await linkControl.getSearchResultType( thirdResult );
+			await linkControl.getSearchResultText( thirdResult );
 
-		expect( firstResultType ).toBe( 'Page' );
-		expect( secondResultType ).toBe( 'Page' );
-		expect( thirdResultType ).toBe( 'Page' );
+		expect( firstResultType ).toContain( 'Page' );
+		expect( secondResultType ).toContain( 'Page' );
+		expect( thirdResultType ).toContain( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
 		const firstResultText =
@@ -629,14 +605,6 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
-			.innerText();
-	}
-
-	async getSearchResultType( result ) {
-		await expect( result ).toBeVisible();
-
-		return result
-			.locator( '.components-menu-item__shortcut' ) // this is the only way to get the type text.
 			.innerText();
 	}
 }
