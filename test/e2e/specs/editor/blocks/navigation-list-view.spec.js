@@ -171,7 +171,8 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await appender.click();
 
-		// Expect to see the Link creation UI be focused.
+		// Expect a Navigation Link block to be inserted
+		// and immediately trigger its Link UI.
 		const linkUIInput = linkControl.getSearchInput();
 
 		// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
