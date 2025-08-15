@@ -14,7 +14,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -60,57 +59,6 @@ function cleanupInsertedBlock( insertedBlock, removeBlock, setInsertedBlock ) {
 	setInsertedBlock( null );
 }
 
-/**
- * Custom hook to handle iframe interaction cleanup for LinkUI in List View context.
- *
- * PROBLEM: When LinkUI is open in the List View and the user clicks on a block in the
- * editor canvas (which is in an iframe), the Popover's built-in focus detection doesn't
- * work because iframe events don't bubble up to the parent document. This causes the
- * auto-inserted Navigation Link block to remain in the canvas instead of being cleaned up.
- *
- * SOLUTION: When LinkUI is open, we add a mousedown listener to the editor canvas iframe.
- * When triggered, we call the provided cleanup function to handle block removal.
- *
- * @param {boolean}  isLinkUIOpen   - Whether the LinkUI is currently rendered
- * @param {Object}   insertedBlock  - The currently inserted block data
- * @param {Function} cleanupFn      - Function to call for cleanup when iframe is clicked
- */
-function useEditorCanvasCleanup( isLinkUIOpen, insertedBlock, cleanupFn ) {
-	useEffect( () => {
-		// Only add listeners when LinkUI is actually rendered
-		if ( ! isLinkUIOpen ) {
-			return;
-		}
-
-		const handleIframeClick = () => {
-			// Check if the LinkUI is still open (insertedBlock still exists)
-			if ( insertedBlock?.clientId ) {
-				// Call the provided cleanup function
-				cleanupFn();
-			}
-		};
-
-		const iframe = document.querySelector( 'iframe[name="editor-canvas"]' );
-
-		if ( iframe?.contentDocument ) {
-			iframe.contentDocument.addEventListener(
-				'mousedown',
-				handleIframeClick
-			);
-		}
-
-		return () => {
-			// Cleanup when component unmounts or LinkUI closes
-			if ( iframe?.contentDocument ) {
-				iframe.contentDocument.removeEventListener(
-					'mousedown',
-					handleIframeClick
-				);
-			}
-		};
-	}, [ isLinkUIOpen, insertedBlock, cleanupFn ] );
-}
-
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -120,11 +68,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	);
 	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
 	const showLinkControls = supportsLinkControls && blockWasJustInserted;
-
-	// Use the editor canvas cleanup hook to handle canvas interactions
-	useEditorCanvasCleanup( showLinkControls, insertedBlock, () =>
-		cleanupInsertedBlock( insertedBlock, removeBlock, setInsertedBlock )
-	);
 
 	if ( ! showLinkControls ) {
 		return null;

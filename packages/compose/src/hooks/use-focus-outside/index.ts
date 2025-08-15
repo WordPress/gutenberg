@@ -77,7 +77,6 @@ export default function useFocusOutside(
 	}, [ onFocusOutside ] );
 
 	const preventBlurCheckRef = useRef( false );
-
 	const blurCheckTimeoutIdRef = useRef< number | undefined >();
 
 	/**
