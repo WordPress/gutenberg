@@ -336,11 +336,15 @@ async function loadPostTypeEntities() {
 			syncConfig: {
 				/**
 				 * @param {Y.Doc} ydoc
-				 * @param {any}   changes
+				 * @param {any}   allChanges
 				 */
-				applyChangesToCRDTDoc: ( ydoc, changes ) => {
+				applyChangesToCRDTDoc: ( ydoc, allChanges ) => {
 					// local changes happened. Apply the differences to the ydoc
 					const ycontent = ydoc.getMap( 'document' );
+					const changes = Object.entries( allChanges ).filter(
+						( [ key ] ) => syncedProperties.has( key )
+					);
+
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
 						if ( typeof value !== 'function' ) {
 							if ( key === 'blocks' ) {
@@ -499,7 +503,6 @@ async function loadPostTypeEntities() {
 									);
 								}
 							} else if (
-								! syncedProperties.has( key ) &&
 								! fun.equalityDeep( ycontent.get( key ), value )
 							) {
 								ycontent.set( key, value );
