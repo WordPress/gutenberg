@@ -23,7 +23,11 @@ interface Block {
 	validationIssues?: string[]; // unserializable
 }
 
-type Foo = Y.Map< Block[ keyof Block ] >;
+// The Y.Map type is not easy to work with. The generic type it accepts represents
+// the possible values of the map, which are varied in our case. This type is
+// accurate, but will require aggressive type narrowing when the map values are
+// accessed -- or type casting with `as`.
+type YBlock = Y.Map< Block[ keyof Block ] >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
@@ -39,8 +43,10 @@ function makeBlockAttributesSerializable(
 	return newAttributes;
 }
 
-function makeBlocksSerializable( blocks: Block[] | Y.Array< Foo > ): Block[] {
-	return blocks.map( ( block: Block | Foo ) => {
+function makeBlocksSerializable(
+	blocks: Block[] | Y.Array< YBlock >
+): Block[] {
+	return blocks.map( ( block: Block | YBlock ) => {
 		const blockAsJson = block instanceof Y.Map ? block.toJSON() : block;
 		const { innerBlocks, attributes, ...rest } = blockAsJson;
 		delete rest.validationIssues;
@@ -58,7 +64,7 @@ function makeBlocksSerializable( blocks: Block[] | Y.Array< Foo > ): Block[] {
  * @param {any}   gblock
  * @param {Y.Map} yblock
  */
-function areBlocksEqual( gblock: Block, yblock: Foo ): boolean {
+function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	const yblockAsJson = yblock.toJSON();
 
 	// we must not sync clientId, as this can't be generated consistenctly and
@@ -83,8 +89,8 @@ function areBlocksEqual( gblock: Block, yblock: Foo ): boolean {
 }
 
 export function mergeBlocks(
-	yblocks: Y.Array< Foo >,
-	newValue: Block[] | Y.Array< Foo >,
+	yblocks: Y.Array< YBlock >,
+	newValue: Block[] | Y.Array< YBlock >,
 	_origin: string // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
 	// Ensure we are working with serializable block data.
