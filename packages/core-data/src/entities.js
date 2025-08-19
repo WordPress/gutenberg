@@ -2,22 +2,19 @@
  * External dependencies
  */
 import { capitalCase, pascalCase } from 'change-case';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { RichTextData } from '@wordpress/rich-text';
 import { parse } from '@wordpress/blocks';
 import { Y } from '@wordpress/sync';
-import * as math from 'lib0/math';
-import * as fun from 'lib0/function';
 
 /**
  * Internal dependencies
  */
+import { mergeBlocks, mergePrimitiveValue } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -259,32 +256,6 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
-const serialisableBlocksCache = new WeakMap();
-
-function makeBlockAttributesSerializable( attributes ) {
-	const newAttributes = { ...attributes };
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
-		}
-	}
-	return newAttributes;
-}
-
-function makeBlocksSerializable( blocks ) {
-	return blocks.map( ( block ) => {
-		const { innerBlocks, attributes, ...rest } = block;
-		delete rest.validationIssues;
-		delete rest.originalContent;
-		// delete rest.isValid
-		return {
-			...rest,
-			attributes: makeBlockAttributesSerializable( attributes ),
-			innerBlocks: makeBlocksSerializable( innerBlocks ),
-		};
-	} );
-}
-
 /**
  * Returns the list of post type entities.
  *
@@ -333,179 +304,55 @@ async function loadPostTypeEntities() {
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
 				/**
-				 * @param {Y.Doc} ydoc
-				 * @param {any}   allChanges
+				 * @param {Y.Doc}  ydoc
+				 * @param {any}    changes
+				 * @param {string} origin
 				 */
-				applyChangesToCRDTDoc: ( ydoc, allChanges ) => {
+				applyChangesToCRDTDoc: ( ydoc, changes, origin ) => {
 					// local changes happened. Apply the differences to the ydoc
 					const ycontent = ydoc.getMap( 'document' );
-					const changes = Object.fromEntries(
-						Object.entries( allChanges ).filter( ( [ key ] ) =>
-							syncedProperties.has( key )
-						)
+
+					const filteredEntries = Object.entries( changes ).filter(
+						( [ key, value ] ) =>
+							syncedProperties.has( key ) &&
+							'function' !== typeof value // cannot serialize function values
 					);
 
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
+					filteredEntries.forEach( ( [ key, newValue ] ) => {
+						const currentValue = ycontent.get( key );
+
+						// Return .get() result so that caller can operate on the data type
+						// without having to call .get() themselves.
+						function setValue( updatedValue ) {
+							ycontent.set( key, updatedValue );
+							return ycontent.get( key );
+						}
+
+						switch ( key ) {
+							case 'blocks': {
+								let currentBlocks = currentValue;
+								if ( ! ( currentBlocks instanceof Y.Array ) ) {
+									currentBlocks = setValue( new Y.Array() ); // Initialize
 								}
-								const blocks =
-									serialisableBlocksCache.get( value );
-								// This is a rudimentary diff implementation similar to the y-prosemirror diffing
-								// approach.
-								// A better implementation would also diff the textual content and represent it
-								// using a Y.Text type.
-								// However, at this time it makes more sense to keep this algorithm generic to
-								// support all kinds of block types.
-								// Ideally, we ensure that block data structure have a consistent data format.
-								// E.g.:
-								//   - textual content (using rich-text formatting?) may always be stored under `block.text`
-								//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
-								if (
-									! ycontent.has( key ) ||
-									ycontent.get( key ) instanceof Array
-								) {
-									// @todo remove the array check
-									ycontent.set( key, new Y.Array() );
-								}
-								/**
-								 * @type {Y.Array<Y.Map<any>>}
-								 */
-								const yblocks = ycontent.get( key );
-								const numOfCommonEntries = math.min(
-									blocks.length,
-									yblocks.length
+
+								// Block[] from local changes or Y.Array< Y.Map > from peer.
+								const newBlocks = newValue ?? [];
+
+								// Merge blocks does not need `setValue` because it has been
+								// called above and the result can be operated on directly.
+								mergeBlocks( currentBlocks, newBlocks, origin );
+								break;
+							}
+
+							// Add support for additional data types here.
+
+							default: {
+								mergePrimitiveValue(
+									currentValue ?? undefined,
+									newValue ?? undefined,
+									setValue,
+									origin
 								);
-								let left = 0;
-								let right = 0;
-								/**
-								 * @param {any}   gblock
-								 * @param {Y.Map} yblock
-								 */
-								const blocksEqual = ( gblock, yblock ) => {
-									if ( yblock.toJSON ) {
-										yblock = yblock.toJSON();
-									}
-									// we must not sync clientId, as this can't be generated consistenctly and
-									// hence will lead to merge conflicts.
-									const overwrites = {
-										innerBlocks: null,
-										clientId: null,
-									};
-									const res = fun.equalityDeep(
-										Object.assign( {}, gblock, overwrites ),
-										Object.assign( {}, yblock, overwrites )
-									);
-									const inners = gblock.innerBlocks || [];
-									const yinners = yblock.innerBlocks || [];
-									return (
-										res &&
-										inners.length === yinners.length &&
-										inners.every( ( block, i ) =>
-											blocksEqual( block, yinners[ i ] )
-										)
-									);
-								};
-								// skip equal blocks from left
-								for (
-									;
-									left < numOfCommonEntries &&
-									blocksEqual(
-										blocks[ left ],
-										yblocks.get( left )
-									);
-									left++
-								) {
-									/* nop */
-								}
-								// skip equal blocks from right
-								for (
-									;
-									right < numOfCommonEntries - left &&
-									blocksEqual(
-										blocks[ blocks.length - right - 1 ],
-										yblocks.get(
-											yblocks.length - right - 1
-										)
-									);
-									right++
-								) {
-									/* nop */
-								}
-								const numOfUpdatesNeeded =
-									numOfCommonEntries - left - right;
-								const numOfInsertionsNeeded = math.max(
-									0,
-									blocks.length - yblocks.length
-								);
-								const numOfDeletionsNeeded = math.max(
-									0,
-									yblocks.length - blocks.length
-								);
-								// updates
-								for (
-									let i = 0;
-									i < numOfUpdatesNeeded;
-									i++, left++
-								) {
-									const block = blocks[ left ];
-									const yblock = yblocks.get( left );
-									Object.entries( block ).forEach(
-										( [ k, v ] ) => {
-											if (
-												! fun.equalityDeep(
-													block[ k ],
-													yblock.get( k )
-												)
-											) {
-												yblock.set( k, v );
-											}
-										}
-									);
-									yblock.forEach( ( _v, k ) => {
-										if ( ! block.hasOwnProperty( k ) ) {
-											yblock.delete( k );
-										}
-									} );
-								}
-								// deletes
-								yblocks.delete( left, numOfDeletionsNeeded );
-								// inserts
-								for (
-									let i = 0;
-									i < numOfInsertionsNeeded;
-									i++, left++
-								) {
-									yblocks.insert( left, [
-										new Y.Map(
-											Object.entries( blocks[ left ] )
-										),
-									] );
-								}
-								const knownClientIds = new Set();
-								// remove duplicate clientids
-								for ( let j = 0; j < yblocks.length; j++ ) {
-									const yblock = yblocks.get( j );
-									if (
-										knownClientIds.has(
-											yblock.get( 'clientId' )
-										)
-									) {
-										yblock.set( 'clientId', uuidv4() );
-									}
-									knownClientIds.add(
-										yblock.get( 'clientId' )
-									);
-								}
-							} else if (
-								! fun.equalityDeep( ycontent.get( key ), value )
-							) {
-								ycontent.set( key, value );
 							}
 						}
 					} );

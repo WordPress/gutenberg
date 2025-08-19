@@ -187,7 +187,11 @@ export class SyncProvider {
 		const initialStateDoc = new Y.Doc( { meta: new Map() } );
 
 		const initialData = syncConfig.getInitialObjectData( record );
-		syncConfig.applyChangesToCRDTDoc( initialStateDoc, initialData );
+		syncConfig.applyChangesToCRDTDoc(
+			initialStateDoc,
+			initialData,
+			'syncProvider.getInitialCRDTDoc'
+		);
 
 		return initialStateDoc;
 	}
@@ -222,10 +226,10 @@ export class SyncProvider {
 			return;
 		}
 
-		const entityState = this.getEntityState( objectType, objectId );
+		const ydoc = this.getEntityState( objectType, objectId )?.ydoc;
 
-		entityState?.ydoc.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( entityState.ydoc, changes );
+		ydoc?.transact( () => {
+			syncConfig.applyChangesToCRDTDoc( ydoc, changes, origin );
 		}, origin );
 	}
 
