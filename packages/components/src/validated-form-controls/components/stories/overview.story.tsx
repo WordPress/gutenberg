@@ -16,11 +16,12 @@ import { debounce } from '@wordpress/compose';
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';
+import Dropdown from '../../../dropdown';
+import { Button } from '../../../button';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
 	id: 'components-validated-form-controls-overview',
-	decorators: formDecorator,
 };
 export default meta;
 
@@ -31,6 +32,7 @@ type Story = StoryObj< typeof ControlWithError >;
  * move focus to the first control with an error.
  */
 export const WithMultipleControls: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState( '' );
 		const [ text2, setText2 ] = useState( '' );
@@ -95,6 +97,7 @@ export const WithMultipleControls: Story = {
  * will depend on context.
  */
 export const WithHelpTextReplacement: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState( '' );
 		const [ customValidity, setCustomValidity ] =
@@ -140,6 +143,7 @@ export const WithHelpTextReplacement: Story = {
  * They may be unnecessary when responses are generally quick.
  */
 export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+	decorators: formDecorator,
 	render: function Template( { ...args } ) {
 		const [ text, setText ] = useState( '' );
 		const [ customValidity, setCustomValidity ] =
@@ -288,3 +292,81 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 		);
 	},
 };
+
+/**
+ * [Form methods](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement#instance_methods) like
+ * `reportValidity()` can be used to validate the fields when a popover is about to be closed,
+ * and prevent the closing of the popover when invalid.
+ */
+export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
+	{
+		render: function Template( { ...args } ) {
+			const [ isOpen, setIsOpen ] = useState( false );
+			const formRef = useRef< HTMLFormElement >( null );
+			const [ text, setText ] = useState( '' );
+			const [ customValidity, setCustomValidity ] =
+				useState<
+					React.ComponentProps<
+						typeof ValidatedInputControl
+					>[ 'customValidity' ]
+				>( undefined );
+
+			return (
+				<Dropdown
+					popoverProps={ { placement: 'right' } }
+					open={ isOpen }
+					onToggle={ ( willOpen ) => {
+						if ( ! willOpen ) {
+							const isValid = formRef.current?.reportValidity();
+							setIsOpen( ! isValid );
+						} else {
+							setIsOpen( true );
+						}
+					} }
+					renderContent={ () => (
+						<form ref={ formRef }>
+							<ValidatedInputControl
+								{ ...args }
+								value={ text }
+								onChange={ ( newValue ) => {
+									setText( newValue ?? '' );
+								} }
+								onValidate={ ( value ) => {
+									if ( value?.toLowerCase() === 'error' ) {
+										setCustomValidity( {
+											type: 'invalid',
+											message:
+												'The word "error" is not allowed.',
+										} );
+									} else {
+										setCustomValidity( undefined );
+									}
+								} }
+								customValidity={ customValidity }
+							/>
+						</form>
+					) }
+					renderToggle={ () => {
+						return (
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								onClick={ () => setIsOpen( ! isOpen ) }
+								aria-expanded={ isOpen }
+							>
+								Open in popover
+							</Button>
+						);
+					} }
+				/>
+			);
+		},
+		args: {
+			label: 'Text',
+			help: 'The word "error" will trigger an error.',
+			required: true,
+			style: {
+				width: '200px',
+			},
+		},
+	};
