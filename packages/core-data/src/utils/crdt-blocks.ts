@@ -21,6 +21,7 @@ interface Block {
 	innerBlocks: Block[];
 	originalContent?: string; // unserializable
 	validationIssues?: string[]; // unserializable
+	name: string;
 }
 
 // The Y.Map type is not easy to work with. The generic type it accepts represents
@@ -48,12 +49,13 @@ function makeBlocksSerializable(
 ): Block[] {
 	return blocks.map( ( block: Block | YBlock ) => {
 		const blockAsJson = block instanceof Y.Map ? block.toJSON() : block;
-		const { innerBlocks, attributes, ...rest } = blockAsJson;
+		const { name, innerBlocks, attributes, ...rest } = blockAsJson;
 		delete rest.validationIssues;
 		delete rest.originalContent;
 		// delete rest.isValid
 		return {
 			...rest,
+			name,
 			attributes: makeBlockAttributesSerializable( attributes ),
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
 		};
@@ -67,7 +69,7 @@ function makeBlocksSerializable(
 function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	const yblockAsJson = yblock.toJSON();
 
-	// we must not sync clientId, as this can't be generated consistenctly and
+	// we must not sync clientId, as this can't be generated consistently and
 	// hence will lead to merge conflicts.
 	const overwrites = {
 		innerBlocks: null,
@@ -100,7 +102,12 @@ export function mergeBlocks(
 			makeBlocksSerializable( newValue )
 		);
 	}
-	const blocks = serializableBlocksCache.get( newValue ) ?? [];
+	const unfilteredBlocks = serializableBlocksCache.get( newValue ) ?? [];
+
+	// Ensure we skip blocks that we don't want to sync at the moment
+	const blocks = unfilteredBlocks.filter( ( block ) =>
+		shouldBlockBeSynced( block )
+	);
 
 	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
 	// approach.
@@ -185,5 +192,28 @@ export function mergeBlocks(
 			yblock.set( 'clientId', clientId );
 		}
 		knownClientIds.add( clientId );
+	}
+}
+
+/**
+ * Determine if a block should be synced.
+ *
+ * Ex: A gallery block should not be synced until the images have been
+ * uploaded to WordPress, and their url is available. Before that,
+ * it's not possible to access the blobs on a client as those are
+ * local.
+ *
+ * @param block The block to check.
+ * @return True if the block should be synced, false otherwise.
+ */
+function shouldBlockBeSynced( block: Block ): boolean {
+	switch ( block.name ) {
+		case 'core/gallery':
+			return ! block.innerBlocks.some(
+				( innerBlock ) =>
+					innerBlock.attributes && innerBlock.attributes.blob
+			);
+		default:
+			return true;
 	}
 }
