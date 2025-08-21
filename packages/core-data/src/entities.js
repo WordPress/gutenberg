@@ -300,7 +300,8 @@ async function loadPostTypeEntities() {
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
 				enabled: Boolean(
-					postType.supports?.[ 'collaborative-editing' ]
+					postType.supports?.[ 'collaborative-editing' ] &&
+						postType.supports?.editor
 				),
 				/**
 				 * @param {Y.Doc}  ydoc
