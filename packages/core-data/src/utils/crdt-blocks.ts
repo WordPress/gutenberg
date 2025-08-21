@@ -15,7 +15,7 @@ interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
-interface Block {
+export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
@@ -28,7 +28,7 @@ interface Block {
 // the possible values of the map, which are varied in our case. This type is
 // accurate, but will require aggressive type narrowing when the map values are
 // accessed -- or type casting with `as`.
-type YBlock = Y.Map< Block[ keyof Block ] >;
+export type YBlock = Y.Map< Block[ keyof Block ] >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
