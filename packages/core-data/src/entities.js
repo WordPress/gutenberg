@@ -24,11 +24,7 @@ const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
  * @return {import('@wordpress/sync').ObjectData} The JSON representation of the document.
  */
 const defaultFromCRDTDoc = ( ydoc ) => {
-	const json = ydoc.getMap( 'document' ).toJSON();
-	if ( json.title?.raw ) {
-		json.title = json.title.raw;
-	}
-	return json;
+	return ydoc.getMap( 'document' ).toJSON();
 };
 
 export const rootEntitiesConfig = [
@@ -272,6 +268,7 @@ async function loadPostTypeEntities() {
 		'sticky',
 		'tags',
 		'template',
+		'title',
 	] );
 
 	const postTypes = await apiFetch( {
@@ -328,6 +325,16 @@ async function loadPostTypeEntities() {
 							return ycontent.get( key );
 						}
 
+						// Set primitive a value (strings, numbers, booleans).
+						function setPrimitiveValue( primitiveValue ) {
+							mergePrimitiveValue(
+								currentValue ?? undefined,
+								primitiveValue ?? undefined,
+								setValue,
+								origin
+							);
+						}
+
 						switch ( key ) {
 							case 'blocks': {
 								let currentBlocks = currentValue;
@@ -344,15 +351,25 @@ async function loadPostTypeEntities() {
 								break;
 							}
 
+							case 'title': {
+								// Copy logic from prePersistPostType to ensure that the "Auto
+								// Draft" template title is not synced.
+								let rawNewValue = newValue?.raw ?? newValue;
+								if (
+									! currentValue &&
+									'Auto Draft' === rawNewValue
+								) {
+									rawNewValue = '';
+								}
+
+								setPrimitiveValue( rawNewValue );
+								break;
+							}
+
 							// Add support for additional data types here.
 
 							default: {
-								mergePrimitiveValue(
-									currentValue ?? undefined,
-									newValue ?? undefined,
-									setValue,
-									origin
-								);
+								setPrimitiveValue( newValue );
 							}
 						}
 					} );
