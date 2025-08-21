@@ -114,7 +114,6 @@ interface DirectivesProps {
 
 // Main context.
 const context = createContext< any >( { client: {}, server: {} } );
-context.displayName = 'InteractivityContext';
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
