@@ -271,7 +271,7 @@ async function loadPostTypeEntities() {
 	] );
 
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -299,6 +299,9 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
+				enabled: Boolean(
+					postType.supports?.[ 'collaborative-editing' ]
+				),
 				/**
 				 * @param {Y.Doc}  ydoc
 				 * @param {Object} changes
@@ -342,7 +345,7 @@ async function loadPostTypeEntities() {
 					);
 				},
 				getObjectId: ( { id } ) => id,
-				objectType: 'postType/' + postType.name,
+				objectType: `postType/${ postType.slug }`,
 				supportsAwareness: true,
 				supportsUndo: true,
 			},
