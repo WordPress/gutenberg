@@ -8,7 +8,6 @@ import * as fun from 'lib0/function';
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 
@@ -218,14 +217,6 @@ function shouldBlockBeSynced( block: Block ): boolean {
 		);
 	}
 
-	// Except the gallery block, all the other core blocks should be synced.
-	// We don't want anyone to override that, as that'll cause problems.
-	if ( block.name.startsWith( 'core/' ) ) {
-		return true;
-	}
-
-	// ToDo: Document this filter once its finalized.
-	// Allow third party blocks to customize if they are ready to be synced or not.
-	// It'll always be true by default as we assume it is ready to be synced.
-	return applyFilters( 'core.shouldBlockBeSynced', true, block ) as boolean;
+	// Allow all other blocks to be synced.
+	return true;
 }
