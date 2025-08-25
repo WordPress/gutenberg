@@ -24,6 +24,14 @@ const EMPTY_OBJECT = {};
  * @param {Object} state Global application state.
  *
  * @return {string} Editing mode.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const mode = select( 'core/edit-post' ).getEditorMode();
+ * console.log( mode ); // e.g. "visual" or "text"
+ * ```
  */
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
@@ -36,6 +44,14 @@ export const getEditorMode = createRegistrySelector(
  * @param {Object} state Global application state
  *
  * @return {boolean} Whether the editor sidebar is opened.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const open = select( 'core/edit-post' ).isEditorSidebarOpened();
+ * console.log( open );
+ * ```
  */
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
@@ -53,6 +69,14 @@ export const isEditorSidebarOpened = createRegistrySelector(
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the plugin sidebar is opened.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const pluginSidebarOpen = select( 'core/edit-post' ).isPluginSidebarOpened();
+ * console.log( pluginSidebarOpen );
+ * ```
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
@@ -80,6 +104,14 @@ export const isPluginSidebarOpened = createRegistrySelector(
  * @param {Object} state Global application state.
  *
  * @return {?string} Active general sidebar name.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const sidebar = select( 'core/edit-post' ).getActiveGeneralSidebarName();
+ * console.log( sidebar ); // "edit-post/document" or null
+ * ```
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
 	( select ) => () => {
@@ -106,6 +138,21 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
  * @param {string[] | undefined} openPanels     An array of open panel names.
  *
  * @return {Object} The converted panel data.
+ *
+ * @example
+ * ```js
+ * // Example with one inactive and two open panels.
+ * const inactivePanels = [ 'discussion-panel' ];
+ * const openPanels = [ 'discussion-panel', 'categories-panel' ];
+ *
+ * const result = convertPanelsToOldFormat( inactivePanels, openPanels );
+ *
+ * console.log( result );
+ * // {
+ * //   "discussion-panel": { enabled: false, opened: true },
+ * //   "categories-panel": { opened: true }
+ * // }
+ * ```
  */
 function convertPanelsToOldFormat( inactivePanels, openPanels ) {
 	// First reduce the inactive panels.
@@ -145,6 +192,14 @@ function convertPanelsToOldFormat( inactivePanels, openPanels ) {
  * @param {Object} state Global application state.
  *
  * @return {Object} Preferences Object.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const prefs = select( 'core/edit-post' ).getPreferences();
+ * console.log( prefs );
+ * ```
  */
 export const getPreferences = createRegistrySelector( ( select ) => () => {
 	deprecated( `select( 'core/edit-post' ).getPreferences`, {
@@ -185,6 +240,7 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 } );
 
 /**
+ * @deprecated
  *
  * @param {Object} state         Global application state.
  * @param {string} preferenceKey Preference Key.
@@ -208,6 +264,14 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * Returns an array of blocks that are hidden.
  *
  * @return {Array} A list of the hidden block types
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const hiddenBlocks = select( 'core/edit-post' ).getHiddenBlockTypes();
+ * console.log( hiddenBlocks );
+ * ```
  */
 export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 	return (
@@ -325,6 +389,14 @@ export const isModalActive = createRegistrySelector(
  * @param {string} feature Feature slug.
  *
  * @return {boolean} Is active.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const isActive = select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' );
+ * console.log( isActive );
+ * ```
  */
 export const isFeatureActive = createRegistrySelector(
 	( select ) => ( state, feature ) => {
@@ -340,6 +412,14 @@ export const isFeatureActive = createRegistrySelector(
  * @param {string} pluginName Plugin item name.
  *
  * @return {boolean} Whether the plugin item is pinned.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const pinned = select( 'core/edit-post' ).isPluginItemPinned( 'my-plugin' );
+ * console.log( pinned );
+ * ```
  */
 export const isPluginItemPinned = createRegistrySelector(
 	( select ) => ( state, pluginName ) => {
@@ -353,6 +433,14 @@ export const isPluginItemPinned = createRegistrySelector(
  * @param {Object} state Post editor state.
  *
  * @return {string[]} Active meta box locations.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const locations = select( 'core/edit-post' ).getActiveMetaBoxLocations();
+ * console.log( locations ); // e.g. [ 'side', 'normal' ]
+ * ```
  */
 export const getActiveMetaBoxLocations = createSelector(
 	( state ) => {
@@ -370,6 +458,15 @@ export const getActiveMetaBoxLocations = createSelector(
  * @param {string} location Meta box location to test.
  *
  * @return {boolean} Whether the meta box location is active and visible.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * // Check if the "side" metabox location is active and visible
+ * const isSideVisible = select( 'core/edit-post' ).isMetaBoxLocationVisible( 'side' );
+ * console.log( isSideVisible ); // true or false
+ * ```
  */
 export const isMetaBoxLocationVisible = createRegistrySelector(
 	( select ) => ( state, location ) => {
@@ -392,6 +489,15 @@ export const isMetaBoxLocationVisible = createRegistrySelector(
  * @param {string} location Meta box location to test.
  *
  * @return {boolean} Whether the meta box location is active.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * // Check if the "side" location has any active meta boxes
+ * const sideHasMeta = select( 'core/edit-post' ).isMetaBoxLocationActive( 'side' );
+ * console.log( sideHasMeta ); // true or false
+ * ```
  */
 export function isMetaBoxLocationActive( state, location ) {
 	const metaBoxes = getMetaBoxesPerLocation( state, location );
@@ -405,6 +511,14 @@ export function isMetaBoxLocationActive( state, location ) {
  * @param {string} location Meta box location to test.
  *
  * @return {?Array} List of meta boxes.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const sideMetaBoxes = select( 'core/edit-post' ).getMetaBoxesPerLocation( 'side' );
+ * console.log( sideMetaBoxes );
+ * ```
  */
 export function getMetaBoxesPerLocation( state, location ) {
 	return state.metaBoxes.locations[ location ];
@@ -416,6 +530,14 @@ export function getMetaBoxesPerLocation( state, location ) {
  * @param {Object} state Global application state.
  *
  * @return {Array} List of meta boxes.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const metaBoxes = select( 'core/edit-post' ).getAllMetaBoxes();
+ * console.log( metaBoxes );
+ * ```
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
@@ -430,6 +552,15 @@ export const getAllMetaBoxes = createSelector(
  * @param {Object} state Global application state
  *
  * @return {boolean} Whether there are metaboxes or not.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * // Check if the current post being edited has any meta boxes
+ * const hasMeta = select( 'core/edit-post' ).hasMetaBoxes();
+ * console.log( hasMeta ); // true or false
+ * ```
  */
 export function hasMetaBoxes( state ) {
 	return getActiveMetaBoxLocations( state ).length > 0;
@@ -441,6 +572,14 @@ export function hasMetaBoxes( state ) {
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the metaboxes are being saved.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const saving = select( 'core/edit-post' ).isSavingMetaBoxes();
+ * console.log( saving );
+ * ```
  */
 export function isSavingMetaBoxes( state ) {
 	return state.metaBoxes.isSaving;
@@ -514,6 +653,14 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the list view is opened.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const listViewOpen = select( 'core/edit-post' ).isListViewOpened();
+ * console.log( listViewOpen );
+ * ```
  */
 export const isListViewOpened = createRegistrySelector( ( select ) => () => {
 	deprecated( `select( 'core/edit-post' ).isListViewOpened`, {
@@ -542,6 +689,14 @@ export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether meta boxes are initialized.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const initialized = select( 'core/edit-post' ).areMetaBoxesInitialized();
+ * console.log( initialized ); // true or false
+ * ```
  */
 export function areMetaBoxesInitialized( state ) {
 	return state.metaBoxes.initialized;
@@ -551,6 +706,14 @@ export function areMetaBoxesInitialized( state ) {
  * Retrieves the template of the currently edited post.
  *
  * @return {?Object} Post Template.
+ *
+ * @example
+ * ```js
+ * import { select } from '@wordpress/data';
+ *
+ * const template = select( 'core/edit-post' ).getEditedPostTemplate();
+ * console.log( template );
+ * ```
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
