@@ -16,6 +16,7 @@ import type {
 	Action,
 	NormalizedField,
 	SupportedLayouts,
+	PickerSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
@@ -50,15 +51,13 @@ type DataViewsContextType< Item > = {
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts: SupportedLayouts | PickerSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
-	picker?: boolean;
-	label?: string;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -80,7 +79,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	containerWidth: 0,
 	containerRef: createRef(),
 	resizeObserverRef: () => {},
-	defaultLayouts: { list: {}, grid: {}, table: {} },
+	defaultLayouts: { table: {} },
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},

@@ -515,7 +515,25 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'pickerGrid';
+
+	layout?: {
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields?: string[];
+
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = DataViewsView | DataViewsPickerView;
+export type DataViewsView = ViewList | ViewGrid | ViewTable;
+export type DataViewsPickerView = ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -634,7 +652,7 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	getItemLevel?: ( item: Item ) => number;
 	isLoading?: boolean;
-	onChangeView: ( view: View ) => void;
+	onChangeView: ( view: DataViewsView ) => void;
 	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -645,11 +663,23 @@ export interface ViewBaseProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
-	view: View;
+	view: DataViewsView;
 	empty: ReactNode;
-	picker?: boolean;
-	label?: string;
 }
+
+export type ViewPickerBaseProps< Item > = Omit<
+	ViewBaseProps< Item >,
+	| 'view'
+	| 'onChangeView'
+	// The following props are not supported for pickers.
+	| 'isItemClickable'
+	| 'onClickItem'
+	| 'renderItemLink'
+> & {
+	label?: string;
+	view: DataViewsPickerView;
+	onChangeView: ( view: DataViewsPickerView ) => void;
+};
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
@@ -663,15 +693,23 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
+export interface ViewPickerGridProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerGrid;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
+export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
 
 /**

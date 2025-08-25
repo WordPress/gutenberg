@@ -25,7 +25,7 @@ import {
 	useFilters,
 	FiltersToggle,
 } from '../dataviews-filters';
-import DataViewsLayout from '../dataviews-layout';
+import DataViewsPickerLayout from '../dataviews-picker-layout';
 import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
 import { BulkActionsFooter } from '../dataviews-bulk-actions';
@@ -39,7 +39,7 @@ import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
-type DataViewsProps< Item > = {
+type DataViewsPickerProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
@@ -66,10 +66,13 @@ type DataViewsProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	config?: {
-		perPageSizes: number[];
-	};
+	config?:
+		| false
+		| {
+				perPageSizes: number[];
+		  };
 	empty?: ReactNode;
+	label?: string;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -79,16 +82,17 @@ const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
-	DataViewsProps< any >,
-	'header' | 'search' | 'searchLabel'
+	DataViewsPickerProps< any >,
+	'label' | 'header' | 'search' | 'searchLabel'
 >;
 
 function DefaultUI( {
+	label,
 	header,
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter } = useContext( DataViewsContext );
+	const { isShowingFilter, config } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -105,25 +109,27 @@ function DefaultUI( {
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</HStack>
-				<HStack
-					spacing={ 1 }
-					expanded={ false }
-					style={ { flexShrink: 0 } }
-				>
-					<DataViewsViewConfig />
-					{ header }
-				</HStack>
+				{ ( config || header ) && (
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						config && <DataViewsViewConfig />
+						{ header }
+					</HStack>
+				) }
 			</HStack>
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
-			<DataViewsLayout />
+			<DataViewsPickerLayout label={ label } />
 			<DataViewsFooter />
 		</>
 	);
 }
 
-function DataViews< Item >( {
+function DataViewsPicker< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -145,7 +151,8 @@ function DataViews< Item >( {
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
-}: DataViewsProps< Item > ) {
+	label,
+}: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
@@ -173,11 +180,6 @@ function DataViews< Item >( {
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
-	const _selection = useMemo( () => {
-		return selection.filter( ( id ) =>
-			data.some( ( item ) => getItemId( item ) === id )
-		);
-	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
@@ -234,7 +236,7 @@ function DataViews< Item >( {
 				data,
 				isLoading,
 				paginationInfo,
-				selection: _selection,
+				selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
 				setOpenedFilter,
@@ -258,6 +260,7 @@ function DataViews< Item >( {
 			<div className="dataviews-wrapper" ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI
+						label={ label }
 						header={ header }
 						search={ search }
 						searchLabel={ searchLabel }
@@ -269,26 +272,25 @@ function DataViews< Item >( {
 }
 
 // Populate the DataViews sub components
-const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActionsFooter;
-	Filters: typeof DataViewsFilters;
-	FiltersToggle: typeof FiltersToggle;
-	Layout: typeof DataViewsLayout;
-	LayoutSwitcher: typeof ViewTypeMenu;
-	Pagination: typeof DataViewsPagination;
-	Search: typeof DataViewsSearch;
-	ViewConfig: typeof DataviewsViewConfigDropdown;
-	Footer: typeof DataViewsFooter;
-};
+const DataViewsPickerSubComponents =
+	DataViewsPicker as typeof DataViewsPicker & {
+		BulkActionToolbar: typeof BulkActionsFooter;
+		Filters: typeof DataViewsFilters;
+		FiltersToggle: typeof FiltersToggle;
+		Layout: typeof DataViewsPickerLayout;
+		LayoutSwitcher: typeof ViewTypeMenu;
+		Pagination: typeof DataViewsPagination;
+		Search: typeof DataViewsSearch;
+		ViewConfig: typeof DataviewsViewConfigDropdown;
+	};
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
-DataViewsSubComponents.Filters = DataViewsFilters;
-DataViewsSubComponents.FiltersToggle = FiltersToggle;
-DataViewsSubComponents.Layout = DataViewsLayout;
-DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
-DataViewsSubComponents.Pagination = DataViewsPagination;
-DataViewsSubComponents.Search = DataViewsSearch;
-DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
-DataViewsSubComponents.Footer = DataViewsFooter;
+DataViewsPickerSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsPickerSubComponents.Filters = DataViewsFilters;
+DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
+DataViewsPickerSubComponents.Layout = DataViewsPickerLayout;
+DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsPickerSubComponents.Pagination = DataViewsPagination;
+DataViewsPickerSubComponents.Search = DataViewsSearch;
+DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;
 
-export default DataViewsSubComponents;
+export default DataViewsPickerSubComponents;

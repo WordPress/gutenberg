@@ -14,13 +14,17 @@ import { __ } from '@wordpress/i18n';
  */
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
-import type { DataViewsView, ViewBaseProps } from '../../types';
+import type { DataViewsPickerView, ViewPickerBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
 	className?: string;
+	label?: string;
 };
 
-export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
+export default function DataViewsPickerLayout( {
+	className,
+	label,
+}: DataViewsLayoutProps ) {
 	const {
 		actions = [],
 		data,
@@ -33,14 +37,11 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		selection,
 		onChangeSelection,
 		setOpenedFilter,
-		onClickItem,
-		isItemClickable,
-		renderItemLink,
 		empty = __( 'No results' ),
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-		?.component as ComponentType< ViewBaseProps< any > >;
+		?.component as ComponentType< ViewPickerBaseProps< any > >;
 
 	return (
 		<ViewComponent
@@ -55,11 +56,9 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 			onChangeSelection={ onChangeSelection }
 			selection={ selection }
 			setOpenedFilter={ setOpenedFilter }
-			onClickItem={ onClickItem }
-			renderItemLink={ renderItemLink }
-			isItemClickable={ isItemClickable }
-			view={ view as DataViewsView }
+			view={ view as DataViewsPickerView }
 			empty={ empty }
+			label={ label }
 		/>
 	);
 }

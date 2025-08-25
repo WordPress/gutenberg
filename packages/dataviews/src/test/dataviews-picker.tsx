@@ -12,8 +12,8 @@ import { useMemo, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DataViews from '../components/dataviews';
-import { LAYOUT_GRID } from '../constants';
+import DataViewsPicker from '../components/dataviews-picker';
+import { LAYOUT_PICKER_GRID } from '../constants';
 import type { Action, View } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
@@ -25,7 +25,7 @@ type Data = {
 };
 
 const defaultLayouts = {
-	[ LAYOUT_GRID ]: {},
+	[ LAYOUT_PICKER_GRID ]: {},
 };
 
 const fields = [
@@ -104,12 +104,12 @@ const multiSelectActions: Action< Data >[] = [
 	},
 ];
 
-function DataViewsPicker( {
+function Picker( {
 	view: additionalView,
 	...props
-}: Partial< Parameters< typeof DataViews< Data > >[ 0 ] > ) {
+}: Partial< Parameters< typeof DataViewsPicker< Data > >[ 0 ] > ) {
 	const [ view, setView ] = useState< View >( {
-		type: LAYOUT_GRID,
+		type: LAYOUT_PICKER_GRID,
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -136,12 +136,12 @@ function DataViewsPicker( {
 		...props,
 	};
 
-	return <DataViews { ...dataViewProps } />;
+	return <DataViewsPicker { ...dataViewProps } />;
 }
-describe( 'DataViews picker mode', () => {
+describe( 'DataViews Picker', () => {
 	describe( 'Grid layout', () => {
 		it( 'renders the grid as a `listbox` role, with items as `option` roles', () => {
-			render( <DataViewsPicker actions={ singleSelectActions } /> );
+			render( <Picker actions={ singleSelectActions } /> );
 
 			// Grid should have listbox role
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
@@ -154,10 +154,7 @@ describe( 'DataViews picker mode', () => {
 		it( 'supports specifying a `label` which is rendered as an aria-label', () => {
 			const testLabel = 'Select an item from the grid';
 			render(
-				<DataViewsPicker
-					label={ testLabel }
-					actions={ singleSelectActions }
-				/>
+				<Picker label={ testLabel } actions={ singleSelectActions } />
 			);
 
 			// Grid should have the specified aria-label
@@ -167,7 +164,7 @@ describe( 'DataViews picker mode', () => {
 		} );
 
 		it( 'implements single tab-stop composite pattern with aria-activedescendant', async () => {
-			render( <DataViewsPicker actions={ singleSelectActions } /> );
+			render( <Picker actions={ singleSelectActions } /> );
 
 			// Grid should be tabbable as the main composite widget
 			const grid = screen.getByRole( 'listbox' );
@@ -254,7 +251,7 @@ describe( 'DataViews picker mode', () => {
 
 		describe( 'Single selection', () => {
 			it( 'maintains only a single selected item', async () => {
-				render( <DataViewsPicker actions={ singleSelectActions } /> );
+				render( <Picker actions={ singleSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -291,7 +288,7 @@ describe( 'DataViews picker mode', () => {
 			} );
 
 			it( 'calls the actions callback with the current single selection when the action button is clicked', async () => {
-				render( <DataViewsPicker actions={ singleSelectActions } /> );
+				render( <Picker actions={ singleSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -333,7 +330,7 @@ describe( 'DataViews picker mode', () => {
 
 		describe( 'Multi selection', () => {
 			it( 'adds the `aria-multiselectable` attribute to the listbox', () => {
-				render( <DataViewsPicker actions={ multiSelectActions } /> );
+				render( <Picker actions={ multiSelectActions } /> );
 
 				const listbox = screen.getByRole( 'listbox' );
 				expect( listbox ).toHaveAttribute(
@@ -344,7 +341,7 @@ describe( 'DataViews picker mode', () => {
 
 			it( 'supports multiple selected items', async () => {
 				// Test multi-selection by clicking multiple items
-				render( <DataViewsPicker actions={ multiSelectActions } /> );
+				render( <Picker actions={ multiSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -384,7 +381,7 @@ describe( 'DataViews picker mode', () => {
 			} );
 
 			it( 'calls the actions callback with the current multi-selection when the action button is clicked', async () => {
-				render( <DataViewsPicker actions={ multiSelectActions } /> );
+				render( <Picker actions={ multiSelectActions } /> );
 
 				const user = userEvent.setup();
 				const options = screen.getAllByRole( 'option' );
@@ -438,10 +435,10 @@ describe( 'DataViews picker mode', () => {
 			it( 'maintains the selected items when navigating between pages for a paginated DataViews component', async () => {
 				// Create a component with pagination (2 items per page)
 				render(
-					<DataViewsPicker
+					<Picker
 						actions={ multiSelectActions }
 						view={ {
-							type: LAYOUT_GRID,
+							type: LAYOUT_PICKER_GRID,
 							fields: [],
 							titleField: 'title',
 							mediaField: 'image',

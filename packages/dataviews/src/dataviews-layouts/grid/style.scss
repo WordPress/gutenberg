@@ -1,27 +1,22 @@
 .dataviews-view-grid {
-	// When the items in dataviews are grouped, the `items` class is on a child element.
-	// When not grouped it's applied to the grid itself. Support both selectors.
-	.dataviews-view-grid__items,
-	&.dataviews-view-grid__items {
-		margin-bottom: auto;
-		display: grid;
-		gap: $grid-unit-40;
-		grid-template-rows: max-content;
-		grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-		padding: 0 $grid-unit-60 $grid-unit-30;
-		container-type: inline-size;
-		/**
-		 * Breakpoints were adjusted from media queries breakpoints to account for
-		 * the sidebar width. This was done to match the existing styles we had.
-		 */
-		@container (max-width: 430px) {
-			padding-left: $grid-unit-30;
-			padding-right: $grid-unit-30;
-		}
+	margin-bottom: auto;
+	display: grid;
+	gap: $grid-unit-40;
+	grid-template-rows: max-content;
+	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+	padding: 0 $grid-unit-60 $grid-unit-30;
+	container-type: inline-size;
+	/**
+	 * Breakpoints were adjusted from media queries breakpoints to account for
+	 * the sidebar width. This was done to match the existing styles we had.
+	 */
+	@container (max-width: 430px) {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
 
-		@media not (prefers-reduced-motion) {
-			transition: padding ease-out 0.1s;
-		}
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
 	}
 
 	.dataviews-view-grid__card {
@@ -58,31 +53,6 @@
 		}
 		.dataviews-view-grid__media:focus::after {
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-	}
-
-	&.is-picker:focus-visible {
-		// Only show one focus outline at a time. When focus is on a child element,
-		// hide the grid's own focus outline.
-		&[aria-activedescendant] {
-			outline: none;
-		}
-
-		[data-active-item="true"] {
-			outline: 2px solid var(--wp-admin-theme-color);
-		}
-	}
-
-	&.is-picker {
-		.dataviews-selection-checkbox {
-			// Always show the checkbox in picker mode.
-			top: $grid-unit-10 !important;
-
-			input {
-				// When the dataview is used as a picker, ensure the checkbox can't be clicked on.
-				// Only the item card itself is clickable.
-				pointer-events: none;
-			}
 		}
 	}
 
@@ -220,7 +190,7 @@
 	cursor: pointer;
 }
 
-.dataviews-view-grid-group__header {
+.dataviews-view-grid__group-header {
 	font-size: $font-size-large;
 	font-weight: $font-weight-medium;
 	color: $gray-900;
