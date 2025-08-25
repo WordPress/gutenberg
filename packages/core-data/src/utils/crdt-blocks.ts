@@ -8,6 +8,7 @@ import * as fun from 'lib0/function';
 /**
  * WordPress dependencies
  */
+import { applyFilters } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 
@@ -207,13 +208,24 @@ export function mergeBlocks(
  * @return True if the block should be synced, false otherwise.
  */
 function shouldBlockBeSynced( block: Block ): boolean {
-	switch ( block.name ) {
-		case 'core/gallery':
-			return ! block.innerBlocks.some(
-				( innerBlock ) =>
-					innerBlock.attributes && innerBlock.attributes.blob
-			);
-		default:
-			return true;
+	// Verify that the gallery block is ready to be synced.
+	// This means that, all images have had their blobs converted to full URLs.
+	// Checking for only the blobs ensures that blocks that have just been inserted work as well.
+	if ( 'core/gallery' === block.name ) {
+		return ! block.innerBlocks.some(
+			( innerBlock ) =>
+				innerBlock.attributes && innerBlock.attributes.blob
+		);
 	}
+
+	// Except the gallery block, all the other core blocks should be synced.
+	// We don't want anyone to override that, as that'll cause problems.
+	if ( block.name.startsWith( 'core/' ) ) {
+		return true;
+	}
+
+	// ToDo: Document this filter once its finalized.
+	// Allow third party blocks to customize if they are ready to be synced or not.
+	// It'll always be true by default as we assume it is ready to be synced.
+	return applyFilters( 'core.shouldBlockBeSynced', true, block ) as boolean;
 }
