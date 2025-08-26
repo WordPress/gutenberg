@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import type { Action, DataViewsPickerView } from '../types';
+import type { Action, Fields, DataViewsPickerView } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -28,7 +28,7 @@ const defaultLayouts = {
 	[ LAYOUT_PICKER_GRID ]: {},
 };
 
-const fields = [
+const fields: Fields< Data > = [
 	{
 		id: 'title',
 		label: 'Title',
@@ -106,10 +106,19 @@ const multiSelectActions: Action< Data >[] = [
 
 function Picker( {
 	view: additionalView,
+	actions,
+	fields: overrideFields,
+	label,
 	...props
-}: Partial< Parameters< typeof DataViewsPicker< Data > >[ 0 ] > ) {
+}: {
+	view?: Partial< DataViewsPickerView >;
+	actions?: Action< Data >[];
+	fields?: Fields< Data >;
+	label?: string;
+} ) {
 	const [ view, setView ] = useState< DataViewsPickerView >( {
 		type: LAYOUT_PICKER_GRID,
+		label,
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -121,16 +130,17 @@ function Picker( {
 	} );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, props.fields || fields );
-	}, [ view, props.fields ] );
+		return filterSortAndPaginate( data, view, overrideFields ?? fields );
+	}, [ view, overrideFields ] );
 
 	const dataViewProps = {
+		actions,
 		picker: true,
 		getItemId: ( item: Data ) => item.id.toString(),
 		paginationInfo,
 		data: shownData,
 		view,
-		fields,
+		fields: overrideFields ?? fields,
 		onChangeView: setView,
 		defaultLayouts,
 		...props,
@@ -155,7 +165,12 @@ describe( 'DataViews Picker', () => {
 			'supports specifying a `label` which is rendered as an aria-label',
 			() => {
 				const testLabel = 'Select an item from the grid';
-				render( <Picker actions={ singleSelectActions } /> );
+				render(
+					<Picker
+						actions={ singleSelectActions }
+						view={ { label: testLabel } }
+					/>
+				);
 
 				// Grid should have the specified aria-label
 				expect(

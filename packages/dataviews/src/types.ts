@@ -518,6 +518,11 @@ export interface ViewGrid extends ViewBase {
 export interface ViewPickerGrid extends ViewBase {
 	type: 'pickerGrid';
 
+	/**
+	 * Label for the grid's interactive `role=listbox` element.
+	 */
+	label?: string;
+
 	layout?: {
 		/**
 		 * The fields to use as badge fields.

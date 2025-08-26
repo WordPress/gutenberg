@@ -21,10 +21,8 @@ import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
 import type { DataViewsPickerView, Action } from '../../../types';
 
-import './style.css';
-
 const meta = {
-	title: 'DataViewsPicker/DataViewsPicker',
+	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
 
@@ -43,6 +41,7 @@ export const Default = ( {
 } ) => {
 	const [ view, setView ] = useState< DataViewsPickerView >( {
 		type: LAYOUT_PICKER_GRID,
+		label: 'Galactic Bodies',
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',

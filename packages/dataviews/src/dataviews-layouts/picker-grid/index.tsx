@@ -97,7 +97,7 @@ function GridItem< Item >( {
 			role="option"
 			aria-posinset={ posinset }
 			aria-setsize={ setsize }
-			className={ clsx( 'dataviews-picker-view-grid__card', {
+			className={ clsx( 'dataviews-view-picker-grid__card', {
 				'is-selected': isSelected,
 			} ) }
 			aria-selected={ isSelected }
@@ -258,10 +258,10 @@ function ViewPickerGrid< Item >( {
 	view,
 	className,
 	empty,
-	label,
 }: ViewPickerGridProps< Item > ) {
 	const { resizeObserverRef, paginationInfo } =
 		useContext( DataViewsContext );
+	const { label } = view;
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
