@@ -13,7 +13,32 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	example: {},
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/accordion-content',
+				innerBlocks: [
+					{
+						name: 'core/accordion-header',
+						attributes: {
+							title: 'Accordion Header Example 1',
+						},
+					},
+				],
+			},
+			{
+				name: 'core/accordion-content',
+				innerBlocks: [
+					{
+						name: 'core/accordion-header',
+						attributes: {
+							title: 'Accordion Header Example 2',
+						},
+					},
+				],
+			},
+		],
+	},
 	edit,
 	save,
 };
