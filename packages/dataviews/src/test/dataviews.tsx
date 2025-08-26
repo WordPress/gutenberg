@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViews from '../components/dataviews';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
-import type { Action, View } from '../types';
+import type { Action, DataViewsView } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -120,7 +120,7 @@ function DataViewWrapper( {
 	view: additionalView,
 	...props
 }: Partial< Parameters< typeof DataViews< Data > >[ 0 ] > ) {
-	const [ view, setView ] = useState< View >( {
+	const [ view, setView ] = useState< DataViewsView >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'order', 'author' ],
 		...additionalView,

@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import type { Action, View } from '../types';
+import type { Action, DataViewsPickerView } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -108,7 +108,7 @@ function Picker( {
 	view: additionalView,
 	...props
 }: Partial< Parameters< typeof DataViewsPicker< Data > >[ 0 ] > ) {
-	const [ view, setView ] = useState< View >( {
+	const [ view, setView ] = useState< DataViewsPickerView >( {
 		type: LAYOUT_PICKER_GRID,
 		fields: [],
 		titleField: 'title',

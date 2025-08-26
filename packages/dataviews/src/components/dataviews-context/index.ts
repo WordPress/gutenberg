@@ -16,7 +16,6 @@ import type {
 	Action,
 	NormalizedField,
 	SupportedLayouts,
-	PickerSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
@@ -51,7 +50,7 @@ type DataViewsContextType< Item > = {
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
-	defaultLayouts: SupportedLayouts | PickerSupportedLayouts;
+	defaultLayouts: SupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;

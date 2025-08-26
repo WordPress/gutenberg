@@ -19,7 +19,7 @@ import {
 } from '../../dataviews/stories/fixtures';
 import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { View, Action } from '../../../types';
+import type { DataViewsPickerView, Action } from '../../../types';
 
 import './style.css';
 
@@ -41,7 +41,7 @@ export const Default = ( {
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
 } ) => {
-	const [ view, setView ] = useState< View >( {
+	const [ view, setView ] = useState< DataViewsPickerView >( {
 		type: LAYOUT_PICKER_GRID,
 		fields: [],
 		titleField: 'title',
@@ -161,8 +161,8 @@ function useInfiniteScroll( {
 	data: shownData,
 	getItemId,
 }: {
-	view: View;
-	setView: ( view: View ) => void;
+	view: DataViewsPickerView;
+	setView: ( view: DataViewsPickerView ) => void;
 	data: SpaceObject[];
 	getItemId: ( item: SpaceObject ) => string;
 } ): {

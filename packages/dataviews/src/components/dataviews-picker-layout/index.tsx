@@ -21,6 +21,8 @@ type DataViewsLayoutProps = {
 	label?: string;
 };
 
+const supportedPickerLayouts = [ 'picker-grid' ];
+
 export default function DataViewsPickerLayout( {
 	className,
 	label,
@@ -40,8 +42,11 @@ export default function DataViewsPickerLayout( {
 		empty = __( 'No results' ),
 	} = useContext( DataViewsContext );
 
-	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-		?.component as ComponentType< ViewPickerBaseProps< any > >;
+	const ViewComponent = VIEW_LAYOUTS.filter( ( v ) =>
+		supportedPickerLayouts.includes( v.type )
+	).find( ( v ) => v.type === view.type )?.component as ComponentType<
+		ViewPickerBaseProps< any >
+	>;
 
 	return (
 		<ViewComponent
