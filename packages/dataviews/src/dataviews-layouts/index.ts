@@ -52,5 +52,6 @@ export const VIEW_LAYOUTS = [
 		component: ViewPickerGrid,
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
+		isPicker: true,
 	},
 ];

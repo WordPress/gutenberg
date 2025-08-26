@@ -20,8 +20,6 @@ type DataViewsLayoutProps = {
 	className?: string;
 };
 
-const supportedLayouts = [ 'table', 'list', 'grid' ];
-
 export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	const {
 		actions = [],
@@ -41,11 +39,9 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		empty = __( 'No results' ),
 	} = useContext( DataViewsContext );
 
-	const ViewComponent = VIEW_LAYOUTS.filter( ( v ) =>
-		supportedLayouts.includes( v.type )
-	).find( ( v ) => v.type === view.type )?.component as ComponentType<
-		ViewBaseProps< any >
-	>;
+	const ViewComponent = VIEW_LAYOUTS.filter( ( v ) => ! v.isPicker ).find(
+		( v ) => v.type === view.type
+	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
 		<ViewComponent
