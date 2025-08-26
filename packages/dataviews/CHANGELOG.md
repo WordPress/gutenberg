@@ -10,6 +10,10 @@
 
 -   DataForm: add description support for the combined fields and show the description in the Card layout ([#71380](https://github.com/WordPress/gutenberg/pull/71380)).
 
+### Internal
+
+- Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208)
+
 ### Bug Fixes
 
 -   DataViews: Fix incorrect documentation for `defaultLayouts` prop. [#71334](https://github.com/WordPress/gutenberg/pull/71334)
