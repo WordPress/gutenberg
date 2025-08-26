@@ -837,6 +837,68 @@ Whenever you have interactive blocks that rely on global state or local context 
 -   **Read-Only References:** Both `getServerState()` and `getServerContext()` return read-only objects. You can use those objects to update the global state or local context.
 -   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/api-reference.md#accessing-data-in-callbacks) to react to state and context changes. Both `getServerState()` and `getServerContext()` return reactive objects. This means that their watch callbacks will only trigger when the value of a property changes. If the value remains the same, the callback will not re-trigger.
 
+## Config
+
+**Config** in the Interactivity API refers to static configuration data that is serialized from the server to the client. Unlike global state or local context, config values are **not reactive** - they don't trigger UI updates when changed, and they're intended to remain constant throughout the client-side lifecycle.
+
+Config is ideal for sending non-reactive data from PHP to JavaScript, such as API endpoints, nonces, feature flags, or translations that won't change during user interaction.
+
+You should use config when:
+
+-   You need to pass static configuration data from the server to the client
+-   The data doesn't need to be reactive (won't change during user interactions)
+-   You want to send API URLs, authentication tokens, or feature toggles
+-   You need to provide translations or other static content
+
+### Working with config
+
+-   **Setting config on the server**
+
+    Use the `wp_interactivity_config()` function in PHP to define configuration values:
+
+    ```php
+    // Setting config values
+    wp_interactivity_config( 'myPlugin', array(
+        'restApiUrl'     => get_rest_url( null, 'my-plugin/v1/' ),
+        'nonce'          => wp_create_nonce( 'my_plugin_action' ),
+        'isUserLoggedIn' => is_user_logged_in(),
+        'translations'   => array(
+            'loading'    => __( 'Loading...', 'my-plugin' ),
+            'error'      => __( 'An error occurred', 'my-plugin' ),
+        ),
+    ) );
+    ```
+
+-   **Accessing config on the client**
+
+    Use the `getConfig()` function in JavaScript to retrieve configuration values:
+
+    ```js
+    import { store, getConfig } from '@wordpress/interactivity';
+
+    const { state } = store( 'myPlugin', {
+    	actions: {
+    		*fetchData() {
+    			const { restApiUrl, nonce } = getConfig();
+
+    			try {
+    				const response = yield fetch( `${ restApiUrl }data`, {
+    					method: 'POST',
+    					headers: {
+    						'X-WP-Nonce': nonce,
+    					},
+    				} );
+    				const data = yield response.json();
+    				state.data = data;
+    			} catch ( error ) {
+    				const { translations } = getConfig();
+    				state.errorMessage = translations.error;
+    			}
+    		},
+    	},
+    } );
+    ```
+
 ## Conclusion
 
-Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, and choose between global state and local context based on the scope and requirements of your data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain. Finally, if you need to synchronize the state or context with the server, you can use `getServerState()` and `getServerContext()` to achieve this.
+Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, choose between global state and local context based on the scope and requirements of your data, and use config for static server-to-client data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain. Finally, if you need to synchronize the state or context with the server, you can use `getServerState()` and `getServerContext()` to achieve this.
