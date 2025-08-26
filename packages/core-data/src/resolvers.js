@@ -786,9 +786,10 @@ export const canUserEditEntityRecord =
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
+ * @param {number} perPage  The number of autosaves to retrieve. Optional, default is 1.
  */
 export const getAutosaves =
-	( postType, postId ) =>
+	( postType, postId, perPage = 1 ) =>
 	async ( { dispatch, resolveSelect } ) => {
 		const {
 			rest_base: restBase,
@@ -800,7 +801,7 @@ export const getAutosaves =
 		}
 
 		const autosaves = await apiFetch( {
-			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
+			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit&per_page=${ perPage }`,
 		} );
 
 		if ( autosaves && autosaves.length ) {
