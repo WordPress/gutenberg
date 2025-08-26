@@ -1,29 +1,7 @@
+
+@import "../utils/grid-items.scss";
+
 .dataviews-view-picker-grid {
-	// When the items in dataviews are grouped, the `items` class is on a child element.
-	// When not grouped it's applied to the grid itself. Support both selectors.
-	.dataviews-view-picker-grid__items,
-	&.dataviews-view-picker-grid__items {
-		margin-bottom: auto;
-		display: grid;
-		gap: $grid-unit-40;
-		grid-template-rows: max-content;
-		grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-		padding: 0 $grid-unit-60 $grid-unit-30;
-		container-type: inline-size;
-		/**
-		 * Breakpoints were adjusted from media queries breakpoints to account for
-		 * the sidebar width. This was done to match the existing styles we had.
-		 */
-		@container (max-width: 480px) {
-			padding-left: $grid-unit-30;
-			padding-right: $grid-unit-30;
-		}
-
-		@media not (prefers-reduced-motion) {
-			transition: padding ease-out 0.1s;
-		}
-	}
-
 	.dataviews-view-picker-grid__card {
 		height: 100%;
 		justify-content: flex-start;

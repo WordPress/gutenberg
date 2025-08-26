@@ -35,6 +35,7 @@ import type {
 	ViewPickerGridProps,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
+import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 
 interface GridItemProps< Item > {
@@ -357,8 +358,8 @@ function ViewPickerGrid< Item >( {
 									groupName={ groupName }
 									groupField={ groupField }
 								>
-									<div
-										className="dataviews-view-picker-grid__items"
+									<GridItems
+										previewSize={ usedPreviewSize }
 										style={ {
 											gridTemplateColumns:
 												usedPreviewSize &&
@@ -402,7 +403,7 @@ function ViewPickerGrid< Item >( {
 												/>
 											);
 										} ) }
-									</div>
+									</GridItems>
 								</GridGroup>
 							)
 						) }
@@ -414,6 +415,19 @@ function ViewPickerGrid< Item >( {
 				// Render a single grid with all data.
 				hasData && ! dataByGroup && (
 					<Composite
+						render={
+							<GridItems
+								className={ clsx(
+									'dataviews-view-picker-grid',
+									className
+								) }
+								previewSize={ usedPreviewSize }
+								aria-busy={ isLoading }
+								ref={
+									resizeObserverRef as React.RefObject< HTMLDivElement >
+								}
+							/>
+						}
 						virtualFocus
 						orientation="horizontal"
 						role="listbox"
@@ -421,20 +435,6 @@ function ViewPickerGrid< Item >( {
 							isMultiselectPicker ?? undefined
 						}
 						aria-label={ label }
-						className={ clsx(
-							'dataviews-view-picker-grid',
-							'dataviews-view-picker-grid__items',
-							className
-						) }
-						style={ {
-							gridTemplateColumns:
-								usedPreviewSize &&
-								`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-						} }
-						aria-busy={ isLoading }
-						ref={
-							resizeObserverRef as React.RefObject< HTMLDivElement >
-						}
 					>
 						{ data.map( ( item, index ) => {
 							let posinset = isInfiniteScroll
