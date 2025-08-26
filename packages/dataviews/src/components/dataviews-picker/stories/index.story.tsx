@@ -123,7 +123,6 @@ export const Default = ( {
 					[ LAYOUT_PICKER_GRID ]: {},
 				} }
 				config={ { perPageSizes } }
-				label="Galactic bodies"
 			/>
 		</>
 	);

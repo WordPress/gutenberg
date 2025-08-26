@@ -18,9 +18,13 @@ import type { DataViewsView, ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
 	className?: string;
+	isPickerView?: boolean;
 };
 
-export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
+export default function DataViewsLayout( {
+	className,
+	isPickerView,
+}: DataViewsLayoutProps ) {
 	const {
 		actions = [],
 		data,
@@ -39,9 +43,11 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		empty = __( 'No results' ),
 	} = useContext( DataViewsContext );
 
-	const ViewComponent = VIEW_LAYOUTS.filter( ( v ) => ! v.isPicker ).find(
-		( v ) => v.type === view.type
-	)?.component as ComponentType< ViewBaseProps< any > >;
+	const ViewComponent = VIEW_LAYOUTS.filter(
+		( v ) => Boolean( v.isPicker ) === Boolean( isPickerView )
+	).find( ( v ) => v.type === view.type )?.component as ComponentType<
+		ViewBaseProps< any >
+	>;
 
 	return (
 		<ViewComponent

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ComponentProps, ReactElement } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ import {
 	useFilters,
 	FiltersToggle,
 } from '../dataviews-filters';
-import DataViewsPickerLayout from '../dataviews-picker-layout';
+import DataViewsLayout from '../dataviews-layout';
 import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
 import { BulkActionsFooter } from '../dataviews-bulk-actions';
@@ -45,6 +45,8 @@ import type {
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
+const isItemClickable = () => false;
+
 type DataViewsPickerProps< Item > = {
 	view: DataViewsPickerView;
 	onChangeView: ( view: DataViewsPickerView ) => void;
@@ -62,13 +64,6 @@ type DataViewsPickerProps< Item > = {
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable?: ( item: Item ) => boolean;
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
@@ -78,22 +73,19 @@ type DataViewsPickerProps< Item > = {
 				perPageSizes: number[];
 		  };
 	empty?: ReactNode;
-	label?: string;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
-const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
-	'label' | 'header' | 'search' | 'searchLabel'
+	'header' | 'search' | 'searchLabel'
 >;
 
 function DefaultUI( {
-	label,
 	header,
 	search = true,
 	searchLabel = undefined,
@@ -129,7 +121,7 @@ function DefaultUI( {
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
-			<DataViewsPickerLayout label={ label } />
+			<DataViewsLayout isPickerView />
 			<DataViewsFooter />
 		</>
 	);
@@ -150,14 +142,10 @@ function DataViewsPicker< Item >( {
 	defaultLayouts,
 	selection: selectionProperty,
 	onChangeSelection,
-	onClickItem,
-	renderItemLink,
-	isItemClickable = defaultIsItemClickable,
 	header,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
-	label,
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
@@ -244,15 +232,13 @@ function DataViewsPicker< Item >( {
 				data,
 				isLoading,
 				paginationInfo,
+				isItemClickable,
 				selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
 				getItemLevel,
-				isItemClickable,
-				onClickItem,
-				renderItemLink,
 				containerWidth,
 				containerRef,
 				resizeObserverRef,
@@ -268,7 +254,6 @@ function DataViewsPicker< Item >( {
 			<div className="dataviews-wrapper" ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI
-						label={ label }
 						header={ header }
 						search={ search }
 						searchLabel={ searchLabel }
@@ -279,13 +264,17 @@ function DataViewsPicker< Item >( {
 	);
 }
 
+function DataViewsPickerLayout( { ...props } ) {
+	return <DataViewsLayout { ...props } isPickerView />;
+}
+
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
 		BulkActionToolbar: typeof BulkActionsFooter;
 		Filters: typeof DataViewsFilters;
 		FiltersToggle: typeof FiltersToggle;
-		Layout: typeof DataViewsPickerLayout;
+		Layout: typeof DataViewsLayout;
 		LayoutSwitcher: typeof ViewTypeMenu;
 		Pagination: typeof DataViewsPagination;
 		Search: typeof DataViewsSearch;

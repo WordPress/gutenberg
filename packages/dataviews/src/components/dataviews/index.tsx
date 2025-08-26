@@ -276,6 +276,10 @@ function DataViews< Item >( {
 	);
 }
 
+function DataViewsLayoutSubComponent( { ...props } ) {
+	return <DataViewsLayout { ...props } isPickerView={ false } />;
+}
+
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;
@@ -292,7 +296,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
 DataViewsSubComponents.Filters = DataViewsFilters;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
-DataViewsSubComponents.Layout = DataViewsLayout;
+DataViewsSubComponents.Layout = DataViewsLayoutSubComponent;
 DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
