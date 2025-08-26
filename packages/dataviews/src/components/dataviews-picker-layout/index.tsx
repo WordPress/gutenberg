@@ -16,7 +16,7 @@ import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { DataViewsPickerView, ViewPickerBaseProps } from '../../types';
 
-type DataViewsLayoutProps = {
+type DataViewsPickerLayout = {
 	className?: string;
 	label?: string;
 };
@@ -24,7 +24,7 @@ type DataViewsLayoutProps = {
 export default function DataViewsPickerLayout( {
 	className,
 	label,
-}: DataViewsLayoutProps ) {
+}: DataViewsPickerLayout ) {
 	const {
 		actions = [],
 		data,
