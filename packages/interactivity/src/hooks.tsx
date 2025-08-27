@@ -17,7 +17,12 @@ import type { VNode, Context } from 'preact';
 /**
  * Internal dependencies
  */
-import { store, stores, universalUnlock } from './store';
+import {
+	store,
+	stores,
+	universalUnlock,
+	derivedStatePropsAccessed,
+} from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
@@ -201,7 +206,7 @@ export const directive = (
 	directivePriorities[ name ] = priority;
 };
 
-export const NOT_RESOLVED = Symbol( 'NOT_RESOLVED' );
+export const PENDING_GETTER = Symbol( 'PENDING_GETTER' );
 
 // Resolve the path to some property of the store object.
 const resolve = ( path: string, namespace: string ) => {
@@ -225,15 +230,24 @@ const resolve = ( path: string, namespace: string ) => {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
+	const isAnInvokedGetter = (
+		derivedStatePropsAccessed[ namespace ] as string[]
+	 )?.find( ( getterPath ) => path.startsWith( getterPath ) );
+
 	try {
-		return path
-			.split( '.' )
-			.reduce(
-				( acc, key ) =>
-					key in acc ? acc[ key ] : acc[ key ] || NOT_RESOLVED,
-				current
-			);
-	} catch ( e ) {}
+		return path.split( '.' ).reduce( ( acc, key ) => {
+			// Subscribe to the prop, even when it doesn't exist yet.
+			const value = acc[ key ];
+			if ( ! ( key in acc ) ) {
+				throw new Error( 'Property not resolved' );
+			}
+			return value;
+		}, current );
+	} catch ( e ) {
+		if ( isAnInvokedGetter ) {
+			return PENDING_GETTER;
+		}
+	}
 };
 
 // Generate the evaluate function.
@@ -280,7 +294,7 @@ export const getEvaluate: GetEvaluate =
 		}
 		const result = value;
 		resetScope();
-		return hasNegationOperator && value !== NOT_RESOLVED
+		return hasNegationOperator && value !== PENDING_GETTER
 			? ! result
 			: result;
 	};
