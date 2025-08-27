@@ -61,11 +61,9 @@ type DataViewsPickerProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	config?:
-		| false
-		| {
-				perPageSizes: number[];
-		  };
+	config?: {
+		perPageSizes: number[];
+	};
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
