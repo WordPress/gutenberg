@@ -839,7 +839,7 @@ Whenever you have interactive blocks that rely on global state or local context 
 
 ## Config
 
-**Config** in the Interactivity API refers to static configuration data that is serialized from the server to the client. Unlike global state or local context, config values are **not reactive** - they don't trigger UI updates when changed, and they're intended to remain constant throughout the client-side lifecycle.
+**Config** in the Interactivity API refers to static configuration data that is serialized from the server to the client. Unlike global state or local context, config values are **not reactive** - they don't trigger UI updates and remain constant throughout the client-side lifecycle.
 
 Config is ideal for sending non-reactive data from PHP to JavaScript, such as API endpoints, nonces, feature flags, or translations that won't change during user interaction.
 
