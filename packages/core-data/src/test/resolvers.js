@@ -1484,7 +1484,7 @@ describe( 'getAutosaves', () => {
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1`,
 		} );
 		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
 			1,
@@ -1511,7 +1511,7 @@ describe( 'getAutosaves', () => {
 		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
+			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&per_page=1`,
 		} );
 		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
 	} );

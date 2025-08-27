@@ -786,10 +786,10 @@ export const canUserEditEntityRecord =
  *
  * @param {string} postType The type of the parent post.
  * @param {number} postId   The id of the parent post.
- * @param {number} perPage  The number of autosaves to retrieve. Optional, default is 1.
+ * @param {number} perPage  The number of autosaves to retrieve. Optional.
  */
 export const getAutosaves =
-	( postType, postId, perPage = 1 ) =>
+	( postType, postId, perPage ) =>
 	async ( { dispatch, resolveSelect } ) => {
 		const {
 			rest_base: restBase,
@@ -799,9 +799,13 @@ export const getAutosaves =
 		if ( ! supports?.autosave ) {
 			return;
 		}
+		let path = `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`;
+		if ( perPage ) {
+			path = path + `&per_page=${ perPage }`;
+		}
 
 		const autosaves = await apiFetch( {
-			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit&per_page=${ perPage }`,
+			path,
 		} );
 
 		if ( autosaves && autosaves.length ) {
@@ -821,7 +825,7 @@ export const getAutosaves =
 export const getAutosave =
 	( postType, postId ) =>
 	async ( { resolveSelect } ) => {
-		await resolveSelect.getAutosaves( postType, postId );
+		await resolveSelect.getAutosaves( postType, postId, 1 );
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =
