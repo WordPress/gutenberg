@@ -115,9 +115,7 @@ function DefaultUI( {
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
 			<DataViewsLayout />
-			{ footerContent && (
-				<DataViewsPickerFooter>{ footerContent }</DataViewsPickerFooter>
-			) }
+			<DataViewsPickerFooter>{ footerContent }</DataViewsPickerFooter>
 		</>
 	);
 }

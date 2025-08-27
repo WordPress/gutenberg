@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import type { Action, Fields, View, ViewPickerGrid } from '../types';
+import type { View, ViewPickerGrid } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -24,41 +24,11 @@ type Data = {
 	order?: number;
 };
 
+const onChangeSelection = jest.fn();
+
 const defaultLayouts = {
 	[ LAYOUT_PICKER_GRID ]: {},
 };
-
-const fields: Fields< Data > = [
-	{
-		id: 'title',
-		label: 'Title',
-		type: 'text' as const,
-	},
-	{
-		label: 'Image',
-		id: 'image',
-		render: ( { item }: { item: Data } ) => {
-			return (
-				<svg
-					width="400"
-					height="180"
-					data-testid={ 'image-field-' + item.id }
-				>
-					<rect
-						x="50"
-						y="20"
-						rx="20"
-						ry="20"
-						width="150"
-						height="150"
-						style={ { fill: 'red', opacity: 0.5 } }
-					/>
-				</svg>
-			);
-		},
-		enableSorting: false,
-	},
-];
 
 const data: Data[] = [
 	{
@@ -81,40 +51,15 @@ const data: Data[] = [
 	},
 ];
 
-const singleSelectCallback = jest.fn();
-const singleSelectActions: Action< Data >[] = [
-	{
-		id: 'confirm',
-		label: 'Confirm',
-		supportsBulk: false,
-		isPrimary: true,
-		callback: singleSelectCallback,
-	},
-];
-
-const multiSelectCallback = jest.fn();
-const multiSelectActions: Action< Data >[] = [
-	{
-		id: 'confirm',
-		label: 'Confirm',
-		supportsBulk: true,
-		isPrimary: true,
-		icon: 'check',
-		callback: multiSelectCallback,
-	},
-];
-
 function Picker( {
 	view: additionalView,
-	actions,
-	fields: overrideFields,
 	label,
+	multiselect,
 	...props
 }: {
 	view?: Partial< View >;
-	actions?: Action< Data >[];
-	fields?: Fields< Data >;
 	label?: string;
+	multiselect?: boolean;
 } ) {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
@@ -129,20 +74,27 @@ function Picker( {
 		...additionalView,
 	} as ViewPickerGrid );
 
+	const [ selection, setSelection ] = useState< string[] >( [] );
+
 	const { data: shownData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, overrideFields ?? fields );
-	}, [ view, overrideFields ] );
+		return filterSortAndPaginate( data, view, [] );
+	}, [ view ] );
 
 	const dataViewProps = {
-		actions,
 		picker: true,
 		getItemId: ( item: Data ) => item.id.toString(),
 		paginationInfo,
 		data: shownData,
 		view,
-		fields: overrideFields ?? fields,
+		fields: [],
 		onChangeView: setView,
 		defaultLayouts,
+		multiselect,
+		selection,
+		onChangeSelection: ( newSelection: string[] ) => {
+			onChangeSelection( newSelection );
+			setSelection( newSelection );
+		},
 		...props,
 	};
 
@@ -151,7 +103,7 @@ function Picker( {
 describe( 'DataViews Picker', () => {
 	describe( 'Grid layout', () => {
 		it( 'renders the grid as a `listbox` role, with items as `option` roles', () => {
-			render( <Picker actions={ singleSelectActions } /> );
+			render( <Picker /> );
 
 			// Grid should have listbox role
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
@@ -163,12 +115,7 @@ describe( 'DataViews Picker', () => {
 
 		it( 'supports specifying a `label` which is rendered as an aria-label', () => {
 			const testLabel = 'Select an item from the grid';
-			render(
-				<Picker
-					actions={ singleSelectActions }
-					view={ { label: testLabel } }
-				/>
-			);
+			render( <Picker view={ { label: testLabel } } /> );
 
 			// Grid should have the specified aria-label
 			expect(
@@ -177,7 +124,7 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		it( 'implements single tab-stop composite pattern with aria-activedescendant', async () => {
-			render( <Picker actions={ singleSelectActions } /> );
+			render( <Picker /> );
 
 			// Grid should be tabbable as the main composite widget
 			const grid = screen.getByRole( 'listbox' );
@@ -263,11 +210,12 @@ describe( 'DataViews Picker', () => {
 		} );
 
 		describe( 'Single selection', () => {
-			it( 'maintains only a single selected item', async () => {
-				render( <Picker actions={ singleSelectActions } /> );
+			it( 'maintains only a single selected item and calls the `onChangeSelection` callback when the selection changes', async () => {
+				render( <Picker /> );
 
 				const user = userEvent.setup();
-				const options = screen.getAllByRole( 'option' );
+				const listbox = screen.getByRole( 'listbox' );
+				const options = within( listbox ).getAllByRole( 'option' );
 
 				// Click first item
 				await user.click( options[ 0 ] );
@@ -283,6 +231,9 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'false'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 0 ].id.toString(),
+				] );
 
 				// Click second item - should deselect first
 				await user.click( options[ 1 ] );
@@ -298,52 +249,15 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'false'
 				);
-			} );
-
-			it( 'calls the actions callback with the current single selection when the action button is clicked', async () => {
-				render( <Picker actions={ singleSelectActions } /> );
-
-				const user = userEvent.setup();
-				const options = screen.getAllByRole( 'option' );
-
-				// Select first item
-				await user.click( options[ 0 ] );
-				expect( options[ 0 ] ).toHaveAttribute(
-					'aria-selected',
-					'true'
-				);
-
-				// Find the action button with correct label within the action buttons container
-				const confirmButton = screen.getByRole( 'button', {
-					name: 'Confirm',
-				} );
-				expect( confirmButton ).toBeInTheDocument();
-
-				// Verify button is in the footer.
-				// eslint-disable-next-line testing-library/no-node-access
-				const actionButtonsContainer = confirmButton.closest(
-					'.dataviews-bulk-actions-footer__action-buttons'
-				);
-				expect( actionButtonsContainer ).toBeInTheDocument();
-
-				// Clear any previous calls and click the action button
-				singleSelectCallback.mockClear();
-				await user.click( confirmButton );
-
-				// Verify the callback was called with correct parameters
-				expect( singleSelectCallback ).toHaveBeenCalledTimes( 1 );
-				expect( singleSelectCallback ).toHaveBeenCalledWith(
-					[ data[ 0 ] ], // Selected items
-					expect.objectContaining( {
-						selection: [ '1' ], // Selection IDs
-					} )
-				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 1 ].id.toString(),
+				] );
 			} );
 		} );
 
 		describe( 'Multi selection', () => {
 			it( 'adds the `aria-multiselectable` attribute to the listbox', () => {
-				render( <Picker actions={ multiSelectActions } /> );
+				render( <Picker multiselect /> );
 
 				const listbox = screen.getByRole( 'listbox' );
 				expect( listbox ).toHaveAttribute(
@@ -352,12 +266,13 @@ describe( 'DataViews Picker', () => {
 				);
 			} );
 
-			it( 'supports multiple selected items', async () => {
+			it( 'supports multiple selected items and calls the `onChangeSelection` callback when the selection changes', async () => {
 				// Test multi-selection by clicking multiple items
-				render( <Picker actions={ multiSelectActions } /> );
+				render( <Picker multiselect /> );
 
 				const user = userEvent.setup();
-				const options = screen.getAllByRole( 'option' );
+				const listbox = screen.getByRole( 'listbox' );
+				const options = within( listbox ).getAllByRole( 'option' );
 
 				// Click first item
 				await user.click( options[ 0 ] );
@@ -369,6 +284,9 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'false'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 0 ].id.toString(),
+				] );
 
 				// Click second item - both should remain selected in multi-select mode
 				await user.click( options[ 1 ] );
@@ -380,6 +298,10 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'true'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 0 ].id.toString(),
+					data[ 1 ].id.toString(),
+				] );
 
 				// Click first item again to deselect it
 				await user.click( options[ 0 ] );
@@ -391,65 +313,16 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'true'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 1 ].id.toString(),
+				] );
 			} );
 
-			it( 'calls the actions callback with the current multi-selection when the action button is clicked', async () => {
-				render( <Picker actions={ multiSelectActions } /> );
-
-				const user = userEvent.setup();
-				const options = screen.getAllByRole( 'option' );
-
-				// Select multiple items
-				await user.click( options[ 0 ] );
-				await user.click( options[ 1 ] );
-
-				expect( options[ 0 ] ).toHaveAttribute(
-					'aria-selected',
-					'true'
-				);
-				expect( options[ 1 ] ).toHaveAttribute(
-					'aria-selected',
-					'true'
-				);
-
-				// Third item should remain unselected
-				expect( options[ 2 ] ).toHaveAttribute(
-					'aria-selected',
-					'false'
-				);
-
-				// Find the action button with correct label within the action buttons container
-				const confirmButton = screen.getByRole( 'button', {
-					name: 'Confirm',
-				} );
-				expect( confirmButton ).toBeInTheDocument();
-
-				// Verify button is in the footer.
-				// eslint-disable-next-line testing-library/no-node-access
-				const actionButtonsContainer = confirmButton.closest(
-					'.dataviews-bulk-actions-footer__action-buttons'
-				);
-				expect( actionButtonsContainer ).toBeInTheDocument();
-
-				// Clear any previous calls and click the action button
-				multiSelectCallback.mockClear();
-				await user.click( confirmButton );
-
-				// Verify the callback was called with correct parameters for multi-selection
-				expect( multiSelectCallback ).toHaveBeenCalledTimes( 1 );
-				expect( multiSelectCallback ).toHaveBeenCalledWith(
-					[ data[ 0 ], data[ 1 ] ], // Both selected items
-					expect.objectContaining( {
-						selection: [ '1', '2' ], // Both selection IDs
-					} )
-				);
-			} );
-
-			it( 'maintains the selected items when navigating between pages for a paginated DataViews component', async () => {
+			it( 'maintains the selected items when navigating between pages for a paginated view', async () => {
 				// Create a component with pagination (2 items per page)
 				render(
 					<Picker
-						actions={ multiSelectActions }
+						multiselect
 						view={ {
 							type: LAYOUT_PICKER_GRID,
 							fields: [],
@@ -464,13 +337,10 @@ describe( 'DataViews Picker', () => {
 				);
 
 				const user = userEvent.setup();
+				const listbox = screen.getByRole( 'listbox' );
 
 				// Page 1: Select first item
-				let options = screen
-					.getAllByRole( 'option' )
-					.filter( ( el ) =>
-						el.classList.contains( 'dataviews-view-grid__card' )
-					);
+				let options = within( listbox ).getAllByRole( 'option' );
 				expect( options ).toHaveLength( 2 ); // Should show 2 items per page
 
 				await user.click( options[ 0 ] );
@@ -478,6 +348,9 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'true'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 0 ].id.toString(),
+				] );
 
 				// Navigate to page 2
 				const nextButton = screen.getByRole( 'button', {
@@ -486,11 +359,7 @@ describe( 'DataViews Picker', () => {
 				await user.click( nextButton );
 
 				// Page 2: Select another item
-				options = screen
-					.getAllByRole( 'option' )
-					.filter( ( el ) =>
-						el.classList.contains( 'dataviews-view-grid__card' )
-					);
+				options = within( listbox ).getAllByRole( 'option' );
 				expect( options ).toHaveLength( 1 ); // Page 2 should have 1 item (item 3)
 
 				await user.click( options[ 0 ] );
@@ -498,6 +367,10 @@ describe( 'DataViews Picker', () => {
 					'aria-selected',
 					'true'
 				);
+				expect( onChangeSelection ).toHaveBeenCalledWith( [
+					data[ 0 ].id.toString(),
+					data[ 2 ].id.toString(),
+				] );
 
 				// Go back to page 1
 				const prevButton = screen.getByRole( 'button', {
@@ -506,33 +379,10 @@ describe( 'DataViews Picker', () => {
 				await user.click( prevButton );
 
 				// Verify first item is still selected
-				options = screen
-					.getAllByRole( 'option' )
-					.filter( ( el ) =>
-						el.classList.contains( 'dataviews-view-grid__card' )
-					);
+				options = within( listbox ).getAllByRole( 'option' );
 				expect( options[ 0 ] ).toHaveAttribute(
 					'aria-selected',
 					'true'
-				);
-
-				// Find the action button with correct label within the action buttons container
-				const confirmButton = screen.getByRole( 'button', {
-					name: 'Confirm',
-				} );
-				expect( confirmButton ).toBeInTheDocument();
-
-				// Clear any previous calls and click the action button
-				multiSelectCallback.mockClear();
-				await user.click( confirmButton );
-
-				// Verify the callback was called with correct parameters for multi-selection.
-				expect( multiSelectCallback ).toHaveBeenCalledTimes( 1 );
-				expect( multiSelectCallback ).toHaveBeenCalledWith(
-					[ data[ 0 ] ], // Doesn't contain items that aren't on the current page.
-					expect.objectContaining( {
-						selection: [ '1', '3' ], // Both selection IDs
-					} )
 				);
 			} );
 		} );
