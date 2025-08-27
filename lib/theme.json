@@ -395,16 +395,6 @@
 					"width": "0"
 				}
 			},
-			"textInput": {
-				"border": {
-					"width": "1px",
-					"style": "solid",
-					"color": "#949494"
-				},
-				"typography": {
-					"fontFamily": "inherit"
-				}
-			},
 			"link": {
 				"typography": {
 					"textDecoration": "underline"

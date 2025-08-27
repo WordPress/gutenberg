@@ -1,6 +1,7 @@
 // Allow these default styles to be overridden by global styles.
 :where(.wp-block-post-comments-form textarea),
 :where(.wp-block-post-comments-form input:not([type="submit"])) {
+	border: 1px solid $gray-600;
 	font-size: 1em;
 	font-family: inherit;
 }

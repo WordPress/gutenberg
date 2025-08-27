@@ -82,6 +82,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 
 // We are lowering the specificity so that the input element can override the rule for the input element inside the search block.
 :where(.wp-block-search__input) {
+	font-family: inherit;
 	font-weight: inherit;
 	font-size: inherit;
 	line-height: inherit;
@@ -93,6 +94,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	margin-left: 0;
 	margin-right: 0;
 	min-width: 3rem;
+	border: 1px solid $gray-600;
 	// !important used to forcibly prevent undesired application of
 	// text-decoration styles on the input field.
 	text-decoration: unset !important;
