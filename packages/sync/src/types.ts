@@ -5,18 +5,24 @@ import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
 export type * as Y from 'yjs';
+export type CRDTDoc = Y.Doc;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-export type ObjectData = object;
 export type UndoManager = Y.UndoManager;
 
-export type CRDTDoc = Y.Doc;
+// Object data represents any entity record, post, term, user, site, etc. There
+// are not many expectations that can hold on its shape, but defining some
+// optional properties cuts down on the type narrowing.
+export interface ObjectData extends Record< string, unknown > {
+	meta?: Record< string, unknown >;
+	status?: string;
+}
 
-export type ConnectDocResult = {
+export interface ConnectDocResult {
 	awareness?: Awareness;
 	destroy: () => void;
-};
+}
 
 export type ConnectDoc = (
 	id: ObjectID,

@@ -675,6 +675,21 @@ export const saveEntityRecord =
 							),
 						};
 					}
+					if (
+						window.__experimentalEnableSync &&
+						entityConfig.syncConfig?.enabled
+					) {
+						// Allow sync provider to create meta for the entity before persisting.
+						edits.meta = {
+							...edits.meta,
+							...( await getSyncProvider().createEntityMeta(
+								entityConfig.syncConfig,
+								persistedRecord,
+								edits
+							) ),
+						};
+					}
+
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',

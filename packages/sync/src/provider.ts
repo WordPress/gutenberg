@@ -124,18 +124,14 @@ export class SyncProvider {
 			ydoc,
 		} );
 
-		// Get the initial data to be synced for this record.
-		const initialCRDTDoc = await this.getInitialCRDTDoc(
-			syncConfig,
-			record
-		);
+		// Get the initial document state.
+		const initialDoc = await this.getInitialCRDTDoc( syncConfig, record );
 
-		// Create the initial document, possible from persisted doc.
+		// Apply the initial document to the current document as a singular update.
 		Y.transact(
 			ydoc,
 			() => {
-				// apply remote changes
-				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialCRDTDoc ) );
+				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
 			},
 			'syncProvider.bootstrap',
 			false
@@ -183,8 +179,23 @@ export class SyncProvider {
 		record: ObjectData
 	): Promise< CRDTDoc > {
 		// IMPORTANT: We use a new Yjs document so that the initial state can be
-		// applied to the "real" Yjs document as a singular update.
+		// applied to the "real" Yjs document as a singular update. Therefore, we
+		// don't need to wrap the changes in a transaction.
 		const initialStateDoc = new Y.Doc( { meta: new Map() } );
+
+		// Load the persisted document from previous sessions.
+		const persistedDoc = await this.getPersistedCRDTDoc(
+			syncConfig,
+			record
+		);
+
+		// If it exists, apply it as the base state of the initial document.
+		if ( persistedDoc ) {
+			Y.applyUpdate(
+				initialStateDoc,
+				Y.encodeStateAsUpdate( persistedDoc )
+			);
+		}
 
 		const initialData = syncConfig.getInitialObjectData( record );
 		syncConfig.applyChangesToCRDTDoc(
@@ -196,6 +207,44 @@ export class SyncProvider {
 		return initialStateDoc;
 	}
 
+	/* eslint-disable @typescript-eslint/no-unused-vars */
+
+	/**
+	 * Create meta for the entity, e.g., to persist the CRDT doc against the
+	 * entity. Custom sync providers can override this method to provide their
+	 * implementation.
+	 *
+	 * @param {SyncConfig}            _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData}            _record     Record representing this object type.
+	 * @param {Partial< ObjectData >} _changes    Updates to make.
+	 * @return {Promise< Record< string, any > >} Entity meta.
+	 */
+	public async createEntityMeta(
+		_syncConfig: SyncConfig,
+		_record: ObjectData,
+		_changes: Partial< ObjectData >
+	): Promise< Record< string, any > > {
+		return Promise.resolve( {} );
+	}
+
+	/**
+	 * Get the persisted CRDT document from the object data, e.g., from meta.
+	 * Custom sync providers can override this method to provide their
+	 * implementation.
+	 *
+	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} _record     Record representing this object type.
+	 * @return {Promise< CRDTDoc | null >} The persisted CRDT document, or null if none exists.
+	 */
+	protected async getPersistedCRDTDoc(
+		_syncConfig: SyncConfig,
+		_record: ObjectData
+	): Promise< CRDTDoc | null > {
+		return Promise.resolve( null );
+	}
+
+	/* eslint-enable @typescript-eslint/no-unused-vars */
+
 	/**
 	 * Get the undo manager.
 	 *
@@ -206,7 +255,7 @@ export class SyncProvider {
 	}
 
 	/**
-	 * Fetch data from local database or remote source.
+	 * Update CRDT document with changes from the local store.
 	 *
 	 * @param {ObjectType}            objectType Object type to load.
 	 * @param {ObjectData}            record     Record to load.
