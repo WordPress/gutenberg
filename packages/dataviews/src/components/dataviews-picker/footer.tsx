@@ -97,12 +97,13 @@ export function DataViewsPickerFooter( {
 			  );
 
 	return (
-		<HStack expanded={ false } justify="end" className="dataviews-footer">
-			<HStack
-				expanded={ false }
-				className="dataviews-bulk-actions-footer__container"
-				spacing={ 3 }
-			>
+		<HStack
+			expanded={ false }
+			justify="space-between"
+			className="dataviews-footer"
+		>
+			<DataViewsPagination />
+			<HStack expanded={ false } spacing={ 3 }>
 				{ picker?.multiselect && (
 					<BulkSelectionCheckbox
 						selection={ selection }
@@ -114,7 +115,6 @@ export function DataViewsPickerFooter( {
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ message }
 				</span>
-				<DataViewsPagination />
 				<HStack
 					className="dataviews-bulk-actions-footer__action-buttons"
 					expanded={ false }

@@ -7,6 +7,7 @@ import type { Meta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -110,6 +111,40 @@ export const Default = ( {
 					[ LAYOUT_PICKER_GRID ]: {},
 				} }
 				config={ { perPageSizes } }
+				footerContent={
+					<>
+						<Button
+							accessibleWhenDisabled
+							disabled={ ! selection.length }
+							variant="primary"
+							onClick={ () => {
+								const selectedItemNames = data
+									.filter(
+										( item ) =>
+											selection?.includes(
+												String( item.id )
+											)
+									)
+									.map( ( item ) => item.title )
+									.join( ', ' );
+								// eslint-disable-next-line no-alert
+								window.alert( selectedItemNames );
+							} }
+						>
+							Confirm
+						</Button>
+						<Button
+							accessibleWhenDisabled
+							disabled={ ! selection.length }
+							variant="secondary"
+							onClick={ () => {
+								setSelection( [] );
+							} }
+						>
+							Cancel
+						</Button>
+					</>
+				}
 			/>
 		</>
 	);
