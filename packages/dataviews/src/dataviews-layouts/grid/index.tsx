@@ -176,24 +176,35 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
-			>
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__title-field dataviews-title-field"
-					{ ...titleA11yProps }
-				>
-					{ renderedTitleField }
-				</ItemClickWrapper>
-				{ !! actions?.length && (
+			{ ! showTitle && showMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__hover-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
-				) }
-			</HStack>
+				</div>
+			) }
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<ItemClickWrapper
+						item={ item }
+						isItemClickable={ isItemClickable }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						className="dataviews-view-grid__title-field dataviews-title-field"
+						{ ...titleA11yProps }
+					>
+						{ renderedTitleField }
+					</ItemClickWrapper>
+					{ !! actions?.length && (
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					) }
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render

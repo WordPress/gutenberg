@@ -536,3 +536,43 @@ export const InfiniteScroll = () => {
 		</>
 	);
 };
+
+export const GridLayoutHiddenTitle = () => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_GRID,
+		search: '',
+		page: 1,
+		perPage: 20,
+		filters: [],
+		fields: [],
+		titleField: 'title',
+		mediaField: 'image',
+		layout: {},
+		showTitle: false,
+	} );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ fields }
+			onChangeView={ setView }
+			actions={ actions }
+			defaultLayouts={ {
+				[ LAYOUT_GRID ]: {
+					showTitle: false, // Only hide in the grid layout.
+				},
+				[ LAYOUT_LIST ]: {
+					showTitle: true, // Show title in the list layout.
+				},
+				[ LAYOUT_TABLE ]: {
+					showTitle: true, // Show title in the table layout.
+				},
+			} }
+		/>
+	);
+};

@@ -152,6 +152,29 @@
 	top: $grid-unit-10;
 }
 
+.dataviews-view-grid__card .dataviews-view-grid__hover-actions {
+	position: absolute;
+	top: $grid-unit-05;
+	opacity: 0;
+	right: $grid-unit-05;
+	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
+
+	.dataviews-all-actions-button {
+		background-color: $white;
+	}
+
+	@media (hover: none) {
+		// Show checkboxes on devices that do not support hover.
+		top: $grid-unit-05;
+	}
+}
+
+.dataviews-view-grid__card:hover .dataviews-view-grid__hover-actions,
+.dataviews-view-grid__card:focus-within .dataviews-view-grid__hover-actions,
+.dataviews-view-grid__card.is-selected .dataviews-view-grid__hover-actions {
+	opacity: 1;
+}
+
 .dataviews-view-grid__media--clickable {
 	cursor: pointer;
 }
