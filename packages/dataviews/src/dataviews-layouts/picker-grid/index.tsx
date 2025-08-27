@@ -27,9 +27,7 @@ import { useContext } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import DataViewsContext from '../../components/dataviews-context';
-import { useIsMultiselectPicker } from '../../components/dataviews-picker-actions';
 import type {
-	Action,
 	NormalizedField,
 	ViewPickerGrid as ViewPickerGridType,
 	ViewPickerGridProps,
@@ -40,11 +38,11 @@ const { Badge } = unlock( componentsPrivateApis );
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
+	multiselect?: boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
-	actions: Action< Item >[];
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
@@ -59,11 +57,11 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	view,
+	multiselect,
 	selection,
 	onChangeSelection,
 	getItemId,
 	item,
-	actions,
 	mediaField,
 	titleField,
 	descriptionField,
@@ -87,7 +85,6 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
-	const isMultiselectPicker = useIsMultiselectPicker( actions );
 
 	return (
 		<Composite.Item
@@ -108,7 +105,7 @@ function GridItem< Item >( {
 						selection.filter( ( itemId ) => id !== itemId )
 					);
 				} else {
-					const newSelection = isMultiselectPicker
+					const newSelection = multiselect
 						? [ ...selection, id ]
 						: [ id ];
 					onChangeSelection( newSelection );
@@ -249,7 +246,6 @@ function GridGroup< Item >( {
 }
 
 function ViewPickerGrid< Item >( {
-	actions,
 	data,
 	fields,
 	getItemId,
@@ -260,7 +256,7 @@ function ViewPickerGrid< Item >( {
 	className,
 	empty,
 }: ViewPickerGridProps< Item > ) {
-	const { resizeObserverRef, paginationInfo } =
+	const { resizeObserverRef, paginationInfo, picker } =
 		useContext( DataViewsContext );
 	const { label } = view;
 	const titleField = fields.find(
@@ -294,7 +290,6 @@ function ViewPickerGrid< Item >( {
 	);
 	const hasData = !! data?.length;
 	const usedPreviewSize = view.layout?.previewSize;
-	const isMultiselectPicker = useIsMultiselectPicker( actions );
 
 	/*
 	 * This is the maximum width that an image can achieve in the grid. The reasoning is:
@@ -336,7 +331,7 @@ function ViewPickerGrid< Item >( {
 						orientation="horizontal"
 						role="listbox"
 						aria-multiselectable={
-							isMultiselectPicker ?? undefined
+							picker?.multiselect ?? undefined
 						}
 						className={ clsx(
 							'dataviews-view-picker-grid',
@@ -379,13 +374,15 @@ function ViewPickerGrid< Item >( {
 												<GridItem
 													key={ getItemId( item ) }
 													view={ view }
+													multiselect={
+														picker?.multiselect
+													}
 													selection={ selection }
 													onChangeSelection={
 														onChangeSelection
 													}
 													getItemId={ getItemId }
 													item={ item }
-													actions={ actions }
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={
@@ -432,7 +429,7 @@ function ViewPickerGrid< Item >( {
 						orientation="horizontal"
 						role="listbox"
 						aria-multiselectable={
-							isMultiselectPicker ?? undefined
+							picker?.multiselect ?? undefined
 						}
 						aria-label={ label }
 					>
@@ -444,8 +441,6 @@ function ViewPickerGrid< Item >( {
 							if ( ! isInfiniteScroll ) {
 								// When infinite scroll isn't active, take pagination into account
 								// when calculating the posinset.
-								// Currently this is only happens when `isPicker` is true, as otherwise
-								// the grid item doesn't use an aria-role that supports posinset.
 								posinset =
 									( currentPage - 1 ) * perPage + index + 1;
 							}
@@ -454,11 +449,11 @@ function ViewPickerGrid< Item >( {
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
+									multiselect={ picker?.multiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
 									getItemId={ getItemId }
 									item={ item }
-									actions={ actions }
 									mediaField={ mediaField }
 									titleField={ titleField }
 									descriptionField={ descriptionField }

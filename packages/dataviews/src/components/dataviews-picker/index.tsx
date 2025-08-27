@@ -26,7 +26,7 @@ import {
 	FiltersToggle,
 } from '../dataviews-filters';
 import DataViewsLayout from '../dataviews-layout';
-import DataViewsFooter from '../dataviews-footer';
+import { DataViewsPickerFooter } from './footer';
 import DataViewsSearch from '../dataviews-search';
 import { BulkActionsFooter } from '../dataviews-bulk-actions';
 import { DataViewsPagination } from '../dataviews-pagination';
@@ -35,7 +35,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Action, Field, View, SupportedLayouts } from '../../types';
+import type { Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
@@ -47,7 +47,6 @@ type DataViewsPickerProps< Item > = {
 	fields: Field< Item >[];
 	search?: boolean;
 	searchLabel?: string;
-	actions?: Action< Item >[];
 	data: Item[];
 	isLoading?: boolean;
 	paginationInfo: {
@@ -56,10 +55,12 @@ type DataViewsPickerProps< Item > = {
 		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
+	multiselect?: boolean;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
+	footerContent?: ReactNode;
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
@@ -70,17 +71,17 @@ type DataViewsPickerProps< Item > = {
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
-const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
-	'header' | 'search' | 'searchLabel'
+	'header' | 'search' | 'searchLabel' | 'footerContent'
 >;
 
 function DefaultUI( {
 	header,
 	search = true,
-	searchLabel = undefined,
+	searchLabel,
+	footerContent,
 }: DefaultUIProps ) {
 	const { isShowingFilter, config } = useContext( DataViewsContext );
 	return (
@@ -114,7 +115,9 @@ function DefaultUI( {
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
 			<DataViewsLayout />
-			<DataViewsFooter />
+			{ footerContent && (
+				<DataViewsPickerFooter>{ footerContent }</DataViewsPickerFooter>
+			) }
 		</>
 	);
 }
@@ -125,16 +128,17 @@ function DataViewsPicker< Item >( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions = EMPTY_ARRAY,
 	data,
 	getItemId = defaultGetItemId,
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts,
+	multiselect,
 	selection: selectionProperty,
 	onChangeSelection,
 	header,
+	footerContent,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
@@ -220,7 +224,6 @@ function DataViewsPicker< Item >( {
 				view,
 				onChangeView,
 				fields: _fields,
-				actions,
 				data,
 				isLoading,
 				paginationInfo,
@@ -241,7 +244,7 @@ function DataViewsPicker< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
-				isPicker: true,
+				picker: { multiselect: Boolean( multiselect ) },
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
@@ -250,6 +253,7 @@ function DataViewsPicker< Item >( {
 						header={ header }
 						search={ search }
 						searchLabel={ searchLabel }
+						footerContent={ footerContent }
 					/>
 				) }
 			</div>

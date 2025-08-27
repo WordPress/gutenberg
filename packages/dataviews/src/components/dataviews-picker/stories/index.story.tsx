@@ -19,7 +19,7 @@ import {
 } from '../../dataviews/stories/fixtures';
 import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { View, Action } from '../../../types';
+import type { View } from '../../../types';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
@@ -66,6 +66,8 @@ export const Default = ( {
 		} ) );
 	}, [ isGrouped, infiniteScrollEnabled ] );
 
+	const [ selection, setSelection ] = useState< string[] >( [] );
+
 	const {
 		data: infiniteScrollData,
 		paginationInfo: infiniteScrollPaginationInfo,
@@ -77,24 +79,6 @@ export const Default = ( {
 		getItemId: ( item ) => item.id.toString(),
 	} );
 
-	const pickerActions: Action< SpaceObject >[] = [
-		{
-			id: 'confirm',
-			label: 'Confirm',
-			isPrimary: true,
-			supportsBulk: isMultiselectable,
-			callback( _items, { selection } ) {
-				const selectedItemNames = data
-					.filter(
-						( item ) => selection?.includes( String( item.id ) )
-					)
-					.map( ( item ) => item.title )
-					.join( ',' );
-				// eslint-disable-next-line no-alert
-				window.alert( selectedItemNames );
-			},
-		},
-	];
 	return (
 		<>
 			{ infiniteScrollEnabled && (
@@ -106,7 +90,11 @@ export const Default = ( {
 				` }</style>
 			) }
 			<DataViewsPicker
-				actions={ pickerActions }
+				multiselect={ isMultiselectable }
+				selection={ selection }
+				onChangeSelection={ ( selectedIds ) => {
+					setSelection( selectedIds );
+				} }
 				getItemId={ ( item ) => item.id.toString() }
 				paginationInfo={
 					infiniteScrollEnabled

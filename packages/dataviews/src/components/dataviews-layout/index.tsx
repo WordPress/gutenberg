@@ -37,11 +37,11 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		isItemClickable,
 		renderItemLink,
 		empty = __( 'No results' ),
-		isPicker,
+		picker,
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.filter(
-		( v ) => Boolean( v.isPicker ) === Boolean( isPicker )
+		( v ) => Boolean( v.isPicker ) === Boolean( picker )
 	).find( ( v ) => v.type === view.type )?.component as ComponentType<
 		ViewBaseProps< any >
 	>;
