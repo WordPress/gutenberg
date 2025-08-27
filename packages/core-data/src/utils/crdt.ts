@@ -37,9 +37,7 @@ export function defaultApplyChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
-				let currentBlocks = ymap.get(
-					'blocks'
-				) as PostChanges[ 'blocks' ];
+				let currentBlocks = ymap.get( 'blocks' ) as Y.Array< YBlock >;
 
 				if ( ! ( currentBlocks instanceof Y.Array ) ) {
 					currentBlocks = setValue< Y.Array< YBlock > >(

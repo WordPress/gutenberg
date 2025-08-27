@@ -24,11 +24,22 @@ export interface Block {
 	name: string;
 }
 
+export type YBlock = Y.Map<
+	/* name, clientId, and originalContent are strings. */
+	| string
+	/* validationIssues? is an array of strings. */
+	| string[]
+	/* attributes is a Y.Map< unknown >. */
+	| Y.Map< unknown >
+	/* innerBlocks is a Y.Array< YBlock >. */
+	| Y.Array< YBlock >
+>;
+
 // The Y.Map type is not easy to work with. The generic type it accepts represents
 // the possible values of the map, which are varied in our case. This type is
 // accurate, but will require aggressive type narrowing when the map values are
 // accessed -- or type casting with `as`.
-export type YBlock = Y.Map< Block[ keyof Block ] >;
+// export type YBlock = Y.Map< Block[ keyof Block ] >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
@@ -90,22 +101,31 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	);
 }
 
+/**
+ * Merge incoming block data into the local Y.Doc.
+ * This function is called to sync local block changes to a shared Y.Doc.
+ *
+ * @param yblocks        The blocks in the local Y.Doc.
+ * @param incomingBlocks Gutenberg blocks being synced.
+ * @param _origin        The origin of the sync, either 'syncProvider.getInitialCRDTDoc' or 'gutenberg'.
+ */
+
 export function mergeCrdtBlocks(
-	yblocks: Y.Array< YBlock >,
-	newValue: Block[] | Y.Array< YBlock >,
+	yblocks: Y.Array< YBlock >, // yblocks represent the blocks in the local Y.Doc
+	incomingBlocks: Block[], // incomingBlocks represent JSON blocks being synced, either from a peer or from the local editor
 	_origin: string // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void {
 	// Ensure we are working with serializable block data.
-	if ( ! serializableBlocksCache.has( newValue ) ) {
+	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
 		serializableBlocksCache.set(
-			newValue,
-			makeBlocksSerializable( newValue )
+			incomingBlocks,
+			makeBlocksSerializable( incomingBlocks )
 		);
 	}
-	const unfilteredBlocks = serializableBlocksCache.get( newValue ) ?? [];
+	const allBlocks = serializableBlocksCache.get( incomingBlocks ) ?? [];
 
 	// Ensure we skip blocks that we don't want to sync at the moment
-	const blocks = unfilteredBlocks.filter( ( block ) =>
+	const blocksToSync = allBlocks.filter( ( block ) =>
 		shouldBlockBeSynced( block )
 	);
 
@@ -119,8 +139,10 @@ export function mergeCrdtBlocks(
 	// E.g.:
 	//   - textual content (using rich-text formatting?) may always be stored under `block.text`
 	//   - local information that shouldn't be shared (e.g. clientId or isDragging) is stored under `block.private`
-
-	const numOfCommonEntries = math.min( blocks.length ?? 0, yblocks.length );
+	const numOfCommonEntries = math.min(
+		blocksToSync.length ?? 0,
+		yblocks.length
+	);
 
 	let left = 0;
 	let right = 0;
@@ -129,7 +151,7 @@ export function mergeCrdtBlocks(
 	for (
 		;
 		left < numOfCommonEntries &&
-		areBlocksEqual( blocks[ left ], yblocks.get( left ) );
+		areBlocksEqual( blocksToSync[ left ], yblocks.get( left ) );
 		left++
 	) {
 		/* nop */
@@ -140,7 +162,7 @@ export function mergeCrdtBlocks(
 		;
 		right < numOfCommonEntries - left &&
 		areBlocksEqual(
-			blocks[ blocks.length - right - 1 ],
+			blocksToSync[ blocksToSync.length - right - 1 ],
 			yblocks.get( yblocks.length - right - 1 )
 		);
 		right++
@@ -149,15 +171,28 @@ export function mergeCrdtBlocks(
 	}
 
 	const numOfUpdatesNeeded = numOfCommonEntries - left - right;
-	const numOfInsertionsNeeded = math.max( 0, blocks.length - yblocks.length );
-	const numOfDeletionsNeeded = math.max( 0, yblocks.length - blocks.length );
+	const numOfInsertionsNeeded = math.max(
+		0,
+		blocksToSync.length - yblocks.length
+	);
+	const numOfDeletionsNeeded = math.max(
+		0,
+		yblocks.length - blocksToSync.length
+	);
 
 	// updates
 	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
-		const block = blocks[ left ];
+		const block = blocksToSync[ left ];
 		const yblock = yblocks.get( left );
 		Object.entries( block ).forEach( ( [ k, v ] ) => {
 			if ( ! fun.equalityDeep( block[ k ], yblock.get( k ) ) ) {
+				if ( k === 'innerBlocks' ) {
+					// Recursively merge innerBlocks
+					const yInnerBlocks = yblock.get( k ) as Y.Array< YBlock >;
+
+					mergeCrdtBlocks( yInnerBlocks, v, _origin );
+				}
+
 				yblock.set( k, v );
 			}
 		} );
@@ -173,17 +208,17 @@ export function mergeCrdtBlocks(
 
 	// inserts
 	for ( let i = 0; i < numOfInsertionsNeeded; i++, left++ ) {
-		yblocks.insert( left, [
-			new Y.Map< Block[ keyof Block ] >(
-				Object.entries( blocks[ left ] )
-			),
-		] );
+		const newBlock = [
+			new Y.Map( Object.entries( blocksToSync[ left ] ) ) as YBlock,
+		];
+
+		yblocks.insert( left, newBlock );
 	}
 
 	// remove duplicate clientids
 	const knownClientIds = new Set< string >();
 	for ( let j = 0; j < yblocks.length; j++ ) {
-		const yblock: Y.Map< Block[ keyof Block ] > = yblocks.get( j );
+		const yblock: YBlock = yblocks.get( j );
 
 		let clientId: string = yblock.get( 'clientId' ) as string;
 
