@@ -113,7 +113,7 @@ function DefaultUI( {
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
-			<DataViewsLayout isPickerView />
+			<DataViewsLayout />
 			<DataViewsFooter />
 		</>
 	);
@@ -241,6 +241,7 @@ function DataViewsPicker< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				isPicker: true,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
@@ -254,10 +255,6 @@ function DataViewsPicker< Item >( {
 			</div>
 		</DataViewsContext.Provider>
 	);
-}
-
-function DataViewsPickerLayout( { ...props } ) {
-	return <DataViewsLayout { ...props } isPickerView />;
 }
 
 // Populate the DataViews sub components
@@ -276,7 +273,7 @@ const DataViewsPickerSubComponents =
 DataViewsPickerSubComponents.BulkActionToolbar = BulkActionsFooter;
 DataViewsPickerSubComponents.Filters = DataViewsFilters;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
-DataViewsPickerSubComponents.Layout = DataViewsPickerLayout;
+DataViewsPickerSubComponents.Layout = DataViewsLayout;
 DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsPickerSubComponents.Pagination = DataViewsPagination;
 DataViewsPickerSubComponents.Search = DataViewsSearch;
