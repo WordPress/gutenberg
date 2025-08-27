@@ -161,23 +161,20 @@ describe( 'DataViews Picker', () => {
 			expect( options ).toHaveLength( data.length );
 		} );
 
-		it.todo(
-			'supports specifying a `label` which is rendered as an aria-label',
-			() => {
-				const testLabel = 'Select an item from the grid';
-				render(
-					<Picker
-						actions={ singleSelectActions }
-						view={ { label: testLabel } }
-					/>
-				);
+		it( 'supports specifying a `label` which is rendered as an aria-label', () => {
+			const testLabel = 'Select an item from the grid';
+			render(
+				<Picker
+					actions={ singleSelectActions }
+					view={ { label: testLabel } }
+				/>
+			);
 
-				// Grid should have the specified aria-label
-				expect(
-					screen.getByRole( 'listbox', { name: testLabel } )
-				).toBeInTheDocument();
-			}
-		);
+			// Grid should have the specified aria-label
+			expect(
+				screen.getByRole( 'listbox', { name: testLabel } )
+			).toBeInTheDocument();
+		} );
 
 		it( 'implements single tab-stop composite pattern with aria-activedescendant', async () => {
 			render( <Picker actions={ singleSelectActions } /> );
