@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
-import type { DataViewsView, ViewBaseProps } from '../../types';
+import type { ViewBaseProps } from '../../types';
 
 type DataViewsLayoutProps = {
 	className?: string;
@@ -65,7 +65,7 @@ export default function DataViewsLayout( {
 			onClickItem={ onClickItem }
 			renderItemLink={ renderItemLink }
 			isItemClickable={ isItemClickable }
-			view={ view as DataViewsView }
+			view={ view }
 			empty={ empty }
 		/>
 	);

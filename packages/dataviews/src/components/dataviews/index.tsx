@@ -35,19 +35,13 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type {
-	Action,
-	Field,
-	DataViewsView,
-	View,
-	SupportedLayouts,
-} from '../../types';
+import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
 type DataViewsProps< Item > = {
-	view: DataViewsView;
-	onChangeView: ( view: DataViewsView ) => void;
+	view: View;
+	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
 	search?: boolean;
 	searchLabel?: string;
@@ -234,9 +228,9 @@ function DataViews< Item >( {
 		<DataViewsContext.Provider
 			value={ {
 				// DataViewsContext is used for both picker and regular Views,
-				// cast the DataViewsView to a View to ensure the types are satisfied.
-				view: view as View,
-				onChangeView: onChangeView as ( view: View ) => void,
+				// cast the View to a View to ensure the types are satisfied.
+				view,
+				onChangeView,
 				fields: _fields,
 				actions,
 				data,

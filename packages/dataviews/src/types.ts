@@ -536,9 +536,7 @@ export interface ViewPickerGrid extends ViewBase {
 	};
 }
 
-export type View = DataViewsView | DataViewsPickerView;
-export type DataViewsView = ViewList | ViewGrid | ViewTable;
-export type DataViewsPickerView = ViewPickerGrid;
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -657,7 +655,7 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	getItemLevel?: ( item: Item ) => number;
 	isLoading?: boolean;
-	onChangeView: ( view: DataViewsView ) => void;
+	onChangeView: ( view: View ) => void;
 	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -668,7 +666,7 @@ export interface ViewBaseProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
-	view: DataViewsView;
+	view: View;
 	empty: ReactNode;
 }
 
@@ -682,8 +680,8 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'renderItemLink'
 > & {
 	label?: string;
-	view: DataViewsPickerView;
-	onChangeView: ( view: DataViewsPickerView ) => void;
+	view: View;
+	onChangeView: ( view: View ) => void;
 };
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

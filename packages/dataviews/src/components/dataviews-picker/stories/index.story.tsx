@@ -19,7 +19,7 @@ import {
 } from '../../dataviews/stories/fixtures';
 import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { DataViewsPickerView, Action } from '../../../types';
+import type { View, Action } from '../../../types';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
@@ -39,7 +39,7 @@ export const Default = ( {
 	isGrouped: boolean;
 	infiniteScrollEnabled: boolean;
 } ) => {
-	const [ view, setView ] = useState< DataViewsPickerView >( {
+	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
 		label: 'Galactic Bodies',
 		fields: [],
@@ -159,8 +159,8 @@ function useInfiniteScroll( {
 	data: shownData,
 	getItemId,
 }: {
-	view: DataViewsPickerView;
-	setView: ( view: DataViewsPickerView ) => void;
+	view: View;
+	setView: ( view: View ) => void;
 	data: SpaceObject[];
 	getItemId: ( item: SpaceObject ) => string;
 } ): {

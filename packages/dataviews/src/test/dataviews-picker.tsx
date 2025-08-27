@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import type { Action, Fields, DataViewsPickerView } from '../types';
+import type { Action, Fields, View, ViewPickerGrid } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -111,12 +111,12 @@ function Picker( {
 	label,
 	...props
 }: {
-	view?: Partial< DataViewsPickerView >;
+	view?: Partial< View >;
 	actions?: Action< Data >[];
 	fields?: Fields< Data >;
 	label?: string;
 } ) {
-	const [ view, setView ] = useState< DataViewsPickerView >( {
+	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
 		label,
 		fields: [],
@@ -127,7 +127,7 @@ function Picker( {
 		perPage: 10,
 		filters: [],
 		...additionalView,
-	} );
+	} as ViewPickerGrid );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, overrideFields ?? fields );
