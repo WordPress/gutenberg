@@ -90,7 +90,7 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	);
 }
 
-export function mergeBlocks(
+export function mergeCrdtBlocks(
 	yblocks: Y.Array< YBlock >,
 	newValue: Block[] | Y.Array< YBlock >,
 	_origin: string // eslint-disable-line @typescript-eslint/no-unused-vars
