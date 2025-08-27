@@ -19,7 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -93,6 +93,7 @@ function GridItem< Item >( {
 		showDescription = true,
 		infiniteScrollEnabled,
 	} = view;
+	const [ isHovered, setIsHovered ] = useState( false );
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const instanceId = useInstanceId( GridItem );
@@ -153,6 +154,8 @@ function GridItem< Item >( {
 				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
 		>
 			{ showMedia && renderedMediaField && (
 				<ItemClickWrapper
@@ -177,7 +180,12 @@ function GridItem< Item >( {
 				/>
 			) }
 			{ ! showTitle && showMedia && !! actions?.length && (
-				<div className="dataviews-view-grid__hover-actions">
+				<div
+					className={ clsx( 'dataviews-view-grid__hover-actions', {
+						// Add an explicit hovered class to preserve the hovered/visible state when popovers are open.
+						'is-hovered': isHovered,
+					} ) }
+				>
 					<ItemActions item={ item } actions={ actions } isCompact />
 				</div>
 			) }

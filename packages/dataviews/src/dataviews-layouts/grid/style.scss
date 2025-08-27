@@ -175,6 +175,11 @@
 	opacity: 1;
 }
 
+// Include an explicit .is-hovered class to preserve hovered state when popovers are active.
+.dataviews-view-grid__card .dataviews-view-grid__hover-actions.is-hovered {
+	opacity: 1;
+}
+
 .dataviews-view-grid__media--clickable {
 	cursor: pointer;
 }
