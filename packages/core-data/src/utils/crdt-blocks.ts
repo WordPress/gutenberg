@@ -101,6 +101,34 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	);
 }
 
+function createNewYBlock( block: Block ): YBlock {
+	return new Y.Map(
+		Object.entries( block ).map( ( [ key, value ] ) => {
+			switch ( key ) {
+				case 'innerBlocks': {
+					if ( Array.isArray( value ) ) {
+						const innerBlocks = new Y.Array();
+
+						innerBlocks.insert(
+							0,
+							value.map( ( innerBlock: Block ) =>
+								createNewYBlock( innerBlock )
+							)
+						);
+
+						return [ key, innerBlocks ];
+					}
+
+					return [ key, value ];
+				}
+
+				default:
+					return [ key, value ];
+			}
+		} )
+	);
+}
+
 /**
  * Merge incoming block data into the local Y.Doc.
  * This function is called to sync local block changes to a shared Y.Doc.
@@ -208,9 +236,7 @@ export function mergeCrdtBlocks(
 
 	// inserts
 	for ( let i = 0; i < numOfInsertionsNeeded; i++, left++ ) {
-		const newBlock = [
-			new Y.Map( Object.entries( blocksToSync[ left ] ) ) as YBlock,
-		];
+		const newBlock = [ createNewYBlock( blocksToSync[ left ] ) ];
 
 		yblocks.insert( left, newBlock );
 	}
