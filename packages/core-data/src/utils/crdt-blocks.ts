@@ -38,10 +38,12 @@ export type YBlock = Y.Map<
 	/* validationIssues? is an array of strings. */
 	| string[]
 	/* attributes is a Y.Map< unknown >. */
-	| Y.Map< unknown >
+	| YBlockAttributes
 	/* innerBlocks is a Y.Array< YBlock >. */
 	| Y.Array< YBlock >
 >;
+
+export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 // The Y.Map type is not easy to work with. The generic type it accepts represents
 // the possible values of the map, which are varied in our case. This type is
@@ -112,26 +114,35 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 function createNewYAttributeMap(
 	blockName: string,
 	attributes: BlockAttributes
-): Y.Map< Y.Text | unknown > {
+): YBlockAttributes {
 	return new Y.Map(
 		Object.entries( attributes ).map(
-			( [ attributeKey, attributeValue ] ) => {
-				const isRichText = isRichTextAttribute(
-					blockName,
-					attributeKey
-				);
-
-				if ( isRichText && 'string' === typeof attributeValue ) {
-					return [
-						attributeKey,
-						new Y.Text( attributeValue as string ),
-					];
-				}
-
-				return [ attributeKey, attributeValue ];
+			( [ attributeName, attributeValue ] ) => {
+				return [
+					attributeName,
+					createNewYAttributeValue(
+						blockName,
+						attributeName,
+						attributeValue
+					),
+				];
 			}
 		)
 	);
+}
+
+function createNewYAttributeValue(
+	blockName: string,
+	attributeName: string,
+	attributeValue: unknown
+): Y.Text | unknown {
+	const isRichText = isRichTextAttribute( blockName, attributeName );
+
+	if ( isRichText && 'string' === typeof attributeValue ) {
+		return new Y.Text( attributeValue );
+	}
+
+	return attributeValue;
 }
 
 function createNewYBlock( block: Block ): YBlock {
@@ -252,14 +263,41 @@ export function mergeCrdtBlocks(
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
-					if (
-						! fun.equalityDeep( block[ key ], yblock.get( key ) )
-					) {
-						yblock.set(
-							key,
-							createNewYAttributeMap( block.name, value )
-						);
-					}
+					const currentAttributes =
+						( yblock.get( key ) as YBlockAttributes ) ??
+						createNewYAttributeMap( block.name, {} );
+
+					Object.entries( value ).forEach(
+						( [ attributeName, attributeValue ] ) => {
+							if (
+								fun.equalityDeep(
+									currentAttributes.get( attributeName ),
+									attributeValue
+								)
+							) {
+								return;
+							}
+
+							currentAttributes.set(
+								attributeName,
+								createNewYAttributeValue(
+									block.name,
+									attributeName,
+									attributeValue
+								)
+							);
+						}
+					);
+
+					// Delete any attributes that are no longer present.
+					currentAttributes.forEach(
+						( _attrValue: unknown, attrName: string ) => {
+							if ( ! value.hasOwnProperty( attrName ) ) {
+								currentAttributes.delete( attrName );
+							}
+						}
+					);
+
 					break;
 				}
 
