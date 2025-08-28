@@ -106,20 +106,21 @@ function createNewYBlock( block: Block ): YBlock {
 		Object.entries( block ).map( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'innerBlocks': {
-					if ( Array.isArray( value ) ) {
-						const innerBlocks = new Y.Array();
+					const innerBlocks = new Y.Array();
 
-						innerBlocks.insert(
-							0,
-							value.map( ( innerBlock: Block ) =>
-								createNewYBlock( innerBlock )
-							)
-						);
-
+					// If not an array, set to empty Y.Array.
+					if ( ! Array.isArray( value ) ) {
 						return [ key, innerBlocks ];
 					}
 
-					return [ key, value ];
+					innerBlocks.insert(
+						0,
+						value.map( ( innerBlock: Block ) =>
+							createNewYBlock( innerBlock )
+						)
+					);
+
+					return [ key, innerBlocks ];
 				}
 
 				case 'attributes': {
