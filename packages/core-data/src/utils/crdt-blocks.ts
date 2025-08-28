@@ -11,6 +11,9 @@ import * as fun from 'lib0/function';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 
+// @ts-expect-error - This is a TypeScript file, and @wordpress/blocks doesn't have a tsconfig.json?
+import { getBlockTypes } from '@wordpress/blocks';
+
 interface BlockAttributes {
 	[ key: string ]: unknown;
 }
@@ -127,7 +130,18 @@ function createNewYBlock( block: Block ): YBlock {
 					const attributes = new Y.Map(
 						Object.entries( value ).map(
 							( [ attributeKey, attributeValue ] ) => {
-								// Rich-text logic here
+								const isRichText = isRichTextAttribute(
+									block.name,
+									attributeKey
+								);
+
+								if ( isRichText ) {
+									return [
+										attributeKey,
+										new Y.Text( attributeValue as string ),
+									];
+								}
+
 								return [ attributeKey, attributeValue ];
 							}
 						)
@@ -238,8 +252,19 @@ export function mergeCrdtBlocks(
 					const yAttributes = yblock.get( key ) as Y.Map< unknown >;
 					Object.entries( value ).forEach(
 						( [ attributeKey, attributeValue ] ) => {
-							// Rich-text logic here
-							yAttributes.set( attributeKey, attributeValue );
+							const isRichText = isRichTextAttribute(
+								block.name,
+								attributeKey
+							);
+
+							if ( isRichText ) {
+								const ytext = new Y.Text(
+									attributeValue as string
+								);
+								yAttributes.set( attributeKey, ytext );
+							} else {
+								yAttributes.set( attributeKey, attributeValue );
+							}
 						}
 					);
 					break;
@@ -309,4 +334,49 @@ function shouldBlockBeSynced( block: Block ): boolean {
 
 	// Allow all other blocks to be synced.
 	return true;
+}
+
+// Cache rich-text attributes for looked-up block types.
+const cachedRichTextAttributes = new Map< string, Map< string, true > >();
+
+/**
+ * Given a block name and attribute key, return true if the attribute is rich-text typed.
+ *
+ * @param blockName    The name of the block, e.g. 'core/paragraph'.
+ * @param attributeKey The key of the attribute to check, e.g. 'content'.
+ * @return True if the attribute is rich-text typed, false otherwise.
+ */
+function isRichTextAttribute(
+	blockName: string,
+	attributeKey: string
+): boolean {
+	if ( cachedRichTextAttributes.has( blockName ) ) {
+		// If we've already cached the rich-text attributes for this block type,
+		// return the cached value.
+		return (
+			cachedRichTextAttributes.get( blockName )?.has( attributeKey ) ??
+			false
+		);
+	}
+
+	const allRegisteredBlockTypes = getBlockTypes();
+	const matchingBlockType = allRegisteredBlockTypes.find(
+		( blockType ) => blockType.name === blockName
+	);
+
+	const isBlockTypeRegistered = matchingBlockType !== undefined;
+	const richTextAttributeMap = new Map< string, true >();
+
+	if ( isBlockTypeRegistered ) {
+		for ( const [ registeredKey, registeredProperties ] of Object.entries(
+			matchingBlockType.attributes as Record< string, { type: string } >
+		) ) {
+			if ( registeredProperties.type === 'rich-text' ) {
+				richTextAttributeMap.set( registeredKey, true );
+			}
+		}
+	}
+
+	cachedRichTextAttributes.set( blockName, richTextAttributeMap );
+	return richTextAttributeMap.has( attributeKey );
 }
