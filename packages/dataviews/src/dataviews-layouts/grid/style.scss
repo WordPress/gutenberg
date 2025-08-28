@@ -139,6 +139,11 @@
 	top: -9999em;
 	left: $grid-unit-10;
 	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
+	opacity: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s linear;
+	}
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.
@@ -149,6 +154,7 @@
 .dataviews-view-grid__card:hover .dataviews-selection-checkbox,
 .dataviews-view-grid__card:focus-within .dataviews-selection-checkbox,
 .dataviews-view-grid__card.is-selected .dataviews-selection-checkbox {
+	opacity: 1;
 	top: $grid-unit-10;
 }
 
@@ -161,6 +167,10 @@
 
 	.dataviews-all-actions-button {
 		background-color: $white;
+	}
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s linear;
 	}
 
 	@media (hover: none) {
