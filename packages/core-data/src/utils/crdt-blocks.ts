@@ -18,6 +18,11 @@ interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
+interface BlockType {
+	name: string;
+	attributes?: Record< string, { type?: string } >;
+}
+
 export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
@@ -104,10 +109,39 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	);
 }
 
+function createNewYAttributeMap(
+	blockName: string,
+	attributes: BlockAttributes
+): Y.Map< Y.Text | unknown > {
+	return new Y.Map(
+		Object.entries( attributes ).map(
+			( [ attributeKey, attributeValue ] ) => {
+				const isRichText = isRichTextAttribute(
+					blockName,
+					attributeKey
+				);
+
+				if ( isRichText && 'string' === typeof attributeValue ) {
+					return [
+						attributeKey,
+						new Y.Text( attributeValue as string ),
+					];
+				}
+
+				return [ attributeKey, attributeValue ];
+			}
+		)
+	);
+}
+
 function createNewYBlock( block: Block ): YBlock {
 	return new Y.Map(
 		Object.entries( block ).map( ( [ key, value ] ) => {
 			switch ( key ) {
+				case 'attributes': {
+					return [ key, createNewYAttributeMap( block.name, value ) ];
+				}
+
 				case 'innerBlocks': {
 					const innerBlocks = new Y.Array();
 
@@ -124,30 +158,6 @@ function createNewYBlock( block: Block ): YBlock {
 					);
 
 					return [ key, innerBlocks ];
-				}
-
-				case 'attributes': {
-					const attributes = new Y.Map(
-						Object.entries( value ).map(
-							( [ attributeKey, attributeValue ] ) => {
-								const isRichText = isRichTextAttribute(
-									block.name,
-									attributeKey
-								);
-
-								if ( isRichText ) {
-									return [
-										attributeKey,
-										new Y.Text( attributeValue as string ),
-									];
-								}
-
-								return [ attributeKey, attributeValue ];
-							}
-						)
-					);
-
-					return [ key, attributes ];
 				}
 
 				default:
@@ -241,32 +251,22 @@ export function mergeCrdtBlocks(
 		const yblock = yblocks.get( left );
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
+				case 'attributes': {
+					if (
+						! fun.equalityDeep( block[ key ], yblock.get( key ) )
+					) {
+						yblock.set(
+							key,
+							createNewYAttributeMap( block.name, value )
+						);
+					}
+					break;
+				}
+
 				case 'innerBlocks': {
 					// Recursively merge innerBlocks
 					const yInnerBlocks = yblock.get( key ) as Y.Array< YBlock >;
 					mergeCrdtBlocks( yInnerBlocks, value ?? [], _origin );
-					break;
-				}
-
-				case 'attributes': {
-					const yAttributes = yblock.get( key ) as Y.Map< unknown >;
-					Object.entries( value ).forEach(
-						( [ attributeKey, attributeValue ] ) => {
-							const isRichText = isRichTextAttribute(
-								block.name,
-								attributeKey
-							);
-
-							if ( isRichText ) {
-								const ytext = new Y.Text(
-									attributeValue as string
-								);
-								yAttributes.set( attributeKey, ytext );
-							} else {
-								yAttributes.set( attributeKey, attributeValue );
-							}
-						}
-					);
 					break;
 				}
 
@@ -336,47 +336,43 @@ function shouldBlockBeSynced( block: Block ): boolean {
 	return true;
 }
 
-// Cache rich-text attributes for looked-up block types.
-const cachedRichTextAttributes = new Map< string, Map< string, true > >();
+// Cache rich-text attributes for all block types.
+let cachedRichTextAttributes: Map< string, Map< string, true > >;
 
 /**
  * Given a block name and attribute key, return true if the attribute is rich-text typed.
  *
- * @param blockName    The name of the block, e.g. 'core/paragraph'.
- * @param attributeKey The key of the attribute to check, e.g. 'content'.
+ * @param blockName     The name of the block, e.g. 'core/paragraph'.
+ * @param attributeName The name of the attribute to check, e.g. 'content'.
  * @return True if the attribute is rich-text typed, false otherwise.
  */
 function isRichTextAttribute(
 	blockName: string,
-	attributeKey: string
+	attributeName: string
 ): boolean {
-	if ( cachedRichTextAttributes.has( blockName ) ) {
-		// If we've already cached the rich-text attributes for this block type,
-		// return the cached value.
-		return (
-			cachedRichTextAttributes.get( blockName )?.has( attributeKey ) ??
-			false
-		);
-	}
+	if ( ! cachedRichTextAttributes ) {
+		// Parse the attributes for all blocks once.
+		cachedRichTextAttributes = new Map< string, Map< string, true > >();
 
-	const allRegisteredBlockTypes = getBlockTypes();
-	const matchingBlockType = allRegisteredBlockTypes.find(
-		( blockType ) => blockType.name === blockName
-	);
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const richTextAttributeMap = new Map< string, true >();
 
-	const isBlockTypeRegistered = matchingBlockType !== undefined;
-	const richTextAttributeMap = new Map< string, true >();
-
-	if ( isBlockTypeRegistered ) {
-		for ( const [ registeredKey, registeredProperties ] of Object.entries(
-			matchingBlockType.attributes as Record< string, { type: string } >
-		) ) {
-			if ( registeredProperties.type === 'rich-text' ) {
-				richTextAttributeMap.set( registeredKey, true );
+			for ( const [ name, definition ] of Object.entries(
+				blockType.attributes ?? {}
+			) ) {
+				if ( 'rich-text' === definition.type ) {
+					richTextAttributeMap.set( name, true );
+				}
 			}
+
+			cachedRichTextAttributes.set(
+				blockType.name,
+				richTextAttributeMap
+			);
 		}
 	}
 
-	cachedRichTextAttributes.set( blockName, richTextAttributeMap );
-	return richTextAttributeMap.has( attributeKey );
+	return (
+		cachedRichTextAttributes.get( blockName )?.has( attributeName ) ?? false
+	);
 }
