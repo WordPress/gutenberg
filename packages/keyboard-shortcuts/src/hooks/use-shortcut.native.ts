@@ -1,2 +1,2 @@
-const useShortcut = (): null => null;
+const useShortcut = () => null;
 export default useShortcut;

@@ -25,7 +25,7 @@ export default function useShortcut(
 	name: string,
 	callback: ( event: KeyboardEvent ) => void,
 	{ isDisabled = false }: UseShortcutOptions = {}
-): void {
+) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
 	const callbackRef = useRef< ( event: KeyboardEvent ) => void >();
@@ -39,7 +39,7 @@ export default function useShortcut(
 			return;
 		}
 
-		function _callback( event: KeyboardEvent ): void {
+		function _callback( event: KeyboardEvent ) {
 			if ( isMatch( name, event ) && callbackRef.current ) {
 				callbackRef.current( event );
 			}

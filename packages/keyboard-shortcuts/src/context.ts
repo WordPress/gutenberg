@@ -11,20 +11,20 @@ interface ShortcutContextType {
 }
 
 const globalShortcuts = new Set< ShortcutCallback >();
-const globalListener = ( event: KeyboardEvent ): void => {
+const globalListener = ( event: KeyboardEvent ) => {
 	for ( const keyboardShortcut of globalShortcuts ) {
 		keyboardShortcut( event );
 	}
 };
 
 export const context = createContext< ShortcutContextType >( {
-	add: ( shortcut: ShortcutCallback ): void => {
+	add: ( shortcut: ShortcutCallback ) => {
 		if ( globalShortcuts.size === 0 ) {
 			document.addEventListener( 'keydown', globalListener );
 		}
 		globalShortcuts.add( shortcut );
 	},
-	delete: ( shortcut: ShortcutCallback ): void => {
+	delete: ( shortcut: ShortcutCallback ) => {
 		globalShortcuts.delete( shortcut );
 		if ( globalShortcuts.size === 0 ) {
 			document.removeEventListener( 'keydown', globalListener );

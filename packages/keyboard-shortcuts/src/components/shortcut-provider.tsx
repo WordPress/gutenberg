@@ -35,7 +35,7 @@ export function ShortcutProvider( props: ShortcutProviderProps ): JSX.Element {
 		() => new Set< ShortcutCallback >()
 	);
 
-	function onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ): void {
+	function onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ) {
 		if ( props.onKeyDown ) {
 			props.onKeyDown( event );
 		}

@@ -34,7 +34,7 @@ export default function useShortcutEventMatch(): (
 	 *
 	 * @return True if the event matches unknown shortcuts, false if not.
 	 */
-	function isMatch( name: string, event: KeyboardEvent ): boolean {
+	function isMatch( name: string, event: KeyboardEvent ) {
 		return getAllShortcutKeyCombinations( name ).some(
 			( combination: WPShortcutKeyCombination | null ) => {
 				if ( ! combination ) {
