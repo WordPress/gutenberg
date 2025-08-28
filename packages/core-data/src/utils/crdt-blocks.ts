@@ -137,7 +137,6 @@ function createNewYBlock( block: Block ): YBlock {
  * @param incomingBlocks Gutenberg blocks being synced.
  * @param _origin        The origin of the sync, either 'syncProvider.getInitialCRDTDoc' or 'gutenberg'.
  */
-
 export function mergeCrdtBlocks(
 	yblocks: Y.Array< YBlock >, // yblocks represent the blocks in the local Y.Doc
 	incomingBlocks: Block[], // incomingBlocks represent JSON blocks being synced, either from a peer or from the local editor
@@ -212,16 +211,21 @@ export function mergeCrdtBlocks(
 	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
 		const block = blocksToSync[ left ];
 		const yblock = yblocks.get( left );
-		Object.entries( block ).forEach( ( [ k, v ] ) => {
-			if ( ! fun.equalityDeep( block[ k ], yblock.get( k ) ) ) {
-				if ( k === 'innerBlocks' ) {
+		Object.entries( block ).forEach( ( [ key, value ] ) => {
+			switch ( key ) {
+				case 'innerBlocks': {
 					// Recursively merge innerBlocks
-					const yInnerBlocks = yblock.get( k ) as Y.Array< YBlock >;
-
-					mergeCrdtBlocks( yInnerBlocks, v, _origin );
+					const yInnerBlocks = yblock.get( key ) as Y.Array< YBlock >;
+					mergeCrdtBlocks( yInnerBlocks, value ?? [], _origin );
+					break;
 				}
 
-				yblock.set( k, v );
+				default:
+					if (
+						! fun.equalityDeep( block[ key ], yblock.get( key ) )
+					) {
+						yblock.set( key, value );
+					}
 			}
 		} );
 		yblock.forEach( ( _v, k ) => {
