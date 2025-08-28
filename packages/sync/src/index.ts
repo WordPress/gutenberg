@@ -12,7 +12,7 @@ import { SyncProvider } from './provider';
 export * as Y from 'yjs';
 export { connectIndexDb } from './connect-indexdb';
 export { createWebRTCConnection } from './create-webrtc-connection';
-export { SyncProvider } from './provider';
+export { CRDT_DOC_VERSION, SyncProvider } from './provider';
 export * from './types';
 
 declare global {

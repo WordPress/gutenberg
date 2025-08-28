@@ -23,6 +23,11 @@ interface EntityState {
 	ydoc: CRDTDoc;
 }
 
+// This version number should be incremented whenever there are breaking changes
+// to Yjs doc schema or in how it is interpreted by code in the SyncConfig. This
+// allows implementors to invalidate persisted CRDT docs, if any.
+export const CRDT_DOC_VERSION = 1;
+
 export class SyncProvider {
 	private connectLocal: ConnectDoc | null;
 	private connectRemote: ConnectDoc | null;
@@ -91,7 +96,10 @@ export class SyncProvider {
 		record: ObjectData,
 		handleChanges: ( data: Partial< ObjectData > ) => void
 	): Promise< void > {
-		const ydoc = new Y.Doc( { meta: new Map() } );
+		const meta = new Map< string, unknown >( [
+			[ 'version', CRDT_DOC_VERSION ],
+		] );
+		const ydoc = new Y.Doc( { meta } );
 		const objectId = syncConfig.getObjectId( record );
 		const objectType = syncConfig.objectType;
 		const connections = await this.connect( objectId, objectType, ydoc );
@@ -174,23 +182,28 @@ export class SyncProvider {
 	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
 	 * @param {ObjectData} record     Initial data to apply to the document.
 	 */
-	protected async getInitialCRDTDoc(
+	private async getInitialCRDTDoc(
 		syncConfig: SyncConfig,
 		record: ObjectData
 	): Promise< CRDTDoc > {
 		// IMPORTANT: We use a new Yjs document so that the initial state can be
 		// applied to the "real" Yjs document as a singular update. Therefore, we
 		// don't need to wrap the changes in a transaction.
-		const initialStateDoc = new Y.Doc( { meta: new Map() } );
+		const initialStateDoc = new Y.Doc();
 
 		// Load the persisted document from previous sessions.
 		const persistedDoc = await this.getPersistedCRDTDoc(
 			syncConfig,
-			record
+			record,
+			CRDT_DOC_VERSION
 		);
 
-		// If it exists, apply it as the base state of the initial document.
-		if ( persistedDoc ) {
+		// If it exists and matches the current version, apply it as the base state
+		// of the initial document.
+		if (
+			persistedDoc &&
+			CRDT_DOC_VERSION === persistedDoc.meta?.get( 'version' )
+		) {
 			Y.applyUpdate(
 				initialStateDoc,
 				Y.encodeStateAsUpdate( persistedDoc )
@@ -232,13 +245,15 @@ export class SyncProvider {
 	 * Custom sync providers can override this method to provide their
 	 * implementation.
 	 *
-	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
-	 * @param {ObjectData} _record     Record representing this object type.
+	 * @param {SyncConfig} _syncConfig      Sync configuration for the object type.
+	 * @param {ObjectData} _record          Record representing this object type.
+	 * @param {number}     _expectedVersion Expected version of persisted CRDT document.
 	 * @return {Promise< CRDTDoc | null >} The persisted CRDT document, or null if none exists.
 	 */
 	protected async getPersistedCRDTDoc(
 		_syncConfig: SyncConfig,
-		_record: ObjectData
+		_record: ObjectData,
+		_expectedVersion: number
 	): Promise< CRDTDoc | null > {
 		return Promise.resolve( null );
 	}
