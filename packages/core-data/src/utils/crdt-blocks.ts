@@ -88,7 +88,7 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	};
 	const res = fun.equalityDeep(
 		Object.assign( {}, gblock, overwrites ),
-		Object.assign( {}, yblock, overwrites )
+		Object.assign( {}, yblockAsJson, overwrites )
 	);
 	const inners = gblock.innerBlocks || [];
 	const yinners = yblockAsJson.innerBlocks || [];
