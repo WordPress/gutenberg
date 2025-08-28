@@ -263,15 +263,24 @@ export function mergeCrdtBlocks(
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
-					const currentAttributes =
-						( yblock.get( key ) as YBlockAttributes ) ??
-						createNewYAttributeMap( block.name, {} );
+					const currentAttributes = yblock.get(
+						key
+					) as YBlockAttributes;
+
+					// If attributes are not set on the yblock, use the new values.
+					if ( ! currentAttributes ) {
+						yblock.set(
+							key,
+							createNewYAttributeMap( block.name, value )
+						);
+						break;
+					}
 
 					Object.entries( value ).forEach(
 						( [ attributeName, attributeValue ] ) => {
 							if (
 								fun.equalityDeep(
-									currentAttributes.get( attributeName ),
+									currentAttributes?.get( attributeName ),
 									attributeValue
 								)
 							) {
