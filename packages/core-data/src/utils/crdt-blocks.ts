@@ -122,6 +122,19 @@ function createNewYBlock( block: Block ): YBlock {
 					return [ key, value ];
 				}
 
+				case 'attributes': {
+					const attributes = new Y.Map(
+						Object.entries( value ).map(
+							( [ attributeKey, attributeValue ] ) => {
+								// Rich-text logic here
+								return [ attributeKey, attributeValue ];
+							}
+						)
+					);
+
+					return [ key, attributes ];
+				}
+
 				default:
 					return [ key, value ];
 			}
@@ -217,6 +230,17 @@ export function mergeCrdtBlocks(
 					// Recursively merge innerBlocks
 					const yInnerBlocks = yblock.get( key ) as Y.Array< YBlock >;
 					mergeCrdtBlocks( yInnerBlocks, value ?? [], _origin );
+					break;
+				}
+
+				case 'attributes': {
+					const yAttributes = yblock.get( key ) as Y.Map< unknown >;
+					Object.entries( value ).forEach(
+						( [ attributeKey, attributeValue ] ) => {
+							// Rich-text logic here
+							yAttributes.set( attributeKey, attributeValue );
+						}
+					);
 					break;
 				}
 
