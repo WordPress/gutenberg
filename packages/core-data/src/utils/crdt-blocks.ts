@@ -91,12 +91,12 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		Object.assign( {}, yblockAsJson, overwrites )
 	);
 	const inners = gblock.innerBlocks || [];
-	const yinners = yblockAsJson.innerBlocks || [];
+	const yinners = yblock.get( 'innerBlocks' ) as Y.Array< YBlock >;
 	return (
 		res &&
 		inners.length === yinners.length &&
 		inners.every( ( block: Block, i: number ) =>
-			areBlocksEqual( block, yinners[ i ] )
+			areBlocksEqual( block, yinners.get( i ) )
 		)
 	);
 }
