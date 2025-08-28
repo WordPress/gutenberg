@@ -15,6 +15,10 @@
 -   DataViews: Fix incorrect documentation for `defaultLayouts` prop. [#71334](https://github.com/WordPress/gutenberg/pull/71334)
 -   DataViews: Fix mismatched padding on mobile viewports for grid layout [#71455](https://github.com/WordPress/gutenberg/pull/71455)
 
+### Enhancements
+
+- Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
+
 ## 7.0.0 (2025-08-20)
 
 ### Breaking changes
