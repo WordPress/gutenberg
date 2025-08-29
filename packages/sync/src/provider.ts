@@ -204,12 +204,10 @@ export class SyncProvider {
 			persistedDoc &&
 			CRDT_DOC_VERSION === persistedDoc.meta?.get( 'version' )
 		) {
-			Y.applyUpdate(
-				initialStateDoc,
-				Y.encodeStateAsUpdate( persistedDoc )
-			);
+			return persistedDoc;
 		}
 
+		// Otherwise, use the current record.
 		const initialData = syncConfig.getInitialObjectData( record );
 		syncConfig.applyChangesToCRDTDoc(
 			initialStateDoc,
