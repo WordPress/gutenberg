@@ -164,7 +164,6 @@
 	top: $grid-unit-05;
 	opacity: 0;
 	right: $grid-unit-05;
-	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
 
 	.dataviews-all-actions-button {
 		background-color: $white;
@@ -182,12 +181,8 @@
 }
 
 .dataviews-view-grid__card:hover .dataviews-view-grid__hover-actions,
-.dataviews-view-grid__card:focus-within .dataviews-view-grid__hover-actions {
-	opacity: 1;
-}
-
-// Include an explicit .is-hovered class to preserve hovered state when popovers are active.
-.dataviews-view-grid__card .dataviews-view-grid__hover-actions.is-hovered {
+.dataviews-view-grid__card:focus-within .dataviews-view-grid__hover-actions,
+.dataviews-view-grid__card .dataviews-view-grid__hover-actions:has(.dataviews-all-actions-button[aria-expanded="true"]) {
 	opacity: 1;
 }
 
