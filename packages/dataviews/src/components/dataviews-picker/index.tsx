@@ -56,8 +56,8 @@ type DataViewsPickerProps< Item > = {
 		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
-	selection?: string[];
-	onChangeSelection?: ( items: string[] ) => void;
+	selection: string[];
+	onChangeSelection: ( items: string[] ) => void;
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	footerContent?: ReactNode;
