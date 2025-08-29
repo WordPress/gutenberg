@@ -34,7 +34,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.9.1",
-		"@actions/github": "^5.0.1",
+		"@actions/github": "^6.0.1",
 		"@jest/test-result": "^29.6.2",
 		"@octokit/types": "^6.34.0",
 		"@octokit/webhooks-types": "^5.8.0",
