@@ -427,7 +427,15 @@ export function HierarchicalTermSelector( { slug } ) {
 				/>
 			) }
 			{ loading && (
-				<FlexItem>
+				<FlexItem
+					display="flex"
+					style={ {
+						justifyContent: 'center',
+						alignItems: 'center',
+						// Match SearchControl height to prevent layout shift.
+						height: '40px',
+					} }
+				>
 					<Spinner />
 				</FlexItem>
 			) }
