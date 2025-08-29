@@ -299,16 +299,24 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
+				/**
+				 * Is syncing enabled for this entity?
+				 */
 				enabled: Boolean(
 					postType.supports?.[ 'collaborative-editing' ] &&
 						postType.supports?.editor
 				),
+
 				/**
-				 * @param {Y.Doc}  ydoc
-				 * @param {Object} changes
-				 * @param {string} origin
+				 * Apply changes from the local editor and to the local CRDT document so
+				 * that those changes can be synced to other peers (via the provider).
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+				 * @param {import('@wordpress/sync').ObjectData} changes
+				 * @param {string}                               origin
+				 * @return {void}
 				 */
-				applyChangesToCRDTDoc: ( ydoc, changes, origin ) => {
+				applyChangesToCRDTDoc: ( crdtDoc, changes, origin ) => {
 					const filteredChanges = Object.fromEntries(
 						Object.entries( changes ).filter(
 							( [ key, value ] ) =>
@@ -318,12 +326,21 @@ async function loadPostTypeEntities() {
 					);
 
 					defaultApplyChangesToCRDTDoc(
-						ydoc,
+						crdtDoc,
 						filteredChanges,
 						origin
 					);
 				},
+
+				/**
+				 * Transform a CRDT document into a partial record that can be used to
+				 * update the local editor state.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
+				 * @return {import('@wordpress/sync').ObjectData} Object data
+				 */
 				fromCRDTDoc: defaultFromCRDTDoc,
+
 				/**
 				 * This initial object data represents the data that will be synced via
 				 * the CRDT document, which may differ from the entity record. There may
@@ -345,7 +362,15 @@ async function loadPostTypeEntities() {
 						)
 					);
 				},
+
+				/**
+				 * Get the immutable identifier for an entity record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectID} The entity's ID
+				 */
 				getObjectId: ( { id } ) => id,
+
 				objectType: `postType/${ postType.slug }`,
 				supportsAwareness: true,
 				supportsUndo: true,
