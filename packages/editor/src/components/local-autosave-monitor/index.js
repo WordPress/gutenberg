@@ -101,6 +101,19 @@ function useAutosaveNotice() {
 			return;
 		}
 
+		// Disable the warning notice if collaborative editing is enabled.
+		//
+		// @TODO
+		//
+		// In the future, we may wish to implement a more sophisticated check -- for
+		// example, if collaborative editing is enabled but the provider is
+		// disconnected, we may want to provide the user with options. For now,
+		// however, since we effectively lock the editor when the provider is not
+		// connected, this simplistic approach will work.
+		if ( window.__experimentalEnableSync ) {
+			return;
+		}
+
 		const id = 'wpEditorAutosaveRestore';
 
 		createWarningNotice(
