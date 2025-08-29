@@ -27,6 +27,7 @@ import { useContext } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import DataViewsContext from '../../components/dataviews-context';
+import { useIsMultiselectPicker } from '../../components/dataviews-picker/footer';
 import type {
 	NormalizedField,
 	ViewPickerGrid as ViewPickerGridType,
@@ -246,6 +247,7 @@ function GridGroup< Item >( {
 }
 
 function ViewPickerGrid< Item >( {
+	actions,
 	data,
 	fields,
 	getItemId,
@@ -256,7 +258,7 @@ function ViewPickerGrid< Item >( {
 	className,
 	empty,
 }: ViewPickerGridProps< Item > ) {
-	const { resizeObserverRef, paginationInfo, picker } =
+	const { resizeObserverRef, paginationInfo } =
 		useContext( DataViewsContext );
 	const { label } = view;
 	const titleField = fields.find(
@@ -290,6 +292,7 @@ function ViewPickerGrid< Item >( {
 	);
 	const hasData = !! data?.length;
 	const usedPreviewSize = view.layout?.previewSize;
+	const isMultiselect = useIsMultiselectPicker( actions );
 
 	/*
 	 * This is the maximum width that an image can achieve in the grid. The reasoning is:
@@ -330,9 +333,7 @@ function ViewPickerGrid< Item >( {
 						virtualFocus
 						orientation="horizontal"
 						role="listbox"
-						aria-multiselectable={
-							picker?.multiselect ?? undefined
-						}
+						aria-multiselectable={ isMultiselect }
 						className={ clsx(
 							'dataviews-view-picker-grid',
 							className
@@ -375,7 +376,7 @@ function ViewPickerGrid< Item >( {
 													key={ getItemId( item ) }
 													view={ view }
 													multiselect={
-														picker?.multiselect
+														isMultiselect
 													}
 													selection={ selection }
 													onChangeSelection={
@@ -428,9 +429,7 @@ function ViewPickerGrid< Item >( {
 						virtualFocus
 						orientation="horizontal"
 						role="listbox"
-						aria-multiselectable={
-							picker?.multiselect ?? undefined
-						}
+						aria-multiselectable={ isMultiselect }
 						aria-label={ label }
 					>
 						{ data.map( ( item, index ) => {
@@ -449,7 +448,7 @@ function ViewPickerGrid< Item >( {
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
-									multiselect={ picker?.multiselect }
+									multiselect={ isMultiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
 									getItemId={ getItemId }

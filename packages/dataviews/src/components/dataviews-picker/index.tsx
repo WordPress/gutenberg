@@ -35,7 +35,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Field, View, SupportedLayouts } from '../../types';
+import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
@@ -45,6 +45,7 @@ type DataViewsPickerProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
+	actions?: Action< Item >[];
 	search?: boolean;
 	searchLabel?: string;
 	data: Item[];
@@ -55,7 +56,6 @@ type DataViewsPickerProps< Item > = {
 		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
-	multiselect?: boolean;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	header?: ReactNode;
@@ -71,18 +71,14 @@ type DataViewsPickerProps< Item > = {
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
+const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
 	'header' | 'search' | 'searchLabel' | 'footerContent'
 >;
 
-function DefaultUI( {
-	header,
-	search = true,
-	searchLabel,
-	footerContent,
-}: DefaultUIProps ) {
+function DefaultUI( { header, search = true, searchLabel }: DefaultUIProps ) {
 	const { isShowingFilter, config } = useContext( DataViewsContext );
 	return (
 		<>
@@ -115,7 +111,7 @@ function DefaultUI( {
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
 			<DataViewsLayout />
-			<DataViewsPickerFooter>{ footerContent }</DataViewsPickerFooter>
+			<DataViewsPickerFooter />
 		</>
 	);
 }
@@ -126,13 +122,13 @@ function DataViewsPicker< Item >( {
 	fields,
 	search = true,
 	searchLabel = undefined,
+	actions = EMPTY_ARRAY,
 	data,
 	getItemId = defaultGetItemId,
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts,
-	multiselect,
 	selection: selectionProperty,
 	onChangeSelection,
 	header,
@@ -217,11 +213,10 @@ function DataViewsPicker< Item >( {
 	return (
 		<DataViewsContext.Provider
 			value={ {
-				// DataViewsContext is used for both picker and regular Views,
-				// cast the View to a View to ensure the types are satisfied.
 				view,
 				onChangeView,
 				fields: _fields,
+				actions,
 				data,
 				isLoading,
 				paginationInfo,
@@ -242,7 +237,7 @@ function DataViewsPicker< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
-				picker: { multiselect: Boolean( multiselect ) },
+				picker: true,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>

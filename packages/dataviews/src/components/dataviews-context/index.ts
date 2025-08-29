@@ -57,7 +57,7 @@ type DataViewsContextType< Item > = {
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
-	picker?: { multiselect: boolean };
+	picker?: boolean;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {

@@ -1,17 +1,14 @@
 /**
- * External dependencies
- */
-import type { ReactNode } from 'react';
-
-/**
  * WordPress dependencies
  */
 import {
+	Button,
 	CheckboxControl,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { useRegistry } from '@wordpress/data';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +16,17 @@ import { useContext } from '@wordpress/element';
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../private-types';
+import type { Action } from '../../types';
+
+const EMPTY_ARRAY: [] = [];
+
+export function useIsMultiselectPicker< Item >(
+	actions: Action< Item >[] | undefined
+) {
+	return useMemo( () => {
+		return actions?.every( ( action ) => action.supportsBulk );
+	}, [ actions ] );
+}
 
 interface BulkSelectionCheckboxProps< Item > {
 	selection: string[];
@@ -68,16 +76,74 @@ function BulkSelectionCheckbox< Item >( {
 	);
 }
 
-export function DataViewsPickerFooter( {
-	children,
+function ActionButtons< Item >( {
+	actions,
+	items,
+	selection,
 }: {
-	multiselect?: boolean;
-	children: ReactNode;
+	actions: Action< Item >[];
+	items: Item[];
+	selection: string[];
 } ) {
-	const { data, selection, onChangeSelection, getItemId, picker } =
-		useContext( DataViewsContext );
+	const registry = useRegistry();
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
+
+	return (
+		<HStack expanded={ false } spacing={ 1 }>
+			{ actions.map( ( action ) => {
+				// Only support actions with callbacks for DataViewsPicker.
+				// This is because many use cases of the picker will be already within modals.
+				if ( ! ( 'callback' in action ) ) {
+					return null;
+				}
+
+				const { id, label, icon, isPrimary, isDestructive, callback } =
+					action;
+
+				const _label =
+					typeof label === 'string' ? label : label( items );
+				const variant = isPrimary ? 'primary' : 'secondary';
+				const isInProgress = id === actionInProgress;
+
+				return (
+					<Button
+						key={ id }
+						accessibleWhenDisabled
+						icon={ icon }
+						disabled={ isInProgress || ! selection?.length }
+						isBusy={ isInProgress }
+						onClick={ async () => {
+							setActionInProgress( id );
+							await callback( items, {
+								registry,
+							} );
+							setActionInProgress( null );
+						} }
+						size="compact"
+						isDestructive={ isDestructive }
+						variant={ variant }
+					>
+						{ _label }
+					</Button>
+				);
+			} ) }
+		</HStack>
+	);
+}
+
+export function DataViewsPickerFooter() {
+	const {
+		data,
+		selection,
+		onChangeSelection,
+		getItemId,
+		actions = EMPTY_ARRAY,
+	} = useContext( DataViewsContext );
 
 	const selectionCount = selection.length;
+	const isMultiselect = useIsMultiselectPicker( actions );
 
 	const message =
 		selectionCount > 0
@@ -96,15 +162,20 @@ export function DataViewsPickerFooter( {
 					data.length
 			  );
 
+	const selectedItems = useMemo(
+		() =>
+			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
+		[ selection, getItemId, data ]
+	);
+
 	return (
 		<HStack
 			expanded={ false }
 			justify="space-between"
 			className="dataviews-footer"
 		>
-			<DataViewsPagination />
 			<HStack expanded={ false } spacing={ 3 }>
-				{ picker?.multiselect && (
+				{ isMultiselect && (
 					<BulkSelectionCheckbox
 						selection={ selection }
 						onChangeSelection={ onChangeSelection }
@@ -115,14 +186,15 @@ export function DataViewsPickerFooter( {
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ message }
 				</span>
-				<HStack
-					className="dataviews-bulk-actions-footer__action-buttons"
-					expanded={ false }
-					spacing={ 1 }
-				>
-					{ children }
-				</HStack>
 			</HStack>
+			<DataViewsPagination />
+			{ Boolean( actions?.length ) && (
+				<ActionButtons
+					actions={ actions }
+					items={ selectedItems }
+					selection={ selection }
+				/>
+			) }
 		</HStack>
 	);
 }

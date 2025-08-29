@@ -7,7 +7,6 @@ import type { Meta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,7 +19,7 @@ import {
 } from '../../dataviews/stories/fixtures';
 import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { View } from '../../../types';
+import type { Action, View } from '../../../types';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
@@ -69,6 +68,33 @@ export const Default = ( {
 
 	const [ selection, setSelection ] = useState< string[] >( [] );
 
+	const actions: Action< SpaceObject >[] = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: isMultiselectable,
+			callback() {
+				const selectedItemNames = data
+					.filter(
+						( item ) => selection?.includes( String( item.id ) )
+					)
+					.map( ( item ) => item.title )
+					.join( ', ' );
+				// eslint-disable-next-line no-alert
+				window.alert( selectedItemNames );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: isMultiselectable,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
 	const {
 		data: infiniteScrollData,
 		paginationInfo: infiniteScrollPaginationInfo,
@@ -91,7 +117,7 @@ export const Default = ( {
 				` }</style>
 			) }
 			<DataViewsPicker
-				multiselect={ isMultiselectable }
+				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ ( selectedIds ) => {
 					setSelection( selectedIds );
@@ -111,40 +137,6 @@ export const Default = ( {
 					[ LAYOUT_PICKER_GRID ]: {},
 				} }
 				config={ { perPageSizes } }
-				footerContent={
-					<>
-						<Button
-							accessibleWhenDisabled
-							disabled={ ! selection.length }
-							variant="primary"
-							onClick={ () => {
-								const selectedItemNames = data
-									.filter(
-										( item ) =>
-											selection?.includes(
-												String( item.id )
-											)
-									)
-									.map( ( item ) => item.title )
-									.join( ', ' );
-								// eslint-disable-next-line no-alert
-								window.alert( selectedItemNames );
-							} }
-						>
-							Confirm
-						</Button>
-						<Button
-							accessibleWhenDisabled
-							disabled={ ! selection.length }
-							variant="secondary"
-							onClick={ () => {
-								setSelection( [] );
-							} }
-						>
-							Cancel
-						</Button>
-					</>
-				}
 			/>
 		</>
 	);
