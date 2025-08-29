@@ -28,27 +28,27 @@ export function useIsMultiselectPicker< Item >(
 	}, [ actions ] );
 }
 
-interface BulkSelectionCheckboxProps< Item > {
-	selection: string[];
-	onChangeSelection: SetSelection;
-	data: Item[];
-	getItemId: ( item: Item ) => string;
-}
-
 function BulkSelectionCheckbox< Item >( {
 	selection,
+	selectedItems,
 	onChangeSelection,
 	data,
 	getItemId,
-}: BulkSelectionCheckboxProps< Item > ) {
-	const areAllSelected = selection.length === data.length;
+}: {
+	selection: string[];
+	selectedItems: Item[];
+	onChangeSelection: SetSelection;
+	data: Item[];
+	getItemId: ( item: Item ) => string;
+} ) {
+	const areAllSelected = selectedItems.length === data.length;
 
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selection.length }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					// Deselect all - remove the current page from the total selection.
@@ -178,6 +178,7 @@ export function DataViewsPickerFooter() {
 				{ isMultiselect && (
 					<BulkSelectionCheckbox
 						selection={ selection }
+						selectedItems={ selectedItems }
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
