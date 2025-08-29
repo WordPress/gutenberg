@@ -217,6 +217,12 @@ function proceed( conversionMap ) {
 
 		case 'closer':
 			// If we're not nesting then this is easy - close the block.
+			if ( 0 === stackDepth ) {
+				// eslint-disable-next-line no-console
+				console.error( `Unmatched closing tag "${ name }" found.` ); // We advance the offset to ignore the invalid tag and continue parsing.
+				offset = startOffset + tokenLength;
+				return true;
+			}
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );
 				offset = startOffset + tokenLength;
