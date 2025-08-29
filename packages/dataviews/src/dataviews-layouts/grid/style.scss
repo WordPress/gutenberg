@@ -147,6 +147,7 @@
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.
+		opacity: 1;
 		top: $grid-unit-10;
 	}
 }
@@ -174,7 +175,8 @@
 	}
 
 	@media (hover: none) {
-		// Show checkboxes on devices that do not support hover.
+		// Show actions on devices that do not support hover.
+		opacity: 1;
 		top: $grid-unit-05;
 	}
 }
