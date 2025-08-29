@@ -28,7 +28,6 @@ import {
 import DataViewsLayout from '../dataviews-layout';
 import { DataViewsPickerFooter } from './footer';
 import DataViewsSearch from '../dataviews-search';
-import { BulkActionsFooter } from '../dataviews-bulk-actions';
 import { DataViewsPagination } from '../dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
@@ -60,7 +59,6 @@ type DataViewsPickerProps< Item > = {
 	onChangeSelection: ( items: string[] ) => void;
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
-	footerContent?: ReactNode;
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
@@ -75,7 +73,7 @@ const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
-	'header' | 'search' | 'searchLabel' | 'footerContent'
+	'header' | 'search' | 'searchLabel'
 >;
 
 function DefaultUI( { header, search = true, searchLabel }: DefaultUIProps ) {
@@ -132,7 +130,6 @@ function DataViewsPicker< Item >( {
 	selection: selectionProperty,
 	onChangeSelection,
 	header,
-	footerContent,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
@@ -246,7 +243,6 @@ function DataViewsPicker< Item >( {
 						header={ header }
 						search={ search }
 						searchLabel={ searchLabel }
-						footerContent={ footerContent }
 					/>
 				) }
 			</div>
@@ -257,7 +253,7 @@ function DataViewsPicker< Item >( {
 // Populate the DataViews sub components
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
-		BulkActionToolbar: typeof BulkActionsFooter;
+		BulkActionToolbar: typeof DataViewsPickerFooter;
 		Filters: typeof DataViewsFilters;
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
@@ -267,7 +263,7 @@ const DataViewsPickerSubComponents =
 		ViewConfig: typeof DataviewsViewConfigDropdown;
 	};
 
-DataViewsPickerSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsPickerSubComponents.BulkActionToolbar = DataViewsPickerFooter;
 DataViewsPickerSubComponents.Filters = DataViewsFilters;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
