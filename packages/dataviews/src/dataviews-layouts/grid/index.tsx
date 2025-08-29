@@ -176,11 +176,18 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			{ ! showTitle && showMedia && !! actions?.length && (
-				<div className="dataviews-view-grid__hover-actions">
-					<ItemActions item={ item } actions={ actions } isCompact />
-				</div>
-			) }
+			{ ! showTitle &&
+				showMedia &&
+				renderedMediaField &&
+				!! actions?.length && (
+					<div className="dataviews-view-grid__hover-actions">
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					</div>
+				) }
 			{ showTitle && (
 				<HStack
 					justify="space-between"
