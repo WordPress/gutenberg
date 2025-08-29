@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### Features
+
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+
 ## 8.0.0 (2025-09-03)
 
 ### Breaking changes
 
 - Revert the ability to hide the view config via `config` prop and export a `DataViews.Footer` component to support the "Minimal UI" story. [#71276](https://github.com/WordPress/gutenberg/pull/71276)
-
-### Features
-
--   DataViews: Add a new `picker` prop for DataViews that should be optimized for selection. This presently only works for the `grid` layout. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
 
 ### Enhancements
 
