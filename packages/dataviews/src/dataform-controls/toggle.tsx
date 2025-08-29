@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,14 +17,9 @@ export default function Toggle< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue } = field;
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedToggleControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -37,37 +27,10 @@ export default function Toggle< Item >( {
 		);
 	}, [ onChange, setValue, data, getValue ] );
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
-	);
-
 	return (
 		<ValidatedToggleControl
 			required={ !! field.isValid.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			customValidity={ validity?.custom ? validity.custom : undefined }
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom
 			label={ label }

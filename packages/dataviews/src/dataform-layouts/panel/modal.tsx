@@ -18,7 +18,12 @@ import { useState, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Form, FormField, NormalizedField } from '../../types';
+import type {
+	Form,
+	FormField,
+	NormalizedField,
+	FieldValidity,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../normalize-form-fields';
@@ -30,12 +35,14 @@ function ModalContent< Item >( {
 	fieldLabel,
 	onChange,
 	onClose,
+	validity,
 }: {
 	data: Item;
 	form: Form;
 	fieldLabel: string;
 	onChange: ( data: Partial< Item > ) => void;
 	onClose: () => void;
+	validity?: FieldValidity;
 } ) {
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
@@ -73,6 +80,7 @@ function ModalContent< Item >( {
 						hideLabelFromVision={
 							( form?.fields ?? [] ).length < 2
 						}
+						validity={ validity }
 					/>
 				) }
 			</DataFormLayout>
@@ -107,6 +115,7 @@ function PanelModal< Item >( {
 	data,
 	onChange,
 	field,
+	validity,
 }: {
 	fieldDefinition: NormalizedField< Item >;
 	summaryFields: NormalizedField< Item >[];
@@ -114,6 +123,7 @@ function PanelModal< Item >( {
 	data: Item;
 	onChange: ( value: any ) => void;
 	field: FormField;
+	validity?: FieldValidity;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -150,6 +160,7 @@ function PanelModal< Item >( {
 					fieldLabel={ fieldLabel ?? '' }
 					onChange={ onChange }
 					onClose={ () => setIsOpen( false ) }
+					validity={ validity }
 				/>
 			) }
 		</>

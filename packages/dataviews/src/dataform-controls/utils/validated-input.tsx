@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,16 +36,11 @@ export default function ValidatedText< Item >( {
 	type,
 	prefix,
 	suffix,
+	validity,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedInputControl
-			>[ 'customValidity' ]
-		>( undefined );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -63,37 +53,10 @@ export default function ValidatedText< Item >( {
 		[ data, setValue, onChange ]
 	);
 
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, isValid, setValue ]
-	);
-
 	return (
 		<ValidatedInputControl
 			required={ !! isValid?.required }
-			onValidate={ onValidateControl }
-			customValidity={ customValidity }
+			customValidity={ validity?.custom ? validity.custom : undefined }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }

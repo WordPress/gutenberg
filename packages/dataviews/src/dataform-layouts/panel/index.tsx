@@ -101,6 +101,7 @@ export default function FormPanelField< Item >( {
 	data,
 	field,
 	onChange,
+	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
@@ -140,6 +141,7 @@ export default function FormPanelField< Item >( {
 				data={ data }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
+				validity={ validity }
 			/>
 		) : (
 			<PanelDropdown
@@ -150,6 +152,7 @@ export default function FormPanelField< Item >( {
 				data={ data }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
+				validity={ validity }
 			/>
 		);
 

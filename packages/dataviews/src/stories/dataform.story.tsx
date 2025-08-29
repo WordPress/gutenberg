@@ -17,7 +17,7 @@ import {
  * Internal dependencies
  */
 import DataForm from '../components/dataform';
-import isItemValid from '../utils/is-item-valid';
+import useIsFormValid from '../hooks/use-is-form-valid';
 
 import type {
 	Field,
@@ -486,6 +486,7 @@ function CustomEditControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, getValue, setValue } = field;
 	const value = getValue( { item: data } );
@@ -499,6 +500,7 @@ function CustomEditControl< Item >( {
 	return (
 		<ValidatedTextControl
 			required={ !! field.isValid?.required }
+			customValidity={ validity?.custom ? validity.custom : undefined }
 			label={ label }
 			placeholder={ placeholder }
 			value={ value ?? '' }
@@ -517,7 +519,7 @@ const ValidationComponent = ( {
 	custom,
 }: {
 	required: boolean;
-	custom: boolean;
+	custom: 'sync' | 'async' | 'none';
 	type: 'regular' | 'panel';
 } ) => {
 	type ValidatedItem = {
@@ -569,6 +571,17 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 	} );
+
+	const makeAsync = ( rule: ( item: ValidatedItem ) => null | string ) => {
+		return async ( value: ValidatedItem ) => {
+			return await new Promise< string | null >( ( resolve ) => {
+				setTimeout( () => {
+					const validationResult = rule( value );
+					resolve( validationResult );
+				}, 2000 );
+			} );
+		};
+	};
 
 	const customTextRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
@@ -726,7 +739,15 @@ const ValidationComponent = ( {
 	const maybeCustomRule = (
 		rule: ( item: ValidatedItem ) => null | string
 	) => {
-		return custom ? rule : undefined;
+		if ( custom === 'sync' ) {
+			return rule;
+		}
+
+		if ( custom === 'async' ) {
+			return makeAsync( rule );
+		}
+
+		return undefined;
 	};
 
 	const _fields: Field< ValidatedItem >[] = [
@@ -737,6 +758,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -750,6 +772,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customSelectRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -764,6 +787,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRadioRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -774,6 +798,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextareaRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -783,6 +808,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customEmailRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -792,6 +818,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTelephoneRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -801,6 +828,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customUrlRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -810,6 +838,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customColorRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -819,6 +848,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customIntegerRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -828,6 +858,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customNumberRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -837,6 +868,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customBooleanRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -845,6 +877,7 @@ const ValidationComponent = ( {
 			label: 'Categories',
 			isValid: {
 				required,
+				elements: false, // TODO: expose this via storybook
 			},
 			elements: [
 				{ value: 'astronomy', label: 'Astronomy' },
@@ -880,6 +913,7 @@ const ValidationComponent = ( {
 			Edit: CustomEditControl,
 			isValid: {
 				required,
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -889,6 +923,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customPasswordRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -899,6 +934,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customToggleRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -914,6 +950,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customToggleGroupRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -923,6 +960,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -933,6 +971,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateRangeRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 		{
@@ -942,6 +981,7 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customDateTimeRule ),
+				elements: false, // TODO: expose this via storybook
 			},
 		},
 	];
@@ -972,7 +1012,7 @@ const ValidationComponent = ( {
 		],
 	};
 
-	const canSave = isItemValid( post, _fields, form );
+	const validity = useIsFormValid( post, _fields, form );
 
 	return (
 		<form>
@@ -981,6 +1021,7 @@ const ValidationComponent = ( {
 					data={ post }
 					fields={ _fields }
 					form={ form }
+					validity={ validity }
 					onChange={ ( edits ) =>
 						setPost( ( prev ) => ( {
 							...prev,
@@ -991,7 +1032,7 @@ const ValidationComponent = ( {
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					disabled={ ! canSave }
+					disabled={ !! validity }
 					variant="primary"
 				>
 					Submit
@@ -1748,14 +1789,15 @@ export const Validation = {
 			options: [ 'regular', 'panel' ],
 		},
 		custom: {
-			control: { type: 'boolean' },
+			control: { type: 'select' },
 			description: 'Whether or not the fields have custom validation.',
+			options: [ 'sync', 'async', 'none' ],
 		},
 	},
 	args: {
 		required: true,
 		type: 'regular',
-		custom: true,
+		custom: 'sync',
 	},
 };
 

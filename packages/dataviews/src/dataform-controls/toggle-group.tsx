@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import {
 	privateApis,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,45 +20,15 @@ export default function ToggleGroup< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue } = field;
-	const [ customValidity, setCustomValidity ] =
-		useState<
-			React.ComponentProps<
-				typeof ValidatedToggleGroupControl
-			>[ 'customValidity' ]
-		>( undefined );
 	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | number | undefined ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
-	);
-	const onValidateControl = useCallback(
-		( newValue: any ) => {
-			const message = field.isValid?.custom?.(
-				deepMerge(
-					data,
-					setValue( {
-						item: data,
-						value: newValue,
-					} ) as Partial< Item >
-				),
-				field
-			);
-
-			if ( message ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message,
-				} );
-				return;
-			}
-
-			setCustomValidity( undefined );
-		},
-		[ data, field, setValue ]
 	);
 
 	if ( field.elements ) {
@@ -73,8 +38,9 @@ export default function ToggleGroup< Item >( {
 		return (
 			<ValidatedToggleGroupControl
 				required={ !! field.isValid?.required }
-				onValidate={ onValidateControl }
-				customValidity={ customValidity }
+				customValidity={
+					validity?.custom ? validity.custom : undefined
+				}
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				isBlock

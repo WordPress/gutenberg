@@ -7,7 +7,7 @@ import { useContext, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Form, FormField, SimpleFormField } from '../types';
+import type { Form, SimpleFormField, FormField, FieldValidity } from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
 import { isCombinedField } from './is-combined-field';
@@ -35,12 +35,14 @@ export function DataFormLayout< Item >( {
 			field: FormField;
 			onChange: ( value: any ) => void;
 			hideLabelFromVision?: boolean;
+			validity?: FieldValidity;
 		} ) => React.JSX.Element | null,
 		field: FormField
 	) => React.JSX.Element;
 	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
-	const { fields: fieldDefinitions } = useContext( DataFormContext );
+	const { fields: fieldDefinitions, validity } =
+		useContext( DataFormContext );
 
 	function getFieldDefinition( field: SimpleFormField | string ) {
 		const fieldId = typeof field === 'string' ? field : field.id;
@@ -84,15 +86,29 @@ export function DataFormLayout< Item >( {
 				}
 
 				if ( children ) {
-					return children( FieldLayout, formField );
+					return children(
+						( props ) => (
+							<FieldLayout
+								{ ...props }
+								validity={ validity?.find(
+									( item ) => item.id === formField.id
+								) }
+							/>
+						),
+						formField
+					);
 				}
 
+				const fieldValidity = validity?.find(
+					( item ) => item.id === formField.id
+				);
 				return (
 					<FieldLayout
 						key={ formField.id }
 						data={ data }
 						field={ formField }
 						onChange={ onChange }
+						validity={ fieldValidity }
 					/>
 				);
 			} ) }
