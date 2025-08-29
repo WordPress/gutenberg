@@ -13,7 +13,6 @@ import {
 	Flex,
 	FlexItem,
 	SearchControl,
-	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -180,13 +179,18 @@ export function HierarchicalTermSelector( { slug } ) {
 		terms,
 		loading,
 		availableTerms,
+		totalTermsCount,
 		taxonomy,
 	} = useSelect(
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getEntityRecord, getEntityRecords, isResolving } =
-				select( coreStore );
+			const {
+				getEntityRecord,
+				getEntityRecords,
+				getEntityRecordsTotalItems,
+				isResolving,
+			} = select( coreStore );
 			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
 
@@ -212,6 +216,12 @@ export function HierarchicalTermSelector( { slug } ) {
 				availableTerms:
 					getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
 					EMPTY_ARRAY,
+				totalTermsCount:
+					getEntityRecordsTotalItems(
+						'taxonomy',
+						slug,
+						DEFAULT_QUERY
+					) ?? 0,
 				taxonomy: _taxonomy,
 			};
 		},
@@ -428,7 +438,12 @@ export function HierarchicalTermSelector( { slug } ) {
 			) }
 			{ loading && (
 				<FlexItem>
-					<Spinner />
+					{ sprintf(
+						/* translators: 1: number of displayed terms, 2: total number of terms. */
+						__( 'Displaying %1$d of %2$d terms…' ),
+						availableTerms.length,
+						totalTermsCount
+					) }
 				</FlexItem>
 			) }
 			<div
