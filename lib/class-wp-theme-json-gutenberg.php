@@ -591,6 +591,16 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * The valid pseudo-selectors that can be used for blocks.
+	 *
+	 * @since 6.1.0
+	 * @var array
+	 */
+	const VALID_BLOCK_PSEUDO_SELECTORS = array(
+		'core/button' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+	);
+
+	/**
 	 * The valid elements that can be found under styles.
 	 *
 	 * @since 5.8.0
@@ -1001,6 +1011,13 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+			
+			// Add pseudo-selectors for blocks that support them
+			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
+				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
+					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
+				}
+			}
 		}
 
 		$block_style_variation_styles             = static::VALID_STYLES;
@@ -1347,6 +1364,7 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
+
 
 		if ( is_string( $types ) ) {
 			// Dispatch error and map old arguments to new ones.
@@ -2815,6 +2833,23 @@ class WP_Theme_JSON_Gutenberg {
 					'variations' => $variation_selectors,
 					'css'        => $selector,
 				);
+
+				// Handle any pseudo selectors for the block.
+				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
+					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo_selector ) {
+						if ( isset( $theme_json['styles']['blocks'][ $name ][ $pseudo_selector ] ) ) {
+							$nodes[] = array(
+								'name'       => $name,
+								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
+								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
+								'selectors'  => $feature_selectors,
+								'duotone'    => $duotone_selector,
+								'variations' => $variation_selectors,
+								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
+							);
+						}
+					}
+				}
 			}
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
 				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
@@ -2937,6 +2972,23 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
+		 * Check if we're processing a block pseudo-selector.
+		 * $block_metadata['path'] = array( 'styles', 'blocks', 'core/button', ':hover' );
+		 */
+		$is_processing_block_pseudo = false;
+		$block_pseudo_selector = null;
+		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
+			$block_name = $block_metadata['path'][2]; // 'core/button'
+			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
+			
+			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) && 
+				 in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
+				$is_processing_block_pseudo = true;
+				$block_pseudo_selector = $last_path_element;
+			}
+		}
+
+		/*
 		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
 		 * This also resets the array keys.
 		 */
@@ -2965,6 +3017,14 @@ class WP_Theme_JSON_Gutenberg {
 			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
+		} elseif ( $is_processing_block_pseudo ) {
+			// Process block pseudo-selector styles
+			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector
+			$block_name = $block_metadata['path'][2]; // 'core/button'
+			$block_data = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
+			$pseudo_data = isset( $block_data[ $block_pseudo_selector ] ) ? $block_data[ $block_pseudo_selector ] : array();
+			
+			$declarations = static::compute_style_properties( $pseudo_data, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}

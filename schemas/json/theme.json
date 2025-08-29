@@ -1779,6 +1779,23 @@
 				}
 			}
 		},
+		"stylesBlocksPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
 		"stylesElementsPseudoSelectorsPropertyNames": {
 			"enum": [
 				":active",
@@ -1789,6 +1806,9 @@
 				":link",
 				":visited"
 			]
+		},
+		"stylesBlocksPseudoSelectorsPropertyNames": {
+			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
 		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
@@ -1905,7 +1925,44 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/button": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+					"allOf": [
+						{
+							"$ref": "#/definitions/stylesProperties"
+						},
+						{
+							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
+						},
+						{
+							"type": "object",
+							"properties": {
+								"elements": {
+									"$ref": "#/definitions/stylesElementsPropertiesComplete"
+								},
+								"variations": {
+									"$ref": "#/definitions/stylesVariationsPropertiesComplete"
+								}
+							},
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
+									},
+									{
+										"enum": [ "elements", "variations" ]
+									}
+								]
+							}
+						}
+					]
 				},
 				"core/buttons": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
