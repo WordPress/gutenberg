@@ -381,11 +381,15 @@ The list of selected items' ids.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
 
+Note: `DataViews` still requires at least one bulk action to make items selectable.
+
 #### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items. It receives the list of selected items' IDs as a parameter.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
+
+Note: `DataViews` still requires at least one bulk action to make items selectable.
 
 #### `isItemClickable`: `function`
 
@@ -423,42 +427,6 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 #### `empty`: React node
 
 A message or element to be displayed instead of the dataview's default empty message.
-
-#### `picker`: `boolean` | `undefined`
-
-Switches the DataView into picking mode, optimized for selection. This option is currently only supported for the `Grid` layout.
-
-This option has the following results:
-
--   The `DataViews` items are rendered with a `listbox` role.
--   Keyboard navigation is supported. The grid becomes a single tab stop, with arrow keys used to navigate items, and Enter/Space used to toggle the selection of items.
--   All action buttons are rendered in the footer.
--   To enable multi-selection, pass only `bulk` actions to the dataview.
--   `isEligible` is not supported for actions.
--   Both `groupByField` and infinite scroll features are supported when `picking` is enabled, but not both at the same time.
--   For action callbacks:
-    -   The `items` array provided in the first parameter only contains items presently visible. If the user selected items on another page, they may not be present in this array.
-    -   The `context.selection` array contains the full selection, including items from pages not visible. This is an array of `ids`.
-
-```jsx
-callback( items, { selection } ) {
-	// The `items` argument only contains shown items from the current page.
-	console.log( items );
-	// The `selection` property of the `context` argument contains the full selection, but only contains the `ids` of the items.
-	console.log( selection );
-}
-```
-
-Good accessibility practices when using this option:
-
--   Supply a `label` whenever there's no clear existing heading element.
--   Specify as few default fields as possible to reduce the amount of announced information for each item, but each item should still be clearly distinguishable.
-
-#### `label`: `string` | `undefined`
-
-Specify an aria-label for the DataViews items wrapper.
-
-This is currently only supported for the `grid` layout when the `picking` option is enabled.
 
 ### Composition modes
 
@@ -531,6 +499,79 @@ When using free composition, developers are responsible for the outer structure 
 Developers don't need to worry about the internal accessibility logic for individual features. The core behaviors — like search semantics, filter toggles, or pagination focus — are encapsulated.
 
 `FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
+
+## `DataViewsPicker`
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
+
+**Important note** If you're trying to use the `DataViewsPicker` component in a WordPress plugin or theme and you're building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.
+
+### Usage
+
+The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
+
+The component behaves differently to a regular `DataViews` component in the following ways:
+
+-   The items in the view are rendered using the `listbox` and `option` aria roles.
+-   Holding the `ctrl` or `cmd` key isn't required for multi-selection of items. The entire item can be clicked to select or deselect it.
+-   Individual items do not display any actions. All actions appear in the footer as text buttons.
+-   Selection is maintained across multiple pages when the component is paginated.
+
+There are also a few differences in the implementation:
+
+-   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
+-   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
+-   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
+-   Only the `callback` style of action is supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
+
+Example:
+
+```jsx
+const Example = () => {
+	// When using DataViewsPicker, `selection` should be managed so that the component is 'controlled'.
+	const [ selection, setSelection ] = useState( [] );
+
+	// Both actions have `supportsBulk: true`, so the `DataViewsPicker` will allow multi-selection.
+	const actions = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: true,
+			callback() {
+				window.alert( selection.join( ', ' ) );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: true,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
+	return (
+		<DataViewsPicker
+			actions={ actions }
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			paginationInfo={ paginationInfo }
+			selection={ selection }
+			onChangeSelection={ setSelection }
+		/>
+	);
+};
+```
+
+### Properties
 
 ## `DataForm`
 
