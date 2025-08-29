@@ -22,7 +22,7 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_PICKER_GRID,
 } from '../constants';
-import PreviewSizePicker from './grid/preview-size-picker';
+import PreviewSizePicker from './utils/preview-size-picker';
 import DensityPicker from './table/density-picker';
 
 export const VIEW_LAYOUTS = [
