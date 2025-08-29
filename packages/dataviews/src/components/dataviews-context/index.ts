@@ -79,7 +79,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	containerWidth: 0,
 	containerRef: createRef(),
 	resizeObserverRef: () => {},
-	defaultLayouts: { table: {} },
+	defaultLayouts: { list: {}, grid: {}, table: {} },
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
