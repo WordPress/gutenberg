@@ -23,7 +23,7 @@ import {
 	universalUnlock,
 	derivedStatePropsAccessed,
 } from './store';
-import { warn, type SyncAwareFunction } from './utils';
+import { warn, isPlainObject, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
 export interface DirectiveEntry {
 	value: string | object;
@@ -208,6 +208,11 @@ export const directive = (
 
 export const PENDING_GETTER = Symbol( 'PENDING_GETTER' );
 
+const isAnInvokedGetter = ( namespace: string, path: string ) =>
+	( derivedStatePropsAccessed[ namespace ] as string[] )?.some(
+		( getterPath ) => path === getterPath
+	);
+
 // Resolve the path to some property of the store object.
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
@@ -230,21 +235,26 @@ const resolve = ( path: string, namespace: string ) => {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
-	const isAnInvokedGetter = (
-		derivedStatePropsAccessed[ namespace ] as string[]
-	 )?.find( ( getterPath ) => path.startsWith( getterPath ) );
 
 	try {
-		return path.split( '.' ).reduce( ( acc, key ) => {
+		const pathParts = path.split( '.' );
+		return pathParts.reduce( ( acc, key, index ) => {
 			// Subscribe to the prop, even when it doesn't exist yet.
 			const value = acc[ key ];
-			if ( ! ( key in acc ) ) {
-				throw new Error( 'Property not resolved' );
+			if (
+				// Getters are serialized as plain objects from PHP.
+				isPlainObject( value ) &&
+				isAnInvokedGetter(
+					namespace,
+					pathParts.slice( 0, index + 1 ).join( '.' )
+				)
+			) {
+				throw PENDING_GETTER;
 			}
 			return value;
 		}, current );
 	} catch ( e ) {
-		if ( isAnInvokedGetter ) {
+		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
 		}
 	}
