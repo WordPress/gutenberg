@@ -1,12 +1,13 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import {
-	__experimentalHStack as HStack,
-	Button,
-	TextareaControl,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { _x, __ } from '@wordpress/i18n';
 
 /**
@@ -31,13 +32,12 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 
 	return (
 		<>
-			<TextareaControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
+			<TextareaAutosize
 				value={ inputComment ?? '' }
-				onChange={ setInputComment }
+				onChange={ ( comment ) =>
+					setInputComment( comment.target.value )
+				}
 				label={ __( 'Comment' ) }
-				hideLabelFromVision
 			/>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
