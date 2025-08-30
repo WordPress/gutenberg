@@ -6,7 +6,7 @@ import * as Y from 'yjs';
 /**
  * Internal dependencies
  */
-import { UndoManager } from './undo-manager';
+import { CRDT_DOC_VERSION } from './config';
 import type {
 	ConnectDoc,
 	ConnectDocResult,
@@ -16,17 +16,15 @@ import type {
 	ObjectData,
 	ObjectType,
 	SyncConfig,
+	RecordHandlers,
 } from './types';
+import { UndoManager } from './undo-manager';
+import { createYjsDoc } from './utils';
 
 interface EntityState {
 	destroy: () => void;
 	ydoc: CRDTDoc;
 }
-
-// This version number should be incremented whenever there are breaking changes
-// to Yjs doc schema or in how it is interpreted by code in the SyncConfig. This
-// allows implementors to invalidate persisted CRDT docs, if any.
-export const CRDT_DOC_VERSION = 1;
 
 export class SyncProvider {
 	private connectLocal: ConnectDoc | null;
@@ -85,23 +83,20 @@ export class SyncProvider {
 	}
 
 	/**
-	 * Fetch data from local database or remote source.
+	 * Bootstrap an entity for syncing and manage its lifecycle.
 	 *
-	 * @param {SyncConfig} syncConfig    Sync configuration for the object type.
-	 * @param {ObjectData} record        Record representing this object type.
-	 * @param {Function}   handleChanges Callback to call when data changes.
+	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
+	 * @param {ObjectData}     record     Record representing this object type.
+	 * @param {RecordHandlers} handlers   Handlers for updating and fetching the record.
 	 */
 	public async bootstrap(
 		syncConfig: SyncConfig,
 		record: ObjectData,
-		handleChanges: ( data: Partial< ObjectData > ) => void
+		handlers: RecordHandlers
 	): Promise< void > {
-		const meta = new Map< string, unknown >( [
-			[ 'version', CRDT_DOC_VERSION ],
-		] );
-		const ydoc = new Y.Doc( { meta } );
 		const objectId = syncConfig.getObjectId( record );
 		const objectType = syncConfig.objectType;
+		const ydoc = createYjsDoc( objectType );
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
 
@@ -114,12 +109,9 @@ export class SyncProvider {
 
 		const onUpdate = ( _update: Uint8Array, origin: string ): void => {
 			if ( origin !== 'gutenberg' ) {
-				const data = syncConfig.fromCRDTDoc( ydoc );
-				handleChanges( data );
+				void this.updateEntityRecord( syncConfig, handlers );
 			}
 		};
-
-		ydoc.on( 'update', onUpdate );
 
 		if ( syncConfig.supportsUndo ) {
 			this.undoManager = new UndoManager( ydoc );
@@ -127,13 +119,15 @@ export class SyncProvider {
 
 		this.configs.set( objectType, syncConfig );
 		this.connections.set( entityId, connections );
-		this.entityStates.set( entityId, {
+		this.setEntityState( objectType, objectId, {
 			destroy: onDestroy,
 			ydoc,
 		} );
 
 		// Get the initial document state.
 		const initialDoc = await this.getInitialCRDTDoc( syncConfig, record );
+
+		ydoc.on( 'update', onUpdate );
 
 		// Apply the initial document to the current document as a singular update.
 		Y.transact(
@@ -176,6 +170,22 @@ export class SyncProvider {
 	}
 
 	/**
+	 * Set the entity state for the given object type and object ID.
+	 *
+	 * @param {ObjectType}             objectType Object type.
+	 * @param {ObjectID}               objectId   Object ID.
+	 * @param {Partial< EntityState >} state      Partial entity state to set.
+	 */
+	private setEntityState(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		state: EntityState
+	): void {
+		const entityId = this.getEntityId( objectType, objectId );
+		this.entityStates.set( entityId, state );
+	}
+
+	/**
 	 * Get the CRDTDoc that represents the initial state of the object data. Custom
 	 * sync providers can override this method to provide a custom initial state.
 	 *
@@ -186,11 +196,6 @@ export class SyncProvider {
 		syncConfig: SyncConfig,
 		record: ObjectData
 	): Promise< CRDTDoc > {
-		// IMPORTANT: We use a new Yjs document so that the initial state can be
-		// applied to the "real" Yjs document as a singular update. Therefore, we
-		// don't need to wrap the changes in a transaction.
-		const initialStateDoc = new Y.Doc();
-
 		// Load the persisted document from previous sessions.
 		const persistedDoc = await this.getPersistedCRDTDoc(
 			syncConfig,
@@ -209,9 +214,16 @@ export class SyncProvider {
 
 		// Otherwise, use the current record.
 		const initialData = syncConfig.getInitialObjectData( record );
+
+		// IMPORTANT: We use a new Yjs document so that the initial state can be
+		// applied to the "real" Yjs document as a singular update. Therefore, we
+		// don't need to wrap the changes in a transaction.
+		const initialStateDoc = createYjsDoc( syncConfig.objectType );
+
 		syncConfig.applyChangesToCRDTDoc(
 			initialStateDoc,
 			initialData,
+			record,
 			'syncProvider.getInitialCRDTDoc'
 		);
 
@@ -275,7 +287,7 @@ export class SyncProvider {
 	 * @param {Partial< ObjectData >} changes    Updates to make.
 	 * @param {string}                origin     The source of change.
 	 */
-	public update(
+	public updateCRDTDoc(
 		objectType: ObjectType,
 		record: ObjectData,
 		changes: Partial< ObjectData >,
@@ -291,8 +303,36 @@ export class SyncProvider {
 		const ydoc = this.getEntityState( objectType, objectId )?.ydoc;
 
 		ydoc?.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, changes, origin );
+			syncConfig.applyChangesToCRDTDoc( ydoc, changes, record, origin );
 		}, origin );
+	}
+
+	private async updateEntityRecord(
+		syncConfig: SyncConfig,
+		handlers: RecordHandlers
+	): Promise< void > {
+		const currentRecord = await handlers.getEditedRecord();
+
+		const objectId = syncConfig.getObjectId( currentRecord );
+		const objectType = syncConfig.objectType;
+
+		const entityState = this.getEntityState( objectType, objectId );
+
+		if ( ! entityState ) {
+			return;
+		}
+
+		const { ydoc } = entityState;
+
+		// Determine which synced properties have actually changed by comparing
+		// them against the current entity record.
+		const changes = syncConfig.getChangesFromCRDTDoc( ydoc, currentRecord );
+
+		// This is a good spot to debug to see which changes are being synced. Note
+		// that `blocks` will always appear in the changes, but will only result
+		// in an update to the store if the blocks have changed.
+
+		handlers.editRecord( changes );
 	}
 
 	/**

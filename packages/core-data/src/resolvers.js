@@ -153,21 +153,31 @@ export const getEntityRecord =
 				! query
 			) {
 				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					// Loads the persisted document.
 					await getSyncProvider().bootstrap(
+						// Bootstrap syncing for the entity.
 						entityConfig.syncConfig,
 						record,
-						( edits ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits,
-								meta: {
-									undo: undefined,
-								},
-							} );
+						{
+							// Handle edits sourced from the sync provider.
+							editRecord: ( edits ) => {
+								dispatch( {
+									type: 'EDIT_ENTITY_RECORD',
+									kind,
+									name,
+									recordId: key,
+									edits,
+									meta: {
+										undo: undefined,
+									},
+								} );
+							},
+							// Get the current entity record.
+							getEditedRecord: async () =>
+								await resolveSelect.getEditedEntityRecord(
+									kind,
+									name,
+									key
+								),
 						}
 					);
 				}

@@ -400,9 +400,7 @@ export const editEntityRecord =
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				// @todo this always updates the Yjs doc, which is undesirable, probably we can read the yjs
-				// content from the comment tag here
-				getSyncProvider().update(
+				getSyncProvider().updateCRDTDoc(
 					entityConfig.syncConfig.objectType,
 					record,
 					edit.edits,

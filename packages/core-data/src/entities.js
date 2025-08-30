@@ -13,18 +13,13 @@ import { parse } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { defaultApplyChangesToCRDTDoc } from './utils/crdt';
+import {
+	applyPostChangesToCRDTDoc,
+	getPostChangesFromCRDTDoc,
+} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
-
-/**
- * @param {Y.Doc} ydoc
- * @return {import('@wordpress/sync').ObjectData} The JSON representation of the document.
- */
-const defaultFromCRDTDoc = ( ydoc ) => {
-	return ydoc.getMap( 'document' ).toJSON();
-};
 
 export const rootEntitiesConfig = [
 	{
@@ -258,15 +253,18 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
  */
 async function loadPostTypeEntities() {
 	const syncedProperties = new Set( [
+		'author',
 		'blocks',
+		'comment_status',
+		'date',
+		'excerpt',
 		'featured_media',
 		'format',
-		'generated_slug',
-		'password',
-		'slug',
-		'sticky',
+		'ping_status',
+		'status',
 		'tags',
 		'template',
+		'slug',
 		'title',
 	] );
 
@@ -308,26 +306,21 @@ async function loadPostTypeEntities() {
 				),
 
 				/**
-				 * Apply changes from the local editor and to the local CRDT document so
+				 * Apply changes from the local editor to the local CRDT document so
 				 * that those changes can be synced to other peers (via the provider).
 				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-				 * @param {import('@wordpress/sync').ObjectData} changes
-				 * @param {string}                               origin
+				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+				 * @param {import('@wordpress/sync').ObjectData}            record
+				 * @param {string}                                          origin
 				 * @return {void}
 				 */
-				applyChangesToCRDTDoc: ( crdtDoc, changes, origin ) => {
-					const filteredChanges = Object.fromEntries(
-						Object.entries( changes ).filter(
-							( [ key, value ] ) =>
-								syncedProperties.has( key ) &&
-								'function' !== typeof value // cannot serialize function values
-						)
-					);
-
-					defaultApplyChangesToCRDTDoc(
+				applyChangesToCRDTDoc: ( crdtDoc, changes, record, origin ) => {
+					applyPostChangesToCRDTDoc(
 						crdtDoc,
-						filteredChanges,
+						changes,
+						record,
+						syncedProperties,
 						origin
 					);
 				},
@@ -336,10 +329,16 @@ async function loadPostTypeEntities() {
 				 * Transform a CRDT document into a partial record that can be used to
 				 * update the local editor state.
 				 *
-				 * @param {import('@wordpress/sync').CRDTDoc} crdtDoc
-				 * @return {import('@wordpress/sync').ObjectData} Object data
+				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 				 */
-				fromCRDTDoc: defaultFromCRDTDoc,
+				getChangesFromCRDTDoc: ( crdtDoc, record ) =>
+					getPostChangesFromCRDTDoc(
+						crdtDoc,
+						record,
+						syncedProperties
+					),
 
 				/**
 				 * This initial object data represents the data that will be synced via
