@@ -1807,9 +1807,6 @@
 				":visited"
 			]
 		},
-		"stylesBlocksPseudoSelectorsPropertyNames": {
-			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
-		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
