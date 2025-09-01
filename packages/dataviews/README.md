@@ -504,8 +504,6 @@ Developers don't need to worry about the internal accessibility logic for indivi
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
 
-**Important note** If you're trying to use the `DataViewsPicker` component in a WordPress plugin or theme and you're building your scripts using the `@wordpress/scripts` package, you need to import the components from `@wordpress/dataviews/wp` instead of `@wordpress/dataviews`.
-
 ### Usage
 
 The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
