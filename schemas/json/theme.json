@@ -1927,40 +1927,10 @@
 				"core/button": {
 					"allOf": [
 						{
-							"$ref": "#/definitions/stylesProperties"
-						},
-						{
-							"$ref": "#/definitions/stylesElementsPropertiesComplete"
+							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
-						},
-						{
-							"type": "object",
-							"properties": {
-								"elements": {
-									"$ref": "#/definitions/stylesElementsPropertiesComplete"
-								},
-								"variations": {
-									"$ref": "#/definitions/stylesVariationsPropertiesComplete"
-								}
-							},
-							"propertyNames": {
-								"anyOf": [
-									{
-										"$ref": "#/definitions/stylesPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
-									},
-									{
-										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
-									},
-									{
-										"enum": [ "elements", "variations" ]
-									}
-								]
-							}
 						}
 					]
 				},
