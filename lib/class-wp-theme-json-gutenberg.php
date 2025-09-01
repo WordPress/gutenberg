@@ -1011,7 +1011,7 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
-			
+
 			// Add pseudo-selectors for blocks that support them
 			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
@@ -1364,7 +1364,6 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $origins ) {
 			$origins = static::VALID_ORIGINS;
 		}
-
 
 		if ( is_string( $types ) ) {
 			// Dispatch error and map old arguments to new ones.
@@ -2976,15 +2975,15 @@ class WP_Theme_JSON_Gutenberg {
 		 * $block_metadata['path'] = array( 'styles', 'blocks', 'core/button', ':hover' );
 		 */
 		$is_processing_block_pseudo = false;
-		$block_pseudo_selector = null;
+		$block_pseudo_selector      = null;
 		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
-			$block_name = $block_metadata['path'][2]; // 'core/button'
+			$block_name        = $block_metadata['path'][2]; // 'core/button'
 			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
-			
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) && 
-				 in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
+
+			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) &&
+				in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
 				$is_processing_block_pseudo = true;
-				$block_pseudo_selector = $last_path_element;
+				$block_pseudo_selector      = $last_path_element;
 			}
 		}
 
@@ -3020,10 +3019,10 @@ class WP_Theme_JSON_Gutenberg {
 		} elseif ( $is_processing_block_pseudo ) {
 			// Process block pseudo-selector styles
 			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector
-			$block_name = $block_metadata['path'][2]; // 'core/button'
-			$block_data = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
+			$block_name  = $block_metadata['path'][2]; // 'core/button'
+			$block_data  = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
 			$pseudo_data = isset( $block_data[ $block_pseudo_selector ] ) ? $block_data[ $block_pseudo_selector ] : array();
-			
+
 			$declarations = static::compute_style_properties( $pseudo_data, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
