@@ -160,7 +160,7 @@ function UnforwardedLinkUI( props, ref ) {
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
-	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const isDefaultBlockEditingMode = blockEditingMode === 'default';
 
 	async function handleCreate( pageTitle ) {
 		const page = await saveEntityRecord( 'postType', postType, {
@@ -267,7 +267,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onCancel={ props.onCancel }
 						renderControlBottom={ () =>
 							! link?.url?.length &&
-							! isContentOnlyMode && (
+							isDefaultBlockEditingMode && (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
 									setAddingBlock={ () => {
