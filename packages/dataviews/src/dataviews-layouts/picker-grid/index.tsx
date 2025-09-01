@@ -13,7 +13,6 @@ import {
 	Spinner,
 	Flex,
 	FlexItem,
-	Tooltip,
 	privateApis as componentsPrivateApis,
 	Composite,
 } from '@wordpress/components';
@@ -185,11 +184,9 @@ function GridItem< Item >( {
 									direction="row"
 								>
 									<>
-										<Tooltip text={ field.label }>
-											<FlexItem className="dataviews-view-picker-grid__field-name">
-												{ field.header }
-											</FlexItem>
-										</Tooltip>
+										<FlexItem className="dataviews-view-picker-grid__field-name">
+											{ field.header }
+										</FlexItem>
 										<FlexItem
 											className="dataviews-view-picker-grid__field-value"
 											style={ { maxHeight: 'none' } }
