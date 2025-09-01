@@ -298,7 +298,8 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 
 	// If no variation matches the isActive condition, we return the default variation,
 	// but only if it doesn't have an isActive condition that wasn't matched.
-	if ( ! match ) {
+	// This fallback is only applied for 'block' scope to avoid affecting block name display.
+	if ( ! match && scope === 'block' ) {
 		match = variations.find(
 			( variation ) =>
 				variation?.isDefault && ! Object.hasOwn( variation, 'isActive' )
