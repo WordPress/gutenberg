@@ -127,7 +127,7 @@ function DataViewsPicker< Item >( {
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts,
-	selection: selectionProperty,
+	selection,
 	onChangeSelection,
 	header,
 	children,
@@ -145,23 +145,15 @@ function DataViewsPicker< Item >( {
 		},
 		{ box: 'border-box' }
 	);
-	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const isUncontrolled =
-		selectionProperty === undefined || onChangeSelection === undefined;
-	const selection = isUncontrolled ? selectionState : selectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
-		if ( isUncontrolled ) {
-			setSelectionState( newValue );
-		}
 		if ( onChangeSelection ) {
 			onChangeSelection( newValue );
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
-
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
 		() =>
