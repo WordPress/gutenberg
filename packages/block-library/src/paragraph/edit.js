@@ -19,7 +19,6 @@ import {
 	RichText,
 	useBlockProps,
 	useSettings,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { getBlockSupport } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
@@ -117,31 +116,29 @@ function ParagraphBlock( {
 		} ),
 		style: { direction },
 	} );
-	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<AlignmentControl
-						value={ align }
-						onChange={ ( newAlign ) =>
-							setAttributes( {
-								align: newAlign,
-								dropCap: hasDropCapDisabled( newAlign )
-									? false
-									: dropCap,
-							} )
-						}
-					/>
-					<ParagraphRTLControl
-						direction={ direction }
-						setDirection={ ( newDirection ) =>
-							setAttributes( { direction: newDirection } )
-						}
-					/>
-				</BlockControls>
-			) }
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ align }
+					category="content"
+					onChange={ ( newAlign ) =>
+						setAttributes( {
+							align: newAlign,
+							dropCap: hasDropCapDisabled( newAlign )
+								? false
+								: dropCap,
+						} )
+					}
+				/>
+				<ParagraphRTLControl
+					direction={ direction }
+					setDirection={ ( newDirection ) =>
+						setAttributes( { direction: newDirection } )
+					}
+				/>
+			</BlockControls>
 			{ isSingleSelected && (
 				<DropCapControl
 					name={ name }

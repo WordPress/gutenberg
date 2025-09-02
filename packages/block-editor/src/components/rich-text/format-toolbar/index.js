@@ -40,7 +40,7 @@ const FormatToolbar = () => {
 					);
 
 					return (
-						<ToolbarItem>
+						<ToolbarItem category="content">
 							{ ( toggleProps ) => (
 								<DropdownMenu
 									icon={ chevronDown }

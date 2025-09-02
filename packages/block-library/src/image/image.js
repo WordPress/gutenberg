@@ -714,8 +714,7 @@ export default function Image( {
 	const mediaReplaceFlow = isSingleSelected &&
 		! isEditingImage &&
 		! lockUrlControls && (
-			// For contentOnly mode, put this button in its own area so it has borders around it.
-			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
@@ -726,6 +725,7 @@ export default function Image( {
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
 					onReset={ () => onSelectImage( undefined ) }
+					category="content"
 				/>
 			</BlockControls>
 		);
@@ -777,21 +777,18 @@ export default function Image( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ isContentOnlyMode && (
-				// Add some extra controls for content attributes when content only mode is active.
-				// With content only mode active, the inspector is hidden, so users need another way
-				// to edit these attributes.
-				<BlockControls group="block">
-					<ContentOnlyControls
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						lockAltControls={ lockAltControls }
-						lockAltControlsMessage={ lockAltControlsMessage }
-						lockTitleControls={ lockTitleControls }
-						lockTitleControlsMessage={ lockTitleControlsMessage }
-					/>
-				</BlockControls>
-			) }
+			{ /* Content-only controls - automatically filtered by category="content" */ }
+			<BlockControls group="block">
+				<ContentOnlyControls
+					category="content"
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					lockAltControls={ lockAltControls }
+					lockAltControlsMessage={ lockAltControlsMessage }
+					lockTitleControls={ lockTitleControls }
+					lockTitleControlsMessage={ lockTitleControlsMessage }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

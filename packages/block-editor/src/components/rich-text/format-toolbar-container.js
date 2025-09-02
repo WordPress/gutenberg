@@ -41,7 +41,7 @@ const FormatToolbarContainer = ( { inline, editableContentElement } ) => {
 	// Render regular toolbar.
 	return (
 		<BlockControls group="inline">
-			<FormatToolbar />
+			<FormatToolbar category="content" />
 		</BlockControls>
 	);
 };
