@@ -309,4 +309,4 @@ const data = parseServerData();
 populateServerData( data );
 
 // TODO: move this to another file once the iAPI initialization is refactored.
-export const derivedStatePropsAccessed = data.derivedStatePropsAccessed || {};
+export const derivedStatePropsAccessed = data?.derivedStatePropsAccessed || {};
