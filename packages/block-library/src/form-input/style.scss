@@ -54,7 +54,8 @@
 	&[type="week"] {
 		min-height: 2em;
 		line-height: 2;
-		border: 1px solid;
+		border-width: 1px;
+		border-style: solid;
 	}
 }
 
