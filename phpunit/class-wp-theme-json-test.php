@@ -6172,13 +6172,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'blocks' => array(
 						'core/button' => array(
-							'color'      => array(
+							'color'  => array(
 								'text'       => 'white',
 								'background' => 'blue',
 							),
 							'variations' => array(
 								'outline' => array(
-									'color'  => array(
+									'color' => array(
 										'text'       => 'currentColor',
 										'background' => 'transparent',
 									),
