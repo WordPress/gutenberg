@@ -822,7 +822,7 @@ describe( 'selectors', () => {
 					} )
 				).toEqual( variations[ 1 ] );
 			} );
-			it( 'should fall back to default variation if no other variation matches', () => {
+			it( 'should fall back to default variation if no other variation matches and scope is "block"', () => {
 				const variations = [
 					{
 						name: 'variation-1',
@@ -856,9 +856,14 @@ describe( 'selectors', () => {
 					createBlockVariationsStateWithTestBlockType( variations );
 
 				expect(
-					getActiveBlockVariation( state, blockName, {
-						testAttribute: 55,
-					} )
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
 				).toEqual( variations[ 0 ] );
 			} );
 			it( 'should return undefined if no variation matches, including the default one', () => {
@@ -896,9 +901,14 @@ describe( 'selectors', () => {
 					createBlockVariationsStateWithTestBlockType( variations );
 
 				expect(
-					getActiveBlockVariation( state, blockName, {
-						testAttribute: 55,
-					} )
+					getActiveBlockVariation(
+						state,
+						blockName,
+						{
+							testAttribute: 55,
+						},
+						'block'
+					)
 				).toBeUndefined();
 			} );
 		} );
