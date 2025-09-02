@@ -190,11 +190,13 @@ export function DataViewsPickerFooter() {
 			</HStack>
 			<DataViewsPagination />
 			{ Boolean( actions?.length ) && (
-				<ActionButtons
-					actions={ actions }
-					items={ selectedItems }
-					selection={ selection }
-				/>
+				<div className="dataviews-picker-footer__actions">
+					<ActionButtons
+						actions={ actions }
+						items={ selectedItems }
+						selection={ selection }
+					/>
+				</div>
 			) }
 		</HStack>
 	);
