@@ -104,7 +104,7 @@ function ActionButtons< Item >( {
 
 				const _label =
 					typeof label === 'string' ? label : label( items );
-				const variant = isPrimary ? 'primary' : 'secondary';
+				const variant = isPrimary ? 'primary' : 'tertiary';
 				const isInProgress = id === actionInProgress;
 
 				return (

@@ -70,6 +70,14 @@ export const Default = ( {
 
 	const actions: Action< SpaceObject >[] = [
 		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: isMultiselectable,
+			callback() {
+				setSelection( [] );
+			},
+		},
+		{
 			id: 'confirm',
 			label: 'Confirm',
 			isPrimary: true,
@@ -83,14 +91,6 @@ export const Default = ( {
 					.join( ', ' );
 				// eslint-disable-next-line no-alert
 				window.alert( selectedItemNames );
-			},
-		},
-		{
-			id: 'cancel',
-			label: 'Cancel',
-			supportsBulk: isMultiselectable,
-			callback() {
-				setSelection( [] );
 			},
 		},
 	];
