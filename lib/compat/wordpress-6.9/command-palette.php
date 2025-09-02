@@ -3,14 +3,78 @@
  * Enqueues the assets required for the Command Palette.
  */
 function gutenberg_enqueue_command_palette_assets() {
-	if ( ! is_admin() ) {
-		return;
+	global $menu, $submenu;
+
+	$command_palette_settings = array();
+
+	if ( $menu ) {
+		$menu_commands = array();
+		foreach ( $menu as $menu_item ) {
+			if ( empty( $menu_item[0] ) || ! empty( $menu_item[1] ) && ! current_user_can( $menu_item[1] ) ) {
+				continue;
+			}
+
+			// Remove all HTML tags and their contents.
+			$menu_label = $menu_item[0];
+			while ( preg_match( '/<[^>]*>/', $menu_label ) ) {
+				$menu_label = preg_replace( '/<[^>]*>.*?<\/[^>]*>|<[^>]*\/>|<[^>]*>/s', '', $menu_label );
+			}
+			$menu_label = trim( $menu_label );
+
+			// Only add the menu item if the menu_slug point to a PHP file.
+			$menu_slug = $menu_item[2];
+			if ( preg_match( '/\.php($|\?)/', $menu_item[2] ) ) {
+				$menu_commands[] = array(
+					'label' => $menu_label,
+					'url'   => $menu_slug,
+					'name'  => $menu_slug,
+				);
+			}
+
+			if ( array_key_exists( $menu_slug, $submenu ) ) {
+				foreach ( $submenu[ $menu_slug ] as $submenu_item ) {
+					if ( empty( $submenu_item[0] ) || ! empty( $submenu_item[1] ) && ! current_user_can( $submenu_item[1] ) ) {
+						continue;
+					}
+
+					// Remove all HTML tags and their contents.
+					$submenu_label = $submenu_item[0];
+					while ( preg_match( '/<[^>]*>/', $submenu_label ) ) {
+						$submenu_label = preg_replace( '/<[^>]*>.*?<\/[^>]*>|<[^>]*\/>|<[^>]*>/s', '', $submenu_label );
+					}
+					$submenu_label = trim( $submenu_label );
+
+					// Only add the menu item if the menu_slug point to a PHP file.
+					$menu_slug = $menu_item[2];
+					if ( preg_match( '/\.php($|\?)/', $menu_item[2] ) ) {
+						$menu_commands[] = array(
+							'label' => sprintf(
+								/* translators: 1: Menu label, 2: Submenu label. */
+								__( '%1$s > %2$s' ),
+								$menu_label,
+								$submenu_label
+							),
+							'url'   => $submenu_item[2],
+							'name'  => $menu_slug . '-' . $submenu_item[2],
+						);
+					}
+				}
+			}
+		}
+		$command_palette_settings['menu_commands'] = $menu_commands;
 	}
 
 	wp_enqueue_script( 'wp-commands' );
 	wp_enqueue_style( 'wp-commands' );
 	wp_enqueue_script( 'wp-core-commands' );
-	wp_add_inline_script( 'wp-core-commands', 'wp.coreCommands.initializeCommandPalette();' );
+
+	wp_add_inline_script(
+		'wp-core-commands',
+		sprintf(
+			'wp.coreCommands.initializeCommandPalette( %s );',
+			wp_json_encode( $command_palette_settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+		)
+	);
 }
 
 if ( has_filter( 'admin_enqueue_scripts', 'wp_enqueue_command_palette_assets' ) ) {
