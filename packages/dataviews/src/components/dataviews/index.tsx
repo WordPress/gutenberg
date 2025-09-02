@@ -227,8 +227,6 @@ function DataViews< Item >( {
 	return (
 		<DataViewsContext.Provider
 			value={ {
-				// DataViewsContext is used for both picker and regular Views,
-				// cast the View to a View to ensure the types are satisfied.
 				view,
 				onChangeView,
 				fields: _fields,
