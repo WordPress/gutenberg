@@ -702,21 +702,14 @@ class WP_Theme_JSON_Gutenberg {
 	private static function process_pseudo_selectors( $node, $base_selector, $settings, $block_name ) {
 		$pseudo_declarations = array();
 		
-		// Check if this block supports pseudo-selectors
 		if ( ! isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) ) {
 			return $pseudo_declarations;
 		}
 		
-		// Process each valid pseudo-selector for this block
 		foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] as $pseudo_selector ) {
 			if ( isset( $node[ $pseudo_selector ] ) ) {
-				// Create the combined selector (base + pseudo-selector)
 				$combined_selector = static::append_to_selector( $base_selector, $pseudo_selector );
-				
-				// Compute the style properties for this pseudo-selector
 				$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
-				
-				// Add to the declarations array
 				$pseudo_declarations[ $combined_selector ] = $declarations;
 			}
 		}
