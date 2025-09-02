@@ -20,7 +20,7 @@ import {
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import type { SlotComponentProps } from './types';
+import type { SlotComponentProps, PrivateSlotComponentProps } from './types';
 
 /**
  * Whether the argument is a function.
@@ -48,11 +48,17 @@ function addKeysToChildren( children: ReactNode ) {
 	} );
 }
 
-function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+function Slot(
+	props: Omit<
+		SlotComponentProps | PrivateSlotComponentProps,
+		'bubblesVirtually'
+	>
+) {
 	const registry = useContext( SlotFillContext );
 	const instanceRef = useRef( {} );
 
-	const { name, children, fillProps = {}, filter } = props;
+	const { name, children, fillProps = {} } = props;
+	const filter = ( props as any ).filter;
 
 	useLayoutEffect( () => {
 		const instance = instanceRef.current;
@@ -68,7 +74,7 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
 		fills = [];
 	}
 
-	// Apply filter function if provided
+	// Apply filter function if provided (private API)
 	const filteredFills = filter ? fills.filter( filter ) : fills;
 
 	const renderedFills = filteredFills

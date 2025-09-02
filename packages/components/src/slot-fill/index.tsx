@@ -26,6 +26,7 @@ import type {
 	DistributiveOmit,
 	FillComponentProps,
 	SlotComponentProps,
+	PrivateSlotComponentProps,
 	SlotFillProviderProps,
 	SlotKey,
 } from './types';
@@ -82,6 +83,30 @@ export function createSlotFill( key: SlotKey ) {
 
 	const SlotComponent = (
 		props: DistributiveOmit< SlotComponentProps, 'name' >
+	) => <Slot name={ key } { ...props } />;
+	SlotComponent.displayName = `${ baseName }Slot`;
+	/**
+	 * @deprecated 6.8.0
+	 * Please use `slotFill.name` instead of `slotFill.Slot.__unstableName`.
+	 */
+	SlotComponent.__unstableName = key;
+
+	return {
+		name: key,
+		Fill: FillComponent,
+		Slot: SlotComponent,
+	};
+}
+
+export function createPrivateSlotFill( key: SlotKey ) {
+	const baseName = typeof key === 'symbol' ? key.description : key;
+	const FillComponent = ( props: Omit< FillComponentProps, 'name' > ) => (
+		<Fill name={ key } { ...props } />
+	);
+	FillComponent.displayName = `${ baseName }Fill`;
+
+	const SlotComponent = (
+		props: DistributiveOmit< PrivateSlotComponentProps, 'name' >
 	) => <Slot name={ key } { ...props } />;
 	SlotComponent.displayName = `${ baseName }Slot`;
 	/**
