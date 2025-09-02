@@ -24,7 +24,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 	);
 
 	return (
-		<div className="wp-block-comments__legacy-placeholder" inert="true">
+		<div className="wp-block-comments__legacy-placeholder" inert>
 			<h3>
 				{
 					/* translators: %s: Post title. */
