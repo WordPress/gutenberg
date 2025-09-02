@@ -174,7 +174,11 @@ export function DataViewsPickerFooter() {
 			justify="space-between"
 			className="dataviews-footer"
 		>
-			<HStack expanded={ false } spacing={ 3 }>
+			<HStack
+				className="dataviews-picker-footer__bulk-selection"
+				expanded={ false }
+				spacing={ 3 }
+			>
 				{ isMultiselect && (
 					<BulkSelectionCheckbox
 						selection={ selection }
