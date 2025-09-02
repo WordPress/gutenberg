@@ -52,7 +52,7 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
 	const registry = useContext( SlotFillContext );
 	const instanceRef = useRef( {} );
 
-	const { name, children, fillProps = {} } = props;
+	const { name, children, fillProps = {}, filter } = props;
 
 	useLayoutEffect( () => {
 		const instance = instanceRef.current;
@@ -68,7 +68,10 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
 		fills = [];
 	}
 
-	const renderedFills = fills
+	// Apply filter function if provided
+	const filteredFills = filter ? fills.filter( filter ) : fills;
+
+	const renderedFills = filteredFills
 		.map( ( fill ) => {
 			const fillChildren = isFunction( fill.children )
 				? fill.children( fillProps )

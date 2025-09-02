@@ -30,6 +30,11 @@ type SlotPropBase = {
 	fillProps?: FillProps;
 };
 
+export type FillFilter = ( fill: {
+	instance: FillInstance;
+	children: FillChildren;
+} ) => boolean;
+
 export type SlotComponentProps =
 	| ( SlotPropBase & {
 			/**
@@ -56,6 +61,12 @@ export type SlotComponentProps =
 			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			style?: React.CSSProperties;
+
+			/**
+			 * Optional filter function to control which fills are rendered.
+			 * Returns true to include the fill, false to exclude it.
+			 */
+			filter?: FillFilter;
 	  } )
 	| ( SlotPropBase & {
 			/**
@@ -82,6 +93,12 @@ export type SlotComponentProps =
 			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			style?: never;
+
+			/**
+			 * Optional filter function to control which fills are rendered.
+			 * Returns true to include the fill, false to exclude it.
+			 */
+			filter?: FillFilter;
 	  } );
 
 export type FillChildren =
