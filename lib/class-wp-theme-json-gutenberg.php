@@ -701,19 +701,19 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	private static function process_pseudo_selectors( $node, $base_selector, $settings, $block_name ) {
 		$pseudo_declarations = array();
-		
+
 		if ( ! isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) ) {
 			return $pseudo_declarations;
 		}
-		
+
 		foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] as $pseudo_selector ) {
 			if ( isset( $node[ $pseudo_selector ] ) ) {
-				$combined_selector = static::append_to_selector( $base_selector, $pseudo_selector );
-				$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
+				$combined_selector                         = static::append_to_selector( $base_selector, $pseudo_selector );
+				$declarations                              = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
 				$pseudo_declarations[ $combined_selector ] = $declarations;
 			}
 		}
-		
+
 		return $pseudo_declarations;
 	}
 
@@ -1069,14 +1069,14 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $style_variation_names ) ) {
 				foreach ( $style_variation_names as $variation_name ) {
 					$variation_schema = $block_style_variation_styles;
-					
+
 					// Add pseudo-selectors to variations for blocks that support them
 					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
 							$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
 						}
 					}
-					
+
 					$schema_styles_variations[ $variation_name ] = $variation_schema;
 				}
 			}
@@ -2989,12 +2989,12 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
-				
+
 				// Process pseudo-selectors for this variation (e.g., :hover, :focus)
-				$block_name = isset( $block_metadata['name'] ) ? $block_metadata['name'] : ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? $block_metadata['path'][2] : null );
+				$block_name                    = isset( $block_metadata['name'] ) ? $block_metadata['name'] : ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? $block_metadata['path'][2] : null );
 				$variation_pseudo_declarations = static::process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name );
-				$style_variation_declarations = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
-				
+				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
+
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
 					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
