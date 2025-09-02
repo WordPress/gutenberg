@@ -365,7 +365,7 @@ export const getEntityRecord = createSelector(
 		}
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if ( ! query || ! query._fields ) {
 			// If expecting a complete item, validate that completeness.
 			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 				return undefined;
