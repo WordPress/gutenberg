@@ -13,7 +13,13 @@
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],
-		"layout": true,
+		"layout": {
+			"allowSwitching": true,
+			"allowEditing": true,
+			"default": {
+				"type": "default"
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,

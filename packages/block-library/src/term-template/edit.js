@@ -6,27 +6,18 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState, useEffect } from '@wordpress/element';
+import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
-	BlockControls,
 	BlockContextProvider,
 	__experimentalUseBlockPreview as useBlockPreview,
 	__experimentalBlockVariationPicker as BlockVariationPicker,
 	useBlockProps,
 	useInnerBlocksProps,
-	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import {
-	PanelBody,
-	ToolbarGroup,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-} from '@wordpress/components';
-import { list, grid } from '@wordpress/icons';
 import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
@@ -197,7 +188,6 @@ function isActiveTerm( termId, activeBlockContextId, blockContexts ) {
 
 export default function TermTemplateEdit( {
 	clientId,
-	attributes,
 	setAttributes,
 	context: {
 		termQuery: {
@@ -214,16 +204,6 @@ export default function TermTemplateEdit( {
 } ) {
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	const { type: layoutType } = attributes?.layout || {};
-
-	// Switch to list if hierarchical is true and grid is selected.
-	useEffect( () => {
-		if ( hierarchical && layoutType === 'grid' ) {
-			setAttributes( {
-				layout: { type: 'default' },
-			} );
-		}
-	}, [ hierarchical, layoutType, setAttributes ] );
 
 	const queryArgs = {
 		order,
@@ -333,30 +313,6 @@ export default function TermTemplateEdit( {
 		return <p { ...blockProps }> { __( 'No terms found.' ) }</p>;
 	}
 
-	const setDisplayLayout = ( newDisplayLayout ) =>
-		setAttributes( {
-			layout: { ...attributes?.layout, ...newDisplayLayout },
-		} );
-
-	const displayLayoutControls = [
-		{
-			icon: list,
-			title: _x( 'List view', 'Term template block display setting' ),
-			onClick: () => setDisplayLayout( { type: 'default' } ),
-			isActive: layoutType === 'default' || layoutType === 'constrained',
-		},
-		{
-			icon: grid,
-			title: _x( 'Grid view', 'Term template block display setting' ),
-			onClick: () =>
-				setDisplayLayout( {
-					type: 'grid',
-				} ),
-			isActive: layoutType === 'grid',
-			disabled: hierarchical,
-		},
-	];
-
 	const renderTerm = ( term ) => {
 		const blockContext = {
 			taxonomy,
@@ -393,51 +349,6 @@ export default function TermTemplateEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup controls={ displayLayoutControls } />
-			</BlockControls>
-
-			<InspectorControls>
-				<PanelBody title={ __( 'Style' ) }>
-					<ToggleGroupControl
-						label={ __( 'Display Layout' ) }
-						value={ layoutType === 'grid' ? 'grid' : 'list' }
-						help={
-							hierarchical
-								? __(
-										'Grid view is not available when the "Show hierarchy" setting is enabled.'
-								  )
-								: undefined
-						}
-						onChange={ ( value ) => {
-							if ( value === 'grid' ) {
-								setAttributes( {
-									layout: { type: 'grid' },
-								} );
-							} else {
-								setAttributes( {
-									layout: { type: 'default' },
-								} );
-							}
-						} }
-						isBlock
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						disabled={ hierarchical }
-					>
-						<ToggleGroupControlOption
-							value="list"
-							label={ __( 'List' ) }
-						/>
-						<ToggleGroupControlOption
-							value="grid"
-							label={ __( 'Grid' ) }
-							disabled={ hierarchical }
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
-			</InspectorControls>
-
 			<ul { ...blockProps }>
 				{ hierarchical
 					? buildTermsTree( filteredTerms ).map( ( termNode ) =>
