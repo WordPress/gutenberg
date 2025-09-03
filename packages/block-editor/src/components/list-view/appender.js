@@ -21,24 +21,21 @@ export const Appender = forwardRef(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
-		// Read directInsert directly from block list settings to avoid prop drilling
-		const directInsert = useSelect(
-			( select ) => {
-				const { getBlockListSettings } = select( blockEditorStore );
-				const settings = getBlockListSettings( clientId );
-				return settings?.directInsert || false;
-			},
-			[ clientId ]
-		);
-
 		const instanceId = useInstanceId( Appender );
-		const hideInserter = useSelect(
+		const { directInsert, hideInserter } = useSelect(
 			( select ) => {
-				const { getTemplateLock, isZoomOut } = unlock(
-					select( blockEditorStore )
-				);
+				const { getBlockListSettings, getTemplateLock, isZoomOut } =
+					unlock( select( blockEditorStore ) );
 
-				return !! getTemplateLock( clientId ) || isZoomOut();
+				const settings = getBlockListSettings( clientId );
+				const directInsertValue = settings?.directInsert || false;
+				const hideInserterValue =
+					!! getTemplateLock( clientId ) || isZoomOut();
+
+				return {
+					directInsert: directInsertValue,
+					hideInserter: hideInserterValue,
+				};
 			},
 			[ clientId ]
 		);
