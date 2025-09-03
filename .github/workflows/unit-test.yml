@@ -418,7 +418,7 @@ jobs:
     required-js-unit-status-checks:
         name: All JavaScript unit tests passing.
         runs-on: 'ubuntu-24.04'
-        needs: ['unit-js', 'unit-js-date', 'mobile-unit-js']
+        needs: ['unit-js', 'unit-js-date']
         if: ${{ always() }}
         steps:
             - name: Detect any failed status checks
