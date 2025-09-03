@@ -34,31 +34,6 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 ];
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-/**
- * Shared cleanup function for auto-inserted Navigation Link blocks.
- *
- * Removes the block if it has no URL and clears the inserted block state.
- * This ensures consistent cleanup behavior across different contexts.
- *
- * @param {Object}   insertedBlock    - The currently inserted block data
- * @param {Function} removeBlock      - Function to remove a block
- * @param {Function} setInsertedBlock - Function to clear the inserted block state
- */
-function cleanupInsertedBlock( insertedBlock, removeBlock, setInsertedBlock ) {
-	// Prevent automatic block selection when removing blocks in list view context
-	// This avoids focus stealing that would close the list view and switch to canvas
-	const shouldAutoSelectBlock = false;
-
-	// Follows the exact same pattern as Navigation Link block's onClose handler
-	// If there is no URL then remove the auto-inserted block to avoid empty blocks
-	if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
-		// Remove the block entirely to avoid poor UX
-		// This matches the Navigation Link block's behavior
-		removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
-	}
-	setInsertedBlock( null );
-}
-
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -72,6 +47,27 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	if ( ! showLinkControls ) {
 		return null;
 	}
+
+	/**
+	 * Cleanup function for auto-inserted Navigation Link blocks.
+	 *
+	 * Removes the block if it has no URL and clears the inserted block state.
+	 * This ensures consistent cleanup behavior across different contexts.
+	 */
+	const cleanupInsertedBlock = () => {
+		// Prevent automatic block selection when removing blocks in list view context
+		// This avoids focus stealing that would close the list view and switch to canvas
+		const shouldAutoSelectBlock = false;
+
+		// Follows the exact same pattern as Navigation Link block's onClose handler
+		// If there is no URL then remove the auto-inserted block to avoid empty blocks
+		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+			// Remove the block entirely to avoid poor UX
+			// This matches the Navigation Link block's behavior
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( null );
+	};
 
 	const setInsertedBlockAttributes =
 		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
@@ -101,12 +97,8 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			link={ insertedBlock?.attributes }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
-				// Use shared cleanup function
-				cleanupInsertedBlock(
-					insertedBlock,
-					removeBlock,
-					setInsertedBlock
-				);
+				// Use cleanup function
+				cleanupInsertedBlock();
 			} }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
