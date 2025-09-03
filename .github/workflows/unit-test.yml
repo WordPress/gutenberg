@@ -404,3 +404,23 @@ jobs:
               env:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
               run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+
+    required-php-unit-status-checks:
+        name: All PHPUnit tests passing.
+        runs-on: 'ubuntu-24.04'
+        needs: ['test-php']
+        if: ${{ always() }}
+        steps:
+            - name: Detect any failed status checks
+              run: |
+                  [[ "${{ join(needs.*.result, ' ') }}" =~ ^(success ?)+$ ]] || exit 1
+
+    required-js-unit-status-checks:
+        name: All JavaScript unit tests passing.
+        runs-on: 'ubuntu-24.04'
+        needs: ['unit-js', 'unit-js-date', 'mobile-unit-js']
+        if: ${{ always() }}
+        steps:
+            - name: Detect any failed status checks
+              run: |
+                  [[ "${{ join(needs.*.result, ' ') }}" =~ ^(success ?)+$ ]] || exit 1
