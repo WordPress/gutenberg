@@ -98,8 +98,8 @@ function NavigationAddPageButton( { clientId } ) {
 
 		// Create a new navigation link block (default block)
 		const newBlock = createBlock( DEFAULT_BLOCK.name, {
-			kind: DEFAULT_BLOCK.kind,
-			type: DEFAULT_BLOCK.type,
+			kind: DEFAULT_BLOCK.attributes.kind,
+			type: DEFAULT_BLOCK.attributes.type,
 		} );
 
 		// Insert the block at the end of the navigation
