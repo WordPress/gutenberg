@@ -34,7 +34,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Action, Field, View, SupportedLayouts } from '../../types';
+import type { Action, Field, View } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
@@ -54,11 +54,8 @@ type DataViewsPickerProps< Item > = {
 		totalPages: number;
 		infiniteScrollHandler?: () => void;
 	};
-	defaultLayouts: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
-	header?: ReactNode;
-	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
@@ -73,11 +70,10 @@ const EMPTY_ARRAY: any[] = [];
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
-	'header' | 'search' | 'searchLabel'
+	'search' | 'searchLabel'
 >;
 
 function DefaultUI( {
-	header,
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
@@ -104,7 +100,6 @@ function DefaultUI( {
 					style={ { flexShrink: 0 } }
 				>
 					<DataViewsViewConfig />
-					{ header }
 				</HStack>
 			</HStack>
 			{ isShowingFilter && (
@@ -125,13 +120,10 @@ function DataViewsPicker< Item >( {
 	actions = EMPTY_ARRAY,
 	data,
 	getItemId = defaultGetItemId,
-	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts,
 	selection,
 	onChangeSelection,
-	header,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
@@ -217,11 +209,10 @@ function DataViewsPicker< Item >( {
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
-				getItemLevel,
 				containerWidth,
 				containerRef,
 				resizeObserverRef,
-				defaultLayouts,
+				defaultLayouts: {},
 				filters,
 				isShowingFilter,
 				setIsShowingFilter,
@@ -233,11 +224,7 @@ function DataViewsPicker< Item >( {
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
 				{ children ?? (
-					<DefaultUI
-						header={ header }
-						search={ search }
-						searchLabel={ searchLabel }
-					/>
+					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
 			</div>
 		</DataViewsContext.Provider>

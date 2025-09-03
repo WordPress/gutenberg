@@ -26,10 +26,6 @@ type Data = {
 
 const onChangeSelection = jest.fn();
 
-const defaultLayouts = {
-	[ LAYOUT_PICKER_GRID ]: {},
-};
-
 const data: Data[] = [
 	{
 		id: 1,
@@ -114,7 +110,6 @@ function Picker( {
 		view,
 		fields: [],
 		onChangeView: setView,
-		defaultLayouts,
 		multiselect,
 		selection,
 		onChangeSelection: ( newSelection: string[] ) => {
