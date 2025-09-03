@@ -122,7 +122,6 @@ function ParagraphBlock( {
 			<BlockControls group="block">
 				<AlignmentControl
 					value={ align }
-					category="content"
 					onChange={ ( newAlign ) =>
 						setAttributes( {
 							align: newAlign,
