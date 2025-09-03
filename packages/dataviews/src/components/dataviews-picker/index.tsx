@@ -222,7 +222,7 @@ function DataViewsPicker< Item >( {
 				picker: true,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className="dataviews-picker-wrapper" ref={ containerRef }>
 				{ children ?? (
 					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
