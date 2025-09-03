@@ -6,6 +6,15 @@
 
 -   `Tabs`: Ensure font size inheritance for tab buttons in all contexts ([#71346](https://github.com/WordPress/gutenberg/pull/71346)).
 
+### Internal
+
+- Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208)
+
+### Internal
+
+-   Upgrade `framer-motion` package to version `^11.15.0` ([#71442](https://github.com/WordPress/gutenberg/pull/71442)).
+-   Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208).
+
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#50448](https://github.com/WordPress/gutenberg/pull/71311)).
 
 

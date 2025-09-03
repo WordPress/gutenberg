@@ -149,7 +149,6 @@
 		"react-native-url-polyfill": "1.1.2",
 		"react-refresh": "0.14.0",
 		"react-scanner": "1.2.0",
-		"react-test-renderer": "18.3.1",
 		"reassure": "0.7.1",
 		"redux": "5.0.1",
 		"resize-observer-polyfill": "1.5.1",

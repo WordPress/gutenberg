@@ -108,6 +108,7 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
+	const shouldRenderMedia = showMedia && renderedMediaField;
 
 	let mediaA11yProps;
 	let titleA11yProps;
@@ -154,7 +155,7 @@ function GridItem< Item >( {
 			}
 			aria-posinset={ posinset }
 		>
-			{ showMedia && renderedMediaField && (
+			{ shouldRenderMedia && (
 				<ItemClickWrapper
 					item={ item }
 					isItemClickable={ isItemClickable }
@@ -166,7 +167,7 @@ function GridItem< Item >( {
 					{ renderedMediaField }
 				</ItemClickWrapper>
 			) }
-			{ hasBulkActions && showMedia && renderedMediaField && (
+			{ hasBulkActions && shouldRenderMedia && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -176,24 +177,35 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
-			>
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__title-field dataviews-title-field"
-					{ ...titleA11yProps }
-				>
-					{ renderedTitleField }
-				</ItemClickWrapper>
-				{ !! actions?.length && (
+			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
-				) }
-			</HStack>
+				</div>
+			) }
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<ItemClickWrapper
+						item={ item }
+						isItemClickable={ isItemClickable }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						className="dataviews-view-grid__title-field dataviews-title-field"
+						{ ...titleA11yProps }
+					>
+						{ renderedTitleField }
+					</ItemClickWrapper>
+					{ !! actions?.length && (
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					) }
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
