@@ -157,7 +157,8 @@ function gutenberg_process_block_bindings( $instance ) {
 		// If the attribute was already processed by Core, process next attribute.
 		if (
 			isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) &&
-			in_array( $attribute_name, $block_bindings_supported_attributes_6_8[ $block_type ], true )
+			in_array( $attribute_name, $block_bindings_supported_attributes_6_8[ $block_type ], true ) &&
+			'core/button' !== $block_type // ... except for the Button block, as WP 6.8 capitalizes the tag name (e.g. <DIV>).
 		) {
 			continue;
 		}
