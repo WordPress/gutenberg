@@ -10,6 +10,7 @@ import {
  * Internal dependencies
  */
 import useBlockControlsFill from './hook';
+import { ContentOnlyFilter } from './content-only-filter';
 
 export default function BlockControlsFill( {
 	group = 'default',
@@ -43,7 +44,7 @@ export default function BlockControlsFill( {
 						( inner, [ Provider, props ] ) => (
 							<Provider { ...props }>{ inner }</Provider>
 						),
-						innerMarkup
+						<ContentOnlyFilter>{ innerMarkup }</ContentOnlyFilter>
 					);
 				} }
 			</Fill>
