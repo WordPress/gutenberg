@@ -88,4 +88,6 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	},
 } );
 
+DataViewsContext.displayName = 'DataViewsContext';
+
 export default DataViewsContext;

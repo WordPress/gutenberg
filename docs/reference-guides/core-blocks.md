@@ -17,7 +17,7 @@ Displays a group of accordion headers and associated expandable content. ([Sourc
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-content
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), ~~html~~
--	**Attributes:** allowedBlocks, autoclose, iconPosition, showIcon
+-	**Attributes:** autoclose, iconPosition, showIcon
 
 ## Accordion Content
 
@@ -28,7 +28,7 @@ Displays a section of content in an accordion, including a header and expandable
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-header, core/accordion-panel
--	**Supports:** align (full, wide), color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin)
+-	**Supports:** color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin)
 -	**Attributes:** openByDefault
 
 ## Accordion Header
@@ -39,7 +39,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** anchor, border, color (background, gradient, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
+-	**Supports:** anchor, color (background, gradient, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
 -	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, textAlignment, title
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** border, color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives

@@ -738,6 +738,7 @@ export type SimpleFormField = {
 export type CombinedFormField = {
 	id: string;
 	label?: string;
+	description?: string;
 	layout?: Layout;
 	children: Array< FormField | string >;
 };
