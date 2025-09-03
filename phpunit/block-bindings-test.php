@@ -40,8 +40,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 	 * @since 6.5.0
 	 */
 	public function tear_down() {
-		remove_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10 );
-
 		foreach ( get_all_registered_block_bindings_sources() as $source_name => $source_properties ) {
 			if ( str_starts_with( $source_name, 'test/' ) ) {
 				unregister_block_bindings_source( $source_name );
@@ -57,6 +55,8 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 	 * @since 6.9.0
 	 */
 	public static function wpTearDownAfterClass() {
+		remove_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10 );
+
 		unregister_block_type( 'test/block' );
 	}
 
