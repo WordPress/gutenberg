@@ -74,8 +74,6 @@ export function PrivateBlockToolbar( {
 		showGroupButtons,
 		showLockButtons,
 		showSwitchSectionStyleButton,
-		hasFixedToolbar,
-		isNavigationMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -87,7 +85,6 @@ export function PrivateBlockToolbar( {
 			getBlockAttributes,
 			getBlockParentsByBlockName,
 			getTemplateLock,
-			getSettings,
 			getParentSectionBlock,
 			isZoomOut,
 			isNavigationMode: _isNavigationMode,
@@ -158,8 +155,6 @@ export function PrivateBlockToolbar( {
 				( isNavigationModeEnabled &&
 					editingMode === 'contentOnly' &&
 					isSectionBlock( selectedBlockClientId ) ), // Zoom out or Write Mode Section Blocks
-			hasFixedToolbar: getSettings().hasFixedToolbar,
-			isNavigationMode: isNavigationModeEnabled,
 		};
 	}, [] );
 
@@ -186,7 +181,6 @@ export function PrivateBlockToolbar( {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
-		'is-inverted-toolbar': isNavigationMode && ! hasFixedToolbar,
 	} );
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
