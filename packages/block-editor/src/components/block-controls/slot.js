@@ -41,7 +41,12 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 		}
 
 		return ( fill ) => {
-			// Check if the fill has category="content"
+			// Check if the fill has category="content" prop directly
+			if ( fill?.props?.category === 'content' ) {
+				return true;
+			}
+
+			// Fallback: check children if needed
 			if ( fill?.children && typeof fill.children === 'function' ) {
 				// For function children, we need to check the rendered result
 				const renderedChildren = fill.children( fillProps );
@@ -54,31 +59,61 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 		};
 	}, [ blockEditingMode, fillProps ] );
 
-	// Helper function to check if any component has category="content"
+	// Helper function to recursively check if any component has category="content"
 	const hasCategoryContent = ( children ) => {
 		if ( ! children ) {
 			return false;
 		}
 
-		if ( Array.isArray( children ) ) {
-			return children.some( ( child ) => {
-				// Check if this component has category="content"
-				if ( child?.props?.category === 'content' ) {
+		// Handle React elements (most common case)
+		if ( children.type && children.props ) {
+			// Check this element's category prop
+			if ( children.props.category === 'content' ) {
+				return true;
+			}
+
+			// Recursively check children
+			if ( children.props.children ) {
+				const hasCategory = hasCategoryContent(
+					children.props.children
+				);
+				if ( hasCategory ) {
 					return true;
 				}
+			}
 
-				// Recursively check children
-				return hasCategoryContent( child?.props?.children );
+			return false;
+		}
+
+		// Handle arrays of React elements
+		if ( Array.isArray( children ) ) {
+			const hasCategory = children.some( ( child ) => {
+				return hasCategoryContent( child );
 			} );
+			return hasCategory;
 		}
 
-		// Check if this component has category="content"
-		if ( children?.props?.category === 'content' ) {
-			return true;
+		// Handle other cases (fragments, etc.)
+		if ( children.props ) {
+			// Check this element's category prop
+			if ( children.props.category === 'content' ) {
+				return true;
+			}
+
+			// Recursively check children
+			if ( children.props.children ) {
+				const hasCategory = hasCategoryContent(
+					children.props.children
+				);
+				if ( hasCategory ) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 
-		// Recursively check children
-		return hasCategoryContent( children?.props?.children );
+		return false;
 	};
 
 	const slotFill = groups[ group ];
