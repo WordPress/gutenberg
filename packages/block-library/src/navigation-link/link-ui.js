@@ -60,6 +60,9 @@ export function getSuggestionsQuery( type, kind ) {
 			if ( kind === 'taxonomy' ) {
 				return { type: 'term', subtype: type };
 			}
+			if ( kind === 'post-type-archive' ) {
+				return { type: 'post-type-archive' };
+			}
 			if ( kind === 'post-type' ) {
 				return { type: 'post', subtype: type };
 			}

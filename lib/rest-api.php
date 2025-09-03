@@ -36,3 +36,23 @@ function gutenberg_register_edit_site_export_controller_endpoints() {
 	$edit_site_export_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_controller_endpoints' );
+
+
+function gutenberg_register_archive_link_field() {
+	register_rest_field(
+		'type',
+		'archive_link',
+		array(
+			'get_callback'    => static function ( $post_object ) {
+				return (string) get_post_type_archive_link( $post_object['slug'] );
+			},
+			'update_callback' => null,
+			'schema'          => array(
+				'description' => __( 'Link to the post type archive page', 'default' ),
+				'type'        => 'string',
+				'context'     => array( 'view', 'edit' ),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_archive_link_field' );

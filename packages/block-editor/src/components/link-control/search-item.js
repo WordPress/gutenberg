@@ -13,6 +13,7 @@ import {
 	file,
 	home,
 	verse,
+	customPostType,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -42,18 +43,16 @@ function SearchItemIcon( { isURL, suggestion } ) {
 				icon = verse;
 			}
 		}
+	} else {
+		icon = customPostType;
 	}
 
-	if ( icon ) {
-		return (
-			<Icon
-				className="block-editor-link-control__search-item-icon"
-				icon={ icon }
-			/>
-		);
-	}
-
-	return null;
+	return (
+		<Icon
+			className="block-editor-link-control__search-item-icon"
+			icon={ icon }
+		/>
+	);
 }
 
 /**
@@ -154,6 +153,10 @@ function getVisualTypeName( suggestion ) {
 
 	if ( suggestion.isBlogHome ) {
 		return 'blog home';
+	}
+
+	if ( suggestion.kind === 'post-type-archive' ) {
+		return 'archive';
 	}
 
 	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.

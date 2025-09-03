@@ -86,6 +86,16 @@ jest.mock( '@wordpress/api-fetch', () =>
 							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					},
 				] );
+			case '/wp/v2/search?search=&per_page=20&type=post-type-archive':
+				return Promise.resolve( [
+					{
+						id: 'books',
+						title: 'All Books',
+						url: 'http://wordpress.local/books/',
+						type: 'books-archive',
+						kind: 'post-type-archive',
+					},
+				] );
 			default:
 				return Promise.resolve( [
 					{
@@ -187,7 +197,7 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 
-	it( 'returns suggestions from post, term, post-format and media', () => {
+	it( 'returns suggestions from post, term, post-format, media and post-type-archive', () => {
 		return fetchLinkSuggestions( '', {} ).then( ( suggestions ) =>
 			expect( suggestions ).toEqual( [
 				{
@@ -231,6 +241,13 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
 					kind: 'media',
+				},
+				{
+					id: 'books',
+					title: 'All Books',
+					url: 'http://wordpress.local/books/',
+					type: 'books-archive',
+					kind: 'post-type-archive',
 				},
 			] )
 		);

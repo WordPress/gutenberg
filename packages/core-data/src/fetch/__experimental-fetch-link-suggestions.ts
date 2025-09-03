@@ -21,7 +21,7 @@ export type SearchOptions = {
 	/**
 	 * Filters by search type.
 	 */
-	type?: 'attachment' | 'post' | 'term' | 'post-format';
+	type?: 'attachment' | 'post' | 'term' | 'post-format' | 'post-type-archive';
 	/**
 	 * Slug of the post-type or taxonomy.
 	 */
@@ -56,6 +56,12 @@ type MediaAPIResult = {
 	title: { rendered: string };
 	source_url: string;
 	type: string;
+};
+
+type PostTypesAPIResult = {
+	slug: string;
+	name: string;
+	archive_link: string;
 };
 
 export type SearchResult = {
@@ -235,6 +241,31 @@ export default async function fetchLinkSuggestions(
 							kind: 'media',
 						};
 					} );
+				} )
+				.catch( () => [] ) // Fail by returning no results.
+		);
+	}
+
+	if ( ! type || type === 'post-type-archive' ) {
+		queries.push(
+			apiFetch< PostTypesAPIResult[] >( {
+				path: addQueryArgs( '/wp/v2/types' ),
+			} )
+				.then( ( results ) => {
+					const resultValues = Object.values( results );
+					return resultValues
+						.filter( ( result ) => !! result.archive_link ) // Filter out results with falsy archive_link, including empty strings
+						.map( ( result, index ) => {
+							return {
+								id: index + 1, // avoid results being filtered due to falsy id
+								url: result.archive_link,
+								title:
+									decodeEntities( result.name || '' ) ||
+									__( '(no title)' ),
+								type: result.slug,
+								kind: 'post-type-archive',
+							};
+						} );
 				} )
 				.catch( () => [] ) // Fail by returning no results.
 		);
