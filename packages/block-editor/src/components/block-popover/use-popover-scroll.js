@@ -24,15 +24,13 @@ function usePopoverScroll( contentRef ) {
 					scrollContainer = getScrollContainer( contentEl );
 					scrollContainerCache.set( contentEl, scrollContainer );
 				}
-				let eventScrollContainer = scrollContainerCache.get( target );
-				if ( ! eventScrollContainer ) {
-					eventScrollContainer = getScrollContainer( target );
-					scrollContainerCache.set( target, eventScrollContainer );
-				}
-				const { scrollHeight, offsetHeight } = eventScrollContainer;
-				// Scrolls “through” the popover only if the event target wasn’t within
-				// a scrollable container and thereby avoids scrolling both containers.
-				if ( scrollHeight === offsetHeight ) {
+				// Finds a scrollable ancestor of the event’s target. It's not cached because the
+				// it may not remain scrollable due to popover position changes. The cache is also
+				// less likely to be utilized because the target may be different every event.
+				const eventScrollContainer = getScrollContainer( target );
+				// Scrolls “through” the popover only if another contained scrollable area isn’t
+				// in front of it. This is to avoid scrolling both containers simultaneously.
+				if ( ! node.contains( eventScrollContainer ) ) {
 					scrollContainer.scrollBy( deltaX, deltaY );
 				}
 			}
