@@ -17,8 +17,9 @@ export default function useMerge( clientId, onMerge ) {
 		getBlockOrder,
 		getBlockRootClientId,
 		getBlockName,
+		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition } =
+	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
 		useDispatch( blockEditorStore );
 	const outdentListItem = useOutdentListItem();
 
@@ -83,6 +84,60 @@ export default function useMerge( clientId, onMerge ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
+	/**
+	 * Handle deletion of an empty list item that has nested children.
+	 * Promotes the nested children to the parent level.
+	 *
+	 * @param {string} id The client ID of the empty list item.
+	 * @return {boolean} True if handled, false otherwise.
+	 */
+	function handleEmptyListItemWithChildren( id ) {
+		const block = getBlock( id );
+		const content = block?.attributes?.content || '';
+		const isEmpty = ! content || content.trim() === '';
+		const hasNestedItems =
+			block?.innerBlocks && block.innerBlocks.length > 0;
+
+		if ( ! isEmpty || ! hasNestedItems ) {
+			return false;
+		}
+
+		registry.batch( () => {
+			// Get the list container that holds this list-item.
+			const listContainerId = getBlockRootClientId( id );
+			const currentItemIndex =
+				getBlockOrder( listContainerId ).indexOf( id );
+
+			// Move each nested list item to become a top-level item.
+			block.innerBlocks.forEach( ( nestedBlock, index ) => {
+				// Get the nested list container (first inner block should be core/list).
+				const nestedListId = nestedBlock.clientId;
+				const nestedListItems = getBlockOrder( nestedListId );
+
+				// Move each nested list item to the parent list level.
+				nestedListItems.forEach( ( nestedItemId, itemIndex ) => {
+					moveBlocksToPosition(
+						[ nestedItemId ],
+						nestedListId,
+						listContainerId,
+						currentItemIndex +
+							1 +
+							index * nestedListItems.length +
+							itemIndex
+					);
+				} );
+
+				// Remove the now-empty nested list container.
+				removeBlock( nestedListId );
+			} );
+
+			// Remove the empty parent list item.
+			removeBlock( id );
+		} );
+
+		return true;
+	}
+
 	return ( forward ) => {
 		function mergeWithNested( clientIdA, clientIdB ) {
 			registry.batch( () => {
@@ -130,7 +185,12 @@ export default function useMerge( clientId, onMerge ) {
 				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
-			// Merging is only done from the top level. For lowel levels, the
+			// Check if this is an empty list item with nested children.
+			if ( handleEmptyListItemWithChildren( clientId ) ) {
+				return;
+			}
+
+			// Merging is only done from the top level. For lower levels, the
 			// list item is outdented instead.
 			const previousBlockClientId = getPreviousBlockClientId( clientId );
 			if ( getParentListItemId( clientId ) ) {
