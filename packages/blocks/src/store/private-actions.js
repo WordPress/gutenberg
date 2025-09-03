@@ -1,6 +1,9 @@
 /**
  * Internal dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { processBlockType } from './process-block-type';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
@@ -56,6 +59,7 @@ export function addBlockBindingsSource( source ) {
 		setValues: source.setValues,
 		canUserEditValue: source.canUserEditValue,
 		getFieldsList: source.getFieldsList,
+		editorUI: source.editorUI,
 	};
 }
 

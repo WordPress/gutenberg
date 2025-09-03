@@ -808,6 +808,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		setValues,
 		canUserEditValue,
 		getFieldsList,
+		editorUI,
 	} = source;
 
 	const existingSource = unlock(
@@ -904,6 +905,11 @@ export const registerBlockBindingsSource = ( source ) => {
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
 		// eslint-disable-next-line no-console
 		warning( 'Block bindings source getFieldsList must be a function.' );
+		return;
+	}
+
+	if ( editorUI && typeof editorUI !== 'function' ) {
+		warning( 'Block bindings source editorUI must be a function.' );
 		return;
 	}
 

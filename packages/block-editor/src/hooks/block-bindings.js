@@ -17,7 +17,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, Fragment } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -29,6 +29,10 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
+/**
+ * External dependencies
+ */
+import { A } from 'storybook/internal/components';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -47,11 +51,11 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelMenuContent( { fieldsList, attribute, binding } ) {
+function BlockBindingsPanelMenuContent( { attribute, binding, data, mode } ) {
 	const { clientId } = useBlockEditContext();
-	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const currentKey = binding?.args?.key;
+	const isMobile = useViewportMatch( 'medium', '<' );
 	const attributeType = useSelect(
 		( select ) => {
 			const { name: blockName } =
@@ -62,54 +66,72 @@ function BlockBindingsPanelMenuContent( { fieldsList, attribute, binding } ) {
 		},
 		[ clientId, attribute ]
 	);
+
 	return (
 		<>
-			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
-				<Fragment key={ name }>
-					<Menu.Group>
-						{ Object.keys( fieldsList ).length > 1 && (
-							<Menu.GroupLabel>
-								{ registeredSources[ name ].label }
-							</Menu.GroupLabel>
-						) }
-						{ Object.entries( fields )
-							.filter(
-								( [ , args ] ) => args?.type === attributeType
-							)
-							.map( ( [ key, args ] ) => (
-								<Menu.RadioItem
-									key={ key }
-									onChange={ () =>
-										updateBlockBindings( {
-											[ attribute ]: {
-												source: name,
-												args: { key },
-											},
-										} )
-									}
-									name={ attribute + '-binding' }
-									value={ key }
-									checked={ key === currentKey }
-								>
-									<Menu.ItemLabel>
-										{ args?.label }
-									</Menu.ItemLabel>
-									<Menu.ItemHelpText>
-										{ args?.value }
-									</Menu.ItemHelpText>
-								</Menu.RadioItem>
-							) ) }
-					</Menu.Group>
-					{ i !== Object.keys( fieldsList ).length - 1 && (
-						<Menu.Separator />
-					) }
-				</Fragment>
-			) ) }
+			{ Object.entries( data ).map( ( [ sourceKey, entries ] ) => {
+				if ( mode[ sourceKey ] === 'dropdown' ) {
+					return (
+						<Menu
+							key={ sourceKey }
+							placement={
+								isMobile ? 'bottom-start' : 'left-start'
+							}
+						>
+							<Menu.SubmenuTriggerItem>
+								<Menu.ItemLabel>{ sourceKey }</Menu.ItemLabel>
+							</Menu.SubmenuTriggerItem>
+							<Menu.Popover gutter={ 8 }>
+								<>
+									{ entries && entries.length > 0 && (
+										<Menu.Group>
+											{ Object.entries( entries )
+												.filter(
+													( [ , args ] ) =>
+														args?.type ===
+														attributeType
+												)
+												.map( ( [ , args ] ) => (
+													<Menu.RadioItem
+														key={ args.key }
+														onChange={ ( a ) => {
+															console.log(
+																'a',
+																a
+															);
+														} }
+														name={
+															attribute +
+															'-binding'
+														}
+														value={ args.key }
+														checked={
+															args.key ===
+															currentKey
+														}
+													>
+														<Menu.ItemLabel>
+															{ args?.label }
+														</Menu.ItemLabel>
+														<Menu.ItemHelpText>
+															{ args?.value }
+														</Menu.ItemHelpText>
+													</Menu.RadioItem>
+												) ) }
+										</Menu.Group>
+									) }
+								</>
+							</Menu.Popover>
+						</Menu>
+					);
+				}
+				return null;
+			} ) }
 		</>
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
+function BlockBindingsAttribute( { attribute, binding, data } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps = getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
@@ -124,7 +146,7 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
+						: data?.[ sourceName ]?.[ args?.key ]?.label ||
 						  sourceProps?.label ||
 						  sourceName }
 				</Text>
@@ -133,7 +155,7 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
+function ReadOnlyBlockBindingsPanelItems( { bindings, data } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
@@ -141,7 +163,7 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						fieldsList={ fieldsList }
+						data={ data }
 					/>
 				</Item>
 			) ) }
@@ -152,7 +174,8 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 function EditableBlockBindingsPanelItems( {
 	attributes,
 	bindings,
-	fieldsList,
+	data,
+	mode,
 } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -180,14 +203,15 @@ function EditableBlockBindingsPanelItems( {
 								<BlockBindingsAttribute
 									attribute={ attribute }
 									binding={ binding }
-									fieldsList={ fieldsList }
+									data={ data }
 								/>
 							</Menu.TriggerButton>
 							<Menu.Popover gutter={ isMobile ? 8 : 36 }>
 								<BlockBindingsPanelMenuContent
-									fieldsList={ fieldsList }
 									attribute={ attribute }
 									binding={ binding }
+									data={ data }
+									mode={ mode }
 								/>
 							</Menu.Popover>
 						</Menu>
@@ -206,76 +230,66 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	// `useSelect` is used purposely here to ensure `getFieldsList`
 	// is updated whenever there are updates in block context.
 	// `source.getFieldsList` may also call a selector via `select`.
-	const _fieldsList = {};
-	const { bindableAttributes, fieldsList, canUpdateBlockBindings } =
-		useSelect(
-			( select ) => {
-				const { __experimentalBlockBindingsSupportedAttributes } =
-					select( blockEditorStore ).getSettings();
-				const _bindableAttributes =
-					__experimentalBlockBindingsSupportedAttributes?.[
-						blockName
-					];
-				if (
-					! _bindableAttributes ||
-					_bindableAttributes.length === 0
-				) {
-					return EMPTY_OBJECT;
-				}
-				const registeredSources = getBlockBindingsSources();
-				Object.entries( registeredSources ).forEach(
-					( [ sourceName, { getFieldsList, usesContext } ] ) => {
-						if ( getFieldsList ) {
-							// Populate context.
-							const context = {};
-							if ( usesContext?.length ) {
-								for ( const key of usesContext ) {
-									context[ key ] = blockContext[ key ];
-								}
-							}
-							const sourceList = getFieldsList( {
-								select,
-								context,
-							} );
-							// Only add source if the list is not empty.
-							if ( Object.keys( sourceList || {} ).length ) {
-								_fieldsList[ sourceName ] = { ...sourceList };
+	const _data = {};
+	const _mode = {};
+	const _sources = {};
+	const { canUpdateBlockBindings, data, mode } = useSelect(
+		( select ) => {
+			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+				return {
+					fieldsList: EMPTY_OBJECT,
+				};
+			}
+			const registeredSources = getBlockBindingsSources();
+			console.log( 'registered sources:', registeredSources );
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, { editorUI, usesContext } ] ) => {
+					if ( editorUI ) {
+						// Populate context.
+						const context = {};
+						if ( usesContext?.length ) {
+							for ( const key of usesContext ) {
+								context[ key ] = blockContext[ key ];
 							}
 						}
+						const editorUIResult = editorUI( {
+							select,
+							context,
+						} );
+						// Only add source if the list is not empty.
+						if ( Object.keys( editorUIResult.data || {} ).length ) {
+							_sources[ sourceName ] = {
+								...editorUIResult,
+							};
+						}
 					}
-				);
-				return {
-					bindableAttributes: _bindableAttributes,
-					fieldsList:
-						Object.values( _fieldsList ).length > 0
-							? _fieldsList
-							: EMPTY_OBJECT,
-					canUpdateBlockBindings:
-						select( blockEditorStore ).getSettings()
-							.canUpdateBlockBindings,
-				};
-			},
-			[ blockContext ]
-		);
+				}
+			);
+			return {
+				data: Object.values( _data ).length > 0 ? _data : EMPTY_OBJECT,
+				canUpdateBlockBindings:
+					select( blockEditorStore ).getSettings()
+						.canUpdateBlockBindings,
+				mode: _mode,
+			};
+		},
+		[ blockContext, bindableAttributes ]
+	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
-	// Filter bindings to only show bindable attributes and remove pattern overrides.
+	// Filter bindings to only show bindable attributes.
 	const { bindings } = metadata || {};
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
-		if (
-			! bindableAttributes.includes( key ) &&
-			filteredBindings[ key ].source === 'core/pattern-overrides'
-		) {
+		if ( ! canBindAttribute( blockName, key ) ) {
 			delete filteredBindings[ key ];
 		}
 	} );
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
-	const readOnly =
-		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
+	const readOnly = ! canUpdateBlockBindings || ! Object.keys( data ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
@@ -295,13 +309,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ readOnly ? (
 						<ReadOnlyBlockBindingsPanelItems
 							bindings={ filteredBindings }
-							fieldsList={ fieldsList }
+							data={ data }
 						/>
 					) : (
 						<EditableBlockBindingsPanelItems
 							attributes={ bindableAttributes }
 							bindings={ filteredBindings }
-							fieldsList={ fieldsList }
+							data={ data }
+							mode={ mode }
 						/>
 					) }
 				</ItemGroup>

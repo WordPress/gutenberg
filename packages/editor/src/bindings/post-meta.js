@@ -144,4 +144,29 @@ export default {
 	getFieldsList( { select, context } ) {
 		return getPostMetaFields( select, context );
 	},
+	editorUI( { select, context } ) {
+		const metaFields = Object.entries(
+			getPostMetaFields( select, context ) || {}
+		).map( ( [ key, field ] ) => ( {
+			key,
+			label: field.label,
+			value: field.value,
+			type: field.type,
+		} ) );
+		/*
+		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
+		 */
+		return {
+			mode: 'dropdown',
+			data: metaFields,
+			getBindingConfig( selectedField ) {
+				return {
+					source: 'core/post-meta',
+					args: {
+						key: selectedField.key,
+					},
+				};
+			},
+		};
+	},
 };
