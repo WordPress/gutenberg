@@ -59,16 +59,6 @@
 	flex-direction: row-reverse;
 }
 
-/* RTL language support */
-[dir="rtl"] .wp-block-accordion-header:not(.icon-position-left) .accordion-content__toggle {
-	/* stylelint-disable-next-line declaration-property-value-allowed-list -- Automatically adjust icon position for RTL languages. */
-	flex-direction: row-reverse;
-}
-
-[dir="rtl"] .wp-block-accordion-header.icon-position-left .accordion-content__toggle {
-	flex-direction: row;
-}
-
 .accordion-content__toggle:focus-visible {
 	outline: 2px solid -webkit-focus-ring-color;
 	outline-offset: 2px;
