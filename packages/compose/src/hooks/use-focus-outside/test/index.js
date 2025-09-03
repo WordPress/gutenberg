@@ -117,8 +117,13 @@ describe( 'useFocusOutside', () => {
 	} );
 
 	it( 'should call handler when unmounting while queued', async () => {
-		const { promise, resolve } = Promise.withResolvers();
-		const mockOnFocusOutside = jest.fn().mockImplementation( resolve );
+		let resolvePromise;
+		const promise = new Promise( ( resolve ) => {
+			resolvePromise = resolve;
+		} );
+		const mockOnFocusOutside = jest
+			.fn()
+			.mockImplementation( resolvePromise );
 		const user = userEvent.setup();
 
 		const { unmount } = render(
