@@ -5,6 +5,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/pattern-overrides',
 	getValues( { select, clientId, context, bindings } ) {

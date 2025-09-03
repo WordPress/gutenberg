@@ -98,7 +98,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 								let successMessage;
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
-										/* translators: The posts's title. */
+										/* translators: %s: The posts's title. */
 										__( '"%s" permanently deleted.' ),
 										getItemTitle( items[ 0 ] )
 									);
@@ -130,7 +130,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 									}
 									// If we were trying to permanently delete multiple posts
 								} else {
-									const errorMessages = new Set();
+									const errorMessages = new Set< string >();
 									const failedPromises = promiseResult.filter(
 										( { status } ) => status === 'rejected'
 									);

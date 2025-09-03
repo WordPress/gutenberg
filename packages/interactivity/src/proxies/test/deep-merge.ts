@@ -515,6 +515,117 @@ describe( 'Interactivity API', () => {
 			expect( deepValue ).toBe( 'value 2' );
 		} );
 
+		it( 'should overwrite the getters of existing signals asynchronously', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// After this await, the `double` getter should have been updated.
+			await Promise.resolve();
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( 6 );
+		} );
+
+		it( 'should overwrite the getters of existing signals synchronously when accessed immediately after', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// Access the getter synchronously.
+			expect( target.double ).toBe( 6 );
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( 6 );
+		} );
+
+		it( 'should set the last value for multiple-overwritten getters', async () => {
+			const target: any = proxifyState( 'test', {
+				number: 2,
+				double: 4,
+			} );
+
+			let double: any;
+			const spy = jest.fn( () => ( double = target.double ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return this.number * 2;
+					},
+				},
+				true
+			);
+
+			deepMerge(
+				target,
+				{
+					number: 3,
+					get double() {
+						return `${ this.number * 2 }!`;
+					},
+				},
+				true
+			);
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( double ).toBe( 4 );
+
+			// Access the getter synchronously.
+			expect( target.double ).toBe( '6!' );
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( double ).toBe( '6!' );
+		} );
+
 		describe( 'arrays', () => {
 			it( 'should handle arrays', () => {
 				const target = { a: [ 1, 2 ] };

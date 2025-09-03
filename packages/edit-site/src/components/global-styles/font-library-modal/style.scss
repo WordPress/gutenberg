@@ -107,6 +107,10 @@ $footer-height: 70px;
 		background-color: $gray-100;
 	}
 
+	&:focus {
+		position: relative;
+	}
+
 	.font-library-modal__font-card__name {
 		font-weight: bold;
 	}

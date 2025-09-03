@@ -11,22 +11,34 @@ import type {
 	Field,
 	FieldTypeDefinition,
 } from '../types';
+import checkbox from './checkbox';
 import datetime from './datetime';
+import date from './date';
+import email from './email';
 import integer from './integer';
 import radio from './radio';
 import select from './select';
 import text from './text';
+import toggleGroup from './toggle-group';
+import boolean from './boolean';
+import array from './array';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
 }
 
 const FORM_CONTROLS: FormControls = {
+	array,
+	boolean,
+	checkbox,
 	datetime,
+	date,
+	email,
 	integer,
 	radio,
 	select,
 	text,
+	toggleGroup,
 };
 
 export function getControl< Item >(
@@ -41,7 +53,7 @@ export function getControl< Item >(
 		return getControlByType( field.Edit );
 	}
 
-	if ( field.elements ) {
+	if ( field.elements && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 

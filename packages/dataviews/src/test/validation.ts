@@ -35,21 +35,8 @@ describe( 'validation', () => {
 		expect( result ).toBe( true );
 	} );
 
-	it( 'integer field is invalid if value is not integer', () => {
+	it( 'integer field is invalid if value is not integer when not empty', () => {
 		const item = { id: 1, order: 'd' };
-		const fields: Field< {} >[] = [
-			{
-				id: 'order',
-				type: 'integer',
-			},
-		];
-		const form = { fields: [ 'order' ] };
-		const result = isItemValid( item, fields, form );
-		expect( result ).toBe( false );
-	} );
-
-	it( 'integer field is invalid if value is empty', () => {
-		const item = { id: 1, order: '' };
 		const fields: Field< {} >[] = [
 			{
 				id: 'order',
@@ -121,7 +108,9 @@ describe( 'validation', () => {
 					{ value: 'a', label: 'A' },
 					{ value: 'b', label: 'B' },
 				],
-				isValid: () => true, // Overrides the validation provided for integer types.
+				isValid: {
+					custom: () => null, // Overrides the validation provided for integer types.
+				},
 			},
 		];
 		const form = { fields: [ 'order' ] };

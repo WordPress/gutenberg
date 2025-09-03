@@ -150,11 +150,15 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 			const gen = func( ...args ) as Generator;
 			let value: any;
 			let it: any;
+			let error: any;
 			while ( true ) {
 				setNamespace( ns );
 				setScope( scope );
 				try {
-					it = gen.next( value );
+					it = error ? gen.throw( error ) : gen.next( value );
+					error = undefined;
+				} catch ( e ) {
+					throw e;
 				} finally {
 					resetScope();
 					resetNamespace();
@@ -163,16 +167,14 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 				try {
 					value = await it.value;
 				} catch ( e ) {
-					setNamespace( ns );
-					setScope( scope );
-					gen.throw( e );
-				} finally {
-					resetScope();
-					resetNamespace();
+					error = e;
 				}
-
 				if ( it.done ) {
-					break;
+					if ( error ) {
+						throw error;
+					} else {
+						break;
+					}
 				}
 			}
 
@@ -285,16 +287,17 @@ export function useCallback< T extends Function >(
 }
 
 /**
- * Pass a factory function and an array of inputs. `useMemo` will only recompute
- * the memoized value when one of the inputs has changed.
+ * Returns the memoized output of the passed factory function, allowing access
+ * to the current element's scope.
  *
  * This hook is equivalent to Preact's `useMemo` and makes the element's scope
  * available so functions like `getElement()` and `getContext()` can be used
- * inside the passed factory function.
+ * inside the passed factory function. Note that `useMemo` will only recompute
+ * the memoized value when one of the inputs has changed.
  *
  * @param factory Factory function that returns that value for memoization.
- * @param inputs  If present, the factory will only be run to recompute if
- *                the values in the list change (using `===`).
+ * @param inputs  If present, the factory will only be run to recompute if the
+ *                values in the list change (using `===`).
  *
  * @return The memoized value.
  */

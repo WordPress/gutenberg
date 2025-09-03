@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { store } from '../store';
+import { store, type AsyncAction, type TypeYield } from '../store';
 
 describe( 'Interactivity API', () => {
 	describe( 'store', () => {
@@ -74,7 +74,7 @@ describe( 'Interactivity API', () => {
 							sync( n ) {
 								return n;
 							},
-							*async( n ): Generator< unknown, number, unknown > {
+							*async( n ): AsyncAction< number > {
 								const n1 = myStore.actions.sync( n );
 								return myStore.state.derived + n1 + n;
 							},
@@ -114,12 +114,16 @@ describe( 'Interactivity API', () => {
 							sync( n: number ) {
 								return n;
 							},
-							*async(
-								n: number
-							): Generator< unknown, number, number > {
-								const n1: number =
-									yield myStore.actions.sync( n );
+							*async( n: number ): AsyncAction< number > {
+								const n1 = ( yield myStore.actions.async2(
+									n
+								) ) as TypeYield<
+									typeof myStore.actions.async2
+								> satisfies number;
 								return myStore.state.derived + n1 + n;
+							},
+							*async2( n: number ) {
+								return n;
 							},
 						},
 					};
@@ -161,12 +165,16 @@ describe( 'Interactivity API', () => {
 							sync( n: number ) {
 								return n;
 							},
-							*async(
-								n: number
-							): Generator< unknown, number, number > {
-								const n1: number =
-									yield myStore.actions.sync( n );
+							*async( n: number ): AsyncAction< number > {
+								const n1 = ( yield myStore.actions.async2(
+									n
+								) ) as TypeYield<
+									typeof myStore.actions.async2
+								> satisfies number;
 								return myStore.state.derived + n1 + n;
+							},
+							*async2( n: number ) {
+								return n;
 							},
 						},
 					} );
@@ -191,6 +199,7 @@ describe( 'Interactivity API', () => {
 						actions: {
 							sync: ( n: number ) => number;
 							async: ( n: number ) => Promise< number >;
+							async2: ( n: number ) => AsyncAction< number >;
 						};
 						callbacks: {
 							existent: number;
@@ -202,10 +211,16 @@ describe( 'Interactivity API', () => {
 							sync( n ) {
 								return n;
 							},
-							*async( n ): Generator< unknown, number, number > {
-								const n1: number =
-									yield myStore.actions.sync( n );
+							*async( n ): AsyncAction< number > {
+								const n1 = ( yield myStore.actions.async2(
+									n
+								) ) as TypeYield<
+									typeof myStore.actions.async2
+								> satisfies number;
 								return n1 + n;
+							},
+							*async2( n: number ) {
+								return n;
 							},
 						},
 						callbacks: {
@@ -279,6 +294,78 @@ describe( 'Interactivity API', () => {
 
 					// @ts-expect-error
 					myStore.state.nonExistent satisfies {};
+				};
+			} );
+
+			describe( 'a typed store can be returned without adding a new store part', () => {
+				type State = {
+					someValue: number;
+				};
+				type Actions = {
+					incrementValue: ( n: number ) => void;
+				};
+
+				const { state, actions } = store< {
+					state: State;
+					actions: Actions;
+				} >( 'storeWithState', {
+					actions: {
+						incrementValue( n ) {
+							state.someValue += n;
+						},
+					},
+				} );
+
+				state.someValue satisfies number;
+				actions.incrementValue( 1 ) satisfies void;
+
+				const { actions: actions2 } = store< { actions: Actions } >(
+					'storeWithoutState',
+					{
+						actions: {
+							incrementValue( n ) {
+								state.someValue += n;
+							},
+						},
+					}
+				);
+
+				actions2.incrementValue( 1 ) satisfies void;
+			} );
+
+			describe( 'async actions can pass state to yields and type the yield returns', () => {
+				// eslint-disable-next-line no-unused-expressions
+				async () => {
+					type Store = {
+						state: {
+							someValue: string;
+						};
+						actions: {
+							asyncAction: () => Promise< number >;
+						};
+					};
+
+					const asyncFunction = async (
+						someValue: string
+					): Promise< string > => {
+						return someValue;
+					};
+
+					const { state, actions } = store< Store >( 'test', {
+						actions: {
+							*asyncAction(): AsyncAction< number > {
+								( yield asyncFunction(
+									state.someValue
+								) ) as TypeYield<
+									typeof asyncFunction
+								> satisfies string;
+
+								return 1;
+							},
+						},
+					} );
+
+					( await actions.asyncAction() ) satisfies number;
 				};
 			} );
 		} );

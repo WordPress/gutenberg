@@ -15,7 +15,7 @@ const storeConfigs = new Map();
 const serverStates = new Map();
 
 /**
- * Get the defined config for the store with the passed namespace.
+ * Gets the defined config for the store with the passed namespace.
  *
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
@@ -24,7 +24,7 @@ export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
- * Get the part of the state defined and updated from the server.
+ * Gets the part of the state defined and updated from the server.
  *
  * The object returned is read-only, and includes the state defined in PHP with
  * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
@@ -61,7 +61,7 @@ interface StoreOptions {
 	 * Property to block/unblock private store namespaces.
 	 *
 	 * If the passed value is `true`, it blocks the given namespace, making it
-	 * accessible only trough the returned variables of the `store()` call. In
+	 * accessible only through the returned variables of the `store()` call. In
 	 * the case a lock string is passed, it also blocks the namespace, but can
 	 * be unblocked for other `store()` calls using the same lock string.
 	 *
@@ -84,6 +84,9 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
+export type AsyncAction< T > = Generator< any, T, unknown >;
+export type TypeYield< T extends ( ...args: any[] ) => Promise< any > > =
+	Awaited< ReturnType< T > >;
 type Prettify< T > = { [ K in keyof T ]: T[ K ] } & {};
 type DeepPartial< T > = T extends object
 	? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
@@ -179,14 +182,14 @@ export function store< T extends object >(
 // Overload for when types are passed via generics and they contain state.
 export function store< T extends { state: object } >(
 	namespace: string,
-	storePart: ConvertPromisesToGenerators< DeepPartialState< T > >,
+	storePart?: ConvertPromisesToGenerators< DeepPartialState< T > >,
 	options?: StoreOptions
 ): Prettify< ConvertGeneratorsToPromises< T > >;
 
 // Overload for when types are passed via generics and they don't contain state.
 export function store< T extends object >(
 	namespace: string,
-	storePart: ConvertPromisesToGenerators< T >,
+	storePart?: ConvertPromisesToGenerators< T >,
 	options?: StoreOptions
 ): Prettify< ConvertGeneratorsToPromises< T > >;
 

@@ -104,8 +104,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
@@ -124,8 +124,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
@@ -144,8 +144,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {

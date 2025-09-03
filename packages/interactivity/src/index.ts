@@ -16,7 +16,13 @@ import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 
-export { store, getConfig, getServerState } from './store';
+export {
+	store,
+	getConfig,
+	getServerState,
+	type AsyncAction,
+	type TypeYield,
+} from './store';
 export { getContext, getServerContext, getElement } from './scopes';
 export {
 	withScope,

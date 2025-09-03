@@ -193,6 +193,7 @@ Properties:
     -   `field`: which field this filter is bound to.
     -   `operator`: which type of filter it is. See "Operator types".
     -   `value`: the actual value selected by the user.
+    -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
@@ -207,15 +208,19 @@ Properties:
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
 -   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
+-   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
 ##### Properties of `layout`
 
-| Properties of `layout`                                                              | Table | Grid | List |
-| ----------------------------------------------------------------------------------- | ----- | ---- | ---- |
-| `badgeFields`: a list of field's `id` to render without label and styled as badges. |       | ✓    |      |
-| `styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column.  | ✓     |      |      |
+| Properties of `layout`                                                                      | Table | Grid | List |
+| ------------------------------------------------------------------------------------------- | ----- | ---- | ---- |
+| `badgeFields`: a list of field's `id` to render without label and styled as badges.         |       | ✓    |      |
+| `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. | ✓     |      |      |
+
+**For column alignment (`align` property), follow these guidelines:**
+Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
 
 #### `onChangeView`: `function`
 
@@ -298,7 +303,7 @@ const actions = [
 		icon: <Icon icon={ view } />,
 		isEligible: ( item ) => item.status === 'published',
 		callback: ( items ) => {
-			console.log( 'Viewing item:', items[0] );
+			console.log( 'Viewing item:', items[ 0 ] );
 		},
 	},
 	{
@@ -308,7 +313,7 @@ const actions = [
 		supportsBulk: true,
 		callback: ( items ) => {
 			console.log( 'Editing items:', items );
-		}
+		},
 	},
 	{
 		id: 'delete',
@@ -320,17 +325,17 @@ const actions = [
 				<p>Are you sure you want to delete { items.length } item(s)?</p>
 				<Button
 					variant="primary"
-					onClick={() => {
+					onClick={ () => {
 						console.log( 'Deleting items:', items );
 						onActionPerformed();
 						closeModal();
-					}}
+					} }
 				>
 					Confirm Delete
 				</Button>
 			</div>
-		)
-	}
+		),
+	},
 ];
 ```
 
@@ -353,9 +358,9 @@ Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-This property provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
+This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
-For example, this is how you'd enable only the table view type:
+For example, this is how you'd enable only the table and grid layout type and set whether those layouts show media by default:
 
 ```js
 const defaultLayouts = {
@@ -368,7 +373,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -386,13 +391,110 @@ If `selection` and `onChangeSelection` are provided, the `DataViews` component b
 
 A function that determines if a media field or a primary field is clickable. It receives an item as an argument and returns a boolean value indicating whether the item can be clicked.
 
-#### `onClickItem`: `function`
+#### `renderItemLink`: `React.ComponentType`
 
-A callback function that is triggered when a user clicks on a media field or primary field. This function is currently implemented only in the `grid` and `list` views.
+A render function used to render clickable items.
+
+It can render regular links, but also allows integration with routing libraries (like TanStack Router or React Router).
+
+The component receives the following props:
+
+-   `item`: The data item that was clicked
+-   Additional standard HTML anchor props (className, style, etc.)
+
+```jsx
+// Then use it in DataViews
+<DataViews
+	// ...other props
+	renderItemLink={ ( { item, ...props } ) => (
+		<Link to={ `/sites/${ item.slug }` } preload="intent" { ...props } />
+	) }
+/>
+```
 
 #### `header`: React component
 
 React component to be rendered next to the view config button.
+
+#### `config`: { perPageSizes: number[] }
+
+Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+
+#### `empty`: React node
+
+A message or element to be displayed instead of the dataview's default empty message.
+
+### Composition modes
+
+The `DataViews` component supports two composition modes:
+
+-   **Controlled**: This is the default usage mode. `DataViews` renders a full layout out-of-the-box — including search, filters, view switcher, layout grid or table, actions, and pagination. It’s the simplest way to get started and requires minimal setup.
+
+-   **Free composition**: This mode gives developers full control over the layout. You can compose your own UI using internal components — placing them exactly where they’re needed in your interface. This is useful for more advanced or custom layouts, while still relying on the same shared context for user interactions.
+
+The component automatically detects the mode based on the `children` prop. If no `children` are passed, `DataViews` renders its internal layout (controlled mode). If `children` are provided, the component switches to free composition mode, skipping the default layout entirely.
+
+In both modes, user interactions update the same `view` object and share the same behavior. Free composition components rely on context state and don’t require additional props to work, making them safe to use without extra boilerplate.
+
+### Free composition
+
+When you pass the `children` prop to the `DataViews` component, it enters free composition mode. In this mode, `DataViews` no longer renders its built-in layout — instead, it acts as a wrapper that provides access to internal state and shared behavior through context.
+
+This allows you to build your own layout from scratch using the subcomponents exposed by `DataViews`. Each subcomponent automatically connects to the shared context, so you don't need to wire props manually. You can arrange these components however you want and combine them with your own custom elements.
+
+This pattern enables full layout flexibility while keeping the data logic centralized.
+
+The following components are available directly under `DataViews`:
+
+-   `DataViews.Search`
+-   `DataViews.FiltersToggle`
+-   `DataViews.Filters`
+-   `DataViews.Layout`
+-   `DataViews.LayoutSwitcher`
+-   `DataViews.Pagination`
+-   `DataViews.BulkActionToolbar`
+-   `DataViews.ViewConfig`
+
+#### example
+
+```jsx
+import DataViews from '@wordpress/dataviews';
+import { __ } from '@wordpress/i18n';
+
+const CustomLayout = () => {
+	// Declare data, fields, etc.
+
+	return (
+		<DataViews
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ { table: {} } }
+		>
+			<h1>{ __( 'Free composition' ) }</h1>
+			<DataViews.Search />
+			<DataViews.FiltersToggle />
+			<DataViews.Filters />
+			<DataViews.Layout />
+			<DataViews.Pagination />
+		</DataViews>
+	);
+};
+```
+
+> You can render only the pieces you need, rearrange them freely, or combine them with custom components.
+
+### Accessibility considerations
+
+All `DataViews` subcomponents are designed with accessibility in mind — including keyboard interactions, focus management, and semantic roles. Components like `Search`, `Pagination`, `FiltersToggle`, and `Filters` already handle these responsibilities internally and can be safely used in custom layouts.
+
+When using free composition, developers are responsible for the outer structure of the layout.
+
+Developers don't need to worry about the internal accessibility logic for individual features. The core behaviors — like search semantics, filter toggles, or pagination focus — are encapsulated.
+
+`FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
 
 ## `DataForm`
 
@@ -421,7 +523,7 @@ const Example = () => {
 
 A single item to be edited.
 
-It can be thought of as a single record coming from the `data` property of `DataViews` — though it doesn't need to be. It can be totally separated or a mix of records if your app supports bulk editing.
+It can be thought of as a single record coming from the `data` property of `DataViews` — though it doesn't need to be. It can be totally separated or a mix of records if your app supports bulk editing.
 
 #### `fields`: `Object[]`
 
@@ -455,15 +557,17 @@ const fields = [
 
 #### `form`: `Object[]`
 
--   `type`: either `regular` or `panel`.
--   `labelPosition`: either `side`, `top`, or `none`.
+-   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
 
 Example:
 
 ```js
 const form = {
-	type: 'panel',
+	layout: {
+		type: 'panel',
+		labelPosition: 'side'
+	},
 	fields: [
 		'title',
 		'data',
@@ -709,10 +813,10 @@ The header text to show in the modal.
 
 Specifies the size of the modal window when displaying action content using `RenderModal`.
 
--	Type: `string`
--	Optional
--	Default: `'medium'`
--	One of: `'small'`, `'medium'`, `'large'`, `'fill'`
+-   Type: `string`
+-   Optional
+-   Default: `'medium'`
+-   One of: `'small'`, `'medium'`, `'large'`, `'fill'`
 
 Example:
 
@@ -726,10 +830,10 @@ Example:
 
 Specifies the focus on mount property of the modal.
 
--	Type: `boolean` | `string`
--	Optional
--	Default: `true`
--	One of: `true` | `false` | `'firstElement'` | `'firstContentElement'`
+-   Type: `boolean` | `string`
+-   Optional
+-   Default: `true`
+-   One of: `true` | `false` | `'firstElement'` | `'firstContentElement'`
 
 Example:
 
@@ -791,7 +895,7 @@ Example:
 
 ### `header`
 
-React component used by the layouts to display the field name — useful to add icons, etc. It's complementary to the `label` property.
+React component used by the layouts to display the field name — useful to add icons, etc. It's complementary to the `label` property.
 
 -   Type: React component.
 -   Optional.
@@ -839,6 +943,7 @@ React component that renders the field. This is used by the layouts.
 -   Defaults to `getValue`.
 -   Props
     -   `item` value to be processed.
+    -   `config` object containing configuration options for the field. It's optional. So far, the only object property available is `sizes`: in fields that are set to be the media field, layouts can pass down the expected size reserved for them so that the field can react accordingly.
 -   Returns a React element that represents the field's value.
 
 Example:
@@ -956,41 +1061,55 @@ Example:
 
 ### `isValid`
 
-Function to validate a field's value.
+Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
--   Type: function.
--   Optional.
--   Args
-    -   `item`: the data to validate
-    -   `context`: an object containing the following props:
-        -   `elements`: the elements defined by the field
--   Returns a boolean, indicating if the field is valid or not.
+- `required`: boolean indicating whether the field is required or not.
+- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
 
 ```js
-// Custom isValid function.
 {
-	isValid: ( item, context ) => {
-		return !! item;
-	};
+	isValid: {
+		custom: ( item: Item, field: NormalizedField<Item> ) => {
+			if ( /* item value is invalid */) {
+				return 'Reason why item value is invalid';
+			}
+
+			return null;
+		}
+	}
 }
 ```
 
+Note that fields that define a type (e.g., `integer`) come with default validation for the type. For example, the `integer` type if the value is a valid integer:
+
 ```js
-// If the field defines a type,
-// it'll get a default isValid function for the type.
 {
-	type: 'number',
+	type: 'integer',
 }
 ```
 
+However, this can be overriden by the field author:
+
 ```js
-// Even if the field provides a type,
-// the field can override the default isValid function.
 {
-	type: 'number',
-	isValid: ( item, context ) => { /* Custom function. */ }
+	type: 'integer',
+	isValid: {
+		custom: ( item: Item, field: NormalizedField<Item> ) => {
+			/* Your custom validation logic. */
+		}
+	}
+}
+```
+
+Fields that define their own Edit component have access to the validation rules via the `field.isValid` object:
+
+```js
+{
+  Edit: ( { field }) => {
+	  return <input required={ !! field.isValid.required } />
+  }
 }
 ```
 
@@ -1065,7 +1184,7 @@ Example:
 
 ### `elements`
 
-List of valid values for a field. If provided, it creates a DataViews' filter for the field. DataForm's edit control will also use these values. (See `Edit` field property.)
+List of valid values for a field. If provided, the field's filter will use these as predefined options instead of using the field's `Edit` function for user input (unless `filterBy` is set to `false`, see below).
 
 -   Type: `array` of objects.
 -   Optional.
@@ -1087,28 +1206,47 @@ Example:
 }
 ```
 
+By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
+
 ### `filterBy`
 
-Configuration of the filters.
+Configuration of the filters. By default, fields have filtering enabled using the field's `Edit` function for user input. When `elements` are provided, the filter will use those as predefined options instead. Set to `false` to opt the field out of filtering entirely.
 
--   Type: `object`.
+-   Type: `object` | `boolean`.
 -   Optional.
--   Properties:
+-   If `false`, the field will not be available for filtering.
+-   If an object, it can have the following properties:
     -   `operators`: the list of operators supported by the field. See "operators" below. A filter will support the `isAny` and `isNone` multi-selection operators by default.
     -   `isPrimary`: boolean, optional. Indicates if the filter is primary. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 Operators:
 
-| Operator   | Selection      | Description                                                             | Example                                            |
-| ---------- | -------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
-| `is`       | Single item    | `EQUAL TO`. The item's field is equal to a single value.                | Author is Admin                                    |
-| `isNot`    | Single item    | `NOT EQUAL TO`. The item's field is not equal to a single value.        | Author is not Admin                                |
-| `isAny`    | Multiple items | `OR`. The item's field is present in a list of values.                  | Author is any: Admin, Editor                       |
-| `isNone`   | Multiple items | `NOT OR`. The item's field is not present in a list of values.          | Author is none: Admin, Editor                      |
-| `isAll`    | Multiple items | `AND`. The item's field has all of the values in the list.              | Category is all: Book, Review, Science Fiction     |
-| `isNotAll` | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list. | Category is not all: Book, Review, Science Fiction |
+| Operator             | Selection      | Description                                                                                          | Example                                            |
+| -------------------- | -------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `is`                 | Single item    | `EQUAL TO`. The item's field is equal to a single value.                                             | Author is Admin                                    |
+| `isNot`              | Single item    | `NOT EQUAL TO`. The item's field is not equal to a single value.                                     | Author is not Admin                                |
+| `isAny`              | Multiple items | `OR`. The item's field is present in a list of values.                                               | Author is any: Admin, Editor                       |
+| `isNone`             | Multiple items | `NOT OR`. The item's field is not present in a list of values.                                       | Author is none: Admin, Editor                      |
+| `isAll`              | Multiple items | `AND`. The item's field has all of the values in the list.                                           | Category is all: Book, Review, Science Fiction     |
+| `isNotAll`           | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list.                              | Category is not all: Book, Review, Science Fiction |
+| `lessThan`           | Single item    | `LESS THAN`. The item's field is numerically less than a single value.                               | Age is less than 18                                |
+| `greaterThan`        | Single item    | `GREATER THAN`. The item's field is numerically greater than a single value.                         | Age is greater than 65                             |
+| `lessThanOrEqual`    | Single item    | `LESS THAN OR EQUAL TO`. The item's field is numerically less than or equal to a single value.       | Age is less than or equal to 18                    |
+| `greaterThanOrEqual` | Single item    | `GREATER THAN OR EQUAL TO`. The item's field is numerically greater than or equal to a single value. | Age is greater than or equal to 65                 |
+| `contains`           | Text           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
+| `notContains`        | Text           | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
+| `startsWith`         | Text           | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
+| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                | Date is on: 2024-01-01                             |
+| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).      | Date is not on: 2024-01-01                         |
+| `before`             | Date           | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
+| `after`              | Date           | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
+| `beforeInc`          | Date           | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
+| `afterInc`           | Date           | `AFTER (Inc)`. The item's field is after a given date, including the date.                           | Date is after 2024-01-01, including 2024-01-01     |
+| `inThePast`          | Date           | `IN THE PAST`. The item's field is within the last N units (days, weeks, months, or years) from now. | Orders placed in the past 7 days                   |
+| `over`               | Date           | `OVER`. The item's field is older than N units (days, weeks, months, or years) from now.             | Orders placed over 7 days ago                      |
+| `between`            | Multiple items | `BETWEEN`. The item's field is between two values.                                                   | Item count between (inc): 10-180                   |
 
-`is` and `isNot` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotALl` are multi-selection. A filter with no operators declared will support the `isAny` and `isNone` multi-selection operators by default. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
+`is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotAll` are multi-selection. `between` is a special operator that requires two values and it's not supported for preset layout. A filter with no operators declared will support the `isAny` and `isNone` multi-selection operators by default. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
 Example:
 
@@ -1139,6 +1277,13 @@ Example:
 }
 ```
 
+```js
+// Opt out of filtering entirely.
+{
+	filterBy: false;
+}
+```
+
 ## Form Field API
 
 ### `id`
@@ -1158,31 +1303,57 @@ Example:
 
 ### `layout`
 
-The same as the `form.type`, either `regular` or `panel` only for the individual field. It defaults to `form.type`.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, or Card. This prop is the same as the `form.layout` prop.
 
--   Type: `string`.
+#### Regular
 
-Example:
+- `type`: `regular`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	layout: 'regular'
+	layout: {
+		type: 'regular',
+		labelPosition: 'side'
+	},
 }
 ```
 
-### `labelPosition`
+#### Panel
 
-The same as the `form.labelPosition`, either `side`, `top`, or `none` for the individual field. It defaults to `form.labelPosition`.
+- `type`: `panel`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
--   Type: `string`.
+For example:
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'panel',
+		labelPosition: 'top'
+	},
+}
+```
 
-Example:
+#### Card
+
+- `type`: `card`. Required.
+- `isOpened`: boolean. Optional. `true` by default.
+- `withHeader`: boolean. Optional. `true` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	labelPosition: 'none'
+	layout: {
+		type: 'card',
+		isOpened: false,
+		withHeader: true,
+	},
 }
 ```
 

@@ -45,6 +45,8 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
  * This function modifies the comments query to exclude comments of type 'block_comment'
  * when the query is for comments in the WordPress admin.
  *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
  * @param WP_Comment_Query $query The current comments query.
  *
  * @return void

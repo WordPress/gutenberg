@@ -1,14 +1,20 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { ReactNode, ComponentProps, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,11 +28,15 @@ import {
 import DataViewsLayout from '../dataviews-layout';
 import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
-import DataViewsViewConfig from '../dataviews-view-config';
+import { BulkActionsFooter } from '../dataviews-bulk-actions';
+import { DataViewsPagination } from '../dataviews-pagination';
+import DataViewsViewConfig, {
+	DataviewsViewConfigDropdown,
+	ViewTypeMenu,
+} from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
-
 type ItemWithId = { id: string };
 
 type DataViewsProps< Item > = {
@@ -41,14 +51,25 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
+		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	onClickItem?: ( item: Item ) => void;
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & ComponentProps< 'a' >
+	) => ReactElement;
 	isItemClickable?: ( item: Item ) => boolean;
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
+	children?: ReactNode;
+	config?: {
+		perPageSizes: number[];
+	};
+	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -57,7 +78,52 @@ const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
 
-export default function DataViews< Item >( {
+type DefaultUIProps = Pick<
+	DataViewsProps< any >,
+	'header' | 'search' | 'searchLabel'
+>;
+
+function DefaultUI( {
+	header,
+	search = true,
+	searchLabel = undefined,
+}: DefaultUIProps ) {
+	const { isShowingFilter } = useContext( DataViewsContext );
+	return (
+		<>
+			<HStack
+				alignment="top"
+				justify="space-between"
+				className="dataviews__view-actions"
+				spacing={ 1 }
+			>
+				<HStack
+					justify="start"
+					expanded={ false }
+					className="dataviews__search"
+				>
+					{ search && <DataViewsSearch label={ searchLabel } /> }
+					<FiltersToggle />
+				</HStack>
+				<HStack
+					spacing={ 1 }
+					expanded={ false }
+					style={ { flexShrink: 0 } }
+				>
+					<DataViewsViewConfig />
+					{ header }
+				</HStack>
+			</HStack>
+			{ isShowingFilter && (
+				<DataViewsFilters className="dataviews-filters__container" />
+			) }
+			<DataViewsLayout />
+			<DataViewsFooter />
+		</>
+	);
+}
+
+function DataViews< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -73,11 +139,17 @@ export default function DataViews< Item >( {
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
+	renderItemLink,
 	isItemClickable = defaultIsItemClickable,
 	header,
+	children,
+	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	empty,
 }: DataViewsProps< Item > ) {
+	const { infiniteScrollHandler } = paginationInfo;
+	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
-	const containerRef = useResizeObserver(
+	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
 			setContainerWidth(
 				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
@@ -108,9 +180,49 @@ export default function DataViews< Item >( {
 	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
-	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
-		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	const hasPrimaryOrLockedFilters = useMemo(
+		() =>
+			( filters || [] ).some(
+				( filter ) => filter.isPrimary || filter.isLocked
+			),
+		[ filters ]
 	);
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >(
+		hasPrimaryOrLockedFilters
+	);
+
+	useEffect( () => {
+		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
+			setIsShowingFilter( true );
+		}
+	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
+
+	// Attach scroll event listener for infinite scroll
+	useEffect( () => {
+		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
+			return;
+		}
+
+		const handleScroll = throttle( ( event: unknown ) => {
+			const target = ( event as Event ).target as HTMLElement;
+			const scrollTop = target.scrollTop;
+			const scrollHeight = target.scrollHeight;
+			const clientHeight = target.clientHeight;
+
+			// Check if user has scrolled near the bottom
+			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
+				infiniteScrollHandler?.();
+			}
+		}, 100 ); // Throttle to 100ms
+
+		const container = containerRef.current;
+		container.addEventListener( 'scroll', handleScroll );
+
+		return () => {
+			container.removeEventListener( 'scroll', handleScroll );
+			handleScroll.cancel(); // Cancel any pending throttled calls
+		};
+	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
 
 	return (
 		<DataViewsContext.Provider
@@ -130,46 +242,53 @@ export default function DataViews< Item >( {
 				getItemLevel,
 				isItemClickable,
 				onClickItem,
+				renderItemLink,
 				containerWidth,
+				containerRef,
+				resizeObserverRef,
+				defaultLayouts,
+				filters,
+				isShowingFilter,
+				setIsShowingFilter,
+				config,
+				empty,
+				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
-				<HStack
-					alignment="top"
-					justify="space-between"
-					className="dataviews__view-actions"
-					spacing={ 1 }
-				>
-					<HStack
-						justify="start"
-						expanded={ false }
-						className="dataviews__search"
-					>
-						{ search && <DataViewsSearch label={ searchLabel } /> }
-						<FiltersToggle
-							filters={ filters }
-							view={ view }
-							onChangeView={ onChangeView }
-							setOpenedFilter={ setOpenedFilter }
-							setIsShowingFilter={ setIsShowingFilter }
-							isShowingFilter={ isShowingFilter }
-						/>
-					</HStack>
-					<HStack
-						spacing={ 1 }
-						expanded={ false }
-						style={ { flexShrink: 0 } }
-					>
-						<DataViewsViewConfig
-							defaultLayouts={ defaultLayouts }
-						/>
-						{ header }
-					</HStack>
-				</HStack>
-				{ isShowingFilter && <DataViewsFilters /> }
-				<DataViewsLayout />
-				<DataViewsFooter />
+				{ children ?? (
+					<DefaultUI
+						header={ header }
+						search={ search }
+						searchLabel={ searchLabel }
+					/>
+				) }
 			</div>
 		</DataViewsContext.Provider>
 	);
 }
+
+// Populate the DataViews sub components
+const DataViewsSubComponents = DataViews as typeof DataViews & {
+	BulkActionToolbar: typeof BulkActionsFooter;
+	Filters: typeof DataViewsFilters;
+	FiltersToggle: typeof FiltersToggle;
+	Layout: typeof DataViewsLayout;
+	LayoutSwitcher: typeof ViewTypeMenu;
+	Pagination: typeof DataViewsPagination;
+	Search: typeof DataViewsSearch;
+	ViewConfig: typeof DataviewsViewConfigDropdown;
+	Footer: typeof DataViewsFooter;
+};
+
+DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
+DataViewsSubComponents.Filters = DataViewsFilters;
+DataViewsSubComponents.FiltersToggle = FiltersToggle;
+DataViewsSubComponents.Layout = DataViewsLayout;
+DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsSubComponents.Pagination = DataViewsPagination;
+DataViewsSubComponents.Search = DataViewsSearch;
+DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.Footer = DataViewsFooter;
+
+export default DataViewsSubComponents;

@@ -48,9 +48,9 @@ export function DataFormLayout< Item >( {
 	);
 
 	return (
-		<VStack spacing={ 2 }>
+		<VStack spacing={ form.layout?.type === 'panel' ? 2 : 4 }>
 			{ normalizedFormFields.map( ( formField ) => {
-				const FieldLayout = getFormFieldLayout( formField.layout )
+				const FieldLayout = getFormFieldLayout( formField.layout.type )
 					?.component;
 
 				if ( ! FieldLayout ) {

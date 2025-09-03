@@ -51,6 +51,7 @@ import { getExamples } from './examples';
 import { store as siteEditorStore } from '../../store';
 import { useSection } from '../sidebar-global-styles-wrapper';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
+import { getVariationClassName } from '../global-styles/utils';
 import {
 	STYLE_BOOK_COLOR_GROUPS,
 	STYLE_BOOK_PREVIEW_CATEGORIES,
@@ -215,6 +216,32 @@ export function getExamplesForSinglePageUse( examples ) {
 	return examplesForSinglePageUse;
 }
 
+/**
+ * Applies a block variation to each example by updating its attributes.
+ *
+ * @param {Array}  examples  Array of examples
+ * @param {string} variation Block variation name.
+ * @return {Array} Updated examples with variation applied.
+ */
+function applyBlockVariationsToExamples( examples, variation ) {
+	if ( ! variation ) {
+		return examples;
+	}
+
+	return examples.map( ( example ) => ( {
+		...example,
+		variation,
+		blocks: {
+			...example.blocks,
+			attributes: {
+				...example.blocks.attributes,
+				style: undefined,
+				className: getVariationClassName( variation ),
+			},
+		},
+	} ) );
+}
+
 function StyleBook( {
 	enableResizing = true,
 	isSelected,
@@ -366,8 +393,8 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 	const canUserUploadMedia = useSelect(
 		( select ) =>
 			select( coreStore ).canUser( 'create', {
-				kind: 'root',
-				name: 'media',
+				kind: 'postType',
+				name: 'attachment',
 			} ),
 		[]
 	);
@@ -394,7 +421,7 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 		);
 	};
 
-	const onSelect = ( blockName ) => {
+	const onSelect = ( blockName, isBlockVariation = false ) => {
 		if (
 			STYLE_BOOK_COLOR_GROUPS.find(
 				( group ) => group.slug === blockName
@@ -410,6 +437,10 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 			return;
 		}
 
+		if ( isBlockVariation ) {
+			return;
+		}
+
 		// Now go to the selected block.
 		onChangeSection( `/blocks/${ encodeURIComponent( blockName ) }` );
 	};
@@ -419,14 +450,20 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 	const examplesForSinglePageUse = getExamplesForSinglePageUse( examples );
 
 	let previewCategory = null;
+	let blockVariation = null;
 	if ( section.includes( '/colors' ) ) {
 		previewCategory = 'colors';
 	} else if ( section.includes( '/typography' ) ) {
 		previewCategory = 'text';
 	} else if ( section.includes( '/blocks' ) ) {
 		previewCategory = 'blocks';
-		const blockName =
-			decodeURIComponent( section ).split( '/blocks/' )[ 1 ];
+		let blockName = decodeURIComponent( section ).split( '/blocks/' )[ 1 ];
+
+		// The blockName can contain variations, if so, extract the variation.
+		if ( blockName?.includes( '/variations' ) ) {
+			[ blockName, blockVariation ] = blockName.split( '/variations/' );
+		}
+
 		if (
 			blockName &&
 			examples.find( ( example ) => example.name === blockName )
@@ -440,21 +477,43 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 		( category ) => category.slug === previewCategory
 	);
 
-	// If there's no category definition there may be a single block.
-	const filteredExamples = categoryDefinition
-		? getExamplesByCategory( categoryDefinition, examples )
-		: {
+	const filteredExamples = useMemo( () => {
+		// If there's no category definition there may be a single block.
+		if ( ! categoryDefinition ) {
+			return {
 				examples: [
 					examples.find(
 						( example ) => example.name === previewCategory
 					),
 				],
-		  };
+			};
+		}
 
-	// If there's no preview category, show all examples.
-	const displayedExamples = previewCategory
-		? filteredExamples
-		: { examples: examplesForSinglePageUse };
+		return getExamplesByCategory( categoryDefinition, examples );
+	}, [ categoryDefinition, examples, previewCategory ] );
+
+	const displayedExamples = useMemo( () => {
+		// If there's no preview category, show all examples.
+		if ( ! previewCategory ) {
+			return { examples: examplesForSinglePageUse };
+		}
+
+		if ( blockVariation ) {
+			return {
+				examples: applyBlockVariationsToExamples(
+					filteredExamples.examples,
+					blockVariation
+				),
+			};
+		}
+
+		return filteredExamples;
+	}, [
+		previewCategory,
+		examplesForSinglePageUse,
+		blockVariation,
+		filteredExamples,
+	] );
 
 	const { base: baseConfig } = useContext( GlobalStylesContext );
 	const goTo = getStyleBookNavigationFromPath( section );
@@ -603,7 +662,11 @@ const Examples = memo(
 							isSelected={ isSelected?.( example.name ) }
 							onClick={
 								!! onSelect
-									? () => onSelect( example.name )
+									? () =>
+											onSelect(
+												example.name,
+												!! example.variation
+											)
 									: null
 							}
 						/>

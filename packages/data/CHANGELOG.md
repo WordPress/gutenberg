@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+## 10.28.0 (2025-08-07)
+
+## 10.27.0 (2025-07-23)
+
+## 10.26.0 (2025-06-25)
+
+### Bug Fixes
+
+-   Add support for private selectors to `resolveSelect` and `suspendSelect` ([#52036](https://github.com/WordPress/gutenberg/pull/52036)).
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
 ## 10.23.0 (2025-05-07)
 
 ## 10.22.0 (2025-04-11)

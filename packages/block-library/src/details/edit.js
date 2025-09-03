@@ -6,20 +6,26 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	TextControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+
+const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 const TEMPLATE = [
 	[
@@ -30,7 +36,7 @@ const TEMPLATE = [
 	],
 ];
 
-function DetailsEdit( { attributes, setAttributes } ) {
+function DetailsEdit( { attributes, setAttributes, clientId } ) {
 	const { name, showContent, summary, allowedBlocks, placeholder } =
 		attributes;
 	const blockProps = useBlockProps();
@@ -41,6 +47,27 @@ function DetailsEdit( { attributes, setAttributes } ) {
 	} );
 	const [ isOpen, setIsOpen ] = useState( showContent );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Check if the inner blocks are selected.
+	const hasSelectedInnerBlock = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
+		[ clientId ]
+	);
+
+	const handleSummaryKeyDown = ( event ) => {
+		if ( event.key === 'Enter' && ! event.shiftKey ) {
+			setIsOpen( ( prevIsOpen ) => ! prevIsOpen );
+			event.preventDefault();
+		}
+	};
+
+	// Prevent spacebar from toggling <details> while typing.
+	const handleSummaryKeyUp = ( event ) => {
+		if ( event.key === ' ' ) {
+			event.preventDefault();
+		}
+	};
 
 	return (
 		<>
@@ -93,13 +120,18 @@ function DetailsEdit( { attributes, setAttributes } ) {
 			</InspectorControls>
 			<details
 				{ ...innerBlocksProps }
-				open={ isOpen }
+				open={ isOpen || hasSelectedInnerBlock }
 				onToggle={ ( event ) => setIsOpen( event.target.open ) }
 			>
-				<summary>
+				<summary
+					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
+					onKeyUp={ handleSummaryKeyUp }
+				>
 					<RichText
 						identifier="summary"
-						aria-label={ __( 'Write summary' ) }
+						aria-label={ __(
+							'Write summary. Press Enter to expand or collapse the details.'
+						) }
 						placeholder={ placeholder || __( 'Write summary…' ) }
 						withoutInteractiveFormatting
 						value={ summary }

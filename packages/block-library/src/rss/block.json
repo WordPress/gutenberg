@@ -18,7 +18,8 @@
 		},
 		"feedURL": {
 			"type": "string",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"itemsToShow": {
 			"type": "number",

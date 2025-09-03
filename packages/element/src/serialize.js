@@ -48,7 +48,11 @@ import RawHTML from './raw-html';
 
 /** @typedef {import('react').ReactElement} ReactElement */
 
-const { Provider, Consumer } = createContext( undefined );
+const Context = createContext( undefined );
+Context.displayName = 'ElementContext';
+
+const { Provider, Consumer } = Context;
+
 const ForwardRef = forwardRef( () => {
 	return null;
 } );
@@ -526,6 +530,7 @@ function getNormalStylePropertyValue( property, value ) {
 	if (
 		typeof value === 'number' &&
 		0 !== value &&
+		! hasPrefix( property, [ '--' ] ) &&
 		! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property )
 	) {
 		return value + 'px';
@@ -717,9 +722,9 @@ export function renderComponent(
 /**
  * Serializes an array of children to string.
  *
- * @param {import('react').ReactNodeArray} children        Children to serialize.
- * @param {Object}                         [context]       Context object.
- * @param {Object}                         [legacyContext] Legacy context object.
+ * @param {ReadonlyArray<import('react').ReactNode>} children        Children to serialize.
+ * @param {Object}                                   [context]       Context object.
+ * @param {Object}                                   [legacyContext] Legacy context object.
  *
  * @return {string} Serialized children.
  */

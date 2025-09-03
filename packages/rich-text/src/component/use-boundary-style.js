@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { colord } from 'colord';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -31,9 +36,9 @@ export function useBoundaryStyle( { record } ) {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 		const computedStyle = defaultView.getComputedStyle( element );
-		const newColor = computedStyle.color
-			.replace( ')', ', 0.2)' )
-			.replace( 'rgb', 'rgba' );
+		const newColor = colord( computedStyle.color )
+			.alpha( 0.2 )
+			.toRgbString();
 		const selector = `.rich-text:focus ${ boundarySelector }`;
 		const rule = `background-color: ${ newColor }`;
 		const style = `${ selector } {${ rule }}`;

@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	CheckboxControl,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -134,7 +135,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description, rel } = attributes;
+	const { label, url, description, rel, opensInNewTab } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -392,6 +393,7 @@ export default function NavigationSubmenuEdit( {
 							url: '',
 							description: '',
 							rel: '',
+							opensInNewTab: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -430,6 +432,24 @@ export default function NavigationSubmenuEdit( {
 							label={ __( 'Link' ) }
 							autoComplete="off"
 							type="url"
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
 						/>
 					</ToolsPanelItem>
 

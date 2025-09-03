@@ -252,14 +252,6 @@ const variations = [
 		attributes: { providerNameSlug: 'reverbnation', responsive: true },
 	},
 	{
-		name: 'screencast',
-		title: getTitle( 'Screencast' ),
-		icon: embedVideoIcon,
-		description: __( 'Embed Screencast content.' ),
-		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
-		attributes: { providerNameSlug: 'screencast', responsive: true },
-	},
-	{
 		name: 'scribd',
 		title: getTitle( 'Scribd' ),
 		icon: embedContentIcon,

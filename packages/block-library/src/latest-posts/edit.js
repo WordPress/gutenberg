@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	PanelBody,
 	Placeholder,
 	QueryControls,
 	RadioControl,
@@ -328,131 +327,240 @@ function Controls( { attributes, setAttributes, postCount } ) {
 					/>
 				</ToolsPanelItem>
 			</ToolsPanel>
-			<PanelBody title={ __( 'Featured image' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Featured image' ) }
+				resetAll={ () =>
+					setAttributes( {
+						displayFeaturedImage: false,
+						featuredImageAlign: undefined,
+						featuredImageSizeSlug: 'thumbnail',
+						featuredImageSizeWidth: null,
+						featuredImageSizeHeight: null,
+						addLinkToFeaturedImage: false,
+					} )
+				}
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					hasValue={ () => !! displayFeaturedImage }
 					label={ __( 'Display featured image' ) }
-					checked={ displayFeaturedImage }
-					onChange={ ( value ) =>
-						setAttributes( { displayFeaturedImage: value } )
+					onDeselect={ () =>
+						setAttributes( { displayFeaturedImage: false } )
 					}
-				/>
+					isShownByDefault
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ ( value ) =>
+							setAttributes( { displayFeaturedImage: value } )
+						}
+					/>
+				</ToolsPanelItem>
 				{ displayFeaturedImage && (
 					<>
-						<ImageSizeControl
-							onChange={ ( value ) => {
-								const newAttrs = {};
-								if ( value.hasOwnProperty( 'width' ) ) {
-									newAttrs.featuredImageSizeWidth =
-										value.width;
-								}
-								if ( value.hasOwnProperty( 'height' ) ) {
-									newAttrs.featuredImageSizeHeight =
-										value.height;
-								}
-								setAttributes( newAttrs );
-							} }
-							slug={ featuredImageSizeSlug }
-							width={ featuredImageSizeWidth }
-							height={ featuredImageSizeHeight }
-							imageWidth={ defaultImageWidth }
-							imageHeight={ defaultImageHeight }
-							imageSizeOptions={ imageSizeOptions }
-							imageSizeHelp={ __(
-								'Select the size of the source image.'
-							) }
-							onChangeImage={ ( value ) =>
+						<ToolsPanelItem
+							hasValue={ () =>
+								featuredImageSizeSlug !== 'thumbnail' ||
+								featuredImageSizeWidth !== null ||
+								featuredImageSizeHeight !== null
+							}
+							label={ __( 'Image size' ) }
+							onDeselect={ () =>
 								setAttributes( {
-									featuredImageSizeSlug: value,
-									featuredImageSizeWidth: undefined,
-									featuredImageSizeHeight: undefined,
+									featuredImageSizeSlug: 'thumbnail',
+									featuredImageSizeWidth: null,
+									featuredImageSizeHeight: null,
 								} )
 							}
-						/>
-						<ToggleGroupControl
-							className="editor-latest-posts-image-alignment-control"
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Image alignment' ) }
-							value={ featuredImageAlign || 'none' }
-							onChange={ ( value ) =>
-								setAttributes( {
-									featuredImageAlign:
-										value !== 'none' ? value : undefined,
-								} )
-							}
+							isShownByDefault
 						>
-							{ imageAlignmentOptions.map(
-								( { value, icon, label } ) => {
-									return (
-										<ToggleGroupControlOptionIcon
-											key={ value }
-											value={ value }
-											icon={ icon }
-											label={ label }
-										/>
-									);
+							<ImageSizeControl
+								onChange={ ( value ) => {
+									const newAttrs = {};
+									if ( value.hasOwnProperty( 'width' ) ) {
+										newAttrs.featuredImageSizeWidth =
+											value.width;
+									}
+									if ( value.hasOwnProperty( 'height' ) ) {
+										newAttrs.featuredImageSizeHeight =
+											value.height;
+									}
+									setAttributes( newAttrs );
+								} }
+								slug={ featuredImageSizeSlug }
+								width={ featuredImageSizeWidth }
+								height={ featuredImageSizeHeight }
+								imageWidth={ defaultImageWidth }
+								imageHeight={ defaultImageHeight }
+								imageSizeOptions={ imageSizeOptions }
+								imageSizeHelp={ __(
+									'Select the size of the source image.'
+								) }
+								onChangeImage={ ( value ) =>
+									setAttributes( {
+										featuredImageSizeSlug: value,
+										featuredImageSizeWidth: undefined,
+										featuredImageSizeHeight: undefined,
+									} )
 								}
-							) }
-						</ToggleGroupControl>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Add link to featured image' ) }
-							checked={ addLinkToFeaturedImage }
-							onChange={ ( value ) =>
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							hasValue={ () => !! featuredImageAlign }
+							label={ __( 'Image alignment' ) }
+							onDeselect={ () =>
 								setAttributes( {
-									addLinkToFeaturedImage: value,
+									featuredImageAlign: undefined,
 								} )
 							}
-						/>
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								className="editor-latest-posts-image-alignment-control"
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Image alignment' ) }
+								value={ featuredImageAlign || 'none' }
+								onChange={ ( value ) =>
+									setAttributes( {
+										featuredImageAlign:
+											value !== 'none'
+												? value
+												: undefined,
+									} )
+								}
+							>
+								{ imageAlignmentOptions.map(
+									( { value, icon, label } ) => {
+										return (
+											<ToggleGroupControlOptionIcon
+												key={ value }
+												value={ value }
+												icon={ icon }
+												label={ label }
+											/>
+										);
+									}
+								) }
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							hasValue={ () => !! addLinkToFeaturedImage }
+							label={ __( 'Add link to featured image' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									addLinkToFeaturedImage: false,
+								} )
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ ( value ) =>
+									setAttributes( {
+										addLinkToFeaturedImage: value,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
 					</>
 				) }
-			</PanelBody>
-			<PanelBody title={ __( 'Sorting and filtering' ) }>
-				<QueryControls
-					{ ...{ order, orderBy } }
-					numberOfItems={ postsToShow }
-					onOrderChange={ ( value ) =>
-						setAttributes( { order: value } )
+			</ToolsPanel>
+
+			<ToolsPanel
+				label={ __( 'Sorting and filtering' ) }
+				resetAll={ () =>
+					setAttributes( {
+						order: 'desc',
+						orderBy: 'date',
+						postsToShow: 5,
+						categories: undefined,
+						selectedAuthor: undefined,
+						columns: 3,
+					} )
+				}
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					hasValue={ () =>
+						order !== 'desc' ||
+						orderBy !== 'date' ||
+						postsToShow !== 5 ||
+						categories?.length > 0 ||
+						!! selectedAuthor
 					}
-					onOrderByChange={ ( value ) =>
-						setAttributes( { orderBy: value } )
-					}
-					onNumberOfItemsChange={ ( value ) =>
-						setAttributes( { postsToShow: value } )
-					}
-					categorySuggestions={ categorySuggestions }
-					onCategoryChange={ selectCategories }
-					selectedCategories={ categories }
-					onAuthorChange={ ( value ) =>
+					label={ __( 'Sort and filter' ) }
+					onDeselect={ () =>
 						setAttributes( {
-							selectedAuthor:
-								'' !== value ? Number( value ) : undefined,
+							order: 'desc',
+							orderBy: 'date',
+							postsToShow: 5,
+							categories: undefined,
+							selectedAuthor: undefined,
 						} )
 					}
-					authorList={ authorList ?? [] }
-					selectedAuthorId={ selectedAuthor }
-				/>
+					isShownByDefault
+				>
+					<QueryControls
+						{ ...{ order, orderBy } }
+						numberOfItems={ postsToShow }
+						onOrderChange={ ( value ) =>
+							setAttributes( { order: value } )
+						}
+						onOrderByChange={ ( value ) =>
+							setAttributes( { orderBy: value } )
+						}
+						onNumberOfItemsChange={ ( value ) =>
+							setAttributes( { postsToShow: value } )
+						}
+						categorySuggestions={ categorySuggestions }
+						onCategoryChange={ selectCategories }
+						selectedCategories={ categories }
+						onAuthorChange={ ( value ) =>
+							setAttributes( {
+								selectedAuthor:
+									'' !== value ? Number( value ) : undefined,
+							} )
+						}
+						authorList={ authorList ?? [] }
+						selectedAuthorId={ selectedAuthor }
+					/>
+				</ToolsPanelItem>
 
 				{ postLayout === 'grid' && (
-					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+					<ToolsPanelItem
+						hasValue={ () => columns !== 3 }
 						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) =>
-							setAttributes( { columns: value } )
+						onDeselect={ () =>
+							setAttributes( {
+								columns: 3,
+							} )
 						}
-						min={ 2 }
-						max={
-							! postCount
-								? MAX_POSTS_COLUMNS
-								: Math.min( MAX_POSTS_COLUMNS, postCount )
-						}
-						required
-					/>
+						isShownByDefault
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) =>
+								setAttributes( { columns: value } )
+							}
+							min={ 2 }
+							max={
+								! postCount
+									? MAX_POSTS_COLUMNS
+									: Math.min( MAX_POSTS_COLUMNS, postCount )
+							}
+							required
+						/>
+					</ToolsPanelItem>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 		</>
 	);
 }
@@ -666,7 +774,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									{ addLinkToFeaturedImage ? (
 										<a
 											href={ post.link }
-											rel="noreferrer noopener"
 											onClick={
 												showRedirectionPreventedNotice
 											}
@@ -681,7 +788,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							<a
 								className="wp-block-latest-posts__post-title"
 								href={ post.link }
-								rel="noreferrer noopener"
 								dangerouslySetInnerHTML={
 									!! titleTrimmed
 										? {

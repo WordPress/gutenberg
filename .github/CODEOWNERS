@@ -93,6 +93,7 @@
 /packages/base-styles
 /packages/icons
 /packages/primitives
+/packages/dataviews                              @oandregal
 
 # Utilities
 /packages/a11y

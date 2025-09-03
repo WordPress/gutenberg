@@ -289,6 +289,11 @@ Options:
              them in a comma-separated list: `--xdebug=develop,coverage`. See
              https://xdebug.org/docs/all_settings#mode for information about
              Xdebug modes.                                              [string]
+  --spx      Enables SPX profiling. If not passed, SPX is turned off. If no
+             mode is set, uses "enabled". SPX is a simple profiling extension
+             with a built-in web UI. See
+             https://github.com/NoiseByNorthwest/php-spx for more information.
+                                                                        [string]
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
@@ -755,6 +760,29 @@ php_value memory_limit 2G
 ```
 
 This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
+
+### Using SPX Profiling
+
+SPX is a simple profiling extension for PHP that provides low-overhead profiling with a built-in web UI. When enabled with `--spx`, you can access the SPX profiling interface to analyze your application's performance.
+
+To enable SPX profiling:
+
+```sh
+wp-env start --spx
+```
+
+Once enabled, you can access the SPX web UI by visiting any page in your WordPress environment with the query parameters `?SPX_KEY=dev&SPX_UI_URI=/`. For example:
+
+- Development site: `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
+- Test site: `http://localhost:8889/?SPX_KEY=dev&SPX_UI_URI=/`
+
+From the SPX interface, you can:
+- Enable profiling for subsequent requests
+- View flame graphs and performance metrics
+- Analyze function call timelines
+- Examine memory usage and other performance data
+
+SPX provides a more lightweight alternative to Xdebug for profiling, with minimal performance overhead and an intuitive web-based interface.
 
 ## Contributing to this package
 

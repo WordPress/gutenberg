@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 30.23.0 (2025-09-03)
+
+### Internal
+
+-   Remove deprecated `clean-webpack-plugin` dependency in favor of webpack's native cleaning functionality ([#71080](https://github.com/WordPress/gutenberg/pull/71080))
+
+## 30.22.0 (2025-08-20)
+
+## 30.21.0 (2025-08-07)
+
+## 30.20.0 (2025-07-23)
+
+## 30.19.0 (2025-06-25)
+
+## 30.18.0 (2025-06-04)
+
+## 30.17.0 (2025-05-22)
+
 ## 30.16.0 (2025-05-07)
 
 ## 30.15.0 (2025-04-11)

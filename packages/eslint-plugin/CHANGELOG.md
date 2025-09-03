@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 22.16.0 (2025-09-03)
+
+## 22.15.0 (2025-08-20)
+
+## 22.14.0 (2025-08-07)
+
+## 22.13.0 (2025-07-23)
+
+### Enhancements
+
+- Added stricter ESLint checks for translator comments.
+- Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
+- Flags missing and extra/outdated placeholders.
+
+## 22.12.0 (2025-06-25)
+
+## 22.11.0 (2025-06-04)
+
+## 22.10.0 (2025-05-22)
+
 ## 22.9.0 (2025-05-07)
 
 ## 22.8.0 (2025-04-11)

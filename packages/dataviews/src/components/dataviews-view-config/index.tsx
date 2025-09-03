@@ -45,15 +45,12 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
-import type { NormalizedField, SupportedLayouts, View } from '../../types';
+import type { NormalizedField, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import InfiniteScrollToggle from './infinite-scroll-toggle';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
-
-interface ViewTypeMenuProps {
-	defaultLayouts?: SupportedLayouts;
-}
 
 const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
@@ -61,10 +58,9 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	offset: 9,
 };
 
-function ViewTypeMenu( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewTypeMenuProps ) {
-	const { view, onChangeView } = useContext( DataViewsContext );
+export function ViewTypeMenu() {
+	const { view, onChangeView, defaultLayouts } =
+		useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
 	if ( availableLayouts.length <= 1 ) {
 		return null;
@@ -107,12 +103,11 @@ function ViewTypeMenu( {
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
 										}
-										// @ts-expect-error
 										return onChangeView( {
 											...viewWithoutLayout,
 											type: e.target.value,
 											...defaultLayouts[ e.target.value ],
-										} );
+										} as View );
 								}
 								warning( 'Invalid dataview' );
 							} }
@@ -218,9 +213,19 @@ function SortDirectionControl() {
 	);
 }
 
-const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
 function ItemsPerPageControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, config, onChangeView } = useContext( DataViewsContext );
+	const { infiniteScrollEnabled } = view;
+	if (
+		! config ||
+		! config.perPageSizes ||
+		config.perPageSizes.length < 2 ||
+		config.perPageSizes.length > 6 ||
+		infiniteScrollEnabled
+	) {
+		return null;
+	}
+
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
@@ -242,7 +247,7 @@ function ItemsPerPageControl() {
 				} );
 			} }
 		>
-			{ PAGE_SIZE_VALUES.map( ( value ) => {
+			{ config.perPageSizes.map( ( value ) => {
 				return (
 					<ToggleGroupControlOption
 						key={ value }
@@ -761,7 +766,7 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigDropdown() {
+export function DataviewsViewConfigDropdown() {
 	const { view } = useContext( DataViewsContext );
 	const popoverId = useInstanceId(
 		_DataViewsViewConfig,
@@ -803,6 +808,7 @@ function DataviewsViewConfigDropdown() {
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
+							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 						</SettingsSection>
 						<SettingsSection title={ __( 'Properties' ) }>
@@ -815,14 +821,10 @@ function DataviewsViewConfigDropdown() {
 	);
 }
 
-function _DataViewsViewConfig( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: {
-	defaultLayouts?: SupportedLayouts;
-} ) {
+function _DataViewsViewConfig() {
 	return (
 		<>
-			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
+			<ViewTypeMenu />
 			<DataviewsViewConfigDropdown />
 		</>
 	);

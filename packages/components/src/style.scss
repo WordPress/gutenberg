@@ -1,7 +1,7 @@
 // Include the default WP Components color variables.
 // TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
 :root {
-	@include admin-scheme(#3858e9);
+	@include admin-scheme( #3858e9 );
 }
 
 // Variables
@@ -13,6 +13,7 @@
 @import "./badge/styles.scss";
 @import "./button-group/style.scss";
 @import "./button/style.scss";
+@import "./calendar/style.scss";
 @import "./checkbox-control/style.scss";
 @import "./circular-option-picker/style.scss";
 @import "./palette-edit/style.scss";
@@ -20,7 +21,6 @@
 @import "./combobox-control/style.scss";
 @import "./color-palette/style.scss";
 @import "./custom-gradient-picker/style.scss";
-@import "./dimension-control/style.scss";
 @import "./draggable/style.scss";
 @import "./drop-zone/style.scss";
 @import "./dropdown/style.scss";
@@ -55,3 +55,4 @@
 @import "./toolbar/toolbar-button/style.scss";
 @import "./toolbar/toolbar-group/style.scss";
 @import "./tooltip/style.scss";
+@import "./validated-form-controls/style.scss";

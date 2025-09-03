@@ -345,6 +345,13 @@ $block-editor-link-control-number-of-actions: 1;
 	position: relative;
 }
 
+.block-editor-link-control__settings {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;

@@ -882,7 +882,7 @@ export const blocks = pipe(
 				const newState = new Map( state );
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
-						action.uniqueByBlock
+						!! action.options?.uniqueByBlock
 							? action.attributes[ clientId ]
 							: action.attributes ?? {}
 					);
@@ -1833,7 +1833,7 @@ export function lastBlockAttributesChange( state = null, action ) {
 			return action.clientIds.reduce(
 				( accumulator, id ) => ( {
 					...accumulator,
-					[ id ]: action.uniqueByBlock
+					[ id ]: !! action.options?.uniqueByBlock
 						? action.attributes[ id ]
 						: action.attributes,
 				} ),
@@ -2056,23 +2056,6 @@ export function lastFocus( state = false, action ) {
 }
 
 /**
- * Reducer setting currently hovered block.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function hoveredBlockClientId( state = false, action ) {
-	switch ( action.type ) {
-		case 'HOVER_BLOCK':
-			return action.clientId;
-	}
-
-	return state;
-}
-
-/**
  * Reducer setting zoom out state.
  *
  * @param {boolean} state  Current state.
@@ -2141,7 +2124,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	hoveredBlockClientId,
 	zoomLevel,
 } );
 

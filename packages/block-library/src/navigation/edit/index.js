@@ -31,10 +31,12 @@ import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	PanelBody,
-	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalVStack as VStack,
+	ToggleControl,
 	Button,
 	Spinner,
 	Notice,
@@ -72,6 +74,7 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 
 function ColorTools( {
 	textColor,
@@ -591,11 +594,25 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
-					<PanelBody title={ __( 'Display' ) }>
+					<ToolsPanel
+						label={ __( 'Display' ) }
+						resetAll={ () => {
+							setAttributes( {
+								showSubmenuIcon: true,
+								openSubmenusOnClick: false,
+								overlayMenu: 'mobile',
+								hasIcon: true,
+								icon: 'handle',
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ isResponsive && (
 							<>
 								<Button
@@ -623,88 +640,134 @@ function Navigation( {
 										</>
 									) }
 								</Button>
-								<div id={ overlayMenuPreviewId }>
-									{ overlayMenuPreview && (
+								{ overlayMenuPreview && (
+									<VStack
+										id={ overlayMenuPreviewId }
+										spacing={ 4 }
+										style={ {
+											gridColumn: 'span 2',
+										} }
+									>
 										<OverlayMenuPreview
 											setAttributes={ setAttributes }
 											hasIcon={ hasIcon }
 											icon={ icon }
 											hidden={ ! overlayMenuPreview }
 										/>
-									) }
-								</div>
-							</>
-						) }
-						<ToggleGroupControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Overlay Menu' ) }
-							aria-label={ __( 'Configure overlay menu' ) }
-							value={ overlayMenu }
-							help={ __(
-								'Collapses the navigation options in a menu icon opening an overlay.'
-							) }
-							onChange={ ( value ) =>
-								setAttributes( { overlayMenu: value } )
-							}
-							isBlock
-						>
-							<ToggleGroupControlOption
-								value="never"
-								label={ __( 'Off' ) }
-							/>
-							<ToggleGroupControlOption
-								value="mobile"
-								label={ __( 'Mobile' ) }
-							/>
-							<ToggleGroupControlOption
-								value="always"
-								label={ __( 'Always' ) }
-							/>
-						</ToggleGroupControl>
-						{ hasSubmenus && (
-							<>
-								<h3>{ __( 'Submenus' ) }</h3>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ openSubmenusOnClick }
-									onChange={ ( value ) => {
-										setAttributes( {
-											openSubmenusOnClick: value,
-											...( value && {
-												showSubmenuIcon: true,
-											} ), // Make sure arrows are shown when we toggle this on.
-										} );
-									} }
-									label={ __( 'Open on click' ) }
-								/>
-
-								<ToggleControl
-									__nextHasNoMarginBottom
-									checked={ showSubmenuIcon }
-									onChange={ ( value ) => {
-										setAttributes( {
-											showSubmenuIcon: value,
-										} );
-									} }
-									disabled={ attributes.openSubmenusOnClick }
-									label={ __( 'Show arrow' ) }
-								/>
-
-								{ submenuAccessibilityNotice && (
-									<div>
-										<Notice
-											spokenMessage={ null }
-											status="warning"
-											isDismissible={ false }
-										>
-											{ submenuAccessibilityNotice }
-										</Notice>
-									</div>
+									</VStack>
 								) }
 							</>
 						) }
-					</PanelBody>
+
+						<ToolsPanelItem
+							hasValue={ () => overlayMenu !== 'mobile' }
+							label={ __( 'Overlay Menu' ) }
+							onDeselect={ () =>
+								setAttributes( { overlayMenu: 'mobile' } )
+							}
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Overlay Menu' ) }
+								aria-label={ __( 'Configure overlay menu' ) }
+								value={ overlayMenu }
+								help={ __(
+									'Collapses the navigation options in a menu icon opening an overlay.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { overlayMenu: value } )
+								}
+								isBlock
+							>
+								<ToggleGroupControlOption
+									value="never"
+									label={ __( 'Off' ) }
+								/>
+								<ToggleGroupControlOption
+									value="mobile"
+									label={ __( 'Mobile' ) }
+								/>
+								<ToggleGroupControlOption
+									value="always"
+									label={ __( 'Always' ) }
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+
+						{ hasSubmenus && (
+							<>
+								<h3 className="wp-block-navigation__submenu-header">
+									{ __( 'Submenus' ) }
+								</h3>
+								<ToolsPanelItem
+									hasValue={ () => openSubmenusOnClick }
+									label={ __( 'Open on click' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											openSubmenusOnClick: false,
+											showSubmenuIcon: true,
+										} )
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ openSubmenusOnClick }
+										onChange={ ( value ) => {
+											setAttributes( {
+												openSubmenusOnClick: value,
+												...( value && {
+													showSubmenuIcon: true,
+												} ), // Make sure arrows are shown when we toggle this on.
+											} );
+										} }
+										label={ __( 'Open on click' ) }
+									/>
+								</ToolsPanelItem>
+
+								<ToolsPanelItem
+									hasValue={ () => ! showSubmenuIcon }
+									label={ __( 'Show arrow' ) }
+									onDeselect={ () =>
+										setAttributes( {
+											showSubmenuIcon: true,
+										} )
+									}
+									isDisabled={
+										attributes.openSubmenusOnClick
+									}
+									isShownByDefault
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										checked={ showSubmenuIcon }
+										onChange={ ( value ) => {
+											setAttributes( {
+												showSubmenuIcon: value,
+											} );
+										} }
+										disabled={
+											attributes.openSubmenusOnClick
+										}
+										label={ __( 'Show arrow' ) }
+									/>
+								</ToolsPanelItem>
+
+								{ submenuAccessibilityNotice && (
+									<Notice
+										spokenMessage={ null }
+										status="warning"
+										isDismissible={ false }
+										className="wp-block-navigation__submenu-accessibility-notice"
+									>
+										{ submenuAccessibilityNotice }
+									</Notice>
+								) }
+							</>
+						) }
+					</ToolsPanel>
 				) }
 			</InspectorControls>
 			<InspectorControls group="color">

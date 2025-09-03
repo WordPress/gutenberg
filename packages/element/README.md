@@ -270,7 +270,23 @@ _Related_
 
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
+Component used to render unescaped HTML.
+
+Note: The `renderElement` serializer will remove the `div` wrapper unless non-children props are present; typically when preparing a block for saving.
+
+_Usage_
+
+```jsx
+import { RawHTML } from '@wordpress/element';
+
+const Component = () => (
+	<RawHTML>
+		<h3>Hello world</h3>
+	</RawHTML>
+);
+// Edit: <div><h3>Hello world</h3></div>
+// save: <h3>Hello world</h3>
+```
 
 _Parameters_
 

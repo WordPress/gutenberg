@@ -150,7 +150,7 @@ Update the [`supports`](https://developer.wordpress.org/block-editor/getting-sta
 
 Note that when you enable text color support with `"text": true`, the background color is also enabled by default. You are welcome to keep it enabled, but it's not required for this tutorial, so you can manually set `"background": false`.
 
-Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Sidebar. Try modifying the settings and see what happens.
+Save the file and select the block in the Editor. You will now see both Color and Typography panels in the Settings Panel. Try modifying the settings and see what happens.
 
 ![The block in the Editor with block supports](https://developer.wordpress.org/files/2023/12/block-tutorial-5.png)
 

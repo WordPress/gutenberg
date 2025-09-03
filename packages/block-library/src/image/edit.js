@@ -99,7 +99,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
 		id,
 		width,
@@ -126,11 +125,6 @@ export function ImageEdit( {
 		useResizeObserver();
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
-
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
 
 	const captionRef = useRef();
 	useEffect( () => {
@@ -248,6 +242,18 @@ export function ImageEdit( {
 		}
 
 		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
+		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.

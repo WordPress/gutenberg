@@ -115,7 +115,7 @@ Here you have some more resources to learn/read more about the Interactivity API
 -   [Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882), especially the [showcase](https://github.com/WordPress/gutenberg/discussions/55642#discussioncomment-9667164) discussions.
 -   [wpmovies.dev](https://wpmovies.dev/) demo and its [wp-movies-demo](https://github.com/WordPress/wp-movies-demo) repo
 -   Examples using the Interactivity API at [block-development-examples](https://github.com/WordPress/block-development-examples):
-    -   [`interactivity-api-block-833d15`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-block-833d15)
+    -   [`my-first-interactive-block`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/my-first-interactive-block)
     -   [`interactivity-api-countdown-3cd73e`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-countdown-3cd73e)
     -   [`interactivity-api-quiz-1835fa`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-quiz-1835fa)
 

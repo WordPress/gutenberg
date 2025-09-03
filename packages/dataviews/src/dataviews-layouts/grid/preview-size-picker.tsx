@@ -3,7 +3,7 @@
  */
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,100 +11,77 @@ import { useMemo, useContext } from '@wordpress/element';
 import DataViewsContext from '../../components/dataviews-context';
 import type { ViewGrid } from '../../types';
 
-const viewportBreaks: {
-	[ key: string ]: { min: number; max: number; default: number };
-} = {
-	xhuge: { min: 3, max: 6, default: 5 },
-	huge: { min: 2, max: 4, default: 4 },
-	xlarge: { min: 2, max: 3, default: 3 },
-	large: { min: 1, max: 2, default: 2 },
-	mobile: { min: 1, max: 2, default: 2 },
-};
-
-/**
- * Breakpoints were adjusted from media queries breakpoints to account for
- * the sidebar width. This was done to match the existing styles we had.
- */
-const BREAKPOINTS = {
-	xhuge: 1520,
-	huge: 1140,
-	xlarge: 780,
-	large: 480,
-	mobile: 0,
-};
-
-function useViewPortBreakpoint() {
-	const containerWidth = useContext( DataViewsContext ).containerWidth;
-	for ( const [ key, value ] of Object.entries( BREAKPOINTS ) ) {
-		if ( containerWidth >= value ) {
-			return key;
-		}
-	}
-	return 'mobile';
-}
-
-export function useUpdatedPreviewSizeOnViewportChange() {
-	const view = useContext( DataViewsContext ).view as ViewGrid;
-	const viewport = useViewPortBreakpoint();
-	return useMemo( () => {
-		const previewSize = view.layout?.previewSize;
-		let newPreviewSize;
-		if ( ! previewSize ) {
-			return;
-		}
-		const breakValues = viewportBreaks[ viewport ];
-		if ( previewSize < breakValues.min ) {
-			newPreviewSize = breakValues.min;
-		}
-		if ( previewSize > breakValues.max ) {
-			newPreviewSize = breakValues.max;
-		}
-		return newPreviewSize;
-	}, [ viewport, view ] );
-}
+const imageSizes = [
+	{
+		value: 120,
+		breakpoint: 1,
+	},
+	{
+		value: 170,
+		breakpoint: 1,
+	},
+	{
+		value: 230,
+		breakpoint: 1,
+	},
+	{
+		value: 290,
+		breakpoint: 1112, // at minimum image width, 4 images display at this container size
+	},
+	{
+		value: 350,
+		breakpoint: 1636, // at minimum image width, 6 images display at this container size
+	},
+	{
+		value: 430,
+		breakpoint: 588, // at minimum image width, 2 images display at this container size
+	},
+];
 
 export default function PreviewSizePicker() {
-	const viewport = useViewPortBreakpoint();
 	const context = useContext( DataViewsContext );
 	const view = context.view as ViewGrid;
-	const breakValues = viewportBreaks[ viewport ];
-	const previewSizeToUse = view.layout?.previewSize || breakValues.default;
-	const marks = useMemo(
-		() =>
-			Array.from(
-				{ length: breakValues.max - breakValues.min + 1 },
-				( _, i ) => {
-					return {
-						value: breakValues.min + i,
-					};
-				}
-			),
-		[ breakValues ]
-	);
-	if ( viewport === 'mobile' ) {
-		return null;
-	}
+
+	const breakValues = imageSizes.filter( ( size ) => {
+		return context.containerWidth >= size.breakpoint;
+	} );
+
+	const layoutPreviewSize = view.layout?.previewSize ?? 230; // Default to the third smallest size if no preview size is set.
+	// If the container has resized and the set preview size is no longer available,
+	// we reset it to the next smallest size, or the smallest available size.
+	const previewSizeToUse =
+		breakValues
+			.map( ( size, index ) => ( { ...size, index } ) )
+			.filter( ( size ) => size.value <= layoutPreviewSize )
+			.sort( ( a, b ) => b.value - a.value )[ 0 ]?.index ?? 0;
+
+	const marks = breakValues.map( ( size, index ) => {
+		return {
+			value: index,
+		};
+	} );
+
 	return (
 		<RangeControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			showTooltip={ false }
 			label={ __( 'Preview size' ) }
-			value={ breakValues.max + breakValues.min - previewSizeToUse }
-			marks={ marks }
-			min={ breakValues.min }
-			max={ breakValues.max }
+			value={ previewSizeToUse }
+			min={ 0 }
+			max={ breakValues.length - 1 }
 			withInputField={ false }
 			onChange={ ( value = 0 ) => {
 				context.onChangeView( {
 					...view,
 					layout: {
 						...view.layout,
-						previewSize: breakValues.max + breakValues.min - value,
+						previewSize: breakValues[ value ].value,
 					},
 				} );
 			} }
 			step={ 1 }
+			marks={ marks }
 		/>
 	);
 }

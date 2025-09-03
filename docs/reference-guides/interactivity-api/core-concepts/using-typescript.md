@@ -269,7 +269,7 @@ That's it! Now you can access the context properties with the correct types.
 
 The derived state is data that is calculated based on the global state or local context. In the client store definition, it is defined using a getter in the `state` object.
 
-_Please, visit the [Understanding global state, local context and derived state](./undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
+_Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
 
 Following our previous example, let's create a derived state that is the double of our counter.
 
@@ -471,7 +471,7 @@ type Store = {
 };
 ```
 
-There's something to keep in mind when when using asynchronous actions. Just like with the derived state, if the asynchronous action needs to return a value and this value directly depends on some part of the global state, TypeScript will not be able to infer the type due to a circular reference.
+There's something to keep in mind when using asynchronous actions. Just like with the derived state, if an asynchronous action uses `state` within a `yield` expression (for example, by passing `state` to an async function that is then yielded) or if its return value depends on `state`, TypeScript might not be able to infer the types correctly due to a potential circular reference.
 
     ```ts
     const { state, actions } = store( 'myCounterPlugin', {
@@ -479,31 +479,76 @@ There's something to keep in mind when when using asynchronous actions. Just lik
     		counter: 0,
     	},
     	actions: {
-    		*delayedReturn() {
-    			yield new Promise( ( r ) => setTimeout( r, 1000 ) );
-    			return state.counter; // TypeScript can't infer this return type.
+    		*delayedOperation() {
+    			// Example: state.counter is used as part of the yielded logic.
+    			yield fetchCounterData( state.counter );
+
+    			// And/or the final return value depends on state.
+    			return state.counter + 1;
     		},
     	},
     } );
     ```
 
-    In this case, just as we did with the derived state, we must manually type the return value of the generator.
+In such cases, TypeScript might issue a warning about a circular reference or default to `any`. To solve this, you need to manually type the generator function. The Interactivity API provides a helper type, `AsyncAction<ReturnType>`, for this purpose.
 
     ```ts
+    import { store, type AsyncAction } from '@wordpress/interactivity';
+
     const { state, actions } = store( 'myCounterPlugin', {
     	state: {
     		counter: 0,
     	},
     	actions: {
-    		*delayedReturn(): Generator< unknown, number, unknown > {
-    			yield new Promise( ( r ) => setTimeout( r, 1000 ) );
-    			return state.counter; // Now this is correctly inferred.
+    		*delayedOperation(): AsyncAction< number > {
+    			// Now, this doesn't cause a circular reference.
+    			yield fetchCounterData( state.counter );
+
+    			// Now, this is correctly typed.
+    			return state.counter + 1;
     		},
     	},
     } );
     ```
 
-    That's it! Remember that the return type of a Generator is the second generic argument: `Generator< unknown, ReturnType, unknown >`.
+That's it! The `AsyncAction<ReturnType>` helper is defined as `Generator<any, ReturnType, unknown>`. By using `any` for the type of values yielded by the generator, it helps break the circular reference, allowing TypeScript to correctly infer the types when `state` is involved in `yield` expressions or in the final return value. You only need to specify the final `ReturnType` of your asynchronous action.
+
+### Typing yielded values in asynchronous actions
+
+While `AsyncAction<ReturnType>` types the overall generator and its final return value, the value resolved by an individual `yield` expression within that generator might still be typed as `any`.
+
+If you need to ensure the correct type for a value that a `yield` expression resolves to (e.g., the result of a `fetch` call or another async operation), you can use the `TypeYield<T>` helper. This helper takes the type of the asynchronous function/operation being yielded (`T`) and resolves to the type of the value that the promise fulfills with.
+
+Suppose `fetchCounterData` returns a promise that resolves to an object:
+
+    ```ts
+    import { store, type AsyncAction, type TypeYield } from '@wordpress/interactivity';
+
+    // Assume this function is defined elsewhere and fetches specific data.
+    const fetchCounterData = async ( counterValue: number ): Promise< { current: number, next: number } > => {
+        // internal logic...
+    };
+
+    const { state, actions } = store( 'myCounterPlugin', {
+    	state: {
+    		counter: 0,
+    	},
+    	actions: {
+    		*loadCounterData(): AsyncAction< void > {
+    			// Use TypeYield to correctly type the resolved value of the yield.
+    			const data = ( yield fetchCounterData( state.counter ) ) as TypeYield< typeof fetchCounterData >;
+
+    			// Now, `data` is correctly typed as { current: number, next: number }.
+    			console.log( data.current, data.next );
+
+    			// Update state based on the fetched data.
+    			state.counter = data.next;
+    		},
+    	},
+    } );
+    ```
+
+In this example, `( yield fetchCounterData( state.counter ) ) as TypeYield< typeof fetchCounterData >` ensures that the `data` constant is correctly typed as `{ current: number, next: number }`, matching the return type of `fetchCounterData`. This allows you to confidently access properties like `data.current` and `data.next` with type safety.
 
 ## Typing stores that are divided into multiple parts
 

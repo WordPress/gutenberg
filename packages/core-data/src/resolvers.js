@@ -307,13 +307,25 @@ export const getEntityRecords =
 						response.headers.get( 'X-WP-TotalPages' )
 					);
 
+					if ( ! meta ) {
+						meta = {
+							totalItems: parseInt(
+								response.headers.get( 'X-WP-Total' )
+							),
+							totalPages: 1,
+						};
+					}
+
 					records.push( ...pageRecords );
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
 							kind,
 							name,
 							records,
-							query
+							query,
+							false,
+							undefined,
+							meta
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
@@ -322,11 +334,6 @@ export const getEntityRecords =
 					} );
 					page++;
 				} while ( page <= totalPages );
-
-				meta = {
-					totalItems: records.length,
-					totalPages: 1,
-				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
 				meta = {
@@ -365,13 +372,19 @@ export const getEntityRecords =
 				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
 				// See https://github.com/WordPress/gutenberg/pull/64504
-				if ( ! query?._fields && ! query.context ) {
+				// See https://github.com/WordPress/gutenberg/pull/70738
+				if ( ! query.context ) {
 					const targetHints = records
-						.filter( ( record ) => record?.[ key ] )
+						.filter(
+							( record ) =>
+								!! record?.[ key ] &&
+								!! record?._links?.self?.[ 0 ]?.targetHints
+									?.allow
+						)
 						.map( ( record ) => ( {
 							id: record[ key ],
 							permissions: getUserPermissionsFromAllowHeader(
-								record?._links?.self?.[ 0 ].targetHints.allow
+								record._links.self[ 0 ].targetHints.allow
 							),
 						} ) );
 
@@ -394,17 +407,22 @@ export const getEntityRecords =
 						}
 					}
 
-					dispatch.receiveUserPermissions(
-						receiveUserPermissionArgs
-					);
-					dispatch.finishResolutions(
-						'getEntityRecord',
-						getResolutionsArgs( records )
-					);
-					dispatch.finishResolutions(
-						'canUser',
-						canUserResolutionsArgs
-					);
+					if ( targetHints.length > 0 ) {
+						dispatch.receiveUserPermissions(
+							receiveUserPermissionArgs
+						);
+						dispatch.finishResolutions(
+							'canUser',
+							canUserResolutionsArgs
+						);
+					}
+
+					if ( ! query?._fields ) {
+						dispatch.finishResolutions(
+							'getEntityRecord',
+							getResolutionsArgs( records )
+						);
+					}
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -422,6 +440,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the total number of entity records.
+ */
+export const getEntityRecordsTotalItems = forwardResolver( 'getEntityRecords' );
+
+/**
+ * Requests the number of available pages for the given query.
+ */
+export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
 
 /**
  * Requests the current theme.
@@ -468,7 +496,7 @@ export const getEmbedPreview =
  *
  * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
  *                                        'delete'.
- * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
  *                                        or REST base as a string - `media`.
  * @param {?string}       id              ID of the rest resource to check.
  */

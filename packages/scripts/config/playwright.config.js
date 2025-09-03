@@ -10,6 +10,8 @@ process.env.STORAGE_STATE_PATH ??= path.join(
 	'storage-states/admin.json'
 );
 
+const baseUrl = new URL( process.env.WP_BASE_URL || 'http://localhost:8889' );
+
 const config = defineConfig( {
 	reporter: process.env.CI ? [ [ 'github' ] ] : [ [ 'list' ] ],
 	forbidOnly: !! process.env.CI,
@@ -25,7 +27,7 @@ const config = defineConfig( {
 		'{testDir}/{testFileDir}/__snapshots__/{arg}-{projectName}{ext}',
 	globalSetup: require.resolve( './playwright/global-setup.js' ),
 	use: {
-		baseURL: process.env.WP_BASE_URL || 'http://localhost:8889',
+		baseURL: baseUrl.href,
 		headless: true,
 		viewport: {
 			width: 960,
@@ -45,7 +47,7 @@ const config = defineConfig( {
 	},
 	webServer: {
 		command: 'npm run wp-env start',
-		port: 8889,
+		port: baseUrl.port,
 		timeout: 120_000, // 120 seconds.
 		reuseExistingServer: true,
 	},

@@ -30,7 +30,7 @@ import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
 
 /**
- * Recursively clone the passed object.
+ * Recursively clones the passed object.
  *
  * @param source Source object.
  * @return Cloned object.
@@ -105,7 +105,7 @@ const ruleNewline = /\n+/g;
 const empty = ' ';
 
 /**
- * Convert a css style string into a object.
+ * Converts a css style string into a object.
  *
  * Made by Cristian Bote (@cristianbote) for Goober.
  * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
@@ -600,7 +600,12 @@ export default () => {
 		}: {
 			element: any;
 		} ) => {
-			// Preserve the initial inner HTML.
+			// Shown deprecation warning
+			warn(
+				'The "data-wp-ignore" directive of the Interactivity API is deprecated since version 6.9 and will be removed in version 7.0.'
+			);
+
+			// Preserve the initial inner HTML
 			const cached = useMemo( () => innerHTML, [] );
 			return createElement( Type, {
 				dangerouslySetInnerHTML: { __html: cached },

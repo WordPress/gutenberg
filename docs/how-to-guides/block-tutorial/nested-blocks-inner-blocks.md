@@ -176,6 +176,8 @@ You can use a react hook called `useInnerBlocksProps` instead of the `InnerBlock
 
 The `useInnerBlocksProps` is exported from the `@wordpress/block-editor` package same as the `InnerBlocks` component itself and supports everything the component does. It also works like the `useBlockProps` hook.
 
+It is important to note that `useBlockProps` hook must be called *before* `useInnerBlocksProps`, otherwise `useBlockProps` will return empty object. 
+
 Here is the basic `useInnerBlocksProps` hook usage.
 
 

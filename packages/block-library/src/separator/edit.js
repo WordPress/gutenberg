@@ -6,29 +6,46 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule } from '@wordpress/components';
 import {
-	useBlockProps,
 	getColorClassName,
-	__experimentalUseColorProps as useColorProps,
 	InspectorControls,
-	privateApis as blockEditorPrivateApis,
+	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
+import { HorizontalRule, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useDeprecatedOpacity from './use-deprecated-opacity';
-import { unlock } from '../lock-unlock';
 
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const HtmlElementControl = ( { tagName, setAttributes } ) => {
+	return (
+		<SelectControl
+			label={ __( 'HTML element' ) }
+			value={ tagName }
+			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
+			options={ [
+				{ label: __( 'Default (<hr>)' ), value: 'hr' },
+				{ label: '<div>', value: 'div' },
+			] }
+			help={
+				tagName === 'hr'
+					? __(
+							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
+					  )
+					: __(
+							'The <div> element should only be used if the block is a design element with no semantic meaning.'
+					  )
+			}
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+		/>
+	);
+};
 
-export default function SeparatorEdit( {
-	attributes,
-	setAttributes,
-	clientId,
-} ) {
+export default function SeparatorEdit( { attributes, setAttributes } ) {
 	const { backgroundColor, opacity, style, tagName } = attributes;
 	const colorProps = useColorProps( attributes );
 	const currentColor = colorProps?.style?.backgroundColor;
@@ -59,16 +76,9 @@ export default function SeparatorEdit( {
 	return (
 		<>
 			<InspectorControls group="advanced">
-				<HTMLElementControl
+				<HtmlElementControl
 					tagName={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					clientId={ clientId }
-					options={ [
-						{ label: __( 'Default (<hr>)' ), value: 'hr' },
-						{ label: '<div>', value: 'div' },
-					] }
+					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
 			<Wrapper

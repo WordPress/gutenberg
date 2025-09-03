@@ -16,10 +16,9 @@
 			"type": "string"
 		},
 		"apiVersion": {
-			"description": "The version of the Block API used by the block. The most recent version is 3 and it was introduced in WordPress 6.3.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"type": "integer",
-			"enum": [ 1, 2, 3 ],
-			"default": 1
+			"const": 3
 		},
 		"name": {
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme.",
@@ -184,6 +183,11 @@
 						"meta": {
 							"description": "Although attributes may be obtained from a post’s meta, meta attribute sources are considered deprecated; EntityProvider and related hook APIs should be used instead, as shown in the Create Meta Block how-to here:\n\nhttps://developer.wordpress.org/block-editor/how-to-guides/metabox/#step-2-add-meta-block",
 							"type": "string"
+						},
+						"role": {
+							"description": "Designates the conceptual type of the attribute.\n\nThe `content` value marks the attribute as user-editable content, and the `local` value marks the attribute as temporary and non-persistable.",
+							"type": "string",
+							"enum": [ "content", "local" ]
 						},
 						"default": {
 							"description": "A block attribute can contain a default value, which will be used if the type and source do not match anything within the block content.\n\nThe value is provided by the default field, and the value should match the expected format of the attribute."
@@ -740,7 +744,7 @@
 			}
 		},
 		"styles": {
-			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles",
+			"description": "Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.\n\nPlugins and Themes can also register custom block style for existing blocks.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/",
 			"type": "array",
 			"items": {
 				"type": "object",
@@ -991,6 +995,6 @@
 			"type": "string"
 		}
 	},
-	"required": [ "name", "title" ],
+	"required": [ "apiVersion", "name", "title" ],
 	"additionalProperties": false
 }

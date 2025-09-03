@@ -16,7 +16,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, memo } from '@wordpress/element';
+import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -41,6 +41,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -162,7 +163,7 @@ function NewTemplateModal( { onClose } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-
+	const containerRef = useRef( null );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const homeUrl = useSelect( ( select ) => {
@@ -179,6 +180,20 @@ function NewTemplateModal( { onClose } ) {
 			homeUrl + '/' + new Date().getFullYear()
 		),
 	};
+
+	useEffect( () => {
+		// Focus the first focusable element when component mounts or UI changes
+		// We don't want to focus on the other modals because they have their own focus management.
+		if (
+			containerRef.current &&
+			modalContent === modalContentMap.templatesList
+		) {
+			const [ firstFocusable ] = focus.focusable.find(
+				containerRef.current
+			);
+			firstFocusable?.focus();
+		}
+	}, [ modalContent ] );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isSubmitting ) {
@@ -261,6 +276,7 @@ function NewTemplateModal( { onClose } ) {
 					? 'edit-site-custom-generic-template__modal'
 					: undefined
 			}
+			ref={ containerRef }
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
@@ -320,12 +336,18 @@ function NewTemplateModal( { onClose } ) {
 				<AddCustomTemplateModalContent
 					onSelect={ createTemplate }
 					entityForSuggestions={ entityForSuggestions }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
+					containerRef={ containerRef }
 				/>
 			) }
 			{ modalContent === modalContentMap.customGenericTemplate && (
 				<AddCustomGenericTemplateModalContent
-					onClose={ onModalClose }
 					createTemplate={ createTemplate }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
 				/>
 			) }
 		</Modal>

@@ -144,11 +144,8 @@ function Thread( {
 					{ ! isFocused && (
 						<VStack className="editor-collab-sidebar-panel__show-more-reply">
 							{ sprintf(
-								// translators: 1: number of replies.
-								_x(
-									'%s more replies..',
-									'Show replies button'
-								),
+								// translators: %s: number of replies.
+								_x( '%s more replies', 'Show replies button' ),
 								thread?.reply?.length
 							) }
 						</VStack>

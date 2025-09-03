@@ -16,11 +16,20 @@ import {
 } from '@wordpress/block-editor';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEntityProp } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function Edit( {
 	attributes: {
@@ -52,6 +61,8 @@ export default function Edit( {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().__experimentalDiscussionSettings;
 	} );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useEffect( () => {
 		if ( isSiteEditor ) {
@@ -111,24 +122,51 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						showPostTitle: true,
+						showCommentsCount: true,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Show post title' ) }
-					checked={ showPostTitle }
-					onChange={ ( value ) =>
-						setAttributes( { showPostTitle: value } )
+					isShownByDefault
+					hasValue={ () => ! showPostTitle }
+					onDeselect={ () =>
+						setAttributes( { showPostTitle: true } )
 					}
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Show post title' ) }
+						checked={ showPostTitle }
+						onChange={ ( value ) =>
+							setAttributes( { showPostTitle: value } )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
 					label={ __( 'Show comments count' ) }
-					checked={ showCommentsCount }
-					onChange={ ( value ) =>
-						setAttributes( { showCommentsCount: value } )
+					isShownByDefault
+					hasValue={ () => ! showCommentsCount }
+					onDeselect={ () =>
+						setAttributes( { showCommentsCount: true } )
 					}
-				/>
-			</PanelBody>
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Show comments count' ) }
+						checked={ showCommentsCount }
+						onChange={ ( value ) =>
+							setAttributes( { showCommentsCount: value } )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 

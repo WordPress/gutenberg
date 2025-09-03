@@ -18,8 +18,7 @@ import { unlock } from '../lock-unlock';
 function PatternsManageButton( { clientId } ) {
 	const { canRemove, isVisible, managePatternsUrl } = useSelect(
 		( select ) => {
-			const { getBlock, canRemoveBlock, getBlockCount } =
-				select( blockEditorStore );
+			const { getBlock, canRemoveBlock } = select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const reusableBlock = getBlock( clientId );
 
@@ -33,7 +32,6 @@ function PatternsManageButton( { clientId } ) {
 						name: 'wp_block',
 						id: reusableBlock.attributes.ref,
 					} ),
-				innerBlockCount: getBlockCount( clientId ),
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.

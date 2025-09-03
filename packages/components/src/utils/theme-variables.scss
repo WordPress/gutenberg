@@ -24,5 +24,9 @@ $components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
 $components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
 $components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
 
+$components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-foreground, transparent 38%);
+$components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);
+
 // Semantic aliases (prefer these over raw gray values when applicable).
 $components-color-border: #{ $components-color-gray-600 };
+$components-color-disabled: #{ $components-color-gray-600 };

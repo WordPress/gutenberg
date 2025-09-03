@@ -49,12 +49,13 @@
 	position: relative;
 	height: auto;
 
-	&:disabled {
+	&:disabled,
+	&[aria-disabled="true"] {
 		opacity: 0.6;
 		cursor: default;
 	}
 
-	&:not(:disabled) {
+	&:not(:disabled, [aria-disabled="true"]) {
 		&:hover {
 			.block-editor-block-types-list__item-title {
 				color: var(--wp-admin-theme-color) !important;
@@ -80,10 +81,6 @@
 			}
 		}
 
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-
 		&.is-active {
 			color: $white;
 			background: $gray-900;
@@ -91,6 +88,12 @@
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
 			outline-offset: -2px;
+		}
+	}
+
+	&:not(:disabled) {
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
 }

@@ -120,7 +120,7 @@ const directiveCallbacks: Record< string, DirectiveCallback > = {};
 const directivePriorities: Record< string, number > = {};
 
 /**
- * Register a new directive type in the Interactivity API runtime.
+ * Registers a new directive type in the Interactivity API runtime.
  *
  * @example
  * ```js

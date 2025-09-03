@@ -138,9 +138,11 @@
 	flex-wrap: wrap;
 	gap: $grid-unit-20;
 
-	.components-button {
+	.components-button,
+	.components-button.has-icon {
 		justify-content: center;
 		flex: 1;
+		min-width: unset;
 	}
 
 	.components-clipboard-button {
@@ -196,6 +198,7 @@
 }
 
 .editor-post-publish-panel {
+	@include reset;
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;

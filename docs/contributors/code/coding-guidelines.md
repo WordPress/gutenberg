@@ -355,7 +355,7 @@ privateValidateBlocks( blocks, true );
 #### Private React component properties
 
 To add a private argument to a stable component you'll need
-to prepare a stable and an private version of that component.
+to prepare a stable and a private version of that component.
 Then, export the stable function and `lock()` the unstable function
 inside it:
 

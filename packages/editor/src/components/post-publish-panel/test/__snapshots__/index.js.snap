@@ -27,7 +27,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   padding: 0;
 }
 
-.emotion-10 {
+.emotion-12 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -47,7 +47,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -87,9 +87,22 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
           <a
+            class="components-external-link"
             href="https://wordpress.local/sample-page/"
+            rel="external noreferrer noopener"
+            target="_blank"
           >
-            (no title)
+            <span
+              class="components-external-link__contents"
+            >
+              (no title)
+            </span>
+            <span
+              aria-label="(opens in a new tab)"
+              class="components-external-link__icon"
+            >
+              ↗
+            </span>
           </a>
            
           is now live.
@@ -143,9 +156,31 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary"
+              class="components-button is-next-40px-default-size is-primary has-icon"
               href="https://wordpress.local/sample-page/"
-            />
+              target="_blank"
+            >
+              <span
+                class="components-visually-hidden emotion-6 emotion-7"
+                data-wp-c16t="true"
+                data-wp-component="VisuallyHidden"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+              >
+                (opens in a new tab)
+              </span>
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z"
+                />
+              </svg>
+            </a>
             <a
               class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
@@ -164,7 +199,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="components-flex components-h-stack emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -219,7 +254,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   padding: 0;
 }
 
-.emotion-10 {
+.emotion-12 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -239,7 +274,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   width: 100%;
 }
 
-.emotion-10>* {
+.emotion-12>* {
   min-width: 0;
 }
 
@@ -279,9 +314,22 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
           <a
+            class="components-external-link"
             href="https://wordpress.local/sample-page/"
+            rel="external noreferrer noopener"
+            target="_blank"
           >
-            (no title)
+            <span
+              class="components-external-link__contents"
+            >
+              (no title)
+            </span>
+            <span
+              aria-label="(opens in a new tab)"
+              class="components-external-link__icon"
+            >
+              ↗
+            </span>
           </a>
            
           is now live.
@@ -335,9 +383,31 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary"
+              class="components-button is-next-40px-default-size is-primary has-icon"
               href="https://wordpress.local/sample-page/"
-            />
+              target="_blank"
+            >
+              <span
+                class="components-visually-hidden emotion-6 emotion-7"
+                data-wp-c16t="true"
+                data-wp-component="VisuallyHidden"
+                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+              >
+                (opens in a new tab)
+              </span>
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z"
+                />
+              </svg>
+            </a>
             <a
               class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
@@ -356,7 +426,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-10 emotion-11"
+            class="components-flex components-h-stack emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >

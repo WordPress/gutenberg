@@ -10,6 +10,7 @@ import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
 /**
  * WordPress dependencies
@@ -47,6 +48,7 @@ import {
 	useBlockEditingMode,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -58,6 +60,8 @@ import {
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -155,7 +159,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 								key={ widthValue }
 								value={ widthValue }
 								label={ sprintf(
-									/* translators: Percentage value. */
+									/* translators: %d: Percentage value. */
 									__( '%d%%' ),
 									widthValue
 								) }
@@ -325,6 +329,10 @@ function ButtonEdit( props ) {
 		},
 	} );
 
+	const hasNonContentControls = blockEditingMode === 'default';
+	const hasBlockControls =
+		hasNonContentControls || ( isLinkTag && ! lockUrlControls );
+
 	return (
 		<>
 			<div
@@ -374,35 +382,32 @@ function ButtonEdit( props ) {
 					identifier="text"
 				/>
 			</div>
-			<BlockControls group="block">
-				{ blockEditingMode === 'default' && (
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				) }
-				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
-					<ToolbarButton
-						name="link"
-						icon={ link }
-						title={ __( 'Link' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ startEditing }
-					/>
-				) }
-				{ isURLSet && isLinkTag && ! lockUrlControls && (
-					<ToolbarButton
-						name="link"
-						icon={ linkOff }
-						title={ __( 'Unlink' ) }
-						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlink }
-						isActive
-					/>
-				) }
-			</BlockControls>
+			{ hasBlockControls && (
+				<BlockControls group="block">
+					{ hasNonContentControls && (
+						<AlignmentControl
+							value={ textAlign }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { textAlign: nextAlign } );
+							} }
+						/>
+					) }
+					{ isLinkTag && ! lockUrlControls && (
+						<ToolbarButton
+							name="link"
+							icon={ ! isURLSet ? link : linkOff }
+							title={ ! isURLSet ? __( 'Link' ) : __( 'Unlink' ) }
+							shortcut={
+								! isURLSet
+									? displayShortcut.primary( 'k' )
+									: displayShortcut.primaryShift( 'k' )
+							}
+							onClick={ ! isURLSet ? startEditing : unlink }
+							isActive={ isURLSet }
+						/>
+					) }
+				</BlockControls>
+			) }
 			{ isLinkTag &&
 				isSelected &&
 				( isEditingURL || isURLSet ) &&
@@ -455,6 +460,16 @@ function ButtonEdit( props ) {
 				/>
 			</InspectorControls>
 			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					options={ [
+						{ label: __( 'Default (<a>)' ), value: 'a' },
+						{ label: '<button>', value: 'button' },
+					] }
+				/>
 				{ isLinkTag && (
 					<TextControl
 						__next40pxDefaultSize

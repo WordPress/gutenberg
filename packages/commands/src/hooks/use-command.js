@@ -47,6 +47,7 @@ export default function useCommand( command ) {
 			label: command.label,
 			searchLabel: command.searchLabel,
 			icon: command.icon,
+			keywords: command.keywords,
 			callback: ( ...args ) => currentCallbackRef.current( ...args ),
 		} );
 		return () => {
@@ -58,6 +59,7 @@ export default function useCommand( command ) {
 		command.searchLabel,
 		command.icon,
 		command.context,
+		command.keywords,
 		command.disabled,
 		registerCommand,
 		unregisterCommand,

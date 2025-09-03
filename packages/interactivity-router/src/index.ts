@@ -6,7 +6,13 @@ import { store, privateApis, getConfig } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { fetchHeadAssets, updateHead, headElements } from './head';
+import { preloadStyles, applyStyles, type StyleElement } from './assets/styles';
+import {
+	preloadScriptModules,
+	importScriptModules,
+	markScriptModuleAsResolved,
+	type ScriptModuleLoad,
+} from './assets/script-modules';
 
 const {
 	directivePrefix,
@@ -21,7 +27,11 @@ const {
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
-interface NavigateOptions {
+const regionAttr = `data-${ directivePrefix }-router-region`;
+const interactiveAttr = `data-${ directivePrefix }-interactive`;
+const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]:not([${ interactiveAttr }] [${ interactiveAttr }])`;
+
+export interface NavigateOptions {
 	force?: boolean;
 	html?: string;
 	replace?: boolean;
@@ -30,7 +40,7 @@ interface NavigateOptions {
 	screenReaderAnnouncement?: boolean;
 }
 
-interface PrefetchOptions {
+export interface PrefetchOptions {
 	force?: boolean;
 	html?: string;
 }
@@ -40,17 +50,20 @@ interface VdomParams {
 }
 
 interface Page {
+	url: string;
 	regions: Record< string, any >;
-	head: HTMLHeadElement[];
+	regionsToAttach: Record< string, string >;
+	styles: StyleElement[];
+	scriptModules: ScriptModuleLoad[];
 	title: string;
 	initialData: any;
 }
 
-type RegionsToVdom = ( dom: Document, params?: VdomParams ) => Promise< Page >;
-
-// Check if the navigation mode is full page or region based.
-const navigationMode: 'regionBased' | 'fullPage' =
-	getConfig( 'core/router' ).navigationMode ?? 'regionBased';
+type PreparePage = (
+	url: string,
+	dom: Document,
+	params?: VdomParams
+) => Promise< Page >;
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map< string, Promise< Page | false > >();
@@ -62,7 +75,32 @@ const getPagePath = ( url: string ) => {
 	return u.pathname + u.search;
 };
 
-// Fetch a new page and convert it to a static virtual DOM.
+/**
+ * Parses the given region's directive.
+ *
+ * @param region Region element.
+ * @return Data contained in the region directive value.
+ */
+const parseRegionAttribute = ( region: Element ) => {
+	const value = region.getAttribute( regionAttr );
+	try {
+		const { id, attachTo } = JSON.parse( value );
+		return { id, attachTo };
+	} catch ( e ) {
+		return { id: value };
+	}
+};
+
+/**
+ * Fetches and prepares a page from a given URL.
+ *
+ * @param url          The URL of the page to fetch.
+ * @param options      Options for the fetch operation.
+ * @param options.html Optional HTML content. If provided, the function will use
+ *                     this instead of fetching from the URL.
+ * @return             A Promise that resolves to the prepared page, or false if
+ *                     there was an error during fetching or preparation.
+ */
 const fetchPage = async ( url: string, { html }: { html: string } ) => {
 	try {
 		if ( ! html ) {
@@ -73,72 +111,117 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 			html = await res.text();
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
-		return regionsToVdom( dom );
+		return await preparePage( url, dom );
 	} catch ( e ) {
 		return false;
 	}
 };
 
-// Return an object with VDOM trees of those HTML regions marked with a
-// `router-region` directive.
-const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
-	const regions = { body: undefined };
-	let head: HTMLElement[];
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( navigationMode === 'fullPage' ) {
-			head = await fetchHeadAssets( dom );
-			regions.body = vdom
-				? vdom.get( document.body )
-				: toVdom( dom.body );
+/**
+ * Processes a DOM document to extract router regions and related resources.
+ *
+ * This function analyzes the provided DOM document and creates a virtual DOM
+ * representation of all HTML regions marked with a `router-region` directive.
+ * It also extracts and preloads associated styles and scripts to prepare for
+ * rendering the page.
+ *
+ * @param url             The URL associated with the page, used for asset
+ *                        loading and caching.
+ * @param dom             The DOM document to process.
+ * @param vdomParams      Optional parameters for virtual DOM processing.
+ * @param vdomParams.vdom An optional existing virtual DOM cache to check for
+ *                        regions. If a region exists in this cache, it will be
+ *                        reused instead of creating a new vDOM representation.
+ * @return                A Promise that resolves to a {@link Page} object
+ *                        containing the virtual DOM for all router regions,
+ *                        preloaded styles and scripts, page title, and initial
+ *                        server-rendered data.
+ */
+const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
+	// Remove all noscript elements as they're irrelevant when request is served via router.
+	// This prevents browsers from extracting styles from noscript tags.
+	dom.querySelectorAll( 'noscript' ).forEach( ( el ) => el.remove() );
+
+	const regions = {};
+	const regionsToAttach = {};
+	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+		const { id, attachTo } = parseRegionAttribute( region );
+		regions[ id ] = vdom?.has( region )
+			? vdom.get( region )
+			: toVdom( region );
+		if ( attachTo ) {
+			regionsToAttach[ id ] = attachTo;
 		}
-	}
-	if ( navigationMode === 'regionBased' ) {
-		const attrName = `data-${ directivePrefix }-router-region`;
-		dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-			const id = region.getAttribute( attrName );
-			regions[ id ] = vdom?.has( region )
-				? vdom.get( region )
-				: toVdom( region );
-		} );
-	}
+	} );
+
 	const title = dom.querySelector( 'title' )?.innerText;
 	const initialData = parseServerData( dom );
-	return { regions, head, title, initialData };
+
+	// Wait for styles and modules to be ready.
+	const [ styles, scriptModules ] = await Promise.all( [
+		Promise.all( preloadStyles( dom, url ) ),
+		Promise.all( preloadScriptModules( dom ) ),
+	] );
+
+	return {
+		regions,
+		regionsToAttach,
+		styles,
+		scriptModules,
+		title,
+		initialData,
+		url,
+	};
 };
 
-// Render all interactive regions contained in the given page.
-const renderRegions = async ( page: Page ) => {
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( navigationMode === 'fullPage' ) {
-			// Once this code is tested and more mature, the head should be updated for region based navigation as well.
-			await updateHead( page.head );
-			const fragment = getRegionRootFragment( document.body );
-			batch( () => {
-				populateServerData( page.initialData );
-				render( page.regions.body, fragment );
-			} );
-		}
-	}
-	if ( navigationMode === 'regionBased' ) {
-		const attrName = `data-${ directivePrefix }-router-region`;
-		batch( () => {
-			populateServerData( page.initialData );
-			document
-				.querySelectorAll( `[${ attrName }]` )
-				.forEach( ( region ) => {
-					const id = region.getAttribute( attrName );
-					const fragment = getRegionRootFragment( region );
-					render( page.regions[ id ], fragment );
-				} );
+/**
+ * Renders a page by applying styles, populating server data, rendering regions,
+ * and updating the document title.
+ *
+ * @param page The {@link Page} object to render.
+ */
+const renderPage = ( page: Page ) => {
+	applyStyles( page.styles );
+
+	// Clone regionsToAttach.
+	const regionsToAttach = { ...page.regionsToAttach };
+
+	batch( () => {
+		populateServerData( page.initialData );
+		document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+			const { id } = parseRegionAttribute( region );
+			const fragment = getRegionRootFragment( region );
+			render( page.regions[ id ], fragment );
+			// If this is an attached region, remove it from the list.
+			delete regionsToAttach[ id ];
 		} );
-	}
+
+		// Render unattached regions.
+		for ( const id in regionsToAttach ) {
+			const parent = document.querySelector( regionsToAttach[ id ] );
+
+			// Get the type from the vnode. If wrapped with Directives, get the
+			// original type from `props.type`.
+			const { props, type } = page.regions[ id ];
+			const elementType = typeof type === 'function' ? props.type : type;
+
+			// Create an element with the obtained type where the region will be
+			// rendered. The type should match the one of the root vnode.
+			const region = document.createElement( elementType );
+			parent.appendChild( region );
+
+			const fragment = getRegionRootFragment( region );
+			render( page.regions[ id ], fragment );
+		}
+	} );
+
 	if ( page.title ) {
 		document.title = page.title;
 	}
 };
 
 /**
- * Load the given page forcing a full page reload.
+ * Loads the given page forcing a full page reload.
  *
  * The function returns a promise that won't resolve, useful to prevent any
  * potential feedback indicating that the navigation has finished while the new
@@ -158,7 +241,7 @@ window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
-		await renderRegions( page );
+		renderPage( page );
 		// Update the URL in the state.
 		state.url = window.location.href;
 	} else {
@@ -167,48 +250,17 @@ window.addEventListener( 'popstate', async () => {
 } );
 
 // Initialize the router and cache the initial page using the initial vDOM.
-// Once this code is tested and more mature, the head should be updated for
-// region based navigation as well.
-if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-	if ( navigationMode === 'fullPage' ) {
-		// Cache the scripts. Has to be called before fetching the assets.
-		[].map.call(
-			document.querySelectorAll( 'script[type="module"][src]' ),
-			( script ) => {
-				headElements.set( script.getAttribute( 'src' ), {
-					tag: script,
-				} );
-			}
-		);
-		await fetchHeadAssets( document );
-	}
-}
+window.document
+	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
+	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
 pages.set(
 	getPagePath( window.location.href ),
-	Promise.resolve( regionsToVdom( document, { vdom: initialVdom } ) )
+	Promise.resolve(
+		preparePage( getPagePath( window.location.href ), document, {
+			vdom: initialVdom,
+		} )
+	)
 );
-
-// Check if the link is valid for client-side navigation.
-const isValidLink = ( ref: HTMLAnchorElement ) =>
-	ref &&
-	ref instanceof window.HTMLAnchorElement &&
-	ref.href &&
-	( ! ref.target || ref.target === '_self' ) &&
-	ref.origin === window.location.origin &&
-	! ref.pathname.startsWith( '/wp-admin' ) &&
-	! ref.pathname.startsWith( '/wp-login.php' ) &&
-	! ref.getAttribute( 'href' ).startsWith( '#' ) &&
-	! new URL( ref.href ).searchParams.has( '_wpnonce' );
-
-// Check if the event is valid for client-side navigation.
-const isValidEvent = ( event: MouseEvent ) =>
-	event &&
-	event.button === 0 && // Left clicks only.
-	! event.metaKey && // Open in new tab (Mac).
-	! event.ctrlKey && // Open in new tab (Windows).
-	! event.altKey && // Download.
-	! event.shiftKey &&
-	! event.defaultPrevented;
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -228,8 +280,11 @@ interface Store {
 		};
 	};
 	actions: {
-		navigate: ( href: string, options?: NavigateOptions ) => void;
-		prefetch: ( url: string, options?: PrefetchOptions ) => void;
+		navigate: (
+			href: string,
+			options?: NavigateOptions
+		) => Promise< void >;
+		prefetch: ( url: string, options?: PrefetchOptions ) => Promise< void >;
 	};
 }
 
@@ -318,7 +373,8 @@ export const { state, actions } = store< Store >( 'core/router', {
 				! page.initialData?.config?.[ 'core/router' ]
 					?.clientNavigationDisabled
 			) {
-				yield renderRegions( page );
+				yield importScriptModules( page.scriptModules );
+				renderPage( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
@@ -357,8 +413,10 @@ export const { state, actions } = store< Store >( 'core/router', {
 		 * @param [options]       Options object.
 		 * @param [options.force] Force fetching the URL again.
 		 * @param [options.html]  HTML string to be used instead of fetching the requested URL.
+		 *
+		 * @return  Promise that resolves once the page has been fetched.
 		 */
-		prefetch( url: string, options: PrefetchOptions = {} ) {
+		*prefetch( url: string, options: PrefetchOptions = {} ) {
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				return;
@@ -371,6 +429,8 @@ export const { state, actions } = store< Store >( 'core/router', {
 					fetchPage( pagePath, { html: options.html } )
 				);
 			}
+
+			yield pages.get( pagePath );
 		},
 	},
 } );
@@ -379,7 +439,7 @@ export const { state, actions } = store< Store >( 'core/router', {
  * Announces a message to screen readers.
  *
  * This is a wrapper around the `@wordpress/a11y` package's `speak` function. It handles importing
- * the package on demand and should be used instead of calling `ally.speak` direacly.
+ * the package on demand and should be used instead of calling `a11y.speak` directly.
  *
  * @param messageKey The message to be announced by assistive technologies.
  */
@@ -423,35 +483,4 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 		// Ignore failures to load the a11y module.
 		() => {}
 	);
-}
-
-// Add click and prefetch to all links.
-if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-	if ( navigationMode === 'fullPage' ) {
-		// Navigate on click.
-		document.addEventListener(
-			'click',
-			function ( event ) {
-				const ref = ( event.target as Element ).closest( 'a' );
-				if ( isValidLink( ref ) && isValidEvent( event ) ) {
-					event.preventDefault();
-					actions.navigate( ref.href );
-				}
-			},
-			true
-		);
-		// Prefetch on hover.
-		document.addEventListener(
-			'mouseenter',
-			function ( event ) {
-				if ( ( event.target as Element )?.nodeName === 'A' ) {
-					const ref = ( event.target as Element ).closest( 'a' );
-					if ( isValidLink( ref ) && isValidEvent( event ) ) {
-						actions.prefetch( ref.href );
-					}
-				}
-			},
-			true
-		);
-	}
 }

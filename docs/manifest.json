@@ -726,6 +726,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "DateCalendar",
+		"slug": "date-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DateRangeCalendar",
+		"slug": "date-range-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CardBody",
 		"slug": "card-body",
 		"markdown_source": "../packages/components/src/card/card-body/README.md",
