@@ -7,16 +7,15 @@ export default function Edit( { attributes } ) {
 	const { allowedBlocks, templateLock, openByDefault, isSelected } =
 		attributes;
 
-	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( {
+	const blockProps = useBlockProps( {
+		'aria-hidden': ! isSelected && ! openByDefault,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks,
 		template: [ [ 'core/paragraph', {} ] ],
 		templateLock,
 	} );
 
-	return (
-		<div { ...blockProps } aria-hidden={ ! isSelected && ! openByDefault }>
-			<div { ...innerBlocksProps } />
-		</div>
-	);
+	return <div { ...innerBlocksProps } />;
 }
