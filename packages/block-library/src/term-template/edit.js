@@ -440,7 +440,7 @@ export default function TermTemplateEdit( {
 
 export const withStylesControlsOnTop = ( BlockEdit ) => ( props ) => {
 	if ( props.name !== 'core/term-template' ) {
-		return <BlockEdit { ...props } />;
+		return <BlockEdit key="edit" { ...props } />;
 	}
 
 	const { attributes, context, setAttributes } = props;
@@ -494,7 +494,7 @@ export const withStylesControlsOnTop = ( BlockEdit ) => ( props ) => {
 					</ToggleGroupControl>
 				</PanelBody>
 			</InspectorControls>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 		</>
 	);
 };
