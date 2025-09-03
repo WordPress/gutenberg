@@ -31,6 +31,13 @@
 	}
 }
 
+.dataviews__view-actions--infinite-scroll {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background-color: #fff;
+}
+
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-30;

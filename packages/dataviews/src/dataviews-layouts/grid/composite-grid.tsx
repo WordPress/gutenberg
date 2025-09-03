@@ -19,7 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, forwardRef } from '@wordpress/element';
+import { useContext, forwardRef, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -322,9 +322,15 @@ export default function CompositeGrid< Item >( {
 	getItemId,
 	actions,
 }: CompositeGridProps< Item > ) {
-	const { paginationInfo, resizeObserverRef } =
+	const { paginationInfo, resizeObserverRef, intersectionObserverCallback } =
 		useContext( DataViewsContext );
 	const gridColumns = useGridColumns();
+	const intersectionObserverRef = useRef< IntersectionObserver | null >(
+		null
+	);
+	const itemRefs = useRef< Map< number, HTMLElement > >( new Map() );
+	// Track stable positions for items in infinite scroll mode
+	const itemPositions = useRef< Map< string, number > >( new Map() );
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -365,6 +371,85 @@ export default function CompositeGrid< Item >( {
 	const size = '900px';
 	const totalRows = Math.ceil( data.length / gridColumns );
 
+	// Update item positions for infinite scroll
+	// Store positions from item metadata to ensure they remain stable
+	useEffect( () => {
+		if ( ! isInfiniteScroll ) {
+			return;
+		}
+
+		data.forEach( ( item ) => {
+			const itemId = getItemId( item );
+			if ( ! itemPositions.current.has( itemId ) ) {
+				// Check if item has position metadata
+				const position = ( item as any ).position;
+				if ( position !== undefined ) {
+					itemPositions.current.set( itemId, position );
+				}
+			}
+		} );
+	}, [ data, getItemId, isInfiniteScroll ] );
+
+	// Set up IntersectionObserver for infinite scroll
+	useEffect( () => {
+		if ( ! intersectionObserverCallback || ! isInfiniteScroll ) {
+			return;
+		}
+
+		const observer = new IntersectionObserver(
+			intersectionObserverCallback,
+			{
+				root: null,
+				rootMargin: '0px',
+				threshold: 0.1,
+			}
+		);
+
+		intersectionObserverRef.current = observer;
+
+		// Observe all current items
+		itemRefs.current.forEach( ( element ) => {
+			observer.observe( element );
+		} );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ intersectionObserverCallback, isInfiniteScroll ] );
+
+	// Helper function to handle item ref changes
+	const setItemRef = (
+		itemId: number | undefined,
+		element: HTMLElement | null
+	) => {
+		if ( itemId === undefined ) {
+			return;
+		}
+
+		// Don't observe if we don't have infinite scroll enabled
+		if ( ! isInfiniteScroll ) {
+			return;
+		}
+
+		const observer = intersectionObserverRef.current;
+		const currentElement = itemRefs.current.get( itemId );
+
+		// Unobserve previous element if it exists
+		if ( currentElement && observer ) {
+			observer.unobserve( currentElement );
+		}
+
+		if ( element ) {
+			itemRefs.current.set( itemId, element );
+			// Observe new element if observer is ready
+			if ( observer ) {
+				observer.observe( element );
+			}
+		} else {
+			itemRefs.current.delete( itemId );
+		}
+	};
+
 	return (
 		<Composite
 			role={ isInfiniteScroll ? 'feed' : 'grid' }
@@ -393,14 +478,25 @@ export default function CompositeGrid< Item >( {
 						/>
 					}
 				>
-					{ row.map( ( item, indexInRow ) => {
-						const index = i * gridColumns + indexInRow;
+					{ row.map( ( item ) => {
+						const itemId = getItemId( item );
+						// Get stable position for infinite scroll
+						const stablePosition = isInfiniteScroll
+							? itemPositions.current.get( itemId )
+							: undefined;
 						return (
 							<Composite.Item
-								key={ getItemId( item ) }
+								key={ itemId }
 								render={ ( props ) => (
 									<GridItem
 										{ ...props }
+										ref={ ( element ) =>
+											setItemRef(
+												stablePosition,
+												element
+											)
+										}
+										id={ itemId }
 										role={
 											isInfiniteScroll
 												? 'article'
@@ -411,11 +507,7 @@ export default function CompositeGrid< Item >( {
 												? paginationInfo.totalItems
 												: undefined
 										}
-										aria-posinset={
-											isInfiniteScroll
-												? index + 1
-												: undefined
-										}
+										aria-posinset={ stablePosition }
 										view={ view }
 										selection={ selection }
 										onChangeSelection={ onChangeSelection }

@@ -2,12 +2,19 @@
  * External dependencies
  */
 import type { ReactNode, ComponentProps, ReactElement } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
@@ -47,7 +54,8 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: () => void;
+		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
+		intersectionObserverCallback?: IntersectionObserverCallback;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
@@ -88,12 +96,17 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
+	const { view } = useContext( DataViewsContext );
+	const isInfiniteScroll = view.infiniteScrollEnabled;
 	return (
 		<>
 			<HStack
 				alignment="top"
 				justify="space-between"
-				className="dataviews__view-actions"
+				className={ clsx( 'dataviews__view-actions', {
+					'dataviews__view-actions--infinite-scroll':
+						isInfiniteScroll,
+				} ) }
 				spacing={ 1 }
 			>
 				<HStack
@@ -143,7 +156,8 @@ function DataViews< Item >( {
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
 }: DataViewsProps< Item > ) {
-	const { infiniteScrollHandler } = paginationInfo;
+	const { infiniteScrollHandler, intersectionObserverCallback } =
+		paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -194,11 +208,13 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Attach scroll event listener for infinite scroll
+	// Attach scroll event listener for infinite scroll (only when virtualization is not enabled)
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
 			return;
 		}
+
+		let lastScrollTop = 0;
 
 		const handleScroll = throttle( ( event: unknown ) => {
 			const target = ( event as Event ).target as HTMLElement;
@@ -206,9 +222,21 @@ function DataViews< Item >( {
 			const scrollHeight = target.scrollHeight;
 			const clientHeight = target.clientHeight;
 
+			// Determine scroll direction
+			const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+			lastScrollTop = scrollTop;
+
 			// Check if user has scrolled near the bottom
-			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
-				infiniteScrollHandler?.();
+			if (
+				scrollDirection === 'down' &&
+				scrollTop + clientHeight >= scrollHeight - 100
+			) {
+				infiniteScrollHandler?.( 'down' );
+			}
+
+			// Check if user has scrolled near the top
+			if ( scrollDirection === 'up' && scrollTop <= 100 ) {
+				infiniteScrollHandler?.( 'up' );
 			}
 		}, 100 ); // Throttle to 100ms
 
@@ -269,6 +297,7 @@ function DataViews< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				intersectionObserverCallback,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>

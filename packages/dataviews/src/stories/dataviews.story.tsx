@@ -535,6 +535,9 @@ export const InfiniteScroll = () => {
 		[]
 	);
 	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
+	const [ scrollDirection, setScrollDirection ] = useState<
+		'up' | 'down' | undefined
+	>( undefined );
 
 	const totalItems = data.length;
 	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
@@ -554,22 +557,41 @@ export const InfiniteScroll = () => {
 		email?: string;
 	} ) => item.id.toString();
 
-	const infiniteScrollHandler = useCallback( () => {
-		if ( isLoadingMore || currentPage >= totalPages ) {
-			return;
-		}
+	const infiniteScrollHandler = useCallback(
+		( direction: 'up' | 'down' ) => {
+			if ( isLoadingMore ) {
+				return;
+			}
 
-		setIsLoadingMore( true );
+			// Handle scrolling down to load next page
+			if ( direction === 'down' && currentPage < totalPages ) {
+				setIsLoadingMore( true );
+				setScrollDirection( 'down' );
+				setView( {
+					...view,
+					page: currentPage + 1,
+				} );
+			}
 
-		setView( {
-			...view,
-			page: currentPage + 1,
-		} );
-	}, [ isLoadingMore, currentPage, totalPages, view ] );
+			// Handle scrolling up to load previous page
+			if ( direction === 'up' && currentPage > 1 ) {
+				setIsLoadingMore( true );
+				setScrollDirection( 'up' );
+				setView( {
+					...view,
+					page: currentPage - 1,
+				} );
+			}
+		},
+		[ isLoadingMore, currentPage, totalPages, view ]
+	);
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
-		if ( currentPage === 1 || ! view.infiniteScrollEnabled ) {
+		if (
+			( currentPage === 1 && ! allLoadedRecords.length ) ||
+			! view.infiniteScrollEnabled
+		) {
 			// First page - replace all data
 			setAllLoadedRecords( shownData );
 		} else {
@@ -579,7 +601,11 @@ export const InfiniteScroll = () => {
 				const newRecords = shownData.filter(
 					( record ) => ! existingIds.has( getItemId( record ) )
 				);
-				return [ ...prev, ...newRecords ];
+				const orderedRecords =
+					scrollDirection === 'up'
+						? [ ...newRecords, ...prev ]
+						: [ ...prev, ...newRecords ];
+				return orderedRecords;
 			} );
 		}
 		setIsLoadingMore( false );
@@ -590,12 +616,26 @@ export const InfiniteScroll = () => {
 		view.perPage,
 		currentPage,
 		view.infiniteScrollEnabled,
+		shownData,
 	] );
 
 	const paginationInfo = {
 		totalItems,
 		totalPages,
 		infiniteScrollHandler,
+		intersectionObserverCallback: (
+			entries: IntersectionObserverEntry[]
+		) => {
+			// eslint-disable-next-line no-console
+			console.log(
+				'Intersection Observer entries:',
+				entries,
+				'target posinset',
+				entries[ 0 ]?.target?.attributes?.getNamedItem(
+					'aria-posinset'
+				)?.value
+			);
+		},
 	};
 
 	return (

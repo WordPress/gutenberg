@@ -58,6 +58,7 @@ type DataViewsContextType< Item > = {
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
 	itemListLabel?: string;
+	intersectionObserverCallback?: IntersectionObserverCallback;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -87,6 +88,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	config: {
 		perPageSizes: [],
 	},
+	intersectionObserverCallback: undefined,
 } );
 
 DataViewsContext.displayName = 'DataViewsContext';
