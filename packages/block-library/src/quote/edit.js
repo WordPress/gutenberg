@@ -106,7 +106,7 @@ export default function QuoteEdit( {
 				{ innerBlocksProps.children }
 				<Caption
 					attributeKey="citation"
-					tagName={ isWebPlatform ? 'cite' : 'p' }
+					tagName="p"
 					style={ isWebPlatform && { display: 'block' } }
 					isSelected={ isSelected }
 					attributes={ attributes }

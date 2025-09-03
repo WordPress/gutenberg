@@ -62,7 +62,7 @@ describe( 'Pullquote', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
-		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
+		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><p>A <br>person</p></blockquote></figure>
 		<!-- /wp:pullquote -->
 
 		<!-- wp:paragraph -->

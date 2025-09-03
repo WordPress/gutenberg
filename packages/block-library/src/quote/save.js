@@ -19,7 +19,11 @@ export default function save( { attributes } ) {
 		<blockquote { ...useBlockProps.save( { className } ) }>
 			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( citation ) && (
-				<RichText.Content tagName="cite" value={ citation } />
+				<RichText.Content
+					tagName="p"
+					className="wp-block-quote__citation"
+					value={ citation }
+				/>
 			) }
 		</blockquote>
 	);

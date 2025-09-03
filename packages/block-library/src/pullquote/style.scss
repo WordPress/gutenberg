@@ -28,7 +28,8 @@
 	}
 
 	cite,
-	footer {
+	footer,
+	.wp-block-pullquote__citation {
 		position: relative;
 	}
 	.has-text-color a {
@@ -60,20 +61,23 @@
 		margin-right: auto;
 		max-width: 60%;
 
-		p {
+		p:not(.wp-block-pullquote__citation) {
 			margin-top: 0;
 			margin-bottom: 0;
 			font-size: 2em;
 		}
 
-		cite {
+		cite,
+		.wp-block-pullquote__citation {
 			text-transform: none;
 			font-style: normal;
 		}
 	}
 }
 
-.wp-block-pullquote :where(cite) {
+.wp-block-pullquote :where(cite),
+.wp-block-pullquote .wp-block-pullquote__citation {
 	color: inherit;
 	display: block;
+	font-size: 0.875rem;
 }

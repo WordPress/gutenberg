@@ -61,6 +61,94 @@ const migrateLargeStyle = ( attributes, innerBlocks ) => {
 	];
 };
 
+// Version with cite element (deprecated for HTML validity)
+const v5 = {
+	attributes: {
+		citation: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'cite',
+			role: 'content',
+		},
+		textAlign: {
+			type: 'string',
+		},
+		anchor: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		html: false,
+		__experimentalOnEnter: true,
+		__experimentalOnMerge: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+		color: {
+			gradients: true,
+			heading: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+	},
+	save( { attributes } ) {
+		const { textAlign, citation } = attributes;
+
+		const className = clsx( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} );
+
+		return (
+			<blockquote { ...useBlockProps.save( { className } ) }>
+				<InnerBlocks.Content />
+				{ ! RichText.isEmpty( citation ) && (
+					<RichText.Content
+						tagName="p"
+						className="wp-block-quote__citation"
+						value={ citation }
+					/>
+				) }
+			</blockquote>
+		);
+	},
+	migrate( attributes, innerBlocks ) {
+		return [ attributes, innerBlocks ];
+	},
+};
+
 // Version before the 'align' attribute was replaced with 'textAlign'.
 const v4 = {
 	attributes: {
@@ -122,7 +210,11 @@ const v4 = {
 			<blockquote { ...useBlockProps.save( { className } ) }>
 				<InnerBlocks.Content />
 				{ ! RichText.isEmpty( citation ) && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="p"
+						className="wp-block-quote__citation"
+						value={ citation }
+					/>
 				) }
 			</blockquote>
 		);
@@ -178,7 +270,11 @@ const v3 = {
 			<blockquote { ...useBlockProps.save( { className } ) }>
 				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="p"
+						className="wp-block-quote__citation"
+						value={ citation }
+					/>
 				) }
 			</blockquote>
 		);
@@ -217,7 +313,11 @@ const v2 = {
 			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="p"
+						className="wp-block-quote__citation"
+						value={ citation }
+					/>
 				) }
 			</blockquote>
 		);
@@ -269,7 +369,11 @@ const v1 = {
 			>
 				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && (
-					<RichText.Content tagName="cite" value={ citation } />
+					<RichText.Content
+						tagName="p"
+						className="wp-block-quote__citation"
+						value={ citation }
+					/>
 				) }
 			</blockquote>
 		);
@@ -334,4 +438,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v4, v3, v2, v1, v0 ];
+export default [ v5, v4, v3, v2, v1, v0 ];
