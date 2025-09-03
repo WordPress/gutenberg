@@ -10,7 +10,7 @@ import {
  * Internal dependencies
  */
 import useBlockControlsFill from './hook';
-import { ContentOnlyFilter } from './content-only-filter';
+import { useBlockEditingMode } from '../block-editing-mode';
 
 export default function BlockControlsFill( {
 	group = 'default',
@@ -22,14 +22,24 @@ export default function BlockControlsFill( {
 		group,
 		__experimentalShareWithChildBlocks
 	);
+	const blockEditingMode = useBlockEditingMode();
+
 	if ( ! Fill ) {
 		return null;
+	}
+
+	// Filter children in content-only mode
+	let filteredChildren = children;
+	if ( blockEditingMode === 'contentOnly' && Array.isArray( children ) ) {
+		filteredChildren = children.filter( ( child ) => {
+			return child?.props?.category === 'content';
+		} );
 	}
 
 	const innerMarkup = (
 		<>
 			{ group === 'default' && <ToolbarGroup controls={ controls } /> }
-			{ children }
+			{ filteredChildren }
 		</>
 	);
 
@@ -44,7 +54,7 @@ export default function BlockControlsFill( {
 						( inner, [ Provider, props ] ) => (
 							<Provider { ...props }>{ inner }</Provider>
 						),
-						<ContentOnlyFilter>{ innerMarkup }</ContentOnlyFilter>
+						innerMarkup
 					);
 				} }
 			</Fill>
