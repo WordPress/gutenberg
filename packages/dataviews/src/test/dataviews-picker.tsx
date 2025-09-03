@@ -108,6 +108,7 @@ function Picker( {
 		paginationInfo,
 		data: shownData,
 		view,
+		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: {} },
 		fields: [],
 		onChangeView: setView,
 		multiselect,

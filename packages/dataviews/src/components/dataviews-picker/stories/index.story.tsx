@@ -134,6 +134,9 @@ export const Default = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
+				defaultLayouts={ {
+					[ LAYOUT_PICKER_GRID ]: {},
+				} }
 			/>
 		</>
 	);

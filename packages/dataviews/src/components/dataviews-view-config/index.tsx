@@ -59,7 +59,7 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 };
 
 export function ViewTypeMenu() {
-	const { view, onChangeView, defaultLayouts, picker } =
+	const { view, onChangeView, defaultLayouts } =
 		useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
 	if ( availableLayouts.length <= 1 ) {
@@ -80,9 +80,7 @@ export function ViewTypeMenu() {
 			<Menu.Popover>
 				{ availableLayouts.map( ( layout ) => {
 					const config = VIEW_LAYOUTS.find(
-						( v ) =>
-							v.type === layout &&
-							Boolean( v.isPicker ) === Boolean( picker )
+						( v ) => v.type === layout
 					);
 					if ( ! config ) {
 						return null;

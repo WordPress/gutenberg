@@ -20,6 +20,7 @@ import { useResizeObserver, throttle } from '@wordpress/compose';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
 	default as DataViewsFilters,
 	useFilters,
@@ -34,11 +35,15 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { ActionButton, Field, View } from '../../types';
+import type { ActionButton, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
 const isItemClickable = () => false;
+
+const dataViewsPickerLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => viewLayout.isPicker
+);
 
 type DataViewsPickerProps< Item > = {
 	view: View;
@@ -54,6 +59,7 @@ type DataViewsPickerProps< Item > = {
 		totalPages: number;
 		infiniteScrollHandler?: () => void;
 	};
+	defaultLayouts: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
@@ -122,6 +128,7 @@ function DataViewsPicker< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
+	defaultLayouts: defaultLayoutsProperty,
 	selection,
 	onChangeSelection,
 	children,
@@ -193,6 +200,25 @@ function DataViewsPicker< Item >( {
 		};
 	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
 
+	// Filter out DataViewsPicker layouts.
+	const defaultLayouts = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( defaultLayoutsProperty ).filter(
+					( [ layoutType ] ) => {
+						return dataViewsPickerLayouts.some(
+							( viewLayout ) => viewLayout.type === layoutType
+						);
+					}
+				)
+			),
+		[ defaultLayoutsProperty ]
+	);
+
+	if ( ! defaultLayouts[ view.type ] ) {
+		return null;
+	}
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -212,14 +238,13 @@ function DataViewsPicker< Item >( {
 				containerWidth,
 				containerRef,
 				resizeObserverRef,
-				defaultLayouts: {},
+				defaultLayouts,
 				filters,
 				isShowingFilter,
 				setIsShowingFilter,
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
-				picker: true,
 			} }
 		>
 			<div className="dataviews-picker-wrapper" ref={ containerRef }>
