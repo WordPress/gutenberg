@@ -44,7 +44,7 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	}
 
 	const { Slot } = slotFill;
-	const slot = <Slot { ...props } fillProps={ fillProps } />;
+	const slot = <Slot { ...props } bubblesVirtually fillProps={ fillProps } />;
 
 	if ( group === 'default' ) {
 		return slot;
