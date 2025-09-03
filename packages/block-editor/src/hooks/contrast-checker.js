@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import ContrastChecker from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
+import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 
 function getComputedValue( node, property ) {
 	return node.ownerDocument.defaultView
@@ -23,7 +24,7 @@ function getBlockElementColors( blockEl, blockType ) {
 		return {};
 	}
 
-	const rootSelector = blockType?.selectors?.root || null;
+	const rootSelector = getBlockCSSSelector( blockType );
 	let targetElement = blockEl;
 
 	if ( rootSelector ) {
