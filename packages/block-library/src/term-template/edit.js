@@ -31,6 +31,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
 
 const TEMPLATE = [
 	[
@@ -397,47 +398,6 @@ export default function TermTemplateEdit( {
 				<ToolbarGroup controls={ displayLayoutControls } />
 			</BlockControls>
 
-			<InspectorControls>
-				<PanelBody title={ __( 'Style' ) }>
-					<ToggleGroupControl
-						label={ __( 'Display Layout' ) }
-						value={ layoutType === 'grid' ? 'grid' : 'list' }
-						help={
-							hierarchical
-								? __(
-										'Grid view is not available when the "Show hierarchy" setting is enabled.'
-								  )
-								: undefined
-						}
-						onChange={ ( value ) => {
-							if ( value === 'grid' ) {
-								setAttributes( {
-									layout: { type: 'grid' },
-								} );
-							} else {
-								setAttributes( {
-									layout: { type: 'default' },
-								} );
-							}
-						} }
-						isBlock
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						disabled={ hierarchical }
-					>
-						<ToggleGroupControlOption
-							value="list"
-							label={ __( 'List' ) }
-						/>
-						<ToggleGroupControlOption
-							value="grid"
-							label={ __( 'Grid' ) }
-							disabled={ hierarchical }
-						/>
-					</ToggleGroupControl>
-				</PanelBody>
-			</InspectorControls>
-
 			<ul { ...blockProps }>
 				{ hierarchical
 					? buildTermsTree( filteredTerms ).map( ( termNode ) =>
@@ -477,3 +437,66 @@ export default function TermTemplateEdit( {
 		</>
 	);
 }
+
+export const withStylesControlsOnTop = ( BlockEdit ) => ( props ) => {
+	if ( props.name !== 'core/term-template' ) {
+		return <BlockEdit { ...props } />;
+	}
+
+	const { attributes, context, setAttributes } = props;
+	const {
+		termQuery: { hierarchical },
+	} = context;
+
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Style' ) }>
+					<ToggleGroupControl
+						label={ __( 'Display Layout' ) }
+						value={
+							attributes?.layout?.type === 'grid'
+								? 'grid'
+								: 'list'
+						}
+						help={
+							hierarchical
+								? __(
+										'Grid view is not available when the "Show hierarchy" setting is enabled.'
+								  )
+								: undefined
+						}
+						onChange={ ( value ) => {
+							if ( value === 'grid' ) {
+								setAttributes( {
+									layout: { type: 'grid' },
+								} );
+							} else {
+								setAttributes( {
+									layout: { type: 'default' },
+								} );
+							}
+						} }
+						isBlock
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						disabled={ hierarchical }
+					>
+						<ToggleGroupControlOption
+							value="list"
+							label={ __( 'List' ) }
+						/>
+						<ToggleGroupControlOption
+							value="grid"
+							label={ __( 'Grid' ) }
+							disabled={ hierarchical }
+						/>
+					</ToggleGroupControl>
+				</PanelBody>
+			</InspectorControls>
+			<BlockEdit { ...props } />
+		</>
+	);
+};
+
+addFilter( 'editor.BlockEdit', 'core/term-template', withStylesControlsOnTop );
