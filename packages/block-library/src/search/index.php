@@ -395,7 +395,6 @@ function styles_for_block_core_search( $attributes ) {
 					// Add adjusted border radius styles for the wrapper element
 					// if button is positioned inside.
 					if ( $is_button_inside && ( intval( $value ) !== 0 || str_contains( $value, 'var(--wp--preset--border-radius--' ) ) ) {
-					// if ( $is_button_inside && intval( $value ) !== 0 ) {
 						$wrapper_styles[] = sprintf(
 							'border-%s-radius: calc(%s + %s);',
 							esc_attr( $name ),
@@ -407,7 +406,7 @@ function styles_for_block_core_search( $attributes ) {
 			}
 		} else {
 			// Numeric check is for backwards compatibility purposes.
-			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
+			$border_radius = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
 			// Get spacing CSS variable from preset value if provided.
 			if ( is_string( $border_radius ) && str_contains( $border_radius, 'var:preset|border-radius|' ) ) {
 				$index_to_splice = strrpos( $border_radius, '|' ) + 1;
