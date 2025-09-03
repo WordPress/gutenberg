@@ -84,7 +84,6 @@ function Picker( {
 } ) {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
-		label,
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -113,6 +112,7 @@ function Picker( {
 		onChangeView: setView,
 		multiselect,
 		selection,
+		label,
 		onChangeSelection: ( newSelection: string[] ) => {
 			onChangeSelection( newSelection );
 			setSelection( newSelection );
@@ -137,7 +137,7 @@ describe( 'DataViews Picker', () => {
 
 		it( 'supports specifying a `label` which is rendered as an aria-label', () => {
 			const testLabel = 'Select an item from the grid';
-			render( <Picker view={ { label: testLabel } } /> );
+			render( <Picker label={ testLabel } /> );
 
 			// Grid should have the specified aria-label
 			expect(

@@ -57,6 +57,7 @@ type DataViewsContextType< Item > = {
 	config: { perPageSizes: number[] };
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
+	label?: string;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {

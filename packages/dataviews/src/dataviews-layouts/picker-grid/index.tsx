@@ -255,9 +255,8 @@ function ViewPickerGrid< Item >( {
 	className,
 	empty,
 }: ViewPickerGridProps< Item > ) {
-	const { resizeObserverRef, paginationInfo } =
+	const { resizeObserverRef, paginationInfo, label } =
 		useContext( DataViewsContext );
-	const { label } = view;
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);

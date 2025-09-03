@@ -41,7 +41,6 @@ export const Default = ( {
 } ) => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_PICKER_GRID,
-		label: 'Galactic Bodies',
 		fields: [],
 		titleField: 'title',
 		mediaField: 'image',
@@ -134,6 +133,7 @@ export const Default = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
+				label="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},
 				} }

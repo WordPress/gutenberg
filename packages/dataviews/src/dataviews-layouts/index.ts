@@ -48,7 +48,7 @@ export const VIEW_LAYOUTS = [
 	},
 	{
 		type: LAYOUT_PICKER_GRID,
-		label: __( 'Picker Grid' ),
+		label: __( 'Grid' ),
 		component: ViewPickerGrid,
 		icon: category,
 		viewConfigOptions: PreviewSizePicker,
