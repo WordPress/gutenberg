@@ -26,7 +26,9 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 					),
 				),
 				'render_callback' => function ( $attributes ) {
-					return '<p>' . esc_html( $attributes['myAttribute'] ) . '</p>';
+					if ( isset( $attributes['myAttribute'] ) ) {
+						return '<p>' . esc_html( $attributes['myAttribute'] ) . '</p>';
+					}
 				},
 			)
 		);
