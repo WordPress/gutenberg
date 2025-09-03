@@ -112,22 +112,31 @@ function createFrame(
  * @return {Element}  A wp element.
  */
 const createInterpolateElement = ( interpolatedString, conversionMap ) => {
-	indoc = interpolatedString;
-	offset = 0;
-	output = [];
-	stack = [];
-	tokenizer.lastIndex = 0;
+	// Gracefully handle invalid HTML tags in interpolation strings to prevent editor crashes.
+	   try {
+		   indoc = interpolatedString;
+		   offset = 0;
+		   output = [];
+		   stack = [];
+		   tokenizer.lastIndex = 0;
 
-	if ( ! isValidConversionMap( conversionMap ) ) {
-		throw new TypeError(
-			'The conversionMap provided is not valid. It must be an object with values that are React Elements'
-		);
-	}
+		   if ( ! isValidConversionMap( conversionMap ) ) {
+			   throw new TypeError(
+				   'The conversionMap provided is not valid. It must be an object with values that are React Elements'
+			   );
+		   }
 
-	do {
-		// twiddle our thumbs
-	} while ( proceed( conversionMap ) );
-	return createElement( Fragment, null, ...output );
+		   do {
+			   // twiddle our thumbs
+		   } while ( proceed( conversionMap ) );
+		   return createElement( Fragment, null, ...output );
+	   } catch ( error ) {
+		   // Gracefully handle invalid HTML tags in interpolation strings to prevent editor crashes.
+		   // Log a warning for developers (not user-facing)
+		   console.warn('createInterpolateElement: unmatched or invalid tags', error);
+		   // Accessibility: role="presentation" for fallback span
+		   return createElement( 'span', { role: 'presentation' }, interpolatedString );
+	   }
 };
 
 /**

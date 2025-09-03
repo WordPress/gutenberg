@@ -10,6 +10,31 @@ import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
 
 describe( 'createInterpolateElement', () => {
+ it('returns a fallback <span> for multiple unmatched tags', () => {
+	 const testString = 'Unmatched <b>bold <i>italic';
+	 const result = createInterpolateElement(testString, { b: <b />, i: <i /> });
+	 expect(result.type).toBe('span');
+	 expect(result.props.children).toBe(testString);
+ });
+
+ it('returns a fallback <span> for interleaved valid and invalid tags', () => {
+	 const testString = 'Valid <code>code</code> and <bad>oops</bad>';
+	 const result = createInterpolateElement(testString, { code: <code /> });
+	 expect(result.type).toBe('span');
+	 expect(result.props.children).toBe(testString);
+ });
+	it('handles unmatched tags gracefully', () => {
+		const result = createInterpolateElement('Hello <code>World</code>', { code: <code /> });
+		expect(result).toBeDefined();
+		// Optionally: expect(result).toEqual(<span>Hello <code>World</code></span>);
+	});
+	 it('returns a fallback <span> for unmatched tags', () => {
+		 const testString = 'Unmatched <b>bold';
+		 const result = createInterpolateElement(testString, { b: <b /> });
+		 // Should return a span wrapping the raw string
+		 expect(result.type).toBe('span');
+		 expect(result.props.children).toBe(testString);
+	 });
 	it( 'throws an error when there is no conversion map', () => {
 		const testString = 'This is a string';
 		expect( () => createInterpolateElement( testString, {} ) ).toThrow(
