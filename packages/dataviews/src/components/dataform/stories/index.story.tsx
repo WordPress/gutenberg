@@ -671,6 +671,8 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				{
 					id: 'customerCard',
 					label: 'Customer',
+					description:
+						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [
 						{
 							id: 'customerContact',

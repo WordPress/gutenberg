@@ -76,7 +76,8 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 			$formatted_date = sprintf( __( '%s ago' ), human_time_diff( $post_timestamp ) );
 		}
 	} else {
-		$formatted_date = gmdate( empty( $attributes['format'] ) ? get_option( 'date_format' ) : $attributes['format'], $post_timestamp );
+		$format         = empty( $attributes['format'] ) ? get_option( 'date_format' ) : $attributes['format'];
+		$formatted_date = wp_date( $format, $post_timestamp );
 	}
 
 	if ( isset( $attributes['textAlign'] ) ) {

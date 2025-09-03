@@ -26,6 +26,7 @@ import usePopoverScroll from './use-popover-scroll';
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
 export const InsertionPointOpenRef = createContext();
+InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
 
 function BlockPopoverInbetween( {
 	previousClientId,

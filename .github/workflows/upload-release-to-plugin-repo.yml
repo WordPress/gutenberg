@@ -11,7 +11,7 @@ permissions: {}
 jobs:
     compute-should-update-trunk:
         name: Decide if trunk or tag
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         # Skip this job if the release is a release candidate. This will in turn skip
         # the upload jobs, which are only relevant for non-RC releases.
@@ -69,7 +69,7 @@ jobs:
 
     get-release-branch:
         name: Get release branch name
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
@@ -86,7 +86,7 @@ jobs:
 
     update-changelog:
         name: Update Changelog on ${{ matrix.branch }} branch
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: write
         if: |
@@ -104,7 +104,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -165,7 +165,7 @@ jobs:
 
     upload:
         name: Publish as trunk (and tag)
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
@@ -225,7 +225,7 @@ jobs:
 
     upload-tag:
         name: Publish as tag
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         environment: wp.org plugin
         needs: [compute-should-update-trunk, update-changelog]
