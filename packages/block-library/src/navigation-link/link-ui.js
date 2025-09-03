@@ -182,6 +182,9 @@ function UnforwardedLinkUI( props, ref ) {
 		`link-ui-link-control__description`
 	);
 
+	const blockEditingMode = useBlockEditingMode();
+	const isDefaultBlockEditingMode = blockEditingMode === 'default';
+
 	return (
 		<Popover
 			ref={ ref }
