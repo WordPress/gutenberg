@@ -21,7 +21,6 @@ const { ComponentsContext } = unlock( privateApis );
 export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	const toolbarState = useContext( ToolbarContext );
 	const contextState = useContext( ComponentsContext );
-
 	const fillProps = useMemo(
 		() => ( {
 			forwardedContext: [
@@ -33,7 +32,7 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	);
 
 	const slotFill = groups[ group ];
-	const fills = useSlotFills( slotFill?.name );
+	const fills = useSlotFills( slotFill.name );
 
 	if ( ! slotFill ) {
 		warning( `Unknown BlockControls group "${ group }" provided.` );
@@ -45,8 +44,6 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 	}
 
 	const { Slot } = slotFill;
-
-	// Use the new filter prop instead of children function
 	const slot = <Slot { ...props } fillProps={ fillProps } />;
 
 	if ( group === 'default' ) {
