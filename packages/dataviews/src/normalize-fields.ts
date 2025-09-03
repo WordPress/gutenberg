@@ -161,6 +161,14 @@ export function normalizeFields< Item >(
 
 		const filterBy = getFilterBy( field, fieldTypeDefinition );
 
+		// Handle lazy loading elements - if elements is a function, set to empty
+		// so it can be resolved by useFieldElements hook.
+		const elements =
+			typeof field.elements === 'function' ? [] : field.elements;
+
+		const elementsLoader =
+			typeof field.elements === 'function' ? field.elements : undefined;
+
 		return {
 			...field,
 			label: field.label || field.id,
@@ -177,6 +185,8 @@ export function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
+			elements,
+			elementsLoader,
 		};
 	} );
 }

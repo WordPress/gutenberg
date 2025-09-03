@@ -61,6 +61,7 @@ type DataType = {
 	text: string;
 	textWithElements: string;
 	textWithTextarea: string;
+	textWithLazyElements: string;
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
@@ -94,6 +95,7 @@ const data: DataType[] = [
 		text: 'Text',
 		textWithElements: 'Item 1',
 		textWithTextarea: 'Textarea',
+		textWithLazyElements: 'Item 1',
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
@@ -147,6 +149,18 @@ const fields: Field< DataType >[] = [
 		label: 'Textarea',
 		description: 'Help for textarea.',
 		Edit: 'textarea',
+	},
+	{
+		id: 'textWithLazyElements',
+		type: 'text',
+		label: 'Text (with lazy elements)',
+		description: 'Rocco.',
+		elements: () =>
+			Promise.resolve( [
+				{ value: 'item1', label: 'Item 1' },
+				{ value: 'item2', label: 'Item 2' },
+				{ value: 'item3', label: 'Item 3' },
+			] ),
 	},
 	{
 		id: 'integer',

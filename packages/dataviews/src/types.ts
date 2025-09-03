@@ -233,7 +233,7 @@ export type Field< Item > = {
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements?: Option[];
+	elements?: Option[] | ( () => Promise< Option[] > );
 
 	/**
 	 * Filter config for the field.
@@ -265,6 +265,8 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
+	elements?: Option[];
+	elementsLoader?: () => Promise< Option[] >;
 };
 
 /**

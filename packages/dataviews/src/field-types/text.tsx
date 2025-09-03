@@ -48,7 +48,7 @@ export default {
 	},
 	Edit: 'text',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
+		return field.elements || field.elementsLoader
 			? renderFromElements( { item, field } )
 			: field.getValue( { item } );
 	},

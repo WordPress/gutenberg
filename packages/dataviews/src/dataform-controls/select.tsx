@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { useFieldElements } from '../field-types';
 
 export default function Select< Item >( {
 	data,
@@ -27,7 +28,12 @@ export default function Select< Item >( {
 		[ id, onChange ]
 	);
 
-	const fieldElements = field?.elements ?? [];
+	const { elements: fieldElements, isLoading } = useFieldElements( field );
+
+	if ( isLoading ) {
+		return <p>loading</p>;
+	}
+
 	const hasEmptyValue = fieldElements.some(
 		( { value: elementValue } ) => elementValue === ''
 	);
