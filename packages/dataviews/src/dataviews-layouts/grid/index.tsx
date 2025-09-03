@@ -108,6 +108,7 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
+	const shouldRenderMedia = showMedia && renderedMediaField;
 
 	let mediaA11yProps;
 	let titleA11yProps;
@@ -154,7 +155,7 @@ function GridItem< Item >( {
 			}
 			aria-posinset={ posinset }
 		>
-			{ showMedia && renderedMediaField && (
+			{ shouldRenderMedia && (
 				<ItemClickWrapper
 					item={ item }
 					isItemClickable={ isItemClickable }
@@ -166,7 +167,7 @@ function GridItem< Item >( {
 					{ renderedMediaField }
 				</ItemClickWrapper>
 			) }
-			{ hasBulkActions && showMedia && renderedMediaField && (
+			{ hasBulkActions && shouldRenderMedia && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -176,18 +177,11 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			{ ! showTitle &&
-				showMedia &&
-				renderedMediaField &&
-				!! actions?.length && (
-					<div className="dataviews-view-grid__media-actions">
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					</div>
-				) }
+			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__media-actions">
+					<ItemActions item={ item } actions={ actions } isCompact />
+				</div>
+			) }
 			{ showTitle && (
 				<HStack
 					justify="space-between"
