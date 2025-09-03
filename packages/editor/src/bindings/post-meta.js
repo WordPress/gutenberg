@@ -163,7 +163,7 @@ export default {
 				return {
 					source: 'core/post-meta',
 					args: {
-						key: selectedField.key,
+						key: selectedField,
 					},
 				};
 			},
