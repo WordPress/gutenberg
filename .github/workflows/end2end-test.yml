@@ -142,3 +142,13 @@ jobs:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   label: '[Type] Flaky Test'
                   artifact-path: flaky-tests
+
+    required-e2e-playwright-status-checks:
+        name: All end-to-end tests passing.
+        runs-on: 'ubuntu-24.04'
+        needs: ['e2e-playwright']
+        if: ${{ always() }}
+        steps:
+            - name: Detect any failed status checks
+              run: |
+                  [[ "${{ join(needs.*.result, ' ') }}" =~ ^(success ?)+$ ]] || exit 1
