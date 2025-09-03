@@ -180,7 +180,7 @@ function GridItem< Item >( {
 				showMedia &&
 				renderedMediaField &&
 				!! actions?.length && (
-					<div className="dataviews-view-grid__hover-actions">
+					<div className="dataviews-view-grid__media-actions">
 						<ItemActions
 							item={ item }
 							actions={ actions }

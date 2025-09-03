@@ -159,7 +159,7 @@
 	top: $grid-unit-10;
 }
 
-.dataviews-view-grid__card .dataviews-view-grid__hover-actions {
+.dataviews-view-grid__card .dataviews-view-grid__media-actions {
 	position: absolute;
 	top: $grid-unit-05;
 	opacity: 0;
@@ -180,9 +180,9 @@
 	}
 }
 
-.dataviews-view-grid__card:hover .dataviews-view-grid__hover-actions,
-.dataviews-view-grid__card:focus-within .dataviews-view-grid__hover-actions,
-.dataviews-view-grid__card .dataviews-view-grid__hover-actions:has(.dataviews-all-actions-button[aria-expanded="true"]) {
+.dataviews-view-grid__card:hover .dataviews-view-grid__media-actions,
+.dataviews-view-grid__card:focus-within .dataviews-view-grid__media-actions,
+.dataviews-view-grid__card .dataviews-view-grid__media-actions:has(.dataviews-all-actions-button[aria-expanded="true"]) {
 	opacity: 1;
 }
 
