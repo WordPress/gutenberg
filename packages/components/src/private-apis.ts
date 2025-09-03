@@ -10,7 +10,6 @@ import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
-import { createPrivateSlotFill } from './slot-fill';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
@@ -36,5 +35,4 @@ lock( privateApis, {
 	ValidatedNumberControl,
 	ValidatedTextControl,
 	ValidatedToggleControl,
-	createPrivateSlotFill,
 } );

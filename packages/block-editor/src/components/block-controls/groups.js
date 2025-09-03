@@ -1,20 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { createPrivateSlotFill } = unlock( componentsPrivateApis );
-
-const BlockControlsDefault = createPrivateSlotFill( 'BlockControls' );
-const BlockControlsBlock = createPrivateSlotFill( 'BlockControlsBlock' );
-const BlockControlsInline = createPrivateSlotFill( 'BlockFormatControls' );
-const BlockControlsOther = createPrivateSlotFill( 'BlockControlsOther' );
-const BlockControlsParent = createPrivateSlotFill( 'BlockControlsParent' );
+const BlockControlsDefault = createSlotFill( 'BlockControls' );
+const BlockControlsBlock = createSlotFill( 'BlockControlsBlock' );
+const BlockControlsInline = createSlotFill( 'BlockFormatControls' );
+const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
+const BlockControlsParent = createSlotFill( 'BlockControlsParent' );
 
 const groups = {
 	default: BlockControlsDefault,

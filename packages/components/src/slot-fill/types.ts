@@ -30,75 +30,59 @@ type SlotPropBase = {
 	fillProps?: FillProps;
 };
 
-export type FillFilter = ( fill: {
-	instance: FillInstance;
-	children: FillChildren;
-} ) => boolean;
-
-// Base slot props with bubblesVirtually discrimination
-type SlotPropsWithBubblesVirtually = SlotPropBase & {
-	/**
-	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
-	 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
-	 * also accept an optional `className`, `id`, etc.  to add to the slot container.
-	 */
-	bubblesVirtually: true;
-
-	/**
-	 * A function that returns nodes to be rendered.
-	 * Supported only when `bubblesVirtually` is `false`.
-	 */
-	children?: never;
-
-	/**
-	 * Additional className for the `Slot` component.
-	 * Supported only when `bubblesVirtually` is `true`.
-	 */
-	className?: string;
-
-	/**
-	 * Additional styles for the `Slot` component.
-	 * Supported only when `bubblesVirtually` is `true`.
-	 */
-	style?: React.CSSProperties;
-};
-
-type SlotPropsWithoutBubblesVirtually = SlotPropBase & {
-	/**
-	 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
-	 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
-	 * also accept an optional `className`, `id`, etc.  to add to the slot container.
-	 */
-	bubblesVirtually?: false;
-
-	/**
-	 * A function that returns nodes to be rendered.
-	 * Supported only when `bubblesVirtually` is `false`.
-	 */
-	children?: ( fills: ReactNode ) => ReactNode;
-
-	/**
-	 * Additional className for the `Slot` component.
-	 * Supported only when `bubblesVirtually` is `true`.
-	 */
-	className?: never;
-
-	/**
-	 * Additional styles for the `Slot` component.
-	 * Supported only when `bubblesVirtually` is `true`.
-	 */
-	style?: never;
-};
-
-// Public slot props (no filtering)
 export type SlotComponentProps =
-	| SlotPropsWithBubblesVirtually
-	| SlotPropsWithoutBubblesVirtually;
+	| ( SlotPropBase & {
+			/**
+			 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+			 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
+			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
+			 */
+			bubblesVirtually: true;
 
-// Private slot props (with filtering)
-export type PrivateSlotComponentProps =
-	| ( SlotPropsWithBubblesVirtually & { filter?: FillFilter } )
-	| ( SlotPropsWithoutBubblesVirtually & { filter?: FillFilter } );
+			/**
+			 * A function that returns nodes to be rendered.
+			 * Supported only when `bubblesVirtually` is `false`.
+			 */
+			children?: never;
+
+			/**
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			className?: string;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: React.CSSProperties;
+	  } )
+	| ( SlotPropBase & {
+			/**
+			 * By default, events will bubble to their parents on the DOM hierarchy (native event bubbling).
+			 * If set to true, events will bubble to their virtual parent in the React elements hierarchy instead,
+			 * also accept an optional `className`, `id`, etc.  to add to the slot container.
+			 */
+			bubblesVirtually?: false;
+
+			/**
+			 * A function that returns nodes to be rendered.
+			 * Supported only when `bubblesVirtually` is `false`.
+			 */
+			children?: ( fills: ReactNode ) => ReactNode;
+
+			/**
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			className?: never;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: never;
+	  } );
 
 export type FillChildren =
 	| ReactNode
