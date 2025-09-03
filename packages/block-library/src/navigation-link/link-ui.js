@@ -13,6 +13,7 @@ import {
 	LinkControl,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	createInterpolateElement,
@@ -157,6 +158,10 @@ function UnforwardedLinkUI( props, ref ) {
 		name: postType,
 	} );
 
+	// Check if we're in contentOnly mode
+	const blockEditingMode = useBlockEditingMode();
+	const isDefaultBlockEditingMode = blockEditingMode === 'default';
+
 	async function handleCreate( pageTitle ) {
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
@@ -261,7 +266,8 @@ function UnforwardedLinkUI( props, ref ) {
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						renderControlBottom={ () =>
-							! link?.url?.length && (
+							! link?.url?.length &&
+							isDefaultBlockEditingMode && (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
 									setAddingBlock={ () => {

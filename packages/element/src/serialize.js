@@ -48,7 +48,11 @@ import RawHTML from './raw-html';
 
 /** @typedef {import('react').ReactElement} ReactElement */
 
-const { Provider, Consumer } = createContext( undefined );
+const Context = createContext( undefined );
+Context.displayName = 'ElementContext';
+
+const { Provider, Consumer } = Context;
+
 const ForwardRef = forwardRef( () => {
 	return null;
 } );
