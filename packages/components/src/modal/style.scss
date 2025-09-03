@@ -31,7 +31,6 @@
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
-	// Set the proper editor text color for all content within the modal
 	color: $gray-900;
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
