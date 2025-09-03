@@ -309,7 +309,7 @@ const LinkUITools = ( {
 					} }
 					aria-haspopup={ blockInserterAriaRole }
 				>
-					{ __( 'Add page' ) }
+					{ __( 'Create page' ) }
 				</Button>
 			) }
 			<Button
