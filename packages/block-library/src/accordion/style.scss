@@ -5,6 +5,12 @@
 
 .wp-block-accordion-content.is-open {
 	grid-template-rows: max-content 1fr;
+
+	> .wp-block-accordion-header {
+		.accordion-content__toggle-icon.has-icon-plus {
+			transform: rotate(45deg);
+		}
+	}
 }
 
 .accordion-content__heading {
@@ -81,13 +87,5 @@
 
 	.wp-block-accordion-content {
 		transition: grid-template-rows 0.3s ease-out;
-	}
-}
-
-.is-open {
-	> .wp-block-accordion-header {
-		.accordion-content__toggle-icon.has-icon-plus {
-			transform: rotate(45deg);
-		}
 	}
 }
