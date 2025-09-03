@@ -641,7 +641,7 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 			registry: any;
 			onActionPerformed?: ( items: Item[] ) => void;
 		}
-	) => void | Promise< void >;
+	) => void;
 }
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
