@@ -76,8 +76,12 @@ type DefaultUIProps = Pick<
 	'header' | 'search' | 'searchLabel'
 >;
 
-function DefaultUI( { header, search = true, searchLabel }: DefaultUIProps ) {
-	const { isShowingFilter, config } = useContext( DataViewsContext );
+function DefaultUI( {
+	header,
+	search = true,
+	searchLabel = undefined,
+}: DefaultUIProps ) {
+	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -94,16 +98,14 @@ function DefaultUI( { header, search = true, searchLabel }: DefaultUIProps ) {
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</HStack>
-				{ ( config || header ) && (
-					<HStack
-						spacing={ 1 }
-						expanded={ false }
-						style={ { flexShrink: 0 } }
-					>
-						config && <DataViewsViewConfig />
-						{ header }
-					</HStack>
-				) }
+				<HStack
+					spacing={ 1 }
+					expanded={ false }
+					style={ { flexShrink: 0 } }
+				>
+					<DataViewsViewConfig />
+					{ header }
+				</HStack>
 			</HStack>
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
