@@ -117,7 +117,8 @@ describe( 'useFocusOutside', () => {
 	} );
 
 	it( 'should call handler when unmounting while queued', async () => {
-		const mockOnFocusOutside = jest.fn();
+		const { promise, resolve } = Promise.withResolvers();
+		const mockOnFocusOutside = jest.fn().mockImplementation( resolve );
 		const user = userEvent.setup();
 
 		const { unmount } = render(
@@ -140,8 +141,8 @@ describe( 'useFocusOutside', () => {
 		// The callback should still be called.
 		unmount();
 
-		// Wait for the queued timeout to execute
-		await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+		// Wait for the callback to be called
+		await promise;
 
 		expect( mockOnFocusOutside ).toHaveBeenCalled();
 	} );
