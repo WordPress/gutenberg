@@ -71,7 +71,10 @@ export default function save( { attributes } ) {
 		/>
 	);
 
-	const displayCaption = ! RichText.isEmpty( caption ) || bindings.caption;
+	const displayCaption =
+		! RichText.isEmpty( caption ) ||
+		bindings.caption ||
+		bindings?.__default?.source === 'core/pattern-overrides';
 
 	const figure = (
 		<>
