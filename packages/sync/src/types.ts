@@ -33,6 +33,7 @@ export type ConnectDoc = (
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	refetchPersistedRecord: () => void;
 }
 
 export interface SyncConfig {

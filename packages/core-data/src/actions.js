@@ -701,6 +701,15 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					if (
+						window.__experimentalEnableSync &&
+						entityConfig.syncConfig?.enabled
+					) {
+						getSyncProvider().markEntityAsPersisted(
+							entityConfig.syncConfig,
+							persistedRecord
+						);
+					}
 				}
 			} catch ( _error ) {
 				hasError = true;

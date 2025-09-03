@@ -23,8 +23,12 @@ import { createYjsDoc } from './utils';
 
 interface EntityState {
 	destroy: () => void;
+	lastPersistedAt: number;
 	ydoc: CRDTDoc;
 }
+
+const CRDT_STATE_MAP_KEY = 'state';
+const CRDT_STATE_PERSISTED_AT_KEY = 'persistedAt';
 
 export class SyncProvider {
 	private connectLocal: ConnectDoc | null;
@@ -121,6 +125,7 @@ export class SyncProvider {
 		this.connections.set( entityId, connections );
 		this.setEntityState( objectType, objectId, {
 			destroy: onDestroy,
+			lastPersistedAt: Date.now(),
 			ydoc,
 		} );
 
@@ -279,6 +284,17 @@ export class SyncProvider {
 		return this.undoManager;
 	}
 
+	public markEntityAsPersisted(
+		syncConfig: SyncConfig,
+		record: ObjectData
+	): void {
+		const objectId = syncConfig.getObjectId( record );
+		const objectType = syncConfig.objectType;
+		const ydoc = this.getEntityState( objectType, objectId )?.ydoc;
+
+		ydoc?.getMap( 'state' ).set( CRDT_STATE_PERSISTED_AT_KEY, Date.now() );
+	}
+
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
@@ -322,7 +338,7 @@ export class SyncProvider {
 			return;
 		}
 
-		const { ydoc } = entityState;
+		const { lastPersistedAt, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current entity record.
@@ -333,6 +349,17 @@ export class SyncProvider {
 		// in an update to the store if the blocks have changed.
 
 		handlers.editRecord( changes );
+
+		// Determine if we should refetch the persisted entity record from the
+		// REST API because another client has persisted changes.
+		const ystateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+		const persistedAt =
+			( ystateMap.get( CRDT_STATE_PERSISTED_AT_KEY ) as number ) ?? 0;
+		if ( persistedAt > lastPersistedAt ) {
+			entityState.lastPersistedAt = persistedAt;
+			this.setEntityState( objectType, objectId, entityState );
+			void handlers.refetchPersistedRecord();
+		}
 	}
 
 	/**

@@ -178,6 +178,17 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Refetch the persisted entity record.
+							refetchPersistedRecord: () => {
+								void ( async () => {
+									dispatch.receiveEntityRecords(
+										kind,
+										name,
+										await apiFetch( { path, parse: true } ),
+										query
+									);
+								} )();
+							},
 						}
 					);
 				}
