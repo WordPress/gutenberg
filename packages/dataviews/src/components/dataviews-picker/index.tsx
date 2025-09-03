@@ -34,7 +34,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Action, Field, View } from '../../types';
+import type { ActionButton, Field, View } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
@@ -44,7 +44,7 @@ type DataViewsPickerProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
-	actions?: Action< Item >[];
+	actions?: ActionButton< Item >[];
 	search?: boolean;
 	searchLabel?: string;
 	data: Item[];

@@ -14,7 +14,7 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../components/dataviews-picker';
 import { LAYOUT_PICKER_GRID } from '../constants';
-import type { Action, View, ViewPickerGrid } from '../types';
+import type { ActionButton, View, ViewPickerGrid } from '../types';
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 
 type Data = {
@@ -48,7 +48,7 @@ const data: Data[] = [
 ];
 
 const singleSelectCallback = jest.fn();
-const singleSelectActions: Action< Data >[] = [
+const singleSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
 		label: 'Confirm',
@@ -59,7 +59,7 @@ const singleSelectActions: Action< Data >[] = [
 ];
 
 const multiSelectCallback = jest.fn();
-const multiSelectActions: Action< Data >[] = [
+const multiSelectActions: ActionButton< Data >[] = [
 	{
 		id: 'confirm',
 		label: 'Confirm',
@@ -77,7 +77,7 @@ function Picker( {
 	multiselect,
 	...props
 }: {
-	actions?: Action< Data >[];
+	actions?: ActionButton< Data >[];
 	view?: Partial< View >;
 	label?: string;
 	multiselect?: boolean;

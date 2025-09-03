@@ -19,7 +19,7 @@ import {
 } from '../../dataviews/stories/fixtures';
 import { LAYOUT_PICKER_GRID } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { Action, View } from '../../../types';
+import type { ActionButton, View } from '../../../types';
 
 const meta = {
 	title: 'DataViews/DataViewsPicker',
@@ -68,7 +68,7 @@ export const Default = ( {
 
 	const [ selection, setSelection ] = useState< string[] >( [] );
 
-	const actions: Action< SpaceObject >[] = [
+	const actions: ActionButton< SpaceObject >[] = [
 		{
 			id: 'cancel',
 			label: 'Cancel',
