@@ -8,9 +8,8 @@ export function renderFromElements< Item >( {
 	field,
 }: DataViewRenderFieldProps< Item > ) {
 	const value = field.getValue( { item } );
-
 	return (
-		field.elements?.find( ( element ) => element.value === value )?.label ||
-		field.getValue( { item } )
+		field?.elements?.find( ( element ) => element.value === value )
+			?.label || field.getValue( { item } )
 	);
 }
