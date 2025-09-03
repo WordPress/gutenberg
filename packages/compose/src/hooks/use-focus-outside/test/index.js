@@ -116,7 +116,7 @@ describe( 'useFocusOutside', () => {
 		mockedDocumentHasFocus.mockRestore();
 	} );
 
-	it( 'should cancel check when unmounting while queued', async () => {
+	it( 'should call handler when unmounting while queued', async () => {
 		const mockOnFocusOutside = jest.fn();
 		const user = userEvent.setup();
 
@@ -130,11 +130,19 @@ describe( 'useFocusOutside', () => {
 		} );
 		await user.click( button );
 
-		// Simulate a blur event and the wrapper unmounting while the blur event
-		// handler is queued
-		button.blur();
+		// Click outside the wrapper to trigger a blur event and queue the callback
+		const outsideButton = screen.getByRole( 'button', {
+			name: 'Button outside the wrapper',
+		} );
+		await user.click( outsideButton );
+
+		// Immediately unmount the component while the blur event is queued
+		// The callback should still be called.
 		unmount();
 
-		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
+		// Wait for the queued timeout to execute
+		await new Promise( ( resolve ) => setTimeout( resolve, 10 ) );
+
+		expect( mockOnFocusOutside ).toHaveBeenCalled();
 	} );
 } );
