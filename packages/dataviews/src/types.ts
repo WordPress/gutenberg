@@ -639,7 +639,6 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 		items: Item[],
 		context: {
 			registry: any;
-			selection?: string[];
 			onActionPerformed?: ( items: Item[] ) => void;
 		}
 	) => void | Promise< void >;
