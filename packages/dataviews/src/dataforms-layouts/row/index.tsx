@@ -32,6 +32,10 @@ function Header( { title }: { title: string } ) {
 	);
 }
 
+const EMPTY_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
+	<>{ children }</>
+);
+
 export default function FormRowField< Item >( {
 	data,
 	field,
@@ -46,14 +50,14 @@ export default function FormRowField< Item >( {
 	} ) as NormalizedRowLayout;
 
 	if ( isCombinedField( field ) ) {
-		const form = {
+		const form: Form = {
 			fields: field.children.map( ( child ) => {
 				if ( typeof child === 'string' ) {
 					return { id: child };
 				}
 				return child;
 			} ),
-		} as Form;
+		};
 
 		return (
 			<div className="dataforms-layouts-row__field">
@@ -65,7 +69,7 @@ export default function FormRowField< Item >( {
 						data={ data }
 						form={ form }
 						onChange={ onChange }
-						disableWrapper
+						as={ EMPTY_WRAPPER }
 					>
 						{ ( FieldLayout, nestedField ) => (
 							<div
