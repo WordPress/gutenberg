@@ -7,15 +7,19 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import apiFetch from '..';
+import type { APIFetchMiddleware, APIFetchOptions } from '../types';
 
 /**
  * Apply query arguments to both URL and Path, whichever is present.
  *
- * @param {import('../types').APIFetchOptions} props
- * @param {Record<string, string | number>}    queryArgs
- * @return {import('../types').APIFetchOptions} The request with the modified query args
+ * @param {APIFetchOptions}                   props     The request options
+ * @param {Record< string, string | number >} queryArgs
+ * @return  The request with the modified query args
  */
-const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
+const modifyQuery = (
+	{ path, url, ...options }: APIFetchOptions,
+	queryArgs: Record< string, string | number >
+): APIFetchOptions => ( {
 	...options,
 	url: url && addQueryArgs( url, queryArgs ),
 	path: path && addQueryArgs( path, queryArgs ),
@@ -24,17 +28,17 @@ const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 /**
  * Duplicates parsing functionality from apiFetch.
  *
- * @param {Response} response
- * @return {Promise<any>} Parsed response json.
+ * @param response
+ * @return Parsed response json.
  */
-const parseResponse = ( response ) =>
+const parseResponse = ( response: Response ) =>
 	response.json ? response.json() : Promise.reject( response );
 
 /**
- * @param {string | null} linkHeader
- * @return {{ next?: string }} The parsed link header.
+ * @param linkHeader
+ * @return The parsed link header.
  */
-const parseLinkHeader = ( linkHeader ) => {
+const parseLinkHeader = ( linkHeader: string | null ) => {
 	if ( ! linkHeader ) {
 		return {};
 	}
@@ -47,19 +51,19 @@ const parseLinkHeader = ( linkHeader ) => {
 };
 
 /**
- * @param {Response} response
- * @return {string | undefined} The next page URL.
+ * @param response
+ * @return  The next page URL.
  */
-const getNextPageUrl = ( response ) => {
+const getNextPageUrl = ( response: Response ) => {
 	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
 	return next;
 };
 
 /**
- * @param {import('../types').APIFetchOptions} options
- * @return {boolean} True if the request contains an unbounded query.
+ * @param options
+ * @return True if the request contains an unbounded query.
  */
-const requestContainsUnboundedQuery = ( options ) => {
+const requestContainsUnboundedQuery = ( options: APIFetchOptions ) => {
 	const pathIsUnbounded =
 		!! options.path && options.path.indexOf( 'per_page=-1' ) !== -1;
 	const urlIsUnbounded =
@@ -71,10 +75,10 @@ const requestContainsUnboundedQuery = ( options ) => {
  * The REST API enforces an upper limit on the per_page option. To handle large
  * collections, apiFetch consumers can pass `per_page=-1`; this middleware will
  * then recursively assemble a full response array from all available pages.
- *
- * @type {import('../types').APIFetchMiddleware}
+ * @param options
+ * @param next
  */
-const fetchAllMiddleware = async ( options, next ) => {
+const fetchAllMiddleware: APIFetchMiddleware = async ( options, next ) => {
 	if ( options.parse === false ) {
 		// If a consumer has opted out of parsing, do not apply middleware.
 		return next( options );
@@ -108,7 +112,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	}
 
 	// Iteratively fetch all remaining pages until no "next" header is found.
-	let mergedResults = /** @type {any[]} */ ( [] ).concat( results );
+	let mergedResults = ( [] as Array< any > ).concat( results );
 	while ( nextPage ) {
 		const nextResponse = await apiFetch( {
 			...options,

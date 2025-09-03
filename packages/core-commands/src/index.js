@@ -30,9 +30,6 @@ function CommandPalette() {
  * Initializes the Command Palette.
  */
 export function initializeCommandPalette() {
-	if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-		return;
-	}
 	const root = document.createElement( 'div' );
 	document.body.appendChild( root );
 	createRoot( root ).render(

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import userLocaleMiddleware from '../user-locale';
 
 describe( 'User locale middleware', () => {
@@ -12,7 +13,7 @@ describe( 'User locale middleware', () => {
 			path: '/wp/v2/posts',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.path ).toBe( '/wp/v2/posts?_locale=user' );
 		};
 
@@ -27,7 +28,7 @@ describe( 'User locale middleware', () => {
 			path: '/wp/v2/posts?foo=bar',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.path ).toBe( '/wp/v2/posts?foo=bar&_locale=user' );
 		};
 
@@ -42,7 +43,7 @@ describe( 'User locale middleware', () => {
 			path: '/wp/v2/posts?_locale=foo',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.path ).toBe( '/wp/v2/posts?_locale=foo' );
 		};
 
@@ -57,7 +58,7 @@ describe( 'User locale middleware', () => {
 			path: '/wp/v2/posts?foo=bar&_locale=foo',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.path ).toBe( '/wp/v2/posts?foo=bar&_locale=foo' );
 		};
 
@@ -72,7 +73,7 @@ describe( 'User locale middleware', () => {
 			url: 'http://wp.org/wp-json/wp/v2/posts',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.url ).toBe(
 				'http://wp.org/wp-json/wp/v2/posts?_locale=user'
 			);
@@ -89,7 +90,7 @@ describe( 'User locale middleware', () => {
 			url: 'http://wp.org/wp-json/wp/v2/posts?foo=bar',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.url ).toBe(
 				'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=user'
 			);
@@ -106,7 +107,7 @@ describe( 'User locale middleware', () => {
 			url: 'http://wp.org/wp-json/wp/v2/posts?_locale=foo',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.url ).toBe(
 				'http://wp.org/wp-json/wp/v2/posts?_locale=foo'
 			);
@@ -123,7 +124,7 @@ describe( 'User locale middleware', () => {
 			url: 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo',
 		};
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.url ).toBe(
 				'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo'
 			);

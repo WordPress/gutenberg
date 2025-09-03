@@ -54,6 +54,7 @@ module.exports = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
+		'@storybook/addon-interactions',
 		'@storybook/addon-webpack5-compiler-babel',
 		'storybook-source-link',
 		'@geometricpanda/storybook-addon-badges',

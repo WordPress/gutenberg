@@ -358,9 +358,9 @@ Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-This property provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
+This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
-For example, this is how you'd enable only the table view type:
+For example, this is how you'd enable only the table and grid layout type and set whether those layouts show media by default:
 
 ```js
 const defaultLayouts = {
@@ -373,7 +373,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -416,9 +416,9 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `config`: false | { perPageSizes: number[] }
+#### `config`: { perPageSizes: number[] }
 
-Optional. Set it to `false` to hide the view config control entirely. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
 
 #### `empty`: React node
 

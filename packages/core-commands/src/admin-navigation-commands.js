@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useCommand, useCommandLoader } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { plus, dashboard } from '@wordpress/icons';
 import { getPath } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -20,6 +20,14 @@ const { useHistory } = unlock( routerPrivateApis );
 
 const getAddNewPageCommand = () =>
 	function useAddNewPageCommand() {
+		const canCreatePage = useSelect(
+			( select ) =>
+				select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'page',
+				} ),
+			[]
+		);
 		const isSiteEditor = getPath( window.location.href )?.includes(
 			'site-editor.php'
 		);
@@ -65,6 +73,10 @@ const getAddNewPageCommand = () =>
 		);
 
 		const commands = useMemo( () => {
+			if ( ! canCreatePage ) {
+				return [];
+			}
+
 			const addNewPage =
 				isSiteEditor && isBlockBasedTheme
 					? createPageEntity
@@ -77,9 +89,137 @@ const getAddNewPageCommand = () =>
 					label: __( 'Add Page' ),
 					icon: plus,
 					callback: addNewPage,
+					keywords: [
+						__( 'page' ),
+						__( 'new' ),
+						__( 'add' ),
+						__( 'create' ),
+					],
 				},
 			];
-		}, [ createPageEntity, isSiteEditor, isBlockBasedTheme ] );
+		}, [
+			createPageEntity,
+			isSiteEditor,
+			isBlockBasedTheme,
+			canCreatePage,
+		] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
+const getAdminBasicNavigationCommands = () =>
+	function useAdminBasicNavigationCommands() {
+		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
+			( select ) => {
+				return {
+					isBlockBasedTheme:
+						select( coreStore ).getCurrentTheme()?.is_block_theme,
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_template',
+					} ),
+				};
+			},
+			[]
+		);
+
+		const commands = useMemo( () => {
+			if ( canCreateTemplate && isBlockBasedTheme ) {
+				const isSiteEditor = getPath( window.location.href )?.includes(
+					'site-editor.php'
+				);
+				if ( ! isSiteEditor ) {
+					return [
+						{
+							name: 'core/go-to-site-editor',
+							label: __( 'Open Site Editor' ),
+							callback: ( { close } ) => {
+								close();
+								document.location = 'site-editor.php';
+							},
+						},
+					];
+				}
+			}
+
+			return [];
+		}, [ canCreateTemplate, isBlockBasedTheme ] );
+
+		return {
+			commands,
+			isLoading: false,
+		};
+	};
+
+const getDashboardCommand = () =>
+	function useDashboardCommand() {
+		const currentPath = getPath( window.location.href );
+
+		const isEditorScreen =
+			currentPath?.includes( 'site-editor.php' ) ||
+			currentPath?.includes( 'post.php' ) ||
+			currentPath?.includes( 'post-new.php' ) ||
+			currentPath?.includes( 'widgets.php' ) ||
+			currentPath?.includes( 'customize.php' );
+
+		const commands = useMemo( () => {
+			if ( isEditorScreen ) {
+				return [
+					{
+						name: 'core/dashboard',
+						label: __( 'Dashboard' ),
+						icon: dashboard,
+						callback: () => {
+							document.location.assign( 'index.php' );
+						},
+					},
+				];
+			}
+			return [];
+		}, [ isEditorScreen ] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
+const getAddNewPostCommand = () =>
+	function useAddNewPostCommand() {
+		const canCreatePost = useSelect(
+			( select ) =>
+				select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'post',
+				} ),
+			[]
+		);
+
+		const commands = useMemo( () => {
+			if ( ! canCreatePost ) {
+				return [];
+			}
+
+			return [
+				{
+					name: 'core/add-new-post',
+					label: __( 'Add Post' ),
+					icon: plus,
+					callback: () => {
+						document.location.assign( 'post-new.php' );
+					},
+					keywords: [
+						__( 'post' ),
+						__( 'new' ),
+						__( 'add' ),
+						__( 'create' ),
+					],
+				},
+			];
+		}, [ canCreatePost ] );
 
 		return {
 			isLoading: false,
@@ -88,17 +228,23 @@ const getAddNewPageCommand = () =>
 	};
 
 export function useAdminNavigationCommands() {
-	useCommand( {
+	useCommandLoader( {
 		name: 'core/add-new-post',
-		label: __( 'Add Post' ),
-		icon: plus,
-		callback: () => {
-			document.location.assign( 'post-new.php' );
-		},
+		hook: getAddNewPostCommand(),
+	} );
+
+	useCommandLoader( {
+		name: 'core/dashboard',
+		hook: getDashboardCommand(),
 	} );
 
 	useCommandLoader( {
 		name: 'core/add-new-page',
 		hook: getAddNewPageCommand(),
+	} );
+
+	useCommandLoader( {
+		name: 'core/admin-navigation',
+		hook: getAdminBasicNavigationCommands(),
 	} );
 }

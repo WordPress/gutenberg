@@ -66,11 +66,9 @@ type DataViewsProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	config?:
-		| false
-		| {
-				perPageSizes: number[];
-		  };
+	config?: {
+		perPageSizes: number[];
+	};
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
@@ -90,7 +88,7 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter, config } = useContext( DataViewsContext );
+	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -107,16 +105,14 @@ function DefaultUI( {
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</HStack>
-				{ ( config || header ) && (
-					<HStack
-						spacing={ 1 }
-						expanded={ false }
-						style={ { flexShrink: 0 } }
-					>
-						config && <DataViewsViewConfig />
-						{ header }
-					</HStack>
-				) }
+				<HStack
+					spacing={ 1 }
+					expanded={ false }
+					style={ { flexShrink: 0 } }
+				>
+					<DataViewsViewConfig />
+					{ header }
+				</HStack>
 			</HStack>
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
@@ -282,6 +278,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
+	Footer: typeof DataViewsFooter;
 };
 
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
@@ -292,5 +289,6 @@ DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.Footer = DataViewsFooter;
 
 export default DataViewsSubComponents;

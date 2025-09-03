@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import createNonceMiddleware from '../nonce';
 
 describe( 'Nonce middleware', () => {
@@ -13,8 +14,8 @@ describe( 'Nonce middleware', () => {
 			method: 'GET',
 			path: '/wp/v2/posts',
 		};
-		const callback = ( options ) => {
-			expect( options.headers[ 'X-WP-Nonce' ] ).toBe( nonce );
+		const callback: FetchHandler = async ( options ) => {
+			expect( options.headers![ 'X-WP-Nonce' ] ).toBe( nonce );
 		};
 
 		nonceMiddleware( requestOptions, callback );
@@ -31,8 +32,8 @@ describe( 'Nonce middleware', () => {
 			headers: { 'X-WP-Nonce': 'existing nonce' },
 		};
 
-		const callback = ( options ) => {
-			expect( options.headers[ 'X-WP-Nonce' ] ).toBe( 'new nonce' );
+		const callback: FetchHandler = async ( options ) => {
+			expect( options.headers![ 'X-WP-Nonce' ] ).toBe( 'new nonce' );
 		};
 
 		nonceMiddleware( requestOptions, callback );

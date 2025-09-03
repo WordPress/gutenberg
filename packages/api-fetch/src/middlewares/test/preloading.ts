@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import createPreloadingMiddleware from '../preloading';
 
 describe( 'Preloading Middleware', () => {
@@ -23,7 +24,10 @@ describe( 'Preloading Middleware', () => {
 						path: 'wp/v2/posts',
 					};
 
-					const response = preloadingMiddleware( requestOptions );
+					const response = preloadingMiddleware(
+						requestOptions,
+						async () => {}
+					);
 					return response.then( ( value ) => {
 						expect( value ).toEqual( body );
 					} );
@@ -60,9 +64,12 @@ describe( 'Preloading Middleware', () => {
 					const noResponseMock =
 						'undefined' === typeof window.Response;
 					if ( noResponseMock ) {
+						// @ts-expect-error
 						window.Response = class {
 							constructor( body, options ) {
+								// @ts-expect-error
 								this.body = JSON.parse( body );
+								// @ts-expect-error
 								this.headers = options.headers;
 							}
 						};
@@ -92,8 +99,12 @@ describe( 'Preloading Middleware', () => {
 						parse: false,
 					};
 
-					const response = preloadingMiddleware( requestOptions );
+					const response = preloadingMiddleware(
+						requestOptions,
+						async () => {}
+					);
 					if ( noResponseMock ) {
+						// @ts-expect-error
 						delete window.Response;
 					}
 					return response.then( ( value ) => {
@@ -126,7 +137,10 @@ describe( 'Preloading Middleware', () => {
 						parse: true,
 					};
 
-					const response = preloadingMiddleware( requestOptions );
+					const response = preloadingMiddleware(
+						requestOptions,
+						async () => {}
+					);
 					return response.then( ( value ) => {
 						expect( value ).toEqual( body );
 					} );
@@ -172,7 +186,10 @@ describe( 'Preloading Middleware', () => {
 			path: 'wp/v2/demo-reverse-alphabetical?baz=quux&foo=bar',
 		};
 
-		let value = await preloadingMiddleware( requestOptions, () => {} );
+		let value = await preloadingMiddleware(
+			requestOptions,
+			async () => {}
+		);
 		expect( value ).toEqual( body );
 
 		requestOptions = {
@@ -180,7 +197,7 @@ describe( 'Preloading Middleware', () => {
 			path: 'wp/v2/demo-alphabetical?foo=bar&baz=quux',
 		};
 
-		value = await preloadingMiddleware( requestOptions, () => {} );
+		value = await preloadingMiddleware( requestOptions, async () => {} );
 		expect( value ).toEqual( body );
 	} );
 
@@ -196,7 +213,7 @@ describe( 'Preloading Middleware', () => {
 				method: 'GET',
 				path: '/?_fields=foo%2Cbar',
 			},
-			() => {}
+			async () => {}
 		);
 
 		expect( response ).toEqual( body );
@@ -214,7 +231,7 @@ describe( 'Preloading Middleware', () => {
 				method: 'GET',
 				url: '/index.php?rest_route=%2F',
 			},
-			() => {}
+			async () => {}
 		);
 
 		expect( response ).toEqual( body );
@@ -232,7 +249,7 @@ describe( 'Preloading Middleware', () => {
 				method: 'GET',
 				url: '/index.php?rest_route=%2F&_fields=foo%2Cbar',
 			},
-			() => {}
+			async () => {}
 		);
 
 		expect( response ).toEqual( body );
@@ -321,7 +338,7 @@ describe( 'Preloading Middleware', () => {
 			[ 'all empty', {} ],
 			[ 'method empty', { [ method ]: {} } ],
 		] )( '%s', ( label, preloadedData ) => {
-			it( 'should move to the next middleware if no preloaded data', () => {
+			it( 'should move to the next middleware if no preloaded data', async () => {
 				const preloadingMiddleware =
 					createPreloadingMiddleware( preloadedData );
 				const requestOptions = {
@@ -329,12 +346,15 @@ describe( 'Preloading Middleware', () => {
 					path: 'wp/v2/posts',
 				};
 
-				const callback = ( options ) => {
+				const callback: FetchHandler = async ( options ) => {
 					expect( options ).toBe( requestOptions );
 					return true;
 				};
 
-				const ret = preloadingMiddleware( requestOptions, callback );
+				const ret = await preloadingMiddleware(
+					requestOptions,
+					callback
+				);
 				expect( ret ).toBe( true );
 			} );
 		} );

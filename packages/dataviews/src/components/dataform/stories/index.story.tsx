@@ -379,24 +379,58 @@ function CustomEditControl< Item >( {
 	);
 }
 
-const ValidationComponent = ( { required }: { required: boolean } ) => {
+const ValidationComponent = ( {
+	required,
+	type,
+	custom,
+}: {
+	required: boolean;
+	custom: boolean;
+	type: 'regular' | 'panel';
+} ) => {
 	type ValidatedItem = {
 		text: string;
 		email: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
-		customValidation: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
-		text: 'Hello, World!',
+		text: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
-		customValidation: 'potato',
 	} );
+
+	const customTextRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customEmailRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
+			return 'Email address must be from @example.com domain.';
+		}
+
+		return null;
+	};
+	const customIntegerRule = ( value: ValidatedItem ) => {
+		if ( value.integer % 2 !== 0 ) {
+			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+
+	const maybeCustomRule = (
+		rule: ( item: ValidatedItem ) => null | string
+	) => {
+		return custom ? rule : undefined;
+	};
 
 	const _fields: Field< ValidatedItem >[] = [
 		{
@@ -405,6 +439,7 @@ const ValidationComponent = ( { required }: { required: boolean } ) => {
 			label: 'Text',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customTextRule ),
 			},
 		},
 		{
@@ -413,6 +448,7 @@ const ValidationComponent = ( { required }: { required: boolean } ) => {
 			label: 'e-mail',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customEmailRule ),
 			},
 		},
 		{
@@ -421,6 +457,7 @@ const ValidationComponent = ( { required }: { required: boolean } ) => {
 			label: 'Integer',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customIntegerRule ),
 			},
 		},
 		{
@@ -439,36 +476,11 @@ const ValidationComponent = ( { required }: { required: boolean } ) => {
 				required,
 			},
 		},
-		{
-			id: 'customValidation',
-			type: 'text',
-			label: 'Custom validation',
-			isValid: {
-				required,
-				custom: ( value: ValidatedItem ) => {
-					if (
-						! [ 'tomato', 'potato' ].includes(
-							value.customValidation
-						)
-					) {
-						return 'Value must be one of "tomato", "potato"';
-					}
-
-					return null;
-				},
-			},
-		},
 	];
 
 	const form = {
-		fields: [
-			'text',
-			'email',
-			'integer',
-			'boolean',
-			'customEdit',
-			'customValidation',
-		],
+		layout: { type },
+		fields: [ 'text', 'email', 'integer', 'boolean', 'customEdit' ],
 	};
 
 	const canSave = isItemValid( post, _fields, form );
@@ -659,6 +671,8 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				{
 					id: 'customerCard',
 					label: 'Customer',
+					description:
+						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [
 						{
 							id: 'customerContact',
@@ -864,9 +878,20 @@ export const Validation = {
 			control: { type: 'boolean' },
 			description: 'Whether or not the fields are required.',
 		},
+		type: {
+			control: { type: 'select' },
+			description: 'Chooses the validation type.',
+			options: [ 'regular', 'panel' ],
+		},
+		custom: {
+			control: { type: 'boolean' },
+			description: 'Whether or not the fields have custom validation.',
+		},
 	},
 	args: {
 		required: true,
+		type: 'regular',
+		custom: true,
 	},
 };
 

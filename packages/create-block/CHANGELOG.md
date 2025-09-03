@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Add lifecycle script execution support during npm packages installation ([#71072](https://github.com/WordPress/gutenberg/pull/71072)).
+
 ## 4.72.0 (2025-08-20)
 
 ## 4.71.0 (2025-08-07)
+
+### Enhancement
 
 -   Add support for template variants to define their own template files ([#70855](https://github.com/WordPress/gutenberg/pull/70855))
 

@@ -1,7 +1,10 @@
 /**
+ * Internal dependencies
+ */
+import type { APIFetchMiddleware } from '../types';
+
+/**
  * Set of HTTP methods which are eligible to be overridden.
- *
- * @type {Set<string>}
  */
 const OVERRIDE_METHODS = new Set( [ 'PATCH', 'PUT', 'DELETE' ] );
 
@@ -12,8 +15,6 @@ const OVERRIDE_METHODS = new Set( [ 'PATCH', 'PUT', 'DELETE' ] );
  * is `GET`."
  *
  * @see  https://fetch.spec.whatwg.org/#requests
- *
- * @type {string}
  */
 const DEFAULT_METHOD = 'GET';
 
@@ -21,9 +22,10 @@ const DEFAULT_METHOD = 'GET';
  * API Fetch middleware which overrides the request method for HTTP v1
  * compatibility leveraging the REST API X-HTTP-Method-Override header.
  *
- * @type {import('../types').APIFetchMiddleware}
+ * @param options
+ * @param next
  */
-const httpV1Middleware = ( options, next ) => {
+const httpV1Middleware: APIFetchMiddleware = ( options, next ) => {
 	const { method = DEFAULT_METHOD } = options;
 	if ( OVERRIDE_METHODS.has( method.toUpperCase() ) ) {
 		options = {
