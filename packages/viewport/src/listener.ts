@@ -37,19 +37,19 @@ const addDimensionsEventListener = (
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/MediaQueryList
 	 */
 	const operatorEntries = Object.entries( operators );
-	const queries: Array< [ string, MediaQueryList ] > = Object.entries(
-		breakpoints
-	).flatMap( ( [ name, width ] ) => {
-		return operatorEntries.map(
-			( [ operator, condition ] ): [ string, MediaQueryList ] => {
-				const list = window.matchMedia(
-					`(${ condition }: ${ width }px)`
-				);
-				list.addEventListener( 'change', setIsMatching );
-				return [ `${ operator } ${ name }`, list ];
-			}
-		);
-	} );
+	const queries = Object.entries( breakpoints ).flatMap(
+		( [ name, width ] ) => {
+			return operatorEntries.map(
+				( [ operator, condition ] ): [ string, MediaQueryList ] => {
+					const list = window.matchMedia(
+						`(${ condition }: ${ width }px)`
+					);
+					list.addEventListener( 'change', setIsMatching );
+					return [ `${ operator } ${ name }`, list ];
+				}
+			);
+		}
+	);
 
 	window.addEventListener( 'orientationchange', setIsMatching );
 
