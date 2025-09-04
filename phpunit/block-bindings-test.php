@@ -227,6 +227,14 @@ HTML;
 	 * @covers ::register_block_bindings_source
 	 */
 	public function test_passing_uses_context_to_source() {
+		add_filter(
+			'block_bindings_supported_attributes_test/block',
+			function ( $supported_attributes ) {
+				$supported_attributes[] = 'myAttribute';
+				return $supported_attributes;
+			}
+		);
+
 		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
 			$value = $block_instance->context['sourceContext'];
 			return "Value: $value";
@@ -242,9 +250,9 @@ HTML;
 		);
 
 		$block_content = <<<HTML
-<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source", "args": {"key": "test"}}}}} -->
+<!-- wp:test/block {"metadata":{"bindings":{"myAttribute":{"source":"test/source", "args": {"key": "test"}}}}} -->
 <p>This should not appear</p>
-<!-- /wp:paragraph -->
+<!-- /wp:test/block -->
 HTML;
 		$parsed_blocks = parse_blocks( $block_content );
 		$block         = new WP_Block( $parsed_blocks[0], array( 'sourceContext' => 'source context value' ) );
@@ -252,8 +260,8 @@ HTML;
 
 		$this->assertSame(
 			'Value: source context value',
-			$block->attributes['content'],
-			"The 'content' should be updated with the value of the source context."
+			$block->attributes['myAttribute'],
+			"The 'myAttribute' should be updated with the value of the source context."
 		);
 		$this->assertSame(
 			'<p>Value: source context value</p>',
