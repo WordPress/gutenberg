@@ -5,6 +5,7 @@ import {
 	__experimentalStyleProvider as StyleProvider,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,8 +31,9 @@ export default function BlockControlsFill( {
 
 	// Filter children in content-only mode
 	let filteredChildren = children;
-	if ( blockEditingMode === 'contentOnly' && Array.isArray( children ) ) {
-		filteredChildren = children.filter( ( child ) => {
+	if ( blockEditingMode === 'contentOnly' ) {
+		const childrenArray = Children.toArray( children );
+		filteredChildren = childrenArray.filter( ( child ) => {
 			return child?.props?.category === 'content';
 		} );
 	}
