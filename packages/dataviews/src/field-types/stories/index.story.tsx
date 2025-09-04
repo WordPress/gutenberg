@@ -42,6 +42,7 @@ const meta = {
 				'select',
 				'telephone',
 				'text',
+				'toggle',
 				'toggleGroup',
 			],
 		},
@@ -320,6 +321,7 @@ type ControlTypes =
 	| 'select'
 	| 'telephone'
 	| 'text'
+	| 'toggle'
 	| 'toggleGroup';
 
 interface FieldTypeStoryProps {

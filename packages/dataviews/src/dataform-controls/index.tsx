@@ -20,6 +20,7 @@ import integer from './integer';
 import radio from './radio';
 import select from './select';
 import text from './text';
+import toggle from './toggle';
 import toggleGroup from './toggle-group';
 import boolean from './boolean';
 import array from './array';
@@ -40,6 +41,7 @@ const FORM_CONTROLS: FormControls = {
 	radio,
 	select,
 	text,
+	toggle,
 	toggleGroup,
 };
 
