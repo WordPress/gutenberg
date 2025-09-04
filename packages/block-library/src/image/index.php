@@ -187,17 +187,18 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 		array(
 			'metadata' => array(
 				$unique_image_id => array(
-					'uploadedSrc'      => $img_uploaded_src,
-					'figureClassNames' => $figure_class_names,
-					'figureStyles'     => $figure_styles,
-					'imgClassNames'    => $img_class_names,
-					'imgStyles'        => $img_styles,
-					'targetWidth'      => $img_width,
-					'targetHeight'     => $img_height,
-					'scaleAttr'        => $block['attrs']['scale'] ?? false,
-					'alt'              => $alt,
-					'galleryId'        => $block_instance->context['galleryId'] ?? null,
-					'customAriaLabel'  => $custom_aria_label ?? null,
+					'uploadedSrc'            => $img_uploaded_src,
+					'figureClassNames'       => $figure_class_names,
+					'figureStyles'           => $figure_styles,
+					'imgClassNames'          => $img_class_names,
+					'imgStyles'              => $img_styles,
+					'targetWidth'            => $img_width,
+					'targetHeight'           => $img_height,
+					'scaleAttr'              => $block['attrs']['scale'] ?? false,
+					'alt'                    => $alt,
+					'galleryId'              => $block_instance->context['galleryId'] ?? null,
+					'customAriaLabel'        => $custom_aria_label ?? null,
+					'triggerButtonAriaLabel' => null,
 				),
 			),
 		)
@@ -238,7 +239,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
-			aria-label="' . esc_attr( __( 'Enlarge' ) ) . '"
+			data-wp-bind--aria-label="state.thisImage.triggerButtonAriaLabel"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on-async--click="actions.showLightbox"
 			data-wp-style--right="state.thisImage.buttonRight"

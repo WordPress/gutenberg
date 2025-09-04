@@ -170,11 +170,13 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 					array(
 						'metadata' => array(
 							$image_id => array(
-								'customAriaLabel' => empty( $alt )
+								'customAriaLabel'        => empty( $alt )
 									/* translators: %1$s: current image index, %2$s: total number of images */
 									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $i + 1, count( $image_ids ) )
 									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
 									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
+								/* translators: %1$s: current image index, %2$s: total number of images */
+								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
 							),
 						),
 					)
