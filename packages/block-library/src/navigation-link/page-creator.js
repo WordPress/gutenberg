@@ -9,13 +9,17 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useFocusOnMount } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { BackButton } from './link-ui';
 
 /**
  * Component for creating new pages within the Navigation Link UI.
@@ -96,17 +100,10 @@ export function LinkUIPageCreator( {
 
 	return (
 		<div className="link-ui-page-creator" ref={ focusOnMountRef }>
-			<Button
+			<BackButton
 				className="link-ui-page-creator__back"
-				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					onBack();
-				} }
-				size="small"
-			>
-				{ __( 'Back' ) }
-			</Button>
+				onBack={ onBack }
+			/>
 
 			<VStack className="link-ui-page-creator__inner" spacing={ 4 }>
 				<form onSubmit={ createPage }>

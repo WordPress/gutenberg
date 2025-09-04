@@ -33,6 +33,29 @@ import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 import { unlock } from '../lock-unlock';
 import { LinkUIPageCreator } from './page-creator';
 
+/**
+ * Shared BackButton component for consistent navigation across LinkUI sub-components.
+ *
+ * @param {Object}   props           Component props.
+ * @param {string}   props.className CSS class name for the button.
+ * @param {Function} props.onBack    Callback when user wants to go back.
+ */
+function BackButton( { className, onBack } ) {
+	return (
+		<Button
+			className={ className }
+			icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+			onClick={ ( e ) => {
+				e.preventDefault();
+				onBack();
+			} }
+			size="small"
+		>
+			{ __( 'Back' ) }
+		</Button>
+	);
+}
+
 const { PrivateQuickInserter: QuickInserter } = unlock(
 	blockEditorPrivateApis
 );
@@ -118,17 +141,10 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 				</p>
 			</VisuallyHidden>
 
-			<Button
+			<BackButton
 				className="link-ui-block-inserter__back"
-				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					onBack();
-				} }
-				size="small"
-			>
-				{ __( 'Back' ) }
-			</Button>
+				onBack={ onBack }
+			/>
 
 			<QuickInserter
 				rootClientId={ rootBlockClientId }
@@ -271,6 +287,8 @@ function UnforwardedLinkUI( props, ref ) {
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
+
+export { BackButton };
 
 const LinkUITools = ( {
 	setAddingBlock,
