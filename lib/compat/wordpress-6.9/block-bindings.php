@@ -127,6 +127,18 @@ function gutenberg_process_block_bindings( $instance ) {
 		$supported_block_attributes
 	);
 
+	/*
+	 * Remove attributes that we know are processed by WP 6.8 from the list,
+	 * except if we're dealing with the button block, since WP 6.8 capitalizes its
+	 * tag name (e.g. <DIV>).
+	 */
+	if ( 'core/button' !== $block_type && isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
+		$supported_block_attributes = array_diff(
+			$supported_block_attributes,
+			$block_bindings_supported_attributes_6_8[ $block_type ]
+		);
+	}
+
 	// If the block doesn't have the bindings property, isn't one of the supported
 	// block types, or the bindings property is not an array, return the block content.
 	if (
@@ -139,13 +151,6 @@ function gutenberg_process_block_bindings( $instance ) {
 
 	$bindings = $parsed_block['attrs']['metadata']['bindings'];
 
-	// if ( isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
-	//     $supported_block_attributes = $block_bindings_supported_attributes_6_8[ $block_type ];
-	//     // Remove attributes that we know are processed by WP 6.8 from the list.
-	//     // $bindings = array_diff_key( $bindings, $supported_block_attributes );
-	// }
-
-
 	// if ( empty( $bindings ) ) {
 	//     return array();
 	// }
@@ -157,15 +162,6 @@ function gutenberg_process_block_bindings( $instance ) {
 
 		// If the attribute is not in the supported list, process next attribute.
 		if ( ! in_array( $attribute_name, $supported_block_attributes, true ) ) {
-			continue;
-		}
-
-		// If the attribute was already processed by Core, process next attribute.
-		if (
-			isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) &&
-			in_array( $attribute_name, $block_bindings_supported_attributes_6_8[ $block_type ], true ) &&
-			'core/button' !== $block_type // ... except for the Button block, as WP 6.8 capitalizes its tag name (e.g. <DIV>).
-		) {
 			continue;
 		}
 
