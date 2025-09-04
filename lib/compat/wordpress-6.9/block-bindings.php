@@ -108,7 +108,7 @@ function gutenberg_process_block_bindings( $instance ) {
 		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
-	$supported_block_attributes =
+	$supported_block_attributes              =
 		$block_bindings_supported_attributes_6_8[ $block_type ] ??
 		array();
 
