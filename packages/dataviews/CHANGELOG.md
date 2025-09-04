@@ -5,6 +5,7 @@
 ### Features
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+- Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
 
 ## 8.0.0 (2025-09-03)
 
