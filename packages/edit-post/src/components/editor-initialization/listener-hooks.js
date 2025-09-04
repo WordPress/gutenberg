@@ -48,6 +48,7 @@ export const useUpdatePostLinkListener = () => {
 			return;
 		}
 
+		nodeToUpdateRef.current.style.display = '';
 		nodeToUpdateRef.current.setAttribute( 'href', newPermalink );
 	}, [ newPermalink, isViewable ] );
 };
