@@ -269,9 +269,9 @@ HTML;
 		);
 
 		$block_content = <<<HTML
-<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source-two", "args": {"key": "test"}}}}} -->
+<!-- wp:test/block {"metadata":{"bindings":{"myAttribute":{"source":"test/source-two", "args": {"key": "test"}}}}} -->
 <p>Default content</p>
-<!-- /wp:paragraph -->
+<!-- /wp:test/block -->
 HTML;
 		$parsed_blocks = parse_blocks( $block_content );
 		$block         = new WP_Block(
@@ -285,8 +285,8 @@ HTML;
 
 		$this->assertSame(
 			'Value: source two context value',
-			$block->attributes['content'],
-			"The 'content' should be updated with the value of the second source context value."
+			$block->attributes['myAttribute'],
+			"The 'myAttribute' should be updated with the value of the second source context value."
 		);
 		$this->assertSame(
 			'<p>Value: source two context value</p>',
