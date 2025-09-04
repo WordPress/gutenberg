@@ -34,6 +34,29 @@ import { unlock } from '../lock-unlock';
 import { LinkUIPageCreator } from './page-creator';
 
 /**
+ * Hook for generating consistent dialog accessibility IDs.
+ *
+ * @param {Object} component     The component to use for ID generation.
+ * @param {string} componentName The name of the component for ID generation.
+ * @return {Object} Object containing dialogTitleId and dialogDescriptionId.
+ */
+function useDialogIds( component, componentName ) {
+	const dialogTitleId = useInstanceId(
+		component,
+		`${ componentName }__title`
+	);
+	const dialogDescriptionId = useInstanceId(
+		component,
+		`${ componentName }__description`
+	);
+
+	return {
+		dialogTitleId,
+		dialogDescriptionId,
+	};
+}
+
+/**
  * Shared BackButton component for consistent navigation across LinkUI sub-components.
  *
  * @param {Object}   props           Component props.
@@ -111,14 +134,9 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 	);
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-
-	const dialogTitleId = useInstanceId(
+	const { dialogTitleId, dialogDescriptionId } = useDialogIds(
 		LinkControl,
-		`link-ui-block-inserter__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		LinkControl,
-		`link-ui-block-inserter__description`
+		'link-ui-block-inserter'
 	);
 
 	if ( ! clientId ) {
@@ -190,13 +208,9 @@ function UnforwardedLinkUI( props, ref ) {
 		setAddingPage( false );
 	};
 
-	const dialogTitleId = useInstanceId(
+	const { dialogTitleId, dialogDescriptionId } = useDialogIds(
 		LinkUI,
-		`link-ui-link-control__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		LinkUI,
-		`link-ui-link-control__description`
+		'link-ui-link-control'
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -288,7 +302,7 @@ function UnforwardedLinkUI( props, ref ) {
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
-export { BackButton };
+export { BackButton, useDialogIds };
 
 const LinkUITools = ( {
 	setAddingBlock,
