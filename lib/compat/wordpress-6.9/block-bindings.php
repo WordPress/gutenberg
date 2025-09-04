@@ -97,12 +97,9 @@ add_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10, 3 );
  * @return array The computed block attributes for the provided block bindings.
  */
 function gutenberg_process_block_bindings( $instance ) {
-	$attributes          = $instance->parsed_block['attrs'];
+	$block_type          = $instance->name;
+	$parsed_block        = $instance->parsed_block;
 	$computed_attributes = array();
-
-	if ( ! isset( $attributes['metadata']['bindings'] ) ) {
-		return array();
-	}
 
 	// List of block attributes supported by Block Bindings in WP 6.8.
 	$block_bindings_supported_attributes_6_8 = array(
@@ -111,16 +108,6 @@ function gutenberg_process_block_bindings( $instance ) {
 		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
-
-	$block_type = $instance->name;
-	$bindings   = $attributes['metadata']['bindings'];
-
-	// if ( isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
-	//     $supported_block_attributes = $block_bindings_supported_attributes_6_8[ $block_type ];
-	//     // Remove attributes that we know are processed by WP 6.8 from the list.
-	//     // $bindings = array_diff_key( $bindings, $supported_block_attributes );
-	// }
-
 	$supported_block_attributes =
 		$block_bindings_supported_attributes_6_8[ $block_type ] ??
 		array();
@@ -139,6 +126,25 @@ function gutenberg_process_block_bindings( $instance ) {
 		"block_bindings_supported_attributes_{$block_type}",
 		$supported_block_attributes
 	);
+
+	// If the block doesn't have the bindings property, isn't one of the supported
+	// block types, or the bindings property is not an array, return the block content.
+	if (
+		empty( $supported_block_attributes ) ||
+		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
+		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
+	) {
+		return $computed_attributes;
+	}
+
+	$bindings = $parsed_block['attrs']['metadata']['bindings'];
+
+	// if ( isset( $block_bindings_supported_attributes_6_8[ $block_type ] ) ) {
+	//     $supported_block_attributes = $block_bindings_supported_attributes_6_8[ $block_type ];
+	//     // Remove attributes that we know are processed by WP 6.8 from the list.
+	//     // $bindings = array_diff_key( $bindings, $supported_block_attributes );
+	// }
+
 
 	// if ( empty( $bindings ) ) {
 	//     return array();
