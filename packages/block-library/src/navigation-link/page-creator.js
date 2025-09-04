@@ -14,12 +14,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { BackButton } from './link-ui';
+import { DialogWrapper } from './link-ui';
 
 /**
  * Component for creating new pages within the Navigation Link UI.
@@ -38,9 +37,6 @@ export function LinkUIPageCreator( {
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( false );
-
-	// Focus the first element when the component mounts
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	// Check if the title is valid for submission
 	const isTitleValid = title.trim().length > 0;
@@ -99,12 +95,12 @@ export function LinkUIPageCreator( {
 	const isSubmitDisabled = isSaving || ! isTitleValid;
 
 	return (
-		<div className="link-ui-page-creator" ref={ focusOnMountRef }>
-			<BackButton
-				className="link-ui-page-creator__back"
-				onBack={ onBack }
-			/>
-
+		<DialogWrapper
+			className="link-ui-page-creator"
+			title={ __( 'Create page' ) }
+			description={ __( 'Create a new page to add to your Navigation.' ) }
+			onBack={ onBack }
+		>
 			<VStack className="link-ui-page-creator__inner" spacing={ 4 }>
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
@@ -156,6 +152,6 @@ export function LinkUIPageCreator( {
 					</VStack>
 				</form>
 			</VStack>
-		</div>
+		</DialogWrapper>
 	);
 }

@@ -34,29 +34,6 @@ import { unlock } from '../lock-unlock';
 import { LinkUIPageCreator } from './page-creator';
 
 /**
- * Hook for generating consistent dialog accessibility IDs.
- *
- * @param {Object} component     The component to use for ID generation.
- * @param {string} componentName The name of the component for ID generation.
- * @return {Object} Object containing dialogTitleId and dialogDescriptionId.
- */
-function useDialogIds( component, componentName ) {
-	const dialogTitleId = useInstanceId(
-		component,
-		`${ componentName }__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		component,
-		`${ componentName }__description`
-	);
-
-	return {
-		dialogTitleId,
-		dialogDescriptionId,
-	};
-}
-
-/**
  * Shared BackButton component for consistent navigation across LinkUI sub-components.
  *
  * @param {Object}   props           Component props.
@@ -76,6 +53,57 @@ function BackButton( { className, onBack } ) {
 		>
 			{ __( 'Back' ) }
 		</Button>
+	);
+}
+
+/**
+ * Shared DialogWrapper component for consistent dialog structure across LinkUI sub-components.
+ *
+ * @param {Object}   props             Component props.
+ * @param {string}   props.className   CSS class name for the dialog container.
+ * @param {string}   props.title       Dialog title for accessibility.
+ * @param {string}   props.description Dialog description for accessibility.
+ * @param {Function} props.onBack      Callback when user wants to go back.
+ * @param {Object}   props.children    Child components to render inside the dialog.
+ */
+function DialogWrapper( { className, title, description, onBack, children } ) {
+	// Derive component and componentName from className
+	let component = LinkUI;
+	if ( className === 'link-ui-block-inserter' ) {
+		component = LinkControl;
+	} else if ( className === 'link-ui-page-creator' ) {
+		component = LinkUIPageCreator;
+	}
+	const componentName = className;
+
+	const dialogTitleId = useInstanceId(
+		component,
+		`${ componentName }__title`
+	);
+	const dialogDescriptionId = useInstanceId(
+		component,
+		`${ componentName }__description`
+	);
+	const focusOnMountRef = useFocusOnMount( 'firstElement' );
+	const backButtonClassName = `${ className }__back`;
+
+	return (
+		<div
+			className={ className }
+			role="dialog"
+			aria-labelledby={ dialogTitleId }
+			aria-describedby={ dialogDescriptionId }
+			ref={ focusOnMountRef }
+		>
+			<VisuallyHidden>
+				<h2 id={ dialogTitleId }>{ title }</h2>
+				<p id={ dialogDescriptionId }>{ description }</p>
+			</VisuallyHidden>
+
+			<BackButton className={ backButtonClassName } onBack={ onBack } />
+
+			{ children }
+		</div>
 	);
 }
 
@@ -133,37 +161,17 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 		[ clientId ]
 	);
 
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const { dialogTitleId, dialogDescriptionId } = useDialogIds(
-		LinkControl,
-		'link-ui-block-inserter'
-	);
-
 	if ( ! clientId ) {
 		return null;
 	}
 
 	return (
-		<div
+		<DialogWrapper
 			className="link-ui-block-inserter"
-			role="dialog"
-			aria-labelledby={ dialogTitleId }
-			aria-describedby={ dialogDescriptionId }
-			ref={ focusOnMountRef }
+			title={ __( 'Add block' ) }
+			description={ __( 'Choose a block to add to your Navigation.' ) }
+			onBack={ onBack }
 		>
-			<VisuallyHidden>
-				<h2 id={ dialogTitleId }>{ __( 'Add block' ) }</h2>
-
-				<p id={ dialogDescriptionId }>
-					{ __( 'Choose a block to add to your Navigation.' ) }
-				</p>
-			</VisuallyHidden>
-
-			<BackButton
-				className="link-ui-block-inserter__back"
-				onBack={ onBack }
-			/>
-
 			<QuickInserter
 				rootClientId={ rootBlockClientId }
 				clientId={ clientId }
@@ -173,7 +181,7 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 				onSelect={ onBlockInsert ? onBlockInsert : undefined }
 				hasSearch={ false }
 			/>
-		</div>
+		</DialogWrapper>
 	);
 }
 
@@ -208,9 +216,13 @@ function UnforwardedLinkUI( props, ref ) {
 		setAddingPage( false );
 	};
 
-	const { dialogTitleId, dialogDescriptionId } = useDialogIds(
+	const dialogTitleId = useInstanceId(
 		LinkUI,
-		'link-ui-link-control'
+		'link-ui-link-control__title'
+	);
+	const dialogDescriptionId = useInstanceId(
+		LinkUI,
+		'link-ui-link-control__description'
 	);
 
 	const blockEditingMode = useBlockEditingMode();
@@ -302,7 +314,7 @@ function UnforwardedLinkUI( props, ref ) {
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
-export { BackButton, useDialogIds };
+export { BackButton, DialogWrapper };
 
 const LinkUITools = ( {
 	setAddingBlock,
