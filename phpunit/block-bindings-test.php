@@ -32,6 +32,10 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 				},
 			)
 		);
+	}
+
+	public function set_up() {
+		parent::set_up();
 
 		add_filter(
 			'block_bindings_supported_attributes_test/block',
