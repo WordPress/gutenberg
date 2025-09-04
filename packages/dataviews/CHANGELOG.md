@@ -18,6 +18,10 @@
 
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
 
+### Internal
+
+-   DataForm: add a textarea field type and support for passing in custom editProps to named field types' Edit components ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
+
 ## 8.0.0 (2025-09-03)
 
 ### Breaking changes
@@ -28,7 +32,6 @@
 
 -   DataForm: add description support for the combined fields and show the description in the Card layout ([#71380](https://github.com/WordPress/gutenberg/pull/71380)).
 -   Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
--   DataForm: add a textarea field type and support for passing in custom editProps to named field types' Edit components ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 
 ### Internal
 
