@@ -655,6 +655,7 @@ function gutenberg_default_script_modules() {
 
 		// All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
 		// Therefore, the modules should be fetched with a low priority to avoid network contention with any LCP element resource.
+		// For allowing a block to opt-in to another fetchpriority, see <https://github.com/WordPress/gutenberg/issues/71366>.
 		$args = array(
 			'fetchpriority' => 'low',
 		);
