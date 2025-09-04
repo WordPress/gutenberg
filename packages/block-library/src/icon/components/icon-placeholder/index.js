@@ -53,11 +53,9 @@ export default function IconPlaceholder( props ) {
 
 	return (
 		<Placeholder
-			className="has-illustration"
 			icon={ bolt }
 			label={ __( 'Icon' ) }
 			instructions={ instructions() }
-			withIllustration
 		>
 			<Button
 				variant="primary"
