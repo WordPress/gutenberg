@@ -151,13 +151,38 @@ function gutenberg_process_block_bindings( $instance ) {
 
 	$bindings = $parsed_block['attrs']['metadata']['bindings'];
 
-	// if ( empty( $bindings ) ) {
-	//     return array();
-	// }
+	/*
+	 * If the default binding is set for pattern overrides, replace it
+	 * with a pattern override binding for all supported attributes.
+	 */
+	if (
+		isset( $bindings['__default']['source'] ) &&
+		'core/pattern-overrides' === $bindings['__default']['source']
+	) {
+		$updated_bindings = array();
 
-	// TODO: Include pattern overrides.
+		/*
+		 * Build a binding array of all supported attributes.
+		 * Note that this also omits the `__default` attribute from the
+		 * resulting array.
+		 */
+		foreach ( $supported_block_attributes as $attribute_name ) {
+			// Retain any non-pattern override bindings that might be present.
+			$updated_bindings[ $attribute_name ] = isset( $bindings[ $attribute_name ] )
+				? $bindings[ $attribute_name ]
+				: array( 'source' => 'core/pattern-overrides' );
+		}
+		$bindings = $updated_bindings;
+		/*
+		 * Update the bindings metadata of the computed attributes.
+		 * This ensures the block receives the expanded __default binding metadata when it renders.
+		 */
+		$computed_attributes['metadata'] = array_merge(
+			$parsed_block['attrs']['metadata'],
+			array( 'bindings' => $bindings )
+		);
+	}
 
-	// TODO: Review the following.
 	foreach ( $bindings as $attribute_name => $block_binding ) {
 
 		// If the attribute is not in the supported list, process next attribute.
