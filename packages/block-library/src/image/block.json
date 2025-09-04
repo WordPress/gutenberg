@@ -8,6 +8,7 @@
 		"allowResize",
 		"imageCrop",
 		"fixedHeight",
+		"hasIcon",
 		"postId",
 		"postType",
 		"queryId",

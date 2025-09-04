@@ -127,8 +127,15 @@ export default function GalleryEdit( props ) {
 		  )
 		: LINK_OPTIONS;
 
-	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
-		attributes;
+	const {
+		hasIcon,
+		columns,
+		imageCrop,
+		randomOrder,
+		linkTarget,
+		linkTo,
+		sizeSlug,
+	} = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -575,6 +582,7 @@ export default function GalleryEdit( props ) {
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
 							setAttributes( {
+								hasIcon: true,
 								columns: undefined,
 								imageCrop: true,
 								randomOrder: false,
@@ -692,6 +700,26 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
+						<ToolsPanelItem
+							label={ __( 'Show icon button' ) }
+							isShownByDefault
+							hasValue={ () => ! hasIcon }
+							onDeselect={ () =>
+								setAttributes( { hasIcon: true } )
+							}
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show icon button' ) }
+								help={ __(
+									'Shows the icon button in the lightbox.'
+								) }
+								onChange={ ( value ) =>
+									setAttributes( { hasIcon: value } )
+								}
+								checked={ hasIcon }
+							/>
+						</ToolsPanelItem>
 					</ToolsPanel>
 				) }
 				{ Platform.isNative && (

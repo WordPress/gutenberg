@@ -61,6 +61,10 @@
 			},
 			"default": []
 		},
+		"hasIcon": {
+			"type": "boolean",
+			"default": true
+		},
 		"shortCodeTransforms": {
 			"type": "array",
 			"items": {
@@ -108,7 +112,8 @@
 	"providesContext": {
 		"allowResize": "allowResize",
 		"imageCrop": "imageCrop",
-		"fixedHeight": "fixedHeight"
+		"fixedHeight": "fixedHeight",
+		"hasIcon": "hasIcon"
 	},
 	"supports": {
 		"anchor": true,

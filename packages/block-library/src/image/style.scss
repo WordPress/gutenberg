@@ -234,7 +234,7 @@
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
-		padding: 0;
+		padding: 0 8px;
 		cursor: pointer;
 		z-index: 2000002;
 
@@ -264,7 +264,7 @@
 		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
-			padding: 0;
+			padding: 0 8px;
 		}
 	}
 

@@ -251,7 +251,12 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-	add_action( 'wp_footer', 'block_core_image_print_lightbox_overlay' );
+	$block_context = $block_instance->context;
+
+	$overlay_callback = function () use ( $block_context ) {
+			block_core_image_print_lightbox_overlay( $block_context );
+	};
+	add_action( 'wp_footer', $overlay_callback );
 
 	return $body_content;
 }
@@ -259,11 +264,15 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 /**
  * @since 6.5.0
  */
-function block_core_image_print_lightbox_overlay() {
-	$close_button_label = esc_attr__( 'Close' );
-	$dialog_label       = esc_attr__( 'Enlarged images' );
-	$prev_button_label  = esc_attr__( 'Previous' );
-	$next_button_label  = esc_attr__( 'Next' );
+function block_core_image_print_lightbox_overlay( $block_context ) {
+	$dialog_label         = esc_attr__( 'Enlarged images' );
+	$has_icon             = $block_context['hasIcon'] ?? true;
+	$close_button_label   = $has_icon ? esc_attr__( 'Close' ) : '';
+	$close_button_content = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>' : esc_attr__( 'Close' );
+	$prev_button_label    = $has_icon ? esc_attr__( 'Previous' ) : '';
+	$prev_button_content  = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>' : esc_attr__( 'Previous' );
+	$next_button_label    = $has_icon ? esc_attr__( 'Next' ) : '';
+	$next_button_content  = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>' : esc_attr__( 'Next' );
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
@@ -306,11 +315,11 @@ function block_core_image_print_lightbox_overlay() {
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="wp-lightbox-close-button">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>
+					$close_button_content
 				</button>
 				<div class="wp-lightbox-navigation-container-prev" data-wp-bind--hidden="!state.hasNavigation">
 					<button type="button" aria-label="$prev_button_label" style="fill: $close_button_color" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>
+						$prev_button_content
 					</button>
 				</div>
 				<div class="lightbox-image-container">
@@ -325,7 +334,7 @@ function block_core_image_print_lightbox_overlay() {
 				</div>
 				<div class="wp-lightbox-navigation-container-next" data-wp-bind--hidden="!state.hasNavigation">
 					<button type="button" aria-label="$next_button_label" style="fill: $close_button_color" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>
+						$next_button_content
 					</button>
 				</div>
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
