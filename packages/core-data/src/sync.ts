@@ -25,7 +25,7 @@ export function getSyncProvider(): SyncProvider {
 		return syncProvider;
 	}
 
-	const fallbackNoOpSyncProvider = new SyncProvider( null, null );
+	const fallbackNoOpSyncProvider = new SyncProvider();
 
 	syncProvider = applyFilters(
 		'core.getSyncProvider',

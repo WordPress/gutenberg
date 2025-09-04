@@ -326,8 +326,8 @@ async function loadPostTypeEntities() {
 				},
 
 				/**
-				 * Transform a CRDT document into a partial record that can be used to
-				 * update the local editor state.
+				 * Extract changes from a CRDT document that can be used to update the
+				 * local editor state.
 				 *
 				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
 				 * @param {import('@wordpress/sync').ObjectData} record
@@ -370,9 +370,18 @@ async function loadPostTypeEntities() {
 				 */
 				getObjectId: ( { id } ) => id,
 
+				/**
+				 * The object type for the entity, used to scope CRDT documents.
+				 */
 				objectType: `postType/${ postType.slug }`,
-				supportsAwareness: true,
-				supportsUndo: true,
+
+				/**
+				 * Sync features supported by the entity.
+				 */
+				supports: {
+					awareness: true,
+					undo: true,
+				},
 			},
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>

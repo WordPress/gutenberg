@@ -35,7 +35,7 @@ declare global {
  * @return {SyncProvider} The WebRTC sync provider.
  */
 export function getWebRTCSyncProvider(): SyncProvider {
-	return new SyncProvider(
+	return new SyncProvider( [
 		connectIndexDb,
 		createWebRTCConnection( {
 			password: window?.__experimentalCollaborativeEditingSecret,
@@ -43,6 +43,6 @@ export function getWebRTCSyncProvider(): SyncProvider {
 				//'ws://localhost:4444',
 				window?.wp?.ajax?.settings?.url,
 			],
-		} )
-	);
+		} ),
+	] );
 }

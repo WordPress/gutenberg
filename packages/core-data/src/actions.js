@@ -401,7 +401,7 @@ export const editEntityRecord =
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
 			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				getSyncProvider().updateCRDTDoc(
-					entityConfig.syncConfig.objectType,
+					entityConfig.syncConfig,
 					record,
 					edit.edits,
 					'gutenberg'
@@ -705,7 +705,7 @@ export const saveEntityRecord =
 						window.__experimentalEnableSync &&
 						entityConfig.syncConfig?.enabled
 					) {
-						getSyncProvider().markEntityAsPersisted(
+						getSyncProvider().updateLastPersistedDate(
 							entityConfig.syncConfig,
 							persistedRecord
 						);
