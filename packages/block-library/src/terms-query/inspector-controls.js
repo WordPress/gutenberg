@@ -61,6 +61,8 @@ export default function TermsQueryInspectorControls( {
 								orderBy: 'name',
 								hideEmpty: true,
 								hierarchical: false,
+								parent: 0,
+								perPage: 10,
 							},
 						} );
 					} }
@@ -126,9 +128,9 @@ export default function TermsQueryInspectorControls( {
 					</ToolsPanelItem>
 
 					<ToolsPanelItem
-						hasValue={ () => termQuery.parent === 0 }
+						hasValue={ () => termQuery.parent !== 0 }
 						label={ __( 'Show only top level terms' ) }
-						onDeselect={ () => setQuery( { parent: undefined } ) }
+						onDeselect={ () => setQuery( { parent: 0 } ) }
 						isShownByDefault
 					>
 						<ToggleControl

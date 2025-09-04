@@ -30,12 +30,8 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
-		},
-		"namespace": {
-			"type": "string"
 		}
 	},
-	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"termQueryId": "termQueryId",
 		"termQuery": "termQuery"
@@ -43,7 +39,6 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
-		"layout": true,
 		"interactivity": true
 	},
 	"allowedBlocks": [ "core/term-template" ],

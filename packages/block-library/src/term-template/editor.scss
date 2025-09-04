@@ -6,7 +6,9 @@
 			margin-bottom: 0.25em;
 			background-color: $gray-100;
 			border-radius: 2px;
-			animation: loadingpulse 1.5s ease-in-out infinite;
+			@media not ( prefers-reduced-motion ) {
+				animation: loadingpulse 1.5s ease-in-out infinite;
+			}
 		}
 	}
 }

@@ -63,13 +63,5 @@
 			"style": true
 		}
 	},
-	"allowedBlocks": [
-		"core/paragraph",
-		"core/heading",
-		"core/image",
-		"core/buttons",
-		"core/button",
-		"core/group"
-	],
 	"style": "wp-block-term-template"
 }
