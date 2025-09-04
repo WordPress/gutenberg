@@ -32,8 +32,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 				},
 			)
 		);
-
-		add_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10, 3 );
 	}
 
 	/**
@@ -57,8 +55,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 	 * @since 6.9.0
 	 */
 	public static function wpTearDownAfterClass() {
-		remove_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10 );
-
 		unregister_block_type( 'test/block' );
 	}
 
