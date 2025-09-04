@@ -38,11 +38,6 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            - name: Fail Part 1.
-              if: ${{ matrix.part == 1 }}
-              run: |
-                  exit 1
-
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
