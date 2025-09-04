@@ -28,6 +28,8 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
+	defaultBlock,
+	defaultBlockType,
 	toggleProps = {},
 } ) => {
 	const {
@@ -42,10 +44,38 @@ const defaultRenderToggle = ( {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
-			blockTitle
+			blockTitle.toLowerCase()
 		);
 	} else if ( ! label ) {
-		label = _x( 'Add block', 'Generic label for block inserter button' );
+		// Get appender label from block's __experimentalLabel function
+		const appenderLabel =
+			defaultBlock &&
+			defaultBlock.attributes &&
+			defaultBlockType?.__experimentalLabel
+				? ( () => {
+						const result = defaultBlockType.__experimentalLabel(
+							defaultBlock.attributes,
+							{ context: 'appender' }
+						);
+						// Only use if it's a string and not too long (safety check)
+						return typeof result === 'string' && result.length < 50
+							? result.toLowerCase()
+							: null;
+				  } )()
+				: null;
+
+		if ( appenderLabel ) {
+			label = sprintf(
+				// translators: %s: the appender label for the default block
+				_x( 'Add %s', 'add default block type' ),
+				appenderLabel
+			);
+		} else {
+			label = _x(
+				'Add block',
+				'Generic label for block inserter button'
+			);
+		}
 	}
 
 	// Handle both onClick functions from the toggle and the parent component.
@@ -108,6 +138,7 @@ class Inserter extends Component {
 			blockTitle,
 			hasSingleBlockType,
 			directInsertBlock,
+			defaultBlockType,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -119,7 +150,8 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
+			defaultBlock: directInsertBlock,
+			defaultBlockType,
 			toggleProps,
 		} );
 	}
@@ -226,7 +258,7 @@ export default compose( [
 				getDirectInsertBlock,
 			} = select( blockEditorStore );
 
-			const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
@@ -246,12 +278,17 @@ export default compose( [
 				allowedBlockType = allowedBlocks[ 0 ];
 			}
 
+			const defaultBlockType = directInsertBlock
+				? getBlockType( directInsertBlock.name )
+				: null;
+
 			return {
 				hasItems: hasInserterItems( rootClientId ),
 				hasSingleBlockType,
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
 				directInsertBlock,
+				defaultBlockType,
 				rootClientId,
 			};
 		}

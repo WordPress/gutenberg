@@ -37,21 +37,49 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				defaultBlock,
+				defaultBlockType,
 			} ) => {
 				const isToggleButton = ! hasSingleBlockType;
-				const label = hasSingleBlockType
-					? sprintf(
-							// translators: %s: the name of the block when there is only one
-							_x(
-								'Add %s',
-								'directly add the only allowed block'
-							),
-							blockTitle
-					  )
-					: _x(
-							'Add block',
-							'Generic label for block inserter button'
-					  );
+
+				// Get appender label from block's __experimentalLabel function
+				const appenderLabel =
+					defaultBlock &&
+					defaultBlock.attributes &&
+					defaultBlockType?.__experimentalLabel
+						? ( () => {
+								const result =
+									defaultBlockType.__experimentalLabel(
+										defaultBlock.attributes,
+										{ context: 'appender' }
+									);
+								// Only use if it's a string and not too long (safety check)
+								return typeof result === 'string' &&
+									result.length < 50
+									? result.toLowerCase()
+									: null;
+						  } )()
+						: null;
+
+				let label;
+				if ( hasSingleBlockType ) {
+					label = sprintf(
+						// translators: %s: the name of the block when there is only one
+						_x( 'Add %s', 'directly add the only allowed block' ),
+						blockTitle.toLowerCase()
+					);
+				} else if ( appenderLabel ) {
+					label = sprintf(
+						// translators: %s: the appender label for the default block
+						_x( 'Add %s', 'add default block type' ),
+						appenderLabel
+					);
+				} else {
+					label = _x(
+						'Add block',
+						'Generic label for block inserter button'
+					);
+				}
 
 				return (
 					<Button

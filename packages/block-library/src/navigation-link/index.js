@@ -23,7 +23,21 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'list-view' ) {
+			return attributes?.label;
+		}
+
+		if ( context === 'appender' ) {
+			if ( attributes?.kind === 'post-type' ) {
+				return attributes.type; // 'page', 'post', etc.
+			}
+			if ( attributes?.kind === 'taxonomy' ) {
+				return attributes.type; // 'category', 'tag', etc.
+			}
+			return 'link';
+		}
+	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {
