@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import Input from './input';
+import ValidatedText from './utils/validated-text';
 
 export default function Text< Item >( {
 	data,
@@ -10,5 +10,7 @@ export default function Text< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	return <Input { ...{ data, field, onChange, hideLabelFromVision } } />;
+	return (
+		<ValidatedText { ...{ data, field, onChange, hideLabelFromVision } } />
+	);
 }

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import Input from './input';
+import ValidatedText from './utils/validated-text';
 
 export default function Email< Item >( {
 	data,
@@ -11,7 +11,7 @@ export default function Email< Item >( {
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	return (
-		<Input
+		<ValidatedText
 			{ ...{ data, field, onChange, hideLabelFromVision, type: 'email' } }
 		/>
 	);

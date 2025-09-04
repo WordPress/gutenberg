@@ -7,25 +7,26 @@ import { useCallback, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../types';
-import { unlock } from '../lock-unlock';
+import type { DataFormControlProps } from '../../types';
+import { unlock } from '../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
-export type DataFormInputControlProps< Item > = DataFormControlProps< Item > & {
-	/**
-	 * The input type of the control.
-	 */
-	type?: 'text' | 'email' | 'tel';
-};
+export type DataFormValidatedTextControlProps< Item > =
+	DataFormControlProps< Item > & {
+		/**
+		 * The input type of the control.
+		 */
+		type?: 'text' | 'email' | 'tel';
+	};
 
-export default function Input< Item >( {
+export default function ValidatedText< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
 	type,
-}: DataFormInputControlProps< Item > ) {
+}: DataFormValidatedTextControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
