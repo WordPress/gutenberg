@@ -519,8 +519,7 @@ There are also a few differences in the implementation:
 
 -   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
 -   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
--   An optional `label` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should
-    be supplied if there's no heading element associated with the UI.
+-   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
 -   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
 -   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
 -   Only the `callback` style of action is supported. `RenderModal` is unsupported.
