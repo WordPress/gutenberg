@@ -5,6 +5,7 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
+			"hasIcon": true,
 			"shortCodeTransforms": [],
 			"caption": "",
 			"imageCrop": true,
