@@ -149,15 +149,27 @@ export const LinkControlSearchItem = ( {
 
 function getVisualTypeName( suggestion ) {
 	if ( suggestion.isFrontPage ) {
-		return 'front page';
+		return __( 'Front page' );
 	}
 
 	if ( suggestion.isBlogHome ) {
-		return 'blog home';
+		return __( 'Blog home' );
 	}
 
 	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
-	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
+	const builtInLabels = {
+		post: __( 'Post' ),
+		page: __( 'Page' ),
+		post_tag: __( 'Tag' ),
+		category: __( 'Category' ),
+		attachment: __( 'Media' ),
+	};
+
+	if ( suggestion.type in builtInLabels ) {
+		return builtInLabels[ suggestion.type ];
+	}
+
+	return suggestion.type;
 }
 
 export default LinkControlSearchItem;
