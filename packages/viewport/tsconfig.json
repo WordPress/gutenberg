@@ -11,5 +11,5 @@
 		{ "path": "../data" },
 		{ "path": "../element" }
 	],
-	"include": [ "src/**/*" ]
+	"include": [ "src" ]
 }
