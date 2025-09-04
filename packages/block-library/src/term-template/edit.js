@@ -17,10 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import {
-	createBlocksFromInnerBlocksTemplate,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 const TEMPLATE = [
 	[
