@@ -184,12 +184,10 @@ function gutenberg_process_block_bindings( $instance ) {
 	}
 
 	foreach ( $bindings as $attribute_name => $block_binding ) {
-
 		// If the attribute is not in the supported list, process next attribute.
 		if ( ! in_array( $attribute_name, $supported_block_attributes, true ) ) {
 			continue;
 		}
-
 		// If no source is provided, or that source is not registered, process next attribute.
 		if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) ) {
 			continue;
