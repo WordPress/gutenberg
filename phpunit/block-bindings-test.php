@@ -32,6 +32,14 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 				},
 			)
 		);
+
+		add_filter(
+			'block_bindings_supported_attributes_test/block',
+			function ( $supported_attributes ) {
+				$supported_attributes[] = 'myAttribute';
+				return $supported_attributes;
+			}
+		);
 	}
 
 	/**
@@ -80,6 +88,16 @@ HTML
 				,
 				'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">test source value</a></div>',
 			),
+			'test block'      => array(
+				'myAttribute',
+				<<<HTML
+<!-- wp:test/block -->
+<p>This should not appear</p>
+<!-- /wp:test/block -->
+HTML
+				,
+				'<p>test source value</p>',
+			),
 		);
 	}
 
@@ -125,53 +143,6 @@ HTML
 		);
 		$this->assertSame(
 			$expected_result,
-			trim( $result ),
-			'The block content should be updated with the value returned by the source.'
-		);
-	}
-
-	/**
-	 * Test if the block_bindings_supported_attributes_{$block_type} filter is applied correctly.
-	 *
-	 * @ticket 62090
-	 */
-	public function test_filter_block_bindings_supported_attributes() {
-		$get_value_callback = function () {
-			return 'test source value';
-		};
-
-		register_block_bindings_source(
-			self::SOURCE_NAME,
-			array(
-				'label'              => self::SOURCE_LABEL,
-				'get_value_callback' => $get_value_callback,
-			)
-		);
-
-		add_filter(
-			'block_bindings_supported_attributes_test/block',
-			function ( $supported_attributes ) {
-				$supported_attributes[] = 'myAttribute';
-				return $supported_attributes;
-			}
-		);
-
-		$block_content = <<<HTML
-<!-- wp:test/block {"metadata":{"bindings":{"myAttribute":{"source":"test/source"}}}} -->
-<p>This should not appear</p>
-<!-- /wp:test/block -->
-HTML;
-		$parsed_blocks = parse_blocks( $block_content );
-		$block         = new WP_Block( $parsed_blocks[0] );
-		$result        = $block->render();
-
-		$this->assertSame(
-			'test source value',
-			$block->attributes['myAttribute'],
-			"The 'myAttribute' attribute should be updated with the value returned by the source."
-		);
-		$this->assertSame(
-			'<p>test source value</p>',
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
 		);
@@ -227,14 +198,6 @@ HTML;
 	 * @covers ::register_block_bindings_source
 	 */
 	public function test_passing_uses_context_to_source() {
-		add_filter(
-			'block_bindings_supported_attributes_test/block',
-			function ( $supported_attributes ) {
-				$supported_attributes[] = 'myAttribute';
-				return $supported_attributes;
-			}
-		);
-
 		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
 			$value = $block_instance->context['sourceContext'];
 			return "Value: $value";
@@ -456,14 +419,6 @@ HTML;
 	 * @covers WP_Block::process_block_bindings
 	 */
 	public function test_default_binding_for_pattern_overrides() {
-		add_filter(
-			'block_bindings_supported_attributes_test/block',
-			function ( $supported_attributes ) {
-				$supported_attributes[] = 'myAttribute';
-				return $supported_attributes;
-			}
-		);
-
 		$block_content = <<<HTML
 <!-- wp:test/block {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test"}} -->
 <p>This should not appear</p>
