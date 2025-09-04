@@ -18,7 +18,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { DialogWrapper } from './link-ui';
+import DialogWrapper from './dialog-wrapper';
 
 /**
  * Component for creating new pages within the Navigation Link UI.

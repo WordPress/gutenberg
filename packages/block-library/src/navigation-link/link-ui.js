@@ -8,13 +8,8 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
-import {
-	LinkControl,
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-	useBlockEditingMode,
-} from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
 	useMemo,
 	useState,
@@ -23,93 +18,14 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { useResourcePermissions } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
-import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+import { plus } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { LinkUIPageCreator } from './page-creator';
-
-/**
- * Shared BackButton component for consistent navigation across LinkUI sub-components.
- *
- * @param {Object}   props           Component props.
- * @param {string}   props.className CSS class name for the button.
- * @param {Function} props.onBack    Callback when user wants to go back.
- */
-function BackButton( { className, onBack } ) {
-	return (
-		<Button
-			className={ className }
-			icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-			onClick={ ( e ) => {
-				e.preventDefault();
-				onBack();
-			} }
-			size="small"
-		>
-			{ __( 'Back' ) }
-		</Button>
-	);
-}
-
-/**
- * Shared DialogWrapper component for consistent dialog structure across LinkUI sub-components.
- *
- * @param {Object}   props             Component props.
- * @param {string}   props.className   CSS class name for the dialog container.
- * @param {string}   props.title       Dialog title for accessibility.
- * @param {string}   props.description Dialog description for accessibility.
- * @param {Function} props.onBack      Callback when user wants to go back.
- * @param {Object}   props.children    Child components to render inside the dialog.
- */
-function DialogWrapper( { className, title, description, onBack, children } ) {
-	// Derive component and componentName from className
-	let component = LinkUI;
-	if ( className === 'link-ui-block-inserter' ) {
-		component = LinkControl;
-	} else if ( className === 'link-ui-page-creator' ) {
-		component = LinkUIPageCreator;
-	}
-	const componentName = className;
-
-	const dialogTitleId = useInstanceId(
-		component,
-		`${ componentName }__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		component,
-		`${ componentName }__description`
-	);
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const backButtonClassName = `${ className }__back`;
-
-	return (
-		<div
-			className={ className }
-			role="dialog"
-			aria-labelledby={ dialogTitleId }
-			aria-describedby={ dialogDescriptionId }
-			ref={ focusOnMountRef }
-		>
-			<VisuallyHidden>
-				<h2 id={ dialogTitleId }>{ title }</h2>
-				<p id={ dialogDescriptionId }>{ description }</p>
-			</VisuallyHidden>
-
-			<BackButton className={ backButtonClassName } onBack={ onBack } />
-
-			{ children }
-		</div>
-	);
-}
-
-const { PrivateQuickInserter: QuickInserter } = unlock(
-	blockEditorPrivateApis
-);
+import LinkUIBlockInserter from './block-inserter';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -149,42 +65,6 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
-	const { rootBlockClientId } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
-
-			return {
-				rootBlockClientId: getBlockRootClientId( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	if ( ! clientId ) {
-		return null;
-	}
-
-	return (
-		<DialogWrapper
-			className="link-ui-block-inserter"
-			title={ __( 'Add block' ) }
-			description={ __( 'Choose a block to add to your Navigation.' ) }
-			onBack={ onBack }
-		>
-			<QuickInserter
-				rootClientId={ rootBlockClientId }
-				clientId={ clientId }
-				isAppender={ false }
-				prioritizePatterns={ false }
-				selectBlockOnInsert={ ! onBlockInsert }
-				onSelect={ onBlockInsert ? onBlockInsert : undefined }
-				hasSearch={ false }
-			/>
-		</DialogWrapper>
-	);
-}
-
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind } = props.link;
 	const postType = type || 'page';
@@ -193,7 +73,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
-	const permissions = useResourcePermissions( {
+	const { canCreate: canCreatePage } = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
@@ -275,8 +155,8 @@ function UnforwardedLinkUI( props, ref ) {
 										setAddingPage( true );
 										setFocusAddPageButton( false );
 									} }
-									canCreatePage={ permissions.canCreate }
 									blockEditingMode={ blockEditingMode }
+									canCreatePage={ canCreatePage }
 								/>
 							)
 						}
@@ -313,8 +193,6 @@ function UnforwardedLinkUI( props, ref ) {
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
-
-export { BackButton, DialogWrapper };
 
 const LinkUITools = ( {
 	setAddingBlock,
