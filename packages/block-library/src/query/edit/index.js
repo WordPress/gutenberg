@@ -22,6 +22,7 @@ const QueryEdit = ( props ) => {
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+
 	return (
 		<>
 			<Component

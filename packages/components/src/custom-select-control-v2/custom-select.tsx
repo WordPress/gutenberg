@@ -28,6 +28,7 @@ import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
+CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
 	value: CustomSelectButtonProps[ 'value' ]

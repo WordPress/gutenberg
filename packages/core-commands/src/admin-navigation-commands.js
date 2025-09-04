@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCommand, useCommandLoader } from '@wordpress/commands';
+import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
 import { plus, dashboard } from '@wordpress/icons';
 import { getPath } from '@wordpress/url';
@@ -20,6 +20,14 @@ const { useHistory } = unlock( routerPrivateApis );
 
 const getAddNewPageCommand = () =>
 	function useAddNewPageCommand() {
+		const canCreatePage = useSelect(
+			( select ) =>
+				select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'page',
+				} ),
+			[]
+		);
 		const isSiteEditor = getPath( window.location.href )?.includes(
 			'site-editor.php'
 		);
@@ -65,6 +73,10 @@ const getAddNewPageCommand = () =>
 		);
 
 		const commands = useMemo( () => {
+			if ( ! canCreatePage ) {
+				return [];
+			}
+
 			const addNewPage =
 				isSiteEditor && isBlockBasedTheme
 					? createPageEntity
@@ -85,7 +97,12 @@ const getAddNewPageCommand = () =>
 					],
 				},
 			];
-		}, [ createPageEntity, isSiteEditor, isBlockBasedTheme ] );
+		}, [
+			createPageEntity,
+			isSiteEditor,
+			isBlockBasedTheme,
+			canCreatePage,
+		] );
 
 		return {
 			isLoading: false,
@@ -170,15 +187,50 @@ const getDashboardCommand = () =>
 		};
 	};
 
+const getAddNewPostCommand = () =>
+	function useAddNewPostCommand() {
+		const canCreatePost = useSelect(
+			( select ) =>
+				select( coreStore ).canUser( 'create', {
+					kind: 'postType',
+					name: 'post',
+				} ),
+			[]
+		);
+
+		const commands = useMemo( () => {
+			if ( ! canCreatePost ) {
+				return [];
+			}
+
+			return [
+				{
+					name: 'core/add-new-post',
+					label: __( 'Add Post' ),
+					icon: plus,
+					callback: () => {
+						document.location.assign( 'post-new.php' );
+					},
+					keywords: [
+						__( 'post' ),
+						__( 'new' ),
+						__( 'add' ),
+						__( 'create' ),
+					],
+				},
+			];
+		}, [ canCreatePost ] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
 export function useAdminNavigationCommands() {
-	useCommand( {
+	useCommandLoader( {
 		name: 'core/add-new-post',
-		label: __( 'Add Post' ),
-		icon: plus,
-		callback: () => {
-			document.location.assign( 'post-new.php' );
-		},
-		keywords: [ __( 'post' ), __( 'new' ), __( 'add' ), __( 'create' ) ],
+		hook: getAddNewPostCommand(),
 	} );
 
 	useCommandLoader( {

@@ -43,7 +43,10 @@ import { canBindBlock } from '../../utils/block-bindings';
 import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
+keyboardShortcutContext.displayName = 'keyboardShortcutContext';
+
 export const inputEventContext = createContext();
+inputEventContext.displayName = 'inputEventContext';
 
 const instanceIdKey = Symbol( 'instanceId' );
 
