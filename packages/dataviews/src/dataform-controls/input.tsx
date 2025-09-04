@@ -7,10 +7,17 @@ import { useCallback, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormInputControlProps } from '../types';
+import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
+
+export type DataFormInputControlProps< Item > = DataFormControlProps< Item > & {
+	/**
+	 * The input type of the control.
+	 */
+	type?: 'text' | 'email' | 'tel';
+};
 
 export default function Input< Item >( {
 	data,
