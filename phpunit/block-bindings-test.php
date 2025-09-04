@@ -148,19 +148,42 @@ HTML
 		);
 	}
 
+	public function data_different_get_value_callbacks() {
+		return array(
+			'pass arguments to source'        => array(
+				function ( $source_args, $block_instance, $attribute_name ) {
+					$value = $source_args['key'];
+					return "The attribute name is '$attribute_name' and its binding has argument 'key' with value '$value'.";
+				},
+				"<p>The attribute name is 'content' and its binding has argument 'key' with value 'test'.</p>",
+			),
+			'unsafe HTML should be sanitized' => array(
+				function () {
+					return '<script>alert("Unsafe HTML")</script>';
+				},
+				'<p>alert("Unsafe HTML")</p>',
+			),
+			'symbols and numbers should be rendered correctly' => array(
+				function () {
+					return '$12.50';
+				},
+				'<p>$12.50</p>',
+			),
+		);
+	}
+
 	/**
 	 * Test passing arguments to the source.
 	 *
 	 * @ticket 60282
+	 * @ticket 60651
+	 * @ticket 61385
 	 *
 	 * @covers ::register_block_bindings_source
+	 *
+	 * @dataProvider data_different_get_value_callbacks
 	 */
-	public function test_passing_arguments_to_source() {
-		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
-			$value = $source_args['key'];
-			return "The attribute name is '$attribute_name' and its binding has argument 'key' with value '$value'.";
-		};
-
+	public function test_different_get_value_callbacks( $get_value_callback, $expected ) {
 		register_block_bindings_source(
 			self::SOURCE_NAME,
 			array(
@@ -179,12 +202,7 @@ HTML;
 		$result        = $block->render();
 
 		$this->assertSame(
-			"The attribute name is 'content' and its binding has argument 'key' with value 'test'.",
-			$block->attributes['content'],
-			"The 'content' attribute should be updated with the value returned by the source."
-		);
-		$this->assertSame(
-			"<p>The attribute name is 'content' and its binding has argument 'key' with value 'test'.</p>",
+			$expected,
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
 		);
@@ -284,78 +302,6 @@ HTML;
 			'<figure class="wp-block-image"><img src="https://example.com/image.jpg" alt=""/></figure>',
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
-		);
-	}
-
-	/**
-	 * Tests if the block content is sanitized when unsafe HTML is passed.
-	 *
-	 * @ticket 60651
-	 *
-	 * @covers ::register_block_bindings_source
-	 */
-	public function test_source_value_with_unsafe_html_is_sanitized() {
-		$get_value_callback = function () {
-			return '<script>alert("Unsafe HTML")</script>';
-		};
-
-		register_block_bindings_source(
-			self::SOURCE_NAME,
-			array(
-				'label'              => self::SOURCE_LABEL,
-				'get_value_callback' => $get_value_callback,
-			)
-		);
-
-		$block_content = <<<HTML
-<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
-<p>This should not appear</p>
-<!-- /wp:paragraph -->
-HTML;
-		$parsed_blocks = parse_blocks( $block_content );
-		$block         = new WP_Block( $parsed_blocks[0] );
-		$result        = $block->render();
-
-		$this->assertSame(
-			'<p>alert("Unsafe HTML")</p>',
-			trim( $result ),
-			'The block content should be updated with the value returned by the source.'
-		);
-	}
-
-	/**
-	 * Tests that including symbols and numbers works well with bound attributes.
-	 *
-	 * @ticket 61385
-	 *
-	 * @covers WP_Block::process_block_bindings
-	 */
-	public function test_using_symbols_in_block_bindings_value() {
-		$get_value_callback = function () {
-			return '$12.50';
-		};
-
-		register_block_bindings_source(
-			self::SOURCE_NAME,
-			array(
-				'label'              => self::SOURCE_LABEL,
-				'get_value_callback' => $get_value_callback,
-			)
-		);
-
-		$block_content = <<<HTML
-<!-- wp:paragraph {"metadata":{"bindings":{"content":{"source":"test/source"}}}} -->
-<p>Default content</p>
-<!-- /wp:paragraph -->
-HTML;
-		$parsed_blocks = parse_blocks( $block_content );
-		$block         = new WP_Block( $parsed_blocks[0] );
-		$result        = $block->render();
-
-		$this->assertSame(
-			'<p>$12.50</p>',
-			trim( $result ),
-			'The block content should properly show the symbol and numbers.'
 		);
 	}
 
