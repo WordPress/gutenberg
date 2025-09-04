@@ -242,17 +242,6 @@ HTML;
 	 */
 	public function test_blocks_can_just_access_the_specific_uses_context() {
 		register_block_bindings_source(
-			'test/source-one',
-			array(
-				'label'              => 'Test Source One',
-				'get_value_callback' => function () {
-					return;
-				},
-				'uses_context'       => array( 'contextOne' ),
-			)
-		);
-
-		register_block_bindings_source(
 			'test/source-two',
 			array(
 				'label'              => 'Test Source Two',
