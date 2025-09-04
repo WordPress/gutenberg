@@ -672,8 +672,8 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'isItemClickable'
 	| 'onClickItem'
 	| 'renderItemLink'
+	| 'getItemLevel'
 > & {
-	label?: string;
 	view: View;
 	onChangeView: ( view: View ) => void;
 };
