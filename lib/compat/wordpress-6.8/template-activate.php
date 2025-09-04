@@ -48,9 +48,8 @@ function gutenberg_setup_static_template() {
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'                 => 'object',
-					'additionalProperties' => array(
-						'type' => 'integer',
-					),
+					// properties can be integers or false (deactivated).
+					'additionalProperties' => true,
 				),
 			),
 			'default'      => array(),
@@ -67,7 +66,7 @@ function gutenberg_allow_template_slugs_to_be_duplicated( $override, $slug, $pos
 add_filter( 'pre_get_block_templates', 'gutenberg_pre_get_block_templates', 10, 3 );
 function gutenberg_pre_get_block_templates( $output, $query, $template_type ) {
 	if ( 'wp_template' === $template_type && ! empty( $query['slug__in'] ) ) {
-		$active_templates = get_option( 'active_templates', array() );
+		$active_templates = (array) get_option( 'active_templates', array() );
 		$slugs            = $query['slug__in'];
 		$output           = array();
 		foreach ( $slugs as $slug ) {
