@@ -20,13 +20,19 @@ function gutenberg_enqueue_command_palette_assets() {
 				$menu_label = preg_replace( '/<[^>]*>.*?<\/[^>]*>|<[^>]*\/>|<[^>]*>/s', '', $menu_label );
 			}
 			$menu_label = trim( $menu_label );
+			$menu_url   = '';
+			$menu_slug  = $menu_item[2];
 
-			// Only add the menu item if the menu_slug point to a PHP file.
-			$menu_slug = $menu_item[2];
-			if ( preg_match( '/\.php($|\?)/', $menu_item[2] ) ) {
+			if ( preg_match( '/\.php($|\?)/', $menu_slug ) || wp_http_validate_url( $menu_slug ) ) {
+				$menu_url = $menu_slug;
+			} elseif ( ! empty( menu_page_url( $menu_slug, false ) ) ) {
+				$menu_url = menu_page_url( $menu_slug, false );
+			}
+
+			if ( $menu_url ) {
 				$menu_commands[] = array(
 					'label' => $menu_label,
-					'url'   => $menu_slug,
+					'url'   => $menu_url,
 					'name'  => $menu_slug,
 				);
 			}
@@ -43,10 +49,16 @@ function gutenberg_enqueue_command_palette_assets() {
 						$submenu_label = preg_replace( '/<[^>]*>.*?<\/[^>]*>|<[^>]*\/>|<[^>]*>/s', '', $submenu_label );
 					}
 					$submenu_label = trim( $submenu_label );
+					$submenu_url   = '';
+					$submenu_slug  = $submenu_item[2];
 
-					// Only add the menu item if the menu_slug point to a PHP file.
-					$menu_slug = $menu_item[2];
-					if ( preg_match( '/\.php($|\?)/', $menu_item[2] ) ) {
+					if ( preg_match( '/\.php($|\?)/', $submenu_slug ) || wp_http_validate_url( $submenu_slug ) ) {
+						$submenu_url = $submenu_slug;
+					} elseif ( ! empty( menu_page_url( $submenu_slug, false ) ) ) {
+						$submenu_url = menu_page_url( $submenu_slug, false );
+					}
+
+					if ( $submenu_url ) {
 						$menu_commands[] = array(
 							'label' => sprintf(
 								/* translators: 1: Menu label, 2: Submenu label. */
@@ -54,7 +66,7 @@ function gutenberg_enqueue_command_palette_assets() {
 								$menu_label,
 								$submenu_label
 							),
-							'url'   => $submenu_item[2],
+							'url'   => $submenu_url,
 							'name'  => $menu_slug . '-' . $submenu_item[2],
 						);
 					}
