@@ -4,12 +4,10 @@
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
-export type * as Y from 'yjs';
 export type CRDTDoc = Y.Doc;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
-export type UndoManager = Y.UndoManager;
 
 // Object data represents any entity record, post, term, user, site, etc. There
 // are not many expectations that can hold on its shape.
