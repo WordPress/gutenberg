@@ -227,9 +227,9 @@ const fields: Field< DataType >[] = [
 		label: 'Telephone (with elements)',
 		description: 'Help for telephone with elements.',
 		elements: [
-			{ value: '+1-555-123-4567', label: 'John Doe' },
-			{ value: '+44-20-7946-0958', label: 'Jane Smith (UK)' },
-			{ value: '+81-3-1234-5678', label: 'Hiroshi Tanaka (Japan)' },
+			{ value: '+1-555-123-4567', label: '+1-555-123-4567' },
+			{ value: '+44-20-7946-0958', label: '+44-20-7946-0958' },
+			{ value: '+81-3-1234-5678', label: '+81-3-1234-5678' },
 		],
 	},
 	{
