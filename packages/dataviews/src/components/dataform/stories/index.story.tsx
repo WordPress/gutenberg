@@ -168,6 +168,17 @@ const fields: Field< SamplePost >[] = [
 		label: 'City',
 		type: 'text',
 	},
+	{
+		id: 'description',
+		label: 'Description',
+		type: 'textarea',
+	},
+	{
+		id: 'alt_text',
+		label: 'Alternative Text',
+		type: 'textarea',
+		editProps: { rows: 2 },
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -189,6 +200,8 @@ const LayoutRegularComponent = ( {
 		filesize: 1024,
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
+		description: 'This is a sample description.',
+		alt_text: 'This is a sample alt text',
 	} );
 
 	const form: Form = useMemo(
@@ -212,6 +225,8 @@ const LayoutRegularComponent = ( {
 				'filesize',
 				'dimensions',
 				'tags',
+				'description',
+				'alt_text',
 			],
 		} ),
 		[ labelPosition ]

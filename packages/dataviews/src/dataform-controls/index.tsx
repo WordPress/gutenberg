@@ -22,6 +22,7 @@ import radio from './radio';
 import select from './select';
 import text from './text';
 import toggle from './toggle';
+import textarea from './textarea';
 import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
@@ -46,6 +47,7 @@ const FORM_CONTROLS: FormControls = {
 	select,
 	text,
 	toggle,
+	textarea,
 	toggleGroup,
 };
 

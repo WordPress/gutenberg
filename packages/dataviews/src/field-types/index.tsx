@@ -16,6 +16,7 @@ import type {
 import { default as email } from './email';
 import { default as integer } from './integer';
 import { default as text } from './text';
+import { default as textarea } from './textarea';
 import { default as datetime } from './datetime';
 import { default as date } from './date';
 import { default as boolean } from './boolean';
@@ -47,6 +48,10 @@ export default function getFieldTypeDefinition< Item >(
 
 	if ( 'text' === type ) {
 		return text;
+	}
+
+	if ( 'textarea' === type ) {
+		return textarea;
 	}
 
 	if ( 'datetime' === type ) {
