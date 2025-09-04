@@ -372,7 +372,7 @@ function styles_for_block_core_search( $attributes ) {
 		if ( is_array( $border_radius ) ) {
 			// Apply styles for individual corner border radii.
 			foreach ( $border_radius as $key => $value ) {
-				// Get spacing CSS variable from preset value if provided.
+				// Get border-radius CSS variable from preset value if provided.
 				if ( is_string( $value ) && str_contains( $value, 'var:preset|border-radius|' ) ) {
 					$index_to_splice = strrpos( $value, '|' ) + 1;
 					$slug            = _wp_to_kebab_case( substr( $value, $index_to_splice ) );
