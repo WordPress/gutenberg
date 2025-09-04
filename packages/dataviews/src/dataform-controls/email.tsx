@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import Text from './text';
+import Input from './input';
 
 export default function Email< Item >( {
 	data,
@@ -11,7 +11,7 @@ export default function Email< Item >( {
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	return (
-		<Text
+		<Input
 			{ ...{ data, field, onChange, hideLabelFromVision, type: 'email' } }
 		/>
 	);

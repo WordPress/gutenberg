@@ -284,6 +284,13 @@ export type DataFormControlProps< Item > = {
 	operator?: Operator;
 };
 
+export type DataFormInputControlProps< Item > = DataFormControlProps< Item > & {
+	/**
+	 * The input type of the control.
+	 */
+	type?: 'text' | 'email' | 'tel';
+};
+
 export type DataViewRenderFieldProps< Item > = {
 	item: Item;
 	field: NormalizedField< Item >;
