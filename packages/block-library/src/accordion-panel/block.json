@@ -47,7 +47,8 @@
 				"fontSize": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"allowedBlocks": {

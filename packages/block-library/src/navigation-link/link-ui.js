@@ -75,7 +75,7 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-function LinkUIBlockInserter( { clientId, onBack } ) {
+function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 	const { rootBlockClientId } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -135,7 +135,8 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 				clientId={ clientId }
 				isAppender={ false }
 				prioritizePatterns={ false }
-				selectBlockOnInsert
+				selectBlockOnInsert={ ! onBlockInsert }
+				onSelect={ onBlockInsert ? onBlockInsert : undefined }
 				hasSearch={ false }
 			/>
 		</div>
@@ -183,7 +184,6 @@ function UnforwardedLinkUI( props, ref ) {
 	);
 
 	const blockEditingMode = useBlockEditingMode();
-	const isDefaultBlockEditingMode = blockEditingMode === 'default';
 
 	return (
 		<Popover
@@ -221,8 +221,7 @@ function UnforwardedLinkUI( props, ref ) {
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						renderControlBottom={ () =>
-							! link?.url?.length &&
-							isDefaultBlockEditingMode && (
+							! link?.url?.length && (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
 									focusAddPageButton={ focusAddPageButton }
@@ -235,6 +234,7 @@ function UnforwardedLinkUI( props, ref ) {
 										setFocusAddPageButton( false );
 									} }
 									canCreatePage={ permissions.canCreate }
+									blockEditingMode={ blockEditingMode }
 								/>
 							)
 						}
@@ -250,6 +250,7 @@ function UnforwardedLinkUI( props, ref ) {
 						setFocusAddBlockButton( true );
 						setFocusAddPageButton( false );
 					} }
+					onBlockInsert={ props?.onBlockInsert }
 				/>
 			) }
 
@@ -277,6 +278,7 @@ const LinkUITools = ( {
 	focusAddBlockButton,
 	focusAddPageButton,
 	canCreatePage,
+	blockEditingMode,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 	const addBlockButtonRef = useRef();
@@ -312,18 +314,20 @@ const LinkUITools = ( {
 					{ __( 'Create page' ) }
 				</Button>
 			) }
-			<Button
-				__next40pxDefaultSize
-				ref={ addBlockButtonRef }
-				icon={ plus }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					setAddingBlock( true );
-				} }
-				aria-haspopup={ blockInserterAriaRole }
-			>
-				{ __( 'Add block' ) }
-			</Button>
+			{ blockEditingMode === 'default' && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addBlockButtonRef }
+					icon={ plus }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingBlock( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Add block' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 };

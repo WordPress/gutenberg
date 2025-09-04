@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode, ComponentProps, ReactElement } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -27,26 +27,31 @@ import {
 	FiltersToggle,
 } from '../dataviews-filters';
 import DataViewsLayout from '../dataviews-layout';
-import DataViewsFooter from '../dataviews-footer';
+import { DataViewsPickerFooter } from './footer';
 import DataViewsSearch from '../dataviews-search';
-import { BulkActionsFooter } from '../dataviews-bulk-actions';
 import { DataViewsPagination } from '../dataviews-pagination';
 import DataViewsViewConfig, {
 	DataviewsViewConfigDropdown,
 	ViewTypeMenu,
 } from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
-import type { Action, Field, View, SupportedLayouts } from '../../types';
+import type { ActionButton, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 type ItemWithId = { id: string };
 
-type DataViewsProps< Item > = {
+const isItemClickable = () => false;
+
+const dataViewsPickerLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => viewLayout.isPicker
+);
+
+type DataViewsPickerProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
+	actions?: ActionButton< Item >[];
 	search?: boolean;
 	searchLabel?: string;
-	actions?: Action< Item >[];
 	data: Item[];
 	isLoading?: boolean;
 	paginationInfo: {
@@ -55,41 +60,27 @@ type DataViewsProps< Item > = {
 		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
-	selection?: string[];
-	onChangeSelection?: ( items: string[] ) => void;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable?: ( item: Item ) => boolean;
-	header?: ReactNode;
-	getItemLevel?: ( item: Item ) => number;
+	selection: string[];
+	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
 	};
+	itemListLabel?: string;
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
-const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
 
-const dataViewsLayouts = VIEW_LAYOUTS.filter(
-	( viewLayout ) => ! viewLayout.isPicker
-);
-
 type DefaultUIProps = Pick<
-	DataViewsProps< any >,
-	'header' | 'search' | 'searchLabel'
+	DataViewsPickerProps< any >,
+	'search' | 'searchLabel'
 >;
 
 function DefaultUI( {
-	header,
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
@@ -116,19 +107,18 @@ function DefaultUI( {
 					style={ { flexShrink: 0 } }
 				>
 					<DataViewsViewConfig />
-					{ header }
 				</HStack>
 			</HStack>
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
 			) }
 			<DataViewsLayout />
-			<DataViewsFooter />
+			<DataViewsPickerFooter />
 		</>
 	);
 }
 
-function DataViews< Item >( {
+function DataViewsPicker< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -137,20 +127,16 @@ function DataViews< Item >( {
 	actions = EMPTY_ARRAY,
 	data,
 	getItemId = defaultGetItemId,
-	getItemLevel,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts: defaultLayoutsProperty,
-	selection: selectionProperty,
+	selection,
 	onChangeSelection,
-	onClickItem,
-	renderItemLink,
-	isItemClickable = defaultIsItemClickable,
-	header,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	itemListLabel,
 	empty,
-}: DataViewsProps< Item > ) {
+}: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
@@ -162,28 +148,15 @@ function DataViews< Item >( {
 		},
 		{ box: 'border-box' }
 	);
-	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const isUncontrolled =
-		selectionProperty === undefined || onChangeSelection === undefined;
-	const selection = isUncontrolled ? selectionState : selectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
-		if ( isUncontrolled ) {
-			setSelectionState( newValue );
-		}
 		if ( onChangeSelection ) {
 			onChangeSelection( newValue );
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
-	const _selection = useMemo( () => {
-		return selection.filter( ( id ) =>
-			data.some( ( item ) => getItemId( item ) === id )
-		);
-	}, [ selection, data, getItemId ] );
-
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
 		() =>
@@ -235,7 +208,7 @@ function DataViews< Item >( {
 			Object.fromEntries(
 				Object.entries( defaultLayoutsProperty ).filter(
 					( [ layoutType ] ) => {
-						return dataViewsLayouts.some(
+						return dataViewsPickerLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
 					}
@@ -258,15 +231,12 @@ function DataViews< Item >( {
 				data,
 				isLoading,
 				paginationInfo,
-				selection: _selection,
+				isItemClickable,
+				selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
-				getItemLevel,
-				isItemClickable,
-				onClickItem,
-				renderItemLink,
 				containerWidth,
 				containerRef,
 				resizeObserverRef,
@@ -275,17 +245,14 @@ function DataViews< Item >( {
 				isShowingFilter,
 				setIsShowingFilter,
 				config,
+				itemListLabel,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
-			<div className="dataviews-wrapper" ref={ containerRef }>
+			<div className="dataviews-picker-wrapper" ref={ containerRef }>
 				{ children ?? (
-					<DefaultUI
-						header={ header }
-						search={ search }
-						searchLabel={ searchLabel }
-					/>
+					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }
 			</div>
 		</DataViewsContext.Provider>
@@ -293,26 +260,25 @@ function DataViews< Item >( {
 }
 
 // Populate the DataViews sub components
-const DataViewsSubComponents = DataViews as typeof DataViews & {
-	BulkActionToolbar: typeof BulkActionsFooter;
-	Filters: typeof DataViewsFilters;
-	FiltersToggle: typeof FiltersToggle;
-	Layout: typeof DataViewsLayout;
-	LayoutSwitcher: typeof ViewTypeMenu;
-	Pagination: typeof DataViewsPagination;
-	Search: typeof DataViewsSearch;
-	ViewConfig: typeof DataviewsViewConfigDropdown;
-	Footer: typeof DataViewsFooter;
-};
+const DataViewsPickerSubComponents =
+	DataViewsPicker as typeof DataViewsPicker & {
+		BulkActionToolbar: typeof DataViewsPickerFooter;
+		Filters: typeof DataViewsFilters;
+		FiltersToggle: typeof FiltersToggle;
+		Layout: typeof DataViewsLayout;
+		LayoutSwitcher: typeof ViewTypeMenu;
+		Pagination: typeof DataViewsPagination;
+		Search: typeof DataViewsSearch;
+		ViewConfig: typeof DataviewsViewConfigDropdown;
+	};
 
-DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
-DataViewsSubComponents.Filters = DataViewsFilters;
-DataViewsSubComponents.FiltersToggle = FiltersToggle;
-DataViewsSubComponents.Layout = DataViewsLayout;
-DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
-DataViewsSubComponents.Pagination = DataViewsPagination;
-DataViewsSubComponents.Search = DataViewsSearch;
-DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
-DataViewsSubComponents.Footer = DataViewsFooter;
+DataViewsPickerSubComponents.BulkActionToolbar = DataViewsPickerFooter;
+DataViewsPickerSubComponents.Filters = DataViewsFilters;
+DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
+DataViewsPickerSubComponents.Layout = DataViewsLayout;
+DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;
+DataViewsPickerSubComponents.Pagination = DataViewsPagination;
+DataViewsPickerSubComponents.Search = DataViewsSearch;
+DataViewsPickerSubComponents.ViewConfig = DataviewsViewConfigDropdown;
 
-export default DataViewsSubComponents;
+export default DataViewsPickerSubComponents;

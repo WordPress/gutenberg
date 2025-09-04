@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ComponentProps, ReactElement } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -13,90 +13,66 @@ import {
 	Spinner,
 	Flex,
 	FlexItem,
-	Tooltip,
 	privateApis as componentsPrivateApis,
+	Composite,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { isAppleOS } from '@wordpress/keycodes';
 import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import ItemActions from '../../components/dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import DataViewsContext from '../../components/dataviews-context';
-import {
-	useHasAPossibleBulkAction,
-	useSomeItemHasAPossibleBulkAction,
-} from '../../components/dataviews-bulk-actions';
+import { useIsMultiselectPicker } from '../../components/dataviews-picker/footer';
 import type {
-	Action,
 	NormalizedField,
-	ViewGrid as ViewGridType,
-	ViewGridProps,
+	ViewPickerGrid as ViewPickerGridType,
+	ViewPickerGridProps,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
-import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 
 interface GridItemProps< Item > {
-	view: ViewGridType;
+	view: ViewPickerGridType;
+	multiselect?: boolean;
 	selection: string[];
 	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
-	onClickItem?: ( item: Item ) => void;
-	renderItemLink?: (
-		props: {
-			item: Item;
-		} & ComponentProps< 'a' >
-	) => ReactElement;
-	isItemClickable: ( item: Item ) => boolean;
 	item: Item;
-	actions: Action< Item >[];
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
 	regularFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
-	hasBulkActions: boolean;
 	config: {
 		sizes: string;
 	};
 	posinset?: number;
+	setsize?: number;
 }
 
 function GridItem< Item >( {
 	view,
+	multiselect,
 	selection,
 	onChangeSelection,
-	onClickItem,
-	isItemClickable,
-	renderItemLink,
 	getItemId,
 	item,
-	actions,
 	mediaField,
 	titleField,
 	descriptionField,
 	regularFields,
 	badgeFields,
-	hasBulkActions,
 	config,
 	posinset,
+	setsize,
 }: GridItemProps< Item > ) {
-	const {
-		showTitle = true,
-		showMedia = true,
-		showDescription = true,
-		infiniteScrollEnabled,
-	} = view;
-	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
+	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
-	const instanceId = useInstanceId( GridItem );
 	const isSelected = selection.includes( id );
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
@@ -109,104 +85,58 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
-	const shouldRenderMedia = showMedia && renderedMediaField;
-
-	let mediaA11yProps;
-	let titleA11yProps;
-	if ( isItemClickable( item ) && onClickItem ) {
-		if ( renderedTitleField ) {
-			mediaA11yProps = {
-				'aria-labelledby': `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-			titleA11yProps = {
-				id: `dataviews-view-grid__title-field-${ instanceId }`,
-			};
-		} else {
-			mediaA11yProps = {
-				'aria-label': __( 'Navigate to item' ),
-			};
-		}
-	}
-	const { paginationInfo } = useContext( DataViewsContext );
 
 	return (
-		<VStack
-			spacing={ 0 }
+		<Composite.Item
 			key={ id }
-			className={ clsx( 'dataviews-view-grid__card', {
-				'is-selected': hasBulkAction && isSelected,
+			render={ ( { children, ...props } ) => (
+				<VStack spacing={ 0 } children={ children } { ...props } />
+			) }
+			role="option"
+			aria-posinset={ posinset }
+			aria-setsize={ setsize }
+			className={ clsx( 'dataviews-view-picker-grid__card', {
+				'is-selected': isSelected,
 			} ) }
-			onClickCapture={ ( event ) => {
-				if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! hasBulkAction ) {
-						return;
-					}
+			aria-selected={ isSelected }
+			onClick={ () => {
+				if ( isSelected ) {
 					onChangeSelection(
-						selection.includes( id )
-							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
+						selection.filter( ( itemId ) => id !== itemId )
 					);
+				} else {
+					const newSelection = multiselect
+						? [ ...selection, id ]
+						: [ id ];
+					onChangeSelection( newSelection );
 				}
 			} }
-			role={ infiniteScrollEnabled ? 'article' : undefined }
-			aria-setsize={
-				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
-			}
-			aria-posinset={ posinset }
 		>
-			{ shouldRenderMedia && (
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__media"
-					{ ...mediaA11yProps }
-				>
+			{ showMedia && renderedMediaField && (
+				<div className="dataviews-view-picker-grid__media">
 					{ renderedMediaField }
-				</ItemClickWrapper>
+				</div>
 			) }
-			{ hasBulkActions && shouldRenderMedia && (
+			{ showMedia && renderedMediaField && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
 					onChangeSelection={ onChangeSelection }
 					getItemId={ getItemId }
 					titleField={ titleField }
-					disabled={ ! hasBulkAction }
+					disabled={ false }
+					aria-hidden
+					tabIndex={ -1 }
 				/>
 			) }
-			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
-				<div className="dataviews-view-grid__media-actions">
-					<ItemActions item={ item } actions={ actions } isCompact />
+			<HStack
+				justify="space-between"
+				className="dataviews-view-picker-grid__title-actions"
+			>
+				<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
+					{ renderedTitleField }
 				</div>
-			) }
-			{ showTitle && (
-				<HStack
-					justify="space-between"
-					className="dataviews-view-grid__title-actions"
-				>
-					<ItemClickWrapper
-						item={ item }
-						isItemClickable={ isItemClickable }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-						className="dataviews-view-grid__title-field dataviews-title-field"
-						{ ...titleA11yProps }
-					>
-						{ renderedTitleField }
-					</ItemClickWrapper>
-					{ !! actions?.length && (
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					) }
-				</HStack>
-			) }
+			</HStack>
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
@@ -216,7 +146,7 @@ function GridItem< Item >( {
 				) }
 				{ !! badgeFields?.length && (
 					<HStack
-						className="dataviews-view-grid__badge-fields"
+						className="dataviews-view-picker-grid__badge-fields"
 						spacing={ 2 }
 						wrap
 						alignment="top"
@@ -226,7 +156,7 @@ function GridItem< Item >( {
 							return (
 								<Badge
 									key={ field.id }
-									className="dataviews-view-grid__field-value"
+									className="dataviews-view-picker-grid__field-value"
 								>
 									<field.render
 										item={ item }
@@ -239,13 +169,13 @@ function GridItem< Item >( {
 				) }
 				{ !! regularFields?.length && (
 					<VStack
-						className="dataviews-view-grid__fields"
+						className="dataviews-view-picker-grid__fields"
 						spacing={ 1 }
 					>
 						{ regularFields.map( ( field ) => {
 							return (
 								<Flex
-									className="dataviews-view-grid__field"
+									className="dataviews-view-picker-grid__field"
 									key={ field.id }
 									gap={ 1 }
 									justify="flex-start"
@@ -254,13 +184,11 @@ function GridItem< Item >( {
 									direction="row"
 								>
 									<>
-										<Tooltip text={ field.label }>
-											<FlexItem className="dataviews-view-grid__field-name">
-												{ field.header }
-											</FlexItem>
-										</Tooltip>
+										<FlexItem className="dataviews-view-picker-grid__field-name">
+											{ field.header }
+										</FlexItem>
 										<FlexItem
-											className="dataviews-view-grid__field-value"
+											className="dataviews-view-picker-grid__field-value"
 											style={ { maxHeight: 'none' } }
 										>
 											<field.render
@@ -275,26 +203,60 @@ function GridItem< Item >( {
 					</VStack>
 				) }
 			</VStack>
+		</Composite.Item>
+	);
+}
+
+function GridGroup< Item >( {
+	groupName,
+	groupField,
+	children,
+}: {
+	groupName: string;
+	groupField: NormalizedField< Item >;
+	children: ReactNode;
+} ) {
+	const headerId = useInstanceId(
+		GridGroup,
+		'dataviews-view-picker-grid-group__header'
+	);
+	return (
+		<VStack
+			key={ groupName }
+			spacing={ 2 }
+			role="group"
+			aria-labelledby={ headerId }
+		>
+			<h3
+				className="dataviews-view-picker-grid-group__header"
+				id={ headerId }
+			>
+				{ sprintf(
+					// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+					__( '%1$s: %2$s' ),
+					groupField.label,
+					groupName
+				) }
+			</h3>
+			{ children }
 		</VStack>
 	);
 }
 
-function ViewGrid< Item >( {
+function ViewPickerGrid< Item >( {
 	actions,
 	data,
 	fields,
 	getItemId,
 	isLoading,
 	onChangeSelection,
-	onClickItem,
-	isItemClickable,
-	renderItemLink,
 	selection,
 	view,
 	className,
 	empty,
-}: ViewGridProps< Item > ) {
-	const { resizeObserverRef } = useContext( DataViewsContext );
+}: ViewPickerGridProps< Item > ) {
+	const { resizeObserverRef, paginationInfo, itemListLabel } =
+		useContext( DataViewsContext );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
@@ -325,8 +287,9 @@ function ViewGrid< Item >( {
 		{ regularFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 	const usedPreviewSize = view.layout?.previewSize;
+	const isMultiselect = useIsMultiselectPicker( actions );
+
 	/*
 	 * This is the maximum width that an image can achieve in the grid. The reasoning is:
 	 * The biggest min image width available is 430px (see /dataviews-layouts/grid/preview-size-picker.tsx).
@@ -353,51 +316,70 @@ function ViewGrid< Item >( {
 
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
+	const currentPage = view?.page ?? 1;
+	const perPage = view?.perPage ?? 0;
+	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
+
 	return (
 		<>
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (
-					<VStack spacing={ 4 }>
+					<Composite
+						virtualFocus
+						orientation="horizontal"
+						role="listbox"
+						aria-multiselectable={ isMultiselect }
+						className={ clsx(
+							'dataviews-view-picker-grid',
+							className
+						) }
+						aria-label={ itemListLabel }
+						render={ ( { children, ...props } ) => (
+							<VStack
+								spacing={ 4 }
+								children={ children }
+								{ ...props }
+							/>
+						) }
+					>
 						{ Array.from( dataByGroup.entries() ).map(
 							( [ groupName, groupItems ] ) => (
-								<VStack key={ groupName } spacing={ 2 }>
-									<h3 className="dataviews-view-grid__group-header">
-										{ sprintf(
-											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-											__( '%1$s: %2$s' ),
-											groupField.label,
-											groupName
-										) }
-									</h3>
+								<GridGroup
+									key={ groupName }
+									groupName={ groupName }
+									groupField={ groupField }
+								>
 									<GridItems
-										className={ clsx(
-											'dataviews-view-grid',
-											className
-										) }
 										previewSize={ usedPreviewSize }
+										style={ {
+											gridTemplateColumns:
+												usedPreviewSize &&
+												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
+										} }
 										aria-busy={ isLoading }
-										ref={ resizeObserverRef }
+										ref={
+											resizeObserverRef as React.RefObject< HTMLDivElement >
+										}
 									>
 										{ groupItems.map( ( item ) => {
+											const posInSet =
+												( currentPage - 1 ) * perPage +
+												data.indexOf( item ) +
+												1;
 											return (
 												<GridItem
 													key={ getItemId( item ) }
 													view={ view }
+													multiselect={
+														isMultiselect
+													}
 													selection={ selection }
 													onChangeSelection={
 														onChangeSelection
 													}
-													onClickItem={ onClickItem }
-													isItemClickable={
-														isItemClickable
-													}
-													renderItemLink={
-														renderItemLink
-													}
 													getItemId={ getItemId }
 													item={ item }
-													actions={ actions }
 													mediaField={ mediaField }
 													titleField={ titleField }
 													descriptionField={
@@ -407,62 +389,80 @@ function ViewGrid< Item >( {
 														regularFields
 													}
 													badgeFields={ badgeFields }
-													hasBulkActions={
-														hasBulkActions
-													}
 													config={ {
 														sizes: size,
 													} }
+													posinset={ posInSet }
+													setsize={ setSize }
 												/>
 											);
 										} ) }
 									</GridItems>
-								</VStack>
+								</GridGroup>
 							)
 						) }
-					</VStack>
+					</Composite>
 				)
 			}
 
 			{
 				// Render a single grid with all data.
 				hasData && ! dataByGroup && (
-					<GridItems
-						className={ clsx( 'dataviews-view-grid', className ) }
-						previewSize={ usedPreviewSize }
-						aria-busy={ isLoading }
-						ref={ resizeObserverRef }
-						role={ isInfiniteScroll ? 'feed' : undefined }
+					<Composite
+						render={
+							<GridItems
+								className={ clsx(
+									'dataviews-view-picker-grid',
+									className
+								) }
+								previewSize={ usedPreviewSize }
+								aria-busy={ isLoading }
+								ref={
+									resizeObserverRef as React.RefObject< HTMLDivElement >
+								}
+							/>
+						}
+						virtualFocus
+						orientation="horizontal"
+						role="listbox"
+						aria-multiselectable={ isMultiselect }
+						aria-label={ itemListLabel }
 					>
 						{ data.map( ( item, index ) => {
+							let posinset = isInfiniteScroll
+								? index + 1
+								: undefined;
+
+							if ( ! isInfiniteScroll ) {
+								// When infinite scroll isn't active, take pagination into account
+								// when calculating the posinset.
+								posinset =
+									( currentPage - 1 ) * perPage + index + 1;
+							}
+
 							return (
 								<GridItem
 									key={ getItemId( item ) }
 									view={ view }
+									multiselect={ isMultiselect }
 									selection={ selection }
 									onChangeSelection={ onChangeSelection }
-									onClickItem={ onClickItem }
-									isItemClickable={ isItemClickable }
-									renderItemLink={ renderItemLink }
 									getItemId={ getItemId }
 									item={ item }
-									actions={ actions }
 									mediaField={ mediaField }
 									titleField={ titleField }
 									descriptionField={ descriptionField }
 									regularFields={ regularFields }
 									badgeFields={ badgeFields }
-									hasBulkActions={ hasBulkActions }
 									config={ {
 										sizes: size,
 									} }
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
+									posinset={ posinset }
+									setsize={ setSize }
 								/>
 							);
 						} ) }
-					</GridItems>
+					</Composite>
 				)
 			}
 			{
@@ -487,4 +487,4 @@ function ViewGrid< Item >( {
 	);
 }
 
-export default ViewGrid;
+export default ViewPickerGrid;

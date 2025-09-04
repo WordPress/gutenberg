@@ -515,7 +515,23 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'pickerGrid';
+
+	layout?: {
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields?: string[];
+
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -648,6 +664,20 @@ export interface ViewBaseProps< Item > {
 	empty: ReactNode;
 }
 
+export type ViewPickerBaseProps< Item > = Omit<
+	ViewBaseProps< Item >,
+	| 'view'
+	| 'onChangeView'
+	// The following props are not supported for pickers.
+	| 'isItemClickable'
+	| 'onClickItem'
+	| 'renderItemLink'
+	| 'getItemLevel'
+> & {
+	view: View;
+	onChangeView: ( view: View ) => void;
+};
+
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
 }
@@ -660,15 +690,23 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
+export interface ViewPickerGridProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerGrid;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
+export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
 
 /**

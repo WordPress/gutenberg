@@ -30,7 +30,8 @@
 				"width": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"openByDefault": {
