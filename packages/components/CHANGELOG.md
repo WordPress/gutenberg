@@ -21,6 +21,7 @@
 
 -   Upgrade `framer-motion` package to version `^11.15.0` ([#71442](https://github.com/WordPress/gutenberg/pull/71442)).
 -   Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208).
+-   Expose `ValidatedTextareaControl` via Private APIs ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 
 ## 30.2.0 (2025-08-20)
 
