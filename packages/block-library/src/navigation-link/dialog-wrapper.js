@@ -42,11 +42,11 @@ function BackButton( { className, onBack } ) {
 function DialogWrapper( { className, title, description, onBack, children } ) {
 	const dialogTitleId = useInstanceId(
 		DialogWrapper,
-		`${ className }__title`
+		'link-ui-dialog-title'
 	);
 	const dialogDescriptionId = useInstanceId(
 		DialogWrapper,
-		`${ className }__description`
+		'link-ui-dialog-description'
 	);
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const backButtonClassName = `${ className }__back`;
