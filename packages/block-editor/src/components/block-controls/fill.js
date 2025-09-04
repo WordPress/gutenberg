@@ -11,7 +11,6 @@ import { Children } from '@wordpress/element';
  * Internal dependencies
  */
 import useBlockControlsFill from './hook';
-import { useBlockEditingMode } from '../block-editing-mode';
 
 export default function BlockControlsFill( {
 	group = 'default',
@@ -23,27 +22,10 @@ export default function BlockControlsFill( {
 		group,
 		__experimentalShareWithChildBlocks
 	);
-	const blockEditingMode = useBlockEditingMode();
 
 	if ( ! Fill ) {
 		return null;
 	}
-
-	// Filter children in content-only mode
-	let filteredChildren = children;
-	if ( blockEditingMode === 'contentOnly' ) {
-		const childrenArray = Children.toArray( children );
-		filteredChildren = childrenArray.filter( ( child ) => {
-			return child?.props?.category === 'content';
-		} );
-	}
-
-	const innerMarkup = (
-		<>
-			{ group === 'default' && <ToolbarGroup controls={ controls } /> }
-			{ filteredChildren }
-		</>
-	);
 
 	return (
 		<StyleProvider document={ document }>
@@ -51,12 +33,28 @@ export default function BlockControlsFill( {
 				{ ( fillProps ) => {
 					// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
 					// that should wrap the fill markup.
-					const { forwardedContext = [] } = fillProps;
+					const { forwardedContext = [], shouldRender = () => true } =
+						fillProps;
+
+					// Filter children based on shouldRender callback
+					const childrenArray = Children.toArray( children );
+					const filteredChildren =
+						childrenArray.filter( shouldRender );
+
+					const filteredMarkup = (
+						<>
+							{ group === 'default' && (
+								<ToolbarGroup controls={ controls } />
+							) }
+							{ filteredChildren }
+						</>
+					);
+
 					return forwardedContext.reduce(
 						( inner, [ Provider, props ] ) => (
 							<Provider { ...props }>{ inner }</Provider>
 						),
-						innerMarkup
+						filteredMarkup
 					);
 				} }
 			</Fill>
