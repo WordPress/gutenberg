@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox' or Edit: 'toggle'` instead. Boolean field types now use checkboxes by default.
+
 ### Features
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)

@@ -22,7 +22,6 @@ import select from './select';
 import text from './text';
 import toggle from './toggle';
 import toggleGroup from './toggle-group';
-import boolean from './boolean';
 import array from './array';
 
 interface FormControls {
@@ -31,7 +30,6 @@ interface FormControls {
 
 const FORM_CONTROLS: FormControls = {
 	array,
-	boolean,
 	checkbox,
 	datetime,
 	date,

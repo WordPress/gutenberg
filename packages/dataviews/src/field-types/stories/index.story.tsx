@@ -32,7 +32,6 @@ const meta = {
 			options: [
 				'default',
 				'array',
-				'boolean',
 				'checkbox',
 				'date',
 				'datetime',
@@ -320,7 +319,6 @@ type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
 	| 'array'
-	| 'boolean'
 	| 'checkbox'
 	| 'date'
 	| 'datetime'
