@@ -448,15 +448,23 @@ HTML;
 	 * @covers WP_Block::process_block_bindings
 	 */
 	public function test_default_binding_for_pattern_overrides() {
+		add_filter(
+			'block_bindings_supported_attributes_test/block',
+			function ( $supported_attributes ) {
+				$supported_attributes[] = 'myAttribute';
+				return $supported_attributes;
+			}
+		);
+
 		$block_content = <<<HTML
-<!-- wp:paragraph {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test"}} -->
+<!-- wp:test/block {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test"}} -->
 <p>This should not appear</p>
-<!-- /wp:paragraph -->
+<!-- /wp:test/block -->
 HTML;
 
 		$expected_content = 'This is the content value';
 		$parsed_blocks    = parse_blocks( $block_content );
-		$block            = new WP_Block( $parsed_blocks[0], array( 'pattern/overrides' => array( 'Test' => array( 'content' => $expected_content ) ) ) );
+		$block            = new WP_Block( $parsed_blocks[0], array( 'pattern/overrides' => array( 'Test' => array( 'myAttribute' => $expected_content ) ) ) );
 
 		$result = $block->render();
 
@@ -467,7 +475,7 @@ HTML;
 		);
 
 		$expected_bindings_metadata = array(
-			'content' => array( 'source' => 'core/pattern-overrides' ),
+			'myAttribute' => array( 'source' => 'core/pattern-overrides' ),
 		);
 		$this->assertSame(
 			$expected_bindings_metadata,
