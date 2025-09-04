@@ -526,6 +526,7 @@ export const InfiniteScroll = () => {
 		mediaField: 'image',
 		infiniteScrollEnabled: true, // Enable infinite scroll by default
 	} );
+
 	const { data: shownData } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -538,6 +539,7 @@ export const InfiniteScroll = () => {
 	const [ scrollDirection, setScrollDirection ] = useState<
 		'up' | 'down' | undefined
 	>( undefined );
+	const [ visibleEntries, setVisibleEntries ] = useState< Number[] >( [] );
 
 	const totalItems = data.length;
 	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
@@ -586,6 +588,40 @@ export const InfiniteScroll = () => {
 		[ isLoadingMore, currentPage, totalPages, view ]
 	);
 
+	const intersectionObserverCallback: IntersectionObserverCallback =
+		useCallback( ( entries: IntersectionObserverEntry[] ) => {
+			// Calculate new visible entries outside of setState
+			setVisibleEntries( ( prev ) => {
+				const newVisibleEntries = new Set( prev );
+				let hasChanged = false;
+
+				entries.forEach( ( entry ) => {
+					const posInSet = Number(
+						entry.target?.attributes?.getNamedItem(
+							'aria-posinset'
+						)?.value
+					);
+					if ( isNaN( posInSet ) ) {
+						return;
+					}
+					if ( entry.isIntersecting ) {
+						if ( ! newVisibleEntries.has( posInSet ) ) {
+							newVisibleEntries.add( posInSet );
+							hasChanged = true;
+						}
+					} else if ( newVisibleEntries.has( posInSet ) ) {
+						newVisibleEntries.delete( posInSet );
+						hasChanged = true;
+					}
+				} );
+
+				// Only return new array if something actually changed
+				return hasChanged
+					? Array.from( newVisibleEntries ).sort()
+					: prev;
+			} );
+		}, [] );
+
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
 		if (
@@ -595,16 +631,35 @@ export const InfiniteScroll = () => {
 			// First page - replace all data
 			setAllLoadedRecords( shownData );
 		} else {
-			// Subsequent pages - append to existing data
+			// Subsequent pages - load more data
 			setAllLoadedRecords( ( prev ) => {
 				const existingIds = new Set( prev.map( getItemId ) );
 				const newRecords = shownData.filter(
 					( record ) => ! existingIds.has( getItemId( record ) )
 				);
-				const orderedRecords =
+				let orderedRecords =
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prev ]
 						: [ ...prev, ...newRecords ];
+				// Check whether we have more than 2 pages of data loaded and if so,
+				// trim some off the end we're scrolling away from.
+				if ( orderedRecords.length > 12 ) {
+					orderedRecords =
+						scrollDirection === 'up'
+							? orderedRecords.filter(
+									( record ) =>
+										record.id <
+										visibleEntries[
+											visibleEntries.length - 1
+										]?.valueOf() +
+											2
+							  )
+							: orderedRecords.filter(
+									( record ) =>
+										record.id >
+										visibleEntries[ 0 ]?.valueOf() - 2
+							  );
+				}
 				return orderedRecords;
 			} );
 		}
@@ -617,25 +672,15 @@ export const InfiniteScroll = () => {
 		currentPage,
 		view.infiniteScrollEnabled,
 		shownData,
+		allLoadedRecords.length,
+		scrollDirection,
 	] );
 
 	const paginationInfo = {
 		totalItems,
 		totalPages,
 		infiniteScrollHandler,
-		intersectionObserverCallback: (
-			entries: IntersectionObserverEntry[]
-		) => {
-			// eslint-disable-next-line no-console
-			console.log(
-				'Intersection Observer entries:',
-				entries,
-				'target posinset',
-				entries[ 0 ]?.target?.attributes?.getNamedItem(
-					'aria-posinset'
-				)?.value
-			);
-		},
+		intersectionObserverCallback,
 	};
 
 	return (
