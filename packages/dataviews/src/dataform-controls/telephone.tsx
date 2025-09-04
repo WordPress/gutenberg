@@ -4,7 +4,7 @@
 import type { DataFormControlProps } from '../types';
 import Text from './text';
 
-export default function Email< Item >( {
+export default function Telephone< Item >( {
 	data,
 	field,
 	onChange,
@@ -12,7 +12,7 @@ export default function Email< Item >( {
 }: DataFormControlProps< Item > ) {
 	return (
 		<Text
-			{ ...{ data, field, onChange, hideLabelFromVision, type: 'email' } }
+			{ ...{ data, field, onChange, hideLabelFromVision, type: 'tel' } }
 		/>
 	);
 }

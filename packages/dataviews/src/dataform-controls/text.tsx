@@ -17,6 +17,7 @@ export default function Text< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	...rest
 }: DataFormControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
@@ -63,9 +64,8 @@ export default function Text< Item >( {
 			value={ value ?? '' }
 			help={ description }
 			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
+			{ ...rest }
 		/>
 	);
 }
