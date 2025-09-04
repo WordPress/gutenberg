@@ -46,6 +46,7 @@ function makeContextValue( i18n: I18n ): I18nContextProps {
 }
 
 const I18nContext = createContext( makeContextValue( defaultI18n ) );
+I18nContext.displayName = 'I18nContext';
 
 type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
 

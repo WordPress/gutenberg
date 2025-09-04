@@ -2,16 +2,13 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-content",
-	"version": "0.1.0",
 	"title": "Accordion Content",
 	"category": "design",
 	"description": "Displays a section of content in an accordion, including a header and expandable content.",
-	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-header", "core/accordion-panel" ],
 	"supports": {
-		"align": [ "wide", "full" ],
 		"color": {
 			"background": true,
 			"gradient": true
