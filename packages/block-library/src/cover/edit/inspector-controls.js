@@ -35,7 +35,7 @@ import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import PosterImage from './poster-image';
+import PosterImage from '../../utils/poster-image';
 
 const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
 	blockEditorPrivateApis
@@ -131,7 +131,12 @@ export default function CoverInspectorControls( {
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -275,7 +280,11 @@ export default function CoverInspectorControls( {
 						{ isVideoBackground && (
 							<PosterImage
 								poster={ poster }
-								setAttributes={ setAttributes }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										poster: posterImage?.url,
+									} )
+								}
 							/>
 						) }
 						{ ! useFeaturedImage && url && ! isVideoBackground && (

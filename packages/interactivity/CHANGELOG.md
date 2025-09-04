@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+### Deprecations
+
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
+    It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
 ## 6.27.0 (2025-07-23)
 
 ## 6.26.0 (2025-06-25)

@@ -102,6 +102,7 @@ const ArrowTriangle = () => (
 );
 
 const slotNameContext = createContext< string | undefined >( undefined );
+slotNameContext.displayName = '__unstableSlotNameContext';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {

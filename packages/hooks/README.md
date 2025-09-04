@@ -54,6 +54,22 @@ One notable difference between the JS and PHP hooks API is that in the JS versio
 -   `filters`
 -   `defaultHooks`
 
+## Parameters
+
+### hookName
+
+Should be a non empty string containing only numbers, letters, dashes, periods and underscores. Also, the hook name cannot begin with `__`.
+
+-   Type: `String`
+-   Required: Yes
+
+### namespace
+
+Should be a non empty string containing only numbers, letters, dashes, periods, underscores and slashes. It should take the form `vendor/plugin/function`.
+
+-   Type: `String`
+-   Required: Yes
+
 ### Events on action/filter add or remove
 
 Whenever an action or filter is added or removed, a matching `hookAdded` or `hookRemoved` action is triggered.

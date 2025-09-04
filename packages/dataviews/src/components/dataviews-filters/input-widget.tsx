@@ -62,7 +62,13 @@ export default function InputWidget( {
 							..._filter,
 							operator:
 								currentFilter.operator || filter.operators[ 0 ],
-							value: nextValue,
+							// Consider empty strings as undefined:
+							//
+							// - undefined as value means the filter is unset: the filter widget displays no value and the search returns all records
+							// - empty string as value means "search empty string": returns only the records that have an empty string as value
+							//
+							// In practice, this means the filter will not be able to find an empty string as the value.
+							value: nextValue === '' ? undefined : nextValue,
 					  }
 					: _filter
 			),

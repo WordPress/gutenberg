@@ -22,6 +22,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useContext,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
@@ -35,6 +36,7 @@ import {
 	ActionsMenuGroup,
 	ActionModal,
 } from '../../components/dataviews-item-actions';
+import DataViewsContext from '../../components/dataviews-context';
 import type {
 	Action,
 	NormalizedField,
@@ -55,6 +57,7 @@ interface ListViewItemProps< Item > {
 	onSelect: ( item: Item ) => void;
 	otherFields: NormalizedField< Item >[];
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
+	posinset?: number;
 }
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -153,8 +156,14 @@ function ListItem< Item >( {
 	onSelect,
 	otherFields,
 	onDropdownTriggerKeyDown,
+	posinset,
 }: ListViewItemProps< Item > ) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
@@ -169,6 +178,7 @@ function ListItem< Item >( {
 		setIsHovered( isHover );
 	};
 
+	const { paginationInfo } = useContext( DataViewsContext );
 	useEffect( () => {
 		if ( isSelected ) {
 			itemRef.current?.scrollIntoView( {
@@ -199,7 +209,11 @@ function ListItem< Item >( {
 	const renderedMediaField =
 		showMedia && mediaField?.render ? (
 			<div className="dataviews-view-list__media-wrapper">
-				<mediaField.render item={ item } field={ mediaField } />
+				<mediaField.render
+					item={ item }
+					field={ mediaField }
+					config={ { sizes: '52px' } }
+				/>
 			</div>
 		) : null;
 
@@ -265,8 +279,18 @@ function ListItem< Item >( {
 	return (
 		<Composite.Row
 			ref={ itemRef }
-			render={ <div /> }
-			role="row"
+			render={
+				/* aria-posinset breaks Composite.Row if passed to it directly. */
+				<div
+					aria-posinset={ posinset }
+					aria-setsize={
+						infiniteScrollEnabled
+							? paginationInfo.totalItems
+							: undefined
+					}
+				/>
+			}
+			role={ infiniteScrollEnabled ? 'article' : 'row' }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
@@ -354,6 +378,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		selection,
 		view,
 		className,
+		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
@@ -487,41 +512,53 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 			>
-				{ ! hasData && (
-					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
-				) }
+				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
 			</div>
 		);
 	}
 
 	return (
-		<Composite
-			id={ baseId }
-			render={ <div /> }
-			className={ clsx( 'dataviews-view-list', className ) }
-			role="grid"
-			activeId={ activeCompositeId }
-			setActiveId={ setActiveCompositeId }
-		>
-			{ data.map( ( item ) => {
-				const id = generateCompositeItemIdPrefix( item );
-				return (
-					<ListItem
-						key={ id }
-						view={ view }
-						idPrefix={ id }
-						actions={ actions }
-						item={ item }
-						isSelected={ item === selectedItem }
-						onSelect={ onSelect }
-						mediaField={ mediaField }
-						titleField={ titleField }
-						descriptionField={ descriptionField }
-						otherFields={ otherFields }
-						onDropdownTriggerKeyDown={ onDropdownTriggerKeyDown }
-					/>
-				);
-			} ) }
-		</Composite>
+		<>
+			<Composite
+				id={ baseId }
+				render={ <div /> }
+				className={ clsx( 'dataviews-view-list', className ) }
+				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
+				activeId={ activeCompositeId }
+				setActiveId={ setActiveCompositeId }
+			>
+				{ data.map( ( item, index ) => {
+					const id = generateCompositeItemIdPrefix( item );
+					return (
+						<ListItem
+							key={ id }
+							view={ view }
+							idPrefix={ id }
+							actions={ actions }
+							item={ item }
+							isSelected={ item === selectedItem }
+							onSelect={ onSelect }
+							mediaField={ mediaField }
+							titleField={ titleField }
+							descriptionField={ descriptionField }
+							otherFields={ otherFields }
+							onDropdownTriggerKeyDown={
+								onDropdownTriggerKeyDown
+							}
+							posinset={
+								view.infiniteScrollEnabled
+									? index + 1
+									: undefined
+							}
+						/>
+					);
+				} ) }
+			</Composite>
+			{ hasData && isLoading && (
+				<p className="dataviews-loading-more">
+					<Spinner />
+				</p>
+			) }
+		</>
 	);
 }

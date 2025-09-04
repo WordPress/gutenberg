@@ -48,29 +48,8 @@ import RawHTML from './raw-html';
 
 /** @typedef {import('react').ReactElement} ReactElement */
 
-export interface Context< T = any > {
-	Provider: {
-		$$typeof: symbol;
-	};
-	Consumer: {
-		$$typeof: symbol;
-	};
-	_currentValue?: T;
-}
-
-export interface ContextProviderProps< T = any > {
-	value: T;
-	children: React.ReactNode;
-}
-
-export interface ContextConsumerProps< T = any > {
-	children: ( value: T ) => React.ReactNode;
-}
-
-export interface ForwardRefComponent {
-	$$typeof: symbol;
-	render: ( props: any ) => React.ReactElement | null;
-}
+const Context = createContext( undefined );
+Context.displayName = 'ElementContext';
 
 interface ComponentInstance {
 	render: () => React.ReactNode;
@@ -98,7 +77,8 @@ interface HTMLProps {
 	[ key: string ]: any;
 }
 
-const { Provider, Consumer } = createContext< any >( undefined );
+const { Provider, Consumer } = Context;
+
 const ForwardRef = forwardRef( () => {
 	return null;
 } );
@@ -561,6 +541,7 @@ function getNormalStylePropertyValue(
 	if (
 		typeof value === 'number' &&
 		0 !== value &&
+		! hasPrefix( property, [ '--' ] ) &&
 		! CSS_PROPERTIES_SUPPORTS_UNITLESS.has( property )
 	) {
 		return value + 'px';

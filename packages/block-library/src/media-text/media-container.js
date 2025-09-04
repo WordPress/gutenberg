@@ -200,6 +200,7 @@ function MediaContainer( props, ref ) {
 					}
 					mediaId={ mediaId }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }

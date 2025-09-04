@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ComponentType, ComponentProps } from 'react';
+import type {
+	ReactElement,
+	ReactNode,
+	ComponentType,
+	ComponentProps,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -100,10 +105,6 @@ export type FieldType =
 	| 'email'
 	| 'array';
 
-export type ValidationContext = {
-	elements?: Option[];
-};
-
 /**
  * An abstract interface for Field based on the field type.
  */
@@ -116,7 +117,7 @@ export type FieldTypeDefinition< Item > = {
 	/**
 	 * Callback used to validate the field.
 	 */
-	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	isValid: Rules< Item >;
 
 	/**
 	 * Callback used to render an edit control for the field or control name.
@@ -143,6 +144,11 @@ export type FieldTypeDefinition< Item > = {
 	 * Whether the field is sortable.
 	 */
 	enableSorting: boolean;
+};
+
+export type Rules< Item > = {
+	required?: boolean;
+	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
 
 /**
@@ -198,7 +204,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to validate the field.
 	 */
-	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
+	isValid?: Rules< Item >;
 
 	/**
 	 * Callback used to decide if a field should be displayed.
@@ -250,7 +256,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	isValid: Rules< Item >;
 	enableHiding: boolean;
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
@@ -280,6 +286,9 @@ export type DataFormControlProps< Item > = {
 export type DataViewRenderFieldProps< Item > = {
 	item: Item;
 	field: NormalizedField< Item >;
+	config?: {
+		sizes: string;
+	};
 };
 
 /**
@@ -300,6 +309,11 @@ export interface Filter {
 	 * The value to filter by.
 	 */
 	value: any;
+
+	/**
+	 * Whether the filter can be edited by the user.
+	 */
+	isLocked?: boolean;
 }
 
 export interface NormalizedFilter {
@@ -337,6 +351,11 @@ export interface NormalizedFilter {
 	 * Whether it is a primary filter.
 	 */
 	isPrimary: boolean;
+
+	/**
+	 * Whether the filter can be edited by the user.
+	 */
+	isLocked: boolean;
 }
 
 interface ViewBase {
@@ -424,6 +443,11 @@ interface ViewBase {
 	 * The field to group by.
 	 */
 	groupByField?: string;
+
+	/**
+	 * Whether infinite scroll is enabled.
+	 */
+	infiniteScrollEnabled?: boolean;
 }
 
 export interface ColumnStyle {
@@ -463,6 +487,11 @@ export interface ViewTable extends ViewBase {
 		 * The density of the view.
 		 */
 		density?: Density;
+
+		/**
+		 * Whether the view allows column moving.
+		 */
+		enableMoving?: boolean;
 	};
 }
 
@@ -486,7 +515,23 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'pickerGrid';
+
+	layout?: {
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields?: string[];
+
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -616,7 +661,22 @@ export interface ViewBaseProps< Item > {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	view: View;
+	empty: ReactNode;
 }
+
+export type ViewPickerBaseProps< Item > = Omit<
+	ViewBaseProps< Item >,
+	| 'view'
+	| 'onChangeView'
+	// The following props are not supported for pickers.
+	| 'isItemClickable'
+	| 'onClickItem'
+	| 'renderItemLink'
+	| 'getItemLevel'
+> & {
+	view: View;
+	onChangeView: ( view: View ) => void;
+};
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
@@ -630,28 +690,94 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
+export interface ViewPickerGridProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerGrid;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
+export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
+
+/**
+ * DataForm layouts.
+ */
+export type LayoutType = 'regular' | 'panel' | 'card';
+export type LabelPosition = 'top' | 'side' | 'none';
+
+export type RegularLayout = {
+	type: 'regular';
+	labelPosition?: LabelPosition;
+};
+export type NormalizedRegularLayout = {
+	type: 'regular';
+	labelPosition: LabelPosition;
+};
+
+export type PanelLayout = {
+	type: 'panel';
+	labelPosition?: LabelPosition;
+	openAs?: 'dropdown' | 'modal';
+};
+export type NormalizedPanelLayout = {
+	type: 'panel';
+	labelPosition: LabelPosition;
+	openAs: 'dropdown' | 'modal';
+};
+
+export type CardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened?: true;
+	  }
+	| {
+			type: 'card';
+			withHeader?: true | undefined;
+			isOpened?: boolean;
+	  };
+export type NormalizedCardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened: true;
+	  }
+	| {
+			type: 'card';
+			withHeader: true;
+			isOpened: boolean;
+	  };
+
+export type Layout = RegularLayout | PanelLayout | CardLayout;
+export type NormalizedLayout =
+	| NormalizedRegularLayout
+	| NormalizedPanelLayout
+	| NormalizedCardLayout;
 
 export type SimpleFormField = {
 	id: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	layout?: Layout;
 };
 
 export type CombinedFormField = {
 	id: string;
 	label?: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	description?: string;
+	layout?: Layout;
 	children: Array< FormField | string >;
 };
 
@@ -661,9 +787,8 @@ export type FormField = SimpleFormField | CombinedFormField;
  * The form configuration.
  */
 export type Form = {
-	type?: 'regular' | 'panel';
+	layout?: Layout;
 	fields?: Array< FormField | string >;
-	labelPosition?: 'side' | 'top' | 'none';
 };
 
 export interface DataFormProps< Item > {

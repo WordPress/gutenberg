@@ -223,55 +223,14 @@ export default function PostList( { postType } ) {
 		},
 		[ location.path, location.query.isCustom, history ]
 	);
-	const getActiveViewFilters = ( views, match ) => {
-		const found = views.find( ( { slug } ) => slug === match );
-		return found?.filters ?? [];
-	};
 
-	const { isLoading: isLoadingFields, fields: _fields } = usePostFields( {
+	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
 		postType,
 	} );
-	const fields = useMemo( () => {
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		).map( ( { field } ) => field );
-		return _fields.map( ( field ) => ( {
-			...field,
-			elements: activeViewFilters.includes( field.id )
-				? []
-				: field.elements,
-		} ) );
-	}, [ _fields, defaultViews, activeView ] );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters?.forEach( ( filter ) => {
-			if (
-				filter.field === 'status' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.status = filter.value;
-			}
-			if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.author = filter.value;
-			} else if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_NONE
-			) {
-				filters.author_exclude = filter.value;
-			}
-		} );
-
-		// The bundled views want data filtered without displaying the filter.
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		);
-		activeViewFilters.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
 				filter.operator === OPERATOR_IS_ANY

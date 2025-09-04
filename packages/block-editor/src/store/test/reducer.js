@@ -1963,7 +1963,7 @@ describe( 'state', () => {
 						attributes: {
 							kumquat: { updated: true },
 						},
-						uniqueByBlock: true,
+						options: { uniqueByBlock: true },
 					} );
 
 					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
@@ -3308,7 +3308,7 @@ describe( 'state', () => {
 				attributes: {
 					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
 				},
-				uniqueByBlock: true,
+				options: { uniqueByBlock: true },
 			} );
 
 			expect( state ).toEqual( {

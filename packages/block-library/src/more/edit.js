@@ -7,9 +7,13 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 } from '@wordpress/components';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
+import {
+	InspectorControls,
+	PlainText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -22,29 +26,6 @@ export default function MoreEdit( {
 	insertBlocksAfter,
 	setAttributes,
 } ) {
-	const onChangeInput = ( event ) => {
-		setAttributes( {
-			customText: event.target.value,
-		} );
-	};
-
-	const onKeyDown = ( { keyCode } ) => {
-		if ( keyCode === ENTER ) {
-			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
-		}
-	};
-
-	const getHideExcerptHelp = ( checked ) =>
-		checked
-			? __( 'The excerpt is hidden.' )
-			: __( 'The excerpt is visible.' );
-
-	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
-
-	const style = {
-		width: `${ ( customText ? customText : DEFAULT_TEXT ).length + 1.2 }em`,
-	};
-
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -73,21 +54,34 @@ export default function MoreEdit( {
 								'Hide the excerpt on the full content page'
 							) }
 							checked={ !! noTeaser }
-							onChange={ toggleHideExcerpt }
-							help={ getHideExcerptHelp }
+							onChange={ () =>
+								setAttributes( { noTeaser: ! noTeaser } )
+							}
+							help={ ( checked ) =>
+								checked
+									? __( 'The excerpt is hidden.' )
+									: __( 'The excerpt is visible.' )
+							}
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
-				<input
-					aria-label={ __( '“Read more” link text' ) }
-					type="text"
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( '"Read more" text' ) }
 					value={ customText }
 					placeholder={ DEFAULT_TEXT }
-					onChange={ onChangeInput }
-					onKeyDown={ onKeyDown }
-					style={ style }
+					onChange={ ( value ) =>
+						setAttributes( { customText: value } )
+					}
+					disableLineBreaks
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
+					}
 				/>
 			</div>
 		</>

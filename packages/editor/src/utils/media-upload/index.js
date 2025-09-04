@@ -92,8 +92,8 @@ export default function mediaUpload( {
 			if ( entityFiles?.length ) {
 				const invalidateCache = true;
 				receiveEntityRecords(
-					'root',
-					'media',
+					'postType',
+					'attachment',
 					entityFiles,
 					undefined,
 					invalidateCache

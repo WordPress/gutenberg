@@ -10,6 +10,7 @@ import type {
 	DataViewRenderFieldProps,
 	SortDirection,
 	FieldTypeDefinition,
+	NormalizedField,
 } from '../types';
 import { renderFromElements } from '../utils';
 import { OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
@@ -31,17 +32,22 @@ function sort( a: any, b: any, direction: SortDirection ) {
 	return boolA ? -1 : 1;
 }
 
-function isValid( value: any ) {
-	if ( ! [ true, false, undefined ].includes( value ) ) {
-		return false;
-	}
-
-	return true;
-}
-
 export default {
 	sort,
-	isValid,
+	isValid: {
+		custom: ( item: any, field: NormalizedField< any > ) => {
+			const value = field.getValue( { item } );
+
+			if (
+				! [ undefined, '', null ].includes( value ) &&
+				! [ true, false ].includes( value )
+			) {
+				return __( 'Value must be true, false, or undefined' );
+			}
+
+			return null;
+		},
+	},
 	Edit: 'boolean',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		if ( field.elements ) {

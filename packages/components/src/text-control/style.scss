@@ -18,7 +18,12 @@
 	margin: 0;
 	background: $components-color-background;
 	color: $components-color-foreground;
-	@include input-control( $components-color-accent);
+	@include input-control( $components-color-accent );
+	border-color: $components-color-border;
+
+	&::placeholder {
+		color: $components-color-dark-gray-placeholder;
+	}
 
 	&.is-next-40px-default-size {
 		height: $grid-unit-50;

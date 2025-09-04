@@ -79,6 +79,9 @@ test.describe( 'Quote', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/quote' );
+		await expect(
+			page.getByRole( 'option', { name: 'Quote', exact: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
 		expect( await editor.getEditedPostContent() ).toBe(

@@ -66,7 +66,10 @@ export interface NavigationOptions {
 }
 
 const RoutesContext = createContext< Match | null >( null );
+RoutesContext.displayName = 'RoutesContext';
+
 export const ConfigContext = createContext< Config >( { pathArg: 'p' } );
+ConfigContext.displayName = 'ConfigContext';
 
 const locationMemo = new WeakMap();
 function getLocationWithQuery() {
@@ -221,7 +224,7 @@ export function RouterProvider( {
 	);
 	const matcher = useMemo( () => {
 		const ret = new RouteRecognizer();
-		routes.forEach( ( route ) => {
+		( routes ?? [] ).forEach( ( route ) => {
 			ret.add( [ { path: route.path, handler: route } ], {
 				as: route.name,
 			} );

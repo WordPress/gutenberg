@@ -133,12 +133,12 @@ export default function PostFeaturedImageEdit( {
 
 	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType, getEditedEntityRecord } =
+			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
 			return {
 				media:
 					featuredImage &&
-					getMedia( featuredImage, {
+					getEntityRecord( 'postType', 'attachment', featuredImage, {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),

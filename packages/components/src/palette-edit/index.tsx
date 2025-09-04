@@ -22,7 +22,7 @@ import { useDebounce } from '@wordpress/compose';
  */
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
-import { FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import { HStack } from '../h-stack';
 import { Item, ItemGroup } from '../item-group';
 import { VStack } from '../v-stack';
@@ -229,7 +229,7 @@ function Option< T extends PaletteElement >( {
 				>
 					<IndicatorStyled colorValue={ value } />
 				</Button>
-				<FlexItem>
+				<FlexBlock>
 					{ ! canOnlyChangeValues ? (
 						<NameInput
 							label={
@@ -256,7 +256,7 @@ function Option< T extends PaletteElement >( {
 								  '\u00A0' }
 						</NameContainer>
 					) }
-				</FlexItem>
+				</FlexBlock>
 				{ ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton

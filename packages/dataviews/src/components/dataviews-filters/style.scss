@@ -22,7 +22,9 @@
 	line-height: $default-line-height;
 
 	.components-popover__content {
-		width: 230px;
+		width: 100%;
+		min-width: 230px;
+		max-width: 250px;
 		border-radius: $grid-unit-05;
 	}
 
@@ -78,11 +80,15 @@
 		align-items: center;
 		box-sizing: border-box;
 
+		&.is-not-clickable {
+			cursor: default;
+		}
+
 		&.has-reset {
 			padding-inline-end: $button-size-small + $grid-unit-05;
 		}
 
-		&:hover,
+		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
 			background: $gray-200;

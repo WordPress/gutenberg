@@ -393,8 +393,8 @@ export const StyleBookPreview = ( { userConfig = {}, isStatic = false } ) => {
 	const canUserUploadMedia = useSelect(
 		( select ) =>
 			select( coreStore ).canUser( 'create', {
-				kind: 'root',
-				name: 'media',
+				kind: 'postType',
+				name: 'attachment',
 			} ),
 		[]
 	);

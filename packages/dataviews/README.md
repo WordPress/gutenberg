@@ -193,6 +193,7 @@ Properties:
     -   `field`: which field this filter is bound to.
     -   `operator`: which type of filter it is. See "Operator types".
     -   `value`: the actual value selected by the user.
+    -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
@@ -207,7 +208,7 @@ Properties:
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
 -   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
--   `groupByField`: The id of the field used for grouping the dataset. So far, only the `grid` layout supports grouping.
+-   `groupByField`: The id of the field used for grouping the dataset. Supported by the `grid` and `table` layouts.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
@@ -357,9 +358,9 @@ Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-This property provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
+This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
-For example, this is how you'd enable only the table view type:
+For example, this is how you'd enable only the table and grid layout type and set whether those layouts show media by default:
 
 ```js
 const defaultLayouts = {
@@ -372,7 +373,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -380,11 +381,15 @@ The list of selected items' ids.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
 
+Note: `DataViews` still requires at least one bulk action to make items selectable.
+
 #### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items. It receives the list of selected items' IDs as a parameter.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
+
+Note: `DataViews` still requires at least one bulk action to make items selectable.
 
 #### `isItemClickable`: `function`
 
@@ -415,11 +420,13 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `perPageSizes`: `[ number, number, number, number ]`
+#### `config`: { perPageSizes: number[] }
 
-A list of numbers used to control the available item counts per page.
+Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
 
-It's optional. Defaults to `[10, 20, 50, 100]`.
+#### `empty`: React node
+
+A message or element to be displayed instead of the dataview's default empty message.
 
 ### Composition modes
 
@@ -493,6 +500,78 @@ Developers don't need to worry about the internal accessibility logic for indivi
 
 `FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
 
+## `DataViewsPicker`
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
+
+### Usage
+
+The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
+
+The component behaves differently to a regular `DataViews` component in the following ways:
+
+-   The items in the view are rendered using the `listbox` and `option` aria roles.
+-   Holding the `ctrl` or `cmd` key isn't required for multi-selection of items. The entire item can be clicked to select or deselect it.
+-   Individual items do not display any actions. All actions appear in the footer as text buttons.
+-   Selection is maintained across multiple pages when the component is paginated.
+
+There are also a few differences in the implementation:
+
+-   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
+-   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
+-   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
+-   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
+-   Only the `callback` style of action is supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
+
+Example:
+
+```jsx
+const Example = () => {
+	// When using DataViewsPicker, `selection` should be managed so that the component is 'controlled'.
+	const [ selection, setSelection ] = useState( [] );
+
+	// Both actions have `supportsBulk: true`, so the `DataViewsPicker` will allow multi-selection.
+	const actions = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: true,
+			callback() {
+				window.alert( selection.join( ', ' ) );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: true,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
+	return (
+		<DataViewsPicker
+			actions={ actions }
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			paginationInfo={ paginationInfo }
+			selection={ selection }
+			onChangeSelection={ setSelection }
+		/>
+	);
+};
+```
+
+### Properties
+
 ## `DataForm`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataform--docs">example implementation of the DataForm component</a>.</div>
@@ -554,15 +633,17 @@ const fields = [
 
 #### `form`: `Object[]`
 
--   `type`: either `regular` or `panel`.
--   `labelPosition`: either `side`, `top`, or `none`.
+-   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
 
 Example:
 
 ```js
 const form = {
-	type: 'panel',
+	layout: {
+		type: 'panel',
+		labelPosition: 'side'
+	},
 	fields: [
 		'title',
 		'data',
@@ -938,6 +1019,7 @@ React component that renders the field. This is used by the layouts.
 -   Defaults to `getValue`.
 -   Props
     -   `item` value to be processed.
+    -   `config` object containing configuration options for the field. It's optional. So far, the only object property available is `sizes`: in fields that are set to be the media field, layouts can pass down the expected size reserved for them so that the field can react accordingly.
 -   Returns a React element that represents the field's value.
 
 Example:
@@ -1055,41 +1137,55 @@ Example:
 
 ### `isValid`
 
-Function to validate a field's value.
+Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
--   Type: function.
--   Optional.
--   Args
-    -   `item`: the data to validate
-    -   `context`: an object containing the following props:
-        -   `elements`: the elements defined by the field
--   Returns a boolean, indicating if the field is valid or not.
+- `required`: boolean indicating whether the field is required or not.
+- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Example:
 
 ```js
-// Custom isValid function.
 {
-	isValid: ( item, context ) => {
-		return !! item;
-	};
+	isValid: {
+		custom: ( item: Item, field: NormalizedField<Item> ) => {
+			if ( /* item value is invalid */) {
+				return 'Reason why item value is invalid';
+			}
+
+			return null;
+		}
+	}
 }
 ```
 
+Note that fields that define a type (e.g., `integer`) come with default validation for the type. For example, the `integer` type if the value is a valid integer:
+
 ```js
-// If the field defines a type,
-// it'll get a default isValid function for the type.
 {
-	type: 'number',
+	type: 'integer',
 }
 ```
 
+However, this can be overriden by the field author:
+
 ```js
-// Even if the field provides a type,
-// the field can override the default isValid function.
 {
-	type: 'number',
-	isValid: ( item, context ) => { /* Custom function. */ }
+	type: 'integer',
+	isValid: {
+		custom: ( item: Item, field: NormalizedField<Item> ) => {
+			/* Your custom validation logic. */
+		}
+	}
+}
+```
+
+Fields that define their own Edit component have access to the validation rules via the `field.isValid` object:
+
+```js
+{
+  Edit: ( { field }) => {
+	  return <input required={ !! field.isValid.required } />
+  }
 }
 ```
 
@@ -1164,7 +1260,7 @@ Example:
 
 ### `elements`
 
-List of valid values for a field. If provided, it creates a DataViews' filter for the field. DataForm's edit control will also use these values. (See `Edit` field property.)
+List of valid values for a field. If provided, the field's filter will use these as predefined options instead of using the field's `Edit` function for user input (unless `filterBy` is set to `false`, see below).
 
 -   Type: `array` of objects.
 -   Optional.
@@ -1186,13 +1282,16 @@ Example:
 }
 ```
 
+By default, we add an empty value (label: "Select item"). The label can be overriden by providing an empty element (`{ value: '', label: 'Custom label for empty value'}`).
+
 ### `filterBy`
 
-Configuration of the filters.
+Configuration of the filters. By default, fields have filtering enabled using the field's `Edit` function for user input. When `elements` are provided, the filter will use those as predefined options instead. Set to `false` to opt the field out of filtering entirely.
 
--   Type: `object`.
+-   Type: `object` | `boolean`.
 -   Optional.
--   Properties:
+-   If `false`, the field will not be available for filtering.
+-   If an object, it can have the following properties:
     -   `operators`: the list of operators supported by the field. See "operators" below. A filter will support the `isAny` and `isNone` multi-selection operators by default.
     -   `isPrimary`: boolean, optional. Indicates if the filter is primary. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
@@ -1254,6 +1353,13 @@ Example:
 }
 ```
 
+```js
+// Opt out of filtering entirely.
+{
+	filterBy: false;
+}
+```
+
 ## Form Field API
 
 ### `id`
@@ -1273,31 +1379,57 @@ Example:
 
 ### `layout`
 
-The same as the `form.type`, either `regular` or `panel` only for the individual field. It defaults to `form.type`.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, or Card. This prop is the same as the `form.layout` prop.
 
--   Type: `string`.
+#### Regular
 
-Example:
+- `type`: `regular`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	layout: 'regular'
+	layout: {
+		type: 'regular',
+		labelPosition: 'side'
+	},
 }
 ```
 
-### `labelPosition`
+#### Panel
 
-The same as the `form.labelPosition`, either `side`, `top`, or `none` for the individual field. It defaults to `form.labelPosition`.
+- `type`: `panel`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
--   Type: `string`.
+For example:
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'panel',
+		labelPosition: 'top'
+	},
+}
+```
 
-Example:
+#### Card
+
+- `type`: `card`. Required.
+- `isOpened`: boolean. Optional. `true` by default.
+- `withHeader`: boolean. Optional. `true` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	labelPosition: 'none'
+	layout: {
+		type: 'card',
+		isOpened: false,
+		withHeader: true,
+	},
 }
 ```
 

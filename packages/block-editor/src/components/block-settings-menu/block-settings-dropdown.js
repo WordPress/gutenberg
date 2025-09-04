@@ -88,6 +88,7 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
+		isNavigationMode,
 		isZoomOut,
 	} = useSelect(
 		( select ) => {
@@ -99,6 +100,7 @@ export function BlockSettingsDropdown( {
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
+				isNavigationMode: _isNavigationMode,
 				isZoomOut: _isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 
@@ -124,6 +126,7 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+				isNavigationMode: _isNavigationMode(),
 				isZoomOut: _isZoomOut(),
 			};
 		},
@@ -155,6 +158,7 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
+	const isContentOnlyWriteMode = isNavigationMode && isContentOnly;
 
 	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
 		if ( ! __experimentalSelectBlock ) {
@@ -278,20 +282,24 @@ export function BlockSettingsDropdown( {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									<CopyMenuItem
-										clientIds={ clientIds }
-										onCopy={ onCopy }
-										shortcut={ shortcuts.copy }
-									/>
-									<CopyMenuItem
-										clientIds={ clientIds }
-										label={ __( 'Cut' ) }
-										eventType="cut"
-										shortcut={ shortcuts.cut }
-										__experimentalUpdateSelection={
-											! __experimentalSelectBlock
-										}
-									/>
+									{ ! isContentOnlyWriteMode && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											onCopy={ onCopy }
+											shortcut={ shortcuts.copy }
+										/>
+									) }
+									{ ! isContentOnlyWriteMode && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											label={ __( 'Cut' ) }
+											eventType="cut"
+											shortcut={ shortcuts.cut }
+											__experimentalUpdateSelection={
+												! __experimentalSelectBlock
+											}
+										/>
+									) }
 									{ canDuplicate && (
 										<MenuItem
 											onClick={ pipe(

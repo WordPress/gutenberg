@@ -12,6 +12,11 @@ import { lock } from './lock-unlock';
 import Badge from './badge';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+import {
+	ValidatedNumberControl,
+	ValidatedTextControl,
+	ValidatedToggleControl,
+} from './validated-form-controls';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -27,4 +32,7 @@ lock( privateApis, {
 	DateCalendar,
 	DateRangeCalendar,
 	TZDate,
+	ValidatedNumberControl,
+	ValidatedTextControl,
+	ValidatedToggleControl,
 } );

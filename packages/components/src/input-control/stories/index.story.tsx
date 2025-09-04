@@ -16,8 +16,8 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Components (Experimental)/Selection & Input/InputControl',
-	id: 'components-experimental-inputcontrol',
+	title: 'Components/Selection & Input/Common/InputControl',
+	id: 'components-inputcontrol',
 	component: InputControl,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
@@ -30,6 +30,7 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

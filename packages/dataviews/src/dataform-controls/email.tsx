@@ -1,13 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { privateApis } from '@wordpress/components';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { ValidatedTextControl } = unlock( privateApis );
 
 export default function Email< Item >( {
 	data,
@@ -17,6 +20,12 @@ export default function Email< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedTextControl
+			>[ 'customValidity' ]
+		>( undefined );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -27,7 +36,28 @@ export default function Email< Item >( {
 	);
 
 	return (
-		<TextControl
+		<ValidatedTextControl
+			required={ !! field.isValid?.required }
+			onValidate={ ( newValue: any ) => {
+				const message = field.isValid?.custom?.(
+					{
+						...data,
+						[ id ]: newValue,
+					},
+					field
+				);
+
+				if ( message ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message,
+					} );
+					return;
+				}
+
+				setCustomValidity( undefined );
+			} }
+			customValidity={ customValidity }
 			type="email"
 			label={ label }
 			placeholder={ placeholder }

@@ -35,13 +35,6 @@ const EMPTY_ARRAY = [];
 const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
 		showMedia: false,
-		layout: {
-			styles: {
-				author: {
-					width: '1%',
-				},
-			},
-		},
 	},
 	[ LAYOUT_GRID ]: {
 		showMedia: true,

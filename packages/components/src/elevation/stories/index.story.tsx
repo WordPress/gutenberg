@@ -10,11 +10,12 @@ import { Elevation } from '..';
 
 const meta: Meta< typeof Elevation > = {
 	component: Elevation,
-	title: 'Components (Experimental)/Elevation',
+	title: 'Components/Elevation',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		borderRadius: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,

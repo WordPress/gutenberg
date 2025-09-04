@@ -882,7 +882,7 @@ export const blocks = pipe(
 				const newState = new Map( state );
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
-						action.uniqueByBlock
+						!! action.options?.uniqueByBlock
 							? action.attributes[ clientId ]
 							: action.attributes ?? {}
 					);
@@ -1833,7 +1833,7 @@ export function lastBlockAttributesChange( state = null, action ) {
 			return action.clientIds.reduce(
 				( accumulator, id ) => ( {
 					...accumulator,
-					[ id ]: action.uniqueByBlock
+					[ id ]: !! action.options?.uniqueByBlock
 						? action.attributes[ id ]
 						: action.attributes,
 				} ),

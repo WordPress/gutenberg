@@ -379,8 +379,8 @@ describe( 'getEmbedPreview', () => {
 describe( 'canUser', () => {
 	const ENTITIES = [
 		{
-			name: 'media',
-			kind: 'root',
+			name: 'attachment',
+			kind: 'postType',
 			baseURL: '/wp/v2/media',
 			baseURLParams: { context: 'edit' },
 		},
@@ -417,7 +417,7 @@ describe( 'canUser', () => {
 			'create',
 			'media'
 		)( { dispatch, registry, resolveSelect } );
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -469,7 +469,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -482,7 +482,7 @@ describe( 'canUser', () => {
 		} );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/root/media',
+			'create/postType/attachment',
 			false
 		);
 	} );
@@ -514,7 +514,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -527,7 +527,7 @@ describe( 'canUser', () => {
 		} );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/root/media',
+			'create/postType/attachment',
 			true
 		);
 	} );

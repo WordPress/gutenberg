@@ -452,6 +452,9 @@ describe( 'isUnmodifiedBlock', () => {
 					type: 'string',
 					role: 'content',
 				},
+				metadata: {
+					type: 'object',
+				},
 			},
 			save: noop,
 			category: 'text',
@@ -490,5 +493,24 @@ describe( 'isUnmodifiedBlock', () => {
 	it( 'should return true if no attributes exist for the specified role', () => {
 		const block = createBlock( 'core/test-block' );
 		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( true );
+	} );
+
+	it( 'should return true if metadata attributes is not modified for role content', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+	} );
+
+	it( 'should return false if metadata attributes is modified for role content', () => {
+		const block = createBlock( 'core/test-block', {
+			metadata: {
+				bindings: {
+					content: {
+						source: 'core/post-meta',
+						args: { key: 'genre' },
+					},
+				},
+			},
+		} );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
 	} );
 } );

@@ -389,13 +389,13 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const newTermLabel = labelWithFallback(
 		'new_item_name',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const parentSelectLabel = labelWithFallback(
 		'parent_item',

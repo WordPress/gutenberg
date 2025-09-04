@@ -54,6 +54,7 @@
 @import "./post-featured-image/editor.scss";
 @import "./post-comments-form/editor.scss";
 @import "./editor-elements.scss";
+@import "./utils/poster-image.scss";
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();

@@ -198,6 +198,7 @@
 }
 
 .editor-post-publish-panel {
+	@include reset;
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;

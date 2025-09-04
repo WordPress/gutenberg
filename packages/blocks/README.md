@@ -544,13 +544,7 @@ registerBlockBindingsSource( {
 
 _Parameters_
 
--   _source_ `Object`: Properties of the source to be registered.
--   _source.name_ `string`: The unique and machine-readable name.
--   _source.label_ `[string]`: Human-readable label. Optional when it is defined in the server.
--   _source.usesContext_ `[Array]`: Optional array of context needed by the source only in the editor.
--   _source.getValues_ `[Function]`: Optional function to get the values from the source.
--   _source.setValues_ `[Function]`: Optional function to update multiple values connected to the source.
--   _source.canUserEditValue_ `[Function]`: Optional function to determine if the user can edit the value.
+-   _source_ `WPBlockBindingsSource`: Object describing a block bindings source.
 
 _Changelog_
 

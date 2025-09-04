@@ -149,7 +149,10 @@ describe( 'DataForm component', () => {
 				<Dataform
 					onChange={ noop }
 					fields={ fields }
-					form={ { ...form, labelPosition: 'side' } }
+					form={ {
+						...form,
+						layout: { type: 'regular', labelPosition: 'side' },
+					} }
 					data={ data }
 				/>
 			);
@@ -191,7 +194,10 @@ describe( 'DataForm component', () => {
 	describe( 'in panel mode', () => {
 		const formPanelMode = {
 			...form,
-			type: 'panel' as const,
+			layout: {
+				type: 'panel',
+				labelPosition: 'side',
+			} as const,
 		};
 		it( 'should display fields', async () => {
 			render(
@@ -210,6 +216,175 @@ describe( 'DataForm component', () => {
 				await user.click( button );
 				expect( field.edit() ).toBeInTheDocument();
 			}
+		} );
+
+		it( 'should use dropdown panel type by default', async () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formPanelMode }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			const titleButton = fieldsSelector.title.view();
+			await user.click( titleButton );
+
+			// Should show dropdown content (not modal)
+			expect(
+				screen.getByRole( 'textbox', { name: /title/i } )
+			).toBeInTheDocument();
+			// Should not have modal dialog
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// Should not have modal buttons (Cancel/Apply)
+			expect(
+				screen.queryByRole( 'button', { name: /cancel/i } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: /apply/i } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should use dropdown panel type when explicitly set', async () => {
+			const formWithDropdownPanel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'dropdown',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formWithDropdownPanel }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			const titleButton = fieldsSelector.title.view();
+			await user.click( titleButton );
+
+			// Should show dropdown content
+			expect(
+				screen.getByRole( 'textbox', { name: /title/i } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should use modal panel type when set', async () => {
+			const formWithModalPanel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'modal',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formWithModalPanel }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			const titleButton = fieldsSelector.title.view();
+			await user.click( titleButton );
+
+			// Should show modal content
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'textbox', { name: /title/i } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should close modal when cancel button is clicked', async () => {
+			const formWithModalPanel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'modal',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ fields }
+					form={ formWithModalPanel }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			const titleButton = fieldsSelector.title.view();
+			await user.click( titleButton );
+
+			// Modal should be open
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+
+			// Click cancel button
+			const cancelButton = screen.getByRole( 'button', {
+				name: /cancel/i,
+			} );
+			await user.click( cancelButton );
+
+			// Modal should be closed
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should apply changes and close modal when apply button is clicked', async () => {
+			const onChange = jest.fn();
+			const formWithModalPanel = {
+				...form,
+				layout: {
+					type: 'panel',
+					labelPosition: 'side',
+					openAs: 'modal',
+				} as const,
+			};
+
+			render(
+				<Dataform
+					onChange={ onChange }
+					fields={ fields }
+					form={ formWithModalPanel }
+					data={ data }
+				/>
+			);
+
+			const user = await userEvent.setup();
+			const titleButton = fieldsSelector.title.view();
+			await user.click( titleButton );
+
+			// Modal should be open
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+
+			// Type in the input
+			const titleInput = screen.getByRole( 'textbox', {
+				name: /title/i,
+			} );
+			await user.clear( titleInput );
+			await user.type( titleInput, 'New Title' );
+
+			// Click apply button
+			const applyButton = screen.getByRole( 'button', {
+				name: /apply/i,
+			} );
+			await user.click( applyButton );
+
+			// Modal should be closed and onChange should be called
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			expect( onChange ).toHaveBeenCalledWith( { title: 'New Title' } );
 		} );
 
 		it( 'should call onChange with the correct value for each typed character', async () => {
@@ -243,7 +418,10 @@ describe( 'DataForm component', () => {
 				<Dataform
 					onChange={ noop }
 					fields={ fields }
-					form={ { ...formPanelMode, labelPosition: 'side' } }
+					form={ {
+						...formPanelMode,
+						layout: { type: 'panel', labelPosition: 'side' },
+					} }
 					data={ data }
 				/>
 			);

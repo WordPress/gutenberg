@@ -14,5 +14,7 @@ export const NavigationMenuContext = createContext< NavigationMenuContextType >(
 		search: '',
 	}
 );
+NavigationMenuContext.displayName = 'NavigationMenuContext';
+
 export const useNavigationMenuContext = () =>
 	useContext( NavigationMenuContext );

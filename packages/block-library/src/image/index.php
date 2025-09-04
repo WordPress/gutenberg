@@ -100,7 +100,7 @@ function render_block_core_image( $attributes, $content, $block ) {
  *
  * @param array $block Block data.
  *
- * @return array Filtered block data.
+ * @return array|null Filtered block data.
  */
 function block_core_image_get_lightbox_settings( $block ) {
 	// Gets the lightbox setting from the block attributes.
