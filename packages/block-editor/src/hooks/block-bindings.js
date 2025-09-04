@@ -14,10 +14,11 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
+	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useContext, useState, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -47,7 +48,12 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
+function BlockBindingsPanelMenuContent( {
+	attribute,
+	binding,
+	sources,
+	onOpenModal,
+} ) {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const currentKey = binding?.args?.key;
@@ -64,68 +70,71 @@ function BlockBindingsPanelMenuContent( { attribute, binding, sources } ) {
 	);
 
 	return (
-		<>
+		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
+				// Always render the same structure, but conditionally show content
 				if ( source.mode === 'dropdown' ) {
 					return (
-						<Menu
-							key={ sourceKey }
-							placement={
-								isMobile ? 'bottom-start' : 'left-start'
-							}
-						>
+						<Menu key={ sourceKey }>
 							<Menu.SubmenuTriggerItem>
 								<Menu.ItemLabel>
 									{ source.label }
 								</Menu.ItemLabel>
 							</Menu.SubmenuTriggerItem>
 							<Menu.Popover gutter={ 8 }>
-								<>
-									<Menu.Group>
-										{ Object.entries( source.data )
-											.filter(
-												( [ , args ] ) =>
-													args?.type === attributeType
-											)
-											.map( ( [ , args ] ) => (
-												<Menu.RadioItem
-													key={ args.key }
-													onChange={ ( e ) => {
-														updateBlockBindings( {
-															[ attribute ]: {
-																...binding,
-																...source.getBindingConfig(
-																	e.target
-																		.value
-																),
-															},
-														} );
-													} }
-													name={
-														attribute + '-binding'
-													}
-													value={ args.key }
-													checked={
-														args.key === currentKey
-													}
-												>
-													<Menu.ItemLabel>
-														{ args?.label }
-													</Menu.ItemLabel>
-													<Menu.ItemHelpText>
-														{ args?.value }
-													</Menu.ItemHelpText>
-												</Menu.RadioItem>
-											) ) }
-									</Menu.Group>
-								</>
+								<Menu.Group>
+									{ Object.entries( source.data )
+										.filter(
+											( [ , args ] ) =>
+												args?.type === attributeType
+										)
+										.map( ( [ , args ] ) => (
+											<Menu.RadioItem
+												key={ args.key }
+												onChange={ ( e ) => {
+													updateBlockBindings( {
+														[ attribute ]: {
+															...binding,
+															...source.getBindingConfig(
+																e.target.value
+															),
+														},
+													} );
+												} }
+												name={ attribute + '-binding' }
+												value={ args.key }
+												checked={
+													args.key === currentKey
+												}
+											>
+												<Menu.ItemLabel>
+													{ args?.label }
+												</Menu.ItemLabel>
+												<Menu.ItemHelpText>
+													{ args?.value }
+												</Menu.ItemHelpText>
+											</Menu.RadioItem>
+										) ) }
+								</Menu.Group>
 							</Menu.Popover>
 						</Menu>
 					);
 				}
+
+				if ( source.mode === 'modal' ) {
+					return (
+						<Menu.Item
+							key={ sourceKey }
+							onClick={ () => onOpenModal( sourceKey, source ) }
+						>
+							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
+						</Menu.Item>
+					);
+				}
+
 				return null;
 			} ) }
-		</>
+		</Menu>
 	);
 }
 
@@ -172,6 +181,16 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, sources } ) {
 function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const [ modalState, setModalState ] = useState( null );
+
+	const handleOpenModal = ( sourceKey, source ) => {
+		setModalState( { sourceKey, source } );
+	};
+
+	const handleCloseModal = () => {
+		setModalState( null );
+	};
+
 	return (
 		<>
 			{ attributes.map( ( attribute ) => {
@@ -204,12 +223,18 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 									attribute={ attribute }
 									binding={ binding }
 									sources={ sources }
+									onOpenModal={ handleOpenModal }
 								/>
 							</Menu.Popover>
 						</Menu>
 					</ToolsPanelItem>
 				);
 			} ) }
+			{ modalState && (
+				<Modal onRequestClose={ handleCloseModal }>
+					{ modalState.source.renderModalContent() }
+				</Modal>
+			) }
 		</>
 	);
 }
@@ -222,7 +247,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	// `useSelect` is used purposely here to ensure `getFieldsList`
 	// is updated whenever there are updates in block context.
 	// `source.getFieldsList` may also call a selector via `select`.
-	const _sources = {};
 	const { canUpdateBlockBindings, sources } = useSelect(
 		( select ) => {
 			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
@@ -230,6 +254,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					fieldsList: EMPTY_OBJECT,
 				};
 			}
+			const _sources = {};
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
 				( [ sourceName, { editorUI, usesContext, label } ] ) => {
@@ -245,6 +270,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							select,
 							context,
 						} );
+
 						// Only add source if the list is not empty.
 						if ( editorUIResult.data?.length > 0 ) {
 							_sources[ sourceName ] = {
