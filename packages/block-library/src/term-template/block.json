@@ -17,7 +17,7 @@
 			"allowSwitching": true,
 			"allowEditing": true,
 			"default": {
-				"type": "default"
+				"type": "flex"
 			}
 		},
 		"color": {
