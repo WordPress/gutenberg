@@ -66,7 +66,7 @@ type DataViewsPickerProps< Item > = {
 	config?: {
 		perPageSizes: number[];
 	};
-	label?: string;
+	itemListLabel?: string;
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
@@ -134,7 +134,7 @@ function DataViewsPicker< Item >( {
 	onChangeSelection,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
-	label,
+	itemListLabel,
 	empty,
 }: DataViewsPickerProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
@@ -245,7 +245,7 @@ function DataViewsPicker< Item >( {
 				isShowingFilter,
 				setIsShowingFilter,
 				config,
-				label,
+				itemListLabel,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }

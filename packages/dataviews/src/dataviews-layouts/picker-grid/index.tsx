@@ -255,7 +255,7 @@ function ViewPickerGrid< Item >( {
 	className,
 	empty,
 }: ViewPickerGridProps< Item > ) {
-	const { resizeObserverRef, paginationInfo, label } =
+	const { resizeObserverRef, paginationInfo, itemListLabel } =
 		useContext( DataViewsContext );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
@@ -334,7 +334,7 @@ function ViewPickerGrid< Item >( {
 							'dataviews-view-picker-grid',
 							className
 						) }
-						aria-label={ label }
+						aria-label={ itemListLabel }
 						render={ ( { children, ...props } ) => (
 							<VStack
 								spacing={ 4 }
@@ -426,7 +426,7 @@ function ViewPickerGrid< Item >( {
 						orientation="horizontal"
 						role="listbox"
 						aria-multiselectable={ isMultiselect }
-						aria-label={ label }
+						aria-label={ itemListLabel }
 					>
 						{ data.map( ( item, index ) => {
 							let posinset = isInfiniteScroll

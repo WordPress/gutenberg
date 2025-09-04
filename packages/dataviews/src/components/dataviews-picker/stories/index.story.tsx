@@ -133,7 +133,7 @@ export const Default = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
-				label="Galactic Bodies"
+				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
 					[ LAYOUT_PICKER_GRID ]: {},
 				} }

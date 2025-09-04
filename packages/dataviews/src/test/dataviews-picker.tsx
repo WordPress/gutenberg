@@ -112,7 +112,7 @@ function Picker( {
 		onChangeView: setView,
 		multiselect,
 		selection,
-		label,
+		itemListLabel: label,
 		onChangeSelection: ( newSelection: string[] ) => {
 			onChangeSelection( newSelection );
 			setSelection( newSelection );
