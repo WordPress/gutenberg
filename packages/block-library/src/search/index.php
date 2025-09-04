@@ -407,7 +407,7 @@ function styles_for_block_core_search( $attributes ) {
 		} else {
 			// Numeric check is for backwards compatibility purposes.
 			$border_radius = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
-			// Get spacing CSS variable from preset value if provided.
+			// Get border-radius CSS variable from preset value if provided.
 			if ( is_string( $border_radius ) && str_contains( $border_radius, 'var:preset|border-radius|' ) ) {
 				$index_to_splice = strrpos( $border_radius, '|' ) + 1;
 				$slug            = _wp_to_kebab_case( substr( $border_radius, $index_to_splice ) );
