@@ -23,13 +23,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		ref,
 		fillProps
 	) => {
-		const slot = slots.get( name );
-
-		slots.set( name, {
-			...slot,
-			ref: ref || slot?.ref,
-			fillProps: fillProps || slot?.fillProps || {},
-		} );
+		slots.set( name, { ref, fillProps } );
 	};
 
 	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
@@ -66,12 +60,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 			return;
 		}
 
-		slot.fillProps = fillProps;
-		const slotFills = fills.get( name );
-		if ( slotFills ) {
-			// Force update fills.
-			slotFills.forEach( ( fill ) => fill.current.rerender() );
-		}
+		slots.set( name, { ref, fillProps } );
 	};
 
 	const registerFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (

@@ -3,7 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	RangeControl,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const createPaginationItem = ( content, Tag = 'a', extraClass = '' ) => (
 	<Tag key={ content } className={ `page-numbers ${ extraClass }` }>
@@ -46,28 +55,41 @@ export default function QueryPaginationNumbersEdit( {
 	const paginationNumbers = previewPaginationNumbers(
 		parseInt( midSize, 10 )
 	);
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => setAttributes( { midSize: 2 } ) }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Number of links' ) }
-						help={ __(
-							'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
-						) }
-						value={ midSize }
-						onChange={ ( value ) => {
-							setAttributes( {
-								midSize: parseInt( value, 10 ),
-							} );
-						} }
-						min={ 0 }
-						max={ 5 }
-						withInputField={ false }
-					/>
-				</PanelBody>
+						hasValue={ () => midSize !== 2 }
+						onDeselect={ () => setAttributes( { midSize: 2 } ) }
+						isShownByDefault
+					>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Number of links' ) }
+							help={ __(
+								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
+							) }
+							value={ midSize }
+							onChange={ ( value ) => {
+								setAttributes( {
+									midSize: parseInt( value, 10 ),
+								} );
+							} }
+							min={ 0 }
+							max={ 5 }
+							withInputField={ false }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...useBlockProps() }>{ paginationNumbers }</div>
 		</>

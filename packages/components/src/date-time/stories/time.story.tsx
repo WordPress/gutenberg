@@ -21,7 +21,7 @@ const meta: Meta< typeof TimePicker > = {
 	subcomponents: { 'TimePicker.TimeInput': TimePicker.TimeInput },
 	argTypes: {
 		currentTime: { control: 'date' },
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { action: 'onChange', control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -52,6 +52,9 @@ const Template: StoryFn< typeof TimePicker > = ( {
 };
 
 export const Default: StoryFn< typeof TimePicker > = Template.bind( {} );
+Default.args = {
+	currentTime: new Date(),
+};
 
 const TimeInputTemplate: StoryFn< typeof TimePicker.TimeInput > = ( args ) => {
 	return <TimePicker.TimeInput { ...args } />;

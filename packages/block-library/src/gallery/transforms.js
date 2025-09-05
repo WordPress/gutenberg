@@ -25,7 +25,7 @@ const parseShortcodeIds = ( ids ) => {
 /**
  * Third party block plugins don't have an easy way to detect if the
  * innerBlocks version of the Gallery is running when they run a
- * 3rdPartyBlock -> GalleryBlock transform so this tranform filter
+ * 3rdPartyBlock -> GalleryBlock transform so this transform filter
  * will handle this. Once the innerBlocks version is the default
  * in a core release, this could be deprecated and removed after
  * plugin authors have been given time to update transforms.
@@ -189,7 +189,7 @@ const transforms = {
 			// When created by drag and dropping multiple files on an insertion point. Because multiple
 			// files must not be transformed to a gallery when dropped within a gallery there is another transform
 			// within the image block to handle that case. Therefore this transform has to have priority 1
-			// set so that it overrrides the image block transformation when mulitple images are dropped outside
+			// set so that it overrides the image block transformation when multiple images are dropped outside
 			// of a gallery block.
 			type: 'files',
 			priority: 1,

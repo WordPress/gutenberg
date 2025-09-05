@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "test/router-styles-blue",
+	"title": "E2E Interactivity tests - router styles - Blue",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewStyle": "file:./style.css",
+	"render": "file:./render.php"
+}

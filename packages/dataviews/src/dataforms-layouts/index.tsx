@@ -1,20 +1,25 @@
 /**
  * Internal dependencies
  */
-import FormRegular from './regular';
-import FormPanel from './panel';
+import FormRegularField from './regular';
+import FormPanelField from './panel';
+import FormCardField from './card';
 
-const FORM_LAYOUTS = [
+const FORM_FIELD_LAYOUTS = [
 	{
 		type: 'regular',
-		component: FormRegular,
+		component: FormRegularField,
 	},
 	{
 		type: 'panel',
-		component: FormPanel,
+		component: FormPanelField,
+	},
+	{
+		type: 'card',
+		component: FormCardField,
 	},
 ];
 
-export function getFormLayout( type: string ) {
-	return FORM_LAYOUTS.find( ( layout ) => layout.type === type );
+export function getFormFieldLayout( type: string ) {
+	return FORM_FIELD_LAYOUTS.find( ( layout ) => layout.type === type );
 }

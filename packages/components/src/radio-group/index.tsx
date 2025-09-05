@@ -6,6 +6,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { useMemo, forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
@@ -46,11 +47,21 @@ function UnforwardedRadioGroup(
 		[ radioStore, disabled ]
 	);
 
+	deprecated( 'wp.components.__experimentalRadioGroup', {
+		alternative:
+			'wp.components.RadioControl or wp.components.__experimentalToggleGroupControl',
+		since: '6.8',
+	} );
+
 	return (
 		<RadioGroupContext.Provider value={ contextValue }>
 			<Ariakit.RadioGroup
 				store={ radioStore }
-				render={ <ButtonGroup>{ children }</ButtonGroup> }
+				render={
+					<ButtonGroup __shouldNotWarnDeprecated>
+						{ children }
+					</ButtonGroup>
+				}
 				aria-label={ label }
 				ref={ ref }
 				{ ...props }

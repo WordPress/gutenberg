@@ -12,7 +12,6 @@ import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
-import { layout } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -29,6 +28,7 @@ import {
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
 import { unlock } from '../lock-unlock';
+import { getTemplateInfo } from '../utils/get-template-info';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -195,7 +195,7 @@ export function getCurrentPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {?number} ID of current post.
+ * @return {?(number|string)} The current post ID (number) or template slug (string).
  */
 export function getCurrentPostId( state ) {
 	return state.postId;
@@ -206,7 +206,7 @@ export function getCurrentPostId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Template ID.
+ * @return {?string} Template ID.
  */
 export function getCurrentTemplateId( state ) {
 	return state.templateId;
@@ -330,10 +330,14 @@ const getNestedEditedPostProperty = createSelector(
  * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
  * 		const getFeaturedMediaId =
  * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ * 		const media = select( 'core' ).getEntityRecord(
+ * 			'postType',
+ * 			'attachment',
+ * 			getFeaturedMediaId
+ * 		);
  *
  * 		return (
- * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ * 			media?.media_details?.sizes?.large?.source_url || media?.source_url || ''
  * 		);
  * }, [] );
  *```
@@ -610,9 +614,14 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+		const postTypeObject = select( coreStore ).getPostType( postType );
 
 		// Currently template autosaving is not supported.
-		if ( postType === 'wp_template' ) {
+		// @todo: Remove hardcode check for template after bumping required WP version to 6.8.
+		if (
+			postType === 'wp_template' ||
+			! postTypeObject?.supports?.autosave
+		) {
 			return false;
 		}
 
@@ -1053,6 +1062,26 @@ export function isPostLocked( state ) {
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ * ```jsx
+ * import { __ } from '@wordpress/i18n';
+ * import { store as editorStore } from '@wordpress/editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const isSavingLocked = useSelect(
+ * 		( select ) => select( editorStore ).isPostSavingLocked(),
+ * 		[]
+ * 	);
+ *
+ * 	return isSavingLocked ? (
+ * 		<p>{ __( 'Post saving is locked' ) }</p>
+ * 	) : (
+ * 		<p>{ __( 'Post saving is not locked' ) }</p>
+ * 	);
+ * };
+ * ```
+ *
  * @return {boolean} Is locked.
  */
 export function isPostSavingLocked( state ) {
@@ -1063,6 +1092,26 @@ export function isPostSavingLocked( state ) {
  * Returns whether post autosaving is locked.
  *
  * @param {Object} state Global application state.
+ *
+ * @example
+ * ```jsx
+ * import { __ } from '@wordpress/i18n';
+ * import { store as editorStore } from '@wordpress/editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const isAutoSavingLocked = useSelect(
+ * 		( select ) => select( editorStore ).isPostAutosavingLocked(),
+ * 		[]
+ * 	);
+ *
+ * 	return isAutoSavingLocked ? (
+ * 		<p>{ __( 'Post auto saving is locked' ) }</p>
+ * 	) : (
+ * 		<p>{ __( 'Post auto saving is not locked' ) }</p>
+ * 	);
+ * };
+ * ```
  *
  * @return {boolean} Is locked.
  */
@@ -1220,10 +1269,10 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * Returns the current selection start.
  *
+ * @deprecated since Gutenberg 10.0.0.
+ *
  * @param {Object} state
  * @return {WPBlockSelection} The selection start.
- *
- * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
@@ -1236,10 +1285,10 @@ export function getEditorSelectionStart( state ) {
 /**
  * Returns the current selection end.
  *
+ * @deprecated since Gutenberg 10.0.0.
+ *
  * @param {Object} state
  * @return {WPBlockSelection} The selection end.
- *
- * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
@@ -1702,16 +1751,19 @@ export const getBlockListSettings = getBlockEditorSelector(
 	'getBlockListSettings'
 );
 
-/**
- * Returns the default template types.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} The template types.
- */
-export function __experimentalGetDefaultTemplateTypes( state ) {
-	return getEditorSettings( state )?.defaultTemplateTypes;
-}
+export const __experimentalGetDefaultTemplateTypes = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			"select('core/editor').__experimentalGetDefaultTemplateTypes",
+			{
+				since: '6.8',
+				alternative:
+					"select('core/core-data').getCurrentTheme()?.default_template_types",
+			}
+		);
+		return select( coreStore ).getCurrentTheme()?.default_template_types;
+	}
+);
 
 /**
  * Returns the default template part areas.
@@ -1720,15 +1772,26 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
  *
  * @return {Array} The template part areas.
  */
-export const __experimentalGetDefaultTemplatePartAreas = createSelector(
-	( state ) => {
-		const areas =
-			getEditorSettings( state )?.defaultTemplatePartAreas ?? [];
-		return areas.map( ( item ) => {
-			return { ...item, icon: getTemplatePartIcon( item.icon ) };
-		} );
-	},
-	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
+export const __experimentalGetDefaultTemplatePartAreas = createRegistrySelector(
+	( select ) =>
+		createSelector( () => {
+			deprecated(
+				"select('core/editor').__experimentalGetDefaultTemplatePartAreas",
+				{
+					since: '6.8',
+					alternative:
+						"select('core/core-data').getCurrentTheme()?.default_template_part_areas",
+				}
+			);
+
+			const areas =
+				select( coreStore ).getCurrentTheme()
+					?.default_template_part_areas || [];
+
+			return areas.map( ( item ) => {
+				return { ...item, icon: getTemplatePartIcon( item.icon ) };
+			} );
+		} )
 );
 
 /**
@@ -1739,20 +1802,28 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
  *
  * @return {Object} The template type.
  */
-export const __experimentalGetDefaultTemplateType = createSelector(
-	( state, slug ) => {
-		const templateTypes = __experimentalGetDefaultTemplateTypes( state );
-		if ( ! templateTypes ) {
-			return EMPTY_OBJECT;
-		}
+export const __experimentalGetDefaultTemplateType = createRegistrySelector(
+	( select ) =>
+		createSelector( ( state, slug ) => {
+			deprecated(
+				"select('core/editor').__experimentalGetDefaultTemplateType",
+				{
+					since: '6.8',
+				}
+			);
+			const templateTypes =
+				select( coreStore ).getCurrentTheme()?.default_template_types;
 
-		return (
-			Object.values( templateTypes ).find(
-				( type ) => type.slug === slug
-			) ?? EMPTY_OBJECT
-		);
-	},
-	( state ) => [ __experimentalGetDefaultTemplateTypes( state ) ]
+			if ( ! templateTypes ) {
+				return EMPTY_OBJECT;
+			}
+
+			return (
+				Object.values( templateTypes ).find(
+					( type ) => type.slug === slug
+				) ?? EMPTY_OBJECT
+			);
+		} )
 );
 
 /**
@@ -1763,38 +1834,29 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
-export const __experimentalGetTemplateInfo = createSelector(
-	( state, template ) => {
-		if ( ! template ) {
-			return EMPTY_OBJECT;
-		}
+export const __experimentalGetTemplateInfo = createRegistrySelector(
+	( select ) =>
+		createSelector( ( state, template ) => {
+			deprecated( "select('core/editor').__experimentalGetTemplateInfo", {
+				since: '6.8',
+			} );
 
-		const { description, slug, title, area } = template;
-		const { title: defaultTitle, description: defaultDescription } =
-			__experimentalGetDefaultTemplateType( state, slug );
+			if ( ! template ) {
+				return EMPTY_OBJECT;
+			}
 
-		const templateTitle =
-			typeof title === 'string' ? title : title?.rendered;
-		const templateDescription =
-			typeof description === 'string' ? description : description?.raw;
-		const templateIcon =
-			__experimentalGetDefaultTemplatePartAreas( state ).find(
-				( item ) => area === item.area
-			)?.icon || layout;
+			const currentTheme = select( coreStore ).getCurrentTheme();
 
-		return {
-			title:
-				templateTitle && templateTitle !== slug
-					? templateTitle
-					: defaultTitle || slug,
-			description: templateDescription || defaultDescription,
-			icon: templateIcon,
-		};
-	},
-	( state ) => [
-		__experimentalGetDefaultTemplateTypes( state ),
-		__experimentalGetDefaultTemplatePartAreas( state ),
-	]
+			const templateTypes = currentTheme?.default_template_types || [];
+			const templateAreas =
+				currentTheme?.default_template_part_areas || [];
+
+			return getTemplateInfo( {
+				template,
+				templateAreas,
+				templateTypes,
+			} );
+		} )
 );
 
 /**

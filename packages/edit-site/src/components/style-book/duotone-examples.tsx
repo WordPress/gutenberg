@@ -9,7 +9,11 @@ import { View } from '@wordpress/primitives';
  */
 import type { Duotone } from './types';
 
-const DuotoneExamples = ( { duotones } ): JSX.Element | null => {
+const DuotoneExamples = ( {
+	duotones,
+}: {
+	duotones: Duotone[];
+} ): JSX.Element | null => {
 	if ( ! duotones ) {
 		return null;
 	}

@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
@@ -16,15 +16,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { useMergeRefs } from '@wordpress/compose';
 
 function ButtonBlockAppender(
 	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
-	const inserterButtonRef = useRef();
-
-	const mergedInserterButtonRef = useMergeRefs( [ inserterButtonRef, ref ] );
 	return (
 		<Inserter
 			position="bottom center"
@@ -34,7 +30,6 @@ function ButtonBlockAppender(
 				if ( onSelect && typeof onSelect === 'function' ) {
 					onSelect( ...args );
 				}
-				inserterButtonRef.current?.focus();
 			} }
 			renderToggle={ ( {
 				onToggle,
@@ -61,7 +56,7 @@ function ButtonBlockAppender(
 				return (
 					<Button
 						__next40pxDefaultSize
-						ref={ mergedInserterButtonRef }
+						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
 						className={ clsx(

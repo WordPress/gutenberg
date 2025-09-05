@@ -14,6 +14,7 @@
  * @return string The content of the block being rendered.
  */
 function render_block_core_form( $attributes, $content ) {
+	wp_enqueue_script_module( '@wordpress/block-library/form/view' );
 
 	$processed_content = new WP_HTML_Tag_Processor( $content );
 	$processed_content->next_tag( 'form' );
@@ -41,26 +42,6 @@ function render_block_core_form( $attributes, $content ) {
 		$processed_content->get_updated_html()
 	);
 }
-
-/**
- * Additional data to add to the view.js script for this block.
- */
-function block_core_form_view_script() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
-		return;
-	}
-
-	wp_localize_script(
-		'wp-block-form-view',
-		'wpBlockFormSettings',
-		array(
-			'nonce'   => wp_create_nonce( 'wp-block-form' ),
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'action'  => 'wp_block_form_email_submit',
-		)
-	);
-}
-add_action( 'wp_enqueue_scripts', 'block_core_form_view_script' );
 
 /**
  * Adds extra fields to the form.

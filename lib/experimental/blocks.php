@@ -117,3 +117,22 @@ function gutenberg_register_block_style( $block_name, $style_properties ) {
 
 	return $result;
 }
+
+/**
+ * Additional data to expose to the view script module in the Form block.
+ */
+function gutenberg_block_core_form_view_script_module( $data ) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
+		return $data;
+	}
+
+	$data['nonce']   = wp_create_nonce( 'wp-block-form' );
+	$data['ajaxUrl'] = admin_url( 'admin-ajax.php' );
+	$data['action']  = 'wp_block_form_email_submit';
+
+	return $data;
+}
+add_filter(
+	'script_module_data_@wordpress/block-library/form/view',
+	'gutenberg_block_core_form_view_script_module'
+);

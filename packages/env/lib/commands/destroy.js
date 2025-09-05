@@ -3,15 +3,14 @@
  * External dependencies
  */
 const { v2: dockerCompose } = require( 'docker-compose' );
-const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
-const inquirer = require( 'inquirer' );
+const { confirm } = require( '@inquirer/prompts' );
 
 /**
  * Promisified dependencies
  */
-const rimraf = util.promisify( require( 'rimraf' ) );
+const { rimraf } = require( 'rimraf' );
 
 /**
  * Internal dependencies
@@ -41,14 +40,19 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
 	);
 
-	const { yesDelete } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'yesDelete',
+	let yesDelete = false;
+	try {
+		yesDelete = await confirm( {
 			message: 'Are you sure you want to continue?',
 			default: false,
-		},
-	] );
+		} );
+	} catch ( error ) {
+		if ( error.name === 'ExitPromptError' ) {
+			console.log( 'Cancelled.' );
+			process.exit( 1 );
+		}
+		throw error;
+	}
 
 	spinner.start();
 

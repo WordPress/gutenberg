@@ -71,6 +71,18 @@ sprintf(
 		{
 			code: `sprintf( '%(greeting)s %(toWhom)s', 'Hello', 'World' )`,
 		},
+		{
+			code: `sprintf( 'Rotated at %d %% degrees', 90 )`,
+		},
+		{
+			code: `sprintf( 'Rotated at %d%% degrees', 90 )`,
+		},
+		{
+			code: `sprintf( __( 'Rotated at %d%% degrees' ), 90 )`,
+		},
+		{
+			code: `sprintf( 'Rotated at %1$d %% degrees, %2$d %% angles', 90, 180 )`,
+		},
 	],
 	invalid: [
 		{

@@ -21,7 +21,7 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 function getFormatElement( range, editableContentElement, tagName, className ) {
 	let element = range.startContainer;
 
-	// Even if the active format is defined, the actualy DOM range's start
+	// Even if the active format is defined, the actually DOM range's start
 	// container may be outside of the format's DOM element:
 	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
 	// So at a given selection index, start with the deepest format DOM element.

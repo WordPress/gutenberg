@@ -10,7 +10,9 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
+	privateApis,
 } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -38,7 +40,29 @@ import {
 	blockEditingModes,
 	openedBlockSettingsMenu,
 	expandedBlock,
+	zoomLevel,
+	withDerivedBlockEditingModes,
 } from '../reducer';
+
+import { unlock } from '../../lock-unlock';
+import { sectionRootClientIdKey } from '.././private-keys';
+
+const { isContentBlock } = unlock( privateApis );
+
+jest.mock( '@wordpress/data/src/select', () => {
+	const actualSelect = jest.requireActual( '@wordpress/data/src/select' );
+
+	return {
+		select: jest.fn( ( ...args ) => actualSelect.select( ...args ) ),
+	};
+} );
+
+jest.mock( '@wordpress/blocks/src/api/utils', () => {
+	return {
+		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
+		isContentBlock: jest.fn(),
+	};
+} );
 
 const noop = () => {};
 
@@ -1939,7 +1963,7 @@ describe( 'state', () => {
 						attributes: {
 							kumquat: { updated: true },
 						},
-						uniqueByBlock: true,
+						options: { uniqueByBlock: true },
 					} );
 
 					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
@@ -3284,7 +3308,7 @@ describe( 'state', () => {
 				attributes: {
 					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
 				},
-				uniqueByBlock: true,
+				options: { uniqueByBlock: true },
 			} );
 
 			expect( state ).toEqual( {
@@ -3542,6 +3566,837 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'withDerivedBlockEditingModes', () => {
+		const testReducer = withDerivedBlockEditingModes(
+			combineReducers( {
+				blocks,
+				settings,
+				zoomLevel,
+				blockEditingModes,
+			} )
+		);
+
+		function dispatchActions( actions, reducer, initialState = {} ) {
+			return actions.reduce( ( _state, action ) => {
+				return reducer( _state, action );
+			}, initialState );
+		}
+
+		beforeEach( () => {
+			isContentBlock.mockImplementation(
+				( blockName ) => blockName === 'core/paragraph'
+			);
+		} );
+
+		afterAll( () => {
+			isContentBlock.mockRestore();
+		} );
+
+		describe( 'edit mode', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no block editing modes when zoomed out / navigation mode are not active and there are no synced patterns', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+		} );
+
+		describe( 'synced patterns', () => {
+			let initialState;
+			beforeAll( () => {
+				// Simulates how the editor typically inserts controlled blocks,
+				// - first the pattern is inserted with no inner blocks.
+				// - next the pattern is marked as a controlled block.
+				// - finally, once the inner blocks of the pattern are received, they're inserted.
+				// This process is repeated for the two patterns in this test.
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'INSERT_BLOCKS',
+							rootClientId: '',
+							blocks: [
+								{
+									name: 'core/block',
+									clientId: 'root-pattern',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'root-pattern',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'root-pattern',
+							blocks: [
+								{
+									name: 'core/block',
+									clientId: 'nested-pattern',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/paragraph',
+									clientId: 'pattern-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/group',
+									clientId: 'pattern-group',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId:
+												'pattern-paragraph-with-overrides',
+											attributes: {
+												metadata: {
+													bindings: {
+														__default:
+															'core/pattern-overrides',
+													},
+												},
+											},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'nested-pattern',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'nested-pattern',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'nested-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/group',
+									clientId: 'nested-group',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId:
+												'nested-paragraph-with-overrides',
+											attributes: {
+												metadata: {
+													bindings: {
+														__default:
+															'core/pattern-overrides',
+													},
+												},
+											},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer,
+					initialState
+				);
+			} );
+
+			it( 'returns the expected block editing modes for synced patterns', () => {
+				// Only the parent pattern and its own children that have bindings
+				// are in contentOnly mode. All other blocks are disabled.
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'pattern-paragraph': 'disabled',
+							'pattern-group': 'disabled',
+							'pattern-paragraph-with-overrides': 'contentOnly',
+							'nested-pattern': 'disabled',
+							'nested-paragraph': 'disabled',
+							'nested-group': 'disabled',
+							'nested-paragraph-with-overrides': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'returns the expected block editing modes for synced patterns in navigation mode', () => {
+				expect( initialState.derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section.
+							'paragraph-1': 'contentOnly', // Content block in section.
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly', // Content block in section.
+							'root-pattern': 'contentOnly', // Section.
+							'pattern-paragraph': 'disabled',
+							'pattern-group': 'disabled',
+							'pattern-paragraph-with-overrides': 'contentOnly', // Pattern child with bindings.
+							'nested-pattern': 'disabled',
+							'nested-paragraph': 'disabled',
+							'nested-group': 'disabled',
+							'nested-paragraph-with-overrides': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'removes block editing modes when synced patterns are removed', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'REMOVE_BLOCKS',
+							clientIds: [ 'root-pattern' ],
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'returns the expected block editing modes for synced patterns when switching to zoomed out mode', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'SET_ZOOM_LEVEL',
+							zoom: 'auto-scaled',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section.
+							'paragraph-1': 'disabled',
+							'group-2': 'disabled',
+							'paragraph-2': 'disabled',
+							'root-pattern': 'contentOnly', // Pattern and section.
+							'pattern-paragraph': 'disabled',
+							'pattern-group': 'disabled',
+							'pattern-paragraph-with-overrides': 'disabled',
+							'nested-pattern': 'disabled',
+							'nested-paragraph': 'disabled',
+							'nested-group': 'disabled',
+							'nested-paragraph-with-overrides': 'disabled',
+						} )
+					)
+				);
+			} );
+		} );
+
+		describe( 'navigation mode', () => {
+			let initialState;
+
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: 'section-root',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/template-part',
+									clientId: 'header',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/group',
+									clientId: 'section-root',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/group',
+											clientId: 'group-1',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-1',
+													attributes: {},
+													innerBlocks: [],
+												},
+												{
+													name: 'core/group',
+													clientId: 'group-2',
+													attributes: {},
+													innerBlocks: [
+														{
+															name: 'core/paragraph',
+															clientId:
+																'paragraph-2',
+															attributes: {},
+															innerBlocks: [],
+														},
+													],
+												},
+											],
+										},
+									],
+								},
+								{
+									name: 'core/template-part',
+									clientId: 'footer',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'header',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'header',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'header-group',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'header-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'footer',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'footer',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'footer-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns the expected block editing modes', () => {
+				expect( initialState.derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							header: 'contentOnly', // Template part.
+							'header-group': 'disabled', // Content block in template part.
+							'header-paragraph': 'contentOnly', // Content block in template part.
+							footer: 'contentOnly', // Template part.
+							'footer-paragraph': 'contentOnly', // Content block in template part.
+							'section-root': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'contentOnly', // Content block in section.
+							'group-2': 'disabled', // Non-content block in section.
+							'paragraph-2': 'contentOnly', // Content block in section.
+						} )
+					)
+				);
+			} );
+
+			it( 'allows content blocks to be disabled explicitly using the block editing mode', () => {
+				const {
+					derivedNavModeBlockEditingModes,
+					blockEditingModes: _blockEditingModes,
+				} = dispatchActions(
+					[
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'paragraph-1',
+							mode: 'disabled',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				// Paragraph 1 is explicitly disabled and omitted from the
+				// derived block editing modes.
+				expect( _blockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'paragraph-1': 'disabled',
+						} )
+					)
+				);
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							header: 'contentOnly',
+							'header-group': 'disabled',
+							'header-paragraph': 'contentOnly',
+							footer: 'contentOnly',
+							'footer-paragraph': 'contentOnly',
+							'section-root': 'contentOnly',
+							'group-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'removes block editing modes when blocks are removed', () => {
+				const { derivedNavModeBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'REMOVE_BLOCKS',
+							clientIds: [ 'group-2' ],
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							header: 'contentOnly', // Template part.
+							'header-group': 'disabled', // Content block in template part.
+							'header-paragraph': 'contentOnly', // Content block in template part.
+							footer: 'contentOnly', // Template part.
+							'footer-paragraph': 'contentOnly', // Content block in template part.
+							'section-root': 'contentOnly',
+							'group-1': 'contentOnly',
+							'paragraph-1': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'updates block editing modes when new blocks are inserted', () => {
+				const { derivedNavModeBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'INSERT_BLOCKS',
+							rootClientId: 'section-root',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-3',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-3',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-4',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled', // Section root.
+							header: 'contentOnly', // Template part.
+							'header-group': 'disabled', // Content block in template part.
+							'header-paragraph': 'contentOnly', // Content block in template part.
+							footer: 'contentOnly', // Template part.
+							'footer-paragraph': 'contentOnly', // Content block in template part.
+							'section-root': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'contentOnly', // Content block in section.
+							'group-2': 'disabled', // Non-content block in section.
+							'paragraph-2': 'contentOnly', // Content block in section.
+							'group-3': 'contentOnly', // New section block.
+							'paragraph-3': 'contentOnly', // New content block in section.
+							'group-4': 'disabled', // Non-content block in section.
+						} )
+					)
+				);
+			} );
+
+			it( 'updates block editing modes when blocks are moved to a new position', () => {
+				const { derivedNavModeBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'MOVE_BLOCKS_TO_POSITION',
+							clientIds: [ 'group-2' ],
+							fromRootClientId: 'group-1',
+							toRootClientId: 'section-root',
+						},
+					],
+					testReducer,
+					initialState
+				);
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled', // Section root.
+							header: 'contentOnly', // Template part.
+							'header-group': 'disabled', // Content block in template part.
+							'header-paragraph': 'contentOnly', // Content block in template part.
+							footer: 'contentOnly', // Template part.
+							'footer-paragraph': 'contentOnly', // Content block in template part.
+							'section-root': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'contentOnly', // Content block in section.
+							'group-2': 'contentOnly', // New section block.
+							'paragraph-2': 'contentOnly', // Still a content block in a section.
+						} )
+					)
+				);
+			} );
+
+			it( 'handles changes to the section root', () => {
+				const { derivedNavModeBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: 'group-1',
+							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedNavModeBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							header: 'contentOnly', // Template part.
+							'header-group': 'disabled', // Content block in template part.
+							'header-paragraph': 'contentOnly', // Content block in template part.
+							footer: 'contentOnly', // Template part.
+							'footer-paragraph': 'contentOnly', // Content block in template part.
+							'section-root': 'disabled',
+							'group-1': 'contentOnly', // New section root.
+							'paragraph-1': 'contentOnly', // Section and content block
+							'group-2': 'contentOnly', // Section.
+							'paragraph-2': 'contentOnly', // Content block.
+						} )
+					)
+				);
+			} );
+		} );
+
+		describe( 'zoom out mode', () => {
+			let initialState;
+
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'SET_ZOOM_LEVEL',
+							zoom: 'auto-scaled',
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns the expected block editing modes', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'disabled',
+							'group-2': 'disabled',
+							'paragraph-2': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'removes block editing modes when blocks are removed', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'REMOVE_BLOCKS',
+							clientIds: [ 'group-2' ],
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly',
+							'group-1': 'contentOnly',
+							'paragraph-1': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'updates block editing modes when new blocks are inserted', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'INSERT_BLOCKS',
+							rootClientId: '',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-3',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-3',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-4',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'disabled',
+							'group-2': 'disabled',
+							'paragraph-2': 'disabled',
+							'group-3': 'contentOnly', // New section block.
+							'paragraph-3': 'disabled',
+							'group-4': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'updates block editing modes when blocks are moved to a new position', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'MOVE_BLOCKS_TO_POSITION',
+							clientIds: [ 'group-2' ],
+							fromRootClientId: 'group-1',
+							toRootClientId: '',
+						},
+					],
+					testReducer,
+					initialState
+				);
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'contentOnly', // Section root.
+							'group-1': 'contentOnly', // Section block.
+							'paragraph-1': 'disabled',
+							'group-2': 'contentOnly', // New section block.
+							'paragraph-2': 'disabled',
+						} )
+					)
+				);
+			} );
+
+			it( 'handles changes to the section root', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: 'group-1',
+							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'group-1': 'contentOnly', // New section root.
+							'paragraph-1': 'contentOnly', // Section block.
+							'group-2': 'contentOnly', // Section block.
+							'paragraph-2': 'disabled',
+						} )
+					)
+				);
+			} );
 		} );
 	} );
 } );

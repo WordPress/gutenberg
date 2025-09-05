@@ -3,13 +3,13 @@
  */
 import { useCopyToClipboard } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { copy } from '@wordpress/icons';
+import { copy, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { CopyButton } from './styles';
+import { Button } from '../button';
 import Tooltip from '../tooltip';
 
 import type { ColorCopyButtonProps } from './types';
@@ -55,18 +55,16 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 		};
 	}, [] );
 
+	const isCopied = copiedColor === color.toHex();
+	const label = isCopied ? __( 'Copied!' ) : __( 'Copy' );
+
 	return (
-		<Tooltip
-			delay={ 0 }
-			hideOnClick={ false }
-			text={
-				copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' )
-			}
-		>
-			<CopyButton
-				size="small"
+		<Tooltip delay={ 0 } hideOnClick={ false } text={ label }>
+			<Button
+				size="compact"
+				aria-label={ label }
 				ref={ copyRef }
-				icon={ copy }
+				icon={ isCopied ? check : copy }
 				showTooltip={ false }
 			/>
 		</Tooltip>

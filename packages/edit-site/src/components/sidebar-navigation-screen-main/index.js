@@ -4,8 +4,9 @@
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,48 +16,58 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	NAVIGATION_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-	PATTERN_TYPES,
-} from '../../utils/constants';
 
-export function MainSidebarNavigationContent() {
+export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
-		<ItemGroup>
-			<SidebarNavigationItem
-				uid="navigation-navigation-item"
-				params={ { postType: NAVIGATION_POST_TYPE } }
-				withChevron
-				icon={ navigation }
-			>
-				{ __( 'Navigation' ) }
-			</SidebarNavigationItem>
-			<SidebarNavigationItemGlobalStyles
-				uid="styles-navigation-item"
-				icon={ styles }
-			>
-				{ __( 'Styles' ) }
-			</SidebarNavigationItemGlobalStyles>
-			<SidebarNavigationItem
-				uid="page-navigation-item"
-				params={ { postType: 'page' } }
-				withChevron
-				icon={ page }
-			>
-				{ __( 'Pages' ) }
-			</SidebarNavigationItem>
-			<SidebarNavigationItem
-				uid="template-navigation-item"
-				params={ { postType: TEMPLATE_POST_TYPE } }
-				withChevron
-				icon={ layout }
-			>
-				{ __( 'Templates' ) }
-			</SidebarNavigationItem>
+		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
+			{ isBlockBasedTheme && (
+				<>
+					<SidebarNavigationItemGlobalStyles
+						to="/styles"
+						uid="global-styles-navigation-item"
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
+					<SidebarNavigationItem
+						uid="navigation-navigation-item"
+						to="/navigation"
+						withChevron
+						icon={ navigation }
+					>
+						{ __( 'Navigation' ) }
+					</SidebarNavigationItem>
+					<SidebarNavigationItem
+						uid="page-navigation-item"
+						to="/page"
+						withChevron
+						icon={ page }
+					>
+						{ __( 'Pages' ) }
+					</SidebarNavigationItem>
+					<SidebarNavigationItem
+						uid="template-navigation-item"
+						to="/template"
+						withChevron
+						icon={ layout }
+					>
+						{ __( 'Templates' ) }
+					</SidebarNavigationItem>
+				</>
+			) }
+			{ ! isBlockBasedTheme && (
+				<SidebarNavigationItem
+					uid="stylebook-navigation-item"
+					to="/stylebook"
+					withChevron
+					icon={ styles }
+				>
+					{ __( 'Styles' ) }
+				</SidebarNavigationItem>
+			) }
 			<SidebarNavigationItem
 				uid="patterns-navigation-item"
-				params={ { postType: PATTERN_TYPES.user } }
+				to="/pattern"
 				withChevron
 				icon={ symbol }
 			>
@@ -66,7 +77,11 @@ export function MainSidebarNavigationContent() {
 	);
 }
 
-export default function SidebarNavigationScreenMain() {
+export default function SidebarNavigationScreenMain( { customDescription } ) {
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
@@ -76,14 +91,29 @@ export default function SidebarNavigationScreenMain() {
 		setEditorCanvasContainerView( undefined );
 	}, [ setEditorCanvasContainerView ] );
 
+	let description;
+	if ( customDescription ) {
+		description = customDescription;
+	} else if ( isBlockBasedTheme ) {
+		description = __(
+			'Customize the appearance of your website using the block editor.'
+		);
+	} else {
+		description = __(
+			'Explore block styles and patterns to refine your site.'
+		);
+	}
+
 	return (
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
-			description={ __(
-				'Customize the appearance of your website using the block editor.'
-			) }
-			content={ <MainSidebarNavigationContent /> }
+			description={ description }
+			content={
+				<MainSidebarNavigationContent
+					isBlockBasedTheme={ isBlockBasedTheme }
+				/>
+			}
 		/>
 	);
 }

@@ -8,11 +8,13 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	PanelBody,
+	CheckboxControl,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
@@ -43,6 +45,7 @@ import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -121,7 +124,6 @@ const useIsDraggingWithin = ( elementRef ) => {
  * @property {number}               [id]            A post or term id.
  * @property {boolean}              [opensInNewTab] Sets link target to _blank when true.
  * @property {string}               [url]           Link href.
- * @property {string}               [title]         Link title attribute.
  */
 
 export default function NavigationSubmenuEdit( {
@@ -133,7 +135,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description, rel, title } = attributes;
+	const { label, url, description, rel, opensInNewTab } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -152,6 +154,7 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const {
 		parentCount,
@@ -273,7 +276,7 @@ export default function NavigationSubmenuEdit( {
 			// as it shares the CMD+K shortcut.
 			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
-			// If we don't stop propogation, this event bubbles up to the parent submenu item
+			// If we don't stop propagation, this event bubbles up to the parent submenu item
 			event.stopPropagation();
 			setIsLinkOpen( true );
 			setOpenedBy( ref.current );
@@ -382,67 +385,118 @@ export default function NavigationSubmenuEdit( {
 			</BlockControls>
 			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ label || '' }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							label: '',
+							url: '',
+							description: '',
+							rel: '',
+							opensInNewTab: false,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Text' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ url || '' }
-						onChange={ ( urlValue ) => {
-							setAttributes( { url: urlValue } );
-						} }
+						isShownByDefault
+						hasValue={ () => !! label }
+						onDeselect={ () => setAttributes( { label: '' } ) }
+					>
+						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							value={ label || '' }
+							onChange={ ( labelValue ) => {
+								setAttributes( { label: labelValue } );
+							} }
+							label={ __( 'Text' ) }
+							autoComplete="off"
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Link' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( {
-								description: descriptionValue,
-							} );
-						} }
+						isShownByDefault
+						hasValue={ () => !! url }
+						onDeselect={ () => setAttributes( { url: '' } ) }
+					>
+						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							value={ url || '' }
+							onChange={ ( urlValue ) => {
+								setAttributes( { url: urlValue } );
+							} }
+							label={ __( 'Link' ) }
+							autoComplete="off"
+							type="url"
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'Additional information to help clarify the purpose of the link.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
+						isShownByDefault
+						hasValue={ () => !! description }
+						onDeselect={ () =>
+							setAttributes( { description: '' } )
+						}
+					>
+						<TextareaControl
+							__nextHasNoMarginBottom
+							value={ description || '' }
+							onChange={ ( descriptionValue ) => {
+								setAttributes( {
+									description: descriptionValue,
+								} );
+							} }
+							label={ __( 'Description' ) }
+							help={ __(
+								'The description will be displayed in the menu if the current theme supports it.'
+							) }
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Rel attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'The relationship of the linked URL as space-separated link types.'
-						) }
-					/>
-				</PanelBody>
+						isShownByDefault
+						hasValue={ () => !! rel }
+						onDeselect={ () => setAttributes( { rel: '' } ) }
+					>
+						<TextControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							value={ rel || '' }
+							onChange={ ( relValue ) => {
+								setAttributes( { rel: relValue } );
+							} }
+							label={ __( 'Rel attribute' ) }
+							autoComplete="off"
+							help={ __(
+								'The relationship of the linked URL as space-separated link types.'
+							) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
@@ -461,12 +515,6 @@ export default function NavigationSubmenuEdit( {
 						aria-label={ __( 'Navigation link text' ) }
 						placeholder={ itemLabelPlaceholder }
 						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
 						onClick={ () => {
 							if ( ! openSubmenusOnClick && ! url ) {
 								setIsLinkOpen( true );
@@ -474,6 +522,11 @@ export default function NavigationSubmenuEdit( {
 							}
 						} }
 					/>
+					{ description && (
+						<span className="wp-block-navigation-item__description">
+							{ description }
+						</span>
+					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }

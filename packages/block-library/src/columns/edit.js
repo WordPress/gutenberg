@@ -9,9 +9,11 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	Notice,
-	PanelBody,
 	RangeControl,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 import {
@@ -39,6 +41,7 @@ import {
 	getRedistributedColumnWidths,
 	toWidthPrecision,
 } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const DEFAULT_BLOCK = {
 	name: 'core/column',
@@ -51,19 +54,15 @@ function ColumnInspectorControls( {
 } ) {
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
-			const {
-				canInsertBlockType,
-				canRemoveBlock,
-				getBlocks,
-				getBlockCount,
-			} = select( blockEditorStore );
-			const innerBlocks = getBlocks( clientId );
+			const { canInsertBlockType, canRemoveBlock, getBlockOrder } =
+				select( blockEditorStore );
+			const blockOrder = getBlockOrder( clientId );
 
 			// Get the indexes of columns for which removal is prevented.
 			// The highest index will be used to determine the minimum column count.
-			const preventRemovalBlockIndexes = innerBlocks.reduce(
-				( acc, block, index ) => {
-					if ( ! canRemoveBlock( block.clientId ) ) {
+			const preventRemovalBlockIndexes = blockOrder.reduce(
+				( acc, blockId, index ) => {
+					if ( ! canRemoveBlock( blockId ) ) {
 						acc.push( index );
 					}
 					return acc;
@@ -72,7 +71,7 @@ function ColumnInspectorControls( {
 			);
 
 			return {
-				count: getBlockCount( clientId ),
+				count: blockOrder.length,
 				canInsertColumnBlock: canInsertBlockType(
 					'core/column',
 					clientId
@@ -148,10 +147,20 @@ function ColumnInspectorControls( {
 		replaceInnerBlocks( clientId, innerBlocks );
 	}
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
-		<PanelBody title={ __( 'Settings' ) }>
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				setAttributes( {
+					isStackedOnMobile: true,
+				} );
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
 			{ canInsertColumnBlock && (
-				<>
+				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
 					<RangeControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -170,19 +179,30 @@ function ColumnInspectorControls( {
 							) }
 						</Notice>
 					) }
-				</>
+				</VStack>
 			) }
-			<ToggleControl
-				__nextHasNoMarginBottom
+			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
-				checked={ isStackedOnMobile }
-				onChange={ () =>
+				isShownByDefault
+				hasValue={ () => isStackedOnMobile !== true }
+				onDeselect={ () =>
 					setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
+						isStackedOnMobile: true,
 					} )
 				}
-			/>
-		</PanelBody>
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
+					onChange={ () =>
+						setAttributes( {
+							isStackedOnMobile: ! isStackedOnMobile,
+						} )
+					}
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 }
 
@@ -211,7 +231,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	/**
 	 * Update all child Column blocks with a new vertical alignment setting
 	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
+	 * to override anything set on a individual column basis.
 	 *
 	 * @param {string} newVerticalAlignment The vertical alignment setting.
 	 */

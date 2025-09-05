@@ -32,6 +32,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/media-utils',
+	'@wordpress/upload-media',
 ];
 
 /**
@@ -137,14 +138,16 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
  * @param object      The object to bind the private data to.
  * @param privateData The private data to bind to the object.
  */
-function lock( object: Record< symbol, WeakKey >, privateData: unknown ) {
+function lock( object: unknown, privateData: unknown ) {
 	if ( ! object ) {
 		throw new Error( 'Cannot lock an undefined object.' );
 	}
-	if ( ! ( __private in object ) ) {
-		object[ __private ] = {};
+	const _object = object as Record< symbol, WeakKey >;
+
+	if ( ! ( __private in _object ) ) {
+		_object[ __private ] = {};
 	}
-	lockedData.set( object[ __private ], privateData );
+	lockedData.set( _object[ __private ], privateData );
 }
 
 /**
@@ -170,17 +173,19 @@ function lock( object: Record< symbol, WeakKey >, privateData: unknown ) {
  * @param object The object to unlock the private data from.
  * @return The private data bound to the object.
  */
-function unlock( object: Record< symbol, WeakKey > ) {
+function unlock< T = any >( object: unknown ): T {
 	if ( ! object ) {
 		throw new Error( 'Cannot unlock an undefined object.' );
 	}
-	if ( ! ( __private in object ) ) {
+	const _object = object as Record< symbol, WeakKey >;
+
+	if ( ! ( __private in _object ) ) {
 		throw new Error(
 			'Cannot unlock an object that was not locked before. '
 		);
 	}
 
-	return lockedData.get( object[ __private ] );
+	return lockedData.get( _object[ __private ] );
 }
 
 const lockedData = new WeakMap();

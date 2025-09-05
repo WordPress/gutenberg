@@ -68,8 +68,6 @@ export {
 	usePostScheduleLabel,
 } from './post-schedule/label';
 export { default as PostSchedulePanel } from './post-schedule/panel';
-export { default as PostSlug } from './post-slug';
-export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';

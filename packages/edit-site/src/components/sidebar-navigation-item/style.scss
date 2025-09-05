@@ -9,7 +9,6 @@
 	&:focus,
 	&[aria-current="true"] {
 		color: $gray-200;
-		background: $gray-800;
 
 		.edit-site-sidebar-navigation-item__drilldown-indicator {
 			fill: $gray-200;
@@ -17,8 +16,14 @@
 	}
 
 	&[aria-current="true"] {
-		background: var(--wp-admin-theme-color);
+		background: $gray-800;
 		color: $white;
+		font-weight: $font-weight-medium;
+	}
+
+	// Make sure the focus style is drawn on top of the current item background.
+	&:focus-visible {
+		transform: translateZ(0);
 	}
 
 	.edit-site-sidebar-navigation-item__drilldown-indicator {

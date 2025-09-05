@@ -49,7 +49,7 @@ export default function useMerge( clientId, onMerge ) {
 	 * return the next list item of the parent list item if it exists.
 	 *
 	 * @param {string} id A list item client ID.
-	 * @return {string?} The client ID of the next list item.
+	 * @return {?string} The client ID of the next list item.
 	 */
 	function _getNextId( id ) {
 		const next = getNextBlockClientId( id );
@@ -68,7 +68,7 @@ export default function useMerge( clientId, onMerge ) {
 	 * line, regardless of indentation level.
 	 *
 	 * @param {string} id The client ID of the current list item.
-	 * @return {string?} The client ID of the next list item.
+	 * @return {?string} The client ID of the next list item.
 	 */
 	function getNextId( id ) {
 		const order = getBlockOrder( id );

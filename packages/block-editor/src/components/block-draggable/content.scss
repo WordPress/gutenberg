@@ -1,13 +1,12 @@
 // This creates a "slot" where the block you're dragging appeared.
 // We use !important as one of the rules are meant to be overridden.
 .block-editor-block-list__layout .is-dragging {
-	background-color: currentColor !important;
-	opacity: 0.05 !important;
+	opacity: 0.1 !important;
 	border-radius: $radius-small !important;
 
-	// Disabling pointer events during the drag event is necessary,
-	// lest the block might affect your drag operation.
-	pointer-events: none !important;
+	iframe {
+		pointer-events: none;
+	}
 
 	// Hide the multi selection indicator when dragging.
 	&::selection {
@@ -17,4 +16,11 @@
 	&::after {
 		content: none !important;
 	}
+}
+
+// Images are draggable by default, so disable drag for them if not explicitly
+// set. This is done so that the block can capture the drag event instead.
+.wp-block img:not([draggable]),
+.wp-block svg:not([draggable]) {
+	pointer-events: none;
 }

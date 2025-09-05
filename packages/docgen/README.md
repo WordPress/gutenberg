@@ -6,7 +6,7 @@ Some characteristics:
 
 -   If the export statement doesn't contain any JSDoc, it'll look up for JSDoc up to the declaration.
 -   It can resolve relative dependencies, either files or directories. For example, `import default from './dependency'` will find `dependency.js` or `dependency/index.js`
--   For TypeScript support, all types must be explicity annotated as the TypeScript Babel plugin is unable to consume inferred types (it does not run the TS compiler, after all—it merely parses TypeScript). For example, all function return types must be explicitly annotated if they are to be documented by `docgen`.
+-   For TypeScript support, all types must be explicitly annotated as the TypeScript Babel plugin is unable to consume inferred types (it does not run the TS compiler, after all—it merely parses TypeScript). For example, all function return types must be explicitly annotated if they are to be documented by `docgen`.
 
 ## Installation
 
@@ -169,12 +169,12 @@ with `./count/index.js` contents being:
 
 ````js
 /**
- * Substracts two numbers.
+ * Subtracts two numbers.
  *
  * @example
  *
  * ```js
- * const result = substraction( 5, 2 );
+ * const result = subtraction( 5, 2 );
  * console.log( result ); // Will log 3
  * ```
  *
@@ -182,7 +182,7 @@ with `./count/index.js` contents being:
  * @param {number} term2 Second number.
  * @return {number} The result of subtracting the two numbers.
  */
-export function substraction( term1, term2 ) {
+export function subtraction( term1, term2 ) {
 	return term1 - term2;
 }
 
@@ -233,16 +233,16 @@ console.log( result ); // Will log 7
 
 `number` The result of adding the two numbers.
 
-## substraction
+## subtraction
 
 [example-module.js#L1-L1](example-module.js#L1-L1)
 
-Substracts two numbers.
+Subtracts two numbers.
 
 **Usage**
 
 ```js
-const result = substraction( 5, 2 );
+const result = subtraction( 5, 2 );
 console.log( result ); // Will log 3
 ```
 

@@ -29,14 +29,33 @@ for ( const packageName of packagesWithTypes ) {
 		hasErrors = true;
 	}
 
-	const packageJson = JSON.parse(
-		readFileSync( `packages/${ packageName }/package.json`, 'utf8' )
-	);
-	const tsconfigJson = JSON.parse(
-		stripJsonComments(
-			readFileSync( `packages/${ packageName }/tsconfig.json`, 'utf8' )
-		)
-	);
+	let packageJson;
+	try {
+		packageJson = JSON.parse(
+			readFileSync( `packages/${ packageName }/package.json`, 'utf8' )
+		);
+	} catch ( e ) {
+		console.error(
+			`Error parsing package.json for package ${ packageName }`
+		);
+		throw e;
+	}
+	let tsconfigJson;
+	try {
+		tsconfigJson = JSON.parse(
+			stripJsonComments(
+				readFileSync(
+					`packages/${ packageName }/tsconfig.json`,
+					'utf8'
+				)
+			)
+		);
+	} catch ( e ) {
+		console.error(
+			`Error parsing tsconfig.json for package ${ packageName }`
+		);
+		throw e;
+	}
 	if ( packageJson.dependencies ) {
 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
 			if ( dependency.startsWith( '@wordpress/' ) ) {

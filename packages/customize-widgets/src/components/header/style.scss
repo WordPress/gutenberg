@@ -33,16 +33,26 @@
 		border-radius: $radius-small;
 		color: $white;
 		padding: 0;
-		min-width: $grid-unit-30;
-		height: $grid-unit-30;
+		min-width: $grid-unit-40;
+		height: $grid-unit-40;
 		margin: $grid-unit-15 0 $grid-unit-15 auto;
 
 		&::before {
 			content: none;
 		}
 
+		svg {
+			@media not (prefers-reduced-motion) {
+				transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+			}
+		}
+
 		&.is-pressed {
 			background: $gray-900;
+
+			svg {
+				transform: rotate(45deg);
+			}
 		}
 	}
 

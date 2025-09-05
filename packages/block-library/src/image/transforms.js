@@ -59,6 +59,7 @@ const schema = ( { phrasingContentSchema } ) => ( {
 			...imageSchema,
 			a: {
 				attributes: [ 'href', 'rel', 'target' ],
+				classes: [ '*' ],
 				children: imageSchema,
 			},
 			figcaption: {

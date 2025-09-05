@@ -34,11 +34,7 @@ import {
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	CommandMenu,
-	privateApis as commandsPrivateApis,
-} from '@wordpress/commands';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -74,9 +70,9 @@ import useEditPostCommands from '../../commands/use-commands';
 import { usePaddingAppender } from './use-padding-appender';
 import { useShouldIframe } from './use-should-iframe';
 import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
+import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
-const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { Editor, FullscreenMode, NavigableRegion } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -171,11 +167,14 @@ function MetaBoxesMain( { isLegacy } ) {
 	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
-	// aria-valuenow attribute on the seperator.
+	// aria-valuenow attribute on the separator.
 	const effectSizeConstraints = useRefEffect( ( node ) => {
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
 		);
+		if ( ! container ) {
+			return;
+		}
 		const noticeLists = container.querySelectorAll(
 			':scope > .components-notice-list'
 		);
@@ -328,7 +327,9 @@ function MetaBoxesMain( { isLegacy } ) {
 			// the event to end the drag is captured by the target (resize handle)
 			// whether or not it’s under the pointer.
 			onPointerDown: ( { pointerId, target } ) => {
-				target.setPointerCapture( pointerId );
+				if ( separatorRef.current.parentElement.contains( target ) ) {
+					target.setPointerCapture( pointerId );
+				}
 			},
 			onResizeStart: ( event, direction, elementRef ) => {
 				if ( isAutoHeight ) {
@@ -370,7 +371,6 @@ function Layout( {
 	settings,
 	initialEdits,
 } ) {
-	useCommands();
 	useEditPostCommands();
 	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -387,19 +387,20 @@ function Layout( {
 	const {
 		mode,
 		isFullscreenActive,
+		hasResolvedMode,
 		hasActiveMetaboxes,
 		hasBlockSelected,
 		showIconLabels,
 		isDistractionFree,
 		showMetaBoxes,
-		hasHistory,
 		isWelcomeGuideVisible,
 		templateId,
 		enablePaddingAppender,
+		isDevicePreview,
 	} = useSelect(
 		( select ) => {
 			const { get } = select( preferencesStore );
-			const { isFeatureActive } = select( editPostStore );
+			const { isFeatureActive, hasMetaBoxes } = select( editPostStore );
 			const { canUser, getPostType, getTemplateId } = unlock(
 				select( coreStore )
 			);
@@ -411,34 +412,49 @@ function Layout( {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
-			const { isZoomOut } = unlock( select( blockEditorStore ) );
-			const { getEditorMode, getRenderingMode } = select( editorStore );
+			const { getBlockSelectionStart, isZoomOut } = unlock(
+				select( blockEditorStore )
+			);
+			const {
+				getEditorMode,
+				getRenderingMode,
+				getDefaultRenderingMode,
+				getDeviceType,
+			} = unlock( select( editorStore ) );
 			const isRenderingPostOnly = getRenderingMode() === 'post-only';
+			const isNotDesignPostType =
+				! DESIGN_POST_TYPES.includes( currentPostType );
+			const isDirectlyEditingPattern =
+				currentPostType === 'wp_block' &&
+				! onNavigateToPreviousEntityRecord;
+			const _templateId = getTemplateId( currentPostType, currentPostId );
+			const defaultMode = getDefaultRenderingMode( currentPostType );
 
 			return {
 				mode: getEditorMode(),
-				isFullscreenActive:
-					select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-				hasBlockSelected:
-					!! select( blockEditorStore ).getBlockSelectionStart(),
+				isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
+				hasActiveMetaboxes: hasMetaBoxes(),
+				hasResolvedMode:
+					defaultMode === 'template-locked'
+						? !! _templateId
+						: defaultMode !== undefined,
+				hasBlockSelected: !! getBlockSelectionStart(),
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				showMetaBoxes:
-					! DESIGN_POST_TYPES.includes( currentPostType ) &&
-					! isZoomOut(),
+					( isNotDesignPostType && ! isZoomOut() ) ||
+					isDirectlyEditingPattern,
 				isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 				templateId:
 					supportsTemplateMode &&
 					isViewable &&
 					canViewTemplate &&
 					! isEditingTemplate
-						? getTemplateId( currentPostType, currentPostId )
+						? _templateId
 						: null,
 				enablePaddingAppender:
-					! isZoomOut() &&
-					isRenderingPostOnly &&
-					! DESIGN_POST_TYPES.includes( currentPostType ),
+					! isZoomOut() && isRenderingPostOnly && isNotDesignPostType,
+				isDevicePreview: getDeviceType() !== 'Desktop',
 			};
 		},
 		[
@@ -446,8 +462,12 @@ function Layout( {
 			currentPostId,
 			isEditingTemplate,
 			settings.supportsTemplateMode,
+			onNavigateToPreviousEntityRecord,
 		]
 	);
+
+	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
+
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		enablePaddingAppender
 	);
@@ -559,8 +579,7 @@ function Layout( {
 
 	return (
 		<SlotFillProvider>
-			<ErrorBoundary>
-				<CommandMenu />
+			<ErrorBoundary canCopyContent>
 				<WelcomeGuide postType={ currentPostType } />
 				<div
 					className={ navigateRegionsProps.className }
@@ -588,14 +607,18 @@ function Layout( {
 						extraContent={
 							! isDistractionFree &&
 							showMetaBoxes && (
-								<MetaBoxesMain isLegacy={ ! shouldIframe } />
+								<MetaBoxesMain
+									isLegacy={
+										! shouldIframe || isDevicePreview
+									}
+								/>
 							)
 						}
 					>
 						<PostLockedModal />
 						<EditorInitialization />
 						<FullscreenMode isActive={ isFullscreenActive } />
-						<BrowserURL hasHistory={ hasHistory } />
+						<BrowserURL />
 						<UnsavedChangesWarning />
 						<AutosaveMonitor />
 						<LocalAutosaveMonitor />

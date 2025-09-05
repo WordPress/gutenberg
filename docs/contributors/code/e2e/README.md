@@ -75,7 +75,7 @@ To encourage better practices for querying elements, selectors are [strict](http
 
 ### Favor Page Object Model over utils
 
-As mentioned above, [Page Object Model](https://playwright.dev/docs/test-pom) is the preferred way to create reusable utility functions on a certain page.
+As mentioned above, [Page Object Model](https://playwright.dev/docs/pom) is the preferred way to create reusable utility functions on a certain page.
 
 The rationale behind using a POM is to group utils under namespaces to be easier to discover and use. In fact, `PageUtils` in the `e2e-test-utils-playwright` package is also a POM, which avoids the need for global variables, and utils can reference each other with `this`.
 

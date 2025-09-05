@@ -1,0 +1,17 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "gutenberg-env" ]
+	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../blob" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../private-apis" },
+		{ "path": "../url" }
+	]
+}

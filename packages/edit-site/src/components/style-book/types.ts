@@ -1,4 +1,4 @@
-type Block = {
+export type Block = {
 	name: string;
 	attributes: Record< string, unknown >;
 	innerBlocks?: Block[];
@@ -32,7 +32,7 @@ export type StyleBookColorGroup = {
 	origin: string;
 	slug: string;
 	title: string;
-	type: string;
+	type: 'colors' | 'gradients' | 'duotones';
 };
 
 export type Color = { slug: string };
@@ -40,6 +40,13 @@ export type Gradient = { slug: string };
 export type Duotone = {
 	colors: string[];
 	slug: string;
+};
+
+export type ColorExampleProps = {
+	colors: Color[] | Gradient[];
+	type: StyleBookColorGroup[ 'type' ];
+	templateColumns?: string | number;
+	itemHeight?: string;
 };
 
 export type ColorOrigin = {
@@ -57,4 +64,17 @@ export type MultiOriginPalettes = {
 	colors: Omit< ColorOrigin, 'gradients' | 'duotones' >;
 	duotones: Omit< ColorOrigin, 'colors' | 'gradients' >;
 	gradients: Omit< ColorOrigin, 'colors' | 'duotones' >;
+};
+
+/*
+ * Typing the items from getBlockTypes from '@wordpress/blocks'
+ * to appease the TS linter.
+ */
+export type BlockType = {
+	name: string;
+	title: string;
+	category: string;
+	example: BlockType;
+	attributes: Record< string, unknown >;
+	supports: Record< string, unknown >;
 };

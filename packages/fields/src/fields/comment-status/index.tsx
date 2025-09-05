@@ -15,9 +15,7 @@ const commentStatusField: Field< BasePost > = {
 	type: 'text',
 	Edit: 'radio',
 	enableSorting: false,
-	filterBy: {
-		operators: [],
-	},
+	filterBy: false,
 	elements: [
 		{
 			value: 'open',

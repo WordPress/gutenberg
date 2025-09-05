@@ -10,7 +10,7 @@ import {
  * Internal dependencies
  */
 import PresetColors from './preset-colors';
-import PreviewIframe from './preview-iframe';
+import PreviewWrapper from './preview-wrapper';
 
 const firstFrameVariants = {
 	start: {
@@ -25,7 +25,7 @@ const firstFrameVariants = {
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	return (
-		<PreviewIframe
+		<PreviewWrapper
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
@@ -51,7 +51,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 					</HStack>
 				</motion.div>
 			) }
-		</PreviewIframe>
+		</PreviewWrapper>
 	);
 };
 

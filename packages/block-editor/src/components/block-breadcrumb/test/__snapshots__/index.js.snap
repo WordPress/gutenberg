@@ -11,7 +11,9 @@ exports[`BlockBreadcrumb should render correctly 1`] = `
       aria-current="true"
       class="block-editor-block-breadcrumb__current"
     >
-      Document
+      <span>
+        Document
+      </span>
     </li>
   </ul>
 </div>

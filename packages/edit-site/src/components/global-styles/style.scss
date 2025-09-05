@@ -6,7 +6,7 @@
 	cursor: pointer;
 }
 
-.edit-site-global-styles-preview__iframe {
+.edit-site-global-styles-preview__wrapper {
 	max-width: 100%;
 	display: block;
 	width: 100%;
@@ -104,8 +104,8 @@
 	flex-shrink: 0;
 }
 
-.edit-site-global-styles__shadows-panel__title,
-.edit-site-global-styles__shadows-panel__options-container {
+.edit-site-global-styles__shadows-panel__options-container,
+.edit-site-global-styles__typography-panel__options-container {
 	height: $grid-unit * 3;
 }
 
@@ -146,20 +146,42 @@
 
 .edit-site-global-styles__shadow-editor__dropdown {
 	width: 100%;
+	position: relative;
+}
 
-	.edit-site-global-styles__shadow-editor__dropdown-toggle,
-	.edit-site-global-styles__shadow-editor__remove-button {
-		width: 100%;
-		height: auto;
-		padding-top: $grid-unit;
-		padding-bottom: $grid-unit;
-		text-align: left;
-		border-radius: inherit;
+.edit-site-global-styles__shadow-editor__dropdown-toggle {
+	width: 100%;
+	height: auto;
+	padding-top: $grid-unit;
+	padding-bottom: $grid-unit;
+	text-align: left;
+	border-radius: inherit;
 
-		&.is-open {
-			background: $gray-100;
-			color: var(--wp-admin-theme-color);
-		}
+	&.is-open {
+		background: $gray-100;
+		color: var(--wp-admin-theme-color);
+	}
+}
+
+.edit-site-global-styles__shadow-editor__remove-button {
+	position: absolute;
+	right: $grid-unit;
+	top: $grid-unit;
+	opacity: 0;
+
+	&.edit-site-global-styles__shadow-editor__remove-button {
+		border: none;
+	}
+
+	.edit-site-global-styles__shadow-editor__dropdown-toggle:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }
 
@@ -206,9 +228,18 @@
 	}
 }
 
+.edit-site-global-styles-sidebar__navigator-provider {
+	height: 100%;
+}
+
 .edit-site-global-styles-sidebar__navigator-screen {
 	display: flex;
 	flex-direction: column;
+	height: 100%;
+}
+
+.edit-site-global-styles-sidebar__navigator-screen .single-column {
+	grid-column: span 1;
 }
 
 .edit-site-global-styles-screen-root.edit-site-global-styles-screen-root,

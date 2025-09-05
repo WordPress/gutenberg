@@ -25,7 +25,7 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
 
 	return (
 		<Button
-			size="small"
+			size="compact"
 			onClick={ onClick }
 			icon={ fullscreen }
 			isPressed={ isModalFullScreen }

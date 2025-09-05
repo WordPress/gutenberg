@@ -39,7 +39,7 @@ Determines if the given blocks are allowed to be inserted into the block list.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be inserted.
+-   _clientIds_ `string[]`: The block client IDs to be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -190,7 +190,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Block attributes.
+-   `?Object`: Block attributes.
 
 ### getBlockCount
 
@@ -448,7 +448,7 @@ Determines the items that appear in the available block transforms list.
 
 Each item object contains what's necessary to display a menu item in the transform list and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequency and recency.
 
 Items are returned ordered descendingly by their 'frecency'.
 
@@ -521,7 +521,7 @@ _Properties_
 
 -   _name_ `string`: The type of block.
 -   _attributes_ `?Object`: Attributes to pass to the newly created block.
--   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjecent blocks when inserted.
+-   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjacent blocks when inserted.
 
 ### getDraggedBlockClientIds
 
@@ -564,15 +564,9 @@ _Returns_
 
 ### getHoveredBlockClientId
 
+> **Deprecated**
+
 Returns the currently hovered block.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -580,7 +574,7 @@ Determines the items that appear in the inserter. Includes both static items (e.
 
 Each item object contains what's necessary to display a button in the inserter and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequency and recency.
 
 Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
@@ -714,7 +708,7 @@ Returns the list of patterns based on their declared `blockTypes` and a block's 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _blockNames_ `string|string[]`: Block's name or array of block names to find matching pattens.
+-   _blockNames_ `string|string[]`: Block's name or array of block names to find matching patterns.
 -   _rootClientId_ `?string`: Optional target root client ID.
 
 _Returns_
@@ -1298,15 +1292,9 @@ Action that hides the insertion point.
 
 ### hoverBlock
 
+> **Deprecated**
+
 Returns an action object used in signalling that the block with the specified client ID has been hovered.
-
-_Parameters_
-
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### insertAfterBlock
 
@@ -1881,8 +1869,9 @@ Action that updates attributes of multiple blocks with the specified client IDs.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
--   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+-   _options_ `Object`: Updating options.
+-   _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
 
 _Returns_
 

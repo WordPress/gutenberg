@@ -5,7 +5,10 @@ const baseConfig = require( '../../../storybook/main' );
 
 const config = {
 	...baseConfig,
-	addons: [ '@storybook/addon-toolbars' ],
+	addons: [
+		'@storybook/addon-toolbars',
+		'@storybook/addon-webpack5-compiler-babel',
+	],
 	docs: undefined,
 	staticDirs: undefined,
 	stories: [

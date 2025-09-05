@@ -11,11 +11,12 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	ToggleControl,
-	PanelBody,
 	Placeholder,
 	Button,
 	Spinner,
 	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -26,6 +27,8 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -38,19 +41,40 @@ import { store as noticesStore } from '@wordpress/notices';
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
-function getMediaSourceUrlBySizeSlug( media, slug ) {
+function FeaturedImageResolutionTool( { image, value, onChange } ) {
+	const { imageSizes } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			imageSizes: getSettings().imageSizes,
+		};
+	}, [] );
+
+	if ( ! imageSizes?.length ) {
+		return null;
+	}
+
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+
 	return (
-		media?.media_details?.sizes?.[ slug ]?.source_url || media?.source_url
+		<ResolutionTool
+			value={ value }
+			defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+			options={ imageSizeOptions }
+			onChange={ onChange }
+		/>
 	);
 }
-
-const disabledClickProps = {
-	onClick: ( event ) => event.preventDefault(),
-	'aria-disabled': true,
-};
 
 export default function PostFeaturedImageEdit( {
 	clientId,
@@ -109,12 +133,12 @@ export default function PostFeaturedImageEdit( {
 
 	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType, getEditedEntityRecord } =
+			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
 			return {
 				media:
 					featuredImage &&
-					getMedia( featuredImage, {
+					getEntityRecord( 'postType', 'attachment', featuredImage, {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
@@ -128,7 +152,9 @@ export default function PostFeaturedImageEdit( {
 		[ featuredImage, postTypeSlug, postId ]
 	);
 
-	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
+	const mediaUrl =
+		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
+		media?.source_url;
 
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
@@ -170,6 +196,17 @@ export default function PostFeaturedImageEdit( {
 		}
 	};
 
+	// On reset image
+	const onResetImage = () => {
+		setAttributes( {
+			isLink: false,
+			linkTarget: '_self',
+			rel: '',
+			sizeSlug: undefined,
+		} );
+		setFeaturedImage( 0 );
+	};
+
 	// Reset temporary url when media is available.
 	useEffect( () => {
 		if ( mediaUrl && temporaryURL ) {
@@ -182,6 +219,8 @@ export default function PostFeaturedImageEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 		setTemporaryURL();
 	};
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const controls = blockEditingMode === 'default' && (
 		<>
@@ -200,47 +239,115 @@ export default function PostFeaturedImageEdit( {
 					media={ media }
 				/>
 			</InspectorControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={
-							postType?.labels.singular_name
-								? sprintf(
-										// translators: %s: Name of the post type e.g: "post".
-										__( 'Link to %s' ),
-										postType.labels.singular_name
-								  )
-								: __( 'Link to post' )
-						}
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-					{ isLink && (
-						<>
+			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								isLink: false,
+								linkTarget: '_self',
+								rel: '',
+								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							label={
+								postType?.labels.singular_name
+									? sprintf(
+											// translators: %s: Name of the post type e.g: "post".
+											__( 'Link to %s' ),
+											postType.labels.singular_name
+									  )
+									: __( 'Link to post' )
+							}
+							isShownByDefault
+							hasValue={ () => !! isLink }
+							onDeselect={ () =>
+								setAttributes( {
+									isLink: false,
+								} )
+							}
+						>
 							<ToggleControl
 								__nextHasNoMarginBottom
+								label={
+									postType?.labels.singular_name
+										? sprintf(
+												// translators: %s: Name of the post type e.g: "post".
+												__( 'Link to %s' ),
+												postType.labels.singular_name
+										  )
+										: __( 'Link to post' )
+								}
+								onChange={ () =>
+									setAttributes( { isLink: ! isLink } )
+								}
+								checked={ isLink }
+							/>
+						</ToolsPanelItem>
+
+						{ isLink && (
+							<ToolsPanelItem
 								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
+								isShownByDefault
+								hasValue={ () => '_self' !== linkTarget }
+								onDeselect={ () =>
 									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
+										linkTarget: '_self',
 									} )
 								}
-								checked={ linkTarget === '_blank' }
-							/>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Open in new tab' ) }
+									onChange={ ( value ) =>
+										setAttributes( {
+											linkTarget: value
+												? '_blank'
+												: '_self',
+										} )
+									}
+									checked={ linkTarget === '_blank' }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ isLink && (
+							<ToolsPanelItem
 								label={ __( 'Link rel' ) }
-								value={ rel }
-								onChange={ ( newRel ) =>
-									setAttributes( { rel: newRel } )
+								isShownByDefault
+								hasValue={ () => !! rel }
+								onDeselect={ () =>
+									setAttributes( {
+										rel: '',
+									} )
+								}
+							>
+								<TextControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Link rel' ) }
+									value={ rel }
+									onChange={ ( newRel ) =>
+										setAttributes( { rel: newRel } )
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+						{ !! media && (
+							<FeaturedImageResolutionTool
+								image={ media }
+								value={ sizeSlug }
+								onChange={ ( nextSizeSlug ) =>
+									setAttributes( { sizeSlug: nextSizeSlug } )
 								}
 							/>
-						</>
-					) }
-				</PanelBody>
-			</InspectorControls>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 		</>
 	);
 
@@ -261,11 +368,7 @@ export default function PostFeaturedImageEdit( {
 				{ controls }
 				<div { ...blockProps }>
 					{ !! isLink ? (
-						<a
-							href={ postPermalink }
-							target={ linkTarget }
-							{ ...disabledClickProps }
-						>
+						<a href={ postPermalink } target={ linkTarget }>
 							{ placeholder() }
 						</a>
 					) : (
@@ -366,18 +469,14 @@ export default function PostFeaturedImageEdit( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-						onReset={ () => setFeaturedImage( 0 ) }
+						onReset={ onResetImage }
 					/>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>
 				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
 				{ !! isLink ? (
-					<a
-						href={ postPermalink }
-						target={ linkTarget }
-						{ ...disabledClickProps }
-					>
+					<a href={ postPermalink } target={ linkTarget }>
 						{ image }
 					</a>
 				) : (

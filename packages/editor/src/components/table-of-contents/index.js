@@ -61,6 +61,6 @@ function TableOfContents(
  * @param {boolean}     props.repositionDropdown      Whether to reposition the dropdown.
  * @param {Element.ref} ref                           The component's ref.
  *
- * @return {JSX.Element} The rendered table of contents component.
+ * @return {React.ReactNode} The rendered table of contents component.
  */
 export default forwardRef( TableOfContents );

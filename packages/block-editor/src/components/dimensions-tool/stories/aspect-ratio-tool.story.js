@@ -13,10 +13,11 @@ import {
 import AspectRatioTool from '../aspect-ratio-tool';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsTool/AspectRatioTool',
+	title: 'BlockEditor/DimensionsTool/AspectRatioTool',
 	component: AspectRatioTool,
+	tags: [ 'status-private' ],
 	argTypes: {
-		panelId: { control: { type: null } },
+		panelId: { control: false },
 		onChange: { action: 'changed' },
 	},
 };

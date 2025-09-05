@@ -9,19 +9,22 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
+import { CreateTemplatePartModal } from '@wordpress/fields';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { canCreate } = useSelect( ( select ) => {
+	const { isBlockBasedTheme, canCreate } = useSelect( ( select ) => {
 		return {
+			isBlockBasedTheme:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
 			canCreate:
 				select( blockEditorStore ).canInsertBlockType(
 					'core/template-part'
@@ -29,7 +32,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 		};
 	}, [] );
 
-	if ( ! canCreate ) {
+	if ( ! isBlockBasedTheme || ! canCreate ) {
 		return null;
 	}
 

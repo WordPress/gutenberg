@@ -444,17 +444,6 @@ export default function DimensionsPanel( {
 
 	const onMouseLeaveControls = () => onVisualize( false );
 
-	const inputProps = {
-		min: minMarginValue,
-		onDragStart: () => {
-			//Reset to 0 in case the value was negative.
-			setMinMarginValue( 0 );
-		},
-		onDragEnd: () => {
-			setMinMarginValue( minimumMargin );
-		},
-	};
-
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -545,8 +534,10 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
-							onMouseOver={ onMouseOverPadding }
-							onMouseOut={ onMouseLeaveControls }
+							inputProps={ {
+								onMouseOver: onMouseOverPadding,
+								onMouseOut: onMouseLeaveControls,
+							} }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -581,14 +572,23 @@ export default function DimensionsPanel( {
 							__next40pxDefaultSize
 							values={ marginValues }
 							onChange={ setMarginValues }
-							inputProps={ inputProps }
+							inputProps={ {
+								min: minMarginValue,
+								onDragStart: () => {
+									// Reset to 0 in case the value was negative.
+									setMinMarginValue( 0 );
+								},
+								onDragEnd: () => {
+									setMinMarginValue( minimumMargin );
+								},
+								onMouseOver: onMouseOverMargin,
+								onMouseOut: onMouseLeaveControls,
+							} }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
-							onMouseOver={ onMouseOverMargin }
-							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 					{ showSpacingPresetsControl && (

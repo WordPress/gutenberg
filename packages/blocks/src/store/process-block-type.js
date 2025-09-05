@@ -15,11 +15,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
-import {
-	BLOCK_ICON_DEFAULT,
-	DEPRECATED_ENTRY_KEYS,
-	TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE,
-} from '../api/constants';
+import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 
@@ -66,39 +62,6 @@ function mergeBlockVariations(
 	return result;
 }
 
-function stabilizeSupports( rawSupports ) {
-	if ( ! rawSupports ) {
-		return rawSupports;
-	}
-
-	// Create a new object to avoid mutating the original. This ensures that
-	// custom block plugins that rely on immutable supports are not affected.
-	// See: https://github.com/WordPress/gutenberg/pull/66849#issuecomment-2463614281
-	const newSupports = {};
-	for ( const [ key, value ] of Object.entries( rawSupports ) ) {
-		if (
-			key === 'typography' &&
-			typeof value === 'object' &&
-			value !== null
-		) {
-			newSupports.typography = Object.fromEntries(
-				Object.entries( value ).map(
-					( [ typographyKey, typographyValue ] ) => [
-						TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE[
-							typographyKey
-						] || typographyKey,
-						typographyValue,
-					]
-				)
-			);
-		} else {
-			newSupports[ key ] = value;
-		}
-	}
-
-	return newSupports;
-}
-
 /**
  * Takes the unprocessed block type settings, merges them with block type metadata
  * and applies all the existing filters for the registered block type.
@@ -115,6 +78,7 @@ export const processBlockType =
 		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 
 		const blockType = {
+			apiVersion: 1,
 			name,
 			icon: BLOCK_ICON_DEFAULT,
 			keywords: [],
@@ -139,9 +103,6 @@ export const processBlockType =
 			),
 		};
 
-		// Stabilize any experimental supports before applying filters.
-		blockType.supports = stabilizeSupports( blockType.supports );
-
 		const settings = applyFilters(
 			'blocks.registerBlockType',
 			blockType,
@@ -149,9 +110,13 @@ export const processBlockType =
 			null
 		);
 
-		// Re-stabilize any experimental supports after applying filters.
-		// This ensures that any supports updated by filters are also stabilized.
-		blockType.supports = stabilizeSupports( blockType.supports );
+		if ( settings.apiVersion <= 2 ) {
+			warning(
+				`The block "${ name }" is registered with API version 2 or lower. This means that the post editor may work as a non-iframe editor.\n` +
+					`Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.\n` +
+					`See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/#version-3-wordpress-6-3`
+			);
+		}
 
 		if (
 			settings.description &&
@@ -163,40 +128,29 @@ export const processBlockType =
 		}
 
 		if ( settings.deprecated ) {
-			settings.deprecated = settings.deprecated.map( ( deprecation ) => {
-				// Stabilize any experimental supports before applying filters.
-				let filteredDeprecation = {
-					...deprecation,
-					supports: stabilizeSupports( deprecation.supports ),
-				};
-
-				filteredDeprecation = // Only keep valid deprecation keys.
-					applyFilters(
-						'blocks.registerBlockType',
-						// Merge deprecation keys with pre-filter settings
-						// so that filters that depend on specific keys being
-						// present don't fail.
-						{
-							// Omit deprecation keys here so that deprecations
-							// can opt out of specific keys like "supports".
-							...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-							...filteredDeprecation,
-						},
-						blockType.name,
-						filteredDeprecation
-					);
-				// Re-stabilize any experimental supports after applying filters.
-				// This ensures that any supports updated by filters are also stabilized.
-				filteredDeprecation.supports = stabilizeSupports(
-					filteredDeprecation.supports
-				);
-
-				return Object.fromEntries(
-					Object.entries( filteredDeprecation ).filter( ( [ key ] ) =>
+			settings.deprecated = settings.deprecated.map( ( deprecation ) =>
+				Object.fromEntries(
+					Object.entries(
+						// Only keep valid deprecation keys.
+						applyFilters(
+							'blocks.registerBlockType',
+							// Merge deprecation keys with pre-filter settings
+							// so that filters that depend on specific keys being
+							// present don't fail.
+							{
+								// Omit deprecation keys here so that deprecations
+								// can opt out of specific keys like "supports".
+								...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+								...deprecation,
+							},
+							blockType.name,
+							deprecation
+						)
+					).filter( ( [ key ] ) =>
 						DEPRECATED_ENTRY_KEYS.includes( key )
 					)
-				);
-			} );
+				)
+			);
 		}
 
 		if ( ! isPlainObject( settings ) ) {

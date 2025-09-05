@@ -126,8 +126,9 @@ test.describe( 'Block Renaming', () => {
 			await pageUtils.pressKeys( 'primary+a' );
 			await page.keyboard.press( 'Delete' );
 
-			// Check placeholder for input is the original block name.
+			// Check that input is empty and placeholder is the original block name.
 			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
+			await expect( nameInput ).toHaveValue( '' );
 
 			// It should be possible to submit empty.
 			await expect( saveButton ).toBeEnabled();

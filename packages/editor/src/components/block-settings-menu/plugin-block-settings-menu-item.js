@@ -76,7 +76,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * );
  * ```
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 const PluginBlockSettingsMenuItem = ( {
 	allowedBlocks,

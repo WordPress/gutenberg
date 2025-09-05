@@ -37,9 +37,8 @@ test.describe( 'Parsing patterns', () => {
 			} );
 		} );
 
-		// Exit zoom out mode and select the inner buttons block to ensure
+		// Select the inner buttons block to ensure
 		// the correct insertion point is selected.
-		await page.getByRole( 'button', { name: 'Zoom Out' } ).click();
 		await editor.selectBlocks(
 			editor.canvas.locator( 'role=document[name="Block: Button"i]' )
 		);

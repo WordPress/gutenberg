@@ -18,3 +18,10 @@ export function registerRoute( route ) {
 		route,
 	};
 }
+
+export function unregisterRoute( name ) {
+	return {
+		type: 'UNREGISTER_ROUTE',
+		name,
+	};
+}

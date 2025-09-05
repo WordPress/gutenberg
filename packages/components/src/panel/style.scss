@@ -62,9 +62,12 @@
 	font-size: inherit;
 	margin-top: 0;
 	margin-bottom: 0;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
 }
+
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
@@ -87,8 +90,11 @@
 	color: $gray-900;
 	border: none;
 	box-shadow: none;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
+
 	height: auto;
 
 	&:focus {
@@ -103,8 +109,10 @@
 		transform: translateY(-50%);
 		color: $gray-900;
 		fill: currentColor;
-		transition: 0.1s color ease-in-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: 0.1s color ease-in-out;
+		}
 	}
 
 	// mirror the arrow horizontally in RTL languages

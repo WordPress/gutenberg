@@ -12,7 +12,6 @@ const CONTROL_PROPS = {
 	controlPaddingXSmall: 8,
 	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
 
-	controlBackgroundColor: COLORS.white,
 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
 	controlHeight: CONTROL_HEIGHT,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,

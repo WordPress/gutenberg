@@ -55,7 +55,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @param string $field_name Field name to pick from metadata.
  * @param int    $index      Optional. Index of the script to register when multiple items passed.
  *                           Default 0.
- * @return string Module ID.
+ * @return string|false Module ID.
  */
 function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 ) {
 	if ( empty( $metadata[ $field_name ] ) ) {

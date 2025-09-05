@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Modal } from '@wordpress/components';
+import { Flex, FlexItem, Modal, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -17,8 +17,8 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import { store as editorStore } from '../../store';
 
 export function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -90,6 +90,8 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 }
 
 function StartPageOptionsModal( { onClose } ) {
+	const [ showStartPatterns, setShowStartPatterns ] = useState( true );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const startPatterns = useStartPatterns();
 	const hasStartPattern = startPatterns.length > 0;
 
@@ -97,45 +99,88 @@ function StartPageOptionsModal( { onClose } ) {
 		return null;
 	}
 
+	function handleClose() {
+		onClose();
+		setPreference( 'core', 'enableChoosePatternModal', showStartPatterns );
+	}
+
 	return (
 		<Modal
+			className="editor-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
 			isFullScreen
-			onRequestClose={ onClose }
+			onRequestClose={ handleClose }
 		>
 			<div className="editor-start-page-options__modal-content">
 				<PatternSelection
 					blockPatterns={ startPatterns }
-					onChoosePattern={ onClose }
+					onChoosePattern={ handleClose }
 				/>
 			</div>
+			<Flex
+				className="editor-start-page-options__modal__actions"
+				justify="flex-end"
+				expanded={ false }
+			>
+				<FlexItem>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						checked={ showStartPatterns }
+						label={ __( 'Show starter patterns' ) }
+						help={ __(
+							'Shows starter patterns when creating a new page.'
+						) }
+						onChange={ ( newValue ) => {
+							setShowStartPatterns( newValue );
+						} }
+					/>
+				</FlexItem>
+			</Flex>
 		</Modal>
 	);
 }
 
 export default function StartPageOptions() {
-	const [ isClosed, setIsClosed ] = useState( false );
-	const shouldEnableModal = useSelect( ( select ) => {
-		const { isEditedPostDirty, isEditedPostEmpty, getCurrentPostType } =
-			select( editorStore );
-		const preferencesModalActive =
-			select( interfaceStore ).isModalActive( 'editor/preferences' );
+	const [ isOpen, setIsOpen ] = useState( false );
+	const { isEditedPostDirty, isEditedPostEmpty } = useSelect( editorStore );
+	const { isModalActive } = useSelect( interfaceStore );
+	const { enabled, postId } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
 			'enableChoosePatternModal'
 		);
-		return (
-			choosePatternModalEnabled &&
-			! preferencesModalActive &&
-			! isEditedPostDirty() &&
-			isEditedPostEmpty() &&
-			TEMPLATE_POST_TYPE !== getCurrentPostType()
-		);
+		return {
+			postId: getCurrentPostId(),
+			enabled:
+				choosePatternModalEnabled &&
+				TEMPLATE_POST_TYPE !== getCurrentPostType(),
+		};
 	}, [] );
 
-	if ( ! shouldEnableModal || isClosed ) {
+	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
+	// Examples: changing pages in the List View, creating a new page via Command Palette.
+	useEffect( () => {
+		const isFreshPage = ! isEditedPostDirty() && isEditedPostEmpty();
+		// Prevents immediately opening when features is enabled via preferences modal.
+		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
+		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
+			return;
+		}
+
+		// Open the modal after the initial render for a new page.
+		setIsOpen( true );
+	}, [
+		enabled,
+		postId,
+		isEditedPostDirty,
+		isEditedPostEmpty,
+		isModalActive,
+	] );
+
+	if ( ! isOpen ) {
 		return null;
 	}
 
-	return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
+	return <StartPageOptionsModal onClose={ () => setIsOpen( false ) } />;
 }

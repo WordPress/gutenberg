@@ -7,11 +7,11 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
  * Internal dependencies
  */
 import TypographyExample from './typography-example';
-import PreviewIframe from './preview-iframe';
+import PreviewWrapper from './preview-wrapper';
 
 const StylesPreviewTypography = ( { variation, isFocused, withHoverView } ) => {
 	return (
-		<PreviewIframe
+		<PreviewWrapper
 			label={ variation.title }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
@@ -32,7 +32,7 @@ const StylesPreviewTypography = ( { variation, isFocused, withHoverView } ) => {
 					/>
 				</HStack>
 			) }
-		</PreviewIframe>
+		</PreviewWrapper>
 	);
 };
 

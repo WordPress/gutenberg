@@ -54,6 +54,7 @@ function UnforwardedToolbarButton(
 				<Button
 					ref={ ref }
 					icon={ restProps.icon }
+					size="compact"
 					label={ title }
 					shortcut={ restProps.shortcut }
 					data-subscript={ restProps.subscript }
@@ -97,6 +98,7 @@ function UnforwardedToolbarButton(
 		>
 			{ ( toolbarItemProps ) => (
 				<Button
+					size="compact"
 					label={ title }
 					isPressed={ isActive }
 					{ ...toolbarItemProps }

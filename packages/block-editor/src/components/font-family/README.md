@@ -29,6 +29,7 @@ const MyFontFamilyControl = () => {
 				setFontFamily( newFontFamily );
 			} }
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 };

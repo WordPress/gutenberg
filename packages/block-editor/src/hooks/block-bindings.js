@@ -26,12 +26,12 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	canBindAttribute,
 	getBindableAttributes,
-} from '../hooks/use-bindings-attributes';
+	useBlockBindingsUtils,
+} from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockEditContext } from '../components/block-edit';
-import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { store as blockEditorStore } from '../store';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -51,7 +51,7 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+function BlockBindingsPanelMenuContent( { fieldsList, attribute, binding } ) {
 	const { clientId } = useBlockEditContext();
 	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
@@ -179,22 +179,21 @@ function EditableBlockBindingsPanelItems( {
 							placement={
 								isMobile ? 'bottom-start' : 'left-start'
 							}
-							gutter={ isMobile ? 8 : 36 }
-							trigger={
-								<Item>
-									<BlockBindingsAttribute
-										attribute={ attribute }
-										binding={ binding }
-										fieldsList={ fieldsList }
-									/>
-								</Item>
-							}
 						>
-							<BlockBindingsPanelDropdown
-								fieldsList={ fieldsList }
-								attribute={ attribute }
-								binding={ binding }
-							/>
+							<Menu.TriggerButton render={ <Item /> }>
+								<BlockBindingsAttribute
+									attribute={ attribute }
+									binding={ binding }
+									fieldsList={ fieldsList }
+								/>
+							</Menu.TriggerButton>
+							<Menu.Popover gutter={ isMobile ? 8 : 36 }>
+								<BlockBindingsPanelMenuContent
+									fieldsList={ fieldsList }
+									attribute={ attribute }
+									binding={ binding }
+								/>
+							</Menu.Popover>
 						</Menu>
 					</ToolsPanelItem>
 				);
@@ -300,13 +299,17 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						/>
 					) }
 				</ItemGroup>
-				<ItemGroup>
-					<Text variant="muted">
+				{ /*
+					Use a div element to make the ToolsPanelHiddenInnerWrapper
+					toggle the visibility of this help text automatically.
+				*/ }
+				<Text as="div" variant="muted">
+					<p>
 						{ __(
 							'Attributes connected to custom fields or other dynamic data.'
 						) }
-					</Text>
-				</ItemGroup>
+					</p>
+				</Text>
 			</ToolsPanel>
 		</InspectorControls>
 	);

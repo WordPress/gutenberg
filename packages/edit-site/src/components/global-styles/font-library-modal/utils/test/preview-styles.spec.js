@@ -201,7 +201,7 @@ describe( 'formatFontFaceName', () => {
 		);
 	} );
 
-	it( 'should ouput the font face name with quotes on Firefox', () => {
+	it( 'should output the font face name with quotes on Firefox', () => {
 		const mockUserAgent =
 			'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:122.0) Gecko/20100101 Firefox/122.0';
 

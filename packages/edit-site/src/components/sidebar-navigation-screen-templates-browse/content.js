@@ -4,35 +4,41 @@
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import DataViewItem from '../sidebar-dataviews/dataview-item';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useAddedBy } from '../page-templates/hooks';
 import { layout } from '@wordpress/icons';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 function TemplateDataviewItem( { template, isActive } ) {
 	const { text, icon } = useAddedBy( template.type, template.id );
+
 	return (
-		<DataViewItem
-			key={ text }
-			slug={ text }
-			title={ text }
+		<SidebarNavigationItem
+			to={ addQueryArgs( '/template', { activeView: text } ) }
 			icon={ icon }
-			isActive={ isActive }
-			isCustom={ false }
-		/>
+			aria-current={ isActive }
+		>
+			{ text }
+		</SidebarNavigationItem>
 	);
 }
 
-export default function DataviewsTemplatesSidebarContent( {
-	activeView,
-	title,
-} ) {
+export default function DataviewsTemplatesSidebarContent() {
+	const {
+		query: { activeView = 'all' },
+	} = useLocation();
 	const { records } = useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 		per_page: -1,
 	} );
@@ -51,14 +57,14 @@ export default function DataviewsTemplatesSidebarContent( {
 	}, [ records ] );
 
 	return (
-		<ItemGroup>
-			<DataViewItem
-				slug="all"
-				title={ title }
+		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
+			<SidebarNavigationItem
+				to="/template"
 				icon={ layout }
-				isActive={ activeView === 'all' }
-				isCustom={ false }
-			/>
+				aria-current={ activeView === 'all' }
+			>
+				{ __( 'All templates' ) }
+			</SidebarNavigationItem>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (
 					<TemplateDataviewItem

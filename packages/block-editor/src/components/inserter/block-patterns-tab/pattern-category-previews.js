@@ -17,7 +17,6 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,8 +33,6 @@ import {
 	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
-import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
 
 const noop = () => {};
 
@@ -46,10 +43,6 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const isZoomOutMode = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).isZoomOut(),
-		[]
-	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -179,15 +172,13 @@ export function PatternCategoryPreviews( {
 			</VStack>
 			{ currentCategoryPatterns.length > 0 && (
 				<>
-					{ isZoomOutMode && (
-						<Text
-							size="12"
-							as="p"
-							className="block-editor-inserter__help-text"
-						>
-							{ __( 'Drag and drop patterns into the canvas.' ) }
-						</Text>
-					) }
+					<Text
+						size="12"
+						as="p"
+						className="block-editor-inserter__help-text"
+					>
+						{ __( 'Drag and drop patterns into the canvas.' ) }
+					</Text>
 					<BlockPatternsList
 						ref={ scrollContainerRef }
 						blockPatterns={ pagingProps.categoryPatterns }

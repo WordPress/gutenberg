@@ -59,10 +59,9 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 			);
 
 			onClose?.();
-			history.push( {
-				postType: PATTERN_TYPES.user,
-				categoryId: PATTERN_DEFAULT_CATEGORY,
-			} );
+			history.navigate(
+				`/pattern?categoryId=${ PATTERN_DEFAULT_CATEGORY }`
+			);
 		} catch ( error ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'

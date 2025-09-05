@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * An API for creating and loading a widget control (a <div class="widget">
  * element) that is compatible with most third party widget scripts. By not
- * using React for this, we ensure that we have complete contorl over the DOM
+ * using React for this, we ensure that we have complete control over the DOM
  * and do not accidentally remove any elements that a third party widget script
  * has attached an event listener to.
  *
@@ -60,7 +60,7 @@ export default class Control {
 	}
 
 	/**
-	 * Clean up the control so that it can be garabge collected.
+	 * Clean up the control so that it can be garbage collected.
 	 *
 	 * @access public
 	 */

@@ -18,40 +18,12 @@
 .edit-site-sidebar-navigation-screen__content {
 	padding: 0 $grid-unit-20;
 
-	.components-item-group {
-		margin-left: -$grid-unit-20;
-		margin-right: -$grid-unit-20;
-	}
-
 	.components-text {
 		color: $gray-400;
 	}
 
 	.components-heading {
 		margin-bottom: $grid-unit-10;
-	}
-}
-
-.edit-site-sidebar-navigation-screen__meta {
-	margin: 0 0 $grid-unit-20 $grid-unit-20;
-	color: $gray-400;
-	.components-text {
-		color: $gray-400;
-	}
-}
-
-.edit-site-sidebar-navigation-screen__page-link {
-	color: $gray-600;
-	display: inline-block;
-	word-break: break-word;
-
-	&:hover,
-	&:focus {
-		color: $white;
-	}
-
-	.components-external-link__icon {
-		margin-left: $grid-unit-05;
 	}
 }
 
@@ -127,9 +99,14 @@
 	bottom: 0;
 	background-color: $gray-900;
 	gap: 0;
-	padding: $grid-unit-20 0;
+	padding: $grid-unit-10 $grid-unit-20;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
+
+	.edit-site-sidebar-navigation-screen-details-footer {
+		margin-left: -$grid-unit-20;
+		margin-right: -$grid-unit-20;
+	}
 }
 
 /* In general style overrides are discouraged.

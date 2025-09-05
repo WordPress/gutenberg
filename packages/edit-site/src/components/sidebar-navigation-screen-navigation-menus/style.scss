@@ -2,11 +2,12 @@
 	margin: 0 0 $grid-unit-40 0;
 }
 
-.edit-site-sidebar-navigation-screen-navigation-menus__content {
-	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
-		width: 100%;
-	}
+.edit-site-sidebar-navigation-screen-navigation-menus {
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+}
 
+.edit-site-sidebar-navigation-screen-navigation-menus__content {
 	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
 		white-space: normal;
 	}
@@ -24,6 +25,14 @@
 		&:hover,
 		&:focus,
 		&[aria-current] {
+			color: $white;
+		}
+	}
+
+	.block-editor-list-view-block__menu {
+		color: $gray-600;
+		&:hover,
+		&:focus {
 			color: $white;
 		}
 	}

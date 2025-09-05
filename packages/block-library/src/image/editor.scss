@@ -32,7 +32,7 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-// Shown while image is being uploded but cannot be previewed.
+// Shown while image is being uploaded but cannot be previewed.
 .wp-block-image__placeholder {
 	aspect-ratio: 4 / 3;
 
@@ -45,19 +45,6 @@ figure.wp-block-image:not(.wp-block) {
 	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
 	.components-placeholder__illustration {
 		opacity: 0.1;
-	}
-}
-
-// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
-.wp-block-image .components-resizable-box__container {
-	// Using "display: table" because:
-	// - it visually hides empty white space in between elements
-	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
-	display: table;
-	img {
-		display: block;
-		width: inherit;
-		height: inherit;
 	}
 }
 

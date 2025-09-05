@@ -22,7 +22,9 @@ jest.mock( '../../../store/actions', () => {
 		...actions,
 		resetBlocks: jest.fn( actions.resetBlocks ),
 		replaceInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
-		setHasControlledInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
+		setHasControlledInnerBlocks: jest.fn(
+			actions.setHasControlledInnerBlocks
+		),
 	};
 } );
 

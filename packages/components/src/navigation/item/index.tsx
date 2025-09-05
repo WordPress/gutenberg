@@ -79,6 +79,8 @@ export function NavigationItem( props: NavigationItemProps ) {
 		? restProps
 		: {
 				as: Button,
+				__next40pxDefaultSize:
+					'as' in restProps ? restProps.as === undefined : true,
 				href,
 				onClick: onItemClick,
 				'aria-current': isActive ? 'page' : undefined,

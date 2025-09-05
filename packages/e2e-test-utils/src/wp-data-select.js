@@ -13,7 +13,7 @@
  * @see https://github.com/WordPress/gutenberg/pull/31199
  *
  * @param {string}    store      Store to query e.g: core/editor, core/blocks...
- * @param {string}    selector   Selector to exectute e.g: getBlocks.
+ * @param {string}    selector   Selector to execute e.g: getBlocks.
  * @param {...Object} parameters Parameters to pass to the selector.
  *
  * @return {Promise<?Object>} Result of querying.

@@ -53,8 +53,10 @@
 	text-align: left;
 	border-radius: $radius-small;
 
+	&[aria-disabled="true"],
 	&:disabled {
 		cursor: default;
+		color: $gray-700;
 	}
 
 	&:focus {

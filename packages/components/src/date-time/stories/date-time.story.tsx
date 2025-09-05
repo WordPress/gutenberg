@@ -20,7 +20,7 @@ const meta: Meta< typeof DateTimePicker > = {
 	component: DateTimePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { action: 'onChange', control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -51,6 +51,9 @@ const Template: StoryFn< typeof DateTimePicker > = ( {
 };
 
 export const Default: StoryFn< typeof DateTimePicker > = Template.bind( {} );
+Default.args = {
+	currentDate: new Date(),
+};
 
 export const WithEvents: StoryFn< typeof DateTimePicker > = Template.bind( {} );
 WithEvents.args = {

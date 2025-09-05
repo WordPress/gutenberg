@@ -47,6 +47,7 @@ const Overlay = ( {
 							gradient: undefined,
 							customGradient: undefined,
 						} ),
+						clearable: true,
 					},
 				] }
 				panelId={ clientId }

@@ -1,0 +1,55 @@
+diff --git a/node_modules/storybook-source-link/dist/esm/Tool.js b/node_modules/storybook-source-link/dist/esm/Tool.js
+index 100099e..53d37c4 100644
+--- a/node_modules/storybook-source-link/dist/esm/Tool.js
++++ b/node_modules/storybook-source-link/dist/esm/Tool.js
+@@ -1,7 +1,8 @@
+ import React from "react";
+-import { Icons, IconButton, TooltipMessage, WithTooltip } from "@storybook/components";
+-import { PARAM_KEY, PREFIX_PARAM_KEY, ICON_PARAM_KEY, INFO_LINK, TOOL_ID } from "./constants";
+-import { useParameter } from '@storybook/api';
++import { IconButton, TooltipMessage, WithTooltip } from "@storybook/components";
++import { RepoIcon } from '@storybook/icons';
++import { PARAM_KEY, PREFIX_PARAM_KEY, INFO_LINK, TOOL_ID } from "./constants";
++import { useParameter } from '@storybook/manager-api';
+ 
+ var Tooltip = function Tooltip() {
+   return /*#__PURE__*/React.createElement(TooltipMessage, {
+@@ -24,7 +25,6 @@ export var getLink = function getLink(prefix, link) {
+ export var Tool = function Tool() {
+   var param_link = useParameter(PARAM_KEY, null);
+   var param_prefix = useParameter(PREFIX_PARAM_KEY, null);
+-  var param_icon = useParameter(ICON_PARAM_KEY, "repository");
+   var link = getLink(param_prefix, param_link);
+   return link ? /*#__PURE__*/React.createElement(IconButton, {
+     key: TOOL_ID,
+@@ -35,9 +35,7 @@ export var Tool = function Tool() {
+         window.open(link);
+       }
+     }
+-  }, /*#__PURE__*/React.createElement(Icons, {
+-    icon: param_icon
+-  })) : /*#__PURE__*/React.createElement(WithTooltip, {
++  }, /*#__PURE__*/React.createElement(RepoIcon)) : /*#__PURE__*/React.createElement(WithTooltip, {
+     placement: "top",
+     trigger: "click",
+     tooltip: /*#__PURE__*/React.createElement(Tooltip, null)
+@@ -45,7 +43,5 @@ export var Tool = function Tool() {
+     key: TOOL_ID,
+     title: "View Source Repository",
+     active: false
+-  }, /*#__PURE__*/React.createElement(Icons, {
+-    icon: param_icon
+-  })));
++  }, /*#__PURE__*/React.createElement(RepoIcon)));
+ };
+\ No newline at end of file
+diff --git a/node_modules/storybook-source-link/dist/esm/preset/manager.js b/node_modules/storybook-source-link/dist/esm/preset/manager.js
+index 845f81d..ca1d066 100644
+--- a/node_modules/storybook-source-link/dist/esm/preset/manager.js
++++ b/node_modules/storybook-source-link/dist/esm/preset/manager.js
+@@ -1,4 +1,4 @@
+-import { addons, types } from "@storybook/addons";
++import { addons, types } from "@storybook/manager-api";
+ import { ADDON_ID, TOOL_ID } from "../constants";
+ import { Tool } from "../Tool"; // Register the addon
+ 

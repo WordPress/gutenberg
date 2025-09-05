@@ -33,6 +33,7 @@ export function ZoomOutSeparator( {
 		insertionPoint,
 		blockInsertionPointVisible,
 		blockInsertionPoint,
+		blocksBeingDragged,
 	} = useSelect( ( select ) => {
 		const {
 			getInsertionPoint,
@@ -40,6 +41,7 @@ export function ZoomOutSeparator( {
 			getSectionRootClientId,
 			isBlockInsertionPointVisible,
 			getBlockInsertionPoint,
+			getDraggedBlockClientIds,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
@@ -47,10 +49,10 @@ export function ZoomOutSeparator( {
 		return {
 			sectionRootClientId: root,
 			sectionClientIds: sectionRootClientIds,
-			blockOrder: getBlockOrder( root ),
 			insertionPoint: getInsertionPoint(),
 			blockInsertionPoint: getBlockInsertionPoint(),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
+			blocksBeingDragged: getDraggedBlockClientIds(),
 		};
 	}, [] );
 
@@ -78,6 +80,7 @@ export function ZoomOutSeparator( {
 		insertionPoint &&
 		insertionPoint.hasOwnProperty( 'index' ) &&
 		clientId === sectionClientIds[ insertionPoint.index - 1 ];
+
 	// We want to show the zoom out separator in either of these conditions:
 	// 1. If the inserter has an insertion index set
 	// 2. We are dragging a pattern over an insertion point
@@ -95,6 +98,32 @@ export function ZoomOutSeparator( {
 			( blockInsertionPointVisible &&
 				clientId ===
 					sectionClientIds[ blockInsertionPoint.index - 1 ] );
+	}
+
+	const blockBeingDraggedClientId = blocksBeingDragged[ 0 ];
+
+	const isCurrentBlockBeingDragged = blocksBeingDragged.includes( clientId );
+
+	const blockBeingDraggedIndex = sectionClientIds.indexOf(
+		blockBeingDraggedClientId
+	);
+	const blockBeingDraggedPreviousSiblingClientId =
+		blockBeingDraggedIndex > 0
+			? sectionClientIds[ blockBeingDraggedIndex - 1 ]
+			: null;
+
+	const isCurrentBlockPreviousSiblingOfBlockBeingDragged =
+		blockBeingDraggedPreviousSiblingClientId === clientId;
+
+	// The separators are visually top/bottom of the block, but in actual fact
+	// the "top" separator is the "bottom" separator of the previous block.
+	// Therefore, this logic hides the separator if the current block is being dragged
+	// or if the current block is the previous sibling of the block being dragged.
+	if (
+		isCurrentBlockBeingDragged ||
+		isCurrentBlockPreviousSiblingOfBlockBeingDragged
+	) {
+		isVisible = false;
 	}
 
 	return (

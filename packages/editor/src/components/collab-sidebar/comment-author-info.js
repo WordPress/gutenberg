@@ -16,7 +16,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * @param {string} props.name   - Name of the author.
  * @param {string} props.date   - Date of the comment.
  *
- * @return {JSX.Element} The JSX element representing the author's information.
+ * @return {React.ReactNode} The JSX element representing the author's information.
  */
 function CommentAuthorInfo( { avatar, name, date } ) {
 	const dateSettings = getDateSettings();

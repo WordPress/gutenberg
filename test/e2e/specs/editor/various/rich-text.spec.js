@@ -758,7 +758,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
-	test( 'should navigate arround emoji', async ( { page, editor } ) => {
+	test( 'should navigate around emoji', async ( { page, editor } ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();

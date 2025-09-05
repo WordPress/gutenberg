@@ -287,7 +287,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
+		 * to override anything set on a individual column basis.
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */

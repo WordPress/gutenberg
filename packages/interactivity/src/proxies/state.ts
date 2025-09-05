@@ -36,7 +36,7 @@ const proxyToProps: WeakMap<
 > = new WeakMap();
 
 /**
- *  Checks wether a {@link PropSignal | `PropSignal`} instance exists for the
+ *  Checks whether a {@link PropSignal | `PropSignal`} instance exists for the
  *  given property in the passed proxy.
  *
  * @param proxy Proxy of a state object or array.
@@ -334,13 +334,15 @@ const deepMergeRecursive = (
 				} );
 				// Update the getter in the property signal if it exists
 				if ( desc.get && propSignal ) {
-					propSignal.setGetter( desc.get );
+					propSignal.setPendingGetter( desc.get );
 				}
 			}
 
 			// Handle nested objects
 		} else if ( isPlainObject( source[ key ] ) ) {
-			if ( isNew || ( override && ! isPlainObject( target[ key ] ) ) ) {
+			const targetValue = Object.getOwnPropertyDescriptor( target, key )
+				?.value;
+			if ( isNew || ( override && ! isPlainObject( targetValue ) ) ) {
 				// Create a new object if the property is new or needs to be overridden
 				target[ key ] = {};
 				if ( propSignal ) {
@@ -350,9 +352,10 @@ const deepMergeRecursive = (
 						proxifyState( ns, target[ key ] as Object )
 					);
 				}
+				deepMergeRecursive( target[ key ], source[ key ], override );
 			}
 			// Both target and source are plain objects, merge them recursively
-			if ( isPlainObject( target[ key ] ) ) {
+			else if ( isPlainObject( targetValue ) ) {
 				deepMergeRecursive( target[ key ], source[ key ], override );
 			}
 
@@ -376,7 +379,7 @@ const deepMergeRecursive = (
 };
 
 /**
- * Recursively update prop values inside the passed `target` and nested plain
+ * Recursively updates prop values inside the passed `target` and nested plain
  * objects, using the values present in `source`. References to plain objects
  * are kept, only updating props containing primitives or arrays. Arrays are
  * replaced instead of merged or concatenated.

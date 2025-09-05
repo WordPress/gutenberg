@@ -8,7 +8,8 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useState, useMemo, forwardRef } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,20 +22,12 @@ import {
 	parseQuantityAndUnitFromRawValue,
 	useCustomUnits,
 } from '../unit-control';
-import { VisuallyHidden } from '../visually-hidden';
-import { getCommonSizeUnit } from './utils';
 import type { FontSizePickerProps } from './types';
-import {
-	Container,
-	Header,
-	HeaderHint,
-	HeaderLabel,
-	HeaderToggle,
-} from './styles';
+import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import { T_SHIRT_NAMES } from './constants';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
@@ -56,6 +49,11 @@ const UnforwardedFontSizePicker = (
 		withSlider = false,
 		withReset = true,
 	} = props;
+
+	const labelId = useInstanceId(
+		UnforwardedFontSizePicker,
+		'font-size-picker-label'
+	);
 
 	const units = useCustomUnits( {
 		availableUnits: unitsProp,
@@ -82,29 +80,6 @@ const UnforwardedFontSizePicker = (
 				: ( 'togglegroup' as const );
 	}
 
-	const headerHint = useMemo( () => {
-		switch ( currentPickerType ) {
-			case 'custom':
-				return __( 'Custom' );
-			case 'togglegroup':
-				if ( selectedFontSize ) {
-					return (
-						selectedFontSize.name ||
-						T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
-					);
-				}
-				break;
-			case 'select':
-				const commonUnit = getCommonSizeUnit( fontSizes );
-				if ( commonUnit ) {
-					return `(${ commonUnit })`;
-				}
-				break;
-		}
-
-		return '';
-	}, [ currentPickerType, selectedFontSize, fontSizes ] );
-
 	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
 		return null;
 	}
@@ -123,20 +98,23 @@ const UnforwardedFontSizePicker = (
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'FontSizePicker',
+		__next40pxDefaultSize,
+		size,
+	} );
+
 	return (
-		<Container ref={ ref } className="components-font-size-picker">
-			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+		<Container
+			ref={ ref }
+			className="components-font-size-picker"
+			// This Container component renders a fieldset element that needs to be labeled.
+			aria-labelledby={ labelId }
+		>
 			<Spacer>
 				<Header className="components-font-size-picker__header">
-					<HeaderLabel
-						aria-label={ `${ __( 'Size' ) } ${ headerHint || '' }` }
-					>
-						{ __( 'Size' ) }
-						{ headerHint && (
-							<HeaderHint className="components-font-size-picker__header__hint">
-								{ headerHint }
-							</HeaderHint>
-						) }
+					<HeaderLabel id={ labelId }>
+						{ __( 'Font size' ) }
 					</HeaderLabel>
 					{ ! disableCustomFontSizes && (
 						<HeaderToggle
@@ -205,7 +183,8 @@ const UnforwardedFontSizePicker = (
 						<FlexItem isBlock>
 							<UnitControl
 								__next40pxDefaultSize={ __next40pxDefaultSize }
-								label={ __( 'Custom' ) }
+								__shouldNotWarnDeprecated36pxSize
+								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
 								value={ value }
@@ -235,8 +214,9 @@ const UnforwardedFontSizePicker = (
 										__next40pxDefaultSize={
 											__next40pxDefaultSize
 										}
+										__shouldNotWarnDeprecated36pxSize
 										className="components-font-size-picker__custom-input"
-										label={ __( 'Custom Size' ) }
+										label={ __( 'Font size' ) }
 										hideLabelFromVision
 										value={ valueQuantity }
 										initialPosition={ fallbackFontSize }

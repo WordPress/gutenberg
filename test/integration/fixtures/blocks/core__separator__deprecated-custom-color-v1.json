@@ -8,7 +8,8 @@
 				"color": {
 					"background": "#cc1d1d"
 				}
-			}
+			},
+			"tagName": "hr"
 		},
 		"innerBlocks": []
 	}

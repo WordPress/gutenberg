@@ -289,8 +289,10 @@ $block-editor-link-control-number-of-actions: 1;
 			right: 0;
 			bottom: 0;
 			border-radius: 100%;
-			animation: loadingpulse 1s linear infinite;
-			animation-delay: 0.5s; // avoid animating for fast network responses
+			@media not ( prefers-reduced-motion ) {
+				animation: loadingpulse 1s linear infinite;
+				animation-delay: 0.5s; // avoid animating for fast network responses
+			}
 		}
 	}
 }
@@ -343,6 +345,13 @@ $block-editor-link-control-number-of-actions: 1;
 	position: relative;
 }
 
+.block-editor-link-control__settings {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;
@@ -381,16 +390,19 @@ $block-editor-link-control-number-of-actions: 1;
 		// Point downwards when open (same as list view expander)
 		&[aria-expanded="true"] svg {
 			visibility: visible;
-			transition: transform 0.1s ease;
+			@media not ( prefers-reduced-motion ) {
+				transition: transform 0.1s ease;
+			}
 			transform: rotate(90deg);
-			@include reduce-motion("transition");
+
 		}
 		// Point rightwards when closed (same as list view expander)
 		&[aria-expanded="false"] svg {
 			visibility: visible;
 			transform: rotate(0deg);
-			transition: transform 0.1s ease;
-			@include reduce-motion("transition");
+			@media not ( prefers-reduced-motion ) {
+				transition: transform 0.1s ease;
+			}
 		}
 	}
 }

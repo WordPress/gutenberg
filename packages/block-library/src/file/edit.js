@@ -29,6 +29,7 @@ import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { getFilename } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -79,7 +80,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			media:
 				id === undefined
 					? undefined
-					: select( coreStore ).getMedia( id ),
+					: select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id
+					  ),
 		} ),
 		[ id ]
 	);
@@ -127,16 +132,25 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			return;
 		}
 
-		const isPdf = newMedia.url.endsWith( '.pdf' );
+		const isPdf =
+			// Media Library and REST API use different properties for mime type.
+			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
+			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
+		const pdfAttributes = {
+			displayPreview: isPdf
+				? attributes.displayPreview ?? true
+				: undefined,
+			previewHeight: isPdf ? attributes.previewHeight ?? 600 : undefined,
+		};
+
 		setAttributes( {
 			href: newMedia.url,
 			fileName: newMedia.title,
 			textLinkHref: newMedia.url,
 			id: newMedia.id,
-			displayPreview: isPdf ? true : undefined,
-			previewHeight: isPdf ? 600 : undefined,
 			fileId: `wp-block-file--media-${ clientId }`,
 			blob: undefined,
+			...pdfAttributes,
 		} );
 		setTemporaryURL();
 	}
@@ -249,11 +263,12 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			<div { ...blockProps }>
 				{ displayPreviewInEditor && (
 					<ResizableBox
-						size={ { height: previewHeight } }
+						size={ { height: previewHeight, width: '100%' } }
 						minHeight={ MIN_PREVIEW_HEIGHT }
 						maxHeight={ MAX_PREVIEW_HEIGHT }
-						minWidth="100%"
-						grid={ [ 10, 10 ] }
+						// The horizontal grid value must be 1 or else the width may snap during a
+						// resize even though only vertical resizing is enabled.
+						grid={ [ 1, 10 ] }
 						enable={ {
 							top: false,
 							right: false,

@@ -3,26 +3,17 @@
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { join, sep, basename } = require( 'path' );
-const fastGlob = require( 'fast-glob' );
 const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
  */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const { PhpFilePathsPlugin } = require( '@wordpress/scripts/utils' );
+const PhpFilePathsPlugin = require( '@wordpress/scripts/plugins/php-file-paths-plugin' );
 
 /**
  * Internal dependencies
  */
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
-
-/*
- * Matches a block's filepaths in the form build-module/<filename>.js
- */
-const blockViewRegex = new RegExp(
-	/build-module\/(?<filename>.*\/view.*).js$/
-);
 
 /**
  * We need to automatically rename some functions when they are called inside block files,
@@ -50,48 +41,16 @@ function escapeRegExp( string ) {
 	return string.replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' );
 }
 
-const createEntrypoints = () => {
-	/*
-	 * Returns an array of paths to block view files within the `@wordpress/block-library` package.
-	 * These paths can be matched by the regex `blockViewRegex` in order to extract
-	 * the block's filename. All blocks were migrated to script modules but the Form block.
-	 *
-	 * Returns an empty array if no files were found.
-	 */
-	const blockViewScriptPaths = fastGlob.sync(
-		'./packages/block-library/build-module/form/view.js'
-	);
-
-	/*
-	 * Go through the paths found above, in order to define webpack entry points for
-	 * each block's view.js file.
-	 */
-	return blockViewScriptPaths.reduce( ( entries, scriptPath ) => {
-		const result = scriptPath.match( blockViewRegex );
-		if ( ! result?.groups?.filename ) {
-			return entries;
-		}
-
-		return {
-			...entries,
-			[ result.groups.filename ]: scriptPath,
-		};
-	}, {} );
-};
-
 module.exports = [
 	{
 		...baseConfig,
 		name: 'blocks',
-		entry: createEntrypoints(),
+		entry: {},
 		output: {
-			devtoolNamespace: 'wp',
-			filename: './build/block-library/blocks/[name].min.js',
 			path: join( __dirname, '..', '..' ),
 		},
 		plugins: [
 			...plugins,
-			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 			new PhpFilePathsPlugin( {
 				context: './packages/block-library/src/',
 				props: [ 'render', 'variations' ],

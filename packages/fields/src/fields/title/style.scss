@@ -1,0 +1,8 @@
+.fields-field__title span:first-child {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	text-decoration: none;
+	white-space: nowrap;
+	display: block;
+	flex-grow: 0;
+}

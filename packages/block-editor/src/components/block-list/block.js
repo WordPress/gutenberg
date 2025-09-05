@@ -6,13 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	memo,
-	useCallback,
-	RawHTML,
-	useContext,
-	useMemo,
-} from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -28,7 +22,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
@@ -103,6 +97,7 @@ function BlockListBlock( {
 	wrapperProps,
 	setAttributes,
 	onReplace,
+	onRemove,
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
@@ -113,11 +108,6 @@ function BlockListBlock( {
 		themeSupportsLayout,
 		...context
 	} = useContext( PrivateBlockContext );
-	const { removeBlock } = useDispatch( blockEditorStore );
-	const onRemove = useCallback(
-		() => removeBlock( clientId ),
-		[ clientId, removeBlock ]
-	);
 
 	const parentLayout = useLayout() || {};
 
@@ -272,15 +262,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		setAttributes( newAttributes ) {
+		setAttributes( nextAttributes ) {
 			const { getMultiSelectedBlockClientIds } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
-			const { clientId } = ownProps;
+			const { clientId, attributes } = ownProps;
 			const clientIds = multiSelectedBlockClientIds.length
 				? multiSelectedBlockClientIds
 				: [ clientId ];
+			const newAttributes =
+				typeof nextAttributes === 'function'
+					? nextAttributes( attributes )
+					: nextAttributes;
 
 			updateBlockAttributes( clientIds, newAttributes );
 		},
@@ -536,6 +530,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				indexToSelect,
 				initialPosition
 			);
+		},
+		onRemove() {
+			removeBlock( ownProps.clientId );
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
@@ -797,6 +794,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayParentControls,
 		originalBlockClientId,
 		themeSupportsLayout,
+		canMove,
 	};
 
 	// Here we separate between the props passed to BlockListBlock and any other

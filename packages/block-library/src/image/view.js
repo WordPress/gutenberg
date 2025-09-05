@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -105,9 +110,6 @@ const { state, actions, callbacks } = store(
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
-					// Starts the overlay closing animation. The showClosingAnimation
-					// class is used to avoid showing it on page load.
-					state.showClosingAnimation = true;
 					state.overlayEnabled = false;
 
 					// Waits until the close animation has completed before allowing a
@@ -128,7 +130,7 @@ const { state, actions, callbacks } = store(
 					}, 450 );
 				}
 			},
-			handleKeydown( event ) {
+			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					// Focuses the close button when the user presses the tab key.
 					if ( event.key === 'Tab' ) {
@@ -141,8 +143,8 @@ const { state, actions, callbacks } = store(
 						actions.hideLightbox();
 					}
 				}
-			},
-			handleTouchMove( event ) {
+			} ),
+			handleTouchMove: withSyncEvent( ( event ) => {
 				// On mobile devices, prevents triggering the scroll event because
 				// otherwise the page jumps around when it resets the scroll position.
 				// This also means that closing the lightbox requires that a user
@@ -152,7 +154,7 @@ const { state, actions, callbacks } = store(
 				if ( state.overlayEnabled ) {
 					event.preventDefault();
 				}
-			},
+			} ),
 			handleTouchStart() {
 				isTouching = true;
 			},
@@ -341,7 +343,6 @@ const { state, actions, callbacks } = store(
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
-				:root {
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
@@ -352,8 +353,7 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
-				}
-			`;
+				`;
 			},
 			setButtonStyles() {
 				const { imageId } = getContext();

@@ -38,7 +38,7 @@ export const buttonView = ( {
 	background: transparent;
 	border: none;
 	border-radius: ${ CONFIG.radiusXSmall };
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 	fill: currentColor;
 	cursor: pointer;
 	display: flex;
@@ -70,7 +70,7 @@ export const buttonView = ( {
 	}
 
 	&:active {
-		background: ${ CONFIG.controlBackgroundColor };
+		background: ${ COLORS.ui.background };
 	}
 
 	${ isDeselectable && deselectable }
@@ -79,7 +79,7 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: ${ COLORS.white };
+	color: ${ COLORS.theme.foregroundInverted };
 
 	&:active {
 		background: transparent;
@@ -87,11 +87,11 @@ const pressed = css`
 `;
 
 const deselectable = css`
-	color: ${ COLORS.gray[ 900 ] };
+	color: ${ COLORS.theme.foreground };
 
 	&:focus {
 		box-shadow:
-			inset 0 0 0 1px ${ COLORS.white },
+			inset 0 0 0 1px ${ COLORS.ui.background },
 			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
 		outline: 2px solid transparent;
 	}
@@ -112,7 +112,7 @@ const isIconStyles = ( {
 	};
 
 	return css`
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		height: ${ iconButtonSizes[ size ] };
 		aspect-ratio: 1;
 		padding-left: 0;

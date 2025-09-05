@@ -12,19 +12,24 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 
-const { __unstableCommentIconFill } = unlock( blockEditorPrivateApis );
+const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
 const AddCommentButton = ( { onClick } ) => {
 	return (
-		<__unstableCommentIconFill>
-			<MenuItem
-				icon={ commentIcon }
-				onClick={ onClick }
-				aria-haspopup="dialog"
-			>
-				{ _x( 'Comment', 'Add comment button' ) }
-			</MenuItem>
-		</__unstableCommentIconFill>
+		<CommentIconSlotFill.Fill>
+			{ ( { onClose } ) => (
+				<MenuItem
+					icon={ commentIcon }
+					onClick={ () => {
+						onClick();
+						onClose();
+					} }
+					aria-haspopup="dialog"
+				>
+					{ _x( 'Comment', 'Add comment button' ) }
+				</MenuItem>
+			) }
+		</CommentIconSlotFill.Fill>
 	);
 };
 

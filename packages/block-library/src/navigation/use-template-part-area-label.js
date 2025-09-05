@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 
 // TODO: this util should perhaps be refactored somewhere like core-data.
 import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
+import { getTemplatePartIcon } from '../template-part/edit/utils/get-template-part-icon';
 
 export default function useTemplatePartAreaLabel( clientId ) {
 	return useSelect(
@@ -35,25 +36,24 @@ export default function useTemplatePartAreaLabel( clientId ) {
 				return;
 			}
 
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			// This code is lifted from this file:
-			// packages/block-library/src/template-part/edit/advanced-controls.js
-			/* eslint-disable @wordpress/data-no-store-string-literals */
-			const definedAreas =
-				select(
-					'core/editor'
-				).__experimentalGetDefaultTemplatePartAreas();
-			/* eslint-enable @wordpress/data-no-store-string-literals */
 			const { getCurrentTheme, getEditedEntityRecord } =
 				select( coreStore );
+
+			const currentTheme = getCurrentTheme();
+			const defaultTemplatePartAreas =
+				currentTheme?.default_template_part_areas || [];
+
+			const definedAreas = defaultTemplatePartAreas.map( ( item ) => ( {
+				...item,
+				icon: getTemplatePartIcon( item.icon ),
+			} ) );
 
 			for ( const templatePartClientId of parentTemplatePartClientIds ) {
 				const templatePartBlock = getBlock( templatePartClientId );
 
 				// The 'area' usually isn't stored on the block, but instead
 				// on the entity.
-				const { theme = getCurrentTheme()?.stylesheet, slug } =
+				const { theme = currentTheme?.stylesheet, slug } =
 					templatePartBlock.attributes;
 				const templatePartEntityId = createTemplatePartId(
 					theme,

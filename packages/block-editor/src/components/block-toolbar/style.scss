@@ -12,9 +12,11 @@
 	overflow-y: hidden;
 	overflow-x: auto;
 
-	// Animation
-	transition: border-color 0.1s linear, box-shadow 0.1s linear;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+
+		// Animation
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	}
 
 	@include break-small() {
 		overflow: inherit;

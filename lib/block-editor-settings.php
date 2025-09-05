@@ -53,6 +53,13 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			$global_styles[]      = $block_classes;
 		}
 
+		// Get any additional css from the customizer and add it before global styles custom CSS.
+		$global_styles[] = array(
+			'css'            => wp_get_custom_css(),
+			'__unstableType' => 'user',
+			'isGlobalStyles' => false,
+		);
+
 		/*
 		 * Add the custom CSS as a separate stylesheet so any invalid CSS
 		 * entered by users does not break other global styles.
@@ -74,6 +81,12 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			$block_classes['css'] = $actual_css;
 			$global_styles[]      = $block_classes;
 		}
+		// Get any additional css from the customizer.
+		$global_styles[] = array(
+			'css'            => wp_get_custom_css(),
+			'__unstableType' => 'user',
+			'isGlobalStyles' => false,
+		);
 	}
 
 	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );

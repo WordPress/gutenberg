@@ -43,7 +43,7 @@ test.describe( 'Image', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
@@ -51,11 +51,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
+<figure class="wp-block-image size-full"><img src="[^"]+\\/${ fileName }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
 		expect( await editor.getEditedPostContent() ).toMatch( regex );
@@ -75,10 +75,10 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -240,11 +240,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
@@ -308,11 +308,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
@@ -367,11 +367,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		// Rotate the image.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -405,11 +405,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 		await editor.canvas.locator( '.wp-block-image' ).focus();
 		await pageUtils.pressKeys( 'primary+z' );
 
@@ -424,9 +424,6 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
-		// This is a temp workaround for dragging and dropping images from the inserter.
-		// This should be removed when we have the zoom out view for media categories.
-		await page.setViewportSize( { width: 1400, height: 800 } );
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
@@ -528,14 +525,13 @@ test.describe( 'Image', () => {
 			name: 'Block: Image',
 		} );
 
-		const html = `
-			<figure>
-				<img src="https://live.staticflickr.com/3894/14962688165_04759a8b03_b.jpg" alt="Cat">
-				<figcaption>"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.</figcaption>
-			</figure>
-		`;
-
-		await page.evaluate( ( _html ) => {
+		await page.evaluate( () => {
+			const { createBlock } = window.wp.blocks;
+			const block = createBlock( 'core/image', {
+				url: 'https://live.staticflickr.com/3894/14962688165_04759a8b03_b.jpg',
+				alt: 'Cat',
+				caption: `"Cat" by tomhouslay is licensed under <a href="https://creativecommons.org/licenses/by-nc/2.0/?ref=openverse">CC BY-NC 2.0</a>.`,
+			} );
 			const dummy = document.createElement( 'div' );
 			dummy.style.width = '10px';
 			dummy.style.height = '10px';
@@ -545,13 +541,17 @@ test.describe( 'Image', () => {
 			dummy.style.left = 0;
 			dummy.draggable = 'true';
 			dummy.addEventListener( 'dragstart', ( event ) => {
-				event.dataTransfer.setData( 'default', _html );
+				event.dataTransfer.setData(
+					'wp-blocks',
+					JSON.stringify( { blocks: [ block ] } )
+				);
+				event.dataTransfer.setData( 'wp-block:core/image', '' );
 				setTimeout( () => {
 					dummy.remove();
 				}, 0 );
 			} );
 			document.body.appendChild( dummy );
-		}, html );
+		} );
 
 		await page.mouse.move( 0, 0 );
 		await page.mouse.down();
@@ -590,7 +590,7 @@ test.describe( 'Image', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
@@ -600,7 +600,7 @@ test.describe( 'Image', () => {
 		await expect( imageInEditor ).toBeVisible();
 		await expect( imageInEditor ).toHaveAttribute(
 			'src',
-			new RegExp( filename )
+			new RegExp( fileName )
 		);
 
 		const postId = await editor.publishPost();
@@ -613,7 +613,7 @@ test.describe( 'Image', () => {
 		await expect( imageDom ).toBeVisible();
 		await expect( imageDom ).toHaveAttribute(
 			'src',
-			new RegExp( filename )
+			new RegExp( fileName )
 		);
 	} );
 
@@ -695,6 +695,39 @@ test.describe( 'Image', () => {
 		const linkDom = figureDom.locator( 'a' );
 		await expect( linkDom ).toBeVisible();
 		await expect( linkDom ).toHaveAttribute( 'href', url );
+	} );
+
+	test( 'appends http protocol to links added which are missing a protocol', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		const urlPopover = page.locator(
+			'.block-editor-url-popover__link-editor'
+		);
+		const urlInput = urlPopover.getByRole( 'combobox', { name: 'URL' } );
+
+		await urlInput.fill( 'example.com' );
+		await urlPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Move to "Edit" and switch UI back to edit mode
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the value of the URL input has had http:// prepended.
+		await expect( urlInput ).toHaveValue( 'http://example.com' );
 	} );
 
 	test( 'should upload external image to media library', async ( {
@@ -859,17 +892,17 @@ test.describe( 'Image', () => {
 			} )
 		).toBeFocused();
 
-		// Select "Expand on click", then remove it.
+		// Select "Enlarge on click", then remove it.
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Expand on click' } )
+			page.getByRole( 'menuitem', { name: 'Enlarge on click' } )
 		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Disable expand on click',
+				name: 'Disable enlarge on click',
 			} )
 		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
@@ -933,7 +966,7 @@ test.describe( 'Image - lightbox', () => {
 
 				await expect(
 					page.getByRole( 'menuitem', {
-						name: 'Expand on click',
+						name: 'Enlarge on click',
 					} )
 				).toBeHidden();
 			} );
@@ -958,13 +991,13 @@ test.describe( 'Image - lightbox', () => {
 
 				await page
 					.getByRole( 'button', {
-						name: 'Disable expand on click',
+						name: 'Disable enlarge on click',
 					} )
 					.click();
 
 				await expect(
 					page.getByRole( 'menuitem', {
-						name: 'Expand on click',
+						name: 'Enlarge on click',
 					} )
 				).toBeHidden();
 			} );
@@ -1037,7 +1070,7 @@ test.describe( 'Image - Site editor', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		const filename = await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
@@ -1045,11 +1078,11 @@ test.describe( 'Image - Site editor', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
-<figure class="wp-block-image size-full"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\1"/></figure>
+<figure class="wp-block-image size-full"><img src="[^"]+\\/${ fileName }\\.png" alt="" class="wp-image-\\1"/></figure>
 <!-- \\/wp:image -->`
 		);
 		expect( await editor.getEditedPostContent() ).toMatch( regex );
@@ -1072,16 +1105,16 @@ class ImageBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
-		const filepath = customFile
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
+		const filePath = customFile
 			? path.join( this.basePath, customFile )
 			: this.TEST_IMAGE_FILE_PATH;
-		await fs.copyFile( filepath, tmpFileName );
+		await fs.copyFile( filePath, tmpFileName );
 
 		await inputElement.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 
 	async getImageBuffer( url ) {

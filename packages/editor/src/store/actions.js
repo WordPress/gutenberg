@@ -23,7 +23,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { TRASH_POST_NOTICE_ID } from './constants';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -35,9 +34,9 @@ import { unlock } from '../lock-unlock';
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post     Post object.
- * @param {Object} edits    Initial edited attributes object.
- * @param {Array?} template Block Template.
+ * @param {Object} post       Post object.
+ * @param {Object} edits      Initial edited attributes object.
+ * @param {Array}  [template] Block Template.
  */
 export const setupEditor =
 	( post, edits, template ) =>
@@ -157,28 +156,13 @@ export function setEditedPost( postType, postId ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits   Post attributes to edit.
- * @param {Object} options Options for the edit.
+ * @param {Object} edits     Post attributes to edit.
+ * @param {Object} [options] Options for the edit.
  *
  * @example
  * ```js
  * // Update the post title
  * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
- * ```
- *
- * @example
- *```js
- * 	// Get specific media size based on the featured media ID
- * 	// Note: change sizes?.large for any registered size
- * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
- * 		const getFeaturedMediaId =
- * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
- *
- * 		return (
- * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
- * 		);
- * }, [] );
  * ```
  *
  * @return {Object} Action object
@@ -195,7 +179,7 @@ export const editPost =
 /**
  * Action for saving the current post in the editor.
  *
- * @param {Object} options
+ * @param {Object} [options]
  */
 export const savePost =
 	( options = {} ) =>
@@ -347,7 +331,6 @@ export const trashPost =
 		const postType = await registry
 			.resolveSelect( coreStore )
 			.getPostType( postTypeSlug );
-		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
 		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
@@ -375,7 +358,8 @@ export const trashPost =
  * autosaving (e.g. on the Web, the post might be committed to Session
  * Storage).
  *
- * @param {Object?} options Extra flags to identify the autosave.
+ * @param {Object}  [options]       Extra flags to identify the autosave.
+ * @param {boolean} [options.local] Whether to perform a local autosave.
  */
 export const autosave =
 	( { local = false, ...options } = {} ) =>
@@ -598,8 +582,8 @@ export function unlockPostAutosaving( lockName ) {
 /**
  * Returns an action object used to signal that the blocks have been updated.
  *
- * @param {Array}   blocks  Block Array.
- * @param {?Object} options Optional options.
+ * @param {Array}  blocks    Block Array.
+ * @param {Object} [options] Optional options.
  */
 export const resetEditorBlocks =
 	( blocks, options = {} ) =>

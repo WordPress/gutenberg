@@ -13,6 +13,7 @@ type SelectControlBaseProps< V extends string > = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
 	| '__next40pxDefaultSize'
+	| '__shouldNotWarnDeprecated36pxSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'

@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+## 22.16.0 (2025-09-03)
+
+## 22.15.0 (2025-08-20)
+
+## 22.14.0 (2025-08-07)
+
+## 22.13.0 (2025-07-23)
+
+### Enhancements
+
+- Added stricter ESLint checks for translator comments.
+- Supports unnamed (%s, %d, %f), positional (%1$s, etc.) and named placeholders.
+- Flags missing and extra/outdated placeholders.
+
+## 22.12.0 (2025-06-25)
+
+## 22.11.0 (2025-06-04)
+
+## 22.10.0 (2025-05-22)
+
+## 22.9.0 (2025-05-07)
+
+## 22.8.0 (2025-04-11)
+
+## 22.7.0 (2025-03-27)
+
+## 22.6.0 (2025-03-13)
+
+## 22.5.0 (2025-02-28)
+
+## 22.4.0 (2025-02-12)
+
+## 22.3.0 (2025-01-29)
+
+## 22.2.0 (2025-01-15)
+
+## 22.1.0 (2025-01-02)
+
+## 22.0.0 (2024-12-11)
+
+### Breaking Changes
+
+-   The minimum required TypeScript version changed to 5 ([#67461](https://github.com/WordPress/gutenberg/pull/67461))
+
+## 21.6.0 (2024-11-27)
+
 ## 21.5.0 (2024-11-16)
 
 ## 21.4.0 (2024-10-30)
@@ -16,8 +62,8 @@
 
 ### Breaking Changes
 
-- Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
-- Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
+-   Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
+-   Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
 
 ## 20.3.0 (2024-08-21)
 
@@ -28,8 +74,9 @@
 ## 20.0.0 (2024-07-10)
 
 ### Breaking Changes
-- Add [`@typescript-eslint/no-unused-vars` rule](https://typescript-eslint.io/rules/no-unused-vars) to the recommended TypeScript ruleset ([#62925](https://github.com/WordPress/gutenberg/pull/62925)).
-- Add [`@typescript-eslint/method-signature-style` rule](https://typescript-eslint.io/rules/method-signature-style) to the recommended TypeScript ruleset ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
+-   Add [`@typescript-eslint/no-unused-vars` rule](https://typescript-eslint.io/rules/no-unused-vars) to the recommended TypeScript ruleset ([#62925](https://github.com/WordPress/gutenberg/pull/62925)).
+-   Add [`@typescript-eslint/method-signature-style` rule](https://typescript-eslint.io/rules/method-signature-style) to the recommended TypeScript ruleset ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
 
 ## 19.2.0 (2024-06-26)
 

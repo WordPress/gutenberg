@@ -10,6 +10,8 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 	public function filter_allowed_html( $tags ) {
 		$tags['form']['class']   = true;
 		$tags['form']['enctype'] = true;
+		$tags['form']['style']   = true;
+		$tags['form']['id']      = true;
 		return $tags;
 	}
 
@@ -25,6 +27,9 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 		$block = preg_replace( "/src=['\"]data:[^'\"]+['\"]/", 'src="https://wordpress.org/foo.jpg"', $block );
 		$block = preg_replace( "/href=['\"]data:[^'\"]+['\"]/", 'href="https://wordpress.org/foo.jpg"', $block );
 		$block = preg_replace( '/url\(data:[^)]+\)/', 'url(https://wordpress.org/foo.jpg)', $block );
+
+		// Account for a wp-env override using a port other than 8889 for the tests environment.
+		$block = preg_replace( '#http://localhost:\d+/#', home_url( '/' ), $block );
 
 		add_filter( 'wp_kses_allowed_html', array( $this, 'filter_allowed_html' ) );
 		$kses_block = wp_kses_post( $block );

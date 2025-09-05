@@ -26,21 +26,21 @@ export const settings = {
 			customOverlayColor: '#065174',
 			dimRatio: 40,
 			url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+			style: {
+				typography: {
+					fontSize: 48,
+				},
+				color: {
+					text: 'white',
+				},
+			},
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: __( '<strong>Snow Patrol</strong>' ),
+					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
 					align: 'center',
-					style: {
-						typography: {
-							fontSize: 48,
-						},
-						color: {
-							text: 'white',
-						},
-					},
 				},
 			},
 		],

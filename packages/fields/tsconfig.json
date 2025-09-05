@@ -2,8 +2,6 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"checkJs": false
 	},
 	"references": [
@@ -12,6 +10,7 @@
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
+		{ "path": "../block-editor" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../date" },
@@ -26,7 +25,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../router" },
 		{ "path": "../url" },
+		{ "path": "../block-editor" },
 		{ "path": "../warning" }
-	],
-	"include": [ "src" ]
+	]
 }

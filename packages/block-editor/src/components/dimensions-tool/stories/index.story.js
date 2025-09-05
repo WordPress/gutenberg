@@ -13,10 +13,11 @@ import {
 import DimensionsTool from '..';
 
 export default {
-	title: 'BlockEditor (Private APIs)/DimensionsTool',
+	title: 'BlockEditor/DimensionsTool/DimensionsTool',
 	component: DimensionsTool,
+	tags: [ 'status-private' ],
 	argTypes: {
-		panelId: { control: { type: null } },
+		panelId: { control: false },
 		onChange: { action: 'changed' },
 	},
 };

@@ -32,6 +32,9 @@ export const rootEntitiesConfig = [
 				'site_logo',
 				'timezone_string',
 				'url',
+				'page_for_posts',
+				'page_on_front',
+				'show_on_front',
 			].join( ',' ),
 		},
 		// The entity doesn't support selecting multiple records.
@@ -135,8 +138,10 @@ export const rootEntitiesConfig = [
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		getTitle: ( record ) => record?.name || record?.slug,
 		baseURLParams: { context: 'edit' },
 		plural: 'users',
+		supportsPagination: true,
 	},
 	{
 		name: 'comment',
@@ -145,6 +150,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menu',
@@ -153,6 +159,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menuItem',
@@ -162,6 +169,7 @@ export const rootEntitiesConfig = [
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 		rawAttributes: [ 'title' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'menuLocation',
@@ -179,7 +187,7 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // Should be different from name.
-		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		getTitle: () => __( 'Custom Styles' ),
 		getRevisionsUrl: ( parentId, revisionId ) =>
 			`/wp/v2/global-styles/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
@@ -214,6 +222,18 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 	},
 ];
+
+export const deprecatedEntities = {
+	root: {
+		media: {
+			since: '6.9',
+			alternative: {
+				kind: 'postType',
+				name: 'attachment',
+			},
+		},
+	},
+};
 
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
@@ -376,6 +396,8 @@ async function loadTaxonomyEntities() {
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.name,
+			getTitle: ( record ) => record?.name,
+			supportsPagination: true,
 		};
 	} );
 }

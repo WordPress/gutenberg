@@ -41,6 +41,7 @@ function MyCustomSelectControl() {
 	const [ , setFontSize ] = useState();
 	return (
 		<CustomSelectControl
+			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
@@ -52,6 +53,7 @@ function MyControlledCustomSelectControl() {
 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
 	return (
 		<CustomSelectControl
+			__next40pxDefaultSize
 			label="Font Size"
 			options={ options }
 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }

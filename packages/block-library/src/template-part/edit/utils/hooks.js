@@ -136,14 +136,9 @@ export function useCreateTemplatePartFromBlocks( area, setAttributes ) {
 export function useTemplatePartArea( area ) {
 	return useSelect(
 		( select ) => {
-			// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
-			// Blocks can be loaded into a *non-post* block editor.
-			/* eslint-disable @wordpress/data-no-store-string-literals */
 			const definedAreas =
-				select(
-					'core/editor'
-				).__experimentalGetDefaultTemplatePartAreas();
-			/* eslint-enable @wordpress/data-no-store-string-literals */
+				select( coreStore ).getCurrentTheme()
+					?.default_template_part_areas || [];
 
 			const selectedArea = definedAreas.find(
 				( definedArea ) => definedArea.area === area

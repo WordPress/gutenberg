@@ -14,6 +14,13 @@ const orderField: Field< BasePost > = {
 	type: 'integer',
 	label: __( 'Order' ),
 	description: __( 'Determines the order of pages.' ),
+	filterBy: false,
+	isValid: {
+		required: true,
+	},
 };
 
+/**
+ * Order field for BasePost.
+ */
 export default orderField;

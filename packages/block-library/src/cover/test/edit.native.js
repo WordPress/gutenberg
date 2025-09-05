@@ -101,7 +101,7 @@ const attributes = {
 };
 
 beforeAll( () => {
-	// Mock Image.getSize to avoid failed attempt to size non-existant image.
+	// Mock Image.getSize to avoid failed attempt to size non-existent image.
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
@@ -541,7 +541,7 @@ describe( 'color settings', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
+	it( 'clears the selected overlay color and maintains the inner blocks', async () => {
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );

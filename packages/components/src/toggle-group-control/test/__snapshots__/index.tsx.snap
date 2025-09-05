@@ -44,8 +44,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   display: inline-flex;
   min-width: 0;
   position: relative;
-  min-height: 36px;
-  padding: 2px;
+  min-height: 40px;
+  padding: 3px;
 }
 
 .emotion-8:hover {
@@ -72,7 +72,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: #1e1e1e;
+  background: var(--wp-components-color-foreground, #1e1e1e);
   outline: 2px solid transparent;
   outline-offset: -3px;
   --antialiasing-factor: 100;
@@ -134,7 +134,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -158,12 +158,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: #1e1e1e;
-  height: 30px;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  height: 32px;
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: #fff;
+  color: var(--wp-components-color-foreground-inverted, #fff);
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -183,7 +183,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-12:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 .emotion-12:active {
@@ -211,7 +211,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -235,8 +235,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: #1e1e1e;
-  height: 30px;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  height: 32px;
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
@@ -259,7 +259,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 }
 
 .emotion-17:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 <div>
@@ -357,7 +357,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
     </div>
   </div>
   <button
-    class="components-button"
+    class="components-button is-next-40px-default-size"
     type="button"
   >
     Reset
@@ -409,8 +409,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   display: inline-flex;
   min-width: 0;
   position: relative;
-  min-height: 36px;
-  padding: 2px;
+  min-height: 40px;
+  padding: 3px;
 }
 
 .emotion-8:hover {
@@ -437,7 +437,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   content: '';
   position: absolute;
   pointer-events: none;
-  background: #1e1e1e;
+  background: var(--wp-components-color-foreground, #1e1e1e);
   outline: 2px solid transparent;
   outline-offset: -3px;
   --antialiasing-factor: 100;
@@ -499,7 +499,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -542,7 +542,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 }
 
 .emotion-12:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 .emotion-13 {
@@ -626,7 +626,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
     </div>
   </div>
   <button
-    class="components-button"
+    class="components-button is-next-40px-default-size"
     type="button"
   >
     Reset
@@ -678,8 +678,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   display: inline-flex;
   min-width: 0;
   position: relative;
-  min-height: 36px;
-  padding: 2px;
+  min-height: 40px;
+  padding: 3px;
 }
 
 .emotion-8:hover {
@@ -706,7 +706,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: #1e1e1e;
+  background: var(--wp-components-color-foreground, #1e1e1e);
   outline: 2px solid transparent;
   outline-offset: -3px;
   --antialiasing-factor: 100;
@@ -768,7 +768,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -792,12 +792,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: #1e1e1e;
-  height: 30px;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  height: 32px;
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
-  color: #fff;
+  color: var(--wp-components-color-foreground-inverted, #fff);
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -817,7 +817,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-12:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 .emotion-12:active {
@@ -845,7 +845,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -869,8 +869,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: #1e1e1e;
-  height: 30px;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  height: 32px;
   aspect-ratio: 1;
   padding-left: 0;
   padding-right: 0;
@@ -893,7 +893,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 }
 
 .emotion-17:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 <div>
@@ -1037,8 +1037,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   display: inline-flex;
   min-width: 0;
   position: relative;
-  min-height: 36px;
-  padding: 2px;
+  min-height: 40px;
+  padding: 3px;
 }
 
 .emotion-8:hover {
@@ -1065,7 +1065,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   content: '';
   position: absolute;
   pointer-events: none;
-  background: #1e1e1e;
+  background: var(--wp-components-color-foreground, #1e1e1e);
   outline: 2px solid transparent;
   outline-offset: -3px;
   --antialiasing-factor: 100;
@@ -1127,7 +1127,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   background: transparent;
   border: none;
   border-radius: 1px;
-  color: #757575;
+  color: var(--wp-components-color-gray-700, #757575);
   fill: currentColor;
   cursor: pointer;
   display: -webkit-box;
@@ -1170,7 +1170,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 }
 
 .emotion-12:active {
-  background: #fff;
+  background: var(--wp-components-color-background, #fff);
 }
 
 .emotion-13 {

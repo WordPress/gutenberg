@@ -72,7 +72,7 @@ export const getPatternTransformedBlocks = (
 			// No need to loop through other pattern's blocks.
 			break;
 		}
-		// Bail eary if a selected block has not been matched.
+		// Bail early if a selected block has not been matched.
 		if ( ! isMatch ) {
 			return;
 		}

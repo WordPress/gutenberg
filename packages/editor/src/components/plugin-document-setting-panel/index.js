@@ -22,7 +22,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  * @param {string}                [props.className]                     An optional class name added to the row.
  * @param {string}                [props.title]                         The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
- * @param {Element}               props.children                        Children to be rendered
+ * @param {React.ReactNode}       props.children                        Children to be rendered
  *
  * @example
  * ```js
@@ -64,7 +64,7 @@ const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
  *  registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
  * ```
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The component to be rendered.
  */
 const PluginDocumentSettingPanel = ( {
 	name,

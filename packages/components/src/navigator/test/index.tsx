@@ -75,6 +75,7 @@ function CustomNavigatorButton( {
 } ) {
 	return (
 		<Navigator.Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
@@ -95,6 +96,7 @@ function CustomNavigatorGoToBackButton( {
 	const { goTo } = useNavigator();
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				goTo( path, { isBack: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
@@ -115,6 +117,7 @@ function CustomNavigatorGoToSkipFocusButton( {
 	const { goTo } = useNavigator();
 	return (
 		<Button
+			__next40pxDefaultSize
 			onClick={ () => {
 				goTo( path, { skipFocus: true } );
 				// Used to spy on the values passed to `navigator.goTo`.
@@ -136,6 +139,7 @@ function CustomNavigatorBackButton( {
 } ) {
 	return (
 		<Navigator.BackButton
+			__next40pxDefaultSize
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );

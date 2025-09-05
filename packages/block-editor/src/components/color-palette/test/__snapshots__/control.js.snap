@@ -203,7 +203,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 class="components-circular-option-picker"
               >
                 <div
-                  aria-label="Custom color picker."
+                  aria-label="Custom color picker"
                   id="components-circular-option-picker-0"
                   role="listbox"
                 >
@@ -217,9 +217,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                         class="components-circular-option-picker__option-wrapper"
                       >
                         <button
-                          aria-label="Color: red"
+                          aria-label="red"
                           aria-selected="true"
-                          class="components-button components-circular-option-picker__option"
+                          class="components-button components-circular-option-picker__option is-next-40px-default-size"
                           data-active-item="true"
                           id="components-circular-option-picker-0-0"
                           role="option"
@@ -247,7 +247,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                   class="components-circular-option-picker__custom-clear-wrapper"
                 >
                   <button
-                    class="components-button components-circular-option-picker__clear is-tertiary"
+                    class="components-button components-circular-option-picker__clear is-next-40px-default-size is-tertiary"
                     type="button"
                   >
                     Clear

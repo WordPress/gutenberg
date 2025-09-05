@@ -726,6 +726,18 @@
 		"parent": "components"
 	},
 	{
+		"title": "DateCalendar",
+		"slug": "date-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "DateRangeCalendar",
+		"slug": "date-range-calendar",
+		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "CardBody",
 		"slug": "card-body",
 		"markdown_source": "../packages/components/src/card/card-body/README.md",
@@ -1968,6 +1980,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/upload-media",
+		"slug": "packages-upload-media",
+		"markdown_source": "../packages/upload-media/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
@@ -2382,7 +2400,7 @@
 		"parent": "contributors"
 	},
 	{
-		"title": "Versions in WordPress",
+		"title": "Gutenberg versions in WordPress",
 		"slug": "versions-in-wordpress",
 		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
 		"parent": "contributors"

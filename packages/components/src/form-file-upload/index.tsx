@@ -9,15 +9,17 @@ import { useRef } from '@wordpress/element';
 import Button from '../button';
 import type { WordPressComponentProps } from '../context';
 import type { FormFileUploadProps } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 /**
- * FormFileUpload is a component that allows users to select files from their local device.
+ * FormFileUpload allows users to select files from their local device.
  *
  * ```jsx
  * import { FormFileUpload } from '@wordpress/components';
  *
  * const MyFormFileUpload = () => (
  *   <FormFileUpload
+ *     __next40pxDefaultSize
  *     accept="image/*"
  *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
  *   >
@@ -40,6 +42,15 @@ export function FormFileUpload( {
 		ref.current?.click();
 	};
 
+	if ( ! render ) {
+		maybeWarnDeprecated36pxSize( {
+			componentName: 'FormFileUpload',
+			__next40pxDefaultSize: props.__next40pxDefaultSize,
+			// @ts-expect-error - We don't "officially" support all Button props but this likely happens.
+			size: props.size,
+		} );
+	}
+
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
@@ -47,11 +58,11 @@ export function FormFileUpload( {
 			{ children }
 		</Button>
 	);
-	// @todo: Temporary fix a bug that prevents Chromium browsers from selecting ".heic" files
-	// from the file upload. See https://core.trac.wordpress.org/ticket/62268#comment:4.
-	// This can be removed once the Chromium fix is in the stable channel.
-	const compatAccept = !! accept?.includes( 'image/*' )
-		? `${ accept }, image/heic, image/heif`
+
+	// iOS browsers may not reliably handle 'audio/*' in the accept attribute.
+	// Adding explicit audio MIME types improves compatibility across all devices.
+	const compatAccept = accept?.includes( 'audio/*' )
+		? `${ accept }, audio/mp3, audio/x-m4a, audio/x-m4b, audio/x-m4p, audio/x-wav, audio/webm`
 		: accept;
 
 	return (

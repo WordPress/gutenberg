@@ -59,7 +59,7 @@ function useResourcePermissions< IdType = void >(
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ * @param    resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
  *                    or REST base as a string - `media`.
  * @param    id       Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged
  *                    when using an entity object as a resource to check permissions and will be ignored.

@@ -39,8 +39,7 @@ function Slot(
 		...restProps
 	} = props;
 
-	const { registerSlot, unregisterSlot, ...registry } =
-		useContext( SlotFillContext );
+	const registry = useContext( SlotFillContext );
 
 	const ref = useRef< HTMLElement >( null );
 
@@ -54,11 +53,9 @@ function Slot(
 	}, [ fillProps ] );
 
 	useLayoutEffect( () => {
-		registerSlot( name, ref, fillPropsRef.current );
-		return () => {
-			unregisterSlot( name, ref );
-		};
-	}, [ registerSlot, unregisterSlot, name ] );
+		registry.registerSlot( name, ref, fillPropsRef.current );
+		return () => registry.unregisterSlot( name, ref );
+	}, [ registry, name ] );
 
 	useLayoutEffect( () => {
 		registry.updateSlot( name, ref, fillPropsRef.current );

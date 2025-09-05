@@ -157,7 +157,7 @@ export function useRichText( {
 
 	const didMountRef = useRef( false );
 
-	// Value updates must happen synchonously to avoid overwriting newer values.
+	// Value updates must happen synchronously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( didMountRef.current && value !== _valueRef.current ) {
 			applyFromProps();
@@ -165,7 +165,7 @@ export function useRichText( {
 		}
 	}, [ value ] );
 
-	// Value updates must happen synchonously to avoid overwriting newer values.
+	// Value updates must happen synchronously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( ! hadSelectionUpdateRef.current ) {
 			return;

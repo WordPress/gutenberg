@@ -270,7 +270,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: The rendered DocumentBar component.
+-   `React.ReactNode`: The rendered DocumentBar component.
 
 ### DocumentOutline
 
@@ -279,13 +279,12 @@ Renders a document outline component.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.onSelect_ `Function`: Function to be called when an outline item is selected.
--   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
+-   _props.onSelect_ `Function`: Function to be called when an outline item is selected
 -   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### DocumentOutlineCheck
 
@@ -294,11 +293,11 @@ Component check if there are any headings (core/heading blocks) present in the d
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component|null`: The component to be rendered or null if there are headings.
+-   `React.ReactNode`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
@@ -311,7 +310,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### EditorHistoryUndo
 
@@ -324,7 +323,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### EditorKeyboardShortcuts
 
@@ -352,7 +351,7 @@ _Usage_
 
 _Returns_
 
--   `JSX.Element`: The rendered EditorNotices component.
+-   `React.ReactNode`: The rendered EditorNotices component.
 
 ### EditorProvider
 
@@ -380,11 +379,11 @@ _Parameters_
 -   _props.post_ `[Object]`: The post object to edit. This is required.
 -   _props.\_\_unstableTemplate_ `[Object]`: The template object wrapper the edited post. This is optional and can only be used when the post type supports templates (like posts and pages).
 -   _props.settings_ `[Object]`: The settings object to use for the editor. This is optional and can be used to override the default settings.
--   _props.children_ `[Element]`: Children elements for which the BlockEditorProvider context should apply. This is optional.
+-   _props.children_ `[React.ReactNode]`: Children elements for which the BlockEditorProvider context should apply. This is optional.
 
 _Returns_
 
--   `JSX.Element`: The rendered EditorProvider component.
+-   `React.ReactNode`: The rendered EditorProvider component.
 
 ### EditorSnackbars
 
@@ -392,7 +391,7 @@ Renders the editor snackbars component.
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### EntitiesSavedStates
 
@@ -402,11 +401,12 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `Function`: The function to render the dialog.
+-   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### ErrorBoundary
 
@@ -489,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 
@@ -500,6 +500,8 @@ _Parameters_
 -   _$0.maxUploadFileSize_ `?number`: Maximum upload size in bytes allowed for the site.
 -   _$0.onError_ `Function`: Function called when an error happens.
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
+-   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
+-   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
 
 ### MediaUploadCheck
 
@@ -524,11 +526,11 @@ Wrapper component that renders its children only if the post type supports page 
 _Parameters_
 
 -   _props_ `Object`: - The component props.
--   _props.children_ `Element`: - The child components to render.
+-   _props.children_ `React.ReactNode`: - The child components to render.
 
 _Returns_
 
--   `Component|null`: The rendered child components or null if page attributes are not supported.
+-   `React.ReactNode`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
@@ -536,7 +538,7 @@ Renders the Page Attributes Order component. A number input in an editor interfa
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PageAttributesPanel
 
@@ -544,7 +546,7 @@ Renders the Page Attributes Panel component.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PageAttributesParent
 
@@ -552,7 +554,7 @@ Renders the Page Attributes Parent component. A dropdown menu in an editor inter
 
 _Returns_
 
--   `Component|null`: The component to be rendered. Return null if post type is not hierarchical.
+-   `React.ReactNode`: The component to be rendered. Return null if post type is not hierarchical.
 
 ### PageTemplate
 
@@ -562,7 +564,7 @@ The dropdown menu includes a button for toggling the menu, a list of available t
 
 _Returns_
 
--   `JSX.Element`: The rendered ClassicThemeControl component.
+-   `React.ReactNode`: The rendered ClassicThemeControl component.
 
 ### PanelColorSettings
 
@@ -628,7 +630,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PluginDocumentSettingPanel
 
@@ -685,11 +687,11 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the row.
 -   _props.title_ `[string]`: The title of the panel
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
+-   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The component to be rendered.
 
 ### PluginMoreMenuItem
 
@@ -739,6 +741,7 @@ const MyButtonMoreMenuItem = () => (
 _Parameters_
 
 -   _props_ `Object`: Component properties.
+-   _props.children_ `[React.ReactNode]`: Children to be rendered.
 -   _props.href_ `[string]`: When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
@@ -746,7 +749,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PluginPostPublishPanel
 
@@ -777,11 +780,11 @@ _Parameters_
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
+-   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PluginPostStatusInfo
 
@@ -821,11 +824,11 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PluginPrePublishPanel
 
@@ -855,12 +858,12 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. If `false` is passed, no icon will be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PluginPreviewMenuItem
 
@@ -890,6 +893,7 @@ registerPlugin( 'external-preview-menu-item', {
 _Parameters_
 
 -   _props_ `Object`: Component properties.
+-   _props.children_ `[React.ReactNode]`: Children to be rendered.
 -   _props.href_ `[string]`: When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
 -   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
@@ -897,7 +901,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The rendered menu item component.
+-   `React.ReactNode`: The rendered menu item component.
 
 ### PluginSidebar
 
@@ -954,6 +958,7 @@ _Parameters_
 
 -   _props_ `Object`: Element props.
 -   _props.name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
+-   _props.children_ `[React.ReactNode]`: Children to be rendered.
 -   _props.className_ `[string]`: An optional class name added to the sidebar body.
 -   _props.title_ `string`: Title displayed at the top of the sidebar.
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
@@ -1000,11 +1005,12 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.target_ `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+-   _props.children_ `[React.ReactNode]`: Children to be rendered.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostAuthor
 
@@ -1012,7 +1018,7 @@ Renders the component for selecting the post author.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostAuthorCheck
 
@@ -1021,11 +1027,11 @@ Wrapper component that renders its children only if the post type supports the a
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component|null`: The component to be rendered. Return `null` if the post type doesn't supports the author or if there are no authors available.
+-   `React.ReactNode`: The component to be rendered. Return `null` if the post type doesn't supports the author or if there are no authors available.
 
 ### PostAuthorPanel
 
@@ -1033,7 +1039,7 @@ Renders the Post Author Panel component.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostComments
 
@@ -1041,7 +1047,7 @@ A form for managing comment status.
 
 _Returns_
 
--   `JSX.Element`: The rendered PostComments component.
+-   `React.ReactNode`: The rendered PostComments component.
 
 ### PostDiscussionPanel
 
@@ -1049,7 +1055,7 @@ This component allows to update comment and pingback settings for the current po
 
 _Returns_
 
--   `JSX.Element|null`: The rendered PostDiscussionPanel component.
+-   `React.ReactNode`: The rendered PostDiscussionPanel component.
 
 ### PostExcerpt
 
@@ -1068,11 +1074,11 @@ Component for checking if the post type supports the excerpt field.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostExcerptPanel
 
@@ -1080,7 +1086,7 @@ Is rendered if the post type supports excerpts and allows editing the excerpt.
 
 _Returns_
 
--   `JSX.Element`: The rendered PostExcerptPanel component.
+-   `React.ReactNode`: The rendered PostExcerptPanel component.
 
 ### PostFeaturedImage
 
@@ -1109,11 +1115,11 @@ Wrapper component that renders its children only if the post type supports a fea
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostFeaturedImagePanel
 
@@ -1126,7 +1132,7 @@ _Parameters_
 
 _Returns_
 
--   `Component|null`: The component to be rendered. Return Null if the editor panel is disabled for featured image.
+-   `React.ReactNode`: The component to be rendered. Return Null if the editor panel is disabled for featured image.
 
 ### PostFormat
 
@@ -1140,7 +1146,7 @@ _Usage_
 
 _Returns_
 
--   `JSX.Element`: The rendered PostFormat component.
+-   `React.ReactNode`: The rendered PostFormat component.
 
 ### PostFormatCheck
 
@@ -1149,11 +1155,11 @@ Component check if there are any post formats.
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `Element`: The child elements to render.
+-   _props.children_ `React.ReactNode`: The child elements to render.
 
 _Returns_
 
--   `Component|null`: The rendered component or null if post formats are disabled.
+-   `React.ReactNode`: The rendered component or null if post formats are disabled.
 
 ### PostLastRevision
 
@@ -1161,7 +1167,7 @@ Renders the component for displaying the last revision of a post.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostLastRevisionCheck
 
@@ -1170,11 +1176,11 @@ Wrapper component that renders its children if the post has more than one revisi
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component|null`: Rendered child components if post has more than one revision, otherwise null.
+-   `React.ReactNode`: Rendered child components if post has more than one revision, otherwise null.
 
 ### PostLastRevisionPanel
 
@@ -1182,7 +1188,7 @@ Renders the panel for displaying the last revision of a post.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostLockedModal
 
@@ -1190,7 +1196,7 @@ A modal component that is displayed when a post is locked for editing by another
 
 _Returns_
 
--   `JSX.Element|null`: The rendered PostLockedModal component.
+-   `React.ReactNode`: The rendered PostLockedModal component.
 
 ### PostPendingStatus
 
@@ -1198,7 +1204,7 @@ A component for displaying and toggling the pending status of a post.
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### PostPendingStatusCheck
 
@@ -1207,11 +1213,11 @@ This component checks the publishing status of the current post. If the post is 
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `JSX.Element|null`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
+-   `React.ReactNode`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
 
 ### PostPingbacks
 
@@ -1232,7 +1238,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element|null`: The rendered button component.
+-   `React.ReactNode`: The rendered button component.
 
 ### PostPublishButton
 
@@ -1274,7 +1280,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostScheduleCheck
 
@@ -1283,11 +1289,11 @@ Wrapper component that renders its children only if post has a publish action.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component`: - The component to be rendered or null if there is no publish action.
+-   `React.ReactNode`: - The component to be rendered or null if there is no publish action.
 
 ### PostScheduleLabel
 
@@ -1299,7 +1305,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostSchedulePanel
 
@@ -1307,28 +1313,7 @@ Renders the Post Schedule Panel component.
 
 _Returns_
 
--   `Component`: The component to be rendered.
-
-### PostSlug
-
-Renders the PostSlug component. It provide a control for editing the post slug.
-
-_Returns_
-
--   `Component`: The component to be rendered.
-
-### PostSlugCheck
-
-Wrapper component that renders its children only if the post type supports the slug.
-
-_Parameters_
-
--   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
-
-_Returns_
-
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostSticky
 
@@ -1336,7 +1321,7 @@ Renders the PostSticky component. It provides a checkbox control for the sticky 
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The rendered component.
 
 ### PostStickyCheck
 
@@ -1345,11 +1330,11 @@ Wrapper component that renders its children only if post has a sticky action.
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered.
+-   _props.children_ `React.ReactNode`: Children to be rendered.
 
 _Returns_
 
--   `Component`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
+-   `React.ReactNode`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
 
 ### PostSwitchToDraftButton
 
@@ -1357,7 +1342,7 @@ Renders a button component that allows the user to switch a post to draft status
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### PostSyncStatus
 
@@ -1365,7 +1350,7 @@ Renders the sync status of a post.
 
 _Returns_
 
--   `JSX.Element|null`: The rendered sync status component.
+-   `React.ReactNode`: The rendered sync status component.
 
 ### PostTaxonomies
 
@@ -1387,11 +1372,11 @@ Renders the children components only if the current post type has taxonomies.
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `Element`: The children components to render.
+-   _props.children_ `React.ReactNode`: The children components to render.
 
 _Returns_
 
--   `Component|null`: The rendered children components or null if the current post type has no taxonomies.
+-   `React.ReactNode`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
@@ -1405,7 +1390,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: The rendered flat term selector component.
+-   `React.ReactNode`: The rendered flat term selector component.
 
 ### PostTaxonomiesHierarchicalTermSelector
 
@@ -1422,17 +1407,11 @@ _Returns_
 
 ### PostTaxonomiesPanel
 
-Renders a panel for a specific taxonomy.
-
-_Parameters_
-
--   _props_ `Object`: The component props.
--   _props.taxonomy_ `Object`: The taxonomy object.
--   _props.children_ `Element`: The child components.
+Component that renders the post taxonomies panel.
 
 _Returns_
 
--   `Component`: The rendered taxonomy panel.
+-   `React.ReactNode`: The rendered component.
 
 ### PostTemplatePanel
 
@@ -1440,7 +1419,7 @@ Displays the template controls based on the current editor settings and user per
 
 _Returns_
 
--   `JSX.Element|null`: The rendered PostTemplatePanel component.
+-   `React.ReactNode`: The rendered PostTemplatePanel component.
 
 ### PostTextEditor
 
@@ -1448,7 +1427,7 @@ Displays the Post Text Editor along with content in Visual and Text mode.
 
 _Returns_
 
--   `JSX.Element|null`: The rendered PostTextEditor component.
+-   `React.ReactNode`: The rendered PostTextEditor component.
 
 ### PostTitle
 
@@ -1461,7 +1440,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: The rendered PostTitle component.
+-   `React.ReactNode`: The rendered PostTitle component.
 
 ### PostTitleRaw
 
@@ -1477,20 +1456,20 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element|null`: The rendered PostTrash component.
+-   `React.ReactNode`: The rendered PostTrash component.
 
 ### PostTrashCheck
 
-Wrapper component that renders its children only if the post can trashed.
+Wrapper component that renders its children only if the post can be trashed.
 
 _Parameters_
 
--   _props_ `Object`: - The component props.
--   _props.children_ `Element`: - The child components to render.
+-   _props_ `Object`: The component props.
+-   _props.children_ `React.ReactNode`: The child components.
 
 _Returns_
 
--   `Component|null`: The rendered child components or null if the post can not trashed.
+-   `React.ReactNode`: The rendered child components or null if the post can't be trashed.
 
 ### PostTypeSupportCheck
 
@@ -1499,12 +1478,12 @@ A component which renders its own children only if the current editor post type 
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: Children to be rendered if post type supports.
+-   _props.children_ `React.ReactNode`: Children to be rendered if post type supports.
 -   _props.supportKeys_ `(string|string[])`: String or string array of keys to test.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `React.ReactNode`: The component to be rendered.
 
 ### PostURL
 
@@ -1518,11 +1497,12 @@ _Usage_
 
 _Parameters_
 
--   _onClose_ `Function`: Callback function to be executed when the popover is closed.
+-   _props_ `{ onClose: () => void }`: The props for the component.
+-   _props.onClose_ `() => void`: Callback function to be executed when the popover is closed.
 
 _Returns_
 
--   `Component`: The rendered PostURL component.
+-   `React.ReactNode`: The rendered PostURL component.
 
 ### PostURLCheck
 
@@ -1531,11 +1511,11 @@ Check if the post URL is valid and visible.
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `Element`: The child components.
+-   _props.children_ `React.ReactNode`: The child components.
 
 _Returns_
 
--   `Component|null`: The child components if the post URL is valid and visible, otherwise null.
+-   `React.ReactNode`: The child components if the post URL is valid and visible, otherwise null.
 
 ### PostURLLabel
 
@@ -1543,7 +1523,7 @@ Represents a label component for a post URL.
 
 _Returns_
 
--   `Component`: The PostURLLabel component.
+-   `React.ReactNode`: The PostURLLabel component.
 
 ### PostURLPanel
 
@@ -1551,7 +1531,7 @@ Renders the `PostURLPanel` component.
 
 _Returns_
 
--   `JSX.Element`: The rendered PostURLPanel component.
+-   `React.ReactNode`: The rendered PostURLPanel component.
 
 ### PostVisibility
 
@@ -1564,7 +1544,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### PostVisibilityCheck
 
@@ -1577,7 +1557,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `React.ReactNode`: The rendered component.
 
 ### PostVisibilityLabel
 
@@ -1602,6 +1582,18 @@ _Parameters_
 -   _kind_ `string`: Entity kind.
 -   _name_ `string`: Entity name.
 -   _config_ `Action`: Action configuration.
+
+### registerEntityField
+
+Registers a new DataViews field.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _config_ `Field`: Field configuration.
 
 ### RichText
 
@@ -1652,7 +1644,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: The rendered table of contents component.
+-   `React.ReactNode`: The rendered table of contents component.
 
 ### TextEditorGlobalKeyboardShortcuts
 
@@ -1667,12 +1659,12 @@ Checks if the current theme supports specific features and renders the children 
 _Parameters_
 
 -   _props_ `Object`: The component props.
--   _props.children_ `Element`: The children to render if the theme supports the specified features.
+-   _props.children_ `React.ReactNode`: The children to render if the theme supports the specified features.
 -   _props.supportKeys_ `string|string[]`: The key(s) of the theme support(s) to check.
 
 _Returns_
 
--   `JSX.Element|null`: The rendered children if the theme supports the specified features, otherwise null.
+-   `React.ReactNode`: The rendered children if the theme supports the specified features, otherwise null.
 
 ### TimeToRead
 
@@ -1680,7 +1672,7 @@ Component for showing Time To Read in Content.
 
 _Returns_
 
--   `JSX.Element`: The rendered TimeToRead component.
+-   `React.ReactNode`: The rendered TimeToRead component.
 
 ### transformStyles
 
@@ -1698,13 +1690,25 @@ _Parameters_
 -   _name_ `string`: Entity name.
 -   _actionId_ `string`: Action ID.
 
+### unregisterEntityField
+
+Unregisters a DataViews field.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _fieldId_ `string`: Field ID.
+
 ### UnsavedChangesWarning
 
 Warns the user if there are unsaved changes before leaving the editor. Compatible with Post Editor and Site Editor.
 
 _Returns_
 
--   `Component`: The component.
+-   `React.ReactNode`: The component.
 
 ### URLInput
 
@@ -1761,7 +1765,7 @@ A user mentions completer.
 
 _Type_
 
--   `WPCompleter`
+-   `Object`
 
 ### VisualEditorGlobalKeyboardShortcuts
 
@@ -1791,7 +1795,7 @@ Renders the word count of the post content.
 
 _Returns_
 
--   `JSX.Element|null`: The rendered WordCount component.
+-   `React.ReactNode`: The rendered WordCount component.
 
 ### WritingFlow
 

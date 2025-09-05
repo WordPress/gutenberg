@@ -113,6 +113,7 @@ export function DimensionControl( props: DimensionControlProps ) {
 		<ContextSystemProvider value={ CONTEXT_VALUE }>
 			<SelectControl
 				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__shouldNotWarnDeprecated36pxSize
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 				className={ clsx(
 					className,

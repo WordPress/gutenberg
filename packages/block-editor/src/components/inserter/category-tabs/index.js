@@ -6,7 +6,7 @@ import {
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,14 +35,13 @@ function CategoryTabs( {
 	const selectedTabId = selectedCategory ? selectedCategory.name : null;
 	const [ activeTabId, setActiveId ] = useState();
 	const firstTabId = categories?.[ 0 ]?.name;
-	useEffect( () => {
-		// If there is no active tab, make the first tab the active tab, so that
-		// when focus is moved to the tablist, the first tab will be focused
-		// despite not being selected
-		if ( selectedTabId === null && ! activeTabId && firstTabId ) {
-			setActiveId( firstTabId );
-		}
-	}, [ selectedTabId, activeTabId, firstTabId, setActiveId ] );
+
+	// If there is no active tab, make the first tab the active tab, so that
+	// when focus is moved to the tablist, the first tab will be focused
+	// despite not being selected
+	if ( selectedTabId === null && ! activeTabId && firstTabId ) {
+		setActiveId( firstTabId );
+	}
 
 	return (
 		<Tabs
@@ -65,7 +64,6 @@ function CategoryTabs( {
 					<Tabs.Tab
 						key={ category.name }
 						tabId={ category.name }
-						aria-label={ category.label }
 						aria-current={
 							category === selectedCategory ? 'true' : undefined
 						}

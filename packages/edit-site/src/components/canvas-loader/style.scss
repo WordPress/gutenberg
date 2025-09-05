@@ -9,9 +9,10 @@
 	align-items: center;
 	justify-content: center;
 
-	animation: 0.5s ease 0.2s edit-site-canvas-loader__fade-in-animation;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not (prefers-reduced-motion) {
+		animation: 0.5s ease 0.2s edit-site-canvas-loader__fade-in-animation;
+		animation-fill-mode: forwards;
+	}
 
 	& > div {
 		width: 160px;

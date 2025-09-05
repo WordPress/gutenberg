@@ -6,7 +6,7 @@ const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
 const { inc: semverInc } = require( 'semver' );
-const rimraf = require( 'rimraf' );
+const { rimraf } = require( 'rimraf' );
 const readline = require( 'readline' );
 const SimpleGit = require( 'simple-git' );
 
@@ -59,17 +59,6 @@ const pluginConfig = require( '../config' );
  * @property {string}      npmReleaseBranch        The selected branch for npm release.
  * @property {ReleaseType} releaseType             The selected release type.
  */
-
-/**
- * Throws if given an error in the node.js callback style.
- *
- * @param {any|null} error If callback failed, this will hold a value.
- */
-const rethrow = ( error ) => {
-	if ( error ) {
-		throw error;
-	}
-};
 
 /**
  * Checks out the npm release branch.
@@ -599,7 +588,7 @@ async function runPackagesRelease( config, customMessages ) {
 			await Promise.all(
 				temporaryFolders
 					.filter( ( tempDir ) => fs.existsSync( tempDir ) )
-					.map( ( tempDir ) => rimraf( tempDir, rethrow ) )
+					.map( ( tempDir ) => rimraf( tempDir ) )
 			)
 	);
 

@@ -1,7 +1,9 @@
 .edit-site-editor__editor-interface {
 	opacity: 1;
-	transition: opacity 0.1s ease-out;
-	@include reduce-motion( "transition" );
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-out;
+	}
 
 	&.is-loading {
 		opacity: 0;
@@ -61,8 +63,8 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 60px;
-	height: 60px;
+	width: $header-height;
+	height: $header-height;
 	display: flex;
 	align-items: center;
 	justify-content: center;

@@ -5,10 +5,11 @@ import {
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -87,7 +88,7 @@ export default function ImageSizeControl( {
 	} );
 
 	return (
-		<>
+		<VStack className="block-editor-image-size-control" spacing="4">
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
 					__nextHasNoMarginBottom
@@ -100,10 +101,9 @@ export default function ImageSizeControl( {
 				/>
 			) }
 			{ isResizable && (
-				<div className="block-editor-image-size-control">
-					<HStack align="baseline" spacing="3">
+				<>
+					<HStack align="baseline" spacing="4">
 						<NumberControl
-							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
 							value={ currentWidth }
 							min={ 1 }
@@ -113,7 +113,6 @@ export default function ImageSizeControl( {
 							size="__unstable-large"
 						/>
 						<NumberControl
-							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
 							value={ currentHeight }
 							min={ 1 }
@@ -137,13 +136,17 @@ export default function ImageSizeControl( {
 								<ToggleGroupControlOption
 									key={ scale }
 									value={ scale }
-									label={ `${ scale }%` }
+									label={ sprintf(
+										/* translators: %d: Percentage value. */
+										__( '%d%%' ),
+										scale
+									) }
 								/>
 							);
 						} ) }
 					</ToggleGroupControl>
-				</div>
+				</>
 			) }
-		</>
+		</VStack>
 	);
 }

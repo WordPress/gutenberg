@@ -392,7 +392,7 @@ Creates a new store registry, given an optional object of initial store configur
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `Object?`: Parent registry.
+-   _parent_ `?Object`: Parent registry.
 
 _Returns_
 
@@ -418,11 +418,11 @@ When registering a control created with `createRegistryControl` with a store, th
 
 _Parameters_
 
--   _registryControl_ `Function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `T & { isRegistryControl?: boolean; }`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `Function`: Registry control that can be registered with a store.
+-   Registry control that can be registered with a store.
 
 ### createRegistrySelector
 
@@ -471,11 +471,11 @@ with a store.
 
 _Parameters_
 
--   _registrySelector_ `Function`: Function receiving a registry `select` function and returning a state selector.
+-   _registrySelector_ `( select:  ) => Selector`: Function receiving a registry `select` function and returning a state selector.
 
 _Returns_
 
--   `Function`: Registry selector that can be registered with a store.
+-   `RegistrySelector< Selector >`: Registry selector that can be registered with a store.
 
 ### createSelector
 
@@ -484,15 +484,6 @@ Creates a memoized selector that caches the computed values according to the arr
 _Related_
 
 -   The documentation for the `rememo` package from which the `createSelector` function is reexported.
-
-_Parameters_
-
--   _selector_ `Function`: Selector function that calculates a value from state and parameters.
--   _getDependants_ `Function`: Function that returns an array of "dependant" objects.
-
-_Returns_
-
--   `Function`: A memoized version of `selector` that caches the calculated return values.
 
 ### dispatch
 
@@ -1013,12 +1004,13 @@ _Returns_
 
 ### batch
 
-As a response of `dispatch` calls, WordPress data based applications updates the connected components (Components using `useSelect` or `withSelect`). This update happens in two steps:
+The `batch` method allows multiple store updates to occur simultaneously, reducing unnecessary executions of selectors and component re-renders during sequential state changes.
 
--   The selectors are called with the update state.
--   If the selectors return values that are different than the previous (strict equality), the component rerenders.
+In WordPress data applications, dispatching consecutive actions typically triggers store listeners and runs selectors, which can lead to re-renders. The `batch` method pauses these listeners and only activates them once at the end, ensuring selectors run only once with the final state.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+This method is particularly effective for optimizing performance with expensive selectors, ensuring atomic operations across multiple stores, and creating single undo/redo entries for several synchronous updates.
+
+Unlike React’s built-in batching or React Redux’s `batch` function, `registry.batch` operates at the store listener level, completely avoiding unnecessary selector computations.
 
 _Usage_
 
@@ -1028,15 +1020,17 @@ import { useRegistry } from '@wordpress/data';
 function Component() {
 	const registry = useRegistry();
 
-	function callback() {
-		// This will only rerender the components once.
+	function handleComplexUpdate() {
+		// Without batch: listeners are called 3 times, which can result in multiple component re-renders.
+		// With batch: notifies listeners once, resulting in a single component re-render as needed.
 		registry.batch( () => {
-			registry.dispatch( someStore ).someAction();
-			registry.dispatch( someStore ).someOtherAction();
+			registry.dispatch( 'someStore' ).someAction();
+			registry.dispatch( 'someStore' ).someOtherAction();
+			registry.dispatch( 'someStore' ).thirdAction();
 		} );
 	}
 
-	return <button onClick={ callback }>Click me</button>;
+	return <button onClick={ handleComplexUpdate }>Update</button>;
 }
 ```
 

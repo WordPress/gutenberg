@@ -13,7 +13,7 @@ import { store as editorStore } from '../../store';
 /**
  * Renders the word count of the post content.
  *
- * @return {JSX.Element|null} The rendered WordCount component.
+ * @return {React.ReactNode} The rendered WordCount component.
  */
 export default function WordCount() {
 	const content = useSelect(

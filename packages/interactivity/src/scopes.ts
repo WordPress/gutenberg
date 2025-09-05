@@ -77,7 +77,7 @@ export const getContext = < T extends object >( namespace?: string ): T => {
 
 /**
  * Retrieves a representation of the element where a function from the store
- * is being evalutated. Such representation is read-only, and contains a
+ * is being evaluated. Such representation is read-only, and contains a
  * reference to the DOM element, its props and a local reactive state.
  *
  * @return Element representation.

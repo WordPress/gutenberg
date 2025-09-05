@@ -122,6 +122,7 @@ describe( 'private selectors', () => {
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
 			},
 			blockEditingModes: new Map( [] ),
+			derivedBlockEditingModes: new Map( [] ),
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
@@ -129,6 +130,7 @@ describe( 'private selectors', () => {
 		getBlockEditingMode.registry = {
 			select: jest.fn( () => ( {
 				hasContentRoleAttribute,
+				get,
 			} ) ),
 		};
 		__unstableGetEditorMode.registry = {
@@ -141,6 +143,7 @@ describe( 'private selectors', () => {
 			const state = {
 				...baseState,
 				blockEditingModes: new Map( [] ),
+				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -156,6 +159,12 @@ describe( 'private selectors', () => {
 				blockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
+				] ),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -165,10 +174,18 @@ describe( 'private selectors', () => {
 			).toBe( true );
 		} );
 
-		it( 'should return true when top level block is disabled via inheritence and there are no editing modes within it', () => {
+		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
 				blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
+				] ),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -184,6 +201,11 @@ describe( 'private selectors', () => {
 				blockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
 			};
 			expect(
@@ -201,6 +223,11 @@ describe( 'private selectors', () => {
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
 				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
+				] ),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -210,12 +237,19 @@ describe( 'private selectors', () => {
 			).toBe( false );
 		} );
 
-		it( 'should return false when top level block is disabled via inheritence and there are non-disabled editing modes within it', () => {
+		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
 			};
 			expect(
@@ -302,6 +336,7 @@ describe( 'private selectors', () => {
 			const state = {
 				...baseState,
 				blockEditingModes: new Map( [] ),
+				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
@@ -339,6 +374,7 @@ describe( 'private selectors', () => {
 			const state = {
 				...baseState,
 				blockEditingModes: new Map( [] ),
+				derivedBlockEditingModes: new Map( [] ),
 			};
 			expect(
 				getEnabledClientIdsTree(
@@ -373,6 +409,10 @@ describe( 'private selectors', () => {
 					[ '', 'disabled' ],
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
@@ -411,6 +451,7 @@ describe( 'private selectors', () => {
 					] ),
 				},
 				blockEditingModes: new Map(),
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -432,7 +473,7 @@ describe( 'private selectors', () => {
 						],
 						[
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
 						],
 						[
 							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
@@ -441,6 +482,7 @@ describe( 'private selectors', () => {
 					] ),
 
 					order: new Map( [
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 						[
 							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
 							[
@@ -452,12 +494,15 @@ describe( 'private selectors', () => {
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
-						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
 				blockListSettings: {},
 			};
@@ -466,10 +511,7 @@ describe( 'private selectors', () => {
 					state,
 					'4c2b7140-fffd-44b4-b2a7-820c670a6514'
 				)
-			).toEqual( [
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-			] );
+			).toEqual( [ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c' ] );
 		} );
 
 		it( 'should order from bottom to top if ascending is true', () => {
@@ -492,6 +534,7 @@ describe( 'private selectors', () => {
 						],
 					] ),
 					order: new Map( [
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 						[
 							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
 							[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f' ],
@@ -504,12 +547,14 @@ describe( 'private selectors', () => {
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
-						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
 				blockListSettings: {},
 			};

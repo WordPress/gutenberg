@@ -19,7 +19,7 @@ import {
 	useAnchor,
 } from '@wordpress/rich-text';
 import {
-	__experimentalLinkControl as LinkControl,
+	LinkControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -181,7 +181,7 @@ function InlineLinkUI( {
 			// As "replace" will operate on the first match only, it is
 			// run only against the second half of the value which was
 			// split at the active format's boundary. This avoids a bug
-			// with incorrectly targetted replacements.
+			// with incorrectly targeted replacements.
 			// See: https://github.com/WordPress/gutenberg/issues/41771.
 			// Note original formats will be lost when applying this change.
 			// That is expected behaviour.

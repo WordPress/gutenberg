@@ -7,19 +7,19 @@ test.describe( 'Write/Design mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
-
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
+		await page.addInitScript( () => {
+			window.__experimentalEditorWriteMode = true;
+		} );
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
-
 	test( 'Should prevent selecting intermediary blocks', async ( {
 		editor,
 		page,
@@ -120,5 +120,153 @@ test.describe( 'Write/Design mode', () => {
 		await expect(
 			editorSettings.getByRole( 'button', { name: 'Content' } )
 		).toBeVisible();
+	} );
+
+	test( 'hides the blocks that cannot be interacted with in List View', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( '' );
+
+		// Insert a section with a nested block and an editable block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/group',
+					attributes: {
+						metadata: {
+							name: 'Non-content block',
+						},
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Something',
+							},
+						},
+					],
+				},
+			],
+		} );
+
+		// Select the inner paragraph block so that List View is expanded.
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.click();
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const nonContentBlock = listView.getByRole( 'link', {
+			name: 'Non-content block',
+		} );
+
+		await expect( nonContentBlock ).toBeVisible();
+
+		// Switch to write mode.
+		await editor.switchEditorTool( 'Write' );
+
+		await expect( nonContentBlock ).toBeHidden();
+	} );
+	test( 'prevents adding non-content blocks to content role containers', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( '' );
+
+		// Insert a section with a nested block and an editable block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/quote',
+					attributes: {
+						metadata: {
+							name: 'Content block',
+						},
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Something',
+							},
+						},
+					],
+				},
+			],
+		} );
+
+		// Switch to write mode.
+		await editor.switchEditorTool( 'Write' );
+
+		// Select the inner paragraph block.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		// Select paragraph
+		await paragraph.click();
+
+		// Try inserting a Group block with the slash inserter.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/group' );
+
+		// Group option should not be available.
+		await expect(
+			page.getByRole( 'option', { name: 'Group' } )
+		).toBeHidden();
+	} );
+	test( 'allows adding blocks to content role containers', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( '' );
+
+		// Insert a section with a nested block and an editable block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'item 1',
+							},
+						},
+					],
+				},
+			],
+		} );
+
+		// Switch to write mode.
+		await editor.switchEditorTool( 'Write' );
+
+		// Select the inner list item block.
+		const listItem = editor.canvas.getByText( 'item 1' );
+
+		// Select list item
+		await listItem.click();
+
+		// Press enter to check whether it adds a new block.
+		await page.keyboard.press( 'Enter' );
+
+		// Write something in the new list item
+		await page.keyboard.type( 'item 2' );
+
+		await expect( listItem ).not.toBeFocused();
+		await expect( listItem ).not.toHaveText( 'item 2' );
 	} );
 } );

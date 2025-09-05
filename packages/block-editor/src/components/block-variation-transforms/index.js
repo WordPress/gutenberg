@@ -86,15 +86,13 @@ function VariationsDropdown( {
 			toggleProps={ { iconPosition: 'right' } }
 		>
 			{ () => (
-				<div className={ `${ className }__container` }>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ selectOptions }
-							value={ selectedValue }
-							onSelect={ onSelectVariation }
-						/>
-					</MenuGroup>
-				</div>
+				<MenuGroup>
+					<MenuItemsChoice
+						choices={ selectOptions }
+						value={ selectedValue }
+						onSelect={ onSelectVariation }
+					/>
+				</MenuGroup>
 			) }
 		</DropdownMenu>
 	);

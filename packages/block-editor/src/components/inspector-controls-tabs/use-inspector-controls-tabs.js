@@ -46,18 +46,18 @@ export default function useInspectorControlsTabs( blockName ) {
 
 	// List View Tab: If there are any fills for the list group add that tab.
 	const listViewDisabled = useIsListViewTabDisabled( blockName );
-	const listFills = useSlotFills( listGroup.Slot.__unstableName );
+	const listFills = useSlotFills( listGroup.name );
 	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
 	const styleFills = [
-		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( effectsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( borderGroup.name ) || [] ),
+		...( useSlotFills( colorGroup.name ) || [] ),
+		...( useSlotFills( dimensionsGroup.name ) || [] ),
+		...( useSlotFills( stylesGroup.name ) || [] ),
+		...( useSlotFills( typographyGroup.name ) || [] ),
+		...( useSlotFills( effectsGroup.name ) || [] ),
 	];
 	const hasStyleFills = styleFills.length;
 
@@ -67,12 +67,12 @@ export default function useInspectorControlsTabs( blockName ) {
 	// the advanced controls slot as well to ensure they are rendered.
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
-		...( useSlotFills( bindingsGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( bindingsGroup.name ) || [] ),
 	];
 
 	const settingsFills = [
-		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
-		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( defaultGroup.name ) || [] ),
+		...( useSlotFills( positionGroup.name ) || [] ),
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 

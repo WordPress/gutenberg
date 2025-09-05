@@ -539,7 +539,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Delete' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
@@ -560,7 +560,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Backspace' );
-			// Carret should be in the first block and at the proper position.
+			// Caret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.

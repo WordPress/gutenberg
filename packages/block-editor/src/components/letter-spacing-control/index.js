@@ -5,6 +5,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -35,9 +36,25 @@ export default function LetterSpacingControl( {
 		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 		defaultValues: { px: 2, em: 0.2, rem: 0.2 },
 	} );
+
+	if (
+		! __next40pxDefaultSize &&
+		( otherProps.size === undefined || otherProps.size === 'default' )
+	) {
+		deprecated(
+			`36px default size for wp.blockEditor.__experimentalLetterSpacingControl`,
+			{
+				since: '6.8',
+				version: '7.1',
+				hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+			}
+		);
+	}
+
 	return (
 		<UnitControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			__shouldNotWarnDeprecated36pxSize
 			{ ...otherProps }
 			label={ __( 'Letter spacing' ) }
 			value={ value }

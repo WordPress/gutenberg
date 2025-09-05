@@ -4,12 +4,15 @@
 import {
 	Icon,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalText as Text,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
+import { useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -22,39 +25,80 @@ import {
 import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
+import { getTemplateInfo } from '../../utils/get-template-info';
+const { Badge } = unlock( componentsPrivateApis );
 
+/**
+ * Renders a title of the post type and the available quick actions available within a 3-dot dropdown.
+ *
+ * @param {Object}          props                     - Component props.
+ * @param {string}          [props.postType]          - The post type string.
+ * @param {string|string[]} [props.postId]            - The post id or list of post ids.
+ * @param {Function}        [props.onActionPerformed] - A callback function for when a quick action is performed.
+ * @return {React.ReactNode} The rendered component.
+ */
 export default function PostCardPanel( {
 	postType,
 	postId,
 	onActionPerformed,
 } ) {
-	const { title, icon } = useSelect(
+	const postIds = useMemo(
+		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
+		[ postId ]
+	);
+	const { postTitle, icon, labels } = useSelect(
 		( select ) => {
-			const { __experimentalGetTemplateInfo } = select( editorStore );
-			const { getEditedEntityRecord } = select( coreStore );
+			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
+				select( coreStore );
+			const { getPostIcon } = unlock( select( editorStore ) );
+			let _title = '';
 			const _record = getEditedEntityRecord(
 				'postType',
 				postType,
-				postId
+				postIds[ 0 ]
 			);
-			const _templateInfo =
-				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-					postType
-				) && __experimentalGetTemplateInfo( _record );
+			if ( postIds.length === 1 ) {
+				const { default_template_types: templateTypes = [] } =
+					getCurrentTheme() ?? {};
+
+				const _templateInfo = [
+					TEMPLATE_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+				].includes( postType )
+					? getTemplateInfo( {
+							template: _record,
+							templateTypes,
+					  } )
+					: {};
+				_title = _templateInfo?.title || _record?.title;
+			}
+
 			return {
-				title: _templateInfo?.title || _record?.title,
-				icon: unlock( select( editorStore ) ).getPostIcon( postType, {
+				postTitle: _title,
+				icon: getPostIcon( postType, {
 					area: _record?.area,
 				} ),
+				labels: getPostType( postType )?.labels,
 			};
 		},
-		[ postId, postType ]
+		[ postIds, postType ]
 	);
 
-	const pageTypeBadge = usePageTypeBadge();
+	const pageTypeBadge = usePageTypeBadge( postId );
+	let title = __( 'No title' );
+	if ( labels?.name && postIds.length > 1 ) {
+		title = sprintf(
+			// translators: %1$d number of selected items %2$s: Name of the plural post type e.g: "Posts".
+			__( '%1$d %2$s' ),
+			postIds.length,
+			labels?.name
+		);
+	} else if ( postTitle ) {
+		title = stripHTML( postTitle );
+	}
 
 	return (
-		<div className="editor-post-card-panel">
+		<VStack spacing={ 1 } className="editor-post-card-panel">
 			<HStack
 				spacing={ 2 }
 				className="editor-post-card-panel__header"
@@ -65,23 +109,32 @@ export default function PostCardPanel( {
 					numberOfLines={ 2 }
 					truncate
 					className="editor-post-card-panel__title"
-					weight={ 500 }
 					as="h2"
-					lineHeight="20px"
 				>
-					{ title ? decodeEntities( title ) : __( 'No title' ) }
-					{ pageTypeBadge && (
-						<span className="editor-post-card-panel__title-badge">
-							{ pageTypeBadge }
-						</span>
+					<span className="editor-post-card-panel__title-name">
+						{ title }
+					</span>
+					{ pageTypeBadge && postIds.length === 1 && (
+						<Badge>{ pageTypeBadge }</Badge>
 					) }
 				</Text>
-				<PostActions
-					postType={ postType }
-					postId={ postId }
-					onActionPerformed={ onActionPerformed }
-				/>
+				{ postIds.length === 1 && (
+					<PostActions
+						postType={ postType }
+						postId={ postIds[ 0 ] }
+						onActionPerformed={ onActionPerformed }
+					/>
+				) }
 			</HStack>
-		</div>
+			{ postIds.length > 1 && (
+				<Text className="editor-post-card-panel__description">
+					{ sprintf(
+						// translators: %s: Name of the plural post type e.g: "Posts".
+						__( 'Changes will be applied to all selected %s.' ),
+						labels?.name.toLowerCase()
+					) }
+				</Text>
+			) }
+		</VStack>
 	);
 }

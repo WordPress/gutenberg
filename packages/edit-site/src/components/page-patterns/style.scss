@@ -4,35 +4,23 @@
 
 .page-patterns-preview-field {
 	display: flex;
+	justify-content: center;
+	align-items: center;
 	flex-direction: column;
 	height: 100%;
 	border-radius: $radius-medium;
 
+	.dataviews-view-grid & {
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+	}
+
 	.dataviews-view-table & {
 		width: 96px;
 		flex-grow: 0;
-	}
-
-	.page-patterns-preview-field__button {
-		box-shadow: none;
-		border: none;
-		padding: 0;
-		background-color: unset;
-		box-sizing: border-box;
-		cursor: pointer;
-		overflow: hidden;
-		height: 100%;
-		border-radius: $grid-unit-05;
-
-		&:focus-visible {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-		}
-
-		&[aria-disabled="true"] {
-			cursor: default;
-		}
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
 	}
 }
 
@@ -48,9 +36,11 @@
 	top: 0;
 	z-index: 2;
 	flex-shrink: 0;
-	transition: padding ease-out 0.1s;
-	@include reduce-motion("transition");
 	min-height: $grid-unit-50;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
 
 	.edit-site-patterns__title {
 		min-height: $grid-unit-50;
@@ -68,34 +58,6 @@
 
 	.screen-reader-shortcut:focus {
 		top: 0;
-	}
-}
-
-.edit-site-patterns__pattern-title {
-	display: block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	color: inherit;
-
-	.is-link {
-		text-decoration: none;
-		color: $gray-200;
-
-		&:hover,
-		&:focus {
-			color: $white;
-		}
-	}
-
-	.edit-site-patterns__pattern-icon {
-		border-radius: $grid-unit-05;
-		background: var(--wp-block-synced-color);
-		fill: $white;
-	}
-
-	.edit-site-patterns__pattern-lock-icon {
-		fill: currentcolor;
 	}
 }
 
@@ -142,7 +104,6 @@
 	}
 }
 
-/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
 		padding-left: $grid-unit-30;

@@ -73,8 +73,9 @@
 				width: inherit;
 				height: $grid-unit-05;
 				border-radius: $radius-small;
-				transition: width 0.3s ease-out;
-				@include reduce-motion("transition");
+				@media not (prefers-reduced-motion) {
+					transition: width 0.3s ease-out;
+				}
 			}
 		}
 
@@ -106,12 +107,15 @@
 	clear: both;
 }
 
-.has-metaboxes .editor-visual-editor {
-	flex: 1;
+// Only when the split view is active the visual editor should allow shrinking and
+// its main size should be zero.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
+	flex-shrink: 1;
+	flex-basis: 0%;
+}
 
-	&.is-iframed {
-		isolation: isolate;
-	}
+.has-metaboxes .editor-visual-editor.is-iframed {
+	isolation: isolate;
 }
 
 // Adjust the position of the notices

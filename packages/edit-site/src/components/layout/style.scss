@@ -56,6 +56,8 @@
 	position: relative;
 	width: 100%;
 	z-index: z-index(".edit-site-layout__canvas-container");
+	display: flex;
+	flex-direction: column;
 
 	/*
 	 * The SiteHubMobile component is displayed
@@ -67,6 +69,10 @@
 	 */
 	.edit-site-sidebar__screen-wrapper {
 		padding: 0;
+	}
+
+	.edit-site-sidebar-navigation-screen__main {
+		padding: 0 $grid-unit-15;
 	}
 }
 
@@ -115,9 +121,12 @@
 
 		.edit-site-resizable-frame__inner-content {
 			box-shadow: $elevation-x-small;
-			transition: border-radius, box-shadow 0.4s;
 			// This ensure the radius work properly.
 			overflow: hidden;
+
+			@media not (prefers-reduced-motion) {
+				transition: border-radius, box-shadow 0.4s;
+			}
 
 			.edit-site-layout:not(.is-full-canvas) & {
 				border-radius: $radius-large;
@@ -195,17 +204,19 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 
 	&::before {
-		transition: box-shadow 0.1s ease;
-		@include reduce-motion("transition");
 		content: "";
 		display: block;
 		position: absolute;
-		top: 9px;
-		right: 9px;
-		bottom: 9px;
-		left: 9px;
+		top: $grid-unit-10 + $border-width;
+		right: $grid-unit-10 + $border-width;
+		bottom: $grid-unit-10 + $border-width;
+		left: $grid-unit-20 + $border-width;
 		border-radius: $radius-medium;
 		box-shadow: none;
+
+		@media not (prefers-reduced-motion) {
+			transition: box-shadow 0.1s ease;
+		}
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {

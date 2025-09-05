@@ -1,11 +1,3 @@
-.block-editor-media-placeholder__url-input-form {
-	min-width: 260px;
-
-	@include break-small() {
-		width: 300px;
-	}
-}
-
 .block-editor-media-placeholder__cancel-button.is-link {
 	margin: 1em;
 	display: block;

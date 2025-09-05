@@ -6,20 +6,20 @@
 	padding: $grid-unit-15 $grid-unit-60;
 	border-top: $border-width solid $gray-100;
 	flex-shrink: 0;
-	transition: padding ease-out 0.1s;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
 	z-index: z-index(".dataviews-footer");
 }
 
-
-/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.dataviews-footer {
 		padding: $grid-unit-15 $grid-unit-30;
 	}
 }
 
-/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 560px) {
 	.dataviews-footer {
 		flex-direction: column !important;

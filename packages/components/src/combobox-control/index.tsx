@@ -26,7 +26,7 @@ import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { FlexBlock, FlexItem } from '../flex';
+import { FlexBlock } from '../flex';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { useControlledValue } from '../utils/hooks';
 import { normalizeTextString } from '../utils/strings';
@@ -34,6 +34,8 @@ import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+import Spinner from '../spinner';
 
 const noop = () => {};
 
@@ -92,6 +94,7 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
+ * 			__next40pxDefaultSize
  * 			__nextHasNoMarginBottom
  * 			label="Font Size"
  * 			value={ fontSize }
@@ -124,6 +127,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		help,
 		allowReset = true,
 		className,
+		isLoading = false,
 		messages = {
 			selected: __( 'Item selected.' ),
 		},
@@ -313,6 +317,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'ComboboxControl',
+		__next40pxDefaultSize,
+		size: undefined,
+	} );
+
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
 	// TODO: Refactor click detection to use blur to stop propagation.
@@ -354,22 +364,21 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								onChange={ onInputChange }
 							/>
 						</FlexBlock>
+						{ isLoading && <Spinner /> }
 						{ allowReset && (
-							<FlexItem>
-								<Button
-									className="components-combobox-control__reset"
-									icon={ closeSmall }
-									// Disable reason: Focus returns to input field when reset is clicked.
-									// eslint-disable-next-line no-restricted-syntax
-									disabled={ ! value }
-									onClick={ handleOnReset }
-									onKeyDown={ handleResetStopPropagation }
-									label={ __( 'Reset' ) }
-								/>
-							</FlexItem>
+							<Button
+								size="small"
+								icon={ closeSmall }
+								// Disable reason: Focus returns to input field when reset is clicked.
+								// eslint-disable-next-line no-restricted-syntax
+								disabled={ ! value }
+								onClick={ handleOnReset }
+								onKeyDown={ handleResetStopPropagation }
+								label={ __( 'Reset' ) }
+							/>
 						) }
 					</InputWrapperFlex>
-					{ isExpanded && (
+					{ isExpanded && ! isLoading && (
 						<SuggestionsList
 							instanceId={ instanceId }
 							// The empty string for `value` here is not actually used, but is

@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // Stores a list of z-index values in a central location.  For clarity, when a
 // specific value is needed, add a comment explaining why (what other rules the
 // value is designed to work with).
@@ -14,6 +16,7 @@ $z-layers: (
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
 	".block-library-query-pattern__selection-search": 2, // higher sticky element
+	".editor-post-template__swap-template-search": 2, // higher sticky element
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -25,7 +28,6 @@ $z-layers: (
 	".components-popover__close": 5,
 	".block-editor-block-list__insertion-point": 6,
 	".block-editor-warning": 5,
-	".block-library-gallery-item__inline-menu": 20,
 	".block-editor-url-input__suggestions": 30,
 	".edit-post-layout__footer": 30,
 	".interface-interface-skeleton__header": 30,
@@ -123,7 +125,7 @@ $z-layers: (
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
-	".editor-create-template-part-modal": 1000001,
+	".fields-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
@@ -131,7 +133,9 @@ $z-layers: (
 	".dataviews-action-modal": 1000001,
 	".editor-action-modal": 1000001,
 	".editor-post-template__swap-template-modal": 1000001,
+	".editor-post-template__create-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
+	".fields-controls__template-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
@@ -165,9 +169,9 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".editor-block-manager__category-title": 1,
+	".block-editor-block-manager__category-title": 1,
 	// And block manager sticky disabled block count is higher still
-	".editor-block-manager__disabled-blocks-count": 2,
+	".block-editor-block-manager__disabled-blocks-count": 2,
 
 	// Needs to appear below other color circular picker related UI elements.
 	".components-circular-option-picker__option-wrapper::before": -1,
@@ -199,6 +203,7 @@ $z-layers: (
 
 	// Ensure modal footer actions appear above modal contents
 	".editor-start-template-options__modal__actions": 1,
+	".editor-start-page-options__modal__actions": 1,
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
@@ -214,8 +219,8 @@ $z-layers: (
 );
 
 @function z-index( $key ) {
-	@if map-has-key( $z-layers, $key ) {
-		@return map-get( $z-layers, $key );
+	@if map.has-key( $z-layers, $key ) {
+		@return map.get( $z-layers, $key );
 	}
 
 	@error "Error: Specified z-index `#{$key}` does not exist in the mapping";

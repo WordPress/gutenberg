@@ -12,13 +12,14 @@ This component is used for blocks that display text, commonly inside a
 Renders a letter spacing control.
 
 ```jsx
-import { LetterSpacingControl } from '@wordpress/block-editor';
+import { __experimentalLetterSpacingControl as LetterSpacingControl } from '@wordpress/block-editor';
 
 const MyLetterSpacingControl = () => (
 	<LetterSpacingControl
 		value={ value }
 		onChange={ onChange }
 		__unstableInputWidth="auto"
+		__next40pxDefaultSize
 	/>
 );
 ```

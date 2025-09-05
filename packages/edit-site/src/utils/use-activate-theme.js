@@ -4,6 +4,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ import {
 	currentlyPreviewingTheme,
 } from './is-previewing-theme';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
  * This should be refactored to use the REST API, once the REST API can activate themes.
@@ -23,6 +24,7 @@ const { useHistory } = unlock( routerPrivateApis );
  */
 export function useActivateTheme() {
 	const history = useHistory();
+	const { path } = useLocation();
 	const { startResolution, finishResolution } = useDispatch( coreStore );
 
 	return async () => {
@@ -37,8 +39,7 @@ export function useActivateTheme() {
 			finishResolution( 'activateTheme' );
 			// Remove the wp_theme_preview query param: we've finished activating
 			// the queue and are switching to normal Site Editor.
-			const { params } = history.getLocationWithParams();
-			history.replace( { ...params, wp_theme_preview: undefined } );
+			history.navigate( addQueryArgs( path, { wp_theme_preview: '' } ) );
 		}
 	};
 }

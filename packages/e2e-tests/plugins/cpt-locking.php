@@ -8,7 +8,7 @@
  */
 
 /**
- * Registers CPT's with 3 diffferent types of locking.
+ * Registers CPT's with 3 different types of locking.
  */
 function gutenberg_test_cpt_locking() {
 	$template = array(

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import {
-	ArgsTable,
+	Controls,
 	Description,
 	Primary,
 	Stories,
@@ -86,6 +86,8 @@ export const globalTypes = {
 			items: [
 				{ value: 'none', title: 'None' },
 				{ value: 'wordpress-sidebar', title: 'WP Sidebar' },
+				{ value: 'small-container', title: 'Small container' },
+				{ value: 'large-container', title: 'Large container' },
 			],
 		},
 	},
@@ -106,6 +108,9 @@ export const parameters = {
 		sort: 'requiredFirst',
 	},
 	docs: {
+		controls: {
+			sort: 'requiredFirst',
+		},
 		// Flips the order of the description and the primary component story
 		// so the component is always visible before the fold.
 		page: () => (
@@ -114,8 +119,7 @@ export const parameters = {
 				<Subtitle />
 				<Primary />
 				<Description />
-				{ /* `story="^"` enables Controls for the primary props table */ }
-				<ArgsTable story="^" />
+				<Controls />
 				<Stories includePrimary={ false } />
 			</>
 		),
@@ -137,11 +141,17 @@ export const parameters = {
 					'Navigation',
 					'Overlays',
 					'Selection & Input',
-					[ 'Color', 'Common', 'File Upload', 'Time & Date' ],
+					[
+						'Color',
+						'Common',
+						'File Upload',
+						'Time & Date',
+						'Validated Form Controls',
+						[ 'Overview' ],
+					],
 					'Typography',
 					'Utilities',
 				],
-				'Components (Experimental)',
 				[
 					'Actions',
 					'Layout',
@@ -156,3 +166,5 @@ export const parameters = {
 	},
 	sourceLinkPrefix: 'https://github.com/WordPress/gutenberg/blob/trunk/',
 };
+
+export const tags = [ 'autodocs' ];

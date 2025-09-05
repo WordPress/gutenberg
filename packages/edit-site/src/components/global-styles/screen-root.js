@@ -55,6 +55,7 @@ function ScreenRoot() {
 	return (
 		<Card
 			size="small"
+			isBorderless
 			className="edit-site-global-styles-screen-root"
 			isRounded={ false }
 		>
@@ -93,7 +94,7 @@ function ScreenRoot() {
 					paddingTop={ 2 }
 					/*
 					 * 13px matches the text inset of the NavigationButton (12px padding, plus the width of the button's border).
-					 * This is an ad hoc override for this instance and the Addtional CSS option below. Other options for matching the
+					 * This is an ad hoc override for this instance and the Additional CSS option below. Other options for matching the
 					 * the nav button inset should be looked at before reusing further.
 					 */
 					paddingX="13px"

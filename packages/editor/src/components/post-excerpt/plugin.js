@@ -12,9 +12,9 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
 /**
  * Renders a post excerpt panel in the post sidebar.
  *
- * @param {Object}  props             Component properties.
- * @param {string}  [props.className] An optional class name added to the row.
- * @param {Element} props.children    Children to be rendered.
+ * @param {Object}          props             Component properties.
+ * @param {string}          [props.className] An optional class name added to the row.
+ * @param {React.ReactNode} props.children    Children to be rendered.
  *
  * @example
  * ```js
@@ -46,7 +46,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
  * );
  * ```
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 const PluginPostExcerpt = ( { children, className } ) => {
 	return (

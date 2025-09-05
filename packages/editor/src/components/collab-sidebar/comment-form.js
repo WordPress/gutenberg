@@ -7,7 +7,7 @@ import {
 	Button,
 	TextareaControl,
 } from '@wordpress/components';
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import { sanitizeCommentString } from './utils';
  * @param {Function} props.onCancel         - The function to call when canceling the comment update.
  * @param {Object}   props.thread           - The comment thread object.
  * @param {string}   props.submitButtonText - The text to display on the submit button.
- * @return {JSX.Element} The CommentForm component.
+ * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 	const [ inputComment, setInputComment ] = useState(
@@ -36,13 +36,18 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 				__nextHasNoMarginBottom
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
+				label={ __( 'Comment' ) }
+				hideLabelFromVision
 			/>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
 					variant="primary"
-					onClick={ () => onSubmit( inputComment ) }
+					onClick={ () => {
+						onSubmit( inputComment );
+						setInputComment( '' );
+					} }
 					disabled={
 						0 === sanitizeCommentString( inputComment ).length
 					}

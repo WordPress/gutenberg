@@ -72,6 +72,9 @@ function getPostMetaFields( select, context ) {
 	return metaFields;
 }
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/post-meta',
 	getValues( { select, context, bindings } ) {
@@ -108,11 +111,8 @@ export default {
 			return false;
 		}
 
-		const postType =
-			context?.postType || select( editorStore ).getCurrentPostType();
-
-		// Check that editing is happening in the post editor and not a template.
-		if ( postType === 'wp_template' ) {
+		// Lock editing when `postType` is not defined.
+		if ( ! context?.postType ) {
 			return false;
 		}
 

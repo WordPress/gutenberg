@@ -8,32 +8,70 @@ import { useState } from '@wordpress/element';
  */
 import TextAlignmentControl from '../';
 
-export default {
+const meta = {
 	title: 'BlockEditor/TextAlignmentControl',
 	component: TextAlignmentControl,
+	tags: [ 'status-private' ],
+	parameters: {
+		docs: {
+			canvas: { sourceState: 'shown' },
+			description: {
+				component: 'Control to facilitate text alignment selections.',
+			},
+		},
+	},
 	argTypes: {
-		onChange: { action: 'onChange' },
-		className: { control: 'text' },
+		value: {
+			control: { type: null },
+			description: 'Currently selected text alignment value.',
+			table: {
+				type: {
+					summary: 'string',
+				},
+			},
+		},
+		onChange: {
+			action: 'onChange',
+			control: { type: null },
+			description: 'Handles change in text alignment selection.',
+			table: {
+				type: {
+					summary: 'function',
+				},
+			},
+		},
 		options: {
 			control: 'check',
+			description: 'Array of text alignment options to display.',
 			options: [ 'left', 'center', 'right', 'justify' ],
+			table: {
+				type: { summary: 'array' },
+			},
 		},
-		value: { control: { type: null } },
+		className: {
+			control: 'text',
+			description: 'Class name to add to the control.',
+			table: {
+				type: { summary: 'string' },
+			},
+		},
 	},
 };
 
-const Template = ( { onChange, ...args } ) => {
-	const [ value, setValue ] = useState();
-	return (
-		<TextAlignmentControl
-			{ ...args }
-			onChange={ ( ...changeArgs ) => {
-				onChange( ...changeArgs );
-				setValue( ...changeArgs );
-			} }
-			value={ value }
-		/>
-	);
-};
+export default meta;
 
-export const Default = Template.bind( {} );
+export const Default = {
+	render: function Template( { onChange, ...args } ) {
+		const [ value, setValue ] = useState();
+		return (
+			<TextAlignmentControl
+				{ ...args }
+				onChange={ ( ...changeArgs ) => {
+					onChange( ...changeArgs );
+					setValue( ...changeArgs );
+				} }
+				value={ value }
+			/>
+		);
+	},
+};

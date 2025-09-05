@@ -9,7 +9,7 @@
  * Returns the stylesheet resulting of merging core, theme, and user data.
  *
  * @param array $types Types of styles to load. Optional.
- *                     It accepts as values: 'variables', 'presets', 'styles', 'base-layout-styles.
+ *                     See {@see 'WP_Theme_JSON::get_stylesheet'} for all valid types.
  *                     If empty, it'll load the following:
  *                     - for themes without theme.json: 'variables', 'presets', 'base-layout-styles'.
  *                     - for themes with theme.json: 'variables', 'presets', 'styles'.
@@ -141,6 +141,8 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
 
 /**
  * Gets the global styles custom css from theme.json.
+ *
+ * @deprecated Gutenberg 18.6.0 Use {@see 'gutenberg_get_global_stylesheet'} instead for top-level custom CSS, or {@see 'WP_Theme_JSON_Gutenberg::get_styles_for_block'} for block-level custom CSS.
  *
  * @return string
  */

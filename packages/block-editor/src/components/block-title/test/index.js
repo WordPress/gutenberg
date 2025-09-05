@@ -31,7 +31,9 @@ const blockLabelMap = {
 };
 
 jest.mock( '@wordpress/blocks', () => {
+	const actualImplementation = jest.requireActual( '@wordpress/blocks' );
 	return {
+		...actualImplementation,
 		isReusableBlock( { title } ) {
 			return title === 'Reusable Block';
 		},

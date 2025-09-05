@@ -44,14 +44,14 @@ function gutenberg_posts_dashboard() {
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');'
 	);
 
 	/** This action is documented in wp-admin/edit-form-blocks.php */
 	do_action( 'enqueue_block_editor_assets' );
 	wp_register_style(
 		'wp-gutenberg-posts-dashboard',
-		gutenberg_url( 'build/edit-site/posts.css', __FILE__ ),
+		gutenberg_url( 'build/edit-site/posts.css' ),
 		array( 'wp-components', 'wp-commands', 'wp-edit-site' )
 	);
 	wp_enqueue_style( 'wp-gutenberg-posts-dashboard' );
@@ -61,25 +61,13 @@ function gutenberg_posts_dashboard() {
 			'wp.domReady( function() {
 				wp.editSite.initializePostsDashboard( "gutenberg-posts-dashboard", %s );
 			} );',
-			wp_json_encode( $editor_settings )
+			wp_json_encode( $editor_settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		)
 	);
 	wp_enqueue_script( 'wp-edit-site' );
 	wp_enqueue_media();
 	echo '<div id="gutenberg-posts-dashboard"></div>';
 }
-
-/**
- * Redirects to the new posts dashboard page and adds the postType query arg.
- */
-function gutenberg_add_post_type_arg() {
-	global $pagenow;
-	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg-posts-dashboard' === $_GET['page'] && empty( $_GET['postType'] ) ) {
-		wp_redirect( admin_url( '/admin.php?page=gutenberg-posts-dashboard&postType=post' ) );
-		exit;
-	}
-}
-add_action( 'admin_init', 'gutenberg_add_post_type_arg' );
 
 /**
  * Replaces the default posts menu item with the new posts dashboard.

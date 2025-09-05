@@ -2,16 +2,12 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
-		"allowJs": false,
-		"checkJs": false
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
+		{ "path": "../compose" },
 		{ "path": "../element" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
-	],
-	"include": [ "src/**/*" ]
+	]
 }

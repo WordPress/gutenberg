@@ -5,10 +5,12 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // !!
 const BUNDLED_PACKAGES = [
 	'@wordpress/dataviews',
+	'@wordpress/dataviews/wp',
 	'@wordpress/icons',
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/upload-media',
 	'@wordpress/fields',
 ];
 

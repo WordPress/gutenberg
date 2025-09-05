@@ -11,6 +11,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import deprecated from '@wordpress/deprecated';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -113,18 +114,23 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
-		const inputLabel = placeholder ?? __( 'Search or type URL' );
+		const _placeholder = placeholder ?? __( 'Search or type URL' );
+
+		const label =
+			hideLabelFromVision && placeholder !== ''
+				? _placeholder
+				: __( 'Link' );
 
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
-					label={ inputLabel }
+					label={ label }
 					hideLabelFromVision={ hideLabelFromVision }
 					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ inputLabel }
+					placeholder={ _placeholder }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
@@ -156,3 +162,11 @@ const LinkControlSearchInput = forwardRef(
 );
 
 export default LinkControlSearchInput;
+
+export const __experimentalLinkControlSearchInput = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchInput', {
+		since: '6.8',
+	} );
+
+	return <LinkControlSearchInput { ...props } />;
+};

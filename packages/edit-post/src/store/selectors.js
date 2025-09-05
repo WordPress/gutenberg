@@ -550,7 +550,7 @@ export function areMetaBoxesInitialized( state ) {
 /**
  * Retrieves the template of the currently edited post.
  *
- * @return {Object?} Post Template.
+ * @return {?Object} Post Template.
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {

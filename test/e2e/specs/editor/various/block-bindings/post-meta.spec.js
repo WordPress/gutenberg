@@ -524,6 +524,47 @@ test.describe( 'Post Meta source', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'new value' );
 		} );
+
+		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by the plugin', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					anchor: 'connected-paragraph',
+					content: 'fallback content',
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: {
+									key: 'movie_field',
+								},
+							},
+						},
+					},
+				},
+			} );
+			const contentInput = page.getByRole( 'textbox', {
+				name: 'Content',
+			} );
+			await expect( contentInput ).toHaveValue(
+				'Movie field default value'
+			);
+			await contentInput.fill( 'new value' );
+			// Check that the paragraph content attribute didn't change.
+			const [ paragraphBlockObject ] = await editor.getBlocks();
+			expect( paragraphBlockObject.attributes.content ).toBe(
+				'fallback content'
+			);
+			// Check the value of the custom field is being updated by visiting the frontend.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-paragraph' )
+			).toHaveText( 'new value' );
+		} );
+
 		test( 'should be possible to connect movie fields through the attributes panel', async ( {
 			editor,
 			page,

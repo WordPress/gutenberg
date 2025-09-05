@@ -5,7 +5,6 @@ import { useObservableValue } from '@wordpress/compose';
 import {
 	useContext,
 	useRef,
-	useState,
 	useEffect,
 	createPortal,
 } from '@wordpress/element';
@@ -17,38 +16,18 @@ import SlotFillContext from './slot-fill-context';
 import StyleProvider from '../../style-provider';
 import type { FillComponentProps } from '../types';
 
-function useForceUpdate() {
-	const [ , setState ] = useState( {} );
-	const mountedRef = useRef( true );
-
-	useEffect( () => {
-		mountedRef.current = true;
-		return () => {
-			mountedRef.current = false;
-		};
-	}, [] );
-
-	return () => {
-		if ( mountedRef.current ) {
-			setState( {} );
-		}
-	};
-}
-
 export default function Fill( { name, children }: FillComponentProps ) {
 	const registry = useContext( SlotFillContext );
 	const slot = useObservableValue( registry.slots, name );
-	const rerender = useForceUpdate();
-	const ref = useRef( { rerender } );
+	const instanceRef = useRef( {} );
 
+	// We register fills so we can keep track of their existence.
+	// Slots can use the `useSlotFills` hook to know if there're already fills
+	// registered so they can choose to render themselves or not.
 	useEffect( () => {
-		// We register fills so we can keep track of their existence.
-		// Some Slot implementations need to know if there're already fills
-		// registered so they can choose to render themselves or not.
-		registry.registerFill( name, ref );
-		return () => {
-			registry.unregisterFill( name, ref );
-		};
+		const instance = instanceRef.current;
+		registry.registerFill( name, instance );
+		return () => registry.unregisterFill( name, instance );
 	}, [ registry, name ] );
 
 	if ( ! slot || ! slot.ref.current ) {

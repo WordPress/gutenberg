@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+// @wordpress/blocks imports are not typed.
+// @ts-expect-error
 import { getCategories } from '@wordpress/blocks';
 
 /**
@@ -29,15 +31,19 @@ export function getExamplesByCategory(
 	if ( ! categoryDefinition?.slug || ! examples?.length ) {
 		return;
 	}
-
-	if ( categoryDefinition?.subcategories?.length ) {
-		return categoryDefinition.subcategories.reduce(
+	const categories: CategoryExamples[] =
+		categoryDefinition?.subcategories ?? [];
+	if ( categories.length ) {
+		return categories.reduce(
 			( acc, subcategoryDefinition ) => {
 				const subcategoryExamples = getExamplesByCategory(
 					subcategoryDefinition,
 					examples
 				);
 				if ( subcategoryExamples ) {
+					if ( ! acc.subcategories ) {
+						acc.subcategories = [];
+					}
 					acc.subcategories = [
 						...acc.subcategories,
 						subcategoryExamples,
@@ -48,7 +54,6 @@ export function getExamplesByCategory(
 			{
 				title: categoryDefinition.title,
 				slug: categoryDefinition.slug,
-				subcategories: [],
 			}
 		);
 	}
@@ -84,8 +89,9 @@ export function getTopLevelStyleBookCategories(): StyleBookCategory[] {
 		...STYLE_BOOK_THEME_SUBCATEGORIES,
 		...STYLE_BOOK_CATEGORIES,
 	].map( ( { slug } ) => slug );
-	const extraCategories = getCategories().filter(
+	const extraCategories: StyleBookCategory[] = getCategories();
+	const extraCategoriesFiltered = extraCategories.filter(
 		( { slug } ) => ! reservedCategories.includes( slug )
 	);
-	return [ ...STYLE_BOOK_CATEGORIES, ...extraCategories ];
+	return [ ...STYLE_BOOK_CATEGORIES, ...extraCategoriesFiltered ];
 }

@@ -148,6 +148,10 @@ export function getDropTargetPosition(
 		} ) => {
 			const rect = getBoundingClientRect();
 
+			if ( ! rect ) {
+				return;
+			}
+
 			let [ distance, edge ] = getDistanceToNearestEdge(
 				position,
 				rect,
@@ -332,6 +336,7 @@ export default function useBlockDropZone( {
 		isGroupable,
 		isZoomOut,
 		getSectionRootClientId,
+		getBlockParents,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -358,13 +363,29 @@ export default function useBlockDropZone( {
 					// So, ensure that the drag state is set when the user drags over a drop zone.
 					startDragging();
 				}
+
+				const draggedBlockClientIds = getDraggedBlockClientIds();
+				const targetParents = [
+					targetRootClientId,
+					...getBlockParents( targetRootClientId, true ),
+				];
+
+				// Check if the target is within any of the dragged blocks.
+				const isTargetWithinDraggedBlocks = draggedBlockClientIds.some(
+					( clientId ) => targetParents.includes( clientId )
+				);
+
+				if ( isTargetWithinDraggedBlocks ) {
+					return;
+				}
+
 				const allowedBlocks = getAllowedBlocks( targetRootClientId );
 				const targetBlockName = getBlockNamesByClientId( [
 					targetRootClientId,
 				] )[ 0 ];
 
 				const draggedBlockNames = getBlockNamesByClientId(
-					getDraggedBlockClientIds()
+					draggedBlockClientIds
 				);
 				const isBlockDroppingAllowed = isDropTargetValid(
 					getBlockType,
@@ -411,10 +432,14 @@ export default function useBlockDropZone( {
 					return {
 						isUnmodifiedDefaultBlock:
 							getIsUnmodifiedDefaultBlock( block ),
-						getBoundingClientRect: () =>
-							ownerDocument
-								.getElementById( `block-${ clientId }` )
-								.getBoundingClientRect(),
+						getBoundingClientRect: () => {
+							const blockElement = ownerDocument.getElementById(
+								`block-${ clientId }`
+							);
+							return blockElement
+								? blockElement.getBoundingClientRect()
+								: null;
+						},
 						blockIndex: getBlockIndex( clientId ),
 						blockOrientation:
 							getBlockListSettings( clientId )?.orientation,
@@ -439,7 +464,14 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
-				if ( isZoomOut() && operation !== 'insert' ) {
+				const isTargetIndexEmptyDefaultBlock =
+					blocksData[ targetIndex ]?.isUnmodifiedDefaultBlock;
+
+				if (
+					isZoomOut() &&
+					! isTargetIndexEmptyDefaultBlock &&
+					operation !== 'insert'
+				) {
 					return;
 				}
 

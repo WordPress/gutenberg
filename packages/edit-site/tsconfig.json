@@ -1,0 +1,53 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../api-fetch" },
+		{ "path": "../autop" },
+		{ "path": "../blob" },
+		{ "path": "../block-library" },
+		{ "path": "../block-editor" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../date" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../editor" },
+		{ "path": "../element" },
+		{ "path": "../escape-html" },
+		{ "path": "../fields" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../interactivity" },
+		{ "path": "../interactivity-router" },
+		{ "path": "../media-utils" },
+		{ "path": "../notices" },
+		{ "path": "../keycodes" },
+		{ "path": "../plugins" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../rich-text" },
+		{ "path": "../router" },
+		{ "path": "../style-engine" },
+		{ "path": "../url" },
+		{ "path": "../wordcount" }
+	],
+	// NOTE: This package is being progressively typed. You are encouraged to
+	// expand this array with files which can be type-checked. At some point in
+	// the future, this can be simplified to an `includes` of `src/**/*`.
+	"files": [
+		"src/components/style-book/categories.ts",
+		"src/components/style-book/constants.ts",
+		"src/components/style-book/types.ts",
+		"src/components/style-book/color-examples.tsx",
+		"src/components/style-book/duotone-examples.tsx",
+		"src/components/style-book/examples.tsx"
+	],
+	"include": []
+}

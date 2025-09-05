@@ -27,7 +27,7 @@ const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
  * @param {Object}   props         Props.
  * @param {Function} props.onClose Function to close the component.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostSchedule( props ) {
 	return (
@@ -59,7 +59,7 @@ export function PrivatePostSchedule( {
 		startOfMonth( new Date( postDate ) )
 	);
 
-	// Pick up published and schduled site posts.
+	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {

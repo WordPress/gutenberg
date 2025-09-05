@@ -4,9 +4,16 @@
 import { Warning } from '@wordpress/block-editor';
 import { Button, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createInterpolateElement } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 
 function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
+	const [ isButtonDisabled, setIsButtonDisabled ] = useState( false );
+
+	const handleButtonClick = () => {
+		setIsButtonDisabled( true );
+		onCreateNew();
+	};
+
 	const message = createInterpolateElement(
 		__(
 			'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
@@ -15,8 +22,10 @@ function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
 			button: (
 				<Button
 					__next40pxDefaultSize
-					onClick={ onCreateNew }
+					onClick={ handleButtonClick }
 					variant="link"
+					disabled={ isButtonDisabled }
+					accessibleWhenDisabled
 				/>
 			),
 		}

@@ -31,7 +31,7 @@ const mockFetchSearchSuggestions = jest.fn();
 /**
  * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
  * Therefore if we pass any value as the mock of `fetchRichUrlData` then ALL of the tests will require
- * addition code to handle the async nature of `fetchRichUrlData`. This is unecessary. Instead we default
+ * addition code to handle the async nature of `fetchRichUrlData`. This is unnecessary. Instead we default
  * to an undefined value which will ensure that the code under test does not call `fetchRichUrlData`. Only
  * when we are testing the "rich previews" to we update this value with a true mock.
  */
@@ -354,7 +354,7 @@ describe( 'Basic rendering', () => {
 
 		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
 			// Why do we need this test?
-			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
+			// Occasionally `forceIsEditingLink` is set explicitly to `false` which causes the Link UI to render
 			// it's preview even if the `value` has no URL.
 			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
 			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
@@ -852,7 +852,7 @@ describe( 'Manual link entry', () => {
 			await toggleSettingsDrawer( user );
 
 			let searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
+				name: 'Link',
 			} );
 
 			let textInput = screen.getByRole( 'textbox', {
@@ -889,7 +889,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the inputs as they have been replaced.
 			searchInput = screen.getByRole( 'combobox', {
-				name: 'Search or type URL',
+				name: 'Link',
 			} );
 
 			textInput = screen.getByRole( 'textbox', {
@@ -2422,7 +2422,7 @@ describe( 'Controlling link title text', () => {
 
 	it.each( [
 		[ '', 'Testing' ],
-		[ '(with leading and traling whitespace)', '    Testing    ' ],
+		[ '(with leading and trailing whitespace)', '    Testing    ' ],
 		[
 			// Note: link control should always preserve the original value.
 			// The consumer is responsible for filtering or otherwise handling the value.

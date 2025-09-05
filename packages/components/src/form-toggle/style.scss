@@ -24,10 +24,13 @@ $transition-duration: 0.2s;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: math.div($toggle-height, 2);
-		transition:
-			$transition-duration background-color ease,
-			$transition-duration border-color ease;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration background-color ease,
+				$transition-duration border-color ease;
+		}
+
 		overflow: hidden;
 
 		// Windows High Contrast Mode
@@ -39,8 +42,9 @@ $transition-duration: 0.2s;
 			// Expand the border to fake a solid in Windows High Contrast Mode.
 			border-top: #{ $toggle-height } solid transparent;
 
-			transition: $transition-duration opacity ease;
-			@include reduce-motion("transition");
+			@media not (prefers-reduced-motion) {
+				transition: $transition-duration opacity ease;
+			}
 
 			opacity: 0;
 		}
@@ -55,10 +59,13 @@ $transition-duration: 0.2s;
 		width: $toggle-thumb-size;
 		height: $toggle-thumb-size;
 		border-radius: $radius-round;
-		transition:
-			$transition-duration transform ease,
-			$transition-duration background-color ease-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				$transition-duration transform ease,
+				$transition-duration background-color ease-out;
+		}
+
 		background-color: $gray-900;
 		box-shadow: $elevation-x-small;
 

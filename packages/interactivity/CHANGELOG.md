@@ -2,6 +2,69 @@
 
 ## Unreleased
 
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+### Deprecations
+
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
+    It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+### Bug Fixes
+
+-   Fix `store()` types to support typing it without passing a store part. ([#70296](https://github.com/WordPress/gutenberg/pull/70296))
+-   Fix captured errors in `withScope` for passed generators. ([#70303](https://github.com/WordPress/gutenberg/pull/70303))
+-   Fix parsing of HTML comments without siblings. ([#70304](https://github.com/WordPress/gutenberg/pull/70304))
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
+### Bug Fixes
+
+-   Fix the logic path that merges plain objects ([#68579](https://github.com/WordPress/gutenberg/pull/68579)).
+
+## 6.15.0 (2025-01-02)
+
+### Enhancements
+
+-   Allow more iterables to be used in each directives ([#67798](https://github.com/WordPress/gutenberg/pull/67798)).
+
+### Bug Fixes
+
+-   Fix an error when the value used in an each directive is not iterable ([#67798](https://github.com/WordPress/gutenberg/pull/67798)).
+
+## 6.14.0 (2024-12-11)
+
+## 6.13.0 (2024-11-27)
+
 ## 6.12.0 (2024-11-16)
 
 ### Bug Fixes

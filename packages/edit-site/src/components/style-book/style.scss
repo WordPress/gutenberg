@@ -12,6 +12,10 @@
 }
 
 .edit-site-style-book__iframe {
+	display: block;
+	height: 100%;
+	width: 100%;
+
 	&.is-button {
 		border-radius: $radius-large;
 	}

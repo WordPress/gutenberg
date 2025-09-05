@@ -6,6 +6,7 @@ import {
 	isReusableBlock,
 	createBlock,
 	serialize,
+	getBlockType,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState, useCallback } from '@wordpress/element';
@@ -60,6 +61,15 @@ export default function PatternConvertButton( {
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
+			// Check if the block has reusable support defined.
+			const hasReusableBlockSupport = ( blockName ) => {
+				const blockType = getBlockType( blockName );
+				const hasParent = blockType && 'parent' in blockType;
+
+				// If the block has a parent, check with false as default, otherwise with true.
+				return hasBlockSupport( blockName, 'reusable', ! hasParent );
+			};
+
 			const isReusable =
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
@@ -82,7 +92,7 @@ export default function PatternConvertButton( {
 						// Hide on invalid blocks.
 						block.isValid &&
 						// Hide when block doesn't support being made into a pattern.
-						hasBlockSupport( block.name, 'reusable', true )
+						hasReusableBlockSupport( block.name )
 				) &&
 				// Hide when current doesn't have permission to do that.
 				// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.

@@ -98,6 +98,26 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Change the rendering mode of the editor.
+	 *
+	 * Setting the rendering mode to something other than the default is sometimes
+	 * needed when for example we want to update the contents of the editor from a
+	 * HTML file. Calling the resetBlocks method of the core/block-editor store will
+	 * replace the contents of the template if the rendering mode is not post-only.
+	 * So this should always be called before the resetBlocks method is used.
+	 *
+	 * @param newRenderingMode Rendering mode to set
+	 *
+	 * @return Promise<void>
+	 */
+	async setRenderingMode( newRenderingMode: string ) {
+		await this.page.evaluate( ( _newRenderingMode ) => {
+			const { dispatch } = window.wp.data;
+			dispatch( 'core/editor' ).setRenderingMode( _newRenderingMode );
+		}, newRenderingMode );
+	}
+
+	/**
 	 * Loads blocks from the small post with containers fixture into the editor
 	 * canvas.
 	 */
@@ -115,6 +135,15 @@ export class PerfUtils {
 	 */
 	async loadBlocksForLargePost() {
 		return await this.loadBlocksFromHtml(
+			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
+		);
+	}
+
+	/**
+	 * Loads the content of the large post fixture.
+	 */
+	async loadContentForLargePost() {
+		return readFile(
 			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
 		);
 	}

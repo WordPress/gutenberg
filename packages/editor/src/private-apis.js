@@ -10,7 +10,6 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import BackButton from './components/header/back-button';
-import CreateTemplatePartModal from './components/create-template-part-modal';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
@@ -24,13 +23,21 @@ import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
 } from './components/global-styles-provider';
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
+import { getTemplateInfo } from './utils/get-template-info';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
 	BackButton,
 	EntitiesSavedStatesExtensible,
 	Editor,
@@ -46,7 +53,7 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	registerCoreBlockBindingsSources,
-
+	getTemplateInfo,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,

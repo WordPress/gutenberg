@@ -9,6 +9,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -57,7 +58,12 @@ export const getBlockPatternsForPostType = createRegistrySelector(
  */
 export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state: State, kind: string, name: string, ids: string[] ) => {
+		(
+			state: State,
+			kind: string,
+			name: string,
+			ids: string | string[]
+		) => {
 			const normalizedIds = Array.isArray( ids ) ? ids : [ ids ];
 			return normalizedIds.map( ( id ) => ( {
 				delete: select( STORE_NAME ).canUser( 'delete', {
@@ -92,6 +98,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -131,8 +138,9 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 		() => {
 			const siteData = select( STORE_NAME ).getEntityRecord(
 				'root',
-				'site'
+				'__unstableBase'
 			) as SiteData | undefined;
+			// Still resolving getEntityRecord.
 			if ( ! siteData ) {
 				return null;
 			}
@@ -148,11 +156,14 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
+			// Still resolving getDefaultTemplateId.
+			if ( ! frontPageTemplateId ) {
+				return null;
+			}
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
-			// @ts-expect-error
-			getEntityRecord( state, 'root', 'site' ),
+			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
 			} ),
@@ -161,9 +172,10 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 );
 
 export const getPostsPageId = createRegistrySelector( ( select ) => () => {
-	const siteData = select( STORE_NAME ).getEntityRecord( 'root', 'site' ) as
-		| SiteData
-		| undefined;
+	const siteData = select( STORE_NAME ).getEntityRecord(
+		'root',
+		'__unstableBase'
+	) as SiteData | undefined;
 	return siteData?.show_on_front === 'page'
 		? normalizePageId( siteData.page_for_posts )
 		: null;

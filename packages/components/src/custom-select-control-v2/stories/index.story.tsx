@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -22,8 +23,8 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 		'CustomSelectControlV2.Item': CustomSelectControlV2.Item,
 	},
 	argTypes: {
-		children: { control: { type: null } },
-		value: { control: { type: null } },
+		children: { control: false },
+		value: { control: false },
 	},
 	tags: [ 'status-wip' ],
 	parameters: {
@@ -44,6 +45,9 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 			</div>
 		),
 	],
+	args: {
+		onChange: fn(),
+	},
 };
 export default meta;
 

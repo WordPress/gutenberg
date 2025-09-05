@@ -2,7 +2,7 @@ let compatibilityStyles = null;
 
 /**
  * Returns a list of stylesheets that target the editor canvas. A stylesheet is
- * considered targetting the editor a canvas if it contains the
+ * considered targeting the editor a canvas if it contains the
  * `editor-styles-wrapper`, `wp-block`, or `wp-block-*` class selectors.
  *
  * Ideally, this hook should be removed in the future and styles should be added

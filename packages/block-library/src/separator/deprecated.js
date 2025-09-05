@@ -49,6 +49,7 @@ const v1 = {
 			style: customColor
 				? { color: { background: customColor } }
 				: undefined,
+			tagName: 'hr',
 		};
 	},
 };

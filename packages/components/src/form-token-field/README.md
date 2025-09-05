@@ -85,6 +85,7 @@ const MyFormTokenField = () => {
 
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			value={ selectedContinents }
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }

@@ -33,7 +33,7 @@ const noop = () => {};
  * the template part in the block editor back to the entity and vice-versa.
  *
  * Here are some of its basic functions:
- * - Initalizes the block-editor store for the given clientID to the blocks
+ * - Initializes the block-editor store for the given clientID to the blocks
  *   given via props.
  * - Adds incoming changes (like undo) to the block-editor store.
  * - Adds outgoing changes (like editing content) to the controlling entity,
@@ -49,7 +49,7 @@ const noop = () => {};
  *                                        root controller rather than an inner block
  *                                        controller.
  * @param {Object[]}      props.value     The control value for the blocks. This value
- *                                        is used to initalize the block-editor store
+ *                                        is used to initialize the block-editor store
  *                                        and for resetting the blocks to incoming
  *                                        changes like undo.
  * @param {Object}        props.selection The selection state responsible to restore the selection on undo/redo.

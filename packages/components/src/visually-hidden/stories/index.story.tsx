@@ -13,7 +13,7 @@ const meta: Meta< typeof VisuallyHidden > = {
 	title: 'Components/Typography/VisuallyHidden',
 	id: 'components-visuallyhidden',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		as: { control: { type: 'text' } },
 	},
 	parameters: {

@@ -29,7 +29,10 @@ export default function PreviewBlockPopover( { blocks } ) {
 					<div className="block-editor-block-switcher__preview-title">
 						{ __( 'Preview' ) }
 					</div>
-					<BlockPreview viewportWidth={ 500 } blocks={ blocks } />
+					{ /* 600px is the value of $break-small in base-styles/_breakpoints.scss.
+						We set the viewport width to 601px to make sure that the media-text 
+						block which uses this breakpoint has the correct padding. */ }
+					<BlockPreview viewportWidth={ 601 } blocks={ blocks } />
 				</div>
 			</Popover>
 		</div>

@@ -42,6 +42,7 @@
 		color: $white;
 		padding: 0;
 
+		// TODO: Consider passing size="small" to the Inserter toggle instead.
 		// Special dimensions for this button.
 		min-width: $button-size-small;
 		height: $button-size-small;

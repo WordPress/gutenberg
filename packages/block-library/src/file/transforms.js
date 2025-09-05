@@ -14,7 +14,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length > 0;
 			},
-			// We define a lower priorty (higher number) than the default of 10. This
+			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: ( files ) => {
@@ -104,8 +104,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
@@ -124,8 +124,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
@@ -144,8 +144,8 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( coreStore );
-				const media = getMedia( id );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
 				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {

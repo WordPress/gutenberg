@@ -40,8 +40,9 @@
 		border-radius: 0;
 
 		// Animation
-		transition: all 0.1s linear;
-		@include reduce-motion("transition");
+		@media not (prefers-reduced-motion) {
+			transition: all 0.1s linear;
+		}
 	}
 
 	// Active.
@@ -68,8 +69,9 @@
 		border-radius: $radius-small;
 
 		// Animation
-		transition: all 0.1s linear;
-		@include reduce-motion("transition");
+		@media not (prefers-reduced-motion) {
+			transition: all 0.1s linear;
+		}
 	}
 
 	&:focus-visible::before {

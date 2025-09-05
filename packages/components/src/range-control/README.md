@@ -88,9 +88,10 @@ import { RangeControl } from '@wordpress/components';
 const MyRangeControl = () => {
 	const [ columns, setColumns ] = useState( 2 );
 
-	return(
+	return (
 		<RangeControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label="Columns"
 			value={ columns }
 			onChange={ ( value ) => setColumns( value ) }
@@ -153,7 +154,6 @@ Disables the `input`, preventing new values from being applied.
 -   Required: No
 -   Platform: Web
 
-
 ### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
@@ -165,7 +165,7 @@ If this property is added, a help text will be generated using help property as 
 
 Provides control over whether the label will only be visible to screen readers.
 
-- Required: No
+-   Required: No
 
 ### `icon`: `string`
 
@@ -334,6 +334,7 @@ The minimum amount by which `value` changes. It is also a factor in validation a
 
 -   Required: No
 -   Platform: Web
+
 ### `trackColor`: `CSSProperties[ 'color' ]`
 
 CSS color string to customize the track element's background.

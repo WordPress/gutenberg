@@ -316,7 +316,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
 			/*
 			 * Unlike block themes, classic themes without a theme.json disable
@@ -359,7 +359,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			if ( current_theme_supports( 'experimental-link-color' ) ) {
 				_doing_it_wrong(
-					current_theme_supports( 'experimental-link-color' ),
+					"add_theme_support( 'experimental-link-color' )",
 					__( '`experimental-link-color` is no longer supported. Use `link-color` instead.', 'gutenberg' ),
 					'6.3.0'
 				);

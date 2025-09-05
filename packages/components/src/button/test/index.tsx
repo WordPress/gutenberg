@@ -6,18 +6,25 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { createRef } from '@wordpress/element';
+import { createRef, forwardRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Button from '..';
+import _Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
 import { press } from '@ariakit/test';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+
+const Button = forwardRef(
+	(
+		props: React.ComponentProps< typeof _Button >,
+		ref: React.ForwardedRef< unknown >
+	) => <_Button __next40pxDefaultSize { ...props } ref={ ref } />
+);
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {

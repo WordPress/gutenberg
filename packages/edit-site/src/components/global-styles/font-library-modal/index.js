@@ -28,7 +28,7 @@ const DEFAULT_TAB = {
 
 const UPLOAD_TAB = {
 	id: 'upload-fonts',
-	title: __( 'Upload' ),
+	title: _x( 'Upload', 'noun' ),
 };
 
 const tabsFromCollections = ( collections ) =>

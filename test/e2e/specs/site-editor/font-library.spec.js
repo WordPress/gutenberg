@@ -186,7 +186,8 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'button', { name: 'Headings', exact: true } )
 				.click();
-			await page.getByLabel( 'Font' ).selectOption( 'Exo 2' );
+			await page.getByRole( 'combobox', { name: 'Font' } ).click();
+			await page.getByRole( 'option', { name: 'Exo 2' } ).click();
 			await expect(
 				editor.canvas.locator( '.is-root-container h1' )
 			).toHaveCSS( 'font-family', '"Exo 2"' );

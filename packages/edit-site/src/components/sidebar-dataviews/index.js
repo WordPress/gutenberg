@@ -14,9 +14,9 @@ import CustomDataViewsList from './custom-dataviews-list';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function DataViewsSidebarContent() {
+export default function DataViewsSidebarContent( { postType } ) {
 	const {
-		params: { postType, activeView = 'all', isCustom = 'false' },
+		query: { activeView = 'all', isCustom = 'false' },
 	} = useLocation();
 	const defaultViews = useDefaultViews( { postType } );
 	if ( ! postType ) {
@@ -26,7 +26,7 @@ export default function DataViewsSidebarContent() {
 
 	return (
 		<>
-			<ItemGroup>
+			<ItemGroup className="edit-site-sidebar-dataviews">
 				{ defaultViews.map( ( dataview ) => {
 					return (
 						<DataViewItem

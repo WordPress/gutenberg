@@ -21,46 +21,47 @@ const Example = () => {
 	);
 };
 ```
+
 ## Props
 
 ### `defaultValue`
-
-If provided, sets the default alignment value.
 
  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
  - Required: No
  - Default: `'center center'`
 
-### `label`
+If provided, sets the default alignment value.
 
-Accessible label. If provided, sets the `aria-label` attribute of the
-underlying `grid` widget.
+### `label`
 
  - Type: `string`
  - Required: No
  - Default: `'Alignment Matrix Control'`
 
-### `onChange`
+Accessible label. If provided, sets the `aria-label` attribute of the
+underlying `grid` widget.
 
-A function that receives the updated alignment value.
+### `onChange`
 
  - Type: `(newValue: AlignmentMatrixControlValue) => void`
  - Required: No
 
-### `value`
+A function that receives the updated alignment value.
 
-The current alignment value.
+### `value`
 
  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
  - Required: No
 
-### `width`
+The current alignment value.
 
-If provided, sets the width of the control.
+### `width`
 
  - Type: `number`
  - Required: No
  - Default: `92`
+
+If provided, sets the width of the control.
 
 ## Subcomponents
 
@@ -70,16 +71,16 @@ If provided, sets the width of the control.
 
 ##### `disablePointerEvents`
 
-If `true`, disables pointer events on the icon.
-
  - Type: `boolean`
  - Required: No
  - Default: `true`
 
-##### `value`
+If `true`, disables pointer events on the icon.
 
-The current alignment value.
+##### `value`
 
  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
  - Required: No
  - Default: `center`
+
+The current alignment value.

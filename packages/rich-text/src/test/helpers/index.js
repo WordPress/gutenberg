@@ -551,6 +551,58 @@ export const spec = [
 			text: '\ufffc',
 		},
 	},
+	{
+		description: 'should preserve comments',
+		html: '<!--comment-->',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 2, 0 ],
+		record: {
+			start: 0,
+			end: 1,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: {
+						'data-rich-text-comment': 'comment',
+					},
+					type: '#comment',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
+	{
+		description: 'should preserve funky comments',
+		html: '<//funky>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element,
+			endOffset: 1,
+			endContainer: element,
+		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 2, 0 ],
+		record: {
+			start: 0,
+			end: 1,
+			formats: [ , ],
+			replacements: [
+				{
+					attributes: {
+						'data-rich-text-comment': '/funky',
+					},
+					type: '#comment',
+				},
+			],
+			text: '\ufffc',
+		},
+	},
 ];
 
 export const specWithRegistration = [

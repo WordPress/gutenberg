@@ -193,7 +193,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
  * @param {Object}  _            Unused parameter.
  * @param {Element} forwardedRef Forwarded ref for the component.
  *
- * @return {Component} The rendered PostTitle component.
+ * @return {React.ReactNode} The rendered PostTitle component.
  */
 export default forwardRef( ( _, forwardedRef ) => (
 	<PostTypeSupportCheck supportKeys="title">

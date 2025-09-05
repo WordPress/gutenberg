@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+## 4.30.0 (2025-09-03)
+
+## 4.29.0 (2025-08-20)
+
+## 4.28.0 (2025-08-07)
+
+## 4.27.0 (2025-07-23)
+
+## 4.26.0 (2025-06-25)
+
+## 4.25.0 (2025-06-04)
+
+## 4.24.0 (2025-05-22)
+
+## 4.23.0 (2025-05-07)
+
+## 4.22.0 (2025-04-11)
+
+## 4.21.0 (2025-03-27)
+
+## 4.20.0 (2025-03-13)
+
+## 4.19.0 (2025-02-28)
+
+## 4.18.0 (2025-02-12)
+
+## 4.17.0 (2025-01-29)
+
+## 4.16.0 (2025-01-15)
+
+## 4.15.0 (2025-01-02)
+
+## 4.14.0 (2024-12-11)
+
+## 4.13.0 (2024-11-27)
+
 ## 4.12.0 (2024-11-16)
 
 ## 4.11.0 (2024-10-30)
@@ -218,7 +254,7 @@
 
 ### Bug Fixes
 
--   The `isValidProtocol` function now correctly considers the protocol of the URL as only incoporating characters up to and including the colon (':').
+-   The `isValidProtocol` function now correctly considers the protocol of the URL as only incorporating characters up to and including the colon (':').
 -   `getFragment` is now greedier and matches fragments from the first occurrence of the '#' symbol instead of the last.
 
 ## 2.3.0 (2018-11-12)

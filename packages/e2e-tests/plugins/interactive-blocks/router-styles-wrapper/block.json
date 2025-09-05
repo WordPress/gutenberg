@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "test/router-styles-wrapper",
+	"title": "E2E Interactivity tests - router styles - Wrapper",
+	"category": "text",
+	"icon": "heart",
+	"description": "",
+	"supports": {
+		"interactivity": true
+	},
+	"textdomain": "e2e-interactivity",
+	"viewScriptModule": "file:./view.js",
+	"viewStyle": "file:./style.css",
+	"render": "file:./render.php"
+}

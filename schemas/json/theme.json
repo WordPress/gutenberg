@@ -3,9 +3,9 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
-			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
+			"explainer": "https://developer.wordpress.org/themes/global-settings-and-styles/",
 			"createTheme": "https://developer.wordpress.org/themes/",
-			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
+			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/global-settings-and-styles/"
 		},
 		"refComplete": {
 			"type": "object",
@@ -75,6 +75,28 @@
 							"description": "Allow users to set custom border widths.",
 							"type": "boolean",
 							"default": false
+						},
+						"radiusSizes": {
+							"description": "Border radius size presets for the border radius selector.\nGenerates a custom property (`--wp--preset--border-radius--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the border radius size preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Unique identifier for the border raidus size preset.",
+										"type": "string"
+									},
+									"size": {
+										"description": "CSS border-radius value, including units.",
+										"type": "string"
+									}
+								},
+								"additionalProperties": false
+							}
 						}
 					},
 					"additionalProperties": false
@@ -922,6 +944,9 @@
 				"core/file": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
+				"core/footnotes": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
 				"core/freeform": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -1030,9 +1055,6 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
-				"core/post-time-to-read": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
 				"core/post-title": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
@@ -1061,6 +1083,9 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/query-title": {
+					"$ref": "#/definitions/settingsPropertiesComplete"
+				},
+				"core/query-total": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/quote": {
@@ -1100,9 +1125,6 @@
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/table": {
-					"$ref": "#/definitions/settingsPropertiesComplete"
-				},
-				"core/table-of-contents": {
 					"$ref": "#/definitions/settingsPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -1713,6 +1735,9 @@
 				":focus": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
+				":focus-visible": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
 				":hover": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
@@ -1729,6 +1754,7 @@
 				":active",
 				":any-link",
 				":focus",
+				":focus-visible",
 				":hover",
 				":link",
 				":visited"
@@ -1809,6 +1835,12 @@
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"cite": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"select": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"textInput": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
@@ -1900,6 +1932,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/file": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/footnotes": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/freeform": {
@@ -2010,9 +2045,6 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
-				"core/post-time-to-read": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
@@ -2041,6 +2073,9 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/query-title": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+				},
+				"core/query-total": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
@@ -2080,9 +2115,6 @@
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/table": {
-					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
-				},
-				"core/table-of-contents": {
 					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/tag-cloud": {
@@ -2316,6 +2348,9 @@
 				"core/file": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
+				"core/footnotes": {
+					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
 				"core/freeform": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2424,9 +2459,6 @@
 				"core/post-terms": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
-				"core/post-time-to-read": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
-				},
 				"core/post-title": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
@@ -2456,6 +2488,9 @@
 				},
 				"core/query-title": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
+				},
+				"core/query-total": {
+					"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
 				},
 				"core/quote": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
@@ -2494,9 +2529,6 @@
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/table": {
-					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
-				},
-				"core/table-of-contents": {
 					"$ref": "#/definitions/stylesVariationBlockPropertiesComplete"
 				},
 				"core/tag-cloud": {
@@ -2575,15 +2607,15 @@
 			"const": 3
 		},
 		"title": {
-			"description": "Title of the global styles variation. If not defined, the file name will be used.",
+			"description": "Title of the styles variation. If not defined, the file name will be used.",
 			"type": "string"
 		},
 		"slug": {
-			"description": "Slug of the global styles variation. If not defined, the kebab-case title will be used.",
+			"description": "Slug of the styles variation. If not defined, the kebab-case title will be used.",
 			"type": "string"
 		},
 		"description": {
-			"description": "Description of the global styles variation.",
+			"description": "Description of the styles variation.",
 			"type": "string"
 		},
 		"blockTypes": {

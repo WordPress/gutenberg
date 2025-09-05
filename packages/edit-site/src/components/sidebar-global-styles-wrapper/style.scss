@@ -33,3 +33,25 @@
 		color: $gray-900;
 	}
 }
+
+.show-icon-labels {
+	.edit-site-styles .edit-site-page-content {
+		.edit-site-page-header__actions {
+			.components-button.has-icon {
+				width: auto;
+				padding: 0 $grid-unit-10;
+
+				// Hide the button icons when labels are set to display...
+				svg {
+					display: none;
+				}
+				// ... and display labels.
+				&::after {
+					content: attr(aria-label);
+					font-size: $helptext-font-size;
+				}
+			}
+
+		}
+	}
+}

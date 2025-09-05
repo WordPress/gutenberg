@@ -107,4 +107,11 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 		 * Callback when either the quantity or the unit inputs gains focus.
 		 */
 		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+		/**
+		 * Do not throw a warning for the deprecated 36px default size.
+		 * For internal components of other components that already throw the warning.
+		 *
+		 * @ignore
+		 */
+		__shouldNotWarnDeprecated36pxSize?: boolean;
 	};

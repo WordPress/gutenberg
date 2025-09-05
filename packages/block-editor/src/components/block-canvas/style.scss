@@ -4,6 +4,8 @@ iframe[name="editor-canvas"] {
 	height: 100%;
 	display: block;
 	// Handles transitions between device previews
-	@include editor-canvas-resize-animation;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 400ms cubic-bezier(0.46, 0.03, 0.52, 0.96);
+	}
 	background-color: $gray-300;
 }

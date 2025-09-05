@@ -3,10 +3,8 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-const { Fill: __unstableCommentIconToolbarFill, Slot } = createSlotFill(
-	'__unstableCommentIconToolbarFill'
+const CommentIconToolbarSlotFill = createSlotFill(
+	Symbol( 'CommentIconToolbarSlotFill' )
 );
 
-__unstableCommentIconToolbarFill.Slot = Slot;
-
-export default __unstableCommentIconToolbarFill;
+export default CommentIconToolbarSlotFill;

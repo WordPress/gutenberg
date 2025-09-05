@@ -15,12 +15,12 @@ const initialHtml = `
 <figure class="wp-block-video"><video controls src="https://i.cloudup.com/YtZFJbuQCE.mov"></video><figcaption class="wp-element-caption">Cloudup video</figcaption></figure>
 <!-- /wp:video -->`;
 
-const tranformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const nonMediaTransforms = [ 'File' ];
 const blockTransforms = [
 	'Cover',
 	'Media & Text',
-	...tranformsWithInnerBlocks,
+	...transformsWithInnerBlocks,
 	...nonMediaTransforms,
 ];
 
@@ -31,7 +31,8 @@ describe( `${ block } block transforms`, () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const newBlock = await transformBlock( screen, block, blockTransform, {
 			isMediaBlock: ! nonMediaTransforms.includes( blockTransform ),
-			hasInnerBlocks: tranformsWithInnerBlocks.includes( blockTransform ),
+			hasInnerBlocks:
+				transformsWithInnerBlocks.includes( blockTransform ),
 		} );
 		expect( newBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();

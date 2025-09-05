@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -89,10 +90,22 @@ const LineHeightControl = ( {
 		onChange( `${ nextValue }` );
 	};
 
+	if (
+		! __next40pxDefaultSize &&
+		( otherProps.size === undefined || otherProps.size === 'default' )
+	) {
+		deprecated( `36px default size for wp.blockEditor.LineHeightControl`, {
+			since: '6.8',
+			version: '7.1',
+			hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+		} );
+	}
+
 	return (
 		<div className="block-editor-line-height-control">
 			<NumberControl
 				{ ...otherProps }
+				__shouldNotWarnDeprecated36pxSize
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }

@@ -10,11 +10,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import {
-	useSettings,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSettings } from '@wordpress/block-editor';
 
 const SCALE_OPTIONS = (
 	<>
@@ -37,7 +33,6 @@ const SCALE_OPTIONS = (
 );
 
 const DEFAULT_SCALE = 'cover';
-const DEFAULT_SIZE = 'full';
 
 const scaleHelp = {
 	cover: __(
@@ -53,9 +48,8 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { aspectRatio, width, height, scale, sizeSlug },
+	attributes: { aspectRatio, width, height, scale },
 	setAttributes,
-	media,
 } ) => {
 	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
@@ -67,18 +61,6 @@ const DimensionControls = ( {
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
-	const imageSizes = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().imageSizes,
-		[]
-	);
-	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) => {
-			return media?.media_details?.sizes?.[ slug ]?.source_url;
-		} )
-		.map( ( { name, slug } ) => ( {
-			value: slug,
-			label: name,
-		} ) );
 
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
@@ -220,32 +202,6 @@ const DimensionControls = ( {
 					>
 						{ SCALE_OPTIONS }
 					</ToggleGroupControl>
-				</ToolsPanelItem>
-			) }
-			{ !! imageSizeOptions.length && (
-				<ToolsPanelItem
-					hasValue={ () => !! sizeSlug }
-					label={ __( 'Resolution' ) }
-					onDeselect={ () =>
-						setAttributes( { sizeSlug: undefined } )
-					}
-					resetAllFilter={ () => ( {
-						sizeSlug: undefined,
-					} ) }
-					isShownByDefault={ false }
-					panelId={ clientId }
-				>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Resolution' ) }
-						value={ sizeSlug || DEFAULT_SIZE }
-						options={ imageSizeOptions }
-						onChange={ ( nextSizeSlug ) =>
-							setAttributes( { sizeSlug: nextSizeSlug } )
-						}
-						help={ __( 'Select the size of the source image.' ) }
-					/>
 				</ToolsPanelItem>
 			) }
 		</>

@@ -122,7 +122,6 @@ export function PageAttributesParent( {
 
 	const { parentPostTitle, pageItems, isHierarchical } = useSelect(
 		( select ) => {
-			// @ts-expect-error getPostType is not typed
 			const { getEntityRecord, getEntityRecords, getPostType } =
 				select( coreStore );
 
@@ -289,7 +288,6 @@ export const ParentEdit = ( {
 	const { id } = field;
 
 	const homeUrl = useSelect( ( select ) => {
-		// @ts-expect-error getEntityRecord is not typed with unstableBase as argument.
 		return select( coreStore ).getEntityRecord< {
 			home: string;
 		} >( 'root', '__unstableBase' )?.home as string;

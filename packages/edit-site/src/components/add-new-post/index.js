@@ -45,7 +45,7 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 				{
 					status: 'draft',
 					title,
-					slug: title || __( 'No title' ),
+					slug: title ?? undefined,
 					content:
 						!! postTypeObject.template &&
 						postTypeObject.template.length

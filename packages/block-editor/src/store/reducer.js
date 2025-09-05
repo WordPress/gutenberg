@@ -9,12 +9,20 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { pipe } from '@wordpress/compose';
 import { combineReducers, select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+import { sectionRootClientIdKey } from './private-keys';
+import { unlock } from '../lock-unlock';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 const identity = ( x ) => x;
 
@@ -874,7 +882,7 @@ export const blocks = pipe(
 				const newState = new Map( state );
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
-						action.uniqueByBlock
+						!! action.options?.uniqueByBlock
 							? action.attributes[ clientId ]
 							: action.attributes ?? {}
 					);
@@ -1825,7 +1833,7 @@ export function lastBlockAttributesChange( state = null, action ) {
 			return action.clientIds.reduce(
 				( accumulator, id ) => ( {
 					...accumulator,
-					[ id ]: action.uniqueByBlock
+					[ id ]: !! action.options?.uniqueByBlock
 						? action.attributes[ id ]
 						: action.attributes,
 				} ),
@@ -1956,8 +1964,14 @@ export function temporarilyEditingFocusModeRevert( state = '', action ) {
 export function blockEditingModes( state = new Map(), action ) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EDITING_MODE':
+			if ( state.get( action.clientId ) === action.mode ) {
+				return state;
+			}
 			return new Map( state ).set( action.clientId, action.mode );
 		case 'UNSET_BLOCK_EDITING_MODE': {
+			if ( ! state.has( action.clientId ) ) {
+				return state;
+			}
 			const newState = new Map( state );
 			newState.delete( action.clientId );
 			return newState;
@@ -2042,23 +2056,6 @@ export function lastFocus( state = false, action ) {
 }
 
 /**
- * Reducer setting currently hovered block.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function hoveredBlockClientId( state = false, action ) {
-	switch ( action.type ) {
-		case 'HOVER_BLOCK':
-			return action.clientId;
-	}
-
-	return state;
-}
-
-/**
  * Reducer setting zoom out state.
  *
  * @param {boolean} state  Current state.
@@ -2127,9 +2124,721 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	hoveredBlockClientId,
 	zoomLevel,
 } );
+
+/**
+ * Retrieves a block's tree structure, handling both controlled and uncontrolled inner blocks.
+ *
+ * @param {Object} state    The current state object.
+ * @param {string} clientId The client ID of the block to retrieve.
+ *
+ * @return {Object|undefined} The block tree object, or undefined if not found. For controlled blocks,
+ *                           returns a merged tree with controlled inner blocks.
+ */
+function getBlockTreeBlock( state, clientId ) {
+	if ( clientId === '' ) {
+		const rootBlock = state.blocks.tree.get( clientId );
+
+		if ( ! rootBlock ) {
+			return;
+		}
+
+		// Patch the root block to have a clientId property.
+		// TODO - consider updating the blocks reducer so that the root block has this property.
+		return {
+			clientId: '',
+			...rootBlock,
+		};
+	}
+
+	if ( ! state.blocks.controlledInnerBlocks[ clientId ] ) {
+		return state.blocks.tree.get( clientId );
+	}
+
+	const controlledTree = state.blocks.tree.get( `controlled||${ clientId }` );
+	const regularTree = state.blocks.tree.get( clientId );
+
+	return {
+		...regularTree,
+		innerBlocks: controlledTree?.innerBlocks,
+	};
+}
+
+/**
+ * Recursively traverses through a block tree of a given block and executes a callback for each block.
+ *
+ * @param {Object}   state    The store state.
+ * @param {string}   clientId The clientId of the block to start traversing from.
+ * @param {Function} callback Function to execute for each block encountered during traversal.
+ *                            The callback receives the current block as its argument.
+ */
+function traverseBlockTree( state, clientId, callback ) {
+	const tree = getBlockTreeBlock( state, clientId );
+	if ( ! tree ) {
+		return;
+	}
+
+	callback( tree );
+
+	if ( ! tree?.innerBlocks?.length ) {
+		return;
+	}
+
+	for ( const innerBlock of tree?.innerBlocks ) {
+		traverseBlockTree( state, innerBlock.clientId, callback );
+	}
+}
+
+/**
+ * Checks if a block has a parent in a list of client IDs, and if so returns the client ID of the parent.
+ *
+ * @param {Object} state     The current state object.
+ * @param {string} clientId  The client ID of the block to search the parents of.
+ * @param {Array}  clientIds The client IDs of the blocks to check.
+ *
+ * @return {string|undefined} The client ID of the parent block if found, undefined otherwise.
+ */
+function findParentInClientIdsList( state, clientId, clientIds ) {
+	if ( ! clientIds.length ) {
+		return;
+	}
+
+	let parent = state.blocks.parents.get( clientId );
+	while ( parent !== undefined ) {
+		if ( clientIds.includes( parent ) ) {
+			return parent;
+		}
+		parent = state.blocks.parents.get( parent );
+	}
+}
+
+/**
+ * Checks if a block has any bindings in its metadata attributes.
+ *
+ * @param {Object} block The block object to check for bindings.
+ * @return {boolean}    True if the block has bindings, false otherwise.
+ */
+function hasBindings( block ) {
+	return (
+		block?.attributes?.metadata?.bindings &&
+		Object.keys( block?.attributes?.metadata?.bindings ).length
+	);
+}
+
+/**
+ * Computes and returns derived block editing modes for a given block tree.
+ *
+ * This function calculates the editing modes for each block in the tree, taking into account
+ * various factors such as zoom level, navigation mode, sections, and synced patterns.
+ *
+ * @param {Object}  state        The current state object.
+ * @param {boolean} isNavMode    Whether the navigation mode is active.
+ * @param {string}  treeClientId The client ID of the root block for the tree. Defaults to an empty string.
+ * @return {Map} A Map containing the derived block editing modes, keyed by block client ID.
+ */
+function getDerivedBlockEditingModesForTree(
+	state,
+	isNavMode = false,
+	treeClientId = ''
+) {
+	const isZoomedOut =
+		state?.zoomLevel < 100 || state?.zoomLevel === 'auto-scaled';
+	const derivedBlockEditingModes = new Map();
+
+	// When there are sections, the majority of blocks are disabled,
+	// so the default block editing mode is set to disabled.
+	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
+	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
+	const hasDisabledBlocks = Array.from( state.blockEditingModes ).some(
+		( [ , mode ] ) => mode === 'disabled'
+	);
+	const templatePartClientIds = [];
+	const syncedPatternClientIds = [];
+
+	Object.keys( state.blocks.controlledInnerBlocks ).forEach( ( clientId ) => {
+		const block = state.blocks.byClientId?.get( clientId );
+
+		if ( block?.name === 'core/template-part' ) {
+			templatePartClientIds.push( clientId );
+		}
+
+		if ( block?.name === 'core/block' ) {
+			syncedPatternClientIds.push( clientId );
+		}
+	} );
+
+	traverseBlockTree( state, treeClientId, ( block ) => {
+		const { clientId, name: blockName } = block;
+
+		// If the block already has an explicit block editing mode set,
+		// don't override it.
+		if ( state.blockEditingModes.has( clientId ) ) {
+			return;
+		}
+
+		// Disabled explicit block editing modes are inherited by children.
+		// It's an expensive calculation, so only do it if there are disabled blocks.
+		if ( hasDisabledBlocks ) {
+			// Look through parents to find one with an explicit block editing mode.
+			let ancestorBlockEditingMode;
+			let parent = state.blocks.parents.get( clientId );
+			while ( parent !== undefined ) {
+				// There's a chance we only just calculated this for the parent,
+				// if so we can return that value for a faster lookup.
+				if ( derivedBlockEditingModes.has( parent ) ) {
+					ancestorBlockEditingMode =
+						derivedBlockEditingModes.get( parent );
+				} else if ( state.blockEditingModes.has( parent ) ) {
+					// Checking the explicit block editing mode will be slower,
+					// as the block editing mode is more likely to be set on a
+					// distant ancestor.
+					ancestorBlockEditingMode =
+						state.blockEditingModes.get( parent );
+				}
+				if ( ancestorBlockEditingMode ) {
+					break;
+				}
+				parent = state.blocks.parents.get( parent );
+			}
+
+			// If the ancestor block editing mode is disabled, it's inherited by the child.
+			if ( ancestorBlockEditingMode === 'disabled' ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
+		}
+
+		if ( isZoomedOut || isNavMode ) {
+			// If the root block is the section root set its editing mode to contentOnly.
+			if ( clientId === sectionRootClientId ) {
+				derivedBlockEditingModes.set( clientId, 'contentOnly' );
+				return;
+			}
+
+			// There are no sections, so everything else is disabled.
+			if ( ! sectionClientIds?.length ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
+
+			if ( sectionClientIds.includes( clientId ) ) {
+				derivedBlockEditingModes.set( clientId, 'contentOnly' );
+				return;
+			}
+
+			// If zoomed out, all blocks that aren't sections or the section root are
+			// disabled.
+			if ( isZoomedOut ) {
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
+			}
+
+			const isInSection = !! findParentInClientIdsList(
+				state,
+				clientId,
+				sectionClientIds
+			);
+			if ( ! isInSection ) {
+				if ( clientId === '' ) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+
+				// Allow selection of template parts outside of sections.
+				if ( blockName === 'core/template-part' ) {
+					derivedBlockEditingModes.set( clientId, 'contentOnly' );
+					return;
+				}
+
+				const isInTemplatePart = !! findParentInClientIdsList(
+					state,
+					clientId,
+					templatePartClientIds
+				);
+				// Allow contentOnly blocks in template parts outside of sections
+				// to be editable. Only disable blocks that don't fit this criteria.
+				if ( ! isInTemplatePart && ! isContentBlock( blockName ) ) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+			}
+
+			// Handle synced pattern content so the inner blocks of a synced pattern are
+			// properly disabled.
+			if ( syncedPatternClientIds.length ) {
+				const parentPatternClientId = findParentInClientIdsList(
+					state,
+					clientId,
+					syncedPatternClientIds
+				);
+
+				if ( parentPatternClientId ) {
+					// This is a pattern nested in another pattern, it should be disabled.
+					if (
+						findParentInClientIdsList(
+							state,
+							parentPatternClientId,
+							syncedPatternClientIds
+						)
+					) {
+						derivedBlockEditingModes.set( clientId, 'disabled' );
+						return;
+					}
+
+					if ( hasBindings( block ) ) {
+						derivedBlockEditingModes.set( clientId, 'contentOnly' );
+						return;
+					}
+
+					// Synced pattern content without a binding isn't editable
+					// from the instance, the user has to edit the pattern source,
+					// so return 'disabled'.
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+			}
+
+			if ( blockName && isContentBlock( blockName ) ) {
+				derivedBlockEditingModes.set( clientId, 'contentOnly' );
+				return;
+			}
+
+			derivedBlockEditingModes.set( clientId, 'disabled' );
+			return;
+		}
+
+		if ( syncedPatternClientIds.length ) {
+			// Synced pattern blocks (core/block).
+			if ( syncedPatternClientIds.includes( clientId ) ) {
+				// This is a pattern nested in another pattern, it should be disabled.
+				if (
+					findParentInClientIdsList(
+						state,
+						clientId,
+						syncedPatternClientIds
+					)
+				) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+
+				// Else do nothing, use the default block editing mode.
+				return;
+			}
+
+			// Inner blocks of synced patterns.
+			const parentPatternClientId = findParentInClientIdsList(
+				state,
+				clientId,
+				syncedPatternClientIds
+			);
+			if ( parentPatternClientId ) {
+				// This is a pattern nested in another pattern, it should be disabled.
+				if (
+					findParentInClientIdsList(
+						state,
+						parentPatternClientId,
+						syncedPatternClientIds
+					)
+				) {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+					return;
+				}
+
+				if ( hasBindings( block ) ) {
+					derivedBlockEditingModes.set( clientId, 'contentOnly' );
+					return;
+				}
+
+				// Synced pattern content without a binding isn't editable
+				// from the instance, the user has to edit the pattern source,
+				// so return 'disabled'.
+				derivedBlockEditingModes.set( clientId, 'disabled' );
+			}
+		}
+	} );
+
+	return derivedBlockEditingModes;
+}
+
+/**
+ * Updates the derived block editing modes based on added and removed blocks.
+ *
+ * This function handles the updating of block editing modes when blocks are added,
+ * removed, or moved within the editor.
+ *
+ * It only returns a value when modifications are made to the block editing modes.
+ *
+ * @param {Object}  options                    The options for updating derived block editing modes.
+ * @param {Object}  options.prevState          The previous state object.
+ * @param {Object}  options.nextState          The next state object.
+ * @param {Array}   [options.addedBlocks]      An array of blocks that were added.
+ * @param {Array}   [options.removedClientIds] An array of client IDs of blocks that were removed.
+ * @param {boolean} [options.isNavMode]        Whether the navigation mode is active.
+ * @return {Map|undefined} The updated derived block editing modes, or undefined if no changes were made.
+ */
+function getDerivedBlockEditingModesUpdates( {
+	prevState,
+	nextState,
+	addedBlocks,
+	removedClientIds,
+	isNavMode = false,
+} ) {
+	const prevDerivedBlockEditingModes = isNavMode
+		? prevState.derivedNavModeBlockEditingModes
+		: prevState.derivedBlockEditingModes;
+	let nextDerivedBlockEditingModes;
+
+	// Perform removals before additions to handle cases like the `MOVE_BLOCKS_TO_POSITION` action.
+	// That action removes a set of clientIds, but adds the same blocks back in a different location.
+	// If removals were performed after additions, those moved clientIds would be removed incorrectly.
+	removedClientIds?.forEach( ( clientId ) => {
+		// The actions only receive parent block IDs for removal.
+		// Recurse through the block tree to ensure all blocks are removed.
+		// Specifically use the previous state, before the blocks were removed.
+		traverseBlockTree( prevState, clientId, ( block ) => {
+			if ( prevDerivedBlockEditingModes.has( block.clientId ) ) {
+				if ( ! nextDerivedBlockEditingModes ) {
+					nextDerivedBlockEditingModes = new Map(
+						prevDerivedBlockEditingModes
+					);
+				}
+				nextDerivedBlockEditingModes.delete( block.clientId );
+			}
+		} );
+	} );
+
+	addedBlocks?.forEach( ( addedBlock ) => {
+		traverseBlockTree( nextState, addedBlock.clientId, ( block ) => {
+			const updates = getDerivedBlockEditingModesForTree(
+				nextState,
+				isNavMode,
+				block.clientId
+			);
+
+			if ( updates.size ) {
+				if ( ! nextDerivedBlockEditingModes ) {
+					nextDerivedBlockEditingModes = new Map( [
+						...( prevDerivedBlockEditingModes?.size
+							? prevDerivedBlockEditingModes
+							: [] ),
+						...updates,
+					] );
+				} else {
+					nextDerivedBlockEditingModes = new Map( [
+						...( nextDerivedBlockEditingModes?.size
+							? nextDerivedBlockEditingModes
+							: [] ),
+						...updates,
+					] );
+				}
+			}
+		} );
+	} );
+
+	return nextDerivedBlockEditingModes;
+}
+
+/**
+ * Higher-order reducer that adds derived block editing modes to the state.
+ *
+ * This function wraps a reducer and enhances it to handle actions that affect
+ * block editing modes. It updates the derivedBlockEditingModes in the state
+ * based on various actions such as adding, removing, or moving blocks, or changing
+ * the editor mode.
+ *
+ * @param {Function} reducer The original reducer function to be wrapped.
+ * @return {Function} A new reducer function that includes derived block editing modes handling.
+ */
+export function withDerivedBlockEditingModes( reducer ) {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		// An exception is needed here to still recompute the block editing modes when
+		// the editor mode changes since the editor mode isn't stored within the
+		// block editor state and changing it won't trigger an altered new state.
+		if ( action.type !== 'SET_EDITOR_MODE' && nextState === state ) {
+			return state;
+		}
+
+		switch ( action.type ) {
+			case 'REMOVE_BLOCKS': {
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						removedClientIds: action.clientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						removedClientIds: action.clientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'RECEIVE_BLOCKS':
+			case 'INSERT_BLOCKS': {
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'SET_BLOCK_EDITING_MODE':
+			case 'UNSET_BLOCK_EDITING_MODE':
+			case 'SET_HAS_CONTROLLED_INNER_BLOCKS': {
+				const updatedBlock = getBlockTreeBlock(
+					nextState,
+					action.clientId
+				);
+
+				// The block might have been removed in which case it'll be
+				// handled by the `REMOVE_BLOCKS` action.
+				if ( ! updatedBlock ) {
+					break;
+				}
+
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						removedClientIds: [ action.clientId ],
+						addedBlocks: [ updatedBlock ],
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						removedClientIds: [ action.clientId ],
+						addedBlocks: [ updatedBlock ],
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'REPLACE_BLOCKS': {
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						removedClientIds: action.clientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						removedClientIds: action.clientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'REPLACE_INNER_BLOCKS': {
+				// Get the clientIds of the blocks that are being replaced
+				// from the old state, before they were removed.
+				const removedClientIds = state.blocks.order.get(
+					action.rootClientId
+				);
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						removedClientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks: action.blocks,
+						removedClientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'MOVE_BLOCKS_TO_POSITION': {
+				const addedBlocks = action.clientIds.map( ( clientId ) => {
+					return nextState.blocks.byClientId.get( clientId );
+				} );
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds: action.clientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds: action.clientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'UPDATE_SETTINGS': {
+				// Recompute the entire tree if the section root changes.
+				if (
+					state?.settings?.[ sectionRootClientIdKey ] !==
+					nextState?.settings?.[ sectionRootClientIdKey ]
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							getDerivedBlockEditingModesForTree(
+								nextState,
+								false /* Nav mode off */
+							),
+						derivedNavModeBlockEditingModes:
+							getDerivedBlockEditingModesForTree(
+								nextState,
+								true /* Nav mode on */
+							),
+					};
+				}
+				break;
+			}
+			case 'RESET_BLOCKS':
+			case 'SET_EDITOR_MODE':
+			case 'RESET_ZOOM_LEVEL':
+			case 'SET_ZOOM_LEVEL': {
+				// Recompute the entire tree if the editor mode or zoom level changes,
+				// or if all the blocks are reset.
+				return {
+					...nextState,
+					derivedBlockEditingModes:
+						getDerivedBlockEditingModesForTree(
+							nextState,
+							false /* Nav mode off */
+						),
+					derivedNavModeBlockEditingModes:
+						getDerivedBlockEditingModesForTree(
+							nextState,
+							true /* Nav mode on */
+						),
+				};
+			}
+		}
+
+		// If there's no change, the derivedBlockEditingModes from the previous
+		// state need to be preserved.
+		nextState.derivedBlockEditingModes =
+			state?.derivedBlockEditingModes ?? new Map();
+		nextState.derivedNavModeBlockEditingModes =
+			state?.derivedNavModeBlockEditingModes ?? new Map();
+
+		return nextState;
+	};
+}
 
 function withAutomaticChangeReset( reducer ) {
 	return ( state, action ) => {
@@ -2184,4 +2893,7 @@ function withAutomaticChangeReset( reducer ) {
 	};
 }
 
-export default withAutomaticChangeReset( combinedReducers );
+export default pipe(
+	withDerivedBlockEditingModes,
+	withAutomaticChangeReset
+)( combinedReducers );

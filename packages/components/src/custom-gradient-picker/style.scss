@@ -47,7 +47,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
 		height: inherit;
 		width: inherit;
-		min-width: $grid-unit-20;
+		min-width: $grid-unit-20 !important;
 		border-radius: $radius-round;
 
 		background: $white;

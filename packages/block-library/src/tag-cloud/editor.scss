@@ -9,11 +9,3 @@
 	border: none;
 	border-radius: inherit;
 }
-
-.wp-block-tag-cloud__inspector-settings {
-	.components-base-control,
-	.components-base-control:last-child {
-		// Cancel out extra margins added by block inspector
-		margin-bottom: 0;
-	}
-}

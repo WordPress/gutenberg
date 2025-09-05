@@ -7,7 +7,6 @@ import { forwardRef, useContext } from '@wordpress/element';
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * Internal dependencies
@@ -28,7 +27,7 @@ function UnforwardedRadio(
 ) {
 	const { store, disabled } = useContext( RadioGroupContext );
 
-	const selectedValue = useStoreState( store, 'value' );
+	const selectedValue = Ariakit.useStoreState( store, 'value' );
 	const isChecked = selectedValue !== undefined && selectedValue === value;
 
 	maybeWarnDeprecated36pxSize( {

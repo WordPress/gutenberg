@@ -177,6 +177,11 @@ export function BackgroundImagePanel( {
 		},
 	};
 
+	const defaultControls = getBlockSupport( name, [
+		BACKGROUND_SUPPORT_KEY,
+		'defaultControls',
+	] );
+
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedValue }
@@ -185,6 +190,7 @@ export function BackgroundImagePanel( {
 			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
+			defaultControls={ defaultControls }
 			value={ style }
 		/>
 	);

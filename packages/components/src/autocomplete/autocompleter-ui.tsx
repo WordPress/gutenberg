@@ -57,6 +57,7 @@ function ListBox( {
 					key={ option.key }
 					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
 					role="option"
+					__next40pxDefaultSize
 					aria-selected={ index === selectedIndex }
 					accessibleWhenDisabled
 					disabled={ option.isDisabled }

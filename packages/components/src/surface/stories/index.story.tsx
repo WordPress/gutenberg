@@ -11,11 +11,12 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof Surface > = {
 	component: Surface,
-	title: 'Components (Experimental)/Surface',
+	title: 'Components/Surface',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		as: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: {
 			expanded: true,

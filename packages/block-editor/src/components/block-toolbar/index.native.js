@@ -14,7 +14,7 @@ import UngroupButton from '../ungroup-button';
 import { BlockSettingsButton } from '../block-settings';
 import { store as blockEditorStore } from '../../store';
 
-const REMOVE_EMPY_PARENT_BLOCKS = [
+const REMOVE_EMPTY_PARENT_BLOCKS = [
 	'core/buttons',
 	'core/columns',
 	'core/social-links',
@@ -69,7 +69,7 @@ export default function BlockToolbar( { anchorNodeRef } ) {
 		// have inner blocks, ideally we should match the behavior as in
 		// the Web editor and show a placeholder instead of removing the parent.
 		if (
-			REMOVE_EMPY_PARENT_BLOCKS.includes( parentBlockName ) &&
+			REMOVE_EMPTY_PARENT_BLOCKS.includes( parentBlockName ) &&
 			parentNumberOfInnerBlocks === 1
 		) {
 			removeBlock( rootClientId );

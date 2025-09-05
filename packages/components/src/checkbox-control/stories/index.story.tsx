@@ -24,7 +24,7 @@ const meta: Meta< typeof CheckboxControl > = {
 			action: 'onChange',
 		},
 		checked: {
-			control: { type: null },
+			control: false,
 		},
 		help: { control: { type: 'text' } },
 	},

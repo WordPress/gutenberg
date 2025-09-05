@@ -120,7 +120,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				),
 			};
 		},
-		[ search, termIds ]
+		[ search, taxonomy.slug, termIds ]
 	);
 	// `existingTerms` are the ones fetched from the API and their type is `{ id: number; name: string }`.
 	// They are used to extract the terms' names to populate the `FormTokenField` properly
@@ -137,7 +137,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				per_page: termIds.length,
 			} );
 		},
-		[ termIds ]
+		[ taxonomy.slug, termIds ]
 	);
 	// Update the `value` state only after the selectors are resolved
 	// to avoid emptying the input when we're changing terms.

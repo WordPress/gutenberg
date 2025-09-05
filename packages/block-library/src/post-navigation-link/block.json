@@ -15,7 +15,8 @@
 			"default": "next"
 		},
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showTitle": {
 			"type": "boolean",
@@ -32,12 +33,6 @@
 		"taxonomy": {
 			"type": "string",
 			"default": ""
-		}
-	},
-	"example": {
-		"attributes": {
-			"label": "Next post",
-			"arrow": "arrow"
 		}
 	},
 	"usesContext": [ "postType" ],

@@ -10,11 +10,7 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	store as blockEditorStore,
-	BlockBreadcrumb,
-	BlockToolbar,
-} from '@wordpress/block-editor';
+import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -30,8 +26,6 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorContentSlotFill from './content-slot-fill';
-
-import { unlock } from '../../lock-unlock';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -62,24 +56,28 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
-		isRichEditingEnabled,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
 		documentLabel,
-		isZoomOut,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
 		const postTypeLabel = getPostTypeLabel();
-		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
+
+		let _mode = select( editorStore ).getEditorMode();
+		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
+			_mode = 'text';
+		}
+		if ( ! editorSettings.codeEditingEnabled && _mode === 'text' ) {
+			_mode = 'visual';
+		}
 
 		return {
-			mode: select( editorStore ).getEditorMode(),
-			isRichEditingEnabled: editorSettings.richEditingEnabled,
+			mode: _mode,
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
@@ -88,7 +86,6 @@ export default function EditorInterface( {
 			documentLabel:
 				// translators: Default label for the Document in the Block Breadcrumb.
 				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
-			isZoomOut: _isZoomOut(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -157,23 +154,20 @@ export default function EditorInterface( {
 								editorCanvasView
 							) : (
 								<>
-									{ ! isPreviewMode &&
-										( mode === 'text' ||
-											! isRichEditingEnabled ) && (
-											<TextEditor
-												// We should auto-focus the canvas (title) on load.
-												// eslint-disable-next-line jsx-a11y/no-autofocus
-												autoFocus={ autoFocus }
-											/>
-										) }
+									{ ! isPreviewMode && mode === 'text' && (
+										<TextEditor
+											// We should auto-focus the canvas (title) on load.
+											// eslint-disable-next-line jsx-a11y/no-autofocus
+											autoFocus={ autoFocus }
+										/>
+									) }
 									{ ! isPreviewMode &&
 										! isLargeViewport &&
 										mode === 'visual' && (
 											<BlockToolbar hideDragHandle />
 										) }
 									{ ( isPreviewMode ||
-										( isRichEditingEnabled &&
-											mode === 'visual' ) ) && (
+										mode === 'visual' ) && (
 										<VisualEditor
 											styles={ styles }
 											contentRef={ contentRef }
@@ -196,8 +190,6 @@ export default function EditorInterface( {
 				! isDistractionFree &&
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
-				isRichEditingEnabled &&
-				! isZoomOut &&
 				mode === 'visual' && (
 					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)

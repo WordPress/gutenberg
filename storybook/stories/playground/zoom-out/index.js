@@ -16,7 +16,7 @@ import { parse } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import editorStyles from '../editor-styles';
+import { editorStyles } from '../editor-styles';
 // eslint-disable-next-line @wordpress/dependency-group
 import contentCss from '!!raw-loader!../../../../packages/block-editor/build-style/content.css';
 import { pattern } from './pattern';

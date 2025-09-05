@@ -17,9 +17,15 @@ import BaseInputControl from '../';
 const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
-	const InputControl = ( props ) => (
-		<BaseInputControl { ...props } data-testid="input" />
-	);
+	const InputControl = ( props ) => {
+		return (
+			<BaseInputControl
+				{ ...props }
+				__next40pxDefaultSize
+				data-testid="input"
+			/>
+		);
+	};
 
 	describe( 'Basic rendering', () => {
 		it( 'should render', () => {
@@ -63,23 +69,6 @@ describe( 'InputControl', () => {
 				// eslint-disable-next-line testing-library/no-node-access
 				help.closest( `#${ input.getAttribute( 'aria-describedby' ) }` )
 			).toBeVisible();
-		} );
-	} );
-
-	describe( 'Ensurance of focus for number inputs', () => {
-		it( 'should focus its input on mousedown events', async () => {
-			const user = await userEvent.setup();
-			const spy = jest.fn();
-			render( <InputControl type="number" onFocus={ spy } /> );
-			const target = getInput();
-
-			// Hovers the input and presses (without releasing) primary button.
-			await user.pointer( [
-				{ target },
-				{ keys: '[MouseLeft]', target },
-			] );
-
-			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 

@@ -33,6 +33,7 @@ export default function ResolutionTool( {
 	options = DEFAULT_SIZE_OPTIONS,
 	defaultValue = DEFAULT_SIZE_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
+	resetAllFilter,
 } ) {
 	const displayValue = value ?? defaultValue;
 	return (
@@ -42,6 +43,7 @@ export default function ResolutionTool( {
 			onDeselect={ () => onChange( defaultValue ) }
 			isShownByDefault={ isShownByDefault }
 			panelId={ panelId }
+			resetAllFilter={ resetAllFilter }
 		>
 			<SelectControl
 				__nextHasNoMarginBottom

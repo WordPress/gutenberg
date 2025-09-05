@@ -82,7 +82,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						{ rootLabel }
 					</Button>
 				) }
-				{ ! hasSelection && rootLabel }
+				{ ! hasSelection && <span>{ rootLabel }</span> }
 				{ !! clientId && (
 					<Icon
 						icon={ chevronRightSmall }

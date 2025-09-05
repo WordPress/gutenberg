@@ -229,7 +229,20 @@ export function toTree( {
 			const { type, attributes, innerHTML } = replacement;
 			const formatType = getFormatType( type );
 
-			if ( ! isEditableTree && type === 'script' ) {
+			if ( isEditableTree && type === '#comment' ) {
+				pointer = append( getParent( pointer ), {
+					type: 'span',
+					attributes: {
+						contenteditable: 'false',
+						'data-rich-text-comment':
+							attributes[ 'data-rich-text-comment' ],
+					},
+				} );
+				append(
+					append( pointer, { type: 'span' } ),
+					attributes[ 'data-rich-text-comment' ].trim()
+				);
+			} else if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
 					getParent( pointer ),
 					fromFormat( {

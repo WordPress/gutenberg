@@ -20,11 +20,12 @@
 @import "./components/sidebar-navigation-screen/style.scss";
 @import "./components/sidebar-navigation-screen-details-footer/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menu/style.scss";
-@import "components/sidebar-navigation-screen-details-panel/style.scss";
 @import "./components/sidebar-navigation-screen-patterns/style.scss";
+@import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
+@import "./components/sidebar-navigation-screen-main/style.scss";
+@import "./components/sidebar-navigation-screen-templates-browse/style.scss";
 @import "./components/sidebar-dataviews/style.scss";
 @import "./components/site-hub/style.scss";
-@import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
 @import "./components/site-icon/style.scss";
 @import "./components/style-book/style.scss";
 @import "./components/editor-canvas-container/style.scss";
@@ -48,6 +49,7 @@
 	mix-blend-mode: normal;
 	display: block;
 }
+
 /* stylelint-enable */
 
 body.js #wpadminbar {

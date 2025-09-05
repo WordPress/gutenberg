@@ -57,12 +57,12 @@ function UnforwardedAnglePickerControl(
 		<Flex { ...restProps } ref={ ref } className={ classes } gap={ 2 }>
 			<FlexBlock>
 				<NumberControl
+					__next40pxDefaultSize
 					label={ label }
 					className="components-angle-picker-control__input-field"
 					max={ 360 }
 					min={ 0 }
 					onChange={ handleOnNumberChange }
-					size="__unstable-large"
 					step="1"
 					value={ value }
 					spinControls="none"
@@ -97,7 +97,7 @@ function UnforwardedAnglePickerControl(
  *     <AnglePickerControl
  *       value={ angle }
  *       onChange={ setAngle }
- *     </>
+ *     />
  *   );
  * }
  * ```

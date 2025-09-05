@@ -1,4 +1,4 @@
-import { Meta, Typeset } from '@storybook/addon-docs/blocks';
+import { Meta, Typeset } from '@storybook/blocks';
 import radius from './static/radius.svg';
 import radiusDo from './static/radius-do.svg';
 import radiusDont from './static/radius-dont.svg';
@@ -31,25 +31,29 @@ These steps are defined as tokens. To view the values and understand how to use 
 -   Accessibility: Larger radius values can create a more approachable and friendly appearance, especially for larger components like cards and modals that demand more attention from users.
 
 <table>
-  <tr>
-    <th width="50%">✅ Do</th>
-    <th width="50%">🚫 Don't</th>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <img src={ radiusDo } alt="Radius do" width="100%" />
+  <thead>
+    <tr>
+      <th width="50%">✅ Do</th>
+      <th width="50%">🚫 Don't</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td width="50%" valign="top">
+        <img src={ radiusDo } alt="Radius do" width="100%" />
 
-      - Scale application of radius with element or container size.
+        - Scale application of radius with element or container size.
 
-      - Use `radius-round` for circles and `radius-full` for pills.
-    </td>
-    <td width="50%" valign="top">
-      <img src={ radiusDont } alt="Radius don't" width="100%" />
+        - Use `radius-round` for circles and `radius-full` for pills.
+      </td>
+      <td width="50%" valign="top">
+        <img src={ radiusDont } alt="Radius don't" width="100%" />
 
-        -   Don't nest larger radii inside smaller radii.
+          -   Don't nest larger radii inside smaller radii.
 
-        -   Don't apply the same
-    radius value to container and immediate descendent.
-    </td>
-  </tr>
+          -   Don't apply the same
+      radius value to container and immediate descendent.
+      </td>
+    </tr>
+  </tbody>
 </table>

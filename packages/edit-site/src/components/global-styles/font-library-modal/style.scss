@@ -64,14 +64,15 @@ $footer-height: 70px;
 
 .font-library-modal__page-selection {
 	font-size: 11px;
-	text-transform: uppercase;
 	font-weight: 500;
-	color: $gray-900;
-}
+	text-transform: uppercase;
 
-// TODO: See if this can be removed after https://github.com/WordPress/gutenberg/issues/38730
-.font-library-modal__tabpanel-layout .components-base-control__field {
-	margin-bottom: 0;
+	@include break-small() {
+		.components-select-control__input {
+			font-size: 11px !important;
+			font-weight: 500;
+		}
+	}
 }
 
 .font-library-modal__fonts-title {
@@ -106,6 +107,10 @@ $footer-height: 70px;
 		background-color: $gray-100;
 	}
 
+	&:focus {
+		position: relative;
+	}
+
 	.font-library-modal__font-card__name {
 		font-weight: bold;
 	}
@@ -123,8 +128,10 @@ $footer-height: 70px;
 	.font-library-modal__font-variant_demo-text {
 		white-space: nowrap;
 		flex-shrink: 0;
-		transition: opacity 0.3s ease-in-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.3s ease-in-out;
+		}
 	}
 }
 
@@ -146,7 +153,6 @@ $footer-height: 70px;
 		margin-bottom: -1px;
 	}
 }
-
 
 .font-library-modal__upload-area {
 	align-items: center;
@@ -200,7 +206,9 @@ button.font-library-modal__upload-area {
 }
 
 .font-library-modal__select-all {
-	padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 + $border-width;
+	padding:
+		$grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 +
+		$border-width;
 
 	.components-checkbox-control__label {
 		padding-left: $grid-unit-20;

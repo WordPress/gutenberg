@@ -33,13 +33,14 @@ import type { DatePickerProps } from '../types';
 import {
 	Wrapper,
 	Navigator,
+	ViewPreviousMonthButton,
+	ViewNextMonthButton,
 	NavigatorHeading,
 	Calendar,
 	DayOfWeek,
 	DayButton,
 } from './styles';
 import { inputToDate } from '../utils';
-import Button from '../../button';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -111,7 +112,7 @@ export function DatePicker( {
 			aria-label={ __( 'Calendar' ) }
 		>
 			<Navigator>
-				<Button
+				<ViewPreviousMonthButton
 					icon={ isRTL() ? arrowRight : arrowLeft }
 					variant="tertiary"
 					aria-label={ __( 'View previous month' ) }
@@ -137,7 +138,7 @@ export function DatePicker( {
 					</strong>{ ' ' }
 					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
 				</NavigatorHeading>
-				<Button
+				<ViewNextMonthButton
 					icon={ isRTL() ? arrowLeft : arrowRight }
 					variant="tertiary"
 					aria-label={ __( 'View next month' ) }
@@ -306,6 +307,7 @@ function Day( {
 
 	return (
 		<DayButton
+			__next40pxDefaultSize
 			ref={ ref }
 			className="components-datetime__date__day" // Unused, for backwards compatibility.
 			disabled={ isInvalid }
@@ -343,7 +345,7 @@ function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
 		);
 	} else if ( isSelected ) {
 		return sprintf(
-			// translators: %s: The calendar date.
+			// translators: 1: The calendar date.
 			__( '%1$s. Selected' ),
 			localizedDate
 		);

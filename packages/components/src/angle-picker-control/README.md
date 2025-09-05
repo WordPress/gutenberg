@@ -19,38 +19,39 @@ function Example() {
     <AnglePickerControl
       value={ angle }
       onChange={ setAngle }
-    </>
+    />
   );
 }
 ```
+
 ## Props
 
 ### `as`
 
-The HTML element or React component to render the component as.
-
  - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
  - Required: No
 
-### `label`
+The HTML element or React component to render the component as.
 
-Label to use for the angle picker.
+### `label`
 
  - Type: `string`
  - Required: No
  - Default: `__( 'Angle' )`
 
-### `onChange`
+Label to use for the angle picker.
 
-A function that receives the new value of the input.
+### `onChange`
 
  - Type: `(value: number) => void`
  - Required: Yes
 
-### `value`
+A function that receives the new value of the input.
 
-The current value of the input. The value represents an angle in degrees
-and should be a value between 0 and 360.
+### `value`
 
  - Type: `string | number`
  - Required: Yes
+
+The current value of the input. The value represents an angle in degrees
+and should be a value between 0 and 360.

@@ -113,7 +113,6 @@ export default function MoreMenu() {
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
 							label={ __( 'Plugins' ) }
-							as={ MenuGroup }
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>

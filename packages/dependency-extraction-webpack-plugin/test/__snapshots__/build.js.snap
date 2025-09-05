@@ -41,7 +41,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dependency-g
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '3e43f50123c85675372f', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '3ca651be783423315165', 'type' => 'module');
 "
 `;
 
@@ -71,7 +71,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-external-dep
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => '1c950858231a54e241b8', 'type' => 'module');
+"<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => 'fbb215dc4902543bce35', 'type' => 'module');
 "
 `;
 
@@ -265,17 +265,17 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comm
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'ee5ac21a1f0003d732e6', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'ab7fa97b1381e41e0f70', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '5b112b32c6db548c2997', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '498fd24026d68fa84ba9', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-b');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => 'b1ca4106075e0bd94f9c', 'type' => 'module');
+"<?php return array('dependencies' => array(), 'version' => '5ac0d6987a8e7fe809a3', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-runtime');
 "
 `;
 
@@ -556,7 +556,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`module-renames\` sh
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '43880e6c42e7c39fcdf1');
+"<?php return array('dependencies' => array(), 'version' => 'be8b28b738de0d6b883a');
 "
 `;
 
@@ -681,17 +681,17 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comm
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'd091f1cbbf7603d6e12c');
+"<?php return array('dependencies' => array('wp-blob'), 'version' => 'd091f1cbbf7603d6e12c', 'handle' => 'runtime-chunk-single-scripts-a');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '845bc6d4ffbdb9419ebd');
+"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '845bc6d4ffbdb9419ebd', 'handle' => 'runtime-chunk-single-scripts-b');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array(), 'version' => '717eb779e609d175a7dd');
+"<?php return array('dependencies' => array(), 'version' => '717eb779e609d175a7dd', 'handle' => 'runtime-chunk-single-scripts-runtime');
 "
 `;
 

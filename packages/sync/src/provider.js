@@ -35,7 +35,7 @@ export const createSyncProvider = ( connectLocal, connectRemote ) => {
 	const docs = {};
 
 	/**
-	 * Registeres an object type.
+	 * Registers an object type.
 	 *
 	 * @param {ObjectType}   objectType   Object type to register.
 	 * @param {ObjectConfig} objectConfig Object config.

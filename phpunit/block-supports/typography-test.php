@@ -284,111 +284,6 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that stabilized typography supports will also apply to blocks using
-	 * the experimental syntax, for backwards compatibility with existing blocks.
-	 *
-	 * @covers ::gutenberg_apply_typography_support
-	 */
-	public function test_should_apply_experimental_typography_supports() {
-		$this->test_block_name = 'test/experimental-typography-supports';
-		register_block_type(
-			$this->test_block_name,
-			array(
-				'api_version' => 3,
-				'attributes'  => array(
-					'style' => array(
-						'type' => 'object',
-					),
-				),
-				'supports'    => array(
-					'typography' => array(
-						'__experimentalFontFamily'     => true,
-						'__experimentalFontStyle'      => true,
-						'__experimentalFontWeight'     => true,
-						'__experimentalLetterSpacing'  => true,
-						'__experimentalTextDecoration' => true,
-						'__experimentalTextTransform'  => true,
-					),
-				),
-			)
-		);
-		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( $this->test_block_name );
-		$block_atts = array(
-			'fontFamily' => 'serif',
-			'style'      => array(
-				'typography' => array(
-					'fontStyle'      => 'italic',
-					'fontWeight'     => 'bold',
-					'letterSpacing'  => '1px',
-					'textDecoration' => 'underline',
-					'textTransform'  => 'uppercase',
-				),
-			),
-		);
-
-		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
-		$expected = array(
-			'class' => 'has-serif-font-family',
-			'style' => 'font-style:italic;font-weight:bold;text-decoration:underline;text-transform:uppercase;letter-spacing:1px;',
-		);
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	/**
-	 * Tests that stabilized typography supports are applied correctly.
-	 *
-	 * @covers ::gutenberg_apply_typography_support
-	 */
-	public function test_should_apply_stabilized_typography_supports() {
-		$this->test_block_name = 'test/experimental-typography-supports';
-		register_block_type(
-			$this->test_block_name,
-			array(
-				'api_version' => 3,
-				'attributes'  => array(
-					'style' => array(
-						'type' => 'object',
-					),
-				),
-				'supports'    => array(
-					'typography' => array(
-						'fontFamily'     => true,
-						'fontStyle'      => true,
-						'fontWeight'     => true,
-						'letterSpacing'  => true,
-						'textDecoration' => true,
-						'textTransform'  => true,
-					),
-				),
-			)
-		);
-		$registry   = WP_Block_Type_Registry::get_instance();
-		$block_type = $registry->get_registered( $this->test_block_name );
-		$block_atts = array(
-			'fontFamily' => 'serif',
-			'style'      => array(
-				'typography' => array(
-					'fontStyle'      => 'italic',
-					'fontWeight'     => 'bold',
-					'letterSpacing'  => '1px',
-					'textDecoration' => 'underline',
-					'textTransform'  => 'uppercase',
-				),
-			),
-		);
-
-		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
-		$expected = array(
-			'class' => 'has-serif-font-family',
-			'style' => 'font-style:italic;font-weight:bold;text-decoration:underline;text-transform:uppercase;letter-spacing:1px;',
-		);
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	/**
 	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
 	 *
 	 * @covers ::wp_get_typography_font_size_value
@@ -1064,7 +959,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * @param string $theme_slug      A theme slug corresponding to an available test theme.
 	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
-	public function test_should_covert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
+	public function test_should_convert_font_sizes_to_fluid_values( $font_size_value, $theme_slug, $expected_output ) {
 		switch_theme( $theme_slug );
 
 		$this->test_block_name = 'test/font-size-fluid-value';
@@ -1101,7 +996,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for test_should_covert_font_sizes_to_fluid_values.
+	 * Data provider for test_should_convert_font_sizes_to_fluid_values.
 	 *
 	 * @return array
 	 */

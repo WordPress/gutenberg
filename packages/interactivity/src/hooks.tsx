@@ -77,7 +77,7 @@ interface DirectiveArgs {
 }
 
 export interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode< any > | null | void;
+	( args: DirectiveArgs ): VNode< any > | VNode< any >[] | null | void;
 }
 
 interface DirectiveOptions {
@@ -120,7 +120,7 @@ const directiveCallbacks: Record< string, DirectiveCallback > = {};
 const directivePriorities: Record< string, number > = {};
 
 /**
- * Register a new directive type in the Interactivity API runtime.
+ * Registers a new directive type in the Interactivity API runtime.
  *
  * @example
  * ```js
@@ -231,6 +231,7 @@ const resolve = ( path: string, namespace: string ) => {
 // Generate the evaluate function.
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
+	// TODO: When removing the temporarily remaining `value( ...args )` call below, remove the `...args` parameter too.
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
@@ -241,7 +242,29 @@ export const getEvaluate: GetEvaluate =
 			path[ 0 ] === '!' && !! ( path = path.slice( 1 ) );
 		setScope( scope );
 		const value = resolve( path, namespace );
-		const result = typeof value === 'function' ? value( ...args ) : value;
+		// Functions are returned without invoking them.
+		if ( typeof value === 'function' ) {
+			// Except if they have a negation operator present, for backward compatibility.
+			// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
+			// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
+			if ( hasNegationOperator ) {
+				warn(
+					'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
+				);
+				const functionResult = ! value( ...args );
+				resetScope();
+				return functionResult;
+			}
+			// Reset scope before return and wrap the function so it will still run within the correct scope.
+			resetScope();
+			return ( ...functionArgs: any[] ) => {
+				setScope( scope );
+				const functionResult = value( ...functionArgs );
+				resetScope();
+				return functionResult;
+			};
+		}
+		const result = value;
 		resetScope();
 		return hasNegationOperator ? ! result : result;
 	};

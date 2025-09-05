@@ -5,12 +5,25 @@ import { __, _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { download } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { downloadBlob } from '@wordpress/blob';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function SiteExport() {
+	const canExport = useSelect( ( select ) => {
+		const targetHints =
+			select( coreStore ).getCurrentTheme()?._links?.[
+				'wp:export-theme'
+			]?.[ 0 ]?.targetHints ?? {};
+
+		return !! targetHints.allow?.includes( 'GET' );
+	}, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	if ( ! canExport ) {
+		return null;
+	}
 
 	async function handleExport() {
 		try {

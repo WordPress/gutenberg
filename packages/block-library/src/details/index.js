@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { details as icon } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			summary: 'La Mancha',
+			summary: __( 'La Mancha' ),
 			showContent: true,
 		},
 		innerBlocks: [
@@ -33,6 +33,28 @@ export const settings = {
 				},
 			},
 		],
+	},
+	__experimentalLabel( attributes, { context } ) {
+		const { summary } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasSummary = summary?.trim().length > 0;
+
+		// In the list view, use the block's summary as the label.
+		// If the summary is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasSummary ) ) {
+			return customName || summary;
+		}
+
+		if ( context === 'accessibility' ) {
+			return ! hasSummary
+				? __( 'Details. Empty.' )
+				: sprintf(
+						/* translators: %s: accessibility text; summary title. */
+						__( 'Details. %s' ),
+						summary
+				  );
+		}
 	},
 	save,
 	edit,

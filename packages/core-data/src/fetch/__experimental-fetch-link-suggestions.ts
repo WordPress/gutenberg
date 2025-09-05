@@ -270,12 +270,29 @@ export function sortResults( results: SearchResult[], search: string ) {
 	for ( const result of results ) {
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
-			const matchingTokens = titleTokens.filter( ( titleToken ) =>
-				searchTokens.some( ( searchToken ) =>
-					titleToken.includes( searchToken )
+			const exactMatchingTokens = titleTokens.filter( ( titleToken ) =>
+				searchTokens.some(
+					( searchToken ) => titleToken === searchToken
 				)
 			);
-			scores[ result.id ] = matchingTokens.length / titleTokens.length;
+			const subMatchingTokens = titleTokens.filter( ( titleToken ) =>
+				searchTokens.some(
+					( searchToken ) =>
+						titleToken !== searchToken &&
+						titleToken.includes( searchToken )
+				)
+			);
+
+			// The score is a combination of exact matches and sub-matches.
+			// More weight is given to exact matches, as they are more relevant (e.g. "cat" vs "caterpillar").
+			// Diving by the total number of tokens in the title normalizes the score and skews
+			// the results towards shorter titles.
+			const exactMatchScore =
+				( exactMatchingTokens.length / titleTokens.length ) * 10;
+
+			const subMatchScore = subMatchingTokens.length / titleTokens.length;
+
+			scores[ result.id ] = exactMatchScore + subMatchScore;
 		} else {
 			scores[ result.id ] = 0;
 		}

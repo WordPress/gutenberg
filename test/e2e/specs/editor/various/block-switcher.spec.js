@@ -107,7 +107,7 @@ test.describe( 'Block Switcher', () => {
 		await expect( button ).toBeEnabled();
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
-		await page.click( 'role=checkbox[name="Prevent removal"]' );
+		await page.click( 'role=checkbox[name="Lock removal"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
 		// Verify the block switcher isn't enabled.

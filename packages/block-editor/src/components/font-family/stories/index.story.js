@@ -50,5 +50,6 @@ export const Default = {
 			},
 		],
 		__nextHasNoMarginBottom: true,
+		__next40pxDefaultSize: true,
 	},
 };

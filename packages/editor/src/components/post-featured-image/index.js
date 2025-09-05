@@ -18,7 +18,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { isBlobURL } from '@wordpress/blob';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import {
@@ -102,17 +102,10 @@ function PostFeaturedImage( {
 	noticeOperations,
 	isRequestingFeaturedImageMedia,
 } ) {
-	const toggleRef = useRef();
+	const returnsFocusRef = useRef( false );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
 	const { mediaSourceUrl } = getMediaDetails( media, currentPostId );
-	const toggleFocusTimerRef = useRef();
-
-	useEffect( () => {
-		return () => {
-			clearTimeout( toggleFocusTimerRef.current );
-		};
-	}, [] );
 
 	function onDropFiles( filesList ) {
 		getSettings().mediaUpload( {
@@ -132,6 +125,7 @@ function PostFeaturedImage( {
 				noticeOperations.removeAllNotices();
 				noticeOperations.createErrorNotice( message );
 			},
+			multiple: false,
 		} );
 	}
 
@@ -162,6 +156,13 @@ function PostFeaturedImage( {
 			),
 			imageMedia.media_details.sizes?.full?.file || imageMedia.slug
 		);
+	}
+
+	function returnFocus( node ) {
+		if ( returnsFocusRef.current && node ) {
+			node.focus();
+			returnsFocusRef.current = false;
+		}
 	}
 
 	const isMissingMedia =
@@ -203,7 +204,7 @@ function PostFeaturedImage( {
 								) : (
 									<Button
 										__next40pxDefaultSize
-										ref={ toggleRef }
+										ref={ returnFocus }
 										className={
 											! featuredImageId
 												? 'editor-post-featured-image__toggle'
@@ -276,12 +277,10 @@ function PostFeaturedImage( {
 											className="editor-post-featured-image__action"
 											onClick={ () => {
 												onRemoveImage();
-												// The toggle button is rendered conditionally, we need
-												// to wait it is rendered before moving focus to it.
-												toggleFocusTimerRef.current =
-													setTimeout( () => {
-														toggleRef.current?.focus();
-													} );
+												// Signal that the toggle button should be focused,
+												// when it is rendered. Can't focus it directly here
+												// because it's rendered conditionally.
+												returnsFocusRef.current = true;
 											} }
 											variant={
 												isMissingMedia
@@ -306,21 +305,25 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType, hasFinishedResolution } =
+	const { getEntityRecord, getPostType, hasFinishedResolution } =
 		select( coreStore );
 	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
 		media: featuredImageId
-			? getMedia( featuredImageId, { context: 'view' } )
+			? getEntityRecord( 'postType', 'attachment', featuredImageId, {
+					context: 'view',
+			  } )
 			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,
 		isRequestingFeaturedImageMedia:
 			!! featuredImageId &&
-			! hasFinishedResolution( 'getMedia', [
+			! hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
 				featuredImageId,
 				{ context: 'view' },
 			] ),
@@ -347,6 +350,7 @@ const applyWithDispatch = withDispatch(
 							noticeOperations.removeAllNotices();
 							noticeOperations.createErrorNotice( message );
 						},
+						multiple: false,
 					} );
 			},
 			onRemoveImage() {

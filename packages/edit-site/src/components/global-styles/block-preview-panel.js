@@ -18,16 +18,16 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 			return null;
 		}
 
-		let example = blockExample;
-		if ( variation ) {
-			example = {
-				...example,
-				attributes: {
-					...example.attributes,
-					className: getVariationClassName( variation ),
-				},
-			};
-		}
+		const example = {
+			...blockExample,
+			attributes: {
+				...blockExample.attributes,
+				style: undefined,
+				className: variation
+					? getVariationClassName( variation )
+					: blockExample.attributes?.className,
+			},
+		};
 
 		return getBlockFromExample( name, example );
 	}, [ name, blockExample, variation ] );

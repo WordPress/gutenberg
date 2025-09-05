@@ -7,12 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	useMemo,
-	createContext,
-	useReducer,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useMemo, useReducer, useLayoutEffect } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 
@@ -24,8 +19,6 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
-
-export const InsertionPointOpenRef = createContext();
 
 function BlockPopoverInbetween( {
 	previousClientId,
@@ -148,6 +141,10 @@ function BlockPopoverInbetween( {
 								? nextRect.left - previousRect.right
 								: 0;
 					}
+
+					// Avoid a negative width which happens when the next rect
+					// is on the next line.
+					width = Math.max( width, 0 );
 				}
 
 				return new window.DOMRect( left, top, width, height );

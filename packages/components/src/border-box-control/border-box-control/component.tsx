@@ -118,6 +118,7 @@ const UnconnectedBorderBoxControl = (
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__shouldNotWarnDeprecated36pxSize
 						size={ size }
 					/>
 				) : (

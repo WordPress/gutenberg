@@ -2,7 +2,7 @@
 
 The signaling server allows multiple clients to exchange messages with each other through various communication topics.
 
-Topics are not defined upfront, but clients define them by subscribing to them. By subscribing to a given topic, the client tells the server to keep track of its unread messages in the given topic. By unsubscribing from a topic, the client tells the server to free the bookeeping it maintains for the given client and topic.
+Topics are not defined upfront, but clients define them by subscribing to them. By subscribing to a given topic, the client tells the server to keep track of its unread messages in the given topic. By unsubscribing from a topic, the client tells the server to free the bookkeeping it maintains for the given client and topic.
 
 Every client communicates with the server via `GET` or `POST`. Clients must have a unique identifier, which can be randomly generated. This identifier should be included as a parameter named `subscriber_id` in every request.
 

@@ -7,6 +7,7 @@ import { registerBlockBindingsSource } from '@wordpress/blocks';
  * Internal dependencies
  */
 import patternOverrides from './pattern-overrides';
+import postData from './post-data';
 import postMeta from './post-meta';
 
 /**
@@ -21,5 +22,6 @@ import postMeta from './post-meta';
  */
 export function registerCoreBlockBindingsSources() {
 	registerBlockBindingsSource( patternOverrides );
+	registerBlockBindingsSource( postData );
 	registerBlockBindingsSource( postMeta );
 }

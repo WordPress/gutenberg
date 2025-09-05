@@ -16,8 +16,9 @@
 		display: inline-flex;
 
 		svg {
-			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
-			@include reduce-motion("transition");
+			@media not (prefers-reduced-motion) {
+				transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+			}
 		}
 
 		&.is-pressed {
@@ -74,14 +75,8 @@
 }
 
 .editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
-	min-width: $button-size-compact;
-	width: $button-size-compact;
-	height: $button-size-compact;
-	padding: 0;
-
 	.show-icon-labels & {
 		width: auto;
-		height: $button-size-compact;
 		padding: 0 $grid-unit-10;
 	}
 }

@@ -10,11 +10,13 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import {
-	PanelBody,
 	Placeholder,
 	ToggleControl,
+	SelectControl,
 	ToolbarButton,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { renderToString } from '@wordpress/element';
@@ -29,6 +31,7 @@ import { tableOfContents as icon } from '@wordpress/icons';
 import TableOfContentsList from './list';
 import { linearToNestedHeadingList } from './utils';
 import { useObserveHeadings } from './hooks';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
 
@@ -37,15 +40,16 @@ import { useObserveHeadings } from './hooks';
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {string}                       props.clientId
- * @param {(attributes: Object) => void} props.setAttributes
+ * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
+ * @param {string}                       props.clientId                          The client id.
+ * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
  *
  * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage },
+	attributes: { headings = [], onlyIncludeCurrentPage, maxLevel },
 	clientId,
 	setAttributes,
 } ) {
@@ -79,7 +83,7 @@ export default function TableOfContentsEdit( {
 	);
 
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
 	const toolbarControls = canInsertList && (
@@ -108,25 +112,81 @@ export default function TableOfContentsEdit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						onlyIncludeCurrentPage: false,
+						maxLevel: undefined,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					hasValue={ () => !! onlyIncludeCurrentPage }
 					label={ __( 'Only include current page' ) }
-					checked={ onlyIncludeCurrentPage }
-					onChange={ ( value ) =>
-						setAttributes( { onlyIncludeCurrentPage: value } )
+					onDeselect={ () =>
+						setAttributes( { onlyIncludeCurrentPage: false } )
 					}
-					help={
-						onlyIncludeCurrentPage
-							? __(
-									'Only including headings from the current page (if the post is paginated).'
-							  )
-							: __(
-									'Toggle to only include headings from the current page (if the post is paginated).'
-							  )
+					isShownByDefault
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Only include current page' ) }
+						checked={ onlyIncludeCurrentPage }
+						onChange={ ( value ) =>
+							setAttributes( { onlyIncludeCurrentPage: value } )
+						}
+						help={
+							onlyIncludeCurrentPage
+								? __(
+										'Only including headings from the current page (if the post is paginated).'
+								  )
+								: __(
+										'Include headings from all pages (if the post is paginated).'
+								  )
+						}
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					hasValue={ () => !! maxLevel }
+					label={ __( 'Limit heading levels' ) }
+					onDeselect={ () =>
+						setAttributes( { maxLevel: undefined } )
 					}
-				/>
-			</PanelBody>
+					isShownByDefault
+				>
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Include headings down to level' ) }
+						value={ maxLevel || '' }
+						options={ [
+							{ value: '', label: __( 'All levels' ) },
+							{ value: '1', label: __( 'Heading 1' ) },
+							{ value: '2', label: __( 'Heading 2' ) },
+							{ value: '3', label: __( 'Heading 3' ) },
+							{ value: '4', label: __( 'Heading 4' ) },
+							{ value: '5', label: __( 'Heading 5' ) },
+							{ value: '6', label: __( 'Heading 6' ) },
+						] }
+						onChange={ ( value ) =>
+							setAttributes( {
+								maxLevel: value ? parseInt( value ) : undefined,
+							} )
+						}
+						help={
+							! maxLevel
+								? __(
+										'Including all heading levels in the table of contents.'
+								  )
+								: __(
+										'Only include headings up to and including this level.'
+								  )
+						}
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 

@@ -65,42 +65,6 @@
 	}
 }
 
-.edit-site-post-list__title span {
-	text-overflow: ellipsis;
-	overflow: hidden;
-}
-
-.dataviews-view-grid__primary-field.dataviews-view-grid__primary-field--clickable
-.edit-site-post-list__title
-span,
-.dataviews-view-table__primary-field > .dataviews-view-table__cell-content--clickable
-.edit-site-post-list__title
-span {
-	text-decoration: none;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-	display: block;
-	flex-grow: 0;
-	color: $gray-900;
-
-	&:hover {
-		color: var(--wp-admin-theme-color);
-	}
-	@include link-reset();
-}
-
-.edit-site-post-list__title-badge {
-	background: $gray-100;
-	color: $gray-800;
-	padding: 0 $grid-unit-05;
-	border-radius: $radius-small;
-	font-size: 12px;
-	font-weight: 400;
-	flex-shrink: 0;
-	line-height: $grid-unit-05 * 5;
-}
-
 .edit-site-post-list__status-icon {
 	height: $grid-unit-30;
 	width: $grid-unit-30;

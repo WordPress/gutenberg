@@ -85,7 +85,7 @@ public class Gutenberg: UIResponder {
 
         let editorSettings = dataSource.gutenbergEditorSettings()
         let settingsUpdates = properties(from: editorSettings)
-        initialProps.merge(settingsUpdates) { (intialProp, settingsUpdates) -> Any in
+        initialProps.merge(settingsUpdates) { (initialProp, settingsUpdates) -> Any in
             settingsUpdates
         }
 
@@ -136,8 +136,8 @@ public class Gutenberg: UIResponder {
     }
 
     public func updateCapabilities() {
-        let capabilites = dataSource.gutenbergCapabilities()
-        sendEvent(.updateCapabilities, body: capabilites.toJSPayload())
+        let capabilities = dataSource.gutenbergCapabilities()
+        sendEvent(.updateCapabilities, body: capabilities.toJSPayload())
     }
 
     private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {

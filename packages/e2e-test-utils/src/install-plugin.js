@@ -9,7 +9,7 @@ import { visitAdminPage } from './visit-admin-page';
  * Installs a plugin from the WP.org repository.
  *
  * @param {string}  slug       Plugin slug.
- * @param {string?} searchTerm If the plugin is not findable by its slug use an alternative term to search.
+ * @param {?string} searchTerm If the plugin is not findable by its slug use an alternative term to search.
  */
 export async function installPlugin( slug, searchTerm ) {
 	await switchUserToAdmin();

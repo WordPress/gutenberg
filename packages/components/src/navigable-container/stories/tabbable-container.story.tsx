@@ -13,7 +13,7 @@ const meta: Meta< typeof TabbableContainer > = {
 	id: 'components-tabbablecontainer',
 	component: TabbableContainer,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

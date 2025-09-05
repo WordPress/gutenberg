@@ -186,6 +186,8 @@ As of Gutenberg version 14.2, the following controls are available:
 -   `taxQuery` - Shows available taxonomies filters for the currently selected post type.
 -   `author` - Shows an input field to filter the query by author.
 -   `search` - Shows an input field to filter the query by keywords.
+-   `format` - Shows an input field to filter the query by array/collection of [formats](https://developer.wordpress.org/advanced-administration/wordpress/post-formats/#supported-formats).
+-   `parents` - Shows an input field to filter the query using parent(s) entity.
 
 In our case, the property would look like this:
 

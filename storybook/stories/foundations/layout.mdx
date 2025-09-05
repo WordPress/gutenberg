@@ -1,0 +1,60 @@
+import { Meta } from '@storybook/blocks';
+import areas from './static/areas.svg';
+import pageLayoutExample1 from './static/page-layout-example-1.svg';
+import pageLayoutExample2 from './static/page-layout-example-2.svg';
+import pageLayoutExample3 from './static/page-layout-example-3.svg';
+import pageLayoutExample4 from './static/page-layout-example-4.svg';
+
+
+<Meta title="Foundations/Layout" name="page" />
+
+# Layout
+
+Layout defines the arrangement and structure of admin pages, content sections, and other visual elements.
+
+## Page areas
+
+At the highest level admin pages are comprised of _areas_, that can be arranged in different ways.
+
+<img src={ areas } alt="Area definition diagram" width="100%" />
+
+1. **Sidebar** – Primary admin navigation UI including notifications and access to Command Palette. Always positioned on the left of the page (assuming left-to-right language).
+2. **Content Frame** – A container for admin page content e.g. data views, settings forms, etc.
+3. **Preview Frame** – Displays a preview of the site homepage, a post or page in focus, or something more abstract like a template or Style Book. In many cases it can be clicked to open the editor.
+
+### Area compositions
+
+Areas can be combined in different ways depending on the use case. Here are some examples.
+
+<table>
+	<tbody>
+		<tr>
+			<td style={{verticalAlign: 'top', width: '50%'}}>
+				#### Sidebar, Content Frame and Preview Frame
+				<img src={ pageLayoutExample1 } alt="Diagram illustrating an example of the 'Sidebar, Content Frame and Preview Frame' arrangement" width="100%" />
+
+				A demonstration of this arrangement can be found in the Styles section of the Site Editor, and in the Pages and Templates sections when List layout is selected.
+			</td>
+			<td style={{verticalAlign: 'top', width: '50%'}}>
+				#### Sidebar and Preview Frame
+				<img src={ pageLayoutExample2 } alt="Diagram illustrating an example of the 'Sidebar and Preview Frame' arrangement" width="100%" />
+
+				A demonstration of this arrangement can be found in the Design section.
+			</td>
+		</tr>
+		<tr>
+			<td style={{verticalAlign: 'top', width: '50%'}}>
+				#### Sidebar and Content Frame
+				<img src={ pageLayoutExample3 } alt="Diagram illustrating an example of the 'Sidebar and Content Frame' arrangement" width="100%" />
+
+				A demonstration of this arrangement can be found in the Patterns and Templates sections of the Site Editor, or in the Pages section when Table or Grid layout are selected.
+			</td>
+			<td style={{verticalAlign: 'top', width: '50%'}}>
+				#### Sidebar and multiple Content Frames
+				<img src={ pageLayoutExample4 } alt="Diagram illustrating an example of the 'Sidebar and multiple Content Frames' arrangement" width="100%" />
+
+				Multiple content frames can be utilised as required.
+			</td>
+		</tr>
+	</tbody>
+</table>

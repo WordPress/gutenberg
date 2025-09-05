@@ -199,7 +199,6 @@ export type Attachment = BetterOmit<
 };
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
-export type OnSuccessHandler = ( attachments: Partial< Attachment >[] ) => void;
 export type OnErrorHandler = ( error: Error ) => void;
 
 export type CreateRestAttachment = Partial< RestAttachment >;

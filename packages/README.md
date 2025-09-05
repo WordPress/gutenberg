@@ -25,19 +25,25 @@ When creating a new package, you need to provide at least the following. Package
     	"bugs": {
     		"url": "https://github.com/WordPress/gutenberg/issues"
     	},
+    	"engines": {
+    		"node": ">=18.12.0",
+    		"npm": ">=8.19.2"
+    	},
     	"main": "build/index.js",
     	"module": "build-module/index.js",
     	"react-native": "src/index",
+    	// Include this line to include the package as a WordPress script.
+    	"wpScript": true,
+    	// Include this line to include the package as a WordPress script module.
+    	"wpScriptModuleExports": "./build-module/index.js",
+    	"types": "build-types",
+    	"sideEffects": false,
     	"dependencies": {
     		"@babel/runtime": "7.25.7"
     	},
     	"publishConfig": {
     		"access": "public"
-    	},
-    	// Include this line to include the package as a WordPress script.
-    	"wpScript": true,
-    	// Include this line to include the package as a WordPress script module.
-    	"wpScriptModuleExports": "./build-module/index.js"
+    	}
     }
     ```
 
@@ -84,7 +90,7 @@ When creating a new package, you need to provide at least the following. Package
     Initial release.
     ```
 
-To ensure your package is recognized, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
+To ensure your package is recognized in npm workspaces, you should run `npm install` to update the package lock file.
 
 ## Managing Dependencies
 
@@ -208,7 +214,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## TypeScript
 
-The [TypeScript](http://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
+The [TypeScript](https://www.typescriptlang.org/) language is a typed superset of JavaScript that compiles to plain JavaScript.
 Gutenberg does not use the TypeScript language, however TypeScript has powerful tooling that can be applied to JavaScript projects.
 
 Gutenberg uses TypeScript for several reasons, including:
@@ -255,12 +261,16 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 ```json
 {
 	"main": "build/index.js",
-	"main-module": "build-module/index.js",
+	"module": "build-module/index.js",
 	"types": "build-types"
 }
 ```
 
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
+
+## Supported Node.js and npm versions
+
+WordPress packages adhere the [Node.js Release Schedule](https://nodejs.org/en/about/previous-releases/). Consequently, the minimum required versions of Node.js and npm are specified using the `engines` field in `package.json` for all packages. This ensures that production applications run only on Active LTS or Maintenance LTS releases on Node.js. LTS release status is "long-term support", which typically guarantees that critical bugs will be fixed for a total of 30 months.
 
 ## Optimizing for bundlers
 

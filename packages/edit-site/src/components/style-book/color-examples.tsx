@@ -11,20 +11,27 @@ import { View } from '@wordpress/primitives';
 import {
 	getColorClassName,
 	__experimentalGetGradientClass,
+	// @wordpress/block-editor imports are not typed.
+	// @ts-expect-error
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import type { Color, Gradient } from './types';
+import type { Color, Gradient, ColorExampleProps } from './types';
 
-const ColorExamples = ( { colors, type } ): JSX.Element | null => {
+const ColorExamples = ( {
+	colors,
+	type,
+	templateColumns = '1fr 1fr',
+	itemHeight = '52px',
+}: ColorExampleProps ): JSX.Element | null => {
 	if ( ! colors ) {
 		return null;
 	}
 
 	return (
-		<Grid columns={ 2 } rowGap={ 8 } columnGap={ 16 }>
+		<Grid templateColumns={ templateColumns } rowGap={ 8 } columnGap={ 16 }>
 			{ colors.map( ( color: Color | Gradient ) => {
 				const className =
 					type === 'gradients'
@@ -35,7 +42,13 @@ const ColorExamples = ( { colors, type } ): JSX.Element | null => {
 					className
 				);
 
-				return <View key={ color.slug } className={ classes } />;
+				return (
+					<View
+						key={ color.slug }
+						className={ classes }
+						style={ { height: itemHeight } }
+					/>
+				);
 			} ) }
 		</Grid>
 	);

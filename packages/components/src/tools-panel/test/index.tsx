@@ -154,7 +154,6 @@ const renderWrappedItemInPanel = () => {
 const renderPanel = () => {
 	return render(
 		<ToolsPanel { ...defaultProps }>
-			{ false && <div>Hidden</div> }
 			<ToolsPanelItem { ...controlProps }>
 				<div>Example control</div>
 			</ToolsPanelItem>
@@ -236,22 +235,6 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render panel menu when there are no panel items', () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
-					{ false && (
-						<ToolsPanelItem
-							label="Not rendered 1"
-							hasValue={ () => false }
-						>
-							Should not show
-						</ToolsPanelItem>
-					) }
-					{ false && (
-						<ToolsPanelItem
-							label="Not rendered 2"
-							hasValue={ () => false }
-						>
-							Not shown either
-						</ToolsPanelItem>
-					) }
 					<span>Visible but insignificant</span>
 				</ToolsPanel>
 			);

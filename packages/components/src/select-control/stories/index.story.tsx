@@ -23,7 +23,7 @@ const meta: Meta< typeof SelectControl > = {
 		label: { control: { type: 'text' } },
 		prefix: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -65,6 +65,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
+	__next40pxDefaultSize: true,
 	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	options: [
@@ -87,6 +88,7 @@ WithLabelAndHelpText.args = {
  */
 export const WithCustomChildren = SelectControlWithState.bind( {} );
 WithCustomChildren.args = {
+	__next40pxDefaultSize: true,
 	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	children: (

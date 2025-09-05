@@ -22,7 +22,7 @@ export default function Pagination( {
 	className,
 	disabled = false,
 	buttonVariant = 'tertiary',
-	label = __( 'Pagination Navigation' ),
+	label = __( 'Pagination' ),
 } ) {
 	return (
 		<HStack

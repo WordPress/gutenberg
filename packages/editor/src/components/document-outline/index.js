@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useRef, useMemo } from '@wordpress/element';
 import { create, getTextContent } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -82,16 +83,13 @@ function EmptyOutlineIllustration() {
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
-	return blocks.flatMap( ( block = {} ) => {
-		if ( block.name === 'core/heading' ) {
-			return {
-				...block,
-				level: block.attributes.level,
-				isEmpty: isEmptyHeading( block ),
-			};
-		}
-		return computeOutlineHeadings( block.innerBlocks );
-	} );
+	return blocks
+		.filter( ( block ) => block.name === 'core/heading' )
+		.map( ( block ) => ( {
+			...block,
+			level: block.attributes.level,
+			isEmpty: isEmptyHeading( block ),
+		} ) );
 };
 
 const isEmptyHeading = ( heading ) =>
@@ -102,32 +100,58 @@ const isEmptyHeading = ( heading ) =>
  * Renders a document outline component.
  *
  * @param {Object}   props                         Props.
- * @param {Function} props.onSelect                Function to be called when an outline item is selected.
- * @param {boolean}  props.isTitleSupported        Indicates whether the title is supported.
+ * @param {Function} props.onSelect                Function to be called when an outline item is selected
  * @param {boolean}  props.hasOutlineItemsDisabled Indicates whether the outline items are disabled.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function DocumentOutline( {
 	onSelect,
-	isTitleSupported,
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { blocks, title } = useSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
+	const { title, isTitleSupported } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			blocks: getBlocks(),
 			isTitleSupported: postType?.supports?.title ?? false,
 		};
 	} );
+	const blocks = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants, getBlock } =
+			select( blockEditorStore );
+		const clientIds = getClientIdsWithDescendants();
+		// Note: Don't modify data inside the `Array.map` callback,
+		// all compulations should happen in `computeOutlineHeadings`.
+		return clientIds.map( ( id ) => getBlock( id ) );
+	} );
+	const contentBlocks = useSelect( ( select ) => {
+		// When rendering in `post-only` mode all blocks are considered content blocks.
+		if ( select( editorStore ).getRenderingMode() === 'post-only' ) {
+			return undefined;
+		}
 
-	const headings = computeOutlineHeadings( blocks );
+		const { getBlocksByName, getClientIdsOfDescendants } =
+			select( blockEditorStore );
+		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
+
+		// Do nothing if there's no post content block.
+		if ( ! postContentClientId ) {
+			return undefined;
+		}
+
+		return getClientIdsOfDescendants( postContentClientId );
+	}, [] );
+
+	const prevHeadingLevelRef = useRef( 1 );
+
+	const headings = useMemo(
+		() => computeOutlineHeadings( blocks ),
+		[ blocks ]
+	);
+
 	if ( headings.length < 1 ) {
 		return (
 			<div className="editor-document-outline has-no-headings">
@@ -141,8 +165,6 @@ export default function DocumentOutline( {
 		);
 	}
 
-	let prevHeadingLevel = 1;
-
 	// Not great but it's the simplest way to locate the title right now.
 	const titleNode = document.querySelector( '.editor-post-title__input' );
 	const hasTitle = isTitleSupported && title && titleNode;
@@ -154,6 +176,12 @@ export default function DocumentOutline( {
 		{}
 	);
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
+
+	function isContentBlock( clientId ) {
+		return Array.isArray( contentBlocks )
+			? contentBlocks.includes( clientId )
+			: true;
+	}
 
 	return (
 		<div className="document-outline">
@@ -169,10 +197,11 @@ export default function DocumentOutline( {
 						{ title }
 					</DocumentOutlineItem>
 				) }
-				{ headings.map( ( item, index ) => {
+				{ headings.map( ( item ) => {
 					// Headings remain the same, go up by one, or down by any amount.
 					// Otherwise there are missing levels.
-					const isIncorrectLevel = item.level > prevHeadingLevel + 1;
+					const isIncorrectLevel =
+						item.level > prevHeadingLevelRef.current + 1;
 
 					const isValid =
 						! item.isEmpty &&
@@ -180,14 +209,17 @@ export default function DocumentOutline( {
 						!! item.level &&
 						( item.level !== 1 ||
 							( ! hasMultipleH1 && ! hasTitle ) );
-					prevHeadingLevel = item.level;
+					prevHeadingLevelRef.current = item.level;
 
 					return (
 						<DocumentOutlineItem
-							key={ index }
+							key={ item.clientId }
 							level={ `H${ item.level }` }
 							isValid={ isValid }
-							isDisabled={ hasOutlineItemsDisabled }
+							isDisabled={
+								hasOutlineItemsDisabled ||
+								! isContentBlock( item.clientId )
+							}
 							href={ `#block-${ item.clientId }` }
 							onSelect={ () => {
 								selectBlock( item.clientId );

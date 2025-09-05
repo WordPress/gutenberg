@@ -2,8 +2,8 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "lib",
-		"declarationDir": "build-types"
+		"rootDir": "lib"
 	},
-	"include": [ "lib/get-leading-comments.js" ]
+	"files": [ "lib/get-leading-comments.js" ],
+	"include": []
 }

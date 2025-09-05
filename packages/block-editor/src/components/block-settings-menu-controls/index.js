@@ -55,7 +55,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const convertToGroupButtonProps =
 		useConvertToGroupButtonProps( selectedClientIds );
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton = isGroupable || isUngroupable;
+	const showConvertToGroupButton =
+		( isGroupable || isUngroupable ) && ! isContentOnly;
 
 	return (
 		<Slot

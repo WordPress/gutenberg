@@ -86,7 +86,7 @@ function UnforwardedSearchControl(
 		() => ( {
 			BaseControl: {
 				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-				// to provide backwards compatibile margin for SearchControl.
+				// to provide backwards compatible margin for SearchControl.
 				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
 				_overrides: { __nextHasNoMarginBottom },
 				__associatedWPComponentName: 'SearchControl',

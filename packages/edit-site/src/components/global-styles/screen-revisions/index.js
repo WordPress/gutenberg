@@ -174,7 +174,7 @@ function ScreenRevisions() {
 						changePage={ setCurrentPage }
 						totalItems={ revisionsCount }
 						disabled={ isLoading }
-						label={ __( 'Global Styles pagination navigation' ) }
+						label={ __( 'Global Styles pagination' ) }
 					/>
 				</div>
 			) }

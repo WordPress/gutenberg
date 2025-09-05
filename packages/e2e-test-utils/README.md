@@ -212,7 +212,7 @@ Create a new user account.
 _Parameters_
 
 -   _username_ `string`: User name.
--   _object_ `Object?`: Optional Settings for the new user account.
+-   _object_ `?Object`: Optional Settings for the new user account.
 -   _object.firstName_ `[string]`: First name.
 -   _object.lastName_ `[string]`: Last name.
 -   _object.role_ `[string]`: Role. Defaults to Administrator.
@@ -252,9 +252,9 @@ Deletes a theme from the site, activating another theme if necessary.
 _Parameters_
 
 -   _slug_ `string`: Theme slug.
--   _settings_ `Object?`: Optional settings object.
--   _settings.newThemeSlug_ `string?`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
--   _settings.newThemeSearchTerm_ `string?`: A search term to use if the new theme is not findable by its slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
 
 ### deleteUser
 
@@ -414,7 +414,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise`: all the blocks anchor nodes matching the lable in the ListView.
+-   `Promise`: all the blocks anchor nodes matching the label in the ListView.
 
 ### getOption
 
@@ -479,7 +479,7 @@ Installs a plugin from the WP.org repository.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
--   _searchTerm_ `string?`: If the plugin is not findable by its slug use an alternative term to search.
+-   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
 
 ### installTheme
 
@@ -488,8 +488,8 @@ Installs a theme from the WP.org repository.
 _Parameters_
 
 -   _slug_ `string`: Theme slug.
--   _settings_ `Object?`: Optional settings object.
--   _settings.searchTerm_ `string?`: Search term to use if the theme is not findable by its slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
 
 ### isCurrentURL
 
@@ -921,7 +921,7 @@ _Related_
 _Parameters_
 
 -   _store_ `string`: Store to query e.g: core/editor, core/blocks...
--   _selector_ `string`: Selector to exectute e.g: getBlocks.
+-   _selector_ `string`: Selector to execute e.g: getBlocks.
 -   _parameters_ `...Object`: Parameters to pass to the selector.
 
 _Returns_

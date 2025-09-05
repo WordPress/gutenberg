@@ -19,8 +19,8 @@ const { useLocation } = unlock( routerPrivateApis );
  * React hook used to set the correct command context based on the current state.
  */
 export default function useSetCommandContext() {
-	const { params } = useLocation();
-	const { canvas = 'view' } = params;
+	const { query = {} } = useLocation();
+	const { canvas = 'view' } = query;
 	const hasBlockSelected = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlockSelectionStart();
 	}, [] );

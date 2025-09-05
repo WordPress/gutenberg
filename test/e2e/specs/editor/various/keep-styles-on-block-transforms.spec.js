@@ -18,7 +18,7 @@ test.describe( 'Keep styles on block transforms', () => {
 			.click();
 		await page.keyboard.type( '## Heading' );
 		await page.click( 'role=button[name="Text"i]' );
-		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
+		await page.click( 'role=option[name="Luminous vivid orange"i]' );
 
 		await page.click( 'role=button[name="Heading"i]' );
 		await page.click( 'role=menuitem[name="Paragraph"i]' );

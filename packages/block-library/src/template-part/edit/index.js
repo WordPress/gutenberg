@@ -260,6 +260,7 @@ export default function TemplatePartEdit( {
 							templatePartId={ templatePartId }
 							defaultWrapper={ areaObject.tagName }
 							hasInnerBlocks={ hasInnerBlocks }
+							clientId={ clientId }
 						/>
 					</InspectorControls>
 				) }

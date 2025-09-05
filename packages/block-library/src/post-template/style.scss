@@ -4,6 +4,8 @@
 	max-width: 100%;
 	list-style: none;
 	padding: 0;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	// These rules no longer apply but should be kept for backwards compatibility.
 	&.is-flex-container {

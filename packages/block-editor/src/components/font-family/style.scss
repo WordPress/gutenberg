@@ -1,0 +1,5 @@
+.block-editor-font-family-control {
+	&:not(.is-next-has-no-margin-bottom) {
+		margin-bottom: $grid-unit-10;
+	}
+}

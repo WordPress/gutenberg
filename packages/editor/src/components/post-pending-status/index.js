@@ -14,7 +14,7 @@ import { store as editorStore } from '../../store';
 /**
  * A component for displaying and toggling the pending status of a post.
  *
- * @return {JSX.Element} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 export function PostPendingStatus() {
 	const status = useSelect(

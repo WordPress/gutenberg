@@ -32,7 +32,11 @@ import {
 } from '../components/duotone/utils';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings, usePrivateStyleOverride } from './utils';
+import {
+	cleanEmptyObject,
+	useBlockSettings,
+	usePrivateStyleOverride,
+} from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -124,9 +128,10 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 		return null;
 	}
 
-	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
-		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
-		: duotoneStyle;
+	const duotonePresetOrColors =
+		duotoneStyle === 'unset' || Array.isArray( duotoneStyle )
+			? duotoneStyle
+			: getColorsFromDuotonePreset( duotoneStyle, duotonePalette );
 
 	return (
 		<>
@@ -140,7 +145,9 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								...newDuotone?.filter,
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
 				/>
@@ -165,7 +172,9 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
 								duotone: maybePreset ?? newDuotone, // use preset or fallback to custom colors.
 							},
 						};
-						setAttributes( { style: newStyle } );
+						setAttributes( {
+							style: cleanEmptyObject( newStyle ),
+						} );
 					} }
 					settings={ settings }
 				/>

@@ -104,7 +104,9 @@ You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Usern
 
 #### Accessing the MySQL Database
 
-To access the MySQL database on the `wp-env` instance you will first need the connection details. To do this:
+phpMyAdmin is available by default for the Gutenberg project. You can access the MySQL Database at: `http://localhost:9000/`.
+
+If you want to access the database through another tool, you will first need the connection details. To do this:
 
 1. In a terminal, navigate to your local Gutenberg repo.
 2. Run `npm run wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
@@ -219,7 +221,7 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 ```json
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
 ```
 

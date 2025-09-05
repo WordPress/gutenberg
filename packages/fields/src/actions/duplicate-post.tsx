@@ -33,12 +33,13 @@ const duplicatePost: Action< BasePost > = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],
 			title: sprintf(
-				/* translators: %s: Existing template title */
-				_x( '%s (Copy)', 'template' ),
+				/* translators: %s: Existing post title */
+				_x( '%s (Copy)', 'post' ),
 				getItemTitle( items[ 0 ] )
 			),
 		} );
@@ -55,7 +56,7 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
-			const newItemOject = {
+			const newItemObject = {
 				status: 'draft',
 				title: item.title,
 				slug: item.title || __( 'No title' ),
@@ -90,7 +91,7 @@ const duplicatePost: Action< BasePost > = {
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
 					// @ts-ignore
-					newItemOject[ property ] = item[ property ];
+					newItemObject[ property ] = item[ property ];
 				}
 			} );
 			setIsCreatingPage( true );
@@ -98,13 +99,13 @@ const duplicatePost: Action< BasePost > = {
 				const newItem = await saveEntityRecord(
 					'postType',
 					item.type,
-					newItemOject,
+					newItemObject,
 					{ throwOnError: true }
 				);
 
 				createSuccessNotice(
 					sprintf(
-						// translators: %s: Title of the created post or template, e.g: "Hello world".
+						// translators: %s: Title of the created post, e.g: "Hello world".
 						__( '"%s" successfully created.' ),
 						decodeEntities( newItem.title?.rendered || item.title )
 					),
@@ -171,4 +172,7 @@ const duplicatePost: Action< BasePost > = {
 	},
 };
 
+/**
+ * Duplicate action for BasePost.
+ */
 export default duplicatePost;

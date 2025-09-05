@@ -18,6 +18,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { copy } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -81,7 +82,7 @@ function BlockSwitcherDropdownMenuContents( {
 			);
 		}
 	}
-	// Simple block tranformation based on the `Block Transforms` API.
+	// Simple block transformation based on the `Block Transforms` API.
 	function onBlockTransform( name ) {
 		const newBlocks = switchToBlockType( blocks, name );
 		replaceBlocks( clientIds, newBlocks );
@@ -185,21 +186,6 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
-	<>
-		<BlockIcon
-			className="block-editor-block-switcher__toggle"
-			icon={ icon }
-			showColors
-		/>
-		{ showTitle && blockTitle && (
-			<span className="block-editor-block-switcher__toggle-text">
-				{ blockTitle }
-			</span>
-		) }
-	</>
-);
-
 export const BlockSwitcher = ( { clientIds } ) => {
 	const {
 		hasContentOnlyLocking,
@@ -272,6 +258,11 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
 	} );
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
 
 	if ( invalidBlocks ) {
 		return null;
@@ -281,6 +272,11 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	const blockSwitcherLabel = isSingleBlock
 		? blockTitle
 		: __( 'Multiple blocks selected' );
+
+	const blockIndicatorText =
+		( isReusable || isTemplate ) && ! showIconLabels && blockTitle
+			? blockTitle
+			: undefined;
 
 	const hideDropdown =
 		isDisabled ||
@@ -295,12 +291,13 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					className="block-editor-block-switcher__no-switcher-icon"
 					title={ blockSwitcherLabel }
 					icon={
-						<BlockIndicator
+						<BlockIcon
+							className="block-editor-block-switcher__toggle"
 							icon={ icon }
-							showTitle={ isReusable || isTemplate }
-							blockTitle={ blockTitle }
+							showColors
 						/>
 					}
+					text={ blockIndicatorText }
 				/>
 			</ToolbarGroup>
 		);
@@ -329,12 +326,13 @@ export const BlockSwitcher = ( { clientIds } ) => {
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
-							<BlockIndicator
+							<BlockIcon
+								className="block-editor-block-switcher__toggle"
 								icon={ icon }
-								showTitle={ isReusable || isTemplate }
-								blockTitle={ blockTitle }
+								showColors
 							/>
 						}
+						text={ blockIndicatorText }
 						toggleProps={ {
 							description: blockSwitcherDescription,
 							...toggleProps,

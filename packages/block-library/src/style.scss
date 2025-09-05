@@ -1,3 +1,4 @@
+@import "./accordion/style.scss";
 @import "./archives/style.scss";
 @import "./avatar/style.scss";
 @import "./audio/style.scss";
@@ -36,7 +37,9 @@
 @import "./post-author/style.scss";
 @import "./post-author-biography/style.scss";
 @import "./post-comments-form/style.scss";
+@import "./post-comments-count/style.scss";
 @import "./post-content/style.scss";
+@import "./post-comments-link/style.scss";
 @import "./post-date/style.scss";
 @import "./post-excerpt/style.scss";
 @import "./post-featured-image/style.scss";
@@ -50,6 +53,7 @@
 @import "./post-template/style.scss";
 @import "./query-pagination/style.scss";
 @import "./query-title/style.scss";
+@import "./query-total/style.scss";
 @import "./quote/style.scss";
 @import "./read-more/style.scss";
 @import "./rss/style.scss";

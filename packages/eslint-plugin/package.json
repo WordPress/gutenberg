@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "21.5.0",
+	"version": "22.16.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,12 +34,12 @@
 		"@babel/eslint-parser": "7.25.7",
 		"@typescript-eslint/eslint-plugin": "^6.4.1",
 		"@typescript-eslint/parser": "^6.4.1",
-		"@wordpress/babel-preset-default": "*",
-		"@wordpress/prettier-config": "*",
+		"@wordpress/babel-preset-default": "file:../babel-preset-default",
+		"@wordpress/prettier-config": "file:../prettier-config",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-import": "^2.25.2",
-		"eslint-plugin-jest": "^27.2.3",
+		"eslint-plugin-jest": "^27.4.3",
 		"eslint-plugin-jsdoc": "^46.4.6",
 		"eslint-plugin-jsx-a11y": "^6.5.1",
 		"eslint-plugin-playwright": "^0.15.3",
@@ -53,7 +53,7 @@
 		"@babel/core": ">=7",
 		"eslint": ">=8",
 		"prettier": ">=3",
-		"typescript": ">=4"
+		"typescript": ">=5"
 	},
 	"peerDependenciesMeta": {
 		"prettier": {

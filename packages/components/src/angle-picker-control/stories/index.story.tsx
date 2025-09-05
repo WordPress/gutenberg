@@ -17,8 +17,8 @@ const meta: Meta< typeof AnglePickerControl > = {
 	title: 'Components/AnglePickerControl',
 	component: AnglePickerControl,
 	argTypes: {
-		as: { control: { type: null } },
-		value: { control: { type: null } },
+		as: { control: false },
+		value: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

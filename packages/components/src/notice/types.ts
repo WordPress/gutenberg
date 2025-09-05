@@ -14,11 +14,13 @@ type CommonNoticeActionProps = {
 // `onClick` will be ignored.
 type NoticeActionWithURL = CommonNoticeActionProps & {
 	url: string;
+	openInNewTab?: boolean;
 	onClick?: never;
 };
 type NoticeActionWithOnClick = CommonNoticeActionProps & {
 	url?: never;
-	onClick: MouseEventHandler< HTMLButtonElement >;
+	openInNewTab?: never;
+	onClick: MouseEventHandler< HTMLButtonElement | HTMLAnchorElement >;
 };
 
 export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
@@ -83,7 +85,7 @@ export type NoticeProps = {
 	isDismissible?: boolean;
 	/**
 	 * A deprecated alternative to `onRemove`. This prop is kept for
-	 * compatibilty reasons but should be avoided.
+	 * compatibility reasons but should be avoided.
 	 *
 	 * @default noop
 	 */

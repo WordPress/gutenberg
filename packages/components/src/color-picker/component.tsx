@@ -87,6 +87,7 @@ const UnconnectedColorPicker = (
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
 					<SelectControl
 						__nextHasNoMarginBottom
+						size="compact"
 						options={ options }
 						value={ colorType }
 						onChange={ ( nextColorType ) =>

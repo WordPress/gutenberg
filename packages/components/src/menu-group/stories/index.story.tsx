@@ -16,10 +16,11 @@ import MenuItemsChoice from '../../menu-items-choice';
 import type { Meta, StoryFn } from '@storybook/react';
 
 const meta: Meta< typeof MenuGroup > = {
-	title: 'Components/MenuGroup',
+	title: 'Components/Actions/MenuGroup',
 	component: MenuGroup,
+	id: 'components-menugroup',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -75,8 +76,8 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
  * When other menu items exist above or below a MenuGroup, the group
  * should have a divider line between it and the adjacent item.
  */
-export const WithSeperator = MultiGroupsTemplate.bind( {} );
-WithSeperator.args = {
+export const WithSeparator = MultiGroupsTemplate.bind( {} );
+WithSeparator.args = {
 	...Default.args,
 	hideSeparator: false,
 	label: 'Editor',

@@ -14,6 +14,7 @@ import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
 import { unlock } from '../lock-unlock';
+import { getNormalizedCommaSeparable } from '../utils';
 
 interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
@@ -168,7 +169,22 @@ export function useEntityRecordsWithPermissions< RecordType >(
 	const { records: data, ...ret } = useEntityRecords(
 		kind,
 		name,
-		queryArgs,
+		{
+			...queryArgs,
+			// If _fields is provided, we need to include _links in the request for permission caching to work.
+			...( queryArgs._fields
+				? {
+						_fields: [
+							...new Set( [
+								...( getNormalizedCommaSeparable(
+									queryArgs._fields
+								) || [] ),
+								'_links',
+							] ),
+						].join(),
+				  }
+				: {} ),
+		},
 		options
 	);
 	const ids = useMemo(

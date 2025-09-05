@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Card, CardBody } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,11 +20,12 @@ const { useZoomOut } = unlock( blockEditorPrivateApis );
 
 function ScreenStyleVariations() {
 	// Style Variations should only be previewed in with
-	// - a "zoomed out" editor
+	// - a "zoomed out" editor (but not when in preview mode)
 	// - "Desktop" device preview
-	const { setDeviceType } = useDispatch( editorStore );
-	useZoomOut();
-	setDeviceType( 'desktop' );
+	const isPreviewMode = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().isPreviewMode;
+	}, [] );
+	useZoomOut( ! isPreviewMode );
 
 	return (
 		<>

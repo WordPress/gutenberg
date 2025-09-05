@@ -76,7 +76,10 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 						// TODO: Explore patching this in jsdom-jscore.
 						if ( node.classList && node.classList.length ) {
 							const mattchers = classes.map( ( item ) => {
-								if ( typeof item === 'string' ) {
+								if ( item === '*' ) {
+									// Keep all classes.
+									return () => true;
+								} else if ( typeof item === 'string' ) {
 									return (
 										/** @type {string} */ className
 									) => className === item;

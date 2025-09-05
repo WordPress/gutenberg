@@ -61,7 +61,8 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus,
 		canUserCreateNavigationMenus,
 		canSwitchNavigationMenu,
-	} = useNavigationMenu();
+		isNavigationMenuMissing,
+	} = useNavigationMenu( currentMenuId );
 
 	const [ currentTitle ] = useEntityProp(
 		'postType',
@@ -106,12 +107,18 @@ function NavigationMenuSelector( {
 	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
 	const menuUnavailable =
 		hasResolvedNavigationMenus && currentMenuId === null;
+	const navMenuHasBeenDeleted = currentMenuId && isNavigationMenuMissing;
 
 	let selectorLabel = '';
 
 	if ( isResolvingNavigationMenus ) {
 		selectorLabel = __( 'Loading…' );
-	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
+	} else if (
+		noMenuSelected ||
+		noBlockMenus ||
+		menuUnavailable ||
+		navMenuHasBeenDeleted
+	) {
 		// Note: classic Menus may be available.
 		selectorLabel = __( 'Choose or create a Navigation Menu' );
 	} else {

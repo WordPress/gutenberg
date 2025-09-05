@@ -15,15 +15,24 @@ import {
 	RichText,
 	Warning,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	RangeControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useCanEditEntity } from '../utils/hooks';
+import {
+	useCanEditEntity,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 
 const ELLIPSIS = '…';
 
@@ -33,6 +42,8 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
+	const blockEditingMode = useBlockEditingMode();
+	const showControls = blockEditingMode === 'default';
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
@@ -40,6 +51,8 @@ export default function PostExcerptEditor( {
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	/**
 	 * Check if the post type supports excerpts.
@@ -210,38 +223,67 @@ export default function PostExcerptEditor( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-				/>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show link on new line' ) }
-						checked={ showMoreOnNewLine }
-						onChange={ ( newShowMoreOnNewLine ) =>
-							setAttributes( {
-								showMoreOnNewLine: newShowMoreOnNewLine,
-							} )
+			{ showControls && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( newAlign ) =>
+							setAttributes( { textAlign: newAlign } )
 						}
 					/>
-					<RangeControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+				</BlockControls>
+			) }
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							showMoreOnNewLine: true,
+							excerptLength: 55,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						hasValue={ () => showMoreOnNewLine !== true }
+						label={ __( 'Show link on new line' ) }
+						onDeselect={ () =>
+							setAttributes( { showMoreOnNewLine: true } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show link on new line' ) }
+							checked={ showMoreOnNewLine }
+							onChange={ ( newShowMoreOnNewLine ) =>
+								setAttributes( {
+									showMoreOnNewLine: newShowMoreOnNewLine,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => excerptLength !== 55 }
 						label={ __( 'Max number of words' ) }
-						value={ excerptLength }
-						onChange={ ( value ) => {
-							setAttributes( { excerptLength: value } );
-						} }
-						min="10"
-						max="100"
-					/>
-				</PanelBody>
+						onDeselect={ () =>
+							setAttributes( { excerptLength: 55 } )
+						}
+						isShownByDefault
+					>
+						<RangeControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Max number of words' ) }
+							value={ excerptLength }
+							onChange={ ( value ) => {
+								setAttributes( { excerptLength: value } );
+							} }
+							min="10"
+							max="100"
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }

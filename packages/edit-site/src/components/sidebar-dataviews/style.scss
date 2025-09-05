@@ -7,9 +7,17 @@
 	}
 }
 
+.edit-site-sidebar-dataviews {
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+}
+
+.edit-site-sidebar-navigation-screen-dataviews__custom-items .edit-site-sidebar-dataviews-dataview-item {
+	padding-right: $grid-unit-10;
+}
+
 .edit-site-sidebar-dataviews-dataview-item {
 	border-radius: $radius-small;
-	padding-right: $grid-unit-10;
 
 	.edit-site-sidebar-dataviews-dataview-item__dropdown-menu {
 		min-width: initial;
@@ -19,11 +27,11 @@
 	&:focus,
 	&[aria-current] {
 		color: $gray-200;
-		background: $gray-800;
 	}
 
 	&.is-selected {
-		background: var(--wp-admin-theme-color);
+		background: $gray-800;
+		font-weight: $font-weight-medium;
 		color: $white;
 	}
 }

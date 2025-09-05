@@ -7,10 +7,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Component check if there are any headings (core/heading blocks) present in the document.
  *
- * @param {Object}  props          Props.
- * @param {Element} props.children Children to be rendered.
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children Children to be rendered.
  *
- * @return {Component|null} The component to be rendered or null if there are headings.
+ * @return {React.ReactNode} The component to be rendered or null if there are headings.
  */
 export default function DocumentOutlineCheck( { children } ) {
 	const hasHeadings = useSelect( ( select ) => {
@@ -19,7 +19,7 @@ export default function DocumentOutlineCheck( { children } ) {
 		return getGlobalBlockCount( 'core/heading' ) > 0;
 	} );
 
-	if ( hasHeadings ) {
+	if ( ! hasHeadings ) {
 		return null;
 	}
 

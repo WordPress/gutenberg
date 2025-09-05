@@ -52,6 +52,17 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"color": {
+			"text": true,
+			"background": true,
+			"link": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,

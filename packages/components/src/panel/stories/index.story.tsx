@@ -23,7 +23,7 @@ const meta: Meta< typeof Panel > = {
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { PanelRow, PanelBody },
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -74,12 +74,12 @@ _PanelRow.args = {
 	children: (
 		<PanelBody title="My Profile">
 			<PanelRow>
-				<InputControl label="First name" />
-				<InputControl label="Last name" />
+				<InputControl label="First name" __next40pxDefaultSize />
+				<InputControl label="Last name" __next40pxDefaultSize />
 			</PanelRow>
 			<PanelRow>
 				<div style={ { flex: 1 } }>
-					<InputControl label="Email" />
+					<InputControl label="Email" __next40pxDefaultSize />
 				</div>
 			</PanelRow>
 		</PanelBody>

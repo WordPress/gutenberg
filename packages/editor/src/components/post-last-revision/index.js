@@ -28,7 +28,7 @@ function usePostLastRevisionInfo() {
 /**
  * Renders the component for displaying the last revision of a post.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostLastRevision() {
 	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();

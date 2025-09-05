@@ -13,6 +13,8 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
+import { useEvent, usePrevious } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -31,7 +33,6 @@ import {
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { usePrevious } from '@wordpress/compose';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -54,7 +55,7 @@ const getCustomView = ( editedEntityRecord ) => {
 
 	return {
 		...content,
-		layout: defaultLayouts[ content.type ]?.layout,
+		...defaultLayouts[ content.type ],
 	};
 };
 
@@ -70,7 +71,8 @@ const getCustomView = ( editedEntityRecord ) => {
  */
 function useView( postType ) {
 	const {
-		params: { activeView = 'all', isCustom = 'false', layout },
+		path,
+		query: { activeView = 'all', isCustom = 'false', layout },
 	} = useLocation();
 	const history = useHistory();
 
@@ -107,50 +109,56 @@ function useView( postType ) {
 		return {
 			...initialView,
 			type,
+			...defaultLayouts[ type ],
 		};
 	} );
 
-	const setViewWithUrlUpdate = useCallback(
-		( newView ) => {
-			const { params } = history.getLocationWithParams();
+	const setViewWithUrlUpdate = useEvent( ( newView ) => {
+		setView( newView );
 
-			if ( newView.type === LAYOUT_LIST && ! params?.layout ) {
-				// Skip updating the layout URL param if
-				// it is not present and the newView.type is LAYOUT_LIST.
-			} else if ( newView.type !== params?.layout ) {
-				history.push( {
-					...params,
+		if ( isCustom === 'true' && editedEntityRecord?.id ) {
+			editEntityRecord(
+				'postType',
+				'wp_dataviews',
+				editedEntityRecord?.id,
+				{
+					content: JSON.stringify( newView ),
+				}
+			);
+		}
+
+		const currentUrlLayout = layout ?? LAYOUT_LIST;
+		if ( newView.type !== currentUrlLayout ) {
+			history.navigate(
+				addQueryArgs( path, {
 					layout: newView.type,
-				} );
-			}
-
-			setView( newView );
-
-			if ( isCustom === 'true' && editedEntityRecord?.id ) {
-				editEntityRecord(
-					'postType',
-					'wp_dataviews',
-					editedEntityRecord?.id,
-					{
-						content: JSON.stringify( newView ),
-					}
-				);
-			}
-		},
-		[ history, isCustom, editEntityRecord, editedEntityRecord?.id ]
-	);
+				} )
+			);
+		}
+	} );
 
 	// When layout URL param changes, update the view type
 	// without affecting any other config.
+	const onUrlLayoutChange = useEvent( () => {
+		setView( ( prevView ) => {
+			const newType = layout ?? LAYOUT_LIST;
+			if ( newType === prevView.type ) {
+				return prevView;
+			}
+
+			return {
+				...prevView,
+				type: newType,
+				...defaultLayouts[ newType ],
+			};
+		} );
+	} );
 	useEffect( () => {
-		setView( ( prevView ) => ( {
-			...prevView,
-			type: layout ?? LAYOUT_LIST,
-		} ) );
-	}, [ layout ] );
+		onUrlLayoutChange();
+	}, [ onUrlLayoutChange, layout ] );
 
 	// When activeView or isCustom URL parameters change, reset the view.
-	useEffect( () => {
+	const onUrlActiveViewChange = useEvent( () => {
 		let newView;
 		if ( isCustom === 'true' ) {
 			newView = getCustomView( editedEntityRecord );
@@ -163,17 +171,31 @@ function useView( postType ) {
 			setView( {
 				...newView,
 				type,
+				...defaultLayouts[ type ],
 			} );
 		}
-	}, [ activeView, isCustom, layout, defaultViews, editedEntityRecord ] );
+	} );
+	useEffect( () => {
+		onUrlActiveViewChange();
+	}, [
+		onUrlActiveViewChange,
+		activeView,
+		isCustom,
+		defaultViews,
+		editedEntityRecord,
+	] );
 
-	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
+	return [ view, setViewWithUrlUpdate ];
 }
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
 function getItemId( item ) {
 	return item.id.toString();
+}
+
+function getItemLevel( item ) {
+	return item.level;
 }
 
 export default function PostList( { postType } ) {
@@ -186,69 +208,29 @@ export default function PostList( { postType } ) {
 		quickEdit = false,
 		isCustom,
 		activeView = 'all',
-	} = location.params;
+	} = location.query;
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			const { params } = history.getLocationWithParams();
-			if ( ( params.isCustom ?? 'false' ) === 'false' ) {
-				history.push( {
-					...params,
-					postId: items.join( ',' ),
-				} );
+			if ( ( location.query.isCustom ?? 'false' ) === 'false' ) {
+				history.navigate(
+					addQueryArgs( location.path, {
+						postId: items.join( ',' ),
+					} )
+				);
 			}
 		},
-		[ history ]
+		[ location.path, location.query.isCustom, history ]
 	);
 
-	const getActiveViewFilters = ( views, match ) => {
-		const found = views.find( ( { slug } ) => slug === match );
-		return found?.filters ?? [];
-	};
-
-	const { isLoading: isLoadingFields, fields: _fields } = usePostFields();
-	const fields = useMemo( () => {
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		).map( ( { field } ) => field );
-		return _fields.map( ( field ) => ( {
-			...field,
-			elements: activeViewFilters.includes( field.id )
-				? []
-				: field.elements,
-		} ) );
-	}, [ _fields, defaultViews, activeView ] );
+	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
+		postType,
+	} );
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters?.forEach( ( filter ) => {
-			if (
-				filter.field === 'status' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.status = filter.value;
-			}
-			if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_ANY
-			) {
-				filters.author = filter.value;
-			} else if (
-				filter.field === 'author' &&
-				filter.operator === OPERATOR_IS_NONE
-			) {
-				filters.author_exclude = filter.value;
-			}
-		} );
-
-		// The bundled views want data filtered without displaying the filter.
-		const activeViewFilters = getActiveViewFilters(
-			defaultViews,
-			activeView
-		);
-		activeViewFilters.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
 				filter.operator === OPERATOR_IS_ANY
@@ -280,6 +262,7 @@ export default function PostList( { postType } ) {
 			_embed: 'author',
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
+			orderby_hierarchy: !! view.showLevels,
 			search: view.search,
 			...filters,
 		};
@@ -311,12 +294,13 @@ export default function PostList( { postType } ) {
 
 	useEffect( () => {
 		if ( postIdWasDeleted ) {
-			history.push( {
-				...history.getLocationWithParams().params,
-				postId: undefined,
-			} );
+			history.navigate(
+				addQueryArgs( location.path, {
+					postId: undefined,
+				} )
+			);
 		}
-	}, [ postIdWasDeleted, history ] );
+	}, [ history, postIdWasDeleted, location.path ] );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -355,11 +339,7 @@ export default function PostList( { postType } ) {
 	const openModal = () => setShowAddPostModal( true );
 	const closeModal = () => setShowAddPostModal( false );
 	const handleNewPage = ( { type, id } ) => {
-		history.push( {
-			postId: id,
-			postType: type,
-			canvas: 'edit',
-		} );
+		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
 	};
 
@@ -401,13 +381,10 @@ export default function PostList( { postType } ) {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ ( item ) => item.status !== 'trash' }
 				onClickItem={ ( { id } ) => {
-					history.push( {
-						postId: id,
-						postType,
-						canvas: 'edit',
-					} );
+					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
 				getItemId={ getItemId }
+				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
 				header={
 					window.__experimentalQuickEditDataViews &&
@@ -419,10 +396,11 @@ export default function PostList( { postType } ) {
 							icon={ drawerRight }
 							label={ __( 'Details' ) }
 							onClick={ () => {
-								history.push( {
-									...location.params,
-									quickEdit: quickEdit ? undefined : true,
-								} );
+								history.navigate(
+									addQueryArgs( location.path, {
+										quickEdit: quickEdit ? undefined : true,
+									} )
+								);
 							} }
 						/>
 					)

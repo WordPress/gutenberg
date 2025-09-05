@@ -26,7 +26,6 @@ import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-c
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
-import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
@@ -40,7 +39,7 @@ function BlockStylesPanel( { clientId } ) {
 	);
 }
 
-const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
+function BlockInspector() {
 	const {
 		count,
 		selectedBlockName,
@@ -138,14 +137,11 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		! selectedBlockClientId ||
 		isSelectedBlockUnregistered
 	) {
-		if ( showNoBlockSelectedMessage ) {
-			return (
-				<span className="block-editor-block-inspector__no-blocks">
-					{ __( 'No block selected.' ) }
-				</span>
-			);
-		}
-		return null;
+		return (
+			<span className="block-editor-block-inspector__no-blocks">
+				{ __( 'No block selected.' ) }
+			</span>
+		);
 	}
 
 	return (
@@ -169,7 +165,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
-};
+}
 
 const BlockInspectorSingleBlockWrapper = ( { animate, wrapper, children } ) => {
 	return animate ? wrapper( children ) : children;
@@ -253,7 +249,6 @@ const BlockInspectorSingleBlock = ( {
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
 			<BlockVariationTransforms blockClientId={ clientId } />
-			<BlockInfo.Slot />
 			{ showTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }

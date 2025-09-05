@@ -11,6 +11,7 @@ There are two ways to register commands: static or dynamic. Both methods receive
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
 -   `context`: (Optional) The context of the command
+-   `keywords`: (Optional) An array of keywords for search matching
 
 ### Static commands
 
@@ -55,6 +56,14 @@ npm install @wordpress/commands --save
 ```
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+
+_This package requires the following stylesheets to be included for proper styling:_
+
+```css
+/* From node_modules: */
+@import '@wordpress/components/build-style/style.css';
+@import '@wordpress/commands/build-style/style.css';
+```
 
 ## API
 

@@ -77,7 +77,7 @@ test.describe( 'Post Editor Template mode', () => {
 		).toBeVisible();
 	} );
 
-	test( 'Swap templates and proper template resolution when switching to default template', async ( {
+	test( 'Change templates and proper template resolution when switching to default template', async ( {
 		editor,
 		page,
 		requestUtils,
@@ -88,10 +88,10 @@ test.describe( 'Post Editor Template mode', () => {
 		await page.reload();
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
-		// Swap to a custom template, save and reload.
+		// Change to a custom template, save and reload.
 		await page
 			.getByRole( 'menuitem', {
-				name: 'Swap template',
+				name: 'Change template',
 			} )
 			.click();
 		await page
@@ -101,7 +101,7 @@ test.describe( 'Post Editor Template mode', () => {
 			.click();
 		await editor.saveDraft();
 		await page.reload();
-		// Swap to the default template.
+		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
 		await page
 			.getByRole( 'menuitem', {

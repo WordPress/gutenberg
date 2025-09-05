@@ -40,4 +40,4 @@ function gutenberg_kses_allowed_html( $allowedtags ) {
 	);
 	return $allowedtags;
 }
-add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowed_html', 10, 2 );
+add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowed_html' );

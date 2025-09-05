@@ -9,9 +9,10 @@
 		outline-offset: -$border-width;
 		overflow: hidden;
 		position: relative;
-		// Add the same transition that block style variations and other buttons have.
-		transition: outline 0.1s linear;
-		@include reduce-motion("transition");
+		@media not (prefers-reduced-motion) {
+			// Add the same transition that block style variations and other buttons have.
+			transition: outline 0.1s linear;
+		}
 
 		&.is-pill {
 			height: $button-size-compact;

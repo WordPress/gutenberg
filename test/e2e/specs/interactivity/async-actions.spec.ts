@@ -28,4 +28,34 @@ test.describe( 'async actions', () => {
 		await page.getByTestId( 'reject' ).click();
 		await expect( resultInput ).toHaveValue( 'Error: 😘' );
 	} );
+
+	test( 'Promise generator callbacks should yield the correct value after captured errors', async ( {
+		page,
+	} ) => {
+		const resultInput = page.getByTestId( 'result' );
+		await expect( resultInput ).toHaveValue( '' );
+
+		await page.getByTestId( 'capture' ).click();
+		await expect( resultInput ).toHaveValue( '3' );
+	} );
+
+	test( 'Promise generator callbacks should be able to throw errors', async ( {
+		page,
+	} ) => {
+		const resultInput = page.getByTestId( 'result' );
+		await expect( resultInput ).toHaveValue( '' );
+
+		await page.getByTestId( 'captureThrow' ).click();
+		await expect( resultInput ).toHaveValue( 'Error: 🤯' );
+	} );
+
+	test( 'Promise generator callbacks should throw when rejected promises are returned', async ( {
+		page,
+	} ) => {
+		const resultInput = page.getByTestId( 'result' );
+		await expect( resultInput ).toHaveValue( '' );
+
+		await page.getByTestId( 'captureReturnReject' ).click();
+		await expect( resultInput ).toHaveValue( 'Error: 🔚' );
+	} );
 } );

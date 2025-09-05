@@ -11,7 +11,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { displayShortcut } from '@wordpress/keycodes';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
@@ -19,24 +18,48 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import __unstableCommentIconFill from '../../components/collab/block-comment-icon-slot';
+import CommentIconSlotFill from '../../components/collab/block-comment-icon-slot';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useNotifyCopy } from '../../utils/use-notify-copy';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { clientIds, onCopy, label, shortcut } ) {
+function CopyMenuItem( {
+	clientIds,
+	onCopy,
+	label,
+	shortcut,
+	eventType = 'copy',
+	__experimentalUpdateSelection: updateSelection = false,
+} ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const { removeBlocks } = useDispatch( blockEditorStore );
+	const notifyCopy = useNotifyCopy();
 	const ref = useCopyToClipboard(
 		() => serialize( getBlocksByClientId( clientIds ) ),
-		onCopy
+		() => {
+			switch ( eventType ) {
+				case 'copy':
+				case 'copyStyles':
+					onCopy();
+					notifyCopy( eventType, clientIds );
+					break;
+				case 'cut':
+					notifyCopy( eventType, clientIds );
+					removeBlocks( clientIds, updateSelection );
+					break;
+				default:
+					break;
+			}
+		}
 	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return (
@@ -57,6 +80,7 @@ export function BlockSettingsDropdown( {
 	const currentClientId = block?.clientId;
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
+
 	const {
 		firstParentClientId,
 		parentBlockType,
@@ -64,6 +88,8 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
+		isNavigationMode,
+		isZoomOut,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -74,6 +100,8 @@ export function BlockSettingsDropdown( {
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
+				isNavigationMode: _isNavigationMode,
+				isZoomOut: _isZoomOut,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -98,10 +126,13 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+				isNavigationMode: _isNavigationMode(),
+				isZoomOut: _isZoomOut(),
 			};
 		},
 		[ firstBlockClientId ]
 	);
+
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
 
@@ -112,6 +143,8 @@ export function BlockSettingsDropdown( {
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
+			copy: getShortcutRepresentation( 'core/block-editor/copy' ),
+			cut: getShortcutRepresentation( 'core/block-editor/cut' ),
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'
 			),
@@ -125,6 +158,7 @@ export function BlockSettingsDropdown( {
 		};
 	}, [] );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
+	const isContentOnlyWriteMode = isNavigationMode && isContentOnly;
 
 	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
 		if ( ! __experimentalSelectBlock ) {
@@ -248,13 +282,22 @@ export function BlockSettingsDropdown( {
 											clientId={ firstBlockClientId }
 										/>
 									) }
-									{ ! isContentOnly && (
+									{ ! isContentOnlyWriteMode && (
 										<CopyMenuItem
 											clientIds={ clientIds }
 											onCopy={ onCopy }
-											shortcut={ displayShortcut.primary(
-												'c'
-											) }
+											shortcut={ shortcuts.copy }
+										/>
+									) }
+									{ ! isContentOnlyWriteMode && (
+										<CopyMenuItem
+											clientIds={ clientIds }
+											label={ __( 'Cut' ) }
+											eventType="cut"
+											shortcut={ shortcuts.cut }
+											__experimentalUpdateSelection={
+												! __experimentalSelectBlock
+											}
 										/>
 									) }
 									{ canDuplicate && (
@@ -269,7 +312,7 @@ export function BlockSettingsDropdown( {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ canInsertBlock && ! isContentOnly && (
+									{ canInsertBlock && ! isZoomOut && (
 										<>
 											<MenuItem
 												onClick={ pipe(
@@ -295,7 +338,7 @@ export function BlockSettingsDropdown( {
 											</MenuItem>
 										</>
 									) }
-									<__unstableCommentIconFill.Slot
+									<CommentIconSlotFill.Slot
 										fillProps={ { onClose } }
 									/>
 								</MenuGroup>
@@ -305,20 +348,23 @@ export function BlockSettingsDropdown( {
 											clientIds={ clientIds }
 											onCopy={ onCopy }
 											label={ __( 'Copy styles' ) }
+											eventType="copyStyles"
 										/>
 										<MenuItem onClick={ onPasteStyles }>
 											{ __( 'Paste styles' ) }
 										</MenuItem>
 									</MenuGroup>
 								) }
-								<BlockSettingsMenuControls.Slot
-									fillProps={ {
-										onClose,
-										count,
-										firstBlockClientId,
-									} }
-									clientIds={ clientIds }
-								/>
+								{ ! isContentOnly && (
+									<BlockSettingsMenuControls.Slot
+										fillProps={ {
+											onClose,
+											count,
+											firstBlockClientId,
+										} }
+										clientIds={ clientIds }
+									/>
+								) }
 								{ typeof children === 'function'
 									? children( { onClose } )
 									: Children.map( ( child ) =>

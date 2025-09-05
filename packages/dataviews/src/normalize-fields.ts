@@ -1,15 +1,25 @@
 /**
+ * External dependencies
+ */
+import type { FunctionComponent } from 'react';
+
+/**
  * Internal dependencies
  */
 import getFieldTypeDefinition from './field-types';
 import type {
-	CombinedFormField,
+	DataViewRenderFieldProps,
 	Field,
+	FieldTypeDefinition,
+	NormalizedFilterByConfig,
 	NormalizedField,
-	NormalizedCombinedFormField,
 } from './types';
 import { getControl } from './dataform-controls';
-import DataFormCombinedEdit from './components/dataform-combined-edit';
+import {
+	ALL_OPERATORS,
+	OPERATOR_BETWEEN,
+	SINGLE_SELECTION_OPERATORS,
+} from './constants';
 
 const getValueFromId =
 	( id: string ) =>
@@ -27,6 +37,83 @@ const getValueFromId =
 		return value;
 	};
 
+function getFilterBy< Item >(
+	field: Field< Item >,
+	fieldTypeDefinition: FieldTypeDefinition< Item >
+): NormalizedFilterByConfig | false {
+	if ( field.filterBy === false ) {
+		return false;
+	}
+
+	if ( typeof field.filterBy === 'object' ) {
+		let operators = field.filterBy.operators;
+
+		// Assign default values if no operator was provided.
+		if ( ! operators || ! Array.isArray( operators ) ) {
+			operators = !! fieldTypeDefinition.filterBy
+				? fieldTypeDefinition.filterBy.defaultOperators
+				: [];
+		}
+
+		// Make sure only valid operators are included.
+		let validOperators = ALL_OPERATORS;
+		if ( typeof fieldTypeDefinition.filterBy === 'object' ) {
+			validOperators = fieldTypeDefinition.filterBy.validOperators;
+		}
+		operators = operators.filter( ( operator ) =>
+			validOperators.includes( operator )
+		);
+
+		// The `between` operator is not supported when elements are provided.
+		if ( field.elements && operators.includes( OPERATOR_BETWEEN ) ) {
+			operators = operators.filter(
+				( operator ) => operator !== OPERATOR_BETWEEN
+			);
+		}
+
+		// Do not allow mixing single & multiselection operators.
+		// Remove multiselection operators if any of the single selection ones is present.
+		const hasSingleSelectionOperator = operators.some( ( operator ) =>
+			SINGLE_SELECTION_OPERATORS.includes( operator )
+		);
+		if ( hasSingleSelectionOperator ) {
+			operators = operators.filter( ( operator ) =>
+				// The 'Between' operator is unique as it can be combined with single selection operators.
+				[ ...SINGLE_SELECTION_OPERATORS, OPERATOR_BETWEEN ].includes(
+					operator
+				)
+			);
+		}
+
+		// If no operators are left at this point,
+		// the filters should be disabled.
+		if ( operators.length === 0 ) {
+			return false;
+		}
+
+		return {
+			isPrimary: !! field.filterBy.isPrimary,
+			operators,
+		};
+	}
+
+	if ( fieldTypeDefinition.filterBy === false ) {
+		return false;
+	}
+
+	let defaultOperators = fieldTypeDefinition.filterBy.defaultOperators;
+	// The `between` operator is not supported when elements are provided.
+	if ( field.elements && defaultOperators.includes( OPERATOR_BETWEEN ) ) {
+		defaultOperators = defaultOperators.filter(
+			( operator ) => operator !== OPERATOR_BETWEEN
+		);
+	}
+
+	return {
+		operators: defaultOperators,
+	};
+}
+
 /**
  * Apply default values and normalize the fields config.
  *
@@ -37,8 +124,9 @@ export function normalizeFields< Item >(
 	fields: Field< Item >[]
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
-		const fieldTypeDefinition = getFieldTypeDefinition( field.type );
-
+		const fieldTypeDefinition = getFieldTypeDefinition< Item >(
+			field.type
+		);
 		const getValue = field.getValue || getValueFromId( field.id );
 
 		const sort =
@@ -51,27 +139,27 @@ export function normalizeFields< Item >(
 				);
 			};
 
-		const isValid =
-			field.isValid ??
-			function isValid( item, context ) {
-				return fieldTypeDefinition.isValid(
-					getValue( { item } ),
-					context
-				);
-			};
+		const isValid = {
+			...fieldTypeDefinition.isValid,
+			...field.isValid,
+		};
 
 		const Edit = getControl( field, fieldTypeDefinition );
 
-		const renderFromElements = ( { item }: { item: Item } ) => {
-			const value = getValue( { item } );
-			return (
-				field?.elements?.find( ( element ) => element.value === value )
-					?.label || getValue( { item } )
-			);
-		};
-
 		const render =
-			field.render || ( field.elements ? renderFromElements : getValue );
+			field.render ??
+			function render( {
+				item,
+				field: renderedField,
+			}: DataViewRenderFieldProps< Item > ) {
+				return (
+					fieldTypeDefinition.render as FunctionComponent<
+						DataViewRenderFieldProps< Item >
+					>
+				 )( { item, field: renderedField } );
+			};
+
+		const filterBy = getFilterBy( field, fieldTypeDefinition );
 
 		return {
 			...field,
@@ -83,33 +171,12 @@ export function normalizeFields< Item >(
 			isValid,
 			Edit,
 			enableHiding: field.enableHiding ?? true,
-			enableSorting: field.enableSorting ?? true,
-		};
-	} );
-}
-
-/**
- * Apply default values and normalize the fields config.
- *
- * @param combinedFields combined field list.
- * @param fields         Fields config.
- * @return Normalized fields config.
- */
-export function normalizeCombinedFields< Item >(
-	combinedFields: CombinedFormField< Item >[],
-	fields: Field< Item >[]
-): NormalizedCombinedFormField< Item >[] {
-	return combinedFields.map( ( combinedField ) => {
-		return {
-			...combinedField,
-			Edit: DataFormCombinedEdit,
-			fields: normalizeFields(
-				combinedField.children
-					.map( ( fieldId ) =>
-						fields.find( ( { id } ) => id === fieldId )
-					)
-					.filter( ( field ): field is Field< Item > => !! field )
-			),
+			enableSorting:
+				field.enableSorting ??
+				fieldTypeDefinition.enableSorting ??
+				true,
+			filterBy,
+			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
 		};
 	} );
 }

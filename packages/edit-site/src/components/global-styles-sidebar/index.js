@@ -28,8 +28,8 @@ const { interfaceStore } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function GlobalStylesSidebar() {
-	const { params } = useLocation();
-	const { canvas = 'view', path } = params;
+	const { query } = useLocation();
+	const { canvas = 'view', name } = query;
 	const {
 		shouldClearCanvasContainerView,
 		isStyleBookOpened,
@@ -133,14 +133,14 @@ export default function GlobalStylesSidebar() {
 	const previousActiveAreaRef = useRef( null );
 
 	useEffect( () => {
-		if ( path?.startsWith( '/wp_global_styles' ) && canvas === 'edit' ) {
+		if ( name === 'styles' && canvas === 'edit' ) {
 			previousActiveAreaRef.current =
 				getActiveComplementaryArea( 'core' );
 			enableComplementaryArea( 'core', 'edit-site/global-styles' );
 		} else if ( previousActiveAreaRef.current ) {
 			enableComplementaryArea( 'core', previousActiveAreaRef.current );
 		}
-	}, [ path, enableComplementaryArea, canvas, getActiveComplementaryArea ] );
+	}, [ name, enableComplementaryArea, canvas, getActiveComplementaryArea ] );
 
 	return (
 		<DefaultSidebar

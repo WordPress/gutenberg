@@ -15,12 +15,13 @@ import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
 	component: TextControl,
-	title: 'Components/TextControl',
+	title: 'Components/Selection & Input/Common/TextControl',
+	id: 'components-textcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: {
@@ -55,6 +56,7 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
+	placeholder: 'Placeholder',
 };
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =

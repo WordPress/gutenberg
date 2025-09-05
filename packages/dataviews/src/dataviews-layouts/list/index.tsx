@@ -22,6 +22,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useContext,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
@@ -35,18 +36,28 @@ import {
 	ActionsMenuGroup,
 	ActionModal,
 } from '../../components/dataviews-item-actions';
-import type { Action, NormalizedField, ViewListProps } from '../../types';
+import DataViewsContext from '../../components/dataviews-context';
+import type {
+	Action,
+	NormalizedField,
+	ViewList as ViewListType,
+	ViewListProps,
+	ActionModal as ActionModalType,
+} from '../../types';
 
 interface ListViewItemProps< Item > {
+	view: ViewListType;
 	actions: Action< Item >[];
 	idPrefix: string;
 	isSelected: boolean;
 	item: Item;
+	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
+	descriptionField?: NormalizedField< Item >;
 	onSelect: ( item: Item ) => void;
-	primaryField?: NormalizedField< Item >;
-	visibleFields: NormalizedField< Item >[];
+	otherFields: NormalizedField< Item >[];
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
+	posinset?: number;
 }
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -93,6 +104,8 @@ function PrimaryActionGridCell< Item >( {
 				render={
 					<Button
 						label={ label }
+						disabled={ !! primaryAction.disabled }
+						accessibleWhenDisabled
 						icon={ primaryAction.icon }
 						isDestructive={ primaryAction.isDestructive }
 						size="small"
@@ -116,6 +129,8 @@ function PrimaryActionGridCell< Item >( {
 				render={
 					<Button
 						label={ label }
+						disabled={ !! primaryAction.disabled }
+						accessibleWhenDisabled
 						icon={ primaryAction.icon }
 						isDestructive={ primaryAction.isDestructive }
 						size="small"
@@ -130,26 +145,40 @@ function PrimaryActionGridCell< Item >( {
 }
 
 function ListItem< Item >( {
+	view,
 	actions,
 	idPrefix,
 	isSelected,
 	item,
+	titleField,
 	mediaField,
+	descriptionField,
 	onSelect,
-	primaryField,
-	visibleFields,
+	otherFields,
 	onDropdownTriggerKeyDown,
+	posinset,
 }: ListViewItemProps< Item > ) {
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
 
+	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ activeModalAction, setActiveModalAction ] = useState(
+		null as ActionModalType< Item > | null
+	);
 	const handleHover: React.MouseEventHandler = ( { type } ) => {
 		const isHover = type === 'mouseenter';
 		setIsHovered( isHover );
 	};
 
+	const { paginationInfo } = useContext( DataViewsContext );
 	useEffect( () => {
 		if ( isSelected ) {
 			itemRef.current?.scrollIntoView( {
@@ -177,15 +206,21 @@ function ListItem< Item >( {
 
 	const hasOnlyOnePrimaryAction = primaryAction && actions.length === 1;
 
-	const renderedMediaField = mediaField?.render ? (
-		<div className="dataviews-view-list__media-wrapper">
-			<mediaField.render item={ item } />
-		</div>
-	) : null;
+	const renderedMediaField =
+		showMedia && mediaField?.render ? (
+			<div className="dataviews-view-list__media-wrapper">
+				<mediaField.render
+					item={ item }
+					field={ mediaField }
+					config={ { sizes: '52px' } }
+				/>
+			</div>
+		) : null;
 
-	const renderedPrimaryField = primaryField?.render ? (
-		<primaryField.render item={ item } />
-	) : null;
+	const renderedTitleField =
+		showTitle && titleField?.render ? (
+			<titleField.render item={ item } field={ titleField } />
+		) : null;
 
 	const usedActions = eligibleActions?.length > 0 && (
 		<HStack spacing={ 3 } className="dataviews-view-list__item-actions">
@@ -198,31 +233,44 @@ function ListItem< Item >( {
 			) }
 			{ ! hasOnlyOnePrimaryAction && (
 				<div role="gridcell">
-					<Menu
-						trigger={
-							<Composite.Item
-								id={ generateDropdownTriggerCompositeId(
-									idPrefix
-								) }
-								render={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										accessibleWhenDisabled
-										disabled={ ! actions.length }
-										onKeyDown={ onDropdownTriggerKeyDown }
-									/>
-								}
-							/>
-						}
-						placement="bottom-end"
-					>
-						<ActionsMenuGroup
-							actions={ eligibleActions }
-							item={ item }
+					<Menu placement="bottom-end">
+						<Menu.TriggerButton
+							render={
+								<Composite.Item
+									id={ generateDropdownTriggerCompositeId(
+										idPrefix
+									) }
+									render={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ __( 'Actions' ) }
+											accessibleWhenDisabled
+											disabled={ ! actions.length }
+											onKeyDown={
+												onDropdownTriggerKeyDown
+											}
+										/>
+									}
+								/>
+							}
 						/>
+						<Menu.Popover>
+							<ActionsMenuGroup
+								actions={ eligibleActions }
+								item={ item }
+								registry={ registry }
+								setActiveModalAction={ setActiveModalAction }
+							/>
+						</Menu.Popover>
 					</Menu>
+					{ !! activeModalAction && (
+						<ActionModal
+							action={ activeModalAction }
+							items={ [ item ] }
+							closeModal={ () => setActiveModalAction( null ) }
+						/>
+					) }
 				</div>
 			) }
 		</HStack>
@@ -231,8 +279,18 @@ function ListItem< Item >( {
 	return (
 		<Composite.Row
 			ref={ itemRef }
-			render={ <li /> }
-			role="row"
+			render={
+				/* aria-posinset breaks Composite.Row if passed to it directly. */
+				<div
+					aria-posinset={ posinset }
+					aria-setsize={
+						infiniteScrollEnabled
+							? paginationInfo.totalItems
+							: undefined
+					}
+				/>
+			}
+			role={ infiniteScrollEnabled ? 'article' : 'row' }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
@@ -259,18 +317,26 @@ function ListItem< Item >( {
 					>
 						<HStack spacing={ 0 }>
 							<div
-								className="dataviews-view-list__primary-field"
+								className="dataviews-title-field"
 								id={ labelId }
 							>
-								{ renderedPrimaryField }
+								{ renderedTitleField }
 							</div>
 							{ usedActions }
 						</HStack>
+						{ showDescription && descriptionField?.render && (
+							<div className="dataviews-view-list__field">
+								<descriptionField.render
+									item={ item }
+									field={ descriptionField }
+								/>
+							</div>
+						) }
 						<div
 							className="dataviews-view-list__fields"
 							id={ descriptionId }
 						>
-							{ visibleFields.map( ( field ) => (
+							{ otherFields.map( ( field ) => (
 								<div
 									key={ field.id }
 									className="dataviews-view-list__field"
@@ -282,7 +348,10 @@ function ListItem< Item >( {
 										{ field.label }
 									</VisuallyHidden>
 									<span className="dataviews-view-list__field-value">
-										<field.render item={ item } />
+										<field.render
+											item={ item }
+											field={ field }
+										/>
 									</span>
 								</div>
 							) ) }
@@ -292,6 +361,10 @@ function ListItem< Item >( {
 			</HStack>
 		</Composite.Row>
 	);
+}
+
+function isDefined< T >( item: T | undefined ): item is T {
+	return !! item;
 }
 
 export default function ViewList< Item >( props: ViewListProps< Item > ) {
@@ -304,27 +377,22 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		onChangeSelection,
 		selection,
 		view,
+		className,
+		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
 	);
-
-	const mediaField = fields.find(
-		( field ) => field.id === view.layout?.mediaField
+	const titleField = fields.find( ( field ) => field.id === view.titleField );
+	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
+	const descriptionField = fields.find(
+		( field ) => field.id === view.descriptionField
 	);
-	const primaryField = fields.find(
-		( field ) => field.id === view.layout?.primaryField
-	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	const visibleFields = fields.filter(
-		( field ) =>
-			viewFields.includes( field.id ) &&
-			! [ view.layout?.primaryField, view.layout?.mediaField ].includes(
-				field.id
-			)
-	);
+	const otherFields = ( view?.fields ?? [] )
+		.map( ( fieldId ) => fields.find( ( f ) => fieldId === f.id ) )
+		.filter( isDefined );
 
 	const onSelect = ( item: Item ) =>
 		onChangeSelection( [ getItemId( item ) ] );
@@ -444,39 +512,53 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 			>
-				{ ! hasData && (
-					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
-				) }
+				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
 			</div>
 		);
 	}
 
 	return (
-		<Composite
-			id={ baseId }
-			render={ <ul /> }
-			className="dataviews-view-list"
-			role="grid"
-			activeId={ activeCompositeId }
-			setActiveId={ setActiveCompositeId }
-		>
-			{ data.map( ( item ) => {
-				const id = generateCompositeItemIdPrefix( item );
-				return (
-					<ListItem
-						key={ id }
-						idPrefix={ id }
-						actions={ actions }
-						item={ item }
-						isSelected={ item === selectedItem }
-						onSelect={ onSelect }
-						mediaField={ mediaField }
-						primaryField={ primaryField }
-						visibleFields={ visibleFields }
-						onDropdownTriggerKeyDown={ onDropdownTriggerKeyDown }
-					/>
-				);
-			} ) }
-		</Composite>
+		<>
+			<Composite
+				id={ baseId }
+				render={ <div /> }
+				className={ clsx( 'dataviews-view-list', className ) }
+				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
+				activeId={ activeCompositeId }
+				setActiveId={ setActiveCompositeId }
+			>
+				{ data.map( ( item, index ) => {
+					const id = generateCompositeItemIdPrefix( item );
+					return (
+						<ListItem
+							key={ id }
+							view={ view }
+							idPrefix={ id }
+							actions={ actions }
+							item={ item }
+							isSelected={ item === selectedItem }
+							onSelect={ onSelect }
+							mediaField={ mediaField }
+							titleField={ titleField }
+							descriptionField={ descriptionField }
+							otherFields={ otherFields }
+							onDropdownTriggerKeyDown={
+								onDropdownTriggerKeyDown
+							}
+							posinset={
+								view.infiniteScrollEnabled
+									? index + 1
+									: undefined
+							}
+						/>
+					);
+				} ) }
+			</Composite>
+			{ hasData && isLoading && (
+				<p className="dataviews-loading-more">
+					<Spinner />
+				</p>
+			) }
+		</>
 	);
 }

@@ -141,7 +141,7 @@ function EditorCanvasContainer( {
 }
 
 function useHasEditorCanvasContainer() {
-	const fills = useSlotFills( EditorContentSlotFill.privateKey );
+	const fills = useSlotFills( EditorContentSlotFill.name );
 	return !! fills?.length;
 }
 

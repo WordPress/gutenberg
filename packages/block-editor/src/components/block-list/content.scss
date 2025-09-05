@@ -58,10 +58,12 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 			background: var(--wp-admin-theme-color);
 			opacity: 0.4;
 
-			// Animate.
-			animation: selection-overlay__fade-in-animation 0.1s ease-out;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
+			@media not ( prefers-reduced-motion ) {
+
+				// Animate.
+				animation: selection-overlay__fade-in-animation 0.1s ease-out;
+				animation-fill-mode: forwards;
+			}
 
 			// Show outline in high contrast mode.
 			outline: 2px solid transparent;
@@ -271,8 +273,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 // Spotlight mode. Fade out blocks unless they contain a selected block.
 .is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
 	opacity: 0.2;
-	transition: opacity 0.1s linear;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s linear;
+	}
 
 	// Nested blocks should never be faded. If the parent block is already faded
 	// out, it shouldn't be faded out more. If the parent block in not faded
@@ -339,9 +342,10 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 // Hide the appender that sits at the end of block lists, when inside a nested block,
 // unless the block itself, or a parent, is selected.
 .wp-block .block-list-appender .block-editor-inserter__toggle {
-	animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
-	animation-fill-mode: forwards;
-	@include reduce-motion("animation");
+	@media not ( prefers-reduced-motion ) {
+		animation: block-editor-inserter__toggle__fade-in-animation 0.1s ease;
+		animation-fill-mode: forwards;
+	}
 }
 
 .block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
@@ -361,14 +365,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	border: none;
 	outline: none;
 	border-radius: $radius-small;
+	box-sizing: border-box;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
-	transition: padding 0.2s linear;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: padding 0.2s linear;
+	}
 
 	&:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -400,7 +406,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
 	margin-left: -1px;
 	margin-right: -1px;
-	transition: background-color 0.3s ease;
+	@media not ( prefers-reduced-motion ) {
+		transition: background-color 0.3s ease;
+	}
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -426,4 +434,10 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	max-width: none;
 	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
 	margin: 0 calc(-1 * var(--wp--style--root--padding-right) - 1px) 0 calc(-1 * var(--wp--style--root--padding-left) - 1px) !important;
+}
+
+// This only works in Firefox, Chrome and Safari don't accept a custom cursor
+// during drag.
+.is-dragging {
+	cursor: grabbing;
 }

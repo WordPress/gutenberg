@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"__experimental": true,
 	"name": "core/post-time-to-read",
-	"title": "Time To Read",
+	"title": "Time to Read",
 	"category": "theme",
 	"description": "Show minutes required to finish reading the post.",
 	"textdomain": "default",

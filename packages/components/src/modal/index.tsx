@@ -44,6 +44,7 @@ type Dismissers = Set<
 	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
 >;
 const ModalContext = createContext< Dismissers >( new Set() );
+ModalContext.displayName = 'ModalContext';
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();
@@ -335,10 +336,10 @@ function UnforwardedModal(
 									<>
 										<Spacer
 											marginBottom={ 0 }
-											marginLeft={ 3 }
+											marginLeft={ 2 }
 										/>
 										<Button
-											size="small"
+											size="compact"
 											onClick={ (
 												event: React.MouseEvent< HTMLButtonElement >
 											) =>

@@ -260,3 +260,54 @@
 		data-wp-text="context.callbackRunCount"
 	></data>
 </div>
+
+<hr>
+
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-unset"
+>
+	<template data-wp-each="state.eachUnset"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-null"
+>
+	<template data-wp-each="state.eachNull"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-undefined"
+>
+	<template data-wp-each="state.eachUndefined"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-array"
+>
+	<template data-wp-each="state.eachArray"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-set"
+>
+	<template data-wp-each="state.eachSet"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-string"
+>
+	<template data-wp-each="state.eachString"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-generator"
+>
+	<template data-wp-each="state.eachGenerator"><p data-wp-text="context.item"></p></template>
+</div>
+<div
+	data-wp-interactive="directive-each"
+	data-testid="each-with-iterator"
+>
+	<template data-wp-each="state.eachIterator"><p data-wp-text="context.item"></p></template>
+</div>

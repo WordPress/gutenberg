@@ -204,7 +204,7 @@ export function parseRawBlock( rawBlock, options ) {
 	// Try finding the type for known block name.
 	let blockType = getBlockType( normalizedBlock.blockName );
 
-	// If not blockType is found for the specified name, fallback to the "unregistedBlockType".
+	// If not blockType is found for the specified name, fallback to the "unregisteredBlockType".
 	if ( ! blockType ) {
 		normalizedBlock = createMissingBlockType( normalizedBlock );
 		blockType = getBlockType( normalizedBlock.blockName );

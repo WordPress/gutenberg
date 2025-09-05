@@ -19,6 +19,25 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const renderQueue = createQueue();
 
+function warnOnUnstableReference( a, b ) {
+	if ( ! a || ! b ) {
+		return;
+	}
+
+	const keys =
+		typeof a === 'object' && typeof b === 'object'
+			? Object.keys( a ).filter( ( k ) => a[ k ] !== b[ k ] )
+			: [];
+
+	// eslint-disable-next-line no-console
+	console.warn(
+		'The `useSelect` hook returns different values when called with the same state and parameters.\n' +
+			'This can lead to unnecessary re-renders and performance issues if not fixed.\n\n' +
+			'Non-equal value keys: %s\n\n',
+		keys.join( ', ' )
+	);
+}
+
 /**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../../types').AnyConfig} C
@@ -155,14 +174,11 @@ function Store( registry, suspense ) {
 				listeningStores
 			);
 
-			if ( process.env.NODE_ENV === 'development' ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
 				if ( ! didWarnUnstableReference ) {
 					const secondMapResult = mapSelect( select, registry );
 					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
-						// eslint-disable-next-line no-console
-						console.warn(
-							`The 'useSelect' hook returns different values when called with the same state and parameters. This can lead to unnecessary rerenders.`
-						);
+						warnOnUnstableReference( mapResult, secondMapResult );
 						didWarnUnstableReference = true;
 					}
 				}

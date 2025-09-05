@@ -42,7 +42,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise< ArrayBuffer >`: Compressed file data.
+-   `Promise< ArrayBuffer | ArrayBufferLike >`: Compressed file data.
 
 ### convertImageFormat
 
@@ -83,7 +83,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise< { buffer: ArrayBuffer; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
+-   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; originalWidth: number; originalHeight: number; } >`: Processed file data plus the old and new dimensions.
 
 ### setLocation
 

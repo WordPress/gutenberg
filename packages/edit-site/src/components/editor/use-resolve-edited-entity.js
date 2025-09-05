@@ -30,8 +30,23 @@ const postTypesWithoutParentTemplate = [
 const authorizedPostTypes = [ 'page', 'post' ];
 
 export function useResolveEditedEntity() {
-	const { params = {} } = useLocation();
-	const { postId, postType } = params;
+	const { name, params = {}, query } = useLocation();
+	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+	let postType;
+	if ( name === 'navigation-item' ) {
+		postType = NAVIGATION_POST_TYPE;
+	} else if ( name === 'pattern-item' ) {
+		postType = PATTERN_TYPES.user;
+	} else if ( name === 'template-part-item' ) {
+		postType = TEMPLATE_PART_POST_TYPE;
+	} else if ( name === 'template-item' || name === 'templates' ) {
+		postType = TEMPLATE_POST_TYPE;
+	} else if ( name === 'page-item' || name === 'pages' ) {
+		postType = 'page';
+	} else if ( name === 'post-item' || name === 'posts' ) {
+		postType = 'post';
+	}
+
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
 		return getHomePage();

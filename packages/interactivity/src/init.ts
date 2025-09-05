@@ -25,7 +25,7 @@ export const getRegionRootFragment = ( region: Element ): ContainerNode => {
 };
 
 // Initial vDOM regions associated with its DOM element.
-export const initialVdom = new WeakMap< Element, ComponentChild[] >();
+export const initialVdom = new WeakMap< Element, ComponentChild >();
 
 // Initialize the router with the initial DOM.
 export const init = async () => {

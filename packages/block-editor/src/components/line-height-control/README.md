@@ -18,6 +18,7 @@ const MyLineHeightControl = () => (
 	<LineHeightControl
 		value={ lineHeight }
 		onChange={ onChange }
+		__next40pxDefaultSize
 	/>
 );
 ```

@@ -6,8 +6,7 @@
 	padding: 4em 0;
 
 	p,
-	blockquote,
-	cite {
+	blockquote {
 		color: inherit;
 	}
 
@@ -46,6 +45,10 @@
 .wp-block-pullquote.has-text-align-right blockquote {
 	text-align: right;
 }
+// Ensure that we are reasonably specific to override theme defaults.
+.wp-block-pullquote.has-text-align-center blockquote {
+	text-align: center;
+}
 
 // .is-style-solid-color is deprecated.
 // This selector has not been scoped with `:root :where`, as global styles
@@ -70,6 +73,7 @@
 	}
 }
 
-.wp-block-pullquote cite {
+.wp-block-pullquote :where(cite) {
 	color: inherit;
+	display: block;
 }

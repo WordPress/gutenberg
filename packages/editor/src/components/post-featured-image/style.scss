@@ -78,12 +78,14 @@
 
 .editor-post-featured-image__actions {
 	&:not(.editor-post-featured-image__actions-missing-image) {
-		@include reduce-motion("transition");
 		bottom: 0;
 		opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
 		padding: $grid-unit-10;
 		position: absolute;
-		transition: opacity 50ms ease-out;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 50ms ease-out;
+		}
 
 		.editor-post-featured-image__action {
 			backdrop-filter: blur(16px) saturate(180%);

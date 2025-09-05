@@ -125,6 +125,13 @@ export class RichTextData {
 	static fromHTMLString( html ) {
 		return new RichTextData( create( { html } ) );
 	}
+	/**
+	 * Create a RichTextData instance from an HTML element.
+	 *
+	 * @param {HTMLElement}                    htmlElement The HTML element to create the instance from.
+	 * @param {{preserveWhiteSpace?: boolean}} options     Options.
+	 * @return {RichTextData} The RichTextData instance.
+	 */
 	static fromHTMLElement( htmlElement, options = {} ) {
 		const { preserveWhiteSpace = false } = options;
 		const element = preserveWhiteSpace
@@ -144,6 +151,12 @@ export class RichTextData {
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
+	/**
+	 * Convert the rich text value to an HTML string.
+	 *
+	 * @param {{preserveWhiteSpace?: boolean}} options Options.
+	 * @return {string} The HTML string.
+	 */
 	toHTMLString( { preserveWhiteSpace } = {} ) {
 		return (
 			this.originalHTML ||
@@ -466,6 +479,34 @@ function createFromElement( { element, range, isEditableTree } ) {
 			accumulator.formats.length += text.length;
 			accumulator.replacements.length += text.length;
 			accumulator.text += text;
+			continue;
+		}
+
+		if (
+			node.nodeType === node.COMMENT_NODE ||
+			( node.nodeType === node.ELEMENT_NODE &&
+				node.tagName === 'SPAN' &&
+				node.hasAttribute( 'data-rich-text-comment' ) )
+		) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type: '#comment',
+						attributes: {
+							'data-rich-text-comment':
+								node.nodeType === node.COMMENT_NODE
+									? node.nodeValue
+									: node.getAttribute(
+											'data-rich-text-comment'
+									  ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 

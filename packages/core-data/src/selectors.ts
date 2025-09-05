@@ -24,6 +24,7 @@ import {
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
 // It makes the selectors slightly more safe, but is intended to evolve
@@ -113,7 +114,7 @@ type Optional< T > = T | undefined;
 /**
  * HTTP Query parameters sent with the API request to fetch the entity records.
  */
-type GetRecordsHttpQuery = Record< string, any >;
+export type GetRecordsHttpQuery = Record< string, any >;
 
 /**
  * Arguments for EntityRecord selectors.
@@ -272,6 +273,8 @@ export function getEntityConfig(
 	kind: string,
 	name: string
 ): any {
+	logEntityDeprecation( kind, name, 'getEntityConfig' );
+
 	return state.entities.config?.find(
 		( config ) => config.kind === kind && config.name === name
 	);
@@ -310,7 +313,7 @@ export interface GetEntityRecord {
 		state: State,
 		kind: string,
 		name: string,
-		key: EntityRecordKey,
+		key?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined;
 
@@ -321,7 +324,7 @@ export interface GetEntityRecord {
 	>(
 		kind: string,
 		name: string,
-		key: EntityRecordKey,
+		key?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord | undefined;
 	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
@@ -335,7 +338,7 @@ export interface GetEntityRecord {
  * @param state State tree
  * @param kind  Entity kind.
  * @param name  Entity name.
- * @param key   Record's key
+ * @param key   Optional record's key. If requesting a global record (e.g. site settings), the key can be omitted. If requesting a specific item, the key must always be included.
  * @param query Optional query. If requesting specific
  *              fields, fields must always include the ID. For valid query parameters see the [Reference](https://developer.wordpress.org/rest-api/reference/) in the REST API Handbook and select the entity kind. Then see the arguments available "Retrieve a [Entity kind]".
  *
@@ -350,9 +353,11 @@ export const getEntityRecord = createSelector(
 		state: State,
 		kind: string,
 		name: string,
-		key: EntityRecordKey,
+		key?: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined => {
+		logEntityDeprecation( kind, name, 'getEntityRecord' );
+
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
@@ -450,6 +455,8 @@ export const getRawEntityRecord = createSelector(
 		name: string,
 		key: EntityRecordKey
 	): EntityRecord | undefined => {
+		logEntityDeprecation( kind, name, 'getRawEntityRecord' );
+
 		const record = getEntityRecord< EntityRecord >(
 			state,
 			kind,
@@ -465,7 +472,10 @@ export const getRawEntityRecord = createSelector(
 					// Because edits are the "raw" attribute values,
 					// we return those from record selectors to make rendering,
 					// comparisons, and joins with edits easier.
-					accumulator[ _key ] = record[ _key ]?.raw ?? record[ _key ];
+					accumulator[ _key ] =
+						record[ _key ]?.raw !== undefined
+							? record[ _key ]?.raw
+							: record[ _key ];
 				} else {
 					accumulator[ _key ] = record[ _key ];
 				}
@@ -509,6 +519,7 @@ export function hasEntityRecords(
 	name: string,
 	query?: GetRecordsHttpQuery
 ): boolean {
+	logEntityDeprecation( kind, name, 'hasEntityRecords' );
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
 
@@ -564,6 +575,8 @@ export const getEntityRecords = ( <
 	name: string,
 	query: GetRecordsHttpQuery
 ): EntityRecord[] | null => {
+	logEntityDeprecation( kind, name, 'getEntityRecords' );
+
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState =
@@ -591,6 +604,8 @@ export const getEntityRecordsTotalItems = (
 	name: string,
 	query: GetRecordsHttpQuery
 ): number | null => {
+	logEntityDeprecation( kind, name, 'getEntityRecordsTotalItems' );
+
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState =
@@ -618,6 +633,8 @@ export const getEntityRecordsTotalPages = (
 	name: string,
 	query: GetRecordsHttpQuery
 ): number | null => {
+	logEntityDeprecation( kind, name, 'getEntityRecordsTotalPages' );
+
 	// Queried data state is prepopulated for all known entities. If this is not
 	// assigned for the given parameters, then it is known to not exist.
 	const queriedState =
@@ -625,7 +642,7 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query.per_page === -1 ) {
+	if ( query?.per_page === -1 ) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -634,7 +651,7 @@ export const getEntityRecordsTotalPages = (
 	}
 	// If `per_page` is not set and the query relies on the defaults of the
 	// REST endpoint, get the info from query's meta.
-	if ( ! query.per_page ) {
+	if ( ! query?.per_page ) {
 		return getQueriedTotalPages( queriedState, query );
 	}
 	return Math.ceil( totalItems / query.per_page );
@@ -771,6 +788,7 @@ export function getEntityRecordEdits(
 	name: string,
 	recordId: EntityRecordKey
 ): Optional< any > {
+	logEntityDeprecation( kind, name, 'getEntityRecordEdits' );
 	return state.entities.records?.[ kind ]?.[ name ]?.edits?.[
 		recordId as string | number
 	];
@@ -797,6 +815,7 @@ export const getEntityRecordNonTransientEdits = createSelector(
 		name: string,
 		recordId: EntityRecordKey
 	): Optional< any > => {
+		logEntityDeprecation( kind, name, 'getEntityRecordNonTransientEdits' );
 		const { transientEdits } = getEntityConfig( state, kind, name ) || {};
 		const edits = getEntityRecordEdits( state, kind, name, recordId ) || {};
 		if ( ! transientEdits ) {
@@ -832,6 +851,7 @@ export function hasEditsForEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean {
+	logEntityDeprecation( kind, name, 'hasEditsForEntityRecord' );
 	return (
 		isSavingEntityRecord( state, kind, name, recordId ) ||
 		Object.keys(
@@ -857,6 +877,7 @@ export const getEditedEntityRecord = createSelector(
 		name: string,
 		recordId: EntityRecordKey
 	): ET.Updatable< EntityRecord > | false => {
+		logEntityDeprecation( kind, name, 'getEditedEntityRecord' );
 		const raw = getRawEntityRecord( state, kind, name, recordId );
 		const edited = getEntityRecordEdits( state, kind, name, recordId );
 		// Never return a non-falsy empty object. Unfortunately we can't return
@@ -907,6 +928,7 @@ export function isAutosavingEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean {
+	logEntityDeprecation( kind, name, 'isAutosavingEntityRecord' );
 	const { pending, isAutosave } =
 		state.entities.records?.[ kind ]?.[ name ]?.saving?.[ recordId ] ?? {};
 	return Boolean( pending && isAutosave );
@@ -928,6 +950,7 @@ export function isSavingEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean {
+	logEntityDeprecation( kind, name, 'isSavingEntityRecord' );
 	return (
 		state.entities.records?.[ kind ]?.[ name ]?.saving?.[
 			recordId as EntityRecordKey
@@ -951,6 +974,7 @@ export function isDeletingEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean {
+	logEntityDeprecation( kind, name, 'isDeletingEntityRecord' );
 	return (
 		state.entities.records?.[ kind ]?.[ name ]?.deleting?.[
 			recordId as EntityRecordKey
@@ -974,6 +998,7 @@ export function getLastEntitySaveError(
 	name: string,
 	recordId: EntityRecordKey
 ): any {
+	logEntityDeprecation( kind, name, 'getLastEntitySaveError' );
 	return state.entities.records?.[ kind ]?.[ name ]?.saving?.[ recordId ]
 		?.error;
 }
@@ -994,6 +1019,7 @@ export function getLastEntityDeleteError(
 	name: string,
 	recordId: EntityRecordKey
 ): any {
+	logEntityDeprecation( kind, name, 'getLastEntityDeleteError' );
 	return state.entities.records?.[ kind ]?.[ name ]?.deleting?.[ recordId ]
 		?.error;
 }
@@ -1140,7 +1166,7 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
  *
  * @param state    Data state.
  * @param action   Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ * @param resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
  *                 or REST base as a string - `media`.
  * @param id       Optional ID of the rest resource to check.
  *
@@ -1156,6 +1182,9 @@ export function canUser(
 	const isEntity = typeof resource === 'object';
 	if ( isEntity && ( ! resource.kind || ! resource.name ) ) {
 		return false;
+	}
+	if ( isEntity ) {
+		logEntityDeprecation( resource.kind, resource.name, 'canUser' );
 	}
 
 	const key = getUserPermissionCacheKey( action, resource, id );
@@ -1415,6 +1444,7 @@ export const getRevisions = (
 	recordKey: EntityRecordKey,
 	query?: GetRecordsHttpQuery
 ): RevisionRecord[] | null => {
+	logEntityDeprecation( kind, name, 'getRevisions' );
 	const queriedStateRevisions =
 		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
 	if ( ! queriedStateRevisions ) {
@@ -1446,6 +1476,7 @@ export const getRevision = createSelector(
 		revisionKey: EntityRecordKey,
 		query?: GetRecordsHttpQuery
 	): RevisionRecord | Record< PropertyKey, never > | undefined => {
+		logEntityDeprecation( kind, name, 'getRevision' );
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
 				recordKey

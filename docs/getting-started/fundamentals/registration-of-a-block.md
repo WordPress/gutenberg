@@ -42,7 +42,7 @@ function minimal_block_ca6eda___register_block() {
 add_action( 'init', 'minimal_block_ca6eda___register_block' );
 ```
 
-_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/index.php)_
+_See the [full block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda) of the  [code above](https://github.com/WordPress/block-development-examples/blob/trunk/plugins/minimal-block-ca6eda/plugin.php)_
 
 ## Registering a block with JavaScript (client-side)
 

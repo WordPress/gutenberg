@@ -13,8 +13,8 @@
 /packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @ajitbohra
-/packages/block-library/src/gallery             @geriux
+/packages/block-library                         @ajitbohra @fabiankaegy
+/packages/block-library/src/gallery
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments            @michalczaplinski
 /packages/block-library/src/table-of-contents   @ZebulanStanphill
@@ -93,6 +93,7 @@
 /packages/base-styles
 /packages/icons
 /packages/primitives
+/packages/dataviews                              @oandregal
 
 # Utilities
 /packages/a11y
@@ -138,10 +139,7 @@
 /lib/compat/*/html-api                          @dmsnell
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
-/lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
-
-# Native
-/packages/components/src/mobile/global-styles-context                @geriux
+/lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey
 
 # Native (Unowned)
 *.native.js

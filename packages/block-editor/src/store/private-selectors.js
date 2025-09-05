@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,6 +33,8 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -81,6 +84,32 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 };
 
+/**
+ * Determines if a container (clientId) allows insertion of blocks, considering contentOnly mode restrictions.
+ *
+ * @param {Object} state        Editor state.
+ * @param {string} blockName    The block name to insert.
+ * @param {string} rootClientId The client ID of the root container block.
+ * @return {boolean} Whether the container allows insertion.
+ */
+export function isContainerInsertableToInWriteMode(
+	state,
+	blockName,
+	rootClientId
+) {
+	const isBlockContentBlock = isContentBlock( blockName );
+	const rootBlockName = getBlockName( state, rootClientId );
+	const isContainerContentBlock = isContentBlock( rootBlockName );
+	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
+
+	// In write mode, containers shouldn't be inserted into unless:
+	// 1. they are a section root;
+	// 2. they are a content block and the block to be inserted is also content.
+	return (
+		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
+	);
+}
+
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -112,12 +141,12 @@ function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
+		state.derivedBlockEditingModes,
+		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
 		select( STORE_NAME ).__unstableGetEditorMode( state ),
-		state.zoomLevel,
-		getSectionRootClientId( state ),
 	] )
 );
 
@@ -406,21 +435,6 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	}, getAllPatternsDependants( select ) )
 );
 
-export const isResolvingPatterns = createRegistrySelector( ( select ) =>
-	createSelector( ( state ) => {
-		const blockPatternsSelect = state.settings[ selectBlockPatternsKey ];
-		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		return (
-			( blockPatternsSelect
-				? blockPatternsSelect( select ) === undefined
-				: false ) ||
-			( reusableBlocksSelect
-				? reusableBlocksSelect( select ) === undefined
-				: false )
-		);
-	}, getAllPatternsDependants( select ) )
-);
-
 const EMPTY_ARRAY = [];
 
 export const getReusableBlocks = createRegistrySelector(
@@ -517,13 +531,23 @@ export const getParentSectionBlock = ( state, clientId ) => {
  * @return {boolean} Whether the block is a content locking parent.
  */
 export function isSectionBlock( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	if (
+		blockName === 'core/block' ||
+		getTemplateLock( state, clientId ) === 'contentOnly'
+	) {
+		return true;
+	}
+
+	// Template parts become sections in navigation mode.
+	const _isNavigationMode = isNavigationMode( state );
+	if ( _isNavigationMode && blockName === 'core/template-part' ) {
+		return true;
+	}
+
 	const sectionRootClientId = getSectionRootClientId( state );
 	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-	return (
-		getBlockName( state, clientId ) === 'core/block' ||
-		getTemplateLock( state, clientId ) === 'contentOnly' ||
-		( isNavigationMode( state ) && sectionClientIds.includes( clientId ) )
-	);
+	return _isNavigationMode && sectionClientIds.includes( clientId );
 }
 
 /**

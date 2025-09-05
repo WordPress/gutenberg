@@ -27,7 +27,13 @@ import {
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
-import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
+import {
+	moreVertical,
+	next,
+	previous,
+	chevronLeft,
+	chevronRight,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -338,7 +344,7 @@ function FontCollection( { slug } ) {
 								! fonts.length && (
 									<Text>
 										{ __(
-											'No fonts found. Try with a different search term'
+											'No fonts found. Try with a different search term.'
 										) }
 									</Text>
 								) }
@@ -486,37 +492,30 @@ function FontCollection( { slug } ) {
 
 					{ ! selectedFont && (
 						<HStack
-							spacing={ 4 }
-							justify="center"
+							expanded={ false }
 							className="font-library-modal__footer"
+							justify="end"
+							spacing={ 6 }
 						>
-							<Button
-								label={ __( 'Previous page' ) }
-								size="compact"
-								onClick={ () => setPage( page - 1 ) }
-								disabled={ page === 1 }
-								showTooltip
-								accessibleWhenDisabled
-								icon={ isRTL() ? chevronRight : chevronLeft }
-								tooltipPosition="top"
-							/>
 							<HStack
 								justify="flex-start"
 								expanded={ false }
-								spacing={ 2 }
+								spacing={ 1 }
 								className="font-library-modal__page-selection"
 							>
 								{ createInterpolateElement(
 									sprintf(
-										// translators: %s: Total number of pages.
+										// translators: 1: Current page number, 2: Total number of pages.
 										_x(
-											'Page <CurrentPageControl /> of %s',
+											'<div>Page</div>%1$s<div>of %2$s</div>',
 											'paging'
 										),
+										'<CurrentPage />',
 										totalPages
 									),
 									{
-										CurrentPageControl: (
+										div: <div aria-hidden />,
+										CurrentPage: (
 											<SelectControl
 												aria-label={ __(
 													'Current page'
@@ -535,22 +534,36 @@ function FontCollection( { slug } ) {
 														parseInt( newPage )
 													)
 												}
-												size="compact"
+												size="small"
 												__nextHasNoMarginBottom
+												variant="minimal"
 											/>
 										),
 									}
 								) }
 							</HStack>
-							<Button
-								label={ __( 'Next page' ) }
-								size="compact"
-								onClick={ () => setPage( page + 1 ) }
-								disabled={ page === totalPages }
-								accessibleWhenDisabled
-								icon={ isRTL() ? chevronLeft : chevronRight }
-								tooltipPosition="top"
-							/>
+							<HStack expanded={ false } spacing={ 1 }>
+								<Button
+									onClick={ () => setPage( page - 1 ) }
+									disabled={ page === 1 }
+									accessibleWhenDisabled
+									label={ __( 'Previous page' ) }
+									icon={ isRTL() ? next : previous }
+									showTooltip
+									size="compact"
+									tooltipPosition="top"
+								/>
+								<Button
+									onClick={ () => setPage( page + 1 ) }
+									disabled={ page === totalPages }
+									accessibleWhenDisabled
+									label={ __( 'Next page' ) }
+									icon={ isRTL() ? previous : next }
+									showTooltip
+									size="compact"
+									tooltipPosition="top"
+								/>
+							</HStack>
 						</HStack>
 					) }
 				</>

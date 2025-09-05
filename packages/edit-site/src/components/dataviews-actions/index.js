@@ -31,11 +31,7 @@ export const useEditPostAction = () => {
 			},
 			callback( items ) {
 				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
+				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
 			},
 		} ),
 		[ history ]

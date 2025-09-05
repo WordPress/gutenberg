@@ -15,7 +15,7 @@ import { store as editorStore } from '../../store';
  * @param {Object}   props        The component props.
  * @param {Function} props.render Function to render the component.
  *                                Receives an object with a `canEdit` property.
- * @return {JSX.Element} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostVisibilityCheck( { render } ) {
 	const canEdit = useSelect( ( select ) => {

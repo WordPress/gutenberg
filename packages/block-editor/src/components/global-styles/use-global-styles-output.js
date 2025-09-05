@@ -1337,12 +1337,12 @@ export function processCSSNesting( css, blockSelector ) {
 			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
-			const splittedPart = part.replace( '}', '' ).split( '{' );
-			if ( splittedPart.length !== 2 ) {
+			const splitPart = part.replace( '}', '' ).split( '{' );
+			if ( splitPart.length !== 2 ) {
 				return;
 			}
 
-			const [ nestedSelector, cssValue ] = splittedPart;
+			const [ nestedSelector, cssValue ] = splitPart;
 
 			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
 			// capture any leading combinator such as >, +, or ~, as well as spaces.

@@ -25,10 +25,22 @@ export type IconType =
 	| ( ( props: { size?: number } ) => JSX.Element )
 	| JSX.Element;
 
-interface BaseProps {
+type AdditionalProps< T > = T extends ComponentType< infer U >
+	? U
+	: T extends DashiconIconKey
+	? SVGProps< SVGSVGElement >
+	: {};
+
+export type Props = {
 	/**
-	 * The icon to render. Supported values are: Dashicons (specified as
-	 * strings), functions, Component instances and `null`.
+	 * The icon to render. In most cases, you should use an icon from
+	 * [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
+	 *
+	 * Other supported values are: component instances, functions,
+	 * [Dashicons](https://developer.wordpress.org/resource/dashicons/)
+	 * (specified as strings), and `null`.
+	 *
+	 * The `size` value, as well as any other additional props, will be passed through.
 	 *
 	 * @default null
 	 */
@@ -36,19 +48,22 @@ interface BaseProps {
 	/**
 	 * The size (width and height) of the icon.
 	 *
-	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
+	 * Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
+	 *
+	 * @default `'string' === typeof icon ? 20 : 24`.
 	 */
 	size?: number;
-}
+} & AdditionalProps< IconType >;
 
-type AdditionalProps< T > = T extends ComponentType< infer U >
-	? U
-	: T extends DashiconIconKey
-	? SVGProps< SVGSVGElement >
-	: {};
-
-export type Props = BaseProps & AdditionalProps< IconType >;
-
+/**
+ * Renders a raw icon without any initial styling or wrappers.
+ *
+ * ```jsx
+ * import { wordpress } from '@wordpress/icons';
+ *
+ * <Icon icon={ wordpress } />
+ * ```
+ */
 function Icon( {
 	icon = null,
 	size = 'string' === typeof icon ? 20 : 24,
@@ -92,6 +107,8 @@ function Icon( {
 		return cloneElement( icon, {
 			// @ts-ignore Just forwarding the size prop along
 			size,
+			width: size,
+			height: size,
 			...additionalProps,
 		} );
 	}

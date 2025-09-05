@@ -36,7 +36,7 @@ export type TreeGridRowProps = {
 type RovingTabIndexItemPassThruProps = {
 	ref: React.ForwardedRef< any >;
 	tabIndex?: number;
-	onFocus: React.FocusEventHandler< any >;
+	onFocus?: React.FocusEventHandler< any >;
 	[ key: string ]: any;
 };
 

@@ -22,6 +22,7 @@ import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -29,10 +30,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { TEMPLATE_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import usePageTypeBadge from '../../utils/pageTypeBadge';
+import { getTemplateInfo } from '../../utils/get-template-info';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
-const MotionButton = motion( Button );
+const MotionButton = motion.create( Button );
 
 /**
  * This component renders a navigation bar at the top of the editor. It displays the title of the current document,
@@ -49,10 +51,11 @@ const MotionButton = motion( Button );
  * @param {IconType} props.icon  An icon for the document, no default.
  *                               (A default icon indicating the document post type is no longer used.)
  *
- * @return {JSX.Element} The rendered DocumentBar component.
+ * @return {React.ReactNode} The rendered DocumentBar component.
  */
 export default function DocumentBar( props ) {
 	const {
+		postId,
 		postType,
 		postTypeLabel,
 		documentTitle,
@@ -65,12 +68,13 @@ export default function DocumentBar( props ) {
 			getCurrentPostType,
 			getCurrentPostId,
 			getEditorSettings,
-			__experimentalGetTemplateInfo: getTemplateInfo,
 			getRenderingMode,
 		} = select( editorStore );
+
 		const {
 			getEditedEntityRecord,
 			getPostType,
+			getCurrentTheme,
 			isResolving: isResolvingSelector,
 		} = select( coreStore );
 		const _postType = getCurrentPostType();
@@ -80,10 +84,18 @@ export default function DocumentBar( props ) {
 			_postType,
 			_postId
 		);
-		const _templateInfo = getTemplateInfo( _document );
+
+		const { default_template_types: templateTypes = [] } =
+			getCurrentTheme() ?? {};
+
+		const _templateInfo = getTemplateInfo( {
+			templateTypes,
+			template: _document,
+		} );
 		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
 
 		return {
+			postId: _postId,
 			postType: _postType,
 			postTypeLabel: _postTypeLabel,
 			documentTitle: _document.title,
@@ -111,7 +123,7 @@ export default function DocumentBar( props ) {
 	const title = props.title || entityTitle;
 	const icon = props.icon;
 
-	const pageTypeBadge = usePageTypeBadge();
+	const pageTypeBadge = usePageTypeBadge( postId );
 
 	const mountedRef = useRef( false );
 	useEffect( () => {
@@ -149,7 +161,7 @@ export default function DocumentBar( props ) {
 					</MotionButton>
 				) }
 			</AnimatePresence>
-			{ ! isTemplate && isTemplatePreview && (
+			{ ! isTemplate && isTemplatePreview && ! hasBackButton && (
 				<BlockIcon
 					icon={ layout }
 					className="editor-document-bar__icon-layout"
@@ -189,7 +201,7 @@ export default function DocumentBar( props ) {
 						<Text size="body" as="h1">
 							<span className="editor-document-bar__post-title">
 								{ title
-									? decodeEntities( title )
+									? stripHTML( title )
 									: __( 'No title' ) }
 							</span>
 							{ pageTypeBadge && (

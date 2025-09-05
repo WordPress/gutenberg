@@ -10,6 +10,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
+	SlotFillProvider,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -17,42 +18,43 @@ import {
 	useResizeObserver,
 	usePrevious,
 } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { CommandMenu } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	EditorSnackbars,
+	UnsavedChangesWarning,
+	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { PluginArea } from '@wordpress/plugins';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import ErrorBoundary from '../error-boundary';
 import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
 import SaveKeyboardShortcut from '../save-keyboard-shortcut';
 import { useIsSiteEditorLoading } from './hooks';
 import useMovingAnimation from './animation';
-import SidebarContent from '../sidebar';
+import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
-const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { NavigableRegion } = unlock( editorPrivateApis );
+const { NavigableRegion, GlobalStylesProvider } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
-export default function Layout( { route } ) {
-	const { params } = useLocation();
-	const { canvas = 'view' } = params;
-	useCommands();
+function Layout() {
+	const { query, name: routeKey, areas, widths } = useLocation();
+	const { canvas = 'view' } = query;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -61,9 +63,17 @@ export default function Layout( { route } ) {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { name: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
 		triggerAnimationOnChange: routeKey + '-' + canvas,
+	} );
+
+	const { showIconLabels } = useSelect( ( select ) => {
+		return {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+		};
 	} );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -78,7 +88,7 @@ export default function Layout( { route } ) {
 
 	return (
 		<>
-			<CommandMenu />
+			<UnsavedChangesWarning />
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
@@ -88,6 +98,7 @@ export default function Layout( { route } ) {
 					navigateRegionsProps.className,
 					{
 						'is-full-canvas': canvas === 'edit',
+						'show-icon-labels': showIconLabels,
 					}
 				) }
 			>
@@ -125,14 +136,18 @@ export default function Layout( { route } ) {
 												isResizableFrameOversized
 											}
 										/>
-										<SidebarContent
-											shouldAnimate={
-												routeKey !== 'styles-view'
-											}
-											routeKey={ routeKey }
-										>
-											{ areas.sidebar }
-										</SidebarContent>
+										<SidebarNavigationProvider>
+											<SidebarContent
+												shouldAnimate={
+													routeKey !== 'styles'
+												}
+												routeKey={ routeKey }
+											>
+												<ErrorBoundary>
+													{ areas.sidebar }
+												</ErrorBoundary>
+											</SidebarContent>
+										</SidebarNavigationProvider>
 										<SaveHub />
 										<SavePanel />
 									</motion.div>
@@ -145,17 +160,29 @@ export default function Layout( { route } ) {
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
-							{ canvas !== 'edit' && (
-								<SidebarContent routeKey={ routeKey }>
-									<SiteHubMobile
-										ref={ toggleRef }
-										isTransparent={
-											isResizableFrameOversized
-										}
-									/>
-								</SidebarContent>
-							) }
-							{ areas.mobile }
+							<SidebarNavigationProvider>
+								{ canvas !== 'edit' ? (
+									<>
+										<SiteHubMobile
+											ref={ toggleRef }
+											isTransparent={
+												isResizableFrameOversized
+											}
+										/>
+										<SidebarContent routeKey={ routeKey }>
+											<ErrorBoundary>
+												{ areas.mobile }
+											</ErrorBoundary>
+										</SidebarContent>
+										<SaveHub />
+										<SavePanel />
+									</>
+								) : (
+									<ErrorBoundary>
+										{ areas.mobile }
+									</ErrorBoundary>
+								) }
+							</SidebarNavigationProvider>
 						</div>
 					) }
 
@@ -168,7 +195,7 @@ export default function Layout( { route } ) {
 									maxWidth: widths?.content,
 								} }
 							>
-								{ areas.content }
+								<ErrorBoundary>{ areas.content }</ErrorBoundary>
 							</div>
 						) }
 
@@ -179,7 +206,7 @@ export default function Layout( { route } ) {
 								maxWidth: widths?.edit,
 							} }
 						>
-							{ areas.edit }
+							<ErrorBoundary>{ areas.edit }</ErrorBoundary>
 						</div>
 					) }
 
@@ -229,5 +256,30 @@ export default function Layout( { route } ) {
 				</div>
 			</div>
 		</>
+	);
+}
+
+export default function LayoutWithGlobalStylesProvider( props ) {
+	const { createErrorNotice } = useDispatch( noticesStore );
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
+			)
+		);
+	}
+
+	return (
+		<SlotFillProvider>
+			<GlobalStylesProvider>
+				{ /** This needs to be within the SlotFillProvider */ }
+				<PluginArea onError={ onPluginAreaError } />
+				<Layout { ...props } />
+			</GlobalStylesProvider>
+		</SlotFillProvider>
 	);
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "5.12.0",
+	"version": "5.30.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,11 +29,11 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "7.25.7",
-		"@wordpress/api-fetch": "*",
-		"@wordpress/blob": "*",
-		"@wordpress/element": "*",
-		"@wordpress/i18n": "*",
-		"@wordpress/private-apis": "*"
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"publishConfig": {
 		"access": "public"

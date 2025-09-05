@@ -24,6 +24,7 @@ import {
 	getRevisions,
 	getRevision,
 } from '../selectors';
+
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
 	[ getEntityRecord ],
@@ -52,6 +53,7 @@ describe.each( [
 			] );
 		} );
 	} );
+
 	it( 'should return undefined for unknown entity kind, name', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -290,6 +292,7 @@ describe( 'getRawEntityRecord', () => {
 			},
 		},
 	};
+
 	it( 'should preserve the structure of `raw` field by default', () => {
 		const state = deepFreeze( {
 			entities: {
@@ -330,6 +333,48 @@ describe( 'getRawEntityRecord', () => {
 			title: {
 				html: '<h1>post</h1>',
 			},
+		} );
+	} );
+	it( 'should allow `null` as raw value', () => {
+		const state = deepFreeze( {
+			entities: {
+				config: [
+					{
+						kind: 'someKind',
+						name: 'someName',
+						rawAttributes: [ 'title' ],
+					},
+				],
+				records: {
+					someKind: {
+						someName: {
+							queriedData: {
+								items: {
+									default: {
+										post: {
+											title: {
+												raw: null,
+												rendered: 'Placeholder',
+											},
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										post: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			getRawEntityRecord( state, 'someKind', 'someName', 'post' )
+		).toEqual( {
+			title: null,
 		} );
 	} );
 } );
@@ -690,7 +735,7 @@ describe( 'canUser', () => {
 		} );
 		expect( canUser( state, 'create', 'media' ) ).toBe( undefined );
 		expect(
-			canUser( state, 'create', { kind: 'root', name: 'media' } )
+			canUser( state, 'create', { kind: 'postType', name: 'attachment' } )
 		).toBe( undefined );
 	} );
 
@@ -698,20 +743,24 @@ describe( 'canUser', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
 		} );
-		expect( canUser( state, 'create', { name: 'media' } ) ).toBe( false );
-		expect( canUser( state, 'create', { kind: 'root' } ) ).toBe( false );
+		expect( canUser( state, 'create', { name: 'attachment' } ) ).toBe(
+			false
+		);
+		expect( canUser( state, 'create', { kind: 'postType' } ) ).toBe(
+			false
+		);
 	} );
 
 	it( 'returns whether an action can be performed', () => {
 		const state = deepFreeze( {
 			userPermissions: {
 				'create/media': false,
-				'create/root/media': false,
+				'create/postType/attachment': false,
 			},
 		} );
 		expect( canUser( state, 'create', 'media' ) ).toBe( false );
 		expect(
-			canUser( state, 'create', { kind: 'root', name: 'media' } )
+			canUser( state, 'create', { kind: 'postType', name: 'attachment' } )
 		).toBe( false );
 	} );
 
@@ -719,12 +768,16 @@ describe( 'canUser', () => {
 		const state = deepFreeze( {
 			userPermissions: {
 				'create/media/123': false,
-				'create/root/media/123': false,
+				'create/postType/attachment/123': false,
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
 		expect(
-			canUser( state, 'create', { kind: 'root', name: 'media', id: 123 } )
+			canUser( state, 'create', {
+				kind: 'postType',
+				name: 'attachment',
+				id: 123,
+			} )
 		).toBe( false );
 	} );
 } );

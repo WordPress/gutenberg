@@ -45,6 +45,20 @@
 				}
 			]
 		},
+		"shadow": {
+			"presets": [
+				{
+					"name": "Shadow name"
+				}
+			]
+		},
+		"border": {
+			"radiusSizes": [
+				{
+					"name": "Border radius size name"
+				}
+			]
+		},
 		"blocks": {
 			"*": {
 				"typography": {
@@ -69,12 +83,31 @@
 						{
 							"name": "Gradient name"
 						}
+					],
+					"duotone": [
+						{
+							"name": "Duotone name"
+						}
+					]
+				},
+				"dimensions": {
+					"aspectRatios": [
+						{
+							"name": "Aspect ratio name"
+						}
 					]
 				},
 				"spacing": {
 					"spacingSizes": [
 						{
 							"name": "Space size name"
+						}
+					]
+				},
+				"border": {
+					"radiusSizes": [
+						{
+							"name": "Border radius size name"
 						}
 					]
 				}

@@ -49,27 +49,17 @@ const getGlobalStylesOpenStylesCommands = () =>
 					label: __( 'Open styles' ),
 					callback: ( { close } ) => {
 						close();
-						if ( ! params.postId ) {
-							history.push( {
-								path: '/wp_global_styles',
-								canvas: 'edit',
+						if ( canvas !== 'edit' ) {
+							history.navigate( '/styles?canvas=edit', {
+								transition: 'canvas-mode-edit-transition',
 							} );
-						}
-						if ( params.postId && canvas !== 'edit' ) {
-							history.push(
-								{ ...params, canvas: 'edit' },
-								undefined,
-								{
-									transition: 'canvas-mode-edit-transition',
-								}
-							);
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
 					},
 					icon: styles,
 				},
 			];
-		}, [ history, openGeneralSidebar, params, canvas, isBlockBasedTheme ] );
+		}, [ history, openGeneralSidebar, canvas, isBlockBasedTheme ] );
 
 		return {
 			isLoading: false,
@@ -100,23 +90,10 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 					label: __( 'Learn about styles' ),
 					callback: ( { close } ) => {
 						close();
-						if ( ! params.postId ) {
-							history.push( {
-								path: '/wp_global_styles',
-								canvas: 'edit',
+						if ( canvas !== 'edit' ) {
+							history.navigate( '/styles?canvas=edit', {
+								transition: 'canvas-mode-edit-transition',
 							} );
-						}
-						if ( params.postId && canvas !== 'edit' ) {
-							history.push(
-								{
-									...params,
-									canvas: 'edit',
-								},
-								undefined,
-								{
-									transition: 'canvas-mode-edit-transition',
-								}
-							);
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
 						set( 'core/edit-site', 'welcomeGuideStyles', true );
@@ -129,14 +106,7 @@ const getGlobalStylesToggleWelcomeGuideCommands = () =>
 					icon: help,
 				},
 			];
-		}, [
-			history,
-			openGeneralSidebar,
-			canvas,
-			isBlockBasedTheme,
-			set,
-			params,
-		] );
+		}, [ history, openGeneralSidebar, canvas, isBlockBasedTheme, set ] );
 
 		return {
 			isLoading: false,
@@ -205,23 +175,10 @@ const getGlobalStylesOpenCssCommands = () =>
 					icon: brush,
 					callback: ( { close } ) => {
 						close();
-						if ( ! params.postId ) {
-							history.push( {
-								path: '/wp_global_styles',
-								canvas: 'edit',
+						if ( canvas !== 'edit' ) {
+							history.navigate( '/styles?canvas=edit', {
+								transition: 'canvas-mode-edit-transition',
 							} );
-						}
-						if ( params.postId && canvas !== 'edit' ) {
-							history.push(
-								{
-									...params,
-									canvas: 'edit',
-								},
-								undefined,
-								{
-									transition: 'canvas-mode-edit-transition',
-								}
-							);
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
 						setEditorCanvasContainerView( 'global-styles-css' );
@@ -234,7 +191,6 @@ const getGlobalStylesOpenCssCommands = () =>
 			setEditorCanvasContainerView,
 			canEditCSS,
 			canvas,
-			params,
 		] );
 		return {
 			isLoading: false,
@@ -272,23 +228,10 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 					icon: backup,
 					callback: ( { close } ) => {
 						close();
-						if ( ! params.postId ) {
-							history.push( {
-								path: '/wp_global_styles',
-								canvas: 'edit',
+						if ( canvas !== 'edit' ) {
+							history.navigate( '/styles?canvas=edit', {
+								transition: 'canvas-mode-edit-transition',
 							} );
-						}
-						if ( params.postId && canvas !== 'edit' ) {
-							history.push(
-								{
-									...params,
-									canvas: 'edit',
-								},
-								undefined,
-								{
-									transition: 'canvas-mode-edit-transition',
-								}
-							);
 						}
 						openGeneralSidebar( 'edit-site/global-styles' );
 						setEditorCanvasContainerView(
@@ -303,7 +246,6 @@ const getGlobalStylesOpenRevisionsCommands = () =>
 			openGeneralSidebar,
 			setEditorCanvasContainerView,
 			canvas,
-			params,
 		] );
 
 		return {

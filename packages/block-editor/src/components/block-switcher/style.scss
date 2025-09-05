@@ -26,15 +26,6 @@
 	}
 }
 
-.block-editor-block-switcher__toggle-text {
-	margin-left: $grid-unit-10;
-
-	// Account for double label when show-text-buttons is set.
-	.show-icon-labels & {
-		display: none;
-	}
-}
-
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	display: flex;
 
@@ -138,7 +129,9 @@
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
 			border-radius: $radius-small;
-			transition: all 0.05s ease-in-out;
+			@media not ( prefers-reduced-motion ) {
+				transition: all 0.05s ease-in-out;
+			}
 			position: relative;
 			border: $border-width solid transparent;
 

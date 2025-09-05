@@ -2,12 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	resolveSelect,
+	subscribe,
+} from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -15,15 +20,15 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-import { collabSidebarName } from './constants';
+import { collabHistorySidebarName, collabSidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import AddCommentToolbarButton from './comment-button-toolbar';
+import { useGlobalStylesContext } from '../global-styles-provider';
+import { getCommentIdsFromBlocks } from './utils';
 
-const isBlockCommentExperimentEnabled =
-	window?.__experimentalEnableBlockComment;
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
 		settings.attributes = {
@@ -44,60 +49,27 @@ addFilter(
 	modifyBlockCommentAttributes
 );
 
-function CollabSidebarContent( { showCommentBoard, setShowCommentBoard } ) {
+function CollabSidebarContent( {
+	showCommentBoard,
+	setShowCommentBoard,
+	styles,
+	comments,
+} ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getEntityRecord } = resolveSelect( coreStore );
 
-	const { postId, threads } = useSelect( ( select ) => {
+	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
 		const _postId = getCurrentPostId();
-		const data = !! _postId
-			? select( coreStore ).getEntityRecords( 'root', 'comment', {
-					post: _postId,
-					type: 'block_comment',
-					status: 'any',
-					per_page: 100,
-			  } )
-			: null;
 
 		return {
 			postId: _postId,
-			threads: data,
 		};
 	}, [] );
 
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	// Process comments to build the tree structure
-	const resultComments = useMemo( () => {
-		// Create a compare to store the references to all objects by id
-		const compare = {};
-		const result = [];
-
-		const filteredComments = ( threads ?? [] ).filter(
-			( comment ) => comment.status !== 'trash'
-		);
-
-		// Initialize each object with an empty `reply` array
-		filteredComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure
-		filteredComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		return result;
-	}, [ threads ] );
 
 	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
@@ -222,18 +194,21 @@ function CollabSidebarContent( { showCommentBoard, setShowCommentBoard } ) {
 	};
 
 	return (
-		<div className="editor-collab-sidebar-panel">
+		<div className="editor-collab-sidebar-panel" style={ styles }>
 			<AddComment
 				onSubmit={ addNewComment }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
 			<Comments
-				threads={ resultComments }
+				key={ getSelectedBlockClientId() }
+				threads={ comments }
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
 				onCommentDelete={ onCommentDelete }
 				onCommentResolve={ onCommentResolve }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
 			/>
 		</div>
 	);
@@ -245,11 +220,26 @@ function CollabSidebarContent( { showCommentBoard, setShowCommentBoard } ) {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 
-	const { postStatus } = useSelect( ( select ) => {
+	const { postId, postType, postStatus, threads } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const _postId = getCurrentPostId();
+		const data =
+			!! _postId && typeof _postId === 'number'
+				? select( coreStore ).getEntityRecords( 'root', 'comment', {
+						post: _postId,
+						type: 'block_comment',
+						status: 'any',
+						per_page: 100,
+				  } )
+				: null;
 		return {
+			postId: _postId,
+			postType: getCurrentPostType(),
 			postStatus:
 				select( editorStore ).getEditedPostAttribute( 'status' ),
+			threads: data,
 		};
 	}, [] );
 
@@ -270,8 +260,74 @@ export default function CollabSidebar() {
 		enableComplementaryArea( 'core', 'edit-post/collab-sidebar' );
 	};
 
-	// Check if the experimental flag is enabled.
-	if ( ! isBlockCommentExperimentEnabled || postStatus === 'publish' ) {
+	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
+		id: postId,
+	} );
+
+	// Process comments to build the tree structure
+	const { resultComments, sortedThreads } = useMemo( () => {
+		// Create a compare to store the references to all objects by id
+		const compare = {};
+		const result = [];
+
+		const filteredComments = ( threads ?? [] ).filter(
+			( comment ) => comment.status !== 'trash'
+		);
+
+		// Initialize each object with an empty `reply` array
+		filteredComments.forEach( ( item ) => {
+			compare[ item.id ] = { ...item, reply: [] };
+		} );
+
+		// Iterate over the data to build the tree structure
+		filteredComments.forEach( ( item ) => {
+			if ( item.parent === 0 ) {
+				// If parent is 0, it's a root item, push it to the result array
+				result.push( compare[ item.id ] );
+			} else if ( compare[ item.parent ] ) {
+				// Otherwise, find its parent and push it to the parent's `reply` array
+				compare[ item.parent ].reply.push( compare[ item.id ] );
+			}
+		} );
+
+		if ( 0 === result?.length ) {
+			return { resultComments: [], sortedThreads: [] };
+		}
+
+		const updatedResult = result.map( ( item ) => ( {
+			...item,
+			reply: [ ...item.reply ].reverse(),
+		} ) );
+
+		const blockCommentIds = getCommentIdsFromBlocks( blocks );
+
+		const threadIdMap = new Map(
+			updatedResult.map( ( thread ) => [ thread.id, thread ] )
+		);
+
+		const sortedComments = blockCommentIds
+			.map( ( id ) => threadIdMap.get( id ) )
+			.filter( ( thread ) => thread !== undefined );
+
+		return { resultComments: updatedResult, sortedThreads: sortedComments };
+	}, [ threads, blocks ] );
+
+	// Get the global styles to set the background color of the sidebar.
+	const { merged: GlobalStyles } = useGlobalStylesContext();
+	const backgroundColor = GlobalStyles?.styles?.color?.background;
+
+	if ( 0 < resultComments.length ) {
+		const unsubscribe = subscribe( () => {
+			const activeSidebar = getActiveComplementaryArea( 'core' );
+
+			if ( ! activeSidebar ) {
+				enableComplementaryArea( 'core', collabSidebarName );
+				unsubscribe();
+			}
+		} );
+	}
+
+	if ( postStatus === 'publish' ) {
 		return null; // or maybe return some message indicating no threads are available.
 	}
 
@@ -283,14 +339,31 @@ export default function CollabSidebar() {
 		<>
 			<AddCommentComponent onClick={ openCollabBoard } />
 			<PluginSidebar
-				identifier={ collabSidebarName }
+				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title
 				title={ __( 'Comments' ) }
 				icon={ commentIcon }
 			>
 				<CollabSidebarContent
+					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+				/>
+			</PluginSidebar>
+			<PluginSidebar
+				isPinnable={ false }
+				header={ false }
+				identifier={ collabSidebarName }
+				className="editor-collab-sidebar"
+				headerClassName="editor-collab-sidebar__header"
+			>
+				<CollabSidebarContent
+					comments={ sortedThreads }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+					styles={ {
+						backgroundColor,
+					} }
 				/>
 			</PluginSidebar>
 		</>

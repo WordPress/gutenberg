@@ -14,7 +14,9 @@ import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 import { getFontFamilies } from './utils';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { useGlobalStyle, GlobalStylesContext } = unlock(
+	blockEditorPrivateApis
+);
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 export default function PreviewTypography( { fontSize, variation } ) {
@@ -23,6 +25,9 @@ export default function PreviewTypography( { fontSize, variation } ) {
 	if ( variation ) {
 		config = mergeBaseAndUserConfigs( base, variation );
 	}
+
+	const [ textColor ] = useGlobalStyle( 'color.text' );
+
 	const [ bodyFontFamilies, headingFontFamilies ] = getFontFamilies( config );
 	const bodyPreviewStyle = bodyFontFamilies
 		? getFamilyPreviewStyle( bodyFontFamilies )
@@ -30,6 +35,11 @@ export default function PreviewTypography( { fontSize, variation } ) {
 	const headingPreviewStyle = headingFontFamilies
 		? getFamilyPreviewStyle( headingFontFamilies )
 		: {};
+
+	if ( textColor ) {
+		bodyPreviewStyle.color = textColor;
+		headingPreviewStyle.color = textColor;
+	}
 
 	if ( fontSize ) {
 		bodyPreviewStyle.fontSize = fontSize;
@@ -52,6 +62,7 @@ export default function PreviewTypography( { fontSize, variation } ) {
 			} }
 			style={ {
 				textAlign: 'center',
+				lineHeight: 1,
 			} }
 		>
 			<span style={ headingPreviewStyle }>

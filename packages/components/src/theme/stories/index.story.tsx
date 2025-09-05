@@ -37,7 +37,7 @@ export const Default = Template.bind( {} );
 Default.args = {};
 
 export const Nested: StoryFn< typeof Theme > = ( args ) => (
-	<Theme accent="tomato">
+	<Theme accent="crimson">
 		<Button variant="primary">Outer theme (hardcoded)</Button>
 
 		<Theme { ...args }>

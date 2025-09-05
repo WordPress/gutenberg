@@ -14,7 +14,7 @@ import { visitAdminPage } from './visit-admin-page';
  * Create a new user account.
  *
  * @param {string}  username           User name.
- * @param {Object?} object             Optional Settings for the new user account.
+ * @param {?Object} object             Optional Settings for the new user account.
  * @param {string}  [object.firstName] First name.
  * @param {string}  [object.lastName]  Last name.
  * @param {string}  [object.role]      Role. Defaults to Administrator.

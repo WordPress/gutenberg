@@ -15,6 +15,36 @@ function KeyboardShortcutsRegister() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	useEffect( () => {
 		registerShortcut( {
+			name: 'core/block-editor/copy',
+			category: 'block',
+			description: __( 'Copy the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'c',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/cut',
+			category: 'block',
+			description: __( 'Cut the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste',
+			category: 'block',
+			description: __( 'Paste the selected block(s).' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'v',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/duplicate',
 			category: 'block',
 			description: __( 'Duplicate the selected block(s).' ),
@@ -31,6 +61,18 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'access',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/paste-styles',
+			category: 'block',
+			description: __(
+				'Paste the copied style to the selected block(s).'
+			),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'v',
 			},
 		} );
 

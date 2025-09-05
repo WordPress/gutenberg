@@ -264,7 +264,7 @@ test.describe( 'Router navigate', () => {
 		const count = page.getByTestId( 'router navigations count' );
 		const title = page.getByTestId( 'title' );
 
-		// Check the cound to ensure the page has hydrated.
+		// Check the count to ensure the page has hydrated.
 		await expect( count ).toHaveText( '0' );
 
 		// Navigate to a page without clientNavigationDisabled.

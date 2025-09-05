@@ -13,7 +13,7 @@ const meta: Meta< typeof NavigableMenu > = {
 	id: 'components-navigablemenu',
 	component: NavigableMenu,
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

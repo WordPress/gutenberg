@@ -166,25 +166,34 @@ function FontSize() {
 								marginBottom={ 0 }
 								paddingX={ 4 }
 							>
-								<Menu
-									trigger={
-										<Button
-											size="small"
-											icon={ moreVertical }
-											label={ __( 'Font size options' ) }
-										/>
-									}
-								>
-									<Menu.Item onClick={ toggleRenameDialog }>
-										<Menu.ItemLabel>
-											{ __( 'Rename' ) }
-										</Menu.ItemLabel>
-									</Menu.Item>
-									<Menu.Item onClick={ toggleDeleteConfirm }>
-										<Menu.ItemLabel>
-											{ __( 'Delete' ) }
-										</Menu.ItemLabel>
-									</Menu.Item>
+								<Menu>
+									<Menu.TriggerButton
+										render={
+											<Button
+												size="small"
+												icon={ moreVertical }
+												label={ __(
+													'Font size options'
+												) }
+											/>
+										}
+									/>
+									<Menu.Popover>
+										<Menu.Item
+											onClick={ toggleRenameDialog }
+										>
+											<Menu.ItemLabel>
+												{ __( 'Rename' ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+										<Menu.Item
+											onClick={ toggleDeleteConfirm }
+										>
+											<Menu.ItemLabel>
+												{ __( 'Delete' ) }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									</Menu.Popover>
 								</Menu>
 							</Spacer>
 						</FlexItem>

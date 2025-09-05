@@ -585,7 +585,7 @@ describe( 'typography utils', () => {
 					'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.078), 15px)',
 			},
 
-			// Equivalent custom config PHP unit tests in `test_should_covert_font_sizes_to_fluid_values()`.
+			// Equivalent custom config PHP unit tests in `test_should_convert_font_sizes_to_fluid_values()`.
 			{
 				message: 'should return clamp value using custom fluid config',
 				preset: {

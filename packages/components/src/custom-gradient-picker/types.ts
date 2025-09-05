@@ -27,6 +27,12 @@ export type CustomGradientPickerProps = {
 	 */
 	onChange: ( currentGradient: string ) => void;
 	/**
+	 * Whether to enable alpha transparency options in the picker.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
+	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false

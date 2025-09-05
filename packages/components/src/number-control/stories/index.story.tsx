@@ -14,8 +14,8 @@ import { useState } from '@wordpress/element';
 import NumberControl from '..';
 
 const meta: Meta< typeof NumberControl > = {
-	title: 'Components (Experimental)/Selection & Input/NumberControl',
-	id: 'components-experimental-numbercontrol',
+	title: 'Components/Selection & Input/Common/NumberControl',
+	id: 'components-numbercontrol',
 	component: NumberControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
@@ -23,8 +23,9 @@ const meta: Meta< typeof NumberControl > = {
 		step: { control: { type: 'text' } },
 		suffix: { control: { type: 'text' } },
 		type: { control: { type: 'text' } },
-		value: { control: null },
+		value: { control: false },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
@@ -62,4 +63,5 @@ const Template: StoryFn< typeof NumberControl > = ( {
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
+	__next40pxDefaultSize: true,
 };

@@ -88,6 +88,7 @@ export default function SavePublishPanels( {
 					variant="secondary"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
+					aria-haspopup="dialog"
 					disabled={ ! isDirty }
 					accessibleWhenDisabled
 				>
@@ -102,7 +103,10 @@ export default function SavePublishPanels( {
 	return (
 		<>
 			{ isEntitiesSavedStatesOpen && (
-				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
+				<EntitiesSavedStates
+					close={ closeEntitiesSavedStates }
+					renderDialog
+				/>
 			) }
 			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }

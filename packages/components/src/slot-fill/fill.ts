@@ -7,31 +7,26 @@ import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import SlotFillContext from './context';
-import useSlot from './use-slot';
 import type { FillComponentProps } from './types';
 
 export default function Fill( { name, children }: FillComponentProps ) {
 	const registry = useContext( SlotFillContext );
-	const slot = useSlot( name );
-
-	const ref = useRef( {
-		name,
-		children,
-	} );
+	const instanceRef = useRef( {} );
+	const childrenRef = useRef( children );
 
 	useLayoutEffect( () => {
-		const refValue = ref.current;
-		refValue.name = name;
-		registry.registerFill( name, refValue );
-		return () => registry.unregisterFill( name, refValue );
+		childrenRef.current = children;
+	}, [ children ] );
+
+	useLayoutEffect( () => {
+		const instance = instanceRef.current;
+		registry.registerFill( name, instance, childrenRef.current );
+		return () => registry.unregisterFill( name, instance );
 	}, [ registry, name ] );
 
 	useLayoutEffect( () => {
-		ref.current.children = children;
-		if ( slot ) {
-			slot.forceUpdate();
-		}
-	}, [ slot, children ] );
+		registry.updateFill( name, instanceRef.current, childrenRef.current );
+	} );
 
 	return null;
 }

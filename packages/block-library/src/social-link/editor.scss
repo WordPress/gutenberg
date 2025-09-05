@@ -14,6 +14,9 @@
 	font-size: inherit;
 	color: currentColor;
 	height: auto;
+	font-weight: inherit;
+	font-family: inherit;
+	margin: 0;
 
 	// This rule ensures social link buttons display correctly in template parts.
 	opacity: 1;
@@ -35,4 +38,9 @@
 
 :root :where(.wp-block-social-links.is-style-logos-only .wp-social-link button) {
 	padding: 0;
+}
+
+.wp-block-social-link__toolbar_content_text {
+	// Corresponds to the size of the text control input in the block inspector.
+	width: 250px;
 }

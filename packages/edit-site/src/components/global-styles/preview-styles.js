@@ -15,7 +15,7 @@ import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
 import TypographyExample from './typography-example';
 import HighlightedColors from './highlighted-colors';
-import PreviewIframe from './preview-iframe';
+import PreviewWrapper from './preview-wrapper';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -67,7 +67,7 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 	const { paletteColors } = useStylesPreviewColors();
 
 	return (
-		<PreviewIframe
+		<PreviewWrapper
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
@@ -178,7 +178,7 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 					</VStack>
 				</motion.div>
 			) }
-		</PreviewIframe>
+		</PreviewWrapper>
 	);
 };
 

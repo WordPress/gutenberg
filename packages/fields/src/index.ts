@@ -1,3 +1,4 @@
 export * from './fields';
 export * from './actions';
-export type * from './types';
+export { default as CreateTemplatePartModal } from './components/create-template-part-modal';
+export type { BasePostWithEmbeddedAuthor, BasePost, PostType } from './types';

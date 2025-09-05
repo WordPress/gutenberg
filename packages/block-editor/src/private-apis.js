@@ -13,11 +13,11 @@ import {
 	normalizeString,
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
-import BlockInfo from './components/block-info-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
+import BlockManager from './components/block-manager';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import {
 	setBackgroundStyleDefaults,
@@ -39,6 +39,8 @@ import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	sectionRootClientIdKey,
+	mediaEditKey,
+	essentialFormatKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -48,8 +50,9 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
-import __unstableCommentIconFill from './components/collab/block-comment-icon-slot';
-import __unstableCommentIconToolbarFill from './components/collab/block-comment-icon-toolbar-slot';
+import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
+import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
+import HTMLElementControl from './components/html-element-control';
 /**
  * Private @wordpress/block-editor APIs.
  */
@@ -66,11 +69,11 @@ lock( privateApis, {
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
-	BlockInfo,
 	useHasBlockToolbar,
 	cleanEmptyObject,
 	BlockQuickNavigation,
 	LayoutStyle,
+	BlockManager,
 	BlockRemovalWarningModal,
 	useLayoutClasses,
 	useLayoutStyles,
@@ -80,6 +83,7 @@ lock( privateApis, {
 	TextAlignmentControl,
 	usesContextKey,
 	useFlashEditableBlocks,
+	HTMLElementControl,
 	useZoomOut,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
@@ -95,6 +99,8 @@ lock( privateApis, {
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
-	__unstableCommentIconFill,
-	__unstableCommentIconToolbarFill,
+	CommentIconSlotFill,
+	CommentIconToolbarSlotFill,
+	mediaEditKey,
+	essentialFormatKey,
 } );

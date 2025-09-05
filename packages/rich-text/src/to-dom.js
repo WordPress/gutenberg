@@ -68,10 +68,16 @@ function append( element, child ) {
 	const { type, attributes } = child;
 
 	if ( type ) {
-		child = element.ownerDocument.createElement( type );
+		if ( type === '#comment' ) {
+			child = element.ownerDocument.createComment(
+				attributes[ 'data-rich-text-comment' ]
+			);
+		} else {
+			child = element.ownerDocument.createElement( type );
 
-		for ( const key in attributes ) {
-			child.setAttribute( key, attributes[ key ] );
+			for ( const key in attributes ) {
+				child.setAttribute( key, attributes[ key ] );
+			}
 		}
 	}
 

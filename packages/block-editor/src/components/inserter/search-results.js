@@ -84,7 +84,9 @@ function InserterSearchResults( {
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
 	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		undefined,
+		isQuick
 	);
 
 	const filteredBlockPatterns = useMemo( () => {

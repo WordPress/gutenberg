@@ -16,12 +16,41 @@ import type { Field, Form } from './types';
 export function isItemValid< Item >(
 	item: Item,
 	fields: Field< Item >[],
-	form: Form< Item >
+	form: Form
 ): boolean {
 	const _fields = normalizeFields(
 		fields.filter( ( { id } ) => !! form.fields?.includes( id ) )
 	);
+
+	const isEmptyNullOrUndefined = ( value: any ) =>
+		[ undefined, '', null ].includes( value );
+
 	return _fields.every( ( field ) => {
-		return field.isValid( item, { elements: field.elements } );
+		const value = field.getValue( { item } );
+
+		if ( field.isValid.required ) {
+			if (
+				( field.type === 'text' && isEmptyNullOrUndefined( value ) ) ||
+				( field.type === 'email' && isEmptyNullOrUndefined( value ) ) ||
+				( field.type === 'integer' &&
+					isEmptyNullOrUndefined( value ) ) ||
+				( field.type === undefined && isEmptyNullOrUndefined( value ) )
+			) {
+				return false;
+			}
+
+			if ( field.type === 'boolean' && value !== true ) {
+				return false;
+			}
+		}
+
+		if (
+			typeof field.isValid.custom === 'function' &&
+			field.isValid.custom( item, field ) !== null
+		) {
+			return false;
+		}
+
+		return true;
 	} );
 }

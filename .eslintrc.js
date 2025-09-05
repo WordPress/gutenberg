@@ -5,21 +5,6 @@ const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
 /**
- * Internal dependencies
- */
-const { version } = require( './package' );
-
-/**
- * Regular expression string matching a SemVer string with equal major/minor to
- * the current package version. Used in identifying deprecations.
- *
- * @type {string}
- */
-const majorMinorRegExp =
-	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
-	'(\\.\\d+)?';
-
-/**
  * The list of patterns matching files used only for development purposes.
  *
  * @type {string[]}
@@ -94,14 +79,6 @@ const restrictedSyntax = [
 	},
 	{
 		selector:
-			'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
-			majorMinorRegExp +
-			'/]',
-		message:
-			'Deprecated functions must be removed before releasing this version.',
-	},
-	{
-		selector:
 			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
 		message:
 			'This method is deprecated. You should use the more explicit API methods available.',
@@ -136,6 +113,17 @@ const restrictedSyntax = [
 			'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
 		message:
 			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/toggle\\b/i]',
+		message: "Avoid using the verb 'Toggle' in translatable strings",
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/(?<![-\\w])sidebar(?![-\\w])/i]',
+		message:
+			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
 	},
 ];
 

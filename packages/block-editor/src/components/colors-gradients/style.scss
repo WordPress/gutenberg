@@ -10,6 +10,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	// Prevents the `fieldset` from growing beyond its parent's size
 	// in order to fit its content.
 	min-width: 0;
@@ -64,6 +69,7 @@ $swatch-gap: 12px;
 .block-editor-tools-panel-color-gradient-settings__item {
 	padding: 0;
 	max-width: 100%;
+	position: relative;
 
 	// Border styles.
 	border-left: 1px solid $gray-300;
@@ -110,6 +116,7 @@ $swatch-gap: 12px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
 	}
 }
 
@@ -118,5 +125,31 @@ $swatch-gap: 12px;
 
 	.component-color-indicator {
 		flex-shrink: 0;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	&.block-editor-panel-color-gradient-settings__reset {
+		border-radius: $radius-small;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }

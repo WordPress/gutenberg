@@ -209,7 +209,7 @@ const getEditorCommandLoader = () =>
 
 		commands.push( {
 			name: 'core/open-settings-sidebar',
-			label: __( 'Show or hide the Settings panel.' ),
+			label: __( 'Show or hide the Settings panel' ),
 			icon: isRTL() ? drawerLeft : drawerRight,
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );

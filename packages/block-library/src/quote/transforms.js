@@ -67,7 +67,7 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
-				// When a single block is selected make the tranformation
+				// When a single block is selected make the transformation
 				// available only to specific blocks that make sense.
 				if ( blocks.length === 1 ) {
 					return [

@@ -25,13 +25,13 @@ export class Lighthouse {
 	 * the summary.
 	 */
 	async getReport() {
-		// From https://github.com/GoogleChrome/lighthouse/blob/d149e9c1b628d5881ca9ca451278d99ff1b31d9a/core/config/default-config.js#L433-L503
+		// From https://github.com/GoogleChrome/lighthouse/blob/36cac182a6c637b1671c57326d7c0241633d0076/core/config/default-config.js#L381-L446
 		const audits = {
 			'largest-contentful-paint': 'LCP',
 			'total-blocking-time': 'TBT',
 			interactive: 'TTI',
 			'cumulative-layout-shift': 'CLS',
-			'experimental-interaction-to-next-paint': 'INP',
+			'interaction-to-next-paint': 'INP',
 		};
 
 		const report = await lighthouse(

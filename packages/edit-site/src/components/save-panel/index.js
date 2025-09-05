@@ -31,7 +31,11 @@ const { EntitiesSavedStatesExtensible, NavigableRegion } =
 	unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
-const EntitiesSavedStatesForPreview = ( { onClose } ) => {
+const EntitiesSavedStatesForPreview = ( {
+	onClose,
+	renderDialog,
+	variant,
+} ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
 	let activateSaveLabel;
 	if ( isDirtyProps.isDirty ) {
@@ -75,23 +79,35 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 				onSave,
 				saveEnabled: true,
 				saveLabel: activateSaveLabel,
+				renderDialog,
+				variant,
 			} }
 		/>
 	);
 };
 
-const _EntitiesSavedStates = ( { onClose, renderDialog = undefined } ) => {
+const _EntitiesSavedStates = ( { onClose, renderDialog, variant } ) => {
 	if ( isPreviewingTheme() ) {
-		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
+		return (
+			<EntitiesSavedStatesForPreview
+				onClose={ onClose }
+				renderDialog={ renderDialog }
+				variant={ variant }
+			/>
+		);
 	}
 	return (
-		<EntitiesSavedStates close={ onClose } renderDialog={ renderDialog } />
+		<EntitiesSavedStates
+			close={ onClose }
+			renderDialog={ renderDialog }
+			variant={ variant }
+		/>
 	);
 };
 
 export default function SavePanel() {
-	const { params } = useLocation();
-	const { canvas = 'view' } = params;
+	const { query } = useLocation();
+	const { canvas = 'view' } = query;
 	const { isSaveViewOpen, isDirty, isSaving } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDirtyEntityRecords,
@@ -124,12 +140,10 @@ export default function SavePanel() {
 			<Modal
 				className="edit-site-save-panel__modal"
 				onRequestClose={ onClose }
-				__experimentalHideHeader
-				contentLabel={ __(
-					'Save site, content, and template changes'
-				) }
+				title={ __( 'Review changes' ) }
+				size="small"
 			>
-				<_EntitiesSavedStates onClose={ onClose } />
+				<_EntitiesSavedStates onClose={ onClose } variant="inline" />
 			</Modal>
 		) : null;
 	}

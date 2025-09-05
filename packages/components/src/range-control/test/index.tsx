@@ -18,7 +18,13 @@ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
 const RangeControl = (
 	props: React.ComponentProps< typeof _RangeControl >
 ) => {
-	return <_RangeControl { ...props } __nextHasNoMarginBottom />;
+	return (
+		<_RangeControl
+			{ ...props }
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+		/>
+	);
 };
 
 describe( 'RangeControl', () => {

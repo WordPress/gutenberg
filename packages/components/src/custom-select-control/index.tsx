@@ -18,6 +18,7 @@ import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function useDeprecatedProps< T extends CustomSelectOption >( {
 	__experimentalShowSelectedHint,
@@ -56,6 +57,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 ) {
 	const {
 		__next40pxDefaultSize = false,
+		__shouldNotWarnDeprecated36pxSize,
 		describedBy,
 		options,
 		onChange,
@@ -65,6 +67,13 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		showSelectedHint = false,
 		...restProps
 	} = useDeprecatedProps( props );
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'CustomSelectControl',
+		__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	const descriptionId = useInstanceId(
 		CustomSelectControl,
@@ -140,7 +149,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 			);
 		} );
 
-	const { value: currentValue } = store.getState();
+	const currentValue = Ariakit.useStoreState( store, 'value' );
 
 	const renderSelectedValueHint = () => {
 		const selectedOptionHint = options

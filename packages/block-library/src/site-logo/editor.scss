@@ -108,17 +108,16 @@
 	}
 }
 
-.block-library-site-logo__inspector-upload-container {
+.block-library-site-logo__inspector-media-replace-container {
+	// Ensure the dropzone is positioned to the size of the item.
 	position: relative;
+
 	// Since there is no option to skip rendering the drag'n'drop icon in drop
 	// zone, we hide it for now.
 	.components-drop-zone__content-icon {
 		display: none;
 	}
-}
 
-.block-library-site-logo__inspector-upload-container,
-.block-library-site-logo__inspector-media-replace-container {
 	button.components-button {
 		color: $gray-900;
 		box-shadow: inset 0 0 0 1px $gray-400;
@@ -144,9 +143,7 @@
 		text-align: start;
 		text-align-last: center;
 	}
-}
 
-.block-library-site-logo__inspector-media-replace-container {
 	.components-dropdown {
 		display: block;
 	}

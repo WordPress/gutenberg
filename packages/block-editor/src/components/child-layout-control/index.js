@@ -6,9 +6,9 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUseCustomUnits as useCustomUnits,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
@@ -21,6 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import { useSettings } from '../use-settings';
 
 function helpText( selfStretch, parentLayout ) {
 	const { orientation = 'horizontal' } = parentLayout;
@@ -98,6 +99,17 @@ function FlexControls( {
 	const hasFlexValue = () => !! selfStretch;
 	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const units = useCustomUnits( {
+		availableUnits: availableUnits || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vh',
+			'vw',
+		],
+	} );
 	const resetFlex = () => {
 		onChange( {
 			selfStretch: undefined,
@@ -167,6 +179,7 @@ function FlexControls( {
 			{ selfStretch === 'fixed' && (
 				<UnitControl
 					size="__unstable-large"
+					units={ units }
 					onChange={ ( value ) => {
 						onChange( {
 							selfStretch,
@@ -174,6 +187,7 @@ function FlexControls( {
 						} );
 					} }
 					value={ flexSize }
+					min={ 0 }
 					label={ flexResetLabel }
 					hideLabelFromVision
 				/>
@@ -195,7 +209,7 @@ function GridControls( {
 	panelId,
 } ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount = 3, rowCount } = parentLayout ?? {};
+	const { columnCount, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
@@ -203,7 +217,7 @@ function GridControls( {
 		useDispatch( blockEditorStore );
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		rootClientId,
-		columnCount
+		columnCount || 3
 	);
 	const hasStartValue = () => !! columnStart || !! rowStart;
 	const hasSpanValue = () => !! columnSpan || !! rowSpan;
@@ -220,9 +234,20 @@ function GridControls( {
 		} );
 	};
 
+	// Calculate max column span based on current position and grid width
+	const maxColumnSpan = columnCount
+		? columnCount - ( columnStart ?? 1 ) + 1
+		: undefined;
+
+	// Calculate max row span based on current position and grid height
+	const maxRowSpan =
+		window.__experimentalEnableGridInteractivity && rowCount
+			? rowCount - ( rowStart ?? 1 ) + 1
+			: undefined;
+
 	return (
 		<>
-			<HStack
+			<Flex
 				as={ ToolsPanelItem }
 				hasValue={ hasSpanValue }
 				label={ __( 'Grid span' ) }
@@ -230,44 +255,58 @@ function GridControls( {
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
 			>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Column span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newColumnSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							rowSpan,
-							columnSpan: newColumnSpan,
-						} );
-					} }
-					value={ columnSpan ?? 1 }
-					min={ 1 }
-				/>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Row span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newRowSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							columnSpan,
-							rowSpan: newRowSpan,
-						} );
-					} }
-					value={ rowSpan ?? 1 }
-					min={ 1 }
-				/>
-			</HStack>
-			{ window.__experimentalEnableGridInteractivity && columnCount && (
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Column span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							// Don't allow unsetting.
+							const newColumnSpan =
+								value === '' ? 1 : parseInt( value, 10 );
+							const constrainedValue = maxColumnSpan
+								? Math.min( newColumnSpan, maxColumnSpan )
+								: newColumnSpan;
+
+							onChange( {
+								columnStart,
+								rowStart,
+								rowSpan,
+								columnSpan: constrainedValue,
+							} );
+						} }
+						value={ columnSpan ?? 1 }
+						min={ 1 }
+						max={ maxColumnSpan }
+					/>
+				</FlexItem>
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Row span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							const newRowSpan =
+								value === '' ? 1 : parseInt( value, 10 );
+							const constrainedValue = maxRowSpan
+								? Math.min( newRowSpan, maxRowSpan )
+								: newRowSpan;
+
+							onChange( {
+								columnStart,
+								rowStart,
+								columnSpan,
+								rowSpan: constrainedValue,
+							} );
+						} }
+						value={ rowSpan ?? 1 }
+						min={ 1 }
+						max={ maxRowSpan }
+					/>
+				</FlexItem>
+			</Flex>
+
+			{ window.__experimentalEnableGridInteractivity && (
 				// Use Flex with an explicit width on the FlexItem instead of HStack to
 				// work around an issue in webkit where inputs with a max attribute are
 				// sized incorrectly.
