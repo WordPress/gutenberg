@@ -8,16 +8,21 @@ import clsx from 'clsx';
  */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { layout } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
 	__experimentalUseBlockPreview as useBlockPreview,
+	__experimentalBlockVariationPicker as BlockVariationPicker,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
+import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 const TEMPLATE = [
 	[
@@ -225,12 +230,19 @@ export default function TermTemplateEdit( {
 		return terms.filter( ( term ) => ! term.parent );
 	}, [ terms, parent ] );
 
-	const { blocks } = useSelect(
+	const { blocks, variations, defaultVariation } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
+			const { getBlockVariations, getDefaultBlockVariation } =
+				select( blocksStore );
 
 			return {
 				blocks: getBlocks( clientId ),
+				variations: getBlockVariations( 'core/term-template', 'block' ),
+				defaultVariation: getDefaultBlockVariation(
+					'core/term-template',
+					'block'
+				),
 			};
 		},
 		[ clientId ]
@@ -251,28 +263,34 @@ export default function TermTemplateEdit( {
 		[ filteredTerms, taxonomy ]
 	);
 
-	// Automatically use list view template if no blocks exist.
+	// Show variation picker if no blocks exist.
 	if ( ! blocks?.length ) {
-		setAttributes( { layout: { type: 'default' } } );
-
-		replaceInnerBlocks(
-			clientId,
-			createBlocksFromInnerBlocksTemplate( TEMPLATE ),
-			true
-		);
-
 		return (
-			<ul { ...blockProps }>
-				<li className="wp-block-term term-loading">
-					<div className="term-loading-placeholder" />
-				</li>
-				<li className="wp-block-term term-loading">
-					<div className="term-loading-placeholder" />
-				</li>
-				<li className="wp-block-term term-loading">
-					<div className="term-loading-placeholder" />
-				</li>
-			</ul>
+			<div { ...blockProps }>
+				<BlockVariationPicker
+					icon={ layout }
+					label={ __( 'Term Template' ) }
+					variations={ variations }
+					instructions={ __(
+						'Choose a layout for displaying terms:'
+					) }
+					onSelect={ ( nextVariation = defaultVariation ) => {
+						if ( nextVariation.attributes ) {
+							setAttributes( nextVariation.attributes );
+						}
+						if ( nextVariation.innerBlocks ) {
+							replaceInnerBlocks(
+								clientId,
+								createBlocksFromInnerBlocksTemplate(
+									nextVariation.innerBlocks
+								),
+								true
+							);
+						}
+					} }
+					allowSkip
+				/>
+			</div>
 		);
 	}
 

@@ -30,6 +30,9 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"namespace": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
