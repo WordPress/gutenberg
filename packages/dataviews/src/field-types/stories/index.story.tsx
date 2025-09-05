@@ -33,6 +33,7 @@ const meta = {
 				'default',
 				'array',
 				'checkbox',
+				'color',
 				'date',
 				'datetime',
 				'email',
@@ -71,6 +72,8 @@ type DataType = {
 	emailWithElements: string;
 	telephone: string;
 	telephoneWithElements: string;
+	color: string;
+	colorWithElements: string;
 	url: string;
 	urlWithElements: string;
 	media: string;
@@ -99,6 +102,8 @@ const data: DataType[] = [
 		emailWithElements: 'hi@example.com',
 		telephone: '+1-555-123-4567',
 		telephoneWithElements: '+1-555-123-4567',
+		color: '#ff6600',
+		colorWithElements: 'rgba(255, 102, 0, 0.8)',
 		url: 'https://example.com',
 		urlWithElements: 'https://example.com',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -342,6 +347,7 @@ type ControlTypes =
 	| 'default'
 	| 'array'
 	| 'checkbox'
+	| 'color'
 	| 'date'
 	| 'datetime'
 	| 'email'
