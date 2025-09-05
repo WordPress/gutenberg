@@ -12,6 +12,8 @@ import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
+Context.displayName = 'DisabledContext';
+
 const { Consumer, Provider } = Context;
 
 /**

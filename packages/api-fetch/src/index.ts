@@ -61,21 +61,6 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
-/**
- * Checks the status of a response, throwing the Response as an error if
- * it is outside the 200 range.
- *
- * @param response
- * @return The response if the status is in the 200 range.
- */
-const checkStatus = ( response: Response ) => {
-	if ( response.status >= 200 && response.status < 300 ) {
-		return response;
-	}
-
-	throw response;
-};
-
 const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -89,7 +74,7 @@ const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
+	const responsePromise = globalThis.fetch(
 		// Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
 		url || path || window.location.href,
 		{
@@ -101,13 +86,15 @@ const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	);
 
 	return responsePromise.then(
-		( value ) =>
-			Promise.resolve( value )
-				.then( checkStatus )
-				.catch( ( response ) => parseAndThrowError( response, parse ) )
-				.then( ( response ) =>
-					parseResponseAndNormalizeError( response, parse )
-				),
+		( response ) => {
+			// If the response is not 2xx, still parse the response body as JSON
+			// but throw the JSON as error.
+			if ( ! response.ok ) {
+				return parseAndThrowError( response, parse );
+			}
+
+			return parseResponseAndNormalizeError( response, parse );
+		},
 		( err ) => {
 			// Re-throw AbortError for the users to handle it themselves.
 			if ( err && err.name === 'AbortError' ) {
@@ -116,7 +103,7 @@ const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 
 			// If the browser reports being offline, we'll just assume that
 			// this is why the request failed.
-			if ( ! window.navigator.onLine ) {
+			if ( ! globalThis.navigator.onLine ) {
 				throw {
 					code: 'offline_error',
 					message: __(
@@ -189,10 +176,17 @@ const apiFetch: apiFetch = ( options ) => {
 		}
 
 		// If the nonce is invalid, refresh it and try again.
-		return window
+		return globalThis
 			.fetch( apiFetch.nonceEndpoint! )
-			.then( checkStatus )
-			.then( ( data ) => data.text() )
+			.then( ( response ) => {
+				// If the nonce refresh fails, it means we failed to recover from the original
+				// `rest_cookie_invalid_nonce` error and that it's time to finally re-throw it.
+				if ( ! response.ok ) {
+					return Promise.reject( error );
+				}
+
+				return response.text();
+			} )
 			.then( ( text ) => {
 				apiFetch.nonceMiddleware!.nonce = text;
 				return apiFetch( options );

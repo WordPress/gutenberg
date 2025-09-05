@@ -389,6 +389,7 @@ const ValidationComponent = ( {
 	type ValidatedItem = {
 		text: string;
 		email: string;
+		telephone: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
@@ -397,6 +398,7 @@ const ValidationComponent = ( {
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
 		email: 'hi@example.com',
+		telephone: '+306978241796',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
@@ -412,6 +414,13 @@ const ValidationComponent = ( {
 	const customEmailRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
 			return 'Email address must be from @example.com domain.';
+		}
+
+		return null;
+	};
+	const customTelephoneRule = ( value: ValidatedItem ) => {
+		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
+			return 'Telephone number must start with +30 and have 10 digits after.';
 		}
 
 		return null;
@@ -450,6 +459,15 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'telephone',
+			type: 'telephone',
+			label: 'telephone',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTelephoneRule ),
+			},
+		},
+		{
 			id: 'integer',
 			type: 'integer',
 			label: 'Integer',
@@ -478,7 +496,14 @@ const ValidationComponent = ( {
 
 	const form = {
 		layout: { type },
-		fields: [ 'text', 'email', 'integer', 'boolean', 'customEdit' ],
+		fields: [
+			'text',
+			'email',
+			'telephone',
+			'integer',
+			'boolean',
+			'customEdit',
+		],
 	};
 
 	const canSave = isItemValid( post, _fields, form );
@@ -669,6 +694,8 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 				{
 					id: 'customerCard',
 					label: 'Customer',
+					description:
+						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [
 						{
 							id: 'customerContact',

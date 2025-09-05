@@ -2,14 +2,14 @@
 	// For components based on InputBase
 	&:has(:is(input, select):user-invalid)
 	.components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For TextControl, TextareaControl
 	:is(textarea, input[type="text"]):user-invalid {
-		--wp-admin-theme-color: $alert-red;
-		--wp-components-color-accent: $alert-red;
+		--wp-admin-theme-color: #{$alert-red};
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
@@ -26,13 +26,13 @@
 
 	// For CustomSelectControl
 	&:has(select:user-invalid) .components-input-control__backdrop {
-		--wp-components-color-accent: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 		border-color: $alert-red;
 	}
 
 	// For ToggleGroupControl
 	&:has(input[type="radio"]:invalid) {
-		--wp-components-color-accent: $alert-red;
+		--wp-components-color-accent: #{$alert-red};
 	}
 }
 

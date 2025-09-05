@@ -4,11 +4,19 @@
 
 ### Bug Fixes
 
+-   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
+
+## 30.3.0 (2025-09-03)
+
+### Bug Fixes
+
 -   `Tabs`: Ensure font size inheritance for tab buttons in all contexts ([#71346](https://github.com/WordPress/gutenberg/pull/71346)).
+-   Validated form controls: Fix Sass var handling for red color ([#71391](https://github.com/WordPress/gutenberg/pull/71391)).
 
 ### Internal
 
 -   Upgrade `framer-motion` package to version `^11.15.0` ([#71442](https://github.com/WordPress/gutenberg/pull/71442)).
+-   Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208).
 
 ## 30.2.0 (2025-08-20)
 

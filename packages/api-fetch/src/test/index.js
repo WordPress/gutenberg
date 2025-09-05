@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import apiFetch from '../';
-
-/**
  * Mock response value for a successful fetch.
  *
  * @return {Response} Mock return value.
@@ -15,9 +10,15 @@ const DEFAULT_FETCH_MOCK_RETURN = {
 };
 
 describe( 'apiFetch', () => {
+	let apiFetch;
 	const originalFetch = globalThis.fetch;
 
-	beforeEach( () => {
+	beforeEach( async () => {
+		// Reset the `apiFetch` module before each test to clear
+		// internal variables (middlewares, fetch handler, etc.).
+		jest.resetModules();
+		apiFetch = ( await import( '../' ) ).default;
+
 		globalThis.fetch = jest.fn();
 	} );
 
@@ -241,6 +242,92 @@ describe( 'apiFetch', () => {
 		).rejects.toBe( mockResponse );
 	} );
 
+	it( 'should refetch after successful nonce refresh', async () => {
+		apiFetch.nonceMiddleware =
+			apiFetch.createNonceMiddleware( 'old-nonce' );
+		apiFetch.use( apiFetch.nonceMiddleware );
+		apiFetch.nonceEndpoint = '/rest-nonce';
+
+		globalThis.fetch.mockImplementation( async ( path, options ) => {
+			if ( path.startsWith( '/random' ) ) {
+				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+					return {
+						ok: true,
+						status: 200,
+						json: async () => ( { code: 'success' } ),
+					};
+				}
+
+				return {
+					ok: false,
+					status: 403,
+					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
+				};
+			}
+
+			if ( path.startsWith( '/rest-nonce' ) ) {
+				return {
+					ok: true,
+					status: 200,
+					text: async () => 'new-nonce',
+				};
+			}
+
+			return {
+				ok: false,
+				status: 404,
+				json: async () => ( { code: 'rest_no_route' } ),
+			};
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).resolves.toEqual( {
+			code: 'success',
+		} );
+	} );
+
+	it( 'should fail with rest_cookie_invalid_nonce after failed nonce refresh', async () => {
+		apiFetch.nonceMiddleware =
+			apiFetch.createNonceMiddleware( 'old-nonce' );
+		apiFetch.use( apiFetch.nonceMiddleware );
+		apiFetch.nonceEndpoint = '/rest-nonce';
+
+		globalThis.fetch.mockImplementation( async ( path, options ) => {
+			if ( path.startsWith( '/random' ) ) {
+				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+					return {
+						ok: true,
+						status: 200,
+						json: async () => ( { code: 'success' } ),
+					};
+				}
+
+				return {
+					ok: false,
+					status: 403,
+					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
+				};
+			}
+
+			if ( path.startsWith( '/rest-nonce' ) ) {
+				return {
+					ok: false,
+					status: 400,
+					text: async () => '0',
+				};
+			}
+
+			return {
+				ok: false,
+				status: 404,
+				json: async () => ( { code: 'rest_no_route' } ),
+			};
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'rest_cookie_invalid_nonce',
+		} );
+	} );
+
 	it( 'should not use the default fetch handler when using a custom fetch handler', async () => {
 		const customFetchHandler = jest.fn();
 
@@ -256,13 +343,8 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should run the last-registered user-defined middleware first', async () => {
-		// This could potentially impact other tests in that a lingering
-		// middleware is left. For the purposes of this test, it is sufficient
-		// to ensure that the last-registered middleware receives the original
-		// options object. It also assumes that some built-in middleware would
-		// either mutate or clone the original options if the extra middleware
-		// had been pushed to the stack.
-		expect.assertions( 1 );
+		// The test assumes that some built-in middleware will either mutate or clone
+		// the original options if the extra middleware had been pushed to the stack.
 
 		const expectedOptions = {};
 
@@ -271,6 +353,9 @@ describe( 'apiFetch', () => {
 
 			return next( actualOptions );
 		} );
+
+		// Set a custom fetch handler to avoid using the default fetch handler.
+		apiFetch.setFetchHandler( jest.fn() );
 
 		await apiFetch( expectedOptions );
 	} );

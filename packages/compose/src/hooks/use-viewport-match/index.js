@@ -57,6 +57,7 @@ const OPERATOR_EVALUATORS = {
 const ViewportMatchWidthContext = createContext(
 	/** @type {null | number} */ ( null )
 );
+ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
 
 /**
  * Returns true if the viewport matches the given query, or false otherwise.

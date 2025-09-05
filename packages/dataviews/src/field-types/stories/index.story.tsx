@@ -40,6 +40,7 @@ const meta = {
 				'integer',
 				'radio',
 				'select',
+				'telephone',
 				'text',
 				'toggleGroup',
 			],
@@ -66,6 +67,8 @@ type DataType = {
 	dateWithElements: string;
 	email: string;
 	emailWithElements: string;
+	telephone: string;
+	telephoneWithElements: string;
 	media: string;
 	mediaWithElements: string;
 	array: string[];
@@ -89,6 +92,8 @@ const data: DataType[] = [
 		dateWithElements: '2021-01-01',
 		email: 'hi@example.com',
 		emailWithElements: 'hi@example.com',
+		telephone: '+1-555-123-4567',
+		telephoneWithElements: '+1-555-123-4567',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -211,6 +216,23 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'telephone',
+		type: 'telephone',
+		label: 'Telephone',
+		description: 'Help for telephone.',
+	},
+	{
+		id: 'telephoneWithElements',
+		type: 'telephone',
+		label: 'Telephone (with elements)',
+		description: 'Help for telephone with elements.',
+		elements: [
+			{ value: '+1-555-123-4567', label: '+1-555-123-4567' },
+			{ value: '+44-20-7946-0958', label: '+44-20-7946-0958' },
+			{ value: '+81-3-1234-5678', label: '+81-3-1234-5678' },
+		],
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -296,6 +318,7 @@ type ControlTypes =
 	| 'integer'
 	| 'radio'
 	| 'select'
+	| 'telephone'
 	| 'text'
 	| 'toggleGroup';
 
@@ -522,6 +545,27 @@ export const Email = ( {
 
 	return (
 		<FieldTypeStory fields={ emailFields } type={ type } Edit={ Edit } />
+	);
+};
+
+export const Telephone = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const telephoneFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'telephone' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ telephoneFields }
+			type={ type }
+			Edit={ Edit }
+		/>
 	);
 };
 
