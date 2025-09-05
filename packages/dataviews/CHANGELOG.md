@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.1-next.0 (2025-09-05)
+
 ### Features
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
