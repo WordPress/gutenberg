@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/components';
+import {
+	Icon,
+	privateApis,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
+import { atSymbol, mobile } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -10,7 +15,7 @@ import { useCallback, useState } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
 export type DataFormValidatedTextControlProps< Item > =
 	DataFormControlProps< Item > & {
@@ -18,7 +23,22 @@ export type DataFormValidatedTextControlProps< Item > =
 		 * The input type of the control.
 		 */
 		type?: 'text' | 'email' | 'tel' | 'url';
+		/**
+		 * Optional icon to display as prefix. If not provided, an appropriate icon will be chosen based on the type.
+		 */
+		icon?: React.ComponentType;
 	};
+
+const getIconForType = ( type?: string ) => {
+	switch ( type ) {
+		case 'email':
+			return atSymbol;
+		case 'tel':
+			return mobile;
+		default:
+			return null;
+	}
+};
 
 export default function ValidatedText< Item >( {
 	data,
@@ -26,15 +46,18 @@ export default function ValidatedText< Item >( {
 	onChange,
 	hideLabelFromVision,
 	type,
+	icon,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
-				typeof ValidatedTextControl
+				typeof ValidatedInputControl
 			>[ 'customValidity' ]
 		>( undefined );
+
+	const iconToShow = icon || getIconForType( type );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -45,7 +68,7 @@ export default function ValidatedText< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! field.isValid?.required }
 			onValidate={ ( newValue: any ) => {
 				const message = field.isValid?.custom?.(
@@ -74,6 +97,14 @@ export default function ValidatedText< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			type={ type }
+			prefix={
+				iconToShow ? (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ iconToShow } />
+					</InputControlPrefixWrapper>
+				) : undefined
+			}
+			__next40pxDefaultSize
 		/>
 	);
 }
