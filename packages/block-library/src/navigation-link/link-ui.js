@@ -142,24 +142,34 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						renderControlBottom={ () => (
-							<LinkUITools
-								focusAddBlockButton={ focusAddBlockButton }
-								focusAddPageButton={ focusAddPageButton }
-								setAddingBlock={ () => {
-									setAddingBlock( true );
-									setFocusAddBlockButton( false );
-								} }
-								setAddingPage={ () => {
-									setAddingPage( true );
-									setFocusAddPageButton( false );
-								} }
-								canAddPage={
-									permissions?.canCreate && type === 'page'
-								}
-								canAddBlock={ blockEditingMode === 'default' }
-							/>
-						) }
+						renderControlBottom={ () => {
+							// Don't show the tools when there is submitted link (preview state).
+							if ( link?.url?.length ) {
+								return null;
+							}
+
+							return (
+								<LinkUITools
+									focusAddBlockButton={ focusAddBlockButton }
+									focusAddPageButton={ focusAddPageButton }
+									setAddingBlock={ () => {
+										setAddingBlock( true );
+										setFocusAddBlockButton( false );
+									} }
+									setAddingPage={ () => {
+										setAddingPage( true );
+										setFocusAddPageButton( false );
+									} }
+									canAddPage={
+										permissions?.canCreate &&
+										type === 'page'
+									}
+									canAddBlock={
+										blockEditingMode === 'default'
+									}
+								/>
+							);
+						} }
 					/>
 				</div>
 			) }
