@@ -209,7 +209,7 @@ HTML;
 	 * @covers ::register_block_bindings_source
 	 */
 	public function test_passing_uses_context_to_source() {
-		$get_value_callback = function ( $source_args, $block_instance, $attribute_name ) {
+		$get_value_callback = function ( $source_args, $block_instance ) {
 			$this->assertArrayNotHasKey(
 				'forbiddenSourceContext',
 				$block_instance->context,
