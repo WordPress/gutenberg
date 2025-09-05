@@ -30,11 +30,11 @@ const mockFetchSearchSuggestions = jest.fn();
 
 function getExpectedVisualTypeName( type ) {
 	const builtInLabels = {
-		post: 'Post',
-		page: 'Page',
-		post_tag: 'Tag',
-		category: 'Category',
-		attachment: 'Media',
+		post: 'post',
+		page: 'page',
+		post_tag: 'tag',
+		category: 'category',
+		attachment: 'attachment',
 	};
 
 	return builtInLabels[ type ] || type;
