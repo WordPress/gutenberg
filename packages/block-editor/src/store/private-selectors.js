@@ -18,6 +18,7 @@ import {
 	getClientIdsWithDescendants,
 	isNavigationMode,
 	getBlockRootClientId,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -534,6 +535,11 @@ export function isSectionBlock( state, clientId ) {
 		blockName === 'core/block' ||
 		getTemplateLock( state, clientId ) === 'contentOnly'
 	) {
+		return true;
+	}
+
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes?.metadata?.patternName ) {
 		return true;
 	}
 
