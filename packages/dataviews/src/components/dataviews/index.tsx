@@ -14,6 +14,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useCallback,
 } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
@@ -55,7 +56,7 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 		infiniteScrollHandler?: ( direction: 'up' | 'down' ) => void;
-		intersectionObserverCallback?: IntersectionObserverCallback;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
@@ -156,8 +157,7 @@ function DataViews< Item >( {
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
 }: DataViewsProps< Item > ) {
-	const { infiniteScrollHandler, intersectionObserverCallback } =
-		paginationInfo;
+	const { infiniteScrollHandler, setVisibleEntries } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -201,6 +201,46 @@ function DataViews< Item >( {
 	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >(
 		hasPrimaryOrLockedFilters
 	);
+
+	const intersectionObserverCallback: IntersectionObserverCallback =
+		useCallback(
+			( entries: IntersectionObserverEntry[] ) => {
+				// Calculate new visible entries outside of setState
+				if ( ! setVisibleEntries ) {
+					return;
+				}
+				setVisibleEntries( ( prev ) => {
+					const newVisibleEntries = new Set( prev );
+					let hasChanged = false;
+
+					entries.forEach( ( entry ) => {
+						const posInSet = Number(
+							entry.target?.attributes?.getNamedItem(
+								'aria-posinset'
+							)?.value
+						);
+						if ( isNaN( posInSet ) ) {
+							return;
+						}
+						if ( entry.isIntersecting ) {
+							if ( ! newVisibleEntries.has( posInSet ) ) {
+								newVisibleEntries.add( posInSet );
+								hasChanged = true;
+							}
+						} else if ( newVisibleEntries.has( posInSet ) ) {
+							newVisibleEntries.delete( posInSet );
+							hasChanged = true;
+						}
+					} );
+
+					// Only return new array if something actually changed
+					return hasChanged
+						? Array.from( newVisibleEntries ).sort()
+						: prev;
+				} );
+			},
+			[ setVisibleEntries ]
+		);
 
 	useEffect( () => {
 		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {

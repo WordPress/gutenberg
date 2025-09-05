@@ -539,7 +539,8 @@ export const InfiniteScroll = () => {
 	const [ scrollDirection, setScrollDirection ] = useState<
 		'up' | 'down' | undefined
 	>( undefined );
-	const [ visibleEntries, setVisibleEntries ] = useState< Number[] >( [] );
+
+	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
 
 	const totalItems = data.length;
 	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
@@ -587,40 +588,6 @@ export const InfiniteScroll = () => {
 		},
 		[ isLoadingMore, currentPage, totalPages, view ]
 	);
-
-	const intersectionObserverCallback: IntersectionObserverCallback =
-		useCallback( ( entries: IntersectionObserverEntry[] ) => {
-			// Calculate new visible entries outside of setState
-			setVisibleEntries( ( prev ) => {
-				const newVisibleEntries = new Set( prev );
-				let hasChanged = false;
-
-				entries.forEach( ( entry ) => {
-					const posInSet = Number(
-						entry.target?.attributes?.getNamedItem(
-							'aria-posinset'
-						)?.value
-					);
-					if ( isNaN( posInSet ) ) {
-						return;
-					}
-					if ( entry.isIntersecting ) {
-						if ( ! newVisibleEntries.has( posInSet ) ) {
-							newVisibleEntries.add( posInSet );
-							hasChanged = true;
-						}
-					} else if ( newVisibleEntries.has( posInSet ) ) {
-						newVisibleEntries.delete( posInSet );
-						hasChanged = true;
-					}
-				} );
-
-				// Only return new array if something actually changed
-				return hasChanged
-					? Array.from( newVisibleEntries ).sort()
-					: prev;
-			} );
-		}, [] );
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
@@ -674,13 +641,14 @@ export const InfiniteScroll = () => {
 		shownData,
 		allLoadedRecords.length,
 		scrollDirection,
+		visibleEntries,
 	] );
 
 	const paginationInfo = {
 		totalItems,
 		totalPages,
 		infiniteScrollHandler,
-		intersectionObserverCallback,
+		setVisibleEntries,
 	};
 
 	return (
