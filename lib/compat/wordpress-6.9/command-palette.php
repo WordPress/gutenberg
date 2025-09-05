@@ -1,6 +1,9 @@
 <?php
 /**
  * Enqueues the assets required for the Command Palette.
+ *
+ * @global array  $menu
+ * @global array  $submenu
  */
 function gutenberg_enqueue_command_palette_assets() {
 	global $menu, $submenu;
