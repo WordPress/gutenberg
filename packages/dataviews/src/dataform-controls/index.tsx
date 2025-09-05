@@ -15,6 +15,7 @@ import checkbox from './checkbox';
 import datetime from './datetime';
 import date from './date';
 import email from './email';
+import telephone from './telephone';
 import integer from './integer';
 import radio from './radio';
 import select from './select';
@@ -34,6 +35,7 @@ const FORM_CONTROLS: FormControls = {
 	datetime,
 	date,
 	email,
+	telephone,
 	integer,
 	radio,
 	select,

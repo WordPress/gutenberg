@@ -54,9 +54,6 @@
 		"autoclose": {
 			"type": "boolean",
 			"default": false
-		},
-		"allowedBlocks": {
-			"type": "array"
 		}
 	},
 	"providesContext": {

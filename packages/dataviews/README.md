@@ -381,11 +381,15 @@ The list of selected items' ids.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
 
+Note: `DataViews` still requires at least one bulk action to make items selectable.
+
 #### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items. It receives the list of selected items' IDs as a parameter.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
+
+Note: `DataViews` still requires at least one bulk action to make items selectable.
 
 #### `isItemClickable`: `function`
 
@@ -495,6 +499,78 @@ When using free composition, developers are responsible for the outer structure 
 Developers don't need to worry about the internal accessibility logic for individual features. The core behaviors — like search semantics, filter toggles, or pagination focus — are encapsulated.
 
 `FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
+
+## `DataViewsPicker`
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
+
+### Usage
+
+The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
+
+The component behaves differently to a regular `DataViews` component in the following ways:
+
+-   The items in the view are rendered using the `listbox` and `option` aria roles.
+-   Holding the `ctrl` or `cmd` key isn't required for multi-selection of items. The entire item can be clicked to select or deselect it.
+-   Individual items do not display any actions. All actions appear in the footer as text buttons.
+-   Selection is maintained across multiple pages when the component is paginated.
+
+There are also a few differences in the implementation:
+
+-   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
+-   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
+-   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
+-   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
+-   Only the `callback` style of action is supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
+
+Example:
+
+```jsx
+const Example = () => {
+	// When using DataViewsPicker, `selection` should be managed so that the component is 'controlled'.
+	const [ selection, setSelection ] = useState( [] );
+
+	// Both actions have `supportsBulk: true`, so the `DataViewsPicker` will allow multi-selection.
+	const actions = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: true,
+			callback() {
+				window.alert( selection.join( ', ' ) );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: true,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
+	return (
+		<DataViewsPicker
+			actions={ actions }
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			paginationInfo={ paginationInfo }
+			selection={ selection }
+			onChangeSelection={ setSelection }
+		/>
+	);
+};
+```
+
+### Properties
 
 ## `DataForm`
 

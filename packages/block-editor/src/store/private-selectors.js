@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,6 +33,8 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -80,6 +83,32 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 	};
 	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 };
+
+/**
+ * Determines if a container (clientId) allows insertion of blocks, considering contentOnly mode restrictions.
+ *
+ * @param {Object} state        Editor state.
+ * @param {string} blockName    The block name to insert.
+ * @param {string} rootClientId The client ID of the root container block.
+ * @return {boolean} Whether the container allows insertion.
+ */
+export function isContainerInsertableToInWriteMode(
+	state,
+	blockName,
+	rootClientId
+) {
+	const isBlockContentBlock = isContentBlock( blockName );
+	const rootBlockName = getBlockName( state, rootClientId );
+	const isContainerContentBlock = isContentBlock( rootBlockName );
+	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
+
+	// In write mode, containers shouldn't be inserted into unless:
+	// 1. they are a section root;
+	// 2. they are a content block and the block to be inserted is also content.
+	return (
+		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
+	);
+}
 
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );

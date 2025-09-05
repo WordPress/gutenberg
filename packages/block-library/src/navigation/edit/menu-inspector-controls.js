@@ -35,7 +35,8 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, removeBlock } =
+		useDispatch( blockEditorStore );
 
 	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT?.includes(
 		insertedBlock?.name
@@ -47,6 +48,27 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 		return null;
 	}
 
+	/**
+	 * Cleanup function for auto-inserted Navigation Link blocks.
+	 *
+	 * Removes the block if it has no URL and clears the inserted block state.
+	 * This ensures consistent cleanup behavior across different contexts.
+	 */
+	const cleanupInsertedBlock = () => {
+		// Prevent automatic block selection when removing blocks in list view context
+		// This avoids focus stealing that would close the list view and switch to canvas
+		const shouldAutoSelectBlock = false;
+
+		// Follows the exact same pattern as Navigation Link block's onClose handler
+		// If there is no URL then remove the auto-inserted block to avoid empty blocks
+		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+			// Remove the block entirely to avoid poor UX
+			// This matches the Navigation Link block's behavior
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( null );
+	};
+
 	const setInsertedBlockAttributes =
 		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
 			if ( ! _insertedBlockClientId ) {
@@ -55,12 +77,28 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
+	// Wrapper function to clean up original block when a new block is selected
+	const handleSetInsertedBlock = ( newBlock ) => {
+		// Prevent automatic block selection when removing blocks in list view context
+		// This avoids focus stealing that would close the list view and switch to canvas
+		const shouldAutoSelectBlock = false;
+
+		// If we have an existing inserted block and a new block is being set,
+		// remove the original block to avoid duplicates
+		if ( insertedBlock?.clientId && newBlock ) {
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( newBlock );
+	};
+
 	return (
 		<LinkUI
 			clientId={ insertedBlock?.clientId }
 			link={ insertedBlock?.attributes }
+			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
-				setInsertedBlock( null );
+				// Use cleanup function
+				cleanupInsertedBlock();
 			} }
 			onChange={ ( updatedValue ) => {
 				updateAttributes(
@@ -68,9 +106,6 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 					setInsertedBlockAttributes( insertedBlock?.clientId ),
 					insertedBlock?.attributes
 				);
-				setInsertedBlock( null );
-			} }
-			onCancel={ () => {
 				setInsertedBlock( null );
 			} }
 		/>
