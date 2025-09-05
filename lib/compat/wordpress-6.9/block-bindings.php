@@ -311,6 +311,7 @@ function gutenberg_get_block_bindings_processor( string $block_content ) {
 		 * @param string $rich_text The rich text to replace the original content with.
 		 * @return bool True on success.
 		 */
+		// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 		public function replace_rich_text( $rich_text ) {
 			if ( $this->is_tag_closer() || ! $this->expects_closer() ) {
 				return false;
