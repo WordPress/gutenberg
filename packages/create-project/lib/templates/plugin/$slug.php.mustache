@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name:       {{title}}
+ * Plugin Name:       {{pluginTitle}}
 {{#pluginURI}}
  * Plugin URI:        {{{pluginURI}}}
 {{/pluginURI}}
-{{#description}}
- * Description:       {{description}}
-{{/description}}
+{{#pluginDescription}}
+ * Description:       {{pluginDescription}}
+{{/pluginDescription}}
  * Version:           {{version}}
 {{#requiresAtLeast}}
  * Requires at least: {{requiresAtLeast}}
@@ -23,7 +23,7 @@
 {{#licenseURI}}
  * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
- * Text Domain:       {{textdomain}}
+ * Text Domain:       {{pluginTextdomain}}
 {{#domainPath}}
  * Domain Path:       {{{domainPath}}}
 {{/domainPath}}
@@ -31,7 +31,7 @@
  * Update URI:        {{{updateURI}}}
 {{/updateURI}}
  *
- * @package {{namespacePascalCase}}
+ * @package {{pluginSlugPascalCase}}
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 {{/wpScripts}}
-function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
+function {{pluginSlugSnakeCase}}_block_init() {
 {{#wpScripts}}
 	/**
 	 * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
@@ -90,7 +90,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 	}
 {{/wpScripts}}
 {{^wpScripts}}
-	register_block_type( __DIR__ . '/build/{{slug}}' );
+	register_block_type( __DIR__ . '/build/{{pluginSlug}}' );
 {{/wpScripts}}
 }
-add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );
+add_action( 'init', '{{pluginSlugSnakeCase}}_block_init' );

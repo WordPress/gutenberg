@@ -25,6 +25,7 @@ module.exports = async ( {
 	isDynamicVariant,
 	customPackageJSON,
 	rootDirectory,
+	theme,
 } ) => {
 	info( '' );
 	info( 'Creating a "package.json" file.' );
@@ -45,7 +46,11 @@ module.exports = async ( {
 						build:
 							( isDynamicVariant
 								? 'wp-scripts build --webpack-copy-php'
-								: 'wp-scripts build' ) + ' --blocks-manifest',
+								: 'wp-scripts build' ) +
+							' --blocks-manifest' +
+							( theme
+								? ' --webpack-src-dir=./assets/src/blocks --output-path=./assets/build/blocks'
+								: '' ),
 						format: 'wp-scripts format',
 						'lint:css': 'wp-scripts lint-style',
 						'lint:js': 'wp-scripts lint-js',
@@ -54,7 +59,11 @@ module.exports = async ( {
 						start:
 							( isDynamicVariant
 								? 'wp-scripts start --webpack-copy-php'
-								: 'wp-scripts start' ) + ' --blocks-manifest',
+								: 'wp-scripts start' ) +
+							' --blocks-manifest' +
+							( theme
+								? ' --webpack-src-dir=./assets/src --output-path=./assets/build'
+								: '' ),
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,

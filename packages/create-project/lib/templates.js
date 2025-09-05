@@ -22,84 +22,95 @@ const prompts = require( './prompts' );
 const predefinedProjectTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'example-project-es5',
-			title: 'Example Project (ES5)',
+			pluginSlug: 'example-plugin-es5',
+			pluginTitle: 'Example Plugin (ES5)',
+			themeSlug: 'example-theme-es5',
+			themeTitle: 'Example Theme (ES5)',
+			blockSlug: 'example-block-es5',
+			blockTitle: 'Example Block (ES5)',
+			blueprintSlug: 'example-blueprint-es5',
+			blueprintTitle: 'Example Blueprint (ES5)',
 			description:
 				'Example project scaffolded with Create Project tool – no build step required.',
-			dashicon: 'smiley',
-			supports: {
+			blockDashicon: 'smiley',
+			blockSupports: {
 				html: false,
 			},
 			wpScripts: false,
-			editorScript: null,
-			editorStyle: null,
-			style: null,
-			viewStyle: null,
-			viewScript: 'file:./view.js',
-			example: {},
+			blockEditorScript: null,
+			blockEditorStyle: null,
+			blockStyle: null,
+			blockViewStyle: null,
+			blockViewScript: 'file:./view.js',
+			blockExample: {},
 		},
 		templatesPath: join( __dirname, 'templates', 'es5' ),
 		variants: {
 			plugin: {
-				slug: 'example-plugin-es5',
-				title: 'Example Plugin (ES5)',
+				pluginSlug: 'example-plugin-es5',
+				pluginTitle: 'Example Plugin (ES5)',
 			},
 			theme: {
-				slug: 'example-theme-es5',
-				title: 'Example Theme (ES5)',
+				themeSlug: 'example-theme-es5',
+				themeTitle: 'Example Theme (ES5)',
 			},
 			block: {
-				slug: 'example-block-es5',
-				title: 'Example Block (ES5)',
+				blockSlug: 'example-block-es5',
+				blockTitle: 'Example Block (ES5)',
 				static: {},
 				dynamic: {
-					slug: 'example-dynamic-block-es5',
-					title: 'Example Dynamic Block (ES5)',
-					render: 'file:./render.php',
+					blockSlug: 'example-dynamic-block-es5',
+					blockTitle: 'Example Dynamic Block (ES5)',
+					blockRender: 'file:./render.php',
 				},
 			},
 		},
 	},
 	standard: {
 		defaultValues: {
-			slug: 'example-project',
-			title: 'Example Project',
+			pluginSlug: 'example-plugin',
+			pluginTitle: 'Example Plugin',
+			themeSlug: 'example-theme',
+			themeTitle: 'Example Theme',
+			blockSlug: 'example-block',
+			blockTitle: 'Example Block',
+			blueprintSlug: 'example-blueprint',
+			blueprintTitle: 'Example Blueprint',
 			description: 'Example project scaffolded with Create Project tool.',
-			dashicon: 'smiley',
-			supports: {
+			blockDashicon: 'smiley',
+			blockSupports: {
 				html: false,
 			},
-			viewScript: 'file:./view.js',
-			example: {},
+			blockViewScript: 'file:./view.js',
+			blockExample: {},
 			folderName: './src/$slug',
 		},
 		variants: {
 			plugin: {
-				slug: 'example-plugin',
-				title: 'Example Plugin',
+				pluginSlug: 'example-plugin',
+				pluginTitle: 'Example Plugin',
 			},
 			theme: {
-				slug: 'example-theme',
-				title: 'Example Theme',
+				themeSlug: 'example-theme',
+				themeTitle: 'Example Theme',
 			},
 			fse: {
-				slug: 'example-fse-theme',
-				title: 'Example FSE Theme',
-				wpScripts: false,
+				themeSlug: 'example-fse-theme',
+				themeTitle: 'Example FSE Theme',
 			},
 			classic: {
-				slug: 'example-classic-theme',
-				title: 'Example Classic Theme',
+				themeSlug: 'example-classic-theme',
+				themeTitle: 'Example Classic Theme',
 				wpScripts: true,
 			},
 			block: {
-				slug: 'example-block',
-				title: 'Example Block',
+				blockSlug: 'example-block',
+				blockTitle: 'Example Block',
 				static: {},
 				dynamic: {
-					slug: 'example-dynamic-block',
-					title: 'Example Dynamic Block',
-					render: 'file:./render.php',
+					blockSlug: 'example-dynamic-block',
+					blockTitle: 'Example Dynamic Block',
+					blockRender: 'file:./render.php',
 				},
 			},
 		},
@@ -180,6 +191,7 @@ const configToTemplate = async ( {
 	pluginTemplatesPath,
 	themeTemplatesPath,
 	blockTemplatesPath,
+	blueprintTemplatesPath,
 	assetsPath,
 	defaultValues = {},
 	variants = {},
@@ -205,6 +217,9 @@ const configToTemplate = async ( {
 			pluginTemplatesPath || join( __dirname, 'templates', 'plugin' );
 		blockTemplatesPath =
 			blockTemplatesPath || join( __dirname, 'templates', 'block' );
+		blueprintTemplatesPath =
+			blueprintTemplatesPath ||
+			join( __dirname, 'templates', 'blueprint' );
 
 		// For themes, use the new multi-path system
 		if ( themeTemplatesPath ) {
@@ -223,6 +238,9 @@ const configToTemplate = async ( {
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
 		themeOutputTemplates: await getOutputTemplates( themeTemplatesPath ),
 		blockOutputTemplates: await getOutputTemplates( blockTemplatesPath ),
+		blueprintOutputTemplates: await getOutputTemplates(
+			blueprintTemplatesPath
+		),
 		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		defaultValues,
 		variants,
@@ -326,14 +344,12 @@ const getDefaultValues = (
 	variant,
 	projectType = 'plugin',
 	blockVariant = null,
-	withBlocks = false
+	withBlocks = false,
+	computedNamespace = null
 ) => {
 	const baseDefaults = {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
 		apiVersion: 3,
-		namespace: 'create-project',
-		category: 'widgets',
-		textdomain: '',
 		author: 'The WordPress Contributors',
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
@@ -346,9 +362,6 @@ const getDefaultValues = (
 		wpEnv: false,
 		npmDependencies: [],
 		folderName: './src',
-		editorScript: 'file:./index.js',
-		editorStyle: 'file:./index.css',
-		style: 'file:./style-index.css',
 		transformer: ( view ) => view,
 		// Project type specific defaults
 		type: projectType,
@@ -356,27 +369,116 @@ const getDefaultValues = (
 		theme: projectType === 'theme',
 		block: projectType === 'block',
 		withBlocks,
+		// Block-specific defaults
+		blockCategory: 'widgets',
+		blockEditorScript: 'file:./index.js',
+		blockEditorStyle: 'file:./index.css',
+		blockStyle: 'file:./style-index.css',
 	};
 
 	// Project type specific configurations
 	if ( projectType === 'theme' ) {
-		baseDefaults.themeURI = '';
-		baseDefaults.requiresWP = '6.7';
-		baseDefaults.tags = '';
-
-		// FSE theme by default (no build process needed)
-		if ( variant === 'classic' ) {
-			// Classic theme with build process
-			baseDefaults.folderName = './assets';
-			baseDefaults.wpScripts = true;
-		} else {
-			// FSE theme (no build process unless with blocks)
+		// Set variant-aware defaults
+		if ( variant === 'fse' ) {
+			baseDefaults.themeSlug = 'example-fse-theme';
+			baseDefaults.themeTitle = 'Example FSE Theme';
+			baseDefaults.themeDescription =
+				'A modern block-based WordPress theme.';
 			baseDefaults.folderName = './blocks';
 			baseDefaults.wpScripts = withBlocks;
+			baseDefaults.themeTags =
+				'block-themes, full-site-editing, custom-colors, custom-spacing';
+		} else if ( variant === 'classic' ) {
+			baseDefaults.themeSlug = 'example-classic-theme';
+			baseDefaults.themeTitle = 'Example Classic Theme';
+			baseDefaults.themeDescription =
+				'A traditional WordPress theme with modern tooling.';
+			baseDefaults.folderName = './assets';
+			baseDefaults.wpScripts = true;
+			baseDefaults.themeTags =
+				'custom-background, custom-colors, custom-header, custom-menu';
+		} else {
+			// Default theme values
+			baseDefaults.themeSlug = 'example-theme';
+			baseDefaults.themeTitle = 'Example Theme';
+			baseDefaults.themeDescription =
+				'Example theme scaffolded with Create Project tool.';
+			baseDefaults.folderName = './src';
+		}
+
+		baseDefaults.themeURI = '';
+		baseDefaults.themeRequiresWP = '6.7';
+		baseDefaults.themeTextdomain = baseDefaults.themeSlug;
+
+		// Block-specific defaults for themes with blocks
+		if ( withBlocks ) {
+			baseDefaults.blockSlug = 'custom-block';
+			baseDefaults.blockTitle = 'Custom Block';
+			baseDefaults.blockDescription = `Custom block for ${ baseDefaults.themeTitle }.`;
+			baseDefaults.blockNamespace =
+				computedNamespace || baseDefaults.themeSlug;
+			baseDefaults.blockTextdomain = baseDefaults.themeSlug;
+			baseDefaults.wpScripts = true;
+		}
+	} else if ( projectType === 'plugin' ) {
+		baseDefaults.pluginSlug = 'example-plugin';
+		baseDefaults.pluginTitle = 'Example Plugin';
+		baseDefaults.pluginDescription =
+			'Example plugin scaffolded with Create Project tool.';
+		baseDefaults.pluginURI = '';
+		baseDefaults.pluginTextdomain = 'example-plugin';
+		baseDefaults.pluginDomainPath = '/languages';
+		baseDefaults.pluginUpdateURI = '';
+
+		// Block-specific defaults for plugins with blocks
+		if ( withBlocks ) {
+			baseDefaults.blockSlug = 'custom-block';
+			baseDefaults.blockTitle = 'Custom Block';
+			baseDefaults.blockDescription = `Custom block for ${ baseDefaults.pluginTitle }.`;
+			baseDefaults.blockNamespace =
+				computedNamespace || baseDefaults.pluginSlug;
+			baseDefaults.blockTextdomain = baseDefaults.pluginSlug;
+			baseDefaults.wpScripts = true;
 		}
 	} else if ( projectType === 'block' ) {
 		// Standalone block in root
+		if ( blockVariant === 'dynamic' ) {
+			baseDefaults.blockSlug = 'custom-dynamic-block';
+			baseDefaults.blockTitle = 'Custom Dynamic Block';
+			baseDefaults.blockDescription =
+				'A dynamic block that renders server-side.';
+			baseDefaults.blockRender = 'file:./render.php';
+		} else {
+			baseDefaults.blockSlug = 'custom-block';
+			baseDefaults.blockTitle = 'Custom Block';
+			baseDefaults.blockDescription =
+				'A static block that saves content to the database.';
+		}
+		baseDefaults.blockNamespace = computedNamespace || 'create-project';
 		baseDefaults.folderName = '.';
+		baseDefaults.wpScripts = true;
+		baseDefaults.blockTextdomain = baseDefaults.blockSlug;
+	} else if ( projectType === 'blueprint' ) {
+		// Defaults for blueprints
+		baseDefaults.blueprintSlug = 'example-blueprint';
+		baseDefaults.blueprintTitle = 'Example Blueprint';
+		baseDefaults.blueprintDescription =
+			'Example blueprint scaffolded with Create Project tool.';
+		baseDefaults.blueprintLandingPage = '/wp-admin/';
+		baseDefaults.blueprintLogin = true;
+		baseDefaults.blueprintPreferredVersions = {
+			php: 'latest',
+			wp: 'latest',
+		};
+		baseDefaults.blueprintFeatures = { networking: false, intl: false };
+		baseDefaults.blueprintExtraLibraries = [];
+		baseDefaults.blueprintConstants = {};
+		baseDefaults.blueprintPlugins = '';
+		baseDefaults.blueprintThemes = '';
+		baseDefaults.blueprintSiteOptions = {};
+		baseDefaults.blueprintResetData = false;
+		baseDefaults.blueprintSteps = [];
+		baseDefaults.blueprintMeta = null;
 		baseDefaults.wpScripts = false;
 	}
 
@@ -405,7 +507,8 @@ const runPrompts = async (
 		variant,
 		optionsValues.type,
 		optionsValues.blockVariant,
-		optionsValues.withBlocks
+		optionsValues.withBlocks,
+		null // No computed namespace in runPrompts context
 	);
 	const result = {};
 	for ( const promptName of promptNames ) {

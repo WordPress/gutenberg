@@ -1,0 +1,184 @@
+=== {{title}} ===
+Contributors: {{#meta.author}}{{meta.author}}{{/meta.author}}{{^meta.author}}{{author}}{{/meta.author}}
+Tags: {{#meta.categories}}{{#meta.categories}}{{.}}{{^@last}}, {{/@last}}{{/meta.categories}}{{/meta.categories}}{{^meta.categories}}wordpress, playground, blueprint{{/meta.categories}}
+Requires at least: {{preferredVersions.wp}}
+Tested up to: {{preferredVersions.wp}}
+Requires PHP: {{preferredVersions.php}}
+Stable tag: 1.0.0
+License: GPL v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+{{#meta.description}}{{meta.description}}{{/meta.description}}{{^meta.description}}{{description}}{{/meta.description}}
+
+== Description ==
+
+This is a WordPress Playground Blueprint that sets up a complete WordPress environment with pre-configured plugins, themes, and settings.
+
+{{#meta.description}}
+{{meta.description}}
+{{/meta.description}}
+{{^meta.description}}
+{{#description}}
+{{description}}
+{{/description}}
+{{^description}}
+This blueprint creates a WordPress environment ready for development or demonstration purposes.
+{{/description}}
+{{/meta.description}}
+
+== What's Included ==
+
+{{#plugins}}
+**Plugins:**
+{{#plugins}}
+* {{.}}
+{{/plugins}}
+
+{{/plugins}}
+{{#steps}}
+{{#steps}}
+{{#step}}
+{{#installTheme}}
+**Themes:**
+{{/installTheme}}
+{{/step}}
+{{/steps}}
+{{#steps}}
+{{#step}}
+{{#installTheme}}
+* {{themeData.slug}}{{#options.activate}} (activated){{/options.activate}}
+{{/installTheme}}
+{{/step}}
+{{/steps}}
+
+{{/steps}}
+**WordPress Configuration:**
+* WordPress Version: {{preferredVersions.wp}}
+* PHP Version: {{preferredVersions.php}}
+* Landing Page: {{landingPage}}
+* Auto Login: {{#login}}Enabled{{/login}}{{^login}}Disabled{{/login}}
+{{#features.networking}}* Networking Support: Enabled{{/features.networking}}
+{{#features.intl}}* Internationalization: Enabled{{/features.intl}}
+
+{{#extraLibraries}}
+**Extra Libraries:**
+{{#extraLibraries}}
+* {{.}}
+{{/extraLibraries}}
+
+{{/extraLibraries}}
+{{#siteOptionsJson}}
+**Site Configuration:**
+{{#siteOptions.blogname}}
+* Site Title: {{siteOptions.blogname}}
+{{/siteOptions.blogname}}
+{{#siteOptions.blogdescription}}
+* Site Tagline: {{siteOptions.blogdescription}}
+{{/siteOptions.blogdescription}}
+{{#siteOptions.admin_email}}
+* Admin Email: {{siteOptions.admin_email}}
+{{/siteOptions.admin_email}}
+
+{{/siteOptionsJson}}
+{{#constantsJson}}
+**PHP Constants:**
+{{#constants.WP_DEBUG}}
+* WP_DEBUG: {{constants.WP_DEBUG}}
+{{/constants.WP_DEBUG}}
+{{#constants.WP_DEBUG_LOG}}
+* WP_DEBUG_LOG: {{constants.WP_DEBUG_LOG}}
+{{/constants.WP_DEBUG_LOG}}
+{{#constants.WP_DEBUG_DISPLAY}}
+* WP_DEBUG_DISPLAY: {{constants.WP_DEBUG_DISPLAY}}
+{{/constants.WP_DEBUG_DISPLAY}}
+{{#constants.SCRIPT_DEBUG}}
+* SCRIPT_DEBUG: {{constants.SCRIPT_DEBUG}}
+{{/constants.SCRIPT_DEBUG}}
+
+{{/constantsJson}}
+== How to Use ==
+
+**Method 1: WordPress Playground Web Interface**
+1. Go to https://playground.wordpress.net/
+2. Click "Load Blueprint"
+3. Upload the `blueprint.json` file from this directory
+4. Click "Run Blueprint"
+
+**Method 2: Direct URL (if hosted publicly)**
+```
+https://playground.wordpress.net/?blueprint-url=https://your-domain.com/path/to/blueprint.json
+```
+
+**Method 3: WordPress Playground CLI**
+1. Install the WordPress Playground CLI:
+   ```bash
+   npm install -g @wp-playground/cli
+   ```
+2. Run the blueprint:
+   ```bash
+   wp-playground --blueprint=./blueprint.json
+   ```
+
+**Method 4: Local Development**
+1. Clone or download this blueprint
+2. Use with any WordPress Playground compatible tool
+3. Point to the `blueprint.json` file
+
+== Blueprint Structure ==
+
+This blueprint follows the WordPress Playground Blueprint schema v1. The main file is:
+
+* `blueprint.json` - The main blueprint configuration file
+* `README.txt` - This documentation file
+
+== Customization ==
+
+You can customize this blueprint by editing the `blueprint.json` file:
+
+1. **Add/Remove Plugins**: Modify the `plugins` array
+2. **Change Themes**: Modify the installation steps for themes
+3. **Update Site Options**: Modify the `siteOptions` object
+4. **Configure Constants**: Modify the `constants` object
+5. **Add Custom Steps**: Add new steps to the `steps` array
+
+== Troubleshooting ==
+
+**Blueprint doesn't load:**
+- Ensure the `blueprint.json` file is valid JSON
+- Check that all referenced plugins and themes exist
+- Verify the blueprint schema is correct
+
+**Plugins/Themes don't install:**
+- Check plugin/theme slugs are correct
+- Ensure they're available on WordPress.org
+- For custom plugins/themes, use proper FileReference format
+
+**Site options don't apply:**
+- Verify option names match WordPress database option names
+- Check that values are properly formatted
+
+== Support ==
+
+{{#meta.author}}
+For support with this blueprint, contact {{meta.author}} on GitHub.
+{{/meta.author}}
+{{^meta.author}}
+For general WordPress Playground support, visit:
+* https://github.com/WordPress/wordpress-playground
+* https://github.com/WordPress/blueprints
+{{/meta.author}}
+
+== Resources ==
+
+* [WordPress Playground](https://playground.wordpress.net/)
+* [Blueprint Documentation](https://github.com/WordPress/blueprints)
+* [Blueprint Schema](https://playground.wordpress.net/blueprint-schema.json)
+* [WordPress Playground CLI](https://www.npmjs.com/package/@wp-playground/cli)
+
+== Changelog ==
+
+= 1.0.0 =
+* Initial blueprint release
+* {{#plugins}}Includes {{plugins.length}} plugin(s){{/plugins}}
+* {{#steps}}{{#steps}}{{#installTheme}}Includes theme installation{{/installTheme}}{{/steps}}{{/steps}}
+* Pre-configured WordPress environment
