@@ -16,8 +16,9 @@ export { privateApis } from './private-apis';
 const { RouterProvider } = unlock( routerPrivateApis );
 
 // Register core commands and render the Command Palette.
-function CommandPalette() {
-	useAdminNavigationCommands();
+function CommandPalette( { settings } ) {
+	const { menu_commands: menuCommands } = settings;
+	useAdminNavigationCommands( menuCommands );
 	useSiteEditorNavigationCommands();
 	return (
 		<RouterProvider pathArg="p">
@@ -28,13 +29,15 @@ function CommandPalette() {
 
 /**
  * Initializes the Command Palette.
+ *
+ * @param {Object} settings Command palette settings.
  */
-export function initializeCommandPalette() {
+export function initializeCommandPalette( settings ) {
 	const root = document.createElement( 'div' );
 	document.body.appendChild( root );
 	createRoot( root ).render(
 		<StrictMode>
-			<CommandPalette />
+			<CommandPalette settings={ settings } />
 		</StrictMode>
 	);
 }

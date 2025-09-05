@@ -9,13 +9,16 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
-import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
-import { useFocusOnMount } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import DialogWrapper from './dialog-wrapper';
 
 /**
  * Component for creating new pages within the Navigation Link UI.
@@ -34,9 +37,6 @@ export function LinkUIPageCreator( {
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( false );
-
-	// Focus the first element when the component mounts
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 
 	// Check if the title is valid for submission
 	const isTitleValid = title.trim().length > 0;
@@ -95,19 +95,12 @@ export function LinkUIPageCreator( {
 	const isSubmitDisabled = isSaving || ! isTitleValid;
 
 	return (
-		<div className="link-ui-page-creator" ref={ focusOnMountRef }>
-			<Button
-				className="link-ui-page-creator__back"
-				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					onBack();
-				} }
-				size="small"
-			>
-				{ __( 'Back' ) }
-			</Button>
-
+		<DialogWrapper
+			className="link-ui-page-creator"
+			title={ __( 'Create page' ) }
+			description={ __( 'Create a new page to add to your Navigation.' ) }
+			onBack={ onBack }
+		>
 			<VStack className="link-ui-page-creator__inner" spacing={ 4 }>
 				<form onSubmit={ createPage }>
 					<VStack spacing={ 4 }>
@@ -159,6 +152,6 @@ export function LinkUIPageCreator( {
 					</VStack>
 				</form>
 			</VStack>
-		</div>
+		</DialogWrapper>
 	);
 }

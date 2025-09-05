@@ -40,6 +40,7 @@ import type {
 } from '../../types';
 import type { SetSelection } from '../../private-types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 
 interface GridItemProps< Item > {
@@ -369,16 +370,12 @@ function ViewGrid< Item >( {
 											groupName
 										) }
 									</h3>
-									<div
+									<GridItems
 										className={ clsx(
 											'dataviews-view-grid',
 											className
 										) }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
+										previewSize={ usedPreviewSize }
 										aria-busy={ isLoading }
 										ref={ resizeObserverRef }
 									>
@@ -419,7 +416,7 @@ function ViewGrid< Item >( {
 												/>
 											);
 										} ) }
-									</div>
+									</GridItems>
 								</VStack>
 							)
 						) }
@@ -430,13 +427,9 @@ function ViewGrid< Item >( {
 			{
 				// Render a single grid with all data.
 				hasData && ! dataByGroup && (
-					<div
+					<GridItems
 						className={ clsx( 'dataviews-view-grid', className ) }
-						style={ {
-							gridTemplateColumns:
-								usedPreviewSize &&
-								`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-						} }
+						previewSize={ usedPreviewSize }
 						aria-busy={ isLoading }
 						ref={ resizeObserverRef }
 						role={ isInfiniteScroll ? 'feed' : undefined }
@@ -469,7 +462,7 @@ function ViewGrid< Item >( {
 								/>
 							);
 						} ) }
-					</div>
+					</GridItems>
 				)
 			}
 			{

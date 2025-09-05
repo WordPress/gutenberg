@@ -21,6 +21,8 @@ import { default as date } from './date';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
 import { default as array } from './array';
+import { default as telephone } from './telephone';
+import { default as url } from './url';
 import { renderFromElements } from '../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
@@ -63,6 +65,14 @@ export default function getFieldTypeDefinition< Item >(
 
 	if ( 'array' === type ) {
 		return array;
+	}
+
+	if ( 'telephone' === type ) {
+		return telephone;
+	}
+
+	if ( 'url' === type ) {
+		return url;
 	}
 
 	// This is a fallback for fields that don't provide a type.

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
+
+### Features
+
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+- Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
+- DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
+- Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
+
 ## 8.0.0 (2025-09-03)
 
 ### Breaking changes
@@ -11,6 +22,7 @@
 ### Enhancements
 
 -   DataForm: add description support for the combined fields and show the description in the Card layout ([#71380](https://github.com/WordPress/gutenberg/pull/71380)).
+-   Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
 ### Internal
 
@@ -20,10 +32,6 @@
 
 -   DataViews: Fix incorrect documentation for `defaultLayouts` prop. [#71334](https://github.com/WordPress/gutenberg/pull/71334)
 -   DataViews: Fix mismatched padding on mobile viewports for grid layout [#71455](https://github.com/WordPress/gutenberg/pull/71455)
-
-### Enhancements
-
-- Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
 
 ## 7.0.0 (2025-08-20)
 
