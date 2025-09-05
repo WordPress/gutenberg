@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import mediaUploadMiddleware from '../media-upload';
 
 describe( 'Media Upload Middleware', () => {
@@ -8,7 +9,7 @@ describe( 'Media Upload Middleware', () => {
 		expect.hasAssertions();
 
 		const originalOptions = { path: '/wp/v2/media' };
-		const next = ( options ) => {
+		const next: FetchHandler = async ( options ) => {
 			expect( options ).toBe( originalOptions );
 		};
 

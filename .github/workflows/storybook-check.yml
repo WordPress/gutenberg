@@ -15,7 +15,7 @@ permissions: {}
 
 jobs:
     check:
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}

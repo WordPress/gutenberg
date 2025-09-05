@@ -1,15 +1,18 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import httpV1Middleware from '../http-v1';
 
 describe( 'HTTP v1 Middleware', () => {
 	it( 'should use a POST for a PUT requests', () => {
 		expect.hasAssertions();
 
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.method ).toBe( 'POST' );
-			expect( options.headers[ 'X-HTTP-Method-Override' ] ).toBe( 'PUT' );
+			expect( options.headers![ 'X-HTTP-Method-Override' ] ).toBe(
+				'PUT'
+			);
 		};
 
 		httpV1Middleware( { method: 'PUT', data: {} }, callback );
@@ -19,7 +22,7 @@ describe( 'HTTP v1 Middleware', () => {
 		expect.hasAssertions();
 
 		const requestOptions = { method: 'GET', path: '/wp/v2/posts' };
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options ).toBe( requestOptions );
 		};
 
@@ -30,7 +33,7 @@ describe( 'HTTP v1 Middleware', () => {
 		expect.hasAssertions();
 
 		const requestOptions = { path: '/wp/v2/posts' };
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options ).toBe( requestOptions );
 		};
 

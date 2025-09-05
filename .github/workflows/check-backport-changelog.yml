@@ -26,7 +26,7 @@ permissions: {}
 jobs:
     check:
         name: Check for a Core backport changelog entry
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}

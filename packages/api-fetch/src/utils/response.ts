@@ -6,12 +6,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Parses the apiFetch response.
  *
- * @param {Response} response
- * @param {boolean}  shouldParseResponse
+ * @param response
+ * @param shouldParseResponse
  *
- * @return {Promise<any> | null | Response} Parsed response.
+ * @return Parsed response.
  */
-const parseResponse = ( response, shouldParseResponse = true ) => {
+const parseResponse = ( response: Response, shouldParseResponse = true ) => {
 	if ( shouldParseResponse ) {
 		if ( response.status === 204 ) {
 			return null;
@@ -27,10 +27,10 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
  * Calls the `json` function on the Response, throwing an error if the response
  * doesn't have a json function or if parsing the json itself fails.
  *
- * @param {Response} response
- * @return {Promise<any>} Parsed response.
+ * @param response
+ * @return Parsed response.
  */
-const parseJsonAndNormalizeError = ( response ) => {
+const parseJsonAndNormalizeError = ( response: Response ) => {
 	const invalidJsonError = {
 		code: 'invalid_json',
 		message: __( 'The response is not a valid JSON response.' ),
@@ -48,13 +48,13 @@ const parseJsonAndNormalizeError = ( response ) => {
 /**
  * Parses the apiFetch response properly and normalize response errors.
  *
- * @param {Response} response
- * @param {boolean}  shouldParseResponse
+ * @param response
+ * @param shouldParseResponse
  *
- * @return {Promise<any>} Parsed response.
+ * @return Parsed response.
  */
 export const parseResponseAndNormalizeError = (
-	response,
+	response: Response,
 	shouldParseResponse = true
 ) => {
 	return Promise.resolve(
@@ -65,11 +65,14 @@ export const parseResponseAndNormalizeError = (
 /**
  * Parses a response, throwing an error if parsing the response fails.
  *
- * @param {Response} response
- * @param {boolean}  shouldParseResponse
- * @return {Promise<any>} Parsed response.
+ * @param response
+ * @param shouldParseResponse
+ * @return Parsed response.
  */
-export function parseAndThrowError( response, shouldParseResponse = true ) {
+export function parseAndThrowError(
+	response: Response,
+	shouldParseResponse = true
+) {
 	if ( ! shouldParseResponse ) {
 		throw response;
 	}

@@ -1,12 +1,20 @@
 /**
- * @param {string} nonce
- * @return {import('../types').APIFetchMiddleware & { nonce: string }} A middleware to enhance a request with a nonce.
+ * Internal dependencies
  */
-function createNonceMiddleware( nonce ) {
-	/**
-	 * @type {import('../types').APIFetchMiddleware & { nonce: string }}
-	 */
-	const middleware = ( options, next ) => {
+import type { APIFetchMiddleware } from '../types';
+
+/**
+ * @param nonce
+ *
+ * @return  A middleware to enhance a request with a nonce.
+ */
+function createNonceMiddleware(
+	nonce: string
+): APIFetchMiddleware & { nonce: string } {
+	const middleware: APIFetchMiddleware & { nonce: string } = (
+		options,
+		next
+	) => {
 		const { headers = {} } = options;
 
 		// If an 'X-WP-Nonce' header (or any case-insensitive variation

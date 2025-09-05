@@ -31,7 +31,7 @@ permissions: {}
 jobs:
     release:
         name: Release - ${{ github.event.inputs.release_type }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         environment: WordPress packages

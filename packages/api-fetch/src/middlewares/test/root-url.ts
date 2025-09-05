@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import createRootUrlMiddleware from '../root-url';
 
 describe( 'Root URL middleware', () => {
@@ -13,7 +14,7 @@ describe( 'Root URL middleware', () => {
 			method: 'GET',
 			path: '/wp/v2/posts',
 		};
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.url ).toBe(
 				'http://wp.org/wp-admin/rest/wp/v2/posts'
 			);

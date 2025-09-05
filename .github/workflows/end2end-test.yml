@@ -22,7 +22,7 @@ permissions: {}
 jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -80,7 +80,7 @@ jobs:
         name: Merge Artifacts
         if: ${{ !cancelled() }}
         needs: [e2e-playwright]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
@@ -108,7 +108,7 @@ jobs:
         name: Report to GitHub
         needs: [merge-artifacts]
         if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
             issues: write

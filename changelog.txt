@@ -1,13 +1,14 @@
 == Changelog ==
 
-= 21.5.0-rc.1 =
-
+= 21.5.0 =
 
 ## Changelog
 
 ### Features
 
 #### Block Library
+
+- Add Accordions Block. ([64119](https://github.com/WordPress/gutenberg/pull/64119))
 - Query Title: Add "Post Type Label" variation. ([71167](https://github.com/WordPress/gutenberg/pull/71167))
 
 
@@ -114,7 +115,9 @@
 #### Widgets Editor
 - Widget Area Block: Apply API version 3. ([71110](https://github.com/WordPress/gutenberg/pull/71110))
 
-
+#### Icons
+- Deprecate moreHorizontalMobile. ([71172](https://github.com/WordPress/gutenberg/pull/71172))
+- 
 ### Tools
 
 #### Testing
@@ -125,16 +128,6 @@
 
 #### Build Tooling
 - Dynamically set `node-version-file` input. ([71090](https://github.com/WordPress/gutenberg/pull/71090))
-
-
-### Various
-
-#### Icons
-- Deprecate moreHorizontalMobile. ([71172](https://github.com/WordPress/gutenberg/pull/71172))
-
-#### Block Library
-- Add Accordions Block. ([64119](https://github.com/WordPress/gutenberg/pull/64119))
-
 
 ## First-time contributors
 
@@ -148,6 +141,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @andrewserong @BogdanUngureanu @BugReportOnWeb @ciampo @desrosj @elazzabi @getdave @gigitux @im3dabasia @jasmussen @jffng @karthikeya-io @Mamaduka @mikachan @mikejolley @mirka @mrleemon @oandregal @p-jackson @priethor @R1shabh-Gupta @ramonjd @shimotmk @Sukhendu2002 @t-hamano @tellthemachines @USERSATOSHI @yogeshbhutkar @youknowriad
+
+
 
 
 = 21.4.0 =

@@ -26,7 +26,7 @@ permissions: {}
 jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -71,7 +71,7 @@ jobs:
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -109,7 +109,7 @@ jobs:
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -136,7 +136,7 @@ jobs:
 
     build-assets:
         name: Build JavaScript assets for PHP unit tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         steps:
@@ -160,9 +160,9 @@ jobs:
                       ./build-module/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
         needs: [compute-previous-wordpress-version, build-assets]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
@@ -297,7 +297,7 @@ jobs:
 
     phpcs:
         name: PHP coding standards
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
@@ -353,7 +353,7 @@ jobs:
     # This job is deprecated but be present for compatibility reasons.
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         needs: [test-php, phpcs]
         if: ${{ always() }}
@@ -372,10 +372,13 @@ jobs:
 
     mobile-unit-js:
         name: Mobile
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        # React 19 breaks these tests, and upgrading React Native to a compatible version is paused.
+        # See: https://github.com/WordPress/gutenberg/issues/71336
+        if: false
+        #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository

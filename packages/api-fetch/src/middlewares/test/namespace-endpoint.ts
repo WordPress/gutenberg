@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { FetchHandler } from '../../types';
 import namespaceEndpointMiddleware from '../namespace-endpoint';
 
 describe( 'Namespace & Endpoint middleware', () => {
@@ -12,7 +13,7 @@ describe( 'Namespace & Endpoint middleware', () => {
 			namespace: '/wp/v2',
 			endpoint: '/posts',
 		};
-		const callback = ( options ) => {
+		const callback: FetchHandler = async ( options ) => {
 			expect( options.path ).toBe( 'wp/v2/posts' );
 			expect( options.namespace ).toBeUndefined();
 			expect( options.endpoint ).toBeUndefined();

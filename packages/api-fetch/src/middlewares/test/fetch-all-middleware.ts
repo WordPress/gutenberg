@@ -19,7 +19,7 @@ describe( 'Fetch All Middleware', () => {
 		expect.hasAssertions();
 		const originalOptions = { url: '/posts?per_page=-1' };
 		let counter = 1;
-		jest.doMock( '../../index.js', () => ( options ) => {
+		jest.doMock( '../../index.ts', () => ( options ) => {
 			const expectedUrl =
 				counter === 1
 					? '/posts?per_page=100'

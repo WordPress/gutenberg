@@ -31,7 +31,7 @@ jobs:
     performance:
         timeout-minutes: 60
         name: Run performance tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' }}

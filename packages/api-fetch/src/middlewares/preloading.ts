@@ -4,10 +4,17 @@
 import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
 
 /**
- * @param {Record<string, any>} preloadedData
- * @return {import('../types').APIFetchMiddleware} Preloading middleware.
+ * Internal dependencies
  */
-function createPreloadingMiddleware( preloadedData ) {
+import type { APIFetchMiddleware } from '../types';
+
+/**
+ * @param preloadedData
+ * @return Preloading middleware.
+ */
+function createPreloadingMiddleware(
+	preloadedData: Record< string, any >
+): APIFetchMiddleware {
 	const cache = Object.fromEntries(
 		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
 			normalizePath( path ),
@@ -17,7 +24,6 @@ function createPreloadingMiddleware( preloadedData ) {
 
 	return ( options, next ) => {
 		const { parse = true } = options;
-		/** @type {string | void} */
 		let rawPath = options.path;
 		if ( ! rawPath && options.url ) {
 			const { rest_route: pathFromQuery, ...queryArgs } = getQueryArgs(
@@ -63,11 +69,14 @@ function createPreloadingMiddleware( preloadedData ) {
 /**
  * This is a helper function that sends a success response.
  *
- * @param {Record<string, any>} responseData
- * @param {boolean}             parse
- * @return {Promise<any>} Promise with the response.
+ * @param responseData
+ * @param parse
+ * @return Promise with the response.
  */
-function prepareResponse( responseData, parse ) {
+function prepareResponse(
+	responseData: Record< string, any >,
+	parse: boolean
+) {
 	if ( parse ) {
 		return Promise.resolve( responseData.body );
 	}
@@ -82,12 +91,13 @@ function prepareResponse( responseData, parse ) {
 		);
 	} catch {
 		// See: https://github.com/WordPress/gutenberg/issues/67358#issuecomment-2621163926.
-		Object.entries( responseData.headers ).forEach( ( [ key, value ] ) => {
+		Object.entries(
+			responseData.headers as Record< string, string >
+		).forEach( ( [ key, value ] ) => {
 			if ( key.toLowerCase() === 'link' ) {
 				responseData.headers[ key ] = value.replace(
 					/<([^>]+)>/,
-					( /** @type {any} */ _, /** @type {string} */ url ) =>
-						`<${ encodeURI( url ) }>`
+					( _, url ) => `<${ encodeURI( url ) }>`
 				);
 			}
 		} );

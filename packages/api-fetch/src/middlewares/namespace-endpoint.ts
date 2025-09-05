@@ -1,7 +1,12 @@
 /**
- * @type {import('../types').APIFetchMiddleware}
+ * Internal dependencies
  */
-const namespaceAndEndpointMiddleware = ( options, next ) => {
+import type { APIFetchMiddleware } from '../types';
+
+const namespaceAndEndpointMiddleware: APIFetchMiddleware = (
+	options,
+	next
+) => {
 	let path = options.path;
 	let namespaceTrimmed, endpointTrimmed;
 

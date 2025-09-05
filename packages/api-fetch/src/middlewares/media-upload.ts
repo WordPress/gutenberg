@@ -10,12 +10,13 @@ import {
 	parseAndThrowError,
 	parseResponseAndNormalizeError,
 } from '../utils/response';
+import type { APIFetchOptions, APIFetchMiddleware } from '../types';
 
 /**
- * @param {import('../types').APIFetchOptions} options
- * @return {boolean} True if the request is for media upload.
+ * @param options
+ * @return True if the request is for media upload.
  */
-function isMediaUploadRequest( options ) {
+function isMediaUploadRequest( options: APIFetchOptions ) {
 	const isCreateMethod = !! options.method && options.method === 'POST';
 	const isMediaEndpoint =
 		( !! options.path && options.path.indexOf( '/wp/v2/media' ) !== -1 ) ||
@@ -26,10 +27,10 @@ function isMediaUploadRequest( options ) {
 
 /**
  * Middleware handling media upload failures and retries.
- *
- * @type {import('../types').APIFetchMiddleware}
+ * @param options
+ * @param next
  */
-const mediaUploadMiddleware = ( options, next ) => {
+const mediaUploadMiddleware: APIFetchMiddleware = ( options, next ) => {
 	if ( ! isMediaUploadRequest( options ) ) {
 		return next( options );
 	}
@@ -38,10 +39,10 @@ const mediaUploadMiddleware = ( options, next ) => {
 	const maxRetries = 5;
 
 	/**
-	 * @param {string} attachmentId
-	 * @return {Promise<any>} Processed post response.
+	 * @param attachmentId
+	 * @return Processed post response.
 	 */
-	const postProcess = ( attachmentId ) => {
+	const postProcess = ( attachmentId: string ): Promise< any > => {
 		retries++;
 		return next( {
 			path: `/wp/v2/media/${ attachmentId }/post-process`,
