@@ -105,8 +105,6 @@ HTML
 	/**
 	 * Test if the block content is updated with the value returned by the source.
 	 *
-	 * @ticket 60282
-	 *
 	 * @covers ::register_block_bindings_source
 	 *
 	 * @dataProvider data_update_block_with_value_from_source
@@ -176,10 +174,6 @@ HTML
 	/**
 	 * Test passing arguments to the source.
 	 *
-	 * @ticket 60282
-	 * @ticket 60651
-	 * @ticket 61385
-	 *
 	 * @covers ::register_block_bindings_source
 	 *
 	 * @dataProvider data_different_get_value_callbacks
@@ -211,9 +205,6 @@ HTML;
 
 	/**
 	 * Tests passing `uses_context` as argument to the source.
-	 *
-	 * @ticket 60525
-	 * @ticket 61642
 	 *
 	 * @covers ::register_block_bindings_source
 	 */
@@ -268,8 +259,6 @@ HTML;
 	 * Tests if the block content is updated with the value returned by the source
 	 * for the Image block in the placeholder state.
 	 *
-	 * @ticket 60282
-	 *
 	 * @covers ::register_block_bindings_source
 	 */
 	public function test_update_block_with_value_from_source_image_placeholder() {
@@ -310,9 +299,6 @@ HTML;
 	 * Tests if the `__default` attribute is replaced with real attributes for
 	 * pattern overrides.
 	 *
-	 * @ticket 61333
-	 * @ticket 62069
-	 *
 	 * @covers WP_Block::process_block_bindings
 	 */
 	public function test_default_binding_for_pattern_overrides() {
@@ -346,8 +332,6 @@ HTML;
 
 	/**
 	 * Tests that filter `block_bindings_source_value` is applied.
-	 *
-	 * @ticket 61181
 	 */
 	public function test_filter_block_bindings_source_value() {
 		register_block_bindings_source(
