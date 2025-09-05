@@ -254,21 +254,19 @@ export default function PageTemplates() {
 			activeField,
 			slugField,
 		];
-		if ( [ 'active', 'user' ].includes( activeView ) ) {
-			const elements = [];
-			for ( const author in users ) {
-				elements.push( {
-					value: users[ author ]?.id ?? author,
-					label: users[ author ]?.name ?? author,
-				} );
-			}
-			_fields.push( {
-				...authorField,
-				elements,
+		const elements = [];
+		for ( const author in users ) {
+			elements.push( {
+				value: users[ author ]?.id ?? author,
+				label: users[ author ]?.name ?? author,
 			} );
 		}
+		_fields.push( {
+			...authorField,
+			elements,
+		} );
 		return _fields;
-	}, [ users, activeView ] );
+	}, [ users ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
