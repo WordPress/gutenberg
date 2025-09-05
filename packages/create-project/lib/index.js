@@ -41,8 +41,7 @@ program
 	.option( '--variant <variant>', 'the variant of the template to use' )
 	.option(
 		'--type <type>',
-		'project type; allowed values: "plugin", "theme", "block", "blueprint"',
-		'plugin'
+		'project type; allowed values: "plugin", "theme", "block", "blueprint"'
 	)
 	.option( '--no-plugin', 'scaffold only block files (legacy compatibility)' )
 	.option( '--with-blocks', 'include block scaffolding for plugins/themes' )
@@ -175,9 +174,9 @@ program
 					type = 'block';
 				}
 
-				// Validate project type
+				// Validate project type (only if provided via CLI)
 				const validTypes = [ 'plugin', 'theme', 'block', 'blueprint' ];
-				if ( ! validTypes.includes( type ) ) {
+				if ( type && ! validTypes.includes( type ) ) {
 					throw new CLIError(
 						`Invalid project type "${ type }". Allowed values: ${ validTypes.join(
 							', '
@@ -204,9 +203,6 @@ program
 				}
 
 				// Ensure type is set to default if not provided
-				if ( ! type ) {
-					type = 'plugin';
-				}
 
 				// Map CLI options to the appropriate prefixed properties based on project type
 				const cliOptionsMap = {
@@ -404,7 +400,7 @@ program
 					log.info( '' );
 
 					// Project type selection if not specified via --type flag
-					if ( ! optionsValues.type ) {
+					if ( ! type ) {
 						const projectType = await select( {
 							message:
 								'What type of project do you want to create?',
