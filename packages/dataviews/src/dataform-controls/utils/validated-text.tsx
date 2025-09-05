@@ -45,8 +45,6 @@ export default function ValidatedText< Item >( {
 			>[ 'customValidity' ]
 		>( undefined );
 
-	const iconToShow = icon;
-
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
 			onChange( {
@@ -86,9 +84,9 @@ export default function ValidatedText< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			type={ type }
 			prefix={
-				iconToShow ? (
+				icon ? (
 					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ iconToShow } />
+						<Icon icon={ icon } />
 					</InputControlPrefixWrapper>
 				) : undefined
 			}
