@@ -5,7 +5,7 @@
 		"attributes": {
 			"images": [],
 			"ids": [],
-			"hasIcon": true,
+			"navigationButtonType": "icon",
 			"shortCodeTransforms": [],
 			"caption": "Gallery Caption",
 			"imageCrop": true,
