@@ -736,7 +736,7 @@ export default function GalleryEdit( props ) {
 								options={ NAVIGATION_BUTTON_TYPE_OPTIONS }
 								size="__unstable-large"
 								help={ __(
-									'Configure the visual appearance of the buttons in the lightbox.'
+									'Adjust the appearance of buttons in the lightbox.'
 								) }
 							/>
 						</ToolsPanelItem>
