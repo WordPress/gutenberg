@@ -50,7 +50,6 @@ export default function Checkbox< Item >( {
 			} }
 			customValidity={ customValidity }
 			hidden={ hideLabelFromVision }
-			__nextHasNoMarginBottom
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
