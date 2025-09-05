@@ -6,11 +6,15 @@
  * Copyright (c) 2015-present, Facebook, Inc.
  *
  */
-const Platform = {
-	OS: 'web',
-	select: ( spec ) => ( 'web' in spec ? spec.web : spec.default ),
-	isWeb: true,
+
+/**
+ * Specification for platform-specific value selection.
+ */
+type PlatformSelectSpec< T > = {
+	web?: T;
+	default?: T;
 };
+
 /**
  * Component used to detect the current Platform being used.
  * Use Platform.OS === 'web' to detect if running on web environment.
@@ -30,4 +34,23 @@ const Platform = {
  * } );
  * ```
  */
+const Platform = {
+	/** Platform identifier. Will always be `'web'` in this module. */
+	OS: 'web' as const,
+
+	/**
+	 * Select a value based on the platform.
+	 *
+	 * @template T
+	 * @param    spec - Object with optional platform-specific values.
+	 * @return The selected value.
+	 */
+	select< T >( spec: PlatformSelectSpec< T > ): T | undefined {
+		return 'web' in spec ? spec.web : spec.default;
+	},
+
+	/** Whether the platform is web */
+	isWeb: true,
+};
+
 export default Platform;

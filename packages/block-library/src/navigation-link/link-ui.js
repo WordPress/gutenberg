@@ -8,26 +8,22 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	LinkControl,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
-	createInterpolateElement,
 	useMemo,
 	useState,
 	useRef,
 	useEffect,
 	forwardRef,
 } from '@wordpress/element';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useResourcePermissions } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
@@ -35,6 +31,7 @@ import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { LinkUIPageCreator } from './page-creator';
 
 const { PrivateQuickInserter: QuickInserter } = unlock(
 	blockEditorPrivateApis
@@ -78,7 +75,7 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-function LinkUIBlockInserter( { clientId, onBack } ) {
+function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 	const { rootBlockClientId } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -138,7 +135,8 @@ function LinkUIBlockInserter( { clientId, onBack } ) {
 				clientId={ clientId }
 				isAppender={ false }
 				prioritizePatterns={ false }
-				selectBlockOnInsert
+				selectBlockOnInsert={ ! onBlockInsert }
+				onSelect={ onBlockInsert ? onBlockInsert : undefined }
 				hasSearch={ false }
 			/>
 		</div>
@@ -150,37 +148,13 @@ function UnforwardedLinkUI( props, ref ) {
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
-
-	async function handleCreate( pageTitle ) {
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
-	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
@@ -193,6 +167,13 @@ function UnforwardedLinkUI( props, ref ) {
 		[ label, opensInNewTab, url ]
 	);
 
+	const handlePageCreated = ( pageLink ) => {
+		// Set the new page as the current link
+		props.onChange( pageLink );
+		// Return to main Link UI
+		setAddingPage( false );
+	};
+
 	const dialogTitleId = useInstanceId(
 		LinkUI,
 		`link-ui-link-control__title`
@@ -202,6 +183,8 @@ function UnforwardedLinkUI( props, ref ) {
 		`link-ui-link-control__description`
 	);
 
+	const blockEditingMode = useBlockEditingMode();
+
 	return (
 		<Popover
 			ref={ ref }
@@ -210,7 +193,7 @@ function UnforwardedLinkUI( props, ref ) {
 			anchor={ props.anchor }
 			shift
 		>
-			{ ! addingBlock && (
+			{ ! addingBlock && ! addingPage && (
 				<div
 					role="dialog"
 					aria-labelledby={ dialogTitleId }
@@ -230,30 +213,7 @@ function UnforwardedLinkUI( props, ref ) {
 						hasRichPreviews
 						value={ link }
 						showInitialSuggestions
-						withCreateSuggestion={ permissions.canCreate }
-						createSuggestion={ handleCreate }
-						createSuggestionButtonText={ ( searchTerm ) => {
-							let format;
-
-							if ( type === 'post' ) {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft post: <mark>%s</mark>'
-								);
-							} else {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft page: <mark>%s</mark>'
-								);
-							}
-
-							return createInterpolateElement(
-								sprintf( format, searchTerm ),
-								{
-									mark: <mark />,
-								}
-							);
-						} }
+						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
@@ -264,10 +224,17 @@ function UnforwardedLinkUI( props, ref ) {
 							! link?.url?.length && (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
+									focusAddPageButton={ focusAddPageButton }
 									setAddingBlock={ () => {
 										setAddingBlock( true );
 										setFocusAddBlockButton( false );
 									} }
+									setAddingPage={ () => {
+										setAddingPage( true );
+										setFocusAddPageButton( false );
+									} }
+									canCreatePage={ permissions.canCreate }
+									blockEditingMode={ blockEditingMode }
 								/>
 							)
 						}
@@ -281,7 +248,22 @@ function UnforwardedLinkUI( props, ref ) {
 					onBack={ () => {
 						setAddingBlock( false );
 						setFocusAddBlockButton( true );
+						setFocusAddPageButton( false );
 					} }
+					onBlockInsert={ props?.onBlockInsert }
+				/>
+			) }
+
+			{ addingPage && (
+				<LinkUIPageCreator
+					postType={ postType }
+					onBack={ () => {
+						setAddingPage( false );
+						setFocusAddPageButton( true );
+						setFocusAddBlockButton( false );
+					} }
+					onPageCreated={ handlePageCreated }
+					initialTitle={ link?.url || '' }
 				/>
 			) }
 		</Popover>
@@ -290,9 +272,17 @@ function UnforwardedLinkUI( props, ref ) {
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
-const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
+const LinkUITools = ( {
+	setAddingBlock,
+	setAddingPage,
+	focusAddBlockButton,
+	focusAddPageButton,
+	canCreatePage,
+	blockEditingMode,
+} ) => {
 	const blockInserterAriaRole = 'listbox';
 	const addBlockButtonRef = useRef();
+	const addPageButtonRef = useRef();
 
 	// Focus the add block button when the popover is opened.
 	useEffect( () => {
@@ -301,20 +291,43 @@ const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 		}
 	}, [ focusAddBlockButton ] );
 
+	// Focus the add page button when the popover is opened.
+	useEffect( () => {
+		if ( focusAddPageButton ) {
+			addPageButtonRef.current?.focus();
+		}
+	}, [ focusAddPageButton ] );
+
 	return (
-		<VStack className="link-ui-tools">
-			<Button
-				__next40pxDefaultSize
-				ref={ addBlockButtonRef }
-				icon={ plus }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					setAddingBlock( true );
-				} }
-				aria-haspopup={ blockInserterAriaRole }
-			>
-				{ __( 'Add block' ) }
-			</Button>
+		<VStack spacing={ 0 } className="link-ui-tools">
+			{ canCreatePage && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addPageButtonRef }
+					icon={ plus }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingPage( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Create page' ) }
+				</Button>
+			) }
+			{ blockEditingMode === 'default' && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addBlockButtonRef }
+					icon={ plus }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingBlock( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Add block' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 };

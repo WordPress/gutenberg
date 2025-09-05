@@ -34,45 +34,37 @@ import {
 	lazy,
 	Suspense,
 } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * Object containing a React element.
- *
- * @typedef {import('react').ReactElement} Element
  */
+export type Element = React.ReactElement;
 
 /**
  * Object containing a React component.
- *
- * @typedef {import('react').ComponentType} ComponentType
  */
+export type ComponentType< T = any > = React.ComponentType< T >;
 
 /**
  * Object containing a React synthetic event.
- *
- * @typedef {import('react').SyntheticEvent} SyntheticEvent
  */
+export type SyntheticEvent< T = Element > = React.SyntheticEvent< T >;
 
 /**
  * Object containing a React ref object.
- *
- * @template T
- * @typedef {import('react').RefObject<T>} RefObject<T>
  */
+export type RefObject< T > = React.RefObject< T >;
 
 /**
  * Object containing a React ref callback.
- *
- * @template T
- * @typedef {import('react').RefCallback<T>} RefCallback<T>
  */
+export type RefCallback< T > = React.RefCallback< T >;
 
 /**
  * Object containing a React ref.
- *
- * @template T
- * @typedef {import('react').Ref<T>} Ref<T>
  */
+export type Ref< T > = React.Ref< T >;
 
 /**
  * Object that provides utilities for dealing with React children.
@@ -261,41 +253,52 @@ export { PureComponent };
 /**
  * Concatenate two or more React children objects.
  *
- * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
- *
- * @return {Array} The concatenated value.
+ * @param childrenArguments - Array of children arguments (array of arrays/strings/objects) to concatenate.
+ * @return The concatenated value.
  */
-export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( accumulator, children, i ) => {
-		Children.forEach( children, ( child, j ) => {
-			if ( child && 'string' !== typeof child ) {
-				child = cloneElement( child, {
-					key: [ i, j ].join(),
-				} );
-			}
+export function concatChildren(
+	...childrenArguments: ReactNode[][]
+): ReactNode[] {
+	return childrenArguments.reduce< ReactNode[] >(
+		( accumulator, children, i ) => {
+			Children.forEach( children, ( child, j ) => {
+				if ( isValidElement( child ) && typeof child !== 'string' ) {
+					child = cloneElement( child, {
+						key: [ i, j ].join(),
+					} );
+				}
 
-			accumulator.push( child );
-		} );
+				accumulator.push( child );
+			} );
 
-		return accumulator;
-	}, [] );
+			return accumulator;
+		},
+		[]
+	);
 }
 
 /**
  * Switches the nodeName of all the elements in the children object.
  *
- * @param {?Object} children Children object.
- * @param {string}  nodeName Node name.
+ * @param children Children object.
+ * @param nodeName Node name.
  *
- * @return {?Object} The updated children object.
+ * @return  The updated children object.
  */
-export function switchChildrenNodeName( children, nodeName ) {
+export function switchChildrenNodeName(
+	children: ReactNode,
+	nodeName: string
+): ReactNode {
 	return (
 		children &&
 		Children.map( children, ( elt, index ) => {
 			if ( typeof elt?.valueOf() === 'string' ) {
 				return createElement( nodeName, { key: index }, elt );
 			}
+			if ( ! isValidElement( elt ) ) {
+				return elt;
+			}
+
 			const { children: childrenProp, ...props } = elt.props;
 			return createElement(
 				nodeName,

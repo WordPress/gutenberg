@@ -40,6 +40,7 @@ import type {
 } from '../../types';
 import type { SetSelection } from '../../private-types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 
 interface GridItemProps< Item > {
@@ -108,6 +109,7 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
+	const shouldRenderMedia = showMedia && renderedMediaField;
 
 	let mediaA11yProps;
 	let titleA11yProps;
@@ -154,7 +156,7 @@ function GridItem< Item >( {
 			}
 			aria-posinset={ posinset }
 		>
-			{ showMedia && renderedMediaField && (
+			{ shouldRenderMedia && (
 				<ItemClickWrapper
 					item={ item }
 					isItemClickable={ isItemClickable }
@@ -166,7 +168,7 @@ function GridItem< Item >( {
 					{ renderedMediaField }
 				</ItemClickWrapper>
 			) }
-			{ hasBulkActions && showMedia && renderedMediaField && (
+			{ hasBulkActions && shouldRenderMedia && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -176,24 +178,35 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
-			>
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__title-field dataviews-title-field"
-					{ ...titleA11yProps }
-				>
-					{ renderedTitleField }
-				</ItemClickWrapper>
-				{ !! actions?.length && (
+			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
-				) }
-			</HStack>
+				</div>
+			) }
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<ItemClickWrapper
+						item={ item }
+						isItemClickable={ isItemClickable }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						className="dataviews-view-grid__title-field dataviews-title-field"
+						{ ...titleA11yProps }
+					>
+						{ renderedTitleField }
+					</ItemClickWrapper>
+					{ !! actions?.length && (
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					) }
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
@@ -357,16 +370,12 @@ function ViewGrid< Item >( {
 											groupName
 										) }
 									</h3>
-									<div
+									<GridItems
 										className={ clsx(
 											'dataviews-view-grid',
 											className
 										) }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
+										previewSize={ usedPreviewSize }
 										aria-busy={ isLoading }
 										ref={ resizeObserverRef }
 									>
@@ -407,7 +416,7 @@ function ViewGrid< Item >( {
 												/>
 											);
 										} ) }
-									</div>
+									</GridItems>
 								</VStack>
 							)
 						) }
@@ -418,13 +427,9 @@ function ViewGrid< Item >( {
 			{
 				// Render a single grid with all data.
 				hasData && ! dataByGroup && (
-					<div
+					<GridItems
 						className={ clsx( 'dataviews-view-grid', className ) }
-						style={ {
-							gridTemplateColumns:
-								usedPreviewSize &&
-								`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-						} }
+						previewSize={ usedPreviewSize }
 						aria-busy={ isLoading }
 						ref={ resizeObserverRef }
 						role={ isInfiniteScroll ? 'feed' : undefined }
@@ -457,7 +462,7 @@ function ViewGrid< Item >( {
 								/>
 							);
 						} ) }
-					</div>
+					</GridItems>
 				)
 			}
 			{
