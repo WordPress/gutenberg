@@ -208,7 +208,7 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Attach scroll event listener for infinite scroll (only when virtualization is not enabled)
+	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
 		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
 			return;
