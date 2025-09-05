@@ -1010,6 +1010,15 @@ export const __unstableSplitSelection =
 			},
 		};
 
+		// When splitting a block, only the first block should retain the blockCommentId.
+		// The second block should not inherit this attribute so it can accept new comments.
+		if (
+			blockA.clientId === blockB.clientId &&
+			tail.attributes.blockCommentId
+		) {
+			delete tail.attributes.blockCommentId;
+		}
+
 		// When splitting a block, attempt to convert the tail block to the
 		// default block type. For example, when splitting a heading block, the
 		// tail block will be converted to a paragraph block. Note that for
@@ -1027,6 +1036,10 @@ export const __unstableSplitSelection =
 			const switched = switchToBlockType( tail, defaultBlockName );
 			if ( switched?.length === 1 ) {
 				tail = switched[ 0 ];
+				// Ensure the converted tail block doesn't inherit blockCommentId
+				if ( tail.attributes.blockCommentId ) {
+					delete tail.attributes.blockCommentId;
+				}
 			}
 		}
 
