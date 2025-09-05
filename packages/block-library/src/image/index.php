@@ -293,14 +293,9 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 			break;
 	}
 
-	$close_button_label = 'icon' === $navigation_button_type ? $close_button_text : '';
-	$prev_button_label  = 'icon' === $navigation_button_type ? $prev_button_text : '';
-	$next_button_label  = 'icon' === $navigation_button_type ? $next_button_text : '';
-
-	// Create aria-label attributes only when labels are not empty
-	$close_button_label_attr = ! empty( $close_button_label ) ? ' aria-label="' . esc_attr( $close_button_label ) . '"' : '';
-	$prev_button_label_attr  = ! empty( $prev_button_label ) ? ' aria-label="' . esc_attr( $prev_button_label ) . '"' : '';
-	$next_button_label_attr  = ! empty( $next_button_label ) ? ' aria-label="' . esc_attr( $next_button_label ) . '"' : '';
+	$close_button_label_attr = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $close_button_text ) . '"' : '';
+	$prev_button_label_attr  = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $prev_button_text ) . '"' : '';
+	$next_button_label_attr  = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $next_button_text ) . '"' : '';
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
