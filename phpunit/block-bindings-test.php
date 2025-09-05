@@ -13,8 +13,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 
 	/**
 	 * Sets up shared fixtures.
-	 *
-	 * @since 6.9.0
 	 */
 	public static function wpSetUpBeforeClass() {
 		register_block_type(
@@ -36,8 +34,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 
 	/**
 	 * Sets up the test fixture.
-	 *
-	 * @since 6.9.0
 	 */
 	public function set_up() {
 		parent::set_up();
@@ -53,8 +49,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 
 	/**
 	 * Tear down after each test.
-	 *
-	 * @since 6.5.0
 	 */
 	public function tear_down() {
 		foreach ( get_all_registered_block_bindings_sources() as $source_name => $source_properties ) {
@@ -68,8 +62,6 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 
 	/**
 	 * Tear down after class.
-	 *
-	 * @since 6.9.0
 	 */
 	public static function wpTearDownAfterClass() {
 		unregister_block_type( 'test/block' );
