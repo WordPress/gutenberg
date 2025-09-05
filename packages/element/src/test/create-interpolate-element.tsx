@@ -26,10 +26,11 @@ describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is an invalid conversion map', () => {
 		const testString = 'This is a <someValue/> string';
 		expect( () =>
-			createInterpolateElement( testString, [
-				'someValue',
-				{ value: 10 },
-			] )
+			createInterpolateElement(
+				testString,
+				// @ts-expect-error - Invalid argument type
+				[ 'someValue', { value: 10 } ]
+			)
 		).toThrow( TypeError );
 	} );
 	it(
@@ -40,6 +41,7 @@ describe( 'createInterpolateElement', () => {
 			expect( () =>
 				createInterpolateElement( testString, {
 					someValue: <em />,
+					// @ts-expect-error - Invalid type for somethingElse
 					somethingElse: 10,
 				} )
 			).toThrow( TypeError );
@@ -53,6 +55,7 @@ describe( 'createInterpolateElement', () => {
 			const expectedElement = <>{ testString }</>;
 			expect(
 				createInterpolateElement( testString, {
+					// @ts-expect-error - Unknown tag
 					someValue: <strong />,
 				} )
 			).toEqual( expectedElement );
@@ -162,8 +165,8 @@ describe( 'createInterpolateElement', () => {
 	} );
 	it( 'returns expected output for complex replacement', () => {
 		class TestComponent extends Component {
-			render( props ) {
-				return <div { ...props } />;
+			render() {
+				return <div { ...this.props } />;
 			}
 		}
 		const testString =

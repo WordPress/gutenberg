@@ -8,6 +8,7 @@ import {
 	isValidElement,
 	type Element as ReactElement,
 } from './react';
+import type { ConversionMap } from './types';
 
 let indoc: string;
 let offset: number;
@@ -126,9 +127,9 @@ function createFrame(
  * @throws {TypeError}
  * @return A wp element.
  */
-const createInterpolateElement = (
-	interpolatedString: string,
-	conversionMap: Record< string, ReactElement >
+const createInterpolateElement = < T extends string >(
+	interpolatedString: T,
+	conversionMap: ConversionMap< T >
 ): ReactElement => {
 	indoc = interpolatedString;
 	offset = 0;
