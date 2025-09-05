@@ -228,6 +228,3 @@ export function useEntityRecordsWithPermissions< RecordType >(
 
 	return { records: dataWithPermissions, ...ret };
 }
-
-export type UseEntityRecordsWithPermissionsType =
-	typeof useEntityRecordsWithPermissions;

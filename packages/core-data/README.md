@@ -1165,29 +1165,6 @@ _Changelog_
 
 `6.1.0` Introduced in WordPress core.
 
-### UseEntityRecordsWithPermissionsType
-
-Type for the `useEntityRecordsWithPermissions` private API function.
-
-This type represents the function signature for `useEntityRecordsWithPermissions`, which resolves entity records with their associated permissions included. It can be used to properly type the function when accessing it through the unlock mechanism.
-
-_Usage_
-
-```ts
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-import type { UseEntityRecordsWithPermissionsType } from '@wordpress/core-data';
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'package-name' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
-);
-
-const { useEntityRecordsWithPermissions } = unlock< {
-	useEntityRecordsWithPermissions: UseEntityRecordsWithPermissionsType;
-} >( coreDataPrivateApis );
-```
-
 ### useResourcePermissions
 
 Resolves resource permissions.
