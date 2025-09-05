@@ -297,6 +297,11 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 	$prev_button_label  = 'icon' === $navigation_button_type ? $prev_button_text : '';
 	$next_button_label  = 'icon' === $navigation_button_type ? $next_button_text : '';
 
+	// Create aria-label attributes only when labels are not empty
+	$close_button_label_attr = ! empty( $close_button_label ) ? ' aria-label="' . esc_attr( $close_button_label ) . '"' : '';
+	$prev_button_label_attr  = ! empty( $prev_button_label ) ? ' aria-label="' . esc_attr( $prev_button_label ) . '"' : '';
+	$next_button_label_attr  = ! empty( $next_button_label ) ? ' aria-label="' . esc_attr( $next_button_label ) . '"' : '';
+
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
 	// default values because it can't get them from the Global Styles.
@@ -315,7 +320,7 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 	echo <<<HTML
 		<div
 			class="wp-lightbox-overlay zoom"
-			aria-label="$dialog_label"
+			aria-label="{$dialog_label}"
 			data-wp-interactive="core/image"
 			data-wp-router-region='{ "id": "core/image-overlay", "attachTo": "body" }'
 			data-wp-key="wp-lightbox-overlay"
@@ -337,13 +342,11 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 			data-wp-bind--style="state.overlayStyles"
 			tabindex="-1"
 			>
-				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="wp-lightbox-close-button">
-					$close_button_content
+				<button type="button"{$close_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-close-button">
+					{$close_button_content}
 				</button>
 				<div class="wp-lightbox-navigation-container-prev" data-wp-bind--hidden="!state.hasNavigation">
-					<button type="button" aria-label="$prev_button_label" style="fill: $close_button_color" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">
-						$prev_button_content
-					</button>
+					<button type="button"{$prev_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">{$prev_button_content}</button>
 				</div>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
@@ -356,12 +359,12 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 					</figure>
 				</div>
 				<div class="wp-lightbox-navigation-container-next" data-wp-bind--hidden="!state.hasNavigation">
-					<button type="button" aria-label="$next_button_label" style="fill: $close_button_color" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
-						$next_button_content
+					<button type="button"{$next_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
+						{$next_button_content}
 					</button>
 				</div>
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
-				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
+				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
 		</div>
 HTML;
 }
