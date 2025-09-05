@@ -118,7 +118,16 @@ _Returns_
 
 ### createPortal
 
-Undocumented declaration.
+Creates a portal into which a component can be rendered.
+
+_Related_
+
+-   <https://github.com/facebook/react/issues/10309#issuecomment-318433235>
+
+_Parameters_
+
+-   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
+-   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 ### createRef
 
@@ -130,15 +139,31 @@ _Returns_
 
 ### createRoot
 
-Undocumented declaration.
+Creates a new React root for the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/client/createRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### findDOMNode
 
-Undocumented declaration.
+Finds the dom node of a React component.
+
+_Parameters_
+
+-   _component_ `import('react').ComponentType`: Component's instance.
 
 ### flushSync
 
-Undocumented declaration.
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
 
 ### forwardRef
 
@@ -158,11 +183,25 @@ A component which renders its children without any wrapping element.
 
 ### hydrate
 
-Undocumented declaration.
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
+Hydrates a given element into the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
-Undocumented declaration.
+Creates a new React root for the target DOM node and hydrates it with a pre-generated markup.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/client/hydrateRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
 
 ### isEmptyElement
 
@@ -259,7 +298,13 @@ _Returns_
 
 ### render
 
-Undocumented declaration.
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
+
+Renders a given element into the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/render>
 
 ### renderToString
 
@@ -302,7 +347,13 @@ _Returns_
 
 ### unmountComponentAtNode
 
-Undocumented declaration.
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
+
+Removes any mounted element from the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 
