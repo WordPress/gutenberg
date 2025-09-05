@@ -2273,6 +2273,16 @@ function getDerivedBlockEditingModesForTree(
 		( clientId ) =>
 			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
 	);
+	const unsyncedPatternClientIds = state.blocks.attributes
+		.keys()
+		.filter(
+			( clientId ) =>
+				state.blocks.attributes.get( clientId )?.metadata?.patternName
+		);
+	const contentOnlyParents = [
+		...contentOnlyTemplateLockedClientIds,
+		...unsyncedPatternClientIds,
+	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
@@ -2464,15 +2474,14 @@ function getDerivedBlockEditingModesForTree(
 			}
 		}
 
-		// `templateLock: 'contentOnly'` derived modes.
-		if ( contentOnlyTemplateLockedClientIds.length ) {
-			const hasContentOnlyTemplateLockedParent =
-				!! findParentInClientIdsList(
-					state,
-					clientId,
-					contentOnlyTemplateLockedClientIds
-				);
-			if ( hasContentOnlyTemplateLockedParent ) {
+		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
+		if ( contentOnlyParents.length ) {
+			const hasContentOnlyParent = !! findParentInClientIdsList(
+				state,
+				clientId,
+				contentOnlyParents
+			);
+			if ( hasContentOnlyParent ) {
 				if ( isContentBlock( blockName ) ) {
 					derivedBlockEditingModes.set( clientId, 'contentOnly' );
 				} else {
