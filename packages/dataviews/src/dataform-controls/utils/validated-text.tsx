@@ -17,7 +17,7 @@ export type DataFormValidatedTextControlProps< Item > =
 		/**
 		 * The input type of the control.
 		 */
-		type?: 'text' | 'email' | 'tel';
+		type?: 'text' | 'email' | 'tel' | 'url';
 	};
 
 export default function ValidatedText< Item >( {

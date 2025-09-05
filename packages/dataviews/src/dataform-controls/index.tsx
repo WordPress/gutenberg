@@ -16,6 +16,7 @@ import datetime from './datetime';
 import date from './date';
 import email from './email';
 import telephone from './telephone';
+import url from './url';
 import integer from './integer';
 import radio from './radio';
 import select from './select';
@@ -36,6 +37,7 @@ const FORM_CONTROLS: FormControls = {
 	date,
 	email,
 	telephone,
+	url,
 	integer,
 	radio,
 	select,

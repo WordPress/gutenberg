@@ -392,6 +392,7 @@ const ValidationComponent = ( {
 		text: string;
 		email: string;
 		telephone: string;
+		url: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
@@ -401,6 +402,7 @@ const ValidationComponent = ( {
 		text: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
+		url: 'https://example.com',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
@@ -423,6 +425,13 @@ const ValidationComponent = ( {
 	const customTelephoneRule = ( value: ValidatedItem ) => {
 		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
 			return 'Telephone number must start with +30 and have 10 digits after.';
+		}
+
+		return null;
+	};
+	const customUrlRule = ( value: ValidatedItem ) => {
+		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
+			return 'URL must be from https://example.com domain.';
 		}
 
 		return null;
@@ -470,6 +479,15 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'url',
+			type: 'url',
+			label: 'URL',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customUrlRule ),
+			},
+		},
+		{
 			id: 'integer',
 			type: 'integer',
 			label: 'Integer',
@@ -502,6 +520,7 @@ const ValidationComponent = ( {
 			'text',
 			'email',
 			'telephone',
+			'url',
 			'integer',
 			'boolean',
 			'customEdit',

@@ -104,6 +104,7 @@ export type FieldType =
 	| 'boolean'
 	| 'email'
 	| 'telephone'
+	| 'url'
 	| 'array';
 
 /**
