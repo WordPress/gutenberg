@@ -73,7 +73,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
-	const { canCreate: canCreatePage } = useResourcePermissions( {
+	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
@@ -142,8 +142,13 @@ function UnforwardedLinkUI( props, ref ) {
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						renderControlBottom={ () =>
-							! link?.url?.length && (
+						renderControlBottom={ () => {
+							// Don't show the tools when there is submitted link (preview state).
+							if ( link?.url?.length ) {
+								return null;
+							}
+
+							return (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
 									focusAddPageButton={ focusAddPageButton }
@@ -155,11 +160,16 @@ function UnforwardedLinkUI( props, ref ) {
 										setAddingPage( true );
 										setFocusAddPageButton( false );
 									} }
-									blockEditingMode={ blockEditingMode }
-									canCreatePage={ canCreatePage }
+									canAddPage={
+										permissions?.canCreate &&
+										type === 'page'
+									}
+									canAddBlock={
+										blockEditingMode === 'default'
+									}
 								/>
-							)
-						}
+							);
+						} }
 					/>
 				</div>
 			) }
@@ -199,8 +209,8 @@ const LinkUITools = ( {
 	setAddingPage,
 	focusAddBlockButton,
 	focusAddPageButton,
-	canCreatePage,
-	blockEditingMode,
+	canAddPage,
+	canAddBlock,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 	const addBlockButtonRef = useRef();
@@ -220,9 +230,14 @@ const LinkUITools = ( {
 		}
 	}, [ focusAddPageButton ] );
 
+	// Don't render anything if neither button should be shown
+	if ( ! canAddPage && ! canAddBlock ) {
+		return null;
+	}
+
 	return (
 		<VStack spacing={ 0 } className="link-ui-tools">
-			{ canCreatePage && (
+			{ canAddPage && (
 				<Button
 					__next40pxDefaultSize
 					ref={ addPageButtonRef }
@@ -236,7 +251,7 @@ const LinkUITools = ( {
 					{ __( 'Create page' ) }
 				</Button>
 			) }
-			{ blockEditingMode === 'default' && (
+			{ canAddBlock && (
 				<Button
 					__next40pxDefaultSize
 					ref={ addBlockButtonRef }
