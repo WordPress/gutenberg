@@ -62,7 +62,7 @@ module.exports = async ( {
 								: 'wp-scripts start' ) +
 							' --blocks-manifest' +
 							( theme
-								? ' --webpack-src-dir=./assets/src --output-path=./assets/build'
+								? ' --webpack-src-dir=./assets/src/blocks --output-path=./assets/build/blocks'
 								: '' ),
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),

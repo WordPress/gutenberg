@@ -48,7 +48,7 @@ async function configureBlockAttributes( existingAttributes = {} ) {
  */
 async function createAttribute() {
 	const name = await input( {
-		message: 'Attribute name (camelCase):',
+		message: 'Attribute name:',
 		validate: ( userInput ) => {
 			if ( ! userInput.trim() ) {
 				return 'Attribute name is required';
