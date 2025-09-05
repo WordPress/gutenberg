@@ -25,12 +25,12 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
-// Check if the project has wp-prettier installed and if the project has a Prettier config.
+// Check if the project has wp-prettier installed and if the project has a Prettier config
 function checkPrettier() {
 	try {
 		const prettierResolvePath = require.resolve( 'prettier' );
 		const prettierPackageJson = readPkgUp( { cwd: prettierResolvePath } );
-		const prettierPackageName = prettierPackageJson.packageJson.name;
+		const prettierPackageName = prettierPackageJson.pkg.name;
 
 		if (
 			! [ 'wp-prettier', '@wordpress/prettier' ].includes(
@@ -79,24 +79,24 @@ if ( ! hasPrettierConfig() ) {
 	];
 }
 
-// If `--ignore-path` is not explicitly specified, use the project's or global .prettierignore.
+// If `--ignore-path` is not explicitly specified, use the project's or global .eslintignore
 let ignorePath = getArgFromCLI( '--ignore-path' );
 if ( ! ignorePath ) {
-	if ( hasProjectFile( '.prettierignore' ) ) {
-		ignorePath = fromProjectRoot( '.prettierignore' );
+	if ( hasProjectFile( '.eslintignore' ) ) {
+		ignorePath = fromProjectRoot( '.eslintignore' );
 	} else {
-		ignorePath = fromConfigRoot( '.prettierignore' );
+		ignorePath = fromConfigRoot( '.eslintignore' );
 	}
 }
 const ignoreArgs = [ '--ignore-path', ignorePath ];
 
-// Forward the --require-pragma option that formats only files that already have the @format
+// forward the --require-pragma option that formats only files that already have the @format
 // pragma in the first docblock.
 const pragmaArgs = hasArgInCLI( '--require-pragma' )
 	? [ '--require-pragma' ]
 	: [];
 
-// Get the files and directories to format and convert them to globs.
+// Get the files and directories to format and convert them to globs
 let fileArgs = getFileArgsFromCLI();
 if ( fileArgs.length === 0 ) {
 	fileArgs = [ '.' ];
@@ -104,7 +104,7 @@ if ( fileArgs.length === 0 ) {
 
 // Converts `foo/bar` directory to `foo/bar/**/*.js`
 const globArgs = dirGlob( fileArgs, {
-	extensions: [ 'js', 'jsx', 'json', 'ts', 'tsx', 'yml', 'yaml' ],
+	extensions: [ 'js', 'jsx', 'ts', 'tsx' ],
 } );
 
 const result = spawn(

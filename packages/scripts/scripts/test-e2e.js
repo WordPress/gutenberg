@@ -12,7 +12,7 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-const path = require( 'path' );
+/* eslint-disable-next-line jest/no-jest-import */
 const jest = require( 'jest' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -28,7 +28,7 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
-const result = spawn( 'node', [ require.resolve( 'puppeteer-core/install' ) ], {
+const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
 	stdio: 'inherit',
 } );
 
@@ -52,7 +52,6 @@ const config = configFile
 	? [ '--config', JSON.stringify( require( configFile ) ) ]
 	: [];
 
-// Force e2e tests to run serially, not in parallel. They test against a shared Docker instance
 const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
 const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 
@@ -77,14 +76,6 @@ Object.entries( configsMapping ).forEach( ( [ envKey, argName ] ) => {
 		process.env[ envKey ] = getArgFromCLI( argName );
 	}
 } );
-
-// Set the default artifacts path.
-if ( ! process.env.WP_ARTIFACTS_PATH ) {
-	process.env.WP_ARTIFACTS_PATH = path.resolve(
-		process.env.GITHUB_WORKSPACE || process.cwd(),
-		'artifacts'
-	);
-}
 
 const cleanUpPrefixes = [ '--puppeteer-', '--wordpress-' ];
 

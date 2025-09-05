@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-const { getAsBooleanFromENV } = require( './process' );
 const {
 	getArgFromCLI,
 	getArgsFromCLI,
@@ -12,49 +11,28 @@ const {
 	spawnScript,
 } = require( './cli' );
 const {
-	getJestOverrideConfigFile,
-	getPhpFilePaths,
-	getProjectSourcePath,
 	getWebpackArgs,
-	getWebpackEntryPoints,
 	hasBabelConfig,
-	hasCssnanoConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
-	hasPostCSSConfig,
 	hasPrettierConfig,
+	hasPostCSSConfig,
 } = require( './config' );
-const {
-	fromConfigRoot,
-	fromProjectRoot,
-	fromScriptsRoot,
-	hasProjectFile,
-} = require( './file' );
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { getPackageProp, hasPackageProp } = require( './package' );
-const {
-	getBlockJsonModuleFields,
-	getBlockJsonScriptFields,
-} = require( './block-json' );
 
 module.exports = {
-	fromConfigRoot,
 	fromProjectRoot,
-	fromScriptsRoot,
-	getAsBooleanFromENV,
+	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
 	getJestOverrideConfigFile,
 	getNodeArgsFromCLI,
 	getPackageProp,
-	getPhpFilePaths,
-	getProjectSourcePath,
 	getWebpackArgs,
-	getWebpackEntryPoints,
-	getBlockJsonModuleFields,
-	getBlockJsonScriptFields,
 	hasArgInCLI,
 	hasBabelConfig,
-	hasCssnanoConfig,
 	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
