@@ -4,7 +4,8 @@
 	max-width: 100%;
 	box-sizing: border-box;
 
-	&.is-layout-grid {
+	&.is-layout-grid,
+	&.is-layout-flex {
 		list-style: none;
 		padding: 0;
 	}
