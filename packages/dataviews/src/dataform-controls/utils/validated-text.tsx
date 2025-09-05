@@ -7,7 +7,6 @@ import {
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
-import { atSymbol, mobile } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,21 +23,10 @@ export type DataFormValidatedTextControlProps< Item > =
 		 */
 		type?: 'text' | 'email' | 'tel' | 'url';
 		/**
-		 * Optional icon to display as prefix. If not provided, an appropriate icon will be chosen based on the type.
+		 * Optional icon to display as prefix.
 		 */
-		icon?: React.ComponentType;
+		icon?: React.ComponentType | React.ReactElement;
 	};
-
-const getIconForType = ( type?: string ) => {
-	switch ( type ) {
-		case 'email':
-			return atSymbol;
-		case 'tel':
-			return mobile;
-		default:
-			return null;
-	}
-};
 
 export default function ValidatedText< Item >( {
 	data,
@@ -57,7 +45,7 @@ export default function ValidatedText< Item >( {
 			>[ 'customValidity' ]
 		>( undefined );
 
-	const iconToShow = icon || getIconForType( type );
+	const iconToShow = icon;
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
