@@ -7,7 +7,7 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { keyboardReturn, lineDashed } from '@wordpress/icons';
 
 const nameWbr = 'core/line-break-wbr';
-const titleWbr = __( 'Insert word break' );
+const titleWbr = __( 'Word break' );
 
 export const lineBreakWbr = {
 	name: nameWbr,
@@ -24,7 +24,7 @@ export const lineBreakWbr = {
 		return (
 			<RichTextToolbarButton
 				icon={ keyboardReturn }
-				title={ __( 'Insert word break' ) }
+				title={ titleWbr }
 				onClick={ onClick }
 				role="menuitem"
 			/>
@@ -33,7 +33,7 @@ export const lineBreakWbr = {
 };
 
 const nameShy = 'core/soft-hyphen';
-const titleShy = __( 'Insert soft hyphen' );
+const titleShy = __( 'Soft hyphen' );
 
 export const softHyphen = {
 	name: nameShy,
