@@ -9,15 +9,13 @@ permissions: {}
 jobs:
     # Runs the actionlint GitHub Action workflow file linter.
     #
+    # See https://github.com/rhysd/actionlint.
+    #
     # This helps guard against common mistakes including strong type checking for expressions (${{ }}), security checks,
     # `run:` script checking, glob syntax validation, and more.
-    #
-    # Performs the following steps:
-    # - Checks out the repository.
-    # - Runs actionlint.
     actionlint:
         name: Run actionlint
-        runs-on: 'ubuntu-24.04'
+        runs-on: ubuntu-24.04
         permissions:
             contents: read
         timeout-minutes: 5
@@ -28,10 +26,99 @@ jobs:
                   persist-credentials: false
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            # actionlint is static checker for GitHub Actions workflow files.
-            # See https://github.com/rhysd/actionlint.
-            # Configuration file: .github/actionlint.yml
             - name: Run actionlint
-              uses: docker://rhysd/actionlint:1.7.7
+              uses: docker://rhysd/actionlint@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 # v1.7.7
               with:
                   args: '-color -verbose'
+
+    # Runs the Octoscan GitHub Action workflow file linter.
+    #
+    # See https://github.com/synacktiv/octoscan
+    #
+    # This helps guard against injection attacks, credential exposure, vulnerable actions, repository jacking,
+    # dangerous checkouts, and artifact security issues.
+    octoscan:
+        name: Octoscan
+        runs-on: ubuntu-24.04
+        permissions:
+            security-events: write
+            actions: read
+            contents: read
+        timeout-minutes: 10
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  persist-credentials: false
+
+            - name: Run octoscan
+              id: octoscan
+              uses: synacktiv/action-octoscan@6b1cf2343893dfb9e5f75652388bd2dc83f456b0 # v1.0.0
+              with:
+                  filter_triggers: ''
+
+            - name: Upload SARIF file to GitHub
+              uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
+              with:
+                  sarif_file: '${{steps.octoscan.outputs.sarif_output}}'
+                  category: octoscan
+
+    # Runs the Zizmor GitHub Action workflow file linter.
+    #
+    # See https://github.com/zizmorcore/zizmor
+    #
+    # This helps guard against supply chain attacks, unpinned dependencies, excessive permissions,
+    # dangerous triggers, credential leaks, and sophisticated security vulnerabilities.
+    zizmor:
+        name: Zizmor
+        runs-on: ubuntu-24.04
+        permissions:
+            security-events: write
+            actions: read
+            contents: read
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  persist-credentials: false
+
+            - name: Install the latest version of uv
+              uses: astral-sh/setup-uv@4959332f0f014c5280e7eac8b70c90cb574c9f9b # v6.6.0
+
+            - name: Run zizmor
+              run: uvx zizmor@1.12.0 --persona=auditor --format=sarif . > results.sarif
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload SARIF file
+              uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
+              with:
+                  sarif_file: results.sarif
+                  category: zizmor
+
+    # Runs the Poutine GitHub Action workflow file linter.
+    #
+    # See https://github.com/boostsecurityio/poutine
+    #
+    # This helps guard against CI/CD pipeline risks, supply chain vulnerabilities, excessive permissions,
+    # and dangerous build platform configurations.
+    poutine:
+        name: Poutine
+        runs-on: ubuntu-24.04
+        permissions:
+            security-events: write
+            contents: read
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  persist-credentials: false
+
+            - name: Run Poutine
+              uses: boostsecurityio/poutine-action@84c0a0d32e8d57ae12651222be1eb15351429228 # v0.15.2
+
+            - name: Upload poutine SARIF file
+              uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
+              with:
+                  sarif_file: results.sarif
+                  category: poutine
