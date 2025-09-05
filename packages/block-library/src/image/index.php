@@ -266,14 +266,36 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
  * @since 6.5.0
  */
 function block_core_image_print_lightbox_overlay( $block_context ) {
-	$dialog_label         = esc_attr__( 'Enlarged images' );
-	$has_icon             = $block_context['hasIcon'] ?? true;
-	$close_button_label   = $has_icon ? esc_attr__( 'Close' ) : '';
-	$close_button_content = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>' : esc_attr__( 'Close' );
-	$prev_button_label    = $has_icon ? esc_attr__( 'Previous' ) : '';
-	$prev_button_content  = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>' : esc_attr__( 'Previous' );
-	$next_button_label    = $has_icon ? esc_attr__( 'Next' ) : '';
-	$next_button_content  = $has_icon ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>' : esc_attr__( 'Next' );
+	$dialog_label           = esc_attr__( 'Enlarged images' );
+	$navigation_button_type = $block_context['navigationButtonType'] ?? 'icon';
+	$close_button_text      = esc_attr__( 'Close' );
+	$prev_button_text       = esc_attr__( 'Previous' );
+	$next_button_text       = esc_attr__( 'Next' );
+	$close_button_icon      = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
+	$prev_button_icon       = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
+	$next_button_icon       = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
+
+	switch ( $navigation_button_type ) {
+		case 'text':
+			$close_button_content = $close_button_text;
+			$prev_button_content  = $prev_button_text;
+			$next_button_content  = $next_button_text;
+			break;
+		case 'icon-and-text':
+			$close_button_content = $close_button_icon . $close_button_text;
+			$prev_button_content  = $prev_button_icon . $prev_button_text;
+			$next_button_content  = $next_button_text . $next_button_icon;
+			break;
+		default:
+			$close_button_content = $close_button_icon;
+			$prev_button_content  = $prev_button_icon;
+			$next_button_content  = $next_button_icon;
+			break;
+	}
+
+	$close_button_label = 'icon' === $navigation_button_type ? $close_button_text : '';
+	$prev_button_label  = 'icon' === $navigation_button_type ? $prev_button_text : '';
+	$next_button_label  = 'icon' === $navigation_button_type ? $next_button_text : '';
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some

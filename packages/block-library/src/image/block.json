@@ -8,7 +8,7 @@
 		"allowResize",
 		"imageCrop",
 		"fixedHeight",
-		"hasIcon",
+		"navigationButtonType",
 		"postId",
 		"postType",
 		"queryId",

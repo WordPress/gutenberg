@@ -250,6 +250,7 @@
 	.wp-lightbox-navigation-button {
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
+		gap: 8px;
 		display: flex;
 		cursor: pointer;
 		align-items: center;

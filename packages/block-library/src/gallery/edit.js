@@ -94,6 +94,20 @@ const LINK_OPTIONS = [
 		noticeText: __( 'None' ),
 	},
 ];
+const NAVIGATION_BUTTON_TYPE_OPTIONS = [
+	{
+		label: __( 'Icon only' ),
+		value: 'icon',
+	},
+	{
+		label: __( 'Text only' ),
+		value: 'text',
+	},
+	{
+		label: __( 'Icon and Text' ),
+		value: 'icon-and-text',
+	},
+];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
@@ -128,7 +142,7 @@ export default function GalleryEdit( props ) {
 		: LINK_OPTIONS;
 
 	const {
-		hasIcon,
+		navigationButtonType,
 		columns,
 		imageCrop,
 		randomOrder,
@@ -582,7 +596,7 @@ export default function GalleryEdit( props ) {
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
 							setAttributes( {
-								hasIcon: true,
+								navigationButtonType: 'icon',
 								columns: undefined,
 								imageCrop: true,
 								randomOrder: false,
@@ -701,23 +715,29 @@ export default function GalleryEdit( props ) {
 							</ToolsPanelItem>
 						) }
 						<ToolsPanelItem
-							label={ __( 'Show icon button' ) }
+							label={ __( 'Navigation button type' ) }
 							isShownByDefault
-							hasValue={ () => ! hasIcon }
+							hasValue={ () => navigationButtonType !== 'icon' }
 							onDeselect={ () =>
-								setAttributes( { hasIcon: true } )
+								setAttributes( {
+									navigationButtonType: 'icon',
+								} )
 							}
 						>
-							<ToggleControl
+							<SelectControl
 								__nextHasNoMarginBottom
-								label={ __( 'Show icon button' ) }
-								help={ __(
-									'Shows the icon button in the lightbox.'
-								) }
+								label={ __( 'Navigation button type' ) }
+								value={ navigationButtonType }
 								onChange={ ( value ) =>
-									setAttributes( { hasIcon: value } )
+									setAttributes( {
+										navigationButtonType: value,
+									} )
 								}
-								checked={ hasIcon }
+								options={ NAVIGATION_BUTTON_TYPE_OPTIONS }
+								size="__unstable-large"
+								help={ __(
+									'Configure the visual appearance of the buttons in the lightbox.'
+								) }
 							/>
 						</ToolsPanelItem>
 					</ToolsPanel>
