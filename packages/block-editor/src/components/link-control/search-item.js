@@ -19,12 +19,27 @@ import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
-const ICONS_MAP = {
-	post: postList,
-	page,
-	post_tag: tag,
-	category,
-	attachment: file,
+const TYPES = {
+	post: {
+		icon: postList,
+		label: __( 'post' ),
+	},
+	page: {
+		icon: page,
+		label: __( 'page' ),
+	},
+	post_tag: {
+		icon: tag,
+		label: __( 'tag' ),
+	},
+	category: {
+		icon: category,
+		label: __( 'category' ),
+	},
+	attachment: {
+		icon: file,
+		label: __( 'attachment' ),
+	},
 };
 
 function SearchItemIcon( { isURL, suggestion } ) {
@@ -32,8 +47,8 @@ function SearchItemIcon( { isURL, suggestion } ) {
 
 	if ( isURL ) {
 		icon = globe;
-	} else if ( suggestion.type in ICONS_MAP ) {
-		icon = ICONS_MAP[ suggestion.type ];
+	} else if ( suggestion.type in TYPES ) {
+		icon = TYPES[ suggestion.type ].icon;
 		if ( suggestion.type === 'page' ) {
 			if ( suggestion.isFrontPage ) {
 				icon = home;
@@ -156,17 +171,9 @@ function getVisualTypeName( suggestion ) {
 		return __( 'blog home' );
 	}
 
-	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
-	const builtInLabels = {
-		post: __( 'post' ),
-		page: __( 'page' ),
-		post_tag: __( 'tag' ),
-		category: __( 'category' ),
-		attachment: __( 'attachment' ),
-	};
-
-	if ( suggestion.type in builtInLabels ) {
-		return builtInLabels[ suggestion.type ];
+	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.
+	if ( suggestion.type in TYPES ) {
+		return TYPES[ suggestion.type ].label;
 	}
 
 	return suggestion.type;
