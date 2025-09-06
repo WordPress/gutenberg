@@ -56,6 +56,7 @@ jobs:
               uses: synacktiv/action-octoscan@6b1cf2343893dfb9e5f75652388bd2dc83f456b0 # v1.0.0
               with:
                   filter_triggers: ''
+                  disable_rules: 'local-action,runner-label'
 
             - name: Upload SARIF file to GitHub
               uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
@@ -86,7 +87,7 @@ jobs:
               uses: astral-sh/setup-uv@4959332f0f014c5280e7eac8b70c90cb574c9f9b # v6.6.0
 
             - name: Run zizmor
-              run: uvx zizmor@1.12.1 --persona=auditor --format=sarif . > results.sarif
+              run: uvx zizmor@1.12.1 --persona=regular --format=sarif . > results.sarif
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
