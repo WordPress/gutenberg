@@ -22,23 +22,23 @@ import deprecated from '@wordpress/deprecated';
 const TYPES = {
 	post: {
 		icon: postList,
-		label: __( 'post' ),
+		label: __( 'Post' ),
 	},
 	page: {
 		icon: page,
-		label: __( 'page' ),
+		label: __( 'Page' ),
 	},
 	post_tag: {
 		icon: tag,
-		label: __( 'tag' ),
+		label: __( 'Tag' ),
 	},
 	category: {
 		icon: category,
-		label: __( 'category' ),
+		label: __( 'Category' ),
 	},
 	attachment: {
 		icon: file,
-		label: __( 'attachment' ),
+		label: __( 'Attachment' ),
 	},
 };
 
@@ -164,11 +164,11 @@ export const LinkControlSearchItem = ( {
 
 function getVisualTypeName( suggestion ) {
 	if ( suggestion.isFrontPage ) {
-		return __( 'front page' );
+		return __( 'Front page' );
 	}
 
 	if ( suggestion.isBlogHome ) {
-		return __( 'blog home' );
+		return __( 'Blog home' );
 	}
 
 	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.
