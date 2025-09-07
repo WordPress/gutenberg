@@ -144,7 +144,7 @@ jobs:
                   artifact-path: flaky-tests
 
     required-e2e-playwright-status-checks:
-        name: All end-to-end tests passing.
+        name: All end-to-end tests passing
         runs-on: 'ubuntu-24.04'
         needs: ['e2e-playwright']
         if: ${{ always() }}
