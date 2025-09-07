@@ -100,22 +100,20 @@ export function useInBetweenInserter() {
 				const offsetLeft = event.clientX;
 
 				const children = Array.from( event.target.children );
-				/** @type {HTMLElement | null} */
-				let element = null;
+				let element;
 
 				if ( orientation === 'horizontal' ) {
-					const wpBlocks = children.filter(
-						( blockEl ) =>
-							blockEl.classList &&
+					// Build candidates: only direct children that are .wp-block
+					const candidates = children
+						.filter( ( blockEl ) =>
 							blockEl.classList.contains( 'wp-block' )
-					);
+						)
+						.map( ( blockEl ) => ( {
+							el: blockEl,
+							rect: blockEl.getBoundingClientRect(),
+						} ) );
 
-					const candidates = wpBlocks.map( ( blockEl ) => ( {
-						el: blockEl,
-						rect: blockEl.getBoundingClientRect(),
-					} ) );
-
-					// Prefer candidates on the same visual row (overlapping Y).
+					// Prefer tiles that overlap the mouse Y (same visual row).
 					const rowCandidates = candidates.filter(
 						( c ) =>
 							offsetTop >= c.rect.top &&
@@ -133,20 +131,16 @@ export function useInBetweenInserter() {
 					const match =
 						findCandidate( rowCandidates ) ||
 						findCandidate( candidates );
-					element = match ? match.el : null;
+					element = match ? match.el : undefined;
 				} else {
 					// Vertical orientation.
-					element =
-						children.find( ( blockEl ) => {
-							if (
-								! blockEl.classList ||
-								! blockEl.classList.contains( 'wp-block' )
-							) {
-								return false;
-							}
-							const blockElRect = blockEl.getBoundingClientRect();
-							return blockElRect.top > offsetTop;
-						} ) || null;
+					element = children.find( ( blockEl ) => {
+						if ( ! blockEl.classList.contains( 'wp-block' ) ) {
+							return false;
+						}
+						const blockElRect = blockEl.getBoundingClientRect();
+						return blockElRect.top > offsetTop;
+					} );
 				}
 
 				if ( ! element ) {
