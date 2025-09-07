@@ -3141,7 +3141,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Block gap styles will be output unless explicitly set to `null`. See static::PROTECTED_PROPERTIES.
 		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
-			if ( ! is_null( $block_gap_value ) && $block_gap_value !== '' ) {
+			if ( null !== $block_gap_value && '' !== $block_gap_value ) {
 				$css .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
 				$css .= ':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 				$css .= ':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
