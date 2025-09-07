@@ -45,7 +45,6 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 				onChange={ ( comment ) =>
 					setInputComment( comment.target.value )
 				}
-				label={ __( 'Comment' ) }
 				rows={ 4 }
 				maxRows={ 20 }
 			>
