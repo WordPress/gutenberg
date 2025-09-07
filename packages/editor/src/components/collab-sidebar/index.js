@@ -308,8 +308,10 @@ export default function CollabSidebar() {
 		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
 		const unresolvedSortedComments = blockCommentIds
 			.map( ( id ) => threadIdMap.get( id ) )
-			.filter( ( thread ) => thread !== undefined )
-			.filter( ( thread ) => thread.status !== 'approved' );
+			.filter(
+				( thread ) =>
+					thread !== undefined && thread.status !== 'approved'
+			);
 
 		return {
 			resultComments: updatedResult,
