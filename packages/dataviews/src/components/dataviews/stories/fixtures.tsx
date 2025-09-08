@@ -772,7 +772,7 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Title',
 		id: 'title',
 		type: 'text',
-		enableHiding: false,
+		enableHiding: true,
 		enableGlobalSearch: true,
 		filterBy: {
 			operators: [ 'contains', 'notContains', 'startsWith' ],

@@ -9,6 +9,7 @@ import {
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	store as blocksStore,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
@@ -42,7 +43,10 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
+	isContainerInsertableToInWriteMode,
 } from './private-selectors';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 /**
  * A block selection object.
@@ -1682,13 +1686,16 @@ const canInsertBlockTypeUnmemoized = (
 	if ( isLocked ) {
 		return false;
 	}
-
-	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
-	if ( _isSectionBlock ) {
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	if ( isParentSectionBlock && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
+	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
+	if ( blockEditingMode === 'disabled' ) {
 		return false;
 	}
 
@@ -1700,11 +1707,22 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	// In write mode, check if this container allows insertion.
+	if (
+		blockEditingMode === 'contentOnly' &&
+		isNavigationMode( state ) &&
+		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+	) {
+		return false;
+	}
+
 	const parentName = getBlockName( state, rootClientId );
+
 	const parentBlockType = getBlockType( parentName );
 
 	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
 	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
+
 	let hasParentAllowedBlock = checkAllowList(
 		parentAllowedChildBlocks,
 		blockName
@@ -1842,11 +1860,29 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
-	if ( isBlockWithinSection ) {
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	const blockEditingMode = getBlockEditingMode( state, rootClientId );
+
+	// Check if the parent container allows insertion/removal in write mode
+	if (
+		blockEditingMode === 'contentOnly' &&
+		isNavigationMode( state ) &&
+		! isContainerInsertableToInWriteMode(
+			state,
+			getBlockName( state, rootClientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
+	return blockEditingMode !== 'disabled';
 }
 
 /**

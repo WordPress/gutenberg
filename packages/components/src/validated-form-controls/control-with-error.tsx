@@ -81,6 +81,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		getValidityTarget: () => ValidityTarget | null | undefined;
 		/**
 		 * The control component to apply validation to.
+		 *
+		 * As `children` will be cloned with additional props,
+		 * the component at the root of `children` should accept
+		 * `label`, `onChange`, and `required` props, and process them
+		 * appropriately.
 		 */
 		children: C;
 	},

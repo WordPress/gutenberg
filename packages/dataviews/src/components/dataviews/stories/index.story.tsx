@@ -46,6 +46,20 @@ import './style.css';
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
+	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
+	// (sb-main-padding class). This ensures consistent layout in DataViews stories
+	// when clicking actions menus. Without this the padding on the body will jump.
+	parameters: {
+		layout: 'fullscreen',
+	},
+	decorators: [
+		( Story ) => (
+			<div style={ { padding: '1rem' } }>
+				<Story />
+			</div>
+		),
+	],
 } as Meta< typeof DataViews >;
 
 export default meta;
