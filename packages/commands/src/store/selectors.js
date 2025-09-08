@@ -60,3 +60,15 @@ export function isOpen( state ) {
 export function getContext( state ) {
 	return state.context;
 }
+
+/**
+ * Returns a specific command by name.
+ *
+ * @param {Object} state State tree.
+ * @param {string} name  Command name.
+ *
+ * @return {import('./actions').WPCommandConfig|undefined} The requested command, if it exists.
+ */
+export function getCommand( state, name ) {
+	return state.commands[ name ];
+}

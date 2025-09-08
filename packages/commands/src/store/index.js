@@ -10,6 +10,7 @@ import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import * as privateActions from './private-actions';
+import { commandTriggerer } from './middleware';
 import { unlock } from '../lock-unlock';
 
 const STORE_NAME = 'core/commands';
@@ -33,6 +34,7 @@ export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
+	middleware: [ commandTriggerer ],
 } );
 
 register( store );

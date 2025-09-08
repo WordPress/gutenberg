@@ -107,3 +107,17 @@ export function close() {
 		type: 'CLOSE',
 	};
 }
+
+/**
+ * Triggers a command by name.
+ *
+ * @param {string} name Command name.
+ *
+ * @return {Object} action.
+ */
+export function triggerCommand( name ) {
+	return {
+		type: 'TRIGGER_COMMAND',
+		name,
+	};
+}
