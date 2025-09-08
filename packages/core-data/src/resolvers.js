@@ -237,12 +237,27 @@ export const getEntityRecords =
 			{ exclusive: false }
 		);
 
+		// Keep a copy of the original query for later use in getResolutionsArgs.
+		// The query object may be modified below (for example, when _fields is
+		// specified), but we want to use the original query when marking
+		// resolutions as finished.
+		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
-		function getResolutionsArgs( records ) {
+		function getResolutionsArgs( records, recordsQuery ) {
+			const queryArgs = Object.fromEntries(
+				Object.entries( recordsQuery ).filter( ( [ k, v ] ) => {
+					return [ 'context', '_fields' ].includes( k ) && !! v;
+				} )
+			);
 			return records
 				.filter( ( record ) => record?.[ key ] )
-				.map( ( record ) => [ kind, name, record[ key ] ] );
+				.map( ( record ) => [
+					kind,
+					name,
+					record[ key ],
+					Object.keys( queryArgs ).length > 0 ? queryArgs : undefined,
+				] );
 		}
 
 		try {
@@ -256,7 +271,7 @@ export const getEntityRecords =
 						...new Set( [
 							...( getNormalizedCommaSeparable( query._fields ) ||
 								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
+							key,
 						] ),
 					].join(),
 				};
@@ -320,7 +335,7 @@ export const getEntityRecords =
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
-							getResolutionsArgs( pageRecords )
+							getResolutionsArgs( pageRecords, rawQuery )
 						);
 					} );
 					page++;
@@ -401,16 +416,10 @@ export const getEntityRecords =
 					);
 				}
 
-				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` selector in addition to `getEntityRecords`.
-				// See https://github.com/WordPress/gutenberg/pull/26575
-				// Todo https://github.com/WordPress/gutenberg/issues/26629
-				if ( ! query?._fields && ! query.context ) {
-					dispatch.finishResolutions(
-						'getEntityRecord',
-						getResolutionsArgs( records )
-					);
-				}
+				dispatch.finishResolutions(
+					'getEntityRecord',
+					getResolutionsArgs( records, rawQuery )
+				);
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
