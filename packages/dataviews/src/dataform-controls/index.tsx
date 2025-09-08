@@ -24,6 +24,7 @@ import text from './text';
 import toggle from './toggle';
 import toggleGroup from './toggle-group';
 import array from './array';
+import color from './color';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -32,6 +33,7 @@ interface FormControls {
 const FORM_CONTROLS: FormControls = {
 	array,
 	checkbox,
+	color,
 	datetime,
 	date,
 	email,

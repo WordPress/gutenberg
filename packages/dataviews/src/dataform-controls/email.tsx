@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { atSymbol } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
@@ -12,7 +17,14 @@ export default function Email< Item >( {
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
-			{ ...{ data, field, onChange, hideLabelFromVision, type: 'email' } }
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				type: 'email',
+				icon: atSymbol,
+			} }
 		/>
 	);
 }

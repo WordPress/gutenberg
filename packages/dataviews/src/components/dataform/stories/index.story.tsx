@@ -391,6 +391,7 @@ const ValidationComponent = ( {
 		email: string;
 		telephone: string;
 		url: string;
+		color: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
@@ -401,6 +402,7 @@ const ValidationComponent = ( {
 		email: 'hi@example.com',
 		telephone: '+306978241796',
 		url: 'https://example.com',
+		color: '#ff6600',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
@@ -430,6 +432,13 @@ const ValidationComponent = ( {
 	const customUrlRule = ( value: ValidatedItem ) => {
 		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
 			return 'URL must be from https://example.com domain.';
+		}
+
+		return null;
+	};
+	const customColorRule = ( value: ValidatedItem ) => {
+		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+			return 'Color must be a valid hex format (e.g., #ff6600).';
 		}
 
 		return null;
@@ -486,6 +495,15 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'color',
+			type: 'color',
+			label: 'Color',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customColorRule ),
+			},
+		},
+		{
 			id: 'integer',
 			type: 'integer',
 			label: 'Integer',
@@ -519,6 +537,7 @@ const ValidationComponent = ( {
 			'email',
 			'telephone',
 			'url',
+			'color',
 			'integer',
 			'boolean',
 			'customEdit',

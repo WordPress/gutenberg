@@ -33,6 +33,7 @@ const meta = {
 				'default',
 				'array',
 				'checkbox',
+				'color',
 				'date',
 				'datetime',
 				'email',
@@ -71,6 +72,8 @@ type DataType = {
 	emailWithElements: string;
 	telephone: string;
 	telephoneWithElements: string;
+	color: string;
+	colorWithElements: string;
 	url: string;
 	urlWithElements: string;
 	media: string;
@@ -99,6 +102,8 @@ const data: DataType[] = [
 		emailWithElements: 'hi@example.com',
 		telephone: '+1-555-123-4567',
 		telephoneWithElements: '+1-555-123-4567',
+		color: '#ff6600',
+		colorWithElements: 'rgba(255, 165, 0, 0.8)',
 		url: 'https://example.com',
 		urlWithElements: 'https://example.com',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -264,6 +269,30 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'color',
+		type: 'color',
+		label: 'Color',
+		description:
+			'Help for color. Supports hex, rgb, hsl formats with alpha channel.',
+	},
+	{
+		id: 'colorWithElements',
+		type: 'color',
+		label: 'Color (with elements)',
+		description: 'Help for color with predefined color options.',
+		elements: [
+			{ value: '#ff0000', label: 'Red' },
+			{ value: '#00ff00', label: 'Green' },
+			{ value: '#0000ff', label: 'Blue' },
+			{ value: 'rgba(255, 165, 0, 0.8)', label: 'Orange (80% opacity)' },
+			{ value: 'hsl(300, 100%, 50%)', label: 'Magenta' },
+			{
+				value: 'hsla(120, 100%, 25%, 0.6)',
+				label: 'Dark Green (60% opacity)',
+			},
+		],
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -342,6 +371,7 @@ type ControlTypes =
 	| 'default'
 	| 'array'
 	| 'checkbox'
+	| 'color'
 	| 'date'
 	| 'datetime'
 	| 'email'
@@ -614,6 +644,23 @@ export const Url = ( {
 	);
 
 	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
+};
+
+export const Color = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const colorFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'color' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
+	);
 };
 
 export const Media = ( {
