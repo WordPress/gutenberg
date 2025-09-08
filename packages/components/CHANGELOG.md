@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.3.1-next.0 (2025-09-08)
+
 ### Bug Fixes
 
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
