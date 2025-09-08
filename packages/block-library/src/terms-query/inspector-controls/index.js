@@ -141,15 +141,12 @@ export default function TermsQueryInspectorControls( {
 						/>
 					) }
 
-					{ termsSelection === 'all' ||
-						( termsSelection === 'top-level' && (
-							<MaxTermsControl
-								termQuery={ termQuery }
-								setQuery={ setQuery }
-							/>
-						) ) }
+					<MaxTermsControl
+						termQuery={ termQuery }
+						setQuery={ setQuery }
+					/>
 
-					{ isTaxonomyHierarchical && (
+					{ isTaxonomyHierarchical && termsSelection === 'all' && (
 						<HierarchyControl
 							termQuery={ termQuery }
 							setQuery={ setQuery }
