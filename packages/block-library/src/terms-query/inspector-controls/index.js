@@ -81,7 +81,7 @@ export default function TermsQueryInspectorControls( {
 	// - subtree only is not displayed or
 	// - subtree only is displayed and is disabled.
 	const displayTermSelectionControl =
-		! displaySubtreeOnlyContol || ! termsSelection === 'subtree';
+		! displaySubtreeOnlyContol || termsSelection !== 'subtree';
 
 	return (
 		<>
@@ -127,7 +127,7 @@ export default function TermsQueryInspectorControls( {
 
 					{ displaySubtreeOnlyContol && (
 						<ShowSubtreeControl
-							showSubtree={ termsSelection === 'subtree' }
+							termsSelection={ termsSelection }
 							setAttributes={ setAttributes }
 						/>
 					) }

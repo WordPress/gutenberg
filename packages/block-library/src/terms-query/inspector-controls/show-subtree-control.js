@@ -8,12 +8,12 @@ import {
 } from '@wordpress/components';
 
 export default function ShowSubtreeControl( {
-	showSubtreeOnly,
+	termsSelection,
 	setAttributes,
 } ) {
 	return (
 		<ToolsPanelItem
-			hasValue={ () => showSubtreeOnly !== false }
+			hasValue={ () => termsSelection !== 'subtree' }
 			label={ __( 'Show subtree only' ) }
 			onDeselect={ () => setAttributes( { termsSelection: 'all' } ) }
 			isShownByDefault
@@ -21,7 +21,7 @@ export default function ShowSubtreeControl( {
 			<ToggleControl
 				__nextHasNoMarginBottom
 				label={ __( 'Show subtree only' ) }
-				checked={ showSubtreeOnly }
+				checked={ termsSelection === 'substree' }
 				onChange={ ( bool ) =>
 					setAttributes( {
 						termsSelection: bool ? 'subtree' : 'all',
