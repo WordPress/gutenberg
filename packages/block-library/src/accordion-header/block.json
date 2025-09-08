@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-header",
-	"version": "0.1.0",
 	"title": "Accordion Header",
 	"category": "design",
 	"description": "Displays an accordion header.",
@@ -19,7 +18,6 @@
 			"gradient": true
 		},
 		"align": false,
-		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,

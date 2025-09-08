@@ -32,7 +32,6 @@ const meta = {
 			options: [
 				'default',
 				'array',
-				'boolean',
 				'checkbox',
 				'date',
 				'datetime',
@@ -40,7 +39,10 @@ const meta = {
 				'integer',
 				'radio',
 				'select',
+				'telephone',
+				'url',
 				'text',
+				'toggle',
 				'toggleGroup',
 			],
 		},
@@ -59,6 +61,7 @@ type DataType = {
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
+	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
 	datetimeWithElements: string;
@@ -66,6 +69,10 @@ type DataType = {
 	dateWithElements: string;
 	email: string;
 	emailWithElements: string;
+	telephone: string;
+	telephoneWithElements: string;
+	url: string;
+	urlWithElements: string;
 	media: string;
 	mediaWithElements: string;
 	array: string[];
@@ -82,6 +89,7 @@ const data: DataType[] = [
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
+		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
 		datetimeWithElements: '2021-01-01T14:30:00Z',
@@ -89,6 +97,10 @@ const data: DataType[] = [
 		dateWithElements: '2021-01-01',
 		email: 'hi@example.com',
 		emailWithElements: 'hi@example.com',
+		telephone: '+1-555-123-4567',
+		telephoneWithElements: '+1-555-123-4567',
+		url: 'https://example.com',
+		urlWithElements: 'https://example.com',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -139,6 +151,13 @@ const fields: Field< DataType >[] = [
 		type: 'boolean',
 		label: 'Boolean',
 		description: 'Help for boolean.',
+	},
+	{
+		id: 'booleanWithToggle',
+		type: 'boolean',
+		label: 'Boolean (with toggle)',
+		description: 'Help for boolean with toggle control.',
+		Edit: 'toggle',
 	},
 	{
 		id: 'booleanWithElements',
@@ -208,6 +227,40 @@ const fields: Field< DataType >[] = [
 			{ value: 'john@example.com', label: 'John Doe' },
 			{ value: 'jane@example.com', label: 'Jane Doe' },
 			{ value: 'bob@example.com', label: 'Bob Smith' },
+		],
+	},
+	{
+		id: 'telephone',
+		type: 'telephone',
+		label: 'Telephone',
+		description: 'Help for telephone.',
+	},
+	{
+		id: 'telephoneWithElements',
+		type: 'telephone',
+		label: 'Telephone (with elements)',
+		description: 'Help for telephone with elements.',
+		elements: [
+			{ value: '+1-555-123-4567', label: '+1-555-123-4567' },
+			{ value: '+44-20-7946-0958', label: '+44-20-7946-0958' },
+			{ value: '+81-3-1234-5678', label: '+81-3-1234-5678' },
+		],
+	},
+	{
+		id: 'url',
+		type: 'url',
+		label: 'URL',
+		description: 'Help for URL.',
+	},
+	{
+		id: 'urlWithElements',
+		type: 'url',
+		label: 'URL (with elements)',
+		description: 'Help for URL with elements.',
+		elements: [
+			{ value: 'https://example.com', label: 'https://example.com' },
+			{ value: 'https://wordpress.org', label: 'https://wordpress.org' },
+			{ value: 'https://github.com', label: 'https://github.com' },
 		],
 	},
 	{
@@ -288,7 +341,6 @@ type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
 	| 'array'
-	| 'boolean'
 	| 'checkbox'
 	| 'date'
 	| 'datetime'
@@ -296,7 +348,10 @@ type ControlTypes =
 	| 'integer'
 	| 'radio'
 	| 'select'
+	| 'telephone'
+	| 'url'
 	| 'text'
+	| 'toggle'
 	| 'toggleGroup';
 
 interface FieldTypeStoryProps {
@@ -523,6 +578,42 @@ export const Email = ( {
 	return (
 		<FieldTypeStory fields={ emailFields } type={ type } Edit={ Edit } />
 	);
+};
+
+export const Telephone = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const telephoneFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'telephone' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ telephoneFields }
+			type={ type }
+			Edit={ Edit }
+		/>
+	);
+};
+
+export const Url = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const urlFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'url' ),
+		[]
+	);
+
+	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
 };
 
 export const Media = ( {

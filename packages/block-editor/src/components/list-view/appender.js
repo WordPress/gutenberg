@@ -22,13 +22,20 @@ export const Appender = forwardRef(
 		const { insertedBlock, setInsertedBlock } = useListViewContext();
 
 		const instanceId = useInstanceId( Appender );
-		const hideInserter = useSelect(
+		const { directInsert, hideInserter } = useSelect(
 			( select ) => {
-				const { getTemplateLock, isZoomOut } = unlock(
-					select( blockEditorStore )
-				);
+				const { getBlockListSettings, getTemplateLock, isZoomOut } =
+					unlock( select( blockEditorStore ) );
 
-				return !! getTemplateLock( clientId ) || isZoomOut();
+				const settings = getBlockListSettings( clientId );
+				const directInsertValue = settings?.directInsert || false;
+				const hideInserterValue =
+					!! getTemplateLock( clientId ) || isZoomOut();
+
+				return {
+					directInsert: directInsertValue,
+					hideInserter: hideInserterValue,
+				};
 			},
 			[ clientId ]
 		);
@@ -79,7 +86,7 @@ export const Appender = forwardRef(
 					position="bottom right"
 					isAppender
 					selectBlockOnInsert={ false }
-					shouldDirectInsert={ false }
+					shouldDirectInsert={ directInsert }
 					__experimentalIsQuick
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }

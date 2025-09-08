@@ -12,13 +12,13 @@ import { unlock } from '../lock-unlock';
 
 const { ValidatedToggleControl } = unlock( privateApis );
 
-export default function Boolean< Item >( {
+export default function Toggle< Item >( {
 	field,
 	onChange,
 	data,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label } = field;
+	const { id, getValue, label, description } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -52,6 +52,7 @@ export default function Boolean< Item >( {
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom
 			label={ label }
+			help={ description }
 			checked={ getValue( { item: data } ) }
 			onChange={ () =>
 				onChange( { [ id ]: ! getValue( { item: data } ) } )
