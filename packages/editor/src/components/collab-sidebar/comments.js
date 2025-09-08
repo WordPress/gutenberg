@@ -251,7 +251,6 @@ function Thread( {
 								'Reply',
 								'Add reply comment'
 							) }
-							shouldFocus
 						/>
 					</VStack>
 				</VStack>
