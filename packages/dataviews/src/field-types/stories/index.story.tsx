@@ -38,6 +38,7 @@ const meta = {
 				'datetime',
 				'email',
 				'integer',
+				'password',
 				'radio',
 				'select',
 				'telephone',
@@ -76,6 +77,8 @@ type DataType = {
 	colorWithElements: string;
 	url: string;
 	urlWithElements: string;
+	password: string;
+	passwordWithElements: string;
 	media: string;
 	mediaWithElements: string;
 	array: string[];
@@ -106,6 +109,8 @@ const data: DataType[] = [
 		colorWithElements: 'rgba(255, 165, 0, 0.8)',
 		url: 'https://example.com',
 		urlWithElements: 'https://example.com',
+		password: 'secretpassword123',
+		passwordWithElements: 'secretpassword123',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -293,6 +298,23 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'password',
+		type: 'password',
+		label: 'Password',
+		description: 'Help for password.',
+	},
+	{
+		id: 'passwordWithElements',
+		type: 'password',
+		label: 'Password (with elements)',
+		description: 'Help for password with elements.',
+		elements: [
+			{ value: 'secretpassword123', label: 'Secret Password' },
+			{ value: 'adminpass456', label: 'Admin Password' },
+			{ value: 'userpass789', label: 'User Password' },
+		],
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -376,6 +398,7 @@ type ControlTypes =
 	| 'datetime'
 	| 'email'
 	| 'integer'
+	| 'password'
 	| 'radio'
 	| 'select'
 	| 'telephone'
@@ -698,6 +721,23 @@ export const Array = ( {
 			type={ type }
 			Edit={ Edit }
 		/>
+	);
+};
+
+export const Password = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const passwordFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'password' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ passwordFields } type={ type } Edit={ Edit } />
 	);
 };
 

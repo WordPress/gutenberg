@@ -35,6 +35,8 @@ export function isItemValid< Item >(
 				( field.type === 'url' && isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'telephone' &&
 					isEmptyNullOrUndefined( value ) ) ||
+				( field.type === 'password' &&
+					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'integer' &&
 					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === undefined && isEmptyNullOrUndefined( value ) )

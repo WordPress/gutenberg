@@ -2,42 +2,30 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Button,
 	privateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
+import { seen, unseen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
 
 const { ValidatedInputControl } = unlock( privateApis );
 
-export type DataFormValidatedTextControlProps< Item > =
-	DataFormControlProps< Item > & {
-		/**
-		 * The input type of the control.
-		 */
-		type?: 'text' | 'email' | 'tel' | 'url' | 'password';
-		/**
-		 * Optional icon to display as prefix.
-		 */
-		icon?: React.ComponentType | React.ReactElement;
-	};
-
-export default function ValidatedText< Item >( {
+export default function Password< Item >( {
 	data,
 	field,
 	onChange,
 	hideLabelFromVision,
-	type,
-	icon,
-}: DataFormValidatedTextControlProps< Item > ) {
+}: DataFormControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
+	const [ isVisible, setIsVisible ] = useState( false );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -52,6 +40,10 @@ export default function ValidatedText< Item >( {
 			} ),
 		[ id, onChange ]
 	);
+
+	const toggleVisibility = useCallback( () => {
+		setIsVisible( ( prev ) => ! prev );
+	}, [] );
 
 	return (
 		<ValidatedInputControl
@@ -82,13 +74,19 @@ export default function ValidatedText< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
-			type={ type }
-			prefix={
-				icon ? (
-					<InputControlPrefixWrapper variant="icon">
-						<Icon icon={ icon } />
-					</InputControlPrefixWrapper>
-				) : undefined
+			type={ isVisible ? 'text' : 'password' }
+			suffix={
+				<InputControlSuffixWrapper variant="control">
+					<Button
+						icon={ isVisible ? unseen : seen }
+						onClick={ toggleVisibility }
+						size="small"
+						variant="tertiary"
+						aria-label={
+							isVisible ? 'Hide password' : 'Show password'
+						}
+					/>
+				</InputControlSuffixWrapper>
 			}
 			__next40pxDefaultSize
 		/>
