@@ -60,8 +60,7 @@ type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
-	textarea: string;
-	textareaWithElements: string;
+	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
@@ -94,8 +93,7 @@ const data: DataType[] = [
 		id: 1,
 		text: 'Text',
 		textWithElements: 'Item 1',
-		textarea: 'Textarea',
-		textareaWithElements: 'Item 1',
+		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
@@ -144,21 +142,11 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
-		id: 'textarea',
-		type: 'textarea',
+		id: 'textWithTextarea',
+		type: 'text',
 		label: 'Textarea',
 		description: 'Help for textarea.',
-	},
-	{
-		id: 'textareaWithElements',
-		type: 'textarea',
-		label: 'Textarea (with elements)',
-		description: 'Help for textarea with elements.',
-		elements: [
-			{ value: 'item1', label: 'Item 1' },
-			{ value: 'item2', label: 'Item 2' },
-			{ value: 'item3', label: 'Item 3' },
-		],
+		Edit: 'textarea',
 	},
 	{
 		id: 'integer',
@@ -569,23 +557,6 @@ export const Text = ( {
 	);
 
 	return <FieldTypeStory fields={ textFields } type={ type } Edit={ Edit } />;
-};
-
-export const Textarea = ( {
-	type,
-	Edit,
-}: {
-	type: PanelTypes;
-	Edit: ControlTypes;
-} ) => {
-	const textareaFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'textarea' ),
-		[]
-	);
-
-	return (
-		<FieldTypeStory fields={ textareaFields } type={ type } Edit={ Edit } />
-	);
 };
 
 export const Integer = ( {

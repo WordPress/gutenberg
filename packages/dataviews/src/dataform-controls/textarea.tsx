@@ -18,7 +18,7 @@ export default function Textarea< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description, editProps } = field;
+	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -66,7 +66,6 @@ export default function Textarea< Item >( {
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
-			{ ...editProps }
 		/>
 	);
 }

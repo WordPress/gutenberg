@@ -97,7 +97,6 @@ export type Operator =
 
 export type FieldType =
 	| 'text'
-	| 'textarea'
 	| 'integer'
 	| 'datetime'
 	| 'date'
@@ -202,11 +201,6 @@ export type Field< Item > = {
 	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
-	 * Arbitrary data to pass to the edit component.
-	 */
-	editProps?: Record< string, any >;
-
-	/**
 	 * Callback used to sort the field.
 	 */
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
@@ -265,7 +259,6 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
-	editProps?: Record< string, any >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: Rules< Item >;
 	enableHiding: boolean;

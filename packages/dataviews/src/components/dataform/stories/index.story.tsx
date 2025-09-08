@@ -171,13 +171,8 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'description',
 		label: 'Description',
-		type: 'textarea',
-	},
-	{
-		id: 'alt_text',
-		label: 'Alternative Text',
-		type: 'textarea',
-		editProps: { rows: 2 },
+		type: 'text',
+		Edit: 'textarea',
 	},
 ];
 
@@ -201,7 +196,6 @@ const LayoutRegularComponent = ( {
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
-		alt_text: 'This is a sample alt text',
 	} );
 
 	const form: Form = useMemo(
@@ -226,7 +220,6 @@ const LayoutRegularComponent = ( {
 				'dimensions',
 				'tags',
 				'description',
-				'alt_text',
 			],
 		} ),
 		[ labelPosition ]
