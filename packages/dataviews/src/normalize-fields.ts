@@ -177,6 +177,8 @@ export function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
+			elementsLoading: field.elementsLoading ?? false,
+			LoadingComponent: field.LoadingComponent,
 		};
 	} );
 }

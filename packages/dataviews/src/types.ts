@@ -232,6 +232,17 @@ export type Field< Item > = {
 	elements?: Option[];
 
 	/**
+	 * Whether the field elements are currently loading.
+	 */
+	elementsLoading?: boolean;
+
+	/**
+	 * Optional component to display while elements are loading.
+	 * If not provided, a default loading indicator will be used.
+	 */
+	LoadingComponent?: ReactElement;
+
+	/**
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | false;
@@ -261,6 +272,8 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
+	elementsLoading: boolean;
+	LoadingComponent: ReactElement | undefined;
 };
 
 /**

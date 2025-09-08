@@ -53,6 +53,7 @@ function usePostFields( {
 					if ( field.id === 'author' ) {
 						return {
 							...field,
+							elementsLoading: isLoadingAuthors,
 							elements: authors?.map( ( { id, name } ) => ( {
 								value: id,
 								label: name,
@@ -63,7 +64,7 @@ function usePostFields( {
 					return field;
 				}
 			) as Field< BasePostWithEmbeddedAuthor >[],
-		[ authors, defaultFields ]
+		[ authors, defaultFields, isLoadingAuthors ]
 	);
 
 	return {

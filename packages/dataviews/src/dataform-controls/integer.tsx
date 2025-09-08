@@ -6,6 +6,7 @@ import {
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
 	privateApis,
+	Spinner,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -96,7 +97,7 @@ export default function Integer< Item >( {
 			onChange( {
 				// Do not convert an empty string or undefined to a number,
 				// otherwise there's a mismatch between the UI control (empty)
-				// and the data relied by onChange (0).
+				// and the data relied on by onChange (0).
 				[ id ]: [ '', undefined ].includes( newValue )
 					? undefined
 					: Number( newValue ),
@@ -104,6 +105,10 @@ export default function Integer< Item >( {
 		},
 		[ id, onChange ]
 	);
+
+	if ( field.elementsLoading ) {
+		return field.LoadingComponent || <Spinner />;
+	}
 
 	if ( operator === OPERATOR_BETWEEN ) {
 		return (

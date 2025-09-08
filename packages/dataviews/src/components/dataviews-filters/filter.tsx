@@ -15,6 +15,7 @@ import {
 	SelectControl,
 	Tooltip,
 	Icon,
+	Spinner,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
@@ -591,6 +592,14 @@ export default function Filter( {
 				</div>
 			) }
 			renderContent={ () => {
+				const field = fields.find( ( f ) => f.id === filter.field );
+				const isLoading = field?.elementsLoading;
+				const LoadingComponent = field?.LoadingComponent;
+
+				if ( isLoading ) {
+					return LoadingComponent || <Spinner />;
+				}
+
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
