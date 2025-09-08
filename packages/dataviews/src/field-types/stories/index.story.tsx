@@ -269,6 +269,30 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'color',
+		type: 'color',
+		label: 'Color',
+		description:
+			'Help for color. Supports hex, rgb, hsl formats with alpha channel.',
+	},
+	{
+		id: 'colorWithElements',
+		type: 'color',
+		label: 'Color (with elements)',
+		description: 'Help for color with predefined color options.',
+		elements: [
+			{ value: '#ff0000', label: 'Red' },
+			{ value: '#00ff00', label: 'Green' },
+			{ value: '#0000ff', label: 'Blue' },
+			{ value: 'rgba(255, 165, 0, 0.8)', label: 'Orange (80% opacity)' },
+			{ value: 'hsl(300, 100%, 50%)', label: 'Magenta' },
+			{
+				value: 'hsla(120, 100%, 25%, 0.6)',
+				label: 'Dark Green (60% opacity)',
+			},
+		],
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -620,6 +644,23 @@ export const Url = ( {
 	);
 
 	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
+};
+
+export const Color = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const colorFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'color' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
+	);
 };
 
 export const Media = ( {
