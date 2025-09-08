@@ -2273,12 +2273,14 @@ function getDerivedBlockEditingModesForTree(
 		( clientId ) =>
 			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
 	);
-	const unsyncedPatternClientIds = state.blocks.attributes
-		.keys()
-		.filter(
-			( clientId ) =>
-				state.blocks.attributes.get( clientId )?.metadata?.patternName
-		);
+	// Use array.from for better back compat. Older versions of the iterator returned
+	// from `keys()` didn't have the `filter` method.
+	const unsyncedPatternClientIds = Array.from(
+		state.blocks.attributes.keys()
+	).filter(
+		( clientId ) =>
+			state.blocks.attributes.get( clientId )?.metadata?.patternName
+	);
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
