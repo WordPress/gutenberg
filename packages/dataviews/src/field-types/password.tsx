@@ -13,22 +13,11 @@ import type {
 	FieldTypeDefinition,
 } from '../types';
 import { renderFromElements } from '../utils';
-import {
-	OPERATOR_CONTAINS,
-	OPERATOR_IS,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_NOT,
-	OPERATOR_IS_NOT_ALL,
-	OPERATOR_NOT_CONTAINS,
-	OPERATOR_STARTS_WITH,
-} from '../constants';
 
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
+	// Passwords should not be sortable for security reasons
+	return 0;
 }
 
 export default {
@@ -50,22 +39,8 @@ export default {
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		return field.elements
 			? renderFromElements( { item, field } )
-			: '•'.repeat( field.getValue( { item } ).length );
+			: '••••••••';
 	},
-	enableSorting: true,
-	filterBy: {
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_CONTAINS,
-			OPERATOR_NOT_CONTAINS,
-			OPERATOR_STARTS_WITH,
-			// Multiple selection
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		],
-	},
+	enableSorting: false,
+	filterBy: false,
 } satisfies FieldTypeDefinition< any >;

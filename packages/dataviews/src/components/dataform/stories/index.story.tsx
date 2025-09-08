@@ -395,6 +395,7 @@ const ValidationComponent = ( {
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
+		password: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -406,6 +407,7 @@ const ValidationComponent = ( {
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
+		password: 'secretpassword123',
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -446,6 +448,20 @@ const ValidationComponent = ( {
 	const customIntegerRule = ( value: ValidatedItem ) => {
 		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+
+	const customPasswordRule = ( value: ValidatedItem ) => {
+		if ( value.password.length < 8 ) {
+			return 'Password must be at least 8 characters long.';
+		}
+		if ( ! /[A-Z]/.test( value.password ) ) {
+			return 'Password must contain at least one uppercase letter.';
+		}
+		if ( ! /[0-9]/.test( value.password ) ) {
+			return 'Password must contain at least one number.';
 		}
 
 		return null;
@@ -528,6 +544,15 @@ const ValidationComponent = ( {
 				required,
 			},
 		},
+		{
+			id: 'password',
+			type: 'password',
+			label: 'Password',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customPasswordRule ),
+			},
+		},
 	];
 
 	const form = {
@@ -541,6 +566,7 @@ const ValidationComponent = ( {
 			'integer',
 			'boolean',
 			'customEdit',
+			'password',
 		],
 	};
 
