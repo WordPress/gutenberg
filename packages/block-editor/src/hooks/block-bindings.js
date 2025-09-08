@@ -18,7 +18,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, useState, Fragment } from '@wordpress/element';
+import { useContext, useState, Fragment, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -232,7 +232,9 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 			} ) }
 			{ modalState && (
 				<Modal onRequestClose={ handleCloseModal }>
-					{ modalState.source.renderModalContent() }
+					{ modalState.source.renderModalContent( {
+						updateBlockBindings,
+					} ) }
 				</Modal>
 			) }
 		</>
@@ -244,55 +246,47 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// `useSelect` is used purposely here to ensure `getFieldsList`
-	// is updated whenever there are updates in block context.
-	// `source.getFieldsList` may also call a selector via `select`.
-	const { canUpdateBlockBindings, sources } = useSelect(
-		( select ) => {
-			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return {
-					fieldsList: EMPTY_OBJECT,
-				};
-			}
-			const _sources = {};
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [ sourceName, { editorUI, usesContext, label } ] ) => {
-					if ( editorUI ) {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
-						const editorUIResult = editorUI( {
-							select,
-							context,
-						} );
+	const canUpdateBlockBindings = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().canUpdateBlockBindings;
+	}, [] );
 
-						// Only add source if the list is not empty.
-						if ( editorUIResult.data?.length > 0 ) {
-							_sources[ sourceName ] = {
-								...editorUIResult,
-								label,
-							};
+	const selectCallback = useSelect( ( select ) => select, [] );
+
+	// Compute sources using useMemo to avoid unnecessary recalculations
+	// while still allowing editorUI functions to access store data via select
+	const sources = useMemo( () => {
+		if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+			return EMPTY_OBJECT;
+		}
+		const _sources = {};
+		const registeredSources = getBlockBindingsSources();
+		Object.entries( registeredSources ).forEach(
+			( [ sourceName, { editorUI, usesContext, label } ] ) => {
+				if ( editorUI ) {
+					// Populate context.
+					const context = {};
+					if ( usesContext?.length ) {
+						for ( const key of usesContext ) {
+							context[ key ] = blockContext[ key ];
 						}
 					}
+					const editorUIResult = editorUI( {
+						select: selectCallback,
+						context,
+					} );
+
+					// Only add source if the list is not empty.
+					if ( editorUIResult.data?.length > 0 ) {
+						_sources[ sourceName ] = {
+							...editorUIResult,
+							label,
+						};
+					}
 				}
-			);
-			return {
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
-				sources:
-					Object.values( _sources ).length > 0
-						? _sources
-						: EMPTY_OBJECT,
-			};
-		},
-		[ blockContext, bindableAttributes ]
-	);
+			}
+		);
+		return Object.values( _sources ).length > 0 ? _sources : EMPTY_OBJECT;
+	}, [ blockContext, bindableAttributes, selectCallback ] );
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
