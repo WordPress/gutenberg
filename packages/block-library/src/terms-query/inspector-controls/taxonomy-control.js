@@ -9,14 +9,19 @@ import {
 
 export default function TaxonomyControl( {
 	termQuery,
-	setQuery,
 	taxonomyOptions,
+	setAttributes,
 } ) {
 	return (
 		<ToolsPanelItem
 			hasValue={ () => termQuery.taxonomy !== 'category' }
 			label={ __( 'Taxonomy' ) }
-			onDeselect={ () => setQuery( { taxonomy: 'category' } ) }
+			onDeselect={ () =>
+				setAttributes( {
+					termQuery: { ...termQuery, taxonomy: 'category' },
+					termsSelection: 'all',
+				} )
+			}
 			isShownByDefault
 		>
 			<SelectControl
@@ -26,7 +31,10 @@ export default function TaxonomyControl( {
 				options={ taxonomyOptions }
 				value={ termQuery.taxonomy }
 				onChange={ ( selectedTaxonomy ) =>
-					setQuery( { taxonomy: selectedTaxonomy } )
+					setAttributes( {
+						termQuery: { ...termQuery, taxonomy: selectedTaxonomy },
+						termsSelection: 'all',
+					} )
 				}
 			/>
 		</ToolsPanelItem>

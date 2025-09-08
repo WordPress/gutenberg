@@ -9,7 +9,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-// import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -19,10 +18,11 @@ import { unlock } from '../../lock-unlock';
 import TaxonomyControl from './taxonomy-control';
 import OrderControl from './order-control';
 import OrderByControl from './order-by-control';
-import TopLevelControl from './top-level-control';
 import HideEmptyControl from './hide-empty-control';
 import HierarchyControl from './hierarchy-control';
 import MaxTermsControl from './max-terms-control';
+import TermSelectionControl from './term-selection-control';
+import ShowSubtreeControl from './show-subtree-control';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
@@ -33,7 +33,7 @@ export default function TermsQueryInspectorControls( {
 	TagName,
 	clientId,
 } ) {
-	const { termQuery } = attributes;
+	const { termQuery, termsSelection } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { taxonomies } = useSelect( ( select ) => {
@@ -45,12 +45,18 @@ export default function TermsQueryInspectorControls( {
 		};
 	}, [] );
 
-	// const { templateSlug } = useSelect( ( select ) => {
-	// 	const { getEditedPostSlug } = select( editorStore );
-	// 	return {
-	// 		templateSlug: getEditedPostSlug(),
-	// 	};
-	// }, [] );
+	const { templateSlug } = useSelect( ( select ) => {
+		// @wordpress/block-library should not depend on @wordpress/editor.
+		// Blocks can be loaded into a *non-post* block editor, so to avoid
+		// declaring @wordpress/editor as a dependency, we must access its
+		// store by string.
+		// The solution here is to split WP specific blocks from generic blocks.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getEditedPostSlug } = select( 'core/editor' );
+		return {
+			templateSlug: getEditedPostSlug(),
+		};
+	}, [] );
 
 	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
 		label: taxonomy.name,
@@ -61,12 +67,21 @@ export default function TermsQueryInspectorControls( {
 		( taxonomy ) => taxonomy.slug === termQuery.taxonomy
 	)?.hierarchical;
 
-	// const isTaxonomyMatchingTemplate = templateSlug.includes(
-	// 	termQuery.taxonomy
-	// );
+	const isTaxonomyMatchingTemplate = templateSlug.includes(
+		termQuery.taxonomy
+	);
 
-	// const allowDisplayingSubtreeOnly =
-	// 	isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+	// Display subtree only control if
+	// - taxonomy is hierarchical and
+	// - taxonomy is matching template (e.g. category template).
+	const displaySubtreeOnlyContol =
+		isTaxonomyHierarchical && isTaxonomyMatchingTemplate;
+
+	// Display taxonomy to show control if
+	// - subtree only is not displayed or
+	// - subtree only is displayed and is disabled.
+	const displayTermSelectionControl =
+		! displaySubtreeOnlyContol || ! termsSelection === 'subtree';
 
 	return (
 		<>
@@ -84,13 +99,14 @@ export default function TermsQueryInspectorControls( {
 								parent: 0,
 								perPage: 10,
 							},
+							termsSelection: 'all',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<TaxonomyControl
 						termQuery={ termQuery }
-						setQuery={ setQuery }
+						setAttributes={ setAttributes }
 						taxonomyOptions={ taxonomyOptions }
 					/>
 
@@ -109,21 +125,37 @@ export default function TermsQueryInspectorControls( {
 						setQuery={ setQuery }
 					/>
 
-					<TopLevelControl
-						termQuery={ termQuery }
-						setQuery={ setQuery }
-					/>
+					{ displaySubtreeOnlyContol && (
+						<ShowSubtreeControl
+							showSubtree={ termsSelection === 'subtree' }
+							setAttributes={ setAttributes }
+						/>
+					) }
 
-					<HierarchyControl
-						termQuery={ termQuery }
-						setQuery={ setQuery }
-						isTaxonomyHierarchical={ isTaxonomyHierarchical }
-					/>
+					{ displayTermSelectionControl && (
+						<TermSelectionControl
+							termsSelection={ termsSelection }
+							setAttributes={ setAttributes }
+							termQuery={ termQuery }
+							setQuery={ setQuery }
+						/>
+					) }
 
-					<MaxTermsControl
-						termQuery={ termQuery }
-						setQuery={ setQuery }
-					/>
+					{ termsSelection === 'all' ||
+						( termsSelection === 'top-level' && (
+							<MaxTermsControl
+								termQuery={ termQuery }
+								setQuery={ setQuery }
+							/>
+						) ) }
+
+					{ isTaxonomyHierarchical && (
+						<HierarchyControl
+							termQuery={ termQuery }
+							setQuery={ setQuery }
+							isTaxonomyHierarchical={ isTaxonomyHierarchical }
+						/>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
