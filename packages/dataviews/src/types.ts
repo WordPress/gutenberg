@@ -104,6 +104,8 @@ export type FieldType =
 	| 'boolean'
 	| 'email'
 	| 'telephone'
+	| 'color'
+	| 'url'
 	| 'array';
 
 /**
@@ -713,7 +715,7 @@ export interface SupportedLayouts {
 /**
  * DataForm layouts.
  */
-export type LayoutType = 'regular' | 'panel' | 'card';
+export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
 export type LabelPosition = 'top' | 'side' | 'none';
 
 export type RegularLayout = {
@@ -763,11 +765,21 @@ export type NormalizedCardLayout =
 			isOpened: boolean;
 	  };
 
-export type Layout = RegularLayout | PanelLayout | CardLayout;
+export type RowLayout = {
+	type: 'row';
+	alignment?: 'start' | 'center' | 'end';
+};
+export type NormalizedRowLayout = {
+	type: 'row';
+	alignment: 'start' | 'center' | 'end';
+};
+
+export type Layout = RegularLayout | PanelLayout | CardLayout | RowLayout;
 export type NormalizedLayout =
 	| NormalizedRegularLayout
 	| NormalizedPanelLayout
-	| NormalizedCardLayout;
+	| NormalizedCardLayout
+	| NormalizedRowLayout;
 
 export type SimpleFormField = {
 	id: string;

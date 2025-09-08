@@ -2,12 +2,16 @@
 
 ## Unreleased
 
-## 8.0.1-next.0 (2025-09-05)
+### Breaking changes
+
+- Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
 
 ### Features
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
 - Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
+- DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
+- Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
 
 ## 8.0.0 (2025-09-03)
 

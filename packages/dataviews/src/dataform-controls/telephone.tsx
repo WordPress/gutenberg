@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { mobile } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
@@ -12,7 +17,14 @@ export default function Telephone< Item >( {
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
-			{ ...{ data, field, onChange, hideLabelFromVision, type: 'tel' } }
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				type: 'tel',
+				icon: mobile,
+			} }
 		/>
 	);
 }

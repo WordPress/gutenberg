@@ -1379,7 +1379,7 @@ Example:
 
 ### `layout`
 
-Represents the type of layout used to render the field. It'll be one of Regular, Panel, or Card. This prop is the same as the `form.layout` prop.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
 
 #### Regular
 
@@ -1429,6 +1429,25 @@ For example:
 		type: 'card',
 		isOpened: false,
 		withHeader: true,
+	},
+}
+```
+
+#### Row
+
+- `type`: `row`. Required.
+- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+
+The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'row',
+		alignment: 'start'
 	},
 }
 ```
