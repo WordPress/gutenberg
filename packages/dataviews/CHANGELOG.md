@@ -13,6 +13,10 @@
 - DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
 - Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
 
+### Bug Fixes
+
+- DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
+
 ## 8.0.0 (2025-09-03)
 
 ### Breaking changes
