@@ -20,6 +20,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -55,6 +56,8 @@ function VideoEdit( {
 	const { id, controls, poster, src, tracks } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -251,7 +254,9 @@ function VideoEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
 				/>
 			</figure>
 		</>
