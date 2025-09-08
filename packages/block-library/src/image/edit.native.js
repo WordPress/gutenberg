@@ -147,7 +147,7 @@ function LinkSettings( {
 			label: __( 'Open in new tab' ),
 		},
 		linkRel: {
-			label: __( 'Link Rel' ),
+			label: __( 'Link Relation' ),
 			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
 		},
 	};

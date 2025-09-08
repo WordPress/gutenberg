@@ -15,6 +15,7 @@ import {
 	Button,
 	Spinner,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -316,7 +317,7 @@ export default function PostFeaturedImageEdit( {
 						) }
 						{ isLink && (
 							<ToolsPanelItem
-								label={ __( 'Link rel' ) }
+								label={ __( 'Link Relation' ) }
 								isShownByDefault
 								hasValue={ () => !! rel }
 								onDeselect={ () =>
@@ -328,7 +329,17 @@ export default function PostFeaturedImageEdit( {
 								<TextControl
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
-									label={ __( 'Link rel' ) }
+									label={ __( 'Link Relation' ) }
+									help={
+										<>
+											{ __(
+												'The Link Relation attribute defines the relationship between a linked resource and the current document.'
+											) }{ ' ' }
+											<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel">
+												{ __( 'Learn more.' ) }
+											</ExternalLink>
+										</>
+									}
 									value={ rel }
 									onChange={ ( newRel ) =>
 										setAttributes( { rel: newRel } )
