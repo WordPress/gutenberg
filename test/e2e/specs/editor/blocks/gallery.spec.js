@@ -225,30 +225,29 @@ test.describe( 'Gallery', () => {
 		editor,
 		page,
 	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
 		await admin.createNewPost();
 		await editor.insertBlock( {
 			name: 'core/gallery',
 			attributes: {
 				randomOrder: true,
 			},
-			innerBlocks: Array.from( { length: 10 }, ( _, i ) => ( {
+			innerBlocks: numbers.map( ( i ) => ( {
 				name: 'core/image',
 				attributes: {
-					url: `${ i }.jpg`,
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
 				},
 			} ) ),
 		} );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 		const imageElements = page.locator( '.wp-block-gallery img' );
-		const imageNumbers = await imageElements.evaluateAll( ( imgs ) =>
-			imgs.map( ( img ) =>
-				parseInt( img.src.match( /(\d+)\.jpg$/ )[ 1 ], 10 )
-			)
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
 		);
-		expect( Array.from( { length: 10 }, ( _, i ) => i ) ).not.toEqual(
-			imageNumbers
-		);
+		expect( numbers ).not.toEqual( imageAltTexts );
 	} );
 
 	test( 'can randomize the image with a lightbox effect order on the front end', async ( {
@@ -256,16 +255,19 @@ test.describe( 'Gallery', () => {
 		editor,
 		page,
 	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
 		await admin.createNewPost();
 		await editor.insertBlock( {
 			name: 'core/gallery',
 			attributes: {
 				randomOrder: true,
 			},
-			innerBlocks: Array.from( { length: 10 }, ( _, i ) => ( {
+			innerBlocks: numbers.map( ( i ) => ( {
 				name: 'core/image',
 				attributes: {
-					url: `${ i }.jpg`,
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
 					lightbox: { enabled: true },
 				},
 			} ) ),
@@ -273,14 +275,10 @@ test.describe( 'Gallery', () => {
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 		const imageElements = page.locator( '.wp-block-gallery img' );
-		const imageNumbers = await imageElements.evaluateAll( ( imgs ) =>
-			imgs.map( ( img ) =>
-				parseInt( img.src.match( /(\d+)\.jpg$/ )[ 1 ], 10 )
-			)
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
 		);
-		expect( Array.from( { length: 10 }, ( _, i ) => i ) ).not.toEqual(
-			imageNumbers
-		);
+		expect( numbers ).not.toEqual( imageAltTexts );
 	} );
 } );
 
