@@ -427,17 +427,15 @@ export function HierarchicalTermSelector( { slug } ) {
 				/>
 			) }
 			{ loading && (
-				<FlexItem
-					display="flex"
+				<Flex
+					justify="center"
 					style={ {
-						justifyContent: 'center',
-						alignItems: 'center',
 						// Match SearchControl height to prevent layout shift.
 						height: '40px',
 					} }
 				>
 					<Spinner />
-				</FlexItem>
+				</Flex>
 			) }
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"
