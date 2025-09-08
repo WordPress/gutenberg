@@ -136,6 +136,9 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
+		// Move focus inside the region.
+		await styleBookRegion.getByRole( 'button', { name: 'Close' } ).focus();
+
 		// Close Style Book via Escape key.
 		await page.keyboard.press( 'Escape' );
 		await expect(

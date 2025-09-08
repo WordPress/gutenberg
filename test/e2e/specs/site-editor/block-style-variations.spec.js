@@ -193,11 +193,8 @@ test.describe( 'Block Style Variations', () => {
 
 		// The initial revision styles should match the editor canvas.
 		await siteEditorBlockStyleVariations.openStylesPanel();
-		const revisionsButton = page.getByRole( 'button', {
-			name: 'Revisions',
-			exact: true,
-		} );
-		await revisionsButton.click();
+		await page.getByTestId( 'revisions-button' ).click();
+
 		await expect(
 			page.locator( 'iframe[name="revisions"]' )
 		).toBeVisible();

@@ -48,7 +48,7 @@ test.describe( 'Style Revisions', () => {
 		await userGlobalStylesRevisions.openStylesPanel();
 
 		// Now there should be enough revisions to show the revisions UI.
-		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await page.getByTestId( 'revisions-button' ).click();
 
 		const revisionButtons = page.getByRole( 'option', {
 			name: /^Changes saved by /,
@@ -83,7 +83,9 @@ test.describe( 'Style Revisions', () => {
 			.getByRole( 'option', { name: 'Luminous vivid amber' } )
 			.click( { force: true } );
 
-		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await page.click( 'role=button[name="Back"]' );
+
+		await page.getByTestId( 'revisions-button' ).click();
 
 		const unSavedButton = page.getByRole( 'option', {
 			name: /^Unsaved changes/,
@@ -119,7 +121,7 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await page.getByTestId( 'revisions-button' ).click();
 		const lastRevisionItem = page
 			.getByLabel( 'Global styles revisions list' )
 			.getByRole( 'option' )
@@ -141,9 +143,7 @@ test.describe( 'Style Revisions', () => {
 			.getByRole( 'button', { name: 'Styles' } )
 			.click();
 
-		await navigationContainer
-			.getByRole( 'button', { name: 'Revisions' } )
-			.click();
+		await page.getByTestId( 'revisions-button' ).click();
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
@@ -158,10 +158,7 @@ test.describe( 'Style Revisions', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		// Search for exact names to avoid selecting the command bar button in the header.
-		const revisionsButton = page.getByRole( 'button', {
-			name: 'Revisions',
-			exact: true,
-		} );
+		const revisionsButton = page.getByTestId( 'revisions-button' );
 		const styleBookButton = page.getByRole( 'button', {
 			name: 'Style Book',
 			exact: true,
@@ -185,7 +182,7 @@ test.describe( 'Style Revisions', () => {
 
 		// Deactivating revisions view while the style book is open should close revisions,
 		// but not the style book.
-		await revisionsButton.click();
+		await page.click( 'role=button[name="Back"]' );
 
 		// Style book is still visible but...
 		await expect(
@@ -204,9 +201,7 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		const revisionsButton = page.getByRole( 'button', {
-			name: 'Revisions',
-		} );
+		const revisionsButton = page.getByTestId( 'revisions-button' );
 		const styleBookButton = page.getByRole( 'button', {
 			name: 'Style Book',
 		} );
@@ -236,12 +231,7 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page
-			.getByRole( 'button', {
-				name: 'Revisions',
-				exact: true,
-			} )
-			.click();
+		await page.getByTestId( 'revisions-button' ).click();
 
 		// Open the command menu from the header.
 		await page
@@ -268,7 +258,7 @@ test.describe( 'Style Revisions', () => {
 			} );
 		}
 		await userGlobalStylesRevisions.openStylesPanel();
-		await page.getByRole( 'button', { name: 'Revisions' } ).click();
+		await page.getByTestId( 'revisions-button' ).click();
 		const pagination = page.getByLabel( 'Global Styles pagination' );
 		await expect( pagination ).toContainText( '1 of 2' );
 		await pagination.getByRole( 'button', { name: 'Next page' } ).click();

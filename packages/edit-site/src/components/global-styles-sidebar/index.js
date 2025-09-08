@@ -3,7 +3,7 @@
  */
 import { FlexItem, Flex, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { styles, seen, backup } from '@wordpress/icons';
+import { styles, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -21,7 +21,6 @@ import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
-import { store as coreStore } from '@wordpress/core-data';
 import DefaultSidebar from './default-sidebar';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -34,7 +33,6 @@ export default function GlobalStylesSidebar() {
 		shouldClearCanvasContainerView,
 		isStyleBookOpened,
 		showListViewByDefault,
-		hasRevisions,
 		isRevisionsOpened,
 		isRevisionsStyleBookOpened,
 	} = useSelect(
@@ -51,13 +49,6 @@ export default function GlobalStylesSidebar() {
 				'core',
 				'showListViewByDefault'
 			);
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
-
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
 
 			return {
 				isStyleBookOpened: 'style-book' === canvasContainerView,
@@ -67,9 +58,6 @@ export default function GlobalStylesSidebar() {
 					! _isVisualEditorMode ||
 					! _isEditCanvasMode,
 				showListViewByDefault: _showListViewByDefault,
-				hasRevisions:
-					!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]
-						?.count,
 				isRevisionsStyleBookOpened:
 					'global-styles-revisions:style-book' ===
 					canvasContainerView,
@@ -92,25 +80,6 @@ export default function GlobalStylesSidebar() {
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
 
-	const toggleRevisions = () => {
-		setIsListViewOpened( false );
-		if ( isRevisionsStyleBookOpened ) {
-			setEditorCanvasContainerView( 'style-book' );
-			return;
-		}
-		if ( isRevisionsOpened ) {
-			setEditorCanvasContainerView( undefined );
-			return;
-		}
-
-		if ( isStyleBookOpened ) {
-			setEditorCanvasContainerView(
-				'global-styles-revisions:style-book'
-			);
-		} else {
-			setEditorCanvasContainerView( 'global-styles-revisions' );
-		}
-	};
 	const toggleStyleBook = () => {
 		if ( isRevisionsOpened ) {
 			setEditorCanvasContainerView(
@@ -181,20 +150,6 @@ export default function GlobalStylesSidebar() {
 								/>
 							</FlexItem>
 						) }
-						<FlexItem>
-							<Button
-								label={ __( 'Revisions' ) }
-								icon={ backup }
-								onClick={ toggleRevisions }
-								accessibleWhenDisabled
-								disabled={ ! hasRevisions }
-								isPressed={
-									isRevisionsOpened ||
-									isRevisionsStyleBookOpened
-								}
-								size="compact"
-							/>
-						</FlexItem>
 						<GlobalStylesMenuSlot />
 					</Flex>
 				</Flex>

@@ -18,7 +18,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { moreVertical } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
@@ -56,25 +55,6 @@ const { Slot: GlobalStylesMenuSlot, Fill: GlobalStylesMenuFill } =
 function GlobalStylesActionMenu() {
 	const [ canReset, onReset ] = useGlobalStylesReset();
 	const { toggle } = useDispatch( preferencesStore );
-	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
-		};
-	}, [] );
-	const { setEditorCanvasContainerView } = unlock(
-		useDispatch( editSiteStore )
-	);
-	const loadCustomCSS = () => {
-		setEditorCanvasContainerView( 'global-styles-css' );
-	};
 
 	return (
 		<GlobalStylesMenuFill>
@@ -86,11 +66,6 @@ function GlobalStylesActionMenu() {
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
-							{ canEditCSS && (
-								<MenuItem onClick={ loadCustomCSS }>
-									{ __( 'Additional CSS' ) }
-								</MenuItem>
-							) }
 							<MenuItem
 								onClick={ () => {
 									toggle(

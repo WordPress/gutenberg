@@ -10,7 +10,7 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
-import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
+import { useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	store as editorStore,
@@ -74,7 +74,6 @@ function EditorCanvasContainer( {
 	);
 	const { setIsListViewOpened } = useDispatch( editorStore );
 
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
 
 	function onCloseContainer() {
@@ -119,7 +118,6 @@ function EditorCanvasContainer( {
 					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 					<section
 						className="edit-site-editor-canvas-container__section"
-						ref={ shouldShowCloseButton ? focusOnMountRef : null }
 						onKeyDown={ closeOnEscape }
 						aria-label={ title }
 					>
