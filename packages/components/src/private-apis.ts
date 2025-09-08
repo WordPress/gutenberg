@@ -13,7 +13,6 @@ import Badge from './badge';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
-	ValidatedInputControl,
 	ValidatedCheckboxControl,
 	ValidatedInputControl,
 	ValidatedNumberControl,
