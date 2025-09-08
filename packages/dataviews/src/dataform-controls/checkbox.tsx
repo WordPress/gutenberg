@@ -1,12 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { CheckboxControl } from '@wordpress/components';
+import { privateApis } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { ValidatedCheckboxControl } = unlock( privateApis );
 
 export default function Checkbox< Item >( {
 	field,
@@ -15,10 +19,36 @@ export default function Checkbox< Item >( {
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, getValue, label, description } = field;
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedCheckboxControl
+			>[ 'customValidity' ]
+		>( undefined );
 
 	return (
-		<CheckboxControl
-			__nextHasNoMarginBottom
+		<ValidatedCheckboxControl
+			required={ !! field.isValid?.required }
+			onValidate={ ( newValue: any ) => {
+				const message = field.isValid?.custom?.(
+					{
+						...data,
+						[ id ]: newValue,
+					},
+					field
+				);
+
+				if ( message ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message,
+					} );
+					return;
+				}
+
+				setCustomValidity( undefined );
+			} }
+			customValidity={ customValidity }
 			hidden={ hideLabelFromVision }
 			label={ label }
 			help={ description }

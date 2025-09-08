@@ -1848,6 +1848,12 @@
 				},
 				"cite": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"select": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"textInput": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
 			"additionalProperties": false

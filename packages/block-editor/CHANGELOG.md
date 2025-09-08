@@ -5,6 +5,8 @@
 ### Enhancement
 
 -  `WordBreakControl`: Add support for word break styles in the block editor.
+## 15.3.0 (2025-09-03)
+
 ## 15.2.0 (2025-08-20)
 
 ## 15.1.0 (2025-08-07)
