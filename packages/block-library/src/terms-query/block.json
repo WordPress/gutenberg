@@ -33,6 +33,11 @@
 		},
 		"namespace": {
 			"type": "string"
+		},
+		"termsSelection": {
+			"type": "string",
+			"enum": [ "all", "top-level", "include", "exclude", "subtree" ],
+			"default": "all"
 		}
 	},
 	"providesContext": {
