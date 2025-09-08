@@ -79,10 +79,6 @@ describe( 'getEntityRecord', () => {
 	it( 'accepts a query that overrides default api path', async () => {
 		const query = { context: 'view', _envelope: '1' };
 
-		const select = {
-			hasEntityRecords: jest.fn( () => {} ),
-		};
-
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
 
@@ -91,7 +87,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, select, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -108,6 +104,31 @@ describe( 'getEntityRecord', () => {
 		);
 
 		// Locks should have been acquired and released.
+		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+	} );
+
+	it( 'does not make a request if the record is already in store', async () => {
+		const select = {
+			hasEntityRecord: jest.fn( () => true ),
+		};
+
+		await getEntityRecord( 'root', 'postType', 'post', {
+			context: 'edit',
+			_fields: 'id,title,slug',
+		} )( { dispatch, select, registry, resolveSelect } );
+
+		// No request should have been made.
+		expect( triggerFetch ).not.toHaveBeenCalled();
+
+		// No record should have been received.
+		expect( dispatch.receiveEntityRecords ).not.toHaveBeenCalled();
+
+		// No locks should have been acquired or released.
 		expect( dispatch.__unstableAcquireStoreLock ).toHaveBeenCalledTimes(
 			1
 		);
