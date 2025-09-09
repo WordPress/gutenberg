@@ -106,6 +106,7 @@ export default {
 		);
 	},
 	canUserEditValue( { select, context, args } ) {
+		return true;
 		// Lock editing in query loop.
 		if ( context?.query || context?.queryId ) {
 			return false;
@@ -159,13 +160,15 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: metaFields,
-			getBindingConfig( selectedField ) {
-				return {
-					source: 'core/post-meta',
-					args: {
-						key: selectedField,
+			onSelect( { value, updateBlockBindings, attribute } ) {
+				updateBlockBindings( {
+					[ attribute ]: {
+						source: 'core/post-meta',
+						args: {
+							key: value,
+						},
 					},
-				};
+				} );
 			},
 		};
 	},

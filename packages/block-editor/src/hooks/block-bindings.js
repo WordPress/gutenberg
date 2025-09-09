@@ -30,6 +30,7 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
+import { updateBlock } from '../store/actions';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -92,13 +93,10 @@ function BlockBindingsPanelMenuContent( {
 											<Menu.RadioItem
 												key={ args.key }
 												onChange={ ( e ) => {
-													updateBlockBindings( {
-														[ attribute ]: {
-															...binding,
-															...source.getBindingConfig(
-																e.target.value
-															),
-														},
+													source.onSelect( {
+														value: e.target.value,
+														updateBlockBindings,
+														attribute,
 													} );
 												} }
 												name={ attribute + '-binding' }
