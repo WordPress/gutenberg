@@ -21,16 +21,12 @@
 	inset: 0 0 auto;
 	height: $button-size-compact;
 
-	// Button style reset for both toggle and separator.
 	> button {
 		appearance: none;
 		padding: 0;
 		border: none;
 		outline: none;
 		background-color: transparent;
-	}
-
-	> button:first-child {
 		cursor: pointer;
 		width: 100%;
 		display: flex;
@@ -52,8 +48,8 @@
 		}
 	}
 
-	> button[role="separator"] {
-		cursor: inherit;
+	[role="separator"] {
+		cursor: row-resize;
 		width: $grid-unit-80;
 		margin: auto;
 		position: absolute;

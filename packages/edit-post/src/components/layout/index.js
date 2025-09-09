@@ -26,6 +26,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -48,9 +49,8 @@ import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 } from '@wordpress/components';
 import {
-    useEvent,
+	useEvent,
 	useMediaQuery,
-	useMergeRefs,
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
@@ -166,21 +166,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	const metaBoxesMainRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
-	const getIsOpen = useEvent( () => isOpen );
-	// When going from resizable to not (isShort), the height should made 'auto'.
-	const effectShort = useRefEffect(
-		( { resizable } ) => {
-			if ( getIsOpen() ) {
-				console.log(`go ${ isShort ? 'short' : 'resizable'}`, metaBoxesMainRef.current.state.height)
-			} else {
-				resizable.style.height = isShort
-					? 'auto'
-					: `${ metaBoxesMainRef.current.state.height }px`;
-			}
-		},
-		[ isShort ]
-	);
-	const setResizableRefs = useMergeRefs( [ metaBoxesMainRef, effectShort ] );
 	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
@@ -215,24 +200,30 @@ function MetaBoxesMain( { isLegacy } ) {
 		return () => observer.disconnect();
 	}, [] );
 
+	const resizeDataRef = useRef( {} );
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
 
 	const [ isUntouched, setIsUntouched ] = useState( true );
 	const applyHeight = ( candidateHeight, isPersistent, isInstant ) => {
-		const nextHeight = Math.min( max, Math.max( min, candidateHeight ) );
+		if ( candidateHeight === 'auto' ) {
+			isPersistent = false; // Just in case — “auto” should never persist.
+		} else {
+			candidateHeight = Math.min( max, Math.max( min, candidateHeight ) );
+		}
 		if ( isPersistent ) {
 			setPreference(
 				'core/edit-post',
 				'metaBoxesMainOpenHeight',
-				nextHeight
+				candidateHeight
 			);
 		} else if ( ! isShort ) {
-			separatorRef.current.ariaValueNow = getAriaValueNow( nextHeight );
+			separatorRef.current.ariaValueNow =
+				getAriaValueNow( candidateHeight );
 		}
 		if ( isInstant ) {
 			metaBoxesMainRef.current.updateSize( {
-				height: nextHeight,
+				height: candidateHeight,
 				// Oddly, when the event that triggered this was not from the mouse (e.g. keydown),
 				// if `width` is left unspecified a subsequent drag gesture applies a fixed
 				// width and the pane fails to widen/narrow with parent width changes from
@@ -241,8 +232,15 @@ function MetaBoxesMain( { isLegacy } ) {
 			} );
 		}
 	};
-
-	const resizeStatsRef = useRef( {} );
+	const getRenderValues = useEvent( () => ( { isOpen, openHeight, min } ) );
+	// Sets the height to 'auto' when not resizable (isShort) and to the
+	// preferred height when resizable.
+	useEffect( () => {
+		const fresh = getRenderValues();
+		const usedOpenHeight = isShort ? 'auto' : fresh.openHeight;
+		const usedHeight = fresh.isOpen ? usedOpenHeight : fresh.min;
+		applyHeight( usedHeight, false, true );
+	}, [ isShort ] );
 
 	if ( ! hasAnyVisible ) {
 		return;
@@ -275,23 +273,23 @@ function MetaBoxesMain( { isLegacy } ) {
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
 
-	const toggle = () =>
-		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', ! isOpen );
+	const persistIsOpen = ( to = ! isOpen ) =>
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
 	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 	const onSeparatorKeyDown = ( event ) => {
+		// Bails unless the event target is the separator.
+		if ( event.target !== separatorRef.current ) {
+			return;
+		}
 		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
 		if ( delta ) {
 			const pane = metaBoxesMainRef.current.resizable;
 			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
 			const nextHeight = delta + fromHeight;
 			applyHeight( nextHeight, true, true );
-			setPreference(
-				'core/edit-post',
-				'metaBoxesMainIsOpen',
-				nextHeight > min
-			);
+			persistIsOpen( nextHeight > min );
 			event.preventDefault();
 		}
 	};
@@ -302,33 +300,14 @@ function MetaBoxesMain( { isLegacy } ) {
 		<>
 			<button
 				aria-expanded={ isOpen }
-				onPointerDown={ ( { timeStamp } ) => {
-					if ( ! isShort ) {
-						resizeStatsRef.current.startTime = timeStamp;
-					}
-				} }
-				onKeyDown={ ( event ) => {
-					onSeparatorKeyDown( event );
-				} }
-				onClick={ ( { timeStamp, detail } ) => {
-					const { startTime, deltaY, nextHeight, finishResize } =
-						resizeStatsRef.current;
-					resizeStatsRef.current = {};
-					const duration = timeStamp - startTime;
-					// When the “click” is from keypress or after a resize of very short distance
-					// or duration then expand or collapse the pane. Otherwise, persist the resize.
-					if ( isShort || ! detail || duration < 144 || deltaY < 5 ) {
-						toggle();
-						if ( ! isShort ) {
-							applyHeight(
-								isOpen ? min : openHeight,
-								false,
-								true
-							);
-						}
-					} else {
-						applyHeight( nextHeight, true );
-						finishResize();
+				onKeyDown={ onSeparatorKeyDown }
+				onClick={ ( { detail } ) => {
+					const { isToggleInferred } = resizeDataRef.current;
+					if ( isShort || ! detail || isToggleInferred ) {
+						persistIsOpen();
+						const usedOpenHeight = isShort ? 'auto' : openHeight;
+						const usedHeight = isOpen ? min : usedOpenHeight;
+						applyHeight( usedHeight, false, true );
 					}
 				} }
 				// Prevents resizing in short viewports.
@@ -338,35 +317,34 @@ function MetaBoxesMain( { isLegacy } ) {
 				} ) }
 			>
 				{ paneLabel }
+				{ ! isShort && (
+					<>
+						<Tooltip text={ __( 'Drag to resize' ) }>
+							<div // eslint-disable-line jsx-a11y/role-supports-aria-props
+								ref={ separatorRef }
+								role="separator"
+								aria-valuenow={ usedAriaValueNow }
+								aria-label={ __( 'Drag to resize' ) }
+								aria-describedby={ separatorHelpId }
+							/>
+						</Tooltip>
+						<VisuallyHidden id={ separatorHelpId }>
+							{ __(
+								'Use up and down arrow keys to resize the meta box panel.'
+							) }
+						</VisuallyHidden>
+					</>
+				) }
 				<Icon icon={ isOpen ? chevronUp : chevronDown } />
 			</button>
-			{ ! isShort && (
-				<>
-					<Tooltip text={ __( 'Drag to resize' ) }>
-						<button // eslint-disable-line jsx-a11y/role-supports-aria-props
-							ref={ separatorRef }
-							role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
-							aria-valuenow={ usedAriaValueNow }
-							aria-label={ __( 'Drag to resize' ) }
-							aria-describedby={ separatorHelpId }
-							onKeyDown={ onSeparatorKeyDown }
-						/>
-					</Tooltip>
-					<VisuallyHidden id={ separatorHelpId }>
-						{ __(
-							'Use up and down arrow keys to resize the meta box panel.'
-						) }
-					</VisuallyHidden>
-				</>
-			) }
 		</>
 	);
 
 	const paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
 		as: NavigableRegion,
-		ref: setResizableRefs,
+		ref: metaBoxesMainRef,
 		className,
-		defaultSize: { height: isOpen ? openHeight : 0 }, //
+		defaultSize: { height: isOpen ? openHeight : 0 },
 		minHeight: min,
 		maxHeight: usedMax,
 		enable: {
@@ -387,13 +365,12 @@ function MetaBoxesMain( { isLegacy } ) {
 		// the event to end the drag is captured by the target (resize handle)
 		// whether or not it’s under the pointer.
 		onPointerDown: ( { pointerId, target } ) => {
-			if ( ! isShort ) {
-				if ( separatorRef.current.parentElement.contains( target ) ) {
-					target.setPointerCapture( pointerId );
-				}
+			const paneResizeHandle = separatorRef.current.parentElement;
+			if ( ! isShort && paneResizeHandle.contains( target ) ) {
+				target.setPointerCapture( pointerId );
 			}
 		},
-		onResizeStart: ( event, direction, elementRef ) => {
+		onResizeStart: ( { timeStamp }, direction, elementRef ) => {
 			if ( isAutoHeight ) {
 				// Sets the starting height to avoid visual jumps in height and
 				// aria-valuenow being `NaN` for the first (few) resize events.
@@ -401,29 +378,34 @@ function MetaBoxesMain( { isLegacy } ) {
 				setIsUntouched( false );
 			}
 			elementRef.classList.add( 'is-resizing' );
+			resizeDataRef.current = { timeStamp, maxDelta: 0 };
 		},
-		onResize: () => applyHeight( metaBoxesMainRef.current.state.height ),
-		onResizeStop: ( event, direction, elementRef, delta ) => {
-			const { height } = metaBoxesMainRef.current.state;
-			const finishResize = () => {
-				elementRef.classList.remove( 'is-resizing' );
-				setPreference(
-					'core/edit-post',
-					'metaBoxesMainIsOpen',
-					height > min
-				);
-			};
-			if ( event.target === separatorRef.current ) {
-				applyHeight( height, true );
-				finishResize();
-			}
-			// The interaction was on the toggle button inside the handle and
-			// may act as either a toggle or resize. For that, it needs
-			// this data from the resize to be recorded.
-			else {
-				resizeStatsRef.current.deltaY = Math.abs( delta.height );
-				resizeStatsRef.current.nextHeight = height;
-				resizeStatsRef.current.finishResize = finishResize;
+		onResize: ( event, direction, elementRef, delta ) => {
+			const { maxDelta } = resizeDataRef.current;
+			const newDelta = Math.abs( delta.height );
+			resizeDataRef.current.maxDelta = Math.max( maxDelta, newDelta );
+			applyHeight( metaBoxesMainRef.current.state.height );
+		},
+		onResizeStop: ( event, direction, elementRef ) => {
+			elementRef.classList.remove( 'is-resizing' );
+			const duration = event.timeStamp - resizeDataRef.current.timeStamp;
+			const wasSeparator = event.target === separatorRef.current;
+			const { maxDelta } = resizeDataRef.current;
+			const isToggleInferred =
+				maxDelta < 1 || ( duration < 144 && maxDelta < 5 );
+			if ( isShort || ( ! wasSeparator && isToggleInferred ) ) {
+				resizeDataRef.current.isToggleInferred = true;
+			} else {
+				const { height } = metaBoxesMainRef.current.state;
+				const nextIsOpen = height > min;
+				persistIsOpen( nextIsOpen );
+				// Persists height only if still open. This is so that when closed by a drag the
+				// prior height can be restored by the toggle button instead of having to drag
+				// the pane open again. Also, if already closed, a click on the separator won’t
+				// persist the height as the minimum.
+				if ( nextIsOpen ) {
+					applyHeight( height, true );
+				}
 			}
 		},
 	} );
