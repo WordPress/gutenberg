@@ -92,7 +92,7 @@ function ScreenRoot() {
 					 * the nav button inset should be looked at before reusing further.
 					 */
 					paddingX="13px"
-					marginBottom={ 4 }
+					marginBottom={ 2 }
 				>
 					{ __(
 						'Customize the appearance of specific blocks for the whole site.'
@@ -114,16 +114,6 @@ function ScreenRoot() {
 				<>
 					<CardDivider />
 					<CardBody>
-						<Spacer
-							as="p"
-							paddingTop={ 2 }
-							paddingX="13px"
-							marginBottom={ 4 }
-						>
-							{ __(
-								'Add your own CSS to customize the appearance and layout of your site.'
-							) }
-						</Spacer>
 						<ItemGroup>
 							<NavigationButtonAsItem path="/css">
 								<HStack justify="space-between">
