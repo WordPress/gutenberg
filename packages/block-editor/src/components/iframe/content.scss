@@ -60,6 +60,15 @@
 		body {
 			min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
 
+			// Add a white backing layer for consistent semi-transparent color blending
+			&::before {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background-color: $white;
+				z-index: -1;
+			}
+
 			> .is-root-container:not(.wp-block-post-content) {
 				flex: 1;
 				display: flex;
