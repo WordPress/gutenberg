@@ -44,6 +44,7 @@ import type {
 	ViewListProps,
 	ActionModal as ActionModalType,
 } from '../../types';
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -517,22 +518,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		);
 	}
 
-	// Get the group field if specified
 	const groupField = view.groupByField
 		? fields.find( ( field ) => field.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
 	// Render data grouped by field
 	if ( hasData && groupField && dataByGroup ) {

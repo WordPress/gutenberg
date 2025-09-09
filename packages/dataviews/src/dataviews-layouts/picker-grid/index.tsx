@@ -35,6 +35,7 @@ import type {
 import type { SetSelection } from '../../private-types';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
@@ -301,18 +302,7 @@ function ViewPickerGrid< Item >( {
 	const groupField = view.groupByField
 		? fields.find( ( f ) => f.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
