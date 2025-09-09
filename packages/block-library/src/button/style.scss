@@ -20,6 +20,10 @@ $blocks-block__margin: 0.5em;
 		/*rtl:ignore*/
 		text-align: right;
 	}
+
+	.has-text-color & {
+		color: inherit;
+	}
 }
 
 // These rules are set to zero specificity to keep the default styles for buttons.

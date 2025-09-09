@@ -15,9 +15,9 @@
 		"__experimentalExposeControlsToChildren": true,
 		"color": {
 			"gradients": true,
-			"text": false,
 			"__experimentalDefaultControls": {
-				"background": true
+				"background": true,
+				"text": true
 			}
 		},
 		"spacing": {
