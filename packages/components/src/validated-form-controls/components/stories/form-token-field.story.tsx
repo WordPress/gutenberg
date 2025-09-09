@@ -79,4 +79,5 @@ Default.args = {
 	label: 'Tags',
 	placeholder: 'Add tags...',
 	suggestions: [ 'Posts', 'Pages', 'Media', 'Error' ],
+	__experimentalExpandOnFocus: true,
 };
