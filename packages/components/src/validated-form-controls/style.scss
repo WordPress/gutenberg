@@ -34,6 +34,12 @@
 	&:has(input[type="radio"]:invalid) {
 		--wp-components-color-accent: #{$alert-red};
 	}
+
+	// For FormTokenField
+	&:has(input:user-invalid) .components-form-token-field__input-container:not(:has([aria-expanded="true"])) {
+		--wp-components-color-accent: #{$alert-red};
+		border-color: $alert-red;
+	}
 }
 
 .components-validated-control__error-delegate {
