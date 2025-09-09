@@ -5,6 +5,7 @@
 ### Breaking changes
 
 - Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
+- DataViews: Custom `empty` elements are no longer wrapped in `<p>` tags to improve accessibility. [#71561](https://github.com/WordPress/gutenberg/pull/71561)
 
 ### Features
 

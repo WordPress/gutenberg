@@ -512,7 +512,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 			>
-				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
+				{ ! hasData &&
+					( isLoading ? (
+						<p>
+							<Spinner />
+						</p>
+					) : (
+						empty
+					) ) }
 			</div>
 		);
 	}
