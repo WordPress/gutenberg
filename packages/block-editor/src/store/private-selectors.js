@@ -539,7 +539,10 @@ export function isSectionBlock( state, clientId ) {
 	}
 
 	const attributes = getBlockAttributes( state, clientId );
-	if ( attributes?.metadata?.patternName ) {
+	if (
+		attributes?.metadata?.patternName &&
+		!! window?.__experimentalContentOnlyPatternInsertion
+	) {
 		return true;
 	}
 

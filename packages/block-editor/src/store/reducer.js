@@ -2275,12 +2275,14 @@ function getDerivedBlockEditingModesForTree(
 	);
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds = Array.from(
-		state.blocks.attributes.keys()
-	).filter(
-		( clientId ) =>
-			state.blocks.attributes.get( clientId )?.metadata?.patternName
-	);
+	const unsyncedPatternClientIds =
+		!! window?.__experimentalContentOnlyPatternInsertion
+			? Array.from( state.blocks.attributes.keys() ).filter(
+					( clientId ) =>
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+			  )
+			: [];
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
