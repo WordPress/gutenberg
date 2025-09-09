@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useId } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,8 +30,6 @@ const UnforwardedValidatedFormTokenField = (
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const valueRef = useRef< Value >( restProps.value );
-
-	const nameAttr = useId();
 
 	return (
 		<div className="components-validated-control__wrapper-with-error-delegate">
@@ -66,8 +64,6 @@ const UnforwardedValidatedFormTokenField = (
 						: ''
 				}
 				tabIndex={ -1 }
-				// A name attribute is needed for the `required` behavior to work.
-				name={ nameAttr }
 				onChange={ () => {} }
 				onFocus={ ( e ) => {
 					e.target.previousElementSibling
