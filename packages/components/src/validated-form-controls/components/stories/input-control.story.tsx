@@ -17,11 +17,9 @@ import { seen, unseen } from '@wordpress/icons';
  * Internal dependencies
  */
 import { ValidatedInputControl } from '../input-control';
-import { ValidatedFormTokenField } from '../form-token-field';
 import { formDecorator } from './story-utils';
 import InputControlSuffixWrapper from '../../../input-control/input-suffix-wrapper';
 import { Button } from '../../../button';
-import type { TokenItem } from '../../../form-token-field/types';
 
 const meta: Meta< typeof ValidatedInputControl > = {
 	title: 'Components/Selection & Input/Validated Form Controls/ValidatedInputControl',
@@ -165,54 +163,4 @@ Password.args = {
 Password.argTypes = {
 	suffix: { control: false },
 	type: { control: false },
-};
-
-/**
- * This demonstrates how array validation would work with the ValidatedFormTokenField component.
- */
-export const ArrayControl: StoryObj< typeof ValidatedFormTokenField > = {
-	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState< ( string | TokenItem )[] >( [] );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedFormTokenField
-				>[ 'customValidity' ]
-			>( undefined );
-
-		return (
-			<ValidatedFormTokenField
-				{ ...args }
-				value={ value }
-				onChange={ ( newValue, ...rest ) => {
-					setValue( newValue );
-					onChange?.( newValue, ...rest );
-				} }
-				onValidate={ ( v ) => {
-					if (
-						v?.some( ( token ) => {
-							const tokenValue =
-								typeof token === 'string' ? token : token.value;
-							return tokenValue.toLowerCase() === 'error';
-						} )
-					) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The tag "error" is not allowed.',
-						} );
-						return;
-					}
-
-					setCustomValidity( undefined );
-				} }
-				customValidity={ customValidity }
-			/>
-		);
-	},
-};
-ArrayControl.args = {
-	required: true,
-	label: 'Tags',
-	placeholder: 'Add tags...',
-	suggestions: [ 'Posts', 'Pages', 'Media', 'Error' ],
 };
