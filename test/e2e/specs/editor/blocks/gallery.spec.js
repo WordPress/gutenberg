@@ -250,7 +250,7 @@ test.describe( 'Gallery', () => {
 		expect( numbers ).not.toEqual( imageAltTexts );
 	} );
 
-	test( 'can randomize the image with a lightbox effect order on the front end', async ( {
+	test( 'can randomize the image with a lightbox effect on the front end', async ( {
 		admin,
 		editor,
 		page,
