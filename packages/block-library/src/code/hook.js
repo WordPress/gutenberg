@@ -89,5 +89,5 @@ export function useTabIndentation() {
 		};
 	}, [] );
 
-	return { ref };
+	return ref;
 }

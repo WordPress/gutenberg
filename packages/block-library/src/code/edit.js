@@ -18,7 +18,7 @@ export default function CodeEdit( {
 	mergeBlocks,
 } ) {
 	const blockProps = useBlockProps();
-	const { ref } = useTabIndentation();
+	const ref = useTabIndentation();
 
 	return (
 		<pre { ...blockProps }>
