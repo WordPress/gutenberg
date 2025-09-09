@@ -11,6 +11,7 @@ There are two ways to register commands: static or dynamic. Both methods receive
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
 -   `context`: (Optional) The context of the command
+-   `keywords`: (Optional) An array of keywords for search matching
 
 ### Static commands
 

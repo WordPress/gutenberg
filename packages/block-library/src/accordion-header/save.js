@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { plus } from '../accordion-item/icons';
+import { plus } from '../accordion-content/icons';
 
 const ICONS = {
 	plus,
@@ -41,7 +41,7 @@ export default function save( { attributes } ) {
 				blockProps.className,
 				colorProps.className,
 				borderProps.className,
-				'accordion-item__heading',
+				'accordion-content__heading',
 				{
 					[ `has-custom-font-size` ]: blockProps?.style?.fontSize,
 					[ `icon-position-left` ]: iconPosition === 'left',
@@ -55,14 +55,14 @@ export default function save( { attributes } ) {
 			} }
 		>
 			<button
-				className={ clsx( 'accordion-item__toggle' ) }
+				className={ clsx( 'accordion-content__toggle' ) }
 				style={ {
 					...spacingProps.style,
 				} }
 			>
 				<RichText.Content tagName="span" value={ title } />
 				<span
-					className={ clsx( `accordion-item__toggle-icon`, {
+					className={ clsx( `accordion-content__toggle-icon`, {
 						'has-icon-plus': showIcon,
 					} ) }
 					style={ {

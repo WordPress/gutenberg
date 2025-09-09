@@ -49,7 +49,7 @@ function gutenberg_add_customizer_block_theme_custom_css_preview_js() {
 JS;
 	wp_add_inline_script(
 		'customize-preview',
-		sprintf( '( %s )( %s )', $js_function, wp_json_encode( $setting_id ) )
+		sprintf( '( %s )( %s )', $js_function, wp_json_encode( $setting_id, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) )
 	);
 }
 
