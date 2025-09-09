@@ -57,7 +57,7 @@ export interface TokenItem {
 export interface FormTokenFieldProps
 	extends Pick<
 		ComponentPropsWithRef< 'input' >,
-		'autoCapitalize' | 'autoComplete' | 'className' | 'required'
+		'autoCapitalize' | 'autoComplete' | 'className'
 	> {
 	label?: string;
 	/**

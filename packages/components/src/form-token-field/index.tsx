@@ -60,7 +60,6 @@ function UnforwardedFormTokenField(
 		onFocus = undefined,
 		isBorderless = false,
 		disabled = false,
-		required = false,
 		tokenizeOnSpace = false,
 		messages = {
 			added: __( 'Item added.' ),
@@ -672,7 +671,6 @@ function UnforwardedFormTokenField(
 			autoComplete,
 			placeholder: value.length === 0 ? placeholder : '',
 			disabled,
-			required,
 			value: incompleteTokenValue,
 			onBlur,
 			isExpanded,
