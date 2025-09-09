@@ -3,6 +3,11 @@
 	display: none;
 }
 
+.block-editor-block-preview__content-iframe {
+	// Ensure a white backing layer for consistent semi-transparent color blending
+	background-color: $white;
+}
+
 .block-editor-block-preview__live-content {
 	* {
 		pointer-events: none;
