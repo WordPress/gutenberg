@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { Button, Card, CardBody, CardHeader } from '@wordpress/components';
-import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
+import {
+	Fragment,
+	useCallback,
+	useContext,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -10,10 +16,18 @@ import { chevronDown, chevronUp } from '@wordpress/icons';
  */
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../components/dataform-context';
-import type { NormalizedCardLayout, FieldLayoutProps, Form } from '../../types';
+import type {
+	NormalizedCardLayout,
+	FieldLayoutProps,
+	Form,
+	Layout,
+	FormField,
+} from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT, normalizeLayout } from '../../normalize-form-fields';
+
+const EMPTY_WRAPPER = Fragment;
 
 export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
@@ -78,7 +92,7 @@ export default function FormCardField< Item >( {
 
 	const form: Form = useMemo(
 		(): Form => ( {
-			layout: DEFAULT_LAYOUT,
+			layout: DEFAULT_LAYOUT as Layout,
 			fields: isCombinedField( field ) ? field.children : [],
 		} ),
 		[ field ]
@@ -92,8 +106,24 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field">
 				{ withHeader && (
-					<CollapsibleCardHeader className="dataforms-layouts-card__field-label">
-						{ field.label }
+					<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+						<span className="dataforms-layouts-card__field-header-label">
+							{ field.label }
+						</span>
+						{ layout.summaryField && (
+							<div className="dataforms-layouts-card__field-summary">
+								<DataFormLayout
+									data={ data }
+									form={ {
+										fields: [
+											layout.summaryField as FormField,
+										],
+									} }
+									onChange={ onChange }
+									as={ EMPTY_WRAPPER }
+								/>
+							</div>
+						) }
 					</CollapsibleCardHeader>
 				) }
 				{ ( isOpen || ! withHeader ) && (
@@ -132,8 +162,24 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
-				<CollapsibleCardHeader className="dataforms-layouts-card__field-label">
-					{ fieldDefinition.label }
+				<CollapsibleCardHeader className="dataforms-layouts-card__field-header">
+					<span className="dataforms-layouts-card__field-header-label">
+						{ fieldDefinition.label }
+					</span>
+					{ layout.summaryField && (
+						<div className="dataforms-layouts-card__field-summary">
+							<DataFormLayout
+								data={ data }
+								form={ {
+									fields: [
+										layout.summaryField as FormField,
+									],
+								} }
+								onChange={ onChange }
+								as={ EMPTY_WRAPPER }
+							/>
+						</div>
+					) }
 				</CollapsibleCardHeader>
 			) }
 			{ ( isOpen || ! withHeader ) && (

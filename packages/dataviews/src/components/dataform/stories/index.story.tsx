@@ -21,10 +21,11 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
+	SimpleFormField,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedTextControl, Badge } = unlock( privateApis );
 
 type SamplePost = {
 	title: string;
@@ -245,11 +246,13 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
+	summaryField,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
+	summaryField?: SimpleFormField;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -279,6 +282,7 @@ const getLayoutFromStoryArgs = ( {
 		if ( withHeader !== undefined ) {
 			// @ts-ignore We want to demo the effects of configuring withHeader.
 			cardLayout.withHeader = withHeader;
+			cardLayout.summaryField = summaryField;
 		}
 		layout = cardLayout;
 	}
@@ -758,6 +762,26 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			label: 'Commission',
 			type: 'integer',
 		},
+		{
+			id: 'customer-summary',
+			type: 'text',
+			readOnly: true,
+			render: ( { item } ) => {
+				return <Badge>{ item.email }</Badge>;
+			},
+		},
+		{
+			id: 'tax-summary',
+			type: 'text',
+			readOnly: true,
+			render: ( { item } ) => {
+				return (
+					<Badge>
+						VAT: { item.vat } - Commission: { item.commission }
+					</Badge>
+				);
+			},
+		},
 	];
 
 	const [ customer, setCustomer ] = useState< Customer >( {
@@ -781,6 +805,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			layout: getLayoutFromStoryArgs( {
 				type: 'card',
 				withHeader,
+				summaryField: {
+					id: 'customer-summary',
+					layout: {
+						type: 'regular',
+						labelPosition: 'none',
+					},
+				},
 			} ),
 			fields: [
 				{
@@ -792,7 +823,17 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 						{
 							id: 'customerContact',
 							label: 'Contact',
-							layout: { type: 'panel', labelPosition: 'top' },
+							layout: {
+								type: 'panel',
+								labelPosition: 'top',
+								summaryField: {
+									id: 'customer-summary',
+									layout: {
+										type: 'regular',
+										labelPosition: 'none',
+									},
+								},
+							},
 							children: [
 								{
 									id: 'name',
@@ -844,6 +885,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 					label: 'Taxes',
 					layout: {
 						type: 'card',
+						summaryField: {
+							id: 'tax-summary',
+							layout: {
+								type: 'regular',
+								labelPosition: 'none',
+							},
+						},
 						isOpened: false,
 					},
 					children: [ 'vat', 'commission' ],

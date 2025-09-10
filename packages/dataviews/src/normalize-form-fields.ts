@@ -49,6 +49,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				type: 'card',
 				withHeader: false,
 				isOpened: true,
+				summaryField: layout.summaryField,
 			} satisfies NormalizedCardLayout;
 		} else {
 			normalizedLayout = {
@@ -58,6 +59,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened
 						: true,
+				summaryField: layout.summaryField,
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {
