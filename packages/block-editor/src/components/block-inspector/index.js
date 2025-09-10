@@ -29,7 +29,6 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-
 import { unlock } from '../../lock-unlock';
 
 function BlockStylesPanel( { clientId } ) {
