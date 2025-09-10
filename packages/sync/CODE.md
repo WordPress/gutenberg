@@ -55,5 +55,6 @@ While the Redux actions in `core-data` and the `SyncProvider` orchestrate this d
 -   `getObjectId` extracts an entity's immutable ID from an entity record.
 -   `objectType` is a unique string that identifies the entity type.
 -   `supports` is a hash that declares support for various sync features, present and future.
+-   `syncedProperties` is the set of entity properties that should be synced (possibly including computed or meta properties from `getInitialObjectData`).
 
-While an entity should internally define which of its properties are synced, that set is not exported. An entity's `syncConfig` "owns" its behavior and it should not delegate or leak that responsibility to other parts of the codebase.
+An entity's `syncConfig` "owns" the sync behavior of the entity (especially via `applyChangesToCRDTDoc` and `getChangesFromCRDTDoc`) and it should not delegate or leak that responsibility to other parts of the codebase.
