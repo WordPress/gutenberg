@@ -295,7 +295,7 @@ describe( 'NavigationMenuSelector', () => {
 					screen.queryByRole( 'menuitem', {
 						name: 'Create new Menu',
 					} )
-				).toBeDisabled();
+				).toHaveAttribute( 'aria-disabled', 'true' );
 
 				// once the menu is created
 				// no more network activity to wait on
@@ -619,7 +619,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check all menu items are present but disabled.
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
 					// // Check all menu items are present but disabled.
-					expect( item ).toBeDisabled();
+					expect( item ).toHaveAttribute( 'aria-disabled', 'true' );
 				} );
 
 				// once the menu is imported

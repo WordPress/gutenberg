@@ -25,9 +25,10 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useArchiveLabel } from './use-archive-label';
+import { usePostTypeLabel } from './use-post-type-label';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const SUPPORTED_TYPES = [ 'archive', 'search' ];
+const SUPPORTED_TYPES = [ 'archive', 'search', 'post-type' ];
 
 export default function QueryTitleEdit( {
 	attributes: {
@@ -39,8 +40,10 @@ export default function QueryTitleEdit( {
 		showSearchTerm,
 	},
 	setAttributes,
+	context: { query },
 } ) {
 	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
+	const { postTypeLabel } = usePostTypeLabel( query?.postType );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const TagName = `h${ level }`;
@@ -170,6 +173,60 @@ export default function QueryTitleEdit( {
 						? __( 'Search results for: “search term”' )
 						: __( 'Search results' ) }
 				</TagName>
+			</>
+		);
+	}
+
+	if ( type === 'post-type' ) {
+		let title;
+		if ( postTypeLabel ) {
+			if ( showPrefix ) {
+				title = sprintf(
+					/* translators: %s: Singular post type name of the queried object */
+					__( 'Post Type: "%s"' ),
+					postTypeLabel
+				);
+			} else {
+				title = postTypeLabel;
+			}
+		} else {
+			title = showPrefix ? __( 'Post Type: Name' ) : __( 'Name' );
+		}
+
+		titleElement = (
+			<>
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () =>
+							setAttributes( {
+								showPrefix: true,
+							} )
+						}
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => ! showPrefix }
+							label={ __( 'Show post type label' ) }
+							onDeselect={ () =>
+								setAttributes( { showPrefix: true } )
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show post type label' ) }
+								onChange={ () =>
+									setAttributes( {
+										showPrefix: ! showPrefix,
+									} )
+								}
+								checked={ showPrefix }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+				<TagName { ...blockProps }>{ title }</TagName>
 			</>
 		);
 	}

@@ -244,7 +244,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			) {
 				result.push( {
 					name: 'core/edit-site/open-template-parts',
-					label: __( 'Template parts' ),
+					label: __( 'Go to: Template parts' ),
 					icon: symbolFilled,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -280,8 +280,8 @@ const getSiteEditorBasicNavigationCommands = () =>
 		const isSiteEditor = getPath( window.location.href )?.includes(
 			'site-editor.php'
 		);
-		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
-			( select ) => {
+		const { isBlockBasedTheme, canCreateTemplate, canCreatePatterns } =
+			useSelect( ( select ) => {
 				return {
 					isBlockBasedTheme:
 						select( coreStore ).getCurrentTheme()?.is_block_theme,
@@ -289,36 +289,20 @@ const getSiteEditorBasicNavigationCommands = () =>
 						kind: 'postType',
 						name: 'wp_template',
 					} ),
+					canCreatePatterns: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_block',
+					} ),
 				};
-			},
-			[]
-		);
+			}, [] );
 		const commands = useMemo( () => {
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
-				result.push( {
-					name: 'core/edit-site/open-navigation',
-					label: __( 'Navigation' ),
-					icon: navigation,
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( '/navigation' );
-						} else {
-							document.location = addQueryArgs(
-								'site-editor.php',
-								{
-									p: '/navigation',
-								}
-							);
-						}
-						close();
-					},
-				} );
-
+				// Go to Styles command
 				result.push( {
 					name: 'core/edit-site/open-styles',
-					label: __( 'Styles' ),
+					label: __( 'Go to: Styles' ),
 					icon: styles,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -336,17 +320,17 @@ const getSiteEditorBasicNavigationCommands = () =>
 				} );
 
 				result.push( {
-					name: 'core/edit-site/open-pages',
-					label: __( 'Pages' ),
-					icon: page,
+					name: 'core/edit-site/open-navigation',
+					label: __( 'Go to: Navigation' ),
+					icon: navigation,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
-							history.navigate( '/page' );
+							history.navigate( '/navigation' );
 						} else {
 							document.location = addQueryArgs(
 								'site-editor.php',
 								{
-									p: '/page',
+									p: '/navigation',
 								}
 							);
 						}
@@ -356,7 +340,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 
 				result.push( {
 					name: 'core/edit-site/open-templates',
-					label: __( 'Templates' ),
+					label: __( 'Go to: Templates' ),
 					icon: layout,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -374,32 +358,41 @@ const getSiteEditorBasicNavigationCommands = () =>
 				} );
 			}
 
-			result.push( {
-				name: 'core/edit-site/open-patterns',
-				label: __( 'Patterns' ),
-				icon: symbol,
-				callback: ( { close } ) => {
-					if ( canCreateTemplate ) {
-						if ( isSiteEditor ) {
-							history.navigate( '/pattern' );
+			if ( canCreatePatterns ) {
+				result.push( {
+					name: 'core/edit-site/open-patterns',
+					label: __( 'Go to: Patterns' ),
+					icon: symbol,
+					callback: ( { close } ) => {
+						if ( canCreateTemplate ) {
+							if ( isSiteEditor ) {
+								history.navigate( '/pattern' );
+							} else {
+								document.location = addQueryArgs(
+									'site-editor.php',
+									{
+										p: '/pattern',
+									}
+								);
+							}
+							close();
 						} else {
-							document.location = addQueryArgs(
-								'site-editor.php',
-								{
-									p: '/pattern',
-								}
-							);
+							// If a user cannot access the site editor.
+							document.location.href =
+								'edit.php?post_type=wp_block';
 						}
-						close();
-					} else {
-						// If a user cannot access the site editor
-						document.location.href = 'edit.php?post_type=wp_block';
-					}
-				},
-			} );
+					},
+				} );
+			}
 
 			return result;
-		}, [ history, isSiteEditor, canCreateTemplate, isBlockBasedTheme ] );
+		}, [
+			history,
+			isSiteEditor,
+			canCreateTemplate,
+			canCreatePatterns,
+			isBlockBasedTheme,
+		] );
 
 		return {
 			commands,

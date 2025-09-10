@@ -50,5 +50,6 @@ export async function saveSiteEditorEntities(
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
 		.getByText( /(updated|published)\./ )
+		.first()
 		.waitFor();
 }

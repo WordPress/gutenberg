@@ -9,6 +9,7 @@ import {
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	store as blocksStore,
+	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
@@ -42,7 +43,10 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	isZoomOut,
+	isContainerInsertableToInWriteMode,
 } from './private-selectors';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 /**
  * A block selection object.
@@ -1682,13 +1686,16 @@ const canInsertBlockTypeUnmemoized = (
 	if ( isLocked ) {
 		return false;
 	}
-
-	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
-	if ( _isSectionBlock ) {
+	const isContentRoleBlock = isContentBlock( blockName );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	// It shouldn't be possible to insert inside a section block unless in
+	// some cases when the block is a content block.
+	if ( isParentSectionBlock && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
+	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
+	if ( blockEditingMode === 'disabled' ) {
 		return false;
 	}
 
@@ -1700,11 +1707,22 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	// In write mode, check if this container allows insertion.
+	if (
+		blockEditingMode === 'contentOnly' &&
+		isNavigationMode( state ) &&
+		! isContainerInsertableToInWriteMode( state, blockName, rootClientId )
+	) {
+		return false;
+	}
+
 	const parentName = getBlockName( state, rootClientId );
+
 	const parentBlockType = getBlockType( parentName );
 
 	// Look at the `blockType.allowedBlocks` field to determine whether this is an allowed child block.
 	const parentAllowedChildBlocks = parentBlockType?.allowedBlocks;
+
 	let hasParentAllowedBlock = checkAllowList(
 		parentAllowedChildBlocks,
 		blockName
@@ -1842,11 +1860,29 @@ export function canRemoveBlock( state, clientId ) {
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
-	if ( isBlockWithinSection ) {
+	const isContentRoleBlock = isContentBlock(
+		getBlockName( state, clientId )
+	);
+	if ( isBlockWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	const blockEditingMode = getBlockEditingMode( state, rootClientId );
+
+	// Check if the parent container allows insertion/removal in write mode
+	if (
+		blockEditingMode === 'contentOnly' &&
+		isNavigationMode( state ) &&
+		! isContainerInsertableToInWriteMode(
+			state,
+			getBlockName( state, rootClientId ),
+			rootClientId
+		)
+	) {
+		return false;
+	}
+
+	return blockEditingMode !== 'disabled';
 }
 
 /**
@@ -3040,62 +3076,36 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
-export const getBlockEditingMode = createRegistrySelector(
-	( select ) =>
-		( state, clientId = '' ) => {
-			// Some selectors that call this provide `null` as the default
-			// rootClientId, but the default rootClientId is actually `''`.
-			if ( clientId === null ) {
-				clientId = '';
-			}
+export function getBlockEditingMode( state, clientId = '' ) {
+	// Some selectors that call this provide `null` as the default
+	// rootClientId, but the default rootClientId is actually `''`.
+	if ( clientId === null ) {
+		clientId = '';
+	}
 
-			const isNavMode = isNavigationMode( state );
+	const isNavMode = isNavigationMode( state );
 
-			// If the editor is currently not in navigation mode, check if the clientId
-			// has an editing mode set in the regular derived map.
-			// There may be an editing mode set here for synced patterns or in zoomed out
-			// mode.
-			if (
-				! isNavMode &&
-				state.derivedBlockEditingModes?.has( clientId )
-			) {
-				return state.derivedBlockEditingModes.get( clientId );
-			}
+	// If the editor is currently not in navigation mode, check if the clientId
+	// has an editing mode set in the regular derived map.
+	// There may be an editing mode set here for synced patterns or in zoomed out
+	// mode.
+	if ( ! isNavMode && state.derivedBlockEditingModes?.has( clientId ) ) {
+		return state.derivedBlockEditingModes.get( clientId );
+	}
 
-			// If the editor *is* in navigation mode, the block editing mode states
-			// are stored in the derivedNavModeBlockEditingModes map.
-			if (
-				isNavMode &&
-				state.derivedNavModeBlockEditingModes?.has( clientId )
-			) {
-				return state.derivedNavModeBlockEditingModes.get( clientId );
-			}
+	// If the editor *is* in navigation mode, the block editing mode states
+	// are stored in the derivedNavModeBlockEditingModes map.
+	if ( isNavMode && state.derivedNavModeBlockEditingModes?.has( clientId ) ) {
+		return state.derivedNavModeBlockEditingModes.get( clientId );
+	}
 
-			// In normal mode, consider that an explicitly set editing mode takes over.
-			const blockEditingMode = state.blockEditingModes.get( clientId );
-			if ( blockEditingMode ) {
-				return blockEditingMode;
-			}
+	// In normal mode, consider that an explicitly set editing mode takes over.
+	if ( state.blockEditingModes.has( clientId ) ) {
+		return state.blockEditingModes.get( clientId );
+	}
 
-			// In normal mode, top level is default mode.
-			if ( clientId === '' ) {
-				return 'default';
-			}
-
-			const rootClientId = getBlockRootClientId( state, clientId );
-			const templateLock = getTemplateLock( state, rootClientId );
-			// If the parent of the block is contentOnly locked, check whether it's a content block.
-			if ( templateLock === 'contentOnly' ) {
-				const name = getBlockName( state, clientId );
-				const { hasContentRoleAttribute } = unlock(
-					select( blocksStore )
-				);
-				const isContent = hasContentRoleAttribute( name );
-				return isContent ? 'contentOnly' : 'disabled';
-			}
-			return 'default';
-		}
-);
+	return 'default';
+}
 
 /**
  * Indicates if a block is ungroupable.

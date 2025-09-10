@@ -42,7 +42,8 @@ try {
 	// First, try to load the package installed from among the optional peerDependencies.
 	loadConfig = require( '@wordpress/env/lib/config/load-config' );
 } catch ( error ) {
-	window.console.log(
+	// eslint-disable-next-line no-console
+	console.log(
 		'Notice: Could not find @wordpress/env package. Using WP_BASE_URL environment variable or else the default http://localhost:8889 URL for tests.'
 	);
 }
