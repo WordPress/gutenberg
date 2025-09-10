@@ -84,6 +84,7 @@ export default function FormRegularField< Item >( {
 	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
 		return null;
 	}
+
 	if ( labelPosition === 'side' ) {
 		return (
 			<HStack className="dataforms-layouts-regular__field">

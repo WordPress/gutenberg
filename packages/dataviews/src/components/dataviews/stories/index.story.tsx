@@ -155,7 +155,7 @@ export const CustomEmpty = () => {
 			onChangeView={ setView }
 			actions={ actions }
 			defaultLayouts={ defaultLayouts }
-			empty={ view.search ? 'No sites found' : 'No sites' }
+			empty={ <p>{ view.search ? 'No sites found' : 'No sites' }</p> }
 		/>
 	);
 };

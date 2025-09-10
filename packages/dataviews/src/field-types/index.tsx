@@ -21,6 +21,7 @@ import { default as date } from './date';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
 import { default as array } from './array';
+import { default as password } from './password';
 import { default as telephone } from './telephone';
 import { default as color } from './color';
 import { default as url } from './url';
@@ -66,6 +67,10 @@ export default function getFieldTypeDefinition< Item >(
 
 	if ( 'array' === type ) {
 		return array;
+	}
+
+	if ( 'password' === type ) {
+		return password;
 	}
 
 	if ( 'telephone' === type ) {

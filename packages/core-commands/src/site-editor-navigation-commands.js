@@ -244,7 +244,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			) {
 				result.push( {
 					name: 'core/edit-site/open-template-parts',
-					label: __( 'Template parts' ),
+					label: __( 'Go to: Template parts' ),
 					icon: symbolFilled,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -299,9 +299,10 @@ const getSiteEditorBasicNavigationCommands = () =>
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
+				// Go to Styles command
 				result.push( {
 					name: 'core/edit-site/open-styles',
-					label: __( 'Styles' ),
+					label: __( 'Go to: Styles' ),
 					icon: styles,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -320,7 +321,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 
 				result.push( {
 					name: 'core/edit-site/open-navigation',
-					label: __( 'Navigation' ),
+					label: __( 'Go to: Navigation' ),
 					icon: navigation,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -338,27 +339,8 @@ const getSiteEditorBasicNavigationCommands = () =>
 				} );
 
 				result.push( {
-					name: 'core/edit-site/open-pages',
-					label: __( 'Pages' ),
-					icon: page,
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( '/page' );
-						} else {
-							document.location = addQueryArgs(
-								'site-editor.php',
-								{
-									p: '/page',
-								}
-							);
-						}
-						close();
-					},
-				} );
-
-				result.push( {
 					name: 'core/edit-site/open-templates',
-					label: __( 'Templates' ),
+					label: __( 'Go to: Templates' ),
 					icon: layout,
 					callback: ( { close } ) => {
 						if ( isSiteEditor ) {
@@ -375,10 +357,11 @@ const getSiteEditorBasicNavigationCommands = () =>
 					},
 				} );
 			}
+
 			if ( canCreatePatterns ) {
 				result.push( {
 					name: 'core/edit-site/open-patterns',
-					label: __( 'Patterns' ),
+					label: __( 'Go to: Patterns' ),
 					icon: symbol,
 					callback: ( { close } ) => {
 						if ( canCreateTemplate ) {
@@ -394,7 +377,7 @@ const getSiteEditorBasicNavigationCommands = () =>
 							}
 							close();
 						} else {
-							// If a user cannot access the site editor
+							// If a user cannot access the site editor.
 							document.location.href =
 								'edit.php?post_type=wp_block';
 						}

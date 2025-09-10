@@ -17,6 +17,7 @@ import {
 	ValidatedInputControl,
 	ValidatedNumberControl,
 	ValidatedTextControl,
+	ValidatedTextareaControl,
 	ValidatedToggleControl,
 } from './validated-form-controls';
 import { Picker } from './color-picker/picker';
@@ -40,5 +41,6 @@ lock( privateApis, {
 	ValidatedCheckboxControl,
 	ValidatedNumberControl,
 	ValidatedTextControl,
+	ValidatedTextareaControl,
 	ValidatedToggleControl,
 } );

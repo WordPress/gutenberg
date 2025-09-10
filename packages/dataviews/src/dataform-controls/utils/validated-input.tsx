@@ -5,6 +5,7 @@ import {
 	Icon,
 	privateApis,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
 
@@ -21,11 +22,15 @@ export type DataFormValidatedTextControlProps< Item > =
 		/**
 		 * The input type of the control.
 		 */
-		type?: 'text' | 'email' | 'tel' | 'url';
+		type?: 'text' | 'email' | 'tel' | 'url' | 'password';
 		/**
 		 * Optional icon to display as prefix.
 		 */
 		icon?: React.ComponentType | React.ReactElement;
+		/**
+		 * Optional icon to display as suffix.
+		 */
+		suffix?: React.ReactElement;
 	};
 
 export default function ValidatedText< Item >( {
@@ -35,6 +40,7 @@ export default function ValidatedText< Item >( {
 	hideLabelFromVision,
 	type,
 	icon,
+	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
@@ -88,6 +94,13 @@ export default function ValidatedText< Item >( {
 					<InputControlPrefixWrapper variant="icon">
 						<Icon icon={ icon } />
 					</InputControlPrefixWrapper>
+				) : undefined
+			}
+			suffix={
+				suffix ? (
+					<InputControlSuffixWrapper variant="control">
+						{ suffix }
+					</InputControlSuffixWrapper>
 				) : undefined
 			}
 			__next40pxDefaultSize

@@ -4380,92 +4380,9 @@ describe( '__unstableGetClientIdsTree', () => {
 
 describe( 'getBlockEditingMode', () => {
 	const baseState = {
-		settings: {},
-		blocks: {
-			byClientId: new Map( [
-				[
-					'6cf70164-9097-4460-bcbf-200560546988',
-					{ name: 'core/template-part' },
-				], // Header
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					{ name: 'core/group' },
-				], // Group
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					{ name: 'core/post-title' },
-				], // |  Post Title
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					{ name: 'core/group' },
-				], // |  Group
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', { name: 'core/p' } ], // | |  Paragraph
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', { name: 'core/p' } ], // | |  Paragraph
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					{ name: 'core/group' },
-				], // | | Group
-			] ),
-			order: new Map( [
-				[
-					'',
-					[
-						'6cf70164-9097-4460-bcbf-200560546988',
-						'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					],
-				],
-				[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
-				[
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-					[
-						'b26fc763-417d-4f01-b81c-2ec61e14a972',
-						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					],
-				],
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', [] ],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					[
-						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-						'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					],
-				],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', [] ],
-			] ),
-			parents: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', '' ],
-				[
-					'b26fc763-417d-4f01-b81c-2ec61e14a972',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				],
-				[
-					'b3247f75-fd94-4fef-97f9-5bfd162cc416',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-				[
-					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
-					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-				],
-			] ),
-		},
-		blockListSettings: {
-			'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-			'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-		},
 		blockEditingModes: new Map( [] ),
 		derivedBlockEditingModes: new Map( [] ),
+		derivedNavModeBlockEditingModes: new Map( [] ),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );
@@ -4514,115 +4431,59 @@ describe( 'getBlockEditingMode', () => {
 		).toBe( 'contentOnly' );
 	} );
 
-	it( 'should return disabled if explicitly set on a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-			] ),
-			derivedBlockEditingModes: new Map( [
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
+	describe( 'derived block editing modes override standard block editing modes', () => {
+		it( 'should return default if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'default' );
+		} );
 
-	it( 'should return default if parent is set to contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'contentOnly' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
+		it( 'should return disabled if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'disabled' );
+		} );
 
-	it( 'should return disabled if overridden by a parent', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [
-				[ '', 'disabled' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'default' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-			] ),
-			derivedBlockEditingModes: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return disabled if explicitly set on root', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
-			derivedBlockEditingModes: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
-				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', 'disabled' ],
-			] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return default if root is contentOnly', () => {
-		const state = {
-			...baseState,
-			blockEditingModes: new Map( [ [ '', 'contentOnly' ] ] ),
-		};
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'default' );
-	} );
-
-	it( 'should return disabled if parent is locked and the block has no content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( false );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'disabled' );
-	} );
-
-	it( 'should return contentOnly if parent is locked and the block has a content role', () => {
-		const state = {
-			...baseState,
-			blockListSettings: {
-				...baseState.blockListSettings,
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {
-					templateLock: 'contentOnly',
-				},
-			},
-		};
-		hasContentRoleAttribute.mockReturnValueOnce( true );
-		expect(
-			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
-		).toBe( 'contentOnly' );
+		it( 'should return contentOnly if explicitly set', () => {
+			const state = {
+				...baseState,
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+				] ),
+				derivedBlockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+			};
+			expect(
+				getBlockEditingMode(
+					state,
+					'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+				)
+			).toBe( 'contentOnly' );
+		} );
 	} );
 } );

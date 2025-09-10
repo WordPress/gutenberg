@@ -5,6 +5,7 @@
 ### Breaking changes
 
 - Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
+- DataViews: Custom `empty` elements are no longer wrapped in `<p>` tags to improve accessibility. [#71561](https://github.com/WordPress/gutenberg/pull/71561)
 
 ### Features
 
@@ -12,6 +13,13 @@
 - Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
 - DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
 - Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
+- Dataform: Add new `password` field type and field control. [#71545](https://github.com/WordPress/gutenberg/pull/71545)
+- DataForm: Add a textarea control for use with the `text` field type ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
+- DataViews: support groupBy in the list layout. [#71548](https://github.com/WordPress/gutenberg/pull/71548)
+
+### Bug Fixes
+
+- DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
 
 ## 8.0.0 (2025-09-03)
 
