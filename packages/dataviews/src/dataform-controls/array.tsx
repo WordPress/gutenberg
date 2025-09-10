@@ -1,93 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { privateApis } from '@wordpress/components';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
 
-// Create a validated FormTokenField wrapper
-const ValidatedFormTokenControl = ( {
-	required,
-	customValidator,
-	onChange,
-	markWhenOptional,
-	label,
-	...restProps
-}: React.ComponentProps< typeof FormTokenField > & {
-	required?: boolean;
-	customValidator?: ( value: any ) => string | void;
-	markWhenOptional?: boolean;
-} ) => {
-	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
-	const [ isTouched, setIsTouched ] = useState( false );
-	const valueRef = useRef( restProps.value );
-
-	const validate = useCallback( () => {
-		if (
-			required &&
-			( ! valueRef.current || valueRef.current.length === 0 )
-		) {
-			setErrorMessage( __( 'This field is required.' ) );
-			return;
-		}
-
-		const customError = customValidator?.( valueRef.current );
-		setErrorMessage( customError || undefined );
-	}, [ required, customValidator ] );
-
-	const onBlur = useCallback( () => {
-		setIsTouched( true );
-		validate();
-	}, [ validate ] );
-
-	const onChangeControl = useCallback(
-		( value: any ) => {
-			valueRef.current = value;
-			onChange?.( value );
-
-			// Only validate incrementally if the field has been touched or currently has an error
-			if ( isTouched || errorMessage ) {
-				validate();
-			}
-		},
-		[ onChange, isTouched, errorMessage, validate ]
-	);
-
-	// Append required indicator to label
-	const labelWithIndicator = useMemo( () => {
-		if ( required && ! markWhenOptional ) {
-			return `${ label } (${ __( 'Required' ) })`;
-		}
-		if ( ! required && markWhenOptional ) {
-			return `${ label } (${ __( 'Optional' ) })`;
-		}
-		return label;
-	}, [ label, required, markWhenOptional ] );
-
-	return (
-		<div className="components-validated-control" onBlur={ onBlur }>
-			<FormTokenField
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				{ ...restProps }
-				label={ labelWithIndicator }
-				onChange={ onChangeControl }
-			/>
-			<div aria-live="polite">
-				{ errorMessage && (
-					<p className="components-validated-control__error">
-						{ errorMessage }
-					</p>
-				) }
-			</div>
-		</div>
-	);
-};
+const { ValidatedFormTokenField } = unlock( privateApis );
 
 export default function ArrayControl< Item >( {
 	data,
@@ -155,7 +78,7 @@ export default function ArrayControl< Item >( {
 	);
 
 	return (
-		<ValidatedFormTokenControl
+		<ValidatedFormTokenField
 			required={ !! field.isValid?.required }
 			customValidator={ ( displayLabels: any ) => {
 				if ( field.isValid?.custom ) {
@@ -187,7 +110,7 @@ export default function ArrayControl< Item >( {
 			suggestions={
 				elements?.map( ( suggestion ) => suggestion.label ) ?? []
 			}
-			__experimentalValidateInput={ ( token ) => {
+			__experimentalValidateInput={ ( token: string ) => {
 				if ( ! field.isValid?.elements ) {
 					return true;
 				}
