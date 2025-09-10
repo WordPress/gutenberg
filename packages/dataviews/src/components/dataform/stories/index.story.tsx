@@ -168,6 +168,12 @@ const fields: Field< SamplePost >[] = [
 		label: 'City',
 		type: 'text',
 	},
+	{
+		id: 'description',
+		label: 'Description',
+		type: 'text',
+		Edit: 'textarea',
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -189,6 +195,7 @@ const LayoutRegularComponent = ( {
 		filesize: 1024,
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
+		description: 'This is a sample description.',
 	} );
 
 	const form: Form = useMemo(
@@ -212,6 +219,7 @@ const LayoutRegularComponent = ( {
 				'filesize',
 				'dimensions',
 				'tags',
+				'description',
 			],
 		} ),
 		[ labelPosition ]
@@ -388,6 +396,7 @@ const ValidationComponent = ( {
 } ) => {
 	type ValidatedItem = {
 		text: string;
+		textarea: string;
 		email: string;
 		telephone: string;
 		url: string;
@@ -395,10 +404,12 @@ const ValidationComponent = ( {
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
+		password: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
+		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
 		url: 'https://example.com',
@@ -406,10 +417,18 @@ const ValidationComponent = ( {
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
+		password: 'secretpassword123',
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customTextareaRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
 			return 'Value must only contain letters and spaces.';
 		}
 
@@ -451,6 +470,20 @@ const ValidationComponent = ( {
 		return null;
 	};
 
+	const customPasswordRule = ( value: ValidatedItem ) => {
+		if ( value.password.length < 8 ) {
+			return 'Password must be at least 8 characters long.';
+		}
+		if ( ! /[A-Z]/.test( value.password ) ) {
+			return 'Password must contain at least one uppercase letter.';
+		}
+		if ( ! /[0-9]/.test( value.password ) ) {
+			return 'Password must contain at least one number.';
+		}
+
+		return null;
+	};
+
 	const maybeCustomRule = (
 		rule: ( item: ValidatedItem ) => null | string
 	) => {
@@ -465,6 +498,16 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRule ),
+			},
+		},
+		{
+			id: 'textarea',
+			type: 'text',
+			Edit: 'textarea',
+			label: 'Textarea',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTextareaRule ),
 			},
 		},
 		{
@@ -528,12 +571,22 @@ const ValidationComponent = ( {
 				required,
 			},
 		},
+		{
+			id: 'password',
+			type: 'password',
+			label: 'Password',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customPasswordRule ),
+			},
+		},
 	];
 
 	const form = {
 		layout: { type },
 		fields: [
 			'text',
+			'textarea',
 			'email',
 			'telephone',
 			'url',
@@ -541,6 +594,7 @@ const ValidationComponent = ( {
 			'integer',
 			'boolean',
 			'customEdit',
+			'password',
 		],
 	};
 

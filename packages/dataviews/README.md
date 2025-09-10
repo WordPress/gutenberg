@@ -426,7 +426,7 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 
 #### `empty`: React node
 
-A message or element to be displayed instead of the dataview's default empty message.
+An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
 
 ### Composition modes
 
