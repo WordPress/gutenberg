@@ -28,6 +28,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
+import ContentOnlyControls from '../content-only-controls';
 
 import { unlock } from '../../lock-unlock';
 
@@ -264,11 +265,20 @@ const BlockInspectorSingleBlock = ( {
 					) }
 
 					{ contentClientIds && contentClientIds?.length > 0 && (
-						<PanelBody title={ __( 'Content' ) }>
-							<BlockQuickNavigation
-								clientIds={ contentClientIds }
-							/>
-						</PanelBody>
+						<>
+							{ ! window?.__experimentalContentOnlyPatternInsertion && (
+								<PanelBody title={ __( 'Content' ) }>
+									<BlockQuickNavigation
+										clientIds={ contentClientIds }
+									/>
+								</PanelBody>
+							) }
+							{ window?.__experimentalContentOnlyPatternInsertion && (
+								<ContentOnlyControls
+									clientIds={ contentClientIds }
+								/>
+							) }
+						</>
 					) }
 
 					{ ! isSectionBlock && (

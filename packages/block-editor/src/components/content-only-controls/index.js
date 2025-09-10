@@ -87,7 +87,7 @@ function getContentAttributesWithControls( blockType ) {
 function getResetAllValue( attributes ) {
 	const resetValue = {};
 
-	attributes.each( ( attribute ) => {
+	attributes.forEach( ( attribute ) => {
 		resetValue[ attribute.key ] = getDefaultValue( attribute );
 	} );
 
@@ -137,8 +137,9 @@ function BlockControls( { clientId } ) {
 				);
 			} }
 		>
-			{ contentAttributesWithControls?.each( ( attribute ) => (
+			{ contentAttributesWithControls?.map( ( attribute ) => (
 				<BlockAttributeToolsPanelItem
+					key={ clientId }
 					clientId={ clientId }
 					attributeDefinition={ attribute }
 					setValue={ ( value ) =>
