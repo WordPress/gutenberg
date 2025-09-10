@@ -9,8 +9,13 @@ export default function Text< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
-}: DataFormControlProps< Item > ) {
+	prefix,
+}: DataFormControlProps< Item > & {
+	prefix?: React.ComponentType | React.ReactElement;
+} ) {
 	return (
-		<ValidatedText { ...{ data, field, onChange, hideLabelFromVision } } />
+		<ValidatedText
+			{ ...{ data, field, onChange, hideLabelFromVision, icon: prefix } }
+		/>
 	);
 }

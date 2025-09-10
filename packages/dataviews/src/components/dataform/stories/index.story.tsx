@@ -26,6 +26,8 @@ import { unlock } from '../../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
+const DollarPrefix = () => <span>$</span>;
+
 type SamplePost = {
 	title: string;
 	order: number;
@@ -41,6 +43,8 @@ type SamplePost = {
 	address1?: string;
 	address2?: string;
 	city?: string;
+	longDescription?: string;
+	priceWithPrefix?: string;
 };
 
 const fields: Field< SamplePost >[] = [
@@ -174,6 +178,24 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: 'textarea',
 	},
+	{
+		id: 'longDescription',
+		label: 'Long Description',
+		type: 'text',
+		Edit: {
+			type: 'textarea',
+			rows: 5,
+		},
+	},
+	{
+		id: 'priceWithPrefix',
+		label: 'Price with Prefix',
+		type: 'text',
+		Edit: {
+			type: 'text',
+			prefix: DollarPrefix,
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -220,6 +242,8 @@ const LayoutRegularComponent = ( {
 				'dimensions',
 				'tags',
 				'description',
+				'longDescription',
+				'priceWithPrefix',
 			],
 		} ),
 		[ labelPosition ]

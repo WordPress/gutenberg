@@ -126,7 +126,11 @@ export type FieldTypeDefinition< Item > = {
 	/**
 	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > > | string | null;
+	Edit:
+		| ComponentType< DataFormControlProps< Item > >
+		| string
+		| EditConfig
+		| null;
 
 	/**
 	 * Callback used to render the field.
@@ -153,6 +157,28 @@ export type FieldTypeDefinition< Item > = {
 export type Rules< Item > = {
 	required?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
+};
+
+/**
+ * Edit configuration object for advanced control options.
+ */
+export type EditConfig = {
+	/**
+	 * The type of control to use.
+	 */
+	type: string;
+	/**
+	 * Number of rows for textarea controls.
+	 */
+	rows?: number;
+	/**
+	 * Prefix component for text controls.
+	 */
+	prefix?: React.ComponentType | React.ReactElement;
+	/**
+	 * Additional configuration properties.
+	 */
+	[ key: string ]: any;
 };
 
 /**
@@ -198,7 +224,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | string;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string | EditConfig;
 
 	/**
 	 * Callback used to sort the field.
