@@ -18,7 +18,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, useState, Fragment, useMemo } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -30,7 +30,6 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockEditContext } from '../components/block-edit';
 import { store as blockEditorStore } from '../store';
-import { updateBlock } from '../store/actions';
 
 const { Menu } = unlock( componentsPrivateApis );
 
@@ -72,66 +71,81 @@ function BlockBindingsPanelMenuContent( {
 
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
-				// Always render the same structure, but conditionally show content
-				if ( source.mode === 'dropdown' ) {
-					return (
-						<Menu key={ sourceKey }>
-							<Menu.SubmenuTriggerItem>
+			{ Object.entries( sources )
+				.filter( ( [ , source ] ) => {
+					// Only show sources that have compatible data for this specific attribute
+					const sourceDataItems = Object.entries(
+						source.data
+					).filter( ( [ , args ] ) => args?.type === attributeType );
+					return sourceDataItems.length > 0;
+				} )
+				.map( ( [ sourceKey, source ] ) => {
+					// Always render the same structure, but conditionally show content
+					if ( source.mode === 'dropdown' ) {
+						return (
+							<Menu key={ sourceKey }>
+								<Menu.SubmenuTriggerItem>
+									<Menu.ItemLabel>
+										{ source.label }
+									</Menu.ItemLabel>
+								</Menu.SubmenuTriggerItem>
+								<Menu.Popover gutter={ 8 }>
+									<Menu.Group>
+										{ Object.entries( source.data )
+											.filter(
+												( [ , args ] ) =>
+													args?.type === attributeType
+											)
+											.map( ( [ , args ] ) => (
+												<Menu.RadioItem
+													key={ args.key }
+													onChange={ ( e ) => {
+														source.onSelect( {
+															value: e.target
+																.value,
+															updateBlockBindings,
+															attribute,
+														} );
+													} }
+													name={
+														attribute + '-binding'
+													}
+													value={ args.key }
+													checked={
+														args.key === currentKey
+													}
+												>
+													<Menu.ItemLabel>
+														{ args?.label }
+													</Menu.ItemLabel>
+													<Menu.ItemHelpText>
+														{ args?.value }
+													</Menu.ItemHelpText>
+												</Menu.RadioItem>
+											) ) }
+									</Menu.Group>
+								</Menu.Popover>
+							</Menu>
+						);
+					}
+
+					if ( source.mode === 'modal' ) {
+						return (
+							<Menu.Item
+								key={ sourceKey }
+								onClick={ () =>
+									onOpenModal( sourceKey, source )
+								}
+							>
 								<Menu.ItemLabel>
 									{ source.label }
 								</Menu.ItemLabel>
-							</Menu.SubmenuTriggerItem>
-							<Menu.Popover gutter={ 8 }>
-								<Menu.Group>
-									{ Object.entries( source.data )
-										.filter(
-											( [ , args ] ) =>
-												args?.type === attributeType
-										)
-										.map( ( [ , args ] ) => (
-											<Menu.RadioItem
-												key={ args.key }
-												onChange={ ( e ) => {
-													source.onSelect( {
-														value: e.target.value,
-														updateBlockBindings,
-														attribute,
-													} );
-												} }
-												name={ attribute + '-binding' }
-												value={ args.key }
-												checked={
-													args.key === currentKey
-												}
-											>
-												<Menu.ItemLabel>
-													{ args?.label }
-												</Menu.ItemLabel>
-												<Menu.ItemHelpText>
-													{ args?.value }
-												</Menu.ItemHelpText>
-											</Menu.RadioItem>
-										) ) }
-								</Menu.Group>
-							</Menu.Popover>
-						</Menu>
-					);
-				}
+							</Menu.Item>
+						);
+					}
 
-				if ( source.mode === 'modal' ) {
-					return (
-						<Menu.Item
-							key={ sourceKey }
-							onClick={ () => onOpenModal( sourceKey, source ) }
-						>
-							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
-						</Menu.Item>
-					);
-				}
-
-				return null;
-			} ) }
+					return null;
+				} ) }
 		</Menu>
 	);
 }
@@ -244,47 +258,76 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const canUpdateBlockBindings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().canUpdateBlockBindings;
-	}, [] );
+	// Use useSelect to ensure sources are updated whenever there are updates in block context
+	// or when underlying data changes.
+	const { sources, canUpdateBlockBindings } = useSelect(
+		( select ) => {
+			const _canUpdateBlockBindings =
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings;
 
-	const selectCallback = useSelect( ( select ) => select, [] );
+			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+				return {
+					sources: EMPTY_OBJECT,
+					canUpdateBlockBindings: _canUpdateBlockBindings,
+				};
+			}
 
-	// Compute sources using useMemo to avoid unnecessary recalculations
-	// while still allowing editorUI functions to access store data via select
-	const sources = useMemo( () => {
-		if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-			return EMPTY_OBJECT;
-		}
-		const _sources = {};
-		const registeredSources = getBlockBindingsSources();
-		Object.entries( registeredSources ).forEach(
-			( [ sourceName, { editorUI, usesContext, label } ] ) => {
-				if ( editorUI ) {
-					// Populate context.
-					const context = {};
-					if ( usesContext?.length ) {
-						for ( const key of usesContext ) {
-							context[ key ] = blockContext[ key ];
+			const _sources = {};
+			const registeredSources = getBlockBindingsSources();
+			Object.entries( registeredSources ).forEach(
+				( [ sourceName, { editorUI, usesContext, label } ] ) => {
+					if ( editorUI ) {
+						// Populate context.
+						const context = {};
+						if ( usesContext?.length ) {
+							for ( const key of usesContext ) {
+								context[ key ] = blockContext[ key ];
+							}
+						}
+						const editorUIResult = editorUI( {
+							select,
+							context,
+						} );
+
+						// Check if this source has any compatible data for any of the block's attributes
+						const hasCompatibleData = bindableAttributes.some(
+							( attribute ) => {
+								const _attributeType =
+									getBlockType( blockName ).attributes?.[
+										attribute
+									]?.type;
+								const attributeType =
+									_attributeType === 'rich-text'
+										? 'string'
+										: _attributeType;
+
+								return editorUIResult.data?.some(
+									( item ) => item?.type === attributeType
+								);
+							}
+						);
+
+						// Only add source if it has compatible data for at least one attribute
+						if ( hasCompatibleData ) {
+							_sources[ sourceName ] = {
+								...editorUIResult,
+								label,
+							};
 						}
 					}
-					const editorUIResult = editorUI( {
-						select: selectCallback,
-						context,
-					} );
-
-					// Only add source if the list is not empty.
-					if ( editorUIResult.data?.length > 0 ) {
-						_sources[ sourceName ] = {
-							...editorUIResult,
-							label,
-						};
-					}
 				}
-			}
-		);
-		return Object.values( _sources ).length > 0 ? _sources : EMPTY_OBJECT;
-	}, [ blockContext, bindableAttributes, selectCallback ] );
+			);
+
+			return {
+				sources:
+					Object.values( _sources ).length > 0
+						? _sources
+						: EMPTY_OBJECT,
+				canUpdateBlockBindings: _canUpdateBlockBindings,
+			};
+		},
+		[ blockContext, bindableAttributes, blockName ]
+	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
