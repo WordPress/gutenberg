@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "prc-block/dialog",
+	"version": "1.0.0",
+	"title": "Dialog",
+	"description": "Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content.",
+	"category": "media",
+	"keywords": ["dialog", "modal", "popup"],
+	"attributes": {
+		"dialogId": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"align": ["full", "wide", "left", "right", "center"],
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
+		},
+		"interactivity": true
+	},
+	"providesContext": {
+		"dialog/id": "dialogId"
+	},
+	"textdomain": "dialog",
+	"render": "file:./render.php",
+	"editorScript": "file:./index.js"
+}

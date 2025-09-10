@@ -1,0 +1,5 @@
+.is-outline-mode .wp-block-prc-block-dialog-element.wp-block {
+	&:not(.remove-outline).is-hovered:not(.is-selected):after,  &:not(.remove-outline):not(.rich-text):not([contenteditable=true]).is-selected:after {
+		border-radius: inherit!important;
+	}
+}

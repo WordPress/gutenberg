@@ -1,0 +1,116 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "prc-block/dialog-element",
+	"version": "1.0.0",
+	"title": "Dialog Element",
+	"category": "media",
+	"attributes": {
+		"dialogLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"backdropColor": {
+			"type": "string"
+		},
+		"customBackdropColor": {
+			"type": "string"
+		},
+		"autoActivateOnRender": {
+			"type": "boolean",
+			"default": false
+		},
+		"animation": {
+			"type": "string",
+			"enum": [
+				"fade",
+				"pop",
+				"bounce",
+				"slide",
+				"slide-up",
+				"slide-left",
+				"slide-right",
+				"zoom"
+			],
+			"default": "fade"
+		},
+		"animationDuration": {
+			"type": "number",
+			"default": 500
+		},
+		"autoActivationTimer": {
+			"type": "number",
+			"default": -1
+		},
+		"enableDeepLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"dialogSize": {
+			"type": "string",
+			"enum": ["small", "medium", "large"],
+			"default": "small"
+		},
+		"dialogPosition": {
+			"type": "string",
+			"enum": [
+				"center",
+				"top",
+				"bottom",
+				"center left",
+				"center right",
+				"top left",
+				"top right",
+				"bottom left",
+				"bottom right"
+			],
+			"default": "center"
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": false,
+		"inserter": false,
+		"animations": true,
+		"color": {
+			"background": true,
+			"text": true,
+			"link": true,
+			"enableContrastChecker": true,
+			"gradients": true
+		},
+		"layout": {
+			"allowEditing": true
+		},
+		"shadow": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
+		},
+		"interactivity": true
+	},
+	"usesContext": ["dialog/id", "dialog/className"],
+	"providesContext": {
+		"dialog/label": "dialogLabel"
+	},
+	"parent": ["prc-block/dialog"],
+	"textdomain": "dialog-element",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScriptModule": "file:./view.js"
+}

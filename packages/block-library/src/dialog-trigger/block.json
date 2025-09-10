@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "prc-block/dialog-trigger",
+	"version": "1.0.0",
+	"title": "Dialog Trigger",
+	"description": "The content inside this block will act as the clickable 'trigger' to display the dialog element.",
+	"category": "media",
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"align": false,
+		"inserter": false,
+		"spacing": {
+			"margin": ["top", "bottom"],
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
+		},
+		"interactivity": true
+	},
+	"usesContext": ["dialog/id", "dialog/className"],
+	"parent": ["prc-block/dialog"],
+	"textdomain": "dialog-trigger",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}
