@@ -3,10 +3,6 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	Button,
-	TextControl,
-	ToggleControl,
-	Popover,
 	Navigator,
 	Icon,
 	__experimentalVStack as VStack,
@@ -17,24 +13,22 @@ import {
 } from '@wordpress/components';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
-import { useState, useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { DataForm } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-// Single Content Attribute Control component
+// Single Content Attribute Control component using DataForm
 function SingleContentAttributeControl( {
 	attr,
 	clientId,
 	updateBlockAttributes,
-	singleLinkPopoverOpen,
-	setSingleLinkPopoverOpen,
 	blockIcon,
 	blockInformation,
 } ) {
@@ -43,94 +37,44 @@ function SingleContentAttributeControl( {
 		return null;
 	}
 
-	const handleChange = ( newValue ) => {
-		updateBlockAttributes( clientId, {
-			[ attr.name ]: newValue,
+	const handleChange = ( edits ) => {
+		Object.keys( edits ).forEach( ( key ) => {
+			updateBlockAttributes( clientId, {
+				[ key ]: edits[ key ],
+			} );
 		} );
 	};
 
-	const controlType = getControlForAttribute( attr.definition, attr.name );
+	// Create data object
+	const data = { [ attr.name ]: attr.value || '' };
 
-	if ( controlType === 'TextControl' ) {
-		return (
-			<>
-				<Flex justify="flex-start">
-					<FlexItem>
-						<BlockIcon icon={ blockIcon } />
-					</FlexItem>
-					<FlexItem>
-						{ blockInformation?.name || blockInformation?.title }
-					</FlexItem>
-				</Flex>
-				<TextControl
-					key={ attr.name }
-					value={ attr.value || '' }
-					onChange={ handleChange }
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-				/>
-			</>
-		);
-	}
+	// Create fields for DataForm
+	const fields = createDataFormFields( [ attr ], blockInformation );
 
-	if ( controlType === 'ToggleControl' ) {
-		return (
-			<div>
-				<Flex style={ { marginBottom: '8px' } }>
-					<FlexItem>
-						<BlockIcon icon={ blockIcon } />
-					</FlexItem>
-					<FlexItem>
-						{ blockInformation?.name || blockInformation?.title }
-					</FlexItem>
-				</Flex>
-				<ToggleControl
-					key={ attr.name }
-					checked={ attr.value || false }
-					onChange={ handleChange }
-					__nextHasNoMarginBottom
-				/>
-			</div>
-		);
-	}
+	// Create form configuration
+	const form = {
+		layout: { type: 'regular' },
+		fields: [ attr.name ],
+	};
 
-	if ( controlType === 'LinkControl' ) {
-		const linkValue = {
-			url: attr.value || '',
-			title: '',
-			opensInNewTab: false,
-		};
-
-		const handleLinkChange = ( newLinkValue ) => {
-			updateBlockAttributes( clientId, {
-				[ attr.name ]: newLinkValue?.url || '',
-			} );
-		};
-
-		return (
-			<LinkControlWithPopover
-				key={ attr.name }
-				attrValue={ attr.value }
-				linkValue={ linkValue }
-				isPopoverOpen={ singleLinkPopoverOpen }
-				onTogglePopover={ () =>
-					setSingleLinkPopoverOpen( ! singleLinkPopoverOpen )
-				}
-				onClosePopover={ () => setSingleLinkPopoverOpen( false ) }
-				onLinkChange={ handleLinkChange }
-				onRemoveLink={ () => {
-					updateBlockAttributes( clientId, {
-						[ attr.name ]: '',
-					} );
-					setSingleLinkPopoverOpen( false );
-				} }
-				blockIcon={ blockIcon }
-				blockInformation={ blockInformation }
+	return (
+		<div>
+			<Flex style={ { marginBottom: '8px' } }>
+				<FlexItem>
+					<BlockIcon icon={ blockIcon } />
+				</FlexItem>
+				<FlexItem>
+					{ blockInformation?.name || blockInformation?.title }
+				</FlexItem>
+			</Flex>
+			<DataForm
+				data={ data }
+				fields={ fields }
+				form={ form }
+				onChange={ handleChange }
 			/>
-		);
-	}
-
-	return null;
+		</div>
+	);
 }
 
 // Block Content Attributes View for Navigator sub-screen
@@ -150,42 +94,27 @@ function BlockContentAttributesView( { clientId } ) {
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// State for popover visibility per attribute
-	const [ popoverStates, setPopoverStates ] = useState( {} );
-
-	// Helper functions for popover state
-	const togglePopover = ( attrName ) => {
-		setPopoverStates( ( prev ) => ( {
-			...prev,
-			[ attrName ]: ! prev[ attrName ],
-		} ) );
-	};
-
-	const closePopover = ( attrName ) => {
-		setPopoverStates( ( prev ) => ( {
-			...prev,
-			[ attrName ]: false,
-		} ) );
-	};
-
 	// Get content attributes for this block
-	const contentAttributes = [];
-	if ( block?.name ) {
-		const blockType = getBlockType( block.name );
-		if ( blockType?.attributes ) {
-			Object.entries( blockType.attributes ).forEach(
-				( [ attrName, attrDef ] ) => {
-					if ( attrDef.role === 'content' ) {
-						contentAttributes.push( {
-							name: attrName,
-							definition: attrDef,
-							value: block.attributes?.[ attrName ],
-						} );
+	const contentAttributes = useMemo( () => {
+		const attributes = [];
+		if ( block?.name ) {
+			const blockType = getBlockType( block.name );
+			if ( blockType?.attributes ) {
+				Object.entries( blockType.attributes ).forEach(
+					( [ attrName, attrDef ] ) => {
+						if ( attrDef.role === 'content' ) {
+							attributes.push( {
+								name: attrName,
+								definition: attrDef,
+								value: block.attributes?.[ attrName ],
+							} );
+						}
 					}
-				}
-			);
+				);
+			}
 		}
-	}
+		return attributes;
+	}, [ block ] );
 
 	return (
 		<VStack spacing={ 2 }>
@@ -207,160 +136,69 @@ function BlockContentAttributesView( { clientId } ) {
 				</FlexBlock>
 			</Flex>
 
-			{ contentAttributes.map( ( attr ) => {
-				const handleChange = ( newValue ) => {
-					updateBlockAttributes( clientId, {
-						[ attr.name ]: newValue,
-					} );
-				};
-
-				const controlType = getControlForAttribute(
-					attr.definition,
-					attr.name
-				);
-
-				if ( controlType === 'TextControl' ) {
-					return (
-						<TextControl
-							key={ attr.name }
-							label={ attr.name }
-							value={ attr.value || '' }
-							onChange={ handleChange }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-						/>
-					);
-				}
-
-				if ( controlType === 'ToggleControl' ) {
-					return (
-						<ToggleControl
-							key={ attr.name }
-							label={ attr.name }
-							checked={ attr.value || false }
-							onChange={ handleChange }
-							__nextHasNoMarginBottom
-						/>
-					);
-				}
-
-				if ( controlType === 'LinkControl' ) {
-					const isPopoverOpen = popoverStates[ attr.name ];
-					const linkValue = {
-						url: attr.value || '',
-						title: '',
-						opensInNewTab: false,
-					};
-
-					const handleLinkChange = ( newLinkValue ) => {
+			<DataForm
+				data={ contentAttributes.reduce( ( acc, attr ) => {
+					acc[ attr.name ] = attr.value || '';
+					return acc;
+				}, {} ) }
+				fields={ createDataFormFields(
+					contentAttributes,
+					blockInformation
+				) }
+				form={ {
+					layout: { type: 'regular' },
+					fields: contentAttributes.map( ( attr ) => attr.name ),
+				} }
+				onChange={ ( edits ) => {
+					Object.keys( edits ).forEach( ( key ) => {
 						updateBlockAttributes( clientId, {
-							[ attr.name ]: newLinkValue?.url || '',
+							[ key ]: edits[ key ],
 						} );
-					};
-
-					return (
-						<LinkControlWithPopover
-							key={ attr.name }
-							attrName={ attr.name }
-							attrValue={ attr.value }
-							linkValue={ linkValue }
-							isPopoverOpen={ isPopoverOpen }
-							onTogglePopover={ () => togglePopover( attr.name ) }
-							onClosePopover={ () => closePopover( attr.name ) }
-							onLinkChange={ handleLinkChange }
-							onRemoveLink={ () => {
-								updateBlockAttributes( clientId, {
-									[ attr.name ]: '',
-								} );
-								closePopover( attr.name );
-							} }
-						/>
-					);
-				}
-
-				return null;
-			} ) }
+					} );
+				} }
+			/>
 		</VStack>
 	);
 }
 
-// LinkControl with Popover component
-function LinkControlWithPopover( {
-	attrValue,
-	linkValue,
-	isPopoverOpen,
-	onTogglePopover,
-	onClosePopover,
-	onLinkChange,
-	onRemoveLink,
-	blockIcon,
-	blockInformation,
-} ) {
-	const buttonRef = useRef( null );
+// Create DataForm fields from content attributes
+function createDataFormFields( contentAttributes, blockInformation ) {
+	return contentAttributes.map( ( attr ) => {
+		const isUrlAttribute =
+			attr.definition.type === 'string' &&
+			( attr.name.includes( 'url' ) ||
+				attr.name.includes( 'src' ) ||
+				attr.name.includes( 'href' ) ||
+				attr.name.includes( 'link' ) ||
+				attr.definition.attribute === 'href' ||
+				attr.definition.attribute === 'src' );
 
-	return (
-		<div>
-			<Flex style={ { marginBottom: '8px' } }>
-				<FlexItem>
-					<BlockIcon icon={ blockIcon } />
-				</FlexItem>
-				<FlexItem>{ blockInformation?.title }</FlexItem>
-			</Flex>
-			<Button
-				ref={ buttonRef }
-				variant="secondary"
-				onClick={ onTogglePopover }
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			>
-				{ attrValue || 'Set link' }
-			</Button>
-			{ isPopoverOpen && (
-				<Popover
-					anchor={ buttonRef.current }
-					onClose={ onClosePopover }
-					placement="bottom-start"
-				>
-					<LinkControl
-						value={ linkValue }
-						onChange={ onLinkChange }
-						onRemove={ onRemoveLink }
-						onCancel={ onClosePopover }
-					/>
-				</Popover>
-			) }
-		</div>
-	);
-}
+		let fieldType = 'text';
+		if ( isUrlAttribute ) {
+			fieldType = 'url';
+		} else {
+			switch ( attr.definition.type ) {
+				case 'boolean':
+					fieldType = 'toggle';
+					break;
+				case 'rich-text':
+					fieldType = 'text';
+					break;
+				case 'number':
+					fieldType = 'text';
+					break;
+				default:
+					fieldType = 'text';
+			}
+		}
 
-// Simple mapping function for attribute types to UI controls
-function getControlForAttribute( attrDef, attrName ) {
-	// Check if this is a URL attribute
-	const isUrlAttribute =
-		attrDef.type === 'string' &&
-		( attrName.includes( 'url' ) ||
-			attrName.includes( 'src' ) ||
-			attrName.includes( 'href' ) ||
-			attrName.includes( 'link' ) ||
-			attrDef.attribute === 'href' ||
-			attrDef.attribute === 'src' );
-
-	if ( isUrlAttribute ) {
-		return 'LinkControl';
-	}
-
-	switch ( attrDef.type ) {
-		case 'string':
-			return 'TextControl';
-		case 'boolean':
-			return 'ToggleControl';
-		case 'rich-text':
-			return 'TextControl'; // Using TextControl for now to avoid selection issues
-		case 'number':
-			return 'TextControl'; // Using TextControl for now, could be NumberControl later
-		default:
-			return 'TextControl'; // Fallback
-	}
+		return {
+			id: attr.name,
+			type: fieldType,
+			label:
+				blockInformation?.name || blockInformation?.title || attr.name,
+		};
+	} );
 }
 
 export default function BlockQuickNavigation( { clientIds, onSelect } ) {
@@ -432,10 +270,6 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 	// Determine if this block has multiple content attributes
 	const hasMultipleContentAttributes = contentAttributes.length > 1;
 
-	// State for single LinkControl popover (only used when there's exactly 1 content attribute)
-	const [ singleLinkPopoverOpen, setSingleLinkPopoverOpen ] =
-		useState( false );
-
 	// If multiple content attributes, show navigation button with chevron
 	if ( hasMultipleContentAttributes ) {
 		return (
@@ -478,8 +312,6 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				attr={ contentAttributes[ 0 ] }
 				clientId={ clientId }
 				updateBlockAttributes={ updateBlockAttributes }
-				singleLinkPopoverOpen={ singleLinkPopoverOpen }
-				setSingleLinkPopoverOpen={ setSingleLinkPopoverOpen }
 				blockIcon={ blockInformation?.icon }
 				blockInformation={ blockInformation }
 			/>
