@@ -132,7 +132,7 @@
 		]
 	},
 	"providesContext": {
-		"tabs/id": "tabsId"
+		"core/tabs-id": "tabsId"
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
