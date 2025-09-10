@@ -13,23 +13,29 @@ import type { FormTokenFieldProps } from '../../form-token-field/types';
 
 type Value = FormTokenFieldProps[ 'value' ];
 
-const UnforwardedValidatedFormTokenField = ( {
-	required,
-	onValidate,
-	customValidity,
-	onChange,
-	markWhenOptional,
-	...restProps
-}: Omit<
-	React.ComponentProps< typeof FormTokenField >,
-	'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
-> &
-	ValidatedControlProps< FormTokenFieldProps[ 'value' ] > ) => {
+const UnforwardedValidatedFormTokenField = (
+	{
+		required,
+		onValidate,
+		customValidity,
+		onChange,
+		markWhenOptional,
+		...restProps
+	}: Omit<
+		React.ComponentProps< typeof FormTokenField >,
+		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+	> &
+		ValidatedControlProps< FormTokenFieldProps[ 'value' ] >,
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
+) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const valueRef = useRef< Value >( restProps.value );
 
 	return (
-		<div className="components-validated-control__wrapper-with-error-delegate">
+		<div
+			className="components-validated-control__wrapper-with-error-delegate"
+			ref={ forwardedRef }
+		>
 			<ControlWithError
 				required={ required }
 				markWhenOptional={ markWhenOptional }
