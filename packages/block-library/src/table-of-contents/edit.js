@@ -43,13 +43,14 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
  * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
+ * @param {string}                       props.attributes.ariaLabel              Custom aria-label for the navigation element.
  * @param {string}                       props.clientId                          The client id.
  * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
  *
  * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage, maxLevel },
+	attributes: { headings = [], onlyIncludeCurrentPage, maxLevel, ariaLabel },
 	clientId,
 	setAttributes,
 } ) {
@@ -212,7 +213,10 @@ export default function TableOfContentsEdit( {
 
 	return (
 		<>
-			<nav { ...blockProps }>
+			<nav
+				{ ...blockProps }
+				aria-label={ ariaLabel || __( 'Table of Contents' ) }
+			>
 				<ol>
 					<TableOfContentsList
 						nestedHeadingList={ headingTree }
