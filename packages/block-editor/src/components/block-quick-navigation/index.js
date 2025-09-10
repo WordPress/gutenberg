@@ -397,15 +397,11 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 	} );
-	const { isSelected, block } = useSelect(
+	const { block } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock, getBlock } =
-				select( blockEditorStore );
+			const { getBlock } = select( blockEditorStore );
 
 			return {
-				isSelected:
-					isBlockSelected( clientId ) ||
-					hasSelectedInnerBlock( clientId, /* deep: */ true ),
 				block: getBlock( clientId ),
 			};
 		},
@@ -446,7 +442,6 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 			<Navigator.Button
 				path={ `/block/${ clientId }` }
 				__next40pxDefaultSize
-				isPressed={ isSelected }
 				onClick={ async () => {
 					await selectBlock( clientId );
 					if ( onSelect ) {
@@ -490,27 +485,4 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 			/>
 		);
 	}
-
-	// Fallback: show regular block button if no content attributes or multiple
-	return (
-		<Button
-			__next40pxDefaultSize
-			isPressed={ isSelected }
-			onClick={ async () => {
-				await selectBlock( clientId );
-				if ( onSelect ) {
-					onSelect( clientId );
-				}
-			} }
-		>
-			<Flex>
-				<FlexItem>
-					<BlockIcon icon={ blockInformation?.icon } />
-				</FlexItem>
-				<FlexBlock style={ { textAlign: 'left' } }>
-					<Truncate>{ blockTitle }</Truncate>
-				</FlexBlock>
-			</Flex>
-		</Button>
-	);
 }
