@@ -23,6 +23,8 @@ const {
 	parseServerData,
 	populateServerData,
 	batch,
+	routerRegions,
+	cloneElement,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -146,9 +148,30 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
-		regions[ id ] = vdom?.has( region )
+		const rawRegion = vdom?.has( region )
 			? vdom.get( region )
 			: toVdom( region );
+
+		// The element is cloned and the `router-region` directive removed. We
+		// have to do so to prevent a recursive rendering that will cause a
+		// stack overflow.
+		const { 'router-region': __ignored, ...directives } =
+			rawRegion.props.directives;
+		const priorityLevels = rawRegion.props.priorityLevels
+			.map( ( level ) =>
+				level.filter( ( directive ) => directive !== 'router-region' )
+			)
+			.filter( ( level ) => level.length > 0 );
+
+		regions[ id ] =
+			priorityLevels.length > 0
+				? cloneElement( rawRegion, {
+						...rawRegion.props,
+						directives,
+						priorityLevels,
+				  } )
+				: rawRegion.props.element;
+
 		if ( attachTo ) {
 			regionsToAttach[ id ] = attachTo;
 		}
@@ -190,8 +213,9 @@ const renderPage = ( page: Page ) => {
 		populateServerData( page.initialData );
 		document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 			const { id } = parseRegionAttribute( region );
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
+			// const fragment = getRegionRootFragment( region );
+			// render( page.regions[ id ], fragment );
+			routerRegions.get( id ).value = page.regions[ id ] ?? null;
 			// If this is an attached region, remove it from the list.
 			delete regionsToAttach[ id ];
 		} );
