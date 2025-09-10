@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "prc-block/dialog",
+	"name": "core/dialog",
 	"version": "1.0.0",
 	"title": "Dialog",
 	"description": "Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content.",
