@@ -15,7 +15,7 @@ import {
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
-import { chevronRight } from '@wordpress/icons';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
 import { useState, useRef } from '@wordpress/element';
 
@@ -35,7 +35,14 @@ function SingleContentAttributeControl( {
 	updateBlockAttributes,
 	singleLinkPopoverOpen,
 	setSingleLinkPopoverOpen,
+	blockIcon,
+	blockTitle,
 } ) {
+	// Safety check for attr object
+	if ( ! attr || ! attr.definition ) {
+		return null;
+	}
+
 	const handleChange = ( newValue ) => {
 		updateBlockAttributes( clientId, {
 			[ attr.name ]: newValue,
@@ -46,26 +53,40 @@ function SingleContentAttributeControl( {
 
 	if ( controlType === 'TextControl' ) {
 		return (
-			<TextControl
-				key={ attr.name }
-				label={ attr.name }
-				value={ attr.value || '' }
-				onChange={ handleChange }
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-			/>
+			<div>
+				<Flex style={ { marginBottom: '8px' } }>
+					<FlexItem>
+						<BlockIcon icon={ blockIcon } />
+					</FlexItem>
+					<FlexItem>{ blockTitle }</FlexItem>
+				</Flex>
+				<TextControl
+					key={ attr.name }
+					value={ attr.value || '' }
+					onChange={ handleChange }
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+				/>
+			</div>
 		);
 	}
 
 	if ( controlType === 'ToggleControl' ) {
 		return (
-			<ToggleControl
-				key={ attr.name }
-				label={ attr.name }
-				checked={ attr.value || false }
-				onChange={ handleChange }
-				__nextHasNoMarginBottom
-			/>
+			<div>
+				<Flex style={ { marginBottom: '8px' } }>
+					<FlexItem>
+						<BlockIcon icon={ blockIcon } />
+					</FlexItem>
+					<FlexItem>{ blockTitle }</FlexItem>
+				</Flex>
+				<ToggleControl
+					key={ attr.name }
+					checked={ attr.value || false }
+					onChange={ handleChange }
+					__nextHasNoMarginBottom
+				/>
+			</div>
 		);
 	}
 
@@ -85,7 +106,7 @@ function SingleContentAttributeControl( {
 		return (
 			<LinkControlWithPopover
 				key={ attr.name }
-				attrName={ attr.name }
+				attrName={ blockTitle }
 				attrValue={ attr.value }
 				linkValue={ linkValue }
 				isPopoverOpen={ singleLinkPopoverOpen }
@@ -100,6 +121,7 @@ function SingleContentAttributeControl( {
 					} );
 					setSingleLinkPopoverOpen( false );
 				} }
+				blockIcon={ blockIcon }
 			/>
 		);
 	}
@@ -112,7 +134,6 @@ function BlockContentAttributesView( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
-		context: 'list-view',
 	} );
 	const { block } = useSelect(
 		( select ) => {
@@ -166,7 +187,9 @@ function BlockContentAttributesView( { clientId } ) {
 		<VStack spacing={ 2 }>
 			<Flex>
 				<FlexItem>
-					<Navigator.BackButton>Back</Navigator.BackButton>
+					<Navigator.BackButton>
+						<Icon icon={ chevronLeft } />
+					</Navigator.BackButton>
 				</FlexItem>
 				<FlexBlock>
 					<Flex>
@@ -267,11 +290,18 @@ function LinkControlWithPopover( {
 	onClosePopover,
 	onLinkChange,
 	onRemoveLink,
+	blockIcon,
 } ) {
 	const buttonRef = useRef( null );
 
 	return (
 		<div>
+			<Flex style={ { marginBottom: '8px' } }>
+				<FlexItem>
+					<BlockIcon icon={ blockIcon } />
+				</FlexItem>
+				<FlexItem>{ attrName }</FlexItem>
+			</Flex>
 			<Button
 				ref={ buttonRef }
 				variant="secondary"
@@ -279,7 +309,7 @@ function LinkControlWithPopover( {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 			>
-				{ attrName }: { attrValue || 'Set link' }
+				{ attrValue || 'Set link' }
 			</Button>
 			{ isPopoverOpen && (
 				<Popover
@@ -362,7 +392,6 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
-		context: 'list-view',
 	} );
 	const { isSelected, block } = useSelect(
 		( select ) => {
@@ -425,7 +454,7 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 					<FlexItem>
 						<BlockIcon icon={ blockInformation?.icon } />
 					</FlexItem>
-					<FlexBlock style={ { textAlign: 'left' } }>
+					<FlexBlock>
 						<Truncate>{ blockTitle }</Truncate>
 					</FlexBlock>
 					<FlexItem>
@@ -436,39 +465,41 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		);
 	}
 
-	// If single content attribute, show inline controls
-	return (
-		<VStack spacing={ 1 }>
-			<Button
-				__next40pxDefaultSize
-				isPressed={ isSelected }
-				onClick={ async () => {
-					await selectBlock( clientId );
-					if ( onSelect ) {
-						onSelect( clientId );
-					}
-				} }
-			>
-				<Flex>
-					<FlexItem>
-						<BlockIcon icon={ blockInformation?.icon } />
-					</FlexItem>
-					<FlexBlock style={ { textAlign: 'left' } }>
-						<Truncate>{ blockTitle }</Truncate>
-					</FlexBlock>
-				</Flex>
-			</Button>
+	// If single content attribute, show inline controls without block title
+	if ( contentAttributes.length === 1 && contentAttributes[ 0 ] ) {
+		return (
+			<SingleContentAttributeControl
+				attr={ contentAttributes[ 0 ] }
+				clientId={ clientId }
+				updateBlockAttributes={ updateBlockAttributes }
+				singleLinkPopoverOpen={ singleLinkPopoverOpen }
+				setSingleLinkPopoverOpen={ setSingleLinkPopoverOpen }
+				blockIcon={ blockInformation?.icon }
+				blockTitle={ blockTitle }
+			/>
+		);
+	}
 
-			{ /* Single content attribute control */ }
-			{ contentAttributes.length === 1 && (
-				<SingleContentAttributeControl
-					attr={ contentAttributes[ 0 ] }
-					clientId={ clientId }
-					updateBlockAttributes={ updateBlockAttributes }
-					singleLinkPopoverOpen={ singleLinkPopoverOpen }
-					setSingleLinkPopoverOpen={ setSingleLinkPopoverOpen }
-				/>
-			) }
-		</VStack>
+	// Fallback: show regular block button if no content attributes or multiple
+	return (
+		<Button
+			__next40pxDefaultSize
+			isPressed={ isSelected }
+			onClick={ async () => {
+				await selectBlock( clientId );
+				if ( onSelect ) {
+					onSelect( clientId );
+				}
+			} }
+		>
+			<Flex>
+				<FlexItem>
+					<BlockIcon icon={ blockInformation?.icon } />
+				</FlexItem>
+				<FlexBlock style={ { textAlign: 'left' } }>
+					<Truncate>{ blockTitle }</Truncate>
+				</FlexBlock>
+			</Flex>
+		</Button>
 	);
 }
