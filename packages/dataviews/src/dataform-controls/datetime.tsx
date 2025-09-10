@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { _x } from '@wordpress/i18n';
 import { BaseControl, TimePicker, VisuallyHidden } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
@@ -55,6 +56,10 @@ export default function DateTime< Item >( {
 				currentTime={ typeof value === 'string' ? value : undefined }
 				onChange={ onChangeControl }
 				hideLabelFromVision
+				dateOrder={
+					/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+					_x( 'dmy', 'date order' ) as 'dmy' | 'mdy' | 'ymd'
+				}
 			/>
 		</fieldset>
 	);
