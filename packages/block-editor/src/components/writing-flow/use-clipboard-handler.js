@@ -166,10 +166,54 @@ export default function useClipboardHandler() {
 						}, [] )
 						.flat();
 				} else {
+					let pasteMode = isFullySelected ? 'BLOCKS' : 'AUTO';
+
+					// Handle multiline paste in partially selected blocks.
+					if ( ! isFullySelected && plainText.includes( '\n' ) ) {
+						const {
+							getBlock,
+							getBlockParentsByBlockName,
+							getBlockEditingMode,
+						} = registry.select( blockEditorStore );
+
+						const isInSyncedPattern = selectedBlockClientIds.some(
+							( clientId ) => {
+								const block = getBlock( clientId );
+								const blockEditingMode =
+									getBlockEditingMode( clientId );
+								const parentPatternClientIds =
+									getBlockParentsByBlockName(
+										clientId,
+										'core/block',
+										true
+									);
+
+								return (
+									blockEditingMode === 'contentOnly' &&
+									parentPatternClientIds.length > 0 &&
+									block?.attributes?.metadata?.bindings &&
+									Object.values(
+										block.attributes.metadata.bindings
+									).some(
+										( binding ) =>
+											binding?.source ===
+											'core/pattern-overrides'
+									)
+								);
+							}
+						);
+
+						// If pasting multiline into a block that is inside a synced pattern,
+						// always paste inline to avoid breaking the pattern structure.
+						if ( isInSyncedPattern ) {
+							pasteMode = 'INLINE';
+						}
+					}
+
 					blocks = pasteHandler( {
 						HTML: html,
 						plainText,
-						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
+						mode: pasteMode,
 						canUserUseUnfilteredHTML,
 					} );
 				}
