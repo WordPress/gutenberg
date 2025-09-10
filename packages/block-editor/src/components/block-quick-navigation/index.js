@@ -36,7 +36,7 @@ function SingleContentAttributeControl( {
 	singleLinkPopoverOpen,
 	setSingleLinkPopoverOpen,
 	blockIcon,
-	blockTitle,
+	blockInformation,
 } ) {
 	// Safety check for attr object
 	if ( ! attr || ! attr.definition ) {
@@ -58,7 +58,9 @@ function SingleContentAttributeControl( {
 					<FlexItem>
 						<BlockIcon icon={ blockIcon } />
 					</FlexItem>
-					<FlexItem>{ blockTitle }</FlexItem>
+					<FlexItem>
+						{ blockInformation?.name || blockInformation?.title }
+					</FlexItem>
 				</Flex>
 				<TextControl
 					key={ attr.name }
@@ -78,7 +80,9 @@ function SingleContentAttributeControl( {
 					<FlexItem>
 						<BlockIcon icon={ blockIcon } />
 					</FlexItem>
-					<FlexItem>{ blockTitle }</FlexItem>
+					<FlexItem>
+						{ blockInformation?.name || blockInformation?.title }
+					</FlexItem>
 				</Flex>
 				<ToggleControl
 					key={ attr.name }
@@ -106,7 +110,6 @@ function SingleContentAttributeControl( {
 		return (
 			<LinkControlWithPopover
 				key={ attr.name }
-				attrName={ blockTitle }
 				attrValue={ attr.value }
 				linkValue={ linkValue }
 				isPopoverOpen={ singleLinkPopoverOpen }
@@ -122,6 +125,7 @@ function SingleContentAttributeControl( {
 					setSingleLinkPopoverOpen( false );
 				} }
 				blockIcon={ blockIcon }
+				blockInformation={ blockInformation }
 			/>
 		);
 	}
@@ -282,7 +286,6 @@ function BlockContentAttributesView( { clientId } ) {
 
 // LinkControl with Popover component
 function LinkControlWithPopover( {
-	attrName,
 	attrValue,
 	linkValue,
 	isPopoverOpen,
@@ -291,6 +294,7 @@ function LinkControlWithPopover( {
 	onLinkChange,
 	onRemoveLink,
 	blockIcon,
+	blockInformation,
 } ) {
 	const buttonRef = useRef( null );
 
@@ -300,7 +304,7 @@ function LinkControlWithPopover( {
 				<FlexItem>
 					<BlockIcon icon={ blockIcon } />
 				</FlexItem>
-				<FlexItem>{ attrName }</FlexItem>
+				<FlexItem>{ blockInformation?.title }</FlexItem>
 			</Flex>
 			<Button
 				ref={ buttonRef }
@@ -475,7 +479,7 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				singleLinkPopoverOpen={ singleLinkPopoverOpen }
 				setSingleLinkPopoverOpen={ setSingleLinkPopoverOpen }
 				blockIcon={ blockInformation?.icon }
-				blockTitle={ blockTitle }
+				blockInformation={ blockInformation }
 			/>
 		);
 	}
