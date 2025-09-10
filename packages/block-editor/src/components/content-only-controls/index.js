@@ -5,8 +5,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	TextControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -14,7 +16,61 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-function RichTextControl() {}
+function RichTextControl( { label, value, setValue } ) {
+	return (
+		<TextControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			label={ label }
+			value={ value ? stripHTML( value ) : '' }
+			onChange={ setValue }
+			autoComplete="off"
+		/>
+	);
+}
+
+function getControlForAttribute( attribute ) {
+	if ( attribute.control.type === 'RichText' ) {
+		return RichTextControl;
+	}
+}
+
+function getDefaultValue( attribute ) {
+	if ( attribute.default ) {
+		return attribute.default;
+	}
+
+	return undefined;
+}
+
+function BlockAttributeToolsPanelItem( {
+	attributeDefinition,
+	setValue,
+	value,
+} ) {
+	const Control = getControlForAttribute( attributeDefinition );
+
+	if ( ! Control ) {
+		return null;
+	}
+
+	const defaultValue = getDefaultValue( attributeDefinition );
+
+	return (
+		<ToolsPanelItem
+			label={ attributeDefinition.control.label }
+			hasValue={ () => value !== defaultValue }
+			onDeselect={ () => setValue( defaultValue ) }
+			isShownByDefault={ attributeDefinition.control.shownByDefault }
+		>
+			<Control
+				label={ attributeDefinition.control.label }
+				value={ value }
+				setValue={ setValue }
+			/>
+		</ToolsPanelItem>
+	);
+}
 
 function getContentAttributesWithControls( blockType ) {
 	return Object.keys( blockType?.attributes ?? {} )
@@ -28,24 +84,14 @@ function getContentAttributesWithControls( blockType ) {
 		} ) );
 }
 
-function getControlForAttribute( attribute ) {
-	if ( attribute.control.type === 'RichText' ) {
-		return RichTextControl;
-	}
-}
+function getResetAllValue( attributes ) {
+	const resetValue = {};
 
-function BlockAttributeControl( { attributeDefinition, setAttribute, value } ) {
-	const Control = getControlForAttribute( attributeDefinition );
+	attributes.each( ( attribute ) => {
+		resetValue[ attribute.key ] = getDefaultValue( attribute );
+	} );
 
-	if ( ! Control ) {
-		return null;
-	}
-
-	return (
-		<ToolsPanelItem>
-			<Control value={ value } setAttribute={ setAttribute } />
-		</ToolsPanelItem>
-	);
+	return resetValue;
 }
 
 function BlockControls( { clientId } ) {
@@ -75,16 +121,27 @@ function BlockControls( { clientId } ) {
 	} );
 
 	if ( ! contentAttributesWithControls?.length ) {
+		// TODO - we might still want to show a placeholder for blocks with no controls.
+		// for example, a way to select the block.
 		return null;
 	}
 
 	return (
-		<ToolsPanel label={ blockTitle } panelId={ clientId }>
+		<ToolsPanel
+			label={ blockTitle }
+			panelId={ clientId }
+			resetAll={ () => {
+				updateBlockAttributes(
+					clientId,
+					getResetAllValue( contentAttributesWithControls )
+				);
+			} }
+		>
 			{ contentAttributesWithControls?.each( ( attribute ) => (
-				<BlockAttributeControl
+				<BlockAttributeToolsPanelItem
 					clientId={ clientId }
 					attributeDefinition={ attribute }
-					setAttribute={ ( value ) =>
+					setValue={ ( value ) =>
 						updateBlockAttributes( clientId, {
 							[ attribute.key ]: value,
 						} )

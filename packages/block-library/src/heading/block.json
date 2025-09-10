@@ -18,7 +18,8 @@
 			"role": "content",
 			"control": {
 				"type": "RichText",
-				"label": "Content"
+				"label": "Content",
+				"shownByDefault": true
 			}
 		},
 		"level": {
