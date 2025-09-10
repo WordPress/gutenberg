@@ -1,22 +1,11 @@
 [
 	{
-		"name": "core/terms-query",
+		"name": "core/missing",
 		"isValid": true,
 		"attributes": {
-			"termQueryId": 0,
-			"termQuery": {
-				"perPage": 10,
-				"pages": 0,
-				"taxonomy": "category",
-				"order": "asc",
-				"orderBy": "name",
-				"hideEmpty": true,
-				"include": [],
-				"exclude": [],
-				"parent": 0,
-				"hierarchical": false
-			},
-			"tagName": "div"
+			"originalName": "core/terms-query",
+			"originalUndelimitedContent": "<div class=\"wp-block-terms-query\"></div>",
+			"originalContent": "<!-- wp:terms-query {\"termQueryId\":0} -->\n<div class=\"wp-block-terms-query\"></div>\n<!-- /wp:terms-query -->"
 		},
 		"innerBlocks": []
 	}
