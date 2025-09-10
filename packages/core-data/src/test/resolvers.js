@@ -337,6 +337,105 @@ describe( 'getEntityRecords', () => {
 	} );
 } );
 
+describe( 'taxonomy pagination', () => {
+	const registry = { batch: ( callback ) => callback() };
+	let dispatch, loadedTaxonomyEntities;
+
+	beforeEach( async () => {
+		dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn().mockResolvedValue( 'lock' ),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		triggerFetch.mockReset();
+
+		const mockTaxonomyConfig = {
+			category: {
+				name: 'Categories',
+				rest_base: 'categories',
+			},
+		};
+
+		triggerFetch.mockResolvedValueOnce( mockTaxonomyConfig );
+
+		const { additionalEntityConfigLoaders } = await import( '../entities' );
+		const taxonomyLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'taxonomy'
+		);
+		loadedTaxonomyEntities = await taxonomyLoader.loadEntities();
+	} );
+
+	it( 'should make paginated API calls with parse: false', async () => {
+		const resolveSelect = {
+			getEntitiesConfig: jest
+				.fn()
+				.mockResolvedValue( loadedTaxonomyEntities ),
+		};
+
+		triggerFetch.mockResolvedValueOnce( [
+			{ id: 1, name: 'Category 1' },
+			{ id: 2, name: 'Category 2' },
+		] );
+
+		await getEntityRecords( 'taxonomy', 'category', {
+			per_page: 2,
+			page: 1,
+		} )( { dispatch, registry, resolveSelect } );
+
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
+			parse: false,
+		} );
+	} );
+
+	it( 'should extract pagination metadata from headers', async () => {
+		const resolveSelect = {
+			getEntitiesConfig: jest
+				.fn()
+				.mockResolvedValue( loadedTaxonomyEntities ),
+		};
+
+		const mockResponse = {
+			json: () =>
+				Promise.resolve( [
+					{ id: 1, name: 'Category 1' },
+					{ id: 2, name: 'Category 2' },
+				] ),
+			headers: {
+				get: jest.fn( ( header ) => {
+					if ( header === 'X-WP-Total' ) {
+						return '10';
+					}
+					if ( header === 'X-WP-TotalPages' ) {
+						return '5';
+					}
+					return null;
+				} ),
+			},
+		};
+
+		triggerFetch.mockResolvedValueOnce( mockResponse );
+
+		await getEntityRecords( 'taxonomy', 'category', {
+			per_page: 2,
+			page: 1,
+		} )( { dispatch, registry, resolveSelect } );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'taxonomy',
+			'category',
+			[
+				{ id: 1, name: 'Category 1' },
+				{ id: 2, name: 'Category 2' },
+			],
+			{ per_page: 2, page: 1 },
+			false,
+			undefined,
+			{ totalItems: 10, totalPages: 5 }
+		);
+	} );
+} );
+
 describe( 'getEmbedPreview', () => {
 	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
 	const UNEMBEDDABLE_RESPONSE = false;
