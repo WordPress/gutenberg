@@ -14,7 +14,8 @@ import { formDecorator } from './story-utils';
 import { ValidatedTextareaControl } from '../textarea-control';
 
 const meta: Meta< typeof ValidatedTextareaControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedTextareaControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedTextareaControl',
+	id: 'components-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -26,6 +27,12 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedTextareaControl > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( '' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedTextareaControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedTextareaControl
@@ -35,6 +42,17 @@ export const Default: StoryObj< typeof ValidatedTextareaControl > = {
 					onChange?.( newValue );
 				} }
 				value={ value }
+				onValidate={ ( v ) => {
+					if ( v?.toLowerCase() === 'error' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'The word "error" is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -43,10 +61,4 @@ Default.args = {
 	required: true,
 	label: 'Textarea',
 	help: 'The word "error" will trigger an error.',
-	customValidator: ( value ) => {
-		if ( value?.toLowerCase() === 'error' ) {
-			return 'The word "error" is not allowed.';
-		}
-		return undefined;
-	},
 };

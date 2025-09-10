@@ -16,13 +16,14 @@ import { ConfirmDialog } from '../component';
 
 const meta: Meta< typeof ConfirmDialog > = {
 	component: ConfirmDialog,
-	title: 'Components (Experimental)/Overlays/ConfirmDialog',
-	id: 'components-experimental-confirmdialog',
+	title: 'Components/Overlays/ConfirmDialog',
+	id: 'components-confirmdialog',
 	argTypes: {
 		isOpen: {
 			control: false,
 		},
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: {

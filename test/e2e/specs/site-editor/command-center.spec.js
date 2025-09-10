@@ -21,16 +21,24 @@ test.describe( 'Site editor command palette', () => {
 	} );
 
 	test( 'Open the command palette and navigate to the page create page', async ( {
+		editor,
 		page,
 	} ) => {
+		await editor.setPreferences( 'core/edit-post', {
+			welcomeGuide: false,
+		} );
+
 		await page
 			.getByRole( 'button', { name: 'Open command palette' } )
-			.focus();
-		await page.keyboard.press( 'Meta+k' );
-		await page.keyboard.type( 'new page' );
-		await page.getByRole( 'option', { name: 'Add Page' } ).click();
+			.click();
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'add page' );
+		await page
+			.getByRole( 'option', { name: 'Go to: Pages > Add Page' } )
+			.click();
 		await expect( page ).toHaveURL(
-			/\/wp-admin\/site-editor.php\?p=%2Fpage%2F(\d+)&canvas=edit/
+			/\/wp-admin\/post-new.php\?post_type=page/
 		);
 		await expect(
 			page

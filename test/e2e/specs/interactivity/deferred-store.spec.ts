@@ -37,4 +37,18 @@ test.describe( 'deferred store', () => {
 		} );
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
+
+	test( 'Ensure that a state getter can access the returned state even when directives already subscribed to it', async ( {
+		page,
+	} ) => {
+		const stateNumber = page.getByTestId( 'state-number' );
+		const stateDouble = page.getByTestId( 'state-double' );
+		await expect( stateNumber ).toHaveText( '2' );
+		await expect( stateDouble ).toHaveText( '4' );
+		await page.evaluate( () => {
+			window.dispatchEvent( new Event( '_test_proceed_' ) );
+		} );
+		await expect( stateNumber ).toHaveText( '3' );
+		await expect( stateDouble ).toHaveText( '6' );
+	} );
 } );

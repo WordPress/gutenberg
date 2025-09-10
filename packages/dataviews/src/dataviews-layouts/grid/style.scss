@@ -1,24 +1,6 @@
+@import "../utils/grid-items.scss";
+
 .dataviews-view-grid {
-	margin-bottom: auto;
-	display: grid;
-	gap: $grid-unit-40;
-	grid-template-rows: max-content;
-	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-	padding: 0 $grid-unit-60 $grid-unit-30;
-	container-type: inline-size;
-	/**
-	 * Breakpoints were adjusted from media queries breakpoints to account for
-	 * the sidebar width. This was done to match the existing styles we had.
-	 */
-	@container (max-width: 480px) {
-		padding-left: $grid-unit-30;
-		padding-right: $grid-unit-30;
-	}
-
-	@media not (prefers-reduced-motion) {
-		transition: padding ease-out 0.1s;
-	}
-
 	.dataviews-view-grid__card {
 		height: 100%;
 		justify-content: flex-start;
@@ -58,7 +40,6 @@
 
 	.dataviews-view-grid__media {
 		width: 100%;
-		min-height: 200px;
 		aspect-ratio: 1/1;
 		background-color: $white;
 		border-radius: $radius-medium;
@@ -105,6 +86,9 @@
 			.dataviews-view-grid__field-name {
 				width: 35%;
 				color: $gray-700;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 			}
 
 			.dataviews-view-grid__field-value {
@@ -137,9 +121,15 @@
 	top: -9999em;
 	left: $grid-unit-10;
 	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
+	opacity: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s linear;
+	}
 
 	@media (hover: none) {
 		// Show checkboxes on devices that do not support hover.
+		opacity: 1;
 		top: $grid-unit-10;
 	}
 }
@@ -147,7 +137,35 @@
 .dataviews-view-grid__card:hover .dataviews-selection-checkbox,
 .dataviews-view-grid__card:focus-within .dataviews-selection-checkbox,
 .dataviews-view-grid__card.is-selected .dataviews-selection-checkbox {
+	opacity: 1;
 	top: $grid-unit-10;
+}
+
+.dataviews-view-grid__card .dataviews-view-grid__media-actions {
+	position: absolute;
+	top: $grid-unit-05;
+	opacity: 0;
+	right: $grid-unit-05;
+
+	.dataviews-all-actions-button {
+		background-color: $white;
+	}
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s linear;
+	}
+
+	@media (hover: none) {
+		// Show actions on devices that do not support hover.
+		opacity: 1;
+		top: $grid-unit-05;
+	}
+}
+
+.dataviews-view-grid__card:hover .dataviews-view-grid__media-actions,
+.dataviews-view-grid__card:focus-within .dataviews-view-grid__media-actions,
+.dataviews-view-grid__card .dataviews-view-grid__media-actions:has(.dataviews-all-actions-button[aria-expanded="true"]) {
+	opacity: 1;
 }
 
 .dataviews-view-grid__media--clickable {
@@ -160,4 +178,10 @@
 	color: $gray-900;
 	margin: 0 0 $grid-unit-10 0;
 	padding: 0 $grid-unit-60;
+	container-type: inline-size;
+
+	@container (max-width: 430px) {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
 }

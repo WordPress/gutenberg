@@ -9,6 +9,8 @@ import type { Meta } from '@storybook/react';
 import {
 	useState,
 	useMemo,
+	useCallback,
+	useEffect,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
@@ -37,13 +39,27 @@ import {
 } from './fixtures';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { View } from '../../../types';
+import type { Field, View } from '../../../types';
 
 import './style.css';
 
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
+	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
+	// (sb-main-padding class). This ensures consistent layout in DataViews stories
+	// when clicking actions menus. Without this the padding on the body will jump.
+	parameters: {
+		layout: 'fullscreen',
+	},
+	decorators: [
+		( Story ) => (
+			<div style={ { padding: '1rem' } }>
+				<Story />
+			</div>
+		),
+	],
 } as Meta< typeof DataViews >;
 
 export default meta;
@@ -87,7 +103,7 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 			) }
 			isItemClickable={ () => true }
 			defaultLayouts={ defaultLayouts }
-			perPageSizes={ perPageSizes }
+			config={ { perPageSizes } }
 		/>
 	);
 };
@@ -144,20 +160,35 @@ export const CustomEmpty = () => {
 	);
 };
 
-export const FieldsNoSortableNoHidable = () => {
+const MinimalUIComponent = ( {
+	layout = 'table',
+}: {
+	layout: 'table' | 'list' | 'grid';
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
+		layout: {
+			enableMoving: false,
+		},
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 
-	const _fields = fields.map( ( field ) => ( {
+	const _fields: Field< SpaceObject >[] = fields.map( ( field ) => ( {
 		...field,
 		enableSorting: false,
 		enableHiding: false,
+		filterBy: false,
 	} ) );
+
+	useEffect( () => {
+		setView( {
+			...view,
+			type: layout as any,
+		} );
+	}, [ layout ] );
 
 	return (
 		<DataViews
@@ -167,11 +198,22 @@ export const FieldsNoSortableNoHidable = () => {
 			view={ view }
 			fields={ _fields }
 			onChangeView={ setView }
-			defaultLayouts={ {
-				table: {},
-			} }
-		/>
+			defaultLayouts={ { [ layout ]: {} } }
+		>
+			<DataViews.Layout />
+			<DataViews.Footer />
+		</DataViews>
 	);
+};
+export const MinimalUI = {
+	render: MinimalUIComponent,
+	argTypes: {
+		layout: {
+			control: 'select',
+			options: [ 'table', 'list', 'grid' ],
+			defaultValue: 'table',
+		},
+	},
 };
 
 /**
@@ -381,5 +423,130 @@ export const GroupByLayout = () => {
 				[ LAYOUT_TABLE ]: {},
 			} }
 		/>
+	);
+};
+
+export const InfiniteScroll = () => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_GRID,
+		search: '',
+		page: 1,
+		perPage: 6, // Start with a small number to demonstrate pagination
+		filters: [],
+		fields: [ 'satellites' ],
+		titleField: 'title',
+		descriptionField: 'description',
+		mediaField: 'image',
+		infiniteScrollEnabled: true, // Enable infinite scroll by default
+	} );
+	const { data: shownData } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+
+	// Custom pagination handler that simulates server-side pagination
+	const [ allLoadedRecords, setAllLoadedRecords ] = useState< SpaceObject[] >(
+		[]
+	);
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
+
+	const totalItems = data.length;
+	const totalPages = Math.ceil( totalItems / 6 ); // perPage is 6.
+	const currentPage = view.page || 1;
+	const hasMoreData = currentPage < totalPages;
+	const getItemId = ( item: {
+		id: any;
+		title?: string;
+		description?: string;
+		image?: string;
+		type?: string;
+		isPlanet?: boolean;
+		categories?: string[];
+		satellites?: number;
+		date?: string;
+		datetime?: string;
+		email?: string;
+	} ) => item.id.toString();
+
+	const infiniteScrollHandler = useCallback( () => {
+		if ( isLoadingMore || currentPage >= totalPages ) {
+			return;
+		}
+
+		setIsLoadingMore( true );
+
+		setView( {
+			...view,
+			page: currentPage + 1,
+		} );
+	}, [ isLoadingMore, currentPage, totalPages, view ] );
+
+	// Initialize data on first load or when view changes significantly
+	useEffect( () => {
+		if ( currentPage === 1 || ! view.infiniteScrollEnabled ) {
+			// First page - replace all data
+			setAllLoadedRecords( shownData );
+		} else {
+			// Subsequent pages - append to existing data
+			setAllLoadedRecords( ( prev ) => {
+				const existingIds = new Set( prev.map( getItemId ) );
+				const newRecords = shownData.filter(
+					( record ) => ! existingIds.has( getItemId( record ) )
+				);
+				return [ ...prev, ...newRecords ];
+			} );
+		}
+		setIsLoadingMore( false );
+	}, [
+		view.search,
+		view.filters,
+		view.perPage,
+		currentPage,
+		view.infiniteScrollEnabled,
+	] );
+
+	const paginationInfo = {
+		totalItems,
+		totalPages,
+		infiniteScrollHandler,
+	};
+
+	return (
+		<>
+			<style>{ `
+			.dataviews-wrapper {
+				height: 600px;
+				overflow: auto;
+			}
+		` }</style>
+			<Text
+				style={ {
+					marginBottom: '16px',
+					padding: '8px',
+					background: '#f0f0f0',
+					borderRadius: '4px',
+					display: 'block',
+				} }
+			>
+				{ __( 'Infinite Scroll Demo' ) }: { allLoadedRecords.length } of{ ' ' }
+				{ totalItems } items loaded.
+				{ isLoadingMore && __( 'Loading more…' ) }
+				{ ! hasMoreData && __( 'All items loaded!' ) }
+			</Text>
+			<DataViews
+				getItemId={ ( item ) => item.id.toString() }
+				paginationInfo={ paginationInfo }
+				data={ allLoadedRecords }
+				view={ view }
+				fields={ fields }
+				onChangeView={ setView }
+				actions={ actions }
+				isLoading={ isLoadingMore }
+				defaultLayouts={ {
+					[ LAYOUT_GRID ]: {},
+					[ LAYOUT_LIST ]: {},
+					[ LAYOUT_TABLE ]: {},
+				} }
+			/>
+		</>
 	);
 };

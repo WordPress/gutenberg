@@ -1,16 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { atSymbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import { unlock } from '../lock-unlock';
-
-const { ValidatedTextControl } = unlock( privateApis );
+import ValidatedText from './utils/validated-text';
 
 export default function Email< Item >( {
 	data,
@@ -18,42 +15,16 @@ export default function Email< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
-
-	const onChangeControl = useCallback(
-		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
-	);
-
 	return (
-		<ValidatedTextControl
-			required={ !! field.isValid?.required }
-			customValidator={ ( newValue: any ) => {
-				if ( field.isValid?.custom ) {
-					return field.isValid.custom(
-						{
-							...data,
-							[ id ]: newValue,
-						},
-						field
-					);
-				}
-
-				return null;
+		<ValidatedText
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				type: 'email',
+				icon: atSymbol,
 			} }
-			type="email"
-			label={ label }
-			placeholder={ placeholder }
-			value={ value ?? '' }
-			help={ description }
-			onChange={ onChangeControl }
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
-			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }

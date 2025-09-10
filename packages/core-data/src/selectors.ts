@@ -642,7 +642,7 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query.per_page === -1 ) {
+	if ( query?.per_page === -1 ) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -651,7 +651,7 @@ export const getEntityRecordsTotalPages = (
 	}
 	// If `per_page` is not set and the query relies on the defaults of the
 	// REST endpoint, get the info from query's meta.
-	if ( ! query.per_page ) {
+	if ( ! query?.per_page ) {
 		return getQueriedTotalPages( queriedState, query );
 	}
 	return Math.ceil( totalItems / query.per_page );

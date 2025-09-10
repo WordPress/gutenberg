@@ -21,6 +21,7 @@ import BlockDropZonePopover from '../block-popover/drop-zone';
 import { unlock } from '../../lock-unlock';
 
 export const InsertionPointOpenRef = createContext();
+InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
 
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,

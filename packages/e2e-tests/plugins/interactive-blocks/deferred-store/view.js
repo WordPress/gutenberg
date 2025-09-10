@@ -20,3 +20,19 @@ window.addEventListener(
 	},
 	{ once: true }
 );
+
+window.addEventListener(
+	'_test_proceed_',
+	() => {
+		const { state } = store( 'test/deferred-store', {
+			state: {
+				number: 3,
+
+				get double() {
+					return state.number * 2;
+				},
+			},
+		} );
+	},
+	{ once: true }
+);

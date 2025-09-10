@@ -88,20 +88,22 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 		$block_instance->refresh_context_dependents();
 	} else {
 		// This branch can be removed once Gutenberg requires WordPress 6.8 or later.
-		// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
-		class WP_Block_Cloner extends WP_Block {
-			/**
-			 * Static methods of subclasses have access to protected properties
-			 * of instances of the parent class.
-			 * In this case, this gives us access to `available_context` and `registry`.
-			 */
-			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-			public static function clone_instance( $instance ) {
-				return new WP_Block(
-					$instance->parsed_block,
-					$instance->available_context,
-					$instance->registry
-				);
+		if ( ! class_exists( 'WP_Block_Cloner' ) ) {
+			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
+			class WP_Block_Cloner extends WP_Block {
+				/**
+				 * Static methods of subclasses have access to protected properties
+				 * of instances of the parent class.
+				 * In this case, this gives us access to `available_context` and `registry`.
+				 */
+				// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
+				public static function clone_instance( $instance ) {
+					return new WP_Block(
+						$instance->parsed_block,
+						$instance->available_context,
+						$instance->registry
+					);
+				}
 			}
 		}
 		$block_instance = WP_Block_Cloner::clone_instance( $block_instance );

@@ -358,9 +358,9 @@ Whether the data is loading. `false` by default.
 
 #### `defaultLayouts`: `Record< string, view >`
 
-This property provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
+This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
-For example, this is how you'd enable only the table view type:
+For example, this is how you'd enable only the table and grid layout type and set whether those layouts show media by default:
 
 ```js
 const defaultLayouts = {
@@ -373,7 +373,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, and/or `list`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -381,11 +381,15 @@ The list of selected items' ids.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
 
+Note: `DataViews` still requires at least one bulk action to make items selectable.
+
 #### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items. It receives the list of selected items' IDs as a parameter.
 
 If `selection` and `onChangeSelection` are provided, the `DataViews` component behaves like a controlled component. Otherwise, it behaves like an uncontrolled component.
+
+Note: `DataViews` still requires at least one bulk action to make items selectable.
 
 #### `isItemClickable`: `function`
 
@@ -416,9 +420,9 @@ The component receives the following props:
 
 React component to be rendered next to the view config button.
 
-#### `perPageSizes`: `number[]`
+#### `config`: { perPageSizes: number[] }
 
-A list of numbers used to control the available item counts per page. It's optional. Defaults to `[10, 20, 50, 100]`. The list needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
+Optional. Pass an object with a list of `perPageSizes` to control the available item counts per page (defaults to `[10, 20, 50, 100]`). `perPageSizes` needs to have a minimum of 2 items and a maximum of 6, otherwise the UI component won't be displayed.
 
 #### `empty`: React node
 
@@ -496,6 +500,78 @@ Developers don't need to worry about the internal accessibility logic for indivi
 
 `FiltersToggle` controls the visibility of the filters panel, and `Filters` renders the actual filters inside it. They work together and should always be used as a pair. While their internal behavior is accessible by default, how they’re positioned and grouped in custom layouts may affect the overall experience — especially for assistive technologies. Extra care is recommended.
 
+## `DataViewsPicker`
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviewspicker--docs">example implementation of the DataviewsPicker component</a>.</div>
+
+### Usage
+
+The `DataViewsPicker` component is very similar to the regular `DataViews` component, but is optimized for selection or picking of items.
+
+The component behaves differently to a regular `DataViews` component in the following ways:
+
+-   The items in the view are rendered using the `listbox` and `option` aria roles.
+-   Holding the `ctrl` or `cmd` key isn't required for multi-selection of items. The entire item can be clicked to select or deselect it.
+-   Individual items do not display any actions. All actions appear in the footer as text buttons.
+-   Selection is maintained across multiple pages when the component is paginated.
+
+There are also a few differences in the implementation:
+
+-   Currently only the `pickerGrid` layout is supported for `DataViewsPicker`. This layout is very similar to the regular `grid` layout.
+-   The picker component is used as a 'controlled' component, so `selection` and `onChangeSelection` should be provided as props. This is so that implementers can access the full range of selected items across pages.
+-   An optional `itemListLabel` prop can be supplied to the `DataViewsPicker` component. This is added as an `aria-label` to the `listbox` element, and should be supplied if there's no heading element associated with the `DataViewsPicker` UI.
+-   The `isItemClickable`, `renderItemLink` and `onClickItem` prop are unsupported for `DataViewsPicker`.
+-   To implement a multi-selection picker, ensure all actions are declared with `supportsBulk: true`. For single selection use `supportsBulk: false`. When a mixture of bulk and non-bulk actions are provided, the component falls back to single selection.
+-   Only the `callback` style of action is supported. `RenderModal` is unsupported.
+-   The `isEligible` callback for actions is unsupported.
+-   The `isPrimary` option for an action is used to render a `primary` variant of `Button` that can be used as a main call to action.
+
+Example:
+
+```jsx
+const Example = () => {
+	// When using DataViewsPicker, `selection` should be managed so that the component is 'controlled'.
+	const [ selection, setSelection ] = useState( [] );
+
+	// Both actions have `supportsBulk: true`, so the `DataViewsPicker` will allow multi-selection.
+	const actions = [
+		{
+			id: 'confirm',
+			label: 'Confirm',
+			isPrimary: true,
+			supportsBulk: true,
+			callback() {
+				window.alert( selection.join( ', ' ) );
+			},
+		},
+		{
+			id: 'cancel',
+			label: 'Cancel',
+			supportsBulk: true,
+			callback() {
+				setSelection( [] );
+			},
+		},
+	];
+
+	return (
+		<DataViewsPicker
+			actions={ actions }
+			data={ data }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
+			paginationInfo={ paginationInfo }
+			selection={ selection }
+			onChangeSelection={ setSelection }
+		/>
+	);
+};
+```
+
+### Properties
+
 ## `DataForm`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataform--docs">example implementation of the DataForm component</a>.</div>
@@ -557,15 +633,17 @@ const fields = [
 
 #### `form`: `Object[]`
 
--   `type`: either `regular` or `panel`.
--   `labelPosition`: either `side`, `top`, or `none`.
+-   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
 
 Example:
 
 ```js
 const form = {
-	type: 'panel',
+	layout: {
+		type: 'panel',
+		labelPosition: 'side'
+	},
 	fields: [
 		'title',
 		'data',
@@ -1301,31 +1379,76 @@ Example:
 
 ### `layout`
 
-The same as the `form.type`, either `regular` or `panel` only for the individual field. It defaults to `form.type`.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
 
--   Type: `string`.
+#### Regular
 
-Example:
+- `type`: `regular`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	layout: 'regular'
+	layout: {
+		type: 'regular',
+		labelPosition: 'side'
+	},
 }
 ```
 
-### `labelPosition`
+#### Panel
 
-The same as the `form.labelPosition`, either `side`, `top`, or `none` for the individual field. It defaults to `form.labelPosition`.
+- `type`: `panel`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
--   Type: `string`.
+For example:
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'panel',
+		labelPosition: 'top'
+	},
+}
+```
 
-Example:
+#### Card
+
+- `type`: `card`. Required.
+- `isOpened`: boolean. Optional. `true` by default.
+- `withHeader`: boolean. Optional. `true` by default.
+
+For example:
 
 ```js
 {
 	id: 'field_id',
-	labelPosition: 'none'
+	layout: {
+		type: 'card',
+		isOpened: false,
+		withHeader: true,
+	},
+}
+```
+
+#### Row
+
+- `type`: `row`. Required.
+- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+
+The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'row',
+		alignment: 'start'
+	},
 }
 ```
 

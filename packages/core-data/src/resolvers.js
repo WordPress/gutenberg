@@ -307,13 +307,25 @@ export const getEntityRecords =
 						response.headers.get( 'X-WP-TotalPages' )
 					);
 
+					if ( ! meta ) {
+						meta = {
+							totalItems: parseInt(
+								response.headers.get( 'X-WP-Total' )
+							),
+							totalPages: 1,
+						};
+					}
+
 					records.push( ...pageRecords );
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
 							kind,
 							name,
 							records,
-							query
+							query,
+							false,
+							undefined,
+							meta
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
@@ -322,11 +334,6 @@ export const getEntityRecords =
 					} );
 					page++;
 				} while ( page <= totalPages );
-
-				meta = {
-					totalItems: records.length,
-					totalPages: 1,
-				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
 				meta = {
@@ -433,6 +440,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the total number of entity records.
+ */
+export const getEntityRecordsTotalItems = forwardResolver( 'getEntityRecords' );
+
+/**
+ * Requests the number of available pages for the given query.
+ */
+export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
 
 /**
  * Requests the current theme.

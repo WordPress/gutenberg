@@ -280,8 +280,8 @@ const getSiteEditorBasicNavigationCommands = () =>
 		const isSiteEditor = getPath( window.location.href )?.includes(
 			'site-editor.php'
 		);
-		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
-			( select ) => {
+		const { isBlockBasedTheme, canCreateTemplate, canCreatePatterns } =
+			useSelect( ( select ) => {
 				return {
 					isBlockBasedTheme:
 						select( coreStore ).getCurrentTheme()?.is_block_theme,
@@ -289,33 +289,16 @@ const getSiteEditorBasicNavigationCommands = () =>
 						kind: 'postType',
 						name: 'wp_template',
 					} ),
+					canCreatePatterns: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_block',
+					} ),
 				};
-			},
-			[]
-		);
+			}, [] );
 		const commands = useMemo( () => {
 			const result = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
-				result.push( {
-					name: 'core/edit-site/open-navigation',
-					label: __( 'Navigation' ),
-					icon: navigation,
-					callback: ( { close } ) => {
-						if ( isSiteEditor ) {
-							history.navigate( '/navigation' );
-						} else {
-							document.location = addQueryArgs(
-								'site-editor.php',
-								{
-									p: '/navigation',
-								}
-							);
-						}
-						close();
-					},
-				} );
-
 				result.push( {
 					name: 'core/edit-site/open-styles',
 					label: __( 'Styles' ),
@@ -328,6 +311,25 @@ const getSiteEditorBasicNavigationCommands = () =>
 								'site-editor.php',
 								{
 									p: '/styles',
+								}
+							);
+						}
+						close();
+					},
+				} );
+
+				result.push( {
+					name: 'core/edit-site/open-navigation',
+					label: __( 'Navigation' ),
+					icon: navigation,
+					callback: ( { close } ) => {
+						if ( isSiteEditor ) {
+							history.navigate( '/navigation' );
+						} else {
+							document.location = addQueryArgs(
+								'site-editor.php',
+								{
+									p: '/navigation',
 								}
 							);
 						}
@@ -373,33 +375,41 @@ const getSiteEditorBasicNavigationCommands = () =>
 					},
 				} );
 			}
-
-			result.push( {
-				name: 'core/edit-site/open-patterns',
-				label: __( 'Patterns' ),
-				icon: symbol,
-				callback: ( { close } ) => {
-					if ( canCreateTemplate ) {
-						if ( isSiteEditor ) {
-							history.navigate( '/pattern' );
+			if ( canCreatePatterns ) {
+				result.push( {
+					name: 'core/edit-site/open-patterns',
+					label: __( 'Patterns' ),
+					icon: symbol,
+					callback: ( { close } ) => {
+						if ( canCreateTemplate ) {
+							if ( isSiteEditor ) {
+								history.navigate( '/pattern' );
+							} else {
+								document.location = addQueryArgs(
+									'site-editor.php',
+									{
+										p: '/pattern',
+									}
+								);
+							}
+							close();
 						} else {
-							document.location = addQueryArgs(
-								'site-editor.php',
-								{
-									p: '/pattern',
-								}
-							);
+							// If a user cannot access the site editor
+							document.location.href =
+								'edit.php?post_type=wp_block';
 						}
-						close();
-					} else {
-						// If a user cannot access the site editor
-						document.location.href = 'edit.php?post_type=wp_block';
-					}
-				},
-			} );
+					},
+				} );
+			}
 
 			return result;
-		}, [ history, isSiteEditor, canCreateTemplate, isBlockBasedTheme ] );
+		}, [
+			history,
+			isSiteEditor,
+			canCreateTemplate,
+			canCreatePatterns,
+			isBlockBasedTheme,
+		] );
 
 		return {
 			commands,
