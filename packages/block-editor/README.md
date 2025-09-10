@@ -997,6 +997,18 @@ _Returns_
 
 -   `BlockEditingMode`: The current editing mode.
 
+### useBlockElement
+
+Return the element for a given client ID. Updates whenever the element changes, becomes available, or disappears.
+
+_Parameters_
+
+-   _clientId_ `string`: The client ID to an element for.
+
+_Returns_
+
+-   `Element|null`: The block's wrapper element.
+
 ### useBlockProps
 
 This hook is used to lightly mark an element as a block element. The element should be the outermost element of a block. Call this hook and pass the returned props to the element to mark as a block. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.

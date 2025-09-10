@@ -18,7 +18,10 @@ import {
 import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	useBlockElement,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -49,7 +52,6 @@ export function Comments( {
 	setShowCommentBoard,
 } ) {
 	const prevRef = useRef( null );
-	const retryRef = useRef( null );
 
 	const { blockCommentId, blocks, selectedBlockClientId } = useSelect(
 		( select ) => {
@@ -68,12 +70,14 @@ export function Comments( {
 		[]
 	);
 
+	// Track the currently highlighted block
+	const [ highlightedBlockId, setHighlightedBlockId ] = useState( null );
+	const highlightedBlockElement = useBlockElement( highlightedBlockId );
+
 	const clearThreadFocus = () => {
 		setFocusThread( null );
 		setShowCommentBoard( false );
 	};
-
-	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const [ focusThread, setFocusThread ] = useState(
 		showCommentBoard && blockCommentId ? blockCommentId : null
@@ -81,76 +85,59 @@ export function Comments( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
+	// Effect to handle highlighting when selectedBlockClientId changes
 	useEffect( () => {
-		const reset = () => {
-			if ( retryRef.current ) {
-				clearTimeout( retryRef.current );
-				retryRef.current = null;
-			}
+		// Clear previous highlight
+		if ( prevRef.current ) {
+			toggleBlockHighlight( prevRef.current, false );
+			prevRef.current = null;
+		}
+
+		if ( ! selectedBlockClientId ) {
+			return;
+		}
+
+		// Highlight the selected block
+		toggleBlockHighlight( selectedBlockClientId, true );
+		prevRef.current = selectedBlockClientId;
+
+		// Find and focus related comment
+		const blockAttributes = blocks?.find(
+			( block ) => block.clientId === selectedBlockClientId
+		)?.attributes;
+		if ( blockAttributes?.blockCommentId ) {
+			setFocusThread( blockAttributes.blockCommentId );
+		}
+
+		return () => {
 			if ( prevRef.current ) {
 				toggleBlockHighlight( prevRef.current, false );
 				prevRef.current = null;
 			}
 		};
+	}, [ selectedBlockClientId, toggleBlockHighlight, blocks ] );
 
-		reset();
-		if ( ! selectedBlockClientId ) {
-			return;
-		}
-
-		try {
-			toggleBlockHighlight( selectedBlockClientId, true );
-			prevRef.current = selectedBlockClientId;
-
-			// Scroll block to center
-			const blockElement = document.querySelector(
-				`[data-block="${ selectedBlockClientId }"]`
-			);
-			blockElement?.scrollIntoView( {
+	// Effect to handle scrolling when highlighted block element changes
+	useEffect( () => {
+		if ( highlightedBlockElement ) {
+			highlightedBlockElement.scrollIntoView( {
 				behavior: 'smooth',
 				block: 'center',
 			} );
-
-			// Scroll related comment to center
-			const blockAttributes = blocks?.find(
-				( block ) => block.clientId === selectedBlockClientId
-			)?.attributes;
-			if ( blockAttributes?.blockCommentId ) {
-				setFocusThread( blockAttributes.blockCommentId );
-				const commentScrollTimeout = setTimeout( () => {
-					const commentElement = document.getElementById(
-						blockAttributes.blockCommentId
-					);
-					commentElement?.scrollIntoView( {
-						behavior: 'smooth',
-						block: 'center',
-					} );
-				}, 100 );
-				scrollTimeouts.current.push( commentScrollTimeout );
-			}
-		} catch {
-			const retryTimeout = setTimeout( () => {
-				toggleBlockHighlight( selectedBlockClientId, true );
-				prevRef.current = selectedBlockClientId;
-
-				const blockElement = document.querySelector(
-					`[data-block="${ selectedBlockClientId }"]`
-				);
-				blockElement?.scrollIntoView( {
-					behavior: 'smooth',
-					block: 'center',
-				} );
-
-				retryRef.current = null;
-			}, 50 );
-			retryRef.current = retryTimeout;
 		}
+	}, [ highlightedBlockElement ] );
 
-		return reset;
-	}, [ selectedBlockClientId, toggleBlockHighlight, blocks ] );
+	// Cleanup effect to clear highlight on unmount
+	useEffect( () => {
+		return () => {
+			if ( highlightedBlockId ) {
+				toggleBlockHighlight( highlightedBlockId, false );
+			}
+		};
+	}, [ highlightedBlockId, toggleBlockHighlight ] );
 
-	// Function to find and select blocks by comment ID
-	const selectBlocksByCommentId = ( commentId ) => {
+	// Function to find and highlight blocks by comment ID (without selecting)
+	const highlightBlocksByCommentId = ( commentId ) => {
 		if ( ! commentId || ! blocks ) {
 			return;
 		}
@@ -170,66 +157,25 @@ export function Comments( {
 
 		findBlocks( blocks );
 
-		// Select the first related block if found
+		// Highlight the first related block if found (without selecting it)
 		if ( relatedBlocks.length > 0 ) {
-			selectBlock( relatedBlocks[ 0 ] );
+			const blockId = relatedBlocks[ 0 ];
 
-			const scrollBlockToCenter = () => {
-				const blockElement = document.querySelector(
-					`[data-block="${ relatedBlocks[ 0 ] }"]`
-				);
-				if ( ! blockElement ) {
-					const retryTimeout = setTimeout( scrollBlockToCenter, 50 );
-					scrollTimeouts.current.push( retryTimeout );
-					return;
-				}
-				const editor =
-					document.querySelector( '.editor-styles-wrapper' ) ||
-					document.querySelector( '.block-editor-writing-flow' );
-				if ( editor ) {
-					const blockRect = blockElement.getBoundingClientRect();
-					editor.scrollTo( {
-						top:
-							blockElement.offsetTop -
-							editor.clientHeight / 2 +
-							blockRect.height / 2,
-						behavior: 'smooth',
-					} );
-				} else {
-					blockElement.scrollIntoView( {
-						behavior: 'smooth',
-						block: 'center',
-						inline: 'nearest',
-					} );
-				}
-			};
-			const initialScrollTimeout = setTimeout( scrollBlockToCenter, 200 );
-			scrollTimeouts.current.push( initialScrollTimeout );
+			// Clear previous highlight
+			if ( highlightedBlockId ) {
+				toggleBlockHighlight( highlightedBlockId, false );
+			}
 
-			// Start scrolling with a delay to ensure block is rendered
-			const scrollTimeout = setTimeout( scrollBlockToCenter, 200 );
-			scrollTimeouts.current.push( scrollTimeout );
+			// Set new highlight
+			setHighlightedBlockId( blockId );
+			toggleBlockHighlight( blockId, true );
 		}
 	};
-
-	// Add this ref at the top with your other refs
-	const scrollTimeouts = useRef( [] );
-
-	// Add this cleanup effect
-	useEffect( () => {
-		return () => {
-			// Clear all scroll timeouts on unmount
-			scrollTimeouts.current.forEach( ( timeout ) =>
-				clearTimeout( timeout )
-			);
-			scrollTimeouts.current = [];
-		};
-	}, [] );
 
 	// Handle comment selection
 	const handleCommentSelect = ( threadId ) => {
 		setFocusThread( threadId );
-		selectBlocksByCommentId( threadId );
+		highlightBlocksByCommentId( threadId );
 	};
 
 	return (
@@ -258,11 +204,8 @@ export function Comments( {
 						className={ clsx(
 							'editor-collab-sidebar-panel__thread',
 							{
-								'editor-collab-sidebar-panel__active-thread':
-									blockCommentId &&
-									blockCommentId === thread.id,
 								'editor-collab-sidebar-panel__focus-thread':
-									focusThread && focusThread === thread.id,
+									focusThread === thread.id,
 							}
 						) }
 						id={ thread.id }
