@@ -196,7 +196,7 @@ function createDataFormFields( contentAttributes, blockInformation ) {
 			id: attr.name,
 			type: fieldType,
 			label:
-				blockInformation?.name || blockInformation?.title || attr.name,
+				attr.name || blockInformation?.name || blockInformation?.title,
 		};
 	} );
 }
