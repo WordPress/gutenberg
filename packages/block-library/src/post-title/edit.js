@@ -26,6 +26,7 @@ import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -217,16 +218,16 @@ export default function PostTitleEdit( {
 											__next40pxDefaultSize
 											__nextHasNoMarginBottom
 											label={ __( 'Link Relation' ) }
-											help={
-												<>
-													{ __(
-														'The Link Relation attribute defines the relationship between a linked resource and the current document.'
-													) }{ ' ' }
-													<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel">
-														{ __( 'Learn more.' ) }
-													</ExternalLink>
-												</>
-											}
+											help={ createInterpolateElement(
+												__(
+													'The <linkRel>Link Relation</linkRel> attribute defines the relationship between a linked resource and the current document.'
+												),
+												{
+													linkRel: (
+														<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+													),
+												}
+											) }
 											value={ rel }
 											onChange={ ( newRel ) =>
 												setAttributes( { rel: newRel } )

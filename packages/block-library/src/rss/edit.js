@@ -19,7 +19,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
@@ -303,16 +303,16 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Link Relation' ) }
-					help={
-						<>
-							{ __(
-								'The Link Relation attribute defines the relationship between a linked resource and the current document.'
-							) }{ ' ' }
-							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel">
-								{ __( 'Learn more.' ) }
-							</ExternalLink>
-						</>
-					}
+					help={ createInterpolateElement(
+						__(
+							'The <linkRel>Link Relation</linkRel> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							linkRel: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
