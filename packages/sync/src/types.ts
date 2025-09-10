@@ -45,4 +45,5 @@ export interface SyncConfig {
 		awareness?: boolean;
 		undo?: boolean;
 	};
+	syncedProperties: Set< string >;
 }

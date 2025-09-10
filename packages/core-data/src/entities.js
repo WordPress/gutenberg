@@ -375,7 +375,7 @@ async function loadPostTypeEntities() {
 				/**
 				 * The object type for the entity, used to scope CRDT documents.
 				 *
-				 * @type {string}
+				 * @type {import('@wordpress/sync').ObjectType}
 				 */
 				objectType: `postType/${ postType.slug }`,
 
