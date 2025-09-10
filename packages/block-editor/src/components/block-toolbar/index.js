@@ -154,10 +154,7 @@ export function PrivateBlockToolbar( {
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showSwitchSectionStyleButton:
-				_isZoomOut ||
-				( isNavigationModeEnabled &&
-					editingMode === 'contentOnly' &&
-					isSectionBlock( selectedBlockClientId ) ), // Zoom out or Write Mode Section Blocks
+				_isZoomOut || isSectionBlock( selectedBlockClientId ),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			isNavigationMode: isNavigationModeEnabled,
 		};
