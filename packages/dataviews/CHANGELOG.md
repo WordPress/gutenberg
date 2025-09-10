@@ -19,6 +19,7 @@
 ### Bug Fixes
 
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
+- DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
 
 ## 8.0.0 (2025-09-03)
 
