@@ -20,6 +20,7 @@ import {
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 } from './validated-form-controls';
+import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
 import { Picker } from './color-picker/picker';
 
 export const privateApis = {};
@@ -43,4 +44,5 @@ lock( privateApis, {
 	ValidatedTextControl,
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
+	ValidatedFormTokenField,
 } );
