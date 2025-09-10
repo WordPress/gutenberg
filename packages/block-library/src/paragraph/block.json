@@ -15,7 +15,11 @@
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "p",
-			"role": "content"
+			"role": "content",
+			"control": {
+				"type": "RichText",
+				"label": "Content"
+			}
 		},
 		"dropCap": {
 			"type": "boolean",
