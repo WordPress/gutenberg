@@ -32,8 +32,7 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "a,button",
-			"attribute": "title",
-			"role": "content"
+			"attribute": "title"
 		},
 		"text": {
 			"type": "rich-text",
@@ -45,15 +44,13 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "target",
-			"role": "content"
+			"attribute": "target"
 		},
 		"rel": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
-			"attribute": "rel",
-			"role": "content"
+			"attribute": "rel"
 		},
 		"placeholder": {
 			"type": "string"

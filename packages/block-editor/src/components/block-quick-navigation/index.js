@@ -13,7 +13,6 @@ import {
 } from '@wordpress/components';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
-import { useMemo } from '@wordpress/element';
 import { DataForm } from '@wordpress/dataviews';
 
 /**
@@ -77,6 +76,26 @@ function SingleContentAttributeControl( {
 	);
 }
 
+function getEditableContentAttributes( block ) {
+	const attributes = [];
+	if ( block?.name ) {
+		const blockType = getBlockType( block.name );
+		if ( blockType?.attributes ) {
+			Object.entries( blockType.attributes ).forEach(
+				( [ attrName, attrDef ] ) => {
+					if ( attrDef.role === 'content' ) {
+						attributes.push( {
+							name: attrName,
+							definition: attrDef,
+							value: block.attributes?.[ attrName ],
+						} );
+					}
+				}
+			);
+		}
+	}
+	return attributes;
+}
 // Block Content Attributes View for Navigator sub-screen
 function BlockContentAttributesView( { clientId } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
@@ -95,26 +114,7 @@ function BlockContentAttributesView( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Get content attributes for this block
-	const contentAttributes = useMemo( () => {
-		const attributes = [];
-		if ( block?.name ) {
-			const blockType = getBlockType( block.name );
-			if ( blockType?.attributes ) {
-				Object.entries( blockType.attributes ).forEach(
-					( [ attrName, attrDef ] ) => {
-						if ( attrDef.role === 'content' ) {
-							attributes.push( {
-								name: attrName,
-								definition: attrDef,
-								value: block.attributes?.[ attrName ],
-							} );
-						}
-					}
-				);
-			}
-		}
-		return attributes;
-	}, [ block ] );
+	const contentAttributes = getEditableContentAttributes( block );
 
 	return (
 		<VStack spacing={ 2 }>
@@ -249,23 +249,7 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		useDispatch( blockEditorStore );
 
 	// Get content attributes for this block
-	const contentAttributes = [];
-	if ( block?.name ) {
-		const blockType = getBlockType( block.name );
-		if ( blockType?.attributes ) {
-			Object.entries( blockType.attributes ).forEach(
-				( [ attrName, attrDef ] ) => {
-					if ( attrDef.role === 'content' ) {
-						contentAttributes.push( {
-							name: attrName,
-							definition: attrDef,
-							value: block.attributes?.[ attrName ],
-						} );
-					}
-				}
-			);
-		}
-	}
+	const contentAttributes = getEditableContentAttributes( block );
 
 	// Determine if this block has multiple content attributes
 	const hasMultipleContentAttributes = contentAttributes.length > 1;

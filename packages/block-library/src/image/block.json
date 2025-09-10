@@ -51,8 +51,7 @@
 			"type": "string",
 			"source": "attribute",
 			"selector": "img",
-			"attribute": "title",
-			"role": "content"
+			"attribute": "title"
 		},
 		"href": {
 			"type": "string",
@@ -74,8 +73,7 @@
 			"attribute": "class"
 		},
 		"id": {
-			"type": "number",
-			"role": "content"
+			"type": "number"
 		},
 		"width": {
 			"type": "string"
