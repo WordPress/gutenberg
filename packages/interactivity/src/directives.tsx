@@ -6,6 +6,7 @@
  */
 import { h as createElement, type VNode, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
+import { signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -198,6 +199,8 @@ const getGlobalAsyncEventDirective = (
 			} );
 	};
 };
+
+export const routerRegions = new Map();
 
 export default () => {
 	// data-wp-context
@@ -718,4 +721,26 @@ export default () => {
 	);
 
 	directive( 'each-child', () => null, { priority: 1 } );
+
+	directive(
+		'router-region',
+		( { directives: { 'router-region': routerRegion } } ) => {
+			const entry = routerRegion.find( isDefaultDirectiveSuffix );
+			if ( ! entry ) {
+				return;
+			}
+
+			const regionId =
+				typeof entry.value === 'string'
+					? entry.value
+					: ( entry.value as any ).id;
+
+			if ( ! routerRegions.has( regionId ) ) {
+				routerRegions.set( regionId, signal() );
+			}
+
+			return routerRegions.get( regionId )!.value;
+		},
+		{ priority: 1 }
+	);
 };
