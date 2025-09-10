@@ -237,7 +237,6 @@ const getAllBlocks = () => {
 		homeLink,
 		logInOut,
 		termDescription,
-		termTemplate,
 		queryTitle,
 		postAuthorBiography,
 	];
@@ -248,6 +247,7 @@ const getAllBlocks = () => {
 		blocks.push( accordionHeader );
 		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
+		blocks.push( termTemplate );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
