@@ -404,7 +404,6 @@ const ValidationComponent = ( {
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
-		customValidation: string;
 		categories: string[];
 		countries: string[];
 		password: string;
