@@ -53,8 +53,8 @@ function SingleContentAttributeControl( {
 
 	if ( controlType === 'TextControl' ) {
 		return (
-			<div>
-				<Flex style={ { marginBottom: '8px' } }>
+			<>
+				<Flex justify="flex-start">
 					<FlexItem>
 						<BlockIcon icon={ blockIcon } />
 					</FlexItem>
@@ -69,7 +69,7 @@ function SingleContentAttributeControl( {
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				/>
-			</div>
+			</>
 		);
 	}
 
@@ -368,8 +368,8 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 		return null;
 	}
 	return (
-		<Navigator initialPath="/">
-			<Navigator.Screen path="/">
+		<Navigator initialPath="/" style={ { overflow: 'visible' } }>
+			<Navigator.Screen path="/" style={ { overflow: 'visible' } }>
 				<VStack spacing={ 1 }>
 					{ clientIds.map( ( clientId ) => (
 						<BlockQuickNavigationItem
@@ -453,14 +453,21 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 						onSelect( clientId );
 					}
 				} }
+				style={ {
+					width: 'calc(100% + 16px)',
+					marginLeft: '-8px',
+					overflow: 'visible',
+				} }
 			>
 				<Flex>
-					<FlexItem>
-						<BlockIcon icon={ blockInformation?.icon } />
-					</FlexItem>
-					<FlexBlock>
-						<Truncate>{ blockTitle }</Truncate>
-					</FlexBlock>
+					<Flex justify="flex-start">
+						<FlexItem>
+							<BlockIcon icon={ blockInformation?.icon } />
+						</FlexItem>
+						<FlexItem>
+							<Truncate>{ blockTitle }</Truncate>
+						</FlexItem>
+					</Flex>
 					<FlexItem>
 						<Icon icon={ chevronRight } />
 					</FlexItem>
