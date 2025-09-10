@@ -106,7 +106,6 @@ export default {
 		);
 	},
 	canUserEditValue( { select, context, args } ) {
-		return true;
 		// Lock editing in query loop.
 		if ( context?.query || context?.queryId ) {
 			return false;
