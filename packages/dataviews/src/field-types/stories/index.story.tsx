@@ -32,16 +32,19 @@ const meta = {
 			options: [
 				'default',
 				'array',
-				'boolean',
 				'checkbox',
+				'color',
 				'date',
 				'datetime',
 				'email',
 				'integer',
+				'password',
 				'radio',
 				'select',
 				'telephone',
+				'url',
 				'text',
+				'toggle',
 				'toggleGroup',
 			],
 		},
@@ -57,9 +60,11 @@ type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
+	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
+	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
 	datetimeWithElements: string;
@@ -69,6 +74,12 @@ type DataType = {
 	emailWithElements: string;
 	telephone: string;
 	telephoneWithElements: string;
+	color: string;
+	colorWithElements: string;
+	url: string;
+	urlWithElements: string;
+	password: string;
+	passwordWithElements: string;
 	media: string;
 	mediaWithElements: string;
 	array: string[];
@@ -82,9 +93,11 @@ const data: DataType[] = [
 		id: 1,
 		text: 'Text',
 		textWithElements: 'Item 1',
+		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
+		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
 		datetimeWithElements: '2021-01-01T14:30:00Z',
@@ -94,6 +107,12 @@ const data: DataType[] = [
 		emailWithElements: 'hi@example.com',
 		telephone: '+1-555-123-4567',
 		telephoneWithElements: '+1-555-123-4567',
+		color: '#ff6600',
+		colorWithElements: 'rgba(255, 165, 0, 0.8)',
+		url: 'https://example.com',
+		urlWithElements: 'https://example.com',
+		password: 'secretpassword123',
+		passwordWithElements: 'secretpassword123',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -123,6 +142,13 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'textWithTextarea',
+		type: 'text',
+		label: 'Textarea',
+		description: 'Help for textarea.',
+		Edit: 'textarea',
+	},
+	{
 		id: 'integer',
 		type: 'integer',
 		label: 'Integer',
@@ -144,6 +170,13 @@ const fields: Field< DataType >[] = [
 		type: 'boolean',
 		label: 'Boolean',
 		description: 'Help for boolean.',
+	},
+	{
+		id: 'booleanWithToggle',
+		type: 'boolean',
+		label: 'Boolean (with toggle)',
+		description: 'Help for boolean with toggle control.',
+		Edit: 'toggle',
 	},
 	{
 		id: 'booleanWithElements',
@@ -233,6 +266,64 @@ const fields: Field< DataType >[] = [
 		],
 	},
 	{
+		id: 'url',
+		type: 'url',
+		label: 'URL',
+		description: 'Help for URL.',
+	},
+	{
+		id: 'urlWithElements',
+		type: 'url',
+		label: 'URL (with elements)',
+		description: 'Help for URL with elements.',
+		elements: [
+			{ value: 'https://example.com', label: 'https://example.com' },
+			{ value: 'https://wordpress.org', label: 'https://wordpress.org' },
+			{ value: 'https://github.com', label: 'https://github.com' },
+		],
+	},
+	{
+		id: 'color',
+		type: 'color',
+		label: 'Color',
+		description:
+			'Help for color. Supports hex, rgb, hsl formats with alpha channel.',
+	},
+	{
+		id: 'colorWithElements',
+		type: 'color',
+		label: 'Color (with elements)',
+		description: 'Help for color with predefined color options.',
+		elements: [
+			{ value: '#ff0000', label: 'Red' },
+			{ value: '#00ff00', label: 'Green' },
+			{ value: '#0000ff', label: 'Blue' },
+			{ value: 'rgba(255, 165, 0, 0.8)', label: 'Orange (80% opacity)' },
+			{ value: 'hsl(300, 100%, 50%)', label: 'Magenta' },
+			{
+				value: 'hsla(120, 100%, 25%, 0.6)',
+				label: 'Dark Green (60% opacity)',
+			},
+		],
+	},
+	{
+		id: 'password',
+		type: 'password',
+		label: 'Password',
+		description: 'Help for password.',
+	},
+	{
+		id: 'passwordWithElements',
+		type: 'password',
+		label: 'Password (with elements)',
+		description: 'Help for password with elements.',
+		elements: [
+			{ value: 'secretpassword123', label: 'Secret Password' },
+			{ value: 'adminpass456', label: 'Admin Password' },
+			{ value: 'userpass789', label: 'User Password' },
+		],
+	},
+	{
 		id: 'media',
 		type: 'media',
 		label: 'Media',
@@ -310,16 +401,19 @@ type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
 	| 'array'
-	| 'boolean'
 	| 'checkbox'
+	| 'color'
 	| 'date'
 	| 'datetime'
 	| 'email'
 	| 'integer'
+	| 'password'
 	| 'radio'
 	| 'select'
 	| 'telephone'
+	| 'url'
 	| 'text'
+	| 'toggle'
 	| 'toggleGroup';
 
 interface FieldTypeStoryProps {
@@ -569,6 +663,38 @@ export const Telephone = ( {
 	);
 };
 
+export const Url = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const urlFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'url' ),
+		[]
+	);
+
+	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
+};
+
+export const Color = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const colorFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'color' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
+	);
+};
+
 export const Media = ( {
 	type,
 	Edit,
@@ -604,6 +730,23 @@ export const Array = ( {
 			type={ type }
 			Edit={ Edit }
 		/>
+	);
+};
+
+export const Password = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const passwordFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'password' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ passwordFields } type={ type } Edit={ Edit } />
 	);
 };
 

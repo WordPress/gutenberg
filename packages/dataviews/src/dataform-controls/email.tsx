@@ -1,8 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { atSymbol } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
-import ValidatedText from './utils/validated-text';
+import ValidatedText from './utils/validated-input';
 
 export default function Email< Item >( {
 	data,
@@ -12,7 +17,14 @@ export default function Email< Item >( {
 }: DataFormControlProps< Item > ) {
 	return (
 		<ValidatedText
-			{ ...{ data, field, onChange, hideLabelFromVision, type: 'email' } }
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				type: 'email',
+				icon: atSymbol,
+			} }
 		/>
 	);
 }

@@ -996,6 +996,28 @@ Display the description of categories, tags and custom taxonomies when viewing a
 -	**Supports:** align (full, wide), color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
+## Term Template
+
+Contains the block elements used to render a taxonomy term, like the name, description, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template))
+
+-	**Name:** core/term-template
+-	**Experimental:** true
+-	**Category:** theme
+-	**Ancestor:** core/terms-query
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout (allowEditing, allowSwitching, default), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** namespace
+
+## Terms Query
+
+An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query))
+
+-	**Name:** core/terms-query
+-	**Experimental:** true
+-	**Category:** theme
+-	**Allowed Blocks:** core/term-template
+-	**Supports:** align (full, wide), interactivity, ~~html~~
+-	**Attributes:** namespace, tagName, termQuery, termQueryId
+
 ## Text Columns (deprecated)
 
 This block is deprecated. Please use the Columns block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/text-columns))

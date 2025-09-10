@@ -144,8 +144,6 @@ export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
 		state.derivedBlockEditingModes,
 		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		state.settings.templateLock,
-		state.blockListSettings,
 		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );

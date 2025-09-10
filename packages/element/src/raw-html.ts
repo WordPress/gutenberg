@@ -3,7 +3,12 @@
  */
 import { Children, createElement } from './react';
 
-/** @typedef {{children: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
+/**
+ * Props for the RawHTML component.
+ */
+export type RawHTMLProps = {
+	children: string | string[];
+} & React.ComponentPropsWithoutRef< 'div' >;
 
 /**
  * Component used to render unescaped HTML.
@@ -24,9 +29,12 @@ import { Children, createElement } from './react';
  *                             of strings. Other props will be passed through
  *                             to the div wrapper.
  *
- * @return {JSX.Element} Dangerously-rendering component.
+ * @return Dangerously-rendering component.
  */
-export default function RawHTML( { children, ...props } ) {
+export default function RawHTML( {
+	children,
+	...props
+}: RawHTMLProps ): JSX.Element {
 	let rawHtml = '';
 
 	// Cast children as an array, and concatenate each element if it is a string.

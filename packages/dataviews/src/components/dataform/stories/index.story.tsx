@@ -168,13 +168,17 @@ const fields: Field< SamplePost >[] = [
 		label: 'City',
 		type: 'text',
 	},
+	{
+		id: 'description',
+		label: 'Description',
+		type: 'text',
+		Edit: 'textarea',
+	},
 ];
 
 const LayoutRegularComponent = ( {
-	type = 'default',
 	labelPosition,
 }: {
-	type?: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 } ) => {
 	const [ post, setPost ] = useState( {
@@ -191,12 +195,13 @@ const LayoutRegularComponent = ( {
 		filesize: 1024,
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
+		description: 'This is a sample description.',
 	} );
 
 	const form: Form = useMemo(
 		() => ( {
 			layout: getLayoutFromStoryArgs( {
-				type,
+				type: 'regular',
 				labelPosition,
 			} ),
 			fields: [
@@ -214,9 +219,10 @@ const LayoutRegularComponent = ( {
 				'filesize',
 				'dimensions',
 				'tags',
+				'description',
 			],
 		} ),
-		[ type, labelPosition ]
+		[ labelPosition ]
 	);
 
 	return (
@@ -240,7 +246,7 @@ const getLayoutFromStoryArgs = ( {
 	openAs,
 	withHeader,
 }: {
-	type: 'default' | 'regular' | 'panel' | 'card';
+	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
@@ -390,24 +396,39 @@ const ValidationComponent = ( {
 } ) => {
 	type ValidatedItem = {
 		text: string;
+		textarea: string;
 		email: string;
 		telephone: string;
+		url: string;
+		color: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
+		password: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
+		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
+		url: 'https://example.com',
+		color: '#ff6600',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
+		password: 'secretpassword123',
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customTextareaRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
 			return 'Value must only contain letters and spaces.';
 		}
 
@@ -427,9 +448,37 @@ const ValidationComponent = ( {
 
 		return null;
 	};
+	const customUrlRule = ( value: ValidatedItem ) => {
+		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
+			return 'URL must be from https://example.com domain.';
+		}
+
+		return null;
+	};
+	const customColorRule = ( value: ValidatedItem ) => {
+		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+			return 'Color must be a valid hex format (e.g., #ff6600).';
+		}
+
+		return null;
+	};
 	const customIntegerRule = ( value: ValidatedItem ) => {
 		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+
+	const customPasswordRule = ( value: ValidatedItem ) => {
+		if ( value.password.length < 8 ) {
+			return 'Password must be at least 8 characters long.';
+		}
+		if ( ! /[A-Z]/.test( value.password ) ) {
+			return 'Password must contain at least one uppercase letter.';
+		}
+		if ( ! /[0-9]/.test( value.password ) ) {
+			return 'Password must contain at least one number.';
 		}
 
 		return null;
@@ -452,6 +501,16 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'textarea',
+			type: 'text',
+			Edit: 'textarea',
+			label: 'Textarea',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTextareaRule ),
+			},
+		},
+		{
 			id: 'email',
 			type: 'email',
 			label: 'e-mail',
@@ -467,6 +526,24 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTelephoneRule ),
+			},
+		},
+		{
+			id: 'url',
+			type: 'url',
+			label: 'URL',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customUrlRule ),
+			},
+		},
+		{
+			id: 'color',
+			type: 'color',
+			label: 'Color',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customColorRule ),
 			},
 		},
 		{
@@ -494,17 +571,30 @@ const ValidationComponent = ( {
 				required,
 			},
 		},
+		{
+			id: 'password',
+			type: 'password',
+			label: 'Password',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customPasswordRule ),
+			},
+		},
 	];
 
 	const form = {
 		layout: { type },
 		fields: [
 			'text',
+			'textarea',
 			'email',
 			'telephone',
+			'url',
+			'color',
 			'integer',
 			'boolean',
 			'customEdit',
+			'password',
 		],
 	};
 
@@ -778,6 +868,247 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 	);
 };
 
+const LayoutRowComponent = ( {
+	alignment,
+}: {
+	alignment: 'start' | 'center' | 'end';
+} ) => {
+	type Customer = {
+		name: string;
+		email: string;
+		phone: string;
+		plan: string;
+		shippingAddress: string;
+		shippingCity: string;
+		shippingPostalCode: string;
+		shippingCountry: string;
+		billingAddress: string;
+		billingCity: string;
+		billingPostalCode: string;
+		totalOrders: number;
+		totalRevenue: number;
+		averageOrderValue: number;
+		hasVat: boolean;
+		hasDiscount: boolean;
+		vat: number;
+		commission: number;
+	};
+
+	const customerFields: Field< Customer >[] = [
+		{
+			id: 'name',
+			label: 'Customer Name',
+			type: 'text',
+		},
+		{
+			id: 'phone',
+			label: 'Phone',
+			type: 'text',
+		},
+		{
+			id: 'email',
+			label: 'Email',
+			type: 'email',
+		},
+		{
+			id: 'shippingAddress',
+			label: 'Shipping Address',
+			type: 'text',
+		},
+		{
+			id: 'shippingCity',
+			label: 'Shipping City',
+			type: 'text',
+		},
+		{
+			id: 'shippingPostalCode',
+			label: 'Shipping Postal Code',
+			type: 'text',
+		},
+		{
+			id: 'shippingCountry',
+			label: 'Shipping Country',
+			type: 'text',
+		},
+		{
+			id: 'billingAddress',
+			label: 'Billing Address',
+			type: 'text',
+		},
+		{
+			id: 'billingCity',
+			label: 'Billing City',
+			type: 'text',
+		},
+		{
+			id: 'billingPostalCode',
+			label: 'Billing Postal Code',
+			type: 'text',
+		},
+		{
+			id: 'vat',
+			label: 'VAT',
+			type: 'integer',
+		},
+		{
+			id: 'commission',
+			label: 'Commission',
+			type: 'integer',
+		},
+		{
+			id: 'hasDiscount',
+			label: 'Has Discount?',
+			type: 'boolean',
+		},
+		{
+			id: 'plan',
+			label: 'Plan',
+			type: 'text',
+			Edit: 'toggleGroup',
+			elements: [
+				{ value: 'basic', label: 'Basic' },
+				{ value: 'business', label: 'Business' },
+				{ value: 'vip', label: 'VIP' },
+			],
+		},
+		{
+			id: 'renewal',
+			label: 'Renewal',
+			type: 'text',
+			Edit: 'radio',
+			elements: [
+				{ value: 'weekly', label: 'Weekly' },
+				{ value: 'monthly', label: 'Monthly' },
+				{ value: 'yearly', label: 'Yearly' },
+			],
+		},
+	];
+
+	const [ customer, setCustomer ] = useState< Customer >( {
+		name: 'Danyka Romaguera',
+		email: 'aromaguera@example.org',
+		phone: '1-828-352-1250',
+		plan: 'Business',
+		shippingAddress: 'N/A',
+		shippingCity: 'N/A',
+		shippingPostalCode: 'N/A',
+		shippingCountry: 'N/A',
+		billingAddress: 'Danyka Romaguera, West Myrtiehaven, 80240-4282, BI',
+		billingCity: 'City',
+		billingPostalCode: 'PC',
+		totalOrders: 2,
+		totalRevenue: 1430,
+		averageOrderValue: 715,
+		hasVat: true,
+		vat: 10,
+		commission: 5,
+		hasDiscount: true,
+	} );
+
+	const form: Form = useMemo(
+		() => ( {
+			fields: [
+				{
+					id: 'customer',
+					label: 'Customer',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'name', 'phone', 'email' ],
+				},
+				{
+					id: 'addressRow',
+					label: 'Billing & Shipping Addresses',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [
+						{
+							id: 'billingAddress',
+							children: [
+								'billingAddress',
+								'billingCity',
+								'billingPostalCode',
+							],
+						},
+						{
+							id: 'shippingAddress',
+							children: [
+								'shippingAddress',
+								'shippingCity',
+								'shippingPostalCode',
+								'shippingCountry',
+							],
+						},
+					],
+				},
+				{
+					id: 'payments-and-tax',
+					label: 'Payments & Taxes',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'vat', 'commission', 'hasDiscount' ],
+				},
+				{
+					id: 'planRow',
+					label: 'Subscription',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'plan', 'renewal' ],
+				},
+			],
+		} ),
+		[ alignment ]
+	);
+
+	const topLevelLayout: Form = useMemo(
+		() => ( {
+			layout: {
+				type: 'row',
+				alignment,
+			},
+			fields: [ 'name', 'phone', 'email' ],
+		} ),
+		[ alignment ]
+	);
+
+	return (
+		<>
+			<h1>Row Layout</h1>
+			<h2>As top-level layout</h2>
+			<DataForm
+				data={ customer }
+				fields={ customerFields }
+				form={ topLevelLayout }
+				onChange={ ( edits ) =>
+					setCustomer( ( prev ) => ( {
+						...prev,
+						...edits,
+					} ) )
+				}
+			/>
+			<h2>Per field layout</h2>
+			<DataForm
+				data={ customer }
+				fields={ customerFields }
+				form={ form }
+				onChange={ ( edits ) =>
+					setCustomer( ( prev ) => ( {
+						...prev,
+						...edits,
+					} ) )
+				}
+			/>
+		</>
+	);
+};
+
 const LayoutMixedComponent = () => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -794,14 +1125,18 @@ const LayoutMixedComponent = () => {
 	const form: Form = {
 		fields: [
 			{
-				id: 'title',
+				id: 'title-and-status',
+				children: [
+					{
+						id: 'title',
+						layout: { type: 'panel' },
+					},
+					'status',
+				],
 				layout: {
-					type: 'panel',
-					labelPosition: 'top',
-					openAs: 'dropdown',
+					type: 'row',
 				},
 			},
-			'status',
 			{
 				id: 'order',
 				layout: {
@@ -889,6 +1224,20 @@ export const LayoutRegular = {
 			description: 'Chooses the label position.',
 			options: [ 'default', 'top', 'side', 'none' ],
 		},
+	},
+};
+
+export const LayoutRow = {
+	render: LayoutRowComponent,
+	argTypes: {
+		alignment: {
+			control: { type: 'select' },
+			description: 'The alignment of the fields.',
+			options: [ 'start', 'center', 'end' ],
+		},
+	},
+	args: {
+		alignment: 'center',
 	},
 };
 

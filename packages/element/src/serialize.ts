@@ -51,6 +51,32 @@ import RawHTML from './raw-html';
 const Context = createContext( undefined );
 Context.displayName = 'ElementContext';
 
+interface ComponentInstance {
+	render: () => React.ReactNode;
+	getChildContext?: () => Record< string, any >;
+}
+
+interface RawHTMLProps {
+	children: string;
+	[ key: string ]: any;
+}
+
+interface StyleObject {
+	[ property: string ]: string | number | null | undefined;
+}
+
+interface HTMLProps {
+	dangerouslySetInnerHTML?: {
+		__html: string;
+	};
+	children?: React.ReactNode;
+	value?: React.ReactNode;
+	style?: StyleObject | string;
+	className?: string;
+	htmlFor?: string;
+	[ key: string ]: any;
+}
+
 const { Provider, Consumer } = Context;
 
 const ForwardRef = forwardRef( () => {
@@ -59,17 +85,13 @@ const ForwardRef = forwardRef( () => {
 
 /**
  * Valid attribute types.
- *
- * @type {Set<string>}
  */
-const ATTRIBUTES_TYPES = new Set( [ 'string', 'boolean', 'number' ] );
+const ATTRIBUTES_TYPES = new Set< string >( [ 'string', 'boolean', 'number' ] );
 
 /**
  * Element tags which can be self-closing.
- *
- * @type {Set<string>}
  */
-const SELF_CLOSING_TAGS = new Set( [
+const SELF_CLOSING_TAGS = new Set< string >( [
 	'area',
 	'base',
 	'br',
@@ -100,10 +122,8 @@ const SELF_CLOSING_TAGS = new Set( [
  *     .reduce( ( result, tr ) => Object.assign( result, {
  *         [ tr.firstChild.textContent.trim() ]: true
  *     } ), {} ) ).sort();
- *
- * @type {Set<string>}
  */
-const BOOLEAN_ATTRIBUTES = new Set( [
+const BOOLEAN_ATTRIBUTES = new Set< string >( [
 	'allowfullscreen',
 	'allowpaymentrequest',
 	'allowusermedia',
@@ -151,10 +171,8 @@ const BOOLEAN_ATTRIBUTES = new Set( [
  * Some notable omissions:
  *
  *  - `alt`: https://blog.whatwg.org/omit-alt
- *
- * @type {Set<string>}
  */
-const ENUMERATED_ATTRIBUTES = new Set( [
+const ENUMERATED_ATTRIBUTES = new Set< string >( [
 	'autocapitalize',
 	'autocomplete',
 	'charset',
@@ -194,10 +212,8 @@ const ENUMERATED_ATTRIBUTES = new Set( [
  *     ) )
  *     .map( ( [ key ] ) => key )
  *     .sort();
- *
- * @type {Set<string>}
  */
-const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
+const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set< string >( [
 	'animation',
 	'animationIterationCount',
 	'baselineShift',
@@ -241,37 +257,28 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 /**
  * Returns true if the specified string is prefixed by one of an array of
  * possible prefixes.
- *
- * @param {string}   string   String to check.
- * @param {string[]} prefixes Possible prefixes.
- *
- * @return {boolean} Whether string has prefix.
+ * @param string
+ * @param prefixes
  */
-export function hasPrefix( string, prefixes ) {
+export function hasPrefix( string: string, prefixes: string[] ): boolean {
 	return prefixes.some( ( prefix ) => string.indexOf( prefix ) === 0 );
 }
 
 /**
  * Returns true if the given prop name should be ignored in attributes
  * serialization, or false otherwise.
- *
- * @param {string} attribute Attribute to check.
- *
- * @return {boolean} Whether attribute should be ignored.
+ * @param attribute
  */
-function isInternalAttribute( attribute ) {
+function isInternalAttribute( attribute: string ): boolean {
 	return 'key' === attribute || 'children' === attribute;
 }
 
 /**
  * Returns the normal form of the element's attribute value for HTML.
- *
- * @param {string} attribute Attribute name.
- * @param {*}      value     Non-normalized attribute value.
- *
- * @return {*} Normalized attribute value.
+ * @param attribute
+ * @param value
  */
-function getNormalAttributeValue( attribute, value ) {
+function getNormalAttributeValue( attribute: string, value: any ): any {
 	switch ( attribute ) {
 		case 'style':
 			return renderStyle( value );
@@ -279,13 +286,14 @@ function getNormalAttributeValue( attribute, value ) {
 
 	return value;
 }
+
 /**
  * This is a map of all SVG attributes that have dashes. Map(lower case prop => dashed lower case attribute).
  * We need this to render e.g strokeWidth as stroke-width.
  *
  * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
  */
-const SVG_ATTRIBUTE_WITH_DASHES_LIST = [
+const SVG_ATTRIBUTE_WITH_DASHES_LIST: Record< string, string > = [
 	'accentHeight',
 	'alignmentBaseline',
 	'arabicForm',
@@ -359,11 +367,14 @@ const SVG_ATTRIBUTE_WITH_DASHES_LIST = [
 	'writingMode',
 	'xmlnsXlink',
 	'xHeight',
-].reduce( ( map, attribute ) => {
-	// The keys are lower-cased for more robust lookup.
-	map[ attribute.toLowerCase() ] = attribute;
-	return map;
-}, {} );
+].reduce(
+	( map, attribute ) => {
+		// The keys are lower-cased for more robust lookup.
+		map[ attribute.toLowerCase() ] = attribute;
+		return map;
+	},
+	{} as Record< string, string >
+);
 
 /**
  * This is a map of all case-sensitive SVG attributes. Map(lowercase key => proper case attribute).
@@ -371,7 +382,7 @@ const SVG_ATTRIBUTE_WITH_DASHES_LIST = [
  * Note that this list only contains attributes that contain at least one capital letter.
  * Lowercase attributes don't need mapping, since we lowercase all attributes by default.
  */
-const CASE_SENSITIVE_SVG_ATTRIBUTES = [
+const CASE_SENSITIVE_SVG_ATTRIBUTES: Record< string, string > = [
 	'allowReorder',
 	'attributeName',
 	'attributeType',
@@ -437,17 +448,20 @@ const CASE_SENSITIVE_SVG_ATTRIBUTES = [
 	'viewTarget',
 	'xChannelSelector',
 	'yChannelSelector',
-].reduce( ( map, attribute ) => {
-	// The keys are lower-cased for more robust lookup.
-	map[ attribute.toLowerCase() ] = attribute;
-	return map;
-}, {} );
+].reduce(
+	( map, attribute ) => {
+		// The keys are lower-cased for more robust lookup.
+		map[ attribute.toLowerCase() ] = attribute;
+		return map;
+	},
+	{} as Record< string, string >
+);
 
 /**
  * This is a map of all SVG attributes that have colons.
  * Keys are lower-cased and stripped of their colons for more robust lookup.
  */
-const SVG_ATTRIBUTES_WITH_COLONS = [
+const SVG_ATTRIBUTES_WITH_COLONS: Record< string, string > = [
 	'xlink:actuate',
 	'xlink:arcrole',
 	'xlink:href',
@@ -459,19 +473,19 @@ const SVG_ATTRIBUTES_WITH_COLONS = [
 	'xml:lang',
 	'xml:space',
 	'xmlns:xlink',
-].reduce( ( map, attribute ) => {
-	map[ attribute.replace( ':', '' ).toLowerCase() ] = attribute;
-	return map;
-}, {} );
+].reduce(
+	( map, attribute ) => {
+		map[ attribute.replace( ':', '' ).toLowerCase() ] = attribute;
+		return map;
+	},
+	{} as Record< string, string >
+);
 
 /**
  * Returns the normal form of the element's attribute name for HTML.
- *
- * @param {string} attribute Non-normalized attribute name.
- *
- * @return {string} Normalized attribute name.
+ * @param attribute
  */
-function getNormalAttributeName( attribute ) {
+function getNormalAttributeName( attribute: string ): string {
 	switch ( attribute ) {
 		case 'htmlFor':
 			return 'for';
@@ -500,12 +514,9 @@ function getNormalAttributeName( attribute ) {
  * - Converts property names to kebab-case, e.g. 'backgroundColor' → 'background-color'
  * - Leaves custom attributes alone, e.g. '--myBackgroundColor' → '--myBackgroundColor'
  * - Converts vendor-prefixed property names to -kebab-case, e.g. 'MozTransform' → '-moz-transform'
- *
- * @param {string} property Property name.
- *
- * @return {string} Normalized property name.
+ * @param property
  */
-function getNormalStylePropertyName( property ) {
+function getNormalStylePropertyName( property: string ): string {
 	if ( property.startsWith( '--' ) ) {
 		return property;
 	}
@@ -520,13 +531,13 @@ function getNormalStylePropertyName( property ) {
 /**
  * Returns the normal form of the style property value for HTML. Appends a
  * default pixel unit if numeric, not a unitless property, and not zero.
- *
- * @param {string} property Property name.
- * @param {*}      value    Non-normalized property value.
- *
- * @return {*} Normalized property value.
+ * @param property
+ * @param value
  */
-function getNormalStylePropertyValue( property, value ) {
+function getNormalStylePropertyValue(
+	property: string,
+	value: any
+): string | number {
 	if (
 		typeof value === 'number' &&
 		0 !== value &&
@@ -541,14 +552,15 @@ function getNormalStylePropertyValue( property, value ) {
 
 /**
  * Serializes a React element to string.
- *
- * @param {import('react').ReactNode} element         Element to serialize.
- * @param {Object}                    [context]       Context object.
- * @param {Object}                    [legacyContext] Legacy context object.
- *
- * @return {string} Serialized element.
+ * @param element
+ * @param context
+ * @param legacyContext
  */
-export function renderElement( element, context, legacyContext = {} ) {
+export function renderElement(
+	element: React.ReactNode,
+	context?: any,
+	legacyContext: Record< string, any > = {}
+): string {
 	if ( null === element || undefined === element || false === element ) {
 		return '';
 	}
@@ -565,9 +577,10 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return element.toString();
 	}
 
-	const { type, props } = /** @type {{type?: any, props?: any}} */ (
-		element
-	);
+	const { type, props } = element as {
+		type?: any;
+		props?: any;
+	};
 
 	switch ( type ) {
 		case StrictMode:
@@ -575,7 +588,7 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return renderChildren( props.children, context, legacyContext );
 
 		case RawHTML:
-			const { children, ...wrapperProps } = props;
+			const { children, ...wrapperProps } = props as RawHTMLProps;
 
 			return renderNativeComponent(
 				! Object.keys( wrapperProps ).length ? null : 'div',
@@ -631,21 +644,17 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 /**
  * Serializes a native component type to string.
- *
- * @param {?string} type            Native component type to serialize, or null if
- *                                  rendering as fragment of children content.
- * @param {Object}  props           Props object.
- * @param {Object}  [context]       Context object.
- * @param {Object}  [legacyContext] Legacy context object.
- *
- * @return {string} Serialized element.
+ * @param type
+ * @param props
+ * @param context
+ * @param legacyContext
  */
 export function renderNativeComponent(
-	type,
-	props,
-	context,
-	legacyContext = {}
-) {
+	type: string | null,
+	props: HTMLProps,
+	context?: any,
+	legacyContext: Record< string, any > = {}
+): string {
 	let content = '';
 	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
 		// Textarea children can be assigned as value prop. If it is, render in
@@ -677,41 +686,23 @@ export function renderNativeComponent(
 	return '<' + type + attributes + '>' + content + '</' + type + '>';
 }
 
-/** @typedef {import('react').ComponentType} ComponentType */
-
 /**
  * Serializes a non-native component type to string.
- *
- * @param {ComponentType} Component       Component type to serialize.
- * @param {Object}        props           Props object.
- * @param {Object}        [context]       Context object.
- * @param {Object}        [legacyContext] Legacy context object.
- *
- * @return {string} Serialized element
+ * @param Component
+ * @param props
+ * @param context
+ * @param legacyContext
  */
 export function renderComponent(
-	Component,
-	props,
-	context,
-	legacyContext = {}
-) {
-	const instance = new /** @type {import('react').ComponentClass} */ (
-		Component
-	)( props, legacyContext );
+	Component: React.ComponentClass,
+	props: Record< string, any >,
+	context?: any,
+	legacyContext: Record< string, any > = {}
+): string {
+	const instance = new Component( props, legacyContext ) as ComponentInstance;
 
-	if (
-		typeof (
-			// Ignore reason: Current prettier reformats parens and mangles type assertion
-			// prettier-ignore
-			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext
-		) === 'function'
-	) {
-		Object.assign(
-			legacyContext,
-			/** @type {{getChildContext?: () => unknown}} */ (
-				instance
-			).getChildContext()
-		);
+	if ( typeof instance.getChildContext === 'function' ) {
+		Object.assign( legacyContext, instance.getChildContext() );
 	}
 
 	const html = renderElement( instance.render(), context, legacyContext );
@@ -721,20 +712,21 @@ export function renderComponent(
 
 /**
  * Serializes an array of children to string.
- *
- * @param {ReadonlyArray<import('react').ReactNode>} children        Children to serialize.
- * @param {Object}                                   [context]       Context object.
- * @param {Object}                                   [legacyContext] Legacy context object.
- *
- * @return {string} Serialized children.
+ * @param children
+ * @param context
+ * @param legacyContext
  */
-function renderChildren( children, context, legacyContext = {} ) {
+function renderChildren(
+	children: React.ReactNode,
+	context?: any,
+	legacyContext: Record< string, any > = {}
+): string {
 	let result = '';
 
-	children = Array.isArray( children ) ? children : [ children ];
+	const childrenArray = Array.isArray( children ) ? children : [ children ];
 
-	for ( let i = 0; i < children.length; i++ ) {
-		const child = children[ i ];
+	for ( let i = 0; i < childrenArray.length; i++ ) {
+		const child = childrenArray[ i ];
 
 		result += renderElement( child, context, legacyContext );
 	}
@@ -744,12 +736,9 @@ function renderChildren( children, context, legacyContext = {} ) {
 
 /**
  * Renders a props object as a string of HTML attributes.
- *
- * @param {Object} props Props object.
- *
- * @return {string} Attributes string.
+ * @param props
  */
-export function renderAttributes( props ) {
+export function renderAttributes( props: Record< string, any > ): string {
 	let result = '';
 
 	for ( const key in props ) {
@@ -807,21 +796,19 @@ export function renderAttributes( props ) {
 
 /**
  * Renders a style object as a string attribute value.
- *
- * @param {Object} style Style object.
- *
- * @return {string} Style attribute value.
+ * @param style
  */
-export function renderStyle( style ) {
+export function renderStyle( style: StyleObject | string ): string | undefined {
 	// Only generate from object, e.g. tolerate string value.
 	if ( ! isPlainObject( style ) ) {
-		return style;
+		return style as string;
 	}
 
-	let result;
+	let result: string | undefined;
 
-	for ( const property in style ) {
-		const value = style[ property ];
+	const styleObj = style as StyleObject;
+	for ( const property in styleObj ) {
+		const value = styleObj[ property ];
 		if ( null === value || undefined === value ) {
 			continue;
 		}

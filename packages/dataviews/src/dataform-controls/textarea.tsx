@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,25 +10,34 @@ import { useState } from '@wordpress/element';
 import type { DataFormControlProps } from '../types';
 import { unlock } from '../lock-unlock';
 
-const { ValidatedToggleControl } = unlock( privateApis );
+const { ValidatedTextareaControl } = unlock( privateApis );
 
-export default function Boolean< Item >( {
+export default function Textarea< Item >( {
+	data,
 	field,
 	onChange,
-	data,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label } = field;
+	const { id, label, placeholder, description } = field;
+	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
-				typeof ValidatedToggleControl
+				typeof ValidatedTextareaControl
 			>[ 'customValidity' ]
 		>( undefined );
 
+	const onChangeControl = useCallback(
+		( newValue: string ) =>
+			onChange( {
+				[ id ]: newValue,
+			} ),
+		[ id, onChange ]
+	);
+
 	return (
-		<ValidatedToggleControl
-			required={ !! field.isValid.required }
+		<ValidatedTextareaControl
+			required={ !! field.isValid?.required }
 			onValidate={ ( newValue: any ) => {
 				const message = field.isValid?.custom?.(
 					{
@@ -49,13 +58,14 @@ export default function Boolean< Item >( {
 				setCustomValidity( undefined );
 			} }
 			customValidity={ customValidity }
-			hidden={ hideLabelFromVision }
-			__nextHasNoMarginBottom
 			label={ label }
-			checked={ getValue( { item: data } ) }
-			onChange={ () =>
-				onChange( { [ id ]: ! getValue( { item: data } ) } )
-			}
+			placeholder={ placeholder }
+			value={ value ?? '' }
+			help={ description }
+			onChange={ onChangeControl }
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }

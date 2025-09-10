@@ -368,61 +368,57 @@ export const getEntityRecords =
 					meta
 				);
 
+				const targetHints = records
+					.filter(
+						( record ) =>
+							!! record?.[ key ] &&
+							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
+					)
+					.map( ( record ) => ( {
+						id: record[ key ],
+						permissions: getUserPermissionsFromAllowHeader(
+							record._links.self[ 0 ].targetHints.allow
+						),
+					} ) );
+
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const targetHint of targetHints ) {
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						canUserResolutionsArgs.push( [
+							action,
+							{ kind, name, id: targetHint.id },
+						] );
+
+						receiveUserPermissionArgs[
+							getUserPermissionCacheKey( action, {
+								kind,
+								name,
+								id: targetHint.id,
+							} )
+						] = targetHint.permissions[ action ];
+					}
+				}
+
+				if ( targetHints.length > 0 ) {
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				}
+
 				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
+				// the `getEntityRecord` selector in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
-				// See https://github.com/WordPress/gutenberg/pull/64504
-				// See https://github.com/WordPress/gutenberg/pull/70738
-				if ( ! query.context ) {
-					const targetHints = records
-						.filter(
-							( record ) =>
-								!! record?.[ key ] &&
-								!! record?._links?.self?.[ 0 ]?.targetHints
-									?.allow
-						)
-						.map( ( record ) => ( {
-							id: record[ key ],
-							permissions: getUserPermissionsFromAllowHeader(
-								record._links.self[ 0 ].targetHints.allow
-							),
-						} ) );
-
-					const canUserResolutionsArgs = [];
-					const receiveUserPermissionArgs = {};
-					for ( const targetHint of targetHints ) {
-						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-							canUserResolutionsArgs.push( [
-								action,
-								{ kind, name, id: targetHint.id },
-							] );
-
-							receiveUserPermissionArgs[
-								getUserPermissionCacheKey( action, {
-									kind,
-									name,
-									id: targetHint.id,
-								} )
-							] = targetHint.permissions[ action ];
-						}
-					}
-
-					if ( targetHints.length > 0 ) {
-						dispatch.receiveUserPermissions(
-							receiveUserPermissionArgs
-						);
-						dispatch.finishResolutions(
-							'canUser',
-							canUserResolutionsArgs
-						);
-					}
-
-					if ( ! query?._fields ) {
-						dispatch.finishResolutions(
-							'getEntityRecord',
-							getResolutionsArgs( records )
-						);
-					}
+				// Todo https://github.com/WordPress/gutenberg/issues/26629
+				if ( ! query?._fields && ! query.context ) {
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						getResolutionsArgs( records )
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );

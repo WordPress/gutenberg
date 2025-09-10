@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { privateApis } from '@wordpress/components';
+import {
+	Icon,
+	privateApis,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
 
 /**
@@ -10,14 +15,22 @@ import { useCallback, useState } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 
-const { ValidatedTextControl } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
 export type DataFormValidatedTextControlProps< Item > =
 	DataFormControlProps< Item > & {
 		/**
 		 * The input type of the control.
 		 */
-		type?: 'text' | 'email' | 'tel';
+		type?: 'text' | 'email' | 'tel' | 'url' | 'password';
+		/**
+		 * Optional icon to display as prefix.
+		 */
+		icon?: React.ComponentType | React.ReactElement;
+		/**
+		 * Optional icon to display as suffix.
+		 */
+		suffix?: React.ReactElement;
 	};
 
 export default function ValidatedText< Item >( {
@@ -26,13 +39,15 @@ export default function ValidatedText< Item >( {
 	onChange,
 	hideLabelFromVision,
 	type,
+	icon,
+	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
-				typeof ValidatedTextControl
+				typeof ValidatedInputControl
 			>[ 'customValidity' ]
 		>( undefined );
 
@@ -45,7 +60,7 @@ export default function ValidatedText< Item >( {
 	);
 
 	return (
-		<ValidatedTextControl
+		<ValidatedInputControl
 			required={ !! field.isValid?.required }
 			onValidate={ ( newValue: any ) => {
 				const message = field.isValid?.custom?.(
@@ -74,6 +89,21 @@ export default function ValidatedText< Item >( {
 			onChange={ onChangeControl }
 			hideLabelFromVision={ hideLabelFromVision }
 			type={ type }
+			prefix={
+				icon ? (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ icon } />
+					</InputControlPrefixWrapper>
+				) : undefined
+			}
+			suffix={
+				suffix ? (
+					<InputControlSuffixWrapper variant="control">
+						{ suffix }
+					</InputControlSuffixWrapper>
+				) : undefined
+			}
+			__next40pxDefaultSize
 		/>
 	);
 }
