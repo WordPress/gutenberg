@@ -44,6 +44,7 @@ function getDefaultValue( attribute ) {
 }
 
 function BlockAttributeToolsPanelItem( {
+	clientId,
 	attributeDefinition,
 	setValue,
 	value,
@@ -58,6 +59,7 @@ function BlockAttributeToolsPanelItem( {
 
 	return (
 		<ToolsPanelItem
+			panelId={ clientId }
 			label={ attributeDefinition.control.label }
 			hasValue={ () => value !== defaultValue }
 			onDeselect={ () => setValue( defaultValue ) }
