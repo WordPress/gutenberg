@@ -149,8 +149,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 					getBlockName,
 					getBlockAttributes,
 					getBlockEditingMode,
-				} = select( blockEditorStore );
-				const { isSectionBlock } = unlock( select( blockEditorStore ) );
+					isSectionBlock,
+				} = unlock( select( blockEditorStore ) );
 
 				const name = blockClientId && getBlockName( blockClientId );
 
