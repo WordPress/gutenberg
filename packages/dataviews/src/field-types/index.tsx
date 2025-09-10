@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +13,7 @@ import type {
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
+	Option,
 } from '../types';
 import { default as email } from './email';
 import { default as integer } from './integer';
@@ -23,6 +25,28 @@ import { default as media } from './media';
 import { default as array } from './array';
 import { renderFromElements } from '../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+
+export function useFieldElements( Field: NormalizedField< any > ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ elements, setElements ] = useState< Option[] >(
+		Field.elements || []
+	);
+
+	useEffect( () => {
+		if ( typeof Field.elementsLoader === 'function' ) {
+			setIsLoading( true );
+			Field.elementsLoader()
+				.then( ( resolvedElements ) => {
+					setElements( resolvedElements );
+				} )
+				.finally( () => {
+					setIsLoading( false );
+				} );
+		}
+	}, [ Field.elementsLoader ] );
+
+	return { isLoading, elements };
+}
 
 /**
  *
