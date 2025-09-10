@@ -237,9 +237,12 @@ function MetaBoxesMain( { isLegacy } ) {
 	// preferred height when resizable.
 	useEffect( () => {
 		const fresh = getRenderValues();
-		const usedOpenHeight = isShort ? 'auto' : fresh.openHeight;
-		const usedHeight = fresh.isOpen ? usedOpenHeight : fresh.min;
-		applyHeight( usedHeight, false, true );
+		// Tests for `min` having a value to skip the first render.
+		if ( fresh.min !== undefined && metaBoxesMainRef.current ) {
+			const usedOpenHeight = isShort ? 'auto' : fresh.openHeight;
+			const usedHeight = fresh.isOpen ? usedOpenHeight : fresh.min;
+			applyHeight( usedHeight, false, true );
+		}
 	}, [ isShort ] );
 
 	if ( ! hasAnyVisible ) {
@@ -297,47 +300,45 @@ function MetaBoxesMain( { isLegacy } ) {
 	const paneLabel = __( 'Meta Boxes' );
 
 	const resizeHandle = (
-		<>
-			<button
-				aria-expanded={ isOpen }
-				onKeyDown={ onSeparatorKeyDown }
-				onClick={ ( { detail } ) => {
-					const { isToggleInferred } = resizeDataRef.current;
-					if ( isShort || ! detail || isToggleInferred ) {
-						persistIsOpen();
-						const usedOpenHeight = isShort ? 'auto' : openHeight;
-						const usedHeight = isOpen ? min : usedOpenHeight;
-						applyHeight( usedHeight, false, true );
-					}
-				} }
-				// Prevents resizing in short viewports.
-				{ ...( isShort && {
-					onMouseDown: ( event ) => event.stopPropagation(),
-					onTouchStart: ( event ) => event.stopPropagation(),
-				} ) }
-			>
-				{ paneLabel }
-				{ ! isShort && (
-					<>
-						<Tooltip text={ __( 'Drag to resize' ) }>
-							<div // eslint-disable-line jsx-a11y/role-supports-aria-props
-								ref={ separatorRef }
-								role="separator"
-								aria-valuenow={ usedAriaValueNow }
-								aria-label={ __( 'Drag to resize' ) }
-								aria-describedby={ separatorHelpId }
-							/>
-						</Tooltip>
-						<VisuallyHidden id={ separatorHelpId }>
-							{ __(
-								'Use up and down arrow keys to resize the meta box panel.'
-							) }
-						</VisuallyHidden>
-					</>
-				) }
-				<Icon icon={ isOpen ? chevronUp : chevronDown } />
-			</button>
-		</>
+		<button
+			aria-expanded={ isOpen }
+			onKeyDown={ onSeparatorKeyDown }
+			onClick={ ( { detail } ) => {
+				const { isToggleInferred } = resizeDataRef.current;
+				if ( isShort || ! detail || isToggleInferred ) {
+					persistIsOpen();
+					const usedOpenHeight = isShort ? 'auto' : openHeight;
+					const usedHeight = isOpen ? min : usedOpenHeight;
+					applyHeight( usedHeight, false, true );
+				}
+			} }
+			// Prevents resizing in short viewports.
+			{ ...( isShort && {
+				onMouseDown: ( event ) => event.stopPropagation(),
+				onTouchStart: ( event ) => event.stopPropagation(),
+			} ) }
+		>
+			{ paneLabel }
+			{ ! isShort && (
+				<>
+					<Tooltip text={ __( 'Drag to resize' ) }>
+						<div // eslint-disable-line jsx-a11y/role-supports-aria-props
+							ref={ separatorRef }
+							role="separator"
+							aria-valuenow={ usedAriaValueNow }
+							aria-label={ __( 'Drag to resize' ) }
+							aria-describedby={ separatorHelpId }
+						/>
+					</Tooltip>
+					<VisuallyHidden id={ separatorHelpId }>
+						{ __(
+							'Use up and down arrow keys to resize the meta box panel.'
+						) }
+					</VisuallyHidden>
+				</>
+			) }
+			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+		</button>
 	);
 
 	const paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
@@ -365,8 +366,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		// the event to end the drag is captured by the target (resize handle)
 		// whether or not it’s under the pointer.
 		onPointerDown: ( { pointerId, target } ) => {
-			const paneResizeHandle = separatorRef.current.parentElement;
-			if ( ! isShort && paneResizeHandle.contains( target ) ) {
+			if ( separatorRef.current?.parentElement.contains( target ) ) {
 				target.setPointerCapture( pointerId );
 			}
 		},
