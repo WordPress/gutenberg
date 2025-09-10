@@ -10,6 +10,7 @@ import {
 	Flex,
 	FlexBlock,
 	FlexItem,
+	__experimentalView as View,
 } from '@wordpress/components';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
@@ -52,27 +53,34 @@ function SingleContentAttributeControl( {
 
 	// Create form configuration
 	const form = {
-		layout: { type: 'regular' },
+		layout: {
+			type: 'regular',
+			labelPosition: 'none',
+		},
 		fields: [ attr.name ],
 	};
 
 	return (
-		<div>
-			<Flex style={ { marginBottom: '8px' } }>
-				<FlexItem>
-					<BlockIcon icon={ blockIcon } />
-				</FlexItem>
-				<FlexItem>
-					{ blockInformation?.name || blockInformation?.title }
-				</FlexItem>
-			</Flex>
-			<DataForm
-				data={ data }
-				fields={ fields }
-				form={ form }
-				onChange={ handleChange }
-			/>
-		</div>
+		<VStack spacing={ 1 }>
+			<View>
+				<Flex justify="flex-start">
+					<FlexItem>
+						<BlockIcon icon={ blockIcon } />
+					</FlexItem>
+					<FlexItem>
+						{ blockInformation?.name || blockInformation?.title }
+					</FlexItem>
+				</Flex>
+			</View>
+			<View>
+				<DataForm
+					data={ data }
+					fields={ fields }
+					form={ form }
+					onChange={ handleChange }
+				/>
+			</View>
+		</VStack>
 	);
 }
 
@@ -146,7 +154,9 @@ function BlockContentAttributesView( { clientId } ) {
 					blockInformation
 				) }
 				form={ {
-					layout: { type: 'regular' },
+					layout: {
+						type: 'regular',
+					},
 					fields: contentAttributes.map( ( attr ) => attr.name ),
 				} }
 				onChange={ ( edits ) => {
@@ -162,7 +172,7 @@ function BlockContentAttributesView( { clientId } ) {
 }
 
 // Create DataForm fields from content attributes
-function createDataFormFields( contentAttributes, blockInformation ) {
+function createDataFormFields( contentAttributes ) {
 	return contentAttributes.map( ( attr ) => {
 		const isUrlAttribute =
 			attr.definition.type === 'string' &&
@@ -195,8 +205,7 @@ function createDataFormFields( contentAttributes, blockInformation ) {
 		return {
 			id: attr.name,
 			type: fieldType,
-			label:
-				attr.name || blockInformation?.name || blockInformation?.title,
+			label: attr.name,
 		};
 	} );
 }
