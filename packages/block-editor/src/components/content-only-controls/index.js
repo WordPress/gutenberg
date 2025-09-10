@@ -5,6 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalHStack as HStack,
 	TextControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -14,7 +15,9 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 function RichTextControl( { label, value, setValue } ) {
 	return (
@@ -121,6 +124,7 @@ function BlockControls( { clientId } ) {
 		clientId,
 		context: 'list-view',
 	} );
+	const blockInformation = useBlockDisplayInformation( clientId );
 
 	if ( ! contentAttributesWithControls?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no controls.
@@ -130,7 +134,12 @@ function BlockControls( { clientId } ) {
 
 	return (
 		<ToolsPanel
-			label={ blockTitle }
+			label={
+				<HStack spacing={ 1 }>
+					<BlockIcon icon={ blockInformation?.icon } />
+					<div>{ blockTitle }</div>
+				</HStack>
+			}
 			panelId={ clientId }
 			resetAll={ () => {
 				updateBlockAttributes(
