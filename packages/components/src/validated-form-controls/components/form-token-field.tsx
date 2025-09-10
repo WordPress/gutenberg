@@ -13,21 +13,18 @@ import type { FormTokenFieldProps } from '../../form-token-field/types';
 
 type Value = FormTokenFieldProps[ 'value' ];
 
-const UnforwardedValidatedFormTokenField = (
-	{
-		required,
-		onValidate,
-		customValidity,
-		onChange,
-		markWhenOptional,
-		...restProps
-	}: Omit<
-		React.ComponentProps< typeof FormTokenField >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps< FormTokenFieldProps[ 'value' ] >,
-	forwardedRef: React.ForwardedRef< HTMLInputElement >
-) => {
+const UnforwardedValidatedFormTokenField = ( {
+	required,
+	onValidate,
+	customValidity,
+	onChange,
+	markWhenOptional,
+	...restProps
+}: Omit<
+	React.ComponentProps< typeof FormTokenField >,
+	'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+> &
+	ValidatedControlProps< FormTokenFieldProps[ 'value' ] > ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const valueRef = useRef< Value >( restProps.value );
 
@@ -45,7 +42,6 @@ const UnforwardedValidatedFormTokenField = (
 				<FormTokenField
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
-					ref={ forwardedRef }
 					{ ...restProps }
 					onChange={ ( value, ...args ) => {
 						valueRef.current = value;
