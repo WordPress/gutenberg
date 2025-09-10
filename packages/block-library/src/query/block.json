@@ -40,6 +40,10 @@
 		"enhancedPagination": {
 			"type": "boolean",
 			"default": false
+		},
+		"matchAllTerms": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "templateSlug" ],
@@ -47,7 +51,8 @@
 		"queryId": "queryId",
 		"query": "query",
 		"displayLayout": "displayLayout",
-		"enhancedPagination": "enhancedPagination"
+		"enhancedPagination": "enhancedPagination",
+		"matchAllTerms": "matchAllTerms"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

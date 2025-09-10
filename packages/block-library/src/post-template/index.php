@@ -68,8 +68,19 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 			$query = $wp_query;
 		}
 	} else {
-		$query_args = build_query_vars_from_query_block( $block, $page );
-		$query      = new WP_Query( $query_args );
+		$query_args      = build_query_vars_from_query_block( $block, $page );
+		$match_all_terms = ! empty( $block->context['matchAllTerms'] );
+
+		if ( $match_all_terms && ! empty( $query_args['tax_query'] ) && is_array( $query_args['tax_query'] ) ) {
+			foreach ( $query_args['tax_query'] as &$tax_query_part ) {
+				if ( isset( $tax_query_part['taxonomy'] ) ) {
+					$tax_query_part['operator'] = 'AND';
+				}
+			}
+			unset( $tax_query_part );
+		}
+
+		$query = new WP_Query( $query_args );
 	}
 
 	if ( ! $query->have_posts() ) {

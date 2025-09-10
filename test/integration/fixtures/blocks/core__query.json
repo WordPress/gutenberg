@@ -20,7 +20,8 @@
 				"format": []
 			},
 			"tagName": "div",
-			"enhancedPagination": false
+			"enhancedPagination": false,
+			"matchAllTerms": false
 		},
 		"innerBlocks": []
 	}

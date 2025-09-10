@@ -100,13 +100,14 @@ export default function PostTemplateEdit( {
 		} = {},
 		templateSlug,
 		previewPostType,
+		matchAllTerms,
 	},
 	attributes: { layout },
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-	const { posts, blocks } = useSelect(
+	const { fetchedPosts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
@@ -217,7 +218,7 @@ export default function PostTemplateEdit( {
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || currentPostType;
 			return {
-				posts: getEntityRecords( 'postType', usedPostType, {
+				fetchedPosts: getEntityRecords( 'postType', usedPostType, {
 					...query,
 					...restQueryArgs,
 				} ),
@@ -244,6 +245,41 @@ export default function PostTemplateEdit( {
 			previewPostType,
 		]
 	);
+
+	// Filtered list of posts that match all selected taxonomy terms,
+	// applied only when matchAllTerms is enabled.
+	const posts = useMemo( () => {
+		if (
+			! matchAllTerms ||
+			! Array.isArray( fetchedPosts ) ||
+			fetchedPosts.length === 0 ||
+			! taxQuery ||
+			Object.keys( taxQuery ).length === 0
+		) {
+			return fetchedPosts;
+		}
+
+		// Map taxonomy slugs to post field names.
+		// Needed for core taxonomies (categories/tags).
+		const taxonomyToPostKey = {
+			category: 'categories',
+			post_tag: 'tags',
+		};
+
+		return fetchedPosts.filter( ( post ) => {
+			return Object.entries( taxQuery ).every(
+				( [ taxonomySlug, requiredTermIds ] ) => {
+					const postKey =
+						taxonomyToPostKey[ taxonomySlug ] || taxonomySlug;
+					const postTerms = post[ postKey ] || [];
+					return requiredTermIds.every( ( termId ) =>
+						postTerms.includes( termId )
+					);
+				}
+			);
+		} );
+	}, [ fetchedPosts, matchAllTerms, taxQuery ] );
+
 	const blockContexts = useMemo(
 		() =>
 			posts?.map( ( post ) => ( {
