@@ -128,7 +128,7 @@ function BlockContentAttributesView( { clientId } ) {
 		<VStack spacing={ 2 }>
 			<Flex>
 				<FlexItem>
-					<Navigator.BackButton>
+					<Navigator.BackButton style={ { paddingLeft: 0 } }>
 						<Icon icon={ chevronLeft } />
 					</Navigator.BackButton>
 				</FlexItem>
