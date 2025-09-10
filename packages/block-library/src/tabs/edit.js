@@ -17,9 +17,8 @@ import {
  * Internal dependencies
  */
 import { TabFill } from '../tab/slotfill';
-import useColorSupports from './use-color-supports';
+import StyleEngine from './style-engine';
 import Controls from './controls';
-import GapStyles from './gap-styles';
 
 const TABS_TEMPLATE = [
 	[ 'core/tab', { label: 'Tab 1', anchor: 'tab-1' } ],
@@ -49,13 +48,6 @@ function Edit( {
 	setTabHoverTextColor,
 } ) {
 	const { style, orientation } = attributes;
-	const tabsListBlockSpacing = style?.spacing?.blockGap || null;
-
-	/**
-	 * Provide additional non-core color supports for tab background and text colors.
-	 * TODO: Talk to Gutenberg team about how to add these into the style engine proper, so that defaults can be set in the style book??
-	 */
-	const additionalColorSupportingStyles = useColorSupports( attributes );
 
 	/**
 	 * Block props for the tabs container.
@@ -66,12 +58,11 @@ function Edit( {
 		),
 		style: {
 			...style,
-			...additionalColorSupportingStyles,
 		},
 	} );
 
 	/**
-	 * Innerblocks props for the tabs content.
+	 * Innerblocks props for the tabs list.
 	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
@@ -85,36 +76,32 @@ function Edit( {
 
 	return (
 		<>
-			<Controls
-				{ ...{
-					clientId,
-					attributes,
-					setAttributes,
-					tabInactiveColor,
-					setTabInactiveColor,
-					tabHoverColor,
-					setTabHoverColor,
-					tabActiveColor,
-					setTabActiveColor,
-					tabTextColor,
-					setTabTextColor,
-					tabActiveTextColor,
-					setTabActiveTextColor,
-					tabHoverTextColor,
-					setTabHoverTextColor,
-				} }
-			/>
 			<div { ...innerBlockProps }>
 				{ innerBlockProps.children }
 				<TabFill tabsClientId={ clientId }>
-					<li className="wp-block-tabs__tab-item__inserter">
+					<div className="wp-block-tabs__tab-item__inserter">
 						<InnerBlocks.ButtonBlockAppender />
-					</li>
+					</div>
 				</TabFill>
-				<GapStyles
-					blockGap={ tabsListBlockSpacing }
-					clientId={ clientId }
-					orientation={ orientation }
+				<StyleEngine attributes={ attributes } clientId={ clientId } />
+				<Controls
+					{ ...{
+						clientId,
+						attributes,
+						setAttributes,
+						tabInactiveColor,
+						setTabInactiveColor,
+						tabHoverColor,
+						setTabHoverColor,
+						tabActiveColor,
+						setTabActiveColor,
+						tabTextColor,
+						setTabTextColor,
+						tabActiveTextColor,
+						setTabActiveTextColor,
+						tabHoverTextColor,
+						setTabHoverTextColor,
+					} }
 				/>
 			</div>
 		</>

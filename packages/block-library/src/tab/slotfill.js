@@ -21,7 +21,7 @@ export const TabsListSlot = ( { tabsClientId } ) => {
 		<Slot
 			name={ `TabsList-${ tabsClientId }` }
 			bubblesVirtually
-			as="ul"
+			as="div"
 			role="tablist"
 			className="tabs__list"
 		/>

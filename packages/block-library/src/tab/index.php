@@ -1,47 +1,41 @@
 <?php
 /**
- * Server-side rendering of the `core/tab` block.
+ * Tabs Block
  *
  * @package WordPress
  */
 
 /**
- * Returns typography classnames depending on whether there are named font sizes/families.
+ * Build typography classnames from named size/family.
  *
- * @since 9.22.0
- *
- * @param array $attributes The block attributes.
- * @return string The typography color classnames to be applied to the block elements.
+ * @param array $attributes Block attributes.
+ * @return string Classnames.
  */
-function block_core_tab_get_typography_classes( $attributes ) {
+function block_core_tab_get_typography_classes( array $attributes ): string {
 	$typography_classes    = array();
 	$has_named_font_family = ! empty( $attributes['fontFamily'] );
 	$has_named_font_size   = ! empty( $attributes['fontSize'] );
 
 	if ( $has_named_font_size ) {
-		$typography_classes[] = sprintf( 'has-%s-font-size', esc_attr( $attributes['fontSize'] ) );
+		$typography_classes[] = sprintf( 'has-%s-font-size', esc_attr( (string) $attributes['fontSize'] ) );
 	}
 
 	if ( $has_named_font_family ) {
-		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( $attributes['fontFamily'] ) );
+		$typography_classes[] = sprintf( 'has-%s-font-family', esc_attr( (string) $attributes['fontFamily'] ) );
 	}
 
 	return implode( ' ', $typography_classes );
 }
 
 /**
- * Returns typography styles to be included in an HTML style tag.
- * This excludes text-decoration, which is applied only to the label and button elements of the search block.
+ * Build inline typography styles.
  *
- * @since 9.22.0
- *
- * @param array $attributes The block attributes.
- * @return string A string of typography CSS declarations.
+ * @param array $attributes Block attributes.
+ * @return string Inline CSS.
  */
-function block_core_tab_get_typography_styles( $attributes ) {
+function block_core_tab_get_typography_styles( array $attributes ): string {
 	$typography_styles = array();
 
-	// Add typography styles.
 	if ( ! empty( $attributes['style']['typography']['fontSize'] ) ) {
 		$typography_styles[] = sprintf(
 			'font-size: %s;',
@@ -61,51 +55,75 @@ function block_core_tab_get_typography_styles( $attributes ) {
 }
 
 /**
- * Render the core/tab block.
- * This function adds Interactivity API directives to the tabpanel.
+ * Render callback for core/tab.
  *
- * @since 9.22.0
+ * @param array     $attributes Block attributes.
+ * @param string    $content    Block content.
+ * @param \WP_Block $block The block.
  *
- * @param array  $attributes Block attributes.
- * @param string $content    Block content.
- * @return string
+ * @return string Updated HTML.
  */
-function render_block_core_tab( $attributes, $content ) {
+function block_core_tab_render( array $attributes, string $content, \WP_Block $block ): string {
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) );
+	$tab_id = (string) $tag_processor->get_attribute( 'id' );
 
-	$tab_id = $tag_processor->get_attribute( 'id' );
+	/**
+	 * Add interactivity to the tab element.
+	 */
+	$tag_processor->set_attribute(
+		'data-wp-interactive',
+		'core/tabs'
+	);
+	$tag_processor->set_attribute(
+		'data-wp-context',
+		wp_json_encode(
+			array(
+				'tab' => array(
+					'id' => $tab_id,
+				),
+			)
+		)
+	);
 
-	$classname  = $tag_processor->get_attribute( 'class' );
+	/**
+	 * Process style classnames.
+	 */
+	$classname  = (string) $tag_processor->get_attribute( 'class' );
 	$classname .= ' ' . block_core_tab_get_typography_classes( $attributes );
 	$tag_processor->set_attribute( 'class', $classname );
 
+	/**
+	 * Process accessibility and interactivity attributes.
+	 */
 	$tag_processor->set_attribute( 'role', 'tabpanel' );
-	$tag_processor->set_attribute( 'aria-labelledby', 'tab-' . $tab_id );
+	$tag_processor->set_attribute( 'aria-labelledby', 'tab__' . $tab_id );
 	$tag_processor->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
 	$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
 
-	$style  = $tag_processor->get_attribute( 'style' );
+	/**
+	 * Process style attribute.
+	 */
+	$style  = (string) $tag_processor->get_attribute( 'style' );
 	$style .= block_core_tab_get_typography_styles( $attributes );
 	$tag_processor->set_attribute( 'style', $style );
 
-	$content = $tag_processor->get_updated_html();
-
-	return $content;
+	return (string) $tag_processor->get_updated_html();
 }
 
 /**
  * Registers the `core/tab` block on the server.
  *
- * @since 9.22.0
+ * @hook init
+ *
+ * @since 6.8.0
  */
 function register_block_core_tab() {
 	register_block_type_from_metadata(
 		__DIR__ . '/tab',
 		array(
-			'render_callback' => 'render_block_core_tab',
+			'render_callback' => 'block_core_tab_render',
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_tab' );

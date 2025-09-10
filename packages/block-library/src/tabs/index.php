@@ -1,31 +1,25 @@
 <?php
 /**
- * Server-side rendering of the `core/tabs` block.
+ * Tabs Block
  *
  * @package WordPress
  */
 
 /**
- * Constructs a string of CSS color variables for the tabs block.
- * - customTabBackgroundColor - The background color of the tabs.
- * - customTabHoverColor - The hover background color of the tabs.
- * - customTabActiveColor - The active background color of the tabs.
- * - customTabTextColor - The text color of the tabs.
- * - customTabHoverTextColor - The hover text color of the tabs.
- * - customTabActiveTextColor - The active text color of the tabs.
- *
- * @since 9.22.0
+ * Build inline CSS custom properties for color settings.
  *
  * @param array $attributes Block attributes.
- * @return string A string of CSS variables.
+ * @param bool  $is_vertical Whether the tabs are vertical.
+ *
+ * @return string Inline CSS string.
  */
-function block_core_tabs_generate_color_styles( $attributes ) {
-	$tab_inactive = array_key_exists( 'customTabInactiveColor', $attributes ) ? $attributes['customTabInactiveColor'] : '';
-	$tab_hover    = array_key_exists( 'customTabHoverColor', $attributes ) ? $attributes['customTabHoverColor'] : '';
-	$tab_active   = array_key_exists( 'customTabActiveColor', $attributes ) ? $attributes['customTabActiveColor'] : '';
-	$tab_text     = array_key_exists( 'customTabTextColor', $attributes ) ? $attributes['customTabTextColor'] : '';
-	$hover_text   = array_key_exists( 'customTabHoverTextColor', $attributes ) ? $attributes['customTabHoverTextColor'] : '';
-	$active_text  = array_key_exists( 'customTabActiveTextColor', $attributes ) ? $attributes['customTabActiveTextColor'] : '';
+function block_core_tabs_generate_color_styles( array $attributes, bool $is_vertical ): string {
+	$tab_inactive = $attributes['customTabInactiveColor'] ?? '';
+	$tab_hover    = $attributes['customTabHoverColor'] ?? '';
+	$tab_active   = $attributes['customTabActiveColor'] ?? '';
+	$tab_text     = $attributes['customTabTextColor'] ?? '';
+	$hover_text   = $attributes['customTabHoverTextColor'] ?? '';
+	$active_text  = $attributes['customTabActiveTextColor'] ?? '';
 
 	$styles = array(
 		'--custom-tab-inactive-color'    => $tab_inactive,
@@ -37,91 +31,99 @@ function block_core_tabs_generate_color_styles( $attributes ) {
 	);
 
 	$style_string = array_map(
-		function ( $key, $value ) {
+		static function ( string $key, string $value ): string {
 			return ! empty( $value ) ? $key . ': ' . $value . ';' : '';
 		},
 		array_keys( $styles ),
 		$styles
 	);
-	$style_string = implode( ' ', array_filter( $style_string ) );
 
-	return $style_string;
+	return implode( ' ', array_filter( $style_string ) );
 }
 
 /**
- * Generates a string of CSS block gap variables for the tabs block.
- *
- * @since 9.22.0
+ * Build inline CSS custom properties for gap settings.
  *
  * @param array $attributes Block attributes.
- * @return string A string of CSS variables.
+ * @param bool  $is_vertical Whether the tabs are vertical.
+ *
+ * @return string Inline CSS string.
  */
-function block_core_tabs_generate_gap_styles( $attributes ) {
-	if ( ! array_key_exists( 'style', $attributes ) || ! is_array( $attributes['style'] ) ) {
+function block_core_tabs_generate_gap_styles( array $attributes, bool $is_vertical ): string {
+	if ( empty( $attributes['style'] ) || ! is_array( $attributes['style'] ) ) {
 		return '--wp--style--tabs-gap-default: 0.5em;';
 	}
-	// Check that 'spacing' exists and it's an array.
-	if ( ! array_key_exists( 'spacing', $attributes['style'] ) || ! is_array( $attributes['style']['spacing'] ) ) {
+	if ( empty( $attributes['style']['spacing'] ) || ! is_array( $attributes['style']['spacing'] ) ) {
 		return '--wp--style--tabs-gap-default: 0.5em;';
 	}
 	if ( ! array_key_exists( 'blockGap', $attributes['style']['spacing'] ) ) {
 		return '--wp--style--tabs-gap-default: 0.5em;';
 	}
 
-	$orientation = array_key_exists( 'orientation', $attributes ) ? $attributes['orientation'] : 'horizontal';
-
 	$block_gap = $attributes['style']['spacing']['blockGap'];
 
-	// Check if block_gap is an array and has both left and top values, if not, return the default value.
-	if ( is_array( $block_gap ) && array_key_exists( 'left', $block_gap ) && array_key_exists( 'top', $block_gap ) ) {
-		$block_gap_horizontal = $block_gap['left'];
-		$block_gap_vertical   = $block_gap['top'];
-	} else {
+	if ( is_array( $block_gap ) ) {
+		if ( array_key_exists( 'left', $block_gap ) && array_key_exists( 'top', $block_gap ) ) {
+			$block_gap_horizontal = $block_gap['left'];
+			$block_gap_vertical   = $block_gap['top'];
+		} elseif ( array_key_exists( 'left', $block_gap ) ) {
+			$block_gap_horizontal = $block_gap['left'];
+			$block_gap_vertical   = '0.5em';
+		} elseif ( array_key_exists( 'top', $block_gap ) ) {
+			$block_gap_horizontal = '0.5em';
+			$block_gap_vertical   = $block_gap['top'];
+		} else {
+			return '--wp--style--tabs-gap-default: 0.5em;';
+		}
+	} elseif ( is_string( $block_gap ) ) {
 		return '--wp--style--tabs-gap-default: 0.5em;';
 	}
 
-	if ( 'vertical' === $orientation ) {
-		$block_gap_horizontal = $block_gap['top'];
-		$block_gap_vertical   = $block_gap['left'];
+	$block_gap_horizontal = preg_match( '/^var:preset\|spacing\|\d+$/', (string) $block_gap_horizontal )
+		? 'var(--wp--preset--spacing--' . substr( (string) $block_gap_horizontal, strrpos( (string) $block_gap_horizontal, '|' ) + 1 ) . ')'
+		: (string) $block_gap_horizontal;
+
+	$block_gap_vertical = preg_match( '/^var:preset\|spacing\|\d+$/', (string) $block_gap_vertical )
+		? 'var(--wp--preset--spacing--' . substr( (string) $block_gap_vertical, strrpos( (string) $block_gap_vertical, '|' ) + 1 ) . ')'
+		: (string) $block_gap_vertical;
+
+	$list_gap  = $block_gap_horizontal;
+	$block_gap = $block_gap_vertical;
+
+	if ( $is_vertical ) {
+		$list_gap  = $block_gap_vertical;
+		$block_gap = $block_gap_horizontal;
 	}
 
-	$block_gap_horizontal = preg_match( '/^var:preset\|spacing\|\d+$/', $block_gap_horizontal )
-		? 'var(--wp--preset--spacing--' . substr( $block_gap_horizontal, strrpos( $block_gap_horizontal, '|' ) + 1 ) . ')'
-		: $block_gap_horizontal;
-	$block_gap_vertical   = preg_match( '/^var:preset\|spacing\|\d+$/', $block_gap_vertical )
-		? 'var(--wp--preset--spacing--' . substr( $block_gap_vertical, strrpos( $block_gap_vertical, '|' ) + 1 ) . ')'
-		: $block_gap_vertical;
-
 	return wp_sprintf(
-		'--wp--style--unstable-tabs-list-gap: %s;--wp--style--unstable-tabs-gap: %s;',
-		$block_gap_horizontal,
-		$block_gap_vertical
+		'--wp--style--unstable-tabs-list-gap: %s; --wp--style--unstable-tabs-gap: %s;',
+		$list_gap,
+		$block_gap
 	);
 }
 
 /**
- * Generates a usable list of tab attributes from the innerblocks of core/tabs.
+ * Extract tabs list from inner blocks for hydration.
  *
- * @since 9.22.0
+ * @param array $innerblocks Parsed inner blocks.
  *
- * @param array $innerblocks The innerblocks of the tabs block.
- * @return array The list of tabs.
+ * @return array List of tabs with id, label, index.
  */
-function block_core_tabs_generate_tabs_list_from_innerblocks( $innerblocks = array() ) {
+function block_core_tabs_generate_tabs_list_from_innerblocks( array $innerblocks = array() ): array {
 	$tab_index = 0;
-	$tabs_list = array_map(
-		function ( $tab ) use ( &$tab_index ) {
-			$attrs = $tab['attrs'];
 
-			$tag_processor = new WP_HTML_Tag_Processor( $tab['innerHTML'] );
+	return array_map(
+		static function ( array $tab ) use ( &$tab_index ): array {
+			$attrs = $tab['attrs'] ?? array();
+
+			$tag_processor = new WP_HTML_Tag_Processor( $tab['innerHTML'] ?? '' );
 			$tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) );
 
 			$tab_id    = $tag_processor->get_attribute( 'id' );
-			$tab_label = array_key_exists( 'label', $attrs ) ? $attrs['label'] : '';
+			$tab_label = $attrs['label'] ?? '';
 
 			$attrs['id']    = $tab_id;
-			$attrs['label'] = esc_html( $tab_label );
-			$attrs['index'] = $tab_index;
+			$attrs['label'] = esc_html( (string) $tab_label );
 
 			$tab_index++;
 
@@ -129,84 +131,102 @@ function block_core_tabs_generate_tabs_list_from_innerblocks( $innerblocks = arr
 		},
 		$innerblocks
 	);
-	return $tabs_list;
 }
 
 /**
- * Render the block
+ * Render callback for core/tabs.
  *
- * @since 9.22.0
+ * @param array     $attributes Block attributes.
+ * @param string    $content    Block content.
+ * @param \WP_Block $block      WP_Block instance.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content Block content.
- * @param WP_Block $block WP_Block object.
- * @return string
+ * @return string Updated HTML.
  */
-function render_block_core_tabs( $attributes, $content, $block ) {
+function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
 	wp_enqueue_script_module( '@wordpress/block-library/tabs/view' );
-	// Get the starting active tab index.
-	$active_tab_index = $attributes['activeTabIndex'];
 
-	// Construct an array of the innerblocks as tabs_list.
-	// We use innerblocks instead of parsing each .wp-block-tab because it scopes
-	// the tab_index to just this instance of the tabs block. This allows
-	// inner tabs to have unique tabs_list indexes, even if they're nested.
-	$tabs_list = block_core_tabs_generate_tabs_list_from_innerblocks( $block->parsed_block['innerBlocks'] );
+	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
 
-	// Generate the color styles and gap styles.
-	$color_styles = block_core_tabs_generate_color_styles( $attributes );
-	$gap_styles   = block_core_tabs_generate_gap_styles( $attributes );
+	$tabs_list = block_core_tabs_generate_tabs_list_from_innerblocks( $block->parsed_block['innerBlocks'] ?? array() );
 
-	// Modify the wrapper and setup initial interactivity directives and context.
+	$tabs_id = wp_unique_id( 'tabs_' );
+
+	/**
+	 * Builds a client side state for just this tabs instance.
+	 * This allows 3rd party extensibility of tabs while retaining
+	 * client side state management per core/tabs instance, like context.
+	 */
+	wp_interactivity_state(
+		'core/tabs',
+		array(
+			$tabs_id => $tabs_list,
+		)
+	);
+
+	$is_vertical = 'vertical' === ( $attributes['orientation'] ?? 'horizontal' );
+
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
-	$tag_processor->add_class( 'vertical' === $attributes['orientation'] ? 'is-vertical' : 'is-horizontal' );
+	$tag_processor->add_class( $is_vertical ? 'is-vertical' : 'is-horizontal' );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs' );
 	$tag_processor->set_attribute(
 		'data-wp-context',
 		wp_json_encode(
 			array(
+				'tabsId'         => $tabs_id,
 				'activeTabIndex' => $active_tab_index,
-				'tabsList'       => $tabs_list,
+				'isVertical'     => $is_vertical,
 			)
 		)
 	);
 	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.onTabsInit' );
 	$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
-	// Get the current hardcoded styles.
-	$style = $tag_processor->get_attribute( 'style' );
-	// Add the color styles and gap styles to the existing styles.
-	$style .= $color_styles;
-	$style .= $gap_styles;
-	// Set the updated styles.
+
+	/**
+	 * Process style attribute.
+	 */
+	$style  = (string) $tag_processor->get_attribute( 'style' );
+	$style .= block_core_tabs_generate_color_styles( $attributes, $is_vertical );
+	$style .= block_core_tabs_generate_gap_styles( $attributes, $is_vertical );
 	$tag_processor->set_attribute( 'style', $style );
 
 	$updated_content = $tag_processor->get_updated_html();
 
-	$tabs_list = array_map(
-		function ( $tab ) {
+	/**
+	 * Build the tabs list markup.
+	 * We're doing this manually instead of using <template/> to make it possible
+	 * for other blocks to exten the tabs list via HTML api.
+	 */
+	$tabs_list_markup = array_map(
+		static function ( array $tab ): string {
 			return wp_sprintf(
 				'<a id="tab__%1$s" class="tabs__tab-label" href="#%1$s" role="tab" aria-controls="%1$s" data-wp-on--click="actions.handleTabClick" data-wp-on--keydown="actions.handleTabKeyDown" data-wp-bind--aria-selected="state.isActiveTab" data-wp-bind--tabindex="state.tabIndexAttribute">%2$s</a>',
 				$tab['id'],
-				$tab['label']
+				html_entity_decode( $tab['label'] ),
 			);
 		},
 		$tabs_list
 	);
-	$tabs_list = implode( '', $tabs_list );
+	$tabs_list_markup = implode( '', $tabs_list_markup );
 
-	// Splice the tabs_list into the updated content.
+	/**
+	 * Splice the tabs list into the content.
+	 */
 	$content = preg_replace(
 		'/<ul\s+class="tabs__list">\s*<\/ul>/i',
-		'<div class="tabs__list" role="tablist">' . $tabs_list . '</div>',
-		$updated_content
+		'<div class="tabs__list" role="tablist">' . $tabs_list_markup . '</div>',
+		(string) $updated_content
 	);
 
-	return $content;
+	/**
+	 * In the event preg_replace fails, return the tabs content without the list spliced in.
+	 * This ensures the block content is still rendered, albeit without the tabs list.
+	 */
+	return is_string( $content ) ? $content : (string) $updated_content;
 }
 
 /**
- * Registers the `core/tab` block on the server.
+ * Registers the `core/tabs` block on the server.
  *
  * @since 6.8.0
  */
@@ -214,7 +234,7 @@ function register_block_core_tabs() {
 	register_block_type_from_metadata(
 		__DIR__ . '/tabs',
 		array(
-			'render_callback' => 'render_block_core_tabs',
+			'render_callback' => 'block_core_tabs_render_block_callback',
 		)
 	);
 }

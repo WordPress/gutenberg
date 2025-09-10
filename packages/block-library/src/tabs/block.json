@@ -6,8 +6,13 @@
 	"description": "Display content in a tabbed interface to help users navigate detailed content with ease.",
 	"version": "1.0.0",
 	"category": "design",
+	"textdomain": "default",
 	"allowedBlocks": [ "core/tab" ],
 	"attributes": {
+		"tabsId": {
+			"type": "string",
+			"default": ""
+		},
 		"orientation": {
 			"type": "string",
 			"default": "horizontal",
@@ -56,13 +61,17 @@
 	},
 	"styles": [
 		{
-			"name": "fill",
-			"label": "Fill",
+			"name": "tab",
+			"label": "Tabs",
 			"isDefault": true
 		},
 		{
-			"name": "outline",
-			"label": "Outline"
+			"name": "links",
+			"label": "Links"
+		},
+		{
+			"name": "button",
+			"label": "Button"
 		}
 	],
 	"supports": {
@@ -80,7 +89,7 @@
 		},
 		"typography": {
 			"fontSize": true,
-			"fontFamily": true
+			"__experimentalFontFamily": true
 		}
 	},
 	"example": {
@@ -91,15 +100,19 @@
 			{
 				"name": "core/tab",
 				"attributes": {
-					"label": "Tab 1",
-					"slug": "tab-1",
-					"tabIndex": 0
+					"label": "Tab 1"
 				},
 				"innerBlocks": [
 					{
 						"name": "core/paragraph",
 						"attributes": {
-							"content": "Tab 1 content"
+							"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod. Aliqua aliqua sunt consequat consequat in duis deserunt."
+						}
+					},
+					{
+						"name": "core/paragraph",
+						"attributes": {
+							"content": "Adipisicing ullamco nisi in eu laborum adipisicing aliquip aliqua. Fugiat labore officia consequat nisi veniam velit commodo cillum enim duis quis ad."
 						}
 					}
 				]
@@ -107,22 +120,20 @@
 			{
 				"name": "core/tab",
 				"attributes": {
-					"label": "Tab 2",
-					"slug": "tab-2",
-					"tabIndex": 1
+					"label": "Tab 2"
 				}
 			},
 			{
 				"name": "core/tab",
 				"attributes": {
-					"label": "Tab 3",
-					"slug": "tab-3",
-					"tabIndex": 2
+					"label": "Tab 3"
 				}
 			}
 		]
 	},
-	"textdomain": "tabs",
+	"providesContext": {
+		"tabs/id": "tabsId"
+	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

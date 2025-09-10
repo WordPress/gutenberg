@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { tab as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
-import initBlock from '../utils/init-block';
 import metadata from './block.json';
+import icon from './icon';
 
 const { name } = metadata;
 
@@ -21,6 +21,4 @@ export const settings = {
 	save,
 };
 
-export const init = () => {
-	initBlock( { name, metadata, settings } );
-};
+export const init = () => initBlock( { name, metadata, settings } );

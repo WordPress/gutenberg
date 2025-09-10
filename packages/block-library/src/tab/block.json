@@ -6,6 +6,7 @@
 	"description": "Content for a tab in a tabbed interface.",
 	"version": "1.0.0",
 	"category": "design",
+	"textdomain": "default",
 	"attributes": {
 		"label": {
 			"type": "string",
@@ -18,8 +19,17 @@
 		"html": false,
 		"reusable": false,
 		"layout": {
-			"type": "constrained",
-			"allowEditing": false
+			"allowSwitching": true,
+			"allowInheriting": false,
+			"allowVerticalAlignment": true,
+			"allowJustification": true,
+			"allowOrientation": true,
+			"allowSizingOnChildren": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": false
 		},
 		"typography": {
 			"fontSize": true,
@@ -32,10 +42,8 @@
 		}
 	},
 	"providesContext": {
-		"tab/label": "label",
-		"tab/slug": "slug"
+		"tab/label": "label"
 	},
-	"textdomain": "tab",
 	"editorScript": "file:./index.js",
 	"style": "file:./style-index.css"
 }

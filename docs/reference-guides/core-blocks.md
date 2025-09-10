@@ -903,7 +903,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 -	**Name:** core/tab
 -	**Category:** design
 -	**Parent:** core/tabs
--	**Supports:** anchor, layout (type, ~~allowEditing~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Table
@@ -932,8 +932,8 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Name:** core/tabs
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
--	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontFamily, fontSize), ~~html~~
--	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor
+-	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
+-	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
 
 ## Tag Cloud
 

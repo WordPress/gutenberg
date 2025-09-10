@@ -39,6 +39,7 @@ export default function Edit( {
 	clientId,
 	isSelected,
 	setAttributes,
+	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -142,17 +143,6 @@ export default function Edit( {
 		tabsHasSelectedBlock,
 	] );
 
-	/**
-	 * This hook focuses the label when the block is selected and does not have any inner blocks selected, usually when the block is mounted by the user by clicking on the label.
-	 */
-	useEffect( () => {
-		if ( isSelected && ! hasInnerBlocksSelected ) {
-			timeoutRef.current = setTimeout( () => {
-				labelRef.current.focus();
-			}, 0 );
-		}
-	}, [ isSelected, hasInnerBlocksSelected ] );
-
 	// Use a custom anchor, if set. Otherwise fall back to the slug generated from the label text.
 	const tabPanelId = useMemo(
 		() => anchor || slugFromLabel( label, blockIndex ),
@@ -176,7 +166,8 @@ export default function Edit( {
 			tabIndex: isSelectedTab ? 0 : -1,
 			className: clsx(
 				tabContentTypographyProps.className,
-				'tabs__tab-editor-content'
+				'tabs__tab-editor-content',
+				layoutClassNames
 			),
 			style: {
 				...tabContentTypographyProps.style,
@@ -189,14 +180,14 @@ export default function Edit( {
 
 	return (
 		<>
-			<Controls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				tabsClientId={ tabsClientId }
-				blockIndex={ blockIndex }
-				isDefaultTab={ isDefaultTab }
-			/>
 			<div { ...blockProps }>
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					tabsClientId={ tabsClientId }
+					blockIndex={ blockIndex }
+					isDefaultTab={ isDefaultTab }
+				/>
 				<TabFill tabsClientId={ tabsClientId }>
 					<button
 						aria-controls={ tabPanelId }
@@ -216,7 +207,8 @@ export default function Edit( {
 							selectBlock( clientId );
 						} }
 						onKeyDown={ ( event ) => {
-							if ( event.key === 'Enter' ) {
+							// If shift is also pressed, do not select the block.
+							if ( event.key === 'Enter' && ! event.shiftKey ) {
 								event.preventDefault();
 								selectBlock( clientId );
 								timeoutRef.current = setTimeout( () => {
@@ -228,8 +220,11 @@ export default function Edit( {
 						<RichText
 							ref={ labelRef }
 							tagName="span"
-							allowedFormats={ [] }
-							withoutInteractiveFormatting
+							allowedFormats={ [
+								'core/bold',
+								'core/italic',
+								'core/strikethrough',
+							] }
 							placeholder={ __( 'Add tab label…' ) }
 							value={ decodeEntities( label ) }
 							onChange={ ( value ) =>
