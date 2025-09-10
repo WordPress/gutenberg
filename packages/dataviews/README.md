@@ -1404,6 +1404,7 @@ For example:
 - `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
 For example:
+
 ```js
 {
 	id: 'field_id',
@@ -1419,6 +1420,7 @@ For example:
 - `type`: `card`. Required.
 - `isOpened`: boolean. Optional. `true` by default.
 - `withHeader`: boolean. Optional. `true` by default.
+- `summaryField`: SimpleFormField | string. Optional. A field to display in the card header as a summary.
 
 For example:
 
@@ -1429,6 +1431,13 @@ For example:
 		type: 'card',
 		isOpened: false,
 		withHeader: true,
+		summaryField: {
+			id: 'summary',
+			layout: {
+				type: 'regular',
+				labelPosition: 'none'
+			}
+		}
 	},
 }
 ```
