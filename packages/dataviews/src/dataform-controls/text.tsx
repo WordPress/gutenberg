@@ -10,12 +10,21 @@ export default function Text< Item >( {
 	onChange,
 	hideLabelFromVision,
 	prefix,
+	suffix,
 }: DataFormControlProps< Item > & {
 	prefix?: React.ComponentType | React.ReactElement;
+	suffix?: React.ReactElement;
 } ) {
 	return (
 		<ValidatedText
-			{ ...{ data, field, onChange, hideLabelFromVision, icon: prefix } }
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				icon: prefix,
+				suffix,
+			} }
 		/>
 	);
 }

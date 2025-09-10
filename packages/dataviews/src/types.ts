@@ -176,6 +176,10 @@ export type EditConfig = {
 	 */
 	prefix?: React.ComponentType | React.ReactElement;
 	/**
+	 * Suffix component for text controls.
+	 */
+	suffix?: React.ReactElement;
+	/**
 	 * Additional configuration properties.
 	 */
 	[ key: string ]: any;

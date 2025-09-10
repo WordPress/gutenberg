@@ -27,6 +27,8 @@ import { unlock } from '../../../lock-unlock';
 const { ValidatedTextControl } = unlock( privateApis );
 
 const DollarPrefix = () => <span>$</span>;
+const PercentSuffix = () => <span>%</span>;
+const USDSuffix = () => <span>USD</span>;
 
 type SamplePost = {
 	title: string;
@@ -45,6 +47,8 @@ type SamplePost = {
 	city?: string;
 	longDescription?: string;
 	priceWithPrefix?: string;
+	percentageWithSuffix?: string;
+	priceWithBoth?: string;
 };
 
 const fields: Field< SamplePost >[] = [
@@ -196,6 +200,25 @@ const fields: Field< SamplePost >[] = [
 			prefix: DollarPrefix,
 		},
 	},
+	{
+		id: 'percentageWithSuffix',
+		label: 'Percentage with Suffix',
+		type: 'text',
+		Edit: {
+			type: 'text',
+			suffix: <PercentSuffix />,
+		},
+	},
+	{
+		id: 'priceWithBoth',
+		label: 'Price with Prefix and Suffix',
+		type: 'text',
+		Edit: {
+			type: 'text',
+			prefix: DollarPrefix,
+			suffix: <USDSuffix />,
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -244,6 +267,8 @@ const LayoutRegularComponent = ( {
 				'description',
 				'longDescription',
 				'priceWithPrefix',
+				'percentageWithSuffix',
+				'priceWithBoth',
 			],
 		} ),
 		[ labelPosition ]
