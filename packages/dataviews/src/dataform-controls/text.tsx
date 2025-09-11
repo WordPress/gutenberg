@@ -21,27 +21,9 @@ export default function Text< Item >( {
 	prefix,
 	suffix,
 }: DataFormControlProps< Item > & {
-	prefix?: React.ComponentType | React.ReactElement;
+	prefix?: React.ReactElement;
 	suffix?: React.ReactElement;
 } ) {
-	const wrappedPrefix = prefix ? (
-		typeof prefix === 'function' ? (
-			<InputControlPrefixWrapper variant="icon">
-				<Icon icon={ prefix } />
-			</InputControlPrefixWrapper>
-		) : (
-			<InputControlPrefixWrapper variant="control">
-				{ prefix }
-			</InputControlPrefixWrapper>
-		)
-	) : undefined;
-
-	const wrappedSuffix = suffix ? (
-		<InputControlSuffixWrapper variant="control">
-			{ suffix }
-		</InputControlSuffixWrapper>
-	) : undefined;
-
 	return (
 		<ValidatedText
 			{ ...{
@@ -49,8 +31,8 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
-				prefix: wrappedPrefix,
-				suffix: wrappedSuffix,
+				prefix: prefix,
+				suffix: suffix,
 			} }
 		/>
 	);
