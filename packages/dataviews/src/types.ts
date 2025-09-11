@@ -331,6 +331,13 @@ export type DataFormControlProps< Item > = {
 	 * Used by DataViews filters to determine which control to render based on the operator type.
 	 */
 	operator?: Operator;
+	/**
+	 * Configuration object for the control.
+	 */
+	config?: {
+		prefix?: React.ReactElement;
+		suffix?: React.ReactElement;
+	};
 };
 
 export type DataViewRenderFieldProps< Item > = {

@@ -63,7 +63,7 @@ function createConfiguredControl( config: EditConfig ) {
 	return function ConfiguredControl< Item >(
 		props: DataFormControlProps< Item >
 	) {
-		return <BaseControl { ...props } { ...controlConfig } />;
+		return <BaseControl { ...props } config={ controlConfig } />;
 	};
 }
 

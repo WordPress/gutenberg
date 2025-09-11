@@ -1,3 +1,4 @@
+
 /**
  * WordPress dependencies
  */
@@ -18,12 +19,10 @@ export default function Text< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
-	prefix,
-	suffix,
-}: DataFormControlProps< Item > & {
-	prefix?: React.ReactElement;
-	suffix?: React.ReactElement;
-} ) {
+	config,
+}: DataFormControlProps< Item > ) {
+	const { prefix, suffix } = config || {};
+
 	return (
 		<ValidatedText
 			{ ...{
