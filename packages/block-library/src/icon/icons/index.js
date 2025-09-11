@@ -458,14 +458,6 @@ const icons = [
 				title: __( 'Design' ),
 			},
 			{
-				name: 'editor',
-				title: __( 'Editor' ),
-			},
-			{
-				name: 'logos',
-				title: __( 'Logos' ),
-			},
-			{
 				name: 'media',
 				title: __( 'Media' ),
 			},
