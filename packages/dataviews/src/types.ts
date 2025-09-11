@@ -337,6 +337,7 @@ export type DataFormControlProps< Item > = {
 	config?: {
 		prefix?: React.ReactElement;
 		suffix?: React.ReactElement;
+		rows?: number;
 	};
 };
 

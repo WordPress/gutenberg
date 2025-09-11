@@ -17,8 +17,9 @@ export default function Textarea< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
-	rows,
-}: DataFormControlProps< Item > & { rows?: number } ) {
+	config,
+}: DataFormControlProps< Item > ) {
+	const { rows = 4 } = config || {};
 	const { id, label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =

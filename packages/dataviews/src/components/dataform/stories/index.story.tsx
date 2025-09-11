@@ -200,9 +200,9 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'longDescription',
 		label: 'Long Description',
-		type: 'text',
+		control: 'text',
 		Edit: {
-			type: 'textarea',
+			control: 'textarea',
 			rows: 5,
 		},
 	},
@@ -211,7 +211,7 @@ const fields: Field< SamplePost >[] = [
 		label: 'Price with Prefix',
 		type: 'text',
 		Edit: {
-			type: 'text',
+			control: 'text',
 			prefix: <DollarPrefix />,
 		},
 	},
@@ -220,7 +220,7 @@ const fields: Field< SamplePost >[] = [
 		label: 'Percentage with Suffix',
 		type: 'text',
 		Edit: {
-			type: 'text',
+			control: 'text',
 			suffix: <PercentSuffix />,
 		},
 	},
@@ -229,7 +229,7 @@ const fields: Field< SamplePost >[] = [
 		label: 'Price with Prefix and Suffix',
 		type: 'text',
 		Edit: {
-			type: 'text',
+			control: 'text',
 			prefix: <DollarPrefix />,
 			suffix: <USDSuffix />,
 		},
