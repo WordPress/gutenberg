@@ -87,17 +87,14 @@ function StyleInspectorSlots( {
 	);
 }
 
-function ContentPanel( { contentClientIds, onSelect } ) {
+function ContentPanel( { contentClientIds } ) {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<PanelBody title={ __( 'Content' ) }>
-			<BlockQuickNavigation
-				clientIds={ contentClientIds }
-				onSelect={ onSelect }
-			/>
+			<BlockQuickNavigation clientIds={ contentClientIds } />
 		</PanelBody>
 	);
 }
