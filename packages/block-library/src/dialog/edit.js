@@ -7,12 +7,22 @@ import {
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
+	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	Button,
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+	TextControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { STORE_NAME } from './store';
 const TEMPLATE = [
 	[
 		'core/dialog-trigger',
@@ -36,7 +46,6 @@ const TEMPLATE = [
 	[
 		'core/dialog-element',
 		{
-			dialogType: 'modal',
 			lock: {
 				move: true,
 				remove: true,
@@ -67,12 +76,32 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	if ( ! dialogId ) {
 		setAttributes( { dialogId: clientId } );
 	}
-	// Set up a ref so that we can query for the dialog element and memoize it.
+
+	// Get the dialog-element block from inner blocks
+	const { dialogElementClientId, isDialogOpen } = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			const dialogElementBlock = block?.innerBlocks?.find(
+				( innerBlock ) => innerBlock.name === 'core/dialog-element'
+			);
+			const dialogElementId = dialogElementBlock?.clientId;
+
+			return {
+				dialogElementClientId: dialogElementId,
+				isDialogOpen: dialogElementId
+					? select( STORE_NAME ).isOpen( dialogElementId )
+					: false,
+			};
+		},
+		[ clientId ]
+	);
+
+	// Get store actions
+	const { open, close } = useDispatch( STORE_NAME );
+
+	// Set up a ref for the block container
 	const ref = useRef( null );
-	// @TODO: This is not... great, but we need to wait for the ref to be populated before we can query for the dialog element. We should look at using a more robust solution for this in the future, perhaps a redux store.
-	const dialogElm = useMemo( () => {
-		return ref.current?.querySelector( '.wp-block-dialog-element' ) || null;
-	}, [ ref.current ] );
 
 	const blockProps = useBlockProps( {
 		ref,
@@ -85,8 +114,8 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	} );
 
 	const buttonLabel = useMemo(
-		() => ( dialogElm?.open ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
-		[ dialogElm ]
+		() => ( isDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
+		[ isDialogOpen ]
 	);
 
 	return (
@@ -96,16 +125,62 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					<ToolbarButton
 						label={ buttonLabel }
 						onClick={ () => {
-							if ( ! dialogElm ) {
+							if ( ! dialogElementClientId ) {
 								return;
 							}
-							dialogElm.showModal();
+							if ( isDialogOpen ) {
+								close( dialogElementClientId );
+							} else {
+								open( dialogElementClientId );
+							}
 						} }
 					>
 						{ buttonLabel }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Dialog Settings' ) }>
+					<div>
+						<p>
+							{ __(
+								'The dialog element requires a dialog trigger and a dialog element. You can edit the text of the trigger and the content of the dialog by clicking the "Edit Dialog" button above.'
+							) }
+						</p>
+						<TextControl
+							label={ __( 'Dialog ID' ) }
+							value={ dialogId }
+							onChange={ ( value ) =>
+								setAttributes( { dialogId: value } )
+							}
+							help={ __(
+								'The ID of the dialog element. This should be unique on the page.'
+							) }
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						/>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								if ( dialogElementClientId ) {
+									if ( isDialogOpen ) {
+										close( dialogElementClientId );
+									} else {
+										open( dialogElementClientId );
+									}
+								}
+							} }
+							disabled={ ! dialogElementClientId }
+							accessibleWhenDisabled
+						>
+							{ isDialogOpen
+								? __( 'Close Dialog' )
+								: __( 'Edit Dialog' ) }
+						</Button>
+					</div>
+				</PanelBody>
+			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>
 	);

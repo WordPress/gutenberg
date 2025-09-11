@@ -5,7 +5,7 @@
 /**
  * WordPress dependencies
  */
-import { register, createReduxStore } from '@wordpress/data';
+import { createReduxStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -171,10 +171,8 @@ const selectors = {
 
 export const STORE_NAME = 'core/dialog';
 
-const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
 } );
-
-register( store );

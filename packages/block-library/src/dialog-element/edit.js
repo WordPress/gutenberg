@@ -6,11 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-/**
- * WordPress dependencies
- */
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { useMemo, useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -25,6 +22,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { Toolbar, InspectorPanel } from './controls';
 import StyleEngine from './style-engine';
+import { STORE_NAME } from '../dialog/store';
 
 function Edit( {
 	attributes,
@@ -37,11 +35,15 @@ function Edit( {
 } ) {
 	const { dialogSize = 'medium', animation = 'fade' } = attributes;
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { rootClientId } = useSelect(
+	const { init, destroy, open, close } = useDispatch( STORE_NAME );
+
+	const { rootClientId, isOpen, isClosingModal } = useSelect(
 		( select ) => {
 			return {
 				rootClientId:
 					select( blockEditorStore ).getBlockRootClientId( clientId ),
+				isOpen: select( STORE_NAME ).isOpen( clientId ),
+				isClosingModal: select( STORE_NAME ).isClosingModal( clientId ),
 			};
 		},
 		[ clientId ]
@@ -51,19 +53,33 @@ function Edit( {
 	 * Setup state and ref for the dialog.
 	 */
 	const dialogElementRef = useRef( null );
-	const isOpen = useMemo( () => {
+
+	// Initialize dialog in store and cleanup on unmount
+	useEffect( () => {
+		init( clientId );
+
+		return () => {
+			destroy( clientId );
+		};
+	}, [ clientId, init, destroy ] );
+
+	// Sync DOM state with store state
+	useEffect( () => {
 		if ( dialogElementRef.current ) {
-			return dialogElementRef.current.open;
+			if ( isOpen && ! dialogElementRef.current.open ) {
+				dialogElementRef.current.showModal();
+			} else if ( ! isOpen && dialogElementRef.current.open ) {
+				dialogElementRef.current.close();
+			}
 		}
-		return false;
-	}, [ dialogElementRef.current ] );
+	}, [ isOpen ] );
 
 	/**
 	 * Helper functions:
 	 */
-	const openDialog = () => dialogElementRef.current.showModal();
+	const openDialog = () => open( clientId );
 	const closeDialog = () => {
-		dialogElementRef.current.close();
+		close( clientId );
 		selectBlock( rootClientId );
 	};
 	const onEscHandler = ( e ) => {
@@ -78,6 +94,7 @@ function Edit( {
 			'is-size-medium': 'medium' === dialogSize,
 			'is-size-large': 'large' === dialogSize,
 			[ `is-animation-${ animation }` ]: animation,
+			'is-closing-modal': isClosingModal,
 		} ),
 		role: 'dialog',
 		'aria-modal': 'true',

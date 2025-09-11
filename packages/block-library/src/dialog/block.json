@@ -19,14 +19,6 @@
 		"anchor": false,
 		"html": false,
 		"align": [ "full", "wide", "left", "right", "center" ],
-		"typography": {
-			"fontSize": true,
-			"__experimentalFontFamily": true,
-			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"__experimentalFontFamily": true
-			}
-		},
 		"interactivity": true
 	},
 	"providesContext": {
