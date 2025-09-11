@@ -20,11 +20,16 @@ export default function Select< Item >( {
 	const isMultiple = type === 'array';
 	const value = field.getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
 	const onChangeControl = useCallback(
-		( newValue: any ) =>
+		( newValue: any ) => {
+			let normalizedValue = newValue;
+			if ( type === 'integer' && newValue !== '' ) {
+				normalizedValue = parseInt( newValue, 10 );
+			}
 			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+				[ id ]: normalizedValue,
+			} );
+		},
+		[ id, onChange, type ]
 	);
 
 	const fieldElements = field?.elements ?? [];
