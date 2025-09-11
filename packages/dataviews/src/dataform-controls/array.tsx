@@ -100,9 +100,7 @@ export default function ArrayControl< Item >( {
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
 			placeholder={ placeholder }
-			suggestions={
-				elements?.map( ( suggestion ) => suggestion.label ) ?? []
-			}
+			suggestions={ elements?.map( ( element ) => element.value ) }
 			__experimentalValidateInput={ ( token: string ) => {
 				if ( ! field.isValid?.elements ) {
 					return true;
