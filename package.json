@@ -27,7 +27,7 @@
 		"@apidevtools/json-schema-ref-parser": "11.6.4",
 		"@ariakit/test": "^0.4.7",
 		"@babel/core": "7.28.4",
-		"@babel/plugin-syntax-jsx": "7.28.4",
+		"@babel/plugin-syntax-jsx": "7.27.1",
 		"@babel/runtime-corejs3": "7.28.4",
 		"@babel/traverse": "7.28.4",
 		"@emotion/babel-plugin": "11.11.0",
