@@ -7,7 +7,7 @@ import { useCallback, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../../types';
+import type { DataFormControlProps, DeepPartial } from '../../types';
 import { unlock } from '../../lock-unlock';
 
 const { ValidatedInputControl } = unlock( privateApis );
@@ -48,10 +48,13 @@ export default function ValidatedText< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange(
+				field.setValue( {
+					item: data as DeepPartial< Item >,
+					value: newValue,
+				} )
+			),
+		[ data, id, onChange ]
 	);
 
 	return (

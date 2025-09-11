@@ -18,6 +18,10 @@ import type { SetSelection } from './private-types';
  */
 import type { useFocusOnMount } from '@wordpress/compose';
 
+export type DeepPartial< T > = T extends object
+	? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
+	: T;
+
 export type SortDirection = 'asc' | 'desc';
 
 /**
@@ -297,12 +301,25 @@ export type Field< Item > = {
 	 * Defaults to `item[ field.id ]`.
 	 */
 	getValue?: ( args: { item: Item } ) => any;
+
+	/**
+	 * Callback used to set the value of the field on the item.
+	 * Used for editing operations to update field values.
+	 */
+	setValue?: ( args: {
+		item: DeepPartial< Item >;
+		value: any;
+	} ) => DeepPartial< Item >;
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
+	setValue: ( args: {
+		item: DeepPartial< Item >;
+		value: any;
+	} ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
@@ -323,7 +340,7 @@ export type Data< Item > = Item[];
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onChange: ( value: Record< string, any > ) => void;
+	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
 	/**
 	 * The currently selected filter operator for this field.

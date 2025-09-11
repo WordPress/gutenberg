@@ -37,19 +37,27 @@ export default function InputWidget( {
 	const currentValue = getCurrentValue( filter, currentFilter );
 	const data = useMemo( () => {
 		return ( view.filters ?? [] ).reduce(
-			( acc, f ) => {
-				acc[ f.field ] = f.value;
+			( acc, activeFilter ) => {
+				const activeFilterField = fields.find(
+					( f ) => f.id === activeFilter.field
+				);
+				if ( activeFilterField ) {
+					acc = activeFilterField.setValue( {
+						item: {},
+						value: activeFilter.value,
+					} );
+				}
 				return acc;
 			},
 			{} as Record< string, any >
 		);
-	}, [ view.filters ] );
+	}, [ fields, view.filters ] );
 
 	const handleChange = useEvent( ( updatedData: Record< string, any > ) => {
 		if ( ! field || ! currentFilter ) {
 			return;
 		}
-		const nextValue = updatedData[ field.id ];
+		const nextValue = field.getValue( { item: updatedData } );
 		if ( fastDeepEqual( nextValue, currentValue ) ) {
 			return;
 		}
