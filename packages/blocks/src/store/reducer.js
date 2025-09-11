@@ -13,7 +13,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { omit } from '../api/utils';
-import { edit } from '@wordpress/icons';
 
 /**
  * @typedef {Object} WPBlockCategory
