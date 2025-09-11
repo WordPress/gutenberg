@@ -38,7 +38,7 @@ function getLatestHeadings( select, clientId ) {
 	let permalink = permalinkTemplate;
 	// Detect if this is a postname or pagename permalink.
 	const permalinkRegexResult =
-		permalinkTemplate.match( /%postname%|%pagename%/ )[ 0 ] ?? null;
+		permalinkTemplate?.match( /%postname%|%pagename%/ )?.[ 0 ] ?? null;
 	// If this is a postname or pagename permalink,
 	// replace the postname or pagename with the editedPostSlug.
 	if ( editedPostSlug && permalinkRegexResult ) {
