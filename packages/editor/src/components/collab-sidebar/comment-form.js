@@ -39,6 +39,9 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 
 	return (
 		<>
+			<VisuallyHidden as="label" htmlFor={ inputId }>
+				{ __( 'Comment' ) }
+			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
@@ -47,11 +50,7 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 				}
 				rows={ 4 }
 				maxRows={ 20 }
-			>
-				<VisuallyHidden as="label" htmlFor={ inputId }>
-					{ __( 'Comment' ) }
-				</VisuallyHidden>
-			</TextareaAutosize>
+			></TextareaAutosize>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
 					__next40pxDefaultSize
