@@ -1,4 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { 
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
+} from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
@@ -15,6 +24,24 @@ export default function Text< Item >( {
 	prefix?: React.ComponentType | React.ReactElement;
 	suffix?: React.ReactElement;
 } ) {
+	const wrappedPrefix = prefix ? (
+		typeof prefix === 'function' ? (
+			<InputControlPrefixWrapper variant="icon">
+				<Icon icon={ prefix } />
+			</InputControlPrefixWrapper>
+		) : (
+			<InputControlPrefixWrapper variant="control">
+				{ prefix }
+			</InputControlPrefixWrapper>
+		)
+	) : undefined;
+
+	const wrappedSuffix = suffix ? (
+		<InputControlSuffixWrapper variant="control">
+			{ suffix }
+		</InputControlSuffixWrapper>
+	) : undefined;
+
 	return (
 		<ValidatedText
 			{ ...{
@@ -22,8 +49,8 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
-				icon: prefix,
-				suffix,
+				prefix: wrappedPrefix,
+				suffix: wrappedSuffix,
 			} }
 		/>
 	);

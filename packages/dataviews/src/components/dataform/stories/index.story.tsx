@@ -6,6 +6,8 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 	privateApis,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 
 /**
@@ -26,9 +28,22 @@ import { unlock } from '../../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
-const DollarPrefix = () => <span>$</span>;
-const PercentSuffix = () => <span>%</span>;
-const USDSuffix = () => <span>USD</span>;
+
+const DollarPrefix = () => (
+	<InputControlPrefixWrapper variant="control">
+		<span>$</span>
+	</InputControlPrefixWrapper>
+);
+const PercentSuffix = () => (
+	<InputControlSuffixWrapper variant="control">
+		<span>%</span>
+	</InputControlSuffixWrapper>
+);
+const USDSuffix = () => (
+	<InputControlSuffixWrapper variant="control">
+		<span>USD</span>
+	</InputControlSuffixWrapper>
+);
 
 type SamplePost = {
 	title: string;
@@ -197,7 +212,7 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			type: 'text',
-			prefix: DollarPrefix,
+			prefix: <DollarPrefix />,
 		},
 	},
 	{
@@ -215,7 +230,7 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			type: 'text',
-			prefix: DollarPrefix,
+			prefix: <DollarPrefix />,
 			suffix: <USDSuffix />,
 		},
 	},
