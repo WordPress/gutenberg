@@ -21,14 +21,11 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
-import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
-import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
-import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockQuickNavigation from '../block-quick-navigation';
-import { useBorderPanelLabel } from '../../hooks/border';
+import StyleInspectorSlots from './style-inspector-slots';
 
 import { unlock } from '../../lock-unlock';
 
@@ -92,50 +89,26 @@ function BlockInspector() {
 	const blockInspectorAnimationSettings =
 		useBlockInspectorAnimationSettings( blockType );
 
-	const borderPanelLabel = useBorderPanelLabel( {
-		blockName: selectedBlockName,
-	} );
+	const hasSelectedBlocks = selectedBlockCount > 1;
 
-	const hasSelectedBlocks = count > 1;
-
-	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
+	if (
+		hasSelectedBlocks &&
+		! isSectionBlockInSelection &&
+		! isSectionBlock
+	) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
 				{ showTabs ? (
 					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
-					<>
-						<InspectorControls.Slot />
-						<InspectorControls.Slot
-							group="color"
-							label={ __( 'Color' ) }
-							className="color-block-support-panel__inner-wrapper"
-						/>
-						<InspectorControls.Slot
-							group="background"
-							label={ __( 'Background image' ) }
-						/>
-						<InspectorControls.Slot
-							group="typography"
-							label={ __( 'Typography' ) }
-						/>
-						<InspectorControls.Slot
-							group="dimensions"
-							label={ __( 'Dimensions' ) }
-						/>
-						<InspectorControls.Slot
-							group="border"
-							label={ borderPanelLabel }
-						/>
-						<InspectorControls.Slot group="styles" />
-					</>
+					<StyleInspectorSlots blockName={ selectedBlockName } />
 				) }
 			</div>
 		);
 	}
 
-	if ( hasSelectedBlocks && isSectionBlockInSelection ) {
+	if ( hasSelectedBlocks && isSectionBlockInSelection && ! isSectionBlock ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -238,7 +211,6 @@ const BlockInspectorSingleBlock = ( {
 		[ blockName ]
 	);
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	const contentClientIds = useSelect(
 		( select ) => {
 			// Avoid unnecessary subscription.
@@ -294,37 +266,10 @@ const BlockInspectorSingleBlock = ( {
 					) }
 
 					{ ! isSectionBlock && (
-						<>
-							<InspectorControls.Slot />
-							<InspectorControls.Slot group="list" />
-							<InspectorControls.Slot
-								group="color"
-								label={ __( 'Color' ) }
-								className="color-block-support-panel__inner-wrapper"
-							/>
-							<InspectorControls.Slot
-								group="background"
-								label={ __( 'Background image' ) }
-							/>
-							<InspectorControls.Slot
-								group="typography"
-								label={ __( 'Typography' ) }
-							/>
-							<InspectorControls.Slot
-								group="dimensions"
-								label={ __( 'Dimensions' ) }
-							/>
-							<InspectorControls.Slot
-								group="border"
-								label={ borderPanelLabel }
-							/>
-							<InspectorControls.Slot group="styles" />
-							<PositionControls />
-							<InspectorControls.Slot group="bindings" />
-							<div>
-								<AdvancedControls />
-							</div>
-						</>
+						<StyleInspectorSlots
+							blockName={ blockName }
+							showListControls
+						/>
 					) }
 				</>
 			) }
