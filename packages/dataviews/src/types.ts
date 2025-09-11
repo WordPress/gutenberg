@@ -160,30 +160,46 @@ export type Rules< Item > = {
 };
 
 /**
- * Edit configuration object for advanced control options.
+ * Edit configuration for textarea controls.
  */
-export type EditConfig = {
+export type EditConfigTextarea = {
+	type: 'textarea';
 	/**
-	 * The type of control to use.
-	 */
-	type: string;
-	/**
-	 * Number of rows for textarea controls.
+	 * Number of rows for the textarea.
 	 */
 	rows?: number;
+};
+
+/**
+ * Edit configuration for text controls.
+ */
+export type EditConfigText = {
+	type: 'text';
 	/**
-	 * Prefix component for text controls.
+	 * Prefix component to display before the input.
 	 */
 	prefix?: React.ComponentType | React.ReactElement;
 	/**
-	 * Suffix component for text controls.
+	 * Suffix component to display after the input.
 	 */
 	suffix?: React.ReactElement;
-	/**
-	 * Additional configuration properties.
-	 */
-	[ key: string ]: any;
 };
+
+/**
+ * Edit configuration for other control types (excluding 'text' and 'textarea').
+ */
+export type EditConfigGeneric = {
+	type: Exclude< FieldType, 'text' | 'textarea' >;
+};
+
+/**
+ * Edit configuration object with type-safe control options.
+ * Each control type has its own specific configuration properties.
+ */
+export type EditConfig =
+	| EditConfigTextarea
+	| EditConfigText
+	| EditConfigGeneric;
 
 /**
  * A dataview field for a specific property of a data type.
