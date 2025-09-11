@@ -30,6 +30,7 @@ import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { unlock } from '../../lock-unlock';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
@@ -196,6 +197,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		isReusable,
 		isTemplate,
 		isDisabled,
+		isSection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -204,7 +206,8 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				getBlockAttributes,
 				canRemoveBlocks,
 				getBlockEditingMode,
-			} = select( blockEditorStore );
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
@@ -250,6 +253,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
 				hasContentOnlyLocking: _hasTemplateLock,
 				isDisabled: editingMode !== 'default',
+				isSection: isSectionBlock( clientIds[ 0 ] ),
 			};
 		},
 		[ clientIds ]
@@ -278,7 +282,10 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			? blockTitle
 			: undefined;
 
+	const hideTransformsForSections =
+		window?.__experimentalContentOnlyPatternInsertion && isSection;
 	const hideDropdown =
+		hideTransformsForSections ||
 		isDisabled ||
 		( ! hasBlockStyles && ! canRemove ) ||
 		hasContentOnlyLocking;

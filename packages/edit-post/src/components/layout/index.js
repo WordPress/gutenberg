@@ -172,6 +172,9 @@ function MetaBoxesMain( { isLegacy } ) {
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
 		);
+		if ( ! container ) {
+			return;
+		}
 		const noticeLists = container.querySelectorAll(
 			':scope > .components-notice-list'
 		);

@@ -100,17 +100,6 @@ test.describe( 'Write/Design mode', () => {
 
 		expect( await getSelectedBlock() ).toEqual( sectionClientId );
 
-		// open the block toolbar more settings menu
-		await page.getByLabel( 'Block tools' ).getByLabel( 'Options' ).click();
-
-		// get the length of the options menu
-		const optionsMenu = page
-			.getByRole( 'menu', { name: 'Options' } )
-			.getByRole( 'menuitem' );
-
-		// we expect 4 items in the options menu (Cut and Copy are hidden in Write Mode)
-		await expect( optionsMenu ).toHaveCount( 4 );
-
 		// We should be able to select the paragraph block and write in it.
 		await paragraph.click();
 		await page.keyboard.type( ' something' );
@@ -186,5 +175,98 @@ test.describe( 'Write/Design mode', () => {
 		await editor.switchEditorTool( 'Write' );
 
 		await expect( nonContentBlock ).toBeHidden();
+	} );
+	test( 'prevents adding non-content blocks to content role containers', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( '' );
+
+		// Insert a section with a nested block and an editable block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/quote',
+					attributes: {
+						metadata: {
+							name: 'Content block',
+						},
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'Something',
+							},
+						},
+					],
+				},
+			],
+		} );
+
+		// Switch to write mode.
+		await editor.switchEditorTool( 'Write' );
+
+		// Select the inner paragraph block.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		// Select paragraph
+		await paragraph.click();
+
+		// Try inserting a Group block with the slash inserter.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/group' );
+
+		// Group option should not be available.
+		await expect(
+			page.getByRole( 'option', { name: 'Group' } )
+		).toBeHidden();
+	} );
+	test( 'allows adding blocks to content role containers', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( '' );
+
+		// Insert a section with a nested block and an editable block.
+		await editor.insertBlock( {
+			name: 'core/group',
+			attributes: {},
+			innerBlocks: [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'item 1',
+							},
+						},
+					],
+				},
+			],
+		} );
+
+		// Switch to write mode.
+		await editor.switchEditorTool( 'Write' );
+
+		// Select the inner list item block.
+		const listItem = editor.canvas.getByText( 'item 1' );
+
+		// Select list item
+		await listItem.click();
+
+		// Press enter to check whether it adds a new block.
+		await page.keyboard.press( 'Enter' );
+
+		// Write something in the new list item
+		await page.keyboard.type( 'item 2' );
+
+		await expect( listItem ).not.toBeFocused();
+		await expect( listItem ).not.toHaveText( 'item 2' );
 	} );
 } );

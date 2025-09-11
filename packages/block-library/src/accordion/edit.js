@@ -5,6 +5,8 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	BlockControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -13,7 +15,10 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToolbarButton,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,10 +32,12 @@ const ACCORDION_BLOCK = {
 
 export default function Edit( {
 	attributes: { autoclose, iconPosition, showIcon },
+	clientId,
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const { insertBlock } = useDispatch( blockEditorStore );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
@@ -39,8 +46,21 @@ export default function Edit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
+	const addAccordionContentBlock = () => {
+		const newAccordionContent = createBlock( ACCORDION_BLOCK_NAME );
+		insertBlock( newAccordionContent, undefined, clientId );
+	};
+
 	return (
 		<>
+			<BlockControls group="other">
+				<ToolbarButton
+					label={ __( 'Add accordion content block' ) }
+					onClick={ addAccordionContentBlock }
+				>
+					{ __( 'Add' ) }
+				</ToolbarButton>
+			</BlockControls>
 			<InspectorControls key="setting">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
