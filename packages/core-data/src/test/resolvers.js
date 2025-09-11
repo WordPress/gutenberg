@@ -26,6 +26,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
+import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
@@ -320,6 +321,11 @@ describe( 'getEntityRecords', () => {
 			baseURL: '/wp/v2/posts',
 			baseURLParams: { context: 'edit' },
 		},
+		{
+			name: 'media',
+			kind: 'root',
+			supportsPagination: true,
+		},
 	];
 	const registry = { batch: ( callback ) => callback() };
 	const resolveSelect = { getEntitiesConfig: jest.fn( () => ENTITIES ) };
@@ -509,6 +515,53 @@ describe( 'getEntityRecords', () => {
 			'getEntityRecord',
 			expect.any( Array )
 		);
+	} );
+
+	it( 'provides pagination metadata during intermediate results fetching', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+			finishResolutions: jest.fn(),
+		} );
+
+		const mockPages = [
+			[ { id: 1 }, { id: 2 } ],
+			[ { id: 3 }, { id: 4 } ],
+			[ { id: 5 } ],
+		];
+
+		let callCount = 0;
+		triggerFetch.mockImplementation( () => {
+			const data = mockPages[ callCount % mockPages.length ];
+			callCount++;
+			return Promise.resolve( {
+				json: () => Promise.resolve( data ),
+				headers: new Map( [
+					[ 'X-WP-Total', '5' ],
+					[ 'X-WP-TotalPages', '3' ],
+				] ),
+			} );
+		} );
+
+		await getEntityRecords( 'root', 'media', {
+			per_page: -1,
+			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
+		} )( { dispatch, registry, resolveSelect } );
+
+		const calls = dispatch.receiveEntityRecords.mock.calls;
+
+		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
+		expect( calls.length ).toBe( 4 );
+
+		calls.forEach( ( call ) => {
+			// 7th parameter is the pagination metadata
+			expect( call[ 6 ] ).toEqual( { totalItems: 5, totalPages: 1 } );
+		} );
+
+		// Should process all the data from our 3 mock pages (2+2+1=5 records total)
+		const finalCall = calls[ calls.length - 1 ];
+		expect( finalCall[ 2 ] ).toHaveLength( 5 );
 	} );
 } );
 
