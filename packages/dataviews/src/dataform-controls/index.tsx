@@ -53,12 +53,12 @@ const FORM_CONTROLS: FormControls = {
 };
 
 function isEditConfig( value: any ): value is EditConfig {
-	return value && typeof value === 'object' && typeof value.type === 'string';
+	return value && typeof value === 'object' && typeof value.control === 'string';
 }
 
 function createConfiguredControl( config: EditConfig ) {
-	const { type, ...controlConfig } = config;
-	const BaseControl = getControlByType( type );
+	const { control, ...controlConfig } = config;
+	const BaseControl = getControlByType( control );
 
 	return function ConfiguredControl< Item >(
 		props: DataFormControlProps< Item >

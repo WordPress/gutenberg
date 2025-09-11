@@ -163,7 +163,7 @@ export type Rules< Item > = {
  * Edit configuration for textarea controls.
  */
 export type EditConfigTextarea = {
-	type: 'textarea';
+	control: 'textarea';
 	/**
 	 * Number of rows for the textarea.
 	 */
@@ -174,7 +174,7 @@ export type EditConfigTextarea = {
  * Edit configuration for text controls.
  */
 export type EditConfigText = {
-	type: 'text';
+	control: 'text';
 	/**
 	 * Prefix component to display before the input.
 	 */
@@ -189,7 +189,7 @@ export type EditConfigText = {
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
-	type: Exclude< FieldType, 'text' | 'textarea' >;
+	control: Exclude< FieldType, 'text' | 'textarea' >;
 };
 
 /**
