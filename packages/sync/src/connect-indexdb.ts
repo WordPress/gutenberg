@@ -21,11 +21,11 @@ export function connectIndexDb(
 	objectId: ObjectID,
 	objectType: ObjectType,
 	doc: CRDTDoc
-): Promise< () => void > {
+) {
 	const roomName = `${ objectType }-${ objectId }`;
 	const provider = new IndexeddbPersistence( roomName, doc );
 
-	return new Promise( ( resolve ) => {
+	return new Promise< VoidFunction >( ( resolve ) => {
 		provider.on( 'synced', () => {
 			resolve( () => provider.destroy() );
 		} );

@@ -170,8 +170,10 @@ function setupSignalEventHandlers(
 								buffer.fromBase64( m.data ),
 								room.key
 							)
-							// @ts-ignore
-							.then( execMessage );
+							.then(
+								// @ts-expect-error -- decryptJson return type is too generic; we know it matches SignalData
+								execMessage
+							);
 					}
 				} else {
 					execMessage( m.data );
@@ -394,18 +396,19 @@ export class WebrtcProviderWithHttpSignaling extends WebrtcProvider {
 	connect() {
 		this.shouldConnect = true;
 		this.signalingUrls.forEach( ( url: string ) => {
-			const signalingConn = map.setIfUndefined(
+			const signalingConn = map.setIfUndefined<
+				SignalingConn | HttpSignalingConn,
+				string,
+				Map< string, SignalingConn | HttpSignalingConn >
+			>(
 				signalingConns,
 				url,
 				// Only this conditional logic to create a normal websocket connection or
 				// an http signaling connection was added to the constructor when compared
 				// with the base class.
-				( url.startsWith( 'ws://' ) || url.startsWith( 'wss://' )
+				url.startsWith( 'ws://' ) || url.startsWith( 'wss://' )
 					? () => new SignalingConn( url )
-					: () =>
-							new HttpSignalingConn(
-								url
-							) ) as () => SignalingConn
+					: () => new HttpSignalingConn( url )
 			);
 			this.signalingConns.push( signalingConn );
 			signalingConn.providers.add( this );

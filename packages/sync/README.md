@@ -26,7 +26,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise< () => void >`: Promise that resolves when the connection is established.
+-   Promise that resolves when the connection is established.
 
 ### createSyncProvider
 
