@@ -45,7 +45,6 @@ export function applyPostChangesToCRDTDoc(
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
 		if ( ! syncedProperties.has( key ) ) {
-			ymap.delete( key );
 			return;
 		}
 
@@ -54,21 +53,19 @@ export function applyPostChangesToCRDTDoc(
 			return;
 		}
 
-		// Return .get() result so that caller can operate on the data type
-		// without having to call .get() themselves.
-		function setValue< T = unknown >( updatedValue: T ): T {
+		// Set the value in the root document.
+		function setValue< T = unknown >( updatedValue: T ): void {
 			ymap.set( key, updatedValue );
-			return ymap.get( key ) as T;
 		}
 
 		switch ( key ) {
 			case 'blocks': {
 				let currentBlocks = ymap.get( 'blocks' ) as Y.Array< YBlock >;
 
+				// Initialize.
 				if ( ! ( currentBlocks instanceof Y.Array ) ) {
-					currentBlocks = setValue< Y.Array< YBlock > >(
-						new Y.Array()
-					); // Initialize
+					currentBlocks = new Y.Array();
+					setValue( currentBlocks );
 				}
 
 				// Block[] from local changes.
