@@ -156,7 +156,7 @@ export function Edit( props ) {
 	const iconsAll = flattenIconsArray( getIcons() );
 	const namedIcon = iconsAll.filter( ( i ) => i.name === iconName );
 	let customIcon = defaultIcon;
-
+	let printedIcon = '';
 	if ( icon && namedIcon.length === 0 ) {
 		customIcon = parseIcon( icon );
 
@@ -166,13 +166,18 @@ export function Edit( props ) {
 		) {
 			customIcon = defaultIcon;
 		}
-	}
+	} else {
+		// Icon chosen from library.
+		if ( icon.length === 0 && namedIcon.length > 0 ) {
+			printedIcon = namedIcon[ 0 ]?.icon;
+		} else {
+			printedIcon = icon;
+		}
 
-	let printedIcon = namedIcon.length > 0 ? namedIcon[ 0 ].icon : customIcon;
-
-	// Icons provided by third-parties are generally strings.
-	if ( typeof printedIcon === 'string' ) {
-		printedIcon = parseIcon( printedIcon );
+		// Icons provided by third-parties are generally strings.
+		if ( typeof printedIcon === 'string' ) {
+			printedIcon = parseIcon( printedIcon );
+		}
 	}
 
 	function setRotate( value ) {

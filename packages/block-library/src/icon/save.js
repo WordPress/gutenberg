@@ -56,6 +56,7 @@ export default function Save( props ) {
 	const namedIcon = iconsAll.filter( ( i ) => i.name === iconName );
 	let printedIcon = '';
 
+	// If there is an icon and the name is empty, then it's a custom icon.
 	if ( icon && namedIcon.length === 0 ) {
 		// Custom icons are strings and need to be parsed.
 		printedIcon = parseIcon( icon );
@@ -67,8 +68,12 @@ export default function Save( props ) {
 			printedIcon = '';
 		}
 	} else {
-		// Icon choosen from library.
-		printedIcon = namedIcon[ 0 ]?.icon;
+		// Icon chosen from library.
+		if ( icon.length === 0 && namedIcon.length > 0 ) {
+			printedIcon = namedIcon[ 0 ]?.icon;
+		} else {
+			printedIcon = icon;
+		}
 
 		// Icons provided by third-parties are generally strings.
 		if ( typeof printedIcon === 'string' ) {
