@@ -179,6 +179,8 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
+				isContainerInsertableToInWriteMode,
+				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -215,7 +217,11 @@ function Items( {
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
-					! isSectionBlock( rootClientId ) &&
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInWriteMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&

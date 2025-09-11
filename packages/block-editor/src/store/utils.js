@@ -11,10 +11,31 @@ import { selectBlockPatternsKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 import { getSectionRootClientId } from './private-selectors';
+import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 export const isFiltered = Symbol( 'isFiltered' );
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
+
+export function mapUserPattern(
+	userPattern,
+	__experimentalUserPatternCategories = []
+) {
+	return {
+		name: `core/block/${ userPattern.id }`,
+		id: userPattern.id,
+		type: INSERTER_PATTERN_TYPES.user,
+		title: userPattern.title?.raw,
+		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
+			const category = __experimentalUserPatternCategories.find(
+				( { id } ) => id === catId
+			);
+			return category ? category.slug : catId;
+		} ),
+		content: userPattern.content?.raw,
+		syncStatus: userPattern.wp_pattern_sync_status,
+	};
+}
 
 function parsePattern( pattern ) {
 	const blocks = parse( pattern.content, {
