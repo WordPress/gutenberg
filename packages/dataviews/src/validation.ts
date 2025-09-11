@@ -25,7 +25,7 @@ export function isItemValid< Item >(
 	const isEmptyNullOrUndefined = ( value: any ) =>
 		[ undefined, '', null ].includes( value );
 
-	const isNotArrayEmptyOrContainsInvalidElements = ( value: any ) => {
+	const isArrayOrElementsEmptyNullOrUndefined = ( value: any ) => {
 		return (
 			! Array.isArray( value ) ||
 			value.length === 0 ||
@@ -48,7 +48,7 @@ export function isItemValid< Item >(
 				( field.type === 'integer' &&
 					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'array' &&
-					isNotArrayEmptyOrContainsInvalidElements( value ) ) ||
+					isArrayOrElementsEmptyNullOrUndefined( value ) ) ||
 				( field.type === undefined && isEmptyNullOrUndefined( value ) )
 			) {
 				return false;
