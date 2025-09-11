@@ -25,14 +25,14 @@ export function mapUserPattern(
 		name: `core/block/${ userPattern.id }`,
 		id: userPattern.id,
 		type: INSERTER_PATTERN_TYPES.user,
-		title: userPattern.title.raw,
+		title: userPattern.title?.raw,
 		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
 			const category = __experimentalUserPatternCategories.find(
 				( { id } ) => id === catId
 			);
 			return category ? category.slug : catId;
 		} ),
-		content: userPattern.content.raw,
+		content: userPattern.content?.raw,
 		syncStatus: userPattern.wp_pattern_sync_status,
 	};
 }
