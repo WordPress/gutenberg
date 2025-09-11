@@ -724,7 +724,7 @@ Show minutes required to finish reading the post. ([Source](https://github.com/W
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** displayAsRange, textAlign
 
 ## Title
 
