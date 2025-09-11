@@ -226,7 +226,10 @@ function MetaBoxesMain( { isLegacy } ) {
 				'metaBoxesMainOpenHeight',
 				candidateHeight
 			);
-		} else if ( ! isShort ) {
+		}
+		// Updates aria-valuenow only when not persisting the value because otherwise
+		// it's done by the render that persisting the value causes.
+		else if ( ! isShort ) {
 			separatorRef.current.ariaValueNow =
 				getAriaValueNow( candidateHeight );
 		}
