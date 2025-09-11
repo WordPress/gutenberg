@@ -372,12 +372,17 @@ async function loadPostTypeEntities() {
 				objectType: `postType/${ postType.slug }`,
 
 				/**
-				 * Sync features supported by the entity.
+				 * Sync features supported by the entity. Since overall syncing support
+				 * is gated by the `enabled` property, we don't need to check for
+				 * "editor" support here.
 				 *
 				 * @type {Record< string, boolean >}
 				 */
 				supports: {
 					awareness: true,
+					crdtPersistence: Boolean(
+						postType.supports?.[ 'custom-fields' ]
+					),
 					undo: true,
 				},
 

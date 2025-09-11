@@ -43,6 +43,7 @@ export interface SyncConfig {
 	objectType: ObjectType;
 	supports?: {
 		awareness?: boolean;
+		crdtPersistence?: boolean;
 		undo?: boolean;
 	};
 	syncedProperties: Set< string >;
