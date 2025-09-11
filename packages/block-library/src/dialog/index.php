@@ -38,7 +38,7 @@ function render_block_core_dialog( $attributes, $content, $block ) {
 	$block_id = array_key_exists( 'dialogId', $attributes ) ? $attributes['dialogId'] : null;
 
 	if ( ! $block_id ) {
-		_doing_it_wrong( 'core/dialog::render', esc_html__( 'The dialog block requires a dialogId attribute.', 'default' ), '1.0.0' );
+		_doing_it_wrong( 'core/dialog::render', esc_html__( 'The core/dialog block requires a dialogId attribute.', 'default' ), '1.0.0' );
 		return '';
 	}
 
