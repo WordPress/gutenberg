@@ -21,15 +21,6 @@ export default function ArrayControl< Item >( {
 	const { id, label, placeholder, elements } = field;
 	const value = field.getValue( { item: data } );
 
-	const findElementByValue = useCallback(
-		( suggestionValue: string ) => {
-			return elements?.find(
-				( suggestion ) => suggestion.value === suggestionValue
-			);
-		},
-		[ elements ]
-	);
-
 	const findElementByLabel = useCallback(
 		( suggestionLabel: string ) => {
 			return elements?.find(
@@ -39,16 +30,18 @@ export default function ArrayControl< Item >( {
 		[ elements ]
 	);
 
-	// Convert values to labels for display purposes only
-	const arrayValueForDisplay = useMemo(
+	// Convert stored values to element objects for the token field
+	const arrayValueAsElements = useMemo(
 		() =>
 			Array.isArray( value )
 				? value.map( ( token ) => {
-						const tokenLabel = findElementByValue( token )?.label;
-						return tokenLabel || token;
+						const element = elements?.find(
+							( suggestion ) => suggestion.value === token
+						);
+						return element || { value: token, label: token };
 				  } )
 				: [],
-		[ value, findElementByValue ]
+		[ value, elements ]
 	);
 
 	const onChangeControl = useCallback(
@@ -104,7 +97,7 @@ export default function ArrayControl< Item >( {
 				return undefined;
 			} }
 			label={ hideLabelFromVision ? undefined : label }
-			value={ arrayValueForDisplay }
+			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
 			placeholder={ placeholder }
 			suggestions={
