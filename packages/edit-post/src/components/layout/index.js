@@ -205,7 +205,16 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorHelpId = useId();
 
 	const [ isUntouched, setIsUntouched ] = useState( true );
-	const applyHeight = ( candidateHeight, isPersistent, isInstant ) => {
+	/**
+	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
+	 * @param {boolean}       isPersistent      Whether to persist the height in preferences.
+	 * @param {boolean}       isInstant         Whether to update the height in the DOM.
+	 */
+	const applyHeight = (
+		candidateHeight = 'auto',
+		isPersistent,
+		isInstant
+	) => {
 		if ( candidateHeight === 'auto' ) {
 			isPersistent = false; // Just in case — “auto” should never persist.
 		} else {
