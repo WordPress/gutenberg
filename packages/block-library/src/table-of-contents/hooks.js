@@ -162,9 +162,7 @@ function observeCallback( select, dispatch, clientId ) {
 	}
 
 	const headings = getLatestHeadings( select, clientId );
-	const headingsChanged = ! fastDeepEqual( headings, attributes.headings );
-
-	if ( headingsChanged ) {
+	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
 		// Executing the update in a microtask ensures that the non-persistent marker doesn't affect an attribute triggering the change.
 		window.queueMicrotask( () => {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -176,7 +174,8 @@ function observeCallback( select, dispatch, clientId ) {
 export function useObserveHeadings( clientId ) {
 	const registry = useRegistry();
 	useEffect( () => {
-		// Subscribe to all relevant store changes in one listener
+		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
+		// See: https://github.com/WordPress/gutenberg/pull/45513
 		return registry.subscribe( () =>
 			observeCallback( registry.select, registry.dispatch, clientId )
 		);
