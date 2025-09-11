@@ -16,6 +16,7 @@
 ### Bug Fixes
 
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
+- DataForm: `integer` select fields correctly return numbers instead of strings. [#71617](https://github.com/WordPress/gutenberg/pull/71617)
 
 ## 8.0.0 (2025-09-03)
 
