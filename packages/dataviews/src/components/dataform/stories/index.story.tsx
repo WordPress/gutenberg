@@ -200,7 +200,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'longDescription',
 		label: 'Long Description',
-		control: 'text',
+		type: 'text',
 		Edit: {
 			control: 'textarea',
 			rows: 5,
