@@ -26,11 +26,29 @@ function getLatestHeadings( select, clientId ) {
 	// store by string. When the store is not available, editorSelectors
 	// will be null, and the block's saved markup will lack permalinks.
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const permalink = select( 'core/editor' ).getPermalink() ?? null;
+	const editorSelectors = select( 'core/editor' );
+
+	// Get the current slug being edited (includes temporary slug for new posts)
+	const currentSlug = editorSelectors?.getEditedPostSlug() ?? null;
+	const permalinkTemplate =
+		editorSelectors?.getEditedPostAttribute( 'permalink_template' ) ?? null;
+
+	// Get block attributes
+	const attributes = getBlockAttributes( clientId ) ?? {};
+	const slug = currentSlug;
+
+	// Construct permalink using slug and template
+	let permalink = null;
+	if ( slug && permalinkTemplate ) {
+		const PERMALINK_POSTNAME_REGEX = /%postname%/;
+		const [ prefix, suffix ] = permalinkTemplate.split(
+			PERMALINK_POSTNAME_REGEX
+		);
+		permalink = prefix + slug + suffix;
+	}
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
-	const { onlyIncludeCurrentPage, maxLevel } =
-		getBlockAttributes( clientId ) ?? {};
+	const { onlyIncludeCurrentPage, maxLevel } = attributes;
 
 	// Get post-content block client ID.
 	const [ postContentClientId = '' ] = getBlocksByName( 'core/post-content' );
@@ -147,7 +165,9 @@ function observeCallback( select, dispatch, clientId ) {
 	}
 
 	const headings = getLatestHeadings( select, clientId );
-	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
+	const headingsChanged = ! fastDeepEqual( headings, attributes.headings );
+
+	if ( headingsChanged ) {
 		// Executing the update in a microtask ensures that the non-persistent marker doesn't affect an attribute triggering the change.
 		window.queueMicrotask( () => {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -159,8 +179,7 @@ function observeCallback( select, dispatch, clientId ) {
 export function useObserveHeadings( clientId ) {
 	const registry = useRegistry();
 	useEffect( () => {
-		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
-		// See: https://github.com/WordPress/gutenberg/pull/45513
+		// Subscribe to all relevant store changes in one listener
 		return registry.subscribe( () =>
 			observeCallback( registry.select, registry.dispatch, clientId )
 		);
