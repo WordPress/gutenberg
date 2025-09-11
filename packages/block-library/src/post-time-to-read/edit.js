@@ -14,10 +14,19 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /**
  * Average reading rate - based on average taken from
@@ -31,6 +40,7 @@ const MAX_READING_RATE = 228;
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const { textAlign, displayAsRange } = attributes;
 	const { postId, postType } = context;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const [ contentStructure ] = useEntityProp(
 		'postType',
@@ -117,21 +127,43 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ _x( 'Time to Read', 'Panel title' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ _x( 'Time to Read', 'Panel title' ) }
+					resetAll={ () => {
+						setAttributes( {
+							displayAsRange: false,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
 						label={ _x(
 							'Display as range',
 							'Turns reading time range display on or off'
 						) }
-						checked={ !! displayAsRange }
-						onChange={ () =>
+						hasValue={ () => !! displayAsRange }
+						onDeselect={ () => {
 							setAttributes( {
-								displayAsRange: ! displayAsRange,
-							} )
-						}
-					/>
-				</PanelBody>
+								displayAsRange: false,
+							} );
+						} }
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ _x(
+								'Display as range',
+								'Turns reading time range display on or off'
+							) }
+							checked={ !! displayAsRange }
+							onChange={ () =>
+								setAttributes( {
+									displayAsRange: ! displayAsRange,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>{ minutesToReadString }</div>
 		</>
