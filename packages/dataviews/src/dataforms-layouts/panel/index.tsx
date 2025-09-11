@@ -33,8 +33,12 @@ export default function FormPanelField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 	const fieldDefinition = fields.find( ( _field ) => {
-		// Default to the first simple child if it is a combined field.
+		// Use summary field if specified for combined fields, otherwise default to the first simple child.
 		if ( isCombinedField( field ) ) {
+			if ( field.summary ) {
+				return _field.id === field.summary;
+			}
+
 			const simpleChildren = field.children.filter(
 				( child ): child is string | SimpleFormField =>
 					typeof child === 'string' || ! isCombinedField( child )

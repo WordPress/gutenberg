@@ -202,6 +202,25 @@ const fields: Field< SamplePost >[] = [
 		type: 'boolean',
 		Edit: 'checkbox',
 	},
+	{
+		id: 'discussion',
+		label: 'Discussion',
+		type: 'text',
+		render: ( { item } ) => {
+			const commentLabel =
+				item.comment_status === 'open'
+					? 'Allow comments'
+					: 'Comments closed';
+			const pingLabel = item.ping_status
+				? 'Pings enabled'
+				: 'Pings disabled';
+			return (
+				<span>
+					{ commentLabel }, { pingLabel }
+				</span>
+			);
+		},
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -369,6 +388,7 @@ const LayoutPanelComponent = ( {
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
+					summary: 'discussion',
 				},
 			],
 		};

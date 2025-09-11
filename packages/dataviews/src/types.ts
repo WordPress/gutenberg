@@ -847,6 +847,7 @@ export type CombinedFormField = {
 	description?: string;
 	layout?: Layout;
 	children: Array< FormField | string >;
+	summary?: string;
 };
 
 export type FormField = SimpleFormField | CombinedFormField;
