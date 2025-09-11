@@ -121,6 +121,30 @@ export default function ArrayControl< Item >( {
 			} }
 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
 			__experimentalShowHowTo={ ! field.isValid?.elements }
+			displayTransform={ ( token: any ) => {
+				// For existing tokens (element objects), display their label
+				if ( typeof token === 'object' && 'label' in token ) {
+					return token.label;
+				}
+				// For suggestions (value strings), find the corresponding element and show its label
+				if ( typeof token === 'string' && elements ) {
+					const element = elements.find(
+						( el ) => el.value === token
+					);
+					return element?.label || token;
+				}
+				return token;
+			} }
+			__experimentalRenderItem={ ( { item }: { item: any } ) => {
+				// Custom rendering for suggestion items (item is a value string)
+				if ( typeof item === 'string' && elements ) {
+					const element = elements.find(
+						( el ) => el.value === item
+					);
+					return <span>{ element?.label || item }</span>;
+				}
+				return <span>{ item }</span>;
+			} }
 		/>
 	);
 }
