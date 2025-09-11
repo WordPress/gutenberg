@@ -192,6 +192,34 @@ _Parameters_
 
 Attach multiple commands to the command palette. Used for static commands.
 
+_Usage_
+
+```js
+import { useCommands } from '@wordpress/commands';
+import { plus, edit } from '@wordpress/icons';
+
+useCommands( [
+	{
+		name: 'myplugin/add-post',
+		label: __( 'Add new post' ),
+		icon: plus,
+		callback: ( { close } ) => {
+			document.location.href = 'post-new.php';
+			close();
+		},
+	},
+	{
+		name: 'myplugin/edit-posts',
+		label: __( 'Edit posts' ),
+		icon: edit,
+		callback: ( { close } ) => {
+			document.location.href = 'edit.php';
+			close();
+		},
+	},
+] );
+```
+
 _Parameters_
 
 -   _commands_ `import('../store/actions').WPCommandConfig[]`: Array of command configs.

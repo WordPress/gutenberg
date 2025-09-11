@@ -70,6 +70,33 @@ export function useCommand( command ) {
  * Attach multiple commands to the command palette. Used for static commands.
  *
  * @param {import('../store/actions').WPCommandConfig[]} commands Array of command configs.
+ *
+ * @example
+ * ```js
+ * import { useCommands } from '@wordpress/commands';
+ * import { plus, edit } from '@wordpress/icons';
+ *
+ * useCommands( [
+ *     {
+ *         name: 'myplugin/add-post',
+ *         label: __( 'Add new post' ),
+ *         icon: plus,
+ *         callback: ({ close }) => {
+ *             document.location.href = 'post-new.php';
+ *             close();
+ *         },
+ *     },
+ *     {
+ *         name: 'myplugin/edit-posts',
+ *         label: __( 'Edit posts' ),
+ *         icon: edit,
+ *         callback: ({ close }) => {
+ *             document.location.href = 'edit.php';
+ *             close();
+ *         },
+ *     },
+ * ] );
+ * ```
  */
 export function useCommands( commands ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
