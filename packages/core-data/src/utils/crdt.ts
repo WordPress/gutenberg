@@ -385,6 +385,8 @@ export function getSyncedMetaPropertiesForPostType(
 	 * registered against the post type and made available via the REST API
 	 * (`'show_in_rest' => true`).
 	 *
+	 * Pass an Array instead of Set as a more familiar data structure.
+	 *
 	 * @param {string[]} syncedMetaProperties List of meta properties to sync.
 	 * @param {string}   postTypeSlug         The post type slug.
 	 * @param {Type}     postType             The post type definition.
@@ -392,7 +394,7 @@ export function getSyncedMetaPropertiesForPostType(
 	 */
 	const syncedMetaProperties: string[] = applyFilters(
 		'sync.metaProperties',
-		[],
+		[ 'footnotes' ],
 		postType.slug,
 		postType
 	) as string[];
