@@ -141,7 +141,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$auto_activation_timer   = $default_is_open ? 0 : $auto_activation_timer;
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
-	// By using state any 3rd party can interact as easy as `store('core/dialog').state[blockId].isOpen = true;` which would open the dialog given the blockId.
+	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
 	$dialog_state           = wp_interactivity_state(
 		'core/dialog',
 		array()
