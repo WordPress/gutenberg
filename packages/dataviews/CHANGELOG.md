@@ -22,6 +22,7 @@
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
 - DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
 - DataForm regular layout: Use BaseControl visual label for readonly fields when in top labelPosition. ([#71597](https://github.com/WordPress/gutenberg/pull/71597))
+- DataForm: `integer` select fields correctly return numbers instead of strings. [#71617](https://github.com/WordPress/gutenberg/pull/71617)
 
 ## 8.0.0 (2025-09-03)
 
