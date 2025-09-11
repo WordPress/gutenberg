@@ -55,6 +55,7 @@ function DropdownHeader( {
 
 function PanelDropdown< Item >( {
 	fieldDefinition,
+	summaryFields,
 	popoverAnchor,
 	labelPosition = 'side',
 	data,
@@ -62,6 +63,7 @@ function PanelDropdown< Item >( {
 	field,
 }: {
 	fieldDefinition: NormalizedField< Item >;
+	summaryFields: NormalizedField< Item >[];
 	popoverAnchor: HTMLElement | null;
 	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
@@ -124,11 +126,38 @@ function PanelDropdown< Item >( {
 					onClick={ onToggle }
 					disabled={ fieldDefinition.readOnly === true }
 					accessibleWhenDisabled
+					style={ summaryFields.length > 1 ? {
+						minHeight: 'auto',
+						height: 'auto',
+						alignItems: 'flex-start'
+					} : undefined }
 				>
-					<fieldDefinition.render
-						item={ data }
-						field={ fieldDefinition }
-					/>
+					{ summaryFields.length > 1 ? (
+						<div style={ { 
+							display: 'flex', 
+							flexDirection: 'column', 
+							alignItems: 'flex-start',
+							width: '100%',
+							gap: '2px'
+						} }>
+							{ summaryFields.map( ( summaryField ) => (
+								<div key={ summaryField.id } style={ { width: '100%' } }>
+									<summaryField.render
+										item={ data }
+										field={ summaryField }
+									/>
+								</div>
+							) ) }
+						</div>
+					) : (
+						summaryFields.map( ( summaryField ) => (
+							<summaryField.render
+								key={ summaryField.id }
+								item={ data }
+								field={ summaryField }
+							/>
+						) )
+					) }
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (

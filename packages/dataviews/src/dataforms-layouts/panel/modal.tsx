@@ -96,12 +96,14 @@ function ModalContent< Item >( {
 
 function PanelModal< Item >( {
 	fieldDefinition,
+	summaryFields,
 	labelPosition,
 	data,
 	onChange,
 	field,
 }: {
 	fieldDefinition: NormalizedField< Item >;
+	summaryFields: NormalizedField< Item >[];
 	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
 	onChange: ( value: any ) => void;
@@ -143,11 +145,38 @@ function PanelModal< Item >( {
 				onClick={ () => setIsOpen( true ) }
 				disabled={ fieldDefinition.readOnly === true }
 				accessibleWhenDisabled
+				style={ summaryFields.length > 1 ? {
+					minHeight: 'auto',
+					height: 'auto',
+					alignItems: 'flex-start'
+				} : undefined }
 			>
-				<fieldDefinition.render
-					item={ data }
-					field={ fieldDefinition }
-				/>
+				{ summaryFields.length > 1 ? (
+					<div style={ { 
+						display: 'flex', 
+						flexDirection: 'column', 
+						alignItems: 'flex-start',
+						width: '100%',
+						gap: '2px'
+					} }>
+						{ summaryFields.map( ( summaryField ) => (
+							<div key={ summaryField.id } style={ { width: '100%' } }>
+								<summaryField.render
+									item={ data }
+									field={ summaryField }
+								/>
+							</div>
+						) ) }
+					</div>
+				) : (
+					summaryFields.map( ( summaryField ) => (
+						<summaryField.render
+							key={ summaryField.id }
+							item={ data }
+							field={ summaryField }
+						/>
+					) )
+				) }
 			</Button>
 			{ isOpen && (
 				<ModalContent

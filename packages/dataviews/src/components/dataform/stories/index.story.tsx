@@ -44,6 +44,11 @@ type SamplePost = {
 	comment_status?: string;
 	ping_status?: boolean;
 	longDescription?: string;
+	origin?: string;
+	destination?: string;
+	flight_status?: string;
+	gate?: string;
+	seat?: string;
 };
 
 const fields: Field< SamplePost >[] = [
@@ -220,6 +225,37 @@ const fields: Field< SamplePost >[] = [
 				</span>
 			);
 		},
+	},
+	{
+		id: 'origin',
+		label: 'Origin',
+		type: 'text',
+	},
+	{
+		id: 'destination',
+		label: 'Destination',
+		type: 'text',
+	},
+	{
+		id: 'flight_status',
+		label: 'Flight Status',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'on-time', label: 'On Time' },
+			{ value: 'delayed', label: 'Delayed' },
+			{ value: 'cancelled', label: 'Cancelled' },
+		],
+	},
+	{
+		id: 'gate',
+		label: 'Gate',
+		type: 'text',
+	},
+	{
+		id: 'seat',
+		label: 'Seat',
+		type: 'text',
 	},
 ];
 
@@ -1302,6 +1338,68 @@ const LayoutMixedComponent = () => {
 	);
 };
 
+const MultipleSummaryPanelComponent = ( {
+	labelPosition,
+	openAs,
+}: {
+	labelPosition: 'default' | 'top' | 'side' | 'none';
+	openAs: 'default' | 'dropdown' | 'modal';
+} ) => {
+	const [ post, setPost ] = useState< SamplePost >( {
+		title: 'Flight Booking',
+		order: 1,
+		author: 1,
+		status: 'confirmed',
+		reviewer: 'system',
+		date: '2024-03-15T10:30:00',
+		birthdate: '1985-06-15T00:00:00',
+		origin: 'New York (JFK)',
+		destination: 'Los Angeles (LAX)',
+		flight_status: 'on-time',
+		gate: 'A12',
+		seat: '14F',
+	} );
+
+	const form: Form = useMemo( () => {
+		return {
+			layout: getLayoutFromStoryArgs( {
+				type: 'panel',
+				labelPosition,
+				openAs,
+			} ),
+			fields: [
+				'title',
+				{
+					id: 'flight_info',
+					label: 'Flight Information',
+					children: [ 'origin', 'destination', 'flight_status', 'gate' ],
+					summary: [ 'origin', 'destination', 'flight_status' ],
+				},
+				{
+					id: 'passenger_details',
+					label: 'Passenger Details',
+					children: [ 'author', 'seat' ],
+					summary: [ 'author', 'seat' ],
+				},
+			],
+		};
+	}, [ labelPosition, openAs ] );
+
+	return (
+		<DataForm< SamplePost >
+			data={ post }
+			fields={ fields }
+			form={ form }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
+		/>
+	);
+};
+
 const meta = {
 	title: 'DataViews/DataForm',
 	component: DataForm,
@@ -1392,4 +1490,24 @@ export const Validation = {
 
 export const Visibility = {
 	render: VisibilityComponent,
+};
+
+export const MultipleSummaryFields = {
+	render: MultipleSummaryPanelComponent,
+	argTypes: {
+		labelPosition: {
+			control: { type: 'select' },
+			description: 'Chooses the label position.',
+			options: [ 'default', 'top', 'side', 'none' ],
+		},
+		openAs: {
+			control: { type: 'select' },
+			description: 'Chooses how to open the panel.',
+			options: [ 'default', 'dropdown', 'modal' ],
+		},
+	},
+	args: {
+		labelPosition: 'side',
+		openAs: 'dropdown',
+	},
 };
