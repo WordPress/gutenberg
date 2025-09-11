@@ -559,7 +559,7 @@ describe( 'getEntityRecords', () => {
 			expect( call[ 6 ] ).toEqual( { totalItems: 5, totalPages: 1 } );
 		} );
 
-		// Should process all the data from our 3 mock pages (2+2+1=5 records total)
+		// Should process all the data from the 3 mock pages (2+2+1=5 records total)
 		const finalCall = calls[ calls.length - 1 ];
 		expect( finalCall[ 2 ] ).toHaveLength( 5 );
 	} );
