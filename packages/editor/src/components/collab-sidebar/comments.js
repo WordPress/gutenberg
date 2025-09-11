@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useRef } from '@wordpress/element';
+import { useState, RawHTML, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -19,7 +19,7 @@ import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	useBlockElement,
+	__unstableUseBlockElement,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
@@ -51,28 +51,18 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const prevRef = useRef( null );
+	const { blockCommentId, blocks } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
 
-	const { blockCommentId, blocks, selectedBlockClientId } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
-				select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-
-			return {
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.blockCommentId
-					: null,
-				blocks: getBlocks(),
-				selectedBlockClientId: _clientId,
-			};
-		},
-		[]
-	);
-
-	// Track the currently highlighted block
-	const [ highlightedBlockId, setHighlightedBlockId ] = useState( null );
-	const highlightedBlockElement = useBlockElement( highlightedBlockId );
+		return {
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.blockCommentId
+				: null,
+			blocks: getBlocks(),
+		};
+	}, [] );
 
 	const clearThreadFocus = () => {
 		setFocusThread( null );
@@ -85,37 +75,10 @@ export function Comments( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
-	// Effect to handle highlighting when selectedBlockClientId changes
-	useEffect( () => {
-		// Clear previous highlight
-		if ( prevRef.current ) {
-			toggleBlockHighlight( prevRef.current, false );
-			prevRef.current = null;
-		}
-
-		if ( ! selectedBlockClientId ) {
-			return;
-		}
-
-		// Highlight the selected block
-		toggleBlockHighlight( selectedBlockClientId, true );
-		prevRef.current = selectedBlockClientId;
-
-		// Find and focus related comment
-		const blockAttributes = blocks?.find(
-			( block ) => block.clientId === selectedBlockClientId
-		)?.attributes;
-		if ( blockAttributes?.blockCommentId ) {
-			setFocusThread( blockAttributes.blockCommentId );
-		}
-
-		return () => {
-			if ( prevRef.current ) {
-				toggleBlockHighlight( prevRef.current, false );
-				prevRef.current = null;
-			}
-		};
-	}, [ selectedBlockClientId, toggleBlockHighlight, blocks ] );
+	// State to track the highlighted block for scrolling
+	const [ highlightedBlockId, setHighlightedBlockId ] = useState( null );
+	const highlightedBlockElement =
+		__unstableUseBlockElement( highlightedBlockId );
 
 	// Effect to handle scrolling when highlighted block element changes
 	useEffect( () => {
@@ -127,18 +90,12 @@ export function Comments( {
 		}
 	}, [ highlightedBlockElement ] );
 
-	// Cleanup effect to clear highlight on unmount
-	useEffect( () => {
-		return () => {
-			if ( highlightedBlockId ) {
-				toggleBlockHighlight( highlightedBlockId, false );
-			}
-		};
-	}, [ highlightedBlockId, toggleBlockHighlight ] );
+	// Handle comment selection
+	const handleCommentSelect = ( threadId ) => {
+		setFocusThread( threadId );
 
-	// Function to find and highlight blocks by comment ID (without selecting)
-	const highlightBlocksByCommentId = ( commentId ) => {
-		if ( ! commentId || ! blocks ) {
+		// Find and highlight blocks by comment ID
+		if ( ! threadId || ! blocks ) {
 			return;
 		}
 
@@ -146,7 +103,7 @@ export function Comments( {
 		const relatedBlocks = [];
 		const findBlocks = ( blockList ) => {
 			blockList.forEach( ( block ) => {
-				if ( block.attributes?.blockCommentId === commentId ) {
+				if ( block.attributes?.blockCommentId === threadId ) {
 					relatedBlocks.push( block.clientId );
 				}
 				if ( block.innerBlocks ) {
@@ -157,25 +114,12 @@ export function Comments( {
 
 		findBlocks( blocks );
 
-		// Highlight the first related block if found (without selecting it)
+		// Highlight the first related block if found
 		if ( relatedBlocks.length > 0 ) {
 			const blockId = relatedBlocks[ 0 ];
-
-			// Clear previous highlight
-			if ( highlightedBlockId ) {
-				toggleBlockHighlight( highlightedBlockId, false );
-			}
-
-			// Set new highlight
-			setHighlightedBlockId( blockId );
 			toggleBlockHighlight( blockId, true );
+			setHighlightedBlockId( blockId );
 		}
-	};
-
-	// Handle comment selection
-	const handleCommentSelect = ( threadId ) => {
-		setFocusThread( threadId );
-		highlightBlocksByCommentId( threadId );
 	};
 
 	return (

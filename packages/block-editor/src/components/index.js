@@ -115,7 +115,7 @@ export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
-export { useBlockElement } from './block-list/use-block-props/use-block-refs';
+export { useBlockElement as __unstableUseBlockElement } from './block-list/use-block-props/use-block-refs';
 export { default as BlockMover } from './block-mover';
 export {
 	default as BlockPreview,
