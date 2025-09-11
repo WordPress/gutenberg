@@ -399,6 +399,7 @@ export default function CollabSidebar() {
 					styles={ {
 						backgroundColor,
 					} }
+					showCommentsinPopover
 				/>
 			</PluginSidebar>
 		</>
