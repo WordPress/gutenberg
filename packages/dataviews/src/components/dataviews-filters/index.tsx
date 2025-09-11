@@ -29,9 +29,7 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 		fields.forEach( ( field ) => {
 			if (
 				field.filterBy === false ||
-				( Array.isArray( field.elements ) &&
-					! field.elements?.length &&
-					! field.Edit )
+				( ! field.elements?.length && ! field.Edit )
 			) {
 				return;
 			}
@@ -45,7 +43,7 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 			filters.push( {
 				field: field.id,
 				name: field.label,
-				elements: Array.isArray( field.elements ) ? field.elements : [],
+				elements: field.elements ?? [],
 				singleSelection: operators.some( ( op ) =>
 					SINGLE_SELECTION_OPERATORS.includes( op )
 				),
