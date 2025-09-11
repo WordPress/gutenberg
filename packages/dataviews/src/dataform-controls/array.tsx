@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,6 +29,13 @@ export default function ArrayControl< Item >( {
 		},
 		[ elements ]
 	);
+	const [ customValidity, setCustomValidity ] = useState<
+		| {
+				type: 'validating' | 'valid' | 'invalid';
+				message: string;
+		  }
+		| undefined
+	>( undefined );
 
 	// Convert stored values to element objects for the token field
 	const arrayValueAsElements = useMemo(
@@ -70,6 +77,10 @@ export default function ArrayControl< Item >( {
 		[ id, onChange, findElementByLabel ]
 	);
 
+	const onFocus = useCallback( () => {
+		setCustomValidity( undefined );
+	}, [] );
+
 	return (
 		<ValidatedFormTokenField
 			required={ !! field.isValid?.required }
@@ -96,9 +107,11 @@ export default function ArrayControl< Item >( {
 
 				return undefined;
 			} }
+			customValidity={ customValidity }
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
+			onFocus={ onFocus }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
 			__experimentalValidateInput={ ( token: string ) => {
