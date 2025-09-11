@@ -169,6 +169,7 @@ function BlockBindingsAttribute( { attribute, binding, sources } ) {
 								( item ) => item.key === args?.key
 						  )?.label ||
 						  sources?.[ sourceName ]?.label ||
+						  sourceProps?.label ||
 						  sourceName }
 				</Text>
 			) }

@@ -20,7 +20,10 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockBindingsSource } from '@wordpress/blocks';
+import {
+	getBlockBindingsSource,
+	getBlockBindingsSources,
+} from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -218,13 +221,29 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				select,
-				context: blockBindingsContext,
-			} );
+
+			// Try to get field label from client-side source data first (preferred approach)
+			let clientSideFieldLabel = null;
+			const allSources = getBlockBindingsSources();
+			const clientSideSource = allSources[ relatedBinding.source ];
+			if ( clientSideSource?.editorUI ) {
+				const editorUIContext = {};
+				if ( clientSideSource.usesContext?.length ) {
+					for ( const key of clientSideSource.usesContext ) {
+						editorUIContext[ key ] = blockContext[ key ];
+					}
+				}
+				const editorUIResult = clientSideSource.editorUI( {
+					select,
+					context: editorUIContext,
+				} );
+				clientSideFieldLabel = editorUIResult.data?.find(
+					( item ) => item.key === relatedBinding?.args?.key
+				)?.label;
+			}
+
 			const bindingKey =
-				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				blockBindingsSource?.label;
+				clientSideFieldLabel ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey

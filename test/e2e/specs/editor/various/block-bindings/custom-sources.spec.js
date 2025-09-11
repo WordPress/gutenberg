@@ -763,7 +763,7 @@ test.describe( 'Registered sources', () => {
 		} );
 	} );
 
-	test.describe( 'getFieldsList', () => {
+	test.describe( 'UI Editor', () => {
 		test( 'should be possible to update attribute value through bindings UI', async ( {
 			editor,
 			page,
@@ -778,6 +778,11 @@ test.describe( 'Registered sources', () => {
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Complete Source',
+				} )
+				.click();
 			await page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Text Field Label' } )
@@ -914,6 +919,11 @@ test.describe( 'Registered sources', () => {
 				},
 			} );
 			await page.getByRole( 'button', { name: 'content' } ).click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Complete Source',
+				} )
+				.click();
 			const textField = page
 				.getByRole( 'menuitemradio' )
 				.filter( { hasText: 'Text Field Label' } );
