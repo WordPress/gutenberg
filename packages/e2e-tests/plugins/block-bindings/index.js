@@ -39,6 +39,58 @@ registerBlockBindingsSource( {
 } );
 
 registerBlockBindingsSource( {
+	name: 'testing/modal-source',
+	label: 'Modal Source',
+	getValues,
+	setValues,
+	canUserEditValue: () => true,
+	editorUI: () => ( {
+		mode: 'modal',
+		data: Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
+			key,
+			label: field?.label || key,
+			type: field?.type || 'string',
+			value: field?.value,
+		} ) ),
+		renderModalContent: ( { updateBlockBindings } ) => {
+			return el(
+				'div',
+				{ style: { padding: '20px' } },
+				el( 'h3', null, 'Select a field from the modal' ),
+				el(
+					'p',
+					null,
+					'This is a modal interface for selecting fields.'
+				),
+				Object.entries( fieldsList || {} ).map( ( [ key, field ] ) =>
+					el(
+						'button',
+						{
+							key,
+							onClick: () => {
+								updateBlockBindings( {
+									content: {
+										source: 'testing/modal-source',
+										args: { key },
+									},
+								} );
+							},
+							style: {
+								display: 'block',
+								margin: '5px 0',
+								padding: '10px',
+								width: '100%',
+							},
+						},
+						field?.label || key
+					)
+				)
+			);
+		},
+	} ),
+} );
+
+registerBlockBindingsSource( {
 	name: 'testing/can-user-edit-false',
 	label: 'Can User Edit: False',
 	getValues,
