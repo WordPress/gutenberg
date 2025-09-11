@@ -56,7 +56,7 @@ function Edit( {
 			return dialogElementRef.current.open;
 		}
 		return false;
-	}, [ dialogElementRef ] );
+	}, [ dialogElementRef.current ] );
 
 	/**
 	 * Helper functions:

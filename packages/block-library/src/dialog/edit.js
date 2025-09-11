@@ -72,7 +72,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	// @TODO: This is not... great, but we need to wait for the ref to be populated before we can query for the dialog element. We should look at using a more robust solution for this in the future, perhaps a redux store.
 	const dialogElm = useMemo( () => {
 		return ref.current?.querySelector( '.wp-block-dialog-element' ) || null;
-	}, [ ref ] );
+	}, [ ref.current ] );
 
 	const blockProps = useBlockProps( {
 		ref,
