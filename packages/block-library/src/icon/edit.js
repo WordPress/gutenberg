@@ -155,16 +155,16 @@ export function Edit( props ) {
 
 	const iconsAll = flattenIconsArray( getIcons() );
 	const namedIcon = iconsAll.filter( ( i ) => i.name === iconName );
-	let customIcon = defaultIcon;
+	const customIcon = defaultIcon;
 	let printedIcon = '';
 	if ( icon && namedIcon.length === 0 ) {
-		customIcon = parseIcon( icon );
+		printedIcon = parseIcon( icon );
 
 		if (
 			customIcon.props &&
 			Object.keys( customIcon?.props ).length === 0
 		) {
-			customIcon = defaultIcon;
+			printedIcon = defaultIcon;
 		}
 	} else {
 		// Icon chosen from library.
