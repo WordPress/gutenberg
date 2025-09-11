@@ -517,7 +517,7 @@ describe( 'getEntityRecords', () => {
 		);
 	} );
 
-	it( 'provides pagination metadata during intermediate results fetching', async () => {
+	it( 'provides pagination metadata and progressive loading during intermediate results fetching', async () => {
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
