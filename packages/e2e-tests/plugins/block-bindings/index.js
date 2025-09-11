@@ -27,7 +27,15 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	getFieldsList: () => fieldsList,
+	editorUI: () => ( {
+		mode: 'dropdown',
+		data: Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
+			key,
+			label: field?.label || key,
+			type: field?.type || 'string',
+			value: field?.value,
+		} ) ),
+	} ),
 } );
 
 registerBlockBindingsSource( {
