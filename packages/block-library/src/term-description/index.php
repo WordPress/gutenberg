@@ -21,6 +21,10 @@ function render_block_core_term_description( $attributes ) {
 		$term_description = term_description();
 	}
 
+	if ( is_author() ) {
+		$term_description = get_the_author_meta( 'description' );
+	}
+
 	if ( empty( $term_description ) ) {
 		return '';
 	}
