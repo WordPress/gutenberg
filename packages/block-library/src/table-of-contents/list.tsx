@@ -14,10 +14,12 @@ export default function TableOfContentsList( {
 	nestedHeadingList,
 	disableLinkActivation,
 	onClick,
+	ordered = true,
 }: {
 	nestedHeadingList: NestedHeadingData[];
 	disableLinkActivation?: boolean;
 	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
+	ordered?: boolean;
 } ): ReactElement {
 	return (
 		<>
@@ -42,25 +44,46 @@ export default function TableOfContentsList( {
 					<span className={ ENTRY_CLASS_NAME }>{ content }</span>
 				);
 
-				return (
-					<li key={ index }>
-						{ entry }
-						{ node.children ? (
+				const childOnClick =
+					disableLinkActivation && 'function' === typeof onClick
+						? onClick
+						: undefined;
+
+				let childrenList: ReactElement | null = null;
+				if ( node.children ) {
+					if ( ordered ) {
+						childrenList = (
 							<ol>
 								<TableOfContentsList
 									nestedHeadingList={ node.children }
 									disableLinkActivation={
 										disableLinkActivation
 									}
-									onClick={
-										disableLinkActivation &&
-										'function' === typeof onClick
-											? onClick
-											: undefined
-									}
+									onClick={ childOnClick }
+									ordered={ ordered }
 								/>
 							</ol>
-						) : null }
+						);
+					} else {
+						childrenList = (
+							<ul>
+								<TableOfContentsList
+									nestedHeadingList={ node.children }
+									disableLinkActivation={
+										disableLinkActivation
+									}
+									onClick={ childOnClick }
+									ordered={ ordered }
+								/>
+							</ul>
+						);
+					}
+				}
+
+				return (
+					<li key={ index }>
+						{ entry }
+						{ childrenList }
 					</li>
 				);
 			} ) }

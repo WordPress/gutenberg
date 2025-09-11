@@ -42,20 +42,37 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  * @param {Object}                       props.attributes                        The block attributes.
  * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
+ * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or undefined to include all levels.
+ * @param {boolean}                      props.attributes.ordered                Whether to render the table of contents as an ordered list (numbers) or unordered (bullets).
+ * @param {boolean}                      props.attributes.hierarchicalNumbering  Whether to display hierarchical numbering when ordered is true.
  * @param {string}                       props.clientId                          The client id.
  * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
  *
  * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage, maxLevel },
+	attributes: {
+		headings = [],
+		onlyIncludeCurrentPage,
+		maxLevel,
+		ordered = true,
+		hierarchicalNumbering = false,
+	},
 	clientId,
 	setAttributes,
 } ) {
 	useObserveHeadings( clientId );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: [
+			! ordered ? 'is-unordered' : null,
+			ordered && hierarchicalNumbering
+				? 'is-hierarchical-numbering'
+				: null,
+		]
+			.filter( Boolean )
+			.join( ' ' ),
+	} );
 	const instanceId = useInstanceId(
 		TableOfContentsEdit,
 		'table-of-contents'
@@ -94,10 +111,11 @@ export default function TableOfContentsEdit( {
 						replaceBlocks(
 							clientId,
 							createBlock( 'core/list', {
-								ordered: true,
+								ordered,
 								values: renderToString(
 									<TableOfContentsList
 										nestedHeadingList={ headingTree }
+										ordered={ ordered }
 									/>
 								),
 							} )
@@ -118,10 +136,63 @@ export default function TableOfContentsEdit( {
 					setAttributes( {
 						onlyIncludeCurrentPage: false,
 						maxLevel: undefined,
+						ordered: true,
+						hierarchicalNumbering: false,
 					} );
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
+				<ToolsPanelItem
+					hasValue={ () => ordered !== true }
+					label={ __( 'List style' ) }
+					onDeselect={ () => setAttributes( { ordered: true } ) }
+					isShownByDefault
+				>
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'List style' ) }
+						value={ ordered ? 'ordered' : 'unordered' }
+						options={ [
+							{ value: 'ordered', label: __( 'Numbers' ) },
+							{ value: 'unordered', label: __( 'Bullets' ) },
+						] }
+						onChange={ ( value ) => {
+							const isOrdered = value === 'ordered';
+							setAttributes( {
+								ordered: isOrdered,
+								...( ! isOrdered
+									? { hierarchicalNumbering: false }
+									: {} ),
+							} );
+						} }
+					/>
+				</ToolsPanelItem>
+
+				{ ordered && (
+					<ToolsPanelItem
+						hasValue={ () => !! hierarchicalNumbering }
+						label={ __( 'Hierarchical numbering' ) }
+						onDeselect={ () =>
+							setAttributes( { hierarchicalNumbering: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Hierarchical numbering' ) }
+							help={ __(
+								'Show hierarchical numbers (e.g., 2.1.1).'
+							) }
+							checked={ hierarchicalNumbering }
+							onChange={ ( value ) =>
+								setAttributes( {
+									hierarchicalNumbering: value,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
 				<ToolsPanelItem
 					hasValue={ () => !! onlyIncludeCurrentPage }
 					label={ __( 'Only include current page' ) }
@@ -213,13 +284,25 @@ export default function TableOfContentsEdit( {
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol>
-					<TableOfContentsList
-						nestedHeadingList={ headingTree }
-						disableLinkActivation
-						onClick={ showRedirectionPreventedNotice }
-					/>
-				</ol>
+				{ ordered ? (
+					<ol>
+						<TableOfContentsList
+							nestedHeadingList={ headingTree }
+							disableLinkActivation
+							onClick={ showRedirectionPreventedNotice }
+							ordered={ ordered }
+						/>
+					</ol>
+				) : (
+					<ul>
+						<TableOfContentsList
+							nestedHeadingList={ headingTree }
+							disableLinkActivation
+							onClick={ showRedirectionPreventedNotice }
+							ordered={ ordered }
+						/>
+					</ul>
+				) }
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

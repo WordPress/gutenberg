@@ -2,3 +2,34 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
+
+:root :where(.wp-block-table-of-contents.is-hierarchical-numbering) {
+	// Remove default bullets and set up counter scope on each list.
+	& ol {
+		list-style: decimal;
+		counter-reset: item;
+		padding-inline-start: revert;
+		margin: revert;
+	}
+
+	& li {
+		counter-increment: item;
+	}
+
+	& li::marker {
+		content: counters(item, ".") ". ";
+	}
+
+	& li > ol {
+		counter-reset: item;
+	}
+}
+
+:root :where(.wp-block-table-of-contents.is-unordered) {
+	& ul {
+		list-style: revert;
+		counter-reset: none;
+		padding-inline-start: revert;
+		margin: revert;
+	}
+}
