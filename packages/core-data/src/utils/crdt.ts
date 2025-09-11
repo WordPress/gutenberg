@@ -6,30 +6,39 @@ import * as fun from 'lib0/function';
 /**
  * WordPress dependencies
  */
-import { type CRDTDoc, type ObjectData, Y } from '@wordpress/sync';
+import { applyFilters } from '@wordpress/hooks';
+import { type CRDTDoc, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { mergeCrdtBlocks, type Block, type YBlock } from './crdt-blocks';
+import { type Post } from '../entity-types/post';
+import { type Type } from '../entity-types';
 
-type MaybeRawValue = string | { raw: string };
-
-interface PostChanges {
-	blocks?: Block[];
-	excerpt?: MaybeRawValue;
-	status?: string;
-	title?: MaybeRawValue;
-}
+type PostChanges = Partial< Post > & { blocks?: Block[] };
 
 // Key used to store the document map in the Y.Doc.
 const DOCUMENT_MAP_KEY = 'document';
 
+/**
+ * Given a set of local changes to a post record, apply those changes to the
+ * local Y.Doc.
+ *
+ * @param {CRDTDoc}       ydoc
+ * @param {PostChanges}   changes
+ * @param {Post}          record
+ * @param {Set< string >} syncedProperties
+ * @param {Set< string >} syncedMetaProperties
+ * @param {string}        origin
+ * @return {void}
+ */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	record: ObjectData,
+	record: Post,
 	syncedProperties: Set< string >,
+	syncedMetaProperties: Set< string >,
 	origin: string
 ): void {
 	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
@@ -63,7 +72,7 @@ export function applyPostChangesToCRDTDoc(
 				}
 
 				// Block[] from local changes.
-				const newBlocks = newValue ?? [];
+				const newBlocks = ( newValue as PostChanges[ 'blocks' ] ) ?? [];
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
@@ -78,6 +87,36 @@ export function applyPostChangesToCRDTDoc(
 				const rawNewValue = getRawValue( newValue );
 
 				mergeValue( currentValue, rawNewValue, setValue );
+				break;
+			}
+
+			// Meta is overloaded term in Core; here, it refers to post meta.
+			case 'meta': {
+				let metaMap = ymap.get( 'meta' ) as Y.Map< unknown >;
+
+				// Initialize.
+				if ( ! ( metaMap instanceof Y.Map ) ) {
+					metaMap = new Y.Map();
+					setValue( metaMap );
+				}
+
+				// Iterate over each meta property in the new value and merge it (if it
+				// is a synced meta property).
+				Object.entries( newValue ?? {} ).forEach(
+					( [ metaKey, metaValue ] ) => {
+						if ( ! syncedMetaProperties.has( metaKey ) ) {
+							return;
+						}
+
+						mergeValue(
+							metaMap.get( metaKey ), // current value in CRDT
+							metaValue, // new value from local changes
+							( updatedMetaValue: unknown ): void => {
+								metaMap.set( metaKey, updatedMetaValue );
+							}
+						);
+					}
+				);
 				break;
 			}
 
@@ -137,14 +176,17 @@ export function applyPostChangesToCRDTDoc(
  * to dispatch.
  *
  * @param {CRDTDoc}       ydoc
- * @param {ObjectData}    record
+ * @param {Post}          record
  * @param {Set< string >} syncedProperties
+ * @param {Set< string >} syncedMetaProperties
+ * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
-	record: ObjectData,
-	syncedProperties: Set< string >
-): Partial< PostChanges > {
+	record: Post,
+	syncedProperties: Set< string >,
+	syncedMetaProperties: Set< string >
+): PostChanges {
 	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
 
 	return Object.fromEntries(
@@ -179,6 +221,24 @@ export function getPostChangesFromCRDTDoc(
 					return haveValuesChanged( currentValue, newValue );
 				}
 
+				case 'meta': {
+					const allowedMeta = Object.fromEntries(
+						Object.entries( newValue ?? {} ).filter(
+							( [ metaKey ] ) =>
+								syncedMetaProperties.has( metaKey )
+						)
+					);
+
+					// Merge the allowed meta changes with the current meta values since
+					// not all meta properties are synced.
+					const mergedValue = {
+						...( currentValue as PostChanges[ 'meta' ] ),
+						...allowedMeta,
+					};
+
+					return haveValuesChanged( currentValue, mergedValue );
+				}
+
 				case 'status': {
 					// Do not sync an invalid status.
 					if ( 'auto-draft' === newValue ) {
@@ -191,7 +251,7 @@ export function getPostChangesFromCRDTDoc(
 				case 'excerpt':
 				case 'title': {
 					return haveValuesChanged(
-						getRawValue( currentValue as MaybeRawValue ),
+						getRawValue( currentValue ),
 						newValue
 					);
 				}
@@ -206,13 +266,29 @@ export function getPostChangesFromCRDTDoc(
 	);
 }
 
-function getRawValue( value?: MaybeRawValue ): string | undefined {
+/**
+ * Extract the raw string value from a property that may be a string or an object
+ * with a `raw` property (`RenderedText`).
+ *
+ * @param {unknown} value The value to extract from.
+ * @return {string|undefined} The raw string value, or undefined if it could not be determined.
+ */
+function getRawValue( value?: unknown ): string | undefined {
 	// Value may be a string property or a nested object with a `raw` property.
 	if ( 'string' === typeof value ) {
 		return value;
 	}
 
-	return value?.raw;
+	if (
+		value &&
+		'object' === typeof value &&
+		'raw' in value &&
+		'string' === typeof value.raw
+	) {
+		return value.raw;
+	}
+
+	return undefined;
 }
 
 function haveValuesChanged< ValueType = any >(
@@ -225,9 +301,94 @@ function haveValuesChanged< ValueType = any >(
 function mergeValue< ValueType = any >(
 	currentValue: ValueType,
 	newValue: ValueType,
-	setValue: ( value: ValueType ) => ValueType
+	setValue: ( value: ValueType ) => void
 ): void {
 	if ( haveValuesChanged< ValueType >( currentValue, newValue ) ) {
 		setValue( newValue );
 	}
+}
+
+/**
+ * Given a post type definition, return the set of properties that should be
+ * synced for that post type.
+ *
+ * @param {Type} postType The post type definition.
+ * @return {Set<string>} The set of properties that should be synced.
+ */
+export function getSyncedPropertiesForPostType(
+	postType: Type
+): Set< string > {
+	const syncedProperties = new Set< string >( [
+		'date',
+		'status',
+		'tags',
+		'template',
+		'slug',
+		'sticky',
+	] );
+
+	Object.entries( postType.supports || {} ).forEach(
+		( [ feature, isSupported ] ) => {
+			if ( ! isSupported ) {
+				return;
+			}
+
+			switch ( feature ) {
+				case 'author':
+					syncedProperties.add( 'author' );
+					break;
+				case 'comments':
+					syncedProperties.add( 'comment_status' );
+					break;
+				case 'custom-fields':
+					syncedProperties.add( 'meta' );
+					break;
+				case 'editor':
+					syncedProperties.add( 'blocks' );
+					break;
+				case 'excerpt':
+					syncedProperties.add( 'excerpt' );
+					break;
+				case 'post-formats':
+					syncedProperties.add( 'format' );
+					break;
+				case 'thumbnail':
+					syncedProperties.add( 'featured_media' );
+					break;
+				case 'trackbacks':
+					syncedProperties.add( 'ping_status' );
+					break;
+				case 'title':
+					syncedProperties.add( 'title' );
+					break;
+			}
+		}
+	);
+
+	return syncedProperties;
+}
+
+/**
+ * Given a post type definition, return the set of meta properties that should
+ * be synced for that post type.
+ *
+ * @param {Type} postType The post type definition.
+ * @return {Set<string>} The set of meta properties that should be synced.
+ */
+export function getSyncedMetaPropertiesForPostType(
+	postType: Type
+): Set< string > {
+	// Return empty set if the post type does not support custom fields.
+	if ( ! postType.supports?.[ 'custom-fields' ] ) {
+		return new Set();
+	}
+
+	const syncedMetaProperties: string[] = applyFilters(
+		'sync.metaProperties',
+		[],
+		postType.slug,
+		postType
+	) as string[];
+
+	return new Set( syncedMetaProperties );
 }
