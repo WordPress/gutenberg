@@ -334,7 +334,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			{ ! isShort && (
 				<>
 					<Tooltip text={ __( 'Drag to resize' ) }>
-						<div // eslint-disable-line jsx-a11y/role-supports-aria-props
+						<span // eslint-disable-line jsx-a11y/role-supports-aria-props
 							ref={ separatorRef }
 							role="separator"
 							aria-valuenow={ usedAriaValueNow }
