@@ -39,7 +39,7 @@ When creating a new package, you need to provide at least the following. Package
     	"types": "build-types",
     	"sideEffects": false,
     	"dependencies": {
-    		"@babel/runtime": "7.25.7"
+    		"@babel/runtime": "7.28.4"
     	},
     	"publishConfig": {
     		"access": "public"

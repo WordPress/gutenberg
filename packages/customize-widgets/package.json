@@ -25,7 +25,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",

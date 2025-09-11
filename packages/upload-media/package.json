@@ -27,7 +27,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/compose": "file:../compose",

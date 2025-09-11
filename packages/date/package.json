@@ -28,7 +28,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@wordpress/deprecated": "file:../deprecated",
 		"moment": "^2.29.4",
 		"moment-timezone": "^0.5.40"

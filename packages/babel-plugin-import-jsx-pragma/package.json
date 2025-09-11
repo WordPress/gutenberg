@@ -32,7 +32,7 @@
 	],
 	"main": "index.js",
 	"peerDependencies": {
-		"@babel/core": "^7.25.7"
+		"@babel/core": "^7.28.4"
 	},
 	"publishConfig": {
 		"access": "public"

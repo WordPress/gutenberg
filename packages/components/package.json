@@ -33,7 +33,7 @@
 	],
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
 		"@emotion/react": "^11.7.1",

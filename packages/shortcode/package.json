@@ -28,7 +28,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"memize": "^2.0.1"
 	},
 	"publishConfig": {

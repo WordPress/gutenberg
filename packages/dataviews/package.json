@@ -45,7 +45,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@ariakit/react": "^0.4.15",
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

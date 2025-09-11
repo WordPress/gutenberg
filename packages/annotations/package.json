@@ -27,7 +27,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
-		"@babel/runtime": "7.25.7",
+		"@babel/runtime": "7.28.4",
 		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
