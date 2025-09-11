@@ -380,6 +380,16 @@ export function getSyncedMetaPropertiesForPostType(
 		return new Set();
 	}
 
+	/**
+	 * In order to be available to the sync module, meta properties must be
+	 * registered against the post type and made available via the REST API
+	 * (`'show_in_rest' => true`).
+	 *
+	 * @param {string[]} syncedMetaProperties List of meta properties to sync.
+	 * @param {string}   postTypeSlug         The post type slug.
+	 * @param {Type}     postType             The post type definition.
+	 * @return {string[]} The filtered list of meta properties to sync.
+	 */
 	const syncedMetaProperties: string[] = applyFilters(
 		'sync.metaProperties',
 		[],
