@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentControl,
@@ -128,7 +128,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<InspectorControls>
 				<ToolsPanel
-					label={ _x( 'Time to Read', 'Panel title' ) }
+					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
 							displayAsRange: false,
