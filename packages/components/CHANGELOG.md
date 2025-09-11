@@ -11,7 +11,7 @@
 -   `ValidatedCheckboxControl`: Expose the component under private API's ([#71505](https://github.com/WordPress/gutenberg/pull/71505/)).
 -   Expose `ValidatedTextareaControl` via Private APIs ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 -   Add support for ValidatedFormTokenField [#71350](https://github.com/WordPress/gutenberg/pull/71350).
--   Add support for elements validation in DataForm's array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+-   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
 
 
 ## 30.3.0 (2025-09-03)
