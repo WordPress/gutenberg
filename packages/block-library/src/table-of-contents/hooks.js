@@ -29,18 +29,20 @@ function getLatestHeadings( select, clientId ) {
 	const editorSelectors = select( 'core/editor' );
 
 	// Get the current slug being edited (includes temporary slug for new posts)
-	const currentSlug = editorSelectors?.getEditedPostSlug() ?? null;
+	const editedPostSlug = editorSelectors?.getEditedPostSlug() ?? null;
 	const permalinkTemplate =
 		editorSelectors?.getEditedPostAttribute( 'permalink_template' ) ?? null;
 
-	// Construct permalink using currentSlug and template
-	let permalink = null;
-	if ( currentSlug && permalinkTemplate ) {
-		const PERMALINK_POSTNAME_REGEX = /%postname%/;
+	// Construct permalink using editedPostSlug and template
+	let permalink = permalinkTemplate;
+	const permalinkRegexResult =
+		permalinkTemplate.match( /%postname%|%pagename%/ )[ 0 ] ?? null;
+	if ( editedPostSlug && permalinkRegexResult ) {
+		const PERMALINK_POSTNAME_REGEX = new RegExp( permalinkRegexResult );
 		const [ prefix, suffix ] = permalinkTemplate.split(
 			PERMALINK_POSTNAME_REGEX
 		);
-		permalink = prefix + currentSlug + suffix;
+		permalink = prefix + editedPostSlug + suffix;
 	}
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
