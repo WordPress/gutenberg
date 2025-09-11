@@ -125,8 +125,11 @@ export default function ArrayControl< Item >( {
 		[ id, onChange, validateTokens ]
 	);
 
-	const onFocus = useCallback( () => {
-		setCustomValidity( undefined );
+	const onInputChange = useCallback( ( input: string ) => {
+		if ( input === '' ) {
+			// Reset custom validity when input is cleared
+			setCustomValidity( undefined );
+		}
 	}, [] );
 
 	return (
@@ -137,7 +140,7 @@ export default function ArrayControl< Item >( {
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
-			onFocus={ onFocus }
+			onInputChange={ onInputChange }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
 			messages={ {
