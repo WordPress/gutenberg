@@ -4,6 +4,7 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalInputControl as InputControl,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
@@ -34,10 +35,20 @@ export function Controls( {
 	attributes,
 	setAttributes,
 	setIsEditingControl = () => {},
+	updateBlockBindings,
+	hasUrlBinding,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const editBoundLink = () => {
+		// Remove the binding
+		updateBlockBindings( { url: undefined } );
+
+		// Clear url and id to allow picking a new entity (keep type and kind)
+		setAttributes( { url: undefined, id: undefined } );
+	};
 
 	return (
 		<ToolsPanel
@@ -79,23 +90,33 @@ export function Controls( {
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<TextControl
+				<InputControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Link' ) }
 					value={ url ? safeDecodeURI( url ) : '' }
 					onChange={ ( urlValue ) => {
+						if ( hasUrlBinding ) {
+							return; // Prevent editing when URL is bound
+						}
 						setAttributes( {
 							url: encodeURI( safeDecodeURI( urlValue ) ),
 						} );
 					} }
 					autoComplete="off"
 					type="url"
+					disabled={ hasUrlBinding }
 					onFocus={ () => {
+						if ( hasUrlBinding ) {
+							return;
+						}
 						lastURLRef.current = url;
 						setIsEditingControl( true );
 					} }
 					onBlur={ () => {
+						if ( hasUrlBinding ) {
+							return;
+						}
 						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
 						updateAttributes(
 							{ url: ! url ? lastURLRef.current : url },
@@ -104,6 +125,32 @@ export function Controls( {
 						);
 						setIsEditingControl( false );
 					} }
+					help={
+						hasUrlBinding &&
+						( () => {
+							const entityType = getEntityTypeName(
+								attributes.type,
+								attributes.kind
+							);
+							return sprintf(
+								/* translators: %s is the entity type (e.g., "page", "post", "category") */
+								__(
+									'Link stays in sync with the selected %s.'
+								),
+								entityType
+							);
+						} )()
+					}
+					suffix={
+						hasUrlBinding && (
+							<Button
+								icon={ unlinkIcon }
+								onClick={ editBoundLink }
+								aria-label={ __( 'Unlink and edit' ) }
+								__next40pxDefaultSize
+							/>
+						)
+					}
 				/>
 			</ToolsPanelItem>
 

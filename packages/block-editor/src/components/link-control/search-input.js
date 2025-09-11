@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { forwardRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -44,6 +44,7 @@ const LinkControlSearchInput = forwardRef(
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
 			suffix,
+			isEntity = false,
 		},
 		ref
 	) => {
@@ -121,6 +122,15 @@ const LinkControlSearchInput = forwardRef(
 				? _placeholder
 				: __( 'Link' );
 
+		// Help text for entity links
+		const helpText = isEntity
+			? sprintf(
+					/* translators: %s: entity type (e.g., page, post) */
+					__( 'Link stays in sync with the selected %s.' ),
+					currentLink?.type || 'item'
+			  )
+			: null;
+
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
@@ -152,8 +162,10 @@ const LinkControlSearchInput = forwardRef(
 							);
 						}
 					} }
-					ref={ ref }
+					inputRef={ ref }
 					suffix={ suffix }
+					disabled={ isEntity }
+					help={ helpText }
 				/>
 				{ children }
 			</div>

@@ -31,6 +31,7 @@ Right now, not all block attributes are compatible with block bindings. There is
 | Heading             | content                    |
 | Image               | id, url, title, alt        |
 | Button              | text, url, linkTarget, rel |
+| Navigation Link     | url                        |
 
 ## Registering a custom source
 
