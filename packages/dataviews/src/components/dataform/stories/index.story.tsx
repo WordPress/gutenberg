@@ -41,6 +41,8 @@ type SamplePost = {
 	address1?: string;
 	address2?: string;
 	city?: string;
+	comment_status?: string;
+	ping_status?: boolean;
 	longDescription?: string;
 };
 
@@ -184,6 +186,22 @@ const fields: Field< SamplePost >[] = [
 			rows: 5,
 		},
 	},
+	{
+		id: 'comment_status',
+		label: 'Comment Status',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'open', label: 'Allow comments' },
+			{ value: 'closed', label: 'Comments closed' },
+		],
+	},
+	{
+		id: 'ping_status',
+		label: 'Allow Pings/Trackbacks',
+		type: 'boolean',
+		Edit: 'checkbox',
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -319,6 +337,8 @@ const LayoutPanelComponent = ( {
 		address1: '123 Main St',
 		address2: 'Apt 4B',
 		city: 'New York',
+		comment_status: 'open',
+		ping_status: true,
 	} );
 
 	const form: Form = useMemo( () => {
@@ -344,6 +364,11 @@ const LayoutPanelComponent = ( {
 					id: 'address1',
 					label: 'Combined Address',
 					children: [ 'address1', 'address2', 'city' ],
+				},
+				{
+					id: 'discussion',
+					label: 'Discussion',
+					children: [ 'comment_status', 'ping_status' ],
 				},
 			],
 		};
