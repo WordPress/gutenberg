@@ -3,6 +3,7 @@
  */
 import { privateApis } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,14 +22,6 @@ export default function ArrayControl< Item >( {
 	const { id, label, placeholder, elements } = field;
 	const value = field.getValue( { item: data } );
 
-	const findElementByLabel = useCallback(
-		( suggestionLabel: string ) => {
-			return elements?.find(
-				( suggestion ) => suggestion.label === suggestionLabel
-			);
-		},
-		[ elements ]
-	);
 	const [ customValidity, setCustomValidity ] = useState<
 		| {
 				type: 'validating' | 'valid' | 'invalid';
@@ -51,30 +44,85 @@ export default function ArrayControl< Item >( {
 		[ value, elements ]
 	);
 
-	const onChangeControl = useCallback(
-		( tokens: ( string | { value: string } )[] ) => {
-			// Convert display labels back to values for storage
-			const valueTokens = tokens.map( ( token ) => {
-				if ( typeof token !== 'string' ) {
+	const validateTokens = useCallback(
+		( tokens: ( string | { value: string; label?: string } )[] ) => {
+			// Extract actual values from tokens for validation
+			const tokenValues = tokens.map( ( token ) => {
+				if ( typeof token === 'object' && 'value' in token ) {
 					return token.value;
 				}
+				return token;
+			} );
 
-				// If user entered a label, convert it to its corresponding value
-				const elementByLabel = findElementByLabel( token );
-				if ( elementByLabel ) {
-					return elementByLabel.value;
+			// First, check if elements validation is required and any tokens are invalid
+			if ( field.isValid?.elements && elements ) {
+				const invalidTokens = tokenValues.filter( ( tokenValue ) => {
+					return ! elements.some(
+						( element ) => element.value === tokenValue
+					);
+				} );
+
+				if ( invalidTokens.length > 0 ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: __(
+							'Please select from the available options.'
+						),
+					} );
+					return;
 				}
+			}
 
-				// If no matching element found, treat it as a direct value
-				// This handles cases where user types values directly or when elements aren't defined
+			// Then check custom validation if provided
+			if ( field.isValid?.custom ) {
+				const result = field.isValid.custom(
+					{
+						...data,
+						[ id ]: tokenValues,
+					},
+					field
+				);
+
+				if ( result ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: result,
+					} );
+					return;
+				}
+			}
+
+			// If no validation errors, clear custom validity
+			setCustomValidity( undefined );
+		},
+		[ elements, data, id, field ]
+	);
+
+	// Generate custom invalid message for elements validation
+	const customInvalidMessage = useMemo( () => {
+		if ( field.isValid?.elements && elements ) {
+			return __( 'Please select from the available options.' );
+		}
+		return __( 'Invalid item' );
+	}, [ field.isValid?.elements, elements ] );
+
+	const onChangeControl = useCallback(
+		( tokens: ( string | { value: string; label?: string } )[] ) => {
+			const valueTokens = tokens.map( ( token ) => {
+				if ( typeof token === 'object' && 'value' in token ) {
+					return token.value;
+				}
+				// If it's a string, it's either a new suggestion value or user input
 				return token;
 			} );
 
 			onChange( {
 				[ id ]: valueTokens,
 			} );
+
+			validateTokens( tokens );
 		},
-		[ id, onChange, findElementByLabel ]
+		[ id, onChange, validateTokens ]
 	);
 
 	const onFocus = useCallback( () => {
@@ -84,29 +132,7 @@ export default function ArrayControl< Item >( {
 	return (
 		<ValidatedFormTokenField
 			required={ !! field.isValid?.required }
-			customValidator={ ( displayLabels: any ) => {
-				if ( field.isValid?.custom ) {
-					// Convert display labels back to values for validation
-					const actualValues = Array.isArray( displayLabels )
-						? displayLabels.map( ( displayLabel ) => {
-								const elementByLabel =
-									findElementByLabel( displayLabel );
-								return elementByLabel?.value || displayLabel;
-						  } )
-						: displayLabels;
-
-					const result = field.isValid.custom(
-						{
-							...data,
-							[ id ]: actualValues,
-						},
-						field
-					);
-					return result || undefined;
-				}
-
-				return undefined;
-			} }
+			onValidate={ validateTokens }
 			customValidity={ customValidity }
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
@@ -114,14 +140,35 @@ export default function ArrayControl< Item >( {
 			onFocus={ onFocus }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
+			messages={ {
+				added: __( 'Item added.' ),
+				removed: __( 'Item removed.' ),
+				remove: __( 'Remove item' ),
+				__experimentalInvalid: customInvalidMessage,
+			} }
 			__experimentalValidateInput={ ( token: string ) => {
-				if ( ! field.isValid?.elements ) {
-					return true;
+				// If elements validation is required, check if token is valid
+				if ( field.isValid?.elements && elements ) {
+					const isValidToken = elements.some(
+						( element ) =>
+							element.value === token || element.label === token
+					);
+
+					// If invalid, trigger error message display using the main validation function
+					if ( ! isValidToken ) {
+						// Create a temporary token object to trigger validation
+						const tempTokens = [
+							...arrayValueAsElements,
+							{ value: token, label: token },
+						];
+						validateTokens( tempTokens );
+					}
+
+					return isValidToken;
 				}
 
-				// Check if the token matches any of the available elements
-				const tokenByLabel = findElementByLabel( token );
-				return !! tokenByLabel;
+				// For non-elements validation, allow all tokens
+				return true;
 			} }
 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
 			__experimentalShowHowTo={ ! field.isValid?.elements }
