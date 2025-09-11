@@ -23,9 +23,12 @@ import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
+import { default as InspectorControls } from '../inspector-controls';
+import PositionControls from '../inspector-controls-tabs/position-controls-panel';
+import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockQuickNavigation from '../block-quick-navigation';
-import StyleInspectorSlots from './style-inspector-slots';
+import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
 
@@ -33,6 +36,68 @@ function BlockStylesPanel( { clientId } ) {
 	return (
 		<PanelBody title={ __( 'Styles' ) }>
 			<BlockStyles clientId={ clientId } />
+		</PanelBody>
+	);
+}
+
+function StyleInspectorSlots( {
+	blockName,
+	showAdvancedControls = true,
+	showPositionControls = true,
+	showListControls = false,
+	showBindingsControls = true,
+	className,
+} ) {
+	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	return (
+		<>
+			<InspectorControls.Slot />
+			{ showListControls && <InspectorControls.Slot group="list" /> }
+			<InspectorControls.Slot
+				group="color"
+				label={ __( 'Color' ) }
+				className={
+					className || 'color-block-support-panel__inner-wrapper'
+				}
+			/>
+			<InspectorControls.Slot
+				group="background"
+				label={ __( 'Background image' ) }
+			/>
+			<InspectorControls.Slot
+				group="typography"
+				label={ __( 'Typography' ) }
+			/>
+			<InspectorControls.Slot
+				group="dimensions"
+				label={ __( 'Dimensions' ) }
+			/>
+			<InspectorControls.Slot group="border" label={ borderPanelLabel } />
+			<InspectorControls.Slot group="styles" />
+			{ showPositionControls && <PositionControls /> }
+			{ showBindingsControls && (
+				<InspectorControls.Slot group="bindings" />
+			) }
+			{ showAdvancedControls && (
+				<div>
+					<AdvancedControls />
+				</div>
+			) }
+		</>
+	);
+}
+
+function ContentPanel( { contentClientIds, onSelect } ) {
+	if ( ! contentClientIds || contentClientIds.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<PanelBody title={ __( 'Content' ) }>
+			<BlockQuickNavigation
+				clientIds={ contentClientIds }
+				onSelect={ onSelect }
+			/>
 		</PanelBody>
 	);
 }
@@ -257,13 +322,7 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStylesPanel clientId={ clientId } />
 					) }
 
-					{ contentClientIds && contentClientIds?.length > 0 && (
-						<PanelBody title={ __( 'Content' ) }>
-							<BlockQuickNavigation
-								clientIds={ contentClientIds }
-							/>
-						</PanelBody>
-					) }
+					<ContentPanel contentClientIds={ contentClientIds } />
 
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
