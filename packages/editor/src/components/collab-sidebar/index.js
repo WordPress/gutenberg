@@ -377,6 +377,7 @@ export default function CollabSidebar() {
 				// translators: Comments sidebar title
 				title={ __( 'Comments' ) }
 				icon={ commentIcon }
+				closeLabel={ __( 'Close comments panel' ) }
 			>
 				<CollabSidebarContent
 					comments={ resultComments }
