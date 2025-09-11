@@ -11,6 +11,10 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"displayAsRange": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

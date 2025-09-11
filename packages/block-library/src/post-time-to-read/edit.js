@@ -11,8 +11,10 @@ import { useMemo } from '@wordpress/element';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -23,9 +25,11 @@ import { count as wordCount } from '@wordpress/wordcount';
  * (Characters/minute used for Chinese rather than words).
  */
 const AVERAGE_READING_RATE = 189;
+const MIN_READING_RATE = 138;
+const MAX_READING_RATE = 228;
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign } = attributes;
+	const { textAlign, displayAsRange } = attributes;
 	const { postId, postType } = context;
 
 	const [ contentStructure ] = useEntityProp(
@@ -63,11 +67,30 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			'Word count type. Do not translate!'
 		);
 
+		const totalWords = wordCount( content || '', wordCountType );
+		if ( displayAsRange ) {
+			const minMinutes = Math.max(
+				1,
+				Math.round( totalWords / MAX_READING_RATE )
+			);
+			let maxMinutes = Math.max(
+				1,
+				Math.round( totalWords / MIN_READING_RATE )
+			);
+			if ( minMinutes === maxMinutes ) {
+				maxMinutes = minMinutes + 1;
+			}
+			// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
+			const rangeLabel = _x(
+				'%1$s–%2$s minutes',
+				'Range of minutes to read'
+			);
+			return sprintf( rangeLabel, minMinutes, maxMinutes );
+		}
+
 		const minutesToRead = Math.max(
 			1,
-			Math.round(
-				wordCount( content || '', wordCountType ) / AVERAGE_READING_RATE
-			)
+			Math.round( totalWords / AVERAGE_READING_RATE )
 		);
 
 		return sprintf(
@@ -75,7 +98,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks ] );
+	}, [ contentStructure, blocks, displayAsRange ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -93,6 +116,23 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ _x( 'Time to Read', 'Panel title' ) }>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ _x(
+							'Display as range',
+							'Turns reading time range display on or off'
+						) }
+						checked={ !! displayAsRange }
+						onChange={ () =>
+							setAttributes( {
+								displayAsRange: ! displayAsRange,
+							} )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<div { ...blockProps }>{ minutesToReadString }</div>
 		</>
 	);
