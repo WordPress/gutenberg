@@ -33,22 +33,19 @@ function getLatestHeadings( select, clientId ) {
 	const permalinkTemplate =
 		editorSelectors?.getEditedPostAttribute( 'permalink_template' ) ?? null;
 
-	// Get block attributes
-	const attributes = getBlockAttributes( clientId ) ?? {};
-	const slug = currentSlug;
-
-	// Construct permalink using slug and template
+	// Construct permalink using currentSlug and template
 	let permalink = null;
-	if ( slug && permalinkTemplate ) {
+	if ( currentSlug && permalinkTemplate ) {
 		const PERMALINK_POSTNAME_REGEX = /%postname%/;
 		const [ prefix, suffix ] = permalinkTemplate.split(
 			PERMALINK_POSTNAME_REGEX
 		);
-		permalink = prefix + slug + suffix;
+		permalink = prefix + currentSlug + suffix;
 	}
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
-	const { onlyIncludeCurrentPage, maxLevel } = attributes;
+	const { onlyIncludeCurrentPage, maxLevel } =
+		getBlockAttributes( clientId ) ?? {};
 
 	// Get post-content block client ID.
 	const [ postContentClientId = '' ] = getBlocksByName( 'core/post-content' );
