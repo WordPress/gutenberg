@@ -104,7 +104,7 @@ function ContentPanel( { contentClientIds, onSelect } ) {
 
 function BlockInspector() {
 	const {
-		count,
+		selectedBlockCount,
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
@@ -133,7 +133,7 @@ function BlockInspector() {
 		);
 
 		return {
-			count: getSelectedBlockCount(),
+			selectedBlockCount: getSelectedBlockCount(),
 			selectedBlockClientId: renderedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
@@ -143,7 +143,7 @@ function BlockInspector() {
 	}, [] );
 
 	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const showTabs = availableTabs?.length > 1;
+	const hasMultipleTabs = availableTabs?.length > 1;
 
 	// The block inspector animation settings will be completely
 	// removed in the future to create an API which allows the block
@@ -164,7 +164,7 @@ function BlockInspector() {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				{ showTabs ? (
+				{ hasMultipleTabs ? (
 					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
 					<StyleInspectorSlots blockName={ selectedBlockName } />
@@ -188,11 +188,10 @@ function BlockInspector() {
 	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
-	if (
-		! blockType ||
-		! selectedBlockClientId ||
-		isSelectedBlockUnregistered
-	) {
+	const shouldShowWarning =
+		! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered;
+
+	if ( shouldShowWarning ) {
 		return (
 			<span className="block-editor-block-inspector__no-blocks">
 				{ __( 'No block selected.' ) }
@@ -218,6 +217,7 @@ function BlockInspector() {
 				clientId={ selectedBlockClientId }
 				blockName={ blockType.name }
 				isSectionBlock={ isSectionBlock }
+				availableTabs={ availableTabs }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -263,9 +263,10 @@ const BlockInspectorSingleBlock = ( {
 	clientId,
 	blockName,
 	isSectionBlock,
+	availableTabs,
 } ) => {
-	const availableTabs = useInspectorControlsTabs( blockName );
-	const showTabs = ! isSectionBlock && availableTabs?.length > 1;
+	const hasMultipleTabs = availableTabs?.length > 1;
+	const shouldShowTabs = ! isSectionBlock && hasMultipleTabs;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
@@ -297,18 +298,20 @@ const BlockInspectorSingleBlock = ( {
 		[ isSectionBlock, clientId ]
 	);
 
+	const isBlockSynced = blockInformation.isSynced;
+
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard
 				{ ...blockInformation }
-				className={ blockInformation.isSynced && 'is-synced' }
+				className={ isBlockSynced && 'is-synced' }
 			>
 				{ window?.__experimentalContentOnlyPatternInsertion && (
 					<EditContentsButton clientId={ clientId } />
 				) }
 			</BlockCard>
 			<BlockVariationTransforms blockClientId={ clientId } />
-			{ showTabs && (
+			{ shouldShowTabs && (
 				<InspectorControlsTabs
 					hasBlockStyles={ hasBlockStyles }
 					clientId={ clientId }
@@ -316,7 +319,7 @@ const BlockInspectorSingleBlock = ( {
 					tabs={ availableTabs }
 				/>
 			) }
-			{ ! showTabs && (
+			{ ! shouldShowTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStylesPanel clientId={ clientId } />
