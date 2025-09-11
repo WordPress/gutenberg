@@ -101,7 +101,7 @@ function block_core_dialog_generate_position_styles( array $attributes ): string
 }
 
 /**
- * Render callback for the dialog element block.
+ * Render the 'core/dialog-element' block.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content Block content.
@@ -219,7 +219,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 }
 
 /**
- * Block init
+ * Registers the `core/dialog-element` block on server.
  *
  * @hook init
  * @return void

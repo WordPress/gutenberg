@@ -6,7 +6,7 @@
  */
 
 /**
- * Render the block callback
+ * Render the 'core/dialog-trigger' block.
  *
  * @param array    $attributes Attributes.
  * @param string   $content Content.
@@ -34,7 +34,7 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 }
 
 /**
- * Block init
+ * Registers the `core/dialog-trigger` block on server.
  *
  * @hook init
  * @return void

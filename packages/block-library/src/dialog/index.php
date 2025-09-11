@@ -6,7 +6,9 @@
  */
 
 /**
- * Fallback to dialogID if not set by the block
+ * Fallback to generate a unique dialogId if one is not provided.
+ * This ensures programmatic usage of the dialog block works if a user forgets to
+ * add an attribute.
  *
  * @hook render_block_data
  *
@@ -24,7 +26,7 @@ function block_core_dialog_id_fallback( $block ) {
 add_filter( 'render_block_data', 'block_core_dialog_id_fallback' );
 
 /**
- * Server-side rendering of the `core/dialog` block.
+ * Render the 'core/dialog' block.
  *
  * @param array  $attributes Block attributes.
  * @param string $content Block content.
@@ -60,7 +62,7 @@ function render_block_core_dialog( $attributes, $content, $block ) {
 }
 
 /**
- * Block init
+ * Registers the `core/dialog` block on server.
  *
  * @hook init
  * @return void
