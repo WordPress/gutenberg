@@ -20,7 +20,7 @@ import type { useFocusOnMount } from '@wordpress/compose';
 
 export type DeepPartial< T > = {
 	[ P in keyof T ]?: T[ P ] extends object ? DeepPartial< T[ P ] > : T[ P ];
-} & T;
+};
 
 export type SortDirection = 'asc' | 'desc';
 
