@@ -141,9 +141,6 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { select, context } ) {
-		return getPostMetaFields( select, context );
-	},
 	editorUI( { select, context } ) {
 		const metaFields = Object.entries(
 			getPostMetaFields( select, context ) || {}

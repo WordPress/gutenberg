@@ -221,8 +221,6 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-
-			// Try to get field label from client-side source data first (preferred approach)
 			let clientSideFieldLabel = null;
 			const allSources = getBlockBindingsSources();
 			const clientSideSource = allSources[ relatedBinding.source ];
