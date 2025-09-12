@@ -23,7 +23,7 @@
 				"hideEmpty": true,
 				"include": [],
 				"exclude": [],
-				"parent": 0,
+				"parent": false,
 				"hierarchical": false
 			}
 		},

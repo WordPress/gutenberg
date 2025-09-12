@@ -80,7 +80,7 @@ export default function TermsQueryInspectorControls( {
 								orderBy: 'name',
 								hideEmpty: true,
 								hierarchical: false,
-								parent: 0,
+								parent: false,
 								perPage: 10,
 							},
 						} );
