@@ -255,7 +255,7 @@ export default function CollabSidebar() {
 
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
-		enableComplementaryArea( 'core', 'edit-post/collab-sidebar' );
+		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
 
 	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {

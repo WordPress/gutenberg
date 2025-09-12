@@ -155,22 +155,26 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds     Block client IDs.
- * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
- *                                        uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
+ * @param {string|string[]} clientIds                     Block client IDs.
+ * @param {Object}          attributes                    Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+ * @param {Object}          options                       Updating options.
+ * @param {boolean}         [options.uniqueByBlock=false] Whether each block in clientIds array has a unique set of attributes.
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false
+	options = { uniqueByBlock: false }
 ) {
+	if ( typeof options === 'boolean' ) {
+		options = { uniqueByBlock: options };
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
-		uniqueByBlock,
+		options,
 	};
 }
 

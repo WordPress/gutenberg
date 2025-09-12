@@ -15,7 +15,7 @@ permissions: {}
 
 jobs:
     check:
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -23,7 +23,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -34,14 +34,14 @@ jobs:
             - name: Build Storybook
               run: npm run storybook:build
 
-            - name: Install Playwright dependencies
-              run: npx --no playwright install --with-deps
+            - name: Install test-runner and Playwright dependencies
+              run: |
+                  npm install --no-save @storybook/test-runner@0.22.1
+                  npx playwright install --with-deps
 
             - name: Serve Storybook and run tests
               run: |
                   npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
                   "npx http-server ./storybook/build --port 50240 --silent" \
                   "npx wait-on tcp:127.0.0.1:50240 && \
-                  NODE_PATH=./node_modules \
-                  npx --package=@storybook/test-runner@0.22.1 -- \
-                  test-storybook --url http://localhost:50240 --config-dir ./storybook"
+                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"

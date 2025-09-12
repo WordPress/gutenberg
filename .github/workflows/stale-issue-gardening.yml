@@ -11,7 +11,7 @@ permissions: {}
 jobs:
     issue-gardening:
         name: ${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             issues: write
             pull-requests: write

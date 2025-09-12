@@ -365,7 +365,7 @@ export const getEntityRecord = createSelector(
 		}
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if ( ! query || ! query._fields ) {
 			// If expecting a complete item, validate that completeness.
 			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 				return undefined;
@@ -375,30 +375,29 @@ export const getEntityRecord = createSelector(
 		}
 
 		const item = queriedState.items[ context ]?.[ key ];
-		if ( item && query._fields ) {
-			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-			for ( let f = 0; f < fields.length; f++ ) {
-				const field = fields[ f ].split( '.' );
-				let value = item;
-				field.forEach( ( fieldName ) => {
-					value = value?.[ fieldName ];
-				} );
-				setNestedValue( filteredItem, field, value );
-			}
-			return filteredItem as EntityRecord;
+		if ( ! item ) {
+			return item;
 		}
 
-		return item;
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			let value = item;
+			field.forEach( ( fieldName ) => {
+				value = value?.[ fieldName ];
+			} );
+			setNestedValue( filteredItem, field, value );
+		}
+		return filteredItem as EntityRecord;
 	} ) as GetEntityRecord,
 	( state: State, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData?.items[
-				context
-			]?.[ recordId ],
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData
-				?.itemIsComplete[ context ]?.[ recordId ],
+			queriedState?.items[ context ]?.[ recordId ],
+			queriedState?.itemIsComplete[ context ]?.[ recordId ],
 		];
 	}
 ) as GetEntityRecord;
@@ -642,7 +641,7 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query.per_page === -1 ) {
+	if ( query?.per_page === -1 ) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -651,7 +650,7 @@ export const getEntityRecordsTotalPages = (
 	}
 	// If `per_page` is not set and the query relies on the defaults of the
 	// REST endpoint, get the info from query's meta.
-	if ( ! query.per_page ) {
+	if ( ! query?.per_page ) {
 		return getQueriedTotalPages( queriedState, query );
 	}
 	return Math.ceil( totalItems / query.per_page );
