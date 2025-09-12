@@ -28,8 +28,6 @@ const SlugEdit = ( {
 	onChange,
 	data,
 }: DataFormControlProps< BasePost > ) => {
-	const { id } = field;
-
 	const slug = field.getValue( { item: data } ) || getSlug( data );
 	const permalinkTemplate = data.permalink_template || '';
 	const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
@@ -53,10 +51,8 @@ const SlugEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ onChange ]
 	);
 
 	const { createNotice } = useDispatch( noticesStore );

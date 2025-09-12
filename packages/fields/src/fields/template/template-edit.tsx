@@ -35,7 +35,6 @@ export const TemplateEdit = ( {
 	field,
 	onChange,
 }: DataFormControlProps< BasePost > ) => {
-	const { id } = field;
 	const postType = data.type;
 	const postId =
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
@@ -138,10 +137,8 @@ export const TemplateEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ onChange ]
 	);
 
 	return (

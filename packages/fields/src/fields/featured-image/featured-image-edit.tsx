@@ -21,8 +21,6 @@ export const FeaturedImageEdit = ( {
 	field,
 	onChange,
 }: DataFormControlProps< BasePost > ) => {
-	const { id } = field;
-
 	const value = field.getValue( { item: data } );
 
 	const media = useSelect(
@@ -35,10 +33,8 @@ export const FeaturedImageEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue: number ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ onChange ]
 	);
 
 	const url = media?.source_url;

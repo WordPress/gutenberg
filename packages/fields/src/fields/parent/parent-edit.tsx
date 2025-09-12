@@ -285,8 +285,6 @@ export const ParentEdit = ( {
 	field,
 	onChange,
 }: DataFormControlProps< BasePost > ) => {
-	const { id } = field;
-
 	const homeUrl = useSelect( ( select ) => {
 		return select( coreStore ).getEntityRecord< {
 			home: string;
@@ -295,10 +293,8 @@ export const ParentEdit = ( {
 
 	const onChangeControl = useCallback(
 		( newValue?: number ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ onChange ]
 	);
 
 	return (
