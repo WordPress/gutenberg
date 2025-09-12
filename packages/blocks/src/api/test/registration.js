@@ -1730,6 +1730,376 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		// Check EditorUI object validation
+		it( 'should reject EditorUI with invalid mode', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'invalid-mode',
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'EditorUI mode must be either "dropdown" or "modal"'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown mode without data array', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: 'not-an-array',
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'EditorUI data must be an array of field objects for dropdown mode'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with invalid field structure', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{ label: 'Field 1' }, // missing 'value'
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Each field must have "label" and "value" properties'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with invalid type', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Field 1',
+							value: 'test',
+							type: 'invalid-type',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field "type" must be one of: null, boolean, object, array, string, integer, number'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with value type mismatch', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Field 1',
+							value: 'string-value',
+							type: 'boolean',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field value must be boolean when type is "boolean", got string'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with integer type but float value', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{ label: 'Field 1', value: 3.14, type: 'integer' },
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field value must be a integer when type is "integer", got number'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with invalid format for non-string type', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Field 1',
+							value: 123,
+							type: 'integer',
+							format: 'email',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field "format" can only be used with string type'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with invalid format value', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Field 1',
+							value: 'test',
+							type: 'string',
+							format: 'invalid-format',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field "format" must be one of: date-time, uri, email, ip, uuid, hex-color'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject dropdown data with value not matching format', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Email Field',
+							value: 'not-an-email',
+							type: 'string',
+							format: 'email',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field value "not-an-email" does not match format "email"'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should successfully register dropdown with valid format values', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Email Field',
+							value: 'test@example.com',
+							type: 'string',
+							format: 'email',
+						},
+						{
+							label: 'Date Field',
+							value: '2023-12-25T10:30:00Z',
+							type: 'string',
+							format: 'date-time',
+						},
+						{
+							label: 'URL Field',
+							value: 'https://example.com',
+							type: 'string',
+							format: 'uri',
+						},
+						{
+							label: 'IPv4 Field',
+							value: '192.168.1.1',
+							type: 'string',
+							format: 'ip',
+						},
+						{
+							label: 'UUID Field',
+							value: '550e8400-e29b-41d4-a716-446655440000',
+							type: 'string',
+							format: 'uuid',
+						},
+						{
+							label: 'Color Field',
+							value: '#ff6600',
+							type: 'string',
+							format: 'hex-color',
+						},
+					],
+				},
+			} );
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
+			unregisterBlockBindingsSource( 'core/testing' );
+		} );
+
+		it( 'should successfully register dropdown with typed values', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'String Field',
+							value: 'test',
+							type: 'string',
+						},
+						{
+							label: 'Boolean Field',
+							value: true,
+							type: 'boolean',
+						},
+						{ label: 'Number Field', value: 42, type: 'number' },
+						{ label: 'Integer Field', value: 10, type: 'integer' },
+						{
+							label: 'Array Field',
+							value: [ 'a', 'b' ],
+							type: 'array',
+						},
+						{
+							label: 'Object Field',
+							value: { key: 'value' },
+							type: 'object',
+						},
+						{ label: 'Null Field', value: null, type: 'null' },
+						{ label: 'Default String', value: 'no-type' },
+					],
+				},
+			} );
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
+			unregisterBlockBindingsSource( 'core/testing' );
+		} );
+
+		it( 'should reject dropdown data with invalid field type', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'Field 1',
+							value: 'field1',
+							type: 'invalid-type',
+						},
+					],
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Field "type" must be one of: null, boolean, object, array, string, integer, number'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should accept valid dropdown data with type validation', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{
+							label: 'String Field',
+							value: 'field1',
+							type: 'string',
+						},
+						{
+							label: 'Number Field',
+							value: 42,
+							type: 'number',
+						},
+						{
+							label: 'Boolean Field',
+							value: true,
+							type: 'boolean',
+						},
+					],
+				},
+			} );
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
+			unregisterBlockBindingsSource( 'core/testing' );
+		} );
+
+		it( 'should reject modal mode without renderModalContent function', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'modal',
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Modal mode requires renderModalContent function'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject modal mode with invalid renderModalContent', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'modal',
+					renderModalContent: 'not-a-function',
+				},
+			} );
+			expect( console ).toHaveWarnedWith(
+				'renderModalContent must be a function'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should successfully register valid dropdown mode source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'dropdown',
+					data: [
+						{ label: 'Field 1', value: 'field1' },
+						{ label: 'Field 2', value: 'field2' },
+					],
+				},
+			} );
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
+			unregisterBlockBindingsSource( 'core/testing' );
+		} );
+
+		it( 'should successfully register valid modal mode source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				editorUI: {
+					mode: 'modal',
+					renderModalContent: () => {
+						return 'mock-react-element';
+					},
+				},
+			} );
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
+			unregisterBlockBindingsSource( 'core/testing' );
+		} );
+
 		// Check correct sources are registered as expected.
 		it( 'should register a valid source', () => {
 			const sourceProperties = {

@@ -124,6 +124,28 @@ import { unlock } from '../lock-unlock';
  */
 
 /**
+ * An object describing data for a field in block bindings EditorUI.
+ *
+ * @typedef {Object} WPBlockBindingsEditorUIDataItem
+ *
+ * @property {string} key     The unique identifier for the field.
+ * @property {string} [label] Human-readable label for the field.
+ * @property {string} [type]  The data type of the field (e.g., 'string', 'number').
+ * @property {*}      [value] The current value of the field.
+ */
+
+/**
+ * An object describing the EditorUI configuration for block bindings.
+ *
+ * @typedef {Object} WPBlockBindingsEditorUI
+ *
+ * @property {string}   mode                 The UI mode - either 'dropdown' or 'modal'.
+ * @property {Array}    [data]               Array of field data items.
+ * @property {Function} [onSelect]           Required for dropdown mode. Function called when a field is selected. Receives an object with this keys: value, updateBlockBindings, attribute.
+ * @property {Function} [renderModalContent] Required for modal mode. Function that renders the modal content. Receives an object with this key: updateBlockBindings.
+ */
+
+/**
  * An object describing a Block Bindings source.
  *
  * @typedef {Object} WPBlockBindingsSource
@@ -134,10 +156,77 @@ import { unlock } from '../lock-unlock';
  * @property {Function} [getValues]        Optional function to get the values from the source.
  * @property {Function} [setValues]        Optional function to update multiple values connected to the source.
  * @property {Function} [canUserEditValue] Optional function to determine if the user can edit the value.
+ * @property {Function} [editorUI]         Optional function that returns WPBlockBindingsEditorUI configuration.
  */
 
 function isObject( object ) {
 	return object !== null && typeof object === 'object';
+}
+
+/**
+ * Validates a string value against a WordPress REST API format.
+ *
+ * TODO: Check if those are the best regex for validate the format.
+ *
+ * @param {string} value  The string value to validate.
+ * @param {string} format The format to validate against.
+ * @return {boolean} Whether the value matches the format.
+ */
+function validateStringFormat( value, format ) {
+	switch ( format ) {
+		case 'date-time':
+			// RFC3339 date-time format validation
+			// Basic pattern: YYYY-MM-DDTHH:mm:ssZ or YYYY-MM-DDTHH:mm:ss+00:00
+			const dateTimePattern =
+				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
+			return (
+				dateTimePattern.test( value ) && ! isNaN( Date.parse( value ) )
+			);
+
+		case 'uri':
+			// Basic URI validation - non-empty string with valid characters
+			try {
+				const url = new URL( value );
+				return Boolean( url.protocol );
+			} catch {
+				// Check if it's a relative URI
+				return /^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test( value );
+			}
+
+		case 'email':
+			// Basic email validation pattern
+			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			return emailPattern.test( value );
+
+		case 'ip':
+			// IPv4 pattern
+			const ipv4Pattern =
+				/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+			// IPv6 pattern (simplified)
+			const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+			const ipv6CompressedPattern =
+				/^(([0-9a-fA-F]{1,4}:)*)?::([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
+
+			return (
+				ipv4Pattern.test( value ) ||
+				ipv6Pattern.test( value ) ||
+				ipv6CompressedPattern.test( value )
+			);
+
+		case 'uuid':
+			// UUID pattern (any version)
+			const uuidPattern =
+				/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+			return uuidPattern.test( value );
+
+		case 'hex-color':
+			// Hex color pattern: #RGB or #RRGGBB
+			const hexColorPattern = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+			return hexColorPattern.test( value );
+
+		default:
+			return false;
+	}
 }
 
 /**
@@ -901,6 +990,11 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
+	if ( getFieldsList ) {
+		warning(
+			'Block bindings source getFieldsList is deprecated. Please remove it from your source definition.'
+		);
+	}
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
 		// eslint-disable-next-line no-console
@@ -908,9 +1002,190 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	if ( editorUI && typeof editorUI !== 'function' ) {
-		warning( 'Block bindings source editorUI must be a function.' );
-		return;
+	if ( editorUI ) {
+		if ( typeof editorUI !== 'object' || Array.isArray( editorUI ) ) {
+			warning( 'EditorUI must be an object' );
+			return;
+		}
+
+		const { mode, data } = editorUI;
+
+		if ( mode && ! [ 'dropdown', 'modal' ].includes( mode ) ) {
+			warning( 'EditorUI mode must be either "dropdown" or "modal"' );
+			return;
+		}
+
+		if ( mode === 'dropdown' ) {
+			if ( ! data || ! Array.isArray( data ) ) {
+				warning(
+					'EditorUI data must be an array of field objects for dropdown mode'
+				);
+				return;
+			}
+
+			for ( const field of data ) {
+				if ( ! field || typeof field !== 'object' ) {
+					warning( 'Each field must be an object' );
+					return;
+				}
+
+				if ( ! field.label || field.value === undefined ) {
+					warning(
+						'Each field must have "label" and "value" properties'
+					);
+					return;
+				}
+
+				if ( typeof field.label !== 'string' ) {
+					warning( 'Field "label" property must be a string' );
+					return;
+				}
+
+				// Validate type field if provided (follows WordPress block attributes type validation).
+				if ( field.type ) {
+					const validTypes = [
+						'null',
+						'boolean',
+						'object',
+						'array',
+						'string',
+						'integer',
+						'number',
+					];
+					if ( ! validTypes.includes( field.type ) ) {
+						warning(
+							'Field "type" must be one of: ' +
+								validTypes.join( ', ' )
+						);
+						return;
+					}
+
+					if ( field.format ) {
+						if ( field.type !== 'string' ) {
+							warning(
+								'Field "format" can only be used with string type'
+							);
+							return;
+						}
+
+						const validFormats = [
+							'date-time',
+							'uri',
+							'email',
+							'ip',
+							'uuid',
+							'hex-color',
+						];
+						if ( ! validFormats.includes( field.format ) ) {
+							warning(
+								'Field "format" must be one of: ' +
+									validFormats.join( ', ' )
+							);
+							return;
+						}
+					}
+
+					const valueType = typeof field.value;
+					switch ( field.type ) {
+						case 'null':
+							if (
+								valueType !== 'object' ||
+								field.value !== null
+							) {
+								warning(
+									`Field value must be null when type is "null", got ${ valueType }`
+								);
+								return;
+							}
+							break;
+						case 'boolean':
+							if ( valueType !== 'boolean' ) {
+								warning(
+									`Field value must be boolean when type is "boolean", got ${ valueType }`
+								);
+								return;
+							}
+							break;
+						case 'object':
+							if (
+								valueType !== 'object' ||
+								field.value === null ||
+								Array.isArray( field.value )
+							) {
+								warning(
+									`Field value must be an object when type is "object", got ${ valueType }`
+								);
+								return;
+							}
+							break;
+						case 'array':
+							if ( ! Array.isArray( field.value ) ) {
+								warning(
+									`Field value must be an array when type is "array", got ${ valueType }`
+								);
+								return;
+							}
+							break;
+						case 'string':
+							if ( valueType !== 'string' ) {
+								warning(
+									`Field value must be a string when type is "string", got ${ valueType }`
+								);
+								return;
+							}
+							// Validate format if specified
+							if ( field.format ) {
+								const isValidFormat = validateStringFormat(
+									field.value,
+									field.format
+								);
+								if ( ! isValidFormat ) {
+									warning(
+										`Field value "${ field.value }" does not match format "${ field.format }"`
+									);
+									return;
+								}
+							}
+							break;
+						case 'integer':
+						case 'number':
+							if (
+								valueType !== 'number' ||
+								( field.type === 'integer' &&
+									! Number.isInteger( field.value ) )
+							) {
+								warning(
+									`Field value must be a ${
+										field.type === 'integer'
+											? 'integer'
+											: 'number'
+									} when type is "${
+										field.type
+									}", got ${ valueType }`
+								);
+								return;
+							}
+							break;
+					}
+				}
+				if ( ! field.type && typeof field.value !== 'string' ) {
+					warning(
+						'Field "value" property must be a string when no type is specified'
+					);
+					return;
+				}
+			}
+		} else if ( mode === 'modal' ) {
+			if ( ! editorUI.renderModalContent ) {
+				warning( 'Modal mode requires renderModalContent function' );
+				return;
+			}
+
+			if ( typeof editorUI.renderModalContent !== 'function' ) {
+				warning( 'renderModalContent must be a function' );
+				return;
+			}
+		}
 	}
 
 	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
