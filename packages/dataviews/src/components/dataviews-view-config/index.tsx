@@ -623,7 +623,7 @@ function FieldControl() {
 			isVisibleFlag: 'showDescription',
 		},
 	].filter( ( { field } ) => isDefined( field ) );
-	const visibleLockedFields = lockedFields.filter(
+	let visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
@@ -632,6 +632,16 @@ function FieldControl() {
 		isVisibleFlag: string;
 		ui?: ReactNode;
 	} >;
+
+	const requireVisibleLockedField = view.requireVisibleLockedField ?? true;
+
+	// If only one locked field is visible, prevent it from being hidden.
+	if ( requireVisibleLockedField && visibleLockedFields.length === 1 ) {
+		visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+			...locked,
+			field: { ...locked.field, enableHiding: false },
+		} ) );
+	}
 	const hiddenLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
