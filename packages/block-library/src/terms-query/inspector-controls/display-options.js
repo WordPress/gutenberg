@@ -21,6 +21,9 @@ const getOptions = ( displayTopLevelControl, displaySubtermsControl ) => {
 		options.push( {
 			label: __( 'Show subterms only' ),
 			value: 'subterms',
+			description: __(
+				'Display subterms of the current term. E.g. subcategories of current category.'
+			),
 		} );
 	}
 
