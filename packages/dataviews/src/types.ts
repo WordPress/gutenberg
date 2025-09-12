@@ -178,11 +178,11 @@ export type EditConfigText = {
 	/**
 	 * Prefix component to display before the input.
 	 */
-	prefix?: React.ComponentType | React.ReactElement;
+	prefix?: React.ComponentType;
 	/**
 	 * Suffix component to display after the input.
 	 */
-	suffix?: React.ReactElement;
+	suffix?: React.ComponentType;
 };
 
 /**
@@ -335,8 +335,8 @@ export type DataFormControlProps< Item > = {
 	 * Configuration object for the control.
 	 */
 	config?: {
-		prefix?: React.ReactElement;
-		suffix?: React.ReactElement;
+		prefix?: React.ComponentType;
+		suffix?: React.ComponentType;
 		rows?: number;
 	};
 };

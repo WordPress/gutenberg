@@ -1,5 +1,10 @@
 
 /**
+ * External dependencies
+ */
+import React from 'react';
+
+/**
  * WordPress dependencies
  */
 import { 
@@ -30,8 +35,8 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
-				prefix: prefix,
-				suffix: suffix,
+				prefix: prefix ? React.createElement( prefix ) : undefined,
+				suffix: suffix ? React.createElement( suffix ) : undefined,
 			} }
 		/>
 	);

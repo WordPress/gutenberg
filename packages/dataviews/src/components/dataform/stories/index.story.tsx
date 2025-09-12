@@ -30,17 +30,17 @@ const { ValidatedTextControl } = unlock( privateApis );
 
 
 const DollarPrefix = () => (
-	<InputControlPrefixWrapper variant="control">
+	<InputControlPrefixWrapper>
 		<span>$</span>
 	</InputControlPrefixWrapper>
 );
 const PercentSuffix = () => (
-	<InputControlSuffixWrapper variant="control">
+	<InputControlSuffixWrapper>
 		<span>%</span>
 	</InputControlSuffixWrapper>
 );
 const USDSuffix = () => (
-	<InputControlSuffixWrapper variant="control">
+	<InputControlSuffixWrapper>
 		<span>USD</span>
 	</InputControlSuffixWrapper>
 );
@@ -212,7 +212,7 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			control: 'text',
-			prefix: <DollarPrefix />,
+			prefix: DollarPrefix,
 		},
 	},
 	{
@@ -221,7 +221,7 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			control: 'text',
-			suffix: <PercentSuffix />,
+			suffix: PercentSuffix,
 		},
 	},
 	{
@@ -230,8 +230,8 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			control: 'text',
-			prefix: <DollarPrefix />,
-			suffix: <USDSuffix />,
+			prefix: DollarPrefix,
+			suffix: USDSuffix,
 		},
 	},
 ];
