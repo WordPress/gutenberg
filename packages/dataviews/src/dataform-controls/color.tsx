@@ -75,7 +75,7 @@ export default function Color< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
+	const { id, label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } ) || '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -86,14 +86,14 @@ export default function Color< Item >( {
 
 	const handleColorChange = useCallback(
 		( colorObject: any ) => {
-			onChange( { [ id ]: colorObject.toHex() } );
+			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
 		},
 		[ id, onChange ]
 	);
 
 	const handleInputChange = useCallback(
 		( newValue: string | undefined ) => {
-			onChange( { [ id ]: newValue || '' } );
+			onChange( setValue( { item: data, value: newValue || '' } ) );
 		},
 		[ id, onChange ]
 	);

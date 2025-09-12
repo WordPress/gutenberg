@@ -20,7 +20,7 @@ export default function Textarea< Item >( {
 	config,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
-	const { id, label, placeholder, description } = field;
+	const { id, label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -31,10 +31,8 @@ export default function Textarea< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	return (

@@ -819,10 +819,8 @@ export const fields: Field< SpaceObject >[] = [
 			required: true,
 		},
 		getValue: ( { item } ) => item.name.title,
-		setValue: ( { item, value } ) => ( {
-			...item,
+		setValue: ( { value } ) => ( {
 			name: {
-				...item.name,
 				title: value,
 			},
 		} ),
@@ -855,8 +853,7 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'isPlanet',
 		label: 'Is Planet',
 		type: 'boolean',
-		setValue: ( { item, value } ) => ( {
-			...item,
+		setValue: ( { value } ) => ( {
 			isPlanet: value === 'true',
 		} ),
 		elements: [
@@ -880,10 +877,8 @@ export const fields: Field< SpaceObject >[] = [
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
 		getValue: ( { item } ) => item.name.description,
-		setValue: ( { item, value } ) => ( {
-			...item,
+		setValue: ( { value } ) => ( {
 			name: {
-				...item.name,
 				description: value,
 			},
 		} ),
