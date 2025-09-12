@@ -35,6 +35,10 @@
 - DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
 - DataForm regular layout: Use BaseControl visual label for readonly fields when in top labelPosition. ([#71597](https://github.com/WordPress/gutenberg/pull/71597))
 
+### Enhancements
+
+- DataViews: Require at least one locked field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
+
 ## 8.0.0 (2025-09-03)
 
 ### Breaking changes
