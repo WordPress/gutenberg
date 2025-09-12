@@ -529,7 +529,7 @@ export function isSectionBlock( state, clientId ) {
 
 	// Template parts become sections in navigation mode.
 	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && blockName === 'core/template-part' ) {
+	if ( _isNavigationMode && isTemplatePart ) {
 		return true;
 	}
 
