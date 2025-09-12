@@ -308,7 +308,6 @@ function MetaBoxesMain( { isLegacy } ) {
 			event.preventDefault();
 		}
 	};
-	const className = 'edit-post-meta-boxes-main';
 	const paneLabel = __( 'Meta Boxes' );
 
 	const resizeHandle = (
@@ -356,7 +355,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	const paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
 		as: NavigableRegion,
 		ref: metaBoxesMainRef,
-		className,
+		className: 'edit-post-meta-boxes-main',
 		defaultSize: { height: isOpen ? openHeight : 0 },
 		minHeight: min,
 		maxHeight: usedMax,
