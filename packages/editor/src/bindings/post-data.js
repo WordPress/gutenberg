@@ -123,7 +123,7 @@ export default {
 		return true;
 	},
 	editorUI( { select, context } ) {
-		const metaFields = Object.entries(
+		const postDataFields = Object.entries(
 			getPostDataFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {
 			key,
@@ -136,7 +136,7 @@ export default {
 		 */
 		return {
 			mode: 'dropdown',
-			data: metaFields,
+			data: postDataFields,
 			onSelect( { value, updateBlockBindings, attribute } ) {
 				updateBlockBindings( {
 					[ attribute ]: {

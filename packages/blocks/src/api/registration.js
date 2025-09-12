@@ -1003,12 +1003,26 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	if ( editorUI ) {
-		if ( typeof editorUI !== 'object' || Array.isArray( editorUI ) ) {
-			warning( 'EditorUI must be an object' );
+		// editorUI can be either an object or a function that returns an object
+		let editorUIConfig;
+
+		if ( typeof editorUI === 'function' ) {
+			// If it's a function, we can't validate the returned object at registration time
+			// since it may depend on runtime context, so we just validate it's a function
+			return unlock( dispatch( blocksStore ) ).addBlockBindingsSource(
+				source
+			);
+		} else if (
+			typeof editorUI === 'object' &&
+			! Array.isArray( editorUI )
+		) {
+			editorUIConfig = editorUI;
+		} else {
+			warning( 'EditorUI must be an object or a function' );
 			return;
 		}
 
-		const { mode, data } = editorUI;
+		const { mode, data } = editorUIConfig;
 
 		if ( mode && ! [ 'dropdown', 'modal' ].includes( mode ) ) {
 			warning( 'EditorUI mode must be either "dropdown" or "modal"' );

@@ -153,7 +153,31 @@ export default {
 
 		return false;
 	},
-	getFieldsList( { select, context } ) {
-		return getTermDataFields( select, context );
+	editorUI( { select, context } ) {
+		const termDataFields = Object.entries(
+			getTermDataFields( select, context ) || {}
+		).map( ( [ key, field ] ) => ( {
+			key,
+			label: field.label,
+			value: field.value,
+			type: field.type,
+		} ) );
+		/*
+		 * We need to define the data as [{ label: string, value: any, type: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation }]
+		 */
+		return {
+			mode: 'dropdown',
+			data: termDataFields,
+			onSelect( { value, updateBlockBindings, attribute } ) {
+				updateBlockBindings( {
+					[ attribute ]: {
+						source: 'core/term-data',
+						args: {
+							key: value,
+						},
+					},
+				} );
+			},
+		};
 	},
 };
