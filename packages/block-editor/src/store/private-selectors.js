@@ -21,6 +21,7 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getBlockCount,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -101,15 +102,19 @@ export function isContainerInsertableToInWriteMode(
 	rootClientId
 ) {
 	const isBlockContentBlock = isContentBlock( blockName );
+	const isBlockListEmpty = ! getBlockCount( state, rootClientId );
 	const rootBlockName = getBlockName( state, rootClientId );
 	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
 
 	// In write mode, containers shouldn't be inserted into unless:
-	// 1. they are a section root;
-	// 2. they are a content block and the block to be inserted is also content.
+	// 1. the entire block list is empty and the block to be inserted is also content;
+	// 2. they are a section root;
+	// 3. they are a content block and the block to be inserted is also content.
 	return (
-		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
+		( isBlockContentBlock && isBlockListEmpty ) ||
+		isRootBlockMain ||
+		( isContainerContentBlock && isBlockContentBlock )
 	);
 }
 

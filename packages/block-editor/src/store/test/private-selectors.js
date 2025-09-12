@@ -10,8 +10,16 @@ import {
 	getExpandedBlock,
 	isDragging,
 	getBlockStyles,
+	isContainerInsertableToInWriteMode,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+
+jest.mock( '@wordpress/blocks/src/api/utils', () => {
+	return {
+		...jest.requireActual( '@wordpress/blocks/src/api/utils' ),
+		isContentBlock: jest.fn(),
+	};
+} );
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -679,6 +687,44 @@ describe( 'private selectors', () => {
 				'block-1': { color: 'red' },
 				'non-existent-block': undefined,
 			} );
+		} );
+	} );
+
+	describe( 'isContainerInsertableToInWriteMode', () => {
+		const { isContentBlock } = require( '@wordpress/blocks/src/api/utils' );
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		it( 'should return true if the block list is empty and the block to be inserted is also content', () => {
+			isContentBlock.mockImplementation(
+				( blockName ) => blockName === 'core/paragraph'
+			);
+
+			const state = {
+				blocks: {
+					order: new Map( [
+						[ 'root-1', [] ], // Empty block list
+					] ),
+					byClientId: new Map( [
+						[
+							'root-1',
+							{ clientId: 'root-1', name: 'core/group' },
+						],
+					] ),
+				},
+			};
+			const blockName = 'core/paragraph'; // Content block.
+			const rootClientId = 'root-1';
+
+			const result = isContainerInsertableToInWriteMode(
+				state,
+				blockName,
+				rootClientId
+			);
+
+			expect( result ).toBe( true );
 		} );
 	} );
 } );
