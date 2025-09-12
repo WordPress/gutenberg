@@ -2108,9 +2108,6 @@ describe( 'blocks', () => {
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				canUserEditValue: () => true,
-				getFieldsList: () => {
-					return { field: 'value' };
-				},
 			};
 			registerBlockBindingsSource( {
 				name: 'core/valid-source',
