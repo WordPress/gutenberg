@@ -921,6 +921,40 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	/**
+	 * Tests that pseudo-elements like ::placeholder are handled correctly for textInput elements.
+	 */
+	public function test_get_stylesheet_handles_pseudo_elements_for_text_input() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							'border'       => array(
+								'color' => 'pink',
+							),
+							':focus'       => array(
+								'border' => array(
+									'color' => 'blue',
+								),
+							),
+							':placeholder' => array(
+								'color' => array(
+									'text' => 'gray',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]){border-color: pink;}:root :where(textarea:focus, input:where([type=email]:focus,[type=number]:focus,[type=password]:focus,[type=search]:focus,[type=text]:focus,[type=tel]:focus,[type=url]):focus){border-color: blue;}textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder{color: gray;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+
 	public function test_get_stylesheet_ignores_pseudo_selectors_on_non_whitelisted_elements() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

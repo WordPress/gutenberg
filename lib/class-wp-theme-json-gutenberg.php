@@ -586,8 +586,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.8.0 Added support for `:focus-visible`.
 	 */
 	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		'button' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'link'      => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'button'    => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		'textInput' => array( ':focus', ':focus-visible', ':valid', ':invalid', ':required', ':placeholder' ),
 	);
 
 	/**
@@ -3047,8 +3048,37 @@ class WP_Theme_JSON_Gutenberg {
 			);
 
 		// 2. Generate and append the rules that use the general selector.
-		$general_selector = $element_only_selector ? $selector : ":root :where($selector)";
-		$block_rules     .= static::to_ruleset( $general_selector, $declarations );
+		// Skip :placeholder pseudo-selector - it will be handled separately without :where() wrapper
+		if ( ':placeholder' !== $pseudo_selector ) {
+			$general_selector = $element_only_selector ? $selector : ":root :where($selector)";
+			$block_rules     .= static::to_ruleset( $general_selector, $declarations );
+		}
+
+		// 2.5. Special handling for :placeholder - create separate rules without :where() wrapper
+		// to ensure better browser compatibility. Only generate ::placeholder pseudo-element.
+		if ( ':placeholder' === $pseudo_selector && ! empty( $declarations ) ) {
+			// Find which elements support :placeholder pseudo-selector
+			$placeholder_elements = array();
+			foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS as $element_name => $pseudo_selectors ) {
+				if ( in_array( ':placeholder', $pseudo_selectors, true ) ) {
+					$placeholder_elements[] = $element_name;
+				}
+			}
+			
+			// Generate placeholder selectors for each supported element
+			foreach ( $placeholder_elements as $element_name ) {
+				if ( isset( static::ELEMENTS[ $element_name ] ) ) {
+					$base_selector = static::ELEMENTS[ $element_name ];
+					// Convert complex selectors to individual ::placeholder selectors
+					$placeholder_selectors = static::convert_to_placeholder_selectors( $base_selector );
+					
+					foreach ( $placeholder_selectors as $placeholder_selector ) {
+						$ruleset = static::to_ruleset( $placeholder_selector, $declarations );
+						$block_rules .= $ruleset;
+					}
+				}
+			}
+		}
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -3793,6 +3823,34 @@ class WP_Theme_JSON_Gutenberg {
 		static::remove_indirect_properties( $input, $output );
 
 		return $output;
+	}
+
+	/**
+	 * Converts a complex selector to individual ::placeholder selectors.
+	 * ::placeholder needs a special treatment to work 
+	 * since it doesn't work with a :where() wrapper
+	 *
+	 * @since 6.2.0
+	 *
+	 * @param string $selector The base selector to convert.
+	 * @return array Array of individual ::placeholder selectors.
+	 */
+	protected static function convert_to_placeholder_selectors( $selector ) {
+		$placeholder_selectors = array();
+		
+		// Find which element this selector belongs to by matching against ELEMENTS constant
+		foreach ( static::ELEMENTS as $element_name => $element_selector ) {
+			if ( $element_selector === $selector ) {
+				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) && 
+					 in_array( ':placeholder', static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ], true ) ) {
+					
+					$placeholder_selectors[] = $selector . '::placeholder';
+				}
+				break;
+			}
+		}
+		
+		return $placeholder_selectors;
 	}
 
 	/**
