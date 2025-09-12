@@ -11,8 +11,9 @@ import {
 	FlexBlock,
 	FlexItem,
 	__experimentalView as View,
+	Button,
 } from '@wordpress/components';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { chevronRight, chevronLeft, media } from '@wordpress/icons';
 import { getBlockType } from '@wordpress/blocks';
 import { DataForm } from '@wordpress/dataviews';
 
@@ -24,6 +25,34 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ContentOnlyBlockEditor from '../content-only-editor';
+import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
+
+// Image Media Selector Component
+function ImageMediaSelector( { value, onChange } ) {
+	return (
+		<MediaUploadCheck>
+			<MediaUpload
+				onSelect={ ( selectedMedia ) => {
+					onChange( selectedMedia.url );
+				} }
+				allowedTypes={ [ 'image' ] }
+				value={ value }
+				render={ ( { open } ) => (
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ open }
+						icon={ media }
+						style={ { width: '100%' } }
+					>
+						{ value ? 'Change Image' : 'Select Image' }
+					</Button>
+				) }
+			/>
+		</MediaUploadCheck>
+	);
+}
 
 // Single Content Attribute Control component using DataForm
 function SingleContentAttributeControl( {
@@ -50,7 +79,7 @@ function SingleContentAttributeControl( {
 	const data = { [ attr.name ]: attr.value || '' };
 
 	// Create fields for DataForm
-	const fields = createDataFormFields( [ attr ], blockInformation );
+	const fields = createDataFormFields( [ attr ] );
 
 	// Create form configuration
 	const form = {
@@ -74,12 +103,21 @@ function SingleContentAttributeControl( {
 				</Flex>
 			</View>
 			<View>
-				<DataForm
-					data={ data }
-					fields={ fields }
-					form={ form }
-					onChange={ handleChange }
-				/>
+				{ isImageSrcAttribute( attr ) ? (
+					<ImageMediaSelector
+						value={ attr.value || '' }
+						onChange={ ( newValue ) => {
+							handleChange( { [ attr.name ]: newValue } );
+						} }
+					/>
+				) : (
+					<DataForm
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ handleChange }
+					/>
+				) }
 			</View>
 		</VStack>
 	);
@@ -125,6 +163,20 @@ function BlockContentAttributesView( { clientId } ) {
 	// Get content attributes for this block
 	const contentAttributes = getEditableContentAttributes( block );
 
+	// Separate image src attributes from other attributes
+	const imageSrcAttributes = contentAttributes.filter( isImageSrcAttribute );
+	const otherAttributes = contentAttributes.filter(
+		( contentAttribute ) => ! isImageSrcAttribute( contentAttribute )
+	);
+
+	const handleAttributeChange = ( edits ) => {
+		Object.keys( edits ).forEach( ( key ) => {
+			updateBlockAttributes( clientId, {
+				[ key ]: edits[ key ],
+			} );
+		} );
+	};
+
 	return (
 		<VStack spacing={ 2 }>
 			<Flex>
@@ -144,30 +196,33 @@ function BlockContentAttributesView( { clientId } ) {
 					</Flex>
 				</FlexBlock>
 			</Flex>
-
-			<DataForm
-				data={ contentAttributes.reduce( ( acc, attr ) => {
-					acc[ attr.name ] = attr.value || '';
-					return acc;
-				}, {} ) }
-				fields={ createDataFormFields(
-					contentAttributes,
-					blockInformation
-				) }
-				form={ {
-					layout: {
-						type: 'regular',
-					},
-					fields: contentAttributes.map( ( attr ) => attr.name ),
-				} }
-				onChange={ ( edits ) => {
-					Object.keys( edits ).forEach( ( key ) => {
-						updateBlockAttributes( clientId, {
-							[ key ]: edits[ key ],
-						} );
-					} );
-				} }
-			/>
+			{ /* Render ImageMediaSelector for image src attributes */ }
+			{ imageSrcAttributes.map( ( attr ) => (
+				<ImageMediaSelector
+					key={ attr.name }
+					value={ attr.value || '' }
+					onChange={ ( newValue ) => {
+						handleAttributeChange( { [ attr.name ]: newValue } );
+					} }
+				/>
+			) ) }
+			{ /* Render DataForm for other attributes */ }
+			{ otherAttributes.length > 0 && (
+				<DataForm
+					data={ otherAttributes.reduce( ( acc, attr ) => {
+						acc[ attr.name ] = attr.value || '';
+						return acc;
+					}, {} ) }
+					fields={ createDataFormFields( otherAttributes ) }
+					form={ {
+						layout: {
+							type: 'regular',
+						},
+						fields: otherAttributes.map( ( attr ) => attr.name ),
+					} }
+					onChange={ handleAttributeChange }
+				/>
+			) }
 		</VStack>
 	);
 }
@@ -201,43 +256,54 @@ function groupContentBlocks( clientIds, blocks ) {
 	return groups;
 }
 
+const isUrlAttribute = ( contentAttribute ) => {
+	return (
+		contentAttribute.definition.type === 'string' &&
+		( contentAttribute.definition.attribute === 'href' ||
+			contentAttribute.definition.attribute === 'src' )
+	);
+};
+
+const isImageSrcAttribute = ( contentAttribute ) => {
+	return (
+		contentAttribute.definition.attribute === 'src' &&
+		contentAttribute.definition.selector === 'img'
+	);
+};
+
 // Create DataForm fields from content attributes
 function createDataFormFields( contentAttributes ) {
-	return contentAttributes.map( ( attr ) => {
-		const isUrlAttribute =
-			attr.definition.type === 'string' &&
-			( attr.name.includes( 'url' ) ||
-				attr.name.includes( 'src' ) ||
-				attr.name.includes( 'href' ) ||
-				attr.name.includes( 'link' ) ||
-				attr.definition.attribute === 'href' ||
-				attr.definition.attribute === 'src' );
-
-		let fieldType = 'text';
-		if ( isUrlAttribute ) {
-			fieldType = 'url';
-		} else {
-			switch ( attr.definition.type ) {
-				case 'boolean':
-					fieldType = 'toggle';
-					break;
-				case 'rich-text':
-					fieldType = 'text';
-					break;
-				case 'number':
-					fieldType = 'text';
-					break;
-				default:
-					fieldType = 'text';
+	return contentAttributes
+		.map( ( contentAttribute ) => {
+			let fieldType = 'text';
+			if ( isImageSrcAttribute( contentAttribute ) ) {
+				// Skip image src attributes as they're handled separately
+				return null;
+			} else if ( isUrlAttribute( contentAttribute ) ) {
+				fieldType = 'url';
+			} else {
+				switch ( contentAttribute.definition.type ) {
+					case 'boolean':
+						fieldType = 'toggle';
+						break;
+					case 'rich-text':
+						fieldType = 'text';
+						break;
+					case 'number':
+						fieldType = 'text';
+						break;
+					default:
+						fieldType = 'text';
+				}
 			}
-		}
 
-		return {
-			id: attr.name,
-			type: fieldType,
-			label: attr.name,
-		};
-	} );
+			return {
+				id: contentAttribute.name,
+				type: fieldType,
+				label: contentAttribute.name,
+			};
+		} )
+		.filter( Boolean );
 }
 
 export default function BlockQuickNavigation( { clientIds, onSelect } ) {
