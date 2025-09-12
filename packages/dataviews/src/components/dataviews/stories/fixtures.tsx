@@ -864,6 +864,18 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'isPlanet',
 		label: 'Is Planet',
 		type: 'boolean',
+		setValue: ( { item, value } ) => {
+			if ( item ) {
+				return {
+					...item,
+					isPlanet: value === 'true',
+				};
+			}
+
+			return {
+				isPlanet: value === 'true',
+			};
+		},
 		elements: [
 			{ value: true, label: 'True' },
 			{ value: false, label: 'False' },
