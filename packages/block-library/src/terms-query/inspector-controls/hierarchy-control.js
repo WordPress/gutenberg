@@ -23,11 +23,7 @@ export default function HierarchyControl( { attributes, setQuery } ) {
 				checked={ termQuery.hierarchical }
 				onChange={ ( hierarchical ) => {
 					setQuery( { hierarchical } );
-					if ( hierarchical && termQuery.parent ) {
-						setQuery( { parent: 0 } );
-					}
 				} }
-				disabled={ termQuery.parent === 0 }
 			/>
 		</ToolsPanelItem>
 	);

@@ -26,7 +26,7 @@ export default function TermsQueryInspectorControls( {
 	TagName,
 	clientId,
 } ) {
-	const { termQuery } = attributes;
+	const { termQuery, termsToShow } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { taxonomies } = useSelect( ( select ) => {
@@ -83,6 +83,7 @@ export default function TermsQueryInspectorControls( {
 								parent: false,
 								perPage: 10,
 							},
+							termsToShow: 'all',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -90,6 +91,7 @@ export default function TermsQueryInspectorControls( {
 					<TaxonomyControl
 						attributes={ attributes }
 						setQuery={ setQuery }
+						setAttributes={ setAttributes }
 						taxonomyOptions={ taxonomyOptions }
 					/>
 					<OrderingControls
@@ -110,7 +112,7 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					{ isTaxonomyHierarchical && (
+					{ isTaxonomyHierarchical && termsToShow === 'all' && (
 						<HierarchyControl
 							attributes={ attributes }
 							setQuery={ setQuery }
