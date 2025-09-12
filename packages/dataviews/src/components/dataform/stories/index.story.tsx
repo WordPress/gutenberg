@@ -472,13 +472,13 @@ function CustomEditControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, description, getValue, setValue } = field;
+	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( field.setValue( { item: data, value: newValue } ) ),
-		[ data, field, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	return (
@@ -1490,56 +1490,32 @@ const NestedDataComponent = () => {
 			label: 'User Name',
 			type: 'text',
 			getValue: ( { item } ) => item.user.profile.name,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						user: {
-							...item.user,
-							profile: {
-								...item?.user?.profile,
-								name: value,
-							},
-						},
-					};
-				}
-
-				return {
-					user: {
-						profile: {
-							name: value,
-						},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				user: {
+					...item.user,
+					profile: {
+						...item?.user?.profile,
+						name: value,
 					},
-				};
-			},
+				},
+			} ),
 		},
 		{
 			id: 'userEmail',
 			label: 'User Email',
 			type: 'email',
 			getValue: ( { item } ) => item.user.profile.email,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						user: {
-							...item.user,
-							profile: {
-								...item?.user?.profile,
-								email: value,
-							},
-						},
-					};
-				}
-
-				return {
-					user: {
-						profile: {
-							email: value,
-						},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				user: {
+					...item.user,
+					profile: {
+						...item?.user?.profile,
+						email: value,
 					},
-				};
-			},
+				},
+			} ),
 		},
 		{
 			id: 'userTheme',
@@ -1552,79 +1528,45 @@ const NestedDataComponent = () => {
 				{ value: 'auto', label: 'Auto' },
 			],
 			getValue: ( { item } ) => item.user.preferences.theme,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						user: {
-							...item.user,
-							preferences: {
-								...item?.user?.preferences,
-								theme: value,
-							},
-						},
-					};
-				}
-
-				return {
-					user: {
-						preferences: {
-							theme: value,
-						},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				user: {
+					...item.user,
+					preferences: {
+						...item?.user?.preferences,
+						theme: value,
 					},
-				};
-			},
+				},
+			} ),
 		},
 		{
 			id: 'notifications',
 			label: 'Enable Notifications',
 			type: 'boolean',
 			getValue: ( { item } ) => item.user.preferences.notifications,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						user: {
-							...item.user,
-							preferences: {
-								...item?.user?.preferences,
-								notifications: value,
-							},
-						},
-					};
-				}
-
-				return {
-					user: {
-						preferences: {
-							notifications: value,
-						},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				user: {
+					...item.user,
+					preferences: {
+						...item?.user?.preferences,
+						notifications: value,
 					},
-				};
-			},
+				},
+			} ),
 		},
 		{
 			id: 'createdAt',
 			label: 'Created At',
 			type: 'datetime',
 			getValue: ( { item } ) => item.metadata.createdAt,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						metadata: {
-							...item.metadata,
-							createdAt: value,
-						},
-					};
-				}
-
-				return {
-					metadata: {
-						createdAt: value,
-					},
-				};
-			},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				metadata: {
+					...item.metadata,
+					createdAt: value,
+				},
+			} ),
 		},
 		{
 			id: 'tags',
@@ -1637,23 +1579,13 @@ const NestedDataComponent = () => {
 				{ value: 'guest', label: 'Guest' },
 			],
 			getValue: ( { item } ) => item.metadata.tags,
-			setValue: ( { item, value } ) => {
-				if ( item ) {
-					return {
-						...item,
-						metadata: {
-							...item.metadata,
-							tags: value,
-						},
-					};
-				}
-
-				return {
-					metadata: {
-						tags: value,
-					},
-				};
-			},
+			setValue: ( { item, value } ) => ( {
+				...item,
+				metadata: {
+					...item.metadata,
+					tags: value,
+				},
+			} ),
 		},
 	];
 

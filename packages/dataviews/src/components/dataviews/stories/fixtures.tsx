@@ -816,25 +816,13 @@ export const fields: Field< SpaceObject >[] = [
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
 		getValue: ( { item } ) => item.name.title,
-		setValue: ( { item, value } ) => {
-			// for proper updates in DataForm
-			if ( item ) {
-				return {
-					...item,
-					name: {
-						...item.name,
-						title: value,
-					},
-				};
-			}
-
-			// to account for weird filter usage
-			return {
-				name: {
-					title: value,
-				},
-			};
-		},
+		setValue: ( { item, value } ) => ( {
+			...item,
+			name: {
+				...item.name,
+				title: value,
+			},
+		} ),
 	},
 	{
 		id: 'date',
@@ -864,18 +852,10 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'isPlanet',
 		label: 'Is Planet',
 		type: 'boolean',
-		setValue: ( { item, value } ) => {
-			if ( item ) {
-				return {
-					...item,
-					isPlanet: value === 'true',
-				};
-			}
-
-			return {
-				isPlanet: value === 'true',
-			};
-		},
+		setValue: ( { item, value } ) => ( {
+			...item,
+			isPlanet: value === 'true',
+		} ),
 		elements: [
 			{ value: true, label: 'True' },
 			{ value: false, label: 'False' },
@@ -897,13 +877,13 @@ export const fields: Field< SpaceObject >[] = [
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
 		getValue: ( { item } ) => item.name.description,
-		setValue: ( { value } ) => {
-			return {
-				name: {
-					description: value,
-				},
-			};
-		},
+		setValue: ( { item, value } ) => ( {
+			...item,
+			name: {
+				...item.name,
+				description: value,
+			},
+		} ),
 	},
 	{
 		label: 'Email',

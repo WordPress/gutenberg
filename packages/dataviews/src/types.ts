@@ -300,14 +300,14 @@ export type Field< Item > = {
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
 	 */
-	getValue?: ( args: { item: Item } ) => any;
+	getValue?: ( args: { item: DeepPartial< Item > } ) => any;
 
 	/**
 	 * Callback used to set the value of the field on the item.
 	 * Used for editing operations to update field values.
 	 */
 	setValue?: ( args: {
-		item: Item | undefined;
+		item: DeepPartial< Item >;
 		value: any;
 	} ) => DeepPartial< Item >;
 };
@@ -315,9 +315,9 @@ export type Field< Item > = {
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
-	getValue: ( args: { item: Item } ) => any;
+	getValue: ( args: { item: DeepPartial< Item > } ) => any;
 	setValue: ( args: {
-		item: Item | undefined;
+		item: DeepPartial< Item >;
 		value: any;
 	} ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
