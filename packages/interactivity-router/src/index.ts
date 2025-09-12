@@ -93,6 +93,27 @@ const parseRegionAttribute = ( region: Element ) => {
 	}
 };
 
+const cloneRouterRegion = ( vdom: any ) => {
+	if ( ! vdom ) {
+		return null;
+	}
+
+	const { 'router-region': __ignored, ...directives } = vdom.props.directives;
+	const priorityLevels = vdom.props.priorityLevels
+		.map( ( level ) =>
+			level.filter( ( directive ) => directive !== 'router-region' )
+		)
+		.filter( ( level ) => level.length > 0 );
+
+	return priorityLevels.length > 0
+		? cloneElement( vdom, {
+				...vdom.props,
+				directives,
+				priorityLevels,
+		  } )
+		: vdom.props.element;
+};
+
 /**
  * Fetches and prepares a page from a given URL.
  *
@@ -148,29 +169,9 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
-		const rawRegion = vdom?.has( region )
+		regions[ id ] = vdom?.has( region )
 			? vdom.get( region )
 			: toVdom( region );
-
-		// The element is cloned and the `router-region` directive removed. We
-		// have to do so to prevent a recursive rendering that will cause a
-		// stack overflow.
-		const { 'router-region': __ignored, ...directives } =
-			rawRegion.props.directives;
-		const priorityLevels = rawRegion.props.priorityLevels
-			.map( ( level ) =>
-				level.filter( ( directive ) => directive !== 'router-region' )
-			)
-			.filter( ( level ) => level.length > 0 );
-
-		regions[ id ] =
-			priorityLevels.length > 0
-				? cloneElement( rawRegion, {
-						...rawRegion.props,
-						directives,
-						priorityLevels,
-				  } )
-				: rawRegion.props.element;
 
 		if ( attachTo ) {
 			regionsToAttach[ id ] = attachTo;
@@ -215,13 +216,21 @@ const renderPage = ( page: Page ) => {
 			const { id } = parseRegionAttribute( region );
 			// const fragment = getRegionRootFragment( region );
 			// render( page.regions[ id ], fragment );
-			routerRegions.get( id ).value = page.regions[ id ] ?? null;
+			routerRegions.get( id ).value = cloneRouterRegion(
+				page.regions[ id ]
+			);
 			// If this is an attached region, remove it from the list.
 			delete regionsToAttach[ id ];
 		} );
 
 		// Render unattached regions.
 		for ( const id in regionsToAttach ) {
+			if ( routerRegions.has( id ) ) {
+				routerRegions.get( id ).value = cloneRouterRegion(
+					page.regions[ id ]
+				);
+				continue;
+			}
 			const parent = document.querySelector( regionsToAttach[ id ] );
 
 			// Get the type from the vnode. If wrapped with Directives, get the
