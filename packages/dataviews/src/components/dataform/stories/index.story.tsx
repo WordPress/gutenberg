@@ -1450,3 +1450,250 @@ export const Validation = {
 export const Visibility = {
 	render: VisibilityComponent,
 };
+
+const NestedDataComponent = () => {
+	type NestedDataItem = {
+		user: {
+			profile: {
+				name: string;
+				email: string;
+			};
+			preferences: {
+				theme: string;
+				notifications: boolean;
+			};
+		};
+		metadata: {
+			createdAt: string;
+			tags: string[];
+		};
+	};
+
+	const [ data, setData ] = useState< NestedDataItem >( {
+		user: {
+			profile: {
+				name: 'John Doe',
+				email: 'john@example.com',
+			},
+			preferences: {
+				theme: 'dark',
+				notifications: true,
+			},
+		},
+		metadata: {
+			createdAt: '2023-01-01T12:00:00',
+			tags: [ 'admin', 'vip' ],
+		},
+	} );
+
+	const nestedFields: Field< NestedDataItem >[] = [
+		{
+			id: 'userName',
+			label: 'User Name',
+			type: 'text',
+			getValue: ( { item } ) => item.user.profile.name,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						user: {
+							...item.user,
+							profile: {
+								...item?.user?.profile,
+								name: value,
+							},
+						},
+					};
+				}
+
+				return {
+					user: {
+						profile: {
+							name: value,
+						},
+					},
+				};
+			},
+		},
+		{
+			id: 'userEmail',
+			label: 'User Email',
+			type: 'email',
+			getValue: ( { item } ) => item.user.profile.email,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						user: {
+							...item.user,
+							profile: {
+								...item?.user?.profile,
+								email: value,
+							},
+						},
+					};
+				}
+
+				return {
+					user: {
+						profile: {
+							email: value,
+						},
+					},
+				};
+			},
+		},
+		{
+			id: 'userTheme',
+			label: 'Theme Preference',
+			type: 'text',
+			Edit: 'toggleGroup',
+			elements: [
+				{ value: 'light', label: 'Light' },
+				{ value: 'dark', label: 'Dark' },
+				{ value: 'auto', label: 'Auto' },
+			],
+			getValue: ( { item } ) => item.user.preferences.theme,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						user: {
+							...item.user,
+							preferences: {
+								...item?.user?.preferences,
+								theme: value,
+							},
+						},
+					};
+				}
+
+				return {
+					user: {
+						preferences: {
+							theme: value,
+						},
+					},
+				};
+			},
+		},
+		{
+			id: 'notifications',
+			label: 'Enable Notifications',
+			type: 'boolean',
+			getValue: ( { item } ) => item.user.preferences.notifications,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						user: {
+							...item.user,
+							preferences: {
+								...item?.user?.preferences,
+								notifications: value,
+							},
+						},
+					};
+				}
+
+				return {
+					user: {
+						preferences: {
+							notifications: value,
+						},
+					},
+				};
+			},
+		},
+		{
+			id: 'createdAt',
+			label: 'Created At',
+			type: 'datetime',
+			getValue: ( { item } ) => item.metadata.createdAt,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						metadata: {
+							...item.metadata,
+							createdAt: value,
+						},
+					};
+				}
+
+				return {
+					metadata: {
+						createdAt: value,
+					},
+				};
+			},
+		},
+		{
+			id: 'tags',
+			label: 'Tags',
+			type: 'array',
+			elements: [
+				{ value: 'admin', label: 'Administrator' },
+				{ value: 'user', label: 'Regular User' },
+				{ value: 'vip', label: 'VIP' },
+				{ value: 'guest', label: 'Guest' },
+			],
+			getValue: ( { item } ) => item.metadata.tags,
+			setValue: ( { item, value } ) => {
+				if ( item ) {
+					return {
+						...item,
+						metadata: {
+							...item.metadata,
+							tags: value,
+						},
+					};
+				}
+
+				return {
+					metadata: {
+						tags: value,
+					},
+				};
+			},
+		},
+	];
+
+	const form: Form = {
+		layout: { type: 'panel', labelPosition: 'top', openAs: 'modal' },
+		fields: [
+			{
+				id: 'userProfile',
+				label: 'User Profile',
+				children: [ 'userName', 'userEmail' ],
+			},
+			{
+				id: 'userPreferences',
+				label: 'Preferences',
+				children: [ 'userTheme', 'notifications' ],
+			},
+			{
+				id: 'metadata',
+				label: 'Metadata',
+				children: [ 'createdAt', 'tags' ],
+			},
+		],
+	};
+
+	const handleChange = useCallback( ( edits: any ) => {
+		setData( edits );
+	}, [] );
+
+	return (
+		<DataForm< NestedDataItem >
+			data={ data }
+			fields={ nestedFields }
+			form={ form }
+			onChange={ handleChange }
+		/>
+	);
+};
+
+export const NestedData = {
+	render: NestedDataComponent,
+};
