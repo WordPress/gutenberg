@@ -204,7 +204,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
 
-	const [ isUntouched, setIsUntouched ] = useState( true );
 	/**
 	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
 	 * @param {boolean}       isPersistent      Whether to persist the height in preferences.
@@ -280,7 +279,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	let usedMax = '50%'; // Approximation before max has a value.
 	if ( max !== undefined ) {
 		// Halves the available max height until a user height is set.
-		usedMax = isAutoHeight && isUntouched ? max / 2 : max;
+		usedMax = isAutoHeight ? max / 2 : max;
 	}
 
 	const getAriaValueNow = ( height ) =>
@@ -386,7 +385,6 @@ function MetaBoxesMain( { isLegacy } ) {
 				// Sets the starting height to avoid visual jumps in height and
 				// aria-valuenow being `NaN` for the first (few) resize events.
 				applyHeight( elementRef.offsetHeight, false, true );
-				setIsUntouched( false );
 			}
 			elementRef.classList.add( 'is-resizing' );
 			resizeDataRef.current = { timeStamp, maxDelta: 0 };

@@ -7,6 +7,12 @@
 	flex-direction: column;
 	overflow: hidden;
 	padding-block-start: $button-size-compact;
+
+	&.is-resizing {
+		// Ths is only for the case that a user height has not been set because the max-height is half
+		// of what’s available and should not apply when resizing.
+		max-height: none !important;
+	}
 }
 
 .edit-post-meta-boxes-main__presenter {
