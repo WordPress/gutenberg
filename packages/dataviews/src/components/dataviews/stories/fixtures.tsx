@@ -815,6 +815,9 @@ export const fields: Field< SpaceObject >[] = [
 		filterBy: {
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
+		isValid: {
+			required: true,
+		},
 		getValue: ( { item } ) => item.name.title,
 		setValue: ( { item, value } ) => ( {
 			...item,

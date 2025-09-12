@@ -33,7 +33,18 @@ export default function InputWidget( {
 		( f ) => f.field === filter.field
 	);
 
-	const field = fields.find( ( f ) => f.id === filter.field );
+	const field = useMemo( () => {
+		const currentField = fields.find( ( f ) => f.id === filter.field );
+		if ( currentField ) {
+			return {
+				...currentField,
+				isValid: {
+					custom: () => null,
+				},
+			};
+		}
+		return currentField;
+	}, [ fields, filter.field ] );
 	const currentValue = getCurrentValue( filter, currentFilter );
 	const data = useMemo( () => {
 		return ( view.filters ?? [] ).reduce(
