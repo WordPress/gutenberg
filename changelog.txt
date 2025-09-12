@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 21.6.0-rc.1 =
-
+= 21.6.0 =
 
 ## Changelog
 
@@ -43,6 +42,7 @@
 
 #### Global Styles
 - Add support for select or dropdown elements. ([70379](https://github.com/WordPress/gutenberg/pull/70379))
+- Add element support for text related inputs. ([70378](https://github.com/WordPress/gutenberg/pull/70378))
 
 
 ### Bug Fixes
@@ -165,6 +165,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @Adi-ty @andrewserong @aristath @DAreRodz @desrosj @dinhtungdu @getdave @himanshupathak95 @im3dabasia @jsnajdr @juanfra @kmanijak @lalitkumawat1m @levinbaria @MaggieCabrera @Mamaduka @manzoorwanijk @Mayank-Tripathi32 @mcsf @mikachan @mirka @nerrad @oandregal @R1shabh-Gupta @ramonjd @shimotmk @sirreal @swissspidy @t-hamano @talldan @tellthemachines @tyxla @USERSATOSHI @vipul0425 @westonruter @youknowriad
+
+
 
 
 = 21.5.0 =

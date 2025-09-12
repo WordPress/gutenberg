@@ -52,7 +52,8 @@ export default function CategoriesEdit( {
 
 	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
 		'root',
-		'taxonomy'
+		'taxonomy',
+		{ per_page: -1 }
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );

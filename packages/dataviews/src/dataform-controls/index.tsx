@@ -22,9 +22,11 @@ import radio from './radio';
 import select from './select';
 import text from './text';
 import toggle from './toggle';
+import textarea from './textarea';
 import toggleGroup from './toggle-group';
 import array from './array';
 import color from './color';
+import password from './password';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -40,10 +42,12 @@ const FORM_CONTROLS: FormControls = {
 	telephone,
 	url,
 	integer,
+	password,
 	radio,
 	select,
 	text,
 	toggle,
+	textarea,
 	toggleGroup,
 };
 

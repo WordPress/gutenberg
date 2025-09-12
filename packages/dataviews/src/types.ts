@@ -103,6 +103,7 @@ export type FieldType =
 	| 'media'
 	| 'boolean'
 	| 'email'
+	| 'password'
 	| 'telephone'
 	| 'color'
 	| 'url'

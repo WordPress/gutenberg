@@ -141,13 +141,21 @@ export const getEntityRecord =
 					};
 				}
 
-				// Disable reason: While true that an early return could leave `path`
-				// unused, it's important that path is derived using the query prior to
-				// additional query modifications in the condition below, since those
-				// modifications are relevant to how the data is tracked in state, and not
-				// for how the request is made to the REST API.
+				if ( query !== undefined && query._fields ) {
+					// The resolution cache won't consider query as reusable based on the
+					// fields, so it's tested here, prior to initiating the REST request,
+					// and without causing `getEntityRecord` resolution to occur.
+					const hasRecord = select.hasEntityRecord(
+						kind,
+						name,
+						key,
+						query
+					);
+					if ( hasRecord ) {
+						return;
+					}
+				}
 
-				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 				const path = addQueryArgs(
 					entityConfig.baseURL + ( key ? '/' + key : '' ),
 					{
@@ -155,23 +163,6 @@ export const getEntityRecord =
 						...query,
 					}
 				);
-
-				if ( query !== undefined && query._fields ) {
-					query = { ...query, include: [ key ] };
-
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecords` resolution to occur.
-					const hasRecords = select.hasEntityRecords(
-						kind,
-						name,
-						query
-					);
-					if ( hasRecords ) {
-						return;
-					}
-				}
-
 				const response = await apiFetch( { path, parse: false } );
 				const record = await response.json();
 				const permissions = getUserPermissionsFromAllowHeader(
@@ -368,61 +359,57 @@ export const getEntityRecords =
 					meta
 				);
 
+				const targetHints = records
+					.filter(
+						( record ) =>
+							!! record?.[ key ] &&
+							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
+					)
+					.map( ( record ) => ( {
+						id: record[ key ],
+						permissions: getUserPermissionsFromAllowHeader(
+							record._links.self[ 0 ].targetHints.allow
+						),
+					} ) );
+
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const targetHint of targetHints ) {
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						canUserResolutionsArgs.push( [
+							action,
+							{ kind, name, id: targetHint.id },
+						] );
+
+						receiveUserPermissionArgs[
+							getUserPermissionCacheKey( action, {
+								kind,
+								name,
+								id: targetHint.id,
+							} )
+						] = targetHint.permissions[ action ];
+					}
+				}
+
+				if ( targetHints.length > 0 ) {
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				}
+
 				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
+				// the `getEntityRecord` selector in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
-				// See https://github.com/WordPress/gutenberg/pull/64504
-				// See https://github.com/WordPress/gutenberg/pull/70738
-				if ( ! query.context ) {
-					const targetHints = records
-						.filter(
-							( record ) =>
-								!! record?.[ key ] &&
-								!! record?._links?.self?.[ 0 ]?.targetHints
-									?.allow
-						)
-						.map( ( record ) => ( {
-							id: record[ key ],
-							permissions: getUserPermissionsFromAllowHeader(
-								record._links.self[ 0 ].targetHints.allow
-							),
-						} ) );
-
-					const canUserResolutionsArgs = [];
-					const receiveUserPermissionArgs = {};
-					for ( const targetHint of targetHints ) {
-						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-							canUserResolutionsArgs.push( [
-								action,
-								{ kind, name, id: targetHint.id },
-							] );
-
-							receiveUserPermissionArgs[
-								getUserPermissionCacheKey( action, {
-									kind,
-									name,
-									id: targetHint.id,
-								} )
-							] = targetHint.permissions[ action ];
-						}
-					}
-
-					if ( targetHints.length > 0 ) {
-						dispatch.receiveUserPermissions(
-							receiveUserPermissionArgs
-						);
-						dispatch.finishResolutions(
-							'canUser',
-							canUserResolutionsArgs
-						);
-					}
-
-					if ( ! query?._fields ) {
-						dispatch.finishResolutions(
-							'getEntityRecord',
-							getResolutionsArgs( records )
-						);
-					}
+				// Todo https://github.com/WordPress/gutenberg/issues/26629
+				if ( ! query?._fields && ! query.context ) {
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						getResolutionsArgs( records )
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
