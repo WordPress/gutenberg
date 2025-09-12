@@ -223,6 +223,9 @@ export default function TermTemplateEdit( {
 	);
 
 	const filteredTerms = useMemo( () => {
+		if ( ! terms ) {
+			return [];
+		}
 		if ( termsToShow === 'top-level' ) {
 			return terms.filter( ( term ) => ! term.parent );
 		}
