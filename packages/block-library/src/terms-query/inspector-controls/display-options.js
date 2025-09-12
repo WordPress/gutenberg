@@ -33,21 +33,6 @@ export default function DisplayOptions( { attributes, setQuery } ) {
 					disabled={ !! termQuery.hierarchical }
 				/>
 			</ToolsPanelItem>
-			<ToolsPanelItem
-				hasValue={ () => termQuery.hideEmpty !== true }
-				label={ __( 'Show empty terms' ) }
-				onDeselect={ () => setQuery( { hideEmpty: true } ) }
-				isShownByDefault
-			>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Show empty terms' ) }
-					checked={ ! termQuery.hideEmpty }
-					onChange={ ( showEmpty ) =>
-						setQuery( { hideEmpty: ! showEmpty } )
-					}
-				/>
-			</ToolsPanelItem>
 
 			<ToolsPanelItem
 				hasValue={ () => termQuery.hierarchical !== false }

@@ -15,7 +15,8 @@ import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
 import SubtermsControl from './subterms-control';
 import DisplayOptions from './display-options';
-import PaginationControl from './max-terms-controls';
+import EmptyTermsControl from './empty-terms-control';
+import MaxTermsControl from './max-terms-controls';
 import AdvancedControls from './advanced-controls';
 
 export default function TermsQueryInspectorControls( {
@@ -95,6 +96,10 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
+					<EmptyTermsControl
+						attributes={ attributes }
+						setQuery={ setQuery }
+					/>
 					{ displaySubtermsControl && (
 						<SubtermsControl
 							attributes={ attributes }
@@ -105,7 +110,7 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					<PaginationControl
+					<MaxTermsControl
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
