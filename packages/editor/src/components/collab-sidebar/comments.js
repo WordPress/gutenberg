@@ -19,15 +19,18 @@ import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	__unstableUseBlockElement,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 /**
  * Renders the Comments component.
@@ -51,18 +54,26 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId, blocks } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
+	const { blockCommentId, blocks, highlightedBlockId } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlocks,
+				getHighlightedBlockClientId,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
 
-		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
-				: null,
-			blocks: getBlocks(),
-		};
-	}, [] );
+			return {
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.blockCommentId
+					: null,
+				blocks: getBlocks(),
+				highlightedBlockId: getHighlightedBlockClientId(),
+			};
+		},
+		[]
+	);
 
 	const clearThreadFocus = () => {
 		setFocusThread( null );
@@ -75,12 +86,10 @@ export function Comments( {
 
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
-	// State to track the highlighted block for scrolling
-	const [ highlightedBlockId, setHighlightedBlockId ] = useState( null );
-	const highlightedBlockElement =
-		__unstableUseBlockElement( highlightedBlockId );
+	// Get the highlighted block element for scrolling
+	const highlightedBlockElement = useBlockElement( highlightedBlockId );
 
-	// Effect to handle scrolling when highlighted block element changes
+	// Effect to handle scrolling when highlighted block changes
 	useEffect( () => {
 		if ( highlightedBlockElement ) {
 			highlightedBlockElement.scrollIntoView( {
@@ -118,7 +127,6 @@ export function Comments( {
 		if ( relatedBlocks.length > 0 ) {
 			const blockId = relatedBlocks[ 0 ];
 			toggleBlockHighlight( blockId, true );
-			setHighlightedBlockId( blockId );
 		}
 	};
 
@@ -148,8 +156,11 @@ export function Comments( {
 						className={ clsx(
 							'editor-collab-sidebar-panel__thread',
 							{
+								'editor-collab-sidebar-panel__active-thread':
+									blockCommentId &&
+									blockCommentId === thread.id,
 								'editor-collab-sidebar-panel__focus-thread':
-									focusThread === thread.id,
+									focusThread && focusThread === thread.id,
 							}
 						) }
 						id={ thread.id }

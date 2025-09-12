@@ -2826,6 +2826,17 @@ export function isBlockHighlighted( state, clientId ) {
 }
 
 /**
+ * Returns the currently highlighted block client ID.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string|null} The highlighted block client ID, or null if no block is highlighted.
+ */
+export function getHighlightedBlockClientId( state ) {
+	return state.highlightedBlock;
+}
+
+/**
  * Checks if a given block has controlled inner blocks.
  *
  * @param {Object} state    Global application state.
