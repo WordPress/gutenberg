@@ -18,9 +18,9 @@ import type { SetSelection } from './private-types';
  */
 import type { useFocusOnMount } from '@wordpress/compose';
 
-export type DeepPartial< T > = T extends object
-	? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
-	: T;
+export type DeepPartial< T > = {
+	[ P in keyof T ]?: T[ P ] extends object ? DeepPartial< T[ P ] > : T[ P ];
+} & T;
 
 export type SortDirection = 'asc' | 'desc';
 
