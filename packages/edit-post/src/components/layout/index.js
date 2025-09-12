@@ -358,7 +358,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		className: 'edit-post-meta-boxes-main',
 		defaultSize: { height: isOpen ? openHeight : 0 },
 		minHeight: min,
-		maxHeight: usedMax,
+		maxHeight: isShort ? null : usedMax,
 		enable: {
 			top: true,
 			right: false,
