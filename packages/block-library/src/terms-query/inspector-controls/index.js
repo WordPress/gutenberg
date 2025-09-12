@@ -13,7 +13,6 @@ import { useSelect } from '@wordpress/data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
-import SubtermsControl from './subterms-control';
 import DisplayOptions from './display-options';
 import HierarchyControl from './hierarchy-control';
 import EmptyTermsControl from './empty-terms-control';
@@ -101,15 +100,11 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
-					{ displaySubtermsControl && (
-						<SubtermsControl
-							attributes={ attributes }
-							setAttributes={ setAttributes }
-						/>
-					) }
 					<DisplayOptions
 						attributes={ attributes }
-						setQuery={ setQuery }
+						setAttributes={ setAttributes }
+						displayTopLevelControl={ isTaxonomyHierarchical }
+						displaySubtermsControl={ displaySubtermsControl }
 					/>
 					<MaxTermsControl
 						attributes={ attributes }

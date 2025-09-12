@@ -27,9 +27,10 @@
 				"hierarchical": false
 			}
 		},
-		"showSubterms": {
-			"type": "boolean",
-			"default": false
+		"termsToShow": {
+			"type": "string",
+			"default": "all",
+			"enum": [ "all", "top-level", "subterms" ]
 		},
 		"tagName": {
 			"type": "string",

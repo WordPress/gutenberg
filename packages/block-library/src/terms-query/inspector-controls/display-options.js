@@ -7,34 +7,54 @@ import {
 	RadioControl,
 } from '@wordpress/components';
 
-export default function DisplayOptions( { attributes, setQuery } ) {
-	const { termQuery } = attributes;
+const getOptions = ( displayTopLevelControl, displaySubtermsControl ) => {
+	const options = [ { label: __( 'Show all' ), value: 'all' } ];
+
+	if ( displayTopLevelControl ) {
+		options.push( {
+			label: __( 'Show only top level terms' ),
+			value: 'top-level',
+		} );
+	}
+
+	if ( displaySubtermsControl ) {
+		options.push( {
+			label: __( 'Show subterms only' ),
+			value: 'subterms',
+		} );
+	}
+
+	return options;
+};
+
+export default function DisplayOptions( {
+	attributes,
+	displayTopLevelControl,
+	displaySubtermsControl,
+	setAttributes,
+} ) {
+	const { termQuery, termsToShow } = attributes;
 
 	return (
-		<>
-			<ToolsPanelItem
-				hasValue={ () => termQuery.parent !== false }
+		<ToolsPanelItem
+			hasValue={ () => termsToShow !== 'all' }
+			label={ __( 'Terms to show' ) }
+			onDeselect={ () => setAttributes( { termsToShow: 'all' } ) }
+			isShownByDefault
+		>
+			<RadioControl
+				__nextHasNoMarginBottom
 				label={ __( 'Terms to show' ) }
-				onDeselect={ () => setQuery( { parent: false } ) }
-				isShownByDefault
-			>
-				<RadioControl
-					__nextHasNoMarginBottom
-					label={ __( 'Terms to show' ) }
-					options={ [
-						{ label: __( 'Show all' ), value: false },
-						{ label: __( 'Show only top level terms' ), value: 0 },
-					] }
-					selected={ termQuery.parent }
-					onChange={ ( parent ) => {
-						setQuery( { parent } );
-						if ( parent === 0 && termQuery.hierarchical ) {
-							setQuery( { hierarchical: false } );
-						}
-					} }
-					disabled={ !! termQuery.hierarchical }
-				/>
-			</ToolsPanelItem>
-		</>
+				options={ getOptions(
+					displayTopLevelControl,
+					displaySubtermsControl
+				) }
+				selected={ termsToShow }
+				onChange={ ( value ) => {
+					setAttributes( { termsToShow: value } );
+				} }
+				disabled={ !! termQuery.hierarchical }
+			/>
+		</ToolsPanelItem>
 	);
 }
