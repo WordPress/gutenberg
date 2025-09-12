@@ -50,11 +50,11 @@ export default function ValidatedText< Item >( {
 		( newValue: string ) =>
 			onChange(
 				field.setValue( {
-					item: data as DeepPartial< Item >,
+					item: data,
 					value: newValue,
 				} )
 			),
-		[ data, id, onChange ]
+		[ data, field, onChange ]
 	);
 
 	return (

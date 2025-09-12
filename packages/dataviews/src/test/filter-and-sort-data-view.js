@@ -43,7 +43,7 @@ describe( 'filters', () => {
 		);
 		expect( result ).toHaveLength( 4 );
 		expect(
-			result.find( ( item ) => item.title === 'Neptune' )
+			result.find( ( item ) => item.name.title === 'Neptune' )
 		).toBeDefined();
 	} );
 

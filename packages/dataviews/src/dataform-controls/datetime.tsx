@@ -166,8 +166,14 @@ export default function DateTime< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description } = field;
-	const value = field.getValue( { item: data } );
+	const { id, label, description, getValue, setValue } = field;
+	const value = getValue( { item: data } );
+
+	const onChangeControl = useCallback(
+		( newValue: string | null ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
 
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -175,7 +181,7 @@ export default function DateTime< Item >( {
 				className="dataviews-controls__datetime"
 				id={ id }
 				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChange }
+				onChange={ onChangeControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				options={ TIME_UNITS_OPTIONS[ operator ] }
@@ -187,7 +193,7 @@ export default function DateTime< Item >( {
 		<CalendarDateTimeControl
 			id={ id }
 			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChange }
+			onChange={ onChangeControl }
 			label={ label }
 			description={ description }
 			hideLabelFromVision={ hideLabelFromVision }

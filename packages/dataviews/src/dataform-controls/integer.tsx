@@ -19,33 +19,27 @@ import { unlock } from '../lock-unlock';
 
 const { ValidatedNumberControl } = unlock( privateApis );
 
-function BetweenControls< Item >( {
-	id,
+function BetweenControls( {
 	value,
 	onChange,
 	hideLabelFromVision,
 }: {
-	id: string;
 	value: any;
-	onChange: DataFormControlProps< Item >[ 'onChange' ];
+	onChange: ( [ min, max ]: [ number, number ] ) => void;
 	hideLabelFromVision?: boolean;
 } ) {
 	const [ min = '', max = '' ] = Array.isArray( value ) ? value : [];
 
 	const onChangeMin = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( {
-				[ id ]: [ Number( newValue ), max ],
-			} ),
-		[ id, onChange, max ]
+			onChange( [ Number( newValue ), max ] ),
+		[ onChange, max ]
 	);
 
 	const onChangeMax = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( {
-				[ id ]: [ min, Number( newValue ) ],
-			} ),
-		[ id, onChange, min ]
+			onChange( [ min, Number( newValue ) ] ),
+		[ onChange, min ]
 	);
 
 	return (
@@ -82,8 +76,8 @@ export default function Integer< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description } = field;
-	const value = field.getValue( { item: data } ) ?? '';
+	const { id, label, description, getValue, setValue } = field;
+	const value = getValue( { item: data } ) ?? '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -93,24 +87,42 @@ export default function Integer< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {
-			onChange( {
-				// Do not convert an empty string or undefined to a number,
-				// otherwise there's a mismatch between the UI control (empty)
-				// and the data relied by onChange (0).
-				[ id ]: [ '', undefined ].includes( newValue )
-					? undefined
-					: Number( newValue ),
-			} );
+			onChange(
+				setValue( {
+					item: data,
+					// Do not convert an empty string or undefined to a number,
+					// otherwise there's a mismatch between the UI control (empty)
+					// and the data relied by onChange (0).
+					value: [ '', undefined ].includes( newValue )
+						? undefined
+						: Number( newValue ),
+				} )
+			);
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
+	);
+
+	const onChangeBetweenControls = useCallback(
+		// We are loosing the type here to account for the fact that this control
+		// type is used only for filtering functionality and is not directly
+		// exposed to users using DataForm. DataForm expects onChange to follow
+		// the shape of the data passed to it, filtering is more liberal.
+		( newValue: any ) => {
+			onChange(
+				setValue( {
+					item: data,
+					value: newValue,
+				} )
+			);
+		},
+		[ data, onChange, setValue ]
 	);
 
 	if ( operator === OPERATOR_BETWEEN ) {
 		return (
 			<BetweenControls
-				id={ id }
 				value={ value }
-				onChange={ onChange }
+				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
 		);

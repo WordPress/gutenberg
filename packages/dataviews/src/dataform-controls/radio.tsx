@@ -15,15 +15,13 @@ export default function Radio< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label } = field;
-	const value = field.getValue( { item: data } );
+	const { label, getValue, setValue } = field;
+	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	if ( field.elements ) {

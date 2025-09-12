@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,13 +18,19 @@ export default function Toggle< Item >( {
 	data,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label, description } = field;
+	const { id, label, description, getValue, setValue } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
 				typeof ValidatedToggleControl
 			>[ 'customValidity' ]
 		>( undefined );
+
+	const onChangeControl = useCallback( () => {
+		onChange(
+			setValue( { item: data, value: ! getValue( { item: data } ) } )
+		);
+	}, [ onChange, setValue, data, getValue ] );
 
 	return (
 		<ValidatedToggleControl
@@ -54,9 +60,7 @@ export default function Toggle< Item >( {
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
-			onChange={ () =>
-				onChange( { [ id ]: ! getValue( { item: data } ) } )
-			}
+			onChange={ onChangeControl }
 		/>
 	);
 }

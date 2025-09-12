@@ -19,7 +19,7 @@ export default function Select< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, type, label, description } = field;
+	const { type, label, description, getValue, setValue } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -28,13 +28,11 @@ export default function Select< Item >( {
 		>( undefined );
 
 	const isMultiple = type === 'array';
-	const value = field.getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
+	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
 	const onChangeControl = useCallback(
 		( newValue: any ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	const fieldElements = field?.elements ?? [];

@@ -816,7 +816,19 @@ export const fields: Field< SpaceObject >[] = [
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
 		getValue: ( { item } ) => item.name.title,
-		setValue: ( { value } ) => {
+		setValue: ( { item, value } ) => {
+			// for proper updates in DataForm
+			if ( item ) {
+				return {
+					...item,
+					name: {
+						...item.name,
+						title: value,
+					},
+				};
+			}
+
+			// to account for weird filter usage
 			return {
 				name: {
 					title: value,

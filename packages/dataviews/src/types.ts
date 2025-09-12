@@ -307,7 +307,7 @@ export type Field< Item > = {
 	 * Used for editing operations to update field values.
 	 */
 	setValue?: ( args: {
-		item: DeepPartial< Item >;
+		item: Item | undefined;
 		value: any;
 	} ) => DeepPartial< Item >;
 };
@@ -317,7 +317,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	setValue: ( args: {
-		item: DeepPartial< Item >;
+		item: Item | undefined;
 		value: any;
 	} ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;

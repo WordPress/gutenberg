@@ -43,7 +43,7 @@ export default function InputWidget( {
 				);
 				if ( activeFilterField ) {
 					acc = activeFilterField.setValue( {
-						item: {},
+						item: undefined,
 						value: activeFilter.value,
 					} );
 				}

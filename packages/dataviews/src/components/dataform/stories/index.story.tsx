@@ -472,15 +472,13 @@ function CustomEditControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
+	const { label, placeholder, description } = field;
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( field.setValue( { item: data, value: newValue } ) ),
+		[ data, field, onChange ]
 	);
 
 	return (

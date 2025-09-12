@@ -21,21 +21,19 @@ export default function ToggleGroup< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id } = field;
+	const { id, getValue, setValue } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
 				typeof ValidatedToggleGroupControl
 			>[ 'customValidity' ]
 		>( undefined );
-	const value = field.getValue( { item: data } );
+	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | number | undefined ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	if ( field.elements ) {
