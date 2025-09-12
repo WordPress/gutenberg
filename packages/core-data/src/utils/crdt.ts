@@ -28,8 +28,8 @@ const DOCUMENT_MAP_KEY = 'document';
  * @param {CRDTDoc}       ydoc
  * @param {PostChanges}   changes
  * @param {Post}          record
+ * @param {Type}          postType
  * @param {Set< string >} syncedProperties
- * @param {Set< string >} syncedMetaProperties
  * @param {string}        origin
  * @return {void}
  */
@@ -37,8 +37,8 @@ export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
 	record: Post,
+	postType: Type,
 	syncedProperties: Set< string >,
-	syncedMetaProperties: Set< string >,
 	origin: string
 ): void {
 	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
@@ -101,7 +101,9 @@ export function applyPostChangesToCRDTDoc(
 				// is a synced meta property).
 				Object.entries( newValue ?? {} ).forEach(
 					( [ metaKey, metaValue ] ) => {
-						if ( ! syncedMetaProperties.has( metaKey ) ) {
+						if (
+							! shouldSyncMetaForPostType( metaKey, postType )
+						) {
 							return;
 						}
 
@@ -174,15 +176,15 @@ export function applyPostChangesToCRDTDoc(
  *
  * @param {CRDTDoc}       ydoc
  * @param {Post}          record
+ * @param {Type}          postType
  * @param {Set< string >} syncedProperties
- * @param {Set< string >} syncedMetaProperties
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	record: Post,
-	syncedProperties: Set< string >,
-	syncedMetaProperties: Set< string >
+	postType: Type,
+	syncedProperties: Set< string >
 ): PostChanges {
 	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
 
@@ -222,7 +224,7 @@ export function getPostChangesFromCRDTDoc(
 					const allowedMeta = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
 							( [ metaKey ] ) =>
-								syncedMetaProperties.has( metaKey )
+								shouldSyncMetaForPostType( metaKey, postType )
 						)
 					);
 
@@ -365,19 +367,25 @@ export function getSyncedPropertiesForPostType(
 	return syncedProperties;
 }
 
+const metaDecisionCache: Map< string, Map< string, boolean > > = new Map();
+
 /**
- * Given a post type definition, return the set of meta properties that should
- * be synced for that post type.
+ * Given a meta key and post type definition, return a decision on whether to
+ * sync the meta property.
  *
- * @param {Type} postType The post type definition.
- * @return {Set<string>} The set of meta properties that should be synced.
+ * @param {string} metaKey  The meta key.
+ * @param {Type}   postType The post type definition.
+ * @return {boolean} Whether to sync the meta property.
  */
-export function getSyncedMetaPropertiesForPostType(
-	postType: Type
-): Set< string > {
-	// Return empty set if the post type does not support custom fields.
-	if ( ! postType.supports?.[ 'custom-fields' ] ) {
-		return new Set();
+function shouldSyncMetaForPostType( metaKey: string, postType: Type ): boolean {
+	if ( ! metaDecisionCache.has( postType.slug ) ) {
+		metaDecisionCache.set( postType.slug, new Map() );
+	}
+
+	const decisionMap = metaDecisionCache.get( postType.slug )!;
+
+	if ( decisionMap.has( metaKey ) ) {
+		return decisionMap.get( metaKey )!;
 	}
 
 	/**
@@ -385,19 +393,27 @@ export function getSyncedMetaPropertiesForPostType(
 	 * registered against the post type and made available via the REST API
 	 * (`'show_in_rest' => true`).
 	 *
-	 * Pass an Array instead of Set as a more familiar data structure.
+	 * Of the registered meta properties, by default we do not sync "hidden" meta
+	 * fields (leading underscore in the meta key). This filter allows third-party
+	 * code to override that behavior.
 	 *
-	 * @param {string[]} syncedMetaProperties List of meta properties to sync.
-	 * @param {string}   postTypeSlug         The post type slug.
-	 * @param {Type}     postType             The post type definition.
-	 * @return {string[]} The filtered list of meta properties to sync.
+	 * @param {boolean} shouldSync   Whether to sync the meta property.
+	 * @param {string}  metaKey      Meta key.
+	 * @param {string}  postTypeSlug The post type slug.
+	 * @param {Type}    postType     The post type definition.
+	 * @return {boolean} The filtered list of meta properties to sync.
 	 */
-	const syncedMetaProperties: string[] = applyFilters(
-		'sync.metaProperties',
-		[ 'footnotes' ],
-		postType.slug,
-		postType
-	) as string[];
+	const shouldSync = Boolean(
+		applyFilters(
+			'sync.shouldSyncMeta',
+			! metaKey.startsWith( '_' ),
+			metaKey,
+			postType.slug,
+			postType
+		)
+	);
 
-	return new Set( syncedMetaProperties );
+	decisionMap.set( metaKey, shouldSync );
+
+	return shouldSync;
 }
