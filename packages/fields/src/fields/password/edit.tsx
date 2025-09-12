@@ -27,7 +27,7 @@ function PasswordEdit( {
 	const handleTogglePassword = ( value: boolean ) => {
 		setShowPassword( value );
 		if ( ! value ) {
-			onChange( field.setValue( { item: data, value: '' } ) );
+			onChange( { password: '' } );
 		}
 	};
 
@@ -49,7 +49,9 @@ function PasswordEdit( {
 					<TextControl
 						label={ __( 'Password' ) }
 						onChange={ ( value ) =>
-							onChange( field.setValue( { item: data, value } ) )
+							onChange( {
+								password: value,
+							} )
 						}
 						value={ field.getValue( { item: data } ) || '' }
 						placeholder={ __( 'Use a secure password' ) }
