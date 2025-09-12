@@ -141,13 +141,21 @@ export const getEntityRecord =
 					};
 				}
 
-				// Disable reason: While true that an early return could leave `path`
-				// unused, it's important that path is derived using the query prior to
-				// additional query modifications in the condition below, since those
-				// modifications are relevant to how the data is tracked in state, and not
-				// for how the request is made to the REST API.
+				if ( query !== undefined && query._fields ) {
+					// The resolution cache won't consider query as reusable based on the
+					// fields, so it's tested here, prior to initiating the REST request,
+					// and without causing `getEntityRecord` resolution to occur.
+					const hasRecord = select.hasEntityRecord(
+						kind,
+						name,
+						key,
+						query
+					);
+					if ( hasRecord ) {
+						return;
+					}
+				}
 
-				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 				const path = addQueryArgs(
 					entityConfig.baseURL + ( key ? '/' + key : '' ),
 					{
@@ -155,23 +163,6 @@ export const getEntityRecord =
 						...query,
 					}
 				);
-
-				if ( query !== undefined && query._fields ) {
-					query = { ...query, include: [ key ] };
-
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecords` resolution to occur.
-					const hasRecords = select.hasEntityRecords(
-						kind,
-						name,
-						query
-					);
-					if ( hasRecords ) {
-						return;
-					}
-				}
-
 				const response = await apiFetch( { path, parse: false } );
 				const record = await response.json();
 				const permissions = getUserPermissionsFromAllowHeader(

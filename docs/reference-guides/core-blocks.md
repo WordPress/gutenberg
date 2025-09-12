@@ -106,7 +106,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
@@ -909,7 +909,7 @@ Describe in a few words what this site is about. This is important for search re
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** level, levelOptions, textAlign
 
 ## Site Title
@@ -938,7 +938,7 @@ Display icons linking to your social profiles or sites. ([Source](https://github
 -	**Name:** core/social-links
 -	**Category:** widgets
 -	**Allowed Blocks:** core/social-link
--	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units), ~~html~~
+-	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units), ~~html~~
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
@@ -967,7 +967,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Experimental:** true
 -	**Category:** design
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage
+-	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
 
 ## Tag Cloud
 

@@ -1176,17 +1176,6 @@ const meta = {
 };
 export default meta;
 
-export const Default = {
-	render: LayoutRegularComponent,
-	argTypes: {
-		type: {
-			control: { type: 'select' },
-			description: 'Chooses the layout type.',
-			options: [ 'default', 'card', 'panel', 'regular' ],
-		},
-	},
-};
-
 export const LayoutCard = {
 	render: LayoutCardComponent,
 	argTypes: {
