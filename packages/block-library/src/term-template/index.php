@@ -28,6 +28,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	}
 
 	$query = $query_block_context['termQuery'];
+	$terms_to_show = $query_block_context['termsToShow'] ?? 'all';
 
 	$query_args = array(
 		'taxonomy'   => $query['taxonomy'] ?? 'category',
@@ -39,13 +40,15 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		'exclude'    => $query['exclude'] ?? array(),
 	);
 
-	// Handle parent.
-	if ( ! empty( $query['hierarchical'] ) && isset( $query['parent'] ) ) {
-		$query_args['parent'] = $query['parent'];
-	} elseif ( ! empty( $query['hierarchical'] ) ) {
+	if ( $terms_to_show === 'top-level' ) {
 		$query_args['parent'] = 0;
-	} elseif ( isset( $query['parent'] ) ) {
-		$query_args['parent'] = $query['parent'];
+	} elseif ( $terms_to_show === 'subterms' ) {
+		// Check if we're in a taxonomy archive context
+		if ( is_tax( $query_args['taxonomy'] ) ) {
+			// Get the current term ID from the queried object
+			$current_term_id = get_queried_object_id();
+			$query_args['parent'] = $current_term_id;
+		}
 	}
 
 	$terms_query = new WP_Term_Query( $query_args );
