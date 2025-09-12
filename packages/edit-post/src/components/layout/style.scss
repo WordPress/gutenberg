@@ -90,7 +90,10 @@
 }
 
 .edit-post-meta-boxes-main__liner {
-	overflow: auto;
+	// Enable scrolling only for the split view.
+	.edit-post-meta-boxes-main & {
+		overflow: auto;
+	}
 	// Keep the contents behind the resize handle.
 	isolation: isolate;
 
