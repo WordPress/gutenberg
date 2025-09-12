@@ -42,7 +42,8 @@
 	},
 	"providesContext": {
 		"termQueryId": "termQueryId",
-		"termQuery": "termQuery"
+		"termQuery": "termQuery",
+		"termsToShow": "termsToShow"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
