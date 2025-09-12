@@ -27,6 +27,28 @@ const getOptions = ( displayTopLevelControl, displaySubtermsControl ) => {
 	return options;
 };
 
+const allTermsQuery = {
+	include: [],
+	exclude: [],
+	parent: false,
+};
+
+const topLevelTermsQuery = {
+	include: [],
+	exclude: [],
+	parent: 0,
+	hierarchical: false,
+};
+
+const getQueryAttributes = ( value ) => {
+	if ( value === 'all' ) {
+		return allTermsQuery;
+	}
+	if ( value === 'top-level' ) {
+		return topLevelTermsQuery;
+	}
+};
+
 export default function DisplayOptions( {
 	attributes,
 	displayTopLevelControl,
@@ -51,9 +73,12 @@ export default function DisplayOptions( {
 				) }
 				selected={ termsToShow }
 				onChange={ ( value ) => {
-					setAttributes( { termsToShow: value } );
+					const queryAttributes = getQueryAttributes( value );
+					setAttributes( {
+						termsToShow: value,
+						termQuery: { ...termQuery, ...queryAttributes },
+					} );
 				} }
-				disabled={ !! termQuery.hierarchical }
 			/>
 		</ToolsPanelItem>
 	);
