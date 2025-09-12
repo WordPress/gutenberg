@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data-controls",
-	"version": "4.30.0",
+	"version": "4.30.1-next.6f42e1382.0",
 	"description": "A set of common controls for the @wordpress/data api.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
