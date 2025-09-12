@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import ContentOnlyBlockEditor from '../content-only-editor';
 
 // Single Content Attribute Control component using DataForm
 function SingleContentAttributeControl( {
@@ -171,6 +172,35 @@ function BlockContentAttributesView( { clientId } ) {
 	);
 }
 
+// Group successive paragraph and list blocks
+function groupContentBlocks( clientIds, blocks ) {
+	const groups = [];
+	let currentGroup = [];
+
+	for ( let i = 0; i < clientIds.length; i++ ) {
+		const clientId = clientIds[ i ];
+		const block = blocks.find( ( b ) => b.clientId === clientId );
+
+		if (
+			block &&
+			( block.name === 'core/paragraph' || block.name === 'core/list' )
+		) {
+			currentGroup.push( clientId );
+		} else {
+			if ( currentGroup.length > 0 ) {
+				groups.push( currentGroup );
+				currentGroup = [];
+			}
+			groups.push( [ clientId ] );
+		}
+	}
+
+	if ( currentGroup.length > 0 ) {
+		groups.push( currentGroup );
+	}
+	return groups;
+}
+
 // Create DataForm fields from content attributes
 function createDataFormFields( contentAttributes ) {
 	return contentAttributes.map( ( attr ) => {
@@ -211,20 +241,69 @@ function createDataFormFields( contentAttributes ) {
 }
 
 export default function BlockQuickNavigation( { clientIds, onSelect } ) {
+	// Get all blocks for the client IDs
+	const blocks = useSelect(
+		( select ) => {
+			const { getBlocksByClientId } = select( blockEditorStore );
+			return getBlocksByClientId( clientIds );
+		},
+		[ clientIds ]
+	);
+
 	if ( ! clientIds.length ) {
 		return null;
 	}
+
+	// Group consecutive paragraph and list blocks
+	const blockGroups = groupContentBlocks( clientIds, blocks );
+
 	return (
 		<Navigator initialPath="/" style={ { overflow: 'visible' } }>
 			<Navigator.Screen path="/" style={ { overflow: 'visible' } }>
 				<VStack spacing={ 1 }>
-					{ clientIds.map( ( clientId ) => (
-						<BlockQuickNavigationItem
-							onSelect={ onSelect }
-							key={ clientId }
-							clientId={ clientId }
-						/>
-					) ) }
+					{ blockGroups.map( ( group, groupIndex ) => {
+						// Check if this group contains only paragraph and list blocks
+						const isContentGroup = group.every( ( clientId ) => {
+							const block = blocks.find(
+								( b ) => b.clientId === clientId
+							);
+							return (
+								block &&
+								( block.name === 'core/paragraph' ||
+									block.name === 'core/list' )
+							);
+						} );
+
+						if ( isContentGroup && group.length > 1 ) {
+							// Get the blocks for this group
+							const groupedContentBlocks = group
+								.map( ( clientId ) =>
+									blocks.find(
+										( b ) => b.clientId === clientId
+									)
+								)
+								.filter( Boolean );
+							// Render ContentOnlyBlockEditor for grouped content blocks
+							return (
+								<div>
+									<h3>Content</h3>
+									<ContentOnlyBlockEditor
+										key={ `content-only-block-editor-${ groupIndex }` }
+										blocks={ groupedContentBlocks }
+									/>
+								</div>
+							);
+						}
+
+						// Render individual blocks for non-content groups or single blocks
+						return group.map( ( clientId ) => (
+							<BlockQuickNavigationItem
+								onSelect={ onSelect }
+								key={ clientId }
+								clientId={ clientId }
+							/>
+						) );
+					} ) }
 				</VStack>
 			</Navigator.Screen>
 			{ clientIds.map( ( clientId ) => (
