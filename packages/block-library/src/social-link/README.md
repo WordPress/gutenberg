@@ -18,4 +18,7 @@ To evaluate if a social service should be added, contributors will consider the 
 
 ## Adding custom social icons
 
-Starting from WordPress 6.9, it's possible to add custom social icons to your site. See: [#70261](https://github.com/WordPress/gutenberg/pull/70261).
+Starting from WordPress 6.9, it's possible to add custom social icons to your site. See:
+
+* Pull Request that introduced custom social icons - [#70261](https://github.com/WordPress/gutenberg/pull/70261).
+* Developer Blog tutorial for custom social icons - [Registering custom social icons in WordPress 6.9](https://developer.wordpress.org/news/2025/08/registering-custom-social-icons-in-wordpress-6-9/).

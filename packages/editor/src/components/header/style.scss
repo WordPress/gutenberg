@@ -1,4 +1,5 @@
 .editor-header {
+	@include reset;
 	height: $header-height;
 	background: $white;
 	display: grid;

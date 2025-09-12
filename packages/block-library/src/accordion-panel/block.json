@@ -1,0 +1,72 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/accordion-panel",
+	"title": "Accordion Panel",
+	"category": "design",
+	"description": "Displays an accordion panel.",
+	"__experimental": true,
+	"parent": [ "core/accordion-content" ],
+	"supports": {
+		"color": {
+			"background": true,
+			"gradient": true
+		},
+		"interactivity": true,
+		"spacing": {
+			"padding": true,
+			"margin": [ "top", "bottom" ],
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"blockGap": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"shadow": true,
+		"layout": true
+	},
+	"attributes": {
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ],
+			"default": false
+		},
+		"openByDefault": {
+			"type": "boolean",
+			"default": false
+		},
+		"isSelected": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"textdomain": "default"
+}

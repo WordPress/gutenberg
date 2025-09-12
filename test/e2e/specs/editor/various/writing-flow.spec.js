@@ -1146,11 +1146,15 @@ class WritingFlowUtils {
 	}
 
 	async addDemoContent() {
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( 'First paragraph' );
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( '/columns' );
-		await this.page.keyboard.press( 'Enter' );
+		await this.editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First paragraph',
+			},
+		} );
+		await this.editor.insertBlock( {
+			name: 'core/columns',
+		} );
 		await this.editor.canvas
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();

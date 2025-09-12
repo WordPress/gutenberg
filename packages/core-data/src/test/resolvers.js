@@ -79,10 +79,6 @@ describe( 'getEntityRecord', () => {
 	it( 'accepts a query that overrides default api path', async () => {
 		const query = { context: 'view', _envelope: '1' };
 
-		const select = {
-			hasEntityRecords: jest.fn( () => {} ),
-		};
-
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
 
@@ -91,7 +87,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, select, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -337,6 +333,105 @@ describe( 'getEntityRecords', () => {
 	} );
 } );
 
+describe( 'taxonomy pagination', () => {
+	const registry = { batch: ( callback ) => callback() };
+	let dispatch, loadedTaxonomyEntities;
+
+	beforeEach( async () => {
+		dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn().mockResolvedValue( 'lock' ),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		triggerFetch.mockReset();
+
+		const mockTaxonomyConfig = {
+			category: {
+				name: 'Categories',
+				rest_base: 'categories',
+			},
+		};
+
+		triggerFetch.mockResolvedValueOnce( mockTaxonomyConfig );
+
+		const { additionalEntityConfigLoaders } = await import( '../entities' );
+		const taxonomyLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'taxonomy'
+		);
+		loadedTaxonomyEntities = await taxonomyLoader.loadEntities();
+	} );
+
+	it( 'should make paginated API calls with parse: false', async () => {
+		const resolveSelect = {
+			getEntitiesConfig: jest
+				.fn()
+				.mockResolvedValue( loadedTaxonomyEntities ),
+		};
+
+		triggerFetch.mockResolvedValueOnce( [
+			{ id: 1, name: 'Category 1' },
+			{ id: 2, name: 'Category 2' },
+		] );
+
+		await getEntityRecords( 'taxonomy', 'category', {
+			per_page: 2,
+			page: 1,
+		} )( { dispatch, registry, resolveSelect } );
+
+		expect( triggerFetch ).toHaveBeenLastCalledWith( {
+			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
+			parse: false,
+		} );
+	} );
+
+	it( 'should extract pagination metadata from headers', async () => {
+		const resolveSelect = {
+			getEntitiesConfig: jest
+				.fn()
+				.mockResolvedValue( loadedTaxonomyEntities ),
+		};
+
+		const mockResponse = {
+			json: () =>
+				Promise.resolve( [
+					{ id: 1, name: 'Category 1' },
+					{ id: 2, name: 'Category 2' },
+				] ),
+			headers: {
+				get: jest.fn( ( header ) => {
+					if ( header === 'X-WP-Total' ) {
+						return '10';
+					}
+					if ( header === 'X-WP-TotalPages' ) {
+						return '5';
+					}
+					return null;
+				} ),
+			},
+		};
+
+		triggerFetch.mockResolvedValueOnce( mockResponse );
+
+		await getEntityRecords( 'taxonomy', 'category', {
+			per_page: 2,
+			page: 1,
+		} )( { dispatch, registry, resolveSelect } );
+
+		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+			'taxonomy',
+			'category',
+			[
+				{ id: 1, name: 'Category 1' },
+				{ id: 2, name: 'Category 2' },
+			],
+			{ per_page: 2, page: 1 },
+			false,
+			undefined,
+			{ totalItems: 10, totalPages: 5 }
+		);
+	} );
+} );
+
 describe( 'getEmbedPreview', () => {
 	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
 	const UNEMBEDDABLE_RESPONSE = false;
@@ -379,8 +474,8 @@ describe( 'getEmbedPreview', () => {
 describe( 'canUser', () => {
 	const ENTITIES = [
 		{
-			name: 'media',
-			kind: 'root',
+			name: 'attachment',
+			kind: 'postType',
 			baseURL: '/wp/v2/media',
 			baseURLParams: { context: 'edit' },
 		},
@@ -417,7 +512,7 @@ describe( 'canUser', () => {
 			'create',
 			'media'
 		)( { dispatch, registry, resolveSelect } );
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -469,7 +564,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -482,7 +577,7 @@ describe( 'canUser', () => {
 		} );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/root/media',
+			'create/postType/attachment',
 			false
 		);
 	} );
@@ -514,7 +609,7 @@ describe( 'canUser', () => {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+		await canUser( 'create', { kind: 'postType', name: 'attachment' } )( {
 			dispatch,
 			registry,
 			resolveSelect,
@@ -527,7 +622,7 @@ describe( 'canUser', () => {
 		} );
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/root/media',
+			'create/postType/attachment',
 			true
 		);
 	} );

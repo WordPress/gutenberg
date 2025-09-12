@@ -16,8 +16,9 @@ export default function Select< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label } = field;
-	const value = field.getValue( { item: data } ) ?? '';
+	const { id, label, type } = field;
+	const isMultiple = type === 'array';
+	const value = field.getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
 	const onChangeControl = useCallback(
 		( newValue: any ) =>
 			onChange( {
@@ -26,17 +27,25 @@ export default function Select< Item >( {
 		[ id, onChange ]
 	);
 
-	const elements = [
-		/*
-		 * Value can be undefined when:
-		 *
-		 * - the field is not required
-		 * - in bulk editing
-		 *
-		 */
-		{ label: __( 'Select item' ), value: '' },
-		...( field?.elements ?? [] ),
-	];
+	const fieldElements = field?.elements ?? [];
+	const hasEmptyValue = fieldElements.some(
+		( { value: elementValue } ) => elementValue === ''
+	);
+
+	const elements =
+		hasEmptyValue || isMultiple
+			? fieldElements
+			: [
+					/*
+					 * Value can be undefined when:
+					 *
+					 * - the field is not required
+					 * - in bulk editing
+					 *
+					 */
+					{ label: __( 'Select item' ), value: '' },
+					...fieldElements,
+			  ];
 
 	return (
 		<SelectControl
@@ -48,6 +57,7 @@ export default function Select< Item >( {
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
+			multiple={ isMultiple }
 		/>
 	);
 }

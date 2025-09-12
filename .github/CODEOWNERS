@@ -1,5 +1,5 @@
 # Documentation
-/docs                                           @ajitbohra @juanmaguitar @fabiankaegy @ndiego
+/docs                                           @ajitbohra @juanmaguitar @fabiankaegy
 /packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
@@ -60,7 +60,7 @@
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra @ndiego
+/docs/tool                                      @ajitbohra
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra

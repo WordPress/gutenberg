@@ -17,7 +17,8 @@ type Value = NumberControlProps[ 'value' ];
 const UnforwardedValidatedNumberControl = (
 	{
 		required,
-		customValidator,
+		onValidate,
+		customValidity,
 		onChange,
 		markWhenOptional,
 		...restProps
@@ -36,9 +37,10 @@ const UnforwardedValidatedNumberControl = (
 		<ControlWithError
 			required={ required }
 			markWhenOptional={ markWhenOptional }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
+			onValidate={ () => {
+				return onValidate?.( valueRef.current );
 			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<NumberControl

@@ -7,13 +7,20 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useContext, useMemo, useRef, useState } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
 	default as DataViewsFilters,
 	useFilters,
@@ -45,6 +52,7 @@ type DataViewsProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
+		infiniteScrollHandler?: () => void;
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
@@ -59,7 +67,10 @@ type DataViewsProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	perPageSizes?: [ number, number, number, number ];
+	config?: {
+		perPageSizes: number[];
+	};
+	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -67,6 +78,10 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+
+const dataViewsLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => ! viewLayout.isPicker
+);
 
 type DefaultUIProps = Pick<
 	DataViewsProps< any >,
@@ -125,7 +140,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts,
+	defaultLayouts: defaultLayoutsProperty,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -133,8 +148,10 @@ function DataViews< Item >( {
 	isItemClickable = defaultIsItemClickable,
 	header,
 	children,
-	perPageSizes,
+	config = { perPageSizes: [ 10, 20, 50, 100 ] },
+	empty,
 }: DataViewsProps< Item > ) {
+	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
@@ -168,9 +185,68 @@ function DataViews< Item >( {
 	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
-	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
-		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	const hasPrimaryOrLockedFilters = useMemo(
+		() =>
+			( filters || [] ).some(
+				( filter ) => filter.isPrimary || filter.isLocked
+			),
+		[ filters ]
 	);
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >(
+		hasPrimaryOrLockedFilters
+	);
+
+	useEffect( () => {
+		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
+			setIsShowingFilter( true );
+		}
+	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
+
+	// Attach scroll event listener for infinite scroll
+	useEffect( () => {
+		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
+			return;
+		}
+
+		const handleScroll = throttle( ( event: unknown ) => {
+			const target = ( event as Event ).target as HTMLElement;
+			const scrollTop = target.scrollTop;
+			const scrollHeight = target.scrollHeight;
+			const clientHeight = target.clientHeight;
+
+			// Check if user has scrolled near the bottom
+			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
+				infiniteScrollHandler?.();
+			}
+		}, 100 ); // Throttle to 100ms
+
+		const container = containerRef.current;
+		container.addEventListener( 'scroll', handleScroll );
+
+		return () => {
+			container.removeEventListener( 'scroll', handleScroll );
+			handleScroll.cancel(); // Cancel any pending throttled calls
+		};
+	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+
+	// Filter out DataViewsPicker layouts.
+	const defaultLayouts = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( defaultLayoutsProperty ).filter(
+					( [ layoutType ] ) => {
+						return dataViewsLayouts.some(
+							( viewLayout ) => viewLayout.type === layoutType
+						);
+					}
+				)
+			),
+		[ defaultLayoutsProperty ]
+	);
+
+	if ( ! defaultLayouts[ view.type ] ) {
+		return null;
+	}
 
 	return (
 		<DataViewsContext.Provider
@@ -198,7 +274,9 @@ function DataViews< Item >( {
 				filters,
 				isShowingFilter,
 				setIsShowingFilter,
-				perPageSizes,
+				config,
+				empty,
+				hasInfiniteScrollHandler: !! infiniteScrollHandler,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
@@ -224,6 +302,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
+	Footer: typeof DataViewsFooter;
 };
 
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
@@ -234,5 +313,6 @@ DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.Footer = DataViewsFooter;
 
 export default DataViewsSubComponents;

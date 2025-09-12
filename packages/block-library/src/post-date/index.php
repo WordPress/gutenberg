@@ -9,6 +9,7 @@
  * Renders the `core/post-date` block on the server.
  *
  * @since 5.8.0
+ * @since 6.9.0 Added `datetime` attribute and Block Bindings support.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -18,44 +19,31 @@
 function render_block_core_post_date( $attributes, $content, $block ) {
 	$classes = array();
 
-	if ( ! isset( $attributes['datetime'] ) ) {
-		/*
-		 * This can mean two things:
-		 *
-		 * 1. We're dealing with the legacy version of the block that didn't have the `datetime` attribute.
-		 * 2. The `datetime` attribute is bound to a Block Bindings source, but we're on a version of WordPress
-		 *    that doesn't support binding that attribute to a Block Bindings source.
-		 *
-		 * In both cases, we set the `datetime` attribute to its correct value by applying Block Bindings manually.
-		 */
-		if (
+	if (
+		! isset( $attributes['datetime'] ) && ! (
 			isset( $attributes['metadata']['bindings']['datetime']['source'] ) &&
 			isset( $attributes['metadata']['bindings']['datetime']['args'] )
-		) {
-			// We're using a version of WordPress that doesn't support binding the block's `datetime` attribute to a Block Bindings source.
-			// This branch can be removed once the minimum required WordPress version supports the `core/post-data` source.
-			$source      = get_block_bindings_source( $attributes['metadata']['bindings']['datetime']['source'] );
-			$source_args = $attributes['metadata']['bindings']['datetime']['args'];
+		)
+	) {
+		/*
+		 * This is the legacy version of the block that didn't have the `datetime` attribute.
+		 * This branch needs to be kept for backward compatibility.
+		 */
+		$source = get_block_bindings_source( 'core/post-data' );
+		if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
+			$source_args = array(
+				'key' => 'modified',
+			);
 		} else {
-			// This is the legacy version of the block that didn't have the `datetime` attribute.
-			// This branch needs to be kept for backward compatibility.
-			$source = get_block_bindings_source( 'core/post-data' );
-			if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
-				$source_args = array(
-					'key' => 'modified',
-				);
-			} else {
-				$source_args = array(
-					'key' => 'date',
-				);
-			}
+			$source_args = array(
+				'key' => 'date',
+			);
 		}
-
 		$attributes['datetime'] = $source->get_value( $source_args, $block, 'datetime' );
+	}
 
-		if ( isset( $source_args['key'] ) && 'modified' === $source_args['key'] ) {
-			$classes[] = 'wp-block-post-date__modified-date';
-		}
+	if ( isset( $source_args['key'] ) && 'modified' === $source_args['key'] ) {
+		$classes[] = 'wp-block-post-date__modified-date';
 	}
 
 	if ( empty( $attributes['datetime'] ) ) {
@@ -65,7 +53,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		// (See https://github.com/WordPress/gutenberg/pull/46839 where this logic was originally
 		// implemented.)
 		// In this case, we have to respect and return the empty value.
-		return $attributes['datetime'];
+		return '';
 	}
 
 	$unformatted_date = $attributes['datetime'];
@@ -80,7 +68,8 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 			$formatted_date = sprintf( __( '%s ago' ), human_time_diff( $post_timestamp ) );
 		}
 	} else {
-		$formatted_date = gmdate( empty( $attributes['format'] ) ? get_option( 'date_format' ) : $attributes['format'], $post_timestamp );
+		$format         = empty( $attributes['format'] ) ? get_option( 'date_format' ) : $attributes['format'];
+		$formatted_date = wp_date( $format, $post_timestamp );
 	}
 
 	if ( isset( $attributes['textAlign'] ) ) {
@@ -115,6 +104,19 @@ function register_block_core_post_date() {
 		array(
 			'render_callback' => 'render_block_core_post_date',
 		)
+	);
+
+	// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+	add_filter(
+		'block_bindings_supported_attributes_core/post-date',
+		function ( $attributes ) {
+			if ( ! in_array( 'datetime', $attributes, true ) ) {
+				$attributes[] = 'datetime';
+			}
+			return $attributes;
+		},
+		10,
+		3
 	);
 }
 add_action( 'init', 'register_block_core_post_date' );

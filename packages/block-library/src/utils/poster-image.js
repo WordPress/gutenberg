@@ -6,25 +6,72 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	BaseControl,
+	DropZone,
+	Spinner,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { isBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const POSTER_IMAGE_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function PosterImage( { poster, onChange } ) {
 	const posterButtonRef = useRef();
+	const [ isLoading, setIsLoading ] = useState( false );
 	const descriptionId = useInstanceId(
 		PosterImage,
 		'block-library-poster-image-description'
 	);
+
+	const { getSettings } = useSelect( blockEditorStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const onDropFiles = ( filesList ) => {
+		getSettings().mediaUpload( {
+			allowedTypes: POSTER_IMAGE_ALLOWED_MEDIA_TYPES,
+			filesList,
+			onFileChange: ( [ image ] ) => {
+				if ( isBlobURL( image?.url ) ) {
+					setIsLoading( true );
+					return;
+				}
+
+				if ( image ) {
+					onChange( image );
+				}
+				setIsLoading( false );
+			},
+			onError: ( message ) => {
+				createErrorNotice( message, {
+					id: 'poster-image-upload-notice',
+					type: 'snackbar',
+				} );
+				setIsLoading( false );
+			},
+			multiple: false,
+		} );
+	};
+
+	const getPosterButtonContent = () => {
+		if ( ! poster && isLoading ) {
+			return <Spinner />;
+		}
+
+		return ! poster ? __( 'Set poster image' ) : __( 'Replace' );
+	};
 
 	return (
 		<MediaUploadCheck>
@@ -48,24 +95,19 @@ function PosterImage( { poster, onChange } ) {
 									__next40pxDefaultSize
 									onClick={ open }
 									aria-haspopup="dialog"
-									aria-label={
-										! poster
-											? null
-											: __(
-													'Edit or replace the poster image.'
-											  )
-									}
-									className={
-										poster
-											? 'block-library-poster-image__preview'
-											: 'block-library-poster-image__toggle'
-									}
+									aria-label={ __(
+										'Edit or replace the poster image.'
+									) }
+									className="block-library-poster-image__preview"
+									disabled={ isLoading }
+									accessibleWhenDisabled
 								>
 									<img
 										src={ poster }
 										alt={ __( 'Poster image preview' ) }
 										className="block-library-poster-image__preview-image"
 									/>
+									{ isLoading && <Spinner /> }
 								</Button>
 							) }
 							<HStack
@@ -87,10 +129,10 @@ function PosterImage( { poster, onChange } ) {
 									variant={
 										! poster ? 'secondary' : undefined
 									}
+									disabled={ isLoading }
+									accessibleWhenDisabled
 								>
-									{ ! poster
-										? __( 'Set poster image' )
-										: __( 'Replace' ) }
+									{ getPosterButtonContent() }
 								</Button>
 								<p id={ descriptionId } hidden>
 									{ poster
@@ -115,11 +157,14 @@ function PosterImage( { poster, onChange } ) {
 											posterButtonRef.current.focus();
 										} }
 										className="block-library-poster-image__action"
+										disabled={ isLoading }
+										accessibleWhenDisabled
 									>
 										{ __( 'Remove' ) }
 									</Button>
 								) }
 							</HStack>
+							<DropZone onFilesDrop={ onDropFiles } />
 						</div>
 					) }
 				/>

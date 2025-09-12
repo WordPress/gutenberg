@@ -905,7 +905,7 @@ export class ImageEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( coreStore );
+		const { getEntityRecord } = select( coreStore );
 		const { getSettings, wasBlockJustInserted } =
 			select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
@@ -926,7 +926,9 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
-		const image = shouldGetMedia ? getMedia( id ) : null;
+		const image = shouldGetMedia
+			? getEntityRecord( 'postType', 'attachment', id )
+			: null;
 
 		return {
 			image,

@@ -14,6 +14,8 @@ function gutenberg_reregister_core_block_types() {
 	$blocks_dirs = array(
 		__DIR__ . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
+				'accordion-header',
+				'accordion-panel',
 				'audio',
 				'button',
 				'buttons',
@@ -44,6 +46,8 @@ function gutenberg_reregister_core_block_types() {
 				'embed',
 			),
 			'block_names'   => array(
+				'accordion-content.php'            => 'core/accordion-content',
+				'accordion.php'                    => 'core/accordion',
 				'archives.php'                     => 'core/archives',
 				'avatar.php'                       => 'core/avatar',
 				'block.php'                        => 'core/block',
@@ -119,6 +123,8 @@ function gutenberg_reregister_core_block_types() {
 				'tag-cloud.php'                    => 'core/tag-cloud',
 				'template-part.php'                => 'core/template-part',
 				'term-description.php'             => 'core/term-description',
+				'terms-query.php'                  => 'core/terms-query',
+				'term-template.php'                => 'core/term-template',
 				'video.php'                        => 'core/video',
 			),
 		),

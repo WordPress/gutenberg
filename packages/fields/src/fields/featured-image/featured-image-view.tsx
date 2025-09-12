@@ -19,7 +19,9 @@ export const FeaturedImageView = ( {
 	const media = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
-			return mediaId ? getEntityRecord( 'root', 'media', mediaId ) : null;
+			return mediaId
+				? getEntityRecord( 'postType', 'attachment', mediaId )
+				: null;
 		},
 		[ mediaId ]
 	);

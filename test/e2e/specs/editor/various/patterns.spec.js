@@ -581,7 +581,10 @@ test.describe( 'Synced pattern', () => {
 
 		await expect(
 			editor.canvas
-				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+					includeHidden: true,
+				} )
 				.filter( { hasText: 'Awesome Paragraph modified' } )
 		).toHaveCount( 2 );
 	} );

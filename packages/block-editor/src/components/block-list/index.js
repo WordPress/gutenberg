@@ -40,6 +40,8 @@ import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
+IntersectionObserver.displayName = 'IntersectionObserverContext';
+
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
@@ -177,6 +179,8 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				isSectionBlock,
+				isContainerInsertableToInWriteMode,
+				getBlockName,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
 			} = unlock( select( blockEditorStore ) );
@@ -213,7 +217,11 @@ function Items( {
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
-					! isSectionBlock( rootClientId ) &&
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInWriteMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&

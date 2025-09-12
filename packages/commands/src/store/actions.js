@@ -12,6 +12,7 @@
  * @property {JSX.Element} icon        Command icon.
  * @property {Function}    callback    Command callback.
  * @property {boolean}     disabled    Whether to disable the command.
+ * @property {string[]=}   keywords    Command keywords for search matching.
  */
 
 /**

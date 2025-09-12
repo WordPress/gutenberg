@@ -16,6 +16,7 @@ import {
  */
 import type { NormalizedField } from '../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { sprintf, __ } from '@wordpress/i18n';
 
 function ColumnPrimary< Item >( {
 	item,
@@ -43,15 +44,34 @@ function ColumnPrimary< Item >( {
 	return (
 		<HStack spacing={ 3 } justify="flex-start">
 			{ mediaField && (
-				<div className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media">
+				<ItemClickWrapper
+					item={ item }
+					isItemClickable={ isItemClickable }
+					onClickItem={ onClickItem }
+					renderItemLink={ renderItemLink }
+					className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media"
+					aria-label={
+						titleField
+							? sprintf(
+									// translators: %s is the item title.
+									__( 'Click item: %s' ),
+									titleField.getValue?.( { item } )
+							  )
+							: undefined
+					}
+				>
 					<mediaField.render
 						item={ item }
 						field={ mediaField }
 						config={ { sizes: '32px' } }
 					/>
-				</div>
+				</ItemClickWrapper>
 			) }
-			<VStack spacing={ 0 }>
+			<VStack
+				spacing={ 0 }
+				alignment="flex-start"
+				className="dataviews-view-table__primary-column-content"
+			>
 				{ titleField && (
 					<ItemClickWrapper
 						item={ item }
@@ -60,7 +80,7 @@ function ColumnPrimary< Item >( {
 						renderItemLink={ renderItemLink }
 						className="dataviews-view-table__cell-content-wrapper dataviews-title-field"
 					>
-						{ level !== undefined && (
+						{ level !== undefined && level > 0 && (
 							<span className="dataviews-view-table__level">
 								{ '—'.repeat( level ) }&nbsp;
 							</span>

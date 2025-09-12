@@ -9,6 +9,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -97,6 +98,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 

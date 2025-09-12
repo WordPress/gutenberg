@@ -15,27 +15,39 @@ import checkbox from './checkbox';
 import datetime from './datetime';
 import date from './date';
 import email from './email';
+import telephone from './telephone';
+import url from './url';
 import integer from './integer';
 import radio from './radio';
 import select from './select';
 import text from './text';
+import toggle from './toggle';
+import textarea from './textarea';
 import toggleGroup from './toggle-group';
-import boolean from './boolean';
+import array from './array';
+import color from './color';
+import password from './password';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
 }
 
 const FORM_CONTROLS: FormControls = {
-	boolean,
+	array,
 	checkbox,
+	color,
 	datetime,
 	date,
 	email,
+	telephone,
+	url,
 	integer,
+	password,
 	radio,
 	select,
 	text,
+	toggle,
+	textarea,
 	toggleGroup,
 };
 
@@ -51,7 +63,7 @@ export function getControl< Item >(
 		return getControlByType( field.Edit );
 	}
 
-	if ( field.elements ) {
+	if ( field.elements && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 

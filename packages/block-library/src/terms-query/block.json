@@ -1,0 +1,49 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/terms-query",
+	"title": "Terms Query",
+	"category": "theme",
+	"description": "An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations.",
+	"keywords": [ "terms", "taxonomy", "categories", "tags", "list" ],
+	"textdomain": "default",
+	"attributes": {
+		"termQueryId": {
+			"type": "number"
+		},
+		"termQuery": {
+			"type": "object",
+			"default": {
+				"perPage": 10,
+				"pages": 0,
+				"taxonomy": "category",
+				"order": "asc",
+				"orderBy": "name",
+				"hideEmpty": true,
+				"include": [],
+				"exclude": [],
+				"parent": 0,
+				"hierarchical": false
+			}
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
+		"namespace": {
+			"type": "string"
+		}
+	},
+	"providesContext": {
+		"termQueryId": "termQueryId",
+		"termQuery": "termQuery"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"interactivity": true
+	},
+	"allowedBlocks": [ "core/term-template" ],
+	"style": "wp-block-terms-query"
+}

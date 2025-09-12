@@ -117,7 +117,7 @@ _Parameters_
 
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }` or REST base as a string - `media`.
 -   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
@@ -619,6 +619,24 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the entity record has edits or not.
+
+### hasEntityRecord
+
+Returns true if a record has been received for the given set of parameters, or false otherwise.
+
+Note: This action does not trigger a request for the entity record from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether an entity record has been received.
 
 ### hasEntityRecords
 

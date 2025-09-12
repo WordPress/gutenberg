@@ -120,9 +120,14 @@ function CoverEdit( {
 			return {
 				media:
 					featuredImage && useFeaturedImage
-						? select( coreStore ).getMedia( featuredImage, {
-								context: 'view',
-						  } )
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
 						: undefined,
 			};
 		},

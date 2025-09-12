@@ -145,7 +145,17 @@ export default function BorderPanel( {
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( settings );
-	const borderRadiusValues = decodeValue( border?.radius );
+	const borderRadiusValues = useMemo( () => {
+		if ( typeof border?.radius !== 'object' ) {
+			return decodeValue( border?.radius );
+		}
+		return {
+			topLeft: decodeValue( border?.radius?.topLeft ),
+			topRight: decodeValue( border?.radius?.topRight ),
+			bottomLeft: decodeValue( border?.radius?.bottomLeft ),
+			bottomRight: decodeValue( border?.radius?.bottomRight ),
+		};
+	}, [ border?.radius, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
@@ -276,6 +286,7 @@ export default function BorderPanel( {
 					panelId={ panelId }
 				>
 					<BorderRadiusControl
+						presets={ settings?.border?.radiusSizes }
 						values={ borderRadiusValues }
 						onChange={ ( newValue ) => {
 							setBorderRadius( newValue || undefined );

@@ -7,7 +7,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	privateApis,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -84,6 +84,13 @@ export default function Integer< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { id, label, description } = field;
 	const value = field.getValue( { item: data } ) ?? '';
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedNumberControl
+			>[ 'customValidity' ]
+		>( undefined );
+
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) => {
 			onChange( {
@@ -112,21 +119,28 @@ export default function Integer< Item >( {
 	return (
 		<ValidatedNumberControl
 			required={ !! field.isValid?.required }
-			customValidator={ ( newValue: any ) => {
-				if ( field.isValid?.custom ) {
-					return field.isValid.custom(
-						{
-							...data,
-							[ id ]: [ undefined, '', null ].includes( newValue )
-								? undefined
-								: Number( newValue ),
-						},
-						field
-					);
+			onValidate={ ( newValue: any ) => {
+				const message = field.isValid?.custom?.(
+					{
+						...data,
+						[ id ]: [ undefined, '', null ].includes( newValue )
+							? undefined
+							: Number( newValue ),
+					},
+					field
+				);
+
+				if ( message ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message,
+					} );
+					return;
 				}
 
-				return null;
+				setCustomValidity( undefined );
 			} }
+			customValidity={ customValidity }
 			label={ label }
 			help={ description }
 			value={ value }

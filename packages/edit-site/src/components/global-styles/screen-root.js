@@ -16,7 +16,6 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,13 +24,8 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
 import PreviewStyles from './preview-styles';
-import { unlock } from '../../lock-unlock';
-
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 function ScreenRoot() {
-	const [ customCSS ] = useGlobalStyle( 'css' );
-
 	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
 		const {
 			getEntityRecord,
@@ -116,7 +110,7 @@ function ScreenRoot() {
 				</ItemGroup>
 			</CardBody>
 
-			{ canEditCSS && !! customCSS && (
+			{ canEditCSS && (
 				<>
 					<CardDivider />
 					<CardBody>

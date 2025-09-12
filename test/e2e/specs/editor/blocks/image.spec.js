@@ -697,6 +697,39 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
+	test( 'appends http protocol to links added which are missing a protocol', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		const urlPopover = page.locator(
+			'.block-editor-url-popover__link-editor'
+		);
+		const urlInput = urlPopover.getByRole( 'combobox', { name: 'URL' } );
+
+		await urlInput.fill( 'example.com' );
+		await urlPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Move to "Edit" and switch UI back to edit mode
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check the value of the URL input has had http:// prepended.
+		await expect( urlInput ).toHaveValue( 'http://example.com' );
+	} );
+
 	test( 'should upload external image to media library', async ( {
 		editor,
 	} ) => {
