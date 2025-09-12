@@ -41,7 +41,9 @@ const topLevelTermsQuery = {
 };
 
 const getQueryAttributes = ( value ) => {
-	if ( value === 'all' ) {
+	// For subterms we fetch all terms and then filter them since we're building the tree
+	// ourselves in Term Template.
+	if ( value === 'all' || value === 'subterms' ) {
 		return allTermsQuery;
 	}
 	if ( value === 'top-level' ) {
