@@ -234,7 +234,13 @@ export function getPresetValueFromControlValue(
 	} else if ( size === 0 ) {
 		return '0';
 	}
-	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
+
+	const slug = presets[ controlValue ]?.slug;
+	if ( slug === '0' ) {
+		return '0';
+	}
+
+	return `var:preset|border-radius|${ slug }`;
 }
 
 /**
@@ -258,6 +264,10 @@ export function getPresetValueFromCustomValue( value, presets ) {
 	);
 
 	if ( spacingMatch?.slug ) {
+		if ( spacingMatch.slug === '0' ) {
+			return '0';
+		}
+
 		return `var:preset|border-radius|${ spacingMatch.slug }`;
 	}
 
