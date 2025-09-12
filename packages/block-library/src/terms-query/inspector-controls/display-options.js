@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	ToggleControl,
+	RadioControl,
 } from '@wordpress/components';
 
 export default function DisplayOptions( { attributes, setQuery } ) {
@@ -13,44 +13,26 @@ export default function DisplayOptions( { attributes, setQuery } ) {
 	return (
 		<>
 			<ToolsPanelItem
-				hasValue={ () => termQuery.parent !== 0 }
-				label={ __( 'Show only top level terms' ) }
-				onDeselect={ () => setQuery( { parent: 0 } ) }
+				hasValue={ () => termQuery.parent !== false }
+				label={ __( 'Terms to show' ) }
+				onDeselect={ () => setQuery( { parent: false } ) }
 				isShownByDefault
 			>
-				<ToggleControl
+				<RadioControl
 					__nextHasNoMarginBottom
-					label={ __( 'Show only top level terms' ) }
-					checked={ termQuery.parent === 0 }
-					onChange={ ( showTopLevel ) => {
-						setQuery( {
-							parent: showTopLevel ? 0 : undefined,
-						} );
-						if ( showTopLevel && termQuery.hierarchical ) {
+					label={ __( 'Terms to show' ) }
+					options={ [
+						{ label: __( 'Show all' ), value: false },
+						{ label: __( 'Show only top level terms' ), value: 0 },
+					] }
+					selected={ termQuery.parent }
+					onChange={ ( parent ) => {
+						setQuery( { parent } );
+						if ( parent === 0 && termQuery.hierarchical ) {
 							setQuery( { hierarchical: false } );
 						}
 					} }
 					disabled={ !! termQuery.hierarchical }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => termQuery.hierarchical !== false }
-				label={ __( 'Show hierarchy' ) }
-				onDeselect={ () => setQuery( { hierarchical: false } ) }
-				isShownByDefault
-			>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Show hierarchy' ) }
-					checked={ termQuery.hierarchical }
-					onChange={ ( hierarchical ) => {
-						setQuery( { hierarchical } );
-						if ( hierarchical && termQuery.parent ) {
-							setQuery( { parent: 0 } );
-						}
-					} }
-					disabled={ termQuery.parent === 0 }
 				/>
 			</ToolsPanelItem>
 		</>

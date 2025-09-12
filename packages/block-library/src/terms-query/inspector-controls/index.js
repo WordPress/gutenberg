@@ -15,6 +15,7 @@ import TaxonomyControl from './taxonomy-control';
 import OrderingControls from './ordering-controls';
 import SubtermsControl from './subterms-control';
 import DisplayOptions from './display-options';
+import HierarchyControl from './hierarchy-control';
 import EmptyTermsControl from './empty-terms-control';
 import MaxTermsControl from './max-terms-controls';
 import AdvancedControls from './advanced-controls';
@@ -114,6 +115,12 @@ export default function TermsQueryInspectorControls( {
 						attributes={ attributes }
 						setQuery={ setQuery }
 					/>
+					{ isTaxonomyHierarchical && (
+						<HierarchyControl
+							attributes={ attributes }
+							setQuery={ setQuery }
+						/>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<AdvancedControls
