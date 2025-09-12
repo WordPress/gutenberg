@@ -6,25 +6,13 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	SelectControl,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
-export default function TaxonomyControl( { attributes, setQuery } ) {
+export default function TaxonomyControl( {
+	attributes,
+	setQuery,
+	taxonomyOptions,
+} ) {
 	const { termQuery } = attributes;
-
-	const { taxonomies } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const allTaxonomies = getEntityRecords( 'root', 'taxonomy' );
-		return {
-			taxonomies:
-				allTaxonomies?.filter( ( t ) => t.visibility.public ) || [],
-		};
-	}, [] );
-
-	const taxonomyOptions = taxonomies.map( ( taxonomy ) => ( {
-		label: taxonomy.name,
-		value: taxonomy.slug,
-	} ) );
 
 	return (
 		<ToolsPanelItem

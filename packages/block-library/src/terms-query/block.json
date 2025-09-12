@@ -27,6 +27,10 @@
 				"hierarchical": false
 			}
 		},
+		"showSubterms": {
+			"type": "boolean",
+			"default": false
+		},
 		"tagName": {
 			"type": "string",
 			"default": "div"
