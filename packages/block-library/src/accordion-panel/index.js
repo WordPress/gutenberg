@@ -13,7 +13,6 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	example: {},
 	edit,
 	save,
 };

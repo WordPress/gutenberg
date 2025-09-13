@@ -386,9 +386,7 @@ export default compose( [
 				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose( {
-						clientId: blockToInsert?.clientId,
-					} );
+					onSelectOrClose( blockToInsert );
 				}
 
 				const message = sprintf(

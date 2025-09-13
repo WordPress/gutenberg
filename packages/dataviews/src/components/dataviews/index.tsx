@@ -20,6 +20,7 @@ import { useResizeObserver, throttle } from '@wordpress/compose';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
 	default as DataViewsFilters,
 	useFilters,
@@ -66,11 +67,9 @@ type DataViewsProps< Item > = {
 	header?: ReactNode;
 	getItemLevel?: ( item: Item ) => number;
 	children?: ReactNode;
-	config?:
-		| false
-		| {
-				perPageSizes: number[];
-		  };
+	config?: {
+		perPageSizes: number[];
+	};
 	empty?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
@@ -79,6 +78,10 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+
+const dataViewsLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => ! viewLayout.isPicker
+);
 
 type DefaultUIProps = Pick<
 	DataViewsProps< any >,
@@ -90,7 +93,7 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter, config } = useContext( DataViewsContext );
+	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -107,16 +110,14 @@ function DefaultUI( {
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</HStack>
-				{ ( config || header ) && (
-					<HStack
-						spacing={ 1 }
-						expanded={ false }
-						style={ { flexShrink: 0 } }
-					>
-						config && <DataViewsViewConfig />
-						{ header }
-					</HStack>
-				) }
+				<HStack
+					spacing={ 1 }
+					expanded={ false }
+					style={ { flexShrink: 0 } }
+				>
+					<DataViewsViewConfig />
+					{ header }
+				</HStack>
 			</HStack>
 			{ isShowingFilter && (
 				<DataViewsFilters className="dataviews-filters__container" />
@@ -139,7 +140,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts,
+	defaultLayouts: defaultLayoutsProperty,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -228,6 +229,25 @@ function DataViews< Item >( {
 		};
 	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
 
+	// Filter out DataViewsPicker layouts.
+	const defaultLayouts = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( defaultLayoutsProperty ).filter(
+					( [ layoutType ] ) => {
+						return dataViewsLayouts.some(
+							( viewLayout ) => viewLayout.type === layoutType
+						);
+					}
+				)
+			),
+		[ defaultLayoutsProperty ]
+	);
+
+	if ( ! defaultLayouts[ view.type ] ) {
+		return null;
+	}
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -282,6 +302,7 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 	Pagination: typeof DataViewsPagination;
 	Search: typeof DataViewsSearch;
 	ViewConfig: typeof DataviewsViewConfigDropdown;
+	Footer: typeof DataViewsFooter;
 };
 
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
@@ -292,5 +313,6 @@ DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
 DataViewsSubComponents.Pagination = DataViewsPagination;
 DataViewsSubComponents.Search = DataViewsSearch;
 DataViewsSubComponents.ViewConfig = DataviewsViewConfigDropdown;
+DataViewsSubComponents.Footer = DataViewsFooter;
 
 export default DataViewsSubComponents;
