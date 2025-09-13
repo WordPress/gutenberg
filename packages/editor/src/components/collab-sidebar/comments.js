@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect } from '@wordpress/element';
+import { useState, RawHTML, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -54,26 +54,14 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId, blocks, highlightedBlockId } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlocks,
-				getHighlightedBlockClientId,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-
-			return {
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.blockCommentId
-					: null,
-				blocks: getBlocks(),
-				highlightedBlockId: getHighlightedBlockClientId(),
-			};
-		},
-		[]
-	);
+	const blockCommentId = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return _clientId
+			? getBlockAttributes( _clientId )?.blockCommentId
+			: null;
+	}, [] );
 
 	const clearThreadFocus = () => {
 		setFocusThread( null );
@@ -84,50 +72,9 @@ export function Comments( {
 		showCommentBoard && blockCommentId ? blockCommentId : null
 	);
 
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
-
-	// Get the highlighted block element for scrolling
-	const highlightedBlockElement = useBlockElement( highlightedBlockId );
-
-	// Effect to handle scrolling when highlighted block changes
-	useEffect( () => {
-		if ( highlightedBlockElement ) {
-			highlightedBlockElement.scrollIntoView( {
-				behavior: 'smooth',
-				block: 'center',
-			} );
-		}
-	}, [ highlightedBlockElement ] );
-
 	// Handle comment selection
 	const handleCommentSelect = ( threadId ) => {
 		setFocusThread( threadId );
-
-		// Find and highlight blocks by comment ID
-		if ( ! threadId || ! blocks ) {
-			return;
-		}
-
-		// Find blocks that have this comment ID
-		const relatedBlocks = [];
-		const findBlocks = ( blockList ) => {
-			blockList.forEach( ( block ) => {
-				if ( block.attributes?.blockCommentId === threadId ) {
-					relatedBlocks.push( block.clientId );
-				}
-				if ( block.innerBlocks ) {
-					findBlocks( block.innerBlocks );
-				}
-			} );
-		};
-
-		findBlocks( blocks );
-
-		// Highlight the first related block if found
-		if ( relatedBlocks.length > 0 ) {
-			const blockId = relatedBlocks[ 0 ];
-			toggleBlockHighlight( blockId, true );
-		}
 	};
 
 	return (
@@ -151,32 +98,18 @@ export function Comments( {
 			{ Array.isArray( threads ) &&
 				threads.length > 0 &&
 				threads.map( ( thread ) => (
-					<VStack
+					<Thread
 						key={ thread.id }
-						className={ clsx(
-							'editor-collab-sidebar-panel__thread',
-							{
-								'editor-collab-sidebar-panel__active-thread':
-									blockCommentId &&
-									blockCommentId === thread.id,
-								'editor-collab-sidebar-panel__focus-thread':
-									focusThread && focusThread === thread.id,
-							}
-						) }
-						id={ thread.id }
-						spacing="3"
-						onClick={ () => handleCommentSelect( thread.id ) }
-					>
-						<Thread
-							thread={ thread }
-							onAddReply={ onAddReply }
-							onCommentDelete={ onCommentDelete }
-							onCommentResolve={ onCommentResolve }
-							onEditComment={ onEditComment }
-							isFocused={ focusThread === thread.id }
-							clearThreadFocus={ clearThreadFocus }
-						/>
-					</VStack>
+						thread={ thread }
+						onAddReply={ onAddReply }
+						onCommentDelete={ onCommentDelete }
+						onCommentResolve={ onCommentResolve }
+						onEditComment={ onEditComment }
+						isFocused={ focusThread === thread.id }
+						clearThreadFocus={ clearThreadFocus }
+						blockCommentId={ blockCommentId }
+						onFocusThread={ handleCommentSelect }
+					/>
 				) ) }
 		</>
 	);
@@ -190,9 +123,63 @@ function Thread( {
 	onCommentResolve,
 	isFocused,
 	clearThreadFocus,
+	blockCommentId,
+	onFocusThread,
 } ) {
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+
+	// Find first block that have this comment ID - run at component root level.
+	const relatedBlock = useMemo( () => {
+		if ( ! thread.id || ! blocks ) {
+			return null;
+		}
+		const findFirstBlock = ( blockList ) => {
+			for ( const block of blockList ) {
+				if ( block.attributes?.blockCommentId === thread.id ) {
+					return block.clientId;
+				}
+				if ( block.innerBlocks ) {
+					const found = findFirstBlock( block.innerBlocks );
+					if ( found ) {
+						return found;
+					}
+				}
+			}
+			return null;
+		};
+
+		return findFirstBlock( blocks );
+	}, [ thread.id, blocks ] );
+
+	const relatedBlockElement = useBlockElement( relatedBlock );
+
+	const handleCommentSelect = ( threadId ) => {
+		onFocusThread( threadId );
+		if ( relatedBlock && relatedBlockElement ) {
+			relatedBlockElement.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'center',
+			} );
+			toggleBlockHighlight( relatedBlock, true );
+		}
+	};
+
 	return (
-		<>
+		<VStack
+			className={ clsx( 'editor-collab-sidebar-panel__thread', {
+				'editor-collab-sidebar-panel__active-thread':
+					blockCommentId && blockCommentId === thread.id,
+				'editor-collab-sidebar-panel__focus-thread': isFocused,
+			} ) }
+			id={ thread.id }
+			spacing="3"
+			onClick={ () => handleCommentSelect( thread.id ) }
+		>
 			<CommentBoard
 				thread={ thread }
 				onResolve={ onCommentResolve }
@@ -262,7 +249,7 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
-		</>
+		</VStack>
 	);
 }
 

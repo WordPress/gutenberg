@@ -562,18 +562,6 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
-### getHighlightedBlockClientId
-
-Returns the currently highlighted block client ID.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `string|null`: The highlighted block client ID, or null if no block is highlighted.
-
 ### getHoveredBlockClientId
 
 > **Deprecated**
