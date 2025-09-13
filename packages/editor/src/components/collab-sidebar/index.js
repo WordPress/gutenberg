@@ -58,6 +58,7 @@ function CollabSidebarContent( {
 	setShowCommentBoard,
 	styles,
 	comments,
+	showCommentsinPopover,
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -226,6 +227,7 @@ function CollabSidebarContent( {
 				onCommentReopen={ onCommentReopen }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
+				showCommentsinPopover = { showCommentsinPopover }
 			/>
 		</div>
 	);
@@ -399,7 +401,7 @@ export default function CollabSidebar() {
 					styles={ {
 						backgroundColor,
 					} }
-					showCommentsinPopover
+					showCommentsinPopover = { true }
 				/>
 			</PluginSidebar>
 		</>
