@@ -13,7 +13,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useAddedBy } from '../page-templates/hooks';
-import { layout } from '@wordpress/icons';
+import { layout, published } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -36,7 +36,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 
 export default function DataviewsTemplatesSidebarContent() {
 	const {
-		query: { activeView = 'active' },
+		query: { activeView },
 	} = useLocation();
 	const { records } = useEntityRecords( 'postType', '_wp_static_template', {
 		per_page: -1,
@@ -58,18 +58,25 @@ export default function DataviewsTemplatesSidebarContent() {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-templates-browse">
 			<SidebarNavigationItem
-				to="/template"
-				icon={ layout }
-				aria-current={ activeView === 'active' }
+				to={ addQueryArgs( '/template', { activeView: 'hierarchy' } ) }
+				icon={ published }
+				aria-current={ activeView === 'hierarchy' }
 			>
-				{ __( 'Active templates' ) }
+				{ __( 'Template Assignments' ) }
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				to={ addQueryArgs( '/template', { activeView: 'user' } ) }
 				icon={ layout }
 				aria-current={ activeView === 'user' }
 			>
-				{ __( 'Custom templates' ) }
+				{ __( 'Created Templates' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				to="/template"
+				icon={ layout }
+				aria-current={ activeView === undefined }
+			>
+				{ __( 'All Theme & Plugin' ) }
 			</SidebarNavigationItem>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (

@@ -29,7 +29,10 @@ const formDuplicateAction = {
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
+	label: ( items ) =>
+		items.every( ( item ) => item.type === '_wp_static_template' )
+			? _x( 'Create Copy', 'action label' )
+			: _x( 'Duplicate', 'action label' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},

@@ -5,6 +5,7 @@ import Editor from '../editor';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import PageTemplates from '../page-templates';
+import { AssignmentsDetails } from '../page-templates/assignments-details';
 
 export const templatesRoute = {
 	name: 'templates',
@@ -27,6 +28,9 @@ export const templatesRoute = {
 			if ( ! isBlockTheme ) {
 				return undefined;
 			}
+			if ( query.activeView === 'hierarchy' ) {
+				return <AssignmentsDetails />;
+			}
 			const isListView = query.layout === 'list';
 			return isListView ? <Editor /> : undefined;
 		},
@@ -41,8 +45,12 @@ export const templatesRoute = {
 	},
 	widths: {
 		content( { query } ) {
-			const isListView = query.layout === 'list';
+			const isListView =
+				query.layout === 'list' || query.activeView === 'hierarchy';
 			return isListView ? 380 : undefined;
+		},
+		preview() {
+			return undefined;
 		},
 	},
 };

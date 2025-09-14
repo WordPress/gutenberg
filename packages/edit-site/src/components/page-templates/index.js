@@ -27,10 +27,7 @@ import {
 	LAYOUT_LIST,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import {
-	useEditPostAction,
-	useSetActiveTemplateAction,
-} from '../dataviews-actions';
+import { useEditPostAction } from '../dataviews-actions';
 import {
 	authorField,
 	descriptionField,
@@ -39,6 +36,7 @@ import {
 	slugField,
 } from './fields';
 import { useDefaultTemplateTypes } from '../add-new-template/utils';
+import { PageTemplateAssignments } from './assignments-view';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -50,15 +48,9 @@ const defaultLayouts = {
 	},
 	[ LAYOUT_GRID ]: {
 		showMedia: true,
-		layout: {
-			badgeFields: [ 'active', 'slug' ],
-		},
 	},
 	[ LAYOUT_LIST ]: {
 		showMedia: false,
-		layout: {
-			badgeFields: [ 'active', 'slug' ],
-		},
 	},
 };
 
@@ -72,16 +64,14 @@ const DEFAULT_VIEW = {
 		direction: 'asc',
 	},
 	titleField: 'title',
-	descriptionField: 'description',
 	mediaField: 'preview',
-	fields: [ 'author', 'active', 'slug' ],
 	filters: [],
 	...defaultLayouts[ LAYOUT_GRID ],
 };
 
-export default function PageTemplates() {
+function PageTemplates() {
 	const { path, query } = useLocation();
-	const { activeView = 'active', layout, postId } = query;
+	const { activeView, layout, postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
@@ -114,7 +104,10 @@ export default function PageTemplates() {
 	useEffect( () => {
 		setView( ( currentView ) => ( {
 			...currentView,
-			filters: ! [ 'active', 'user' ].includes( activeView )
+			fields: [ undefined, 'user' ].includes( activeView )
+				? [ 'author' ]
+				: [],
+			filters: ! [ undefined, 'user' ].includes( activeView )
 				? [
 						{
 							field: 'author',
@@ -277,13 +270,12 @@ export default function PageTemplates() {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-	const setActiveTemplateAction = useSetActiveTemplateAction();
 	const actions = useMemo(
 		() =>
 			activeView === 'user'
-				? [ setActiveTemplateAction, editAction, ...postTypeActions ]
-				: [ setActiveTemplateAction, ...postTypeActions ],
-		[ postTypeActions, setActiveTemplateAction, editAction, activeView ]
+				? [ editAction, ...postTypeActions ]
+				: [ ...postTypeActions ],
+		[ postTypeActions, editAction, activeView ]
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
@@ -325,3 +317,12 @@ export default function PageTemplates() {
 		</Page>
 	);
 }
+
+export default () => {
+	const { query } = useLocation();
+	const { activeView = 'active' } = query;
+	if ( activeView === 'hierarchy' ) {
+		return <PageTemplateAssignments />;
+	}
+	return <PageTemplates />;
+};

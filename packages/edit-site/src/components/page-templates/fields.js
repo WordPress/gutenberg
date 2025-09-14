@@ -118,16 +118,26 @@ export const authorField = {
 };
 
 export const activeField = {
-	label: __( 'Active' ),
+	label: __( 'Assigned' ),
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
 	__returnsBadge: true,
 	render: function Render( { item } ) {
 		const isActive = item._isActive;
+		let label = isActive
+			? __( 'Assigned with Custom Template' )
+			: __( 'Unassigned' );
+		if ( isActive ) {
+			if ( item.source === 'plugin' ) {
+				label = __( 'Assigned by Plugin' );
+			} else if ( item.source === 'theme' ) {
+				label = __( 'Assigned by Theme' );
+			}
+		} else if ( isActive === false ) {
+			label = __( 'Disabled' );
+		}
 		return (
-			<Badge intent={ isActive ? 'success' : 'default' }>
-				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
-			</Badge>
+			<Badge intent={ isActive ? 'success' : 'default' }>{ label }</Badge>
 		);
 	},
 };
