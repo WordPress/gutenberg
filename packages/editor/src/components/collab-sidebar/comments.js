@@ -295,32 +295,21 @@ const CommentBoard = ( { thread, onResolve, onEdit, onDelete, status } ) => {
 					) }
 				</span>
 			</HStack>
-			<HStack
-				alignment="left"
-				spacing="3"
-				justify="flex-start"
-				className="editor-collab-sidebar-panel__user-comment"
-			>
-				<VStack
-					spacing="3"
-					className="editor-collab-sidebar-panel__comment-field"
-				>
-					{ 'edit' === actionState && (
-						<CommentForm
-							onSubmit={ ( value ) => {
-								onEdit( thread.id, value );
-								setActionState( false );
-							} }
-							onCancel={ () => handleCancel() }
-							thread={ thread }
-							submitButtonText={ _x( 'Update', 'verb' ) }
-						/>
-					) }
-					{ 'edit' !== actionState && (
-						<RawHTML>{ thread?.content?.raw }</RawHTML>
-					) }
-				</VStack>
-			</HStack>
+			{ 'edit' === actionState ? (
+				<CommentForm
+					onSubmit={ ( value ) => {
+						onEdit( thread.id, value );
+						setActionState( false );
+					} }
+					onCancel={ () => handleCancel() }
+					thread={ thread }
+					submitButtonText={ _x( 'Update', 'verb' ) }
+				/>
+			) : (
+				<RawHTML className="editor-collab-sidebar-panel__user-comment">
+					{ thread?.content?.rendered }
+				</RawHTML>
+			) }
 			{ 'resolve' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }

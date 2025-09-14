@@ -59,13 +59,7 @@
 	}
 
 	&__user-comment {
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 20px;
-		text-align: left;
-		color: $gray-900;
-
-		p {
+		p:last-child {
 			margin-bottom: 0;
 		}
 	}
