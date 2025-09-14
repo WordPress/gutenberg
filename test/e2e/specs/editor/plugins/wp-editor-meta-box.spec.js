@@ -27,7 +27,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		// Open the meta box pane. The click isn’t in the center because that
 		// would hit the resize handle instead of the located element.
 		await page
-			.getByRole( 'button', { name: /Meta Boxes/i } )
+			.getByRole( 'button', { name: 'Meta Boxes' } )
 			.click( { position: { x: 0, y: 0 } } );
 		// Switch tinymce to Text mode, first waiting for it to initialize
 		// because otherwise it will flip back to Visual mode once initialized.

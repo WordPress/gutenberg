@@ -293,10 +293,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
 	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 	const onSeparatorKeyDown = ( event ) => {
-		// Bails unless the event target is the separator.
-		if ( event.target !== separatorRef.current ) {
-			return;
-		}
 		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
 		if ( delta ) {
 			const pane = metaBoxesMainRef.current.resizable;
@@ -309,10 +305,9 @@ function MetaBoxesMain( { isLegacy } ) {
 	};
 	const paneLabel = __( 'Meta Boxes' );
 
-	const resizeHandle = (
+	const toggle = (
 		<button
 			aria-expanded={ isOpen }
-			onKeyDown={ onSeparatorKeyDown }
 			onClick={ ( { detail } ) => {
 				const { isToggleInferred } = resizeDataRef.current;
 				if ( isShort || ! detail || isToggleInferred ) {
@@ -329,26 +324,28 @@ function MetaBoxesMain( { isLegacy } ) {
 			} ) }
 		>
 			{ paneLabel }
-			{ ! isShort && (
-				<>
-					<Tooltip text={ __( 'Drag to resize' ) }>
-						<span // eslint-disable-line jsx-a11y/role-supports-aria-props
-							ref={ separatorRef }
-							role="separator"
-							aria-valuenow={ usedAriaValueNow }
-							aria-label={ __( 'Drag to resize' ) }
-							aria-describedby={ separatorHelpId }
-						/>
-					</Tooltip>
-					<VisuallyHidden id={ separatorHelpId }>
-						{ __(
-							'Use up and down arrow keys to resize the meta box panel.'
-						) }
-					</VisuallyHidden>
-				</>
-			) }
 			<Icon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
+	);
+
+	const separator = ! isShort && (
+		<>
+			<Tooltip text={ __( 'Drag to resize' ) }>
+				<button // eslint-disable-line jsx-a11y/role-supports-aria-props
+					ref={ separatorRef }
+					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
+					aria-valuenow={ usedAriaValueNow }
+					aria-label={ __( 'Drag to resize' ) }
+					aria-describedby={ separatorHelpId }
+					onKeyDown={ onSeparatorKeyDown }
+				/>
+			</Tooltip>
+			<VisuallyHidden id={ separatorHelpId }>
+				{ __(
+					'Use up and down arrow keys to resize the meta box panel.'
+				) }
+			</VisuallyHidden>
+		</>
 	);
 
 	const paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
@@ -370,7 +367,12 @@ function MetaBoxesMain( { isLegacy } ) {
 		},
 		handleClasses: { top: 'edit-post-meta-boxes-main__presenter' },
 		handleComponent: {
-			top: resizeHandle,
+			top: (
+				<>
+					{ toggle }
+					{ separator }
+				</>
+			),
 		},
 		// Avoids hiccups while dragging over objects like iframes and ensures that
 		// the event to end the drag is captured by the target (resize handle)

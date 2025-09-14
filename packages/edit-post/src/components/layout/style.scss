@@ -27,12 +27,16 @@
 	inset: 0 0 auto;
 	height: $button-size-compact;
 
+	// Style reset for both toggle and separator buttons.
 	> button {
 		appearance: none;
 		padding: 0;
 		border: none;
 		outline: none;
 		background-color: transparent;
+	}
+
+	> button[aria-expanded] {
 		cursor: pointer;
 		width: 100%;
 		display: flex;
@@ -54,13 +58,12 @@
 		}
 	}
 
-	[role="separator"] {
+	button[role="separator"] {
 		cursor: row-resize;
 		width: $grid-unit-80;
 		margin: auto;
 		position: absolute;
 		inset: 0;
-		outline: none;
 
 		&::before {
 			content: "";
