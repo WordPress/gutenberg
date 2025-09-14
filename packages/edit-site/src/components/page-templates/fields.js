@@ -11,7 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { parse } from '@wordpress/blocks';
@@ -20,6 +20,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { EditorProvider } from '@wordpress/editor';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -31,6 +32,28 @@ import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { Badge } = unlock( componentsPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+
+function useAllDefaultTemplateTypes() {
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const { records: staticRecords } = useEntityRecordsWithPermissions(
+		'postType',
+		'_wp_static_template',
+		{ per_page: -1 }
+	);
+	return [
+		...defaultTemplateTypes,
+		...staticRecords
+			?.filter( ( record ) => ! record.is_custom )
+			.map( ( record ) => {
+				return {
+					slug: record.slug,
+					title: record.title.rendered,
+					description: record.description,
+				};
+			} ),
+	];
+}
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
@@ -74,8 +97,14 @@ export const previewField = {
 export const descriptionField = {
 	label: __( 'Description' ),
 	id: 'description',
-	render: ( { item } ) => {
-		return item.description && decodeEntities( item.description );
+	render: function RenderDescription( { item } ) {
+		const defaultTemplateTypes = useAllDefaultTemplateTypes();
+		const defaultTemplateType = defaultTemplateTypes.find(
+			( type ) => type.slug === item.slug
+		);
+		return item.description
+			? decodeEntities( item.description )
+			: defaultTemplateType?.description;
 	},
 	enableSorting: false,
 	enableGlobalSearch: true,
@@ -137,14 +166,14 @@ export const slugField = {
 	id: 'slug',
 	getValue: ( { item } ) => item.slug,
 	render: function Render( { item } ) {
-		const defaultTemplateTypes = useDefaultTemplateTypes();
+		const defaultTemplateTypes = useAllDefaultTemplateTypes();
 		const defaultTemplateType = defaultTemplateTypes.find(
 			( type ) => type.slug === item.slug
 		);
 		return (
 			defaultTemplateType?.title ||
 			// translators: %s is the slug of a custom template.
-			sprintf( __( 'Custom: %s' ), item.slug )
+			__( 'Custom' )
 		);
 	},
 };

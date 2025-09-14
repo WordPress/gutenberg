@@ -38,7 +38,6 @@ import {
 	activeField,
 	slugField,
 } from './fields';
-import { useDefaultTemplateTypes } from '../add-new-template/utils';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -131,7 +130,6 @@ export default function PageTemplates() {
 			select( coreStore ).getEntityRecord( 'root', 'site' )
 				?.active_templates
 	);
-	const defaultTemplateTypes = useDefaultTemplateTypes();
 	// Todo: this will have to be better so that we're not fetching all the
 	// records all the time. Active templates query will need to move server
 	// side.
@@ -145,7 +143,9 @@ export default function PageTemplates() {
 		} );
 
 	const activeTemplates = useMemo( () => {
-		const _active = [ ...staticRecords ];
+		const _active = [ ...staticRecords ].filter(
+			( record ) => ! record.is_custom
+		);
 		if ( activeTemplatesOption ) {
 			for ( const activeSlug in activeTemplatesOption ) {
 				const activeId = activeTemplatesOption[ activeSlug ];
@@ -175,16 +175,8 @@ export default function PageTemplates() {
 				}
 			}
 		}
-		const defaultSlugs = defaultTemplateTypes.map( ( type ) => type.slug );
-		return _active.filter( ( template ) =>
-			defaultSlugs.includes( template.slug )
-		);
-	}, [
-		defaultTemplateTypes,
-		userRecords,
-		staticRecords,
-		activeTemplatesOption,
-	] );
+		return _active;
+	}, [ userRecords, staticRecords, activeTemplatesOption ] );
 
 	let _records;
 	let isLoadingData;
