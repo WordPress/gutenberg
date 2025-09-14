@@ -36,12 +36,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 
 	// WordPress 6.8 compat.
-	require __DIR__ . '/compat/wordpress-6.8/class-gutenberg-rest-static-templates-controller.php';
-	require __DIR__ . '/compat/wordpress-6.8/class-gutenberg-rest-templates-controller.php';
-	require __DIR__ . '/compat/wordpress-6.8/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
 	// WordPress 6.9 compat.
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
