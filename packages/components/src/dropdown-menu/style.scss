@@ -34,6 +34,10 @@
 			height: 1px;
 		}
 
+		svg {
+			min-width: $icon-size;
+		}
+
 		&.is-active {
 			svg,
 			.dashicon {
