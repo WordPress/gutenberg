@@ -355,16 +355,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		defaultSize: { height: isOpen ? openHeight : 0 },
 		minHeight: min,
 		maxHeight: isShort ? null : usedMax,
-		enable: {
-			top: true,
-			right: false,
-			bottom: false,
-			left: false,
-			topLeft: false,
-			topRight: false,
-			bottomRight: false,
-			bottomLeft: false,
-		},
+		enable: { top: true },
 		handleClasses: { top: 'edit-post-meta-boxes-main__presenter' },
 		handleComponent: {
 			top: (
