@@ -241,6 +241,8 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
+	const hasValidPostId = !! postId && typeof postId === 'number';
+
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
@@ -335,6 +337,10 @@ export default function CollabSidebar() {
 	const AddCommentComponent = blockCommentId
 		? AddCommentToolbarButton
 		: AddCommentButton;
+
+	if ( ! hasValidPostId ) {
+		return null;
+	}
 
 	return (
 		<>

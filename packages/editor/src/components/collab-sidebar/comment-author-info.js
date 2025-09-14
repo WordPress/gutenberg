@@ -33,7 +33,7 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 		const { __experimentalDiscussionSettings } = getSettings();
 		const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
 		return {
-			currentUserAvatar: userData?.avatar_urls[ 48 ] ?? defaultAvatar,
+			currentUserAvatar: userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
 			currentUserName: userData?.name,
 		};
 	}, [] );
