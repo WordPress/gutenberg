@@ -1,4 +1,4 @@
-textarea.editor-post-text-editor {
+.editor-post-text-editor {
 	border: $border-width solid $gray-600;
 	border-radius: 0;
 	display: block;
@@ -10,6 +10,7 @@ textarea.editor-post-text-editor {
 	font-family: $editor-html-font;
 	line-height: 2.4;
 	min-height: 200px;
+	white-space: pre-wrap;
 
 	@media not (prefers-reduced-motion) {
 		transition: border 0.1s ease-out, box-shadow 0.1s linear;
@@ -27,6 +28,10 @@ textarea.editor-post-text-editor {
 		font-size: $text-editor-font-size !important;
 	}
 
+	&:focus-visible {
+		outline: none;
+	}
+
 	&:focus {
 		border-color: var(--wp-admin-theme-color);
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -35,15 +40,12 @@ textarea.editor-post-text-editor {
 		position: relative;
 	}
 
-	&::-webkit-input-placeholder {
+	// Show placeholder when empty or only contains br tags
+	&:empty::before,
+	&:has(br:only-child)::before {
+		content: attr(data-placeholder);
 		color: $dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
-		color: $dark-gray-placeholder;
+		pointer-events: none;
+		position: absolute;
 	}
 }

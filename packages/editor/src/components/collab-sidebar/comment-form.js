@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	Button,
@@ -36,21 +31,38 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 	);
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
+	const editableElementRef = useRef( null );
+
+	useEffect( () => {
+		if (
+			editableElementRef.current &&
+			editableElementRef.current.textContent !== inputComment
+		) {
+			editableElementRef.current.textContent = inputComment;
+		}
+	}, [ inputComment ] );
 
 	return (
 		<>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
 				{ __( 'Comment' ) }
 			</VisuallyHidden>
-			<TextareaAutosize
+			<pre
+				ref={ editableElementRef }
+				contentEditable="plaintext-only"
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+				role="textbox"
+				onInput={ () => {
+					if ( editableElementRef.current ) {
+						setInputComment(
+							editableElementRef.current.textContent
+						);
+					}
+				} }
+				className="editor-collab-sidebar-panel__comment-form-editable-area"
 				id={ inputId }
-				value={ inputComment ?? '' }
-				onChange={ ( comment ) =>
-					setInputComment( comment.target.value )
-				}
-				rows={ 4 }
-				maxRows={ 20 }
-			></TextareaAutosize>
+				data-placeholder={ __( 'Write a comment…' ) }
+			/>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
 					__next40pxDefaultSize

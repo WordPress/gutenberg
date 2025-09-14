@@ -1323,7 +1323,7 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Add empty list block
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
@@ -1334,11 +1334,9 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Verify no WSOD and content is proper.
-		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul class="wp-block-list"><!-- wp:list-item -->
-<li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->` );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:list --><ul class="wp-block-list"><!-- wp:list-item --><li></li><!-- /wp:list-item --></ul><!-- /wp:list -->`
+		);
 	} );
 
 	test( 'should merge two list with same attributes', async ( {

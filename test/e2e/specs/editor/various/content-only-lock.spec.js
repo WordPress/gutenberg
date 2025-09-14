@@ -16,7 +16,7 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>Hello</p>
@@ -40,7 +40,7 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
@@ -85,17 +85,17 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 			<div class="wp-block-group"><!-- wp:paragraph -->
 			<p>Locked block a</p>
 			<!-- /wp:paragraph -->
-			
+
 			<!-- wp:paragraph -->
 			<p>Locked block b</p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:group -->
-			
+
 			<!-- wp:heading -->
 			<h2 class="wp-block-heading"><strong>outside block</strong></h2>
 			<!-- /wp:heading -->` );

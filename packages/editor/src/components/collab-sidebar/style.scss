@@ -130,4 +130,17 @@
 		font-style: italic;
 		padding: 0;
 	}
+
+	&__comment-form-editable-area {
+		@include input-control;
+		min-height: 80px !important;
+		max-height: 400px;
+		margin: 0;
+		white-space: pre-wrap;
+		overflow-y: auto;
+
+		&:focus-visible {
+			outline: none;
+		}
+	}
 }

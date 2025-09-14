@@ -1,18 +1,11 @@
 /**
- * External dependencies
- */
-import Textarea from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef, useEffect } from '@wordpress/element';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,7 +18,7 @@ import { store as editorStore } from '../../store';
  * @return {React.ReactNode} The rendered PostTextEditor component.
  */
 export default function PostTextEditor() {
-	const instanceId = useInstanceId( PostTextEditor );
+	const editableElementRef = useRef( null );
 	const { content, blocks, type, id } = useSelect( ( select ) => {
 		const { getEditedEntityRecord } = select( coreStore );
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
@@ -54,29 +47,34 @@ export default function PostTextEditor() {
 		return content;
 	}, [ content, blocks ] );
 
+	useEffect( () => {
+		if (
+			editableElementRef.current &&
+			editableElementRef.current.textContent !== value
+		) {
+			editableElementRef.current.textContent = value;
+		}
+	}, [ value ] );
+
 	return (
-		<>
-			<VisuallyHidden
-				as="label"
-				htmlFor={ `post-content-${ instanceId }` }
-			>
-				{ __( 'Type text or HTML' ) }
-			</VisuallyHidden>
-			<Textarea
-				autoComplete="off"
-				dir="auto"
-				value={ value }
-				onChange={ ( event ) => {
+		<pre
+			ref={ editableElementRef }
+			contentEditable="plaintext-only"
+			suppressContentEditableWarning
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+			role="textbox"
+			onInput={ () => {
+				if ( editableElementRef.current ) {
 					editEntityRecord( 'postType', type, id, {
-						content: event.target.value,
+						content: editableElementRef.current.textContent,
 						blocks: undefined,
 						selection: undefined,
 					} );
-				} }
-				className="editor-post-text-editor"
-				id={ `post-content-${ instanceId }` }
-				placeholder={ __( 'Start writing with text or HTML' ) }
-			/>
-		</>
+				}
+			} }
+			className="editor-post-text-editor"
+			data-placeholder={ __( 'Start writing with text or HTML' ) }
+			aria-label={ __( 'Type text or HTML' ) }
+		/>
 	);
 }

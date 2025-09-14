@@ -372,6 +372,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
+	white-space: pre-wrap;
+
 	@media not ( prefers-reduced-motion ) {
 		transition: padding 0.2s linear;
 	}
