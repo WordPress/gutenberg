@@ -152,6 +152,7 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const paragraphs = patternBlocks.first().getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			// Ensure the first pattern is selected.
 			await patternBlocks.first().selectText();
@@ -278,9 +279,11 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const patternBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Pattern',
+				includeHidden: true,
 			} );
 			const paragraphs = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			const blockWithOverrides = paragraphs.filter( {
 				hasText: 'Pattern Overrides',
@@ -541,6 +544,7 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			const paragraphBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
+				includeHidden: true,
 			} );
 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
 			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
@@ -821,6 +825,7 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 		const headingBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Heading',
+			includeHidden: true,
 		} );
 		const paragraphBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Paragraph',
@@ -905,6 +910,7 @@ test.describe( 'Pattern Overrides', () => {
 		} );
 		const paragraphBlock = patternBlock.getByRole( 'document', {
 			name: 'Block: Paragraph',
+			includeHidden: true,
 		} );
 		const resetButton = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -969,6 +975,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
+			includeHidden: true,
 		} );
 		await editor.selectBlocks( imageBlock );
 		await imageBlock

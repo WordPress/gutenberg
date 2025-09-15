@@ -15,8 +15,14 @@ import {
 import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
-import PreviewSizePicker from './grid/preview-size-picker';
+import ViewPickerGrid from './picker-grid';
+import {
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+	LAYOUT_PICKER_GRID,
+} from '../constants';
+import PreviewSizePicker from './utils/preview-size-picker';
 import DensityPicker from './table/density-picker';
 
 export const VIEW_LAYOUTS = [
@@ -39,5 +45,13 @@ export const VIEW_LAYOUTS = [
 		label: __( 'List' ),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
+	},
+	{
+		type: LAYOUT_PICKER_GRID,
+		label: __( 'Grid' ),
+		component: ViewPickerGrid,
+		icon: category,
+		viewConfigOptions: PreviewSizePicker,
+		isPicker: true,
 	},
 ];
