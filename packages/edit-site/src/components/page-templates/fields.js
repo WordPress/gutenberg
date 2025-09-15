@@ -147,10 +147,9 @@ export const authorField = {
 };
 
 export const activeField = {
-	label: __( 'Active' ),
+	label: __( 'Status' ),
 	id: 'active',
 	getValue: ( { item } ) => item._isActive,
-	__returnsBadge: true,
 	render: function Render( { item } ) {
 		const isActive = item._isActive;
 		return (

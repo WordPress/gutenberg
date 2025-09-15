@@ -265,7 +265,6 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
-	__returnsBadge?: boolean;
 };
 
 /**

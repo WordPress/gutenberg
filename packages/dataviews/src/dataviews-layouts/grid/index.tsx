@@ -227,9 +227,6 @@ function GridItem< Item >( {
 							const out = (
 								<field.render item={ item } field={ field } />
 							);
-							if ( field.__returnsBadge ) {
-								return out;
-							}
 							return (
 								<Badge
 									key={ field.id }

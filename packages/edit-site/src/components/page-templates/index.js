@@ -49,15 +49,9 @@ const defaultLayouts = {
 	},
 	[ LAYOUT_GRID ]: {
 		showMedia: true,
-		layout: {
-			badgeFields: [ 'active', 'slug' ],
-		},
 	},
 	[ LAYOUT_LIST ]: {
 		showMedia: false,
-		layout: {
-			badgeFields: [ 'active', 'slug' ],
-		},
 	},
 };
 
