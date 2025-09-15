@@ -236,7 +236,7 @@ const ImageURLInputUI = ( {
 			<TextControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Link Relation' ) }
+				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 				help={ createInterpolateElement(

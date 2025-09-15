@@ -244,7 +244,7 @@ const SocialLinkEdit = ( {
 				<TextControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
-					label={ __( 'Link Relation' ) }
+					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(
 							'The <linkRel>Link Relation</linkRel> attribute defines the relationship between a linked resource and the current document.'
