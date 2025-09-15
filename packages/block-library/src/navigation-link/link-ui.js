@@ -8,37 +8,24 @@ import {
 	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __, sprintf, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
-	LinkControl,
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import {
-	createInterpolateElement,
 	useMemo,
 	useState,
 	useRef,
 	useEffect,
 	forwardRef,
 } from '@wordpress/element';
-import {
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { chevronLeftSmall, chevronRightSmall, plus } from '@wordpress/icons';
-import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
+import { useResourcePermissions } from '@wordpress/core-data';
+import { plus } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
-
-const { PrivateQuickInserter: QuickInserter } = unlock(
-	blockEditorPrivateApis
-);
+import { LinkUIPageCreator } from './page-creator';
+import LinkUIBlockInserter from './block-inserter';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -78,109 +65,18 @@ export function getSuggestionsQuery( type, kind ) {
 	}
 }
 
-function LinkUIBlockInserter( { clientId, onBack } ) {
-	const { rootBlockClientId } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
-
-			return {
-				rootBlockClientId: getBlockRootClientId( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-
-	const dialogTitleId = useInstanceId(
-		LinkControl,
-		`link-ui-block-inserter__title`
-	);
-	const dialogDescriptionId = useInstanceId(
-		LinkControl,
-		`link-ui-block-inserter__description`
-	);
-
-	if ( ! clientId ) {
-		return null;
-	}
-
-	return (
-		<div
-			className="link-ui-block-inserter"
-			role="dialog"
-			aria-labelledby={ dialogTitleId }
-			aria-describedby={ dialogDescriptionId }
-			ref={ focusOnMountRef }
-		>
-			<VisuallyHidden>
-				<h2 id={ dialogTitleId }>{ __( 'Add block' ) }</h2>
-
-				<p id={ dialogDescriptionId }>
-					{ __( 'Choose a block to add to your Navigation.' ) }
-				</p>
-			</VisuallyHidden>
-
-			<Button
-				className="link-ui-block-inserter__back"
-				icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					onBack();
-				} }
-				size="small"
-			>
-				{ __( 'Back' ) }
-			</Button>
-
-			<QuickInserter
-				rootClientId={ rootBlockClientId }
-				clientId={ clientId }
-				isAppender={ false }
-				prioritizePatterns={ false }
-				selectBlockOnInsert
-				hasSearch={ false }
-			/>
-		</div>
-	);
-}
-
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind } = props.link;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
+	const [ addingPage, setAddingPage ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const [ focusAddPageButton, setFocusAddPageButton ] = useState( false );
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: postType,
 	} );
-
-	async function handleCreate( pageTitle ) {
-		const page = await saveEntityRecord( 'postType', postType, {
-			title: pageTitle,
-			status: 'draft',
-		} );
-
-		return {
-			id: page.id,
-			type: postType,
-			// Make `title` property consistent with that in `fetchLinkSuggestions` where the `rendered` title (containing HTML entities)
-			// is also being decoded. By being consistent in both locations we avoid having to branch in the rendering output code.
-			// Ideally in the future we will update both APIs to utilise the "raw" form of the title which is better suited to edit contexts.
-			// e.g.
-			// - title.raw = "Yes & No"
-			// - title.rendered = "Yes &#038; No"
-			// - decodeEntities( title.rendered ) = "Yes & No"
-			// See:
-			// - https://github.com/WordPress/gutenberg/pull/41063
-			// - https://github.com/WordPress/gutenberg/blob/a1e1fdc0e6278457e9f4fc0b31ac6d2095f5450b/packages/core-data/src/fetch/__experimental-fetch-link-suggestions.js#L212-L218
-			title: decodeEntities( page.title.rendered ),
-			url: page.link,
-			kind: 'post-type',
-		};
-	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
@@ -193,14 +89,23 @@ function UnforwardedLinkUI( props, ref ) {
 		[ label, opensInNewTab, url ]
 	);
 
+	const handlePageCreated = ( pageLink ) => {
+		// Set the new page as the current link
+		props.onChange( pageLink );
+		// Return to main Link UI
+		setAddingPage( false );
+	};
+
 	const dialogTitleId = useInstanceId(
 		LinkUI,
-		`link-ui-link-control__title`
+		'link-ui-link-control__title'
 	);
 	const dialogDescriptionId = useInstanceId(
 		LinkUI,
-		`link-ui-link-control__description`
+		'link-ui-link-control__description'
 	);
+
+	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<Popover
@@ -210,7 +115,7 @@ function UnforwardedLinkUI( props, ref ) {
 			anchor={ props.anchor }
 			shift
 		>
-			{ ! addingBlock && (
+			{ ! addingBlock && ! addingPage && (
 				<div
 					role="dialog"
 					aria-labelledby={ dialogTitleId }
@@ -230,47 +135,41 @@ function UnforwardedLinkUI( props, ref ) {
 						hasRichPreviews
 						value={ link }
 						showInitialSuggestions
-						withCreateSuggestion={ permissions.canCreate }
-						createSuggestion={ handleCreate }
-						createSuggestionButtonText={ ( searchTerm ) => {
-							let format;
-
-							if ( type === 'post' ) {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft post: <mark>%s</mark>'
-								);
-							} else {
-								/* translators: %s: search term. */
-								format = __(
-									'Create draft page: <mark>%s</mark>'
-								);
-							}
-
-							return createInterpolateElement(
-								sprintf( format, searchTerm ),
-								{
-									mark: <mark />,
-								}
-							);
-						} }
+						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
-						renderControlBottom={ () =>
-							! link?.url?.length && (
+						renderControlBottom={ () => {
+							// Don't show the tools when there is submitted link (preview state).
+							if ( link?.url?.length ) {
+								return null;
+							}
+
+							return (
 								<LinkUITools
 									focusAddBlockButton={ focusAddBlockButton }
+									focusAddPageButton={ focusAddPageButton }
 									setAddingBlock={ () => {
 										setAddingBlock( true );
 										setFocusAddBlockButton( false );
 									} }
+									setAddingPage={ () => {
+										setAddingPage( true );
+										setFocusAddPageButton( false );
+									} }
+									canAddPage={
+										permissions?.canCreate &&
+										type === 'page'
+									}
+									canAddBlock={
+										blockEditingMode === 'default'
+									}
 								/>
-							)
-						}
+							);
+						} }
 					/>
 				</div>
 			) }
@@ -281,7 +180,22 @@ function UnforwardedLinkUI( props, ref ) {
 					onBack={ () => {
 						setAddingBlock( false );
 						setFocusAddBlockButton( true );
+						setFocusAddPageButton( false );
 					} }
+					onBlockInsert={ props?.onBlockInsert }
+				/>
+			) }
+
+			{ addingPage && (
+				<LinkUIPageCreator
+					postType={ postType }
+					onBack={ () => {
+						setAddingPage( false );
+						setFocusAddPageButton( true );
+						setFocusAddBlockButton( false );
+					} }
+					onPageCreated={ handlePageCreated }
+					initialTitle={ link?.url || '' }
 				/>
 			) }
 		</Popover>
@@ -290,9 +204,17 @@ function UnforwardedLinkUI( props, ref ) {
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
 
-const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
+const LinkUITools = ( {
+	setAddingBlock,
+	setAddingPage,
+	focusAddBlockButton,
+	focusAddPageButton,
+	canAddPage,
+	canAddBlock,
+} ) => {
 	const blockInserterAriaRole = 'listbox';
 	const addBlockButtonRef = useRef();
+	const addPageButtonRef = useRef();
 
 	// Focus the add block button when the popover is opened.
 	useEffect( () => {
@@ -301,20 +223,48 @@ const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 		}
 	}, [ focusAddBlockButton ] );
 
+	// Focus the add page button when the popover is opened.
+	useEffect( () => {
+		if ( focusAddPageButton ) {
+			addPageButtonRef.current?.focus();
+		}
+	}, [ focusAddPageButton ] );
+
+	// Don't render anything if neither button should be shown
+	if ( ! canAddPage && ! canAddBlock ) {
+		return null;
+	}
+
 	return (
-		<VStack className="link-ui-tools">
-			<Button
-				__next40pxDefaultSize
-				ref={ addBlockButtonRef }
-				icon={ plus }
-				onClick={ ( e ) => {
-					e.preventDefault();
-					setAddingBlock( true );
-				} }
-				aria-haspopup={ blockInserterAriaRole }
-			>
-				{ __( 'Add block' ) }
-			</Button>
+		<VStack spacing={ 0 } className="link-ui-tools">
+			{ canAddPage && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addPageButtonRef }
+					icon={ plus }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingPage( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Create page' ) }
+				</Button>
+			) }
+			{ canAddBlock && (
+				<Button
+					__next40pxDefaultSize
+					ref={ addBlockButtonRef }
+					icon={ plus }
+					onClick={ ( e ) => {
+						e.preventDefault();
+						setAddingBlock( true );
+					} }
+					aria-haspopup={ blockInserterAriaRole }
+				>
+					{ __( 'Add block' ) }
+				</Button>
+			) }
 		</VStack>
 	);
 };

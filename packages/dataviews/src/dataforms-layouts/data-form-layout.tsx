@@ -11,13 +11,18 @@ import type { Form, FormField, SimpleFormField } from '../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../components/dataform-context';
 import { isCombinedField } from './is-combined-field';
-import normalizeFormFields from '../normalize-form-fields';
+import normalizeFormFields, { normalizeLayout } from '../normalize-form-fields';
+
+const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
+	<VStack spacing={ 4 }>{ children }</VStack>
+);
 
 export function DataFormLayout< Item >( {
 	data,
 	form,
 	onChange,
 	children,
+	as,
 }: {
 	data: Item;
 	form: Form;
@@ -31,6 +36,7 @@ export function DataFormLayout< Item >( {
 		} ) => React.JSX.Element | null,
 		field: FormField
 	) => React.JSX.Element;
+	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
 	const { fields: fieldDefinitions } = useContext( DataFormContext );
 
@@ -47,8 +53,14 @@ export function DataFormLayout< Item >( {
 		[ form ]
 	);
 
+	const normalizedFormLayout = normalizeLayout( form.layout );
+	const Wrapper =
+		as ??
+		getFormFieldLayout( normalizedFormLayout.type )?.wrapper ??
+		DEFAULT_WRAPPER;
+
 	return (
-		<VStack spacing={ form.layout?.type === 'panel' ? 2 : 4 }>
+		<Wrapper layout={ normalizedFormLayout }>
 			{ normalizedFormFields.map( ( formField ) => {
 				const FieldLayout = getFormFieldLayout( formField.layout.type )
 					?.component;
@@ -82,6 +94,6 @@ export function DataFormLayout< Item >( {
 					/>
 				);
 			} ) }
-		</VStack>
+		</Wrapper>
 	);
 }

@@ -1,13 +1,19 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	Button,
-	TextareaControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { _x, __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,16 +35,22 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 		thread?.content?.raw ?? ''
 	);
 
+	const inputId = useInstanceId( CommentForm, 'comment-input' );
+
 	return (
 		<>
-			<TextareaControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
+			<VisuallyHidden as="label" htmlFor={ inputId }>
+				{ __( 'Comment' ) }
+			</VisuallyHidden>
+			<TextareaAutosize
+				id={ inputId }
 				value={ inputComment ?? '' }
-				onChange={ setInputComment }
-				label={ __( 'Comment' ) }
-				hideLabelFromVision
-			/>
+				onChange={ ( comment ) =>
+					setInputComment( comment.target.value )
+				}
+				rows={ 4 }
+				maxRows={ 20 }
+			></TextareaAutosize>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
 					__next40pxDefaultSize
