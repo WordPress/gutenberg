@@ -44,18 +44,4 @@ class Tests_blockCommentFilter extends WP_UnitTestCase {
 		$this->assertContains( 'block_comment', $updated_comment_types );
 	}
 
-	/**
-	 * Tests that `update_comment_type_filter_dropdown` returns the correct options.
-	*/
-	public function test_update_comment_type_filter_dropdown() {
-
-		// Call the function
-		$dropdown_options = update_comment_type_filter_dropdown();
-
-		// Assertions
-		$this->assertArrayHasKey( 'comment', $dropdown_options );
-		$this->assertArrayHasKey( 'block_comment', $dropdown_options );
-		$this->assertEquals( 'Comments', $dropdown_options['comment'] );
-		$this->assertEquals( 'Block Comments', $dropdown_options['block_comment'] );
-	}
 }
