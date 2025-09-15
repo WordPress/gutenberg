@@ -13,10 +13,13 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 		// Only prefetch for the root. If we preload it for all pages and it's not used
 		// it won't be possible to invalidate.
 		// To do: perhaps purge all preloaded paths when client side navigating.
-		if ( $_GET['p'] !== '/' ) {
-            $paths = array_filter( $paths, function( $path ) {
-                return $path !== '/wp/v2/templates/lookup?slug=front-page' && $path !== '/wp/v2/templates/lookup?slug=home';
-            } );
+		if ( '/' === $_GET['p'] ) {
+			$paths = array_filter(
+				$paths,
+				function ( $path ) {
+					return '/wp/v2/templates/lookup?slug=front-page' !== $path && '/wp/v2/templates/lookup?slug=home' !== $path;
+				}
+			);
 		}
 
 		$paths[] = '/wp/v2/_wp_static_template?context=edit';
