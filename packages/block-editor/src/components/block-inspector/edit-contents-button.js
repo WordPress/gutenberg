@@ -33,7 +33,7 @@ export default function EditContentsButton( { clientId } ) {
 			variant="secondary"
 			onClick={ () => {
 				const { patternName, ...metadataWithoutPatternName } =
-					attributes?.metadata;
+					attributes?.metadata ?? {};
 				updateBlockAttributes( clientId, {
 					...attributes,
 					metadata: metadataWithoutPatternName,
