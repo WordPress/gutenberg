@@ -56,11 +56,11 @@ function render_block_core_post_time_to_read( $attributes, $content, $block )
 
 	$wrapper_attributes = get_block_wrapper_attributes(array('class' => $align_class_name));
 
-    return sprintf(
-        '<div %1$s>%2$s</div>',
-        $wrapper_attributes,
-        $minutes_to_read_string
-    );
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		$minutes_to_read_string
+	);
 }
 
 /**
