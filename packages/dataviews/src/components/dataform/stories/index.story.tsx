@@ -516,6 +516,7 @@ const ValidationComponent = ( {
 	type ValidatedItem = {
 		text: string;
 		select?: string;
+		textWithRadio?: string;
 		textarea: string;
 		email: string;
 		telephone: string;
@@ -532,6 +533,7 @@ const ValidationComponent = ( {
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
 		select: undefined,
+		textWithRadio: undefined,
 		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
@@ -556,6 +558,13 @@ const ValidationComponent = ( {
 	const customSelectRule = ( value: ValidatedItem ) => {
 		if ( value.select !== 'option1' ) {
 			return 'Value must be Option 1.';
+		}
+		return null;
+	};
+
+	const customTextRadioRule = ( value: ValidatedItem ) => {
+		if ( value.textWithRadio !== 'item1' ) {
+			return 'Value must be Item 1.';
 		}
 
 		return null;
@@ -666,6 +675,20 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customSelectRule ),
+			},
+		},
+		{
+			id: 'textWithRadio',
+			type: 'text',
+			Edit: 'radio',
+			label: 'Text with radio',
+			elements: [
+				{ value: 'item1', label: 'Item 1' },
+				{ value: 'item2', label: 'Item 2' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTextRadioRule ),
 			},
 		},
 		{
@@ -781,6 +804,7 @@ const ValidationComponent = ( {
 		fields: [
 			'text',
 			'select',
+			'textWithRadio',
 			'textarea',
 			'email',
 			'telephone',
