@@ -33,7 +33,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		$min_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 0.8 ) );
 		$max_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 1.2 ) );
 		if ( $min_minutes === $max_minutes ) {
-		$max_minutes = $min_minutes + 1;
+			$max_minutes = $min_minutes + 1;
 		}
 	/* translators: 1: minimum minutes, 2: maximum minutes to read the post. */
 		$minutes_to_read_string = sprintf(
