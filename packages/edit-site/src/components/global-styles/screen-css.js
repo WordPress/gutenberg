@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink } from '@wordpress/components';
+import {
+	Button,
+	Navigator,
+	ExternalLink,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
@@ -18,9 +23,6 @@ const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
 );
 
 function ScreenCSS() {
-	const description = __(
-		'You can add custom CSS to further customize the appearance and layout of your site.'
-	);
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
@@ -38,7 +40,9 @@ function ScreenCSS() {
 				title={ __( 'Additional CSS' ) }
 				description={
 					<>
-						{ description }
+						{ __(
+							'You can add custom CSS to further customize the appearance and layout of your site.'
+						) }
 						<br />
 						<ExternalLink
 							href={ __(
@@ -54,6 +58,13 @@ function ScreenCSS() {
 					setEditorCanvasContainerView( undefined );
 				} }
 			/>
+			<Spacer margin={ 0 } paddingX={ 4 }>
+				<Navigator.Button as={ Button } variant="link" path="/blocks">
+					{ __(
+						'Want to change block appearance? Use the Blocs section instead.'
+					) }
+				</Navigator.Button>
+			</Spacer>
 			<div className="edit-site-global-styles-screen-css">
 				<StylesAdvancedPanel
 					value={ style }
