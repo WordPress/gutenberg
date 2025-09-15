@@ -108,8 +108,12 @@ function BlockSwitcherDropdownMenuContents( {
 	 */
 	const isSingleBlock = blocks.length === 1;
 	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
+	const isReusable = isSingleBlock && isReusableBlock( blocks[ 0 ] );
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
+		!! possibleBlockTransformations.length &&
+		canRemove &&
+		! isTemplate &&
+		! isReusable;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
