@@ -15,7 +15,8 @@
 					"link": "#heading-id-2"
 				}
 			],
-			"onlyIncludeCurrentPage": false
+			"onlyIncludeCurrentPage": false,
+			"ordered": true
 		},
 		"innerBlocks": []
 	}

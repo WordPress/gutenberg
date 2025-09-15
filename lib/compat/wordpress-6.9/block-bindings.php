@@ -7,6 +7,20 @@
  * @subpackage Block Bindings
  */
 
+
+// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+add_filter(
+	'block_bindings_supported_attributes_core/post-date',
+	function ( $attributes ) {
+		if ( ! in_array( 'datetime', $attributes, true ) ) {
+			$attributes[] = 'datetime';
+		}
+		return $attributes;
+	},
+	10,
+	3
+);
+
 /**
  * Callback function for the render_block filter.
  *

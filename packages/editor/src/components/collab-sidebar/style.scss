@@ -35,6 +35,11 @@
 
 	&__comment-field {
 		flex: 1;
+
+		button {
+			flex-grow: 1;
+			justify-content: center;
+		}
 	}
 
 	&__child-thread {
@@ -59,13 +64,7 @@
 	}
 
 	&__user-comment {
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 20px;
-		text-align: left;
-		color: $gray-900;
-
-		p {
+		p:last-child {
 			margin-bottom: 0;
 		}
 	}
@@ -114,15 +113,6 @@
 
 	&__comment-dropdown-menu {
 		flex-shrink: 0;
-
-		button {
-			&.has-icon {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-			}
-		}
 	}
 
 	&__show-more-reply {
