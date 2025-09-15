@@ -307,13 +307,25 @@ export const getEntityRecords =
 						response.headers.get( 'X-WP-TotalPages' )
 					);
 
+					if ( ! meta ) {
+						meta = {
+							totalItems: parseInt(
+								response.headers.get( 'X-WP-Total' )
+							),
+							totalPages: 1,
+						};
+					}
+
 					records.push( ...pageRecords );
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
 							kind,
 							name,
 							records,
-							query
+							query,
+							false,
+							undefined,
+							meta
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
@@ -322,11 +334,6 @@ export const getEntityRecords =
 					} );
 					page++;
 				} while ( page <= totalPages );
-
-				meta = {
-					totalItems: records.length,
-					totalPages: 1,
-				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
 				meta = {
@@ -361,61 +368,57 @@ export const getEntityRecords =
 					meta
 				);
 
+				const targetHints = records
+					.filter(
+						( record ) =>
+							!! record?.[ key ] &&
+							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
+					)
+					.map( ( record ) => ( {
+						id: record[ key ],
+						permissions: getUserPermissionsFromAllowHeader(
+							record._links.self[ 0 ].targetHints.allow
+						),
+					} ) );
+
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const targetHint of targetHints ) {
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						canUserResolutionsArgs.push( [
+							action,
+							{ kind, name, id: targetHint.id },
+						] );
+
+						receiveUserPermissionArgs[
+							getUserPermissionCacheKey( action, {
+								kind,
+								name,
+								id: targetHint.id,
+							} )
+						] = targetHint.permissions[ action ];
+					}
+				}
+
+				if ( targetHints.length > 0 ) {
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				}
+
 				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
+				// the `getEntityRecord` selector in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
-				// See https://github.com/WordPress/gutenberg/pull/64504
-				// See https://github.com/WordPress/gutenberg/pull/70738
-				if ( ! query.context ) {
-					const targetHints = records
-						.filter(
-							( record ) =>
-								!! record?.[ key ] &&
-								!! record?._links?.self?.[ 0 ]?.targetHints
-									?.allow
-						)
-						.map( ( record ) => ( {
-							id: record[ key ],
-							permissions: getUserPermissionsFromAllowHeader(
-								record._links.self[ 0 ].targetHints.allow
-							),
-						} ) );
-
-					const canUserResolutionsArgs = [];
-					const receiveUserPermissionArgs = {};
-					for ( const targetHint of targetHints ) {
-						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-							canUserResolutionsArgs.push( [
-								action,
-								{ kind, name, id: targetHint.id },
-							] );
-
-							receiveUserPermissionArgs[
-								getUserPermissionCacheKey( action, {
-									kind,
-									name,
-									id: targetHint.id,
-								} )
-							] = targetHint.permissions[ action ];
-						}
-					}
-
-					if ( targetHints.length > 0 ) {
-						dispatch.receiveUserPermissions(
-							receiveUserPermissionArgs
-						);
-						dispatch.finishResolutions(
-							'canUser',
-							canUserResolutionsArgs
-						);
-					}
-
-					if ( ! query?._fields ) {
-						dispatch.finishResolutions(
-							'getEntityRecord',
-							getResolutionsArgs( records )
-						);
-					}
+				// Todo https://github.com/WordPress/gutenberg/issues/26629
+				if ( ! query?._fields && ! query.context ) {
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						getResolutionsArgs( records )
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -433,6 +436,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the total number of entity records.
+ */
+export const getEntityRecordsTotalItems = forwardResolver( 'getEntityRecords' );
+
+/**
+ * Requests the number of available pages for the given query.
+ */
+export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
 
 /**
  * Requests the current theme.

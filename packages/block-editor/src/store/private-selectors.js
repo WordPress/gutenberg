@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -17,14 +18,15 @@ import {
 	getClientIdsWithDescendants,
 	isNavigationMode,
 	getBlockRootClientId,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getGrammar,
+	mapUserPattern,
 } from './utils';
-import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -32,6 +34,8 @@ import {
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 } from './private-keys';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -81,6 +85,32 @@ export const isBlockSubtreeDisabled = ( state, clientId ) => {
 	return getBlockOrder( state, clientId ).every( isChildSubtreeDisabled );
 };
 
+/**
+ * Determines if a container (clientId) allows insertion of blocks, considering contentOnly mode restrictions.
+ *
+ * @param {Object} state        Editor state.
+ * @param {string} blockName    The block name to insert.
+ * @param {string} rootClientId The client ID of the root container block.
+ * @return {boolean} Whether the container allows insertion.
+ */
+export function isContainerInsertableToInWriteMode(
+	state,
+	blockName,
+	rootClientId
+) {
+	const isBlockContentBlock = isContentBlock( blockName );
+	const rootBlockName = getBlockName( state, rootClientId );
+	const isContainerContentBlock = isContentBlock( rootBlockName );
+	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
+
+	// In write mode, containers shouldn't be inserted into unless:
+	// 1. they are a section root;
+	// 2. they are a content block and the block to be inserted is also content.
+	return (
+		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
+	);
+}
+
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -115,8 +145,6 @@ export const getEnabledClientIdsTree = createRegistrySelector( ( select ) =>
 		state.derivedBlockEditingModes,
 		state.derivedNavModeBlockEditingModes,
 		state.blockEditingModes,
-		state.settings.templateLock,
-		state.blockListSettings,
 		select( STORE_NAME ).__unstableGetEditorMode( state ),
 	] )
 );
@@ -321,26 +349,6 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
-function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
-) {
-	return {
-		name: `core/block/${ userPattern.id }`,
-		id: userPattern.id,
-		type: INSERTER_PATTERN_TYPES.user,
-		title: userPattern.title.raw,
-		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
-			const category = __experimentalUserPatternCategories.find(
-				( { id } ) => id === catId
-			);
-			return category ? category.slug : catId;
-		} ),
-		content: userPattern.content.raw,
-		syncStatus: userPattern.wp_pattern_sync_status,
-	};
-}
-
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, patternName ) => {
@@ -506,6 +514,14 @@ export function isSectionBlock( state, clientId ) {
 	if (
 		blockName === 'core/block' ||
 		getTemplateLock( state, clientId ) === 'contentOnly'
+	) {
+		return true;
+	}
+
+	const attributes = getBlockAttributes( state, clientId );
+	if (
+		attributes?.metadata?.patternName &&
+		!! window?.__experimentalContentOnlyPatternInsertion
 	) {
 		return true;
 	}

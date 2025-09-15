@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 import { Button, Card, CardBody, CardHeader } from '@wordpress/components';
@@ -104,6 +100,11 @@ export default function FormCardField< Item >( {
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
 					<CardBody className="dataforms-layouts-card__field-control">
+						{ field.description && (
+							<div className="dataforms-layouts-card__field-description">
+								{ field.description }
+							</div>
+						) }
 						<DataFormLayout
 							data={ data }
 							form={ form }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, ReactChild, ReactNode } from 'react';
+import type { ForwardedRef, ReactElement, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ function _contextConnect<
  * @return The connected namespaces.
  */
 export function getConnectNamespace(
-	Component: ReactChild | undefined | {}
+	Component: ReactElement | number | string | undefined | {}
 ): string[] {
 	if ( ! Component ) {
 		return [];

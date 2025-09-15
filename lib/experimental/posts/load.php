@@ -44,7 +44,7 @@ function gutenberg_posts_dashboard() {
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');'
 	);
 
 	/** This action is documented in wp-admin/edit-form-blocks.php */
@@ -61,7 +61,7 @@ function gutenberg_posts_dashboard() {
 			'wp.domReady( function() {
 				wp.editSite.initializePostsDashboard( "gutenberg-posts-dashboard", %s );
 			} );',
-			wp_json_encode( $editor_settings )
+			wp_json_encode( $editor_settings, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 		)
 	);
 	wp_enqueue_script( 'wp-edit-site' );

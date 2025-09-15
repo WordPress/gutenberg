@@ -8,6 +8,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,16 +30,26 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
-		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.blockCommentId,
-		};
-	} );
+	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
+		( select ) => {
+			const { getSelectedBlock } = select( blockEditorStore );
+			const selectedBlock = getSelectedBlock();
+			return {
+				clientId: selectedBlock?.clientId,
+				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				isEmptyDefaultBlock: selectedBlock
+					? isUnmodifiedDefaultBlock( selectedBlock )
+					: false,
+			};
+		}
+	);
 
-	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
+	if (
+		! showCommentBoard ||
+		! clientId ||
+		undefined !== blockCommentId ||
+		isEmptyDefaultBlock
+	) {
 		return null;
 	}
 

@@ -92,18 +92,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-command-palette-everywhere',
-		__( 'Command Palette: enable everywhere', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables the Command Palette everywhere in the admin dashboard.', 'gutenberg' ),
-			'id'    => 'gutenberg-command-palette-everywhere',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-media-processing',
 		__( 'Client-side media processing', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -208,6 +196,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables full-page client-side navigation, powered by the Interactivity API.', 'gutenberg' ),
 			'id'    => 'gutenberg-full-page-client-side-navigation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-only-pattern-insertion',
+		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-pattern-insertion',
 		)
 	);
 

@@ -43,7 +43,12 @@ export default function BlockActions( {
 
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
-				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
+				canInsertBlock: blocks.every( ( block ) => {
+					return (
+						( canInsertDefaultBlock || !! directInsertBlock ) &&
+						canInsertBlockType( block.name, rootClientId )
+					);
+				} ),
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
