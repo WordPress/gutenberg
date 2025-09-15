@@ -420,6 +420,12 @@ const LayoutPanelComponent = ( {
 				'dimensions',
 				'tags',
 				{
+					id: 'discussion',
+					label: 'Discussion',
+					children: [ 'comment_status', 'ping_status' ],
+					summary: 'discussion',
+				},
+				{
 					id: 'address1',
 					label: 'Combined Address',
 					children: [ 'address1', 'address2', 'city' ],
@@ -440,12 +446,6 @@ const LayoutPanelComponent = ( {
 					label: 'Passenger Details',
 					children: [ 'author', 'seat' ],
 					summary: [ 'author', 'seat' ],
-				},
-				{
-					id: 'discussion',
-					label: 'Discussion',
-					children: [ 'comment_status', 'ping_status' ],
-					summary: 'discussion',
 				},
 			],
 		};
