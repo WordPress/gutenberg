@@ -7,7 +7,7 @@ import { useCallback, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps, DeepPartial } from '../../types';
+import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 
 const { ValidatedInputControl } = unlock( privateApis );
@@ -37,8 +37,9 @@ export default function ValidatedText< Item >( {
 	prefix,
 	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
+	const { id, label, placeholder, description, getValue, setValue, isValid } =
+		field;
+	const value = getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -49,19 +50,19 @@ export default function ValidatedText< Item >( {
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
 			onChange(
-				field.setValue( {
+				setValue( {
 					item: data,
 					value: newValue,
 				} )
 			),
-		[ data, field, onChange ]
+		[ data, setValue, onChange ]
 	);
 
 	return (
 		<ValidatedInputControl
-			required={ !! field.isValid?.required }
+			required={ !! isValid?.required }
 			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
+				const message = isValid?.custom?.(
 					{
 						...data,
 						[ id ]: newValue,
