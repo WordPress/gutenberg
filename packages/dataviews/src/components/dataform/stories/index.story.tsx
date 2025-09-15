@@ -6,8 +6,6 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 	privateApis,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 
 /**
@@ -28,22 +26,6 @@ import { unlock } from '../../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
-const DollarPrefix = () => (
-	<InputControlPrefixWrapper>
-		<span>$</span>
-	</InputControlPrefixWrapper>
-);
-const PercentSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>%</span>
-	</InputControlSuffixWrapper>
-);
-const USDSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>USD</span>
-	</InputControlSuffixWrapper>
-);
-
 type SamplePost = {
 	title: string;
 	order: number;
@@ -60,9 +42,6 @@ type SamplePost = {
 	address2?: string;
 	city?: string;
 	longDescription?: string;
-	priceWithPrefix?: string;
-	percentageWithSuffix?: string;
-	priceWithBoth?: string;
 };
 
 const fields: Field< SamplePost >[] = [
@@ -205,34 +184,6 @@ const fields: Field< SamplePost >[] = [
 			rows: 5,
 		},
 	},
-	{
-		id: 'priceWithPrefix',
-		label: 'Price with Prefix',
-		type: 'text',
-		Edit: {
-			control: 'text',
-			prefix: DollarPrefix,
-		},
-	},
-	{
-		id: 'percentageWithSuffix',
-		label: 'Percentage with Suffix',
-		type: 'text',
-		Edit: {
-			control: 'text',
-			suffix: PercentSuffix,
-		},
-	},
-	{
-		id: 'priceWithBoth',
-		label: 'Price with Prefix and Suffix',
-		type: 'text',
-		Edit: {
-			control: 'text',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
-		},
-	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -280,9 +231,6 @@ const LayoutRegularComponent = ( {
 				'tags',
 				'description',
 				'longDescription',
-				'priceWithPrefix',
-				'percentageWithSuffix',
-				'priceWithBoth',
 			],
 		} ),
 		[ labelPosition ]
