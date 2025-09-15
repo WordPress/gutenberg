@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import TextareaAutosize from 'react-autosize-textarea';
+
+/**
  * WordPress dependencies
  */
 import { useState, useRef } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	Button,
-	TextareaControl,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { _x, __ } from '@wordpress/i18n';
 import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
@@ -31,23 +36,25 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 	);
 
 	const textareaRef = useRef( null );
-	const instanceId = useInstanceId( CommentForm );
-	const textareaId = `comment-textarea-${ instanceId }`;
+	const inputId = useInstanceId( CommentForm, 'comment-input' );
 	const focusOnMountRef = useFocusOnMount();
 
 	return (
 		<>
 			<div ref={ focusOnMountRef }>
-				<TextareaControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					value={ inputComment ?? '' }
-					onChange={ setInputComment }
-					label={ __( 'Comment' ) }
-					hideLabelFromVision
-					id={ textareaId }
+				<VisuallyHidden as="label" htmlFor={ inputId }>
+					{ __( 'Comment' ) }
+				</VisuallyHidden>
+				<TextareaAutosize
 					ref={ textareaRef }
-				/>
+					id={ inputId }
+					value={ inputComment ?? '' }
+					onChange={ ( comment ) =>
+						setInputComment( comment.target.value )
+					}
+					rows={ 4 }
+					maxRows={ 20 }
+				></TextareaAutosize>
 			</div>
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<Button
