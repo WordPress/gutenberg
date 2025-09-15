@@ -8,7 +8,19 @@
  */
 
 
-// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+// The following filters can be removed once the minimum required WordPress version is 6.9 or newer.
+add_filter(
+	'block_bindings_supported_attributes_core/image',
+	function ( $attributes ) {
+		if ( ! in_array( 'caption', $attributes, true ) ) {
+			$attributes[] = 'caption';
+		}
+		return $attributes;
+	},
+	10,
+	3
+);
+
 add_filter(
 	'block_bindings_supported_attributes_core/post-date',
 	function ( $attributes ) {
