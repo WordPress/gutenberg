@@ -28,7 +28,6 @@ import { unlock } from '../../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
-
 const DollarPrefix = () => (
 	<InputControlPrefixWrapper>
 		<span>$</span>

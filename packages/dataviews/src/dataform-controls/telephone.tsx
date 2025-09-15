@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { 
+import {
 	Icon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';

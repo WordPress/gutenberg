@@ -53,7 +53,9 @@ const FORM_CONTROLS: FormControls = {
 };
 
 function isEditConfig( value: any ): value is EditConfig {
-	return value && typeof value === 'object' && typeof value.control === 'string';
+	return (
+		value && typeof value === 'object' && typeof value.control === 'string'
+	);
 }
 
 function createConfiguredControl( config: EditConfig ) {

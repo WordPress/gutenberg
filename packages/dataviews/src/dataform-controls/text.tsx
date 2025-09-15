@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -7,7 +6,7 @@ import React from 'react';
 /**
  * WordPress dependencies
  */
-import { 
+import {
 	Icon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
