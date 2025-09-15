@@ -21,6 +21,11 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$content = get_the_content();
 
+	/*
+	 * Reading rates (words per minute) - based on averages from
+	 * https://irisreading.com/average-reading-speed-in-various-languages/
+	 * (Characters/minute used for Chinese rather than words).
+	 */
 	$average_reading_rate = $attributes['averageReadingSpeed'] ?? 189;
 
 	$word_count_type = wp_get_word_count_type();
