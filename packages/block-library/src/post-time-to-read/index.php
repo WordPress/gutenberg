@@ -66,7 +66,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block )
 /**
  * Registers the `core/post-time-to-read` block on the server.
  */
-function register_block_core_post_time_to_read()
+function register_block_core_post_time_to_read() {
 {
     register_block_type_from_metadata(
         __DIR__.'/post-time-to-read',
