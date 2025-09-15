@@ -3,7 +3,11 @@
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	getDate,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -55,10 +59,16 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 					{ name ?? currentUserName }
 				</span>
 				<time
-					dateTime={ dateI18n( 'c', date ?? currentDate ) }
+					dateTime={ dateI18n(
+						'c',
+						date ? getDate( date ) : currentDate
+					) }
 					className="editor-collab-sidebar-panel__user-time"
 				>
-					{ dateI18n( dateTimeFormat, date ?? currentDate ) }
+					{ dateI18n(
+						dateTimeFormat,
+						date ? getDate( date ) : currentDate
+					) }
 				</time>
 			</VStack>
 		</>
