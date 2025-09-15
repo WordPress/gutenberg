@@ -60,6 +60,9 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 				>
 					{ dateI18n( dateTimeFormat, date ?? currentDate ) }
 				</time>
+				<span className="editor-collab-sidebar-panel__user-date">
+					{ dateI18n( 'F j, Y', date ?? currentDate ) }
+				</span>
 			</VStack>
 		</>
 	);

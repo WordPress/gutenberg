@@ -3,10 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 	// @ts-ignore
 } from '@wordpress/block-editor';
+
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
@@ -19,8 +19,7 @@ import { unlock } from '../../../lock-unlock';
 // @ts-ignore
 import { store as editorStore } from '../../../store';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-
+const { useGlobalStyle, BlockPreview } = unlock( blockEditorPrivateApis );
 function PostPreviewContainer( {
 	template,
 	post,
