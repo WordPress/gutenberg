@@ -18,6 +18,10 @@ import type { SetSelection } from './private-types';
  */
 import type { useFocusOnMount } from '@wordpress/compose';
 
+/**
+ * Utility type that makes all properties of T optional recursively.
+ * Used by field setValue functions to allow partial item updates.
+ */
 export type DeepPartial< T > = {
 	[ P in keyof T ]?: T[ P ] extends object ? DeepPartial< T[ P ] > : T[ P ];
 };
