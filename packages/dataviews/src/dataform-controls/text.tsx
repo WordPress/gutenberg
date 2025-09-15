@@ -1,16 +1,7 @@
 /**
- * External dependencies
- */
-import React from 'react';
-
-/**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-} from '@wordpress/components';
+import { createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,8 +25,8 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
-				prefix: prefix ? React.createElement( prefix ) : undefined,
-				suffix: suffix ? React.createElement( suffix ) : undefined,
+				prefix: prefix ? createElement( prefix ) : undefined,
+				suffix: suffix ? createElement( suffix ) : undefined,
 			} }
 		/>
 	);

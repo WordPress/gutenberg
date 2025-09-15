@@ -60,12 +60,12 @@ function isEditConfig( value: any ): value is EditConfig {
 
 function createConfiguredControl( config: EditConfig ) {
 	const { control, ...controlConfig } = config;
-	const BaseControl = getControlByType( control );
+	const BaseControlType = getControlByType( control );
 
 	return function ConfiguredControl< Item >(
 		props: DataFormControlProps< Item >
 	) {
-		return <BaseControl { ...props } config={ controlConfig } />;
+		return <BaseControlType { ...props } config={ controlConfig } />;
 	};
 }
 
