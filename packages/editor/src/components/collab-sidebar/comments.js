@@ -380,8 +380,7 @@ const CommentBoard = ( { thread, onResolve, onEdit, onDelete, status } ) => {
 					isOpen={ showConfirmDialog }
 					onConfirm={ handleConfirmResolve }
 					onCancel={ handleCancel }
-					confirmButtonText="Yes"
-					cancelButtonText="No"
+					confirmButtonText={ __( 'Resolve' ) }
 				>
 					{
 						// translators: message displayed when confirming an action
@@ -396,8 +395,7 @@ const CommentBoard = ( { thread, onResolve, onEdit, onDelete, status } ) => {
 					isOpen={ showConfirmDialog }
 					onConfirm={ handleConfirmDelete }
 					onCancel={ handleCancel }
-					confirmButtonText="Yes"
-					cancelButtonText="No"
+					confirmButtonText={ __( 'Delete' ) }
 				>
 					{
 						// translators: message displayed when confirming an action
