@@ -7,7 +7,7 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 
 /**
@@ -129,35 +129,15 @@ function PanelModal< Item >( {
 
 	return (
 		<>
-			<Button
-				className="dataforms-layouts-modal__field-control"
-				size="compact"
-				variant={
-					[ 'none', 'top' ].includes( labelPosition )
-						? 'link'
-						: 'tertiary'
-				}
-				aria-expanded={ isOpen }
-				aria-label={ sprintf(
-					// translators: %s: Field name.
-					_x( 'Edit %s', 'field' ),
-					fieldLabel || ''
-				) }
-				onClick={ () => setIsOpen( true ) }
+			<SummaryButton
+				summaryFields={ summaryFields }
+				data={ data }
+				labelPosition={ labelPosition }
+				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				accessibleWhenDisabled
-				style={
-					summaryFields.length > 1
-						? {
-								minHeight: 'auto',
-								height: 'auto',
-								alignItems: 'flex-start',
-						  }
-						: undefined
-				}
-			>
-				<SummaryButton summaryFields={ summaryFields } data={ data } />
-			</Button>
+				onClick={ () => setIsOpen( true ) }
+				aria-expanded={ isOpen }
+			/>
 			{ isOpen && (
 				<ModalContent
 					data={ data }

@@ -9,7 +9,7 @@ import {
 	Dropdown,
 	Button,
 } from '@wordpress/components';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 
@@ -110,38 +110,15 @@ function PanelDropdown< Item >( {
 				tooltipPosition: 'middle left',
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					className="dataforms-layouts-panel__field-control"
-					size="compact"
-					variant={
-						[ 'none', 'top' ].includes( labelPosition )
-							? 'link'
-							: 'tertiary'
-					}
-					aria-expanded={ isOpen }
-					aria-label={ sprintf(
-						// translators: %s: Field name.
-						_x( 'Edit %s', 'field' ),
-						fieldLabel || ''
-					) }
-					onClick={ onToggle }
+				<SummaryButton
+					summaryFields={ summaryFields }
+					data={ data }
+					labelPosition={ labelPosition }
+					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
-					accessibleWhenDisabled
-					style={
-						summaryFields.length > 1
-							? {
-									minHeight: 'auto',
-									height: 'auto',
-									alignItems: 'flex-start',
-							  }
-							: undefined
-					}
-				>
-					<SummaryButton
-						summaryFields={ summaryFields }
-						data={ data }
-					/>
-				</Button>
+					onClick={ onToggle }
+					aria-expanded={ isOpen }
+				/>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>
