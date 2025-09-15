@@ -37,7 +37,7 @@ export default function ValidatedText< Item >( {
 	prefix,
 	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
-	const { id, label, placeholder, description, getValue, setValue, isValid } =
+	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
@@ -58,28 +58,30 @@ export default function ValidatedText< Item >( {
 		[ data, setValue, onChange ]
 	);
 
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = isValid?.custom?.(
+				setValue( { item: data, value: newValue } ),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, isValid, setValue ]
+	);
+
 	return (
 		<ValidatedInputControl
 			required={ !! isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }

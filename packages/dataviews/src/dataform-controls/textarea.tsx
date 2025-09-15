@@ -20,7 +20,7 @@ export default function Textarea< Item >( {
 	config,
 }: DataFormControlProps< Item > ) {
 	const { rows = 4 } = config || {};
-	const { id, label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -35,28 +35,30 @@ export default function Textarea< Item >( {
 		[ data, onChange, setValue ]
 	);
 
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				setValue( { item: data, value: newValue } ),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
+
 	return (
 		<ValidatedTextareaControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }

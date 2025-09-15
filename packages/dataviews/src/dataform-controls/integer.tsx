@@ -76,7 +76,7 @@ export default function Integer< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description, getValue, setValue } = field;
+	const { label, description, getValue, setValue } = field;
 	const value = getValue( { item: data } ) ?? '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -118,6 +118,31 @@ export default function Integer< Item >( {
 		[ data, onChange, setValue ]
 	);
 
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				setValue( {
+					item: data,
+					value: [ undefined, '', null ].includes( newValue )
+						? undefined
+						: Number( newValue ),
+				} ),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
+
 	if ( operator === OPERATOR_BETWEEN ) {
 		return (
 			<BetweenControls
@@ -131,27 +156,7 @@ export default function Integer< Item >( {
 	return (
 		<ValidatedNumberControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: [ undefined, '', null ].includes( newValue )
-							? undefined
-							: Number( newValue ),
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			help={ description }

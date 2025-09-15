@@ -18,7 +18,7 @@ export default function Toggle< Item >( {
 	data,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description, getValue, setValue } = field;
+	const { label, description, getValue, setValue } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -32,28 +32,30 @@ export default function Toggle< Item >( {
 		);
 	}, [ onChange, setValue, data, getValue ] );
 
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				setValue( { item: data, value: newValue } ),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
+
 	return (
 		<ValidatedToggleControl
 			required={ !! field.isValid.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom

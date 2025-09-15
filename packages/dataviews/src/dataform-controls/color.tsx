@@ -75,7 +75,7 @@ export default function Color< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description, setValue } = field;
+	const { label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } ) || '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -88,38 +88,40 @@ export default function Color< Item >( {
 		( colorObject: any ) => {
 			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
 	);
 
 	const handleInputChange = useCallback(
 		( newValue: string | undefined ) => {
 			onChange( setValue( { item: data, value: newValue || '' } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				setValue( { item: data, value: newValue } ),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
 	);
 
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }
