@@ -123,6 +123,10 @@ export default {
 		return true;
 	},
 	editorUI( { select, context } ) {
+		const selectedBlock = select( 'core/block-editor' ).getSelectedBlock();
+		if ( selectedBlock?.name !== 'core/post-date' ) {
+			return {};
+		}
 		const postDataFields = Object.entries(
 			getPostDataFields( select, context ) || {}
 		).map( ( [ key, field ] ) => ( {

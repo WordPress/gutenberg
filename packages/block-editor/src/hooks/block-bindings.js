@@ -280,17 +280,24 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				( [ sourceName, { editorUI, usesContext, label } ] ) => {
 					if ( editorUI ) {
 						// Populate context.
-						const context = {};
+						const context = { ...blockContext };
 						if ( usesContext?.length ) {
 							for ( const key of usesContext ) {
 								context[ key ] = blockContext[ key ];
 							}
 						}
+
+						// Provide editor context if available in settings
+						const settings =
+							select( blockEditorStore ).getSettings();
+						context.postId = context.postId || settings.postId;
+						context.postType =
+							context.postType || settings.postType;
+
 						const editorUIResult = editorUI( {
 							select,
 							context,
 						} );
-
 						const hasCompatibleData = bindableAttributes.some(
 							( attribute ) => {
 								const _attributeType =
