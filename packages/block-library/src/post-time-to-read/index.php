@@ -30,7 +30,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	if ( ! empty( $attributes['displayAsRange'] ) ) {
 		// Calculate faster reading rate with 20% speed = lower minutes,
 		// and slower reading rate with 20% speed = higher minutes.
-		$min_minutes = max(1, (int) round($total_words / $average_reading_rate * 0.8));
+		$min_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 0.8 ) );
 		$max_minutes = max(1, (int) round($total_words / $average_reading_rate * 1.2));
 		if ($min_minutes === $max_minutes) {
 		$max_minutes = $min_minutes + 1;
