@@ -24,7 +24,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
     $average_reading_rate = $attributes['averageReadingSpeed'] ?? 189;
 
-    $word_count_type = wp_get_word_count_type();
+	$word_count_type = wp_get_word_count_type();
 
     $total_words = wp_word_count($content, $word_count_type);
 
