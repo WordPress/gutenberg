@@ -133,7 +133,7 @@ function BlockBindingsPanelMenuContent( {
 							<Menu.Item
 								key={ sourceKey }
 								onClick={ () =>
-									onOpenModal( sourceKey, source )
+									onOpenModal( sourceKey, source, attribute )
 								}
 							>
 								<Menu.ItemLabel>
@@ -197,8 +197,8 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ modalState, setModalState ] = useState( null );
 
-	const handleOpenModal = ( sourceKey, source ) => {
-		setModalState( { sourceKey, source } );
+	const handleOpenModal = ( sourceKey, source, attribute ) => {
+		setModalState( { sourceKey, source, attribute } );
 	};
 
 	const handleCloseModal = () => {
@@ -248,6 +248,7 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 				<Modal onRequestClose={ handleCloseModal }>
 					{ modalState.source.renderModalContent( {
 						updateBlockBindings,
+						attribute: modalState.attribute,
 					} ) }
 				</Modal>
 			) }
