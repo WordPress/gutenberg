@@ -42,7 +42,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 			$max_minutes
 		);
 	} else {
-		$minutes_to_read        = max(1, (int) round($total_words / $average_reading_rate));
+		$minutes_to_read        = max( 1, (int) round( $total_words / $average_reading_rate ) );
 		$minutes_to_read_string = sprintf(
 			/* translators: %s: the number of minutes to read the post. */
 			_n( '%s minute', '%s minutes', $minutes_to_read ),
