@@ -92,6 +92,12 @@ const fields: Field< SamplePost >[] = [
 			{ value: 3, label: 'Alice' },
 			{ value: 4, label: 'Bob' },
 		],
+		setValue: ( { item, value } ) => {
+			return {
+				...item,
+				author: Number( value ),
+			};
+		},
 	},
 	{
 		id: 'reviewer',
@@ -1569,6 +1575,10 @@ const DataAdapterComponent = () => {
 				to highlight how DataForm can wrangle data in scenarios such as
 				nested data, bridge data to/from UI controls, and derived data.
 			</p>
+			<p>
+				<b>Current data snapshot:</b>
+			</p>
+			<pre>{ JSON.stringify( data, null, 2 ) }</pre>
 			<h2>Nested data</h2>
 			<p>
 				The first example demonstrates how to signal nested data via{ ' ' }

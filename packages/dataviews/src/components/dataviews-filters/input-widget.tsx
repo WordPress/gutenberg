@@ -76,6 +76,7 @@ export default function InputWidget( {
 		}
 		return currentField;
 	}, [ fields, filter.field ] );
+
 	const data = useMemo( () => {
 		return ( view.filters ?? [] ).reduce(
 			( acc, activeFilter ) => {
