@@ -2675,7 +2675,7 @@ export function withDerivedBlockEditingModes( reducer ) {
 				const removedClientIds = [];
 
 				for ( const clientId of action?.clientIds ) {
-					const attributes = action.options.uniqueByBlock
+					const attributes = action.options?.uniqueByBlock
 						? action.attributes[ clientId ]
 						: action.attributes;
 
