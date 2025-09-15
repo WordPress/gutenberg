@@ -31,7 +31,7 @@ const {
 
 const regionAttr = `data-${ directivePrefix }-router-region`;
 const interactiveAttr = `data-${ directivePrefix }-interactive`;
-const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]:not([${ interactiveAttr }] [${ interactiveAttr }])`;
+const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]`; // All regions.
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -95,7 +95,7 @@ const parseRegionAttribute = ( region: Element ) => {
 
 const cloneRouterRegion = ( vdom: any ) => {
 	if ( ! vdom ) {
-		return null;
+		return vdom;
 	}
 
 	const { 'router-region': __ignored, ...directives } = vdom.props.directives;
@@ -171,9 +171,14 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
-		regions[ id ] = vdom?.has( region )
-			? vdom.get( region )
-			: toVdom( region );
+
+		if ( region.parentElement.closest( regionsSelector ) ) {
+			regions[ id ] = undefined;
+		} else {
+			regions[ id ] = vdom?.has( region )
+				? vdom.get( region )
+				: toVdom( region );
+		}
 
 		if ( attachTo ) {
 			regionsToAttach[ id ] = attachTo;
@@ -218,7 +223,12 @@ const renderPage = ( page: Page ) => {
 		populateServerData( page.initialData );
 
 		// 1. Reset all router regions.
-		// TODO: this should be changed to update only the relevant siganls.
+		//
+		// TODO: this should be changed to update only the relevant siganls. How
+		// to differentiate here which regions should be updated? The CSS
+		// selector should recognize router-regions inside other route-regions,
+		// interactive, etc. In that case, the stored value in the page should
+		// be `undefined` (we can think of something else).
 		( routerRegions as Map< string, any > ).forEach( ( signal ) => {
 			signal.value = null;
 		} );
