@@ -34,18 +34,22 @@ export default function FormPanelField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const getSummaryFields = () => {
 		if ( ! isCombinedField( field ) ) {
-			const fieldDef = fields.find( ( _field ) => _field.id === field.id );
+			const fieldDef = fields.find(
+				( _field ) => _field.id === field.id
+			);
 			return fieldDef ? [ fieldDef ] : [];
 		}
 
 		// Use summary field(s) if specified for combined fields
 		if ( field.summary ) {
-			const summaryIds = Array.isArray( field.summary ) 
-				? field.summary 
+			const summaryIds = Array.isArray( field.summary )
+				? field.summary
 				: [ field.summary ];
 			return summaryIds
-				.map( summaryId => fields.find( _field => _field.id === summaryId ) )
-				.filter( field => field !== undefined );
+				.map( ( summaryId ) =>
+					fields.find( ( _field ) => _field.id === summaryId )
+				)
+				.filter( ( field ) => field !== undefined );
 		}
 
 		// Default to the first simple child
@@ -63,7 +67,9 @@ export default function FormPanelField< Item >( {
 				? simpleChildren[ 0 ]
 				: simpleChildren[ 0 ].id;
 
-		const fieldDef = fields.find( _field => _field.id === firstChildFieldId );
+		const fieldDef = fields.find(
+			( _field ) => _field.id === firstChildFieldId
+		);
 		return fieldDef ? [ fieldDef ] : [];
 	};
 
