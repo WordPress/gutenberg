@@ -67,7 +67,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'textbox' );
 
 		// Make sure the paragraph content is rendered as expected.
-		await expect( paragraphHTML ).toHaveValue( '<p>Hello world!</p>' );
+		await expect( paragraphHTML ).toHaveText( '<p>Hello world!</p>' );
 
 		// Change the `drop cap` using the sidebar.
 		await page
@@ -79,7 +79,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).check();
 
 		// Make sure the HTML content updated.
-		await expect( paragraphHTML ).toHaveValue(
+		await expect( paragraphHTML ).toHaveText(
 			'<p class="has-drop-cap">Hello world!</p>'
 		);
 	} );
