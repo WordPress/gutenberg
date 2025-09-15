@@ -16,9 +16,9 @@
  * @return string Returns the rendered post author name block.
  */
 function render_block_core_post_time_to_read( $attributes, $content, $block ) {
-    if ( ! isset($block->context['postId'])) {
-        return '';
-    }
+	if ( ! isset($block->context['postId'])) {
+		return '';
+	}
 
     $content = get_the_content();
 
