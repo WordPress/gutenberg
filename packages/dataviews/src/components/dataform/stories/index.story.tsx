@@ -406,6 +406,8 @@ const ValidationComponent = ( {
 		boolean: boolean;
 		customEdit: string;
 		password: string;
+		toggle?: boolean;
+		toggleGroup?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
@@ -420,6 +422,8 @@ const ValidationComponent = ( {
 		boolean: true,
 		customEdit: 'custom control',
 		password: 'secretpassword123',
+		toggle: undefined,
+		toggleGroup: undefined,
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -474,6 +478,27 @@ const ValidationComponent = ( {
 	const customIntegerRule = ( value: ValidatedItem ) => {
 		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+	const customBooleanRule = ( value: ValidatedItem ) => {
+		if ( value.boolean !== true ) {
+			return 'Boolean must be active.';
+		}
+
+		return null;
+	};
+	const customToggleRule = ( value: ValidatedItem ) => {
+		if ( value.toggle !== true ) {
+			return 'Toggle must be checked.';
+		}
+
+		return null;
+	};
+	const customToggleGroupRule = ( value: ValidatedItem ) => {
+		if ( value.toggleGroup !== 'option1' ) {
+			return 'Toggle must be Option 1.';
 		}
 
 		return null;
@@ -583,6 +608,7 @@ const ValidationComponent = ( {
 			label: 'Boolean',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customBooleanRule ),
 			},
 		},
 		{
@@ -602,6 +628,31 @@ const ValidationComponent = ( {
 				custom: maybeCustomRule( customPasswordRule ),
 			},
 		},
+		{
+			id: 'toggle',
+			type: 'boolean',
+			label: 'Toggle',
+			Edit: 'toggle',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customToggleRule ),
+			},
+		},
+		{
+			id: 'toggleGroup',
+			type: 'text',
+			label: 'Toggle Group',
+			Edit: 'toggleGroup',
+			elements: [
+				{ value: 'option1', label: 'Option 1' },
+				{ value: 'option2', label: 'Option 2' },
+				{ value: 'option3', label: 'Option 3' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customToggleGroupRule ),
+			},
+		},
 	];
 
 	const form = {
@@ -616,8 +667,10 @@ const ValidationComponent = ( {
 			'color',
 			'integer',
 			'boolean',
-			'customEdit',
+			'toggle',
+			'toggleGroup',
 			'password',
+			'customEdit',
 		],
 	};
 
