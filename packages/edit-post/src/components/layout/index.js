@@ -276,12 +276,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	}
 
 	const isAutoHeight = openHeight === undefined;
-	let usedMax = '50%'; // Approximation before max has a value.
-	if ( max !== undefined ) {
-		// Halves the available max height until a user height is set.
-		usedMax = isAutoHeight ? max / 2 : max;
-	}
-
 	const getAriaValueNow = ( height ) =>
 		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
@@ -354,7 +348,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		className: 'edit-post-meta-boxes-main',
 		defaultSize: { height: isOpen ? openHeight : 0 },
 		minHeight: min,
-		maxHeight: isShort ? null : usedMax,
+		maxHeight: max,
 		enable: { top: true },
 		handleClasses: { top: 'edit-post-meta-boxes-main__presenter' },
 		handleComponent: {
