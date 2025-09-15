@@ -32,6 +32,12 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ checked, setChecked ] = useState( false );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedCheckboxControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedCheckboxControl
@@ -41,6 +47,17 @@ export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
 					setChecked( value );
 					onChange?.( value );
 				} }
+				onValidate={ ( value ) => {
+					if ( value ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'This checkbox may not be checked.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -49,10 +66,4 @@ Default.args = {
 	required: true,
 	label: 'Checkbox',
 	help: 'This checkbox may neither be checked nor unchecked.',
-	customValidator: ( value ) => {
-		if ( value ) {
-			return 'This checkbox may not be checked.';
-		}
-		return undefined;
-	},
 };

@@ -141,6 +141,7 @@ export const rootEntitiesConfig = [
 		getTitle: ( record ) => record?.name || record?.slug,
 		baseURLParams: { context: 'edit' },
 		plural: 'users',
+		supportsPagination: true,
 	},
 	{
 		name: 'comment',
@@ -149,6 +150,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menu',
@@ -157,6 +159,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menuItem',
@@ -166,6 +169,7 @@ export const rootEntitiesConfig = [
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 		rawAttributes: [ 'title' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'menuLocation',
@@ -393,6 +397,7 @@ async function loadTaxonomyEntities() {
 			name,
 			label: taxonomy.name,
 			getTitle: ( record ) => record?.name,
+			supportsPagination: true,
 		};
 	} );
 }

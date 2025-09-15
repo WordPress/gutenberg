@@ -46,6 +46,20 @@ import './style.css';
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
+	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
+	// (sb-main-padding class). This ensures consistent layout in DataViews stories
+	// when clicking actions menus. Without this the padding on the body will jump.
+	parameters: {
+		layout: 'fullscreen',
+	},
+	decorators: [
+		( Story ) => (
+			<div style={ { padding: '1rem' } }>
+				<Story />
+			</div>
+		),
+	],
 } as Meta< typeof DataViews >;
 
 export default meta;
@@ -141,12 +155,16 @@ export const CustomEmpty = () => {
 			onChangeView={ setView }
 			actions={ actions }
 			defaultLayouts={ defaultLayouts }
-			empty={ view.search ? 'No sites found' : 'No sites' }
+			empty={ <p>{ view.search ? 'No sites found' : 'No sites' }</p> }
 		/>
 	);
 };
 
-export const MinimalUI = () => {
+const MinimalUIComponent = ( {
+	layout = 'table',
+}: {
+	layout: 'table' | 'list' | 'grid';
+} ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
@@ -165,6 +183,13 @@ export const MinimalUI = () => {
 		filterBy: false,
 	} ) );
 
+	useEffect( () => {
+		setView( {
+			...view,
+			type: layout as any,
+		} );
+	}, [ layout ] );
+
 	return (
 		<DataViews
 			getItemId={ ( item ) => item.id.toString() }
@@ -172,14 +197,23 @@ export const MinimalUI = () => {
 			data={ shownData }
 			view={ view }
 			fields={ _fields }
-			config={ false }
-			search={ false }
 			onChangeView={ setView }
-			defaultLayouts={ {
-				table: {},
-			} }
-		/>
+			defaultLayouts={ { [ layout ]: {} } }
+		>
+			<DataViews.Layout />
+			<DataViews.Footer />
+		</DataViews>
 	);
+};
+export const MinimalUI = {
+	render: MinimalUIComponent,
+	argTypes: {
+		layout: {
+			control: 'select',
+			options: [ 'table', 'list', 'grid' ],
+			defaultValue: 'table',
+		},
+	},
 };
 
 /**

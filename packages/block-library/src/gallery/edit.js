@@ -392,7 +392,9 @@ export default function GalleryEdit( props ) {
 				lightboxSetting
 			);
 		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
+		updateBlockAttributes( blocks, changedAttributes, {
+			uniqueByBlock: true,
+		} );
 		const linkToText = [ ...linkOptions ].find(
 			( linkType ) => linkType.value === value
 		);
@@ -434,7 +436,9 @@ export default function GalleryEdit( props ) {
 				block.attributes
 			);
 		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
+		updateBlockAttributes( blocks, changedAttributes, {
+			uniqueByBlock: true,
+		} );
 		const noticeText = openInNewTab
 			? __( 'All gallery images updated to open in new tab' )
 			: __( 'All gallery images updated to not open in new tab' );
@@ -458,7 +462,9 @@ export default function GalleryEdit( props ) {
 				newSizeSlug
 			);
 		} );
-		updateBlockAttributes( blocks, changedAttributes, true );
+		updateBlockAttributes( blocks, changedAttributes, {
+			uniqueByBlock: true,
+		} );
 		const imageSize = imageSizeOptions.find(
 			( size ) => size.value === newSizeSlug
 		);

@@ -21,7 +21,7 @@ import { ToolbarGroup } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { plus } from '../accordion-item/icons';
+import { plus } from '../accordion-content/icons';
 
 const ICONS = {
 	plus,
@@ -73,7 +73,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					blockProps.className,
 					colorProps.className,
 					borderProps.className,
-					'accordion-item__heading',
+					'accordion-content__heading',
 					{
 						[ `has-custom-font-size` ]: blockProps.style.fontSize,
 						[ `icon-position-left` ]: iconPosition === 'left',
@@ -87,7 +87,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 				} }
 			>
 				<button
-					className={ clsx( 'accordion-item__toggle' ) }
+					className={ clsx( 'accordion-content__toggle' ) }
 					style={ {
 						...spacingProps.style,
 					} }
@@ -109,9 +109,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					/>
 					{ shouldShowIcon && (
 						<span
-							className={ clsx( `accordion-item__toggle-icon`, {
-								'has-icon-plus': true,
-							} ) }
+							className={ clsx(
+								`accordion-content__toggle-icon`,
+								{
+									'has-icon-plus': true,
+								}
+							) }
 							style={ {
 								// TO-DO: make this configurable
 								width: `1.2em`,

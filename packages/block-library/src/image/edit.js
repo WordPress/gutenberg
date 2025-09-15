@@ -99,7 +99,6 @@ export function ImageEdit( {
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
 		id,
 		width,
@@ -126,11 +125,6 @@ export function ImageEdit( {
 		useResizeObserver();
 
 	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
-
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
 
 	const captionRef = useRef();
 	useEffect( () => {

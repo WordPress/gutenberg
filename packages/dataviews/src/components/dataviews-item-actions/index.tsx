@@ -179,17 +179,6 @@ export default function ItemActions< Item >( {
 		);
 	}
 
-	// If all actions are primary, there is no need to render the dropdown.
-	if ( primaryActions.length === eligibleActions.length ) {
-		return (
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-		);
-	}
-
 	return (
 		<HStack
 			spacing={ 1 }
@@ -205,11 +194,13 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			<CompactItemActions
-				item={ item }
-				actions={ eligibleActions }
-				registry={ registry }
-			/>
+			{ primaryActions.length < eligibleActions.length && (
+				<CompactItemActions
+					item={ item }
+					actions={ eligibleActions }
+					registry={ registry }
+				/>
+			) }
 		</HStack>
 	);
 }
