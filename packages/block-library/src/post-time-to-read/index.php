@@ -35,7 +35,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		if ( $min_minutes === $max_minutes ) {
 			$max_minutes = $min_minutes + 1;
 		}
-	/* translators: 1: minimum minutes, 2: maximum minutes to read the post. */
+		/* translators: 1: minimum minutes, 2: maximum minutes to read the post. */
 		$minutes_to_read_string = sprintf(
 			_x( '%1$s–%2$s minutes', 'Range of minutes to read' ),
 			$min_minutes,
