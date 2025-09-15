@@ -71,14 +71,13 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		const totalWords = wordCount( content || '', wordCountType );
 		if ( displayAsRange ) {
-			const readingSpeed = averageReadingSpeed;
 			const minMinutes = Math.max(
 				1,
-				Math.round( totalWords / ( readingSpeed * 1.2 ) )
+				Math.round( totalWords / ( averageReadingSpeed * 1.2 ) )
 			);
 			let maxMinutes = Math.max(
 				1,
-				Math.round( totalWords / ( readingSpeed * 0.8 ) )
+				Math.round( totalWords / ( averageReadingSpeed * 0.8 ) )
 			);
 			if ( minMinutes === maxMinutes ) {
 				maxMinutes = minMinutes + 1;
