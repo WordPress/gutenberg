@@ -89,17 +89,6 @@ function gutenberg_pre_get_block_templates( $output, $query, $template_type ) {
 	return $output;
 }
 
-add_filter( 'get_block_templates', 'gutenberg_get_block_templates', PHP_INT_MAX, 3 );
-function gutenberg_get_block_templates( $query_result, $query, $template_type ) {
-	if ( 'wp_template' === $template_type && ! empty( $query['slug__in'] ) ) {
-		// Never return any user templates.
-		$query_result = array_filter( $query_result, function( $template ) {
-			return empty( $template->wp_id );
-		} );
-	}
-	return $query_result;
-}
-
 // Whenever templates are queried by slug, never return any user templates.
 // We are handling that in gutenberg_pre_get_block_templates.
 function gutenberg_remove_tax_query_for_templates( $query ) {
@@ -110,10 +99,10 @@ function gutenberg_remove_tax_query_for_templates( $query ) {
 	}
 }
 
-add_filter( 'pre_get_block_templates', 'gutenberg_tax_pre_get_block_templates', PHP_INT_MAX, 3 );
+add_filter( 'pre_get_block_templates', 'gutenberg_tax_pre_get_block_templates', 10, 3 );
 function gutenberg_tax_pre_get_block_templates( $output, $query, $template_type ) {
 	// Do not remove the tax query when querying for a specific slug.
-	if ( $output === null && 'wp_template' === $template_type && ! empty( $query['slug__in'] ) ) {
+	if ( 'wp_template' === $template_type && ! empty( $query['slug__in'] ) ) {
 		add_action( 'pre_get_posts', 'gutenberg_remove_tax_query_for_templates' );
 	}
 	return $output;
