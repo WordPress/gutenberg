@@ -20,7 +20,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		return '';
 	}
 
-    $content = get_the_content();
+	$content = get_the_content();
 
     $average_reading_rate = $attributes['averageReadingSpeed'] ?? 189;
 
