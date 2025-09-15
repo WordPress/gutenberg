@@ -128,10 +128,7 @@ export function filterSortAndPaginate< Item >(
 							return filter.value.some( ( filterValue: any ) =>
 								fieldValue.includes( filterValue )
 							);
-						} else if (
-							typeof fieldValue === 'string' ||
-							typeof fieldValue === 'number'
-						) {
+						} else if ( typeof fieldValue === 'string' ) {
 							return filter.value.includes( fieldValue );
 						}
 						return false;
