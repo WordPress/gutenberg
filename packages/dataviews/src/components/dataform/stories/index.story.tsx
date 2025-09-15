@@ -13,7 +13,15 @@ import {
  */
 import DataForm from '../index';
 import { isItemValid } from '../../../validation';
-import type { Field, Form, DataFormControlProps } from '../../../types';
+import type {
+	Field,
+	Form,
+	DataFormControlProps,
+	Layout,
+	RegularLayout,
+	PanelLayout,
+	CardLayout,
+} from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
@@ -30,47 +38,31 @@ type SamplePost = {
 	filesize?: number;
 	dimensions?: string;
 	tags?: string[];
+	address1?: string;
+	address2?: string;
+	city?: string;
 };
 
-const meta = {
-	title: 'DataViews/DataForm',
-	component: DataForm,
-	argTypes: {
-		type: {
-			control: { type: 'select' },
-			description:
-				'Chooses the default layout of each field. "regular" is the default layout.',
-			options: [ 'default', 'regular', 'panel', 'card' ],
-		},
-		labelPosition: {
-			control: { type: 'select' },
-			description: 'Chooses the label position of the layout.',
-			options: [ 'default', 'top', 'side', 'none' ],
-		},
-	},
-};
-export default meta;
-
-const fields = [
+const fields: Field< SamplePost >[] = [
 	{
 		id: 'title',
 		label: 'Title',
-		type: 'text' as const,
+		type: 'text',
 	},
 	{
 		id: 'order',
 		label: 'Order',
-		type: 'integer' as const,
+		type: 'integer',
 	},
 	{
 		id: 'date',
 		label: 'Date',
-		type: 'datetime' as const,
+		type: 'datetime',
 	},
 	{
 		id: 'birthdate',
 		label: 'Date as options',
-		type: 'datetime' as const,
+		type: 'datetime',
 		elements: [
 			{ value: '', label: 'Select a date' },
 			{ value: '1970-02-23T12:00:00', label: "Jane's birth date" },
@@ -80,28 +72,31 @@ const fields = [
 	{
 		id: 'author',
 		label: 'Author',
-		type: 'integer' as const,
+		type: 'integer',
 		elements: [
 			{ value: 1, label: 'Jane' },
 			{ value: 2, label: 'John' },
+			{ value: 3, label: 'Alice' },
+			{ value: 4, label: 'Bob' },
 		],
 	},
 	{
 		id: 'reviewer',
 		label: 'Reviewer',
-		type: 'text' as const,
-		Edit: 'radio' as const,
+		type: 'text',
+		Edit: 'radio',
 		elements: [
-			{ value: 'fulano', label: 'Fulano' },
-			{ value: 'mengano', label: 'Mengano' },
-			{ value: 'zutano', label: 'Zutano' },
+			{ value: 'jane', label: 'Jane' },
+			{ value: 'john', label: 'John' },
+			{ value: 'alice', label: 'Alice' },
+			{ value: 'bob', label: 'Bob' },
 		],
 	},
 	{
 		id: 'status',
 		label: 'Status',
-		type: 'text' as const,
-		Edit: 'toggleGroup' as const,
+		type: 'text',
+		Edit: 'toggleGroup',
 		elements: [
 			{ value: 'draft', label: 'Draft' },
 			{ value: 'published', label: 'Published' },
@@ -111,12 +106,12 @@ const fields = [
 	{
 		id: 'email',
 		label: 'Email',
-		type: 'email' as const,
+		type: 'email',
 	},
 	{
 		id: 'password',
 		label: 'Password',
-		type: 'text' as const,
+		type: 'text',
 		isVisible: ( item: SamplePost ) => {
 			return item.status !== 'private';
 		},
@@ -129,25 +124,25 @@ const fields = [
 	{
 		id: 'can_comment',
 		label: 'Allow people to leave a comment',
-		type: 'boolean' as const,
+		type: 'boolean',
 		Edit: 'checkbox',
 	},
 	{
 		id: 'filesize',
 		label: 'File Size',
-		type: 'integer' as const,
+		type: 'integer',
 		readOnly: true,
 	},
 	{
 		id: 'dimensions',
 		label: 'Dimensions',
-		type: 'text' as const,
+		type: 'text',
 		readOnly: true,
 	},
 	{
 		id: 'tags',
 		label: 'Tags',
-		type: 'array' as const,
+		type: 'array',
 		placeholder: 'Enter comma-separated tags',
 		description: 'Add tags separated by commas (e.g., "tag1, tag2, tag3")',
 		elements: [
@@ -158,13 +153,32 @@ const fields = [
 			{ value: 'travel', label: 'Travel' },
 		],
 	},
-] as Field< SamplePost >[];
+	{
+		id: 'address1',
+		label: 'Address 1',
+		type: 'text',
+	},
+	{
+		id: 'address2',
+		label: 'Address 2',
+		type: 'text',
+	},
+	{
+		id: 'city',
+		label: 'City',
+		type: 'text',
+	},
+	{
+		id: 'description',
+		label: 'Description',
+		type: 'text',
+		Edit: 'textarea',
+	},
+];
 
-export const Default = ( {
-	type,
+const LayoutRegularComponent = ( {
 	labelPosition,
 }: {
-	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 } ) => {
 	const [ post, setPost ] = useState( {
@@ -181,14 +195,15 @@ export const Default = ( {
 		filesize: 1024,
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
+		description: 'This is a sample description.',
 	} );
 
-	const form = useMemo(
+	const form: Form = useMemo(
 		() => ( {
-			layout: {
-				type,
+			layout: getLayoutFromStoryArgs( {
+				type: 'regular',
 				labelPosition,
-			},
+			} ),
 			fields: [
 				'title',
 				'order',
@@ -204,10 +219,11 @@ export const Default = ( {
 				'filesize',
 				'dimensions',
 				'tags',
+				'description',
 			],
 		} ),
-		[ type, labelPosition ]
-	) as Form;
+		[ labelPosition ]
+	);
 
 	return (
 		<DataForm< SamplePost >
@@ -224,12 +240,59 @@ export const Default = ( {
 	);
 };
 
-const CombinedFieldsComponent = ( {
+const getLayoutFromStoryArgs = ( {
 	type,
 	labelPosition,
+	openAs,
+	withHeader,
+}: {
+	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
+	labelPosition?: 'default' | 'top' | 'side' | 'none';
+	openAs?: 'default' | 'dropdown' | 'modal';
+	withHeader?: boolean;
+} ): Layout | undefined => {
+	let layout: Layout | undefined;
+
+	if ( type === 'default' || type === 'regular' ) {
+		const regularLayout: RegularLayout = {
+			type: 'regular',
+		};
+		if ( labelPosition !== 'default' ) {
+			regularLayout.labelPosition = labelPosition;
+		}
+		layout = regularLayout;
+	} else if ( type === 'panel' ) {
+		const panelLayout: PanelLayout = {
+			type: 'panel',
+		};
+		if ( labelPosition !== 'default' ) {
+			panelLayout.labelPosition = labelPosition;
+		}
+		if ( openAs !== 'default' ) {
+			panelLayout.openAs = openAs;
+		}
+		layout = panelLayout;
+	} else if ( type === 'card' ) {
+		const cardLayout: CardLayout = {
+			type: 'card',
+		};
+		if ( withHeader !== undefined ) {
+			// @ts-ignore We want to demo the effects of configuring withHeader.
+			cardLayout.withHeader = withHeader;
+		}
+		layout = cardLayout;
+	}
+
+	return layout;
+};
+
+const LayoutPanelComponent = ( {
+	labelPosition,
+	openAs,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	openAs: 'default' | 'dropdown' | 'modal';
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -242,14 +305,18 @@ const CombinedFieldsComponent = ( {
 		filesize: 1024,
 		dimensions: '1920x1080',
 		tags: [ 'photography' ],
+		address1: '123 Main St',
+		address2: 'Apt 4B',
+		city: 'New York',
 	} );
 
-	const form = useMemo(
-		() => ( {
-			layout: {
-				type,
+	const form: Form = useMemo( () => {
+		return {
+			layout: getLayoutFromStoryArgs( {
+				type: 'panel',
 				labelPosition,
-			},
+				openAs,
+			} ),
 			fields: [
 				'title',
 				{
@@ -262,10 +329,14 @@ const CombinedFieldsComponent = ( {
 				'filesize',
 				'dimensions',
 				'tags',
+				{
+					id: 'address1',
+					label: 'Combined Address',
+					children: [ 'address1', 'address2', 'city' ],
+				},
 			],
-		} ),
-		[ type, labelPosition ]
-	) as Form;
+		};
+	}, [ labelPosition, openAs ] );
 
 	return (
 		<DataForm< SamplePost >
@@ -280,17 +351,6 @@ const CombinedFieldsComponent = ( {
 			}
 		/>
 	);
-};
-
-export const CombinedFields = {
-	title: 'DataViews/CombinedFields',
-	render: CombinedFieldsComponent,
-	argTypes: {
-		...meta.argTypes,
-	},
-	args: {
-		type: 'panel',
-	},
 };
 
 function CustomEditControl< Item >( {
@@ -325,53 +385,179 @@ function CustomEditControl< Item >( {
 	);
 }
 
-const DataFormValidationComponent = ( { required }: { required: boolean } ) => {
+const ValidationComponent = ( {
+	required,
+	type,
+	custom,
+}: {
+	required: boolean;
+	custom: boolean;
+	type: 'regular' | 'panel';
+} ) => {
 	type ValidatedItem = {
 		text: string;
+		textarea: string;
 		email: string;
+		telephone: string;
+		url: string;
+		color: string;
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
-		customValidation: string;
+		password: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
-		text: 'Hello, World!',
+		text: 'Can have letters and spaces',
+		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
+		telephone: '+306978241796',
+		url: 'https://example.com',
+		color: '#ff6600',
 		integer: 2,
 		boolean: true,
 		customEdit: 'custom control',
-		customValidation: 'potato',
+		password: 'secretpassword123',
 	} );
+
+	const customTextRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customTextareaRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
+			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customEmailRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
+			return 'Email address must be from @example.com domain.';
+		}
+
+		return null;
+	};
+	const customTelephoneRule = ( value: ValidatedItem ) => {
+		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
+			return 'Telephone number must start with +30 and have 10 digits after.';
+		}
+
+		return null;
+	};
+	const customUrlRule = ( value: ValidatedItem ) => {
+		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
+			return 'URL must be from https://example.com domain.';
+		}
+
+		return null;
+	};
+	const customColorRule = ( value: ValidatedItem ) => {
+		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+			return 'Color must be a valid hex format (e.g., #ff6600).';
+		}
+
+		return null;
+	};
+	const customIntegerRule = ( value: ValidatedItem ) => {
+		if ( value.integer % 2 !== 0 ) {
+			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+
+	const customPasswordRule = ( value: ValidatedItem ) => {
+		if ( value.password.length < 8 ) {
+			return 'Password must be at least 8 characters long.';
+		}
+		if ( ! /[A-Z]/.test( value.password ) ) {
+			return 'Password must contain at least one uppercase letter.';
+		}
+		if ( ! /[0-9]/.test( value.password ) ) {
+			return 'Password must contain at least one number.';
+		}
+
+		return null;
+	};
+
+	const maybeCustomRule = (
+		rule: ( item: ValidatedItem ) => null | string
+	) => {
+		return custom ? rule : undefined;
+	};
 
 	const _fields: Field< ValidatedItem >[] = [
 		{
 			id: 'text',
-			type: 'text' as const,
+			type: 'text',
 			label: 'Text',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customTextRule ),
+			},
+		},
+		{
+			id: 'textarea',
+			type: 'text',
+			Edit: 'textarea',
+			label: 'Textarea',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTextareaRule ),
 			},
 		},
 		{
 			id: 'email',
-			type: 'email' as const,
+			type: 'email',
 			label: 'e-mail',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customEmailRule ),
+			},
+		},
+		{
+			id: 'telephone',
+			type: 'telephone',
+			label: 'telephone',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTelephoneRule ),
+			},
+		},
+		{
+			id: 'url',
+			type: 'url',
+			label: 'URL',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customUrlRule ),
+			},
+		},
+		{
+			id: 'color',
+			type: 'color',
+			label: 'Color',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customColorRule ),
 			},
 		},
 		{
 			id: 'integer',
-			type: 'integer' as const,
+			type: 'integer',
 			label: 'Integer',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customIntegerRule ),
 			},
 		},
 		{
 			id: 'boolean',
-			type: 'boolean' as const,
+			type: 'boolean',
 			label: 'Boolean',
 			isValid: {
 				required,
@@ -386,34 +572,29 @@ const DataFormValidationComponent = ( { required }: { required: boolean } ) => {
 			},
 		},
 		{
-			id: 'customValidation',
-			type: 'text',
-			label: 'Custom validation',
+			id: 'password',
+			type: 'password',
+			label: 'Password',
 			isValid: {
 				required,
-				custom: ( value: ValidatedItem ) => {
-					if (
-						! [ 'tomato', 'potato' ].includes(
-							value.customValidation
-						)
-					) {
-						return 'Value must be one of "tomato", "potato"';
-					}
-
-					return null;
-				},
+				custom: maybeCustomRule( customPasswordRule ),
 			},
 		},
 	];
 
 	const form = {
+		layout: { type },
 		fields: [
 			'text',
+			'textarea',
 			'email',
+			'telephone',
+			'url',
+			'color',
 			'integer',
 			'boolean',
 			'customEdit',
-			'customValidation',
+			'password',
 		],
 	};
 
@@ -446,21 +627,7 @@ const DataFormValidationComponent = ( { required }: { required: boolean } ) => {
 	);
 };
 
-export const Validation = {
-	title: 'DataForm/Validation',
-	render: DataFormValidationComponent,
-	argTypes: {
-		required: {
-			control: { type: 'boolean' },
-			description: 'Whether or not the fields are required.',
-		},
-	},
-	args: {
-		required: true,
-	},
-};
-
-const DataFormVisibilityComponent = () => {
+const VisibilityComponent = () => {
 	type Post = {
 		name: string;
 		email: string;
@@ -472,7 +639,7 @@ const DataFormVisibilityComponent = () => {
 		isActive: true,
 	} );
 
-	const _fields = [
+	const _fields: Field< Post >[] = [
 		{ id: 'isActive', label: 'Is module active?', type: 'boolean' },
 		{
 			id: 'name',
@@ -486,8 +653,8 @@ const DataFormVisibilityComponent = () => {
 			type: 'email',
 			isVisible: ( post ) => post.isActive === true,
 		},
-	] satisfies Field< Post >[];
-	const form = {
+	];
+	const form: Form = {
 		fields: [ 'isActive', 'name', 'email' ],
 	};
 	return (
@@ -505,12 +672,7 @@ const DataFormVisibilityComponent = () => {
 	);
 };
 
-export const Visibility = {
-	title: 'DataForm/Visibility',
-	render: DataFormVisibilityComponent,
-};
-
-const LayoutCardComponent = () => {
+const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -614,76 +776,81 @@ const LayoutCardComponent = () => {
 		commission: 5,
 	} );
 
-	const form = useMemo(
-		() =>
-			( {
-				layout: {
-					type: 'card',
-				},
-				fields: [
-					{
-						id: 'customerCard',
-						label: 'Customer',
-						children: [
-							{
-								id: 'customerContact',
-								label: 'Contact',
-								layout: { type: 'panel', labelPosition: 'top' },
-								children: [
-									{
-										id: 'name',
-										layout: {
-											type: 'regular',
-											labelPosition: 'top',
-										},
+	const form: Form = useMemo(
+		() => ( {
+			layout: getLayoutFromStoryArgs( {
+				type: 'card',
+				withHeader,
+			} ),
+			fields: [
+				{
+					id: 'customerCard',
+					label: 'Customer',
+					description:
+						'Enter your contact details, plan type, and addresses to complete your customer information.',
+					children: [
+						{
+							id: 'customerContact',
+							label: 'Contact',
+							layout: { type: 'panel', labelPosition: 'top' },
+							children: [
+								{
+									id: 'name',
+									layout: {
+										type: 'regular',
+										labelPosition: 'top',
 									},
-									{
-										id: 'phone',
-										layout: {
-											type: 'regular',
-											labelPosition: 'top',
-										},
+								},
+								{
+									id: 'phone',
+									layout: {
+										type: 'regular',
+										labelPosition: 'top',
 									},
-									{
-										id: 'email',
-										layout: {
-											type: 'regular',
-											labelPosition: 'top',
-										},
+								},
+								{
+									id: 'email',
+									layout: {
+										type: 'regular',
+										labelPosition: 'top',
 									},
-								],
-							},
-							{
-								id: 'plan',
-								layout: { type: 'panel', labelPosition: 'top' },
-							},
-							{
-								id: 'shippingAddress',
-								layout: { type: 'panel', labelPosition: 'top' },
-							},
-							{
-								id: 'billingAddress',
-								layout: { type: 'panel', labelPosition: 'top' },
-							},
-							'displayPayments',
-						],
-					},
-					{
-						id: 'payments',
-						layout: { type: 'card', withHeader: false },
-					},
-					{
-						id: 'taxConfiguration',
-						label: 'Taxes',
-						layout: {
-							type: 'card',
-							isOpened: false,
+								},
+							],
 						},
-						children: [ 'vat', 'commission' ],
+						{
+							id: 'plan',
+							layout: { type: 'panel', labelPosition: 'top' },
+						},
+						{
+							id: 'shippingAddress',
+							layout: { type: 'panel', labelPosition: 'top' },
+						},
+						{
+							id: 'billingAddress',
+							layout: { type: 'panel', labelPosition: 'top' },
+						},
+						'displayPayments',
+					],
+				},
+				{
+					id: 'payments',
+					layout: {
+						type: 'card',
+						withHeader: false,
 					},
-				],
-			} ) satisfies Form,
-		[]
+				},
+				{
+					id: 'taxConfiguration',
+					label: 'Taxes',
+					layout: {
+						type: 'card',
+						isOpened: false,
+					},
+					children: [ 'vat', 'commission' ],
+				},
+			],
+		} ),
+		[ withHeader ]
 	);
 
 	return (
@@ -701,9 +868,245 @@ const LayoutCardComponent = () => {
 	);
 };
 
-export const LayoutCard = {
-	title: 'DataForm/LayoutCard',
-	render: LayoutCardComponent,
+const LayoutRowComponent = ( {
+	alignment,
+}: {
+	alignment: 'start' | 'center' | 'end';
+} ) => {
+	type Customer = {
+		name: string;
+		email: string;
+		phone: string;
+		plan: string;
+		shippingAddress: string;
+		shippingCity: string;
+		shippingPostalCode: string;
+		shippingCountry: string;
+		billingAddress: string;
+		billingCity: string;
+		billingPostalCode: string;
+		totalOrders: number;
+		totalRevenue: number;
+		averageOrderValue: number;
+		hasVat: boolean;
+		hasDiscount: boolean;
+		vat: number;
+		commission: number;
+	};
+
+	const customerFields: Field< Customer >[] = [
+		{
+			id: 'name',
+			label: 'Customer Name',
+			type: 'text',
+		},
+		{
+			id: 'phone',
+			label: 'Phone',
+			type: 'text',
+		},
+		{
+			id: 'email',
+			label: 'Email',
+			type: 'email',
+		},
+		{
+			id: 'shippingAddress',
+			label: 'Shipping Address',
+			type: 'text',
+		},
+		{
+			id: 'shippingCity',
+			label: 'Shipping City',
+			type: 'text',
+		},
+		{
+			id: 'shippingPostalCode',
+			label: 'Shipping Postal Code',
+			type: 'text',
+		},
+		{
+			id: 'shippingCountry',
+			label: 'Shipping Country',
+			type: 'text',
+		},
+		{
+			id: 'billingAddress',
+			label: 'Billing Address',
+			type: 'text',
+		},
+		{
+			id: 'billingCity',
+			label: 'Billing City',
+			type: 'text',
+		},
+		{
+			id: 'billingPostalCode',
+			label: 'Billing Postal Code',
+			type: 'text',
+		},
+		{
+			id: 'vat',
+			label: 'VAT',
+			type: 'integer',
+		},
+		{
+			id: 'commission',
+			label: 'Commission',
+			type: 'integer',
+		},
+		{
+			id: 'hasDiscount',
+			label: 'Has Discount?',
+			type: 'boolean',
+		},
+		{
+			id: 'plan',
+			label: 'Plan',
+			type: 'text',
+			Edit: 'toggleGroup',
+			elements: [
+				{ value: 'basic', label: 'Basic' },
+				{ value: 'business', label: 'Business' },
+				{ value: 'vip', label: 'VIP' },
+			],
+		},
+		{
+			id: 'renewal',
+			label: 'Renewal',
+			type: 'text',
+			Edit: 'radio',
+			elements: [
+				{ value: 'weekly', label: 'Weekly' },
+				{ value: 'monthly', label: 'Monthly' },
+				{ value: 'yearly', label: 'Yearly' },
+			],
+		},
+	];
+
+	const [ customer, setCustomer ] = useState< Customer >( {
+		name: 'Danyka Romaguera',
+		email: 'aromaguera@example.org',
+		phone: '1-828-352-1250',
+		plan: 'Business',
+		shippingAddress: 'N/A',
+		shippingCity: 'N/A',
+		shippingPostalCode: 'N/A',
+		shippingCountry: 'N/A',
+		billingAddress: 'Danyka Romaguera, West Myrtiehaven, 80240-4282, BI',
+		billingCity: 'City',
+		billingPostalCode: 'PC',
+		totalOrders: 2,
+		totalRevenue: 1430,
+		averageOrderValue: 715,
+		hasVat: true,
+		vat: 10,
+		commission: 5,
+		hasDiscount: true,
+	} );
+
+	const form: Form = useMemo(
+		() => ( {
+			fields: [
+				{
+					id: 'customer',
+					label: 'Customer',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'name', 'phone', 'email' ],
+				},
+				{
+					id: 'addressRow',
+					label: 'Billing & Shipping Addresses',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [
+						{
+							id: 'billingAddress',
+							children: [
+								'billingAddress',
+								'billingCity',
+								'billingPostalCode',
+							],
+						},
+						{
+							id: 'shippingAddress',
+							children: [
+								'shippingAddress',
+								'shippingCity',
+								'shippingPostalCode',
+								'shippingCountry',
+							],
+						},
+					],
+				},
+				{
+					id: 'payments-and-tax',
+					label: 'Payments & Taxes',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'vat', 'commission', 'hasDiscount' ],
+				},
+				{
+					id: 'planRow',
+					label: 'Subscription',
+					layout: {
+						type: 'row',
+						alignment,
+					},
+					children: [ 'plan', 'renewal' ],
+				},
+			],
+		} ),
+		[ alignment ]
+	);
+
+	const topLevelLayout: Form = useMemo(
+		() => ( {
+			layout: {
+				type: 'row',
+				alignment,
+			},
+			fields: [ 'name', 'phone', 'email' ],
+		} ),
+		[ alignment ]
+	);
+
+	return (
+		<>
+			<h1>Row Layout</h1>
+			<h2>As top-level layout</h2>
+			<DataForm
+				data={ customer }
+				fields={ customerFields }
+				form={ topLevelLayout }
+				onChange={ ( edits ) =>
+					setCustomer( ( prev ) => ( {
+						...prev,
+						...edits,
+					} ) )
+				}
+			/>
+			<h2>Per field layout</h2>
+			<DataForm
+				data={ customer }
+				fields={ customerFields }
+				form={ form }
+				onChange={ ( edits ) =>
+					setCustomer( ( prev ) => ( {
+						...prev,
+						...edits,
+					} ) )
+				}
+			/>
+		</>
+	);
 };
 
 const LayoutMixedComponent = () => {
@@ -719,28 +1122,38 @@ const LayoutMixedComponent = () => {
 		dimensions: '1920x1080',
 	} );
 
-	const form = useMemo(
-		() =>
-			( {
-				fields: [
+	const form: Form = {
+		fields: [
+			{
+				id: 'title-and-status',
+				children: [
 					{
 						id: 'title',
-						layout: { type: 'panel', labelPosition: 'top' },
+						layout: { type: 'panel' },
 					},
 					'status',
-					{ id: 'order', layout: { type: 'card' } },
-					{
-						id: 'authorDateCard',
-						label: 'Author & Date',
-						layout: {
-							type: 'card',
-						},
-						children: [ 'author', 'date' ],
-					},
 				],
-			} ) satisfies Form,
-		[]
-	);
+				layout: {
+					type: 'row',
+				},
+			},
+			{
+				id: 'order',
+				layout: {
+					type: 'card',
+				},
+				children: [ { id: 'order', layout: { type: 'panel' } } ],
+			},
+			{
+				id: 'authorDateCard',
+				label: 'Author & Date',
+				layout: {
+					type: 'card',
+				},
+				children: [ 'author', 'date' ],
+			},
+		],
+	};
 
 	return (
 		<DataForm< SamplePost >
@@ -757,7 +1170,94 @@ const LayoutMixedComponent = () => {
 	);
 };
 
+const meta = {
+	title: 'DataViews/DataForm',
+	component: DataForm,
+};
+export default meta;
+
+export const LayoutCard = {
+	render: LayoutCardComponent,
+	argTypes: {
+		withHeader: {
+			control: { type: 'boolean' },
+			description: 'Whether the card has a header.',
+		},
+	},
+	args: {
+		withHeader: true,
+	},
+};
+
+export const LayoutPanel = {
+	render: LayoutPanelComponent,
+	argTypes: {
+		labelPosition: {
+			control: { type: 'select' },
+			description: 'Chooses the label position.',
+			options: [ 'default', 'top', 'side', 'none' ],
+		},
+		openAs: {
+			control: { type: 'select' },
+			description: 'Chooses how to open the panel.',
+			options: [ 'default', 'dropdown', 'modal' ],
+		},
+	},
+};
+
+export const LayoutRegular = {
+	render: LayoutRegularComponent,
+	argTypes: {
+		labelPosition: {
+			control: { type: 'select' },
+			description: 'Chooses the label position.',
+			options: [ 'default', 'top', 'side', 'none' ],
+		},
+	},
+};
+
+export const LayoutRow = {
+	render: LayoutRowComponent,
+	argTypes: {
+		alignment: {
+			control: { type: 'select' },
+			description: 'The alignment of the fields.',
+			options: [ 'start', 'center', 'end' ],
+		},
+	},
+	args: {
+		alignment: 'center',
+	},
+};
+
 export const LayoutMixed = {
-	title: 'DataForm/LayoutMixed',
 	render: LayoutMixedComponent,
+};
+
+export const Validation = {
+	render: ValidationComponent,
+	argTypes: {
+		required: {
+			control: { type: 'boolean' },
+			description: 'Whether or not the fields are required.',
+		},
+		type: {
+			control: { type: 'select' },
+			description: 'Chooses the validation type.',
+			options: [ 'regular', 'panel' ],
+		},
+		custom: {
+			control: { type: 'boolean' },
+			description: 'Whether or not the fields have custom validation.',
+		},
+	},
+	args: {
+		required: true,
+		type: 'regular',
+		custom: true,
+	},
+};
+
+export const Visibility = {
+	render: VisibilityComponent,
 };

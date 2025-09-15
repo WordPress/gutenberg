@@ -1,22 +1,18 @@
 /**
- * WordPress dependencies
- */
-import { accordionPanel } from '@wordpress/icons';
-/**
  * Internal dependencies
  */
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import initBlock from '../utils/init-block';
+import icon from './icon';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	icon: accordionPanel,
-	example: {},
+	icon,
 	edit,
 	save,
 };

@@ -20,29 +20,6 @@ import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
 /**
- * Reducer managing terms state. Keyed by taxonomy slug, the value is either
- * undefined (if no request has been made for given taxonomy), null (if a
- * request is in-flight for given taxonomy), or the array of terms for the
- * taxonomy.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function terms( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TERMS':
-			return {
-				...state,
-				[ action.taxonomy ]: action.terms,
-			};
-	}
-
-	return state;
-}
-
-/**
  * Reducer managing authors state. Keyed by id.
  *
  * @param {Object} state  Current state.
@@ -87,23 +64,6 @@ export function currentUser( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_USER':
 			return action.currentUser;
-	}
-
-	return state;
-}
-
-/**
- * Reducer managing taxonomies.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function taxonomies( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TAXONOMIES':
-			return action.taxonomies;
 	}
 
 	return state;
@@ -418,7 +378,29 @@ export function entitiesConfig( state = rootEntitiesConfig, action ) {
 export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
-	// Generates a dynamic reducer for the entities.
+	// Generates a reducer for the entities nested by `kind` and `name`.
+	// A config array with shape:
+	// ```
+	// [
+	//   { kind: 'taxonomy', name: 'category' },
+	//   { kind: 'taxonomy', name: 'post_tag' },
+	//   { kind: 'postType', name: 'post' },
+	//   { kind: 'postType', name: 'page' },
+	// ]
+	// ```
+	// generates a reducer for state tree with shape:
+	// ```
+	// {
+	//   taxonomy: {
+	//     category,
+	//     post_tag,
+	//   },
+	//   postType: {
+	//     post,
+	//     page,
+	//   },
+	// }
+	// ```
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
 		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
@@ -431,22 +413,21 @@ export const entities = ( state = {}, action ) => {
 		}, {} );
 
 		entitiesDataReducer = combineReducers(
-			Object.entries( entitiesByKind ).reduce(
-				( memo, [ kind, subEntities ] ) => {
-					const kindReducer = combineReducers(
-						subEntities.reduce(
-							( kindMemo, entityConfig ) => ( {
-								...kindMemo,
-								[ entityConfig.name ]: entity( entityConfig ),
-							} ),
-							{}
-						)
-					);
+			Object.fromEntries(
+				Object.entries( entitiesByKind ).map(
+					( [ kind, subEntities ] ) => {
+						const kindReducer = combineReducers(
+							Object.fromEntries(
+								subEntities.map( ( entityConfig ) => [
+									entityConfig.name,
+									entity( entityConfig ),
+								] )
+							)
+						);
 
-					memo[ kind ] = kindReducer;
-					return memo;
-				},
-				{}
+						return [ kind, kindReducer ];
+					}
+				)
 			)
 		);
 	}
@@ -648,7 +629,6 @@ export function registeredPostMeta( state = {}, action ) {
 }
 
 export default combineReducers( {
-	terms,
 	users,
 	currentTheme,
 	currentGlobalStylesId,
@@ -656,7 +636,6 @@ export default combineReducers( {
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	themeGlobalStyleRevisions,
-	taxonomies,
 	entities,
 	editsReference,
 	undoManager,

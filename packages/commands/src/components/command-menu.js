@@ -50,6 +50,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
@@ -121,6 +122,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>

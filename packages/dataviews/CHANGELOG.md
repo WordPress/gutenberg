@@ -4,6 +4,49 @@
 
 ### Breaking changes
 
+- Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
+- DataViews: Custom `empty` elements are no longer wrapped in `<p>` tags to improve accessibility. [#71561](https://github.com/WordPress/gutenberg/pull/71561)
+
+### Features
+
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+- Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
+- DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
+- Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
+- Dataform: Add new `password` field type and field control. [#71545](https://github.com/WordPress/gutenberg/pull/71545)
+- DataForm: Add a textarea control for use with the `text` field type ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
+- DataViews: support groupBy in the list layout. [#71548](https://github.com/WordPress/gutenberg/pull/71548)
+
+### Bug Fixes
+
+- DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
+- DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
+- DataForm regular layout: Use BaseControl visual label for readonly fields when in top labelPosition. ([#71597](https://github.com/WordPress/gutenberg/pull/71597))
+
+## 8.0.0 (2025-09-03)
+
+### Breaking changes
+
+- Revert the ability to hide the view config via `config` prop and export a `DataViews.Footer` component to support the "Minimal UI" story. [#71276](https://github.com/WordPress/gutenberg/pull/71276)
+
+### Enhancements
+
+-   DataForm: add description support for the combined fields and show the description in the Card layout ([#71380](https://github.com/WordPress/gutenberg/pull/71380)).
+-   Add support for hiding the `title` in Grid layouts, with the actions menu rendered over the media preview. [#71369](https://github.com/WordPress/gutenberg/pull/71369)
+
+### Internal
+
+- Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208)
+
+### Bug Fixes
+
+-   DataViews: Fix incorrect documentation for `defaultLayouts` prop. [#71334](https://github.com/WordPress/gutenberg/pull/71334)
+-   DataViews: Fix mismatched padding on mobile viewports for grid layout [#71455](https://github.com/WordPress/gutenberg/pull/71455)
+
+## 7.0.0 (2025-08-20)
+
+### Breaking changes
+
 - DataForm: introduce a new `card` layout. The `form.type` has been moved under a new `layout` object and it is now `form.layout.type`, check the README for details. [#71100](https://github.com/WordPress/gutenberg/pull/71100)
 - Adds a new `config` prop to DataViews that allows hiding the view config control entirely. The `perPageSizes` prop has been moved to be part of this new prop. [#71173](https://github.com/WordPress/gutenberg/pull/71173)
 
@@ -12,14 +55,17 @@
 - Introduce a new `array` DataForm Edit control that supports multi-selection. [#71136](https://github.com/WordPress/gutenberg/pull/71136)
 - Add `enableMoving` option to the `table` layout to allow or disallow column moving left and right. [#71120](https://github.com/WordPress/gutenberg/pull/71120)
 - Add infinite scroll support across all layout types (grid, list, table). Enable infinite scroll by providing an `infiniteScrollHandler` function in the `paginationInfo` prop and toggling the feature in the view configuration. ([#70955](https://github.com/WordPress/gutenberg/pull/70955))
+- Add support for modal in DataForm panel layouts. [#71212](https://github.com/WordPress/gutenberg/pull/71212)
 
 ### Enhancements
 
+- Update DataForm stories to better highlight the library's capabilities ([#71268](https://github.com/WordPress/gutenberg/pull/71268)).
 - Add two smaller sizs to the grid layout ([#71077](https://github.com/WordPress/gutenberg/pull/71077)).
 
 ### Bug Fixes
 
 - Do not throw exception when `view.layout.previewSize` is smaller than the smallest available size. [#71218](https://github.com/WordPress/gutenberg/pull/71218)
+- Fix actions horizontal layout consistency when all actions are primary. [#71274](https://github.com/WordPress/gutenberg/pull/71274)
 
 ## 6.0.0 (2025-08-07)
 

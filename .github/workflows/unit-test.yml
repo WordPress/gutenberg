@@ -26,7 +26,7 @@ permissions: {}
 jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -38,7 +38,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -71,7 +71,7 @@ jobs:
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -82,7 +82,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -109,7 +109,7 @@ jobs:
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
@@ -136,11 +136,11 @@ jobs:
 
     build-assets:
         name: Build JavaScript assets for PHP unit tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -160,9 +160,9 @@ jobs:
                       ./build-module/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
         needs: [compute-previous-wordpress-version, build-assets]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
@@ -195,7 +195,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -211,7 +211,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@ccf2c627fe61b1b4d924adfcbd19d661a18133a0 # v2.35.2
+              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -297,7 +297,7 @@ jobs:
 
     phpcs:
         name: PHP coding standards
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
@@ -305,13 +305,13 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@ccf2c627fe61b1b4d924adfcbd19d661a18133a0 # v2.35.2
+              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
               with:
                   php-version: '7.4'
                   coverage: none
@@ -324,7 +324,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -353,7 +353,7 @@ jobs:
     # This job is deprecated but be present for compatibility reasons.
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions: {}
         needs: [test-php, phpcs]
         if: ${{ always() }}
@@ -372,14 +372,17 @@ jobs:
 
     mobile-unit-js:
         name: Mobile
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        # React 19 breaks these tests, and upgrading React Native to a compatible version is paused.
+        # See: https://github.com/WordPress/gutenberg/issues/71336
+        if: false
+        #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false

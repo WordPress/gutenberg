@@ -8,6 +8,7 @@ import type {
 	NormalizedRegularLayout,
 	NormalizedPanelLayout,
 	NormalizedCardLayout,
+	NormalizedRowLayout,
 } from './types';
 
 interface NormalizedFormField {
@@ -38,6 +39,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 		normalizedLayout = {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
+			openAs: layout?.openAs ?? 'dropdown',
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
@@ -58,6 +60,11 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 						: true,
 			} satisfies NormalizedCardLayout;
 		}
+	} else if ( layout?.type === 'row' ) {
+		normalizedLayout = {
+			type: 'row',
+			alignment: layout?.alignment ?? 'center',
+		} satisfies NormalizedRowLayout;
 	}
 
 	return normalizedLayout;

@@ -30,6 +30,12 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedTextControl > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( '' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedTextControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedTextControl
@@ -39,6 +45,17 @@ export const Default: StoryObj< typeof ValidatedTextControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
+				onValidate={ ( v ) => {
+					if ( v?.toString().toLowerCase() === 'error' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'The word "error" is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -47,10 +64,4 @@ Default.args = {
 	required: true,
 	label: 'Text',
 	help: "The word 'error' will trigger an error.",
-	customValidator: ( value ) => {
-		if ( value?.toString().toLowerCase() === 'error' ) {
-			return 'The word "error" is not allowed.';
-		}
-		return undefined;
-	},
 };
