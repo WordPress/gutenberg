@@ -26,7 +26,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$word_count_type = wp_get_word_count_type();
 
-    $total_words = wp_word_count($content, $word_count_type);
+	$total_words = wp_word_count($content, $word_count_type);
 
     if ( ! empty($attributes['displayAsRange'])) {
         // Calculate faster reading rate with 20% speed = lower minutes,
