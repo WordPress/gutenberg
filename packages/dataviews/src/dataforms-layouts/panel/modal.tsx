@@ -17,6 +17,7 @@ import type { Form, FormField, NormalizedField } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../../normalize-form-fields';
+import SummaryButton from './summary-button';
 
 function ModalContent< Item >( {
 	data,
@@ -145,38 +146,17 @@ function PanelModal< Item >( {
 				onClick={ () => setIsOpen( true ) }
 				disabled={ fieldDefinition.readOnly === true }
 				accessibleWhenDisabled
-				style={ summaryFields.length > 1 ? {
-					minHeight: 'auto',
-					height: 'auto',
-					alignItems: 'flex-start'
-				} : undefined }
+				style={
+					summaryFields.length > 1
+						? {
+								minHeight: 'auto',
+								height: 'auto',
+								alignItems: 'flex-start',
+						  }
+						: undefined
+				}
 			>
-				{ summaryFields.length > 1 ? (
-					<div style={ { 
-						display: 'flex', 
-						flexDirection: 'column', 
-						alignItems: 'flex-start',
-						width: '100%',
-						gap: '2px'
-					} }>
-						{ summaryFields.map( ( summaryField ) => (
-							<div key={ summaryField.id } style={ { width: '100%' } }>
-								<summaryField.render
-									item={ data }
-									field={ summaryField }
-								/>
-							</div>
-						) ) }
-					</div>
-				) : (
-					summaryFields.map( ( summaryField ) => (
-						<summaryField.render
-							key={ summaryField.id }
-							item={ data }
-							field={ summaryField }
-						/>
-					) )
-				) }
+				<SummaryButton summaryFields={ summaryFields } data={ data } />
 			</Button>
 			{ isOpen && (
 				<ModalContent
