@@ -35,12 +35,12 @@ registerBlockBindingsSource( {
 			type: field?.type || 'string',
 			value: field?.value,
 		} ) ),
-		onSelect( { value, updateBlockBindings, attribute } ) {
+		onSelect( { item, updateBlockBindings, attribute } ) {
 			updateBlockBindings( {
 				[ attribute ]: {
 					source: 'testing/complete-source',
 					args: {
-						key: value,
+						key: item.key,
 					},
 				},
 			} );

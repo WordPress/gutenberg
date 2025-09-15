@@ -168,12 +168,12 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: termDataFields,
-			onSelect( { value, updateBlockBindings, attribute } ) {
+			onSelect( { item, updateBlockBindings, attribute } ) {
 				updateBlockBindings( {
 					[ attribute ]: {
 						source: 'core/term-data',
 						args: {
-							key: value,
+							key: item.key,
 						},
 					},
 				} );

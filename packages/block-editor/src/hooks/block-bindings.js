@@ -98,10 +98,9 @@ function BlockBindingsPanelMenuContent( {
 											.map( ( item ) => (
 												<Menu.RadioItem
 													key={ item.key }
-													onChange={ ( e ) => {
+													onChange={ () => {
 														source.onSelect( {
-															value: e.target
-																.value,
+															item,
 															updateBlockBindings,
 															attribute,
 														} );

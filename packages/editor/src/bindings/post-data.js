@@ -137,12 +137,12 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: postDataFields,
-			onSelect( { value, updateBlockBindings, attribute } ) {
+			onSelect( { item, updateBlockBindings, attribute } ) {
 				updateBlockBindings( {
 					[ attribute ]: {
 						source: 'core/post-data',
 						args: {
-							key: value,
+							key: item.key,
 						},
 					},
 				} );
