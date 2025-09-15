@@ -72,7 +72,7 @@ export default function PatternConvertButton( {
 				return hasBlockSupport( blockName, 'reusable', ! hasParent );
 			};
 
-			const isReusable =
+			const isSyncedPattern =
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
@@ -82,9 +82,15 @@ export default function PatternConvertButton( {
 					blocks[ 0 ].attributes.ref
 				);
 
+			const isUnsyncedPattern =
+				window?.__experimentalContentOnlyPatternInsertion &&
+				blocks.length === 1 &&
+				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
+
 			const _canConvert =
-				// Hide when this is already a synced pattern.
-				! isReusable &&
+				// Hide when this is already a pattern.
+				! isUnsyncedPattern &&
+				! isSyncedPattern &&
 				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
 				blocks.every(
