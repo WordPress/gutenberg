@@ -49,7 +49,7 @@ export default function FormPanelField< Item >( {
 				.map( ( summaryId ) =>
 					fields.find( ( _field ) => _field.id === summaryId )
 				)
-				.filter( ( field ) => field !== undefined );
+				.filter( ( _field ) => _field !== undefined );
 		}
 
 		// Default to the first simple child
