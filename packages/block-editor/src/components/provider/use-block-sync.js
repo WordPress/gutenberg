@@ -192,6 +192,9 @@ export default function useBlockSync( {
 		// and so it would already be persisted.
 		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
+			const blockName = getBlockName( clientId );
+			const isPostContentBlock = blockName === 'core/post-content';
+
 			// It is important to batch here because otherwise,
 			// as soon as `setHasControlledInnerBlocks` is called
 			// the effect to restore might be triggered
@@ -199,14 +202,15 @@ export default function useBlockSync( {
 			registry.batch( () => {
 				setHasControlledInnerBlocks( clientId, true );
 
-				// Clear previous mappings and build new ones during cloning.
-				// This ensures the mapping stays in sync with the current blocks.
-				idMappingRef.current.externalToInternal.clear();
-				idMappingRef.current.internalToExternal.clear();
+				// For post-content block children, preserve the
+				// original blocks to maintain UUIDs used for
+				// multi-user collaboration
+				//
+				// Unsure: Why are these blocks being cloned? Do they need to be?
+				const storeBlocks = isPostContentBlock
+					? controlledBlocks
+					: controlledBlocks.map( ( block ) => cloneBlock( block ) );
 
-				const storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlockWithMapping( block, idMappingRef.current )
-				);
 				if ( subscribedRef.current ) {
 					pendingChangesRef.current.incoming = storeBlocks;
 				}
