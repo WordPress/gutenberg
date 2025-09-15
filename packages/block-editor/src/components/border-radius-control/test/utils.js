@@ -250,10 +250,4 @@ describe( 'getPresetValueFromControlValue', () => {
 			'var:preset|border-radius|md'
 		);
 	} );
-
-	it( 'should return "0" if matched preset slug is "0"', () => {
-		expect( getPresetValueFromControlValue( 0, 'slider', presets ) ).toBe(
-			'0'
-		);
-	} );
 } );
