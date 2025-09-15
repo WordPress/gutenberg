@@ -642,7 +642,7 @@ Example:
 const form = {
 	layout: {
 		type: 'panel',
-		labelPosition: 'side'
+		labelPosition: 'side',
 	},
 	fields: [
 		'title',
@@ -1234,15 +1234,15 @@ Example:
 
 Object that contains the validation rules for the field. If a rule is not met, the control will be marked as invalid and a message will be displayed.
 
-- `required`: boolean indicating whether the field is required or not.
-- `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
+-   `required`: boolean indicating whether the field is required or not.
+-   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null. The `item` parameter passed to this function may not contain the full item data - it will contain whatever `setValue` for the field returns.
 
 Example:
 
 ```js
 {
 	isValid: {
-		custom: ( item: Item, field: NormalizedField<Item> ) => {
+		custom: ( item: DeepPartial< Item >, field: NormalizedField< Item > ) => {
 			if ( /* item value is invalid */) {
 				return 'Reason why item value is invalid';
 			}
@@ -1267,7 +1267,7 @@ However, this can be overriden by the field author:
 {
 	type: 'integer',
 	isValid: {
-		custom: ( item: Item, field: NormalizedField<Item> ) => {
+		custom: ( item: DeepPartial< Item >, field: NormalizedField< Item > ) => {
 			/* Your custom validation logic. */
 		}
 	}
@@ -1278,9 +1278,9 @@ Fields that define their own Edit component have access to the validation rules 
 
 ```js
 {
-  Edit: ( { field }) => {
-	  return <input required={ !! field.isValid.required } />
-  }
+	Edit: ( { field } ) => {
+		return <input required={ !! field.isValid.required } />;
+	};
 }
 ```
 
@@ -1407,8 +1407,8 @@ Operators:
 | `contains`           | Text           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
 | `notContains`        | Text           | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
 | `startsWith`         | Text           | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
-| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                | Date is on: 2024-01-01                             |
-| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).      | Date is not on: 2024-01-01                         |
+| `on`                 | Date           | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is on: 2024-01-01                             |
+| `notOn`              | Date           | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not on: 2024-01-01                         |
 | `before`             | Date           | `BEFORE`. The item's field is before a given date.                                                   | Date is before 2024-01-01                          |
 | `after`              | Date           | `AFTER`. The item's field is after a given date.                                                     | Date is after 2024-01-01                           |
 | `beforeInc`          | Date           | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is before 2024-01-01, including 2024-01-01    |
@@ -1478,8 +1478,8 @@ Represents the type of layout used to render the field. It'll be one of Regular,
 
 #### Regular
 
-- `type`: `regular`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `type`: `regular`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
 For example:
 
@@ -1495,10 +1495,11 @@ For example:
 
 #### Panel
 
-- `type`: `panel`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `type`: `panel`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
 
 For example:
+
 ```js
 {
 	id: 'field_id',
@@ -1511,9 +1512,9 @@ For example:
 
 #### Card
 
-- `type`: `card`. Required.
-- `isOpened`: boolean. Optional. `true` by default.
-- `withHeader`: boolean. Optional. `true` by default.
+-   `type`: `card`. Required.
+-   `isOpened`: boolean. Optional. `true` by default.
+-   `withHeader`: boolean. Optional. `true` by default.
 
 For example:
 
@@ -1530,8 +1531,8 @@ For example:
 
 #### Row
 
-- `type`: `row`. Required.
-- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `type`: `row`. Required.
+-   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
