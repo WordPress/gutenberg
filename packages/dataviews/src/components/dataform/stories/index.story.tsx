@@ -205,7 +205,6 @@ const fields: Field< SamplePost >[] = [
 		id: 'ping_status',
 		label: 'Allow Pings/Trackbacks',
 		type: 'boolean',
-		Edit: 'checkbox',
 	},
 	{
 		id: 'discussion',
