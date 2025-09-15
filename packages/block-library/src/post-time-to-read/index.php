@@ -67,7 +67,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
  */
 function register_block_core_post_time_to_read() {
 	register_block_type_from_metadata(
-		__DIR__.'/post-time-to-read',
+		__DIR__ . '/post-time-to-read',
 		array(
 			'render_callback' => 'render_block_core_post_time_to_read',
 		)
