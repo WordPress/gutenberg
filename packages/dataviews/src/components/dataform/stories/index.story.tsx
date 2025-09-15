@@ -498,7 +498,7 @@ const ValidationComponent = ( {
 	};
 	const customToggleGroupRule = ( value: ValidatedItem ) => {
 		if ( value.toggleGroup !== 'option1' ) {
-			return 'Toggle must be Option 1.';
+			return 'Value must be Option 1.';
 		}
 
 		return null;

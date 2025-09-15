@@ -17,6 +17,7 @@
 - DataForm: Add a textarea control for use with the `text` field type ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 - DataViews: support groupBy in the list layout. [#71548](https://github.com/WordPress/gutenberg/pull/71548)
 - DataForm: support validation in select control [#71665](https://github.com/WordPress/gutenberg/pull/71665)
+- DataForm: support validation in toggleGroup control. ([#71666](https://github.com/WordPress/gutenberg/pull/71666))
 
 ### Bug Fixes
 
