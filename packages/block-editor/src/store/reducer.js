@@ -2686,7 +2686,7 @@ export function withDerivedBlockEditingModes( reducer ) {
 					if (
 						// patternName is switching from falsy to truthy, indicating
 						// this block is becoming an unsynced pattern.
-						attributes.metadata.patternName &&
+						attributes.metadata?.patternName &&
 						! state.blocks.attributes.get( clientId )?.metadata
 							?.patternName
 					) {

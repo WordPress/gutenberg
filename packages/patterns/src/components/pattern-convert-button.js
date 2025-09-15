@@ -39,11 +39,13 @@ export default function PatternConvertButton( {
 	closeBlockSettingsMenu,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 	// Ignore reason: false positive of the lint rule.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { setEditingPattern } = unlock( useDispatch( patternsStore ) );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -116,7 +118,20 @@ export default function PatternConvertButton( {
 	}
 
 	const handleSuccess = ( { pattern } ) => {
-		if ( pattern.wp_pattern_sync_status !== PATTERN_SYNC_TYPES.unsynced ) {
+		if ( pattern.wp_pattern_sync_status === PATTERN_SYNC_TYPES.unsynced ) {
+			if ( clientIds?.length === 1 ) {
+				const existingAttributes = getBlockAttributes( clientIds[ 0 ] );
+				updateBlockAttributes( clientIds[ 0 ], {
+					metadata: {
+						...( existingAttributes?.metadata
+							? existingAttributes.metadata
+							: {} ),
+						patternName: `core/block/${ pattern.id }`,
+						name: pattern.title.raw,
+					},
+				} );
+			}
+		} else {
 			const newBlock = createBlock( 'core/block', {
 				ref: pattern.id,
 			} );
