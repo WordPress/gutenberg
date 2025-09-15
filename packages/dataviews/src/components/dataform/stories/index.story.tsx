@@ -396,6 +396,7 @@ const ValidationComponent = ( {
 } ) => {
 	type ValidatedItem = {
 		text: string;
+		select?: string;
 		textarea: string;
 		email: string;
 		telephone: string;
@@ -409,6 +410,7 @@ const ValidationComponent = ( {
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
+		select: undefined,
 		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
@@ -423,6 +425,13 @@ const ValidationComponent = ( {
 	const customTextRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
 			return 'Value must only contain letters and spaces.';
+		}
+
+		return null;
+	};
+	const customSelectRule = ( value: ValidatedItem ) => {
+		if ( value.select !== 'option1' ) {
+			return 'Value must be Option 1.';
 		}
 
 		return null;
@@ -498,6 +507,19 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRule ),
+			},
+		},
+		{
+			id: 'select',
+			type: 'text',
+			label: 'Select',
+			elements: [
+				{ value: 'option1', label: 'Option 1' },
+				{ value: 'option2', label: 'Option 2' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customSelectRule ),
 			},
 		},
 		{
@@ -586,6 +608,7 @@ const ValidationComponent = ( {
 		layout: { type },
 		fields: [
 			'text',
+			'select',
 			'textarea',
 			'email',
 			'telephone',
