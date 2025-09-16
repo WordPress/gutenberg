@@ -63,15 +63,11 @@ export default function InputWidget( {
 					custom: () => null,
 				},
 				// Configure getValue/setValue as if Item was a plain object.
-				getValue: ( { item }: { item: any } ) => {
-					return item[ currentField.id ];
-				},
-				setValue: ( { item, value }: { item: any; value: any } ) => {
-					return {
-						...item,
-						[ currentField.id ]: value,
-					};
-				},
+				getValue: ( { item }: { item: any } ) =>
+					item[ currentField.id ],
+				setValue: ( { value }: { value: any } ) => ( {
+					[ currentField.id ]: value,
+				} ),
 			};
 		}
 		return currentField;
