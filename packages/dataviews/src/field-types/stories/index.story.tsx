@@ -840,32 +840,3 @@ export const NoType = ( {
 		<FieldTypeStory fields={ noTypeFields } type={ type } Edit={ Edit } />
 	);
 };
-
-export const TextWithPrefixSuffix = ( {
-	type,
-	Edit,
-}: {
-	type: PanelTypes;
-	Edit: ControlTypes;
-} ) => {
-	const prefixSuffixFields = useMemo(
-		() =>
-			fields.filter( ( field ) =>
-				[
-					'priceWithPrefix',
-					'ratingWithIcon',
-					'percentageWithSuffix',
-					'priceWithBoth',
-				].includes( field.id )
-			),
-		[]
-	);
-
-	return (
-		<FieldTypeStory
-			fields={ prefixSuffixFields }
-			type={ type }
-			Edit={ Edit }
-		/>
-	);
-};
