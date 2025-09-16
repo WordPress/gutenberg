@@ -191,16 +191,26 @@ const UnforwardedFontSizePicker = (
 						selectedSlug={ selectedSlug }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
-						onChange={ ( newValue ) => {
+						onChange={ ( newValue, newSelectedSlug ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined );
 							} else {
+								// Find the font size that matches the new value
+								// Use the selectedSlug if provided to get the exact font size
+								const matchingFontSize = newSelectedSlug
+									? fontSizes.find(
+											( fontSize ) =>
+												fontSize.slug ===
+												newSelectedSlug
+									  )
+									: fontSizes.find(
+											( fontSize ) =>
+												fontSize.size === newValue
+									  );
+
 								onChange?.(
 									hasUnits ? newValue : Number( newValue ),
-									fontSizes.find(
-										( fontSize ) =>
-											fontSize.size === newValue
-									)
+									matchingFontSize
 								);
 							}
 						} }

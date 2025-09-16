@@ -140,5 +140,8 @@ export type FontSizePickerToggleGroupProps = Pick<
 	'value' | 'size' | '__next40pxDefaultSize' | 'selectedSlug'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
-	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
+	onChange: (
+		value: number | string | undefined,
+		selectedSlug?: string
+	) => void;
 };
