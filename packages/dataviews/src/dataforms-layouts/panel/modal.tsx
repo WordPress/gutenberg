@@ -7,7 +7,7 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 
 /**
@@ -17,6 +17,7 @@ import type { Form, FormField, NormalizedField } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../../normalize-form-fields';
+import SummaryButton from './summary-button';
 
 function ModalContent< Item >( {
 	data,
@@ -96,12 +97,14 @@ function ModalContent< Item >( {
 
 function PanelModal< Item >( {
 	fieldDefinition,
+	summaryFields,
 	labelPosition,
 	data,
 	onChange,
 	field,
 }: {
 	fieldDefinition: NormalizedField< Item >;
+	summaryFields: NormalizedField< Item >[];
 	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
 	onChange: ( value: any ) => void;
@@ -126,29 +129,15 @@ function PanelModal< Item >( {
 
 	return (
 		<>
-			<Button
-				className="dataforms-layouts-modal__field-control"
-				size="compact"
-				variant={
-					[ 'none', 'top' ].includes( labelPosition )
-						? 'link'
-						: 'tertiary'
-				}
-				aria-expanded={ isOpen }
-				aria-label={ sprintf(
-					// translators: %s: Field name.
-					_x( 'Edit %s', 'field' ),
-					fieldLabel || ''
-				) }
-				onClick={ () => setIsOpen( true ) }
+			<SummaryButton
+				summaryFields={ summaryFields }
+				data={ data }
+				labelPosition={ labelPosition }
+				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				accessibleWhenDisabled
-			>
-				<fieldDefinition.render
-					item={ data }
-					field={ fieldDefinition }
-				/>
-			</Button>
+				onClick={ () => setIsOpen( true ) }
+				aria-expanded={ isOpen }
+			/>
 			{ isOpen && (
 				<ModalContent
 					data={ data }

@@ -2286,6 +2286,9 @@ function getDerivedBlockEditingModesForTree(
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
+		...( window?.__experimentalContentOnlyPatternInsertion
+			? templatePartClientIds
+			: [] ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
@@ -2662,6 +2665,86 @@ export function withDerivedBlockEditingModes( reducer ) {
 							state.derivedNavModeBlockEditingModes,
 					};
 				}
+				break;
+			}
+			case 'UPDATE_BLOCK_ATTRIBUTES': {
+				// Handle unsynced patterns which indicate their contentOnly-ness via
+				// the `attributes.metadata.patternName` property.
+				// Check when this is added or removed and update blockEditingModes.
+				const addedBlocks = [];
+				const removedClientIds = [];
+
+				for ( const clientId of action?.clientIds ) {
+					const attributes = action.options?.uniqueByBlock
+						? action.attributes[ clientId ]
+						: action.attributes;
+
+					if ( ! attributes ) {
+						break;
+					}
+
+					if (
+						// patternName is switching from falsy to truthy, indicating
+						// this block is becoming an unsynced pattern.
+						attributes.metadata?.patternName &&
+						! state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+					) {
+						addedBlocks.push(
+							nextState.blocks.tree.get( clientId )
+						);
+					} else if (
+						// patternName is switching from truthy to falsy, this block is becoming
+						// a regular block but was an unsynced pattern.
+						// Check that `metadata` is part of the included attributes, as
+						// `updateBlockAttributes` merges attributes, if it isn't present
+						// the previous `metadata` would be retained.
+						attributes.metadata &&
+						! attributes.metadata?.patternName &&
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+					) {
+						// Include it in 'removedClientIds'.
+						removedClientIds.push( clientId );
+					}
+				}
+
+				if ( ! addedBlocks?.length && ! removedClientIds?.length ) {
+					break;
+				}
+
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+
 				break;
 			}
 			case 'UPDATE_BLOCK_LIST_SETTINGS': {
