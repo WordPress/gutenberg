@@ -52,6 +52,10 @@
 	margin-bottom: $grid-unit-20;
 }
 
+.dataforms-layouts-panel__modal-footer {
+	margin-top: $grid-unit-20;
+}
+
 .components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
 	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
 }

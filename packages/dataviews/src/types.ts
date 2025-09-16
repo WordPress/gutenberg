@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ComponentType, ComponentProps } from 'react';
+import type {
+	ReactElement,
+	ReactNode,
+	ComponentType,
+	ComponentProps,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -98,6 +103,10 @@ export type FieldType =
 	| 'media'
 	| 'boolean'
 	| 'email'
+	| 'password'
+	| 'telephone'
+	| 'color'
+	| 'url'
 	| 'array';
 
 /**
@@ -117,7 +126,11 @@ export type FieldTypeDefinition< Item > = {
 	/**
 	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > > | string | null;
+	Edit:
+		| ComponentType< DataFormControlProps< Item > >
+		| string
+		| EditConfig
+		| null;
 
 	/**
 	 * Callback used to render the field.
@@ -145,6 +158,48 @@ export type Rules< Item > = {
 	required?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
+
+/**
+ * Edit configuration for textarea controls.
+ */
+export type EditConfigTextarea = {
+	control: 'textarea';
+	/**
+	 * Number of rows for the textarea.
+	 */
+	rows?: number;
+};
+
+/**
+ * Edit configuration for text controls.
+ */
+export type EditConfigText = {
+	control: 'text';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text' and 'textarea').
+ */
+export type EditConfigGeneric = {
+	control: Exclude< FieldType, 'text' | 'textarea' >;
+};
+
+/**
+ * Edit configuration object with type-safe control options.
+ * Each control type has its own specific configuration properties.
+ */
+export type EditConfig =
+	| EditConfigTextarea
+	| EditConfigText
+	| EditConfigGeneric;
 
 /**
  * A dataview field for a specific property of a data type.
@@ -189,7 +244,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | string;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string | EditConfig;
 
 	/**
 	 * Callback used to sort the field.
@@ -276,6 +331,14 @@ export type DataFormControlProps< Item > = {
 	 * Used by DataViews filters to determine which control to render based on the operator type.
 	 */
 	operator?: Operator;
+	/**
+	 * Configuration object for the control.
+	 */
+	config?: {
+		prefix?: React.ComponentType;
+		suffix?: React.ComponentType;
+		rows?: number;
+	};
 };
 
 export type DataViewRenderFieldProps< Item > = {
@@ -304,6 +367,11 @@ export interface Filter {
 	 * The value to filter by.
 	 */
 	value: any;
+
+	/**
+	 * Whether the filter can be edited by the user.
+	 */
+	isLocked?: boolean;
 }
 
 export interface NormalizedFilter {
@@ -341,6 +409,11 @@ export interface NormalizedFilter {
 	 * Whether it is a primary filter.
 	 */
 	isPrimary: boolean;
+
+	/**
+	 * Whether the filter can be edited by the user.
+	 */
+	isLocked: boolean;
 }
 
 interface ViewBase {
@@ -428,6 +501,11 @@ interface ViewBase {
 	 * The field to group by.
 	 */
 	groupByField?: string;
+
+	/**
+	 * Whether infinite scroll is enabled.
+	 */
+	infiniteScrollEnabled?: boolean;
 }
 
 export interface ColumnStyle {
@@ -467,6 +545,11 @@ export interface ViewTable extends ViewBase {
 		 * The density of the view.
 		 */
 		density?: Density;
+
+		/**
+		 * Whether the view allows column moving.
+		 */
+		enableMoving?: boolean;
 	};
 }
 
@@ -490,7 +573,23 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'pickerGrid';
+
+	layout?: {
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields?: string[];
+
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -620,7 +719,22 @@ export interface ViewBaseProps< Item > {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	view: View;
+	empty: ReactNode;
 }
+
+export type ViewPickerBaseProps< Item > = Omit<
+	ViewBaseProps< Item >,
+	| 'view'
+	| 'onChangeView'
+	// The following props are not supported for pickers.
+	| 'isItemClickable'
+	| 'onClickItem'
+	| 'renderItemLink'
+	| 'getItemLevel'
+> & {
+	view: View;
+	onChangeView: ( view: View ) => void;
+};
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
@@ -634,29 +748,106 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
+export interface ViewPickerGridProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerGrid;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
+export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
+
+/**
+ * DataForm layouts.
+ */
+export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
+export type LabelPosition = 'top' | 'side' | 'none';
+
+export type RegularLayout = {
+	type: 'regular';
+	labelPosition?: LabelPosition;
+};
+export type NormalizedRegularLayout = {
+	type: 'regular';
+	labelPosition: LabelPosition;
+};
+
+export type PanelLayout = {
+	type: 'panel';
+	labelPosition?: LabelPosition;
+	openAs?: 'dropdown' | 'modal';
+};
+export type NormalizedPanelLayout = {
+	type: 'panel';
+	labelPosition: LabelPosition;
+	openAs: 'dropdown' | 'modal';
+};
+
+export type CardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened?: true;
+	  }
+	| {
+			type: 'card';
+			withHeader?: true | undefined;
+			isOpened?: boolean;
+	  };
+export type NormalizedCardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened: true;
+	  }
+	| {
+			type: 'card';
+			withHeader: true;
+			isOpened: boolean;
+	  };
+
+export type RowLayout = {
+	type: 'row';
+	alignment?: 'start' | 'center' | 'end';
+};
+export type NormalizedRowLayout = {
+	type: 'row';
+	alignment: 'start' | 'center' | 'end';
+};
+
+export type Layout = RegularLayout | PanelLayout | CardLayout | RowLayout;
+export type NormalizedLayout =
+	| NormalizedRegularLayout
+	| NormalizedPanelLayout
+	| NormalizedCardLayout
+	| NormalizedRowLayout;
 
 export type SimpleFormField = {
 	id: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	layout?: Layout;
 };
 
 export type CombinedFormField = {
 	id: string;
 	label?: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	description?: string;
+	layout?: Layout;
 	children: Array< FormField | string >;
+	summary?: string | string[];
 };
 
 export type FormField = SimpleFormField | CombinedFormField;
@@ -665,9 +856,8 @@ export type FormField = SimpleFormField | CombinedFormField;
  * The form configuration.
  */
 export type Form = {
-	type?: 'regular' | 'panel';
+	layout?: Layout;
 	fields?: Array< FormField | string >;
-	labelPosition?: 'side' | 'top' | 'none';
 };
 
 export interface DataFormProps< Item > {

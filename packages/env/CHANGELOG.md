@@ -6,6 +6,12 @@
 
 -   Add support for HTTPS using devcert ([#66264](https://github.com/WordPress/gutenberg/pull/66264)).
 
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+## 10.28.0 (2025-08-07)
+
 ## 10.27.0 (2025-07-23)
 
 ### Enhancements

@@ -34,12 +34,6 @@
 			margin: 0; // Reset default LinkControl margins.
 		}
 
-		.block-editor-link-control__search-item-title,
-		.block-editor-link-control__search-item-info {
-			max-width: 200px;
-			white-space: nowrap;
-		}
-
 		.block-editor-link-control__tools {
 			justify-content: flex-end;
 			padding: $grid-unit-20 var(--wp-admin-border-width-focus) var(--wp-admin-border-width-focus);

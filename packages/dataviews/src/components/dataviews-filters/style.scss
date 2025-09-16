@@ -80,11 +80,15 @@
 		align-items: center;
 		box-sizing: border-box;
 
+		&.is-not-clickable {
+			cursor: default;
+		}
+
 		&.has-reset {
 			padding-inline-end: $button-size-small + $grid-unit-05;
 		}
 
-		&:hover,
+		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
 			background: $gray-200;

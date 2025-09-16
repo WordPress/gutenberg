@@ -306,7 +306,12 @@ export default function Image( {
 	const image = useSelect(
 		( select ) =>
 			id && isSingleSelected
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isSingleSelected ]
 	);
@@ -701,7 +706,8 @@ export default function Image( {
 		! lockHrefControls &&
 		! lockUrlControls;
 
-	const showCoverControls = isSingleSelected && canInsertCover;
+	const showCoverControls =
+		isSingleSelected && canInsertCover && ! isContentOnlyMode;
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 

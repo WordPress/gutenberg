@@ -20,6 +20,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { getSyncProvider } from './sync';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -286,6 +287,7 @@ export const deleteEntityRecord =
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -363,6 +365,7 @@ export const deleteEntityRecord =
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
 	( { select, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
@@ -503,6 +506,7 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
@@ -781,6 +785,7 @@ export const __experimentalBatch =
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'saveEditedEntityRecord' );
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -814,6 +819,11 @@ export const saveEditedEntityRecord =
 export const __experimentalSaveSpecifiedEntityEdits =
 	( kind, name, recordId, itemsToSave, options ) =>
 	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation(
+			kind,
+			name,
+			'__experimentalSaveSpecifiedEntityEdits'
+		);
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -974,6 +984,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'receiveRevisions' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name

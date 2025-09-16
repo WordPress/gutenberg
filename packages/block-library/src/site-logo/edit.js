@@ -38,6 +38,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -73,6 +74,16 @@ const SiteLogo = ( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Check if we're in contentOnly mode
+	const blockEditingMode = useBlockEditingMode();
+	const isNavigationMode = useSelect(
+		( select ) => select( blockEditorStore ).isNavigationMode(),
+		[]
+	);
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const isContentOnlyWriteMode = isNavigationMode && isContentOnlyMode;
+
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -205,8 +216,12 @@ const SiteLogo = ( {
 	const canEditImage =
 		logoId && naturalWidth && naturalHeight && imageEditing;
 
-	const imgEdit =
-		canEditImage && isEditingImage ? (
+	// Hide crop and dimensions editing in write mode
+	const shouldShowCropAndDimensions = ! isContentOnlyWriteMode;
+
+	let imgEdit;
+	if ( canEditImage && isEditingImage ) {
+		imgEdit = (
 			<ImageEditor
 				id={ logoId }
 				url={ logoUrl }
@@ -221,13 +236,16 @@ const SiteLogo = ( {
 					setIsEditingImage( false );
 				} }
 			/>
-		) : (
+		);
+	} else {
+		// Always render ResizableBox but disable resize functionality in contentOnly mode
+		imgEdit = (
 			<ResizableBox
 				size={ {
 					width: currentWidth,
 					height: currentHeight,
 				} }
-				showHandle={ isSelected }
+				showHandle={ isSelected && shouldShowCropAndDimensions }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
 				minHeight={ minHeight }
@@ -251,6 +269,7 @@ const SiteLogo = ( {
 				{ imgWrapper }
 			</ResizableBox>
 		);
+	}
 
 	// Support the previous location for the Site Icon settings. To be removed
 	// when the required WP core version for Gutenberg is >= 6.5.0.
@@ -371,15 +390,17 @@ const SiteLogo = ( {
 					) }
 				</ToolsPanel>
 			</InspectorControls>
-			<BlockControls group="block">
-				{ canEditImage && ! isEditingImage && (
-					<ToolbarButton
-						onClick={ () => setIsEditingImage( true ) }
-						icon={ crop }
-						label={ __( 'Crop' ) }
-					/>
+			{ canEditImage &&
+				! isEditingImage &&
+				shouldShowCropAndDimensions && (
+					<BlockControls group="block">
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					</BlockControls>
 				) }
-			</BlockControls>
 			{ imgEdit }
 		</>
 	);
@@ -454,12 +475,19 @@ export default function LogoEdit( {
 		const _siteIconId = siteSettings?.site_icon;
 		const mediaItem =
 			_siteLogoId &&
-			select( coreStore ).getMedia( _siteLogoId, {
-				context: 'view',
-			} );
+			select( coreStore ).getEntityRecord(
+				'postType',
+				'attachment',
+				_siteLogoId,
+				{
+					context: 'view',
+				}
+			);
 		const _isRequestingMediaItem =
 			!! _siteLogoId &&
-			! select( coreStore ).hasFinishedResolution( 'getMedia', [
+			! select( coreStore ).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
 				_siteLogoId,
 				{ context: 'view' },
 			] );

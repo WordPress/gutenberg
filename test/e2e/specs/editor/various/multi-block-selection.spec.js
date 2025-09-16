@@ -70,7 +70,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
 		await page.keyboard.press( 'ArrowRight' );
 		// Select mid line one to mid line four.
-		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 3 } );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 3, delay: 50 } );
 		// Delete the text to see if the selection was correct.
 		await page.keyboard.press( 'Backspace' );
 
@@ -1089,7 +1089,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', {
+			times: 5,
+			delay: 50,
+		} );
 
 		await page.keyboard.press( 'Delete' );
 
@@ -1116,7 +1120,11 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( ']2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', {
+			times: 3,
+			delay: 50,
+		} );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '|' );
@@ -1141,7 +1149,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await page.keyboard.type( ']2' );
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3, delay: 50 } );
 
 		// Ensure selection is in the correct place.
 		await page.keyboard.type( '|' );
@@ -1179,7 +1187,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.click();
 		await page.keyboard.press( 'ArrowLeft' );
 		// Select everything between [].
-		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5 } );
+		// Delay ensures selection can catch up.
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 5, delay: 50 } );
 
 		await page.keyboard.press( 'Enter' );
 
@@ -1218,7 +1227,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.filter( { hasText: 'a' } )
 			.click();
 
-		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 2 } );
+		await pageUtils.pressKeys( 'Shift+ArrowDown', { times: 2, delay: 50 } );
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure selection is in the correct place.

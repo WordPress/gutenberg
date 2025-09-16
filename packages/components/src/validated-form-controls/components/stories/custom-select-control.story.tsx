@@ -15,7 +15,8 @@ import { ValidatedCustomSelectControl } from '../custom-select-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedCustomSelectControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedCustomSelectControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedCustomSelectControl',
+	id: 'components-validatedcustomselectcontrol',
 	component: ValidatedCustomSelectControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -34,6 +35,12 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 					typeof ValidatedCustomSelectControl
 				>[ 'value' ]
 			>();
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedCustomSelectControl
+				>[ 'customValidity' ]
+			>( undefined );
 
 		return (
 			<ValidatedCustomSelectControl
@@ -43,6 +50,17 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
 					setValue( newValue.selectedItem );
 					onChange?.( newValue );
 				} }
+				onValidate={ ( v ) => {
+					if ( v?.key === 'a' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'Option A is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+					}
+				} }
+				customValidity={ customValidity }
 			/>
 		);
 	},
@@ -55,10 +73,4 @@ Default.args = {
 		{ key: 'a', name: 'Option A (not allowed)' },
 		{ key: 'b', name: 'Option B' },
 	],
-	customValidator: ( value ) => {
-		if ( value?.key === 'a' ) {
-			return 'Option A is not allowed.';
-		}
-		return undefined;
-	},
 };

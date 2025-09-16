@@ -14,11 +14,12 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 	TextControl,
+	ExternalLink,
 	__experimentalInputControl as InputControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { createInterpolateElement, useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
 import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
@@ -301,7 +302,17 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 				<TextControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
-					label={ __( 'Link rel' ) }
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>

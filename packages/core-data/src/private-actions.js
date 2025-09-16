@@ -59,8 +59,8 @@ export const editMediaEntity =
 			return;
 		}
 
-		const kind = 'root';
-		const name = 'media';
+		const kind = 'postType';
+		const name = 'attachment';
 
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(

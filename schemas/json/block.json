@@ -16,10 +16,9 @@
 			"type": "string"
 		},
 		"apiVersion": {
-			"description": "The version of the Block API used by the block. The most recent version is 3 and it was introduced in WordPress 6.3.\n\n See the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
+			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
 			"type": "integer",
-			"enum": [ 1, 2, 3 ],
-			"default": 1
+			"const": 3
 		},
 		"name": {
 			"description": "The name for a block is a unique string that identifies a block. Names have to be structured as `namespace/block-name`, where namespace is the name of your plugin or theme.",
@@ -996,6 +995,6 @@
 			"type": "string"
 		}
 	},
-	"required": [ "name", "title" ],
+	"required": [ "apiVersion", "name", "title" ],
 	"additionalProperties": false
 }

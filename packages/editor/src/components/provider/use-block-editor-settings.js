@@ -177,8 +177,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
-						kind: 'root',
-						name: 'media',
+						kind: 'postType',
+						name: 'attachment',
 					} ) ?? true,
 				userCanCreatePages: canUser( 'create', {
 					kind: 'postType',

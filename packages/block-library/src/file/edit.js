@@ -80,7 +80,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			media:
 				id === undefined
 					? undefined
-					: select( coreStore ).getMedia( id ),
+					: select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id
+					  ),
 		} ),
 		[ id ]
 	);
@@ -128,9 +132,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			return;
 		}
 
-		const isPdf = getFilename( newMedia.url )
-			.toLowerCase()
-			.endsWith( '.pdf' );
+		const isPdf =
+			// Media Library and REST API use different properties for mime type.
+			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
+			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
 		const pdfAttributes = {
 			displayPreview: isPdf
 				? attributes.displayPreview ?? true

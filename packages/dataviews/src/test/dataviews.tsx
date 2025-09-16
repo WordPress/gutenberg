@@ -147,6 +147,23 @@ function DataViewWrapper( {
 
 // jest.useFakeTimers();
 
+// Tests run against a DataView which is 500px wide.
+jest.mock( '@wordpress/compose', () => {
+	return {
+		...jest.requireActual( '@wordpress/compose' ),
+		useResizeObserver: jest.fn( ( callback ) => {
+			setTimeout( () => {
+				callback( [
+					{
+						borderBoxSize: [ { inlineSize: 500 } ],
+					},
+				] );
+			}, 0 );
+			return () => {};
+		} ),
+	};
+} );
+
 describe( 'DataViews component', () => {
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
@@ -491,6 +508,113 @@ describe( 'DataViews component', () => {
 			).toBeChecked();
 
 			await user.keyboard( '{/Control}' );
+		} );
+
+		it( 'supports tabbing to selection and actions when title is visible', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						type: 'grid',
+						fields: [],
+						mediaField: 'image',
+						titleField: 'title',
+					} }
+					isItemClickable={ () => true }
+					actions={ actions }
+				/>
+			);
+
+			// Double check that the title is being rendered.
+			expect( screen.getByText( data[ 0 ].title ) ).toBeInTheDocument();
+
+			const viewOptionsButton = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			const user = userEvent.setup();
+
+			// Double click to open and then close view options. This is performed
+			// instead of a direct .focus() so that effects have time to complete.
+			await user.click( viewOptionsButton );
+			await user.click( viewOptionsButton );
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toHaveFocus();
+
+			await user.tab();
+
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } )[ 0 ]
+			).toHaveFocus();
+		} );
+
+		it( 'supports tabbing to selection and actions when title is not visible', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						type: 'grid',
+						fields: [],
+						mediaField: 'image',
+						titleField: 'title',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					actions={ actions }
+				/>
+			);
+
+			// Double check that the title is not being rendered.
+			expect(
+				screen.queryByText( data[ 0 ].title )
+			).not.toBeInTheDocument();
+
+			const viewOptionsButton = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			const user = userEvent.setup();
+
+			// Double click to open and then close view options. This is performed
+			// instead of a direct .focus() so that effects have time to complete.
+			await user.click( viewOptionsButton );
+			await user.click( viewOptionsButton );
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toHaveFocus();
+
+			await user.tab();
+
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } )[ 0 ]
+			).toHaveFocus();
+		} );
+
+		it( 'accepts an invalid previewSize and the preview size picker falls back to another size', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'grid',
+						mediaField: 'image',
+						layout: { previewSize: 13 },
+					} }
+				/>
+			);
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'button', { name: 'View options' } )
+			);
+			const previewSizeSlider = screen.getByRole( 'slider', {
+				name: 'Preview size',
+			} );
+			expect( previewSizeSlider ).toBeInTheDocument();
+			expect( previewSizeSlider ).toHaveValue( '0' ); // Falls back to the smallest size, which is the first one.
 		} );
 	} );
 

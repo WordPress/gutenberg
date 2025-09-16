@@ -1004,12 +1004,13 @@ _Returns_
 
 ### batch
 
-As a response of `dispatch` calls, WordPress data based applications updates the connected components (Components using `useSelect` or `withSelect`). This update happens in two steps:
+The `batch` method allows multiple store updates to occur simultaneously, reducing unnecessary executions of selectors and component re-renders during sequential state changes.
 
--   The selectors are called with the update state.
--   If the selectors return values that are different than the previous (strict equality), the component rerenders.
+In WordPress data applications, dispatching consecutive actions typically triggers store listeners and runs selectors, which can lead to re-renders. The `batch` method pauses these listeners and only activates them once at the end, ensuring selectors run only once with the final state.
 
-As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+This method is particularly effective for optimizing performance with expensive selectors, ensuring atomic operations across multiple stores, and creating single undo/redo entries for several synchronous updates.
+
+Unlike React’s built-in batching or React Redux’s `batch` function, `registry.batch` operates at the store listener level, completely avoiding unnecessary selector computations.
 
 _Usage_
 
@@ -1019,15 +1020,17 @@ import { useRegistry } from '@wordpress/data';
 function Component() {
 	const registry = useRegistry();
 
-	function callback() {
-		// This will only rerender the components once.
+	function handleComplexUpdate() {
+		// Without batch: listeners are called 3 times, which can result in multiple component re-renders.
+		// With batch: notifies listeners once, resulting in a single component re-render as needed.
 		registry.batch( () => {
-			registry.dispatch( someStore ).someAction();
-			registry.dispatch( someStore ).someOtherAction();
+			registry.dispatch( 'someStore' ).someAction();
+			registry.dispatch( 'someStore' ).someOtherAction();
+			registry.dispatch( 'someStore' ).thirdAction();
 		} );
 	}
 
-	return <button onClick={ callback }>Click me</button>;
+	return <button onClick={ handleComplexUpdate }>Update</button>;
 }
 ```
 
