@@ -12,7 +12,11 @@ import { useState, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityBlockEditor,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -25,7 +29,7 @@ import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
-import AddCommentToolbarButton from './comment-button-toolbar';
+import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { getCommentIdsFromBlocks } from './utils';
 
@@ -80,7 +84,7 @@ function CollabSidebarContent( {
 			comment_approved: 0,
 		};
 
-		// Create a new object, conditionally including the parent property
+		// Create a new object, conditionally including the parent property.
 		const updatedArgs = {
 			...args,
 			...( parentCommentId ? { parent: parentCommentId } : {} ),
@@ -225,24 +229,28 @@ export default function CollabSidebar() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 
-	const { postId, postType, threads } = useSelect( ( select ) => {
+	const { postId, postType } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		const _postId = getCurrentPostId();
-		const data =
-			!! _postId && typeof _postId === 'number'
-				? select( coreStore ).getEntityRecords( 'root', 'comment', {
-						post: _postId,
-						type: 'block_comment',
-						status: 'any',
-						per_page: 100,
-				  } )
-				: null;
 		return {
-			postId: _postId,
+			postId: getCurrentPostId(),
 			postType: getCurrentPostType(),
-			threads: data,
 		};
 	}, [] );
+
+	const queryArgs = {
+		post: postId,
+		type: 'block_comment',
+		status: 'all',
+		per_page: 100,
+	};
+
+	const { records: threads, totalPages } = useEntityRecords(
+		'root',
+		'comment',
+		queryArgs
+	);
+
+	const hasMoreComments = totalPages && totalPages > 1;
 
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -265,28 +273,26 @@ export default function CollabSidebar() {
 		id: postId,
 	} );
 
-	// Process comments to build the tree structure
+	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		// Create a compare to store the references to all objects by id
+		// Create a compare to store the references to all objects by id.
 		const compare = {};
 		const result = [];
 
-		const filteredComments = ( threads ?? [] ).filter(
-			( comment ) => comment.status !== 'trash'
-		);
+		const allComments = threads ?? [];
 
-		// Initialize each object with an empty `reply` array
-		filteredComments.forEach( ( item ) => {
+		// Initialize each object with an empty `reply` array.
+		allComments.forEach( ( item ) => {
 			compare[ item.id ] = { ...item, reply: [] };
 		} );
 
-		// Iterate over the data to build the tree structure
-		filteredComments.forEach( ( item ) => {
+		// Iterate over the data to build the tree structure.
+		allComments.forEach( ( item ) => {
 			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array
+				// If parent is 0, it's a root item, push it to the result array.
 				result.push( compare[ item.id ] );
 			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array
+				// Otherwise, find its parent and push it to the parent's `reply` array.
 				compare[ item.parent ].reply.push( compare[ item.id ] );
 			}
 		} );
@@ -336,8 +342,13 @@ export default function CollabSidebar() {
 	}
 
 	const AddCommentComponent = blockCommentId
-		? AddCommentToolbarButton
+		? CommentAvatarIndicator
 		: AddCommentButton;
+
+	// Find the current thread for the selected block.
+	const currentThread = blockCommentId
+		? resultComments.find( ( thread ) => thread.id === blockCommentId )
+		: null;
 
 	// If postId is not a valid number, do not render the comment sidebar.
 	if ( ! ( !! postId && typeof postId === 'number' ) ) {
@@ -346,7 +357,11 @@ export default function CollabSidebar() {
 
 	return (
 		<>
-			<AddCommentComponent onClick={ openCollabBoard } />
+			<AddCommentComponent
+				onClick={ openCollabBoard }
+				thread={ currentThread }
+				hasMoreComments={ hasMoreComments }
+			/>
 			<PluginSidebar
 				identifier={ collabHistorySidebarName }
 				// translators: Comments sidebar title
