@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { colord } from 'colord';
+import deepMerge from 'deepmerge';
 
 /**
  * WordPress dependencies
@@ -101,7 +102,13 @@ export default function Color< Item >( {
 	const onValidateControl = useCallback(
 		( newValue: any ) => {
 			const message = field.isValid?.custom?.(
-				setValue( { item: data, value: newValue } ),
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
 				field
 			);
 

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
@@ -61,7 +66,13 @@ export default function ValidatedText< Item >( {
 	const onValidateControl = useCallback(
 		( newValue: any ) => {
 			const message = isValid?.custom?.(
-				setValue( { item: data, value: newValue } ),
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
 				field
 			);
 

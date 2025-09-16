@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -121,12 +126,15 @@ export default function Integer< Item >( {
 	const onValidateControl = useCallback(
 		( newValue: any ) => {
 			const message = field.isValid?.custom?.(
-				setValue( {
-					item: data,
-					value: [ undefined, '', null ].includes( newValue )
-						? undefined
-						: Number( newValue ),
-				} ),
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: [ undefined, '', null ].includes( newValue )
+							? undefined
+							: Number( newValue ),
+					} ) as Partial< Item >
+				),
 				field
 			);
 

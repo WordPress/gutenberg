@@ -26,7 +26,6 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
-	DeepPartial,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
@@ -546,8 +545,8 @@ const ValidationComponent = ( {
 		toggleGroup: undefined,
 	} );
 
-	const customTextRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.text && ! /^[a-zA-Z ]+$/.test( value.text ) ) {
+	const customTextRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.text ) ) {
 			return 'Value must only contain letters and spaces.';
 		}
 
@@ -562,46 +561,43 @@ const ValidationComponent = ( {
 		return null;
 	};
 
-	const customTextareaRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.textarea && ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
+	const customTextareaRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
 			return 'Value must only contain letters and spaces.';
 		}
 
 		return null;
 	};
-	const customEmailRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if (
-			value.email &&
-			! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email )
-		) {
+	const customEmailRule = ( value: ValidatedItem ) => {
+		if ( ! /^[a-zA-Z0-9._%+-]+@example\.com$/.test( value.email ) ) {
 			return 'Email address must be from @example.com domain.';
 		}
 
 		return null;
 	};
-	const customTelephoneRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.telephone && ! /^\+30\d{10}$/.test( value.telephone ) ) {
+	const customTelephoneRule = ( value: ValidatedItem ) => {
+		if ( ! /^\+30\d{10}$/.test( value.telephone ) ) {
 			return 'Telephone number must start with +30 and have 10 digits after.';
 		}
 
 		return null;
 	};
-	const customUrlRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.url && ! /^https:\/\/example\.com$/.test( value.url ) ) {
+	const customUrlRule = ( value: ValidatedItem ) => {
+		if ( ! /^https:\/\/example\.com$/.test( value.url ) ) {
 			return 'URL must be from https://example.com domain.';
 		}
 
 		return null;
 	};
-	const customColorRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.color && ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
+	const customColorRule = ( value: ValidatedItem ) => {
+		if ( ! /^#[0-9A-Fa-f]{6}$/.test( value.color ) ) {
 			return 'Color must be a valid hex format (e.g., #ff6600).';
 		}
 
 		return null;
 	};
-	const customIntegerRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.integer && value.integer % 2 !== 0 ) {
+	const customIntegerRule = ( value: ValidatedItem ) => {
+		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
 		}
 
@@ -629,14 +625,14 @@ const ValidationComponent = ( {
 		return null;
 	};
 
-	const customPasswordRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( value.password && value.password.length < 8 ) {
+	const customPasswordRule = ( value: ValidatedItem ) => {
+		if ( value.password.length < 8 ) {
 			return 'Password must be at least 8 characters long.';
 		}
-		if ( value.password && ! /[A-Z]/.test( value.password ) ) {
+		if ( ! /[A-Z]/.test( value.password ) ) {
 			return 'Password must contain at least one uppercase letter.';
 		}
-		if ( value.password && ! /[0-9]/.test( value.password ) ) {
+		if ( ! /[0-9]/.test( value.password ) ) {
 			return 'Password must contain at least one number.';
 		}
 
@@ -644,7 +640,7 @@ const ValidationComponent = ( {
 	};
 
 	const maybeCustomRule = (
-		rule: ( item: DeepPartial< ValidatedItem > ) => null | string
+		rule: ( item: ValidatedItem ) => null | string
 	) => {
 		return custom ? rule : undefined;
 	};

@@ -164,10 +164,7 @@ export type FieldTypeDefinition< Item > = {
 
 export type Rules< Item > = {
 	required?: boolean;
-	custom?: (
-		item: DeepPartial< Item >,
-		field: NormalizedField< Item >
-	) => null | string;
+	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
 
 /**
