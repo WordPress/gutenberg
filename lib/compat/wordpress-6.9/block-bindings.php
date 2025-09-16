@@ -8,29 +8,20 @@
  */
 
 
-// The following filters can be removed once the minimum required WordPress version is 6.9 or newer.
+// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
 add_filter(
-	'block_bindings_supported_attributes_core/image',
-	function ( $attributes ) {
-		if ( ! in_array( 'caption', $attributes, true ) ) {
+	'block_bindings_supported_attributes',
+	function ( $attributes, $block_type ) {
+		if ( 'core/image' === $block_type && ! in_array( 'caption', $attributes, true ) ) {
 			$attributes[] = 'caption';
 		}
-		return $attributes;
-	},
-	10,
-	3
-);
-
-add_filter(
-	'block_bindings_supported_attributes_core/post-date',
-	function ( $attributes ) {
-		if ( ! in_array( 'datetime', $attributes, true ) ) {
+		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
 		return $attributes;
 	},
 	10,
-	3
+	2
 );
 
 /**
