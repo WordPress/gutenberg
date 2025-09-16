@@ -13,6 +13,7 @@ import {
 	file,
 	home,
 	verse,
+	blank,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -57,6 +58,9 @@ function SearchItemIcon( { isURL, suggestion } ) {
 				icon = verse;
 			}
 		}
+	} else if ( suggestion.kind === 'post-type' ) {
+		// Use blank icon for CPT that don't have a specific icon
+		icon = blank;
 	}
 
 	if ( icon ) {
