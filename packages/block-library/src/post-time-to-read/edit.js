@@ -148,10 +148,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ _x(
-								'Display as range',
-								'Turns reading time range display on or off'
-							) }
+							label={ __( 'Display as range' ) }
 							checked={ !! displayAsRange }
 							onChange={ () =>
 								setAttributes( {
