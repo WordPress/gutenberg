@@ -1246,7 +1246,7 @@ store( 'mySliderPlugin', {
 				withScope( () => {
 					actions.nextImage();
 				} ),
-				3_000
+				3000
 			);
 		},
 	},
