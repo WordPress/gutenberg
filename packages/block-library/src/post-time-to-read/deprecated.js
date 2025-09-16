@@ -17,7 +17,10 @@ const v1 = {
 		};
 	},
 	isEligible( attributes ) {
-		return attributes.displayAsRange === undefined;
+		return (
+			attributes.displayAsRange === undefined &&
+			attributes.averageReadingSpeed === undefined
+		);
 	},
 };
 
