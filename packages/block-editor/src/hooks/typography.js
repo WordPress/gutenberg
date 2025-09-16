@@ -33,6 +33,7 @@ const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+const WORD_BREAK_SUPPORT_KEY = 'typography.__experimentalWordBreak';
 const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
@@ -44,6 +45,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
+	WORD_BREAK_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,

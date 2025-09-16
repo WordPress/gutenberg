@@ -124,6 +124,18 @@ const writingMode = {
 	},
 };
 
+const wordBreak = {
+	name: 'wordBreak',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'wordBreak' ],
+			'wordBreak'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -134,5 +146,6 @@ export default [
 	textColumns,
 	textDecoration,
 	textTransform,
+	wordBreak,
 	writingMode,
 ];

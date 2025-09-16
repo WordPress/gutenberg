@@ -21,6 +21,7 @@ import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
+import WordBreakControl from '../word-break-control';
 import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -39,6 +40,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasWordBreak = useHasWordBreakControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
@@ -50,10 +52,11 @@ export function useHasTypographyPanel( settings ) {
 		hasLetterSpacing ||
 		hasTextAlign ||
 		hasTextTransform ||
-		hasFontSize ||
 		hasTextDecoration ||
+		hasWordBreak ||
 		hasWritingMode ||
-		hasTextColumns
+		hasTextColumns ||
+		hasFontSize
 	);
 }
 
@@ -109,6 +112,10 @@ function useHasTextDecorationControl( settings ) {
 
 function useHasWritingModeControl( settings ) {
 	return settings?.typography?.writingMode;
+}
+
+function useHasWordBreakControl( settings ) {
+	return settings?.typography?.wordBreak;
 }
 
 function useHasTextColumnsControl( settings ) {
@@ -168,6 +175,7 @@ const DEFAULT_CONTROLS = {
 	textDecoration: true,
 	writingMode: true,
 	textColumns: true,
+	wordBreak: true,
 };
 
 export default function TypographyPanel( {
@@ -376,6 +384,21 @@ export default function TypographyPanel( {
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
 
+	// Word Break
+	const hasWordBreakControl = useHasWordBreakControl( settings );
+	const wordBreak = decodeValue( inheritedValue?.typography?.wordBreak );
+	const setWordBreak = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'wordBreak' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasWordBreak = () => !! value?.typography?.wordBreak;
+	const resetWordBreak = () => setWordBreak( undefined );
+
 	// Text Alignment
 	const hasTextAlignmentControl = useHasTextAlignmentControl( settings );
 
@@ -583,6 +606,22 @@ export default function TypographyPanel( {
 						value={ textAlign }
 						onChange={ setTextAlign }
 						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasWordBreakControl && (
+				<ToolsPanelItem
+					label={ __( 'Word break' ) }
+					hasValue={ hasWordBreak }
+					onDeselect={ resetWordBreak }
+					isShownByDefault={ defaultControls.wordBreak }
+					panelId={ panelId }
+				>
+					<WordBreakControl
+						value={ wordBreak }
+						onChange={ setWordBreak }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>

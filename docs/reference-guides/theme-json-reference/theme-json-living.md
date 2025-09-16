@@ -195,6 +195,7 @@ Settings related to typography.
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
+| wordBreak | Allow users to set custom word break behavior. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
 | fontFamilies | Font family presets for the font family selector. | `[ { name, slug, fontFamily, fontFace } ]` |  |
@@ -329,6 +330,7 @@ Typography styles.
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
+| wordBreak | Sets the `word-break` CSS property. | `string`, `{ ref }` |
 
 ---
 

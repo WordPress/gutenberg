@@ -630,6 +630,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"wordBreak": {
+							"description": "Allow users to set custom word break behavior.",
+							"type": "boolean",
+							"default": true
+						},
 						"dropCap": {
 							"description": "Enable drop cap.",
 							"type": "boolean",
@@ -1686,6 +1691,13 @@
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"wordBreak": {
+							"description": "Sets the `word-break` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
