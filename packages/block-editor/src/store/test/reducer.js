@@ -4739,8 +4739,6 @@ describe( 'state', () => {
 				} );
 
 				it( 'returns the expected block editing modes for synced patterns', () => {
-					// Only the parent pattern and its own children that have bindings
-					// are in contentOnly mode. All other blocks are disabled.
 					expect( initialState.derivedBlockEditingModes ).toEqual(
 						new Map(
 							Object.entries( {
@@ -4769,8 +4767,7 @@ describe( 'state', () => {
 						testReducer,
 						initialState
 					);
-					// Only the parent pattern and its own children that have bindings
-					// are in contentOnly mode. All other blocks are disabled.
+
 					expect( derivedBlockEditingModes ).toEqual( new Map() );
 				} );
 
