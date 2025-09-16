@@ -47,8 +47,8 @@ function ModalContent< Item >( {
 		onClose();
 	};
 
-	const handleOnChange = ( value: Partial< Item > ) => {
-		setChanges( value );
+	const handleOnChange = ( newValue: Partial< Item > ) => {
+		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
 
 	return (
