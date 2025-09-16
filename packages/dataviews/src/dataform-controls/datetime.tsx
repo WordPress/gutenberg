@@ -57,7 +57,7 @@ function CalendarDateTimeControl( {
 }: {
 	id: string;
 	value: string | undefined;
-	onChange: ( value: any ) => void;
+	onChange: ( value: string | undefined ) => void;
 	label: string;
 	description?: string;
 	hideLabelFromVision?: boolean;
@@ -86,12 +86,12 @@ function CalendarDateTimeControl( {
 				}
 
 				const dateTimeValue = finalDateTime.toISOString();
-				onChange( { [ id ]: dateTimeValue } );
+				onChange( dateTimeValue );
 			} else {
-				onChange( { [ id ]: undefined } );
+				onChange( undefined );
 			}
 		},
-		[ id, onChange, value ]
+		[ onChange, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -99,7 +99,7 @@ function CalendarDateTimeControl( {
 			if ( newValue ) {
 				// Convert from datetime-local format to ISO string
 				const dateTime = new Date( newValue );
-				onChange( { [ id ]: dateTime.toISOString() } );
+				onChange( dateTime.toISOString() );
 
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
@@ -107,10 +107,10 @@ function CalendarDateTimeControl( {
 					setCalendarMonth( parsedDate );
 				}
 			} else {
-				onChange( { [ id ]: undefined } );
+				onChange( undefined );
 			}
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const {
@@ -169,8 +169,14 @@ export default function DateTime< Item >( {
 	const { id, label, description, getValue, setValue } = field;
 	const value = getValue( { item: data } );
 
-	const onChangeControl = useCallback(
-		( newValue: string | null ) =>
+	const onChangeRelativeDateControl = useCallback(
+		( { value: newValue }: { value: string | number } ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
+	const onChangeCalendarDateTimeControl = useCallback(
+		( newValue: string | undefined ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
 	);
@@ -181,7 +187,7 @@ export default function DateTime< Item >( {
 				className="dataviews-controls__datetime"
 				id={ id }
 				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChangeControl }
+				onChange={ onChangeRelativeDateControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				options={ TIME_UNITS_OPTIONS[ operator ] }
@@ -193,7 +199,7 @@ export default function DateTime< Item >( {
 		<CalendarDateTimeControl
 			id={ id }
 			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChangeControl }
+			onChange={ onChangeCalendarDateTimeControl }
 			label={ label }
 			description={ description }
 			hideLabelFromVision={ hideLabelFromVision }

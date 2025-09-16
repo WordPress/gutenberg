@@ -23,7 +23,10 @@ import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 interface RelativeDateControlProps {
 	id: string;
 	value: { value?: string | number; unit?: string };
-	onChange: ( value: any ) => void;
+	onChange: ( args: {
+		value: string | number;
+		unit: string | undefined;
+	} ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
 	options: { value: string; label: string }[];
@@ -58,18 +61,14 @@ export default function RelativeDateControl( {
 
 	const onChangeValue = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( {
-				[ id ]: { value: Number( newValue ), unit },
-			} ),
-		[ id, onChange, unit ]
+			onChange( { value: Number( newValue ), unit } ),
+		[ onChange, unit ]
 	);
 
 	const onChangeUnit = useCallback(
 		( newUnit: string | undefined ) =>
-			onChange( {
-				[ id ]: { value: relValue, unit: newUnit },
-			} ),
-		[ id, onChange, relValue ]
+			onChange( { value: relValue, unit: newUnit } ),
+		[ onChange, relValue ]
 	);
 
 	return (
