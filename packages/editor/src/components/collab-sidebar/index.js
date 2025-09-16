@@ -75,6 +75,17 @@ function CollabSidebarContent( {
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
+	const onError = ( error ) => {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? error.message
+				: __( 'An error occurred while performing an update.' );
+		createNotice( 'error', errorMessage, {
+			type: 'snackbar',
+			isDismissible: true,
+		} );
+	};
+
 	const addNewComment = async ( comment, parentCommentId ) => {
 		try {
 			const savedRecord = await saveEntityRecord(
@@ -108,7 +119,7 @@ function CollabSidebarContent( {
 				}
 			);
 		} catch ( error ) {
-			onError();
+			onError( error );
 		}
 	};
 
@@ -127,8 +138,8 @@ function CollabSidebarContent( {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} catch {
-			onError();
+		} catch ( error ) {
+			onError( error );
 		}
 	};
 
@@ -147,8 +158,8 @@ function CollabSidebarContent( {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} catch {
-			onError();
+		} catch ( error ) {
+			onError( error );
 		}
 	};
 
@@ -167,21 +178,9 @@ function CollabSidebarContent( {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} catch {
-			onError();
+		} catch ( error ) {
+			onError( error );
 		}
-	};
-
-	const onError = () => {
-		createNotice(
-			'error',
-			__(
-				'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-			),
-			{
-				isDismissible: true,
-			}
-		);
 	};
 
 	const onCommentDelete = async ( commentId ) => {
@@ -205,8 +204,8 @@ function CollabSidebarContent( {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} catch {
-			onError();
+		} catch ( error ) {
+			onError( error );
 		}
 	};
 
