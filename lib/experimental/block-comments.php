@@ -1,4 +1,18 @@
 <?php
+
+/**
+ * Adds support for block comments to the built-in post types.
+ *
+ * @return void
+ */
+if ( ! function_exists( 'gutenberg_block_comment_add_post_type_support' ) ) {
+	function gutenberg_block_comment_add_post_type_support() {
+		add_post_type_support( 'post', 'block-comments' );
+		add_post_type_support( 'page', 'block-comments' );
+	}
+	add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
+}
+
 /**
  * Updates the comment type in the REST API.
  *

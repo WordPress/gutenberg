@@ -21,6 +21,7 @@ import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
+import PostTypeSupportCheck from '../post-type-support-check';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
@@ -197,7 +198,9 @@ function Header( {
 				) }
 
 				{ isBlockCommentExperimentEnabled ? (
-					<CollabSidebar />
+					<PostTypeSupportCheck supportKeys="block-comments">
+						<CollabSidebar />
+					</PostTypeSupportCheck>
 				) : undefined }
 
 				{ customSaveButton }
