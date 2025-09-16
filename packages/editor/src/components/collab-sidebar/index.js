@@ -58,7 +58,6 @@ function CollabSidebarContent( {
 	setShowCommentBoard,
 	styles,
 	comments,
-	showCommentsinPopover,
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -227,7 +226,6 @@ function CollabSidebarContent( {
 				onCommentReopen={ onCommentReopen }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
-				showCommentsinPopover = { showCommentsinPopover }
 			/>
 		</div>
 	);
@@ -379,7 +377,6 @@ export default function CollabSidebar() {
 				// translators: Comments sidebar title
 				title={ __( 'Comments' ) }
 				icon={ commentIcon }
-				closeLabel={ __( 'Close comments panel' ) }
 			>
 				<CollabSidebarContent
 					comments={ resultComments }
@@ -401,7 +398,6 @@ export default function CollabSidebar() {
 					styles={ {
 						backgroundColor,
 					} }
-					showCommentsinPopover = { true }
 				/>
 			</PluginSidebar>
 		</>
