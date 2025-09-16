@@ -16,9 +16,10 @@
  * @param array    $source_args    Array containing source arguments used to look up the override value.
  *                                 Example: array( "key" => "name" ).
  * @param WP_Block $block_instance The block instance.
+ * @param string   $attribute_name The name of the attribute being bound.
  * @return mixed The value computed for the source.
  */
-function gutenberg_block_bindings_term_data_get_value( array $source_args, $block_instance ) {
+function gutenberg_block_bindings_term_data_get_value( array $source_args, $block_instance, $attribute_name = '' ) {
 	if ( empty( $source_args['key'] ) ) {
 		return null;
 	}
@@ -53,6 +54,13 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 
 		case 'link':
 			return esc_url( get_term_link( $term ) );
+
+		case 'nameWithLink':
+			if ( 'content' === $attribute_name ) {
+				return '<a href="' . esc_url( get_term_link( $term ) ) . '">' . esc_html( $term->name ) . '</a>';
+			}
+			// Return null for non-content attributes.
+			return null;
 
 		case 'slug':
 			return esc_html( $term->slug );

@@ -80,6 +80,13 @@ function BlockBindingsPanelMenuContent( { fieldsList, attribute, binding } ) {
 							.filter(
 								( [ , args ] ) => args?.type === attributeType
 							)
+							.filter( ( [ , args ] ) => {
+								// Filter out markup for non-content attributes.
+								if ( args?.markup && attribute !== 'content' ) {
+									return false;
+								}
+								return true;
+							} )
 							.map( ( [ key, args ] ) => (
 								<Menu.RadioItem
 									key={ key }

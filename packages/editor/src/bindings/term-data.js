@@ -23,14 +23,23 @@ function createDataFields( termDataValues, idValue ) {
 			value: termDataValues?.name,
 			type: 'string',
 		},
-		slug: {
-			label: __( 'Slug' ),
-			value: termDataValues?.slug,
-			type: 'string',
-		},
 		link: {
 			label: __( 'Link' ),
 			value: termDataValues?.link,
+			type: 'string',
+		},
+		nameWithLink: {
+			label: __( 'Name with Link' ),
+			value:
+				termDataValues?.name && termDataValues?.link
+					? `<a href="${ termDataValues.link }">${ termDataValues.name }</a>`
+					: termDataValues?.nameWithLink,
+			type: 'string',
+			markup: true,
+		},
+		slug: {
+			label: __( 'Slug' ),
+			value: termDataValues?.slug,
 			type: 'string',
 		},
 		description: {
