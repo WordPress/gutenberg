@@ -139,7 +139,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Display as range' ) }
-						hasValue={ () => !! displayAsRange }
+						hasValue={ () => ! displayAsRange }
 						onDeselect={ () => {
 							setAttributes( {
 								displayAsRange: true,
