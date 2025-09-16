@@ -131,7 +131,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							displayAsRange: false,
+							displayAsRange: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
