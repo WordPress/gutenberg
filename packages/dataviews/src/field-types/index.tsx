@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +13,8 @@ import type {
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
+	Option,
+	NormalizedFilter,
 } from '../types';
 import { default as email } from './email';
 import { default as integer } from './integer';
@@ -27,6 +30,50 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { renderFromElements } from '../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
+
+export function useFieldElements( Field: NormalizedField< any > ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ elements, setElements ] = useState< Option[] >(
+		Field.elements || []
+	);
+
+	useEffect( () => {
+		if ( typeof Field.elementsLoader === 'function' ) {
+			setIsLoading( true );
+			Field.elementsLoader()
+				.then( ( resolvedElements ) => {
+					setElements( resolvedElements );
+				} )
+				.finally( () => {
+					setIsLoading( false );
+				} );
+		}
+	}, [ Field.elementsLoader ] );
+
+	return { isLoading, elements };
+}
+
+export function useFilterElements( Filter: NormalizedFilter ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ elements, setElements ] = useState< Option[] >(
+		Filter.elements || []
+	);
+
+	useEffect( () => {
+		if ( typeof Filter.elementsLoader === 'function' ) {
+			setIsLoading( true );
+			Filter.elementsLoader()
+				.then( ( resolvedElements ) => {
+					setElements( resolvedElements );
+				} )
+				.finally( () => {
+					setIsLoading( false );
+				} );
+		}
+	}, [ Filter, Filter.elementsLoader ] );
+
+	return { isLoading, elements };
+}
 
 /**
  *
