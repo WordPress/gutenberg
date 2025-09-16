@@ -19,16 +19,18 @@ import CommentForm from './comment-form';
 /**
  * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
  *
- * @param {Object}   props                     - The component props.
- * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
- * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
- * @param {Function} props.setShowCommentBoard - The function to delete the comment.
+ * @param {Object}   props                          - The component props.
+ * @param {Function} props.onSubmit                 - A callback function to be called when the user submits a comment.
+ * @param {boolean}  props.showCommentBoard         - The function to edit the comment.
+ * @param {Function} props.setShowCommentBoard      - The function to delete the comment.
+ * @param {Function} props.setShouldShowCommentForm - The function to control comment form visibility.
  * @return {React.ReactNode} The rendered comment input UI.
  */
 export function AddComment( {
 	onSubmit,
 	showCommentBoard,
 	setShowCommentBoard,
+	setShouldShowCommentForm,
 } ) {
 	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
 		( select ) => {
@@ -64,9 +66,11 @@ export function AddComment( {
 			<CommentForm
 				onSubmit={ ( inputComment ) => {
 					onSubmit( inputComment );
+					setShouldShowCommentForm( false );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
+					setShouldShowCommentForm( false );
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
 			/>

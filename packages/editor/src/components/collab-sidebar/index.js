@@ -8,7 +8,7 @@ import {
 	resolveSelect,
 	subscribe,
 } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -56,6 +56,8 @@ addFilter(
 function CollabSidebarContent( {
 	showCommentBoard,
 	setShowCommentBoard,
+	shouldShowCommentForm,
+	setShouldShowCommentForm,
 	styles,
 	comments,
 } ) {
@@ -201,11 +203,14 @@ function CollabSidebarContent( {
 
 	return (
 		<div className="editor-collab-sidebar-panel" style={ styles }>
-			<AddComment
-				onSubmit={ addNewComment }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-			/>
+			{ shouldShowCommentForm && (
+				<AddComment
+					onSubmit={ addNewComment }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+					setShouldShowCommentForm={ setShouldShowCommentForm }
+				/>
+			) }
 			<Comments
 				key={ getSelectedBlockClientId() }
 				threads={ comments }
@@ -226,6 +231,8 @@ function CollabSidebarContent( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const [ shouldShowCommentForm, setShouldShowCommentForm ] =
+		useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 
@@ -264,8 +271,29 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
+	// Reset comment form when block selection changes
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const [ previousBlockId, setPreviousBlockId ] = useState( null );
+
+	useEffect( () => {
+		const currentBlockId = getSelectedBlockClientId();
+		if ( previousBlockId !== currentBlockId ) {
+			setPreviousBlockId( currentBlockId );
+			// Reset comment form when switching blocks
+			if ( shouldShowCommentForm ) {
+				setShouldShowCommentForm( false );
+			}
+		}
+	}, [
+		getSelectedBlockClientId,
+		previousBlockId,
+		shouldShowCommentForm,
+		setShouldShowCommentForm,
+	] );
+
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
+		setShouldShowCommentForm( true );
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
 
@@ -372,6 +400,8 @@ export default function CollabSidebar() {
 					comments={ resultComments }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					shouldShowCommentForm={ shouldShowCommentForm }
+					setShouldShowCommentForm={ setShouldShowCommentForm }
 				/>
 			</PluginSidebar>
 			<PluginSidebar
@@ -385,6 +415,8 @@ export default function CollabSidebar() {
 					comments={ unresolvedSortedThreads }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
+					shouldShowCommentForm={ shouldShowCommentForm }
+					setShouldShowCommentForm={ setShouldShowCommentForm }
 					styles={ {
 						backgroundColor,
 					} }
