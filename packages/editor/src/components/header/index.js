@@ -8,6 +8,7 @@ import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -21,7 +22,6 @@ import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
-import PostTypeSupportCheck from '../post-type-support-check';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
@@ -70,8 +70,10 @@ function Header( {
 		hasFixedToolbar,
 		hasBlockSelection,
 		hasSectionRootClientId,
+		supportsBlockComments,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
+		const { getPostType } = select( coreStore );
 		const {
 			getEditorMode,
 			getCurrentPostType,
@@ -81,14 +83,23 @@ function Header( {
 			select( blockEditorStore )
 		);
 
+		const currentPostType = getCurrentPostType();
+		const _postType = getPostType( currentPostType );
+
 		return {
-			postType: getCurrentPostType(),
+			postType: currentPostType,
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
+			supportsBlockComments:
+				_postType?.supports?.editor &&
+				Array.isArray( _postType.supports.editor ) &&
+				!! _postType.supports.editor.find(
+					( item ) => item?.[ 'block-comments' ] === true
+				),
 		};
 	}, [] );
 
@@ -197,11 +208,9 @@ function Header( {
 					/>
 				) }
 
-				{ isBlockCommentExperimentEnabled ? (
-					<PostTypeSupportCheck supportKeys="block-comments">
-						<CollabSidebar />
-					</PostTypeSupportCheck>
-				) : undefined }
+				{ isBlockCommentExperimentEnabled && supportsBlockComments && (
+					<CollabSidebar />
+				) }
 
 				{ customSaveButton }
 				<MoreMenu />

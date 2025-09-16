@@ -6,8 +6,12 @@
  * @return void
  */
 function gutenberg_block_comment_add_post_type_support() {
-	add_post_type_support( 'post', 'block-comments' );
-	add_post_type_support( 'page', 'block-comments' );
+	$post_types = array( 'post', 'page' );
+	foreach ( $post_types as $post_type ) {
+		if ( post_type_supports( $post_type, 'editor' ) ) {
+			add_post_type_support( $post_type, 'editor', array( 'block-comments' => true ) );
+		}
+	}
 }
 add_action( 'init', 'gutenberg_block_comment_add_post_type_support' );
 
