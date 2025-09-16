@@ -43,15 +43,6 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 	}
 
 	/*
-	 * If we're dealing with the Button block, we remove the bindings metadata
-	 * in order to avoid having it reprocessed, which would lead to Core
-	 * capitalizing the wrapper tag (e.g. <DIV>).
-	 */
-	if ( 'core/button' === $instance->name ) {
-		unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
-	}
-
-	/*
 	 * Merge the computed attributes with the original attributes.
 	 *
 	 * Note that this is not a recursive merge, meaning that nested attributes --
@@ -63,6 +54,15 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 	 * so the block can update its content based on those attributes.
 	 */
 	$instance->attributes = array_merge( $instance->attributes, $computed_attributes );
+
+	/*
+	 * If we're dealing with the Button block, we remove the bindings metadata
+	 * in order to avoid having it reprocessed, which would lead to Core
+	 * capitalizing the wrapper tag (e.g. <DIV>).
+	 */
+	if ( 'core/button' === $instance->name ) {
+		unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
+	}
 
 	/**
 	 * This filter (`gutenberg_block_bindings_render_block`) is called from `WP_Block::render()`.
