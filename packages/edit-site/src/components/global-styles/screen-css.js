@@ -61,7 +61,7 @@ function ScreenCSS() {
 			<Spacer margin={ 0 } paddingX={ 4 }>
 				<Navigator.Button as={ Button } variant="link" path="/blocks">
 					{ __(
-						'Want to change block appearance? Use the Blocs section instead.'
+						'Want to change block appearance? Use the Blocкs section instead.'
 					) }
 				</Navigator.Button>
 			</Spacer>
