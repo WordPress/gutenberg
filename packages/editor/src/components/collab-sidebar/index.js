@@ -75,32 +75,25 @@ function CollabSidebarContent( {
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
-		const args = {
-			post: postId,
-			content: comment,
-			comment_type: 'block_comment',
-			comment_approved: 0,
-		};
+		try {
+			const savedRecord = await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					post: postId,
+					content: comment,
+					comment_type: 'block_comment',
+					comment_approved: 0,
+					...( parentCommentId ? { parent: parentCommentId } : {} ),
+				},
+				{ throwOnError: true }
+			);
 
-		// Create a new object, conditionally including the parent property.
-		const updatedArgs = {
-			...args,
-			...( parentCommentId ? { parent: parentCommentId } : {} ),
-		};
-
-		const savedRecord = await saveEntityRecord(
-			'root',
-			'comment',
-			updatedArgs
-		);
-
-		if ( savedRecord ) {
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parentCommentId ) {
+			if ( ! parentCommentId && savedRecord?.id ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
-					blockCommentId: savedRecord?.id,
+					blockCommentId: savedRecord.id,
 				} );
 			}
 
@@ -114,55 +107,67 @@ function CollabSidebarContent( {
 					isDismissible: true,
 				}
 			);
-		} else {
+		} catch ( error ) {
 			onError();
 		}
 	};
 
 	const onCommentResolve = async ( commentId ) => {
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			id: commentId,
-			status: 'approved',
-		} );
-
-		if ( savedRecord ) {
+		try {
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: commentId,
+					status: 'approved',
+				},
+				{ throwOnError: true }
+			);
 			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} else {
+		} catch {
 			onError();
 		}
 	};
 
 	const onCommentReopen = async ( commentId ) => {
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			id: commentId,
-			status: 'hold',
-		} );
-
-		if ( savedRecord ) {
+		try {
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: commentId,
+					status: 'hold',
+				},
+				{ throwOnError: true }
+			);
 			createNotice( 'snackbar', __( 'Comment reopened.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} else {
+		} catch {
 			onError();
 		}
 	};
 
 	const onEditComment = async ( commentId, comment ) => {
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			id: commentId,
-			content: comment,
-		} );
-
-		if ( savedRecord ) {
+		try {
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: commentId,
+					content: comment,
+				},
+				{ throwOnError: true }
+			);
 			createNotice( 'snackbar', __( 'Comment edited successfully.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-		} else {
+		} catch {
 			onError();
 		}
 	};
@@ -180,23 +185,29 @@ function CollabSidebarContent( {
 	};
 
 	const onCommentDelete = async ( commentId ) => {
-		const childComment = await getEntityRecord(
-			'root',
-			'comment',
-			commentId
-		);
-		await deleteEntityRecord( 'root', 'comment', commentId );
-
-		if ( childComment && ! childComment.parent ) {
-			updateBlockAttributes( getSelectedBlockClientId(), {
-				blockCommentId: undefined,
+		try {
+			const childComment = await getEntityRecord(
+				'root',
+				'comment',
+				commentId
+			);
+			await deleteEntityRecord( 'root', 'comment', commentId, undefined, {
+				throwOnError: true,
 			} );
-		}
 
-		createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
-			type: 'snackbar',
-			isDismissible: true,
-		} );
+			if ( childComment && ! childComment.parent ) {
+				updateBlockAttributes( getSelectedBlockClientId(), {
+					blockCommentId: undefined,
+				} );
+			}
+
+			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+		} catch {
+			onError();
+		}
 	};
 
 	return (
