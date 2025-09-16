@@ -15,6 +15,7 @@ import {
 	SelectControl,
 	Tooltip,
 	Icon,
+	Spinner,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
@@ -61,6 +62,7 @@ import type {
 	View,
 	NormalizedField,
 } from '../../types';
+import { useFilterElements } from '../../field-types';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -477,11 +479,12 @@ export default function Filter( {
 	const filterInView = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
+	const { elements, isLoading } = useFilterElements( filter );
 
 	let activeElements: Option[] = [];
 
-	if ( filter.elements.length > 0 ) {
-		activeElements = filter.elements.filter( ( element ) => {
+	if ( elements.length > 0 ) {
+		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
@@ -591,15 +594,18 @@ export default function Filter( {
 				</div>
 			) }
 			renderContent={ () => {
+				if ( isLoading ) {
+					return <Spinner />;
+				}
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.elements.length > 0 ? (
+						{ elements.length > 0 ? (
 							<SearchWidget
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements: commonProps.filter.elements,
+									elements,
 								} }
 							/>
 						) : (

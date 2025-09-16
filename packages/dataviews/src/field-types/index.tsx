@@ -14,6 +14,7 @@ import type {
 	FieldTypeDefinition,
 	SortDirection,
 	Option,
+	NormalizedFilter,
 } from '../types';
 import { default as email } from './email';
 import { default as integer } from './integer';
@@ -48,6 +49,28 @@ export function useFieldElements( Field: NormalizedField< any > ) {
 				} );
 		}
 	}, [ Field.elementsLoader ] );
+
+	return { isLoading, elements };
+}
+
+export function useFilterElements( Filter: NormalizedFilter ) {
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ elements, setElements ] = useState< Option[] >(
+		Filter.elements || []
+	);
+
+	useEffect( () => {
+		if ( typeof Filter.elementsLoader === 'function' ) {
+			setIsLoading( true );
+			Filter.elementsLoader()
+				.then( ( resolvedElements ) => {
+					setElements( resolvedElements );
+				} )
+				.finally( () => {
+					setIsLoading( false );
+				} );
+		}
+	}, [ Filter, Filter.elementsLoader ] );
 
 	return { isLoading, elements };
 }

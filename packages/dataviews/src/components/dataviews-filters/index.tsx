@@ -45,7 +45,8 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 			filters.push( {
 				field: field.id,
 				name: field.label,
-				elements: Array.isArray( field.elements ) ? field.elements : [],
+				elements: field.elements ?? [],
+				elementsLoader: field.elementsLoader ?? undefined,
 				singleSelection: operators.some( ( op ) =>
 					SINGLE_SELECTION_OPERATORS.includes( op )
 				),

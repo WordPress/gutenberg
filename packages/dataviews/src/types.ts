@@ -339,6 +339,11 @@ export interface NormalizedFilter {
 	elements: Option[];
 
 	/**
+	 * Function to load elements asynchronously.
+	 */
+	elementsLoader?: () => Promise< Option[] >;
+
+	/**
 	 * Is a single selection filter.
 	 */
 	singleSelection: boolean;
