@@ -196,7 +196,7 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ modalState, setModalState ] = useState( null );
 
-	const handleOpenModal = ( attribute, sourceKey ) => {
+	const handleOpenModal = ( { attribute, sourceKey } ) => {
 		setModalState( { attribute, sourceKey } );
 	};
 

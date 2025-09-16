@@ -27,26 +27,57 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	editorUI: () => ( {
-		mode: 'dropdown',
-		data: Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
-			key,
-			label: field?.label || key,
-			type: field?.type || 'string',
-			value: field?.value,
-		} ) ),
-		onSelect( { item, updateBlockBindings, attribute } ) {
-			updateBlockBindings( {
-				[ attribute ]: {
-					source: 'testing/complete-source',
-					args: {
-						key: item.key,
+	editorUI() {
+		const { updateBlockBindings } = wp.blockEditor.useBlockBindingsUtils();
+
+		return {
+			mode: 'dropdown',
+			data: Object.entries( fieldsList || {} ).map(
+				( [ key, field ] ) => ( {
+					key,
+					label: field?.label || key,
+					type: field?.type || 'string',
+					value: field?.value,
+				} )
+			),
+			onSelect( { item, attribute } ) {
+				updateBlockBindings( {
+					[ attribute ]: {
+						source: 'testing/complete-source',
+						args: {
+							key: item.key,
+						},
 					},
-				},
-			} );
-		},
-	} ),
+				} );
+			},
+		};
+	},
 } );
+
+const ModalButton = ( { fieldKey, fieldLabel, attribute } ) => {
+	const { updateBlockBindings } = wp.blockEditor.useBlockBindingsUtils();
+
+	return el(
+		'button',
+		{
+			onClick: () => {
+				updateBlockBindings( {
+					[ attribute ]: {
+						source: 'testing/modal-source',
+						args: { key: fieldKey },
+					},
+				} );
+			},
+			style: {
+				display: 'block',
+				margin: '5px 0',
+				padding: '10px',
+				width: '100%',
+			},
+		},
+		fieldLabel
+	);
+};
 
 registerBlockBindingsSource( {
 	name: 'testing/modal-source',
@@ -54,50 +85,40 @@ registerBlockBindingsSource( {
 	getValues,
 	setValues,
 	canUserEditValue: () => true,
-	editorUI: () => ( {
-		mode: 'modal',
-		data: Object.entries( fieldsList || {} ).map( ( [ key, field ] ) => ( {
-			key,
-			label: field?.label || key,
-			type: field?.type || 'string',
-			value: field?.value,
-		} ) ),
-		renderModalContent: ( { updateBlockBindings } ) => {
-			return el(
-				'div',
-				{ style: { padding: '20px' } },
-				el( 'h3', null, 'Select a field from the modal' ),
-				el(
-					'p',
-					null,
-					'This is a modal interface for selecting fields.'
-				),
-				Object.entries( fieldsList || {} ).map( ( [ key, field ] ) =>
+	editorUI() {
+		return {
+			mode: 'modal',
+			data: Object.entries( fieldsList || {} ).map(
+				( [ key, field ] ) => ( {
+					key,
+					label: field?.label || key,
+					type: field?.type || 'string',
+					value: field?.value,
+				} )
+			),
+			renderModalContent( { attribute } ) {
+				return el(
+					'div',
+					{ style: { padding: '20px' } },
+					el( 'h3', null, 'Select a field from the modal' ),
 					el(
-						'button',
-						{
-							key,
-							onClick: () => {
-								updateBlockBindings( {
-									content: {
-										source: 'testing/modal-source',
-										args: { key },
-									},
-								} );
-							},
-							style: {
-								display: 'block',
-								margin: '5px 0',
-								padding: '10px',
-								width: '100%',
-							},
-						},
-						field?.label || key
+						'p',
+						null,
+						'This is a modal interface for selecting fields.'
+					),
+					Object.entries( fieldsList || {} ).map(
+						( [ key, field ] ) =>
+							el( ModalButton, {
+								key,
+								fieldKey: key,
+								fieldLabel: field?.label || key,
+								attribute,
+							} )
 					)
-				)
-			);
-		},
-	} ),
+				);
+			},
+		};
+	},
 } );
 
 registerBlockBindingsSource( {
