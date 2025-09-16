@@ -7,6 +7,20 @@
  * @subpackage Block Bindings
  */
 
+
+// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+add_filter(
+	'block_bindings_supported_attributes_core/post-date',
+	function ( $attributes ) {
+		if ( ! in_array( 'datetime', $attributes, true ) ) {
+			$attributes[] = 'datetime';
+		}
+		return $attributes;
+	},
+	10,
+	3
+);
+
 /**
  * Callback function for the render_block filter.
  *
@@ -111,6 +125,20 @@ function gutenberg_process_block_bindings( $instance ) {
 	$supported_block_attributes              =
 		$block_bindings_supported_attributes_6_8[ $block_type ] ??
 		array();
+
+	/**
+	 * Filters the supported block attributes for block bindings.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param string[] $supported_block_attributes The block's attributes that are supported by block bindings.
+	 * @param string   $block_type                 The block type whose attributes are being filtered.
+	 */
+	$supported_block_attributes = apply_filters(
+		'block_bindings_supported_attributes',
+		$supported_block_attributes,
+		$block_type
+	);
 
 	/**
 	 * Filters the supported block attributes for block bindings.

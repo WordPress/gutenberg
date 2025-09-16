@@ -79,10 +79,6 @@ describe( 'getEntityRecord', () => {
 	it( 'accepts a query that overrides default api path', async () => {
 		const query = { context: 'view', _envelope: '1' };
 
-		const select = {
-			hasEntityRecords: jest.fn( () => {} ),
-		};
-
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
 
@@ -91,7 +87,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, select, registry, resolveSelect } );
+		)( { dispatch, registry, resolveSelect } );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -241,7 +237,7 @@ describe( 'getEntityRecords', () => {
 		] );
 	} );
 
-	it( 'caches permissions but does not mark entity records as resolved when using _fields', async () => {
+	it( 'caches permissions and marks entity records as resolved when using _fields', async () => {
 		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
@@ -285,9 +281,7 @@ describe( 'getEntityRecords', () => {
 			'canUser',
 			expect.any( Array )
 		);
-
-		// But individual entity records should NOT be marked as resolved
-		expect( finishResolutions ).not.toHaveBeenCalledWith(
+		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
 		);
@@ -328,9 +322,7 @@ describe( 'getEntityRecords', () => {
 			'canUser',
 			expect.any( Array )
 		);
-
-		// Individual entity records should NOT be marked as resolved
-		expect( finishResolutions ).not.toHaveBeenCalledWith(
+		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
 		);
