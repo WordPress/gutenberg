@@ -630,17 +630,13 @@ const ValidationComponent = ( {
 	};
 
 	const customPasswordRule = ( value: DeepPartial< ValidatedItem > ) => {
-		if ( ! value.password ) {
-			return 'Password is required.';
-		}
-
-		if ( value.password.length < 8 ) {
+		if ( value.password && value.password.length < 8 ) {
 			return 'Password must be at least 8 characters long.';
 		}
-		if ( ! /[A-Z]/.test( value.password ) ) {
+		if ( value.password && ! /[A-Z]/.test( value.password ) ) {
 			return 'Password must contain at least one uppercase letter.';
 		}
-		if ( ! /[0-9]/.test( value.password ) ) {
+		if ( value.password && ! /[0-9]/.test( value.password ) ) {
 			return 'Password must contain at least one number.';
 		}
 
