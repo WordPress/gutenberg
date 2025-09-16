@@ -211,6 +211,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-block-visibility',
+		__( 'Block Visibility', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Add block visibility control support and UI.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-visibility',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
