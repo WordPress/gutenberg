@@ -42,6 +42,8 @@ import type { DataFormControlProps } from '../types';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
 
+type DateRange = [ string, string ] | undefined;
+
 const DATE_PRESETS: {
 	id: string;
 	label: string;
@@ -276,8 +278,8 @@ function CalendarDateRangeControl( {
 	className,
 }: {
 	id: string;
-	value: [ string, string ] | undefined;
-	onChange: ( value: [ string, string ] | undefined ) => void;
+	value: DateRange;
+	onChange: ( value: DateRange ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
@@ -454,11 +456,7 @@ export default function DateControl< Item >( {
 	);
 
 	const onChangeCalendarDateRangeControl = useCallback(
-		// We are loosing the type here to account for the fact that this control
-		// type is used only for filtering functionality and is not directly
-		// exposed to users using DataForm. DataForm expects onChange to follow
-		// the shape of the data passed to it, filtering is more liberal.
-		( newValue: any ) => {
+		( newValue: DateRange ) => {
 			onChange(
 				setValue( {
 					item: data,
@@ -490,14 +488,14 @@ export default function DateControl< Item >( {
 	}
 
 	if ( operator === OPERATOR_BETWEEN ) {
-		let dateRangeValue: [ string, string ] | undefined;
+		let dateRangeValue: DateRange;
 		if (
 			Array.isArray( value ) &&
 			value.length === 2 &&
 			value.every( ( date ) => typeof date === 'string' )
 		) {
 			// Ensure the value is expected format
-			dateRangeValue = value as unknown as [ string, string ];
+			dateRangeValue = value as DateRange;
 		}
 
 		return (
