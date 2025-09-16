@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
@@ -29,10 +34,37 @@ export default function Select< Item >( {
 
 	const isMultiple = type === 'array';
 	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
+
 	const onChangeControl = useCallback(
 		( newValue: any ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
 	);
 
 	const fieldElements = field?.elements ?? [];
@@ -58,25 +90,7 @@ export default function Select< Item >( {
 	return (
 		<ValidatedSelectControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			value={ value }
