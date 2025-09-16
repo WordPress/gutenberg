@@ -23,6 +23,7 @@ import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 import RelativeDateControl, {
 	TIME_UNITS_OPTIONS,
+	type DateRelative,
 } from './relative-date-control';
 import { unlock } from '../lock-unlock';
 
@@ -170,7 +171,7 @@ export default function DateTime< Item >( {
 	const value = getValue( { item: data } );
 
 	const onChangeRelativeDateControl = useCallback(
-		( { value: newValue }: { value: string | number } ) =>
+		( { value: newValue }: DateRelative ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
 	);

@@ -20,13 +20,15 @@ import { __ } from '@wordpress/i18n';
  */
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 
+export type DateRelative = {
+	value?: string | number;
+	unit?: string;
+};
+
 interface RelativeDateControlProps {
 	id: string;
-	value: { value?: string | number; unit?: string };
-	onChange: ( args: {
-		value: string | number;
-		unit: string | undefined;
-	} ) => void;
+	value: DateRelative;
+	onChange: ( args: DateRelative ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
 	options: { value: string; label: string }[];
