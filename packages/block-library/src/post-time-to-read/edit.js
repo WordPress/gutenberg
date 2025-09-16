@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -40,6 +40,15 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const { textAlign, averageReadingSpeed, displayAsRange } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Set displayAsRange: true for new blocks on first render
+	const hasSetInitialValue = useRef( false );
+	useEffect( () => {
+		if ( ! hasSetInitialValue.current ) {
+			hasSetInitialValue.current = true;
+			setAttributes( { displayAsRange: true } );
+		}
+	}, [ setAttributes ] );
 
 	const [ contentStructure ] = useEntityProp(
 		'postType',
