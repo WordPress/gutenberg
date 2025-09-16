@@ -19,6 +19,7 @@
 - DataForm: support validation in select control [#71665](https://github.com/WordPress/gutenberg/pull/71665)
 - DataForm: support validation in toggleGroup control. ([#71666](https://github.com/WordPress/gutenberg/pull/71666))
 -  DataForm: Add object configuration support for Edit property with some options. ([#71582](https://github.com/WordPress/gutenberg/pull/71582))
+- DataForm: Add summary field support for composed fields. ([#71614](https://github.com/WordPress/gutenberg/pull/71614))
 
 ### Bug Fixes
 
