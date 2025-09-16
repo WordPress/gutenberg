@@ -46,11 +46,13 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
-			// There's an issue where preloaded data does not invalidate,
-			// preloading had to be disabled for now.
-			'/wp/v2/wp_template',
+			// I'm not quite sure why this is needed, because it is preloaded.
+			// It might be that there's a request that invalides the resolver
+			// and then triggers a new request.
+			'/wp/v2/templates/lookup?slug=front-page',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
+			'/wp/v2/wp_template',
 			// This is the auto-draft template.
 			expect.stringMatching( /\/wp\/v2\/wp_template\/\d+\?context=edit/ ),
 			// There are two separate settings OPTIONS requests. We should fix
