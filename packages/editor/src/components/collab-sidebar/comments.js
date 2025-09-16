@@ -15,7 +15,7 @@ import {
 	DropdownMenu,
 } from '@wordpress/components';
 import { published, moreVertical } from '@wordpress/icons';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -156,7 +156,11 @@ function Thread( {
 						>
 							{ sprintf(
 								// translators: %s: number of replies.
-								_x( '%s more replies', 'Show replies button' ),
+								_n(
+									'%s more reply',
+									'%s more replies',
+									thread?.reply?.length
+								),
 								thread?.reply?.length
 							) }
 						</Button>
