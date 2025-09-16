@@ -24,16 +24,18 @@ import { unlock } from '../lock-unlock';
 
 const { ValidatedNumberControl } = unlock( privateApis );
 
+type IntegerBetween = [ number | string, number | string ];
+
 function BetweenControls( {
 	value,
 	onChange,
 	hideLabelFromVision,
 }: {
-	value: any;
-	onChange: ( [ min, max ]: [ number, number ] ) => void;
+	value: IntegerBetween;
+	onChange: ( [ min, max ]: IntegerBetween ) => void;
 	hideLabelFromVision?: boolean;
 } ) {
-	const [ min = '', max = '' ] = Array.isArray( value ) ? value : [];
+	const [ min = '', max = '' ] = value;
 
 	const onChangeMin = useCallback(
 		( newValue: string | undefined ) =>
@@ -108,11 +110,7 @@ export default function Integer< Item >( {
 	);
 
 	const onChangeBetweenControls = useCallback(
-		// We are loosing the type here to account for the fact that this control
-		// type is used only for filtering functionality and is not directly
-		// exposed to users using DataForm. DataForm expects onChange to follow
-		// the shape of the data passed to it, filtering is more liberal.
-		( newValue: any ) => {
+		( newValue: IntegerBetween ) => {
 			onChange(
 				setValue( {
 					item: data,
@@ -152,9 +150,19 @@ export default function Integer< Item >( {
 	);
 
 	if ( operator === OPERATOR_BETWEEN ) {
+		let valueBetween: IntegerBetween = [ '', '' ];
+		if (
+			Array.isArray( value ) &&
+			value.length === 2 &&
+			value.every(
+				( element ) => typeof element === 'number' || element === ''
+			)
+		) {
+			valueBetween = value as IntegerBetween;
+		}
 		return (
 			<BetweenControls
-				value={ value }
+				value={ valueBetween }
 				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
