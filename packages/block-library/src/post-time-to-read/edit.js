@@ -142,7 +142,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 						hasValue={ () => !! displayAsRange }
 						onDeselect={ () => {
 							setAttributes( {
-								displayAsRange: false,
+								displayAsRange: true,
 							} );
 						} }
 					>
