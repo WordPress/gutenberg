@@ -20,7 +20,7 @@ const serverStates = new Map();
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = < T extends object >( namespace?: string ): T =>
+export const getConfig = < T extends object = any >( namespace?: string ): T =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
