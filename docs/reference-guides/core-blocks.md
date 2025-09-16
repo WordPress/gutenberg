@@ -17,7 +17,7 @@ Displays a group of accordion headers and associated expandable content. ([Sourc
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-content
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), ~~html~~
--	**Attributes:** allowedBlocks, autoclose, iconPosition, showIcon
+-	**Attributes:** autoclose, iconPosition, showIcon
 
 ## Accordion Content
 
@@ -28,7 +28,7 @@ Displays a section of content in an accordion, including a header and expandable
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-header, core/accordion-panel
--	**Supports:** align (full, wide), color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin)
+-	**Supports:** color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin)
 -	**Attributes:** openByDefault
 
 ## Accordion Header
@@ -39,7 +39,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** anchor, border, color (background, gradient, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
+-	**Supports:** anchor, color (background, gradient, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
 -	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, textAlignment, title
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** border, color (background, gradient, text), interactivity, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
@@ -106,7 +106,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 -	**Name:** core/buttons
 -	**Category:** design
 -	**Allowed Blocks:** core/button
--	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), anchor, color (background, gradients, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Calendar
 
@@ -900,7 +900,7 @@ Describe in a few words what this site is about. This is important for search re
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** level, levelOptions, textAlign
 
 ## Site Title
@@ -929,7 +929,7 @@ Display icons linking to your social profiles or sites. ([Source](https://github
 -	**Name:** core/social-links
 -	**Category:** widgets
 -	**Allowed Blocks:** core/social-link
--	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units), ~~html~~
+-	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units), ~~html~~
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
@@ -958,7 +958,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Experimental:** true
 -	**Category:** design
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage
+-	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
 
 ## Tag Cloud
 
@@ -986,6 +986,28 @@ Display the description of categories, tags and custom taxonomies when viewing a
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
+
+## Term Template
+
+Contains the block elements used to render a taxonomy term, like the name, description, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template))
+
+-	**Name:** core/term-template
+-	**Experimental:** true
+-	**Category:** theme
+-	**Ancestor:** core/terms-query
+-	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout (allowEditing, allowSwitching, default), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Attributes:** namespace
+
+## Terms Query
+
+An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query))
+
+-	**Name:** core/terms-query
+-	**Experimental:** true
+-	**Category:** theme
+-	**Allowed Blocks:** core/term-template
+-	**Supports:** align (full, wide), interactivity, ~~html~~
+-	**Attributes:** namespace, tagName, termQuery, termQueryId
 
 ## Text Columns (deprecated)
 

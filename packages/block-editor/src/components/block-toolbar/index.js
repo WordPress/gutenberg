@@ -130,6 +130,16 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 
+		// The switch style button appears more prominently with the
+		// content only pattern experiment.
+		const _showSwitchSectionStyleButton =
+			window?.__experimentalContentOnlyPatternInsertion
+				? _isZoomOut || isSectionBlock( selectedBlockClientId )
+				: _isZoomOut ||
+				  ( isNavigationModeEnabled &&
+						editingMode === 'contentOnly' &&
+						isSectionBlock( selectedBlockClientId ) );
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -156,11 +166,7 @@ export function PrivateBlockToolbar( {
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
-			showSwitchSectionStyleButton:
-				_isZoomOut ||
-				( isNavigationModeEnabled &&
-					editingMode === 'contentOnly' &&
-					isSectionBlock( selectedBlockClientId ) ), // Zoom out or Write Mode Section Blocks
+			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			isNavigationMode: isNavigationModeEnabled,
 		};

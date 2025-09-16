@@ -48,7 +48,7 @@ export default {
 			return null;
 		},
 	},
-	Edit: 'boolean',
+	Edit: 'checkbox',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		if ( field.elements ) {
 			return renderFromElements( { item, field } );

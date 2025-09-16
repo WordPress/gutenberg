@@ -2,15 +2,18 @@
  * WordPress dependencies
  */
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
+	privateApis,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { ValidatedToggleGroupControl } = unlock( privateApis );
 
 export default function ToggleGroup< Item >( {
 	data,
@@ -19,6 +22,12 @@ export default function ToggleGroup< Item >( {
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id } = field;
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedToggleGroupControl
+			>[ 'customValidity' ]
+		>( undefined );
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -34,7 +43,28 @@ export default function ToggleGroup< Item >( {
 			( el ) => el.value === value
 		);
 		return (
-			<ToggleGroupControl
+			<ValidatedToggleGroupControl
+				required={ !! field.isValid?.required }
+				onValidate={ ( newValue: any ) => {
+					const message = field.isValid?.custom?.(
+						{
+							...data,
+							[ id ]: newValue,
+						},
+						field
+					);
+
+					if ( message ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message,
+						} );
+						return;
+					}
+
+					setCustomValidity( undefined );
+				} }
+				customValidity={ customValidity }
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				isBlock
@@ -51,7 +81,7 @@ export default function ToggleGroup< Item >( {
 						value={ el.value }
 					/>
 				) ) }
-			</ToggleGroupControl>
+			</ValidatedToggleGroupControl>
 		);
 	}
 

@@ -38,6 +38,7 @@ import { toggleFont } from './utils/toggleFont';
 import setNestedValue from '../../../utils/set-nested-value';
 
 export const FontLibraryContext = createContext( {} );
+FontLibraryContext.displayName = 'FontLibraryContext';
 
 function FontLibraryProvider( { children } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );

@@ -2267,6 +2267,29 @@ function getDerivedBlockEditingModesForTree(
 			syncedPatternClientIds.push( clientId );
 		}
 	} );
+	const contentOnlyTemplateLockedClientIds = Object.keys(
+		state.blockListSettings
+	).filter(
+		( clientId ) =>
+			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
+	);
+	// Use array.from for better back compat. Older versions of the iterator returned
+	// from `keys()` didn't have the `filter` method.
+	const unsyncedPatternClientIds =
+		!! window?.__experimentalContentOnlyPatternInsertion
+			? Array.from( state.blocks.attributes.keys() ).filter(
+					( clientId ) =>
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+			  )
+			: [];
+	const contentOnlyParents = [
+		...contentOnlyTemplateLockedClientIds,
+		...unsyncedPatternClientIds,
+		...( window?.__experimentalContentOnlyPatternInsertion
+			? templatePartClientIds
+			: [] ),
+	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
@@ -2457,6 +2480,22 @@ function getDerivedBlockEditingModesForTree(
 				derivedBlockEditingModes.set( clientId, 'disabled' );
 			}
 		}
+
+		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
+		if ( contentOnlyParents.length ) {
+			const hasContentOnlyParent = !! findParentInClientIdsList(
+				state,
+				clientId,
+				contentOnlyParents
+			);
+			if ( hasContentOnlyParent ) {
+				if ( isContentBlock( blockName ) ) {
+					derivedBlockEditingModes.set( clientId, 'contentOnly' );
+				} else {
+					derivedBlockEditingModes.set( clientId, 'disabled' );
+				}
+			}
+		}
 	} );
 
 	return derivedBlockEditingModes;
@@ -2609,6 +2648,155 @@ export function withDerivedBlockEditingModes( reducer ) {
 						prevState: state,
 						nextState,
 						addedBlocks: action.blocks,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+				break;
+			}
+			case 'UPDATE_BLOCK_ATTRIBUTES': {
+				// Handle unsynced patterns which indicate their contentOnly-ness via
+				// the `attributes.metadata.patternName` property.
+				// Check when this is added or removed and update blockEditingModes.
+				const addedBlocks = [];
+				const removedClientIds = [];
+
+				for ( const clientId of action?.clientIds ) {
+					const attributes = action.options?.uniqueByBlock
+						? action.attributes[ clientId ]
+						: action.attributes;
+
+					if ( ! attributes ) {
+						break;
+					}
+
+					if (
+						// patternName is switching from falsy to truthy, indicating
+						// this block is becoming an unsynced pattern.
+						attributes.metadata?.patternName &&
+						! state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+					) {
+						addedBlocks.push(
+							nextState.blocks.tree.get( clientId )
+						);
+					} else if (
+						// patternName is switching from truthy to falsy, this block is becoming
+						// a regular block but was an unsynced pattern.
+						// Check that `metadata` is part of the included attributes, as
+						// `updateBlockAttributes` merges attributes, if it isn't present
+						// the previous `metadata` would be retained.
+						attributes.metadata &&
+						! attributes.metadata?.patternName &&
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+					) {
+						// Include it in 'removedClientIds'.
+						removedClientIds.push( clientId );
+					}
+				}
+
+				if ( ! addedBlocks?.length && ! removedClientIds?.length ) {
+					break;
+				}
+
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: true,
+					} );
+
+				if (
+					nextDerivedBlockEditingModes ||
+					nextDerivedNavModeBlockEditingModes
+				) {
+					return {
+						...nextState,
+						derivedBlockEditingModes:
+							nextDerivedBlockEditingModes ??
+							state.derivedBlockEditingModes,
+						derivedNavModeBlockEditingModes:
+							nextDerivedNavModeBlockEditingModes ??
+							state.derivedNavModeBlockEditingModes,
+					};
+				}
+
+				break;
+			}
+			case 'UPDATE_BLOCK_LIST_SETTINGS': {
+				// Handle the addition and removal of contentOnly template locked blocks.
+				const addedBlocks = [];
+				const removedClientIds = [];
+
+				const updates =
+					typeof action.clientId === 'string'
+						? { [ action.clientId ]: action.settings }
+						: action.clientId;
+
+				for ( const clientId in updates ) {
+					const isNewContentOnlyBlock =
+						state.blockListSettings[ clientId ]?.templateLock !==
+							'contentOnly' &&
+						nextState.blockListSettings[ clientId ]
+							?.templateLock === 'contentOnly';
+
+					const wasContentOnlyBlock =
+						state.blockListSettings[ clientId ]?.templateLock ===
+							'contentOnly' &&
+						nextState.blockListSettings[ clientId ]
+							?.templateLock !== 'contentOnly';
+
+					if ( isNewContentOnlyBlock ) {
+						addedBlocks.push(
+							nextState.blocks.tree.get( clientId )
+						);
+					} else if ( wasContentOnlyBlock ) {
+						removedClientIds.push( clientId );
+					}
+				}
+
+				if ( ! addedBlocks.length && ! removedClientIds.length ) {
+					break;
+				}
+
+				const nextDerivedBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
+						isNavMode: false,
+					} );
+				const nextDerivedNavModeBlockEditingModes =
+					getDerivedBlockEditingModesUpdates( {
+						prevState: state,
+						nextState,
+						addedBlocks,
+						removedClientIds,
 						isNavMode: true,
 					} );
 

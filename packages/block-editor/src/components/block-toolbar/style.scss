@@ -52,10 +52,8 @@
 			color: var(--wp-block-synced-color);
 		}
 
-		.components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
-			&:disabled .block-editor-block-icon.has-colors {
-				color: var(--wp-block-synced-color);
-			}
+		.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] .block-editor-block-icon {
+			color: var(--wp-block-synced-color);
 		}
 	}
 

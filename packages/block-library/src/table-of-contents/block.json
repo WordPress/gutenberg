@@ -22,6 +22,10 @@
 		},
 		"maxLevel": {
 			"type": "number"
+		},
+		"ordered": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
