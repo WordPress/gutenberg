@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/missing",
+		"isValid": true,
+		"attributes": {
+			"originalName": "core/terms-query",
+			"originalUndelimitedContent": "<div class=\"wp-block-terms-query\"></div>",
+			"originalContent": "<!-- wp:terms-query {\"termQueryId\":0} -->\n<div class=\"wp-block-terms-query\"></div>\n<!-- /wp:terms-query -->"
+		},
+		"innerBlocks": []
+	}
+]

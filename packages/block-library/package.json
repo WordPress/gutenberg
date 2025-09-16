@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.28.0",
+	"version": "9.30.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,6 +27,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
+		"./accordion/view": "./build-module/accordion/view.js",
 		"./file/view": "./build-module/file/view.js",
 		"./form/view": "./build-module/form/view.js",
 		"./image/view": "./build-module/image/view.js",

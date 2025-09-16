@@ -183,3 +183,6 @@ export const sortIcons = {
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_GRID = 'grid';
 export const LAYOUT_LIST = 'list';
+
+// Picker view layouts.
+export const LAYOUT_PICKER_GRID = 'pickerGrid';

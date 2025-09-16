@@ -13,10 +13,15 @@ import Badge from './badge';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
+	ValidatedCheckboxControl,
+	ValidatedInputControl,
 	ValidatedNumberControl,
+	ValidatedSelectControl,
 	ValidatedTextControl,
+	ValidatedTextareaControl,
 	ValidatedToggleControl,
 } from './validated-form-controls';
+import { Picker } from './color-picker/picker';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -32,7 +37,12 @@ lock( privateApis, {
 	DateCalendar,
 	DateRangeCalendar,
 	TZDate,
+	Picker,
+	ValidatedInputControl,
+	ValidatedCheckboxControl,
 	ValidatedNumberControl,
+	ValidatedSelectControl,
 	ValidatedTextControl,
+	ValidatedTextareaControl,
 	ValidatedToggleControl,
 } );

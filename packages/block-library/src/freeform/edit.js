@@ -188,6 +188,13 @@ function ClassicEdit( {
 				}
 			} );
 
+			editor.on( 'paste', ( event ) => {
+				// TinyMCE selection isn’t synced with the block editor selection store.
+				// This event handler prevents paste from bubbling so the useClipboardHandler
+				// won’t replace the block.
+				event.stopPropagation();
+			} );
+
 			editor.on( 'init', () => {
 				const rootNode = editor.getBody();
 

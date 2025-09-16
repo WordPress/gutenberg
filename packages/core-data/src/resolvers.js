@@ -141,13 +141,21 @@ export const getEntityRecord =
 					};
 				}
 
-				// Disable reason: While true that an early return could leave `path`
-				// unused, it's important that path is derived using the query prior to
-				// additional query modifications in the condition below, since those
-				// modifications are relevant to how the data is tracked in state, and not
-				// for how the request is made to the REST API.
+				if ( query !== undefined && query._fields ) {
+					// The resolution cache won't consider query as reusable based on the
+					// fields, so it's tested here, prior to initiating the REST request,
+					// and without causing `getEntityRecord` resolution to occur.
+					const hasRecord = select.hasEntityRecord(
+						kind,
+						name,
+						key,
+						query
+					);
+					if ( hasRecord ) {
+						return;
+					}
+				}
 
-				// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 				const path = addQueryArgs(
 					entityConfig.baseURL + ( key ? '/' + key : '' ),
 					{
@@ -155,23 +163,6 @@ export const getEntityRecord =
 						...query,
 					}
 				);
-
-				if ( query !== undefined && query._fields ) {
-					query = { ...query, include: [ key ] };
-
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecords` resolution to occur.
-					const hasRecords = select.hasEntityRecords(
-						kind,
-						name,
-						query
-					);
-					if ( hasRecords ) {
-						return;
-					}
-				}
-
 				const response = await apiFetch( { path, parse: false } );
 				const record = await response.json();
 				const permissions = getUserPermissionsFromAllowHeader(
@@ -246,12 +237,27 @@ export const getEntityRecords =
 			{ exclusive: false }
 		);
 
+		// Keep a copy of the original query for later use in getResolutionsArgs.
+		// The query object may be modified below (for example, when _fields is
+		// specified), but we want to use the original query when marking
+		// resolutions as finished.
+		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
-		function getResolutionsArgs( records ) {
+		function getResolutionsArgs( records, recordsQuery ) {
+			const queryArgs = Object.fromEntries(
+				Object.entries( recordsQuery ).filter( ( [ k, v ] ) => {
+					return [ 'context', '_fields' ].includes( k ) && !! v;
+				} )
+			);
 			return records
 				.filter( ( record ) => record?.[ key ] )
-				.map( ( record ) => [ kind, name, record[ key ] ] );
+				.map( ( record ) => [
+					kind,
+					name,
+					record[ key ],
+					Object.keys( queryArgs ).length > 0 ? queryArgs : undefined,
+				] );
 		}
 
 		try {
@@ -265,7 +271,7 @@ export const getEntityRecords =
 						...new Set( [
 							...( getNormalizedCommaSeparable( query._fields ) ||
 								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
+							key,
 						] ),
 					].join(),
 				};
@@ -307,26 +313,33 @@ export const getEntityRecords =
 						response.headers.get( 'X-WP-TotalPages' )
 					);
 
+					if ( ! meta ) {
+						meta = {
+							totalItems: parseInt(
+								response.headers.get( 'X-WP-Total' )
+							),
+							totalPages: 1,
+						};
+					}
+
 					records.push( ...pageRecords );
 					registry.batch( () => {
 						dispatch.receiveEntityRecords(
 							kind,
 							name,
 							records,
-							query
+							query,
+							false,
+							undefined,
+							meta
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
-							getResolutionsArgs( pageRecords )
+							getResolutionsArgs( pageRecords, rawQuery )
 						);
 					} );
 					page++;
 				} while ( page <= totalPages );
-
-				meta = {
-					totalItems: records.length,
-					totalPages: 1,
-				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
 				meta = {
@@ -361,62 +374,52 @@ export const getEntityRecords =
 					meta
 				);
 
-				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
-				// See https://github.com/WordPress/gutenberg/pull/26575
-				// See https://github.com/WordPress/gutenberg/pull/64504
-				// See https://github.com/WordPress/gutenberg/pull/70738
-				if ( ! query.context ) {
-					const targetHints = records
-						.filter(
-							( record ) =>
-								!! record?.[ key ] &&
-								!! record?._links?.self?.[ 0 ]?.targetHints
-									?.allow
-						)
-						.map( ( record ) => ( {
-							id: record[ key ],
-							permissions: getUserPermissionsFromAllowHeader(
-								record._links.self[ 0 ].targetHints.allow
-							),
-						} ) );
+				const targetHints = records
+					.filter(
+						( record ) =>
+							!! record?.[ key ] &&
+							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
+					)
+					.map( ( record ) => ( {
+						id: record[ key ],
+						permissions: getUserPermissionsFromAllowHeader(
+							record._links.self[ 0 ].targetHints.allow
+						),
+					} ) );
 
-					const canUserResolutionsArgs = [];
-					const receiveUserPermissionArgs = {};
-					for ( const targetHint of targetHints ) {
-						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-							canUserResolutionsArgs.push( [
-								action,
-								{ kind, name, id: targetHint.id },
-							] );
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const targetHint of targetHints ) {
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						canUserResolutionsArgs.push( [
+							action,
+							{ kind, name, id: targetHint.id },
+						] );
 
-							receiveUserPermissionArgs[
-								getUserPermissionCacheKey( action, {
-									kind,
-									name,
-									id: targetHint.id,
-								} )
-							] = targetHint.permissions[ action ];
-						}
-					}
-
-					if ( targetHints.length > 0 ) {
-						dispatch.receiveUserPermissions(
-							receiveUserPermissionArgs
-						);
-						dispatch.finishResolutions(
-							'canUser',
-							canUserResolutionsArgs
-						);
-					}
-
-					if ( ! query?._fields ) {
-						dispatch.finishResolutions(
-							'getEntityRecord',
-							getResolutionsArgs( records )
-						);
+						receiveUserPermissionArgs[
+							getUserPermissionCacheKey( action, {
+								kind,
+								name,
+								id: targetHint.id,
+							} )
+						] = targetHint.permissions[ action ];
 					}
 				}
+
+				if ( targetHints.length > 0 ) {
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
+				}
+
+				dispatch.finishResolutions(
+					'getEntityRecord',
+					getResolutionsArgs( records, rawQuery )
+				);
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
@@ -433,6 +436,16 @@ getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
 		name === action.name
 	);
 };
+
+/**
+ * Requests the total number of entity records.
+ */
+export const getEntityRecordsTotalItems = forwardResolver( 'getEntityRecords' );
+
+/**
+ * Requests the number of available pages for the given query.
+ */
+export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
 
 /**
  * Requests the current theme.

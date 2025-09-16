@@ -103,6 +103,10 @@ export type FieldType =
 	| 'media'
 	| 'boolean'
 	| 'email'
+	| 'password'
+	| 'telephone'
+	| 'color'
+	| 'url'
 	| 'array';
 
 /**
@@ -443,6 +447,11 @@ interface ViewBase {
 	 * The field to group by.
 	 */
 	groupByField?: string;
+
+	/**
+	 * Whether infinite scroll is enabled.
+	 */
+	infiniteScrollEnabled?: boolean;
 }
 
 export interface ColumnStyle {
@@ -510,7 +519,23 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewTable;
+export interface ViewPickerGrid extends ViewBase {
+	type: 'pickerGrid';
+
+	layout?: {
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields?: string[];
+
+		/**
+		 * The preview size of the grid.
+		 */
+		previewSize?: number;
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewTable | ViewPickerGrid;
 
 interface ActionBase< Item > {
 	/**
@@ -643,6 +668,20 @@ export interface ViewBaseProps< Item > {
 	empty: ReactNode;
 }
 
+export type ViewPickerBaseProps< Item > = Omit<
+	ViewBaseProps< Item >,
+	| 'view'
+	| 'onChangeView'
+	// The following props are not supported for pickers.
+	| 'isItemClickable'
+	| 'onClickItem'
+	| 'renderItemLink'
+	| 'getItemLevel'
+> & {
+	view: View;
+	onChangeView: ( view: View ) => void;
+};
+
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
 }
@@ -655,28 +694,104 @@ export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
+export interface ViewPickerGridProps< Item >
+	extends Omit< ViewPickerBaseProps< Item >, 'view' > {
+	view: ViewPickerGrid;
+}
+
 export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
 
+export type ViewPickerProps< Item > = ViewPickerGridProps< Item >;
+
 export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
 }
+
+/**
+ * DataForm layouts.
+ */
+export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
+export type LabelPosition = 'top' | 'side' | 'none';
+
+export type RegularLayout = {
+	type: 'regular';
+	labelPosition?: LabelPosition;
+};
+export type NormalizedRegularLayout = {
+	type: 'regular';
+	labelPosition: LabelPosition;
+};
+
+export type PanelLayout = {
+	type: 'panel';
+	labelPosition?: LabelPosition;
+	openAs?: 'dropdown' | 'modal';
+};
+export type NormalizedPanelLayout = {
+	type: 'panel';
+	labelPosition: LabelPosition;
+	openAs: 'dropdown' | 'modal';
+};
+
+export type CardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened?: true;
+	  }
+	| {
+			type: 'card';
+			withHeader?: true | undefined;
+			isOpened?: boolean;
+	  };
+export type NormalizedCardLayout =
+	| {
+			type: 'card';
+			withHeader: false;
+			// isOpened cannot be false if withHeader is false as well.
+			// Otherwise, the card would not be visible.
+			isOpened: true;
+	  }
+	| {
+			type: 'card';
+			withHeader: true;
+			isOpened: boolean;
+	  };
+
+export type RowLayout = {
+	type: 'row';
+	alignment?: 'start' | 'center' | 'end';
+};
+export type NormalizedRowLayout = {
+	type: 'row';
+	alignment: 'start' | 'center' | 'end';
+};
+
+export type Layout = RegularLayout | PanelLayout | CardLayout | RowLayout;
+export type NormalizedLayout =
+	| NormalizedRegularLayout
+	| NormalizedPanelLayout
+	| NormalizedCardLayout
+	| NormalizedRowLayout;
 
 export type SimpleFormField = {
 	id: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	layout?: Layout;
 };
 
 export type CombinedFormField = {
 	id: string;
 	label?: string;
-	layout?: 'regular' | 'panel';
-	labelPosition?: 'side' | 'top' | 'none';
+	description?: string;
+	layout?: Layout;
 	children: Array< FormField | string >;
 };
 
@@ -686,9 +801,8 @@ export type FormField = SimpleFormField | CombinedFormField;
  * The form configuration.
  */
 export type Form = {
-	type?: 'regular' | 'panel';
+	layout?: Layout;
 	fields?: Array< FormField | string >;
-	labelPosition?: 'side' | 'top' | 'none';
 };
 
 export interface DataFormProps< Item > {

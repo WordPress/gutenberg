@@ -29,6 +29,55 @@ module.exports = async ( {
 	info( '' );
 	info( 'Creating a "package.json" file.' );
 
+	/**
+	 * Helper to determine if we can install this package.
+	 *
+	 * @param {string} packageArg The package to install.
+	 */
+	function checkDependency( packageArg ) {
+		const { type } = npmPackageArg( packageArg );
+		if (
+			! [ 'git', 'tag', 'version', 'range', 'remote' ].includes( type )
+		) {
+			throw new Error(
+				`Provided package type "${ type }" is not supported.`
+			);
+		}
+	}
+
+	const dependencies = {};
+	const devDependencies = {};
+
+	if ( npmDependencies && npmDependencies.length ) {
+		for ( const packageArg of npmDependencies ) {
+			try {
+				checkDependency( packageArg );
+				const parsed = npmPackageArg( packageArg );
+				dependencies[ parsed.name ] = parsed.saveSpec || 'latest';
+			} catch ( { message } ) {
+				info( '' );
+				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
+				error( message );
+			}
+		}
+	}
+
+	if ( npmDevDependencies && npmDevDependencies.length ) {
+		for ( const packageArg of npmDevDependencies ) {
+			try {
+				checkDependency( packageArg );
+				const parsed = npmPackageArg( packageArg );
+				devDependencies[ parsed.name ] = parsed.saveSpec || 'latest';
+			} catch ( { message } ) {
+				info( '' );
+				info(
+					`Skipping "${ packageArg }" npm dev dependency. Reason:`
+				);
+				error( message );
+			}
+		}
+	}
+
 	await writePkg(
 		rootDirectory,
 		Object.fromEntries(
@@ -59,71 +108,42 @@ module.exports = async ( {
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,
 				},
+				dependencies:
+					Object.keys( dependencies ).length > 0
+						? dependencies
+						: undefined,
+				devDependencies:
+					Object.keys( devDependencies ).length > 0
+						? devDependencies
+						: undefined,
 				...customPackageJSON,
 			} ).filter( ( [ , value ] ) => !! value )
 		)
 	);
 
-	/**
-	 * Helper to determine if we can install this package.
-	 *
-	 * @param {string} packageArg The package to install.
-	 */
-	function checkDependency( packageArg ) {
-		const { type } = npmPackageArg( packageArg );
-		if (
-			! [ 'git', 'tag', 'version', 'range', 'remote' ].includes( type )
-		) {
-			throw new Error(
-				`Provided package type "${ type }" is not supported.`
-			);
-		}
-	}
-
 	if ( wpScripts ) {
-		if ( npmDependencies && npmDependencies.length ) {
+		if (
+			Object.keys( dependencies ).length > 0 ||
+			Object.keys( devDependencies ).length > 0
+		) {
 			info( '' );
 			info(
 				'Installing npm dependencies. It might take a couple of minutes...'
 			);
-			for ( const packageArg of npmDependencies ) {
-				try {
-					checkDependency( packageArg );
-					info( '' );
-					info( `Installing "${ packageArg }".` );
-					await command( `npm install ${ packageArg }`, {
-						cwd: rootDirectory,
-					} );
-				} catch ( { message } ) {
-					info( '' );
-					info(
-						`Skipping "${ packageArg }" npm dependency. Reason:`
-					);
-					error( message );
-				}
-			}
-		}
 
-		if ( npmDevDependencies && npmDevDependencies.length ) {
-			info( '' );
-			info(
-				'Installing npm devDependencies. It might take a couple of minutes...'
-			);
-			for ( const packageArg of npmDevDependencies ) {
-				try {
-					checkDependency( packageArg );
-					info( '' );
-					info( `Installing "${ packageArg }".` );
-					await command( `npm install ${ packageArg } --save-dev`, {
-						cwd: rootDirectory,
-					} );
-				} catch ( { message } ) {
-					info( '' );
-					info(
-						`Skipping "${ packageArg }" npm dev dependency. Reason:`
-					);
-					error( message );
-				}
+			try {
+				await command( 'npm install', {
+					cwd: rootDirectory,
+				} );
+
+				info( '' );
+				info(
+					'Successfully installed dependencies and ran lifecycle scripts.'
+				);
+			} catch ( { message } ) {
+				info( '' );
+				info( 'Warning: Failed to install dependencies:' );
+				error( message );
 			}
 		}
 	}

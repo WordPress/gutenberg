@@ -70,7 +70,7 @@ const arrayFieldType: FieldTypeDefinition< any > = {
 			return null;
 		},
 	},
-	Edit: null, // Not implemented yet
+	Edit: 'array', // Use array control
 	render,
 	enableSorting: true,
 	filterBy: {

@@ -193,7 +193,7 @@ export function CreateTemplatePartModalContents( {
 					onChange={ setTitle }
 					required
 				/>
-				<fieldset>
+				<fieldset className="fields-create-template-part-modal__area-fieldset">
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Area' ) }
 					</BaseControl.VisualLabel>
