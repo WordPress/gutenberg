@@ -42,7 +42,16 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 		return $block_content;
 	}
 
-	/**
+	/*
+	 * If we're dealing with the Button block, we remove the bindings metadata
+	 * in order to avoid having it reprocessed, which would lead to Core
+	 * capitalizing the wrapper tag (e.g. <DIV>).
+	 */
+	if ( 'core/button' === $instance->name ) {
+		unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
+	}
+
+	/*
 	 * Merge the computed attributes with the original attributes.
 	 *
 	 * Note that this is not a recursive merge, meaning that nested attributes --
