@@ -181,7 +181,14 @@ export function useSyncDeprecatedEntityIntoState( {
 
 	useEffect( () => {
 		if ( isReady ) {
-			setEditedEntity( postType, postId, context );
+			// setEditedEntity expects a string (because the postId used to be
+			// the template slug, even for edited templates). Now the postId can
+			// be a number (either because it's an auto-draft or edited
+			// template). Passing a number could break plugins doing things like
+			// `id.includes`. It would be way more complex to keep passing the
+			// template slug, while also being incorrect, so the easiest
+			// solution is to cast the postId to a string.
+			setEditedEntity( postType, String( postId ), context );
 		}
 	}, [ isReady, postType, postId, context, setEditedEntity ] );
 }
