@@ -149,15 +149,6 @@ function Thread( {
 							variant="link"
 							className="editor-collab-sidebar-panel__show-more-reply"
 							onClick={ () => setFocusThread( thread.id ) }
-							aria-expanded="false"
-							aria-label={ sprintf(
-								// translators: %s: number of replies.
-								_x(
-									'Show %s more replies',
-									'Show replies button'
-								),
-								thread?.reply?.length
-							) }
 						>
 							{ sprintf(
 								// translators: %s: number of replies.
