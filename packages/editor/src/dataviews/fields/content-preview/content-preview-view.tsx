@@ -7,7 +7,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	// @ts-ignore
 } from '@wordpress/block-editor';
-
 import type { BasePost } from '@wordpress/fields';
 import { useSelect } from '@wordpress/data';
 import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';

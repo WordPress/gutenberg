@@ -3,7 +3,12 @@
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings, humanTimeDiff, getDate } from '@wordpress/date';
+import {
+	dateI18n,
+	getSettings as getDateSettings,
+	humanTimeDiff,
+	getDate,
+} from '@wordpress/date';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
