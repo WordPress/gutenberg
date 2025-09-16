@@ -171,7 +171,7 @@ export default function DateTime< Item >( {
 	const value = getValue( { item: data } );
 
 	const onChangeRelativeDateControl = useCallback(
-		( { value: newValue }: DateRelative ) =>
+		( newValue: DateRelative ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
 		[ data, onChange, setValue ]
 	);
