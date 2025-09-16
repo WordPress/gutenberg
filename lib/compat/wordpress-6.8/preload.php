@@ -36,6 +36,8 @@ function gutenberg_block_editor_preload_paths_6_8( $paths, $context ) {
 
 		$paths[] = '/wp/v2/settings';
 		$paths[] = array( '/wp/v2/settings', 'OPTIONS' );
+		$paths[] = '/wp/v2/templates/lookup?slug=front-page';
+		$paths[] = '/wp/v2/templates/lookup?slug=home';
 	}
 
 	// Preload theme and global styles paths.
