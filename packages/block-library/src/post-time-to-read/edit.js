@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	RangeControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -28,17 +29,15 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-/**
- * Average reading rate - based on average taken from
- * https://irisreading.com/average-reading-speed-in-various-languages/
- * (Characters/minute used for Chinese rather than words).
- */
-const AVERAGE_READING_RATE = 189;
-const MIN_READING_RATE = 138;
-const MAX_READING_RATE = 228;
-
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign, displayAsRange } = attributes;
+	/**
+	 * Average reading rate - based on average taken from
+	 * https://irisreading.com/average-reading-speed-in-various-languages/
+	 * (Characters/minute used for Chinese rather than words).
+	 */
+	const AVERAGE_READING_RATE = 189;
+
+	const { textAlign, averageReadingSpeed, displayAsRange } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -81,11 +80,11 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		if ( displayAsRange ) {
 			const minMinutes = Math.max(
 				1,
-				Math.round( totalWords / MAX_READING_RATE )
+				Math.round( totalWords / ( averageReadingSpeed * 1.2 ) )
 			);
 			let maxMinutes = Math.max(
 				1,
-				Math.round( totalWords / MIN_READING_RATE )
+				Math.round( totalWords / ( averageReadingSpeed * 0.8 ) )
 			);
 			if ( minMinutes === maxMinutes ) {
 				maxMinutes = minMinutes + 1;
@@ -100,7 +99,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		const minutesToRead = Math.max(
 			1,
-			Math.round( totalWords / AVERAGE_READING_RATE )
+			Math.round( totalWords / averageReadingSpeed )
 		);
 
 		return sprintf(
@@ -108,7 +107,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks, displayAsRange ] );
+	}, [ contentStructure, blocks, averageReadingSpeed, displayAsRange ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -138,8 +137,36 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				>
 					<ToolsPanelItem
 						isShownByDefault
-						label={ __( 'Display as range' ) }
-						hasValue={ () => ! displayAsRange }
+						hasValue={ () =>
+							averageReadingSpeed !== AVERAGE_READING_RATE
+						}
+						label={ __( 'Average Reading Speed' ) }
+						onDeselect={ () =>
+							setAttributes( { averageReadingSpeed: undefined } )
+						}
+					>
+						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							min={ 1 }
+							max={ AVERAGE_READING_RATE * 2 }
+							label={ __( 'Average Reading Speed' ) }
+							value={
+								averageReadingSpeed || AVERAGE_READING_RATE
+							}
+							initialPosition={ AVERAGE_READING_RATE }
+							onChange={ ( value ) => {
+								setAttributes( { averageReadingSpeed: value } );
+							} }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ _x(
+							'Display as range',
+							'Turns reading time range display on or off'
+						) }
+						hasValue={ () => !! displayAsRange }
 						onDeselect={ () => {
 							setAttributes( {
 								displayAsRange: true,
