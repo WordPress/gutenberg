@@ -111,7 +111,7 @@ function BlockSwitcherDropdownMenuContents( {
 		isSingleBlock &&
 		( isTemplatePart( blocks[ 0 ] ) || isReusableBlock( blocks[ 0 ] ) );
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations.length && canRemove && ! isSynced;
+		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
