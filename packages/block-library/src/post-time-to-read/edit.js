@@ -130,7 +130,10 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				>
 					<ToolsPanelItem
 						isShownByDefault
-						hasValue={ () => averageReadingSpeed !== undefined }
+						hasValue={ () =>
+							averageReadingSpeed !==
+							DEFAULT_AVERAGE_READING_SPEED
+						}
 						label={ __( 'Average Reading Speed' ) }
 						onDeselect={ () =>
 							setAttributes( { averageReadingSpeed: undefined } )
