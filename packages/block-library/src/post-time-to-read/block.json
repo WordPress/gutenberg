@@ -12,10 +12,10 @@
 		"textAlign": {
 			"type": "string"
 		},
-        "averageReadingSpeed": {
-          "type": "string",
-          "default": 189
-        },
+		"averageReadingSpeed": {
+			"type": "number",
+			"default": 189
+		},
 		"displayAsRange": {
 			"type": "boolean",
 			"default": true
