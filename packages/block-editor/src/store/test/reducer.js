@@ -4506,7 +4506,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		// Tests for the contentsOnly experiments pattern.
+		// Tests for the contentOnly experiments pattern.
 		// If/when the experiment is stabilized, this wrapping `describe` and
 		// `beforeAll`/`afterAll` can be removed, un-nesting the tests within.
 		describe( 'contentOnly patterns experiment', () => {
@@ -4685,9 +4685,9 @@ describe( 'state', () => {
 				let initialState;
 				beforeAll( () => {
 					// Simulates how the editor typically inserts controlled blocks,
-					// - first the tp is inserted with no inner blocks.
-					// - next the tp is marked as a controlled block.
-					// - finally, once the inner blocks of the tp are received, they're inserted.
+					// - first the template part is inserted with no inner blocks.
+					// - next the template part is marked as a controlled block.
+					// - finally, once the inner blocks of the template part are received, they're inserted.
 					initialState = dispatchActions(
 						[
 							{
