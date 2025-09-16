@@ -31,6 +31,12 @@ import { default as url } from './url';
 import { renderFromElements } from '../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
+/**
+ *
+ * @param Field The field to get elements for.
+ *
+ * @return The loading state and elements for the field.
+ */
 export function useFieldElements( Field: NormalizedField< any > ) {
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ elements, setElements ] = useState< Option[] >(
@@ -48,11 +54,17 @@ export function useFieldElements( Field: NormalizedField< any > ) {
 					setIsLoading( false );
 				} );
 		}
-	}, [ Field.elementsLoader ] );
+	}, [ Field ] );
 
 	return { isLoading, elements };
 }
 
+/**
+ *
+ * @param Filter The filter to get elements for.
+ *
+ * @return The loading state and elements for the filter.
+ */
 export function useFilterElements( Filter: NormalizedFilter ) {
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ elements, setElements ] = useState< Option[] >(

@@ -62,6 +62,7 @@ type DataType = {
 	textWithElements: string;
 	textWithTextarea: string;
 	textWithLazyElements: string;
+	textWithNeverResolvingElements: string;
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
@@ -96,6 +97,7 @@ const data: DataType[] = [
 		textWithElements: 'Item 1',
 		textWithTextarea: 'Textarea',
 		textWithLazyElements: 'Item 1',
+		textWithNeverResolvingElements: 'Never resolves',
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
@@ -154,13 +156,23 @@ const fields: Field< DataType >[] = [
 		id: 'textWithLazyElements',
 		type: 'text',
 		label: 'Text (with lazy elements)',
-		description: 'Rocco.',
+		description: 'The elements are loaded asynchronously.',
 		elements: () =>
 			Promise.resolve( [
 				{ value: 'item1', label: 'Item 1' },
 				{ value: 'item2', label: 'Item 2' },
 				{ value: 'item3', label: 'Item 3' },
 			] ),
+	},
+	{
+		id: 'textWithNeverResolvingElements',
+		type: 'text',
+		label: 'Text (with never resolving elements)',
+		description: 'Elements that never resolve to test loading states.',
+		elements: () =>
+			new Promise( () => {
+				// This promise never resolves
+			} ),
 	},
 	{
 		id: 'integer',

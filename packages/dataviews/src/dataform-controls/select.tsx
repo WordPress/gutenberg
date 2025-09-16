@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
+import { SelectControl, Spinner } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -31,7 +31,7 @@ export default function Select< Item >( {
 	const { elements: fieldElements, isLoading } = useFieldElements( field );
 
 	if ( isLoading ) {
-		return <p>loading</p>;
+		return <Spinner />;
 	}
 
 	const hasEmptyValue = fieldElements.some(

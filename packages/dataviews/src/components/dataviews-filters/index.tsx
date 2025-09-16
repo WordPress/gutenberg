@@ -29,9 +29,7 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 		fields.forEach( ( field ) => {
 			if (
 				field.filterBy === false ||
-				( Array.isArray( field.elements ) &&
-					! field.elements?.length &&
-					! field.Edit )
+				( ! field.elements?.length && ! field.Edit )
 			) {
 				return;
 			}
