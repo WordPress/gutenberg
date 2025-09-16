@@ -197,10 +197,10 @@ function DataViews< Item >( {
 	);
 
 	useEffect( () => {
-		if ( hasPrimaryOrLockedFilters ) {
+		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
 			setIsShowingFilter( true );
 		}
-	}, [ hasPrimaryOrLockedFilters ] );
+	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {

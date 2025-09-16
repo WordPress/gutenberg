@@ -104,6 +104,12 @@ export function FiltersToggle() {
 	);
 	const visibleFilters = filters.filter( ( filter ) => filter.isVisible );
 
+	const hasOnlyPrimaryOrLockedFilters =
+		visibleFilters.length > 0 &&
+		visibleFilters.every(
+			( filter ) => filter.isPrimary || filter.isLocked
+		);
+
 	const hasVisibleFilters = !! visibleFilters.length;
 	if ( filters.length === 0 ) {
 		return null;
@@ -118,6 +124,7 @@ export function FiltersToggle() {
 		label: _x( 'Filter', 'verb' ),
 		'aria-expanded': isShowingFilter,
 		isPressed: isShowingFilter,
+		disabled: hasOnlyPrimaryOrLockedFilters && isShowingFilter,
 		onClick: () => {
 			if ( ! isShowingFilter ) {
 				setOpenedFilter( null );
