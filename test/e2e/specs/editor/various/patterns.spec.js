@@ -33,7 +33,6 @@ test.describe( 'Unsynced pattern', () => {
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
-			.first()
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
@@ -53,6 +52,15 @@ test.describe( 'Unsynced pattern', () => {
 
 		await page.keyboard.press( 'Enter' );
 
+		// Check that the block content is still the same. If the pattern was added as synced
+		// the content would be wrapped by a pattern block.
+		await expect
+			.poll(
+				editor.getBlocks,
+				'The block content should be the same after converting to an unsynced pattern'
+			)
+			.toEqual( before );
+
 		// Check that the new pattern is available in the inserter and that it gets inserted as
 		// a plain paragraph block.
 		await page.getByLabel( 'Block Inserter' ).click();
@@ -66,52 +74,28 @@ test.describe( 'Unsynced pattern', () => {
 				name: newCategory,
 			} )
 			.click();
-
 		const pattern = page.getByLabel( 'My unsynced pattern' ).first();
 
 		const insertedPatternId = await pattern.evaluate(
 			( element ) => element.id
 		);
 
-		// Check that the block content is still the same. If the pattern was added as synced
-		// the content would be wrapped by a pattern block.
-		const expectedUnsyncedPattern = {
-			...before[ 0 ],
-			attributes: {
-				...before[ 0 ].attributes,
-				metadata: {
-					name: 'My unsynced pattern',
-					patternName: insertedPatternId,
-					// When a pattern is created for the first time the `categories` are missing.
-					// This is a known issue that needs to be fixed.
-				},
-			},
-		};
-
-		await expect
-			.poll( editor.getBlocks )
-			.toEqual( [ expectedUnsyncedPattern ] );
-
-		const expectedInserterUnsyncedPattern = {
-			...before[ 0 ],
-			attributes: {
-				...before[ 0 ].attributes,
-				metadata: {
-					name: 'My unsynced pattern',
-					patternName: insertedPatternId,
-					categories: [ 'contact-details' ],
-				},
-			},
-		};
-
-		// Insert and check that there are two identical unsynced patterns.
 		await pattern.click();
-		await expect
-			.poll( editor.getBlocks )
-			.toEqual( [
-				expectedUnsyncedPattern,
-				expectedInserterUnsyncedPattern,
-			] );
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			...before,
+			{
+				...before[ 0 ],
+				attributes: {
+					...before[ 0 ].attributes,
+					metadata: {
+						categories: [ 'contact-details' ],
+						name: 'My unsynced pattern',
+						patternName: insertedPatternId,
+					},
+				},
+			},
+		] );
 	} );
 } );
 
@@ -148,7 +132,6 @@ test.describe( 'Synced pattern', () => {
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Options' } )
-			.first()
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
@@ -250,7 +233,6 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', {
 				name: 'Edit original',
 			} )
-			.first()
 			.click();
 
 		const editorTopBar = page.getByRole( 'region', {
@@ -312,7 +294,6 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', {
 				name: 'Edit original',
 			} )
-			.first()
 			.click();
 
 		const editorTopBar = page.getByRole( 'region', {
@@ -578,7 +559,6 @@ test.describe( 'Synced pattern', () => {
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Edit original' } )
-			.first()
 			.click();
 
 		await editor.canvas
