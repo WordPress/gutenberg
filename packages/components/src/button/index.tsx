@@ -146,7 +146,8 @@ export function UnforwardedButton(
 	];
 
 	const classes = clsx( 'components-button', className, {
-		'is-next-40px-default-size': __next40pxDefaultSize,
+		'is-next-40px-default-size':
+			__next40pxDefaultSize && variant !== 'link',
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
 		'is-small': size === 'small',
