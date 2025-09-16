@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import {
@@ -190,9 +185,9 @@ describe( 'mode', () => {
 
 describe( 'getPresetValueFromCustomValue', () => {
 	const presets = [
-		{ name: __( 'None' ), slug: '0', size: 0 },
-		{ name: __( 'Small' ), slug: 'sm', size: '4px' },
-		{ name: __( 'Medium' ), slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
+		{ name: 'None', slug: '0', size: 0 },
+		{ name: 'Small', slug: 'sm', size: '4px' },
+		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
 	];
 
 	it( 'should return "0" if value is "0"', () => {
@@ -230,9 +225,9 @@ describe( 'getPresetValueFromCustomValue', () => {
 
 describe( 'getPresetValueFromControlValue', () => {
 	const presets = [
-		{ name: __( 'None' ), slug: '0', size: 0 },
-		{ name: __( 'Small' ), slug: 'sm', size: '4px' },
-		{ name: __( 'Medium' ), slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
+		{ name: 'None', slug: '0', size: 0 },
+		{ name: 'Small', slug: 'sm', size: '4px' },
+		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
 	];
 
 	it( 'should return "0" if control value is 0 and not selectList', () => {
