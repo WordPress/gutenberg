@@ -174,32 +174,6 @@ attributes: {
 }
 ```
 
-## blockVisibility
-
-_**Note:** Since WordPress 6.9._
-
--   Type: `boolean`
--   Default value: `true`
-
-By default, a block can be hidden within the editor from the block "Options" dropdown or the block toolbar. To disable this behavior for a block, set `blockVisibility` to `false`.
-
-```js
-supports: {
-	// Don't allow the block to be hidden via the editor UI.
-	blockVisibility: false
-}
-```
-
-When a block is hidden, the state is stored in the block's `metadata` attribute:
-
-```js
-attributes: {
-	metadata: {
-		blockVisibility: false
-	}
-}
-```
-
 ## className
 
 -   Type: `boolean`
