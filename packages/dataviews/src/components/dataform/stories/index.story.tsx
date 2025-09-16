@@ -93,12 +93,9 @@ const fields: Field< SamplePost >[] = [
 			{ value: 3, label: 'Alice' },
 			{ value: 4, label: 'Bob' },
 		],
-		setValue: ( { item, value } ) => {
-			return {
-				...item,
-				author: Number( value ),
-			};
-		},
+		setValue: ( { value } ) => ( {
+			author: Number( value ),
+		} ),
 	},
 	{
 		id: 'reviewer',
