@@ -25,7 +25,7 @@
 		"html": false,
 		"reusable": false,
 		"renaming": false,
-		"blockVisibility": false,
+		"__experimentalBlockVisibility": false,
 		"interactivity": {
 			"clientNavigation": true
 		}

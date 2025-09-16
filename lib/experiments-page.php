@@ -218,7 +218,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Add block visibility control support and UI.', 'gutenberg' ),
+			'label' => __( 'Add block visibility support and UI.', 'gutenberg' ),
 			'id'    => 'gutenberg-block-visibility',
 		)
 	);

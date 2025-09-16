@@ -489,9 +489,10 @@ function ListViewBlock( {
 		isLocked
 	);
 
-	const blockVisibilityDescription = isBlockHidden
-		? __( 'Block is hidden.' )
-		: null;
+	const blockVisibilityDescription =
+		isBlockHidden && window.__experimentalBlockVisibility
+			? __( 'Block is hidden.' )
+			: null;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;

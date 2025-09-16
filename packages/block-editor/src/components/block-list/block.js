@@ -803,6 +803,7 @@ function BlockListBlockProvider( props ) {
 	};
 
 	if (
+		window.__experimentalBlockVisibility &&
 		isBlockHidden &&
 		! isSelected &&
 		! isMultiSelected &&

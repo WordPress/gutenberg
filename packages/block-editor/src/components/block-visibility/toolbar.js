@@ -24,7 +24,7 @@ export default function BlockVisibilityToolbar( { clientId } ) {
 			return {
 				canToggleBlockVisibility: hasBlockSupport(
 					getBlockName( clientId ),
-					'blockVisibility',
+					'__experimentalBlockVisibility',
 					true
 				),
 				isBlockHidden: _isBlockHidden( clientId ),

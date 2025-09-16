@@ -49,7 +49,11 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				canToggleSelectedBlocksVisibility: getBlocksByClientId(
 					ids
 				).every( ( block ) =>
-					hasBlockSupport( block.name, 'blockVisibility', true )
+					hasBlockSupport(
+						block.name,
+						'__experimentalBlockVisibility',
+						true
+					)
 				),
 			};
 		},
@@ -63,7 +67,9 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
-		canToggleSelectedBlocksVisibility && ! isContentOnly;
+		window.__experimentalBlockVisibility &&
+		canToggleSelectedBlocksVisibility &&
+		! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
