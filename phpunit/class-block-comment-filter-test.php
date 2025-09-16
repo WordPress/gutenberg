@@ -49,5 +49,4 @@ class Tests_BlockCommentFilter extends WP_UnitTestCase {
 		// Assertions.
 		$this->assertContains( 'block_comment', $updated_comment_types );
 	}
-
 }
