@@ -16,6 +16,7 @@
 - Dataform: Add new `password` field type and field control. [#71545](https://github.com/WordPress/gutenberg/pull/71545)
 - DataForm: Add a textarea control for use with the `text` field type ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 - DataViews: support groupBy in the list layout. [#71548](https://github.com/WordPress/gutenberg/pull/71548)
+- DataForm: support validation in select control [#71665](https://github.com/WordPress/gutenberg/pull/71665)
 
 ### Bug Fixes
 

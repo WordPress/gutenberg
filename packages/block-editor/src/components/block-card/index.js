@@ -53,9 +53,18 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {Object}        [props.blockType] Deprecated: Object containing block type data.
  * @param {string}        [props.className] Additional classes to apply to the card.
  * @param {string}        [props.name]      Custom block name to display before the title.
+ * @param {Element}       [props.children]  Children.
  * @return {Element}                        Block card component.
  */
-function BlockCard( { title, icon, description, blockType, className, name } ) {
+function BlockCard( {
+	title,
+	icon,
+	description,
+	blockType,
+	className,
+	name,
+	children,
+} ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
@@ -109,6 +118,7 @@ function BlockCard( { title, icon, description, blockType, className, name } ) {
 						{ description }
 					</Text>
 				) }
+				{ children }
 			</VStack>
 		</div>
 	);
