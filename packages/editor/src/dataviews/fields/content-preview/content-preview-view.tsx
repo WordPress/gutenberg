@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 	// @ts-ignore
 } from '@wordpress/block-editor';
@@ -19,7 +20,8 @@ import { unlock } from '../../../lock-unlock';
 // @ts-ignore
 import { store as editorStore } from '../../../store';
 
-const { useGlobalStyle, BlockPreview } = unlock( blockEditorPrivateApis );
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
 function PostPreviewContainer( {
 	template,
 	post,
