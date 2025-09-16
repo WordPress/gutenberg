@@ -117,6 +117,8 @@ export default function useBlockSync( {
 				// For post-content block children, preserve the
 				// original blocks to maintain UUIDs used for
 				// multi-user collaboration
+				//
+				// Unsure: Why are these blocks being cloned? Do they need to be?
 				const storeBlocks = isPostContentBlock
 					? controlledBlocks
 					: controlledBlocks.map( ( block ) => cloneBlock( block ) );
