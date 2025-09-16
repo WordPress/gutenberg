@@ -142,24 +142,17 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
 	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
-	$dialog_state           = wp_interactivity_state(
-		'core/dialog',
-		array()
-	);
-	$dialogs                = $dialog_state['dialogs'] ?? array();
-	$dialogs[ $context_id ] = array(
-		'id'                      => $context_id,
-		'activationTimerDuration' => (int) $auto_activation_timer,
-		'isOpen'                  => $is_open,
-		'enableDeepLink'          => $enable_deep_link,
-		'isClosing'               => false,
-	);
-	wp_interactivity_state(
-		'core/dialog',
-		array(
-			'dialogs' => $dialogs,
+wp_interactivity_state( 'core/dialog', array( 
+	'dialogs' => array(
+		$context_id => array(
+			'id'                      => $context_id,
+			'activationTimerDuration' => (int) $auto_activation_timer,
+			'isOpen'                  => $is_open,
+			'enableDeepLink'          => $enable_deep_link,
+			'isClosing'               => false,
 		)
-	);
+	)
+) );
 
 	$block_styles  = block_core_dialog_generate_animation_styles( $attributes );
 	$block_styles .= ' ' . block_core_dialog_generate_color_styles( $attributes );
