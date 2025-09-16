@@ -54,6 +54,48 @@ const controls = {
 			</ToolsPanelItem>
 		);
 	},
+	Media( {
+		clientId,
+		control,
+		blockType,
+		attributeValues,
+		updateAttributes,
+	} ) {
+		return (
+			<ToolsPanelItem
+				panelId={ clientId }
+				label={ control.label }
+				hasValue={ () => false } // TODO.
+				onDeselect={ () => {
+					// TODO.
+				} }
+				isShownByDefault={ control.shownByDefault }
+			>
+				Media
+			</ToolsPanelItem>
+		);
+	},
+	Link( {
+		clientId,
+		control,
+		blockType,
+		attributeValues,
+		updateAttributes,
+	} ) {
+		return (
+			<ToolsPanelItem
+				panelId={ clientId }
+				label={ control.label }
+				hasValue={ () => true } // TODO.
+				onDeselect={ () => {
+					// TODO.
+				} }
+				isShownByDefault={ control.shownByDefault }
+			>
+				Link
+			</ToolsPanelItem>
+		);
+	},
 };
 
 function BlockAttributeToolsPanelItem( {

@@ -62,4 +62,31 @@ export const settings = {
 	deprecated,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.controls = [
+		{
+			label: __( 'Image' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'id',
+				src: 'url',
+				caption: 'caption',
+				alt: 'alt',
+			},
+		},
+		{
+			label: __( 'Link' ),
+			type: 'Link',
+			shownByDefault: false,
+			mapping: {
+				href: 'href',
+				rel: 'rel',
+				target: 'linkTarget',
+				destination: 'linkDestination',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );
