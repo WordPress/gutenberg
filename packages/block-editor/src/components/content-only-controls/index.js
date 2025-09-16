@@ -19,106 +19,83 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
 
-function RichTextControl( { label, value, setValue } ) {
+const controls = {
+	RichText( {
+		clientId,
+		control,
+		blockType,
+		attributeValues,
+		updateAttributes,
+	} ) {
+		const valueKey = control.mapping.value;
+		const value = attributeValues[ valueKey ];
+		const defaultValue = blockType.attributes[ valueKey ]?.defaultValue;
+
+		return (
+			<ToolsPanelItem
+				panelId={ clientId }
+				label={ control.label }
+				hasValue={ () => value !== defaultValue }
+				onDeselect={ () => {
+					updateAttributes( { [ valueKey ]: defaultValue } );
+				} }
+				isShownByDefault={ control.shownByDefault }
+			>
+				<TextControl
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+					label={ control.label }
+					value={ value ? stripHTML( value ) : '' }
+					onChange={ ( newValue ) => {
+						updateAttributes( { [ valueKey ]: newValue } );
+					} }
+					autoComplete="off"
+				/>
+			</ToolsPanelItem>
+		);
+	},
+};
+
+function BlockAttributeToolsPanelItem( {
+	clientId,
+	control,
+	blockType,
+	attributeValues,
+} ) {
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const ControlComponent = controls[ control.type ];
+
+	if ( ! ControlComponent ) {
+		return null;
+	}
+
 	return (
-		<TextControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			label={ label }
-			value={ value ? stripHTML( value ) : '' }
-			onChange={ setValue }
-			autoComplete="off"
+		<ControlComponent
+			clientId={ clientId }
+			control={ control }
+			blockType={ blockType }
+			attributeValues={ attributeValues }
+			updateAttributes={ ( attributes ) =>
+				updateBlockAttributes( clientId, attributes )
+			}
 		/>
 	);
 }
 
-function getControlForAttribute( attribute ) {
-	if ( attribute.control.type === 'RichText' ) {
-		return RichTextControl;
-	}
-}
-
-function getDefaultValue( attribute ) {
-	if ( attribute.default ) {
-		return attribute.default;
-	}
-
-	return undefined;
-}
-
-function BlockAttributeToolsPanelItem( {
-	clientId,
-	attributeDefinition,
-	setValue,
-	value,
-} ) {
-	const Control = getControlForAttribute( attributeDefinition );
-
-	if ( ! Control ) {
-		return null;
-	}
-
-	const defaultValue = getDefaultValue( attributeDefinition );
-
-	return (
-		<ToolsPanelItem
-			panelId={ clientId }
-			label={ attributeDefinition.control.label }
-			hasValue={ () => value !== defaultValue }
-			onDeselect={ () => setValue( defaultValue ) }
-			isShownByDefault={ attributeDefinition.control.shownByDefault }
-		>
-			<Control
-				label={ attributeDefinition.control.label }
-				value={ value }
-				setValue={ setValue }
-			/>
-		</ToolsPanelItem>
-	);
-}
-
-function getContentAttributesWithControls( blockType ) {
-	return Object.keys( blockType?.attributes ?? {} )
-		.filter( ( attributeKey ) => {
-			const attribute = blockType.attributes[ attributeKey ];
-			return attribute?.role === 'content' && !! attribute.control;
-		} )
-		.map( ( attributeKey ) => ( {
-			key: attributeKey,
-			...blockType?.attributes[ attributeKey ],
-		} ) );
-}
-
-function getResetAllValue( attributes ) {
-	const resetValue = {};
-
-	attributes.forEach( ( attribute ) => {
-		resetValue[ attribute.key ] = getDefaultValue( attribute );
-	} );
-
-	return resetValue;
-}
-
 function BlockControls( { clientId } ) {
-	const { blockType, attributes } = useSelect(
+	const { attributes, blockType } = useSelect(
 		( select ) => {
-			const { getBlockName, getBlockAttributes } =
+			const { getBlockAttributes, getBlockName } =
 				select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
-
 			const blockName = getBlockName( clientId );
-
 			return {
-				blockType: getBlockType( blockName ),
 				attributes: getBlockAttributes( clientId ),
+				blockType: getBlockType( blockName ),
 			};
 		},
 		[ clientId ]
 	);
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const contentAttributesWithControls =
-		getContentAttributesWithControls( blockType );
 
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -126,7 +103,7 @@ function BlockControls( { clientId } ) {
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	if ( ! contentAttributesWithControls?.length ) {
+	if ( ! blockType?.controls?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no controls.
 		// for example, a way to select the block.
 		return null;
@@ -141,24 +118,14 @@ function BlockControls( { clientId } ) {
 				</HStack>
 			}
 			panelId={ clientId }
-			resetAll={ () => {
-				updateBlockAttributes(
-					clientId,
-					getResetAllValue( contentAttributesWithControls )
-				);
-			} }
 		>
-			{ contentAttributesWithControls?.map( ( attribute ) => (
+			{ blockType?.controls?.map( ( control, index ) => (
 				<BlockAttributeToolsPanelItem
-					key={ clientId }
+					key={ `${ clientId }/${ index }` }
 					clientId={ clientId }
-					attributeDefinition={ attribute }
-					setValue={ ( value ) =>
-						updateBlockAttributes( clientId, {
-							[ attribute.key ]: value,
-						} )
-					}
-					value={ attributes[ attribute.key ] }
+					control={ control }
+					blockType={ blockType }
+					attributeValues={ attributes }
 				/>
 			) ) }
 		</ToolsPanel>

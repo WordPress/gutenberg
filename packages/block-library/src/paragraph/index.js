@@ -58,4 +58,17 @@ export const settings = {
 	variations,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.controls = [
+		{
+			label: __( 'Content' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'content',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );
