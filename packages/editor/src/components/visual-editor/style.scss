@@ -6,9 +6,6 @@
 	// when the iframe doesn't cover the whole canvas
 	// like the "focused entities".
 	background-color: $gray-300;
-	// Allows the height to fit the parent container and avoids parent scrolling contexts from
-	// having overflow due to popovers of block tools.
-	overflow: hidden;
 
 	// This overrides the iframe background since it's applied again here
 	// It also prevents some style glitches if `editor-visual-editor`
@@ -28,6 +25,12 @@
 		padding: $grid-unit-30 $grid-unit-30 0;
 	}
 
+	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the
+	// legacy (non-iframed) canvas, overflow must not be hidden in order to maintain support for sticky positioning.
+	&.is-iframed {
+		overflow: hidden;
+	}
+
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
@@ -39,32 +42,6 @@
 		&.is-tertiary,
 		&.has-icon {
 			padding: 6px;
-		}
-	}
-
-	// The cases for this are non-iframed editor canvas or previewing devices. The block canvas is
-	// made the scrolling context.
-	&.is-scrollable .block-editor-block-canvas {
-		overflow: auto;
-
-		// Applicable only when legacy (non-iframed).
-		> .block-editor-writing-flow {
-			display: flow-root;
-			min-height: 100%;
-			box-sizing: border-box; // Ensures that 100% min-height doesn’t create overflow.
-		}
-
-		// Applicable only when iframed. These styles ensure that if the the iframe is
-		// given a fixed height and it’s taller than the viewport then scrolling is
-		// allowed. This is needed for device previews.
-		> .block-editor-iframe__container {
-			display: flex;
-			flex-direction: column;
-
-			> .block-editor-iframe__scale-container {
-				flex: 1 0 fit-content;
-				display: flow-root;
-			}
 		}
 	}
 }

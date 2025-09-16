@@ -12,13 +12,16 @@ import type { BasePost } from '../../types';
 
 export const FeaturedImageView = ( {
 	item,
+	config,
 }: DataViewRenderFieldProps< BasePost > ) => {
 	const mediaId = item.featured_media;
 
 	const media = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
-			return mediaId ? getEntityRecord( 'root', 'media', mediaId ) : null;
+			return mediaId
+				? getEntityRecord( 'postType', 'attachment', mediaId )
+				: null;
 		},
 		[ mediaId ]
 	);
@@ -30,6 +33,17 @@ export const FeaturedImageView = ( {
 				className="fields-controls__featured-image-image"
 				src={ url }
 				alt=""
+				srcSet={
+					media?.media_details?.sizes
+						? Object.values( media.media_details.sizes )
+								.map(
+									( size: any ) =>
+										`${ size.source_url } ${ size.width }w`
+								)
+								.join( ', ' )
+						: undefined
+				}
+				sizes={ config?.sizes || '100vw' }
 			/>
 		);
 	}

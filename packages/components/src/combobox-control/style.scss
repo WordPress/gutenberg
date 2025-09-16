@@ -12,6 +12,8 @@ input.components-combobox-control__input[type="text"] {
 	margin: 0;
 	line-height: inherit;
 	min-height: auto;
+	background: $components-color-background;
+	color: $components-color-foreground;
 
 	// Resolves Zooming on iOS devices
 	// https://github.com/WordPress/gutenberg/issues/27405
@@ -26,7 +28,7 @@ input.components-combobox-control__input[type="text"] {
 }
 
 .components-combobox-control__suggestions-container {
-	@include input-control;
+	@include input-control($components-color-accent);
 	display: flex;
 	flex-wrap: wrap;
 	align-items: flex-start;
@@ -34,7 +36,7 @@ input.components-combobox-control__input[type="text"] {
 	padding: 0;
 
 	&:focus-within {
-		@include input-style__focus();
+		@include input-style__focus($components-color-accent);
 	}
 
 	.components-spinner {

@@ -36,10 +36,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			);
 
 			const { default_template_types: templateTypes = [] } =
-				select( coreStore ).getEntityRecord(
-					'root',
-					'__unstableBase'
-				) ?? {};
+				select( coreStore ).getCurrentTheme() ?? {};
 
 			return {
 				entityRecordTitle: getTemplateInfo( {

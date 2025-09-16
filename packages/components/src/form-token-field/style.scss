@@ -1,5 +1,5 @@
 .components-form-token-field__input-container {
-	@include input-control();
+	@include input-control($components-color-accent);
 	width: 100%;
 	padding: 0;
 	cursor: text;
@@ -10,7 +10,7 @@
 	}
 
 	&.is-active {
-		@include input-style__focus();
+		@include input-style__focus($components-color-accent);
 	}
 
 	// Token input
@@ -27,7 +27,7 @@
 		min-width: 50px;
 		background: inherit;
 		border: 0;
-		color: $gray-900;
+		color: $components-color-foreground;
 		box-shadow: none;
 
 		// Resolves Zooming on iOS devices
@@ -168,7 +168,7 @@
 }
 
 .components-form-token-field__suggestion {
-	color: $gray-900;
+	color: $components-color-foreground;
 	display: block;
 	font-size: $default-font-size;
 	padding: $grid-unit-10 $grid-unit-15;
@@ -178,7 +178,7 @@
 
 	&.is-selected {
 		background: $components-color-accent;
-		color: $white;
+		color: $components-color-foreground-inverted;
 	}
 
 	&[aria-disabled="true"] {
@@ -186,7 +186,7 @@
 		color: $gray-600;
 
 		&.is-selected {
-			background-color: $components-color-accent-transparent-40;
+			background: color-mix(in srgb, $components-color-accent 4%, transparent);
 		}
 	}
 

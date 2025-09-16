@@ -7,12 +7,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import CustomSelectControl from '../custom-select-control';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
-import { getCommonSizeUnit, isSimpleCssValue } from './utils';
+import { isSimpleCssValue } from './utils';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
@@ -23,20 +22,11 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const { __next40pxDefaultSize, fontSizes, value, size, onChange } = props;
 
-	const areAllSizesSameUnit = !! getCommonSizeUnit( fontSizes );
-
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
 			let hint;
-			if ( areAllSizesSameUnit ) {
-				const [ quantity ] = parseQuantityAndUnitFromRawValue(
-					fontSize.size
-				);
-				if ( quantity !== undefined ) {
-					hint = String( quantity );
-				}
-			} else if ( isSimpleCssValue( fontSize.size ) ) {
+			if ( isSimpleCssValue( fontSize.size ) ) {
 				hint = String( fontSize.size );
 			}
 			return {

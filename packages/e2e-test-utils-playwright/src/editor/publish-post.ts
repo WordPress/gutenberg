@@ -34,9 +34,12 @@ export async function publishPost( this: Editor ) {
 	}
 
 	// Handle saving just the post.
-	await this.page.click(
-		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
-	);
+	await this.page
+		.getByRole( 'region', {
+			name: 'Editor publish',
+		} )
+		.getByRole( 'button', { name: 'Publish', exact: true } )
+		.click();
 
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )

@@ -17,3 +17,11 @@
 		margin-bottom: $grid-unit-10;
 	}
 }
+
+.block-editor-hooks__grid-layout-columns-and-rows-controls,
+.block-editor-hooks__grid-layout-minimum-width-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}

@@ -27,7 +27,7 @@ add_filter(
  */
 function gutenberg_get_site_editor_redirection() {
 	global $pagenow;
-	if ( 'site-editor.php' !== $pagenow || isset( $_REQUEST['p'] ) || ! $_SERVER['QUERY_STRING'] ) {
+	if ( 'site-editor.php' !== $pagenow || isset( $_REQUEST['p'] ) || empty( $_SERVER['QUERY_STRING'] ) ) {
 		return false;
 	}
 

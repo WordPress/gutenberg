@@ -40,8 +40,8 @@ test.describe( 'adding inline tokens', () => {
 			'assets',
 			'10x10_e2e_test_image_z9T8jK.png'
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( os.tmpdir(), filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( os.tmpdir(), fileName + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
 		await page
 			.locator( '.media-modal .moxie-shim input[type=file]' )
@@ -52,7 +52,7 @@ test.describe( 'adding inline tokens', () => {
 
 		// Check the content.
 		const contentRegex = new RegExp(
-			`a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?>`
+			`a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ fileName }\\.png" alt=""\\/?>`
 		);
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -73,7 +73,7 @@ test.describe( 'adding inline tokens', () => {
 
 		// Check the content.
 		const contentRegex2 = new RegExp(
-			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt="Alt"\\/?>`
+			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ fileName }\\.png" alt="Alt"\\/?>`
 		);
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

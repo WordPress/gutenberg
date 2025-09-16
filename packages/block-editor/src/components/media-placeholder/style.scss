@@ -4,4 +4,10 @@
 	@include break-small() {
 		width: 300px;
 	}
+
+	input {
+		// Targeting input as we're using text instead of URLs for relative paths.
+		/* rtl:ignore */
+		direction: ltr;
+	}
 }

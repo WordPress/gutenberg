@@ -27,11 +27,7 @@ export default function EnhancedPaginationModal( {
 		useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		if (
-			enhancedPagination &&
-			hasUnsupportedBlocks &&
-			! window.__experimentalFullPageClientSideNavigation
-		) {
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
 		}

@@ -94,6 +94,7 @@ const {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	mediaEditKey,
 } = unlock( privateApis );
 
 /**
@@ -176,8 +177,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
-						kind: 'root',
-						name: 'media',
+						kind: 'postType',
+						name: 'attachment',
 					} ) ?? true,
 				userCanCreatePages: canUser( 'create', {
 					kind: 'postType',
@@ -231,7 +232,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	);
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
-
+	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	/**
@@ -291,6 +292,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			[ mediaEditKey ]: hasUploadPermissions
+				? editMediaEntity
+				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			mediaSideload: hasUploadPermissions ? mediaSideload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
@@ -363,6 +367,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesData,
 		globalStylesLinksData,
 		renderingMode,
+		editMediaEntity,
 	] );
 }
 

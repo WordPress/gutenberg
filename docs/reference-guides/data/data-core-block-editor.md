@@ -39,7 +39,7 @@ Determines if the given blocks are allowed to be inserted into the block list.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be inserted.
+-   _clientIds_ `string[]`: The block client IDs to be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -564,15 +564,9 @@ _Returns_
 
 ### getHoveredBlockClientId
 
+> **Deprecated**
+
 Returns the currently hovered block.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -1298,15 +1292,9 @@ Action that hides the insertion point.
 
 ### hoverBlock
 
+> **Deprecated**
+
 Returns an action object used in signalling that the block with the specified client ID has been hovered.
-
-_Parameters_
-
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### insertAfterBlock
 
@@ -1881,8 +1869,9 @@ Action that updates attributes of multiple blocks with the specified client IDs.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
--   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+-   _options_ `Object`: Updating options.
+-   _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
 
 _Returns_
 

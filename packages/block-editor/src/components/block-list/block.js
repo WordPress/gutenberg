@@ -262,15 +262,19 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 	// Do not add new properties here, use `useDispatch` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		setAttributes( newAttributes ) {
+		setAttributes( nextAttributes ) {
 			const { getMultiSelectedBlockClientIds } =
 				registry.select( blockEditorStore );
 			const multiSelectedBlockClientIds =
 				getMultiSelectedBlockClientIds();
-			const { clientId } = ownProps;
+			const { clientId, attributes } = ownProps;
 			const clientIds = multiSelectedBlockClientIds.length
 				? multiSelectedBlockClientIds
 				: [ clientId ];
+			const newAttributes =
+				typeof nextAttributes === 'function'
+					? nextAttributes( attributes )
+					: nextAttributes;
 
 			updateBlockAttributes( clientIds, newAttributes );
 		},

@@ -9,6 +9,7 @@ import {
 	setDefaultBlockName,
 } from '../registration';
 import {
+	isUnmodifiedBlock,
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
@@ -433,5 +434,83 @@ describe( 'isContentBlock', () => {
 			title: 'test non-content block',
 		} );
 		expect( isContentBlock( 'core/test-non-content-block' ) ).toBe( false );
+	} );
+} );
+
+describe( 'isUnmodifiedBlock', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				align: {
+					type: 'string',
+				},
+				includesDefault: {
+					type: 'boolean',
+					default: true,
+				},
+				content: {
+					type: 'string',
+					role: 'content',
+				},
+				metadata: {
+					type: 'object',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'core/test-block' );
+	} );
+
+	it( 'should return true if all attributes match their defaults', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block ) ).toBe( true );
+	} );
+
+	it( 'should return false if any attribute does not match its default', () => {
+		const block = createBlock( 'core/test-block', {
+			includesDefault: false,
+		} );
+		expect( isUnmodifiedBlock( block ) ).toBe( false );
+	} );
+
+	it( 'should return true if attributes with a specific role match their defaults', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+	} );
+
+	it( 'should return false if attributes with a specific role do not match their defaults', () => {
+		const block = createBlock( 'core/test-block', {
+			content: 'Updated content',
+		} );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+
+	it( 'should return true if no attributes exist for the specified role', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( true );
+	} );
+
+	it( 'should return true if metadata attributes is not modified for role content', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+	} );
+
+	it( 'should return false if metadata attributes is modified for role content', () => {
+		const block = createBlock( 'core/test-block', {
+			metadata: {
+				bindings: {
+					content: {
+						source: 'core/post-meta',
+						args: { key: 'genre' },
+					},
+				},
+			},
+		} );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
 	} );
 } );

@@ -10,6 +10,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	// Prevents the `fieldset` from growing beyond its parent's size
 	// in order to fit its content.
 	min-width: 0;

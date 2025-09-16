@@ -179,7 +179,7 @@ add_filter( 'wp_nav_menu_objects', 'gutenberg_remove_block_nav_menu_items', 10 )
  *
  * @param array $menu_items The menu items to convert, sorted by each menu item's menu order.
  * @param array $menu_items_by_parent_id All menu items, indexed by their parent's ID.
-
+ *
  * @return array Updated menu items, sorted by each menu item's menu order.
  */
 function gutenberg_convert_menu_items_to_blocks(

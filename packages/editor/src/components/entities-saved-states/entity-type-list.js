@@ -26,7 +26,7 @@ function getEntityDescription( entity, count ) {
 				: __( 'These changes will affect your whole site.' );
 		case 'wp_template':
 			return __(
-				'This change will affect pages and posts that use this template.'
+				'This change will affect other parts of your site that use this template.'
 			);
 		case 'page':
 		case 'post':

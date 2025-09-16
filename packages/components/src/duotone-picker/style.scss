@@ -13,6 +13,10 @@
 		color: transparent;
 	}
 
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
+		color: transparent;
+	}
+
 	&:not([aria-disabled="true"]):active {
 		color: transparent;
 	}

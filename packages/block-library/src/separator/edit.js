@@ -6,20 +6,44 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule, SelectControl } from '@wordpress/components';
 import {
-	useBlockProps,
 	getColorClassName,
-	__experimentalUseColorProps as useColorProps,
 	InspectorControls,
+	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
+import { HorizontalRule, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import useDeprecatedOpacity from './use-deprecated-opacity';
-import { htmlElementMessages } from '../utils/messages';
+
+const HtmlElementControl = ( { tagName, setAttributes } ) => {
+	return (
+		<SelectControl
+			label={ __( 'HTML element' ) }
+			value={ tagName }
+			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
+			options={ [
+				{ label: __( 'Default (<hr>)' ), value: 'hr' },
+				{ label: '<div>', value: 'div' },
+			] }
+			help={
+				tagName === 'hr'
+					? __(
+							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
+					  )
+					: __(
+							'The <div> element should only be used if the block is a design element with no semantic meaning.'
+					  )
+			}
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+		/>
+	);
+};
 
 export default function SeparatorEdit( { attributes, setAttributes } ) {
 	const { backgroundColor, opacity, style, tagName } = attributes;
@@ -52,19 +76,9 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<hr>)' ), value: 'hr' },
-						{ label: '<div>', value: 'div' },
-					] }
-					value={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ tagName ] }
+				<HtmlElementControl
+					tagName={ tagName }
+					setAttributes={ setAttributes }
 				/>
 			</InspectorControls>
 			<Wrapper

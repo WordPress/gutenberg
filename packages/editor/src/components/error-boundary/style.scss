@@ -3,7 +3,7 @@
 	margin: auto;
 	max-width: 780px;
 	padding: 1em;
-	margin-top: 60px;
+	margin-top: $header-height;
 	box-shadow: $elevation-large;
 	border: $border-width solid $gray-900;
 	border-radius: $radius-small;

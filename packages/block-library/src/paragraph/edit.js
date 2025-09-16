@@ -81,8 +81,8 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 				hasValue={ () => !! dropCap }
 				label={ __( 'Drop cap' ) }
 				isShownByDefault={ isDropCapControlEnabledByDefault }
-				onDeselect={ () => setAttributes( { dropCap: undefined } ) }
-				resetAllFilter={ () => ( { dropCap: undefined } ) }
+				onDeselect={ () => setAttributes( { dropCap: false } ) }
+				resetAllFilter={ () => ( { dropCap: false } ) }
 				panelId={ clientId }
 			>
 				<ToggleControl

@@ -52,7 +52,9 @@ describe( 'FontSizePicker', () => {
 			await render(
 				<FontSizePicker value={ value } onChange={ onChange } />
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.clear( input );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 3 ); // Once for the clear, then once per keystroke.
@@ -79,7 +81,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( expectedValue );
@@ -129,27 +133,13 @@ describe( 'FontSizePicker', () => {
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12px' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16px' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20px' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
 		} );
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size (px)' },
-			{ value: '8px', expectedLabel: 'Size (px)' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
 
 		test.each( [
 			{
@@ -158,7 +148,7 @@ describe( 'FontSizePicker', () => {
 				expectedArguments: [ undefined ],
 			},
 			{
-				option: 'Tiny 8',
+				option: 'Tiny 8px',
 				value: undefined,
 				expectedArguments: [ '8px', fontSizes[ 0 ] ],
 			},
@@ -252,23 +242,6 @@ describe( 'FontSizePicker', () => {
 				expect(
 					screen.getByRole( 'combobox', { name: 'Font size' } )
 				).toHaveTextContent( option );
-			}
-		);
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '8px', expectedLabel: 'Size' },
-			{ value: '1em', expectedLabel: 'Size' },
-			{ value: '2rem', expectedLabel: 'Size' },
-			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
 			}
 		);
 
@@ -372,20 +345,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Gigantosaurus' );
 		} );
 
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
-
 		it( 'calls onChange when a font size is selected', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -438,25 +397,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 3 ] ).toHaveTextContent( 'XL' );
 			expect( options[ 3 ] ).toHaveAccessibleName( 'Extra Large' );
 		} );
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '1em', expectedLabel: 'Size Medium' },
-			{ value: '2rem', expectedLabel: 'Size Large' },
-			{
-				value: 'clamp(1.75rem, 3vw, 2.25rem)',
-				expectedLabel: 'Size Extra Large',
-			},
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			async ( { value, expectedLabel } ) => {
-				await render(
-					<FontSizePicker fontSizes={ fontSizes } value={ value } />
-				);
-				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
-			}
-		);
 
 		test.each( [
 			{ radio: 'Small', expectedArguments: [ '12px', fontSizes[ 0 ] ] },
@@ -524,14 +464,18 @@ describe( 'FontSizePicker', () => {
 			await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 		} );
 
 		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', async () => {
 			const { rerender } = await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -549,7 +493,9 @@ describe( 'FontSizePicker', () => {
 			const { rerender } = await render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -557,7 +503,9 @@ describe( 'FontSizePicker', () => {
 					value={ fontSizes[ 0 ].size }
 				/>
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 		} );
 
 		it( 'allows custom values by default', async () => {
@@ -569,7 +517,10 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
@@ -585,7 +536,10 @@ describe( 'FontSizePicker', () => {
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
 
-			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Use size preset' } )
@@ -632,7 +586,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const sliderInput = screen.getByLabelText( 'Custom Size' );
+			const sliderInput = screen.getByRole( 'slider', {
+				name: 'Font size',
+			} );
 			fireEvent.change( sliderInput, {
 				target: { value: 80 },
 			} );

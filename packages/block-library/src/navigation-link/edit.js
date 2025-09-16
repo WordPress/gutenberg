@@ -11,6 +11,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	CheckboxControl,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -26,6 +27,7 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
@@ -41,8 +43,13 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
+const NESTING_BLOCK_NAMES = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -95,19 +102,29 @@ const useIsDraggingWithin = ( elementRef ) => {
 	return isDraggingWithin;
 };
 
-const useIsInvalidLink = ( kind, type, id ) => {
+const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const isPostType =
 		kind === 'post-type' || type === 'post' || type === 'page';
 	const hasId = Number.isInteger( id );
+	const blockEditingMode = useBlockEditingMode();
+
 	const postStatus = useSelect(
 		( select ) => {
 			if ( ! isPostType ) {
 				return null;
 			}
+
+			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
+			// When the block is rendered in a template or other disabled contexts we can skip this check in order
+			// to avoid all these additional requests that don't really add any value in that mode.
+			if ( blockEditingMode === 'disabled' || ! enabled ) {
+				return null;
+			}
+
 			const { getEntityRecord } = select( coreStore );
 			return getEntityRecord( 'postType', type, id )?.status;
 		},
-		[ isPostType, type, id ]
+		[ isPostType, blockEditingMode, enabled, type, id ]
 	);
 
 	// Check Navigation Link validity if:
@@ -158,10 +175,24 @@ function getMissingText( type ) {
  * packages/block-library/src/navigation-submenu/edit.js
  * Consider reusing this components for both blocks.
  */
-function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
-	const { label, url, description, title, rel } = attributes;
+function Controls( { attributes, setAttributes, setIsEditingControl } ) {
+	const { label, url, description, rel, opensInNewTab } = attributes;
+	const lastURLRef = useRef( url );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	return (
-		<ToolsPanel label={ __( 'Settings' ) }>
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				setAttributes( {
+					label: '',
+					url: '',
+					description: '',
+					rel: '',
+					opensInNewTab: false,
+				} );
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
 			<ToolsPanelItem
 				hasValue={ () => !! label }
 				label={ __( 'Text' ) }
@@ -177,8 +208,8 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 						setAttributes( { label: labelValue } );
 					} }
 					autoComplete="off"
-					onFocus={ () => setIsLabelFieldFocused( true ) }
-					onBlur={ () => setIsLabelFieldFocused( false ) }
+					onFocus={ () => setIsEditingControl( true ) }
+					onBlur={ () => setIsEditingControl( false ) }
 				/>
 			</ToolsPanelItem>
 
@@ -194,13 +225,41 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 					label={ __( 'Link' ) }
 					value={ url ? safeDecodeURI( url ) : '' }
 					onChange={ ( urlValue ) => {
-						updateAttributes(
-							{ url: urlValue },
-							setAttributes,
-							attributes
-						);
+						setAttributes( {
+							url: encodeURI( safeDecodeURI( urlValue ) ),
+						} );
 					} }
 					autoComplete="off"
+					type="url"
+					onFocus={ () => {
+						lastURLRef.current = url;
+						setIsEditingControl( true );
+					} }
+					onBlur={ () => {
+						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
+						updateAttributes(
+							{ url: ! url ? lastURLRef.current : url },
+							setAttributes,
+							{ ...attributes, url: lastURLRef.current }
+						);
+						setIsEditingControl( false );
+					} }
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={ () => !! opensInNewTab }
+				label={ __( 'Open in new tab' ) }
+				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
+				isShownByDefault
+			>
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Open in new tab' ) }
+					checked={ opensInNewTab }
+					onChange={ ( value ) =>
+						setAttributes( { opensInNewTab: value } )
+					}
 				/>
 			</ToolsPanelItem>
 
@@ -219,27 +278,6 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 					} }
 					help={ __(
 						'The description will be displayed in the menu if the current theme supports it.'
-					) }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! title }
-				label={ __( 'Title attribute' ) }
-				onDeselect={ () => setAttributes( { title: '' } ) }
-				isShownByDefault
-			>
-				<TextControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Title attribute' ) }
-					value={ title || '' }
-					onChange={ ( titleValue ) => {
-						setAttributes( { title: titleValue } );
-					} }
-					autoComplete="off"
-					help={ __(
-						'Additional information to help clarify the purpose of the link.'
 					) }
 				/>
 			</ToolsPanelItem>
@@ -279,8 +317,6 @@ export default function NavigationLinkEdit( {
 	clientId,
 } ) {
 	const { id, label, type, url, description, kind } = attributes;
-
-	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
 
 	const {
@@ -303,15 +339,17 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 
-	// Change the label using inspector causes rich text to change focus on firefox.
-	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
-	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
+	// Change the `label` and `url` using inspector causes RichText to change focus.
+	// This is a workaround to keep the focus on the field when it's focused we don't render the RichText.
+	// See: https://github.com/WordPress/gutenberg/pull/61374.
+	const [ isEditingControl, setIsEditingControl ] = useState( false );
 
 	const {
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
+		validateLinkStatus,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -320,27 +358,47 @@ export default function NavigationLinkEdit( {
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			const isTopLevel =
+				getBlockName( rootClientId ) === 'core/navigation';
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const rootNavigationClientId = isTopLevel
+				? rootClientId
+				: getBlockParentsByBlockName(
+						clientId,
+						'core/navigation'
+				  )[ 0 ];
+
+			// Enable when the root Navigation block is selected or any of its inner blocks.
+			const enableLinkStatusValidation =
+				selectedBlockClientId === rootNavigationClientId ||
+				hasSelectedInnerBlock( rootNavigationClientId, true );
 
 			return {
 				isAtMaxNesting:
-					getBlockParentsByBlockName( clientId, [
-						'core/navigation-link',
-						'core/navigation-submenu',
-					] ).length >= maxNestingLevel,
-				isTopLevelLink:
-					getBlockName( getBlockRootClientId( clientId ) ) ===
-					'core/navigation',
+					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
+						.length >= maxNestingLevel,
+				isTopLevelLink: isTopLevel,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
+				validateLinkStatus: enableLinkStatusValidation,
 			};
 		},
 		[ clientId, maxNestingLevel ]
 	);
 	const { getBlocks } = useSelect( blockEditorStore );
+
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
 
 	/**
 	 * Transform to submenu block.
@@ -519,14 +577,14 @@ export default function NavigationLinkEdit( {
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setIsLabelFieldFocused={ setIsLabelFieldFocused }
+					setIsEditingControl={ setIsEditingControl }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url ? (
+					{ ! url && ! isEditingControl ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<span>{ missingText }</span>
 						</div>
@@ -534,7 +592,7 @@ export default function NavigationLinkEdit( {
 						<>
 							{ ! isInvalid &&
 								! isDraft &&
-								! isLabelFieldFocused && (
+								! isEditingControl && (
 									<>
 										<RichText
 											ref={ ref }
@@ -568,9 +626,7 @@ export default function NavigationLinkEdit( {
 										) }
 									</>
 								) }
-							{ ( isInvalid ||
-								isDraft ||
-								isLabelFieldFocused ) && (
+							{ ( isInvalid || isDraft || isEditingControl ) && (
 								<div
 									className={ clsx(
 										'wp-block-navigation-link__placeholder-text',

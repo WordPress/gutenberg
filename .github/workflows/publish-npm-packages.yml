@@ -10,6 +10,7 @@ on:
                 default: 'development'
                 options:
                     - development
+                    - latest
                     - bugfix
                     - wp
             wp_version:
@@ -23,33 +24,41 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     release:
         name: Release - ${{ github.event.inputs.release_type }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   path: cli
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
@@ -58,6 +67,7 @@ jobs:
                   fetch-depth: 999
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Configure git user name and email (for publishing)
               run: |
@@ -67,7 +77,7 @@ jobs:
 
             - name: Setup Node.js
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
@@ -75,7 +85,7 @@ jobs:
 
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
@@ -87,6 +97,15 @@ jobs:
                   cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish packages based on the latest Gutenberg plugin to npm ("latest" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'latest' }}
+              run: |
+                  cd cli
+                  npm ci
+                  ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -104,6 +123,7 @@ jobs:
               run: |
                   cd publish
                   npm ci
-                  npx lerna publish patch --dist-tag wp-${{ github.event.inputs.wp_version }} --no-private --yes --no-verify-access
+                  npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+                  WP_VERSION: ${{ github.event.inputs.wp_version }}

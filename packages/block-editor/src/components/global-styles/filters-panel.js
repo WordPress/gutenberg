@@ -124,7 +124,10 @@ const renderToggle =
 
 		const toggleProps = {
 			onClick: onToggle,
-			className: clsx( { 'is-open': isOpen } ),
+			className: clsx(
+				'block-editor-global-styles-filters-panel__dropdown-toggle',
+				{ 'is-open': isOpen }
+			),
 			'aria-expanded': isOpen,
 			ref: duotoneButtonRef,
 		};

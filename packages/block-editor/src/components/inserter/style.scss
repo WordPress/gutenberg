@@ -373,13 +373,13 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-15;
+		top: $header-height + $grid-unit-10;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
 		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
 		overflow-x: visible;
-		overflow-y: scroll;
+		overflow-y: auto;
 
 		&__categories-list__item {
 			display: block;
@@ -644,5 +644,10 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	display: none;
 	padding: 0 $grid-unit-30 $grid-unit-20;
+
+	@include break-mobile {
+		display: block;
+	}
 }

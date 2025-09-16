@@ -17,6 +17,7 @@ export const settings = {
 	edit,
 	save,
 	variations,
+	example: {},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

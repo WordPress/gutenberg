@@ -16,9 +16,17 @@ concurrency:
     group: ${{ github.workflow }}
     cancel-in-progress: false
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     cherry-pick:
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: write
+            issues: write
+            pull-requests: read
         # When in the context of a PR, ensure the PR is merged.
         if: github.event.pull_request == null || github.event.pull_request.merged == true
         steps:
@@ -70,10 +78,11 @@ jobs:
 
             - name: Checkout repository
               if: env.cherry_pick == 'true'
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   fetch-depth: 0
+                  persist-credentials: false
 
             - name: Set up Git
               if: env.cherry_pick == 'true'
@@ -85,20 +94,20 @@ jobs:
               id: cherry-pick
               if: env.cherry_pick == 'true'
               run: |
-                  TARGET_BRANCH="wp/${{ env.version }}"
-                  COMMIT_SHA="${{ env.commit_sha }}"
+                  TARGET_BRANCH="wp/${version}"
+                  COMMIT_SHA="${commit_sha}"
                   echo "Target branch: $TARGET_BRANCH"
                   echo "Commit SHA: $COMMIT_SHA"
-                  git checkout $TARGET_BRANCH
-                  git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
+                  git checkout "$TARGET_BRANCH"
+                  git cherry-pick "$COMMIT_SHA" || echo "cherry-pick-failed" > result
                   if [ -f result ] && grep -q "cherry-pick-failed" result; then
-                    echo "conflict=true" >> $GITHUB_ENV
+                    echo "conflict=true" >> "$GITHUB_ENV"
                     git cherry-pick --abort
                   else
-                    CHERRY_PICK_SHA=$(git rev-parse HEAD)
-                    echo "conflict=false" >> $GITHUB_ENV
-                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> $GITHUB_ENV
-                    git push origin $TARGET_BRANCH
+                    CHERRY_PICK_SHA="$(git rev-parse HEAD)"
+                    echo "conflict=false" >> "$GITHUB_ENV"
+                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> "$GITHUB_ENV"
+                    git push origin "$TARGET_BRANCH"
                   fi
 
             - name: Remove cherry-pick label

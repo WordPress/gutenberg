@@ -13,7 +13,9 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ColorListPicker from './color-list-picker';
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import { VStack } from '../v-stack';
 
 import CustomDuotoneBar from './custom-duotone-bar';
@@ -127,33 +129,12 @@ function DuotonePicker( {
 		);
 	} );
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
-
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
-	}
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
 	const options = unsetable
 		? [ unsetOption, ...duotoneOptions ]
@@ -163,6 +144,7 @@ function DuotonePicker( {
 		<CircularOptionPicker
 			{ ...otherProps }
 			{ ...metaProps }
+			{ ...labelProps }
 			options={ options }
 			actions={
 				!! clearable && (

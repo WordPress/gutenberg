@@ -4,18 +4,18 @@
 import {
 	TextControl,
 	SelectControl,
-	RangeControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
+	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,12 +35,13 @@ import {
 	useAllowedControls,
 	isControlAllowed,
 	useTaxonomies,
+	useOrderByOptions,
 } from '../../utils';
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout, isSingular } = props;
-	const { query, displayLayout } = attributes;
+	const { attributes, setQuery, isSingular } = props;
+	const { query } = attributes;
 	const {
 		order,
 		orderBy,
@@ -98,28 +99,20 @@ export default function QueryInspectorControls( props ) {
 		setQuery( updateQuery );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
-	const onChangeDebounced = useCallback(
-		debounce( () => {
-			if ( query.search !== querySearch ) {
-				setQuery( { search: querySearch } );
-			}
-		}, 250 ),
-		[ querySearch, query.search ]
-	);
-	useEffect( () => {
-		onChangeDebounced();
-		return onChangeDebounced.cancel;
-	}, [ querySearch, onChangeDebounced ] );
+	const debouncedQuerySearch = useMemo( () => {
+		return debounce( ( newQuerySearch ) => {
+			setQuery( { search: newQuerySearch } );
+		}, 250 );
+	}, [ setQuery ] );
 
-	const showInheritControl =
-		! isSingular && isControlAllowed( allowedControls, 'inherit' );
+	const orderByOptions = useOrderByOptions( postType );
+	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
 	);
-	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
 	const showStickyControl =
@@ -129,7 +122,6 @@ export default function QueryInspectorControls( props ) {
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
-		showColumnsControl ||
 		showOrderControl ||
 		showStickyControl;
 	const showTaxControl =
@@ -183,6 +175,10 @@ export default function QueryInspectorControls( props ) {
 	const showDisplayPanel =
 		showPostCountControl || showOffSetControl || showPagesControl;
 
+	// The block cannot inherit a default WordPress query in singular content (e.g., post, page, 404, blank).
+	// Warn users but still permit this type of query for exceptional cases in Classic and Hybrid themes.
+	const hasInheritanceWarning = isSingular && inherit;
+
 	return (
 		<>
 			{ showSettingsPanel && (
@@ -206,36 +202,48 @@ export default function QueryInspectorControls( props ) {
 							onDeselect={ () => setQuery( { inherit: true } ) }
 							isShownByDefault
 						>
-							<ToggleGroupControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Query type' ) }
-								isBlock
-								onChange={ ( value ) => {
-									setQuery( {
-										inherit: value === 'default',
-									} );
-								} }
-								help={
-									inherit
-										? __(
-												'Display a list of posts or custom post types based on the current template.'
-										  )
-										: __(
-												'Display a list of posts or custom post types based on specific criteria.'
-										  )
-								}
-								value={ !! inherit ? 'default' : 'custom' }
-							>
-								<ToggleGroupControlOption
-									value="default"
-									label={ __( 'Default' ) }
-								/>
-								<ToggleGroupControlOption
-									value="custom"
-									label={ __( 'Custom' ) }
-								/>
-							</ToggleGroupControl>
+							<VStack spacing={ 4 }>
+								<ToggleGroupControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Query type' ) }
+									isBlock
+									onChange={ ( value ) => {
+										setQuery( {
+											inherit: value === 'default',
+										} );
+									} }
+									help={
+										inherit
+											? __(
+													'Display a list of posts or custom post types based on the current template.'
+											  )
+											: __(
+													'Display a list of posts or custom post types based on specific criteria.'
+											  )
+									}
+									value={ !! inherit ? 'default' : 'custom' }
+								>
+									<ToggleGroupControlOption
+										value="default"
+										label={ __( 'Default' ) }
+									/>
+									<ToggleGroupControlOption
+										value="custom"
+										label={ __( 'Custom' ) }
+									/>
+								</ToggleGroupControl>
+								{ hasInheritanceWarning && (
+									<Notice
+										status="warning"
+										isDismissible={ false }
+									>
+										{ __(
+											'Cannot inherit the current template query when placed inside the singular content (e.g., post, page, 404, blank).'
+										) }
+									</Notice>
+								) }
+							</VStack>
 						</ToolsPanelItem>
 					) }
 
@@ -280,43 +288,6 @@ export default function QueryInspectorControls( props ) {
 						</ToolsPanelItem>
 					) }
 
-					{ showColumnsControl && (
-						<ToolsPanelItem
-							hasValue={ () => displayLayout?.columns !== 2 }
-							label={ __( 'Columns' ) }
-							onDeselect={ () =>
-								setDisplayLayout( { columns: 2 } )
-							}
-							isShownByDefault
-						>
-							<>
-								<RangeControl
-									__nextHasNoMarginBottom
-									__next40pxDefaultSize
-									label={ __( 'Columns' ) }
-									value={ displayLayout.columns }
-									onChange={ ( value ) =>
-										setDisplayLayout( {
-											columns: value,
-										} )
-									}
-									min={ 2 }
-									max={ Math.max( 6, displayLayout.columns ) }
-								/>
-								{ displayLayout.columns > 6 && (
-									<Notice
-										status="warning"
-										isDismissible={ false }
-									>
-										{ __(
-											'This column count exceeds the recommended amount and may cause visual breakage.'
-										) }
-									</Notice>
-								) }
-							</>
-						</ToolsPanelItem>
-					) }
-
 					{ showOrderControl && (
 						<ToolsPanelItem
 							hasValue={ () =>
@@ -329,7 +300,7 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							<OrderControl
-								{ ...{ order, orderBy } }
+								{ ...{ order, orderBy, orderByOptions } }
 								onChange={ setQuery }
 							/>
 						</ToolsPanelItem>
@@ -441,14 +412,20 @@ export default function QueryInspectorControls( props ) {
 						<ToolsPanelItem
 							hasValue={ () => !! querySearch }
 							label={ __( 'Keyword' ) }
-							onDeselect={ () => setQuerySearch( '' ) }
+							onDeselect={ () => {
+								setQuery( { search: '' } );
+								setQuerySearch( '' );
+							} }
 						>
 							<TextControl
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
-								onChange={ setQuerySearch }
+								onChange={ ( newQuerySearch ) => {
+									debouncedQuerySearch( newQuerySearch );
+									setQuerySearch( newQuerySearch );
+								} }
 							/>
 						</ToolsPanelItem>
 					) }

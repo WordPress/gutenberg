@@ -1,6 +1,6 @@
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $gray-900;
+	border: $border-width solid $components-color-foreground;
 	border-radius: $radius-small;
 	flex-shrink: 0;
 
@@ -14,13 +14,11 @@
 		& > .components-toolbar-group {
 			border-right: none;
 		}
-
 	}
 }
 
 .components-accessible-toolbar,
 .components-toolbar {
-
 	&[aria-orientation="vertical"] {
 		display: flex;
 		flex-direction: column;
@@ -56,7 +54,7 @@
 			z-index: -1;
 
 			// Animate in.
-			@media not (prefers-reduced-motion) {
+			@media not ( prefers-reduced-motion ) {
 				animation: components-button__appear-animation 0.1s ease;
 				animation-fill-mode: forwards;
 			}
@@ -79,7 +77,7 @@
 			}
 
 			&::before {
-				background: $gray-900;
+				background: $components-color-foreground;
 			}
 		}
 
@@ -98,7 +96,6 @@
 		}
 	}
 }
-
 
 @keyframes components-button__appear-animation {
 	from {

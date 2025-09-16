@@ -6,6 +6,7 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import variations from './variations';
+import deprecated from './deprecated';
 
 /**
  * WordPress dependencies
@@ -19,7 +20,9 @@ export { metadata, name };
 export const settings = {
 	edit,
 	save,
+	deprecated,
 	variations,
+	example: {},
 };
 
 export const init = () => {

@@ -6,9 +6,23 @@ import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import { Tabs } from './tabs';
-import { kebabCase } from './utils/strings';
+import { kebabCase, normalizeTextString } from './utils/strings';
+import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
 import Badge from './badge';
+
+import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+import {
+	ValidatedCheckboxControl,
+	ValidatedInputControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+} from './validated-form-controls';
+import { Picker } from './color-picker/picker';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -18,5 +32,19 @@ lock( privateApis, {
 	Theme,
 	Menu,
 	kebabCase,
+	withIgnoreIMEEvents,
 	Badge,
+	normalizeTextString,
+	DateCalendar,
+	DateRangeCalendar,
+	TZDate,
+	Picker,
+	ValidatedInputControl,
+	ValidatedCheckboxControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
 } );

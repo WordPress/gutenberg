@@ -12,9 +12,15 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     test:
         runs-on: macos-13
+        permissions:
+            contents: read
         if: false
         #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
@@ -24,9 +30,10 @@ jobs:
 
         steps:
             - name: checkout
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Use desired version of Java
               uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
@@ -38,7 +45,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Restore tests setup cache
-              uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
               with:
                   path: |
                       ~/.appium
@@ -53,7 +60,7 @@ jobs:
             # AVD cache disabled as it caused emulator termination to hang indefinitely.
             # https://github.com/ReactiveCircus/android-emulator-runner/issues/385
             # - name: AVD cache
-            #   uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+            #   uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
             #   id: avd-cache
             #   with:
             #       path: |
@@ -75,6 +82,8 @@ jobs:
 
             - name: Run tests
               uses: reactivecircus/android-emulator-runner@62dbb605bba737720e10b196cb4220d374026a6d # v2.33.0
+              env:
+                  NATIVE_TEST_NAME: ${{ matrix.native-test-name }}
               with:
                   api-level: ${{ matrix.api-level }}
                   force-avd-creation: false
@@ -82,7 +91,7 @@ jobs:
                   disable-animations: true
                   arch: x86_64
                   profile: Nexus 6
-                  script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
+                  script: npm run native test:e2e:android:local "$NATIVE_TEST_NAME"
 
             - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: always()

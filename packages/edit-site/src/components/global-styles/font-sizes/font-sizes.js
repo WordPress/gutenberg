@@ -69,9 +69,9 @@ function FontSizeGroup( {
 				/>
 			) }
 			<VStack spacing={ 4 }>
-				<HStack justify="space-between" align="center">
+				<HStack>
 					<Subtitle level={ 3 }>{ label }</Subtitle>
-					<FlexItem>
+					<FlexItem className="edit-site-global-styles__typography-panel__options-container">
 						{ origin === 'custom' && (
 							<Button
 								label={ __( 'Add font size' ) }

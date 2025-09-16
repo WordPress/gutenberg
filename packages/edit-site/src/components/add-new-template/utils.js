@@ -68,8 +68,7 @@ export const useExistingTemplates = () => {
 export const useDefaultTemplateTypes = () => {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-				?.default_template_types || [],
+			select( coreStore ).getCurrentTheme()?.default_template_types || [],
 		[]
 	);
 };
@@ -81,10 +80,20 @@ const usePublicPostTypes = () => {
 	);
 	return useMemo( () => {
 		const excludedPostTypes = [ 'attachment' ];
-		return postTypes?.filter(
-			( { viewable, slug } ) =>
-				viewable && ! excludedPostTypes.includes( slug )
-		);
+		return postTypes
+			?.filter(
+				( { viewable, slug } ) =>
+					viewable && ! excludedPostTypes.includes( slug )
+			)
+			.sort( ( a, b ) => {
+				// Sort post types alphabetically by name,
+				// but exclude the built-in 'post' type from sorting.
+				if ( a.slug === 'post' || b.slug === 'post' ) {
+					return 0;
+				}
+
+				return a.name.localeCompare( b.name );
+			} );
 	}, [ postTypes ] );
 };
 
@@ -413,7 +422,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 			if ( _needsUniqueIdentifier ) {
 				menuItemTitle = labels.template_name
 					? sprintf(
-							// translators: 1: Name of the template e.g: "Products by Category". 2s: Slug of the taxonomy e.g: "product_cat".
+							// translators: 1: Name of the template e.g: "Products by Category". 2: Slug of the taxonomy e.g: "product_cat".
 							_x( '%1$s (%2$s)', 'taxonomy template menu label' ),
 							labels.template_name,
 							slug

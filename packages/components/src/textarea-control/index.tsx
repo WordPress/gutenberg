@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -32,6 +37,8 @@ function UnforwardedTextareaControl(
 	const onChangeValue = ( event: React.ChangeEvent< HTMLTextAreaElement > ) =>
 		onChange( event.target.value );
 
+	const classes = clsx( 'components-textarea-control', className );
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
@@ -40,7 +47,7 @@ function UnforwardedTextareaControl(
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			help={ help }
-			className={ className }
+			className={ classes }
 		>
 			<StyledTextarea
 				className="components-textarea-control__input"

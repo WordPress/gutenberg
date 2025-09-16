@@ -15,7 +15,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
@@ -52,6 +52,7 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
+import usePasteStyles from '../use-paste-styles';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -96,6 +97,10 @@ function ListViewBlock( {
 		insertBeforeBlock,
 		setOpenedBlockSettingsMenu,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
 
 	const {
 		canInsertBlockType,
@@ -111,6 +116,8 @@ function ListViewBlock( {
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
+
+	const pasteStyles = usePasteStyles();
 
 	const { block, blockName, allowRightClickOverrides } = useSelect(
 		( select ) => {
@@ -233,6 +240,13 @@ function ListViewBlock( {
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+
+			pasteStyles( blocks );
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			event.preventDefault();
 
@@ -353,12 +367,12 @@ function ListViewBlock( {
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		toggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		toggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
@@ -627,6 +641,7 @@ function ListViewBlock( {
 								tabIndex,
 								onClick: clearSettingsAnchorRect,
 								onFocus,
+								size: 'small',
 							} }
 							disableOpenOnArrowDown
 							expand={ expand }

@@ -16,6 +16,7 @@ import type {
 	QueryControlsProps,
 	QueryControlsWithMultipleCategorySelectionProps,
 	QueryControlsWithSingleCategorySelectionProps,
+	OrderByOption,
 } from './types';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -34,13 +35,34 @@ function isMultipleCategorySelection(
 	return 'categorySuggestions' in props;
 }
 
+const defaultOrderByOptions: OrderByOption[] = [
+	{
+		label: __( 'Newest to oldest' ),
+		value: 'date/desc',
+	},
+	{
+		label: __( 'Oldest to newest' ),
+		value: 'date/asc',
+	},
+	{
+		/* translators: Label for ordering posts by title in ascending order. */
+		label: __( 'A → Z' ),
+		value: 'title/asc',
+	},
+	{
+		/* translators: Label for ordering posts by title in descending order. */
+		label: __( 'Z → A' ),
+		value: 'title/desc',
+	},
+];
+
 /**
  * Controls to query for posts.
  *
  * ```jsx
  * const MyQueryControls = () => (
  *   <QueryControls
- *     { ...{ maxItems, minItems, numberOfItems, order, orderBy } }
+ *     { ...{ maxItems, minItems, numberOfItems, order, orderBy, orderByOptions } }
  *     onOrderByChange={ ( newOrderBy ) => {
  *       updateQuery( { orderBy: newOrderBy } )
  *     }
@@ -65,6 +87,7 @@ export function QueryControls( {
 	numberOfItems,
 	order,
 	orderBy,
+	orderByOptions = defaultOrderByOptions,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onAuthorChange,
@@ -89,26 +112,7 @@ export function QueryControls( {
 								? undefined
 								: `${ orderBy }/${ order }`
 						}
-						options={ [
-							{
-								label: __( 'Newest to oldest' ),
-								value: 'date/desc',
-							},
-							{
-								label: __( 'Oldest to newest' ),
-								value: 'date/asc',
-							},
-							{
-								/* translators: Label for ordering posts by title in ascending order. */
-								label: __( 'A → Z' ),
-								value: 'title/asc',
-							},
-							{
-								/* translators: Label for ordering posts by title in descending order. */
-								label: __( 'Z → A' ),
-								value: 'title/desc',
-							},
-						] }
+						options={ orderByOptions }
 						onChange={ ( value ) => {
 							if ( typeof value !== 'string' ) {
 								return;

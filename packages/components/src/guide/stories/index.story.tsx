@@ -20,6 +20,8 @@ const meta: Meta< typeof Guide > = {
 	argTypes: {
 		contentLabel: { control: 'text' },
 		finishButtonText: { control: 'text' },
+		nextButtonText: { control: 'text' },
+		previousButtonText: { control: 'text' },
 		onFinish: { action: 'onFinish' },
 	},
 };

@@ -160,10 +160,6 @@ test.describe( 'Site Editor Performance', () => {
 				await toggleSidebarButton.click();
 			}
 
-			await canvas
-				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
-				.click();
-
 			const paragraph = canvas.getByRole( 'document', {
 				name: /Empty block/i,
 			} );

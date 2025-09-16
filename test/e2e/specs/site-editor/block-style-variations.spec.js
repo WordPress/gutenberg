@@ -204,21 +204,12 @@ test.describe( 'Block Style Variations', () => {
 		const revisionIframe = page.frameLocator( '[name="revisions"]' );
 
 		const revisionFirstGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.first();
 		const revisionSecondGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 1 );
 		const revisionThirdGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 2 );
 
@@ -317,7 +308,9 @@ async function draftNewPage( page ) {
 
 // Create a Group block with 2 nested Group blocks.
 async function addPageContent( editor, page ) {
-	const inserterButton = page.locator( 'role=tab[name="Blocks"i]' );
+	const inserterButton = page.locator(
+		'role=button[name="Block Inserter"i]'
+	);
 	await inserterButton.click();
 	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
 	await page.click(

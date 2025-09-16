@@ -69,13 +69,7 @@ export const descriptionField = {
 	label: __( 'Description' ),
 	id: 'description',
 	render: ( { item } ) => {
-		return (
-			item.description && (
-				<span className="page-templates-description">
-					{ decodeEntities( item.description ) }
-				</span>
-			)
-		);
+		return item.description && decodeEntities( item.description );
 	},
 	enableSorting: false,
 	enableGlobalSearch: true,

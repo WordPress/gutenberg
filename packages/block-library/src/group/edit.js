@@ -8,8 +8,8 @@ import {
 	InspectorControls,
 	useInnerBlocksProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { SelectControl } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
@@ -18,7 +18,9 @@ import { View } from '@wordpress/primitives';
  * Internal dependencies
  */
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
-import { htmlElementMessages } from '../utils/messages';
+import { unlock } from '../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 /**
  * Render inspector controls for the Group block.
@@ -26,16 +28,17 @@ import { htmlElementMessages } from '../utils/messages';
  * @param {Object}   props                 Component props.
  * @param {string}   props.tagName         The HTML tag name.
  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
+ * @param {string}   props.clientId        The client ID of the current block.
  *
  * @return {JSX.Element}                The control group.
  */
-function GroupEditControls( { tagName, onSelectTagName } ) {
+function GroupEditControls( { tagName, onSelectTagName, clientId } ) {
 	return (
 		<InspectorControls group="advanced">
-			<SelectControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'HTML element' ) }
+			<HTMLElementControl
+				tagName={ tagName }
+				onChange={ onSelectTagName }
+				clientId={ clientId }
 				options={ [
 					{ label: __( 'Default (<div>)' ), value: 'div' },
 					{ label: '<header>', value: 'header' },
@@ -45,9 +48,6 @@ function GroupEditControls( { tagName, onSelectTagName } ) {
 					{ label: '<aside>', value: 'aside' },
 					{ label: '<footer>', value: 'footer' },
 				] }
-				value={ tagName }
-				onChange={ onSelectTagName }
-				help={ htmlElementMessages[ tagName ] }
 			/>
 		</InspectorControls>
 	);
@@ -129,6 +129,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				onSelectTagName={ ( value ) =>
 					setAttributes( { tagName: value } )
 				}
+				clientId={ clientId }
 			/>
 			{ showPlaceholder && (
 				<View>

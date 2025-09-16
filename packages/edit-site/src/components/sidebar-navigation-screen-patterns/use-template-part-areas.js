@@ -17,7 +17,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 
 	const templatePartAreas = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			select( coreStore ).getCurrentTheme()
 				?.default_template_part_areas || [],
 		[]
 	);

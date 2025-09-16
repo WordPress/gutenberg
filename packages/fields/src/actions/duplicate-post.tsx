@@ -33,6 +33,7 @@ const duplicatePost: Action< BasePost > = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],

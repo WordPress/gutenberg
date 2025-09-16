@@ -26,6 +26,7 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * @param {Object}  options.spinner      A CLI spinner which indicates progress.
  * @param {boolean} options.debug        True if debug mode is enabled.
  * @param {string}  options.xdebug       The Xdebug mode to set. Defaults to "off".
+ * @param {string}  options.spx          The SPX mode to set. Defaults to "off".
  * @param {boolean} options.writeChanges If true, writes the parsed config to the
  *                                       required docker files like docker-compose
  *                                       and Dockerfile. By default, this is false
@@ -37,6 +38,7 @@ module.exports = async function initConfig( {
 	spinner,
 	debug,
 	xdebug = 'off',
+	spx = 'off',
 	writeChanges = false,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
@@ -46,6 +48,11 @@ module.exports = async function initConfig( {
 	// config has changed when only the xdebug param has changed. This is needed
 	// so that Docker will rebuild the image whenever the xdebug flag changes.
 	config.xdebug = xdebug;
+
+	// Adding this to the config allows the start command to understand that the
+	// config has changed when only the spx param has changed. This is needed
+	// so that Docker will rebuild the image whenever the spx flag changes.
+	config.spx = spx;
 
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 
@@ -129,6 +136,11 @@ RUN sed -i 's|deb.debian.org/debian stretch|archive.debian.org/debian stretch|g'
 RUN sed -i 's|security.debian.org/debian-security stretch|archive.debian.org/debian-security stretch|g' /etc/apt/sources.list
 RUN sed -i '/stretch-updates/d' /etc/apt/sources.list
 
+# buster (https://lists.debian.org/debian-devel-announce/2025/06/msg00001.html)
+RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.org/debian-security buster/updates|g' /etc/apt/sources.list
+RUN sed -i '/buster-updates/d' /etc/apt/sources.list
+
 # Create the host's user so that we can match ownership in the container.
 ARG HOST_USERNAME
 ARG HOST_UID
@@ -196,6 +208,7 @@ function installDependencies( service, env, config ) {
 		case 'wordpress': {
 			dockerFileContent += `
 # Make sure we're working with the latest packages.
+RUN apt-get clean
 RUN apt-get -qy update
 
 # Install some basic PHP dependencies.
@@ -230,6 +243,12 @@ RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
 	dockerFileContent += getXdebugConfig(
 		config.xdebug,
 		config.env[ env ].phpVersion
+	);
+
+	dockerFileContent += getSpxConfig(
+		config.spx,
+		config.env[ env ].phpVersion,
+		service
 	);
 
 	// Add better PHP settings.
@@ -302,4 +321,51 @@ RUN docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
 RUN echo 'xdebug.client_host="host.docker.internal"' >> /usr/local/etc/php/php.ini`;
+}
+
+/**
+ * Gets the SPX config based on the options in the config object.
+ *
+ * @param {string} spxMode    The SPX mode set in the config.
+ * @param {string} phpVersion The php version set in the environment.
+ * @param {string} service    The service name.
+ * @return {string} The SPX config -- can be an empty string when it's not used.
+ */
+function getSpxConfig( spxMode = 'off', phpVersion, service ) {
+	if ( spxMode === 'off' || service === 'cli' ) {
+		return '';
+	}
+
+	if ( phpVersion ) {
+		const versionTokens = phpVersion.split( '.' );
+		const majorVer = parseInt( versionTokens[ 0 ] );
+		const minorVer = parseInt( versionTokens[ 1 ] );
+
+		if ( isNaN( majorVer ) || isNaN( minorVer ) ) {
+			throw new ValidationError(
+				'Something went wrong when parsing the PHP version.'
+			);
+		}
+
+		// SPX requires PHP 5.4 or higher
+		if ( majorVer < 5 || ( majorVer === 5 && minorVer < 4 ) ) {
+			throw new ValidationError(
+				`Cannot use SPX with PHP < 5.4. Your PHP version is ${ phpVersion }.`
+			);
+		}
+	}
+
+	return `
+# Install SPX profiler
+RUN apt-get update -qy
+RUN apt-get install -qy git zlib1g-dev
+RUN cd /tmp && git clone https://github.com/NoiseByNorthwest/php-spx.git
+RUN cd /tmp/php-spx && git checkout release/latest
+RUN cd /tmp/php-spx && phpize && ./configure && make && make install
+RUN docker-php-ext-enable spx
+RUN echo 'spx.http_enabled=1' >> /usr/local/etc/php/php.ini
+RUN echo 'spx.http_key="dev"' >> /usr/local/etc/php/php.ini
+RUN echo 'spx.http_ip_whitelist="*"' >> /usr/local/etc/php/php.ini
+RUN echo 'spx.data_dir="/tmp/spx"' >> /usr/local/etc/php/php.ini
+RUN mkdir -p /tmp/spx && chmod 777 /tmp/spx`;
 }

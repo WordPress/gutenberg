@@ -6,14 +6,10 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	canUser,
-	getDefaultTemplateId,
-	getEntityRecord,
-	type State,
-} from './selectors';
+import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
@@ -102,6 +98,7 @@ export function getEntityRecordPermissions(
 	name: string,
 	id: string
 ) {
+	logEntityDeprecation( kind, name, 'getEntityRecordPermissions' );
 	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
 }
 
@@ -139,17 +136,11 @@ interface SiteData {
 export const getHomePage = createRegistrySelector( ( select ) =>
 	createSelector(
 		() => {
-			const canReadSiteData = select( STORE_NAME ).canUser( 'read', {
-				kind: 'root',
-				name: 'site',
-			} );
-			if ( ! canReadSiteData ) {
-				return null;
-			}
 			const siteData = select( STORE_NAME ).getEntityRecord(
 				'root',
-				'site'
+				'__unstableBase'
 			) as SiteData | undefined;
+			// Still resolving getEntityRecord.
 			if ( ! siteData ) {
 				return null;
 			}
@@ -165,13 +156,14 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
+			// Still resolving getDefaultTemplateId.
+			if ( ! frontPageTemplateId ) {
+				return null;
+			}
 			return { postType: 'wp_template', postId: frontPageTemplateId };
 		},
 		( state ) => [
-			canUser( state, 'read', {
-				kind: 'root',
-				name: 'site',
-			} ) && getEntityRecord( state, 'root', 'site' ),
+			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
 			} ),
@@ -180,16 +172,10 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 );
 
 export const getPostsPageId = createRegistrySelector( ( select ) => () => {
-	const canReadSiteData = select( STORE_NAME ).canUser( 'read', {
-		kind: 'root',
-		name: 'site',
-	} );
-	if ( ! canReadSiteData ) {
-		return null;
-	}
-	const siteData = select( STORE_NAME ).getEntityRecord( 'root', 'site' ) as
-		| SiteData
-		| undefined;
+	const siteData = select( STORE_NAME ).getEntityRecord(
+		'root',
+		'__unstableBase'
+	) as SiteData | undefined;
 	return siteData?.show_on_front === 'page'
 		? normalizePageId( siteData.page_for_posts )
 		: null;

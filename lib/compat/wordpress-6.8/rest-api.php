@@ -36,40 +36,19 @@ add_action(
 );
 
 /**
- * Adds the default template part areas to the REST API index.
- *
- * This function exposes the default template part areas through the WordPress REST API.
- * Note: This function backports into the wp-includes/rest-api/class-wp-rest-server.php file.
+ * Adds the site reading options to the REST API index.
  *
  * @param WP_REST_Response $response REST API response.
- * @return WP_REST_Response Modified REST API response with default template part areas.
+ * @return WP_REST_Response Modified REST API response.
  */
-function gutenberg_add_default_template_part_areas_to_index( WP_REST_Response $response ) {
-	$response->data['default_template_part_areas'] = get_allowed_block_template_part_areas();
+function gutenberg_add_rest_index_reading_options( WP_REST_Response $response ) {
+	$response->data['page_for_posts'] = (int) get_option( 'page_for_posts' );
+	$response->data['page_on_front']  = (int) get_option( 'page_on_front' );
+	$response->data['show_on_front']  = get_option( 'show_on_front' );
+
 	return $response;
 }
-add_filter( 'rest_index', 'gutenberg_add_default_template_part_areas_to_index' );
-
-/**
- * Adds the default template types to the REST API index.
- *
- * This function exposes the default template types through the WordPress REST API.
- * Note: This function backports into the wp-includes/rest-api/class-wp-rest-server.php file.
- *
- * @param WP_REST_Response $response REST API response.
- * @return WP_REST_Response Modified REST API response with default template part areas.
- */
-function gutenberg_add_default_template_types_to_index( WP_REST_Response $response ) {
-	$indexed_template_types = array();
-	foreach ( get_default_block_template_types() as $slug => $template_type ) {
-		$template_type['slug']    = (string) $slug;
-		$indexed_template_types[] = $template_type;
-	}
-
-	$response->data['default_template_types'] = $indexed_template_types;
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_add_default_template_types_to_index' );
+add_filter( 'rest_index', 'gutenberg_add_rest_index_reading_options' );
 
 /**
  * Adds `ignore_sticky` parameter to the post collection endpoint.
@@ -114,3 +93,88 @@ function gutenberg_modify_post_collection_query( $args, WP_REST_Request $request
 	return $args;
 }
 add_filter( 'rest_post_query', 'gutenberg_modify_post_collection_query', 10, 2 );
+
+/**
+ * Registers `default_template_types` and `default_template_part_areas` fields for the active theme.
+ *
+ * Note: Backports into the wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php file.
+ *
+ * @return void
+ */
+function gutenberg_register_rest_theme_fields() {
+	register_rest_field(
+		'theme',
+		'default_template_types',
+		array(
+			'get_callback' => static function ( $response_data ) {
+				if ( ! isset( $response_data['status'] ) || 'active' !== $response_data['status'] ) {
+					return null;
+				}
+
+				$default_template_types = array();
+				foreach ( get_default_block_template_types() as $slug => $template_type ) {
+					$template_type['slug']    = (string) $slug;
+					$default_template_types[] = $template_type;
+				}
+
+				return $default_template_types;
+			},
+			'schema'       => array(
+				'description' => __( 'A list of default template types.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type'       => 'object',
+					'properties' => array(
+						'slug'        => array(
+							'type' => 'string',
+						),
+						'title'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		)
+	);
+	register_rest_field(
+		'theme',
+		'default_template_part_areas',
+		array(
+			'get_callback' => static function ( $response_data ) {
+				if ( ! isset( $response_data['status'] ) || 'active' !== $response_data['status'] ) {
+					return null;
+				}
+
+				return get_allowed_block_template_part_areas();
+			},
+			'schema'       => array(
+				'description' => __( 'A list of allowed area values for template parts.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type'       => 'object',
+					'properties' => array(
+						'area'        => array(
+							'type' => 'string',
+						),
+						'label'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'icon'        => array(
+							'type' => 'string',
+						),
+						'area_tag'    => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_theme_fields' );

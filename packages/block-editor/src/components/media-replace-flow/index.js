@@ -232,6 +232,9 @@ const MediaReplaceFlow = ( {
 								onChange={ ( { url } ) => {
 									onSelectURL( url );
 								} }
+								searchInputPlaceholder={ __(
+									'Paste or type URL'
+								) }
 							/>
 						</form>
 					) }

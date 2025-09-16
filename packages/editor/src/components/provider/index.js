@@ -57,11 +57,6 @@ const NON_CONTEXTUAL_POST_TYPES = [
 ];
 
 /**
- * These are rendering modes that the editor supports.
- */
-const RENDERING_MODES = [ 'post-only', 'template-locked' ];
-
-/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -183,34 +178,33 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
-				} = select( editorStore );
-				const {
-					getEntitiesConfig,
-					getPostType,
-					hasFinishedResolution,
-				} = select( coreStore );
+					getDefaultRenderingMode,
+				} = unlock( select( editorStore ) );
+				const { getEntitiesConfig } = select( coreStore );
 
-				const postTypeSupports = getPostType( post.type )?.supports;
-				const hasLoadedPostObject = hasFinishedResolution(
-					'getPostType',
-					[ post.type ]
-				);
-
-				const _defaultMode = Array.isArray( postTypeSupports?.editor )
-					? postTypeSupports.editor.find(
-							( features ) => 'default-mode' in features
-					  )?.[ 'default-mode' ]
-					: undefined;
-				const hasDefaultMode = RENDERING_MODES.includes( _defaultMode );
+				const _mode = getRenderingMode();
+				const _defaultMode = getDefaultRenderingMode( post.type );
+				/**
+				 * To avoid content "flash", wait until rendering mode has been resolved.
+				 * This is important for the initial render of the editor.
+				 *
+				 * - Wait for template to be resolved if the default mode is 'template-locked'.
+				 * - Wait for default mode to be resolved otherwise.
+				 */
+				const hasResolvedDefaultMode =
+					_defaultMode === 'template-locked'
+						? hasTemplate
+						: _defaultMode !== undefined;
+				// Wait until the default mode is retrieved and start rendering canvas.
+				const isRenderingModeReady = _defaultMode !== undefined;
 
 				return {
 					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady() && hasLoadedPostObject,
-					mode: getRenderingMode(),
-					defaultMode:
-						hasTemplate && hasDefaultMode
-							? _defaultMode
-							: 'post-only',
+					isReady: __unstableIsEditorReady(),
+					mode: isRenderingModeReady ? _mode : undefined,
+					defaultMode: hasResolvedDefaultMode
+						? _defaultMode
+						: undefined,
 					selection: getEditorSelection(),
 					postTypeEntities:
 						post.type === 'wp_template'
@@ -221,7 +215,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			[ post.type, hasTemplate ]
 		);
 
-		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
@@ -338,7 +332,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode( defaultMode );
+			if ( defaultMode ) {
+				setRenderingMode( defaultMode );
+			}
 		}, [ defaultMode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type, mode );

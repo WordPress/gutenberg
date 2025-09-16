@@ -272,7 +272,6 @@ test.describe( 'Pages', () => {
 
 		// Create new page that has the default template so as to swap it.
 		await draftNewPage( page );
-		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -295,7 +294,6 @@ test.describe( 'Pages', () => {
 		} );
 
 		// Now reset, and apply the default template back.
-		await editor.openDocumentSettingsSidebar();
 		await templateOptionsButton.click();
 		const resetButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
@@ -310,7 +308,6 @@ test.describe( 'Pages', () => {
 		editor,
 	} ) => {
 		await draftNewPage( page );
-		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -322,6 +319,6 @@ test.describe( 'Pages', () => {
 			page
 				.getByRole( 'menu', { name: 'Template options' } )
 				.getByText( 'Change template' )
-		).toHaveCount( 0 );
+		).toBeDisabled();
 	} );
 } );

@@ -11,7 +11,7 @@ import { VStack } from '../..';
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components (Experimental)/VStack',
+	title: 'Components/VStack',
 };
 export default meta;
 

@@ -26,7 +26,7 @@ if ( ! function_exists( 'apply_block_hooks_to_content_from_post_object' ) ) {
 	 *                               Default: 'insert_hooked_blocks'.
 	 * @return string The serialized markup.
 	 */
-	function apply_block_hooks_to_content_from_post_object( $content, WP_Post $post = null, $callback = 'insert_hooked_blocks' ) {
+	function apply_block_hooks_to_content_from_post_object( $content, $post = null, $callback = 'insert_hooked_blocks' ) {
 		// Default to the current post if no context is provided.
 		if ( null === $post ) {
 			$post = get_post();
@@ -34,6 +34,25 @@ if ( ! function_exists( 'apply_block_hooks_to_content_from_post_object' ) ) {
 
 		if ( ! $post instanceof WP_Post ) {
 			return apply_block_hooks_to_content( $content, $post, $callback );
+		}
+
+		/*
+		 * If the content was created using the classic editor or using a single Classic block
+		 * (`core/freeform`), it might not contain any block markup at all.
+		 * However, we still might need to inject hooked blocks in the first child or last child
+		 * positions of the parent block. To be able to apply the Block Hooks algorithm, we wrap
+		 * the content in a `core/freeform` wrapper block.
+		 */
+		if ( ! has_blocks( $content ) ) {
+			$original_content = $content;
+
+			$content_wrapped_in_classic_block = get_comment_delimited_block_content(
+				'core/freeform',
+				array(),
+				$content
+			);
+
+			$content = $content_wrapped_in_classic_block;
 		}
 
 		$attributes = array();
@@ -70,6 +89,17 @@ if ( ! function_exists( 'apply_block_hooks_to_content_from_post_object' ) ) {
 
 		// Finally, we need to remove the temporary wrapper block.
 		$content = remove_serialized_parent_block( $content );
+
+		// If we wrapped the content in a `core/freeform` block, we also need to remove that.
+		if ( ! empty( $content_wrapped_in_classic_block ) ) {
+			/*
+			 * We cannot simply use remove_serialized_parent_block() here,
+			 * as that function assumes that the block wrapper is at the top level.
+			 * However, there might now be a hooked block inserted next to it
+			 * (as first or last child of the parent).
+			 */
+			$content = str_replace( $content_wrapped_in_classic_block, $original_content, $content );
+		}
 
 		return $content;
 	}

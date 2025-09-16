@@ -19,22 +19,29 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22']
+                node: ['20', '22', '24']
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -52,27 +59,33 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
+              env:
+                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
+                  SHARD: ${{ matrix.shard }}
               run: |
                   npm run test:unit -- \
                     --ci \
-                    --maxWorkers="${{ steps.cpu-cores.outputs.count }}" \
-                    --shard="${{ matrix.shard }}" \
+                    --maxWorkers="$MAXWORKERS" \
+                    --shard="$SHARD" \
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22']
+                node: ['20', '22', '24']
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -90,11 +103,14 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
-              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
+              env:
+                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
+              run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
         outputs:
             previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
 
@@ -106,24 +122,28 @@ jobs:
                     -H "Accept: application/json" \
                     -o versions.json \
                     "http://api.wordpress.org/core/stable-check/1.0/"
-                  LATEST_WP_VERSION=$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)
-                  IFS='.' read LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
-                  if [[ ${LATEST_WP_MINOR} == "0" ]]; then
+                  LATEST_WP_VERSION="$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)"
+                  # shellcheck disable=SC2034
+                  IFS='.' read -r LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ "${LATEST_WP_MINOR}" == "0" ]]; then
                     PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
                   else
                     PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
                   fi
-                  PREVIOUS_WP_VERSION=$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)
-                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> $GITHUB_OUTPUT
+                  PREVIOUS_WP_VERSION="$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)"
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> "$GITHUB_OUTPUT"
                   rm versions.json
 
     build-assets:
         name: Build JavaScript assets for PHP unit tests
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -140,9 +160,11 @@ jobs:
                       ./build-module/
 
     test-php:
-        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on Linux
         needs: [compute-previous-wordpress-version, build-assets]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
@@ -173,9 +195,10 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -188,7 +211,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.32.0
+              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -196,17 +219,19 @@ jobs:
 
             # Ensure that Composer installs the correct versions of packages.
             - name: Override PHP version in composer.json
-              run: composer config platform.php ${{ matrix.php }}
+              env:
+                  VERSION: ${{ matrix.php }}
+              run: composer config platform.php "$VERSION"
 
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
+              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Download built JavaScript assets
-              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
               with:
                   name: build-assets
 
@@ -258,32 +283,35 @@ jobs:
               run: |
                   # Note: relies on PHPUnit execution to fail on test failure.
                   # Extract the number of executed tests from the log file.
-                  if ! num_tests=$(grep -Eo 'OK \([0-9]+ tests' phpunit.log) ; then
-                    if ! num_tests=$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log) ; then
+                  if ! num_tests="$(grep -Eo 'OK \([0-9]+ tests' phpunit.log)" ; then
+                    if ! num_tests="$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log)" ; then
                       echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
                     fi
                   fi
                   # Extract just the number of tests from the string.
-                  num_tests=$(echo "$num_tests" | grep -Eo '[0-9]+')
-                  if [ $num_tests -lt 500 ] ; then
+                  num_tests="$(echo "$num_tests" | grep -Eo '[0-9]+')"
+                  if [ "$num_tests" -lt 500 ] ; then
                     echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
                   fi
                   echo "$num_tests tests passed."
 
     phpcs:
         name: PHP coding standards
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.32.0
+              uses: shivammathur/setup-php@ec406be512d7077f68eed36e63f4d91bc006edc4 # v2.35.4
               with:
                   php-version: '7.4'
                   coverage: none
@@ -293,10 +321,10 @@ jobs:
             # http://man7.org/linux/man-pages/man1/date.1.html
             - name: "Get last Monday's date"
               id: get-date
-              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> "$GITHUB_OUTPUT"
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+              uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -304,12 +332,12 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
+              uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
             - name: Make Composer packages available globally
-              run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+              run: echo "${PWD}/vendor/bin" >> "$GITHUB_PATH"
 
             - name: Run PHPCS on all Gutenberg files
               id: phpcs-gutenberg
@@ -325,7 +353,8 @@ jobs:
     # This job is deprecated but be present for compatibility reasons.
     unit-php:
         name: PHP
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
         needs: [test-php, phpcs]
         if: ${{ always() }}
         steps:
@@ -343,14 +372,20 @@ jobs:
 
     mobile-unit-js:
         name: Mobile
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        # React 19 breaks these tests, and upgrading React Native to a compatible version is paused.
+        # See: https://github.com/WordPress/gutenberg/issues/71336
+        if: false
+        #if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
@@ -366,4 +401,6 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
+              env:
+                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
+              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store } from '@wordpress/interactivity';
+import { store, withSyncEvent } from '@wordpress/interactivity';
 
 const { state } = store( 'router', {
 	state: {
@@ -18,7 +18,7 @@ const { state } = store( 'router', {
 		},
 	},
 	actions: {
-		*navigate( e ) {
+		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 
 			state.navigations.count += 1;
@@ -38,7 +38,7 @@ const { state } = store( 'router', {
 			if ( state.navigations.pending === 0 ) {
 				state.status = 'idle';
 			}
-		},
+		} ),
 		toggleTimeout() {
 			state.timeout = state.timeout === 10000 ? 0 : 10000;
 		},

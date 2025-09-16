@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { Input, SpinButton, styles } from './styles/number-control-styles';
 import * as inputControlActionTypes from '../input-control/reducer/actions';
-import { add, subtract, roundClamp } from '../utils/math';
+import { add, subtract, clamp, ensureValidStep } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { NumberControlProps } from './types';
@@ -78,17 +78,18 @@ function UnforwardedNumberControl(
 	const isStepAny = step === 'any';
 	const baseStep = isStepAny ? 1 : ensureNumber( step );
 	const baseSpin = ensureNumber( spinFactor ) * baseStep;
-	const baseValue = roundClamp( 0, min, max, baseStep );
 	const constrainValue = (
 		value: number | string,
 		stepOverride?: number
 	) => {
-		// When step is "any" clamp the value, otherwise round and clamp it.
-		// Use '' + to convert to string for use in input value attribute.
-		return isStepAny
-			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
-			: '' + roundClamp( value, min, max, stepOverride ?? baseStep );
+		// When step is not "any" the value must be a valid step.
+		if ( ! isStepAny ) {
+			value = ensureValidStep( value, min, stepOverride ?? baseStep );
+		}
+
+		return `${ clamp( value, min, max ) }`;
 	};
+	const baseValue = constrainValue( 0 );
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
 	const classes = clsx( 'components-number-control', className );

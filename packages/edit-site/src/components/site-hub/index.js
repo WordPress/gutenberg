@@ -121,21 +121,65 @@ export const SiteHubMobile = memo(
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
 
-		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
+		const {
+			dashboardLink,
+			homeUrl,
+			siteTitle,
+			isBlockTheme,
+			isClassicThemeWithStyleBookSupport,
+		} = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
-			const { getEntityRecord } = select( coreStore );
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
 			const _site = getEntityRecord( 'root', 'site' );
+			const currentTheme = getCurrentTheme();
+			const settings = getSettings();
+			const supportsEditorStyles =
+				currentTheme.theme_supports[ 'editor-styles' ];
+			// This is a temp solution until the has_theme_json value is available for the current theme.
+			const hasThemeJson = settings.supportsLayout;
+
 			return {
-				dashboardLink: getSettings().__experimentalDashboardLink,
+				dashboardLink: settings.__experimentalDashboardLink,
 				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )
 						: _site?.title,
+				isBlockTheme: currentTheme?.is_block_theme,
+				isClassicThemeWithStyleBookSupport:
+					! currentTheme?.is_block_theme &&
+					( supportsEditorStyles || hasThemeJson ),
 			};
 		}, [] );
 		const { open: openCommandCenter } = useDispatch( commandsStore );
-		const isRoot = path === '/';
+
+		let backPath;
+
+		// If the current path is not the root page, find a page to back to.
+		if ( path !== '/' ) {
+			if ( isBlockTheme || isClassicThemeWithStyleBookSupport ) {
+				// If the current theme is a block theme or a classic theme that supports StyleBook,
+				// back to the Design screen.
+				backPath = '/';
+			} else if ( path !== '/pattern' ) {
+				// If the current theme is a classic theme that does not support StyleBook,
+				// back to the Patterns page.
+				backPath = '/pattern';
+			}
+		}
+
+		const backButtonProps = {
+			href: !! backPath ? undefined : dashboardLink,
+			label: !! backPath
+				? __( 'Go to Site Editor' )
+				: __( 'Go to the Dashboard' ),
+			onClick: !! backPath
+				? () => {
+						history.navigate( backPath );
+						navigate( 'back' );
+				  }
+				: undefined,
+		};
 
 		return (
 			<div className="edit-site-site-hub">
@@ -156,18 +200,7 @@ export const SiteHubMobile = memo(
 								transform: 'scale(0.5)',
 								borderRadius: 4,
 							} }
-							{ ...( isRoot
-								? {
-										href: dashboardLink,
-										label: __( 'Go to the Dashboard' ),
-								  }
-								: {
-										onClick: () => {
-											history.navigate( '/' );
-											navigate( 'back' );
-										},
-										label: __( 'Go to Site Editor' ),
-								  } ) }
+							{ ...backButtonProps }
 						>
 							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>

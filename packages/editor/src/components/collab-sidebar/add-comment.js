@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import { __experimentalHStack as HStack } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,7 +21,22 @@ import CommentForm from './comment-form';
  * @param {Function} props.setIsNewComment - The function to set the new comment board visibility.
  * @return {React.ReactNode} The rendered comment input UI.
  */
+
 export function AddComment( { onSubmit, setIsNewComment } ) {
+	const { isEmptyDefaultBlock } = useSelect( ( select ) => {
+		const { getSelectedBlock } = select( blockEditorStore );
+		const selectedBlock = getSelectedBlock();
+		return {
+			isEmptyDefaultBlock: selectedBlock
+				? isUnmodifiedDefaultBlock( selectedBlock )
+				: false,
+		};
+	} );
+
+	if ( isEmptyDefaultBlock ) {
+		return null;
+	}
+
 	return (
 		<>
 			<HStack alignment="left" spacing="3">

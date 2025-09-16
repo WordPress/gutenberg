@@ -53,3 +53,7 @@ test/gutenberg-test-themes/twentytwentyone
 test/gutenberg-test-themes/twentytwentythree
 test/gutenberg-test-themes/twentytwentyfour
 packages/react-native-editor/src/setup-local.js
+
+# Files related to applying patches
+*.rej
+*.orig

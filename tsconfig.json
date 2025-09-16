@@ -62,6 +62,7 @@
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" },
 		{ "path": "test/e2e" },
+		{ "path": "packages/jest-console" },
 		{ "path": "test/performance" }
 	],
 	"files": []

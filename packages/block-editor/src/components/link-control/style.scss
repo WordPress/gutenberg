@@ -144,7 +144,6 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.components-menu-item__shortcut {
 		color: $gray-700;
-		text-transform: capitalize;
 		white-space: nowrap; // tags shouldn't go over two lines.
 	}
 
@@ -343,6 +342,13 @@ $block-editor-link-control-number-of-actions: 1;
 	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
 	position: relative;
+}
+
+.block-editor-link-control__settings {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
 }
 
 .block-editor-link-control__setting {

@@ -15,6 +15,7 @@ import {
 	RichText,
 	Warning,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -41,6 +42,8 @@ export default function PostExcerptEditor( {
 	isSelected,
 	context: { postId, postType, queryId },
 } ) {
+	const blockEditingMode = useBlockEditingMode();
+	const showControls = blockEditingMode === 'default';
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
@@ -220,14 +223,16 @@ export default function PostExcerptEditor( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-				/>
-			</BlockControls>
+			{ showControls && (
+				<BlockControls>
+					<AlignmentToolbar
+						value={ textAlign }
+						onChange={ ( newAlign ) =>
+							setAttributes( { textAlign: newAlign } )
+						}
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

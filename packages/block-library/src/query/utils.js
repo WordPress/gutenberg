@@ -6,6 +6,7 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 import {
 	cloneBlock,
 	getBlockSupport,
@@ -13,6 +14,7 @@ import {
 } from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('@wordpress/components/build-types/query-controls/types').OrderByOption} OrderByOption */
 
 /**
  * @typedef IHasNameAndId
@@ -184,6 +186,62 @@ export function useIsPostTypeHierarchical( postType ) {
 		},
 		[ postType ]
 	);
+}
+
+/**
+ * List of avaiable options to order by.
+ *
+ * @param {string} postType The post type to check.
+ * @return {OrderByOption[]} List of order options.
+ */
+export function useOrderByOptions( postType ) {
+	const supportsCustomOrder = useSelect(
+		( select ) => {
+			const type = select( coreStore ).getPostType( postType );
+			return !! type?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
+
+	return useMemo( () => {
+		const orderByOptions = [
+			{
+				label: __( 'Newest to oldest' ),
+				value: 'date/desc',
+			},
+			{
+				label: __( 'Oldest to newest' ),
+				value: 'date/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in ascending order. */
+				label: __( 'A → Z' ),
+				value: 'title/asc',
+			},
+			{
+				/* translators: Label for ordering posts by title in descending order. */
+				label: __( 'Z → A' ),
+				value: 'title/desc',
+			},
+		];
+
+		if ( supportsCustomOrder ) {
+			orderByOptions.push(
+				{
+					/* translators: Label for ordering posts by ascending menu order. */
+					label: __( 'Ascending by order' ),
+					value: 'menu_order/asc',
+				},
+				{
+					/* translators: Label for ordering posts by descending menu order. */
+					label: __( 'Descending by order' ),
+					value: 'menu_order/desc',
+				}
+			);
+		}
+
+		return orderByOptions;
+	}, [ supportsCustomOrder ] );
 }
 
 /**

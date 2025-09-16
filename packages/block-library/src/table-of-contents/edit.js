@@ -12,6 +12,7 @@ import { createBlock } from '@wordpress/blocks';
 import {
 	Placeholder,
 	ToggleControl,
+	SelectControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -19,10 +20,16 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { renderToString } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { store as noticeStore } from '@wordpress/notices';
-import { tableOfContents as icon } from '@wordpress/icons';
+import {
+	tableOfContents as icon,
+	formatListBullets,
+	formatListBulletsRTL,
+	formatListNumbered,
+	formatListNumberedRTL,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,15 +46,22 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
  *
  * @param {Object}                       props                                   The props.
  * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               A list of data for each heading in the post.
+ * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
  * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {string}                       props.clientId
- * @param {(attributes: Object) => void} props.setAttributes
+ * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
+ * @param {boolean}                      props.attributes.ordered                Whether to display as an ordered list (true) or unordered list (false).
+ * @param {string}                       props.clientId                          The client id.
+ * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
  *
  * @return {Component} The component.
  */
 export default function TableOfContentsEdit( {
-	attributes: { headings = [], onlyIncludeCurrentPage },
+	attributes: {
+		headings = [],
+		onlyIncludeCurrentPage,
+		maxLevel,
+		ordered = true,
+	},
 	clientId,
 	setAttributes,
 } ) {
@@ -84,27 +98,48 @@ export default function TableOfContentsEdit( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const headingTree = linearToNestedHeadingList( headings );
 
-	const toolbarControls = canInsertList && (
+	const toolbarControls = (
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarButton
-					onClick={ () =>
-						replaceBlocks(
-							clientId,
-							createBlock( 'core/list', {
-								ordered: true,
-								values: renderToString(
-									<TableOfContentsList
-										nestedHeadingList={ headingTree }
-									/>
-								),
-							} )
-						)
+					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+					title={ __( 'Unordered' ) }
+					description={ __( 'Convert to unordered list' ) }
+					onClick={ () => setAttributes( { ordered: false } ) }
+					isActive={ ordered === false }
+				/>
+				<ToolbarButton
+					icon={
+						isRTL() ? formatListNumberedRTL : formatListNumbered
 					}
-				>
-					{ __( 'Convert to static list' ) }
-				</ToolbarButton>
+					title={ __( 'Ordered' ) }
+					description={ __( 'Convert to ordered list' ) }
+					onClick={ () => setAttributes( { ordered: true } ) }
+					isActive={ ordered === true }
+				/>
 			</ToolbarGroup>
+			{ canInsertList && (
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () =>
+							replaceBlocks(
+								clientId,
+								createBlock( 'core/list', {
+									ordered,
+									values: renderToString(
+										<TableOfContentsList
+											nestedHeadingList={ headingTree }
+											ordered={ ordered }
+										/>
+									),
+								} )
+							)
+						}
+					>
+						{ __( 'Convert to static list' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			) }
 		</BlockControls>
 	);
 
@@ -115,6 +150,8 @@ export default function TableOfContentsEdit( {
 				resetAll={ () => {
 					setAttributes( {
 						onlyIncludeCurrentPage: false,
+						maxLevel: undefined,
+						ordered: true,
 					} );
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
@@ -145,6 +182,44 @@ export default function TableOfContentsEdit( {
 						}
 					/>
 				</ToolsPanelItem>
+				<ToolsPanelItem
+					hasValue={ () => !! maxLevel }
+					label={ __( 'Limit heading levels' ) }
+					onDeselect={ () =>
+						setAttributes( { maxLevel: undefined } )
+					}
+					isShownByDefault
+				>
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Include headings down to level' ) }
+						value={ maxLevel || '' }
+						options={ [
+							{ value: '', label: __( 'All levels' ) },
+							{ value: '1', label: __( 'Heading 1' ) },
+							{ value: '2', label: __( 'Heading 2' ) },
+							{ value: '3', label: __( 'Heading 3' ) },
+							{ value: '4', label: __( 'Heading 4' ) },
+							{ value: '5', label: __( 'Heading 5' ) },
+							{ value: '6', label: __( 'Heading 6' ) },
+						] }
+						onChange={ ( value ) =>
+							setAttributes( {
+								maxLevel: value ? parseInt( value ) : undefined,
+							} )
+						}
+						help={
+							! maxLevel
+								? __(
+										'Including all heading levels in the table of contents.'
+								  )
+								: __(
+										'Only include headings up to and including this level.'
+								  )
+						}
+					/>
+				</ToolsPanelItem>
 			</ToolsPanel>
 		</InspectorControls>
 	);
@@ -169,16 +244,19 @@ export default function TableOfContentsEdit( {
 		);
 	}
 
+	const ListTag = ordered ? 'ol' : 'ul';
+
 	return (
 		<>
 			<nav { ...blockProps }>
-				<ol>
+				<ListTag>
 					<TableOfContentsList
 						nestedHeadingList={ headingTree }
 						disableLinkActivation
 						onClick={ showRedirectionPreventedNotice }
+						ordered={ ordered }
 					/>
-				</ol>
+				</ListTag>
 			</nav>
 			{ toolbarControls }
 			{ inspectorControls }

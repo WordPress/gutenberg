@@ -890,6 +890,24 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveClass( /is-selected/ );
 	} );
 
+	test( 'should focus preceding tabbable using shift+tab from post title and writing flow container', async ( {
+		editor,
+		page,
+	} ) => {
+		const optionsButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } );
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( optionsButton ).toBeFocused();
+
+		const editorCanvasBody = editor.canvas.locator( 'body' );
+		// Focuses the editor canvas body. In the editor the click doesn’t have
+		// to be on the element itself – just somewhere that won’t focus a block.
+		await editorCanvasBody.click();
+		await page.keyboard.press( 'Shift+Tab' );
+		await expect( optionsButton ).toBeFocused();
+	} );
+
 	test( 'should only consider the content as one tab stop', async ( {
 		editor,
 		page,
@@ -1128,11 +1146,15 @@ class WritingFlowUtils {
 	}
 
 	async addDemoContent() {
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( 'First paragraph' );
-		await this.page.keyboard.press( 'Enter' );
-		await this.page.keyboard.type( '/columns' );
-		await this.page.keyboard.press( 'Enter' );
+		await this.editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First paragraph',
+			},
+		} );
+		await this.editor.insertBlock( {
+			name: 'core/columns',
+		} );
 		await this.editor.canvas
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();

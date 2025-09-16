@@ -375,7 +375,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( siteTitle );
 
 		// Remove the default site title block.
-		await pageUtils.pressKeys( 'primaryShift+Backspace' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		// Insert a group block with a Site Title block inside.
 		await editor.insertBlock( {
