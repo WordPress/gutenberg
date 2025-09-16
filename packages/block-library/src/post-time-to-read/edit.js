@@ -130,7 +130,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							displayAsRange: false,
+							displayAsRange: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -169,16 +169,13 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 						hasValue={ () => !! displayAsRange }
 						onDeselect={ () => {
 							setAttributes( {
-								displayAsRange: false,
+								displayAsRange: true,
 							} );
 						} }
 					>
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ _x(
-								'Display as range',
-								'Turns reading time range display on or off'
-							) }
+							label={ __( 'Display as range' ) }
 							checked={ !! displayAsRange }
 							onChange={ () =>
 								setAttributes( {
