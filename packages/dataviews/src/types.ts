@@ -126,7 +126,11 @@ export type FieldTypeDefinition< Item > = {
 	/**
 	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > > | string | null;
+	Edit:
+		| ComponentType< DataFormControlProps< Item > >
+		| string
+		| EditConfig
+		| null;
 
 	/**
 	 * Callback used to render the field.
@@ -154,6 +158,48 @@ export type Rules< Item > = {
 	required?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
+
+/**
+ * Edit configuration for textarea controls.
+ */
+export type EditConfigTextarea = {
+	control: 'textarea';
+	/**
+	 * Number of rows for the textarea.
+	 */
+	rows?: number;
+};
+
+/**
+ * Edit configuration for text controls.
+ */
+export type EditConfigText = {
+	control: 'text';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text' and 'textarea').
+ */
+export type EditConfigGeneric = {
+	control: Exclude< FieldType, 'text' | 'textarea' >;
+};
+
+/**
+ * Edit configuration object with type-safe control options.
+ * Each control type has its own specific configuration properties.
+ */
+export type EditConfig =
+	| EditConfigTextarea
+	| EditConfigText
+	| EditConfigGeneric;
 
 /**
  * A dataview field for a specific property of a data type.
@@ -198,7 +244,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | string;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string | EditConfig;
 
 	/**
 	 * Callback used to sort the field.
@@ -285,6 +331,14 @@ export type DataFormControlProps< Item > = {
 	 * Used by DataViews filters to determine which control to render based on the operator type.
 	 */
 	operator?: Operator;
+	/**
+	 * Configuration object for the control.
+	 */
+	config?: {
+		prefix?: React.ComponentType;
+		suffix?: React.ComponentType;
+		rows?: number;
+	};
 };
 
 export type DataViewRenderFieldProps< Item > = {
@@ -793,6 +847,7 @@ export type CombinedFormField = {
 	description?: string;
 	layout?: Layout;
 	children: Array< FormField | string >;
+	summary?: string | string[];
 };
 
 export type FormField = SimpleFormField | CombinedFormField;
