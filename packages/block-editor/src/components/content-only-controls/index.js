@@ -15,7 +15,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import useBlockDisplayInformation from '../use-block-display-information';
-import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
 
 // controls
 import RichText from './rich-text';
@@ -74,7 +74,7 @@ function BlockControls( { clientId } ) {
 		context: 'list-view',
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const popoverPlacementProps = useInspectorPopoverPlacement();
 
 	if ( ! blockType?.controls?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no controls.
@@ -91,7 +91,7 @@ function BlockControls( { clientId } ) {
 				</HStack>
 			}
 			panelId={ clientId }
-			dropdownMenuProps={ dropdownMenuProps }
+			dropdownMenuProps={ popoverPlacementProps }
 		>
 			{ blockType?.controls?.map( ( control, index ) => (
 				<BlockAttributeToolsPanelItem
