@@ -93,11 +93,13 @@ export default function Media( {
 	const captionKey = control.mapping.caption;
 	const altKey = control.mapping.alt;
 	const posterKey = control.mapping.poster;
+	const featuredImageKey = control.mapping.featuredImage;
 
 	const id = attributeValues[ idKey ];
 	const src = attributeValues[ srcKey ];
 	const caption = attributeValues[ captionKey ];
 	const alt = attributeValues[ altKey ];
+	const useFeaturedImage = attributeValues[ featuredImageKey ];
 
 	// TODO - pluralize when multiple.
 	let chooseItemLabel;
@@ -149,6 +151,16 @@ export default function Media( {
 					onReset={ () => {
 						updateAttributes( defaultValues );
 					} }
+					useFeaturedImage={ !! useFeaturedImage }
+					onToggleFeaturedImage={
+						!! featuredImageKey &&
+						( () => {
+							updateAttributes( {
+								...defaultValues,
+								[ featuredImageKey ]: ! useFeaturedImage,
+							} );
+						} )
+					}
 					onSelect={ ( selectedMedia ) => {
 						if ( selectedMedia.id && selectedMedia.url ) {
 							const optionalAttributes = {};

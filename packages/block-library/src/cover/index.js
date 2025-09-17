@@ -63,6 +63,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 				id: 'id',
 				src: 'url',
 				alt: 'alt',
+				featuredImage: 'useFeaturedImage',
 			},
 			args: {
 				// TODO - How to support custom gradient?
