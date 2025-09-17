@@ -174,6 +174,7 @@ export default function RichTextControl( {
 							isSelected,
 							disableFormats: control.args?.disableFormats,
 							value,
+							tagName: 'div',
 							removeEditorOnlyFormats,
 							disableLineBreaks: control.args?.disableLineBreaks,
 							keyboardShortcuts,
