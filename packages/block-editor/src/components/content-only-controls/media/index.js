@@ -3,17 +3,76 @@
  */
 import {
 	Button,
+	Icon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { lineSolid } from '@wordpress/icons';
+import {
+	image as imageIcon,
+	media as mediaIcon,
+	video as videoIcon,
+	lineSolid,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
 import MediaUploadCheck from '../../media-upload/check';
+
+function MediaThumbnail( { control, attributeValues } ) {
+	const { allowedTypes, multiple } = control.args;
+	const mapping = control.mapping;
+	if ( multiple ) {
+		return 'todo multiple';
+	}
+
+	if ( allowedTypes.length === 1 ) {
+		let src;
+		if (
+			allowedTypes[ 0 ] === 'image' &&
+			mapping.src &&
+			attributeValues[ mapping.src ]
+		) {
+			src = attributeValues[ mapping.src ];
+		} else if (
+			allowedTypes[ 0 ] === 'video' &&
+			mapping.poster &&
+			attributeValues[ mapping.poster ]
+		) {
+			src = attributeValues[ mapping.poster ];
+		}
+
+		if ( src ) {
+			return (
+				<img
+					className="block-editor-content-only-controls__media-thumbnail"
+					alt=""
+					width={ 24 }
+					height={ 24 }
+					src={ src }
+				/>
+			);
+		}
+
+		let icon;
+		if ( allowedTypes[ 0 ] === 'image' ) {
+			icon = imageIcon;
+		} else if ( allowedTypes[ 1 ] === 'video' ) {
+			icon = videoIcon;
+		} else {
+			icon = mediaIcon;
+		}
+
+		if ( icon ) {
+			return <Icon icon={ icon } size={ 24 } />;
+		}
+	}
+
+	return <Icon icon={ mediaIcon } size={ 24 } />;
+}
 
 export default function Media( {
 	clientId,
@@ -26,19 +85,11 @@ export default function Media( {
 	const srcKey = control.mapping.src;
 	const captionKey = control.mapping.caption;
 	const altKey = control.mapping.alt;
+	const posterKey = control.mapping.poster;
 
 	const src = attributeValues[ srcKey ];
 	const caption = attributeValues[ captionKey ];
 	const alt = attributeValues[ altKey ];
-
-	const idDefaultValue =
-		blockType.attributes[ idKey ]?.defaultValue ?? undefined;
-	const srcDefaultValue =
-		blockType.attributes[ srcKey ]?.defaultValue ?? undefined;
-	const captionDefaultValue =
-		blockType.attributes[ captionKey ]?.defaultValue ?? undefined;
-	const altDefaultValue =
-		blockType.attributes[ altKey ]?.defaultValue ?? undefined;
 
 	// TODO - pluralize when multiple.
 	let chooseItemLabel;
@@ -57,6 +108,18 @@ export default function Media( {
 		chooseItemLabel = __( 'Choose a media item…' );
 	}
 
+	const defaultValues = useMemo( () => {
+		return Object.fromEntries(
+			Object.entries( control.mapping ).map( ( [ , attributeKey ] ) => {
+				return [
+					attributeKey,
+					blockType.attributes[ attributeKey ]?.defaultValue ??
+						undefined,
+				];
+			} )
+		);
+	}, [ blockType.attributes, control.mapping ] );
+
 	return (
 		<MediaUploadCheck>
 			<ToolsPanelItem
@@ -64,12 +127,7 @@ export default function Media( {
 				label={ control.label }
 				hasValue={ () => !! src }
 				onDeselect={ () => {
-					updateAttributes( {
-						[ idKey ]: idDefaultValue,
-						[ srcKey ]: srcDefaultValue,
-						[ captionKey ]: captionDefaultValue,
-						[ altKey ]: altDefaultValue,
-					} );
+					updateAttributes( defaultValues );
 				} }
 				isShownByDefault={ control.shownByDefault }
 			>
@@ -78,13 +136,21 @@ export default function Media( {
 						if ( selectedMedia.id && selectedMedia.url ) {
 							const optionalAttributes = {};
 
-							if ( ! caption && selectedMedia.caption ) {
+							if (
+								captionKey &&
+								! caption &&
+								selectedMedia.caption
+							) {
 								optionalAttributes[ captionKey ] =
 									selectedMedia.caption;
 							}
-							if ( ! alt && selectedMedia.alt ) {
+							if ( altKey && ! alt && selectedMedia.alt ) {
 								optionalAttributes[ altKey ] =
 									selectedMedia.alt;
+							}
+							if ( posterKey && selectedMedia.poster ) {
+								optionalAttributes[ posterKey ] =
+									selectedMedia.poster;
 							}
 
 							updateAttributes( {
@@ -115,12 +181,11 @@ export default function Media( {
 									>
 										{ src && (
 											<>
-												<img
-													className="block-editor-content-only-controls__media-thumbnail"
-													alt=""
-													width={ 24 }
-													height={ 24 }
-													src={ src }
+												<MediaThumbnail
+													control={ control }
+													attributeValues={
+														attributeValues
+													}
 												/>
 												<span className="block-editor-content-only-controls__media-title">
 													{
@@ -153,16 +218,9 @@ export default function Media( {
 													icon={ lineSolid }
 													onClick={ ( event ) => {
 														event.stopPropagation();
-														updateAttributes( {
-															[ idKey ]:
-																idDefaultValue,
-															[ srcKey ]:
-																srcDefaultValue,
-															[ captionKey ]:
-																captionDefaultValue,
-															[ altKey ]:
-																altDefaultValue,
-														} );
+														updateAttributes(
+															defaultValues
+														);
 													} }
 												/>
 											</>
