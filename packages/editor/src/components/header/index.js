@@ -74,6 +74,7 @@ function Header( {
 		const {
 			getEditorMode,
 			getCurrentPostType,
+			getCurrentPostId,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
 		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
@@ -82,6 +83,7 @@ function Header( {
 
 		return {
 			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
 			isTextEditor: getEditorMode() === 'text',
 			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
@@ -111,6 +113,9 @@ function Header( {
 			( hasFixedToolbar &&
 				( ! hasBlockSelection || isBlockToolsCollapsed ) ) );
 	const hasBackButton = useHasBackButton();
+
+	const shouldRenderCollabSidebar =
+		isBlockCommentExperimentEnabled && typeof postId === 'number';
 
 	/*
 	 * The edit-post-header classname is only kept for backward compatibility
@@ -196,9 +201,7 @@ function Header( {
 					/>
 				) }
 
-				{ isBlockCommentExperimentEnabled ? (
-					<CollabSidebar />
-				) : undefined }
+				{ shouldRenderCollabSidebar && <CollabSidebar /> }
 
 				{ customSaveButton }
 				<MoreMenu />
