@@ -247,7 +247,8 @@ export default function CollabSidebar() {
 	const { records: threads, totalPages } = useEntityRecords(
 		'root',
 		'comment',
-		queryArgs
+		queryArgs,
+		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
 	const hasMoreComments = totalPages && totalPages > 1;
@@ -349,6 +350,11 @@ export default function CollabSidebar() {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
+
+	// If postId is not a valid number, do not render the comment sidebar. 1Code has comments. Press enter to view.
+	if ( ! ( !! postId && typeof postId === 'number' ) ) {
+		return null;
+	}
 
 	return (
 		<>
