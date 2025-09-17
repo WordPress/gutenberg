@@ -19,7 +19,6 @@ import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,16 +29,17 @@ import CommentForm from './comment-form';
 /**
  * Renders the Comments component.
  *
- * @param {Object}   props                     - The component props.
- * @param {Array}    props.threads             - The array of comment threads.
- * @param {Function} props.onEditComment       - The function to handle comment editing.
- * @param {Function} props.onAddReply          - The function to add a reply to a comment.
- * @param {Function} props.onCommentDelete     - The function to delete a comment.
- * @param {Function} props.onCommentResolve    - The function to mark a comment as resolved.
- * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
- * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
- * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
- * @param {boolean}  props.inPopover           - Whether to show comments in a popover.
+ * @param {Object}   props                       - The component props.
+ * @param {Array}    props.threads               - The array of comment threads.
+ * @param {Function} props.onEditComment         - The function to handle comment editing.
+ * @param {Function} props.onAddReply            - The function to add a reply to a comment.
+ * @param {Function} props.onCommentDelete       - The function to delete a comment.
+ * @param {Function} props.onCommentResolve      - The function to mark a comment as resolved.
+ * @param {Function} props.onCommentReopen       - The function to reopen a resolved comment.
+ * @param {boolean}  props.showCommentBoard      - Whether to show the comment board.
+ * @param {Function} props.setShowCommentBoard   - The function to set the comment board visibility.
+ * @param {boolean}  props.inPopover             - Whether to show comments in a popover.
+ * @param {Array}    props.commentToBlockMapping - Mapping of comment IDs to block references.
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -52,18 +52,15 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 	inPopover,
+	commentToBlockMapping,
 } ) {
-	const { blockCommentId, commentPopoverRef } = useSelect( ( select ) => {
+	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
-		console.log( getBlockAttributes( _clientId ) );
 		return {
 			blockCommentId: _clientId
 				? getBlockAttributes( _clientId )?.blockCommentId
-				: null,
-			commentPopoverRef: _clientId
-				? getBlockAttributes( _clientId )?.commentPopoverRef
 				: null,
 		};
 	}, [] );
@@ -76,8 +73,6 @@ export function Comments( {
 		setFocusThread( null );
 		setShowCommentBoard( false );
 	};
-
-	console.log( 'commentPopoverRef: ', commentPopoverRef );
 
 	return (
 		<>
@@ -97,46 +92,10 @@ export function Comments( {
 					</VStack>
 				)
 			}
-			{ Array.isArray( threads ) &&
+			{ ! inPopover &&
+				Array.isArray( threads ) &&
 				threads.length > 0 &&
 				threads.map( ( thread ) => (
-					inPopover ?
-					<Popover
-						key={ thread.id }
-						anchor={ commentPopoverRef ? commentPopoverRef.current : null }
-						placement="bottom-end"
-					>
-						<VStack
-							key={ thread.id }
-							className={ clsx(
-								'editor-collab-sidebar-panel__thread',
-								{
-									'editor-collab-sidebar-panel__active-thread':
-										blockCommentId &&
-										blockCommentId === thread.id,
-									'editor-collab-sidebar-panel__focus-thread':
-										focusThread && focusThread === thread.id,
-								}
-							) }
-							id={ thread.id }
-							spacing="3"
-							onClick={ () => setFocusThread( thread.id ) }
-						>
-							<Thread
-								thread={ thread }
-								onAddReply={ onAddReply }
-								onCommentDelete={ onCommentDelete }
-								onCommentResolve={ onCommentResolve }
-								onCommentReopen={ onCommentReopen }
-								onEditComment={ onEditComment }
-								isFocused={ focusThread === thread.id }
-								clearThreadFocus={ clearThreadFocus }
-								setFocusThread={ setFocusThread }
-							/>
-							<div>comment {thread.id}</div> &&
-
-						</VStack>
-					</Popover> :
 					<VStack
 						key={ thread.id }
 						className={ clsx(
@@ -165,8 +124,58 @@ export function Comments( {
 							setFocusThread={ setFocusThread }
 						/>
 					</VStack>
-
 				) ) }
+			{ inPopover &&
+				commentToBlockMapping &&
+				commentToBlockMapping.length > 0 &&
+				commentToBlockMapping.map( ( comment ) => {
+					return (
+						<Popover
+							key={ comment.blockCommentId }
+							placement="bottom-end"
+							anchor={ comment.commentPopoverRef.current }
+						>
+							<VStack
+								key={ comment.blockCommentId }
+								className={ clsx(
+									'editor-collab-sidebar-panel__thread',
+									{
+										'editor-collab-sidebar-panel__active-thread':
+											blockCommentId &&
+											blockCommentId ===
+												comment.blockCommentId,
+										'editor-collab-sidebar-panel__focus-thread':
+											focusThread &&
+											focusThread ===
+												comment.blockCommentId,
+									}
+								) }
+								id={ comment.blockCommentId }
+								spacing="3"
+								onClick={ () =>
+									setFocusThread( comment.blockCommentId )
+								}
+							>
+								<Thread
+									thread={ threads.find(
+										( thread ) =>
+											thread.id === comment.blockCommentId
+									) }
+									onAddReply={ onAddReply }
+									onCommentDelete={ onCommentDelete }
+									onCommentResolve={ onCommentResolve }
+									onCommentReopen={ onCommentReopen }
+									onEditComment={ onEditComment }
+									isFocused={
+										focusThread === comment.blockCommentId
+									}
+									clearThreadFocus={ clearThreadFocus }
+									setFocusThread={ setFocusThread }
+								/>
+							</VStack>
+						</Popover>
+					);
+				} ) }
 		</>
 	);
 }

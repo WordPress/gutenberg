@@ -31,7 +31,7 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { getCommentIdsFromBlocks } from './utils';
+import { getCommentIdsFromBlocks, getcommentToBlockMapping } from './utils';
 
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
@@ -59,6 +59,7 @@ function CollabSidebarContent( {
 	styles,
 	comments,
 	inPopover,
+	commentToBlockMapping,
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -228,6 +229,7 @@ function CollabSidebarContent( {
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				inPopover={ inPopover }
+				commentToBlockMapping={ commentToBlockMapping }
 			/>
 		</div>
 	);
@@ -286,57 +288,59 @@ export default function CollabSidebar() {
 	} );
 
 	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
+	const { resultComments, unresolvedSortedThreads, commentToBlockMapping } =
+		useMemo( () => {
+			// Create a compare to store the references to all objects by id.
+			const compare = {};
+			const result = [];
 
-		const allComments = threads ?? [];
+			const allComments = threads ?? [];
 
-		// Initialize each object with an empty `reply` array.
-		allComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
+			// Initialize each object with an empty `reply` array.
+			allComments.forEach( ( item ) => {
+				compare[ item.id ] = { ...item, reply: [] };
+			} );
 
-		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
+			// Iterate over the data to build the tree structure.
+			allComments.forEach( ( item ) => {
+				if ( item.parent === 0 ) {
+					// If parent is 0, it's a root item, push it to the result array.
+					result.push( compare[ item.id ] );
+				} else if ( compare[ item.parent ] ) {
+					// Otherwise, find its parent and push it to the parent's `reply` array.
+					compare[ item.parent ].reply.push( compare[ item.id ] );
+				}
+			} );
+
+			if ( 0 === result?.length ) {
+				return { resultComments: [], unresolvedSortedThreads: [] };
 			}
-		} );
 
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
-		}
+			const updatedResult = result.map( ( item ) => ( {
+				...item,
+				reply: [ ...item.reply ].reverse(),
+			} ) );
 
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
-
-		const blockCommentIds = getCommentIdsFromBlocks( blocks );
-
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ thread.id, thread ] )
-		);
-
-		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = blockCommentIds
-			.map( ( id ) => threadIdMap.get( id ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status !== 'approved'
+			const blockCommentIds = getCommentIdsFromBlocks( blocks );
+			const mappingData = getcommentToBlockMapping( blocks );
+			const threadIdMap = new Map(
+				updatedResult.map( ( thread ) => [ thread.id, thread ] )
 			);
 
-		return {
-			resultComments: updatedResult,
-			unresolvedSortedThreads: unresolvedSortedComments,
-		};
-	}, [ threads, blocks ] );
+			// Get comments by block order, filter out undefined threads, and exclude resolved comments.
+			const unresolvedSortedComments = blockCommentIds
+				.map( ( id ) => threadIdMap.get( id ) )
+				.filter(
+					( thread ) =>
+						thread !== undefined && thread.status !== 'approved'
+				);
+
+			return {
+				resultComments: updatedResult,
+				unresolvedSortedThreads: unresolvedSortedComments,
+				commentToBlockMapping: mappingData,
+			};
+		}, [ threads, blocks ] );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -386,23 +390,17 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			<PluginSidebar
-				isPinnable={ false }
-				header={ false }
-				identifier={ collabSidebarName }
-				className="editor-collab-sidebar"
-				headerClassName="editor-collab-sidebar__header"
-			>
-				<CollabSidebarContent
-					comments={ unresolvedSortedThreads }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					styles={ {
-						backgroundColor,
-					} }
-					inPopover
-				/>
-			</PluginSidebar>
+
+			<CollabSidebarContent
+				comments={ unresolvedSortedThreads }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				styles={ {
+					backgroundColor,
+				} }
+				inPopover
+				commentToBlockMapping={ commentToBlockMapping }
+			/>
 		</>
 	);
 }

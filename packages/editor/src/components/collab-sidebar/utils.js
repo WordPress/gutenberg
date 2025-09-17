@@ -43,3 +43,43 @@ export function getCommentIdsFromBlocks( blocks ) {
 	// Extract all comment IDs recursively
 	return extractCommentIds( blocks );
 }
+
+/**
+ * Extract a map of comment IDs to their block references from an array of blocks.
+ * This is useful for linking comments to specific blocks in the editor.
+ *
+ * Only top-level comments are mapped to blocks.
+ *
+ * @param {Array} blocks - The array of blocks to extract comment IDs from.
+ * @return {Object} An object mapping comment IDs to their block references.
+ */
+export function getcommentToBlockMapping( blocks ) {
+	const commentToBlockMapping = [];
+
+	// Recursive function to extract comment IDs and their block refs from blocks.
+	const extractCommentIdsAndRefs = ( items ) => {
+		items.forEach( ( block ) => {
+			// Check for comment IDs in the current block's attributes
+			if (
+				block.attributes &&
+				block.attributes.blockCommentId &&
+				! commentToBlockMapping[ block.attributes.blockCommentId ]
+			) {
+				commentToBlockMapping[ block.attributes.blockCommentId ] = {
+					blockCommentId: block.attributes.blockCommentId,
+					commentPopoverRef: block.attributes.commentPopoverRef,
+				};
+			}
+
+			// Recursively check inner blocks
+			if ( block.innerBlocks && block.innerBlocks.length > 0 ) {
+				extractCommentIdsAndRefs( block.innerBlocks );
+			}
+		} );
+	};
+
+	// Extract all comment IDs and their block refs recursively.
+	extractCommentIdsAndRefs( blocks );
+
+	return commentToBlockMapping;
+}
