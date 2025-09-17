@@ -7,8 +7,7 @@
  * @subpackage Block Bindings
  */
 
-
-// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+// The following filters can be removed once the minimum required WordPress version is 6.9 or newer.
 add_filter(
 	'block_bindings_supported_attributes',
 	function ( $attributes, $block_type ) {
@@ -22,6 +21,20 @@ add_filter(
 	},
 	10,
 	2
+);
+add_filter(
+	'block_bindings_supported_attributes_core/pullquote',
+	function ( $attributes ) {
+		if ( ! in_array( 'value', $attributes, true ) ) {
+			$attributes[] = 'value';
+		}
+		if ( ! in_array( 'citation', $attributes, true ) ) {
+			$attributes[] = 'citation';
+		}
+		return $attributes;
+	},
+	10,
+	3
 );
 
 /**

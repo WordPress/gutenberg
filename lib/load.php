@@ -85,7 +85,6 @@ require __DIR__ . '/compat/wordpress-6.8/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 
 // WordPress 6.9 compat.
-require __DIR__ . '/compat/wordpress-6.9/blocks.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
