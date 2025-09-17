@@ -90,6 +90,22 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 				destination: 'linkDestination',
 			},
 		},
+		{
+			label: __( 'Caption' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'caption',
+			},
+		},
+		{
+			label: __( 'Alt text' ),
+			type: 'RichText',
+			shownByDefault: false,
+			mapping: {
+				value: 'alt',
+			},
+		},
 	];
 }
 
