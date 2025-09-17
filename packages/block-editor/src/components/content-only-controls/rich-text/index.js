@@ -3,17 +3,18 @@
  */
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useState } from '@wordpress/element';
 import {
 	__unstableUseRichText as useRichText,
-	// removeFormat,
+	isEmpty,
+	removeFormat,
 } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { useFormatTypes } from '../rich-text';
+import { useFormatTypes } from '../../rich-text/use-format-types';
+import { getAllowedFormats } from '../../rich-text/utils';
 
 export default function RichTextControl( {
 	clientId,
@@ -32,40 +33,77 @@ export default function RichTextControl( {
 		start: undefined,
 		end: undefined,
 	} );
+	const [ isSelected, setIsSelected ] = useState( false );
 
-	// const {
-	// 	formatTypes,
-	// 	prepareHandlers,
-	// 	valueHandlers,
-	// 	changeHandlers,
-	// 	dependencies,
-	// } = useFormatTypes( {
-	// 	clientId,
-	// 	identifier,
-	// 	allowedFormats: adjustedAllowedFormats,
-	// 	withoutInteractiveFormatting,
-	// 	disableNoneEssentialFormatting: isContentOnlyWriteMode,
-	// } );
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats: control.args?.allowedFormats,
+		disableFormats: control.args?.disableFormats,
+	} );
+
+	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
+		clientId,
+		identifier: valueKey,
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting:
+			control.args?.withoutInteractiveFormatting,
+		disableNoneEssentialFormatting: true,
+	} );
+
+	function addEditorOnlyFormats( value ) {
+		return valueHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	function removeEditorOnlyFormats( value ) {
+		formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat(
+					value,
+					formatType.name,
+					0,
+					value.text.length
+				);
+			}
+		} );
+
+		return value.formats;
+	}
+
+	function addInvisibleFormats( value ) {
+		return prepareHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
 
 	const { value, ref: richTextRef } = useRichText( {
 		value: attrValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			updateAttributes( { [ valueKey ]: html } );
-			// Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-			// 	changeHandler( __unstableFormats, __unstableText );
-			// } );
+			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+				changeHandler( __unstableFormats, __unstableText );
+			} );
 		},
 		selectionStart: selection.start,
 		selectionEnd: selection.end,
 		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
-		// placeholder: bindingsPlaceholder || placeholder,
-		// __unstableIsSelected: isSelected,
-		// __unstableDisableFormats: disableFormats,
-		// preserveWhiteSpace,
-		// __unstableDependencies: dependencies,
-		// __unstableAfterParse: addEditorOnlyFormats,
-		// __unstableBeforeSerialize: removeEditorOnlyFormats,
-		// __unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableIsSelected: isSelected,
+		preserveWhiteSpace: !! control.args?.preserveWhiteSpace,
+		placeholder: control.args?.placeholder,
+		__unstableDisableFormats: control.args?.disableFormats,
+		__unstableDependencies: dependencies,
+		__unstableAfterParse: addEditorOnlyFormats,
+		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 
 	const hasVisibleLabel = ! control.shownByDefault;
@@ -75,11 +113,11 @@ export default function RichTextControl( {
 			panelId={ clientId }
 			label={ control.label }
 			hasValue={ () => {
-				return (
-					value !== defaultValue && stripHTML( value )?.length !== 0
-				);
+				return value?.text && ! isEmpty( value );
 			} }
-			onDeselect={ () => {} }
+			onDeselect={ () =>
+				updateAttributes( { [ valueKey ]: defaultValue } )
+			}
 			isShownByDefault={ control.shownByDefault }
 		>
 			{ hasVisibleLabel && (
@@ -93,6 +131,8 @@ export default function RichTextControl( {
 				aria-label={ hasVisibleLabel ? undefined : control.label }
 				aria-multiline={ ! control.args?.disableLineBreaks }
 				ref={ useMergeRefs( [ richTextRef ] ) }
+				onFocus={ () => setIsSelected( true ) }
+				onBlur={ () => setIsSelected( false ) }
 				contentEditable
 			/>
 		</ToolsPanelItem>
