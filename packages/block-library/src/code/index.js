@@ -39,4 +39,17 @@ export const settings = {
 	save,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.controls = [
+		{
+			label: __( 'Code' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'content',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );
