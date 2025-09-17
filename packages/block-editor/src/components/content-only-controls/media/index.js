@@ -10,6 +10,7 @@ import {
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	audio as audioIcon,
 	image as imageIcon,
 	media as mediaIcon,
 	video as videoIcon,
@@ -60,8 +61,10 @@ function MediaThumbnail( { control, attributeValues } ) {
 		let icon;
 		if ( allowedTypes[ 0 ] === 'image' ) {
 			icon = imageIcon;
-		} else if ( allowedTypes[ 1 ] === 'video' ) {
+		} else if ( allowedTypes[ 0 ] === 'video' ) {
 			icon = videoIcon;
+		} else if ( allowedTypes[ 0 ] === 'audio' ) {
+			icon = audioIcon;
 		} else {
 			icon = mediaIcon;
 		}
