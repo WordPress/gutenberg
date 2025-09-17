@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useContext } from '@wordpress/element';
+import { useMemo, useContext, useRef } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	Popover,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -19,6 +22,7 @@ import {
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -39,6 +43,7 @@ export default function BlockEdit( {
 	// public API!
 	...props
 } ) {
+
 	const {
 		name,
 		isSelected,
@@ -46,12 +51,18 @@ export default function BlockEdit( {
 		attributes = {},
 		__unstableLayoutClassNames,
 	} = props;
+
 	const { layout = null, metadata = {} } = attributes;
 	const { bindings } = metadata;
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
+
+	const blockCommentId = props.attributes?.blockCommentId;
+
+	const ref = useRef( 'comment-anchor-' + blockCommentId );
+	props.attributes.commentPopoverRef = ref;
 
 	return (
 		<BlockEditContextProvider
@@ -88,6 +99,12 @@ export default function BlockEdit( {
 				]
 			) }
 		>
+			{ blockCommentId && (
+				<Popover.Slot
+					name={ 'block-comment-popover-slot-' + blockCommentId }
+					ref={ ref }
+				/>
+			) }
 			<Edit { ...props } />
 			{ originalBlockClientId && (
 				<MultipleUsageWarning

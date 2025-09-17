@@ -13,11 +13,13 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	DropdownMenu,
+	Popover,
 } from '@wordpress/components';
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -37,6 +39,7 @@ import CommentForm from './comment-form';
  * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
  * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
+ * @param {boolean}  props.inPopover           - Whether to show comments in a popover.
  * @return {React.ReactNode} The rendered Comments component.
  */
 export function Comments( {
@@ -48,15 +51,19 @@ export function Comments( {
 	onCommentReopen,
 	showCommentBoard,
 	setShowCommentBoard,
+	inPopover,
 } ) {
-	const { blockCommentId } = useSelect( ( select ) => {
+	const { blockCommentId, commentPopoverRef } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
-
+		console.log( getBlockAttributes( _clientId ) );
 		return {
 			blockCommentId: _clientId
 				? getBlockAttributes( _clientId )?.blockCommentId
+				: null,
+			commentPopoverRef: _clientId
+				? getBlockAttributes( _clientId )?.commentPopoverRef
 				: null,
 		};
 	}, [] );
@@ -69,6 +76,8 @@ export function Comments( {
 		setFocusThread( null );
 		setShowCommentBoard( false );
 	};
+
+	console.log( 'commentPopoverRef: ', commentPopoverRef );
 
 	return (
 		<>
@@ -91,6 +100,43 @@ export function Comments( {
 			{ Array.isArray( threads ) &&
 				threads.length > 0 &&
 				threads.map( ( thread ) => (
+					inPopover ?
+					<Popover
+						key={ thread.id }
+						anchor={ commentPopoverRef ? commentPopoverRef.current : null }
+						placement="bottom-end"
+					>
+						<VStack
+							key={ thread.id }
+							className={ clsx(
+								'editor-collab-sidebar-panel__thread',
+								{
+									'editor-collab-sidebar-panel__active-thread':
+										blockCommentId &&
+										blockCommentId === thread.id,
+									'editor-collab-sidebar-panel__focus-thread':
+										focusThread && focusThread === thread.id,
+								}
+							) }
+							id={ thread.id }
+							spacing="3"
+							onClick={ () => setFocusThread( thread.id ) }
+						>
+							<Thread
+								thread={ thread }
+								onAddReply={ onAddReply }
+								onCommentDelete={ onCommentDelete }
+								onCommentResolve={ onCommentResolve }
+								onCommentReopen={ onCommentReopen }
+								onEditComment={ onEditComment }
+								isFocused={ focusThread === thread.id }
+								clearThreadFocus={ clearThreadFocus }
+								setFocusThread={ setFocusThread }
+							/>
+							<div>comment {thread.id}</div> &&
+
+						</VStack>
+					</Popover> :
 					<VStack
 						key={ thread.id }
 						className={ clsx(
@@ -119,6 +165,7 @@ export function Comments( {
 							setFocusThread={ setFocusThread }
 						/>
 					</VStack>
+
 				) ) }
 		</>
 	);
