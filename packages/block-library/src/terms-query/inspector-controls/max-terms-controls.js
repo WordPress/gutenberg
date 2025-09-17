@@ -10,7 +10,7 @@ import {
 export default function PaginationControl( { attributes, setQuery } ) {
 	const { termQuery } = attributes;
 
-	// Only show pagination control when not hierarchical
+	// Only show pagination control when not hierarchical.
 	if ( termQuery.hierarchical ) {
 		return null;
 	}
