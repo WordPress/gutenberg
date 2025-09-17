@@ -52,4 +52,25 @@ export const settings = {
 	variations,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.controls = [
+		{
+			label: __( 'Background' ),
+			type: 'Media',
+			shownByDefault: true,
+			mapping: {
+				id: 'id',
+				src: 'url',
+				alt: 'alt',
+			},
+			args: {
+				// TODO - work out how to support video. Also background gradient.
+				// Does this need to be a custom control?
+				allowedTypes: [ 'image' ],
+				multiple: false,
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );
