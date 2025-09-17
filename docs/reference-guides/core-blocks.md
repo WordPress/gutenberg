@@ -759,7 +759,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), contentRole, interactivity, layout, ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results
@@ -900,7 +900,7 @@ Describe in a few words what this site is about. This is important for search re
 
 -	**Name:** core/site-tagline
 -	**Category:** theme
--	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), color (background, gradients, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** level, levelOptions, textAlign
 
 ## Site Title

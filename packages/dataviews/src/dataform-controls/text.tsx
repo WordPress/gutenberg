@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { createElement } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
@@ -9,8 +14,20 @@ export default function Text< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	config,
 }: DataFormControlProps< Item > ) {
+	const { prefix, suffix } = config || {};
+
 	return (
-		<ValidatedText { ...{ data, field, onChange, hideLabelFromVision } } />
+		<ValidatedText
+			{ ...{
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				prefix: prefix ? createElement( prefix ) : undefined,
+				suffix: suffix ? createElement( suffix ) : undefined,
+			} }
+		/>
 	);
 }
