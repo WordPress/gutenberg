@@ -46,7 +46,6 @@ function StyleInspectorSlots( {
 	showPositionControls = true,
 	showListControls = false,
 	showBindingsControls = true,
-	className,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	return (
@@ -56,9 +55,7 @@ function StyleInspectorSlots( {
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
-				className={
-					className || 'color-block-support-panel__inner-wrapper'
-				}
+				className="color-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
 				group="background"
