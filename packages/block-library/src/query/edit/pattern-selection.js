@@ -43,7 +43,16 @@ export function useBlockPatterns( clientId, attributes ) {
 		clientId,
 		attributes
 	);
-	return usePatterns( clientId, blockNameForPatterns );
+	const allPatterns = usePatterns( clientId, blockNameForPatterns );
+	// Filter out any patterns that don't have Query as their root block
+	// so that a Query block is always replaced by another Query block.
+	const rootBlockPatterns = useMemo( () => {
+		return allPatterns.filter( ( pattern ) => {
+			return pattern.blocks?.[ 0 ]?.name === blockNameForPatterns;
+		} );
+	}, [ allPatterns, blockNameForPatterns ] );
+
+	return rootBlockPatterns;
 }
 
 export default function PatternSelection( {
@@ -74,6 +83,18 @@ export default function PatternSelection( {
 			blocks,
 			attributes
 		);
+		// console.log(
+		// 	'new blocks',
+		// 	newBlocks,
+		// 	'query client ids',
+		// 	queryClientIds,
+		// 	'pattern',
+		// 	pattern,
+		// 	'blocks',
+		// 	blocks,
+		// 	'attributes',
+		// 	attributes
+		// );
 		replaceBlock( clientId, newBlocks );
 		if ( queryClientIds[ 0 ] ) {
 			selectBlock( queryClientIds[ 0 ] );
