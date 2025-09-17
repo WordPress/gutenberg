@@ -261,6 +261,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
+	const _sources = {};
 	const { sources, canUpdateBlockBindings } = useSelect(
 		( select ) => {
 			const _canUpdateBlockBindings =
@@ -273,13 +274,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				};
 			}
 
-			const _sources = {};
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
 				( [ sourceName, { editorUI, usesContext, label } ] ) => {
 					if ( editorUI ) {
 						// Populate context.
-						const context = { ...blockContext };
+						const context = {};
 						if ( usesContext?.length ) {
 							for ( const key of usesContext ) {
 								context[ key ] = blockContext[ key ];
