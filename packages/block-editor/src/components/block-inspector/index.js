@@ -50,6 +50,7 @@ function BlockInspector() {
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			getSelectedBlockCount,
 			getBlockName,
 			getParentSectionBlock,
@@ -63,13 +64,17 @@ function BlockInspector() {
 			renderedBlockClientId && getBlockName( renderedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
+			_isSectionBlock( id )
+		);
 
 		return {
 			count: getSelectedBlockCount(),
 			selectedBlockClientId: renderedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
+			isSectionBlock: isSectionInSelection,
 		};
 	}, [] );
 
@@ -89,7 +94,9 @@ function BlockInspector() {
 		blockName: selectedBlockName,
 	} );
 
-	if ( count > 1 && ! isSectionBlock ) {
+	const hasSelectedBlocks = count > 1;
+
+	if ( hasSelectedBlocks && ! isSectionBlock ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -122,6 +129,14 @@ function BlockInspector() {
 						<InspectorControls.Slot group="styles" />
 					</>
 				) }
+			</div>
+		);
+	}
+
+	if ( hasSelectedBlocks && isSectionBlock ) {
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
 			</div>
 		);
 	}
