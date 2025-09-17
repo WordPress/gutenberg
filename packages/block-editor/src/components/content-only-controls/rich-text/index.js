@@ -161,7 +161,6 @@ export default function RichTextControl( {
 			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
 				<div
 					className="block-editor-content-only-controls__rich-text"
-					tagName="div"
 					role="textbox"
 					aria-multiline={ ! control.args?.disableLineBreaks }
 					ref={ useMergeRefs( [
@@ -175,7 +174,6 @@ export default function RichTextControl( {
 							isSelected,
 							disableFormats: control.args?.disableFormats,
 							value,
-							tagName: 'div',
 							removeEditorOnlyFormats,
 							disableLineBreaks: control.args?.disableLineBreaks,
 							keyboardShortcuts,
