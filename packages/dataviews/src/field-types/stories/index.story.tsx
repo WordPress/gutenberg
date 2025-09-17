@@ -5,7 +5,11 @@ import { useState, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
+import { starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,10 +60,32 @@ const meta = {
 };
 export default meta;
 
+const DollarPrefix = () => (
+	<InputControlPrefixWrapper>
+		<span>$</span>
+	</InputControlPrefixWrapper>
+);
+const StarIconPrefix = () => (
+	<InputControlPrefixWrapper variant="icon">
+		<Icon icon={ starFilled } />
+	</InputControlPrefixWrapper>
+);
+const PercentSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>%</span>
+	</InputControlSuffixWrapper>
+);
+const USDSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>USD</span>
+	</InputControlSuffixWrapper>
+);
+
 type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
+	textWithRadio: string;
 	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
@@ -86,13 +112,18 @@ type DataType = {
 	arrayWithElements: string[];
 	notype: string;
 	notypeWithElements: string;
+	priceWithPrefix?: string;
+	ratingWithIcon?: string;
+	percentageWithSuffix?: string;
+	priceWithBoth?: string;
 };
 
 const data: DataType[] = [
 	{
 		id: 1,
 		text: 'Text',
-		textWithElements: 'Item 1',
+		textWithElements: 'item1',
+		textWithRadio: 'item2',
 		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
@@ -120,6 +151,10 @@ const data: DataType[] = [
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
 		notypeWithElements: 'No type',
+		priceWithPrefix: '25.99',
+		ratingWithIcon: '4.5',
+		percentageWithSuffix: '85',
+		priceWithBoth: '199.99',
 	},
 ];
 
@@ -135,6 +170,18 @@ const fields: Field< DataType >[] = [
 		type: 'text',
 		label: 'Text (with elements)',
 		description: 'Help for text with elements.',
+		elements: [
+			{ value: 'item1', label: 'Item 1' },
+			{ value: 'item2', label: 'Item 2' },
+			{ value: 'item3', label: 'Item 3' },
+		],
+	},
+	{
+		id: 'textWithRadio',
+		type: 'text',
+		label: 'Text (with radio)',
+		description: 'Help for text with radio.',
+		Edit: 'radio',
 		elements: [
 			{ value: 'item1', label: 'Item 1' },
 			{ value: 'item2', label: 'Item 2' },
@@ -394,6 +441,47 @@ const fields: Field< DataType >[] = [
 			{ value: 'item2', label: 'Item 2' },
 			{ value: 'item3', label: 'Item 3' },
 		],
+	},
+	{
+		id: 'priceWithPrefix',
+		label: 'Text with Prefix',
+		type: 'text',
+		description: 'Text field with dollar sign prefix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+		},
+	},
+	{
+		id: 'ratingWithIcon',
+		label: 'Text with Icon Prefix',
+		type: 'text',
+		description: 'Text field with star icon prefix.',
+		Edit: {
+			control: 'text',
+			prefix: StarIconPrefix,
+		},
+	},
+	{
+		id: 'percentageWithSuffix',
+		label: 'Text with Suffix',
+		type: 'text',
+		description: 'Text field with percent sign suffix.',
+		Edit: {
+			control: 'text',
+			suffix: PercentSuffix,
+		},
+	},
+	{
+		id: 'priceWithBoth',
+		label: 'Text with Prefix and Suffix',
+		type: 'text',
+		description: 'Text field with both dollar prefix and USD suffix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+			suffix: USDSuffix,
+		},
 	},
 ];
 

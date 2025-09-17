@@ -32,7 +32,7 @@ jobs:
         steps:
             - name: Determine if label should trigger cherry-pick
               id: label-check
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
               with:
                   script: |
                       const commit_sha = context.payload.pull_request ? context.payload.pull_request.merge_commit_sha : context.sha;
@@ -112,7 +112,7 @@ jobs:
 
             - name: Remove cherry-pick label
               if: env.cherry_pick == 'true' && env.conflict == 'false'
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
               with:
                   script: |
                       const prNumber = process.env.pr_number;
@@ -136,7 +136,7 @@ jobs:
 
             - name: Comment on the PR
               if: env.cherry_pick == 'true' && env.conflict == 'false'
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
               with:
                   script: |
                       const prNumber = process.env.pr_number;
@@ -154,7 +154,7 @@ jobs:
 
             - name: Comment on the PR about conflict
               if: env.cherry_pick == 'true' && env.conflict == 'true'
-              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
               with:
                   script: |
                       const prNumber = process.env.pr_number;

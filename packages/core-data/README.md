@@ -471,7 +471,7 @@ _Parameters_
 
 _Returns_
 
--   `ET.User< 'edit' >`: Current user object.
+-   `ET.User< 'view' >`: Current user object.
 
 ### getDefaultTemplateId
 

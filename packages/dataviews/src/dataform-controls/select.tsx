@@ -1,14 +1,22 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
+import { privateApis } from '@wordpress/components';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { unlock } from '../lock-unlock';
+
+const { ValidatedSelectControl } = unlock( privateApis );
 
 export default function Select< Item >( {
 	data,
@@ -16,15 +24,47 @@ export default function Select< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, type } = field;
+	const { type, label, description, getValue, setValue } = field;
+	const [ customValidity, setCustomValidity ] =
+		useState<
+			React.ComponentProps<
+				typeof ValidatedSelectControl
+			>[ 'customValidity' ]
+		>( undefined );
+
 	const isMultiple = type === 'array';
-	const value = field.getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
+	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
+
 	const onChangeControl = useCallback(
 		( newValue: any ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
 	);
 
 	const fieldElements = field?.elements ?? [];
@@ -48,10 +88,13 @@ export default function Select< Item >( {
 			  ];
 
 	return (
-		<SelectControl
+		<ValidatedSelectControl
+			required={ !! field.isValid?.required }
+			onValidate={ onValidateControl }
+			customValidity={ customValidity }
 			label={ label }
 			value={ value }
-			help={ field.description }
+			help={ description }
 			options={ elements }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
