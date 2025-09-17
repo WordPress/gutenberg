@@ -100,7 +100,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		},
 		{
 			label: __( 'Alt text' ),
-			type: 'RichText',
+			type: 'PlainText',
 			shownByDefault: false,
 			mapping: {
 				value: 'alt',
