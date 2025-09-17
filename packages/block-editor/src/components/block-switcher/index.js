@@ -30,6 +30,7 @@ import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { unlock } from '../../lock-unlock';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
@@ -101,14 +102,16 @@ function BlockSwitcherDropdownMenuContents( {
 		selectForMultipleBlocks( transformedBlocks );
 	}
 	/**
-	 * The `isTemplate` check is a stopgap solution here.
+	 * The `isSynced` check is a stopgap solution here.
 	 * Ideally, the Transforms API should handle this
 	 * by allowing to exclude blocks from wildcard transformations.
 	 */
 	const isSingleBlock = blocks.length === 1;
-	const isTemplate = isSingleBlock && isTemplatePart( blocks[ 0 ] );
+	const isSynced =
+		isSingleBlock &&
+		( isTemplatePart( blocks[ 0 ] ) || isReusableBlock( blocks[ 0 ] ) );
 	const hasPossibleBlockTransformations =
-		!! possibleBlockTransformations.length && canRemove && ! isTemplate;
+		!! possibleBlockTransformations?.length && canRemove && ! isSynced;
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
@@ -196,6 +199,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		isReusable,
 		isTemplate,
 		isDisabled,
+		isSection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -204,7 +208,8 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				getBlockAttributes,
 				canRemoveBlocks,
 				getBlockEditingMode,
-			} = select( blockEditorStore );
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
@@ -250,6 +255,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
 				hasContentOnlyLocking: _hasTemplateLock,
 				isDisabled: editingMode !== 'default',
+				isSection: isSectionBlock( clientIds[ 0 ] ),
 			};
 		},
 		[ clientIds ]
@@ -278,7 +284,10 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			? blockTitle
 			: undefined;
 
+	const hideTransformsForSections =
+		window?.__experimentalContentOnlyPatternInsertion && isSection;
 	const hideDropdown =
+		hideTransformsForSections ||
 		isDisabled ||
 		( ! hasBlockStyles && ! canRemove ) ||
 		hasContentOnlyLocking;

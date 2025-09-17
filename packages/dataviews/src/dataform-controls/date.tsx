@@ -31,6 +31,7 @@ import {
  */
 import RelativeDateControl, {
 	TIME_UNITS_OPTIONS,
+	type DateRelative,
 } from './relative-date-control';
 import {
 	OPERATOR_IN_THE_PAST,
@@ -41,6 +42,8 @@ import { unlock } from '../lock-unlock';
 import type { DataFormControlProps } from '../types';
 
 const { DateCalendar, DateRangeCalendar } = unlock( componentsPrivateApis );
+
+type DateRange = [ string, string ] | undefined;
 
 const DATE_PRESETS: {
 	id: string;
@@ -146,7 +149,7 @@ function CalendarDateControl( {
 }: {
 	id: string;
 	value: string | undefined;
-	onChange: ( value: any ) => void;
+	onChange: ( value: string | undefined ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
@@ -165,10 +168,10 @@ function CalendarDateControl( {
 			const dateValue = newDate
 				? format( newDate, 'yyyy-MM-dd' )
 				: undefined;
-			onChange( { [ id ]: dateValue } );
+			onChange( dateValue );
 			setSelectedPresetId( null );
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const handlePresetClick = useCallback(
@@ -177,15 +180,15 @@ function CalendarDateControl( {
 			const dateValue = formatDate( presetDate );
 
 			setCalendarMonth( presetDate );
-			onChange( { [ id ]: dateValue } );
+			onChange( dateValue );
 			setSelectedPresetId( preset.id );
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const handleManualDateChange = useCallback(
 		( newValue?: string ) => {
-			onChange( { [ id ]: newValue } );
+			onChange( newValue );
 			if ( newValue ) {
 				const parsedDate = parseDate( newValue );
 				if ( parsedDate ) {
@@ -194,7 +197,7 @@ function CalendarDateControl( {
 			}
 			setSelectedPresetId( null );
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const {
@@ -276,8 +279,8 @@ function CalendarDateRangeControl( {
 	className,
 }: {
 	id: string;
-	value: [ string, string ] | undefined;
-	onChange: ( value: any ) => void;
+	value: DateRange;
+	onChange: ( value: DateRange ) => void;
 	label: string;
 	hideLabelFromVision?: boolean;
 	className?: string;
@@ -305,15 +308,13 @@ function CalendarDateRangeControl( {
 	const updateDateRange = useCallback(
 		( fromDate?: Date | string, toDate?: Date | string ) => {
 			if ( fromDate && toDate ) {
-				onChange( {
-					[ id ]: [ formatDate( fromDate ), formatDate( toDate ) ],
-				} );
+				onChange( [ formatDate( fromDate ), formatDate( toDate ) ] );
 			} else if ( ! fromDate && ! toDate ) {
-				onChange( { [ id ]: undefined } );
+				onChange( undefined );
 			}
 			// Do nothing if only one date is set - wait for both
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const onSelectCalendarRange = useCallback(
@@ -446,8 +447,33 @@ export default function DateControl< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label } = field;
-	const value = field.getValue( { item: data } );
+	const { id, label, getValue, setValue } = field;
+	const value = getValue( { item: data } );
+
+	const onChangeRelativeDateControl = useCallback(
+		( newValue: DateRelative ) => {
+			onChange( setValue( { item: data, value: newValue } ) );
+		},
+		[ data, onChange, setValue ]
+	);
+
+	const onChangeCalendarDateRangeControl = useCallback(
+		( newValue: DateRange ) => {
+			onChange(
+				setValue( {
+					item: data,
+					value: newValue,
+				} )
+			);
+		},
+		[ data, onChange, setValue ]
+	);
+
+	const onChangeCalendarDateControl = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
 
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -455,7 +481,7 @@ export default function DateControl< Item >( {
 				className="dataviews-controls__date"
 				id={ id }
 				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChange }
+				onChange={ onChangeRelativeDateControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				options={ TIME_UNITS_OPTIONS[ operator ] }
@@ -464,14 +490,14 @@ export default function DateControl< Item >( {
 	}
 
 	if ( operator === OPERATOR_BETWEEN ) {
-		let dateRangeValue: [ string, string ] | undefined;
+		let dateRangeValue: DateRange;
 		if (
 			Array.isArray( value ) &&
 			value.length === 2 &&
 			value.every( ( date ) => typeof date === 'string' )
 		) {
 			// Ensure the value is expected format
-			dateRangeValue = value as unknown as [ string, string ];
+			dateRangeValue = value as DateRange;
 		}
 
 		return (
@@ -479,7 +505,7 @@ export default function DateControl< Item >( {
 				className="dataviews-controls__date"
 				id={ id }
 				value={ dateRangeValue }
-				onChange={ onChange }
+				onChange={ onChangeCalendarDateRangeControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
@@ -491,7 +517,7 @@ export default function DateControl< Item >( {
 			className="dataviews-controls__date"
 			id={ id }
 			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChange }
+			onChange={ onChangeCalendarDateControl }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 		/>

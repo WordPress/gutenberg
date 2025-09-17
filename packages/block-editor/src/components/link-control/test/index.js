@@ -28,6 +28,18 @@ import {
 
 const mockFetchSearchSuggestions = jest.fn();
 
+function getExpectedVisualTypeName( type ) {
+	const builtInLabels = {
+		post: 'Post',
+		page: 'Page',
+		post_tag: 'Tag',
+		category: 'Category',
+		attachment: 'Attachment',
+	};
+
+	return builtInLabels[ type ] || type;
+}
+
 /**
  * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
  * Therefore if we pass any value as the mock of `fetchRichUrlData` then ALL of the tests will require
@@ -510,7 +522,7 @@ describe( 'Searching for a link', () => {
 				firstSuggestion.title
 			);
 			expect( searchResultElements[ 0 ] ).toHaveTextContent(
-				firstSuggestion.type
+				getExpectedVisualTypeName( firstSuggestion.type )
 			);
 
 			// The fallback URL suggestion should not be shown when input is not URL-like.
@@ -2078,7 +2090,7 @@ describe( 'Post types', () => {
 
 		searchResultElements.forEach( ( resultItem, index ) => {
 			expect( resultItem ).toHaveTextContent(
-				fauxEntitySuggestions[ index ].type
+				getExpectedVisualTypeName( fauxEntitySuggestions[ index ].type )
 			);
 		} );
 	} );

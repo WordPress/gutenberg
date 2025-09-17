@@ -15,8 +15,8 @@ export default function ArrayControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, elements } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, elements, getValue, setValue } = field;
+	const value = getValue( { item: data } );
 
 	const findElementByValue = useCallback(
 		( suggestionValue: string ) => {
@@ -61,11 +61,9 @@ export default function ArrayControl< Item >( {
 				return tokenByLabel?.value || token;
 			} );
 
-			onChange( {
-				[ id ]: stringTokens,
-			} );
+			onChange( setValue( { item: data, value: stringTokens } ) );
 		},
-		[ id, onChange, findElementByLabel ]
+		[ onChange, setValue, data, findElementByLabel ]
 	);
 
 	return (

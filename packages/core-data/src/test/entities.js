@@ -1,10 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+
+jest.mock( '@wordpress/api-fetch' );
+
+/**
  * Internal dependencies
  */
 import {
 	getMethodName,
 	rootEntitiesConfig,
 	prePersistPostType,
+	additionalEntityConfigLoaders,
 } from '../entities';
 
 describe( 'getMethodName', () => {
@@ -66,5 +74,29 @@ describe( 'prePersistPostType', () => {
 			title: 'My Title',
 		};
 		expect( prePersistPostType( record, edits ) ).toEqual( {} );
+	} );
+} );
+
+describe( 'loadTaxonomyEntities', () => {
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'should add supportsPagination: true to taxonomy entities', async () => {
+		const mockTaxonomies = {
+			category: {
+				name: 'Categories',
+				rest_base: 'categories',
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockTaxonomies );
+
+		const taxonomyLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'taxonomy'
+		);
+		const entities = await taxonomyLoader.loadEntities();
+
+		expect( entities[ 0 ].supportsPagination ).toBe( true );
 	} );
 } );
