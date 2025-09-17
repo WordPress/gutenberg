@@ -43,11 +43,13 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 	if ( 'top-level' === $terms_to_show ) {
 		$query_args['parent'] = 0;
 	} elseif ( 'subterms' === $terms_to_show ) {
-		// Check if we're in a taxonomy archive context
+		// Check if we're in a taxonomy archive context.
 		if ( is_tax( $query_args['taxonomy'] ) ) {
-			// Get the current term ID from the queried object
+			// Get the current term ID from the queried object.
 			$current_term_id      = get_queried_object_id();
-			$query_args['parent'] = $current_term_id;
+			if ( $current_term_id && $current_term_id > 0 ) {
+				$query_args['parent'] = $current_term_id;
+			}
 		}
 	}
 
