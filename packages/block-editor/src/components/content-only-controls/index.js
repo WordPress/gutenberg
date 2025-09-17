@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
@@ -106,12 +107,32 @@ function BlockControls( { clientId } ) {
 	);
 }
 
-export default function ContentOnlyControls( { clientIds } ) {
-	if ( ! clientIds.length ) {
+export default function ContentOnlyControls( {
+	rootClientId,
+	contentClientIds,
+} ) {
+	const isRootContentBlock = useSelect(
+		( select ) => {
+			const { getBlockName } = select( blockEditorStore );
+			const blockName = getBlockName( rootClientId );
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			return hasContentRoleAttribute( blockName );
+		},
+		[ rootClientId ]
+	);
+
+	if ( ! isRootContentBlock && ! contentClientIds.length ) {
 		return null;
 	}
 
-	return clientIds.map( ( clientId ) => (
-		<BlockControls key={ clientId } clientId={ clientId } />
-	) );
+	return (
+		<>
+			{ isRootContentBlock && (
+				<BlockControls clientId={ rootClientId } />
+			) }
+			{ contentClientIds.map( ( clientId ) => (
+				<BlockControls key={ clientId } clientId={ clientId } />
+			) ) }
+		</>
+	);
 }
