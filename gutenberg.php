@@ -16,19 +16,40 @@
 defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES
 defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.7' );
-
+defined( 'GUTENBERG_MINIMUM_PHP_VERSION' ) or define( 'GUTENBERG_MINIMUM_PHP_VERSION', '7.2' );
 
 gutenberg_pre_init();
 
 /**
- * Display a version notice and deactivate the Gutenberg plugin.
+ * Display a WordPress version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
 	/* translators: %s: Minimum required version */
-	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), GUTENBERG_MINIMUM_WP_VERSION );
+	printf(
+		__( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ),
+		GUTENBERG_MINIMUM_WP_VERSION
+	);
+	echo '</p></div>';
+
+	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+}
+
+/**
+ * Display a PHP version notice and deactivate the Gutenberg plugin.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_php_version_notice() {
+	echo '<div class="error"><p>';
+	/* translators: %1$s: Minimum required PHP version, %2$s: current PHP version */
+	printf(
+		__( 'Gutenberg requires PHP %1$s or later to function. Your site is running PHP %2$s. Please update PHP or contact your host to enable PHP %1$s+.', 'gutenberg' ),
+		GUTENBERG_MINIMUM_PHP_VERSION,
+		PHP_VERSION
+	);
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -41,19 +62,27 @@ function gutenberg_wordpress_version_notice() {
  */
 function gutenberg_build_files_notice() {
 	echo '<div class="error"><p>';
-	_e( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/getting-started-with-code-contribution.md">contributing</a> file for more information.', 'gutenberg' );
+	_e(
+		'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/getting-started-with-code-contribution.md">contributing</a> file for more information.',
+		'gutenberg'
+	);
 	echo '</p></div>';
 }
 
 /**
- * Verify that we can initialize the Gutenberg editor , then load it.
+ * Verify that we can initialize the Gutenberg editor, then load it.
  *
  * @since 1.5.0
  *
- * @global string $wp_version             The WordPress version string.
- *
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_pre_init() {
+	// Check PHP version early.
+	if ( defined( 'GUTENBERG_MINIMUM_PHP_VERSION' ) && version_compare( PHP_VERSION, GUTENBERG_MINIMUM_PHP_VERSION, '<' ) ) {
+		add_action( 'admin_notices', 'gutenberg_php_version_notice' );
+		return;
+	}
+
 	global $wp_version;
 	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
