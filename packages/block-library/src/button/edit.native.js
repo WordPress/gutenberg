@@ -180,7 +180,7 @@ function ButtonEdit( props ) {
 			label: __( 'Open in new tab' ),
 		},
 		linkRel: {
-			label: __( 'Link Rel' ),
+			label: __( 'Link relation' ),
 			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
 		},
 	};

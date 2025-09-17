@@ -42,6 +42,120 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( result ).toBe( 'value' );
 		} );
 	} );
+	describe( 'setValue from ID', () => {
+		it( 'user', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( { user: 'newValue' } );
+		} );
+
+		it( 'user.name', () => {
+			const item = {
+				user: { name: 'value', email: 'user@example.com' },
+				date: '2023-01-01',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'user.name',
+				},
+				{
+					id: 'user.email',
+				},
+				{
+					id: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( { user: { name: 'newValue' } } );
+		} );
+
+		it( 'user.name.first', () => {
+			const item = {
+				user: {
+					name: { first: 'firstName', last: 'lastName' },
+					email: 'user@example.com',
+				},
+				date: '2023-01-01',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'user.name.first',
+				},
+				{
+					id: 'user.name.last',
+				},
+				{
+					id: 'user.email',
+				},
+				{
+					id: 'date',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: 'newValue',
+			} );
+			expect( result ).toEqual( {
+				user: {
+					name: { first: 'newValue' },
+				},
+			} );
+		} );
+
+		it( 'returns null for null value', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: null,
+			} );
+			expect( result ).toEqual( { user: null } );
+		} );
+
+		it( 'returns undefined for undefined value', () => {
+			const item = { user: 'value', email: 'user@example.com' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'user',
+				},
+				{
+					id: 'email',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: undefined,
+			} );
+			expect( result ).toEqual( { user: undefined } );
+		} );
+	} );
+
 	describe( 'filterBy', () => {
 		it( 'returns the default field type definition if undefined for untyped field', () => {
 			const fields: Field< {} >[] = [
