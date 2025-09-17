@@ -74,6 +74,10 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 				caption: 'caption',
 				alt: 'alt',
 			},
+			args: {
+				allowedTypes: [ 'image' ],
+				multiple: false,
+			},
 		},
 		{
 			label: __( 'Link' ),
