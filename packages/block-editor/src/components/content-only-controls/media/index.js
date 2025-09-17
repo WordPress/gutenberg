@@ -40,21 +40,21 @@ export default function Media( {
 	const altDefaultValue =
 		blockType.attributes[ altKey ]?.defaultValue ?? undefined;
 
-	// TODO - pluralize.
+	// TODO - pluralize when multiple.
 	let chooseItemLabel;
 	if ( control.args.allowedTypes.length === 1 ) {
 		const allowedType = control.args.allowedTypes[ 0 ];
 		if ( allowedType === 'image' ) {
-			chooseItemLabel = __( 'Choose image' );
+			chooseItemLabel = __( 'Choose an image…' );
 		} else if ( allowedType === 'video' ) {
-			chooseItemLabel = __( 'Choose video' );
+			chooseItemLabel = __( 'Choose a video…' );
 		} else if ( allowedType === 'application' ) {
-			chooseItemLabel = __( 'Choose file' );
+			chooseItemLabel = __( 'Choose a file…' );
 		} else {
-			chooseItemLabel = __( 'Choose media item' );
+			chooseItemLabel = __( 'Choose a media item…' );
 		}
 	} else {
-		chooseItemLabel = __( 'Choose media item' );
+		chooseItemLabel = __( 'Choose a media item…' );
 	}
 
 	return (
@@ -98,73 +98,77 @@ export default function Media( {
 					multiple={ control.args.multiple }
 					render={ ( { open } ) => {
 						return (
-							<div
-								role="button"
-								tabIndex={ -1 }
-								onClick={ () => {
-									open();
-								} }
-								onKeyDown={ open }
-							>
-								<Grid
-									rowGap={ 0 }
-									columnGap={ 8 }
-									templateColumns="24px 1fr 24px"
+							<div className="block-editor-content-only-controls__media">
+								<div
+									role="button"
+									tabIndex={ -1 }
+									onClick={ () => {
+										open();
+									} }
+									onKeyDown={ open }
 								>
-									{ src && (
-										<>
-											<img
-												className="block-editor-content-only-controls__media-preview"
-												alt=""
-												width={ 24 }
-												height={ 24 }
-												src={ src }
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{
-													// TODO - use media title instead of src.
-													src
-												}
-											</span>
-										</>
-									) }
-									{ ! src && (
-										<>
-											<span
-												className="block-editor-content-only-controls__media-placeholder"
-												style={ {
-													width: '24px',
-													height: '24px',
-												} }
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{ chooseItemLabel }
-											</span>
-										</>
-									) }
-									{ src && (
-										<>
-											<Button
-												size="small"
-												className="block-editor-content-only-controls__remove-button"
-												icon={ lineSolid }
-												onClick={ ( event ) => {
-													event.stopPropagation();
-													updateAttributes( {
-														[ idKey ]:
-															idDefaultValue,
-														[ srcKey ]:
-															srcDefaultValue,
-														[ captionKey ]:
-															captionDefaultValue,
-														[ altKey ]:
-															altDefaultValue,
-													} );
-												} }
-											/>
-										</>
-									) }
-								</Grid>
+									<Grid
+										rowGap={ 0 }
+										columnGap={ 8 }
+										templateColumns="24px 1fr 24px"
+										className="block-editor-content-only-controls__media-row"
+									>
+										{ src && (
+											<>
+												<img
+													className="block-editor-content-only-controls__media-thumbnail"
+													alt=""
+													width={ 24 }
+													height={ 24 }
+													src={ src }
+												/>
+												<span className="block-editor-content-only-controls__media-title">
+													{
+														// TODO - use media title instead of src.
+														// TODO - truncate to show filename when there's no title.
+														src
+													}
+												</span>
+											</>
+										) }
+										{ ! src && (
+											<>
+												<span
+													className="block-editor-content-only-controls__media-placeholder"
+													style={ {
+														width: '24px',
+														height: '24px',
+													} }
+												/>
+												<span className="block-editor-content-only-controls__media-title">
+													{ chooseItemLabel }
+												</span>
+											</>
+										) }
+										{ src && (
+											<>
+												<Button
+													size="small"
+													className="block-editor-content-only-controls__remove-button"
+													icon={ lineSolid }
+													onClick={ ( event ) => {
+														event.stopPropagation();
+														updateAttributes( {
+															[ idKey ]:
+																idDefaultValue,
+															[ srcKey ]:
+																srcDefaultValue,
+															[ captionKey ]:
+																captionDefaultValue,
+															[ altKey ]:
+																altDefaultValue,
+														} );
+													} }
+												/>
+											</>
+										) }
+									</Grid>
+								</div>
 							</div>
 						);
 					} }

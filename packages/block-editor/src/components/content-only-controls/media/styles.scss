@@ -1,0 +1,41 @@
+.block-editor-content-only-controls__media {
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	// Add important to prevent toolspanel from unsetting padding.
+	padding: 8px 12px !important;
+	cursor: pointer;
+	&:hover {
+		background-color: $gray-100;
+	}
+}
+
+.block-editor-content-only-controls__media-row {
+	align-items: center;
+}
+
+.block-editor-content-only-controls__media-placeholder {
+	width: 24px;
+	height: 24px;
+	border-radius: $radius-small;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+	display: inline-block;
+	padding: 0;
+	background:
+		$white
+		linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+}
+
+.block-editor-content-only-controls__media-title {
+	width: 100%;
+	color: $gray-900;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+block-editor-content-only-controls__media-thumbnail {
+	width: 100%;
+	height: 100%;
+	border-radius: $radius-small;
+	align-self: center;
+}
