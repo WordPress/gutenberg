@@ -8,13 +8,13 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
 	applyPostChangesToCRDTDoc,
+	getInitialPostObjectData,
 	getPostChangesFromCRDTDoc,
 	getSyncedPropertiesForPostType,
 } from './utils/crdt';
@@ -340,18 +340,12 @@ async function loadPostTypeEntities() {
 				 * @param {import('@wordpress/sync').ObjectData} record
 				 * @return {import('@wordpress/sync').ObjectData} The initial data
 				 */
-				getInitialObjectData: ( record ) => {
-					// Mix in the parsed blocks into the record. Only allow properties in
-					// the synced properties set.
-					const content = record.content?.raw ?? record.content ?? '';
-					const blocks = parse( content );
-
-					return Object.fromEntries(
-						Object.entries( { ...record, blocks } ).filter(
-							( [ key ] ) => syncedProperties.has( key )
-						)
-					);
-				},
+				getInitialObjectData: ( record ) =>
+					getInitialPostObjectData(
+						record,
+						postType,
+						syncedProperties
+					),
 
 				/**
 				 * Get the immutable identifier for an entity record.
