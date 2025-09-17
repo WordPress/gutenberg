@@ -152,6 +152,7 @@ export default function RichTextControl( {
 								onFocus={ onFocus }
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
+								isVisible={ false }
 							/>
 						</div>
 					</inputEventContext.Provider>
