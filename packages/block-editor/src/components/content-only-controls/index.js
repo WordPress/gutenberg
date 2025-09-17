@@ -19,11 +19,13 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import { useInspectorPopoverPlacement } from './use-inspector-popover-placement';
 
 // controls
+import PlainText from './plain-text';
 import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
 
 const controls = {
+	PlainText,
 	RichText,
 	Media,
 	Link,
