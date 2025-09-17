@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import BlockQuickNavigation from '../block-quick-navigation';
 import ContentOnlyControls from '../content-only-controls';
 
-const ContentTab = ( { contentClientIds } ) => {
+const ContentTab = ( { rootClientId, contentClientIds } ) => {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
 	}
@@ -24,7 +24,10 @@ const ContentTab = ( { contentClientIds } ) => {
 					</PanelBody>
 				) }
 				{ window?.__experimentalContentOnlyPatternInsertion && (
-					<ContentOnlyControls clientIds={ contentClientIds } />
+					<ContentOnlyControls
+						rootClientId={ rootClientId }
+						contentClientIds={ contentClientIds }
+					/>
 				) }
 			</>
 		</PanelBody>
