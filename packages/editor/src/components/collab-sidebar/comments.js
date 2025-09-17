@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useMemo } from '@wordpress/element';
+import { useState, RawHTML, useMemo, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -15,8 +15,8 @@ import {
 	DropdownMenu,
 } from '@wordpress/components';
 
-import { Icon, check, published, moreVertical } from '@wordpress/icons';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { published, moreVertical } from '@wordpress/icons';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
@@ -31,6 +31,28 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
+
+/**
+ * Finds the first block that has the specified comment ID.
+ *
+ * @param {string} commentId - The comment ID to search for.
+ * @param {Array}  blockList - The list of blocks to search through.
+ * @return {string|null} The client ID of the found block, or null if not found.
+ */
+const findBlockByCommentId = ( commentId, blockList ) => {
+	for ( const block of blockList ) {
+		if ( block.attributes?.blockCommentId === commentId ) {
+			return block.clientId;
+		}
+		if ( block.innerBlocks ) {
+			const found = findBlockByCommentId( commentId, block.innerBlocks );
+			if ( found ) {
+				return found;
+			}
+		}
+	}
+	return null;
+};
 
 /**
  * Renders the Comments component.
@@ -56,16 +78,35 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const blockCommentId = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return _clientId
-			? getBlockAttributes( _clientId )?.blockCommentId
-			: null;
-	}, [] );
+	const { blockCommentId, selectedBlockClientId, blocks } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
+				select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.blockCommentId
+					: null,
+				selectedBlockClientId: _clientId,
+				blocks: getBlocks(),
+			};
+		},
+		[]
+	);
+
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 
 	const clearThreadFocus = () => {
+		// Clear any block highlights when clearing thread focus
+		if ( focusThread && blocks ) {
+			const relatedBlockClientId = findBlockByCommentId(
+				focusThread,
+				blocks
+			);
+			if ( relatedBlockClientId ) {
+				toggleBlockHighlight( relatedBlockClientId, false );
+			}
+		}
 		setFocusThread( null );
 		setShowCommentBoard( false );
 	};
@@ -74,8 +115,56 @@ export function Comments( {
 		showCommentBoard && blockCommentId ? blockCommentId : null
 	);
 
-	// Handle comment selection
+	// Sync comment ↔ block highlighting bidirectionally.
+	useEffect( () => {
+		const relatedBlockClientId =
+			focusThread && blocks
+				? findBlockByCommentId( focusThread, blocks )
+				: null;
+
+		// Clear highlight if switching blocks.
+		if (
+			relatedBlockClientId &&
+			relatedBlockClientId !== selectedBlockClientId
+		) {
+			toggleBlockHighlight( relatedBlockClientId, false );
+		}
+
+		// Highlight comment when block is selected.
+		if ( blockCommentId && ! focusThread ) {
+			setFocusThread( blockCommentId );
+		}
+
+		// Clear focus if no block-comment is selected.
+		if ( ! blockCommentId && focusThread ) {
+			setFocusThread( null );
+		}
+
+		// Highlight block when comment is focused.
+		if ( relatedBlockClientId ) {
+			toggleBlockHighlight( relatedBlockClientId, true );
+		}
+	}, [
+		selectedBlockClientId,
+		blockCommentId,
+		focusThread,
+		blocks,
+		toggleBlockHighlight,
+		setFocusThread,
+	] );
+
+	// Handle comment selection.
 	const handleCommentSelect = ( threadId ) => {
+		// Clear previous highlight if switching to a different comment.
+		if ( focusThread && focusThread !== threadId && blocks ) {
+			const relatedBlockClientId = findBlockByCommentId(
+				focusThread,
+				blocks
+			);
+			if ( relatedBlockClientId ) {
+				toggleBlockHighlight( relatedBlockClientId, false );
+			}
+		}
 		setFocusThread( threadId );
 	};
 
@@ -98,38 +187,23 @@ export function Comments( {
 				)
 			}
 			{ Array.isArray( threads ) &&
-        threads.length > 0 &&
-        threads.map( ( thread ) => (
-          <VStack
-            key={ thread.id }
-            className={ clsx(
-              'editor-collab-sidebar-panel__thread',
-              {
-                'editor-collab-sidebar-panel__active-thread':
-                  blockCommentId && blockCommentId === thread.id,
-                'editor-collab-sidebar-panel__focus-thread':
-                  focusThread && focusThread === thread.id,
-              }
-            ) }
-            id={ thread.id }
-            spacing="3"
-            onClick={ () => setFocusThread( thread.id ) }
-          >
-            <Thread
-              thread={ thread }
-              onAddReply={ onAddReply }
-              onCommentDelete={ onCommentDelete }
-              onCommentResolve={ onCommentResolve }
-              onCommentReopen={ onCommentReopen }
-              onEditComment={ onEditComment }
-              isFocused={ focusThread === thread.id }
-              clearThreadFocus={ clearThreadFocus }
-              setFocusThread={ setFocusThread }
-              blockCommentId={ blockCommentId }
-              onFocusThread={ handleCommentSelect }
-            />
-          </VStack>
-        ) ) }
+				threads.length > 0 &&
+				threads.map( ( thread ) => (
+					<Thread
+						key={ thread.id }
+						thread={ thread }
+						onAddReply={ onAddReply }
+						onCommentDelete={ onCommentDelete }
+						onCommentResolve={ onCommentResolve }
+						onCommentReopen={ onCommentReopen }
+						onEditComment={ onEditComment }
+						isFocused={ focusThread === thread.id }
+						clearThreadFocus={ clearThreadFocus }
+						setFocusThread={ setFocusThread }
+						blockCommentId={ blockCommentId }
+						onFocusThread={ handleCommentSelect }
+					/>
+				) ) }
 		</>
 	);
 }
@@ -143,38 +217,20 @@ function Thread( {
 	onCommentReopen,
 	isFocused,
 	clearThreadFocus,
-	blockCommentId,
 	onFocusThread,
-  setFocusThread,
+	setFocusThread,
 } ) {
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks(),
 		[]
 	);
 
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
-
 	// Find first block that have this comment ID - run at component root level.
 	const relatedBlock = useMemo( () => {
 		if ( ! thread.id || ! blocks ) {
 			return null;
 		}
-		const findFirstBlock = ( blockList ) => {
-			for ( const block of blockList ) {
-				if ( block.attributes?.blockCommentId === thread.id ) {
-					return block.clientId;
-				}
-				if ( block.innerBlocks ) {
-					const found = findFirstBlock( block.innerBlocks );
-					if ( found ) {
-						return found;
-					}
-				}
-			}
-			return null;
-		};
-
-		return findFirstBlock( blocks );
+		return findBlockByCommentId( thread.id, blocks );
 	}, [ thread.id, blocks ] );
 
 	const relatedBlockElement = useBlockElement( relatedBlock );
@@ -186,15 +242,12 @@ function Thread( {
 				behavior: 'smooth',
 				block: 'center',
 			} );
-			toggleBlockHighlight( relatedBlock, true );
 		}
 	};
 
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
-				'editor-collab-sidebar-panel__active-thread':
-					blockCommentId && blockCommentId === thread.id,
 				'editor-collab-sidebar-panel__focus-thread': isFocused,
 			} ) }
 			id={ thread.id }
