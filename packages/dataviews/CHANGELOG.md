@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible.
+
 ## 9.0.0 (2025-09-17)
 
 ### Breaking changes
