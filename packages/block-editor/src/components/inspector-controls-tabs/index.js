@@ -12,9 +12,10 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW } from './utils';
+import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW, TAB_CONTENT } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
+import ContentTab from './content-tab';
 import InspectorControls from '../inspector-controls';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { unlock } from '../../lock-unlock';
@@ -26,6 +27,8 @@ export default function InspectorControlsTabs( {
 	clientId,
 	hasBlockStyles,
 	tabs,
+	isSectionBlock,
+	contentClientIds,
 } ) {
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
@@ -69,7 +72,11 @@ export default function InspectorControlsTabs( {
 						blockName={ blockName }
 						clientId={ clientId }
 						hasBlockStyles={ hasBlockStyles }
+						isSectionBlock={ isSectionBlock }
 					/>
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<ContentTab contentClientIds={ contentClientIds } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
 					<InspectorControls.Slot group="list" />
