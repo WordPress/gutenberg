@@ -164,7 +164,12 @@ function BlockInspector() {
 				{ hasMultipleTabs ? (
 					<InspectorControlsTabs tabs={ availableTabs } />
 				) : (
-					<StyleInspectorSlots blockName={ selectedBlockName } />
+					<StyleInspectorSlots
+						blockName={ selectedBlockName }
+						showAdvancedControls={ false }
+						showPositionControls={ false }
+						showBindingsControls={ false }
+					/>
 				) }
 			</div>
 		);
