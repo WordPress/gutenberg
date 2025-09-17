@@ -59,14 +59,15 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 			type: 'Media',
 			shownByDefault: true,
 			mapping: {
+				type: 'backgroundType',
 				id: 'id',
 				src: 'url',
 				alt: 'alt',
 			},
 			args: {
-				// TODO - work out how to support video. Also background gradient.
-				// Does this need to be a custom control?
-				allowedTypes: [ 'image' ],
+				// TODO - How to support custom gradient?
+				// Build it into Media, or use a custom control?
+				allowedTypes: [ 'image', 'video' ],
 				multiple: false,
 			},
 		},
