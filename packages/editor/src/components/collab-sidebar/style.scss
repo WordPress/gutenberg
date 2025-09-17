@@ -198,5 +198,9 @@
 }
 
 .editor-collab-sidebar-panel__comment-popover {
-	margin-left: 250px;
+	margin-left: 300px;
+
+	& .components-popover__content {
+		min-width: 250px;
+	}
 }
