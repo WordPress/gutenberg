@@ -23,7 +23,11 @@ export default function RichText( {
 		<ToolsPanelItem
 			panelId={ clientId }
 			label={ control.label }
-			hasValue={ () => value !== defaultValue }
+			hasValue={ () => {
+				return (
+					value !== defaultValue && stripHTML( value )?.length !== 0
+				);
+			} }
 			onDeselect={ () => {
 				updateAttributes( { [ valueKey ]: defaultValue } );
 			} }
@@ -38,6 +42,7 @@ export default function RichText( {
 					updateAttributes( { [ valueKey ]: newValue } );
 				} }
 				autoComplete="off"
+				hideLabelFromVision={ control.shownByDefault }
 			/>
 		</ToolsPanelItem>
 	);
