@@ -209,6 +209,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				canRemoveBlocks,
 				getBlockEditingMode,
 				isSectionBlock,
+				getSelectedBlockClientIds,
 			} = unlock( select( blockEditorStore ) );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -243,6 +244,11 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
 			}
 
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
+				isSectionBlock( id )
+			);
+
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
 				hasBlockStyles:
@@ -255,7 +261,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
 				hasContentOnlyLocking: _hasTemplateLock,
 				isDisabled: editingMode !== 'default',
-				isSection: isSectionBlock( clientIds[ 0 ] ),
+				isSection: isSectionInSelection,
 			};
 		},
 		[ clientIds ]
