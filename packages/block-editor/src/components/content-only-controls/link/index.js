@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	Icon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
@@ -10,7 +9,7 @@ import {
 } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { lineSolid, link } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 
@@ -127,7 +126,7 @@ export default function Link( {
 			<div className="block-editor-content-only-controls__media">
 				<div
 					role="button"
-					tabIndex={ -1 }
+					tabIndex={ 0 }
 					onClick={ () => {
 						setIsLinkControlOpen( true );
 					} }
@@ -142,7 +141,7 @@ export default function Link( {
 					<Grid
 						rowGap={ 0 }
 						columnGap={ 8 }
-						templateColumns="24px 1fr 24px"
+						templateColumns="24px 1fr"
 						className="block-editor-content-only-controls__media-row"
 					>
 						{ href && (
@@ -163,25 +162,6 @@ export default function Link( {
 								<span className="block-editor-content-only-controls__media-title">
 									{ __( 'Link' ) }
 								</span>
-							</>
-						) }
-						{ href && (
-							<>
-								<Button
-									size="small"
-									className="block-editor-content-only-controls__remove-button"
-									icon={ lineSolid }
-									onClick={ ( event ) => {
-										event.stopPropagation();
-										updateAttributes( {
-											[ hrefKey ]: hrefDefaultValue,
-											[ relKey ]: relDefaultValue,
-											[ targetKey ]: targetDefaultValue,
-											[ destinationKey ]:
-												destinationDefaultValue,
-										} );
-									} }
-								/>
 							</>
 						) }
 					</Grid>
