@@ -134,6 +134,10 @@ export function Comments( {
 							key={ comment.blockCommentId }
 							placement="bottom-end"
 							anchor={ comment.commentPopoverRef.current }
+							className="editor-collab-sidebar-panel__comment-popover"
+							resize={ false }
+							shift={ false }
+							focusOnMount={ false }
 						>
 							<VStack
 								key={ comment.blockCommentId }

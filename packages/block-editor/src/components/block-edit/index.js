@@ -1,11 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useContext, useRef } from '@wordpress/element';
+import { useMemo, useContext, useRef, useEffect } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
-import {
-	Popover,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,7 +20,6 @@ import {
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
-
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -43,7 +40,6 @@ export default function BlockEdit( {
 	// public API!
 	...props
 } ) {
-
 	const {
 		name,
 		isSelected,
@@ -60,9 +56,15 @@ export default function BlockEdit( {
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
 
 	const blockCommentId = props.attributes?.blockCommentId;
+	const { setAttributes } = props;
 
 	const ref = useRef( 'comment-anchor-' + blockCommentId );
-	props.attributes.commentPopoverRef = ref;
+
+	useEffect( () => {
+		if ( blockCommentId && ref && setAttributes ) {
+			setAttributes( { commentPopoverRef: ref } );
+		}
+	}, [ blockCommentId, ref, setAttributes ] );
 
 	return (
 		<BlockEditContextProvider
