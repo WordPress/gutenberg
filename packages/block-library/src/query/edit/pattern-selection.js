@@ -83,18 +83,6 @@ export default function PatternSelection( {
 			blocks,
 			attributes
 		);
-		// console.log(
-		// 	'new blocks',
-		// 	newBlocks,
-		// 	'query client ids',
-		// 	queryClientIds,
-		// 	'pattern',
-		// 	pattern,
-		// 	'blocks',
-		// 	blocks,
-		// 	'attributes',
-		// 	attributes
-		// );
 		replaceBlock( clientId, newBlocks );
 		if ( queryClientIds[ 0 ] ) {
 			selectBlock( queryClientIds[ 0 ] );
