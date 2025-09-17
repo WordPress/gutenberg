@@ -25,7 +25,7 @@ const postTypesWithoutParentTemplate = [
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
-	'_wp_static_template',
+	'wp_registered_template',
 ];
 
 const authorizedPostTypes = [ 'page', 'post' ];
@@ -41,11 +41,11 @@ function getPostType( name, postId ) {
 	} else if ( name === 'templates' ) {
 		postType = /^\d+$/.test( postId )
 			? TEMPLATE_POST_TYPE
-			: '_wp_static_template';
+			: 'wp_registered_template';
 	} else if ( name === 'template-item' ) {
 		postType = TEMPLATE_POST_TYPE;
 	} else if ( name === 'static-template-item' ) {
-		postType = '_wp_static_template';
+		postType = 'wp_registered_template';
 	} else if ( name === 'page-item' || name === 'pages' ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
@@ -67,7 +67,7 @@ export function useResolveEditedEntity() {
 
 	const [ postType, postId ] = useSelect(
 		( select ) => {
-			if ( _postType !== '_wp_static_template' ) {
+			if ( _postType !== 'wp_registered_template' ) {
 				return [ _postType, _postId ];
 			}
 			return [

@@ -81,7 +81,7 @@ const DESIGN_POST_TYPES = [
 	'wp_template_part',
 	'wp_block',
 	'wp_navigation',
-	'_wp_static_template',
+	'wp_registered_template',
 ];
 
 function useEditorStyles( ...additionalStyles ) {

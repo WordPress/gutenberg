@@ -90,7 +90,7 @@ test.describe( 'Zoom Out', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'twentytwentyfour//index',
-			postType: '_wp_static_template',
+			postType: 'wp_registered_template',
 			canvas: 'edit',
 		} );
 	} );

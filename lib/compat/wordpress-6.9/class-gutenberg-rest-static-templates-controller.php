@@ -121,7 +121,7 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 		$templates = array();
 		foreach ( $query_result as $template ) {
 			$item               = $this->prepare_item_for_response( $template, $request );
-			$item->data['type'] = '_wp_static_template';
+			$item->data['type'] = 'wp_registered_template';
 			$templates[]        = $this->prepare_response_for_collection( $item );
 		}
 
@@ -137,7 +137,7 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 
 		$item = $this->prepare_item_for_response( $template, $request );
 		// adjust the template type here instead
-		$item->data['type'] = '_wp_static_template';
+		$item->data['type'] = 'wp_registered_template';
 		return rest_ensure_response( $item );
 	}
 }

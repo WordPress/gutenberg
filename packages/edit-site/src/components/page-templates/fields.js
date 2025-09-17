@@ -38,7 +38,7 @@ function useAllDefaultTemplateTypes() {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const { records: staticRecords } = useEntityRecordsWithPermissions(
 		'postType',
-		'_wp_static_template',
+		'wp_registered_template',
 		{ per_page: -1 }
 	);
 	return [

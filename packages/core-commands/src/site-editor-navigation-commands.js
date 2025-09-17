@@ -33,7 +33,7 @@ const icons = {
 	post,
 	page,
 	wp_template: layout,
-	_wp_static_template: layout,
+	wp_registered_template: layout,
 	wp_template_part: symbolFilled,
 };
 
@@ -472,7 +472,7 @@ export function useSiteEditorNavigationCommands() {
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
-		hook: getNavigationCommandLoaderPerTemplate( '_wp_static_template' ),
+		hook: getNavigationCommandLoaderPerTemplate( 'wp_registered_template' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',

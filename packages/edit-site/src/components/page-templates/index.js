@@ -132,7 +132,7 @@ export default function PageTemplates() {
 			per_page: -1,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'postType', '_wp_static_template', {
+		useEntityRecordsWithPermissions( 'postType', 'wp_registered_template', {
 			per_page: -1,
 		} );
 

@@ -12,7 +12,7 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
-				postType: '_wp_static_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 		} );
@@ -57,7 +57,7 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'twentytwentythree//index',
-				postType: '_wp_static_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 		} );
@@ -137,7 +137,7 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
-				postType: '_wp_static_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 		} );
@@ -219,7 +219,7 @@ test.describe( 'Font Library', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitSiteEditor( {
 				postId: 'twentytwentyfour//home',
-				postType: '_wp_static_template',
+				postType: 'wp_registered_template',
 				canvas: 'edit',
 			} );
 		} );

@@ -76,7 +76,7 @@ export const getEntityRecord =
 			// with a string key, so we need that it's not a numeric ID.
 			! /^\d+$/.test( key )
 		) {
-			name = '_wp_static_template';
+			name = 'wp_registered_template';
 		}
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -219,7 +219,7 @@ export const getTemplateAutoDraftId =
 	async ( { resolveSelect, dispatch } ) => {
 		const record = await resolveSelect.getEntityRecord(
 			'postType',
-			'_wp_static_template',
+			'wp_registered_template',
 			staticTemplateId
 		);
 		const autoDraft = await dispatch.saveEntityRecord(
@@ -862,7 +862,9 @@ export const getDefaultTemplateId =
 		if ( id ) {
 			template.id = id;
 			template.type =
-				typeof id === 'string' ? '_wp_static_template' : 'wp_template';
+				typeof id === 'string'
+					? 'wp_registered_template'
+					: 'wp_template';
 			registry.batch( () => {
 				dispatch.receiveDefaultTemplateId( query, id );
 				dispatch.receiveEntityRecords( 'postType', template.type, [

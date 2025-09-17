@@ -22,7 +22,7 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 			);
 		}
 
-		$paths[] = '/wp/v2/_wp_static_template?context=edit';
+		$paths[] = '/wp/v2/wp_registered_template?context=edit';
 	}
 
 	return $paths;

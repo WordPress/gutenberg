@@ -369,7 +369,7 @@ export const getEntityRecord = createSelector(
 			// with a string key, so we need that it's not a numeric ID.
 			! /^\d+$/.test( key )
 		) {
-			name = '_wp_static_template';
+			name = 'wp_registered_template';
 		}
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;

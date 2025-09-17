@@ -1046,7 +1046,7 @@ test.describe( 'Image - Site editor', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: '_wp_static_template',
+			postType: 'wp_registered_template',
 			canvas: 'edit',
 		} );
 	} );

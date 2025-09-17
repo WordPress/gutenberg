@@ -40,6 +40,6 @@ export const templateItemRoute = {
 
 export const staticTemplateItemRoute = {
 	name: 'static-template-item',
-	path: '/_wp_static_template/*postId',
+	path: '/wp_registered_template/*postId',
 	areas,
 };

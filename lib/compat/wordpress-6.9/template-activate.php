@@ -35,10 +35,10 @@ function gutenberg_maintain_templates_routes() {
 add_action( 'init', 'gutenberg_setup_static_template' );
 function gutenberg_setup_static_template() {
 	global $wp_post_types;
-	$wp_post_types['_wp_static_template']                        = clone $wp_post_types['wp_template'];
-	$wp_post_types['_wp_static_template']->name                  = '_wp_static_template';
-	$wp_post_types['_wp_static_template']->rest_base             = '_wp_static_template';
-	$wp_post_types['_wp_static_template']->rest_controller_class = 'Gutenberg_REST_Static_Templates_Controller';
+	$wp_post_types['wp_registered_template']                        = clone $wp_post_types['wp_template'];
+	$wp_post_types['wp_registered_template']->name                  = 'wp_registered_template';
+	$wp_post_types['wp_registered_template']->rest_base             = 'wp_registered_template';
+	$wp_post_types['wp_registered_template']->rest_controller_class = 'Gutenberg_REST_Static_Templates_Controller';
 
 	register_setting(
 		'reading',
