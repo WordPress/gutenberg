@@ -7,7 +7,8 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import { useRef, useState } from '@wordpress/element';
 import {
 	__unstableUseRichText as useRichText,
 	isEmpty,
@@ -19,6 +20,9 @@ import {
  */
 import { useFormatTypes } from '../../rich-text/use-format-types';
 import { getAllowedFormats } from '../../rich-text/utils';
+import { useEventListeners } from '../../rich-text/event-listeners';
+import FormatEdit from '../../rich-text/format-edit';
+import { keyboardShortcutContext, inputEventContext } from '../../rich-text';
 
 export default function RichTextControl( {
 	clientId,
@@ -27,6 +31,7 @@ export default function RichTextControl( {
 	attributeValues,
 	updateAttributes,
 } ) {
+	const registry = useRegistry();
 	const valueKey = control.mapping.value;
 	const attrValue = attributeValues[ valueKey ];
 	const defaultValue =
@@ -36,6 +41,9 @@ export default function RichTextControl( {
 		end: undefined,
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
+	const anchorRef = useRef();
+	const inputEvents = useRef( new Set() );
+	const keyboardShortcuts = useRef( new Set() );
 
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats: control.args?.allowedFormats,
@@ -87,7 +95,16 @@ export default function RichTextControl( {
 		);
 	}
 
-	const { value, ref: richTextRef } = useRichText( {
+	function onFocus() {
+		anchorRef.current?.focus();
+	}
+
+	const {
+		value,
+		getValue,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
 		value: attrValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			updateAttributes( { [ valueKey ]: html } );
@@ -125,13 +142,46 @@ export default function RichTextControl( {
 			}
 			isShownByDefault={ control.shownByDefault }
 		>
+			{ isSelected && (
+				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
+					<inputEventContext.Provider value={ inputEvents }>
+						<div>
+							<FormatEdit
+								value={ value }
+								onChange={ onChange }
+								onFocus={ onFocus }
+								formatTypes={ formatTypes }
+								forwardedRef={ anchorRef }
+							/>
+						</div>
+					</inputEventContext.Provider>
+				</keyboardShortcutContext.Provider>
+			) }
 			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
 				<div
 					className="block-editor-content-only-controls__rich-text"
 					tagName="div"
 					role="textbox"
 					aria-multiline={ ! control.args?.disableLineBreaks }
-					ref={ useMergeRefs( [ richTextRef ] ) }
+					ref={ useMergeRefs( [
+						richTextRef,
+						useEventListeners( {
+							registry,
+							getValue,
+							onChange,
+							formatTypes,
+							selectionChange: setSelection,
+							isSelected,
+							disableFormats: control.args?.disableFormats,
+							value,
+							tagName: 'div',
+							removeEditorOnlyFormats,
+							disableLineBreaks: control.args?.disableLineBreaks,
+							keyboardShortcuts,
+							inputEvents,
+						} ),
+						anchorRef,
+					] ) }
 					onFocus={ () => setIsSelected( true ) }
 					onBlur={ () => setIsSelected( false ) }
 					contentEditable
