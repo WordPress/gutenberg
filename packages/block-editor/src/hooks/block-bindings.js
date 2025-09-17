@@ -286,13 +286,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							}
 						}
 
-						// Provide editor context if available in settings
-						const settings =
-							select( blockEditorStore ).getSettings();
-						context.postId = context.postId || settings.postId;
-						context.postType =
-							context.postType || settings.postType;
-
 						const editorUIResult = editorUI( {
 							select,
 							context,
