@@ -198,7 +198,7 @@ export default function Media( {
 						<div className="block-editor-content-only-controls__media">
 							<div
 								role="button"
-								tabIndex={ -1 }
+								tabIndex={ 0 }
 								{ ...buttonProps }
 								onKeyDown={ ( event ) => {
 									const { keyCode } = event;
