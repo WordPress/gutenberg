@@ -47,22 +47,26 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
  *
  * @global wpdb $wpdb WordPress database abstraction object.
  *
- * @param string[] $clauses The current SQL clauses for the comments query.
  * @param WP_Comment_Query $query The current comments query.
  *
- * @return string[] The modified SQL clauses for the comments query.
+ * @return void
  */
 if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
-	function exclude_block_comments_from_admin( $clauses, $query ) {
+	function exclude_block_comments_from_admin( $query ) {
 		// Only modify the query if it's for comments
 		if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
 			$query->set( 'type', '' );
 
-			global $wpdb;
-			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
+			add_filter(
+				'comments_clauses',
+				function ( $clauses ) {
+					global $wpdb;
+					// Exclude comments of type 'block_comment'
+					$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
+					return $clauses;
+				}
+			);
 		}
-
-		return $clauses;
 	}
-	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
+	add_action( 'pre_get_comments', 'exclude_block_comments_from_admin' );
 }
