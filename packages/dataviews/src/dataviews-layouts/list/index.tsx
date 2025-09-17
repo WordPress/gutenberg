@@ -22,8 +22,9 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	useContext,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
@@ -35,6 +36,7 @@ import {
 	ActionsMenuGroup,
 	ActionModal,
 } from '../../components/dataviews-item-actions';
+import DataViewsContext from '../../components/dataviews-context';
 import type {
 	Action,
 	NormalizedField,
@@ -42,6 +44,7 @@ import type {
 	ViewListProps,
 	ActionModal as ActionModalType,
 } from '../../types';
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -55,6 +58,7 @@ interface ListViewItemProps< Item > {
 	onSelect: ( item: Item ) => void;
 	otherFields: NormalizedField< Item >[];
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
+	posinset?: number;
 }
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -153,8 +157,14 @@ function ListItem< Item >( {
 	onSelect,
 	otherFields,
 	onDropdownTriggerKeyDown,
+	posinset,
 }: ListViewItemProps< Item > ) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
@@ -169,6 +179,7 @@ function ListItem< Item >( {
 		setIsHovered( isHover );
 	};
 
+	const { paginationInfo } = useContext( DataViewsContext );
 	useEffect( () => {
 		if ( isSelected ) {
 			itemRef.current?.scrollIntoView( {
@@ -199,13 +210,17 @@ function ListItem< Item >( {
 	const renderedMediaField =
 		showMedia && mediaField?.render ? (
 			<div className="dataviews-view-list__media-wrapper">
-				<mediaField.render item={ item } />
+				<mediaField.render
+					item={ item }
+					field={ mediaField }
+					config={ { sizes: '52px' } }
+				/>
 			</div>
 		) : null;
 
 	const renderedTitleField =
 		showTitle && titleField?.render ? (
-			<titleField.render item={ item } />
+			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
 	const usedActions = eligibleActions?.length > 0 && (
@@ -265,8 +280,18 @@ function ListItem< Item >( {
 	return (
 		<Composite.Row
 			ref={ itemRef }
-			render={ <div /> }
-			role="row"
+			render={
+				/* aria-posinset breaks Composite.Row if passed to it directly. */
+				<div
+					aria-posinset={ posinset }
+					aria-setsize={
+						infiniteScrollEnabled
+							? paginationInfo.totalItems
+							: undefined
+					}
+				/>
+			}
+			role={ infiniteScrollEnabled ? 'article' : 'row' }
 			className={ clsx( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
@@ -302,7 +327,10 @@ function ListItem< Item >( {
 						</HStack>
 						{ showDescription && descriptionField?.render && (
 							<div className="dataviews-view-list__field">
-								<descriptionField.render item={ item } />
+								<descriptionField.render
+									item={ item }
+									field={ descriptionField }
+								/>
 							</div>
 						) }
 						<div
@@ -321,7 +349,10 @@ function ListItem< Item >( {
 										{ field.label }
 									</VisuallyHidden>
 									<span className="dataviews-view-list__field-value">
-										<field.render item={ item } />
+										<field.render
+											item={ item }
+											field={ field }
+										/>
 									</span>
 								</div>
 							) ) }
@@ -347,6 +378,8 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		onChangeSelection,
 		selection,
 		view,
+		className,
+		empty,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
@@ -480,41 +513,124 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 			>
-				{ ! hasData && (
-					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
-				) }
+				{ ! hasData &&
+					( isLoading ? (
+						<p>
+							<Spinner />
+						</p>
+					) : (
+						empty
+					) ) }
 			</div>
 		);
 	}
 
+	const groupField = view.groupByField
+		? fields.find( ( field ) => field.id === view.groupByField )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+
+	// Render data grouped by field
+	if ( hasData && groupField && dataByGroup ) {
+		return (
+			<Composite
+				id={ `${ baseId }` }
+				render={ <div /> }
+				className="dataviews-view-list__group"
+				role="grid"
+				activeId={ activeCompositeId }
+				setActiveId={ setActiveCompositeId }
+			>
+				<VStack
+					spacing={ 4 }
+					className={ clsx( 'dataviews-view-list', className ) }
+				>
+					{ Array.from( dataByGroup.entries() ).map(
+						( [ groupName, groupItems ] ) => (
+							<VStack key={ groupName } spacing={ 2 }>
+								<h3 className="dataviews-view-list__group-header">
+									{ sprintf(
+										// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+										__( '%1$s: %2$s' ),
+										groupField.label,
+										groupName
+									) }
+								</h3>
+								{ groupItems.map( ( item ) => {
+									const id =
+										generateCompositeItemIdPrefix( item );
+									return (
+										<ListItem
+											key={ id }
+											view={ view }
+											idPrefix={ id }
+											actions={ actions }
+											item={ item }
+											isSelected={ item === selectedItem }
+											onSelect={ onSelect }
+											mediaField={ mediaField }
+											titleField={ titleField }
+											descriptionField={
+												descriptionField
+											}
+											otherFields={ otherFields }
+											onDropdownTriggerKeyDown={
+												onDropdownTriggerKeyDown
+											}
+										/>
+									);
+								} ) }
+							</VStack>
+						)
+					) }
+				</VStack>
+			</Composite>
+		);
+	}
+
+	// Render ungrouped data
 	return (
-		<Composite
-			id={ baseId }
-			render={ <div /> }
-			className="dataviews-view-list"
-			role="grid"
-			activeId={ activeCompositeId }
-			setActiveId={ setActiveCompositeId }
-		>
-			{ data.map( ( item ) => {
-				const id = generateCompositeItemIdPrefix( item );
-				return (
-					<ListItem
-						key={ id }
-						view={ view }
-						idPrefix={ id }
-						actions={ actions }
-						item={ item }
-						isSelected={ item === selectedItem }
-						onSelect={ onSelect }
-						mediaField={ mediaField }
-						titleField={ titleField }
-						descriptionField={ descriptionField }
-						otherFields={ otherFields }
-						onDropdownTriggerKeyDown={ onDropdownTriggerKeyDown }
-					/>
-				);
-			} ) }
-		</Composite>
+		<>
+			<Composite
+				id={ baseId }
+				render={ <div /> }
+				className={ clsx( 'dataviews-view-list', className ) }
+				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
+				activeId={ activeCompositeId }
+				setActiveId={ setActiveCompositeId }
+			>
+				{ data.map( ( item, index ) => {
+					const id = generateCompositeItemIdPrefix( item );
+					return (
+						<ListItem
+							key={ id }
+							view={ view }
+							idPrefix={ id }
+							actions={ actions }
+							item={ item }
+							isSelected={ item === selectedItem }
+							onSelect={ onSelect }
+							mediaField={ mediaField }
+							titleField={ titleField }
+							descriptionField={ descriptionField }
+							otherFields={ otherFields }
+							onDropdownTriggerKeyDown={
+								onDropdownTriggerKeyDown
+							}
+							posinset={
+								view.infiniteScrollEnabled
+									? index + 1
+									: undefined
+							}
+						/>
+					);
+				} ) }
+			</Composite>
+			{ hasData && isLoading && (
+				<p className="dataviews-loading-more">
+					<Spinner />
+				</p>
+			) }
+		</>
 	);
 }

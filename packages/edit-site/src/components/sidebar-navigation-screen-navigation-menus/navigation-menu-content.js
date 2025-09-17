@@ -102,6 +102,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender={ false }
+					isExpanded
 				/>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">

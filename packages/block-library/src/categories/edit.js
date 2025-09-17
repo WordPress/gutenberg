@@ -25,6 +25,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -44,12 +46,14 @@ export default function CategoriesEdit( {
 	},
 	setAttributes,
 	className,
+	clientId,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
 	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
 		'root',
-		'taxonomy'
+		'taxonomy',
+		{ per_page: -1 }
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
@@ -69,6 +73,15 @@ export default function CategoriesEdit( {
 		taxonomySlug,
 		query
 	);
+
+	const { createWarningNotice } = useDispatch( noticeStore );
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: `block-library/core/categories/redirection-prevented/${ clientId }`,
+			type: 'snackbar',
+		} );
+	};
 
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
@@ -99,7 +112,7 @@ export default function CategoriesEdit( {
 		const { id, link, count, name } = category;
 		return (
 			<li key={ id } className={ `cat-item cat-item-${ id }` }>
-				<a href={ link } target="_blank" rel="noreferrer noopener">
+				<a href={ link } onClick={ showRedirectionPreventedNotice }>
 					{ renderCategoryName( name ) }
 				</a>
 				{ showPostCounts && ` (${ count })` }
@@ -125,7 +138,7 @@ export default function CategoriesEdit( {
 					<RichText
 						className="wp-block-categories__label"
 						aria-label={ __( 'Label text' ) }
-						placeholder={ taxonomy.name }
+						placeholder={ taxonomy?.name }
 						withoutInteractiveFormatting
 						value={ label }
 						onChange={ ( html ) =>
@@ -134,7 +147,7 @@ export default function CategoriesEdit( {
 					/>
 				) : (
 					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ label ? label : taxonomy.name }
+						{ label ? label : taxonomy?.name }
 					</VisuallyHidden>
 				) }
 				<select id={ selectId }>
@@ -142,7 +155,7 @@ export default function CategoriesEdit( {
 						{ sprintf(
 							/* translators: %s: taxonomy's singular name */
 							__( 'Select %s' ),
-							taxonomy.labels.singular_name
+							taxonomy?.labels?.singular_name
 						) }
 					</option>
 					{ categoriesList.map( ( category ) =>

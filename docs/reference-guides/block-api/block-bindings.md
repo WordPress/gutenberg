@@ -99,6 +99,10 @@ add_action(
 );
 ```
 
+<div class="callout callout-alert">
+<strong>Note:</strong> Post meta keys that begin with an underscore (e.g. `_example_key`) are protected and cannot be used with Block Bindings. Additionally, post meta must be registered with `show_in_rest = true` to be available through the Block Bindings API.
+</div>
+
 #### Block bindings source value filter
 
 _**Note:** Since WordPress 6.7._

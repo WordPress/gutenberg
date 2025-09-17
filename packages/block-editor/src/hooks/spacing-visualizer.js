@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useRef,
-	useLayoutEffect,
-	useEffect,
-	useReducer,
-} from '@wordpress/element';
+import { useState, useRef, useEffect, useReducer } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -22,19 +16,22 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 		computeStyle( blockElement )
 	);
 
-	useLayoutEffect( () => {
+	// It's not sufficient to read the block’s computed style when `value` changes because
+	// the effect would run before the block’s style has updated. Thus observing mutations
+	// to the block’s attributes is used to trigger updates to the visualizer’s styles.
+	useEffect( () => {
 		if ( ! blockElement ) {
 			return;
 		}
-		// It's not sufficient to read the computed spacing value when value.spacing changes as
-		// useEffect may run before the browser recomputes CSS. We therefore combine
-		// useLayoutEffect and two rAF calls to ensure that we read the spacing after the current
-		// paint but before the next paint.
-		// See https://github.com/WordPress/gutenberg/pull/59227.
-		window.requestAnimationFrame( () =>
-			window.requestAnimationFrame( updateStyle )
-		);
-	}, [ blockElement, value ] );
+		const observer = new window.MutationObserver( updateStyle );
+		observer.observe( blockElement, {
+			attributes: true,
+			attributeFilter: [ 'style', 'class' ],
+		} );
+		return () => {
+			observer.disconnect();
+		};
+	}, [ blockElement ] );
 
 	const previousValueRef = useRef( value );
 	const [ isActive, setIsActive ] = useState( false );

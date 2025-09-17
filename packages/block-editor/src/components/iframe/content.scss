@@ -4,8 +4,11 @@
 
 .block-editor-iframe__html {
 	transform-origin: top center;
-	// Prevents a flash of background color change when entering/exiting zoom out
-	transition: background-color 400ms;
+
+	@media not ( prefers-reduced-motion ) {
+		// Prevents a flash of background color change when entering/exiting zoom out
+		transition: background-color 400ms;
+	}
 
 	&.zoom-out-animation {
 		$scroll-top: var(--wp-block-editor-iframe-zoom-out-scroll-top, 0);

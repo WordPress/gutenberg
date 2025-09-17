@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 10.31.0 (2025-09-17)
+
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+-  Breaking change: deprecate `moreHorizontalMobile` icon. This was added in error, and `moreHorizontal` should be used instead. ([#71172](https://github.com/WordPress/gutenberg/pull/71172))
+
+## 10.28.0 (2025-08-07)
+
+-   Add new `dashboard` icon ([#70300](https://github.com/WordPress/gutenberg/pull/70300)).
+
+## 10.27.0 (2025-07-23)
+
+-  Update `cancelCircleFilled`, `currencyDollar`, `currencyPound`, `currencyEuro`, `globe`, `helpFilled`, `siteLogo`, `swatch`, to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70581](#70581)).
+-  Update `help`, `plusCircle`, and `typography` icons to have a unified circular footprint that matches other circle icons. ([#70299](https://github.com/WordPress/gutenberg/pull/70299)).
+-  Update `plusCircleFilled` to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70650](#70650)).
+
+## 10.26.0 (2025-06-25)
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
+## 10.23.0 (2025-05-07)
+
+## 10.22.0 (2025-04-11)
+
+## 10.21.0 (2025-03-27)
+
+## 10.20.0 (2025-03-13)
+
+## 10.19.0 (2025-02-28)
+
+## 10.18.0 (2025-02-12)
+
+## 10.17.0 (2025-01-29)
+
 ## 10.16.0 (2025-01-15)
 
 ## 10.15.0 (2025-01-02)

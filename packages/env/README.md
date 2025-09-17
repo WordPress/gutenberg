@@ -289,6 +289,11 @@ Options:
              them in a comma-separated list: `--xdebug=develop,coverage`. See
              https://xdebug.org/docs/all_settings#mode for information about
              Xdebug modes.                                              [string]
+  --spx      Enables SPX profiling. If not passed, SPX is turned off. If no
+             mode is set, uses "enabled". SPX is a simple profiling extension
+             with a built-in web UI. See
+             https://github.com/NoiseByNorthwest/php-spx for more information.
+                                                                        [string]
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
@@ -479,19 +484,20 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports fields for options applicable to both the tests and development instances.
 
-| Field              | Type           | Default                                | Description                                                                                                                      |
-|--------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `"core"`           | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
-| `"phpVersion"`     | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
-| `"plugins"`        | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
-| `"themes"`         | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`           | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
-| `"testsPort"`      | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
-| `"config"`         | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
-| `"mappings"`       | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
-| `"mysqlPort"`      | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                 |
-| `"phpmyadminPort"` | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
-| `"multisite"`      | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| Field                | Type           | Default                                | Description                                                                                                                      |
+|----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
+| `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
+| `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
+| `"port"`             | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
+| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
+| `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
+| `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                 |
+| `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
+| `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -754,6 +760,29 @@ php_value memory_limit 2G
 ```
 
 This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
+
+### Using SPX Profiling
+
+SPX is a simple profiling extension for PHP that provides low-overhead profiling with a built-in web UI. When enabled with `--spx`, you can access the SPX profiling interface to analyze your application's performance.
+
+To enable SPX profiling:
+
+```sh
+wp-env start --spx
+```
+
+Once enabled, you can access the SPX web UI by visiting any page in your WordPress environment with the query parameters `?SPX_KEY=dev&SPX_UI_URI=/`. For example:
+
+- Development site: `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
+- Test site: `http://localhost:8889/?SPX_KEY=dev&SPX_UI_URI=/`
+
+From the SPX interface, you can:
+- Enable profiling for subsequent requests
+- View flame graphs and performance metrics
+- Analyze function call timelines
+- Examine memory usage and other performance data
+
+SPX provides a more lightweight alternative to Xdebug for profiling, with minimal performance overhead and an intuitive web-based interface.
 
 ## Contributing to this package
 

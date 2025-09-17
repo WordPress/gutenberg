@@ -191,9 +191,12 @@
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
-		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
-		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
-		animation: hide-during-dragging 1ms linear forwards;
+		@media not ( prefers-reduced-motion ) {
+
+			// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+			// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
+			animation: hide-during-dragging 1ms linear forwards;
+		}
 	}
 
 	.block-editor-block-parent-selector {

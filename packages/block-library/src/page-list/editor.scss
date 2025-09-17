@@ -1,10 +1,4 @@
 .wp-block-navigation {
-	// Block wrapper gets the classes in the editor, and there's an extra div wrapper for now, so background styles need to be inherited.
-	.wp-block-page-list > div,
-	.wp-block-page-list {
-		background-color: inherit;
-	}
-
 	// space-between justification.
 	&.items-justified-space-between {
 		.wp-block-page-list > div,

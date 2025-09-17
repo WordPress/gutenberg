@@ -120,6 +120,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			isRoot={ ! backPath }
 			backPath={ backPath }
 			content={
 				<>

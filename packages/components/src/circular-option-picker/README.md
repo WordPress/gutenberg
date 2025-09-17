@@ -93,6 +93,19 @@ Prevents keyboard interaction from wrapping around. Only used when `asButtons` i
 - Required: No
 - Default: `true`
 
+### `aria-labelledby`: `string`
+
+The ID reference list of one or more elements that label the wrapper element.
+
+- Required: No
+
+### `aria-label`: `string`
+
+The label for the wrapper element. Not used if an 'aria-labelledby' is provided.
+
+- Required: No
+- Default: `Custom color picker`
+
 ## Subcomponents
 
 ### `CircularOptionPicker.ButtonAction`

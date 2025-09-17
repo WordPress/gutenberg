@@ -18,8 +18,6 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	return jest.fn();
 } );
 
-jest.mock( '@wordpress/core-data' );
-
 describe( 'FullscreenModeClose', () => {
 	describe( 'when in full screen mode', () => {
 		it( 'should display a user uploaded site icon if it exists', () => {

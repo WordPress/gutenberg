@@ -24,6 +24,10 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 			? nameA.localeCompare( nameB )
 			: nameB.localeCompare( nameA );
 	},
+
+	filterBy: {
+		operators: [ 'isAny', 'isNone' ],
+	},
 };
 
 /**

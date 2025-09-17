@@ -25,6 +25,7 @@ export function useShowBlockTools() {
 			getSettings,
 			__unstableGetEditorMode,
 			isTyping,
+			isBlockInterfaceHidden,
 		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
@@ -35,7 +36,7 @@ export function useShowBlockTools() {
 		const hasSelectedBlock = !! clientId && !! block;
 		const isEmptyDefaultBlock =
 			hasSelectedBlock &&
-			isUnmodifiedDefaultBlock( block ) &&
+			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
 			clientId &&
@@ -45,6 +46,7 @@ export function useShowBlockTools() {
 			editorMode !== 'navigation' &&
 			isEmptyDefaultBlock;
 		const _showBlockToolbarPopover =
+			! isBlockInterfaceHidden() &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&

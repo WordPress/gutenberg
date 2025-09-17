@@ -18,6 +18,10 @@ const meta: Meta< typeof FontSizePicker > = {
 	component: FontSizePicker,
 	argTypes: {
 		value: { control: false },
+		units: {
+			control: 'inline-check',
+			options: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+		},
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },

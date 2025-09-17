@@ -16,7 +16,7 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarItemProps } from './types';
 
-function ToolbarItem(
+function UnforwardedToolbarItem(
 	{ children, as: Component, ...props }: ToolbarItemProps,
 	ref: ForwardedRef< any >
 ) {
@@ -57,4 +57,5 @@ function ToolbarItem(
 	);
 }
 
-export default forwardRef( ToolbarItem );
+export const ToolbarItem = forwardRef( UnforwardedToolbarItem );
+export default ToolbarItem;

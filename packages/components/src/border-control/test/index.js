@@ -138,7 +138,7 @@ describe( 'BorderControl', () => {
 
 			const customColorPicker = getButton( /Custom color picker/ );
 			const circularOptionPicker = screen.getByRole( 'listbox', {
-				name: 'Custom color picker.',
+				name: 'Custom color picker',
 			} );
 			const colorSwatchButtons =
 				within( circularOptionPicker ).getAllByRole( 'option' );

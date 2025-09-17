@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const { actions } = store(
 	'core/search',
@@ -31,7 +36,7 @@ const { actions } = store(
 			},
 		},
 		actions: {
-			openSearchInput( event ) {
+			openSearchInput: withSyncEvent( ( event ) => {
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( ! ctx.isSearchInputVisible ) {
@@ -39,7 +44,7 @@ const { actions } = store(
 					ctx.isSearchInputVisible = true;
 					ref.parentElement.querySelector( 'input' ).focus();
 				}
-			},
+			} ),
 			closeSearchInput() {
 				const ctx = getContext();
 				ctx.isSearchInputVisible = false;

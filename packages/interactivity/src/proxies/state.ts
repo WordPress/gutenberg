@@ -334,7 +334,7 @@ const deepMergeRecursive = (
 				} );
 				// Update the getter in the property signal if it exists
 				if ( desc.get && propSignal ) {
-					propSignal.setGetter( desc.get );
+					propSignal.setPendingGetter( desc.get );
 				}
 			}
 
@@ -379,7 +379,7 @@ const deepMergeRecursive = (
 };
 
 /**
- * Recursively update prop values inside the passed `target` and nested plain
+ * Recursively updates prop values inside the passed `target` and nested plain
  * objects, using the values present in `source`. References to plain objects
  * are kept, only updating props containing primitives or arrays. Arrays are
  * replaced instead of merged or concatenated.

@@ -30,7 +30,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 					resetAll={ () => {
 						setAttributes( {
 							displayAsDropdown: false,
-							showLabel: false,
+							showLabel: true,
 							showPostCounts: false,
 							type: 'monthly',
 						} );
@@ -63,7 +63,7 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
 							isShownByDefault
 							hasValue={ () => ! showLabel }
 							onDeselect={ () =>
-								setAttributes( { showLabel: false } )
+								setAttributes( { showLabel: true } )
 							}
 						>
 							<ToggleControl

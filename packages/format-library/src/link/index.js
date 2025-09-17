@@ -16,6 +16,7 @@ import { isURL, isEmail, isPhoneNumber } from '@wordpress/url';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon } from '@wordpress/icons';
@@ -26,6 +27,9 @@ import { speak } from '@wordpress/a11y';
  */
 import InlineLinkUI from './inline';
 import { isValidHref } from './utils';
+import { unlock } from '../lock-unlock';
+
+const { essentialFormatKey } = unlock( blockEditorPrivateApis );
 
 const name = 'core/link';
 const title = __( 'Link' );
@@ -228,6 +232,7 @@ export const link = {
 		target: 'target',
 		rel: 'rel',
 	},
+	[ essentialFormatKey ]: true,
 	__unstablePasteRule( value, { html, plainText } ) {
 		const pastedText = ( html || plainText )
 			.replace( /<[^>]+>/g, '' )

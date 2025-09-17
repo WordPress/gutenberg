@@ -1,0 +1,13 @@
+# This is the configuration file for actionlint, a static checker for GitHub Actions workflow files.
+# See https://github.com/rhysd/actionlint.
+
+# Path-specific configurations.
+paths:
+    .github/workflows/**/*.{yml,yaml}:
+        ignore:
+            # [SC2129](https://www.shellcheck.net/wiki/SC2129) is ignored because it is a stylistic issue.
+            - 'shellcheck reported issue in this script: SC2129:.+'
+    .github/workflows/end2end-test.yml:
+        ignore:
+            # This file gets created in the step prior.
+            - 'file "build/index.js" does not exist.+'

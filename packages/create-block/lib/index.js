@@ -63,6 +63,7 @@ program
 		'disable integration with `@wordpress/scripts` package'
 	)
 	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
+	.option( '--textdomain <value>', 'text domain for internationalization' )
 	.action(
 		async (
 			slug,
@@ -77,6 +78,7 @@ program
 				wpEnv,
 				variant,
 				targetDir,
+				textdomain,
 			}
 		) => {
 			try {
@@ -110,6 +112,7 @@ program
 						wpScripts,
 						wpEnv,
 						targetDir,
+						textdomain,
 					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
@@ -158,7 +161,7 @@ program
 							'description',
 							'dashicon',
 							'category',
-							! plugin && 'textdomain',
+							! plugin && ! textdomain && 'textdomain',
 						].filter( Boolean ),
 						variant,
 						optionsValues
@@ -215,6 +218,9 @@ program
 		log.info( `  $ ${ commandName } todo-list` );
 		log.info(
 			`  $ ${ commandName } todo-list --template es5 --title "TODO List"`
+		);
+		log.info(
+			`  $ ${ commandName } todo-list --no-plugin --textdomain=my-plugin`
 		);
 	} )
 	.parse( process.argv );

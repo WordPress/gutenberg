@@ -75,11 +75,6 @@ $footer-height: 70px;
 	}
 }
 
-// TODO: See if this can be removed after https://github.com/WordPress/gutenberg/issues/38730
-.font-library-modal__tabpanel-layout .components-base-control__field {
-	margin-bottom: 0;
-}
-
 .font-library-modal__fonts-title {
 	text-transform: uppercase;
 	font-size: 11px;
@@ -110,6 +105,10 @@ $footer-height: 70px;
 
 	&:hover {
 		background-color: $gray-100;
+	}
+
+	&:focus {
+		position: relative;
 	}
 
 	.font-library-modal__font-card__name {

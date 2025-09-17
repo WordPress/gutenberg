@@ -7,6 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { useContext } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,7 +16,11 @@ import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import type { ViewBaseProps } from '../../types';
 
-export default function DataViewsLayout() {
+type DataViewsLayoutProps = {
+	className?: string;
+};
+
+export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 	const {
 		actions = [],
 		data,
@@ -30,13 +35,18 @@ export default function DataViewsLayout() {
 		setOpenedFilter,
 		onClickItem,
 		isItemClickable,
+		renderItemLink,
+		defaultLayouts,
+		empty = <p>{ __( 'No results' ) }</p>,
 	} = useContext( DataViewsContext );
 
-	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-		?.component as ComponentType< ViewBaseProps< any > >;
+	const ViewComponent = VIEW_LAYOUTS.find(
+		( v ) => v.type === view.type && defaultLayouts[ v.type ]
+	)?.component as ComponentType< ViewBaseProps< any > >;
 
 	return (
 		<ViewComponent
+			className={ className }
 			actions={ actions }
 			data={ data }
 			fields={ fields }
@@ -48,8 +58,10 @@ export default function DataViewsLayout() {
 			selection={ selection }
 			setOpenedFilter={ setOpenedFilter }
 			onClickItem={ onClickItem }
+			renderItemLink={ renderItemLink }
 			isItemClickable={ isItemClickable }
 			view={ view }
+			empty={ empty }
 		/>
 	);
 }

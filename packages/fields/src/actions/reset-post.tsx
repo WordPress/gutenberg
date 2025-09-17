@@ -189,6 +189,7 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 
@@ -210,12 +211,12 @@ const resetPostAction: Action< Template | TemplatePart > = {
 				createSuccessNotice(
 					items.length > 1
 						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
+								/* translators: %d: The number of items. */
+								__( '%d items reset.' ),
 								items.length
 						  )
 						: sprintf(
-								/* translators: The template/part's name. */
+								/* translators: %s: The template/part's name. */
 								__( '"%s" reset.' ),
 								getItemTitle( items[ 0 ] )
 						  ),

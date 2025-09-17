@@ -132,15 +132,15 @@ function PostAuthorNameEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ supportsAuthor
-					? displayAuthor
-					: sprintf(
+				{ ! supportsAuthor && postType !== undefined
+					? sprintf(
 							// translators: %s: Name of the post type e.g: "post".
 							__(
 								'This post type (%s) does not support the author.'
 							),
 							postType
-					  ) }
+					  )
+					: displayAuthor }
 			</div>
 		</>
 	);

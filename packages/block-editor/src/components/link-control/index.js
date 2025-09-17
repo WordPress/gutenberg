@@ -501,7 +501,7 @@ function LinkControl( {
 LinkControl.ViewerFill = ViewerFill;
 LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
-export const DeprecatedExperimentalLinkControl = ( props ) => {
+const DeprecatedExperimentalLinkControl = ( props ) => {
 	deprecated( 'wp.blockEditor.__experimentalLinkControl', {
 		since: '6.8',
 		alternative: 'wp.blockEditor.LinkControl',
@@ -510,4 +510,9 @@ export const DeprecatedExperimentalLinkControl = ( props ) => {
 	return <LinkControl { ...props } />;
 };
 
+DeprecatedExperimentalLinkControl.ViewerFill = LinkControl.ViewerFill;
+DeprecatedExperimentalLinkControl.DEFAULT_LINK_SETTINGS =
+	LinkControl.DEFAULT_LINK_SETTINGS;
+
+export { DeprecatedExperimentalLinkControl };
 export default LinkControl;

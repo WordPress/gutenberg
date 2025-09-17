@@ -16,6 +16,7 @@ import {
 	verse,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -33,6 +34,11 @@ const EMPTY_INSERTION_POINT = {
 	insertionIndex: undefined,
 	filterValue: undefined,
 };
+
+/**
+ * These are rendering modes that the editor supports.
+ */
+const RENDERING_MODES = [ 'post-only', 'template-locked' ];
 
 /**
  * Get the inserter.
@@ -99,10 +105,8 @@ export const getPostIcon = createRegistrySelector(
 				postType === 'wp_template'
 			) {
 				const templateAreas =
-					select( coreStore ).getEntityRecord(
-						'root',
-						'__unstableBase'
-					)?.default_template_part_areas || [];
+					select( coreStore ).getCurrentTheme()
+						?.default_template_part_areas || [];
 
 				const areaData = templateAreas.find(
 					( item ) => options.area === item.area
@@ -214,4 +218,55 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 		},
 		() => [ select( blockEditorStore ).getBlocks() ]
 	)
+);
+
+/**
+ * Returns the default rendering mode for a post type by user preference or post type configuration.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} postType The post type.
+ *
+ * @return {string} The default rendering mode. Returns `undefined` while resolving value.
+ */
+export const getDefaultRenderingMode = createRegistrySelector(
+	( select ) => ( state, postType ) => {
+		const { getPostType, getCurrentTheme, hasFinishedResolution } =
+			select( coreStore );
+
+		// This needs to be called before `hasFinishedResolution`.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const currentTheme = getCurrentTheme();
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const postTypeEntity = getPostType( postType );
+
+		// Wait for the post type and theme resolution.
+		if (
+			! hasFinishedResolution( 'getPostType', [ postType ] ) ||
+			! hasFinishedResolution( 'getCurrentTheme' )
+		) {
+			return undefined;
+		}
+
+		const theme = currentTheme?.stylesheet;
+		const defaultModePreference = select( preferencesStore ).get(
+			'core',
+			'renderingModes'
+		)?.[ theme ]?.[ postType ];
+		const postTypeDefaultMode = Array.isArray(
+			postTypeEntity?.supports?.editor
+		)
+			? postTypeEntity.supports.editor.find(
+					( features ) => 'default-mode' in features
+			  )?.[ 'default-mode' ]
+			: undefined;
+
+		const defaultMode = defaultModePreference || postTypeDefaultMode;
+
+		// Fallback gracefully to 'post-only' when rendering mode is not supported.
+		if ( ! RENDERING_MODES.includes( defaultMode ) ) {
+			return 'post-only';
+		}
+
+		return defaultMode;
+	}
 );

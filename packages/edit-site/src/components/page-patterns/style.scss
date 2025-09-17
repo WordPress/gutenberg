@@ -19,6 +19,8 @@
 	.dataviews-view-table & {
 		width: 96px;
 		flex-grow: 0;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
 	}
 }
 

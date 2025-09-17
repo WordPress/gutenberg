@@ -83,8 +83,9 @@ $block-inserter-tabs-height: 44px;
 	border: none;
 	outline: none;
 	padding: 0;
-	transition: color 0.2s ease;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: color 0.2s ease;
+	}
 }
 
 .block-editor-inserter__menu {
@@ -165,10 +166,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
 	text-align: center;
-}
-
-.block-editor-inserter__no-results-icon {
-	fill: $gray-600;
 }
 
 .block-editor-inserter__child-blocks {
@@ -376,13 +373,13 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-15;
+		top: $header-height + $grid-unit-10;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
 		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
 		overflow-x: visible;
-		overflow-y: scroll;
+		overflow-y: auto;
 
 		&__categories-list__item {
 			display: block;
@@ -563,8 +560,9 @@ $block-inserter-tabs-height: 44px;
 		outline-color: var(--wp-admin-theme-color);
 		outline-width: var(--wp-admin-border-width-focus);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
-		transition: outline 0.1s linear;
-		@include reduce-motion("transition");
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s linear;
+		}
 	}
 }
 
@@ -646,5 +644,10 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	display: none;
 	padding: 0 $grid-unit-30 $grid-unit-20;
+
+	@include break-mobile {
+		display: block;
+	}
 }

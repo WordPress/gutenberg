@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity-router",
-	"version": "2.16.0",
+	"version": "2.31.0",
 	"description": "Package that exposes state and actions from the `core/router` store, part of the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,11 +25,15 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"wpScriptModuleExports": "./build-module/index.js",
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js",
+		"./full-page": "./build-module/full-page.js"
+	},
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/interactivity": "file:../interactivity"
+		"@wordpress/interactivity": "file:../interactivity",
+		"es-module-lexer": "^1.5.4"
 	},
 	"publishConfig": {
 		"access": "public"

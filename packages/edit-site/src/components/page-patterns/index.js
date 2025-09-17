@@ -9,7 +9,6 @@ import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { patternTitleField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -34,7 +33,7 @@ import {
 } from './fields';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { usePostActions } = unlock( editorPrivateApis );
+const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];

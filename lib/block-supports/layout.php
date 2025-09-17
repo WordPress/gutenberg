@@ -583,6 +583,24 @@ function gutenberg_incremental_id_per_prefix( $prefix = '' ) {
 }
 
 /**
+ * Generates a unique ID based on the structure and values of a given array.
+ *
+ * This function serializes the array into a JSON string and generates a hash
+ * that serves as a unique identifier. Optionally, a prefix can be added to
+ * the generated ID for context or categorization.
+ *
+ * @param array  $data   The input array to generate an ID from.
+ * @param string $prefix Optional. A prefix to prepend to the generated ID. Default ''.
+ *
+ * @return string The generated unique ID for the array.
+ */
+function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): string {
+	$serialized = wp_json_encode( $data );
+	$hash       = substr( md5( $serialized ), 0, 8 );
+	return $prefix . $hash;
+}
+
+/**
  * Renders the layout config to the block wrapper.
  *
  * @param  string $block_content Rendered block content.
@@ -603,7 +621,33 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	// Child layout specific logic.
 	if ( $child_layout ) {
-		$container_content_class   = wp_unique_prefixed_id( 'wp-container-content-' );
+		/*
+		 * Generates a unique class for child block layout styles.
+		 *
+		 * To ensure consistent class generation across different page renders,
+		 * only properties that affect layout styling are used. These properties
+		 * come from `$block['attrs']['style']['layout']` and `$block['parentLayout']`.
+		 *
+		 * As long as these properties coincide, the generated class will be the same.
+		 */
+		$container_content_class = gutenberg_unique_id_from_values(
+			array(
+				'layout'       => array_intersect_key(
+					$block['attrs']['style']['layout'] ?? array(),
+					array_flip(
+						array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+					)
+				),
+				'parentLayout' => array_intersect_key(
+					$block['parentLayout'] ?? array(),
+					array_flip(
+						array( 'minimumColumnWidth', 'columnCount' )
+					)
+				),
+			),
+			'wp-container-content-'
+		);
+
 		$child_layout_declarations = array();
 		$child_layout_styles       = array();
 
@@ -755,16 +799,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
 
-	/*
-	* We use an incremental ID that is independent per prefix to make sure that
-	* rendering different numbers of blocks doesn't affect the IDs of other
-	* blocks. We need this to make the CSS class names stable across paginations
-	* for features like the enhanced pagination of the Query block.
-	*/
-	$container_class = gutenberg_incremental_id_per_prefix(
-		'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
-	);
-
 	// Set the correct layout type for blocks using legacy content width.
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] || isset( $used_layout['contentSize'] ) && $used_layout['contentSize'] ) {
 		$used_layout['type'] = 'constrained';
@@ -837,6 +871,25 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		$block_gap             = $global_settings['spacing']['blockGap'] ?? null;
 		$has_block_gap_support = isset( $block_gap );
+
+		/*
+		 * We generate a unique ID based on all the data required to obtain the
+		 * corresponding layout style. This way, the CSS class names keep the same
+		 * even for different blocks with the same layout definition. We need this to
+		 * make the CSS class names stable across paginations for features like the
+		 * enhanced pagination of the Query block.
+		 */
+		$container_class = gutenberg_unique_id_from_values(
+			array(
+				$used_layout,
+				$has_block_gap_support,
+				$gap_value,
+				$should_skip_gap_serialization,
+				$fallback_gap_value,
+				$block_spacing,
+			),
+			'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
+		);
 
 		$style = gutenberg_get_layout_style(
 			".$container_class",

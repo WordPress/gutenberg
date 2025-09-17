@@ -28,8 +28,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../lock-unlock';
-const { useHistory } = unlock( routerPrivateApis );
 import { SidebarNavigationContext } from '../sidebar';
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const SiteHub = memo(
 	forwardRef( ( { isTransparent }, ref ) => {
@@ -117,29 +117,69 @@ export default SiteHub;
 
 export const SiteHubMobile = memo(
 	forwardRef( ( { isTransparent }, ref ) => {
+		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
 
-		const { dashboardLink, isBlockTheme, homeUrl, siteTitle } = useSelect(
-			( select ) => {
-				const { getSettings } = unlock( select( editSiteStore ) );
+		const {
+			dashboardLink,
+			homeUrl,
+			siteTitle,
+			isBlockTheme,
+			isClassicThemeWithStyleBookSupport,
+		} = useSelect( ( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
+			const currentTheme = getCurrentTheme();
+			const settings = getSettings();
+			const supportsEditorStyles =
+				currentTheme.theme_supports[ 'editor-styles' ];
+			// This is a temp solution until the has_theme_json value is available for the current theme.
+			const hasThemeJson = settings.supportsLayout;
 
-				const { getEntityRecord, getCurrentTheme } =
-					select( coreStore );
-				const _site = getEntityRecord( 'root', 'site' );
-				return {
-					dashboardLink: getSettings().__experimentalDashboardLink,
-					isBlockTheme: getCurrentTheme()?.is_block_theme,
-					homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
-					siteTitle:
-						! _site?.title && !! _site?.url
-							? filterURLForDisplay( _site?.url )
-							: _site?.title,
-				};
-			},
-			[]
-		);
+			return {
+				dashboardLink: settings.__experimentalDashboardLink,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
+				isBlockTheme: currentTheme?.is_block_theme,
+				isClassicThemeWithStyleBookSupport:
+					! currentTheme?.is_block_theme &&
+					( supportsEditorStyles || hasThemeJson ),
+			};
+		}, [] );
 		const { open: openCommandCenter } = useDispatch( commandsStore );
+
+		let backPath;
+
+		// If the current path is not the root page, find a page to back to.
+		if ( path !== '/' ) {
+			if ( isBlockTheme || isClassicThemeWithStyleBookSupport ) {
+				// If the current theme is a block theme or a classic theme that supports StyleBook,
+				// back to the Design screen.
+				backPath = '/';
+			} else if ( path !== '/pattern' ) {
+				// If the current theme is a classic theme that does not support StyleBook,
+				// back to the Patterns page.
+				backPath = '/pattern';
+			}
+		}
+
+		const backButtonProps = {
+			href: !! backPath ? undefined : dashboardLink,
+			label: !! backPath
+				? __( 'Go to Site Editor' )
+				: __( 'Go to the Dashboard' ),
+			onClick: !! backPath
+				? () => {
+						history.navigate( backPath );
+						navigate( 'back' );
+				  }
+				: undefined,
+		};
 
 		return (
 			<div className="edit-site-site-hub">
@@ -160,18 +200,7 @@ export const SiteHubMobile = memo(
 								transform: 'scale(0.5)',
 								borderRadius: 4,
 							} }
-							{ ...( ! isBlockTheme
-								? {
-										href: dashboardLink,
-										label: __( 'Go to the Dashboard' ),
-								  }
-								: {
-										onClick: () => {
-											history.navigate( '/' );
-											navigate( 'back' );
-										},
-										label: __( 'Go to Site Editor' ),
-								  } ) }
+							{ ...backButtonProps }
 						>
 							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>

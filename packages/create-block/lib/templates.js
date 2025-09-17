@@ -299,4 +299,6 @@ module.exports = {
 	getDefaultValues,
 	getProjectTemplate,
 	runPrompts,
+	getOutputTemplates,
+	getOutputAssets,
 };

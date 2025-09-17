@@ -12,9 +12,11 @@
 	overflow-y: hidden;
 	overflow-x: auto;
 
-	// Animation
-	transition: border-color 0.1s linear, box-shadow 0.1s linear;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+
+		// Animation
+		transition: border-color 0.1s linear, box-shadow 0.1s linear;
+	}
 
 	@include break-small() {
 		overflow: inherit;
@@ -50,10 +52,8 @@
 			color: var(--wp-block-synced-color);
 		}
 
-		.components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
-			&:disabled .block-editor-block-icon.has-colors {
-				color: var(--wp-block-synced-color);
-			}
+		.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] .block-editor-block-icon {
+			color: var(--wp-block-synced-color);
 		}
 	}
 
@@ -173,7 +173,7 @@
 
 .show-icon-labels {
 	.block-editor-block-toolbar {
-		.components-button.has-icon {
+		.components-button.has-icon:where(:not(.has-text)) {
 			width: auto;
 
 			// Hide the button icons when labels are set to display...

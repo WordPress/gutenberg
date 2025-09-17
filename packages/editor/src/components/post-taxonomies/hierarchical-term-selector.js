@@ -13,10 +13,15 @@ import {
 	Flex,
 	FlexItem,
 	SearchControl,
+	Spinner,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -25,6 +30,10 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { normalizeTextString } = unlock( componentsPrivateApis );
+const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 
 /**
  * Module Constants
@@ -35,10 +44,9 @@ const DEFAULT_QUERY = {
 	order: 'asc',
 	_fields: 'id,name,parent',
 	context: 'view',
+	[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 };
-
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
-
 const EMPTY_ARRAY = [];
 
 /**
@@ -132,7 +140,9 @@ export function getFilterMatcher( filterValue ) {
 		// (i.e. some child matched at some point in the tree) then return it.
 		if (
 			-1 !==
-				term.name.toLowerCase().indexOf( filterValue.toLowerCase() ) ||
+				normalizeTextString( term.name ).indexOf(
+					normalizeTextString( filterValue )
+				) ||
 			term.children.length > 0
 		) {
 			return term;
@@ -175,21 +185,21 @@ export function HierarchicalTermSelector( { slug } ) {
 		( select ) => {
 			const { getCurrentPost, getEditedPostAttribute } =
 				select( editorStore );
-			const { getTaxonomy, getEntityRecords, isResolving } =
+			const { getEntityRecord, getEntityRecords, isResolving } =
 				select( coreStore );
-			const _taxonomy = getTaxonomy( slug );
+			const _taxonomy = getEntityRecord( 'root', 'taxonomy', slug );
 			const post = getCurrentPost();
 
 			return {
 				hasCreateAction: _taxonomy
-					? post._links?.[
+					? !! post._links?.[
 							'wp:action-create-' + _taxonomy.rest_base
-					  ] ?? false
+					  ]
 					: false,
 				hasAssignAction: _taxonomy
-					? post._links?.[
+					? !! post._links?.[
 							'wp:action-assign-' + _taxonomy.rest_base
-					  ] ?? false
+					  ]
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )
@@ -385,13 +395,13 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	const newTermButtonLabel = labelWithFallback(
 		'add_new_item',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const newTermLabel = labelWithFallback(
 		'new_item_name',
-		__( 'Add new category' ),
-		__( 'Add new term' )
+		__( 'Add Category' ),
+		__( 'Add Term' )
 	);
 	const parentSelectLabel = labelWithFallback(
 		'parent_item',
@@ -406,7 +416,7 @@ export function HierarchicalTermSelector( { slug } ) {
 
 	return (
 		<Flex direction="column" gap="4">
-			{ showFilter && (
+			{ showFilter && ! loading && (
 				<SearchControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
@@ -415,6 +425,17 @@ export function HierarchicalTermSelector( { slug } ) {
 					value={ filterValue }
 					onChange={ setFilter }
 				/>
+			) }
+			{ loading && (
+				<Flex
+					justify="center"
+					style={ {
+						// Match SearchControl height to prevent layout shift.
+						height: '40px',
+					} }
+				>
+					<Spinner />
+				</Flex>
 			) }
 			<div
 				className="editor-post-taxonomies__hierarchical-terms-list"

@@ -22,6 +22,13 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
 			{ isBlockBasedTheme && (
 				<>
+					<SidebarNavigationItemGlobalStyles
+						to="/styles"
+						uid="global-styles-navigation-item"
+						icon={ styles }
+					>
+						{ __( 'Styles' ) }
+					</SidebarNavigationItemGlobalStyles>
 					<SidebarNavigationItem
 						uid="navigation-navigation-item"
 						to="/navigation"
@@ -30,13 +37,6 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 					>
 						{ __( 'Navigation' ) }
 					</SidebarNavigationItem>
-					<SidebarNavigationItemGlobalStyles
-						to="/styles"
-						uid="global-styles-navigation-item"
-						icon={ styles }
-					>
-						{ __( 'Styles' ) }
-					</SidebarNavigationItemGlobalStyles>
 					<SidebarNavigationItem
 						uid="page-navigation-item"
 						to="/page"
@@ -77,7 +77,7 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	);
 }
 
-export default function SidebarNavigationScreenMain() {
+export default function SidebarNavigationScreenMain( { customDescription } ) {
 	const isBlockBasedTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
 		[]
@@ -91,19 +91,24 @@ export default function SidebarNavigationScreenMain() {
 		setEditorCanvasContainerView( undefined );
 	}, [ setEditorCanvasContainerView ] );
 
+	let description;
+	if ( customDescription ) {
+		description = customDescription;
+	} else if ( isBlockBasedTheme ) {
+		description = __(
+			'Customize the appearance of your website using the block editor.'
+		);
+	} else {
+		description = __(
+			'Explore block styles and patterns to refine your site.'
+		);
+	}
+
 	return (
 		<SidebarNavigationScreen
 			isRoot
 			title={ __( 'Design' ) }
-			description={
-				isBlockBasedTheme
-					? __(
-							'Customize the appearance of your website using the block editor.'
-					  )
-					: __(
-							'Explore block styles and patterns to refine your site'
-					  )
-			}
+			description={ description }
 			content={
 				<MainSidebarNavigationContent
 					isBlockBasedTheme={ isBlockBasedTheme }

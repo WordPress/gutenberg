@@ -402,6 +402,7 @@ _Parameters_
 -   _props_ `Object`: The component props.
 -   _props.close_ `Function`: The function to close the dialog.
 -   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
+-   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
 
 _Returns_
 
@@ -488,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 
@@ -500,6 +501,7 @@ _Parameters_
 -   _$0.onError_ `Function`: Function called when an error happens.
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
 -   _$0.onSuccess_ `Function`: Function called after the final representation of the file is available.
+-   _$0.multiple_ `boolean`: Whether to allow multiple files to be uploaded.
 
 ### MediaUploadCheck
 
@@ -856,7 +858,7 @@ _Parameters_
 -   _props.className_ `[string]`: An optional class name added to the panel.
 -   _props.title_ `[string]`: Title displayed at the top of the panel.
 -   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar. If `false` is passed, no icon will be rendered.
 -   _props.children_ `React.ReactNode`: Children to be rendered
 
 _Returns_

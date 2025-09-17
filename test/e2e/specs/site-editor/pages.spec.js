@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft new: page"i]' )
 		.locator( 'role=textbox[name="title"i]' )
@@ -247,7 +247,7 @@ test.describe( 'Pages', () => {
 		// Create a custom template first.
 		const templateName = 'demo';
 		await page.getByRole( 'button', { name: 'Templates' } ).click();
-		await page.getByRole( 'button', { name: 'Add New Template' } ).click();
+		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
 				name: 'A custom template can be manually applied to any post or page.',
@@ -265,14 +265,11 @@ test.describe( 'Pages', () => {
 		await page
 			.locator( '.block-editor-block-patterns-list__list-item' )
 			.click();
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.
 		await draftNewPage( page );
-		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -295,7 +292,6 @@ test.describe( 'Pages', () => {
 		} );
 
 		// Now reset, and apply the default template back.
-		await editor.openDocumentSettingsSidebar();
 		await templateOptionsButton.click();
 		const resetButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
@@ -310,7 +306,6 @@ test.describe( 'Pages', () => {
 		editor,
 	} ) => {
 		await draftNewPage( page );
-		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 		await editor.openDocumentSettingsSidebar();
 		const templateOptionsButton = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -322,6 +317,6 @@ test.describe( 'Pages', () => {
 			page
 				.getByRole( 'menu', { name: 'Template options' } )
 				.getByText( 'Change template' )
-		).toHaveCount( 0 );
+		).toBeDisabled();
 	} );
 } );

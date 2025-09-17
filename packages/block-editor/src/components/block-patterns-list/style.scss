@@ -44,9 +44,9 @@
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
 			border-radius: $radius-medium;
-
-			transition: outline 0.1s linear;
-			@include reduce-motion("transition");
+			@media not ( prefers-reduced-motion ) {
+				transition: outline 0.1s linear;
+			}
 		}
 	}
 

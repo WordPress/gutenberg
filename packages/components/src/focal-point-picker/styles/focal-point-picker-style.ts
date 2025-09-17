@@ -53,7 +53,7 @@ export const MediaContainer = styled.div`
 		max-width: 100%;
 		pointer-events: none;
 		user-select: none;
-		width: auto;
+		width: 100%;
 	}
 `;
 

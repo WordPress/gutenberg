@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 6.7.0 (2025-09-17)
+
+## 6.6.0 (2025-09-03)
+
+## 6.5.0 (2025-08-20)
+
+## 6.4.0 (2025-08-07)
+
+### New Features
+
+-   Introduce a new `useServerSideRender` hook ([70543](https://github.com/WordPress/gutenberg/pull/70543)).
+
+## 6.3.0 (2025-07-23)
+
+## 6.2.0 (2025-06-25)
+
+## 6.1.0 (2025-06-04)
+
+## 6.0.0 (2025-05-22)
+
+### Breaking Changes
+
+-   The `LoadingResponsePlaceholder` prop will no longer receive `showLoader`. The spinner rendering logic is now located in the same component ([#70147](https://github.com/WordPress/gutenberg/pull/70147)).
+
+## 5.23.0 (2025-05-07)
+
+### Bug Fixes
+
+-   Fix `ServerSideRender` not updating when attributes change by properly implementing debounced fetch with refs ([#69237](https://github.com/WordPress/gutenberg/pull/69237)).
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
 ## 5.16.0 (2025-01-15)
 
 ## 5.15.0 (2025-01-02)

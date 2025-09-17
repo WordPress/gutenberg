@@ -6,7 +6,7 @@
  * For example, don't add rules to this sheet that affect block visuals. It's purely for UI.
  */
 
-@import "./colors";
+@use "./colors";
 
 /**
  * Fonts & basic variables.
@@ -77,16 +77,16 @@ $radius-round: 50%;     // For circles and ovals.
  */
 
 // For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.
-$elevation-x-small: 0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01);
+$elevation-x-small: 0 1px 1px rgba(colors.$black, 0.03), 0 1px 2px rgba(colors.$black, 0.02), 0 3px 3px rgba(colors.$black, 0.02), 0 4px 4px rgba(colors.$black, 0.01);
 
 // For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.
-$elevation-small: 0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02);
+$elevation-small: 0 1px 2px rgba(colors.$black, 0.05), 0 2px 3px rgba(colors.$black, 0.04), 0 6px 6px rgba(colors.$black, 0.03), 0 8px 8px rgba(colors.$black, 0.02);
 
 // For components that offer additional actions. Example: Menus, Command Palette
-$elevation-medium: 0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02);
+$elevation-medium: 0 2px 3px rgba(colors.$black, 0.05), 0 4px 5px rgba(colors.$black, 0.04), 0 12px 12px rgba(colors.$black, 0.03), 0 16px 16px rgba(colors.$black, 0.02);
 
 // For components that confirm decisions or handle necessary interruptions. Example: Modals.
-$elevation-large: 0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02);
+$elevation-large: 0 5px 15px rgba(colors.$black, 0.08), 0 15px 27px rgba(colors.$black, 0.07), 0 30px 36px rgba(colors.$black, 0.04), 0 50px 43px rgba(colors.$black, 0.02);
 
 /**
  * Dimensions.
@@ -97,7 +97,7 @@ $button-size: 36px;
 $button-size-next-default-40px: 40px; // transitionary variable for next default button size
 $button-size-small: 24px;
 $button-size-compact: 32px;
-$header-height: 60px;
+$header-height: 64px;
 $panel-header-height: $grid-unit-60;
 $nav-sidebar-width: 300px;
 $admin-bar-height: 32px;

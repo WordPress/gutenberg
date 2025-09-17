@@ -36,39 +36,145 @@ add_action(
 );
 
 /**
- * Adds the default template part areas to the REST API index.
- *
- * This function exposes the default template part areas through the WordPress REST API.
- * Note: This function backports into the wp-includes/rest-api/class-wp-rest-server.php file.
+ * Adds the site reading options to the REST API index.
  *
  * @param WP_REST_Response $response REST API response.
- * @return WP_REST_Response Modified REST API response with default template part areas.
+ * @return WP_REST_Response Modified REST API response.
  */
-function gutenberg_add_default_template_part_areas_to_index( WP_REST_Response $response ) {
-	$response->data['default_template_part_areas'] = get_allowed_block_template_part_areas();
+function gutenberg_add_rest_index_reading_options( WP_REST_Response $response ) {
+	$response->data['page_for_posts'] = (int) get_option( 'page_for_posts' );
+	$response->data['page_on_front']  = (int) get_option( 'page_on_front' );
+	$response->data['show_on_front']  = get_option( 'show_on_front' );
+
 	return $response;
 }
-
-add_filter( 'rest_index', 'gutenberg_add_default_template_part_areas_to_index' );
+add_filter( 'rest_index', 'gutenberg_add_rest_index_reading_options' );
 
 /**
- * Adds the default template types to the REST API index.
+ * Adds `ignore_sticky` parameter to the post collection endpoint.
  *
- * This function exposes the default template types through the WordPress REST API.
- * Note: This function backports into the wp-includes/rest-api/class-wp-rest-server.php file.
+ * Note: Backports into the wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php file.
  *
- * @param WP_REST_Response $response REST API response.
- * @return WP_REST_Response Modified REST API response with default template part areas.
+ * @param array        $query_params JSON Schema-formatted collection parameters.
+ * @param WP_Post_Type $post_type    Post type object.
+ * @return array
  */
-function gutenberg_add_default_template_types_to_index( WP_REST_Response $response ) {
-	$indexed_template_types = array();
-	foreach ( get_default_block_template_types() as $slug => $template_type ) {
-		$template_type['slug']    = (string) $slug;
-		$indexed_template_types[] = $template_type;
+function gutenberg_modify_post_collection_param( $query_params, WP_Post_Type $post_type ) {
+	if ( 'post' === $post_type->name && ! isset( $query_params['ignore_sticky'] ) ) {
+		$query_params['ignore_sticky'] = array(
+			'description' => __( 'Whether to ignore sticky posts or not.' ),
+			'type'        => 'boolean',
+			'default'     => false,
+		);
 	}
 
-	$response->data['default_template_types'] = $indexed_template_types;
-	return $response;
+	return $query_params;
 }
+add_filter( 'rest_post_collection_params', 'gutenberg_modify_post_collection_param', 10, 2 );
 
-add_filter( 'rest_index', 'gutenberg_add_default_template_types_to_index' );
+/**
+ * Modify posts query based on `ignore_sticky` parameter.
+ *
+ * Note: Backports into the wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php file.
+ *
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The REST API request.
+ * @return array Modified arguments
+ */
+function gutenberg_modify_post_collection_query( $args, WP_REST_Request $request ) {
+	/*
+	 * Honor the original REST API `post__in` behavior. Don't prepend sticky posts
+	 * when `post__in` has been specified.
+	 */
+	if ( isset( $request['ignore_sticky'] ) && empty( $args['post__in'] ) ) {
+		$args['ignore_sticky_posts'] = $request['ignore_sticky'];
+	}
+
+	return $args;
+}
+add_filter( 'rest_post_query', 'gutenberg_modify_post_collection_query', 10, 2 );
+
+/**
+ * Registers `default_template_types` and `default_template_part_areas` fields for the active theme.
+ *
+ * Note: Backports into the wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php file.
+ *
+ * @return void
+ */
+function gutenberg_register_rest_theme_fields() {
+	register_rest_field(
+		'theme',
+		'default_template_types',
+		array(
+			'get_callback' => static function ( $response_data ) {
+				if ( ! isset( $response_data['status'] ) || 'active' !== $response_data['status'] ) {
+					return null;
+				}
+
+				$default_template_types = array();
+				foreach ( get_default_block_template_types() as $slug => $template_type ) {
+					$template_type['slug']    = (string) $slug;
+					$default_template_types[] = $template_type;
+				}
+
+				return $default_template_types;
+			},
+			'schema'       => array(
+				'description' => __( 'A list of default template types.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type'       => 'object',
+					'properties' => array(
+						'slug'        => array(
+							'type' => 'string',
+						),
+						'title'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		)
+	);
+	register_rest_field(
+		'theme',
+		'default_template_part_areas',
+		array(
+			'get_callback' => static function ( $response_data ) {
+				if ( ! isset( $response_data['status'] ) || 'active' !== $response_data['status'] ) {
+					return null;
+				}
+
+				return get_allowed_block_template_part_areas();
+			},
+			'schema'       => array(
+				'description' => __( 'A list of allowed area values for template parts.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type'       => 'object',
+					'properties' => array(
+						'area'        => array(
+							'type' => 'string',
+						),
+						'label'       => array(
+							'type' => 'string',
+						),
+						'description' => array(
+							'type' => 'string',
+						),
+						'icon'        => array(
+							'type' => 'string',
+						),
+						'area_tag'    => array(
+							'type' => 'string',
+						),
+					),
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_theme_fields' );

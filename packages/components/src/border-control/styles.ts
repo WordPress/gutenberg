@@ -147,16 +147,10 @@ export const borderControlPopoverControls = css`
 export const borderControlPopoverContent = css``;
 export const borderColorIndicator = css``;
 
-export const resetButton = css`
-	justify-content: center;
-	width: 100%;
-
-	/* Override button component styling */
-	&& {
-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
-		border-top-left-radius: 0;
-		border-top-right-radius: 0;
-	}
+export const resetButtonWrapper = css`
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 12px;
 `;
 
 export const borderSlider = () => css`

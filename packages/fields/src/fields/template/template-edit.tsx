@@ -28,6 +28,8 @@ import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
 import { unlock } from '../../lock-unlock';
 
+const EMPTY_ARRAY: [] = [];
+
 export const TemplateEdit = ( {
 	data,
 	field,
@@ -39,7 +41,7 @@ export const TemplateEdit = ( {
 		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
 
-	const { availableTemplates, templates } = useSelect(
+	const { canSwitchTemplate, templates } = useSelect(
 		( select ) => {
 			const allTemplates =
 				select( coreStore ).getEntityRecords< WpTemplate >(
@@ -49,7 +51,7 @@ export const TemplateEdit = ( {
 						per_page: -1,
 						post_type: postType,
 					}
-				) ?? [];
+				) ?? EMPTY_ARRAY;
 
 			const { getHomePage, getPostsPageId } = unlock(
 				select( coreStore )
@@ -63,40 +65,41 @@ export const TemplateEdit = ( {
 
 			return {
 				templates: allTemplates,
-				availableTemplates: allowSwitchingTemplate
-					? allTemplates.filter(
-							( template ) =>
-								template.is_custom &&
-								template.slug !== data.template &&
-								!! template.content.raw // Skip empty templates.
-					  )
-					: [],
+				canSwitchTemplate: allowSwitchingTemplate,
 			};
 		},
-		[ data.template, postId, postType ]
+		[ postId, postType ]
 	);
 
-	const templatesAsPatterns = useMemo(
-		() =>
-			availableTemplates.map( ( template ) => ( {
+	const templatesAsPatterns = useMemo( () => {
+		if ( ! canSwitchTemplate ) {
+			return [];
+		}
+		return templates
+			.filter(
+				( template ) =>
+					template.is_custom &&
+					template.slug !== data.template &&
+					// Skip empty templates.
+					!! template.content.raw
+			)
+			.map( ( template ) => ( {
 				name: template.slug,
 				blocks: parse( template.content.raw ),
 				title: decodeEntities( template.title.rendered ),
 				id: template.id,
-			} ) ),
-		[ availableTemplates ]
-	);
+			} ) );
+	}, [ canSwitchTemplate, data.template, templates ] );
 
 	const shownTemplates = useAsyncList( templatesAsPatterns );
 
 	const value = field.getValue( { item: data } );
+	const foundTemplate = templates.find(
+		( template ) => template.slug === value
+	);
 
 	const currentTemplate = useSelect(
 		( select ) => {
-			const foundTemplate = templates?.find(
-				( template ) => template.slug === value
-			);
-
 			if ( foundTemplate ) {
 				return foundTemplate;
 			}
@@ -128,7 +131,7 @@ export const TemplateEdit = ( {
 				);
 			}
 		},
-		[ postType, slug, templates, value ]
+		[ foundTemplate, postType, slug ]
 	);
 
 	const [ showModal, setShowModal ] = useState( false );

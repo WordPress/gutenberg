@@ -31,30 +31,50 @@ export function useAllowSwitchingTemplates() {
 			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
-			const templates = getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} );
+
 			const isPostsPage = +postId === siteSettings?.page_for_posts;
+			const isFrontPage =
+				postType === 'page' && +postId === siteSettings?.page_on_front;
 			// If current page is set front page or posts page, we also need
 			// to check if the current theme has a template for it. If not
-			const isFrontPage =
-				postType === 'page' &&
-				+postId === siteSettings?.page_on_front &&
-				templates?.some( ( { slug } ) => slug === 'front-page' );
-			return ! isPostsPage && ! isFrontPage;
+			const templates = isFrontPage
+				? getEntityRecords( 'postType', 'wp_template', {
+						per_page: -1,
+				  } )
+				: [];
+			const hasFrontPage =
+				isFrontPage &&
+				!! templates?.some( ( { slug } ) => slug === 'front-page' );
+			return ! isPostsPage && ! hasFrontPage;
 		},
 		[ postId, postType ]
 	);
 }
 
 function useTemplates( postType ) {
-	return useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-				post_type: postType,
-			} ),
+	// To do: create a new selector to checks if templates exist at all instead
+	// of and unbound request. In the modal, the user templates should be
+	// paginated and we should not make an unbound request.
+	const { staticTemplates, templates } = useSelect(
+		( select ) => {
+			return {
+				staticTemplates: select( coreStore ).getEntityRecords(
+					'postType',
+					'wp_registered_template',
+					{ per_page: -1, post_type: postType }
+				),
+				templates: select( coreStore ).getEntityRecords(
+					'postType',
+					'wp_template',
+					{ per_page: -1, post_type: postType }
+				),
+			};
+		},
 		[ postType ]
+	);
+	return useMemo(
+		() => [ ...( staticTemplates || [] ), ...( templates || [] ) ],
+		[ staticTemplates, templates ]
 	);
 }
 
@@ -67,7 +87,7 @@ export function useAvailableTemplates( postType ) {
 			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
-					template.is_custom &&
+					( template.is_custom || template.type === 'wp_template' ) &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),

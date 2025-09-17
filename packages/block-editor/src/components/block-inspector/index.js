@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import EditContentsButton from './edit-contents-button';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -247,7 +248,11 @@ const BlockInspectorSingleBlock = ( {
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
-			/>
+			>
+				{ window?.__experimentalContentOnlyPatternInsertion && (
+					<EditContentsButton clientId={ clientId } />
+				) }
+			</BlockCard>
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ showTabs && (
 				<InspectorControlsTabs

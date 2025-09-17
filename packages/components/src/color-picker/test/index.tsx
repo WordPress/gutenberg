@@ -3,6 +3,7 @@
  */
 import { fireEvent, screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { click } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -13,7 +14,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { ColorPicker } from '..';
-import { click } from '@ariakit/test';
 
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
@@ -39,6 +39,34 @@ const legacyColorMatcher = {
 	} ),
 	oldHue: expect.any( Number ),
 	source: 'hex',
+};
+
+// Without the controlled component, slider values don't update after changes.
+// Controlled component with state helps synchronize input box and slider during testing.
+const ControlledColorPicker = ( {
+	onChange: onChangeProp,
+	initialColor = '#000000',
+	...restProps
+}: React.ComponentProps< typeof ColorPicker > & { initialColor?: string } ) => {
+	const [ colorState, setColorState ] = useState( initialColor );
+
+	const internalOnChange: typeof onChangeProp = ( newColor ) => {
+		onChangeProp?.( newColor );
+		setColorState( newColor );
+	};
+
+	return (
+		<>
+			<ColorPicker
+				{ ...restProps }
+				onChange={ internalOnChange }
+				color={ colorState }
+			/>
+			<button onClick={ () => setColorState( '#4d87ba' ) }>
+				Set color to #4d87ba
+			</button>
+		</>
+	);
 };
 
 describe( 'ColorPicker', () => {
@@ -143,31 +171,6 @@ describe( 'ColorPicker', () => {
 		it( 'sliders should use accurate H and S values based on user interaction when possible', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-
-			const ControlledColorPicker = ( {
-				onChange: onChangeProp,
-				...restProps
-			}: React.ComponentProps< typeof ColorPicker > ) => {
-				const [ colorState, setColorState ] = useState( '#000000' );
-
-				const internalOnChange: typeof onChangeProp = ( newColor ) => {
-					onChangeProp?.( newColor );
-					setColorState( newColor );
-				};
-
-				return (
-					<>
-						<ColorPicker
-							{ ...restProps }
-							onChange={ internalOnChange }
-							color={ colorState }
-						/>
-						<button onClick={ () => setColorState( '#4d87ba' ) }>
-							Set color to #4d87ba
-						</button>
-					</>
-				);
-			};
 
 			render(
 				<ControlledColorPicker
@@ -340,6 +343,80 @@ describe( 'ColorPicker', () => {
 				expect( onChange ).toHaveBeenCalledTimes( 3 );
 				expect( onChange ).toHaveBeenLastCalledWith( expected );
 			} );
+		} );
+	} );
+
+	describe.each( [
+		[ 'hsl', 'HSL' ],
+		[ 'rgb', 'RGB' ],
+	] )( 'Alpha-enabled %s format', ( format, formatLabel ) => {
+		it( `should update alpha correctly when ${ formatLabel } format is selected`, async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<ControlledColorPicker
+					onChange={ onChange }
+					enableAlpha
+					initialColor="#ffffff80"
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			expect( formatSelector ).toBeVisible();
+			await user.selectOptions( formatSelector, format );
+
+			const alphaInput = screen.getByRole( 'spinbutton', {
+				name: 'Alpha',
+			} );
+			expect( alphaInput ).toBeVisible();
+
+			const alphaSliders = screen.getAllByRole( 'slider', {
+				name: 'Alpha',
+			} );
+
+			expect( alphaSliders ).toHaveLength( 2 );
+
+			// Choose the second slider which is the actual slider of type: input[type="range"]
+			const alphaSlider = alphaSliders.at( -1 )!;
+
+			expect( alphaSlider ).toHaveValue( '50' );
+			expect( alphaInput ).toHaveValue( 50 );
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			// Test pattern 1: Update the slider
+			fireEvent.change( alphaSlider, {
+				target: { value: 75 },
+			} );
+
+			await waitFor( () => {
+				expect( onChange ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#ffffffbf' );
+			expect( alphaInput ).toHaveValue( 75 );
+			expect( alphaSlider ).toHaveValue( '75' );
+
+			onChange.mockClear();
+
+			// Test pattern 2: Update the alphaInput
+			await user.clear( alphaInput );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+
+			// Initially type 7 in the alpha input, we expect it to be called with #ffffff12
+			await user.keyboard( '7' );
+
+			// Now with 75% opacity we expect it to be called with #ffffffbf
+			await user.keyboard( '5' );
+
+			// Called twice, once per key stroke (`7` and `5`)
+			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenNthCalledWith( 2, '#ffffff12' );
+			expect( onChange ).toHaveBeenNthCalledWith( 3, '#ffffffbf' );
+
+			expect( alphaSlider ).toHaveValue( '75' );
+			expect( alphaInput ).toHaveValue( 75 );
 		} );
 	} );
 } );

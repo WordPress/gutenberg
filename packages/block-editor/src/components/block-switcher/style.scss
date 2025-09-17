@@ -129,7 +129,9 @@
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
 			border-radius: $radius-small;
-			transition: all 0.05s ease-in-out;
+			@media not ( prefers-reduced-motion ) {
+				transition: all 0.05s ease-in-out;
+			}
 			position: relative;
 			border: $border-width solid transparent;
 

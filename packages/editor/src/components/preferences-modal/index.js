@@ -88,7 +88,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showListViewByDefault"
 									help={ __(
-										'Opens the List View sidebar by default.'
+										'Opens the List View panel by default.'
 									) }
 									label={ __( 'Always open List View' ) }
 								/>

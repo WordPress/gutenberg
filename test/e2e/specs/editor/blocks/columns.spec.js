@@ -407,4 +407,73 @@ test.describe( 'Columns', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'Template Lock', () => {
+		for ( const templateLock of [ 'all', 'insert', 'contentOnly' ] ) {
+			test( `templateLock="${ templateLock }" should hide column count control`, async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/columns',
+					attributes: { templateLock },
+					innerBlocks: [
+						{
+							name: 'core/column',
+							innerBlocks: [
+								{
+									name: 'core/paragraph',
+									attributes: { content: 'Col 1' },
+								},
+							],
+						},
+					],
+				} );
+				await editor.openDocumentSettingsSidebar();
+
+				await expect(
+					page.getByRole( 'slider', { name: 'Columns' } )
+				).toBeHidden();
+			} );
+		}
+
+		test( 'templateLock=false should show column count control inside locked parent', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					templateLock: 'insert',
+					layout: { type: 'constrained' },
+				},
+				innerBlocks: [
+					{
+						name: 'core/columns',
+						attributes: { templateLock: false },
+						innerBlocks: [
+							{
+								name: 'core/column',
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Col 1' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByLabel( 'Block: Columns' )
+			);
+
+			await editor.openDocumentSettingsSidebar();
+
+			await expect(
+				page.getByRole( 'slider', { name: 'Columns' } )
+			).toBeVisible();
+		} );
+	} );
 } );

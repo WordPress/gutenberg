@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import Editor from '../editor';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
@@ -27,21 +28,40 @@ export const pagesRoute = {
 	name: 'pages',
 	path: '/page',
 	areas: {
-		sidebar: (
-			<SidebarNavigationScreen
-				title={ __( 'Pages' ) }
-				backPath="/"
-				content={ <DataViewsSidebarContent postType="page" /> }
-			/>
-		),
-		content: <PostList postType="page" />,
-		preview( { query } ) {
+		sidebar( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? (
+				<SidebarNavigationScreen
+					title={ __( 'Pages' ) }
+					backPath="/"
+					content={ <DataViewsSidebarContent postType="page" /> }
+				/>
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		content( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <PostList postType="page" /> : undefined;
+		},
+		preview( { query, siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
 			const isListView =
 				( query.layout === 'list' || ! query.layout ) &&
 				query.isCustom !== 'true';
 			return isListView ? <Editor /> : undefined;
 		},
-		mobile: <MobilePagesView />,
+		mobile( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? (
+				<MobilePagesView />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
 		edit( { query } ) {
 			const hasQuickEdit =
 				( query.layout ?? 'list' ) !== 'list' && !! query.quickEdit;

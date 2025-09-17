@@ -203,7 +203,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                 class="components-circular-option-picker"
               >
                 <div
-                  aria-label="Custom color picker."
+                  aria-label="Custom color picker"
                   id="components-circular-option-picker-0"
                   role="listbox"
                 >

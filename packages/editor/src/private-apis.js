@@ -23,7 +23,11 @@ import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
 } from './components/global-styles-provider';
-import { CreateTemplatePartModal } from '@wordpress/fields';
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
 import { getTemplateInfo } from './utils/get-template-info';
 
@@ -32,6 +36,8 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
 	BackButton,
 	EntitiesSavedStatesExtensible,
 	Editor,

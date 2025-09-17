@@ -79,10 +79,8 @@
 		background-color: var(--wp-admin-theme-color);
 		box-shadow: inset 0 0 0 $border-width $light-gray-placeholder;
 		color: $light-gray-placeholder;
-		transition: background-color 0.2s ease-in-out;
-
-		@media ( prefers-reduced-motion: reduce ) {
-			transition: none;
+		@media not ( prefers-reduced-motion ) {
+			transition: background-color 0.2s ease-in-out;
 		}
 	}
 }

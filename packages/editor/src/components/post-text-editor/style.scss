@@ -41,8 +41,6 @@ textarea.editor-post-text-editor {
 
 	&::-moz-placeholder {
 		color: $dark-gray-placeholder;
-		// Override Firefox default.
-		opacity: 1;
 	}
 
 	&:-ms-input-placeholder {

@@ -1,11 +1,14 @@
+@use "./mixins";
+@use "./functions";
+
 // It is important to include these styles in all built stylesheets.
 // This allows to CSS variables post CSS plugin to generate fallbacks.
 // It also provides default CSS variables for npm package consumers.
 :root {
-	@include admin-scheme(#007cba);
 	--wp-block-synced-color: #7a00df;
-	--wp-block-synced-color--rgb: #{hex-to-rgb(#7a00df)};
+	--wp-block-synced-color--rgb: #{functions.hex-to-rgb(#7a00df)};
 	// This CSS variable is not used in Gutenberg project,
 	// but is maintained for backwards compatibility.
 	--wp-bound-block-color: var(--wp-block-synced-color);
+	@include mixins.admin-scheme(#007cba);
 }

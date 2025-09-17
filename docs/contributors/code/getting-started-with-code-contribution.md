@@ -221,7 +221,7 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 ```json
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
 ```
 

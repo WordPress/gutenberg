@@ -7,6 +7,7 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalHStack as HStack,
+	withFilters,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
@@ -20,13 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-/**
- * A modal component that is displayed when a post is locked for editing by another user.
- * The modal provides information about the lock status and options to take over or exit the editor.
- *
- * @return {React.ReactNode} The rendered PostLockedModal component.
- */
-export default function PostLockedModal() {
+function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
@@ -277,3 +272,13 @@ export default function PostLockedModal() {
 		</Modal>
 	);
 }
+
+/**
+ * A modal component that is displayed when a post is locked for editing by another user.
+ * The modal provides information about the lock status and options to take over or exit the editor.
+ *
+ * @return {React.ReactNode} The rendered PostLockedModal component.
+ */
+export default globalThis.IS_GUTENBERG_PLUGIN
+	? withFilters( 'editor.PostLockedModal' )( PostLockedModal )
+	: PostLockedModal;

@@ -10,6 +10,11 @@ $swatch-gap: 12px;
 }
 
 .block-editor-color-gradient-control__fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	// Prevents the `fieldset` from growing beyond its parent's size
 	// in order to fit its content.
 	min-width: 0;
@@ -129,8 +134,9 @@ $swatch-gap: 12px;
 	top: $grid-unit;
 	margin: auto $grid-unit auto;
 	opacity: 0;
-	transition: opacity 0.1s ease-in-out;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
 
 	&.block-editor-panel-color-gradient-settings__reset {
 		border-radius: $radius-small;

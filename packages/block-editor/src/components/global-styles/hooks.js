@@ -32,6 +32,7 @@ const VALID_SETTINGS = [
 	'border.radius',
 	'border.style',
 	'border.width',
+	'border.radiusSizes',
 	'shadow.presets',
 	'shadow.defaultPresets',
 	'color.background',

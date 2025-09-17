@@ -166,7 +166,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 					),
 					'wp:theme-file' => array(
 						array(
-							'href'   => 'http://localhost:8889/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg',
+							'href'   => home_url( '/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg' ),
 							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
 							'target' => 'styles.background.backgroundImage.url',
 							'type'   => 'image/jpeg',

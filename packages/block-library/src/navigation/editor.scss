@@ -569,7 +569,7 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	// Ref - https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
 	height: $grid-unit-40 * 2 !important;
 
-	margin-bottom: $grid-unit-15;
+	grid-column: span 2;
 
 	&.open {
 		box-shadow: inset 0 0 0 $border-width $gray-200;
@@ -637,7 +637,11 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-left: 24px;
 }
 
-.wp-block-navigation__overlay-menu-icon-toggle-group {
-	// Counteract the margin added by the block inspector.
-	margin-bottom: $grid-unit-20;
+.editor-sidebar__panel .wp-block-navigation__submenu-header {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.wp-block-navigation__submenu-accessibility-notice {
+	grid-column: span 2;
 }
