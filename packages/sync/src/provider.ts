@@ -6,7 +6,13 @@ import * as Y from 'yjs';
 /**
  * Internal dependencies
  */
-import { CRDT_DOC_VERSION } from './config';
+import {
+	CRDT_DOC_VERSION,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_PERSISTED_AT_KEY,
+	LOCAL_ORIGINS,
+	LOCAL_SYNC_PROVIDER_ORIGIN,
+} from './config';
 import type {
 	ConnectDoc,
 	ConnectDocResult,
@@ -29,11 +35,6 @@ interface EntityState {
 	undoManager?: UndoManager;
 	ydoc: CRDTDoc;
 }
-
-const CRDT_STATE_MAP_KEY = 'state';
-const CRDT_STATE_PERSISTED_AT_KEY = 'persistedAt';
-
-const LOCAL_ORIGINS = [ 'gutenberg', 'syncProvider' ];
 
 export class SyncProvider {
 	private connectionCreators: ConnectDoc[];
@@ -78,7 +79,7 @@ export class SyncProvider {
 	): Promise< void > {
 		const objectId = syncConfig.getObjectId( record );
 		const objectType = syncConfig.objectType;
-		const ydoc = createYjsDoc( objectType );
+		const ydoc = createYjsDoc( { objectType } );
 		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
 
@@ -133,7 +134,7 @@ export class SyncProvider {
 			() => {
 				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
 			},
-			'syncProvider',
+			LOCAL_SYNC_PROVIDER_ORIGIN,
 			false
 		);
 	}
@@ -215,13 +216,15 @@ export class SyncProvider {
 		// IMPORTANT: We use a new Yjs document so that the initial state can be
 		// applied to the "real" Yjs document as a singular update. Therefore, we
 		// don't need to wrap the changes in a transaction.
-		const initialStateDoc = createYjsDoc( syncConfig.objectType );
+		const initialStateDoc = createYjsDoc( {
+			objectType: syncConfig.objectType,
+		} );
 
 		syncConfig.applyChangesToCRDTDoc(
 			initialStateDoc,
 			initialData,
 			record,
-			'syncProvider.getInitialCRDTDoc'
+			LOCAL_SYNC_PROVIDER_ORIGIN
 		);
 
 		return initialStateDoc;
@@ -382,7 +385,7 @@ export class SyncProvider {
 				const stateMap = ydoc.getMap( 'state' );
 				stateMap.set( CRDT_STATE_PERSISTED_AT_KEY, lastPersistedAt );
 			},
-			'syncProvider',
+			LOCAL_SYNC_PROVIDER_ORIGIN,
 			true
 		);
 	}

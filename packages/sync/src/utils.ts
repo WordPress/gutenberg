@@ -6,15 +6,18 @@ import * as Y from 'yjs';
 /**
  * Internal dependencies
  */
-import { CRDT_DOC_VERSION } from './config';
-import { type ObjectType } from './types';
+import { CRDT_DOC_VERSION, CRDT_STATE_MAP_KEY } from './config';
 
-export function createYjsDoc( objectType: ObjectType ): Y.Doc {
+export function createYjsDoc( documentMeta: Record< string, unknown > ): Y.Doc {
 	// Meta is not synced and does not get persisted with the document.
-	const meta = new Map< string, unknown >( [
-		[ 'objectType', objectType ],
-		[ 'version', CRDT_DOC_VERSION ],
-	] );
+	const metaMap = new Map< string, unknown >(
+		Object.entries( documentMeta )
+	);
 
-	return new Y.Doc( { meta } );
+	const ydoc = new Y.Doc( { meta: metaMap } );
+	const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+
+	stateMap.set( 'version', CRDT_DOC_VERSION );
+
+	return ydoc;
 }

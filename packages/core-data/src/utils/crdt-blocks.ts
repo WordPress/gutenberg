@@ -184,7 +184,7 @@ function createNewYBlock( block: Block ): YBlock {
  *
  * @param yblocks        The blocks in the local Y.Doc.
  * @param incomingBlocks Gutenberg blocks being synced.
- * @param _origin        The origin of the sync, either 'syncProvider.getInitialCRDTDoc' or 'gutenberg'.
+ * @param _origin        The origin of the sync, either 'syncProvider' or 'gutenberg'.
  */
 export function mergeCrdtBlocks(
 	yblocks: Y.Array< YBlock >, // yblocks represent the blocks in the local Y.Doc
