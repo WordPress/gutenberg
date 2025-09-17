@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Icon,
+	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -16,15 +20,40 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { EditorProvider } from '@wordpress/editor';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useAddedBy } from './hooks';
+import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { Badge } = unlock( componentsPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
+
+function useAllDefaultTemplateTypes() {
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const { records: staticRecords } = useEntityRecordsWithPermissions(
+		'postType',
+		'wp_registered_template',
+		{ per_page: -1 }
+	);
+	return [
+		...defaultTemplateTypes,
+		...staticRecords
+			?.filter( ( record ) => ! record.is_custom )
+			.map( ( record ) => {
+				return {
+					slug: record.slug,
+					title: record.title.rendered,
+					description: record.description,
+				};
+			} ),
+	];
+}
 
 function PreviewField( { item } ) {
 	const settings = usePatternSettings();
@@ -68,8 +97,14 @@ export const previewField = {
 export const descriptionField = {
 	label: __( 'Description' ),
 	id: 'description',
-	render: ( { item } ) => {
-		return item.description && decodeEntities( item.description );
+	render: function RenderDescription( { item } ) {
+		const defaultTemplateTypes = useAllDefaultTemplateTypes();
+		const defaultTemplateType = defaultTemplateTypes.find(
+			( type ) => type.slug === item.slug
+		);
+		return item.description
+			? decodeEntities( item.description )
+			: defaultTemplateType?.description;
 	},
 	enableSorting: false,
 	enableGlobalSearch: true,
@@ -107,6 +142,37 @@ function AuthorField( { item } ) {
 export const authorField = {
 	label: __( 'Author' ),
 	id: 'author',
-	getValue: ( { item } ) => item.author_text,
+	getValue: ( { item } ) => item.author_text ?? item.author,
 	render: AuthorField,
+};
+
+export const activeField = {
+	label: __( 'Status' ),
+	id: 'active',
+	getValue: ( { item } ) => item._isActive,
+	render: function Render( { item } ) {
+		const isActive = item._isActive;
+		return (
+			<Badge intent={ isActive ? 'success' : 'default' }>
+				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
+			</Badge>
+		);
+	},
+};
+
+export const slugField = {
+	label: __( 'Template Type' ),
+	id: 'slug',
+	getValue: ( { item } ) => item.slug,
+	render: function Render( { item } ) {
+		const defaultTemplateTypes = useAllDefaultTemplateTypes();
+		const defaultTemplateType = defaultTemplateTypes.find(
+			( type ) => type.slug === item.slug
+		);
+		return (
+			defaultTemplateType?.title ||
+			// translators: %s is the slug of a custom template.
+			__( 'Custom' )
+		);
+	},
 };

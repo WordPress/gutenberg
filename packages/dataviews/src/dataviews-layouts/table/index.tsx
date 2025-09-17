@@ -40,6 +40,7 @@ import type { SetSelection } from '../../private-types';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -70,6 +71,7 @@ interface TableRowProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
+	posinset?: number;
 }
 
 function TableColumnField< Item >( {
@@ -114,11 +116,18 @@ function TableRow< Item >( {
 	renderItemLink,
 	onChangeSelection,
 	isActionsColumnSticky,
+	posinset,
 }: TableRowProps< Item > ) {
+	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const handleMouseEnter = () => {
 		setIsHovered( true );
 	};
@@ -148,6 +157,11 @@ function TableRow< Item >( {
 			onTouchStart={ () => {
 				isTouchDeviceRef.current = true;
 			} }
+			aria-setsize={
+				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+			}
+			aria-posinset={ posinset }
+			role={ infiniteScrollEnabled ? 'article' : undefined }
 			onClick={ ( event ) => {
 				if ( ! hasPossibleBulkAction ) {
 					return;
@@ -323,22 +337,10 @@ function ViewTable< Item >( {
 		( field ) => field.id === view.descriptionField
 	);
 
-	// Get group field if groupByField is specified
 	const groupField = view.groupByField
 		? fields.find( ( f ) => f.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -356,6 +358,7 @@ function ViewTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
 	return (
 		<>
@@ -369,6 +372,7 @@ function ViewTable< Item >( {
 				} ) }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
+				role={ isInfiniteScroll ? 'feed' : undefined }
 			>
 				<thead>
 					<tr className="dataviews-view-table__row">
@@ -434,6 +438,9 @@ function ViewTable< Item >( {
 										onChangeView={ onChangeView }
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
+										canMove={
+											view.layout?.enableMoving ?? true
+										}
 									/>
 								</th>
 							);
@@ -545,6 +552,9 @@ function ViewTable< Item >( {
 									isActionsColumnSticky={
 										! isHorizontalScrollEnd
 									}
+									posinset={
+										isInfiniteScroll ? index + 1 : undefined
+									}
 								/>
 							) ) }
 					</tbody>
@@ -557,7 +567,19 @@ function ViewTable< Item >( {
 				} ) }
 				id={ tableNoticeId }
 			>
-				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
+				{ ! hasData &&
+					( isLoading ? (
+						<p>
+							<Spinner />
+						</p>
+					) : (
+						empty
+					) ) }
+				{ hasData && isLoading && (
+					<p className="dataviews-loading-more">
+						<Spinner />
+					</p>
+				) }
 			</div>
 		</>
 	);

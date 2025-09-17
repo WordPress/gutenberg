@@ -25,8 +25,10 @@ export type Theme = {
 
 export type SpaceObject = {
 	id: number;
-	title: string;
-	description: string;
+	name: {
+		title: string;
+		description: string;
+	};
 	image: string;
 	type: string;
 	isPlanet: boolean;
@@ -40,9 +42,11 @@ export type SpaceObject = {
 export const data: SpaceObject[] = [
 	{
 		id: 1,
-		title: 'Moon',
-		description:
-			'The Moon is Earth’s only natural satellite, orbiting at an average distance of 384,400 kilometers with a synchronous rotation that leads to fixed lunar phases as seen from Earth. Its cratered surface and subtle glow define night skies, inspiring exploration missions and influencing tides and biological rhythms worldwide.',
+		name: {
+			title: 'Moon',
+			description:
+				"The Moon is Earth's only natural satellite, orbiting at an average distance of 384,400 kilometers with a synchronous rotation that leads to fixed lunar phases as seen from Earth. Its cratered surface and subtle glow define night skies, inspiring exploration missions and influencing tides and biological rhythms worldwide.",
+		},
 		image: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		type: 'Satellite',
 		isPlanet: false,
@@ -54,8 +58,10 @@ export const data: SpaceObject[] = [
 	},
 	{
 		id: 2,
-		title: 'Io',
-		description: 'Moon of Jupiter',
+		name: {
+			title: 'Io',
+			description: 'Moon of Jupiter',
+		},
 		image: 'https://live.staticflickr.com/5482/9460973502_07e8ab81fe_z.jpg',
 		type: 'Satellite',
 		isPlanet: false,
@@ -67,8 +73,10 @@ export const data: SpaceObject[] = [
 	},
 	{
 		id: 3,
-		title: 'Europa',
-		description: 'Moon of Jupiter',
+		name: {
+			title: 'Europa',
+			description: 'Moon of Jupiter',
+		},
 		image: 'https://live.staticflickr.com/65535/31499273012_baf5f38cc1_z.jpg',
 		type: 'Satellite',
 		isPlanet: false,
@@ -80,8 +88,70 @@ export const data: SpaceObject[] = [
 	},
 	{
 		id: 4,
-		title: 'Neptune',
-		description: 'Ice giant in the Solar system',
+		name: {
+			title: 'Ganymede',
+			description: 'Largest moon of Jupiter',
+		},
+		image: 'https://live.staticflickr.com/7816/33436473218_a836235935_k.jpg',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Jupiter', 'Moon' ],
+		satellites: 0,
+		date: '2022-01-04',
+		datetime: '2022-01-04T12:30:00Z',
+		email: 'ganymede@example.com',
+	},
+	{
+		id: 5,
+		name: {
+			title: 'Callisto',
+			description: 'Outermost Galilean moon of Jupiter',
+		},
+		image: 'https://live.staticflickr.com/804/27604150528_4512448a9c_c.jpg',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Jupiter', 'Moon' ],
+		satellites: 0,
+		date: '2021-01-05',
+		datetime: '2021-01-05T14:15:30Z',
+		email: 'callisto@example.com',
+	},
+	{
+		id: 6,
+		name: {
+			title: 'Amalthea',
+			description: 'Small irregular moon of Jupiter',
+		},
+		image: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Amalthea.gif',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Jupiter', 'Moon' ],
+		satellites: 0,
+		date: '2020-01-06',
+		datetime: '2020-01-06T10:45:15Z',
+		email: 'amalthea@example.com',
+	},
+	{
+		id: 7,
+		name: {
+			title: 'Himalia',
+			description: 'Largest irregular moon of Jupiter',
+		},
+		image: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Cassini-Huygens_Image_of_Himalia.png',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Jupiter', 'Moon' ],
+		satellites: 0,
+		date: '2019-01-07',
+		datetime: '2019-01-07T16:20:45Z',
+		email: 'himalia@example.com',
+	},
+	{
+		id: 8,
+		name: {
+			title: 'Neptune',
+			description: 'Ice giant in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/65535/29523683990_000ff4720c_z.jpg',
 		type: 'Ice giant',
 		isPlanet: true,
@@ -92,9 +162,56 @@ export const data: SpaceObject[] = [
 		email: 'neptune@example.com',
 	},
 	{
-		id: 5,
-		title: 'Mercury',
-		description: 'Terrestrial planet in the Solar system',
+		id: 9,
+		name: {
+			title: 'Triton',
+			description: 'Largest moon of Neptune',
+		},
+		image: 'https://live.staticflickr.com/65535/50728384241_02c5126c30_h.jpg',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Neptune', 'Moon' ],
+		satellites: 0,
+		date: '2021-02-01',
+		datetime: '2021-02-01T11:30:00Z',
+		email: 'triton@example.com',
+	},
+	{
+		id: 10,
+		name: {
+			title: 'Nereid',
+			description: 'Irregular moon of Neptune',
+		},
+		image: 'https://upload.wikimedia.org/wikipedia/commons/b/b0/Nereid-Voyager2.jpg',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Neptune', 'Moon' ],
+		satellites: 0,
+		date: '2020-02-02',
+		datetime: '2020-02-02T15:45:30Z',
+		email: 'nereid@example.com',
+	},
+	{
+		id: 11,
+		name: {
+			title: 'Proteus',
+			description: 'Second-largest moon of Neptune',
+		},
+		image: 'https://live.staticflickr.com/65535/50727825808_bf427e007b_c.jpg',
+		type: 'Satellite',
+		isPlanet: false,
+		categories: [ 'Solar system', 'Satellite', 'Neptune', 'Moon' ],
+		satellites: 0,
+		date: '2019-02-03',
+		datetime: '2019-02-03T09:20:15Z',
+		email: 'proteus@example.com',
+	},
+	{
+		id: 12,
+		name: {
+			title: 'Mercury',
+			description: 'Terrestrial planet in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/813/40199101735_e5e92ffd11_z.jpg',
 		type: 'Terrestrial',
 		isPlanet: true,
@@ -105,9 +222,11 @@ export const data: SpaceObject[] = [
 		email: 'mercury@example.com',
 	},
 	{
-		id: 6,
-		title: 'Venus',
-		description: 'La planète Vénus',
+		id: 13,
+		name: {
+			title: 'Venus',
+			description: 'La planète Vénus',
+		},
 		image: 'https://live.staticflickr.com/8025/7544560662_900e717727_z.jpg',
 		type: 'Terrestrial',
 		isPlanet: true,
@@ -118,9 +237,11 @@ export const data: SpaceObject[] = [
 		email: 'venus@example.com',
 	},
 	{
-		id: 7,
-		title: 'Earth',
-		description: 'Terrestrial planet in the Solar system',
+		id: 14,
+		name: {
+			title: 'Earth',
+			description: 'Terrestrial planet in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/3762/9460163562_964fe6af07_z.jpg',
 		type: 'Terrestrial',
 		isPlanet: true,
@@ -131,9 +252,11 @@ export const data: SpaceObject[] = [
 		email: 'earth@example.com',
 	},
 	{
-		id: 8,
-		title: 'Mars',
-		description: 'Terrestrial planet in the Solar system',
+		id: 15,
+		name: {
+			title: 'Mars',
+			description: 'Terrestrial planet in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/8151/7651156426_e047f4d219_z.jpg',
 		type: 'Terrestrial',
 		isPlanet: true,
@@ -144,9 +267,11 @@ export const data: SpaceObject[] = [
 		email: 'mars@example.com',
 	},
 	{
-		id: 9,
-		title: 'Jupiter',
-		description: 'Gas giant in the Solar system',
+		id: 16,
+		name: {
+			title: 'Jupiter',
+			description: 'Gas giant in the Solar system',
+		},
 		image: 'https://staging-jubilee.flickr.com/2853/9458010071_6e6fc41408_z.jpg',
 		type: 'Gas giant',
 		isPlanet: true,
@@ -157,9 +282,11 @@ export const data: SpaceObject[] = [
 		email: 'jupiter@example.com',
 	},
 	{
-		id: 10,
-		title: 'Saturn',
-		description: 'Gas giant in the Solar system',
+		id: 17,
+		name: {
+			title: 'Saturn',
+			description: 'Gas giant in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/5524/9464658509_fc2d83dff5_z.jpg',
 		type: 'Gas giant',
 		isPlanet: true,
@@ -170,9 +297,11 @@ export const data: SpaceObject[] = [
 		email: 'saturn@example.com',
 	},
 	{
-		id: 11,
-		title: 'Uranus',
-		description: 'Ice giant in the Solar system',
+		id: 18,
+		name: {
+			title: 'Uranus',
+			description: 'Ice giant in the Solar system',
+		},
 		image: 'https://live.staticflickr.com/65535/5553350875_3072df91e2_c.jpg',
 		type: 'Ice giant',
 		isPlanet: true,
@@ -631,7 +760,7 @@ export const actions: Action< SpaceObject >[] = [
 			return (
 				<VStack spacing="5">
 					<Text>
-						{ `Are you sure you want to delete "${ items[ 0 ].title }"?` }
+						{ `Are you sure you want to delete "${ items[ 0 ].name.title }"?` }
 					</Text>
 					<HStack justify="right">
 						<Button
@@ -681,11 +810,20 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Title',
 		id: 'title',
 		type: 'text',
-		enableHiding: false,
+		enableHiding: true,
 		enableGlobalSearch: true,
 		filterBy: {
 			operators: [ 'contains', 'notContains', 'startsWith' ],
 		},
+		isValid: {
+			required: true,
+		},
+		getValue: ( { item } ) => item.name.title,
+		setValue: ( { value } ) => ( {
+			name: {
+				title: value,
+			},
+		} ),
 	},
 	{
 		id: 'date',
@@ -715,6 +853,9 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'isPlanet',
 		label: 'Is Planet',
 		type: 'boolean',
+		setValue: ( { value } ) => ( {
+			isPlanet: value === 'true',
+		} ),
 		elements: [
 			{ value: true, label: 'True' },
 			{ value: false, label: 'False' },
@@ -732,7 +873,15 @@ export const fields: Field< SpaceObject >[] = [
 		type: 'text',
 		enableSorting: false,
 		enableGlobalSearch: true,
-		filterBy: false,
+		filterBy: {
+			operators: [ 'contains', 'notContains', 'startsWith' ],
+		},
+		getValue: ( { item } ) => item.name.description,
+		setValue: ( { value } ) => ( {
+			name: {
+				description: value,
+			},
+		} ),
 	},
 	{
 		label: 'Email',

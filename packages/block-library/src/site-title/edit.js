@@ -16,6 +16,8 @@ import {
 	BlockControls,
 	useBlockProps,
 	HeadingLevelDropdown,
+	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -36,9 +38,11 @@ export default function SiteTitleEdit( {
 	insertBlocksAfter,
 } ) {
 	const { level, levelOptions, textAlign, isLink, linkTarget } = attributes;
-	const { canUserEdit, title } = useSelect( ( select ) => {
+	const { canUserEdit, title, isNavigationMode } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
+		const { isNavigationMode: _isNavigationMode } =
+			select( blockEditorStore );
 		const canEdit = canUser( 'update', {
 			kind: 'root',
 			name: 'site',
@@ -49,10 +53,12 @@ export default function SiteTitleEdit( {
 		return {
 			canUserEdit: canEdit,
 			title: canEdit ? settings?.title : readOnlySettings?.name,
+			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockEditingMode = useBlockEditingMode();
 
 	function setTitle( newTitle ) {
 		editEntityRecord( 'root', 'site', undefined, {
@@ -103,21 +109,23 @@ export default function SiteTitleEdit( {
 	);
 	return (
 		<>
-			<BlockControls group="block">
-				<HeadingLevelDropdown
-					value={ level }
-					options={ levelOptions }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
+			{ ! isNavigationMode && blockEditingMode === 'default' && (
+				<BlockControls group="block">
+					<HeadingLevelDropdown
+						value={ level }
+						options={ levelOptions }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }

@@ -19,7 +19,7 @@ test.describe( 'Site editor title', () => {
 		// Navigate to a template.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_template',
+			postType: 'wp_registered_template',
 			canvas: 'edit',
 		} );
 		const title = page

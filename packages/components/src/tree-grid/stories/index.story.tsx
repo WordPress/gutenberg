@@ -16,14 +16,15 @@ import { Button } from '../../button';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof TreeGrid > = {
-	title: 'Components (Experimental)/Navigation/TreeGrid',
-	id: 'components-experimental-treegrid',
+	title: 'Components/Navigation/TreeGrid',
+	id: 'components-treegrid',
 	component: TreeGrid,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: false },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },

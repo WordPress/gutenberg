@@ -16,7 +16,8 @@ type Value = ToggleGroupControlProps[ 'value' ];
 const UnforwardedValidatedToggleGroupControl = (
 	{
 		required,
-		customValidator,
+		onValidate,
+		customValidity,
 		onChange,
 		markWhenOptional,
 		...restProps
@@ -37,17 +38,16 @@ const UnforwardedValidatedToggleGroupControl = (
 			<ControlWithError
 				required={ required }
 				markWhenOptional={ markWhenOptional }
-				customValidator={ () => {
-					return customValidator?.( valueRef.current );
+				onValidate={ () => {
+					return onValidate?.( valueRef.current );
 				} }
+				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
 				<ToggleGroupControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					ref={ forwardedRef }
-					// TODO: Upstream limitation - In uncontrolled mode, starting from an undefined value then
-					// setting a value has a visual bug.
 					onChange={ ( value ) => {
 						valueRef.current = value;
 						onChange?.( value );
@@ -60,7 +60,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				type="radio"
 				ref={ validityTargetRef }
 				required={ required }
-				checked={ restProps.value !== null }
+				checked={ restProps.value !== undefined }
 				tabIndex={ -1 }
 				// A name attribute is needed for the `required` behavior to work.
 				name={ nameAttr }

@@ -13,6 +13,7 @@ import {
 	Spinner,
 	Flex,
 	FlexItem,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -39,7 +40,9 @@ import type {
 } from '../../types';
 import type { SetSelection } from '../../private-types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface GridItemProps< Item > {
 	view: ViewGridType;
@@ -64,6 +67,7 @@ interface GridItemProps< Item > {
 	config: {
 		sizes: string;
 	};
+	posinset?: number;
 }
 
 function GridItem< Item >( {
@@ -83,8 +87,14 @@ function GridItem< Item >( {
 	badgeFields,
 	hasBulkActions,
 	config,
+	posinset,
 }: GridItemProps< Item > ) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const instanceId = useInstanceId( GridItem );
@@ -100,6 +110,7 @@ function GridItem< Item >( {
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
+	const shouldRenderMedia = showMedia && renderedMediaField;
 
 	let mediaA11yProps;
 	let titleA11yProps;
@@ -117,6 +128,7 @@ function GridItem< Item >( {
 			};
 		}
 	}
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	return (
 		<VStack
@@ -139,8 +151,13 @@ function GridItem< Item >( {
 					);
 				}
 			} }
+			role={ infiniteScrollEnabled ? 'article' : undefined }
+			aria-setsize={
+				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+			}
+			aria-posinset={ posinset }
 		>
-			{ showMedia && renderedMediaField && (
+			{ shouldRenderMedia && (
 				<ItemClickWrapper
 					item={ item }
 					isItemClickable={ isItemClickable }
@@ -152,7 +169,7 @@ function GridItem< Item >( {
 					{ renderedMediaField }
 				</ItemClickWrapper>
 			) }
-			{ hasBulkActions && showMedia && renderedMediaField && (
+			{ hasBulkActions && shouldRenderMedia && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -162,24 +179,35 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
-			>
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__title-field dataviews-title-field"
-					{ ...titleA11yProps }
-				>
-					{ renderedTitleField }
-				</ItemClickWrapper>
-				{ !! actions?.length && (
+			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
-				) }
-			</HStack>
+				</div>
+			) }
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<ItemClickWrapper
+						item={ item }
+						isItemClickable={ isItemClickable }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						className="dataviews-view-grid__title-field dataviews-title-field"
+						{ ...titleA11yProps }
+					>
+						{ renderedTitleField }
+					</ItemClickWrapper>
+					{ !! actions?.length && (
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					) }
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
@@ -227,9 +255,11 @@ function GridItem< Item >( {
 									direction="row"
 								>
 									<>
-										<FlexItem className="dataviews-view-grid__field-name">
-											{ field.header }
-										</FlexItem>
+										<Tooltip text={ field.label }>
+											<FlexItem className="dataviews-view-grid__field-name">
+												{ field.header }
+											</FlexItem>
+										</Tooltip>
 										<FlexItem
 											className="dataviews-view-grid__field-value"
 											style={ { maxHeight: 'none' } }
@@ -309,18 +339,8 @@ function ViewGrid< Item >( {
 	const groupField = view.groupByField
 		? fields.find( ( f ) => f.id === view.groupByField )
 		: null;
-
-	// Group data by groupByField if specified
-	const dataByGroup = groupField
-		? data.reduce( ( groups: Map< string, typeof data >, item ) => {
-				const groupName = groupField.getValue( { item } );
-				if ( ! groups.has( groupName ) ) {
-					groups.set( groupName, [] );
-				}
-				groups.get( groupName )?.push( item );
-				return groups;
-		  }, new Map< string, typeof data >() )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 
 	return (
 		<>
@@ -339,16 +359,12 @@ function ViewGrid< Item >( {
 											groupName
 										) }
 									</h3>
-									<div
+									<GridItems
 										className={ clsx(
 											'dataviews-view-grid',
 											className
 										) }
-										style={ {
-											gridTemplateColumns:
-												usedPreviewSize &&
-												`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-										} }
+										previewSize={ usedPreviewSize }
 										aria-busy={ isLoading }
 										ref={ resizeObserverRef }
 									>
@@ -389,7 +405,7 @@ function ViewGrid< Item >( {
 												/>
 											);
 										} ) }
-									</div>
+									</GridItems>
 								</VStack>
 							)
 						) }
@@ -400,17 +416,14 @@ function ViewGrid< Item >( {
 			{
 				// Render a single grid with all data.
 				hasData && ! dataByGroup && (
-					<div
+					<GridItems
 						className={ clsx( 'dataviews-view-grid', className ) }
-						style={ {
-							gridTemplateColumns:
-								usedPreviewSize &&
-								`repeat(auto-fill, minmax(${ usedPreviewSize }px, 1fr))`,
-						} }
+						previewSize={ usedPreviewSize }
 						aria-busy={ isLoading }
 						ref={ resizeObserverRef }
+						role={ isInfiniteScroll ? 'feed' : undefined }
 					>
-						{ data.map( ( item ) => {
+						{ data.map( ( item, index ) => {
 							return (
 								<GridItem
 									key={ getItemId( item ) }
@@ -432,10 +445,13 @@ function ViewGrid< Item >( {
 									config={ {
 										sizes: size,
 									} }
+									posinset={
+										isInfiniteScroll ? index + 1 : undefined
+									}
 								/>
 							);
 						} ) }
-					</div>
+					</GridItems>
 				)
 			}
 			{
@@ -447,10 +463,21 @@ function ViewGrid< Item >( {
 							'dataviews-no-results': ! isLoading,
 						} ) }
 					>
-						<p>{ isLoading ? <Spinner /> : empty }</p>
+						{ isLoading ? (
+							<p>
+								<Spinner />
+							</p>
+						) : (
+							empty
+						) }
 					</div>
 				)
 			}
+			{ hasData && isLoading && (
+				<p className="dataviews-loading-more">
+					<Spinner />
+				</p>
+			) }
 		</>
 	);
 }

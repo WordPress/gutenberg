@@ -89,7 +89,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
 			} );
 		} );
 
@@ -101,7 +101,19 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
+			} );
+		} );
+
+		it( 'should fold boolean uniqueByBlock option into an object', () => {
+			const clientId = 'myclientid';
+			const attributes = {};
+			const result = updateBlockAttributes( clientId, attributes, true );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ clientId ],
+				attributes,
+				options: { uniqueByBlock: true },
 			} );
 		} );
 	} );

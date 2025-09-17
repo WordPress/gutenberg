@@ -17,12 +17,25 @@ export const Wrapper = styled.div`
 `;
 
 export const Navigator = styled( HStack )`
+	column-gap: ${ space( 2 ) };
+	display: grid;
+	grid-template-columns: 0.5fr repeat( 5, 1fr ) 0.5fr;
+	justify-items: center;
 	margin-bottom: ${ space( 4 ) };
+`;
+
+export const ViewPreviousMonthButton = styled( Button )`
+	grid-column: 1 / 2;
+`;
+
+export const ViewNextMonthButton = styled( Button )`
+	grid-column: 7 / 8;
 `;
 
 export const NavigatorHeading = styled( Heading )`
 	font-size: ${ CONFIG.fontSize };
 	font-weight: ${ CONFIG.fontWeight };
+	grid-column: 2 / 7;
 
 	strong {
 		font-weight: ${ CONFIG.fontWeightHeading };
@@ -41,14 +54,6 @@ export const DayOfWeek = styled.div`
 	color: ${ COLORS.theme.gray[ 700 ] };
 	font-size: ${ CONFIG.fontSize };
 	line-height: ${ CONFIG.fontLineHeightBase };
-
-	&:nth-of-type( 1 ) {
-		justify-self: start;
-	}
-
-	&:nth-of-type( 7 ) {
-		justify-self: end;
-	}
 `;
 
 export const DayButton = styled( Button, {
@@ -63,18 +68,6 @@ export const DayButton = styled( Button, {
 	grid-column: ${ ( props ) => props.column };
 	position: relative;
 	justify-content: center;
-
-	${ ( props ) =>
-		props.column === 1 &&
-		`
-		justify-self: start;
-		` }
-
-	${ ( props ) =>
-		props.column === 7 &&
-		`
-		justify-self: end;
-		` }
 
 	${ ( props ) =>
 		props.disabled &&
