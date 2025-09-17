@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	Icon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
@@ -14,14 +13,15 @@ import {
 	image as imageIcon,
 	media as mediaIcon,
 	video as videoIcon,
-	lineSolid,
 } from '@wordpress/icons';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import MediaUpload from '../../media-upload';
+import MediaReplaceFlow from '../../media-replace-flow';
 import MediaUploadCheck from '../../media-upload/check';
+import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 
 function MediaThumbnail( { control, attributeValues } ) {
 	const { allowedTypes, multiple } = control.args;
@@ -84,6 +84,9 @@ export default function Media( {
 	attributeValues,
 	updateAttributes,
 } ) {
+	const { popoverProps } = useInspectorPopoverPlacement( {
+		isControl: true,
+	} );
 	const typeKey = control.mapping.type;
 	const idKey = control.mapping.id;
 	const srcKey = control.mapping.src;
@@ -91,6 +94,7 @@ export default function Media( {
 	const altKey = control.mapping.alt;
 	const posterKey = control.mapping.poster;
 
+	const id = attributeValues[ idKey ];
 	const src = attributeValues[ srcKey ];
 	const caption = attributeValues[ captionKey ];
 	const alt = attributeValues[ altKey ];
@@ -135,7 +139,16 @@ export default function Media( {
 				} }
 				isShownByDefault={ control.shownByDefault }
 			>
-				<MediaUpload
+				<MediaReplaceFlow
+					className="block-editor-content-only-controls__media-replace-flow"
+					allowedTypes={ control.args.allowedTypes }
+					mediaId={ id }
+					mediaURL={ srcKey }
+					multiple={ control.args.multiple }
+					popoverProps={ popoverProps }
+					onReset={ () => {
+						updateAttributes( defaultValues );
+					} }
 					onSelect={ ( selectedMedia ) => {
 						if ( selectedMedia.id && selectedMedia.url ) {
 							const optionalAttributes = {};
@@ -169,76 +182,64 @@ export default function Media( {
 							} );
 						}
 					} }
-					allowedTypes={ control.args.allowedTypes }
-					multiple={ control.args.multiple }
-					render={ ( { open } ) => {
-						return (
-							<div className="block-editor-content-only-controls__media">
-								<div
-									role="button"
-									tabIndex={ -1 }
-									onClick={ () => {
-										open();
-									} }
-									onKeyDown={ open }
+					renderToggle={ ( buttonProps ) => (
+						<div className="block-editor-content-only-controls__media">
+							<div
+								role="button"
+								tabIndex={ -1 }
+								{ ...buttonProps }
+								onKeyDown={ ( event ) => {
+									const { keyCode } = event;
+
+									if (
+										keyCode === ENTER ||
+										keyCode === SPACE
+									) {
+										buttonProps.onClick();
+									}
+								} }
+							>
+								<Grid
+									rowGap={ 0 }
+									columnGap={ 8 }
+									templateColumns="24px 1fr"
+									className="block-editor-content-only-controls__media-row"
 								>
-									<Grid
-										rowGap={ 0 }
-										columnGap={ 8 }
-										templateColumns="24px 1fr 24px"
-										className="block-editor-content-only-controls__media-row"
-									>
-										{ src && (
-											<>
-												<MediaThumbnail
-													control={ control }
-													attributeValues={
-														attributeValues
-													}
-												/>
-												<span className="block-editor-content-only-controls__media-title">
-													{
-														// TODO - use media title instead of src.
-														// TODO - truncate to show filename when there's no title.
-														src
-													}
-												</span>
-											</>
-										) }
-										{ ! src && (
-											<>
-												<span
-													className="block-editor-content-only-controls__media-placeholder"
-													style={ {
-														width: '24px',
-														height: '24px',
-													} }
-												/>
-												<span className="block-editor-content-only-controls__media-title">
-													{ chooseItemLabel }
-												</span>
-											</>
-										) }
-										{ src && (
-											<>
-												<Button
-													size="small"
-													className="block-editor-content-only-controls__remove-button"
-													icon={ lineSolid }
-													onClick={ ( event ) => {
-														event.stopPropagation();
-														updateAttributes(
-															defaultValues
-														);
-													} }
-												/>
-											</>
-										) }
-									</Grid>
-								</div>
+									{ src && (
+										<>
+											<MediaThumbnail
+												control={ control }
+												attributeValues={
+													attributeValues
+												}
+											/>
+											<span className="block-editor-content-only-controls__media-title">
+												{
+													// TODO - use media title instead of src.
+													// TODO - truncate to show filename when there's no title.
+													src
+												}
+											</span>
+										</>
+									) }
+									{ ! src && (
+										<>
+											<span
+												className="block-editor-content-only-controls__media-placeholder"
+												style={ {
+													width: '24px',
+													height: '24px',
+												} }
+											/>
+											<span className="block-editor-content-only-controls__media-title">
+												{ chooseItemLabel }
+											</span>
+										</>
+									) }
+								</Grid>
 							</div>
-						);
-					} }
+						</div>
+					) }
 				/>
 			</ToolsPanelItem>
 		</MediaUploadCheck>
