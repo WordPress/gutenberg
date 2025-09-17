@@ -87,18 +87,6 @@ function StyleInspectorSlots( {
 	);
 }
 
-function ContentPanel( { contentClientIds } ) {
-	if ( ! contentClientIds || contentClientIds.length === 0 ) {
-		return null;
-	}
-
-	return (
-		<PanelBody title={ __( 'Content' ) }>
-			<BlockQuickNavigation clientIds={ contentClientIds } />
-		</PanelBody>
-	);
-}
-
 function BlockInspector() {
 	const {
 		selectedBlockCount,
@@ -327,7 +315,13 @@ const BlockInspectorSingleBlock = ( {
 						<BlockStylesPanel clientId={ clientId } />
 					) }
 
-					<ContentPanel contentClientIds={ contentClientIds } />
+					{ contentClientIds && contentClientIds.length > 0 && (
+						<PanelBody title={ __( 'Content' ) }>
+							<BlockQuickNavigation
+								clientIds={ contentClientIds }
+							/>
+						</PanelBody>
+					) }
 
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
