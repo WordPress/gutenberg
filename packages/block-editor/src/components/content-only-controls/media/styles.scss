@@ -9,6 +9,11 @@
 	}
 }
 
+.block-editor-content-only-controls__media-replace-flow {
+	// Required, otherwise the width collapses.
+	display: block;
+}
+
 .block-editor-content-only-controls__media-row {
 	align-items: center;
 }

@@ -11,6 +11,7 @@ import {
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { lineSolid, link } from '@wordpress/icons';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 
 /**
@@ -130,7 +131,13 @@ export default function Link( {
 					onClick={ () => {
 						setIsLinkControlOpen( true );
 					} }
-					onKeyDown={ () => setIsLinkControlOpen( true ) }
+					onKeyDown={ ( event ) => {
+						const { keyCode } = event;
+
+						if ( keyCode === ENTER || keyCode === SPACE ) {
+							setIsLinkControlOpen( true );
+						}
+					} }
 				>
 					<Grid
 						rowGap={ 0 }
