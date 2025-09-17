@@ -682,8 +682,7 @@ export const saveEntityRecord =
 							...edits.meta,
 							...( await getSyncProvider().createEntityMeta(
 								entityConfig.syncConfig,
-								persistedRecord,
-								edits
+								{ ...persistedRecord, ...edits }
 							) ),
 						};
 					}
