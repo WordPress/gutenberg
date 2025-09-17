@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/priority-queue",
-	"version": "3.30.0",
+	"version": "3.30.1-next.a730c9c8c.0",
 	"description": "Generic browser priority queue.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
