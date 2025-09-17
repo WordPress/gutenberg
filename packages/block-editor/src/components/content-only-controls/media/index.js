@@ -84,6 +84,7 @@ export default function Media( {
 	attributeValues,
 	updateAttributes,
 } ) {
+	const typeKey = control.mapping.type;
 	const idKey = control.mapping.id;
 	const srcKey = control.mapping.src;
 	const captionKey = control.mapping.caption;
@@ -138,6 +139,11 @@ export default function Media( {
 					onSelect={ ( selectedMedia ) => {
 						if ( selectedMedia.id && selectedMedia.url ) {
 							const optionalAttributes = {};
+
+							if ( typeKey && selectedMedia.type ) {
+								optionalAttributes[ typeKey ] =
+									selectedMedia.type;
+							}
 
 							if (
 								captionKey &&
