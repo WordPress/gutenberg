@@ -110,6 +110,11 @@ export type FontSize = {
 		min?: string | number;
 		max?: string | number;
 	};
+	/**
+	 * The `hint` property is an optional string that provides additional information
+	 * about the font size, such as fluid typography ranges or custom descriptions.
+	 */
+	hint?: string;
 };
 
 export type FontSizePickerSelectProps = Pick<

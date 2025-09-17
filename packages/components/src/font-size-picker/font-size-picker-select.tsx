@@ -16,7 +16,7 @@ import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
-import { isSimpleCssValue } from './utils';
+import { generateFontSizeHint } from './utils';
 
 // Custom styled component to force line break between name and hint while keeping checkmark on the right
 const StyledCustomSelectControl = styled( CustomSelectControl )`
@@ -64,35 +64,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const options: FontSizePickerSelectOption[] = [
 		DEFAULT_OPTION,
 		...fontSizes.map( ( fontSize ) => {
-			let hint;
-			if ( fontSize.fluid ) {
-				const hasMin = isSimpleCssValue( fontSize.fluid.min ?? '' );
-				const hasMax = isSimpleCssValue( fontSize.fluid.max ?? '' );
-
-				if ( hasMin && hasMax ) {
-					hint = sprintf(
-						// translators: 1: the minimum fluid font size value, 2: the maximum fluid font size value.
-						__( '%1$s - %2$s' ),
-						String( fontSize.fluid.min! ),
-						String( fontSize.fluid.max! )
-					);
-				} else if ( hasMin ) {
-					hint = sprintf(
-						// translators: %s: the minimum fluid font size value.
-						__( '>= %s' ),
-						String( fontSize.fluid.min! )
-					);
-				} else if ( hasMax ) {
-					hint = sprintf(
-						// translators: %s: the maximum fluid font size value.
-						__( '<= %s' ),
-						String( fontSize.fluid.max! )
-					);
-				}
-			}
-			if ( ! hint && isSimpleCssValue( fontSize.size ) ) {
-				hint = String( fontSize.size );
-			}
+			const hint = generateFontSizeHint( fontSize );
 			return {
 				key: fontSize.slug,
 				name: fontSize.name || fontSize.slug,
