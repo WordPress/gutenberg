@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
-import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import {
+	BaseControl,
+	useBaseControlProps,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useMergeRefs } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import {
 	__unstableUseRichText as useRichText,
@@ -23,8 +27,6 @@ export default function RichTextControl( {
 	attributeValues,
 	updateAttributes,
 } ) {
-	const instanceId = useInstanceId( RichTextControl );
-	const controlId = `block-editor-content-only-controls__rich-text-${ instanceId }`;
 	const valueKey = control.mapping.value;
 	const attrValue = attributeValues[ valueKey ];
 	const defaultValue =
@@ -106,7 +108,10 @@ export default function RichTextControl( {
 		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 
-	const hasVisibleLabel = ! control.shownByDefault;
+	const { baseControlProps, controlProps } = useBaseControlProps( {
+		hideLabelFromVision: control.shownByDefault,
+		label: control.label,
+	} );
 
 	return (
 		<ToolsPanelItem
@@ -120,21 +125,19 @@ export default function RichTextControl( {
 			}
 			isShownByDefault={ control.shownByDefault }
 		>
-			{ hasVisibleLabel && (
-				<label htmlFor={ controlId }>{ control.label }</label>
-			) }
-			<div
-				tagName="div"
-				role="textbox"
-				id={ hasVisibleLabel ? controlId : undefined }
-				className="block-editor-content-only-controls__rich-text"
-				aria-label={ hasVisibleLabel ? undefined : control.label }
-				aria-multiline={ ! control.args?.disableLineBreaks }
-				ref={ useMergeRefs( [ richTextRef ] ) }
-				onFocus={ () => setIsSelected( true ) }
-				onBlur={ () => setIsSelected( false ) }
-				contentEditable
-			/>
+			<BaseControl __nextHasNoMarginBottom { ...baseControlProps }>
+				<div
+					className="block-editor-content-only-controls__rich-text"
+					tagName="div"
+					role="textbox"
+					aria-multiline={ ! control.args?.disableLineBreaks }
+					ref={ useMergeRefs( [ richTextRef ] ) }
+					onFocus={ () => setIsSelected( true ) }
+					onBlur={ () => setIsSelected( false ) }
+					contentEditable
+					{ ...controlProps }
+				/>
+			</BaseControl>
 		</ToolsPanelItem>
 	);
 }
