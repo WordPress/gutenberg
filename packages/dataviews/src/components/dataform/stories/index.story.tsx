@@ -196,6 +196,7 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: {
 			control: 'textarea',
+			resize: 'vertical',
 			rows: 5,
 		},
 	},

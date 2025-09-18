@@ -6,6 +6,7 @@ import type {
 	ReactNode,
 	ComponentType,
 	ComponentProps,
+	CSSProperties,
 } from 'react';
 
 /**
@@ -176,6 +177,10 @@ export type EditConfigTextarea = {
 	 * Number of rows for the textarea.
 	 */
 	rows?: number;
+	/**
+	 * Resize CSS property for the textarea.
+	 */
+	resize?: CSSProperties[ 'resize' ];
 };
 
 /**
@@ -353,6 +358,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		resize?: CSSProperties[ 'resize' ];
 	};
 };
 

@@ -24,7 +24,7 @@ export default function Textarea< Item >( {
 	hideLabelFromVision,
 	config,
 }: DataFormControlProps< Item > ) {
-	const { rows = 4 } = config || {};
+	const { rows = 4, resize } = config || {};
 	const { label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
@@ -80,6 +80,7 @@ export default function Textarea< Item >( {
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
+			style={ resize ? { resize } : undefined }
 		/>
 	);
 }
