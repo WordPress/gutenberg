@@ -209,7 +209,6 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				canRemoveBlocks,
 				getBlockEditingMode,
 				isSectionBlock,
-				getSelectedBlockClientIds,
 			} = unlock( select( blockEditorStore ) );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -244,8 +243,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
 			}
 
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
+			const isSectionInSelection = clientIds.some( ( id ) =>
 				isSectionBlock( id )
 			);
 
