@@ -368,10 +368,6 @@ export default function CollabSidebar() {
 		} );
 	}
 
-	if ( postStatus === 'publish' ) {
-		return null; // or maybe return some message indicating no threads are available.
-	}
-
 	// Open the comment board when the user clicks on the comment button.
 	const openNewCommentBoard = () => {
 		setIsNewComment( true );
