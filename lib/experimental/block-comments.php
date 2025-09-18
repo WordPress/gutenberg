@@ -53,20 +53,20 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
  */
 if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 	function exclude_block_comments_from_admin( $query ) {
-		// Only modify the query if it's for comments
-		if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
-			$query->set( 'type', '' );
+		$types_in = array_merge( (array) $query->query_vars['type'], (array) $query->query_vars['type__in'] );
+		$types_in = array_filter( $types_in );
 
-			add_filter(
-				'comments_clauses',
-				function ( $clauses ) {
-					global $wpdb;
-					// Exclude comments of type 'block_comment'
-					$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'block_comment'";
-					return $clauses;
-				}
-			);
+		$types_not_in = (array) $query->query_vars['type__not_in'];
+		$types_not_in = array_filter( $types_not_in );
+
+		// If 'block_comment' is already included in the types to include or exclude, do nothing.
+		if ( in_array( 'block_comment', array_merge( $types_in, $types_not_in ), true ) ) {
+			return;
 		}
+
+		// Exclude block comments from queries
+		$types_not_in[]                    = 'block_comment';
+		$query->query_vars['type__not_in'] = $types_not_in;
 	}
 	add_action( 'pre_get_comments', 'exclude_block_comments_from_admin' );
 }
