@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+-   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+
 ## 30.4.0 (2025-09-17)
 
 ### Bug Fixes
@@ -16,7 +20,6 @@
 -   Add support for ValidatedFormTokenField [#71350](https://github.com/WordPress/gutenberg/pull/71350).
 -   Expose `ValidatedSelectControl` via Private APIs ([#71665](https://github.com/WordPress/gutenberg/pull/71665))
 -   Expose `ValidatedToggleGroupControl` via private APIs. Also properly detects `undefined` values for `required` validation ([#71666](https://github.com/WordPress/gutenberg/pull/71666)).
--   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
 
 ## 30.3.0 (2025-09-03)
 

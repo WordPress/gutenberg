@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+- DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+
 ## 9.0.0 (2025-09-17)
 
 ### Breaking changes
@@ -24,7 +28,6 @@
 - DataForm: Add object configuration support for Edit property with some options. ([#71582](https://github.com/WordPress/gutenberg/pull/71582))
 - DataForm: Add summary field support for composed fields. ([#71614](https://github.com/WordPress/gutenberg/pull/71614))
 - DataForm: update radio control to support `required` and `custom` validation. [#71664](https://github.com/WordPress/gutenberg/pull/71664)
-- DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
 
 ### Bug Fixes
 
