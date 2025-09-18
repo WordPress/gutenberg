@@ -6,6 +6,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -22,12 +23,30 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import MediaReplaceFlow from '../../media-replace-flow';
 import MediaUploadCheck from '../../media-upload/check';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
+import { getMediaSelectKey } from '../../../store/private-keys';
+import { store as blockEditorStore } from '../../../store';
 
-function MediaThumbnail( { control, attributeValues } ) {
+function MediaThumbnail( { control, attributeValues, attachment } ) {
 	const { allowedTypes, multiple } = control.args;
 	const mapping = control.mapping;
 	if ( multiple ) {
 		return 'todo multiple';
+	}
+
+	if ( attachment?.media_type === 'image' || attachment?.poster ) {
+		return (
+			<img
+				className="block-editor-content-only-controls__media-thumbnail"
+				alt=""
+				width={ 24 }
+				height={ 24 }
+				src={
+					attachment.media_type === 'image'
+						? attachment.source_url
+						: attachment.poster
+				}
+			/>
+		);
 	}
 
 	if ( allowedTypes.length === 1 ) {
@@ -101,6 +120,24 @@ export default function Media( {
 	const alt = attributeValues[ altKey ];
 	const useFeaturedImage = attributeValues[ featuredImageKey ];
 
+	const attachment = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return;
+			}
+
+			const settings = select( blockEditorStore ).getSettings();
+			const getMedia = settings[ getMediaSelectKey ];
+
+			if ( ! getMedia ) {
+				return;
+			}
+
+			return getMedia( select, id );
+		},
+		[ id ]
+	);
+
 	// TODO - pluralize when multiple.
 	let chooseItemLabel;
 	if ( control.args.allowedTypes.length === 1 ) {
@@ -145,7 +182,7 @@ export default function Media( {
 					className="block-editor-content-only-controls__media-replace-flow"
 					allowedTypes={ control.args.allowedTypes }
 					mediaId={ id }
-					mediaURL={ srcKey }
+					mediaURL={ src }
 					multiple={ control.args.multiple }
 					popoverProps={ popoverProps }
 					onReset={ () => {
@@ -220,6 +257,7 @@ export default function Media( {
 									{ src && (
 										<>
 											<MediaThumbnail
+												attachment={ attachment }
 												control={ control }
 												attributeValues={
 													attributeValues
@@ -227,9 +265,9 @@ export default function Media( {
 											/>
 											<span className="block-editor-content-only-controls__media-title">
 												{
-													// TODO - use media title instead of src.
-													// TODO - truncate to show filename when there's no title.
-													src
+													// TODO - truncate long titles or url smartly (e.g. show filename).
+													attachment?.title?.raw ??
+														src
 												}
 											</span>
 										</>
