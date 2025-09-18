@@ -56,6 +56,7 @@ function PostTimeToReadEdit( {
 	// When the block is first inserted, default to displaying as a range.
 	useEffect( () => {
 		if ( blockWasJustInserted ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				displayAsRange: true,
 			} );
