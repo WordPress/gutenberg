@@ -31,7 +31,7 @@ const {
 
 const regionAttr = `data-${ directivePrefix }-router-region`;
 const interactiveAttr = `data-${ directivePrefix }-interactive`;
-const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]`; // All regions.
+const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ regionAttr }]`;
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -172,7 +172,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
 
-		if ( region.parentElement.closest( regionsSelector ) ) {
+		if ( region.parentElement.closest( `[${ regionAttr }]` ) ) {
 			regions[ id ] = undefined;
 		} else {
 			regions[ id ] = vdom?.has( region )
