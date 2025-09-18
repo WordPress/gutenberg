@@ -70,26 +70,14 @@ const defaultLayouts = {
 	[ LAYOUT_LIST ]: {},
 };
 
-export const Default = ( {
-	perPageSizes = [ 10, 25, 50, 100 ],
-	requireVisibleLockedField = true,
-} ) => {
+export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'categories' ],
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
-		requireVisibleLockedField,
 	} );
-	useEffect( () => {
-		if ( requireVisibleLockedField !== view.requireVisibleLockedField ) {
-			setView( {
-				...view,
-				requireVisibleLockedField,
-			} );
-		}
-	}, [ requireVisibleLockedField, view ] );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
@@ -122,17 +110,12 @@ export const Default = ( {
 
 Default.args = {
 	perPageSizes: [ 10, 25, 50, 100 ],
-	requireVisibleLockedField: true,
 };
 
 Default.argTypes = {
 	perPageSizes: {
 		control: 'object',
 		description: 'Array of available page sizes',
-	},
-	requireVisibleLockedField: {
-		control: 'boolean',
-		description: 'Whether to require at least one visible locked field',
 	},
 };
 

@@ -6,6 +6,10 @@
 
 - DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
 
+### Enhancements
+
+- DataViews: Require at least one field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
+
 ## 9.0.0 (2025-09-17)
 
 ### Breaking changes
@@ -34,10 +38,6 @@
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
 - DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
 - DataForm regular layout: Use BaseControl visual label for readonly fields when in top labelPosition. ([#71597](https://github.com/WordPress/gutenberg/pull/71597))
-
-### Enhancements
-
-- DataViews: Require at least one locked field to be visible. ([#71625](https://github.com/WordPress/gutenberg/pull/71625))
 
 ## 8.0.0 (2025-09-03)
 

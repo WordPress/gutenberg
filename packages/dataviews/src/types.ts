@@ -521,11 +521,6 @@ interface ViewBase {
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;
-
-	/**
-	 * Whether at least one locked field must remain visible.
-	 */
-	requireVisibleLockedField?: boolean;
 }
 
 export interface ColumnStyle {
