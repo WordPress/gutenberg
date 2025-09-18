@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useMemo, useEffect } from '@wordpress/element';
+import {
+	useState,
+	RawHTML,
+	useMemo,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -78,36 +84,21 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId, selectedBlockClientId, blocks } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
-				select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.blockCommentId
-					: null,
-				selectedBlockClientId: _clientId,
-				blocks: getBlocks(),
-			};
-		},
-		[]
-	);
+	const { blockCommentId, blocks } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.blockCommentId
+				: null,
+			blocks: getBlocks(),
+		};
+	}, [] );
 
-	const { toggleBlockHighlight, flashBlock } =
-		useDispatch( blockEditorStore );
+	const { flashBlock } = useDispatch( blockEditorStore );
 
 	const clearThreadFocus = () => {
-		// Clear any block highlights when clearing thread focus
-		if ( focusThread && blocks ) {
-			const relatedBlockClientId = findBlockByCommentId(
-				focusThread,
-				blocks
-			);
-			if ( relatedBlockClientId ) {
-				toggleBlockHighlight( relatedBlockClientId, false );
-			}
-		}
 		setFocusThread( null );
 		setShowCommentBoard( false );
 	};
@@ -118,56 +109,34 @@ export function Comments( {
 
 	// Sync comment ↔ block highlighting bidirectionally.
 	useEffect( () => {
-		const relatedBlockClientId =
-			focusThread && blocks
-				? findBlockByCommentId( focusThread, blocks )
-				: null;
-
 		// Highlight comment when block is selected.
 		if ( blockCommentId && ! focusThread ) {
 			setFocusThread( blockCommentId );
 		}
-
-		// Flash block when comment is focused (non-persistent highlight).
-		if ( relatedBlockClientId ) {
-			flashBlock( relatedBlockClientId );
-		}
-	}, [
-		selectedBlockClientId,
-		blockCommentId,
-		focusThread,
-		blocks,
-		toggleBlockHighlight,
-		flashBlock,
-		setFocusThread,
-	] );
-
-	// Only clear if we're switching from a block WITH comments to a block WITHOUT comments
-	// This prevents clearing when switching between comments on the same block without comments
-	if ( selectedBlockClientId && ! blockCommentId && focusThread && blocks ) {
-		// Check if the current focus thread belongs to a different block
-		const currentFocusedThreadBlock = findBlockByCommentId(
-			focusThread,
-			blocks
-		);
-		const isDifferentBlock =
-			currentFocusedThreadBlock &&
-			currentFocusedThreadBlock !== selectedBlockClientId;
-
-		if ( isDifferentBlock ) {
-			// Clear the block highlight
-			toggleBlockHighlight( currentFocusedThreadBlock, false );
-		}
-	}
+	}, [ blockCommentId, focusThread, blocks, setFocusThread ] );
 
 	// Handle comment selection.
-	const handleCommentSelect = ( threadId ) => {
-		// Clear the add comment form when selecting a comment.
-		setShowCommentBoard( false );
+	const handleCommentSelect = useCallback(
+		( threadId ) => {
+			// Clear the add comment form when selecting a comment.
+			setShowCommentBoard( false );
 
-		// Set the focused thread.
-		setFocusThread( threadId );
-	};
+			// Set the focused thread.
+			setFocusThread( threadId );
+
+			// Flash the related block when comment is clicked
+			if ( blocks ) {
+				const relatedBlockClientId = findBlockByCommentId(
+					threadId,
+					blocks
+				);
+				if ( relatedBlockClientId ) {
+					flashBlock( relatedBlockClientId );
+				}
+			}
+		},
+		[ blocks, flashBlock, setFocusThread, setShowCommentBoard ]
+	);
 
 	return (
 		<>
@@ -326,7 +295,7 @@ function Thread( {
 								onAddReply( inputComment, thread.id );
 							} }
 							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered.
+								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								clearThreadFocus();
 							} }
 							placeholderText={
