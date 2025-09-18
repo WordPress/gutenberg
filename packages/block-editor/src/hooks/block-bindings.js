@@ -71,82 +71,78 @@ function BlockBindingsPanelMenuContent( {
 
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
-			{ Object.entries( sources )
-				.filter( ( [ , source ] ) => {
-					// Only show sources that have compatible data for this specific attribute.
-					const sourceDataItems = source.data?.filter(
-						( item ) => item?.type === attributeType
-					);
-					return sourceDataItems && sourceDataItems.length > 0;
-				} )
-				.map( ( [ sourceKey, source ] ) => {
-					if ( source.mode === 'dropdown' ) {
-						return (
-							<Menu key={ sourceKey }>
-								<Menu.SubmenuTriggerItem>
-									<Menu.ItemLabel>
-										{ source.label }
-									</Menu.ItemLabel>
-								</Menu.SubmenuTriggerItem>
-								<Menu.Popover gutter={ 8 }>
-									<Menu.Group>
-										{ source.data
-											?.filter(
-												( item ) =>
-													item?.type === attributeType
-											)
-											.map( ( item ) => (
-												<Menu.RadioItem
-													key={ item.key }
-													onChange={ () => {
-														updateBlockBindings( {
-															[ attribute ]: {
-																source: sourceKey,
-																args: {
-																	key: item.key,
-																},
-															},
-														} );
-													} }
-													name={
-														attribute + '-binding'
-													}
-													value={ item.key }
-													checked={
-														item.key === currentKey
-													}
-												>
-													<Menu.ItemLabel>
-														{ item?.label }
-													</Menu.ItemLabel>
-													<Menu.ItemHelpText>
-														{ item?.value }
-													</Menu.ItemHelpText>
-												</Menu.RadioItem>
-											) ) }
-									</Menu.Group>
-								</Menu.Popover>
-							</Menu>
-						);
-					}
+			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
+				// Only show sources that have compatible data for this specific attribute.
+				const sourceDataItems = source.data?.filter(
+					( item ) => item?.type === attributeType
+				);
 
-					if ( source.mode === 'modal' ) {
-						return (
-							<Menu.Item
-								key={ sourceKey }
-								onClick={ () =>
-									onOpenModal( { attribute, sourceKey } )
-								}
-							>
+				// Skip sources with no compatible data
+				if ( ! sourceDataItems || sourceDataItems.length === 0 ) {
+					return null;
+				}
+
+				if ( source.mode === 'dropdown' ) {
+					return (
+						<Menu
+							key={ sourceKey }
+							placement={
+								isMobile ? 'bottom-start' : 'left-start'
+							}
+						>
+							<Menu.SubmenuTriggerItem>
 								<Menu.ItemLabel>
 									{ source.label }
 								</Menu.ItemLabel>
-							</Menu.Item>
-						);
-					}
+							</Menu.SubmenuTriggerItem>
+							<Menu.Popover gutter={ 8 }>
+								<Menu.Group>
+									{ sourceDataItems.map( ( item ) => (
+										<Menu.RadioItem
+											key={ item.key }
+											onChange={ () => {
+												updateBlockBindings( {
+													[ attribute ]: {
+														source: sourceKey,
+														args: {
+															key: item.key,
+														},
+													},
+												} );
+											} }
+											name={ attribute + '-binding' }
+											value={ item.key }
+											checked={ item.key === currentKey }
+										>
+											<Menu.ItemLabel>
+												{ item?.label }
+											</Menu.ItemLabel>
+											<Menu.ItemHelpText>
+												{ item?.value }
+											</Menu.ItemHelpText>
+										</Menu.RadioItem>
+									) ) }
+								</Menu.Group>
+							</Menu.Popover>
+						</Menu>
+					);
+				}
 
-					return null;
-				} ) }
+				if ( source.mode === 'modal' ) {
+					return (
+						<Menu.Item
+							key={ sourceKey }
+							onClick={ () =>
+								onOpenModal( { attribute, sourceKey } )
+							}
+						>
+							<Menu.ItemLabel>{ source.label }</Menu.ItemLabel>
+						</Menu.Item>
+					);
+				}
+
+				return null;
+			} ) }
 		</Menu>
 	);
 }
