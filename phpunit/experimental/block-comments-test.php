@@ -164,6 +164,58 @@ class Block_Comments_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that excluding block comments does not affect the query when the filter is removed.
+	 *
+	 * @dataProvider data_excluding_block_comments_does_not_affect_query
+	 *
+	 * @covers ::exclude_block_comments_from_admin
+	 */
+	public function test_excluding_block_comments_does_not_affect_query( $query_args ) {
+		$query = new WP_Comment_Query();
+		$query->query( $query_args );
+
+		$type_in          = array_merge( (array) $query->query_vars['type__in'], (array) $query->query_vars['type'] );
+		$type_in_expected = array_merge( (array) ( $query_args['type__in'] ?? '' ), (array) ( $query_args['type'] ?? '' ) );
+		$this->assertNotContains( 'block_comment', (array) $type_in );
+		$this->assertSameSets( $type_in_expected, (array) $type_in );
+
+		$type_not_in = (array) $query->query_vars['type__not_in'];
+		$this->assertContains( 'block_comment', $type_not_in );
+		$this->assertSameSets( (array) $query_args['type__not_in'], (array) $type_not_in );
+	}
+
+	/**
+	 * Data provider for test_excluding_block_comments_does_not_affect_query.
+	 *
+	 * @return array[] Data provider.
+	 */
+	public function data_excluding_block_comments_does_not_affect_query() {
+		return array(
+			'not_in_string'   => array(
+				array(
+					'type__not_in' => 'block_comment',
+				),
+			),
+			'not_in_array'    => array(
+				array(
+					'type__not_in' => array( 'block_comment' ),
+				),
+			),
+			'not_in_multiple' => array(
+				array(
+					'type__not_in' => array( 'block_comment', 'comment' ),
+				),
+			),
+			'in_and_not_in'   => array(
+				array(
+					'type'         => 'comment',
+					'type__not_in' => array( 'block_comment', 'pingback' ),
+				),
+			),
+		);
+	}
+
+	/**
 	 * Test that the exclude_block_comments_from_admin filter does not affect subsequent queries.
 	 *
 	 * @covers ::exclude_block_comments_from_admin
