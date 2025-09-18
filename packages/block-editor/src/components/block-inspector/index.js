@@ -47,6 +47,7 @@ function BlockInspector() {
 		selectedBlockClientId,
 		blockType,
 		isSectionBlock,
+		isSectionBlockInSelection,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -65,8 +66,8 @@ function BlockInspector() {
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const isSectionInSelection = selectedBlockClientIds.some( ( id ) =>
-			_isSectionBlock( id )
+		const _isSectionBlockInSelection = selectedBlockClientIds.some(
+			( id ) => _isSectionBlock( id )
 		);
 
 		return {
@@ -74,7 +75,8 @@ function BlockInspector() {
 			selectedBlockClientId: renderedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			isSectionBlock: isSectionInSelection,
+			isSectionBlockInSelection: _isSectionBlockInSelection,
+			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
 		};
 	}, [] );
 
@@ -96,7 +98,7 @@ function BlockInspector() {
 
 	const hasSelectedBlocks = count > 1;
 
-	if ( hasSelectedBlocks && ! isSectionBlock ) {
+	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -133,7 +135,7 @@ function BlockInspector() {
 		);
 	}
 
-	if ( hasSelectedBlocks && isSectionBlock ) {
+	if ( hasSelectedBlocks && isSectionBlockInSelection ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
