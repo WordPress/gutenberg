@@ -132,14 +132,48 @@ export class SyncProvider {
 		ydoc.on( 'update', onUpdate );
 
 		// Apply the initial document to the current document as a singular update.
-		Y.transact(
-			ydoc,
-			() => {
-				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
-			},
-			LOCAL_SYNC_PROVIDER_ORIGIN,
-			false
-		);
+		if ( initialDoc ) {
+			Y.transact(
+				ydoc,
+				() => {
+					Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
+				},
+				LOCAL_SYNC_PROVIDER_ORIGIN,
+				false
+			);
+		}
+
+		if ( ! initialDoc || true === initialDoc?.meta?.get( 'invalidated' ) ) {
+			Y.transact(
+				ydoc,
+				() => {
+					syncConfig.applyChangesToCRDTDoc(
+						ydoc,
+						syncConfig.getInitialObjectData( rawRecord ),
+						rawRecord,
+						LOCAL_SYNC_PROVIDER_ORIGIN
+					);
+				},
+				LOCAL_SYNC_PROVIDER_ORIGIN,
+				true
+			);
+
+			// TODO: This new state should be persisted to the entity record. This
+			// will result in a "dirty" record, but if the user does not save the
+			// record, then content can be duplicated as other users join the session
+			// or refresh.
+			//
+			// If we have high confidence in our hash validation / invalidation, then
+			// we could persist the updated record automatically. Or we could use
+			// awareness states to let the user know that the content has changed on
+			// the server and prompt them to save.
+			handlers.editRecord( {
+				meta: {
+					...( rawRecord.meta as object ),
+					...( await this.createEntityMeta( syncConfig, rawRecord ) ),
+				},
+			} );
+		}
 	}
 
 	/**
@@ -196,7 +230,7 @@ export class SyncProvider {
 	private async getInitialCRDTDoc(
 		syncConfig: SyncConfig,
 		rawRecord: ObjectData
-	): Promise< CRDTDoc > {
+	): Promise< CRDTDoc | null > {
 		// Load the persisted document from previous sessions.
 		const persistedDoc = await this.getPersistedCRDTDoc(
 			syncConfig,
@@ -205,31 +239,19 @@ export class SyncProvider {
 
 		// If it exists and matches the current version, apply it as the base state
 		// of the initial document.
-		if (
-			persistedDoc &&
-			CRDT_DOC_VERSION === persistedDoc.meta?.get( 'version' )
-		) {
-			return persistedDoc;
+		if ( ! persistedDoc ) {
+			return null;
 		}
 
-		// Otherwise, use the current record.
-		const initialData = syncConfig.getInitialObjectData( rawRecord );
+		const stateMap = persistedDoc.getMap( CRDT_STATE_MAP_KEY );
 
-		// IMPORTANT: We use a new Yjs document so that the initial state can be
-		// applied to the "real" Yjs document as a singular update. Therefore, we
-		// don't need to wrap the changes in a transaction.
-		const initialStateDoc = createYjsDoc( {
-			objectType: syncConfig.objectType,
-		} );
+		if ( CRDT_DOC_VERSION !== stateMap.get( 'version' ) ) {
+			// TODO: Implement version migration. We have not yet incremented the
+			// version number, so there is nothing to implement yet.
+			persistedDoc.meta?.set( 'invalidated', true );
+		}
 
-		syncConfig.applyChangesToCRDTDoc(
-			initialStateDoc,
-			initialData,
-			rawRecord,
-			LOCAL_SYNC_PROVIDER_ORIGIN
-		);
-
-		return initialStateDoc;
+		return persistedDoc;
 	}
 
 	/* eslint-disable @typescript-eslint/no-unused-vars */
@@ -254,6 +276,29 @@ export class SyncProvider {
 	 * Get the persisted CRDT document from the object data, e.g., from meta.
 	 * Custom sync providers can override this method to provide their
 	 * implementation.
+	 *
+	 * There are 5 possible states:
+	 *
+	 * 1. No persisted document exists: return null. A new document will be created
+	 *    from the current entity record.
+	 *
+	 * 2. A persisted document exists with a different version: return it. The
+	 *    version mismatch will be detected and the document will be migrated.
+	 *
+	 * 3. A persisted document exists, but its content no longer matches the
+	 *    current entity record (i.e., the entity record was updated outside of
+	 *    the block editor): return it, but mark it as invalidated. The document
+	 *    will be used as the base document and the current entity record will be
+	 *    applied as an update.
+	 *
+	 *    - Mark it as invalidated by setting `invalidated=true` on its meta map.
+	 *
+	 * 4. A persisted document exists, but the entity record has been restored
+	 *    from a revision. This is a special case of #3, but is handled
+	 *    identically.
+	 *
+	 * 5. A persisted document exists: return it. It will be used as the initial
+	 *    document.
 	 *
 	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
 	 * @param {ObjectData} _rawRecord  Record representing this object type.
