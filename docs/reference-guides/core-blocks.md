@@ -433,7 +433,7 @@ Insert an SVG icon or graphic. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/icon
 -	**Category:** media
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** customGradient, customIconBackgroundColor, customIconColor, gradient, hasNoIconFill, height, icon, iconBackgroundColor, iconBackgroundColorValue, iconName, label, linkRel, linkTarget, linkUrl, title, width
+-	**Attributes:** height, icon, iconName, label, linkRel, linkTarget, linkUrl, title, width
 
 ## Image
 

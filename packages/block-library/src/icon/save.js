@@ -23,11 +23,8 @@ import { flattenIconsArray, parseIcon } from './utils';
  *
  * @param {Object} props All props passed to this function.
  */
-export default function Save( props ) {
+export default function save( props ) {
 	const {
-		customGradient,
-		gradient,
-		hasNoIconFill,
 		icon,
 		iconName,
 		label,
@@ -90,11 +87,7 @@ export default function Save( props ) {
 	const blockProps = useBlockProps.save();
 	const borderProps = getBorderClassesAndStyles( props.attributes );
 
-	const iconClasses = clsx( 'icon-container', borderProps?.className, {
-		'has-no-icon-fill-color': hasNoIconFill,
-		'has-icon-background-color': gradient || customGradient,
-		[ `has-${ gradient }-gradient-background` ]: gradient,
-	} );
+	const iconClasses = clsx( 'icon-container', borderProps?.className );
 
 	const [ widthQuantity, widthUnit ] =
 		parseQuantityAndUnitFromRawValue( width );
@@ -109,7 +102,6 @@ export default function Save( props ) {
 	}
 
 	const iconStyles = {
-		background: ! gradient ? customGradient : undefined,
 		width: iconWidth,
 		height: height || undefined,
 		...blockProps.style,

@@ -18,27 +18,6 @@
 			"type": "string",
 			"__experimentalRole": "content"
 		},
-		"iconBackgroundColor": {
-			"type": "string"
-		},
-		"customIconBackgroundColor": {
-			"type": "string"
-		},
-		"iconBackgroundColorValue": {
-			"type": "string"
-		},
-		"customIconColor": {
-			"type": "string"
-		},
-		"gradient": {
-			"type": "string"
-		},
-		"customGradient": {
-			"type": "string"
-		},
-		"hasNoIconFill": {
-			"type": "boolean"
-		},
 		"label": {
 			"type": "string"
 		},

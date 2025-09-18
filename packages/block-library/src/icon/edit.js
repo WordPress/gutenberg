@@ -28,7 +28,6 @@ import {
 	MediaUpload,
 	useBlockProps,
 	useBlockEditingMode,
-	__experimentalUseGradient as useGradient,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -67,7 +66,6 @@ const NEW_TAB_REL = 'noreferrer noopener';
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
 	const {
-		hasNoIconFill,
 		icon,
 		iconName,
 		label,
@@ -94,8 +92,6 @@ export function Edit( props ) {
 	const isSVGUploadAllowed = allowedMimeTypes
 		? Object.values( allowedMimeTypes ).includes( 'image/svg+xml' )
 		: false;
-
-	const { gradientClass, gradientValue } = useGradient();
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
@@ -491,12 +487,7 @@ export function Edit( props ) {
 	const blockProps = useBlockProps();
 	const borderProps = getBorderClassesAndStyles( attributes );
 
-	const iconClasses = clsx( 'icon-container', borderProps?.className, {
-		'has-no-icon-fill-color': hasNoIconFill,
-		'has-icon-background-color': gradientValue,
-		'has-background-gradient': gradientValue,
-		[ gradientClass ]: gradientClass,
-	} );
+	const iconClasses = clsx( 'icon-container', borderProps?.className );
 
 	const [ widthQuantity, widthUnit ] =
 		parseQuantityAndUnitFromRawValue( width );
@@ -511,7 +502,6 @@ export function Edit( props ) {
 	}
 
 	const iconStyles = {
-		background: gradientValue,
 		...blockProps.style,
 		...borderProps.style,
 		width: iconWidth,
