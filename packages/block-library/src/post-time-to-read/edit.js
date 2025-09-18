@@ -16,7 +16,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	RangeControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -41,8 +40,9 @@ function PostTimeToReadEdit( {
 	 * Average reading rate - based on average taken from
 	 * https://irisreading.com/average-reading-speed-in-various-languages/
 	 * (Characters/minute used for Chinese rather than words).
+	 * Can be filtered via the 'post_time_to_read_average_reading_speed' PHP filter.
 	 */
-	const AVERAGE_READING_RATE = 189;
+	const AVERAGE_READING_RATE = window.gutenbergTimeToReadAverageSpeed || 189;
 
 	const { blockWasJustInserted } = useSelect(
 		( select ) => {
@@ -64,7 +64,7 @@ function PostTimeToReadEdit( {
 		}
 	}, [ blockWasJustInserted ] );
 
-	const { textAlign, averageReadingSpeed, displayAsRange } = attributes;
+	const { textAlign, displayAsRange } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -107,11 +107,11 @@ function PostTimeToReadEdit( {
 		if ( displayAsRange ) {
 			const minMinutes = Math.max(
 				1,
-				Math.round( totalWords / ( averageReadingSpeed * 1.2 ) )
+				Math.round( totalWords / ( AVERAGE_READING_RATE * 1.2 ) )
 			);
 			let maxMinutes = Math.max(
 				1,
-				Math.round( totalWords / ( averageReadingSpeed * 0.8 ) )
+				Math.round( totalWords / ( AVERAGE_READING_RATE * 0.8 ) )
 			);
 			if ( minMinutes === maxMinutes ) {
 				maxMinutes = minMinutes + 1;
@@ -126,7 +126,7 @@ function PostTimeToReadEdit( {
 
 		const minutesToRead = Math.max(
 			1,
-			Math.round( totalWords / averageReadingSpeed )
+			Math.round( totalWords / AVERAGE_READING_RATE )
 		);
 
 		return sprintf(
@@ -134,7 +134,7 @@ function PostTimeToReadEdit( {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks, averageReadingSpeed, displayAsRange ] );
+	}, [ contentStructure, blocks, displayAsRange ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -158,38 +158,10 @@ function PostTimeToReadEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							displayAsRange: true,
-							averageReadingSpeed: AVERAGE_READING_RATE,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
-					<ToolsPanelItem
-						isShownByDefault
-						hasValue={ () =>
-							averageReadingSpeed !== AVERAGE_READING_RATE
-						}
-						label={ __( 'Average Reading Speed' ) }
-						onDeselect={ () =>
-							setAttributes( {
-								averageReadingSpeed: AVERAGE_READING_RATE,
-							} )
-						}
-					>
-						<RangeControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							min={ 1 }
-							max={ AVERAGE_READING_RATE * 2 }
-							label={ __( 'Average Reading Speed' ) }
-							value={
-								averageReadingSpeed || AVERAGE_READING_RATE
-							}
-							initialPosition={ AVERAGE_READING_RATE }
-							onChange={ ( value ) => {
-								setAttributes( { averageReadingSpeed: value } );
-							} }
-						/>
-					</ToolsPanelItem>
 					<ToolsPanelItem
 						isShownByDefault
 						label={ _x(

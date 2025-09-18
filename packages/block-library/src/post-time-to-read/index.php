@@ -26,7 +26,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	 * https://irisreading.com/average-reading-speed-in-various-languages/
 	 * (Characters/minute used for Chinese rather than words).
 	 */
-	$average_reading_rate = $attributes['averageReadingSpeed'] ?? 189;
+	$average_reading_rate = get_post_time_to_read_average_reading_speed();
 
 	$word_count_type = wp_get_word_count_type();
 
@@ -68,6 +68,15 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 }
 
 /**
+ * Get the average reading speed with filter applied.
+ *
+ * @return int The average reading speed in words per minute.
+ */
+function get_post_time_to_read_average_reading_speed() {
+	return apply_filters( 'post_time_to_read_average_reading_speed', 189 );
+}
+
+/**
  * Registers the `core/post-time-to-read` block on the server.
  */
 function register_block_core_post_time_to_read() {
@@ -76,6 +85,13 @@ function register_block_core_post_time_to_read() {
 		array(
 			'render_callback' => 'render_block_core_post_time_to_read',
 		)
+	);
+
+	// Make the average reading speed available to the block editor.
+	wp_add_inline_script(
+		'wp-block-editor',
+		'window.gutenbergTimeToReadAverageSpeed = ' . get_post_time_to_read_average_reading_speed() . ';',
+		'before'
 	);
 }
 add_action( 'init', 'register_block_core_post_time_to_read' );
