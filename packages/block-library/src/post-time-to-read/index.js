@@ -4,7 +4,6 @@
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
-import deprecated from './deprecated';
 import icon from './icon';
 
 const { name } = metadata;
@@ -14,7 +13,6 @@ export const settings = {
 	icon,
 	edit,
 	example: {},
-	deprecated,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

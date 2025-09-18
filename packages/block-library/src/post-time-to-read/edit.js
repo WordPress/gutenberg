@@ -140,6 +140,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					resetAll={ () => {
 						setAttributes( {
 							displayAsRange: true,
+							averageReadingSpeed: AVERAGE_READING_RATE,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -151,7 +152,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 						}
 						label={ __( 'Average Reading Speed' ) }
 						onDeselect={ () =>
-							setAttributes( { averageReadingSpeed: undefined } )
+							setAttributes( {
+								averageReadingSpeed: AVERAGE_READING_RATE,
+							} )
 						}
 					>
 						<RangeControl
@@ -175,7 +178,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 							'Display as range',
 							'Turns reading time range display on or off'
 						) }
-						hasValue={ () => !! displayAsRange }
+						hasValue={ () => ! displayAsRange }
 						onDeselect={ () => {
 							setAttributes( {
 								displayAsRange: true,
