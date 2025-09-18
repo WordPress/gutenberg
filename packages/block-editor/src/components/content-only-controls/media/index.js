@@ -234,7 +234,6 @@ export default function Media( {
 					renderToggle={ ( buttonProps ) => (
 						<Button
 							__next40pxDefaultSize
-							variant="secondary"
 							className="block-editor-content-only-controls__media"
 							{ ...buttonProps }
 						>

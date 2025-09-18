@@ -125,7 +125,6 @@ export default function Link( {
 		>
 			<Button
 				__next40pxDefaultSize
-				variant="secondary"
 				className="block-editor-content-only-controls__link"
 				onClick={ () => {
 					setIsLinkControlOpen( true );
