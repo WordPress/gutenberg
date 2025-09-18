@@ -18,7 +18,7 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { getItemTitle } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
@@ -27,7 +27,7 @@ const trashPost: Action< PostWithPermissions > = {
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
-		if ( isTemplateOrTemplatePart( item ) || item.type === 'wp_block' ) {
+		if ( item.type === 'wp_template_part' || item.type === 'wp_block' ) {
 			return false;
 		}
 

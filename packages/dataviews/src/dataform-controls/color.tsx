@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { colord } from 'colord';
+import deepMerge from 'deepmerge';
 
 /**
  * WordPress dependencies
@@ -75,7 +76,7 @@ export default function Color< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
+	const { label, placeholder, description, setValue } = field;
 	const value = field.getValue( { item: data } ) || '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -86,40 +87,48 @@ export default function Color< Item >( {
 
 	const handleColorChange = useCallback(
 		( colorObject: any ) => {
-			onChange( { [ id ]: colorObject.toHex() } );
+			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
 	);
 
 	const handleInputChange = useCallback(
 		( newValue: string | undefined ) => {
-			onChange( { [ id ]: newValue || '' } );
+			onChange( setValue( { item: data, value: newValue || '' } ) );
 		},
-		[ id, onChange ]
+		[ data, onChange, setValue ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
 	);
 
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }

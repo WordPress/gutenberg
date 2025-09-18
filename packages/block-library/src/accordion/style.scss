@@ -7,7 +7,7 @@
 	grid-template-rows: max-content 1fr;
 
 	> .wp-block-accordion-header {
-		.accordion-content__toggle-icon.has-icon-plus {
+		.accordion-content__toggle-icon {
 			transform: rotate(45deg);
 		}
 	}
@@ -36,8 +36,16 @@
 	width: 100%;
 }
 
-.accordion-content__toggle > span {
-	width: 100%;
+.accordion-content__toggle > span:not(.accordion-content__toggle-icon) {
+	flex: 1;
+}
+
+.accordion-content__toggle-icon {
+	width: 1.2em;
+	height: 1.2em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .is-layout-flow > .wp-block-accordion-panel,

@@ -10,15 +10,18 @@
 
 // The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
 add_filter(
-	'block_bindings_supported_attributes_core/post-date',
-	function ( $attributes ) {
-		if ( ! in_array( 'datetime', $attributes, true ) ) {
+	'block_bindings_supported_attributes',
+	function ( $attributes, $block_type ) {
+		if ( 'core/image' === $block_type && ! in_array( 'caption', $attributes, true ) ) {
+			$attributes[] = 'caption';
+		}
+		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
 		return $attributes;
 	},
 	10,
-	3
+	2
 );
 
 /**
@@ -36,26 +39,39 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 		return $block_content;
 	}
 
-	$attributes = $instance->parsed_block['attrs'];
 	// Process the block bindings and get attributes updated with the values from the sources.
 	$computed_attributes = gutenberg_process_block_bindings( $instance );
 	if ( empty( $computed_attributes ) ) {
 		return $block_content;
 	}
 
-	// Merge the computed attributes with the original attributes.
-	$instance->attributes = array_merge( $attributes, $computed_attributes );
+	/*
+	 * Merge the computed attributes with the original attributes.
+	 *
+	 * Note that this is not a recursive merge, meaning that nested attributes --
+	 * such as block bindings metadata -- will be completely replaced.
+	 * This is desirable. At this point, Core has already processed any block
+	 * bindings that it supports. What remains to be processed are only the attributes
+	 * for which support was added later (through the `block_bindings_supported_attributes`
+	 * filter). To do so, we'll run `$instance->render()` once more
+	 * so the block can update its content based on those attributes.
+	 */
+	$instance->attributes = array_merge( $instance->attributes, $computed_attributes );
+
+	/*
+	 * If we're dealing with the Button block, we remove the bindings metadata
+	 * in order to avoid having it reprocessed, which would lead to Core
+	 * capitalizing the wrapper tag (e.g. <DIV>).
+	 */
+	if ( 'core/button' === $instance->name ) {
+		unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
+	}
 
 	/**
-	 * This filter is called from WP_Block::render(), after the block content has
-	 * already been rendered. However, dynamic blocks expect their render() method
-	 * to receive block attributes to have their bound values. This means that we have
-	 * to re-render the block here.
-	 * To do so, we'll set a flag that this filter checks when invoked to avoid infinite
-	 * recursion. Furthermore, we can unset all of the block's bindings, as we know that
-	 * they have been processed by the time we reach this point.
+	 * This filter (`gutenberg_block_bindings_render_block`) is called from `WP_Block::render()`.
+	 * To avoid infinite recursion, we set a flag that this filter checks when invoked which tells
+	 * it to exit early.
 	 */
-	unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
 	$inside_block_bindings_render = true;
 	$block_content                = $instance->render();
 	$inside_block_bindings_render = false;

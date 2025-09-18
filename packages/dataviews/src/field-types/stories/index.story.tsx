@@ -85,6 +85,7 @@ type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
+	textWithRadio: string;
 	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
@@ -121,7 +122,8 @@ const data: DataType[] = [
 	{
 		id: 1,
 		text: 'Text',
-		textWithElements: 'Item 1',
+		textWithElements: 'item1',
+		textWithRadio: 'item2',
 		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
@@ -168,6 +170,18 @@ const fields: Field< DataType >[] = [
 		type: 'text',
 		label: 'Text (with elements)',
 		description: 'Help for text with elements.',
+		elements: [
+			{ value: 'item1', label: 'Item 1' },
+			{ value: 'item2', label: 'Item 2' },
+			{ value: 'item3', label: 'Item 3' },
+		],
+	},
+	{
+		id: 'textWithRadio',
+		type: 'text',
+		label: 'Text (with radio)',
+		description: 'Help for text with radio.',
+		Edit: 'radio',
 		elements: [
 			{ value: 'item1', label: 'Item 1' },
 			{ value: 'item2', label: 'Item 2' },

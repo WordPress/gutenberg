@@ -110,6 +110,7 @@ function getNavigationPath( location, postType ) {
 			'template-part-item',
 			'page-item',
 			'template-item',
+			'static-template-item',
 			'post-item',
 		].includes( name )
 	) {

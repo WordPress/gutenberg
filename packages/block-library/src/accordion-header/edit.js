@@ -18,14 +18,6 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import { plus } from '../accordion-content/icons';
-
-const ICONS = {
-	plus,
-};
 
 export default function Edit( { attributes, setAttributes, context } ) {
 	const { level, title, textAlign, levelOptions } = attributes;
@@ -50,9 +42,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
-
-	const Icon = ICONS.plus;
-	const shouldShowIcon = showIcon && Icon;
 
 	return (
 		<>
@@ -107,21 +96,9 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						}
 						placeholder={ __( 'Accordion title' ) }
 					/>
-					{ shouldShowIcon && (
-						<span
-							className={ clsx(
-								`accordion-content__toggle-icon`,
-								{
-									'has-icon-plus': true,
-								}
-							) }
-							style={ {
-								// TO-DO: make this configurable
-								width: `1.2em`,
-								height: `1.2em`,
-							} }
-						>
-							{ Icon && <Icon width="1.2em" height="1.2em" /> }
+					{ showIcon && (
+						<span className="accordion-content__toggle-icon">
+							+
 						</span>
 					) }
 				</button>
