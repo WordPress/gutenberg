@@ -18,18 +18,10 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$content = get_the_content();
-
-	/*
-	 * Reading rates (words per minute) - based on averages from
-	 * https://irisreading.com/average-reading-speed-in-various-languages/
-	 * (Characters/minute used for Chinese rather than words).
-	 */
-	$average_reading_rate = get_post_time_to_read_average_reading_speed();
-
-	$word_count_type = wp_get_word_count_type();
-
-	$total_words = wp_word_count( $content, $word_count_type );
+	$content               = get_the_content();
+	$average_reading_rate  = get_post_time_to_read_average_reading_speed();
+	$word_count_type       = wp_get_word_count_type();
+	$total_words           = wp_word_count( $content, $word_count_type );
 
 	if ( ! empty( $attributes['displayAsRange'] ) ) {
 		// Calculate faster reading rate with 20% speed = lower minutes,
@@ -68,6 +60,11 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 /**
  * Get the average reading speed with filter applied.
+ *
+ * The default average reading speed is 189 words per minute
+ * based on averages from:
+ *  https://irisreading.com/average-reading-speed-in-various-languages/
+ * (Characters/minute used for Chinese rather than words).
  *
  * @return int The average reading speed in words per minute.
  */
