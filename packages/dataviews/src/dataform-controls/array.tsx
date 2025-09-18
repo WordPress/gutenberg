@@ -125,10 +125,8 @@ export default function ArrayControl< Item >( {
 			} );
 
 			onChange( setValue( { item: data, value: valueTokens } ) );
-
-			validateTokens( tokens );
 		},
-		[ onChange, setValue, data, validateTokens ]
+		[ onChange, setValue, data ]
 	);
 
 	const onInputChange = useCallback( ( input: string ) => {
