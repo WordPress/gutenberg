@@ -18,6 +18,14 @@ import type { SetSelection } from './private-types';
  */
 import type { useFocusOnMount } from '@wordpress/compose';
 
+/**
+ * Utility type that makes all properties of T optional recursively.
+ * Used by field setValue functions to allow partial item updates.
+ */
+export type DeepPartial< T > = {
+	[ P in keyof T ]?: T[ P ] extends object ? DeepPartial< T[ P ] > : T[ P ];
+};
+
 export type SortDirection = 'asc' | 'desc';
 
 /**
@@ -126,7 +134,11 @@ export type FieldTypeDefinition< Item > = {
 	/**
 	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > > | string | null;
+	Edit:
+		| ComponentType< DataFormControlProps< Item > >
+		| string
+		| EditConfig
+		| null;
 
 	/**
 	 * Callback used to render the field.
@@ -155,6 +167,48 @@ export type Rules< Item > = {
 	elements?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
+
+/**
+ * Edit configuration for textarea controls.
+ */
+export type EditConfigTextarea = {
+	control: 'textarea';
+	/**
+	 * Number of rows for the textarea.
+	 */
+	rows?: number;
+};
+
+/**
+ * Edit configuration for text controls.
+ */
+export type EditConfigText = {
+	control: 'text';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text' and 'textarea').
+ */
+export type EditConfigGeneric = {
+	control: Exclude< FieldType, 'text' | 'textarea' >;
+};
+
+/**
+ * Edit configuration object with type-safe control options.
+ * Each control type has its own specific configuration properties.
+ */
+export type EditConfig =
+	| EditConfigTextarea
+	| EditConfigText
+	| EditConfigGeneric;
 
 /**
  * A dataview field for a specific property of a data type.
@@ -199,7 +253,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | string;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string | EditConfig;
 
 	/**
 	 * Callback used to sort the field.
@@ -252,12 +306,19 @@ export type Field< Item > = {
 	 * Defaults to `item[ field.id ]`.
 	 */
 	getValue?: ( args: { item: Item } ) => any;
+
+	/**
+	 * Callback used to set the value of the field on the item.
+	 * Used for editing operations to update field values.
+	 */
+	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
+	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
@@ -278,7 +339,7 @@ export type Data< Item > = Item[];
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onChange: ( value: Record< string, any > ) => void;
+	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
 	/**
 	 * The currently selected filter operator for this field.
@@ -286,6 +347,14 @@ export type DataFormControlProps< Item > = {
 	 * Used by DataViews filters to determine which control to render based on the operator type.
 	 */
 	operator?: Operator;
+	/**
+	 * Configuration object for the control.
+	 */
+	config?: {
+		prefix?: React.ComponentType;
+		suffix?: React.ComponentType;
+		rows?: number;
+	};
 };
 
 export type DataViewRenderFieldProps< Item > = {
@@ -794,6 +863,7 @@ export type CombinedFormField = {
 	description?: string;
 	layout?: Layout;
 	children: Array< FormField | string >;
+	summary?: string | string[];
 };
 
 export type FormField = SimpleFormField | CombinedFormField;

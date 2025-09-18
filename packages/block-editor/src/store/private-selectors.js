@@ -18,14 +18,15 @@ import {
 	getClientIdsWithDescendants,
 	isNavigationMode,
 	getBlockRootClientId,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getGrammar,
+	mapUserPattern,
 } from './utils';
-import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
@@ -348,26 +349,6 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
-function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
-) {
-	return {
-		name: `core/block/${ userPattern.id }`,
-		id: userPattern.id,
-		type: INSERTER_PATTERN_TYPES.user,
-		title: userPattern.title.raw,
-		categories: userPattern.wp_pattern_category?.map( ( catId ) => {
-			const category = __experimentalUserPatternCategories.find(
-				( { id } ) => id === catId
-			);
-			return category ? category.slug : catId;
-		} ),
-		content: userPattern.content.raw,
-		syncStatus: userPattern.wp_pattern_sync_status,
-	};
-}
-
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, patternName ) => {
@@ -537,9 +518,18 @@ export function isSectionBlock( state, clientId ) {
 		return true;
 	}
 
+	const attributes = getBlockAttributes( state, clientId );
+	const isTemplatePart = blockName === 'core/template-part';
+	if (
+		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		!! window?.__experimentalContentOnlyPatternInsertion
+	) {
+		return true;
+	}
+
 	// Template parts become sections in navigation mode.
 	const _isNavigationMode = isNavigationMode( state );
-	if ( _isNavigationMode && blockName === 'core/template-part' ) {
+	if ( _isNavigationMode && isTemplatePart ) {
 		return true;
 	}
 

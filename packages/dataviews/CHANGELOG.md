@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.0.0 (2025-09-17)
+
 ### Breaking changes
 
 - Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
@@ -9,6 +11,7 @@
 
 ### Features
 
+- Field API: introduce `setValue` to fix DataViews filters and DataForm panel layout (modal) when working with nested data. [#71604](https://github.com/WordPress/gutenberg/pull/71604)
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
 - Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
 - DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
@@ -16,11 +19,18 @@
 - Dataform: Add new `password` field type and field control. [#71545](https://github.com/WordPress/gutenberg/pull/71545)
 - DataForm: Add a textarea control for use with the `text` field type ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 - DataViews: support groupBy in the list layout. [#71548](https://github.com/WordPress/gutenberg/pull/71548)
+- DataForm: support validation in select control [#71665](https://github.com/WordPress/gutenberg/pull/71665)
+- DataForm: support validation in toggleGroup control. ([#71666](https://github.com/WordPress/gutenberg/pull/71666))
+- DataForm: Add object configuration support for Edit property with some options. ([#71582](https://github.com/WordPress/gutenberg/pull/71582))
+- DataForm: Add summary field support for composed fields. ([#71614](https://github.com/WordPress/gutenberg/pull/71614))
+- DataForm: update radio control to support `required` and `custom` validation. [#71664](https://github.com/WordPress/gutenberg/pull/71664)
 - DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
 
 ### Bug Fixes
 
 - DataViews grid layout: make sure media previews have rounded corners. [#71543](https://github.com/WordPress/gutenberg/pull/71543)
+- DataForm regular layout: Remove label style overrides as they cause inconsistent results. ([#71574](https://github.com/WordPress/gutenberg/pull/71574))
+- DataForm regular layout: Use BaseControl visual label for readonly fields when in top labelPosition. ([#71597](https://github.com/WordPress/gutenberg/pull/71597))
 
 ## 8.0.0 (2025-09-03)
 

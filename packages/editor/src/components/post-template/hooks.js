@@ -52,13 +52,29 @@ export function useAllowSwitchingTemplates() {
 }
 
 function useTemplates( postType ) {
-	return useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-				post_type: postType,
-			} ),
+	// To do: create a new selector to checks if templates exist at all instead
+	// of and unbound request. In the modal, the user templates should be
+	// paginated and we should not make an unbound request.
+	const { staticTemplates, templates } = useSelect(
+		( select ) => {
+			return {
+				staticTemplates: select( coreStore ).getEntityRecords(
+					'postType',
+					'wp_registered_template',
+					{ per_page: -1, post_type: postType }
+				),
+				templates: select( coreStore ).getEntityRecords(
+					'postType',
+					'wp_template',
+					{ per_page: -1, post_type: postType }
+				),
+			};
+		},
 		[ postType ]
+	);
+	return useMemo(
+		() => [ ...( staticTemplates || [] ), ...( templates || [] ) ],
+		[ staticTemplates, templates ]
 	);
 }
 
@@ -71,7 +87,7 @@ export function useAvailableTemplates( postType ) {
 			allowSwitchingTemplate &&
 			templates?.filter(
 				( template ) =>
-					template.is_custom &&
+					( template.is_custom || template.type === 'wp_template' ) &&
 					template.slug !== currentTemplateSlug &&
 					!! template.content.raw // Skip empty templates.
 			),

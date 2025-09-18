@@ -1,6 +1,10 @@
 /**
  * WordPress dependencies
  */
+import {
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
 import { link } from '@wordpress/icons';
 
 /**
@@ -23,7 +27,11 @@ export default function Url< Item >( {
 				onChange,
 				hideLabelFromVision,
 				type: 'url',
-				icon: link,
+				prefix: (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ link } />
+					</InputControlPrefixWrapper>
+				),
 			} }
 		/>
 	);

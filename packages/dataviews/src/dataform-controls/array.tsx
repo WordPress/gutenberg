@@ -19,8 +19,8 @@ export default function ArrayControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, elements } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, elements, getValue, setValue } = field;
+	const value = getValue( { item: data } );
 
 	const [ customValidity, setCustomValidity ] = useState<
 		| {
@@ -116,13 +116,11 @@ export default function ArrayControl< Item >( {
 				return token;
 			} );
 
-			onChange( {
-				[ id ]: valueTokens,
-			} );
-
-			validateTokens( tokens );
+			onChange( setValue( { item: data, value: stringTokens } ) );
+			
+      validateTokens( tokens );
 		},
-		[ id, onChange, validateTokens ]
+		[ onChange, setValue, data, findElementByLabel ]
 	);
 
 	const onInputChange = useCallback( ( input: string ) => {

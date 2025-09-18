@@ -295,6 +295,17 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 			return match || variation;
 		}
 	}
+
+	// If no variation matches the isActive condition, we return the default variation,
+	// but only if it doesn't have an isActive condition that wasn't matched.
+	// This fallback is only applied for the 'block' and 'transform' scopes but not to
+	// the 'inserter', to avoid affecting block name display there.
+	if ( ! match && [ 'block', 'transform' ].includes( scope ) ) {
+		match = variations.find(
+			( variation ) =>
+				variation?.isDefault && ! Object.hasOwn( variation, 'isActive' )
+		);
+	}
 	return match;
 }
 
