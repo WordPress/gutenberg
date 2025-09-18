@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible.
+- DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
 
 ## 9.0.0 (2025-09-17)
 
