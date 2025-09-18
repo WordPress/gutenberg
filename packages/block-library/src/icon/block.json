@@ -18,9 +18,6 @@
 			"type": "string",
 			"__experimentalRole": "content"
 		},
-		"itemsJustification": {
-			"type": "string"
-		},
 		"iconBackgroundColor": {
 			"type": "string"
 		},
