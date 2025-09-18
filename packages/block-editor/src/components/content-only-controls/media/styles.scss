@@ -1,12 +1,5 @@
 .block-editor-content-only-controls__media {
-	border: $border-width solid $gray-600;
-	border-radius: $radius-small;
-	// Add important to prevent toolspanel from unsetting padding.
-	padding: 8px 12px !important;
-	cursor: pointer;
-	&:hover {
-		background-color: $gray-100;
-	}
+	width: 100%;
 }
 
 .block-editor-content-only-controls__media-replace-flow {
@@ -32,7 +25,6 @@
 
 .block-editor-content-only-controls__media-title {
 	width: 100%;
-	color: $gray-900;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;

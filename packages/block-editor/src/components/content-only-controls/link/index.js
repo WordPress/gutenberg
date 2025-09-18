@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	Icon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
@@ -10,7 +11,6 @@ import {
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { link } from '@wordpress/icons';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 import { prependHTTP } from '@wordpress/url';
 
 /**
@@ -123,50 +123,42 @@ export default function Link( {
 			} }
 			isShownByDefault={ control.shownByDefault }
 		>
-			<div className="block-editor-content-only-controls__media">
-				<div
-					role="button"
-					tabIndex={ 0 }
-					onClick={ () => {
-						setIsLinkControlOpen( true );
-					} }
-					onKeyDown={ ( event ) => {
-						const { keyCode } = event;
-
-						if ( keyCode === ENTER || keyCode === SPACE ) {
-							setIsLinkControlOpen( true );
-						}
-					} }
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				className="block-editor-content-only-controls__link"
+				onClick={ () => {
+					setIsLinkControlOpen( true );
+				} }
+			>
+				<Grid
+					rowGap={ 0 }
+					columnGap={ 8 }
+					templateColumns="24px 1fr"
+					className="block-editor-content-only-controls__link-row"
 				>
-					<Grid
-						rowGap={ 0 }
-						columnGap={ 8 }
-						templateColumns="24px 1fr"
-						className="block-editor-content-only-controls__media-row"
-					>
-						{ href && (
-							<>
-								<Icon icon={ link } size={ 24 } />
-								<span className="block-editor-content-only-controls__media-title">
-									{ href }
-								</span>
-							</>
-						) }
-						{ ! href && (
-							<>
-								<Icon
-									icon={ link }
-									size={ 24 }
-									style={ { opacity: 0.3 } }
-								/>
-								<span className="block-editor-content-only-controls__media-title">
-									{ __( 'Link' ) }
-								</span>
-							</>
-						) }
-					</Grid>
-				</div>
-			</div>
+					{ href && (
+						<>
+							<Icon icon={ link } size={ 24 } />
+							<span className="block-editor-content-only-controls__link-title">
+								{ href }
+							</span>
+						</>
+					) }
+					{ ! href && (
+						<>
+							<Icon
+								icon={ link }
+								size={ 24 }
+								style={ { opacity: 0.3 } }
+							/>
+							<span className="block-editor-content-only-controls__link-title">
+								{ __( 'Link' ) }
+							</span>
+						</>
+					) }
+				</Grid>
+			</Button>
 			{ isLinkControlOpen && (
 				<Popover
 					onClose={ () => {
