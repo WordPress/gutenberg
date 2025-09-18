@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import EditContentsButton from './edit-contents-button';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -46,9 +47,11 @@ function BlockInspector() {
 		selectedBlockClientId,
 		blockType,
 		isSectionBlock,
+		isSectionBlockInSelection,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
+			getSelectedBlockClientIds,
 			getSelectedBlockCount,
 			getBlockName,
 			getParentSectionBlock,
@@ -62,12 +65,17 @@ function BlockInspector() {
 			renderedBlockClientId && getBlockName( renderedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const _isSectionBlockInSelection = selectedBlockClientIds.some(
+			( id ) => _isSectionBlock( id )
+		);
 
 		return {
 			count: getSelectedBlockCount(),
 			selectedBlockClientId: renderedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
+			isSectionBlockInSelection: _isSectionBlockInSelection,
 			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
 		};
 	}, [] );
@@ -88,7 +96,9 @@ function BlockInspector() {
 		blockName: selectedBlockName,
 	} );
 
-	if ( count > 1 && ! isSectionBlock ) {
+	const hasSelectedBlocks = count > 1;
+
+	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -121,6 +131,14 @@ function BlockInspector() {
 						<InspectorControls.Slot group="styles" />
 					</>
 				) }
+			</div>
+		);
+	}
+
+	if ( hasSelectedBlocks && isSectionBlockInSelection ) {
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
 			</div>
 		);
 	}
@@ -247,7 +265,11 @@ const BlockInspectorSingleBlock = ( {
 			<BlockCard
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
-			/>
+			>
+				{ window?.__experimentalContentOnlyPatternInsertion && (
+					<EditContentsButton clientId={ clientId } />
+				) }
+			</BlockCard>
 			<BlockVariationTransforms blockClientId={ clientId } />
 			{ showTabs && (
 				<InspectorControlsTabs

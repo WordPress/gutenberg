@@ -40,10 +40,13 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Filtering', async ( { requestUtils, admin, page } ) => {
-		await requestUtils.createTemplate( 'wp_template', {
+		const template = await requestUtils.createTemplate( 'wp_template', {
 			slug: 'date',
 			title: 'Date Archives',
 			content: 'hi',
+		} );
+		await requestUtils.updateSiteSettings( {
+			active_templates: { date: template.wp_id },
 		} );
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.
@@ -54,7 +57,7 @@ test.describe( 'Templates', () => {
 		await page
 			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
-		await expect( titles ).toHaveCount( 6 );
+		await expect( titles ).toHaveCount( 5 );
 
 		// Filter by author.
 		await page.getByRole( 'button', { name: 'Add filter' } ).click();

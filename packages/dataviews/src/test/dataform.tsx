@@ -139,7 +139,7 @@ describe( 'DataForm component', () => {
 			expect( onChange ).toHaveBeenCalledTimes( newValue.length );
 			for ( let i = 0; i < newValue.length; i++ ) {
 				expect( onChange ).toHaveBeenNthCalledWith( i + 1, {
-					title: newValue[ i ],
+					title: newValue.slice( 0, i + 1 ),
 				} );
 			}
 		} );
@@ -408,7 +408,7 @@ describe( 'DataForm component', () => {
 			expect( onChange ).toHaveBeenCalledTimes( newValue.length );
 			for ( let i = 0; i < newValue.length; i++ ) {
 				expect( onChange ).toHaveBeenNthCalledWith( i + 1, {
-					title: newValue[ i ],
+					title: newValue.slice( 0, i + 1 ),
 				} );
 			}
 		} );

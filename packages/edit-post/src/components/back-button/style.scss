@@ -6,6 +6,7 @@
 		display: flex;
 		align-items: center;
 		align-self: stretch;
+		justify-content: center;
 		border: none;
 		background: $gray-900;
 		color: $white;
@@ -29,10 +30,10 @@
 			content: "";
 			display: block;
 			position: absolute;
-			top: 9px;
-			right: 9px;
-			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
-			left: 9px;
+			top: $grid-unit-10 + $border-width;
+			right: $grid-unit-10 + $border-width;
+			bottom: $grid-unit-10 + $border-width;
+			left: $grid-unit-10 + $border-width;
 			border-radius: $radius-small + $border-width + $border-width;
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
 		}

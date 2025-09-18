@@ -99,6 +99,7 @@ export function ViewTypeMenu() {
 									case 'list':
 									case 'grid':
 									case 'table':
+									case 'pickerGrid':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
@@ -561,7 +562,8 @@ function FieldControl() {
 		( f ) =>
 			! visibleFieldIds.includes( f.id ) &&
 			! togglableFields.includes( f.id ) &&
-			f.type !== 'media'
+			f.type !== 'media' &&
+			f.enableHiding !== false
 	);
 	const visibleFields = visibleFieldIds
 		.map( ( fieldId ) => fields.find( ( f ) => f.id === fieldId ) )

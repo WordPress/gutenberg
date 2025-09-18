@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -7,7 +12,7 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 
 /**
@@ -17,6 +22,7 @@ import type { Form, FormField, NormalizedField } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../../normalize-form-fields';
+import SummaryButton from './summary-button';
 
 function ModalContent< Item >( {
 	data,
@@ -32,18 +38,18 @@ function ModalContent< Item >( {
 	onClose: () => void;
 } ) {
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
+	const modalData = useMemo( () => {
+		return deepMerge( data, changes );
+	}, [ data, changes ] );
 
 	const onApply = () => {
 		onChange( changes );
 		onClose();
 	};
 
-	const handleOnChange = ( value: Partial< Item > ) => {
-		setChanges( ( prev ) => ( { ...prev, ...value } ) );
+	const handleOnChange = ( newValue: Partial< Item > ) => {
+		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
-
-	// Merge original data with local changes for display
-	const displayData = { ...data, ...changes };
 
 	return (
 		<Modal
@@ -54,14 +60,14 @@ function ModalContent< Item >( {
 			size="medium"
 		>
 			<DataFormLayout
-				data={ displayData }
+				data={ modalData }
 				form={ form }
 				onChange={ handleOnChange }
 			>
 				{ ( FieldLayout, nestedField ) => (
 					<FieldLayout
 						key={ nestedField.id }
-						data={ displayData }
+						data={ modalData }
 						field={ nestedField }
 						onChange={ handleOnChange }
 						hideLabelFromVision={
@@ -96,12 +102,14 @@ function ModalContent< Item >( {
 
 function PanelModal< Item >( {
 	fieldDefinition,
+	summaryFields,
 	labelPosition,
 	data,
 	onChange,
 	field,
 }: {
 	fieldDefinition: NormalizedField< Item >;
+	summaryFields: NormalizedField< Item >[];
 	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
 	onChange: ( value: any ) => void;
@@ -126,29 +134,15 @@ function PanelModal< Item >( {
 
 	return (
 		<>
-			<Button
-				className="dataforms-layouts-modal__field-control"
-				size="compact"
-				variant={
-					[ 'none', 'top' ].includes( labelPosition )
-						? 'link'
-						: 'tertiary'
-				}
-				aria-expanded={ isOpen }
-				aria-label={ sprintf(
-					// translators: %s: Field name.
-					_x( 'Edit %s', 'field' ),
-					fieldLabel || ''
-				) }
-				onClick={ () => setIsOpen( true ) }
+			<SummaryButton
+				summaryFields={ summaryFields }
+				data={ data }
+				labelPosition={ labelPosition }
+				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				accessibleWhenDisabled
-			>
-				<fieldDefinition.render
-					item={ data }
-					field={ fieldDefinition }
-				/>
-			</Button>
+				onClick={ () => setIsOpen( true ) }
+				aria-expanded={ isOpen }
+			/>
 			{ isOpen && (
 				<ModalContent
 					data={ data }

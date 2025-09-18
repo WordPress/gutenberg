@@ -81,6 +81,7 @@ const DESIGN_POST_TYPES = [
 	'wp_template_part',
 	'wp_block',
 	'wp_navigation',
+	'wp_registered_template',
 ];
 
 function useEditorStyles( ...additionalStyles ) {
@@ -172,6 +173,9 @@ function MetaBoxesMain( { isLegacy } ) {
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
 		);
+		if ( ! container ) {
+			return;
+		}
 		const noticeLists = container.querySelectorAll(
 			':scope > .components-notice-list'
 		);
@@ -465,6 +469,17 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
+	const editableResolvedTemplateId = useSelect(
+		( select ) => {
+			if ( typeof templateId !== 'string' ) {
+				return templateId;
+			}
+			return unlock( select( coreStore ) ).getTemplateAutoDraftId(
+				templateId
+			);
+		},
+		[ templateId ]
+	);
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
 		enablePaddingAppender
 	);
@@ -588,7 +603,7 @@ function Layout( {
 						initialEdits={ initialEdits }
 						postType={ currentPostType }
 						postId={ currentPostId }
-						templateId={ templateId }
+						templateId={ editableResolvedTemplateId }
 						className={ className }
 						styles={ styles }
 						forceIsDirty={ hasActiveMetaboxes }

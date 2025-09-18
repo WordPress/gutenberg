@@ -238,7 +238,10 @@ test.describe( 'Site Editor Performance', () => {
 
 				await metrics.startTracing();
 				await page
-					.getByText( 'Single Posts', { exact: true } )
+					.getByRole( 'button', {
+						name: 'Single Posts',
+						exact: true,
+					} )
 					.click( { force: true } );
 				await metrics.stopTracing();
 
@@ -289,11 +292,7 @@ test.describe( 'Site Editor Performance', () => {
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
 				// queries or patterns already cached.
-				await admin.visitSiteEditor( {
-					postId: 'twentytwentyfour//home',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
+				await admin.visitSiteEditor( { canvas: 'edit' } );
 				await editor.openDocumentSettingsSidebar();
 
 				/*

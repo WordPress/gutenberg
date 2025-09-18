@@ -19,6 +19,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 	useBlockProps,
+	useBlockEditingMode,
 	__experimentalDateFormatPicker as DateFormatPicker,
 	__experimentalPublishDateTimePicker as PublishDateTimePicker,
 } from '@wordpress/block-editor';
@@ -99,6 +100,8 @@ export default function PostDateEdit( {
 		[ postTypeSlug ]
 	);
 
+	const blockEditingMode = useBlockEditingMode();
+
 	let postDate = (
 		<time dateTime={ dateI18n( 'c', datetime ) } ref={ setPopoverAnchor }>
 			{ format === 'human-diff'
@@ -120,61 +123,69 @@ export default function PostDateEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-				{ displayType !== 'modified' && ! isDescendentOfQueryLoop && (
-					<ToolbarGroup>
-						<Dropdown
-							popoverProps={ popoverProps }
-							renderContent={ ( { onClose } ) => (
-								<PublishDateTimePicker
-									title={
-										displayType === 'date'
-											? __( 'Publish Date' )
-											: __( 'Date' )
-									}
-									currentDate={ datetime }
-									onChange={ ( newDatetime ) =>
-										setAttributes( {
-											datetime: newDatetime,
-										} )
-									}
-									is12Hour={ is12HourFormat(
-										siteTimeFormat
+			{ ( blockEditingMode === 'default' ||
+				! isDescendentOfQueryLoop ) && (
+				<BlockControls group="block">
+					<AlignmentControl
+						value={ textAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { textAlign: nextAlign } );
+						} }
+					/>
+
+					{ displayType !== 'modified' &&
+						! isDescendentOfQueryLoop && (
+							<ToolbarGroup>
+								<Dropdown
+									popoverProps={ popoverProps }
+									renderContent={ ( { onClose } ) => (
+										<PublishDateTimePicker
+											title={
+												displayType === 'date'
+													? __( 'Publish Date' )
+													: __( 'Date' )
+											}
+											currentDate={ datetime }
+											onChange={ ( newDatetime ) =>
+												setAttributes( {
+													datetime: newDatetime,
+												} )
+											}
+											is12Hour={ is12HourFormat(
+												siteTimeFormat
+											) }
+											onClose={ onClose }
+											dateOrder={
+												/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+												_x( 'dmy', 'date order' )
+											}
+										/>
 									) }
-									onClose={ onClose }
-									dateOrder={
-										/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
-										_x( 'dmy', 'date order' )
-									}
+									renderToggle={ ( { isOpen, onToggle } ) => {
+										const openOnArrowDown = ( event ) => {
+											if (
+												! isOpen &&
+												event.keyCode === DOWN
+											) {
+												event.preventDefault();
+												onToggle();
+											}
+										};
+										return (
+											<ToolbarButton
+												aria-expanded={ isOpen }
+												icon={ edit }
+												title={ __( 'Change Date' ) }
+												onClick={ onToggle }
+												onKeyDown={ openOnArrowDown }
+											/>
+										);
+									} }
 								/>
-							) }
-							renderToggle={ ( { isOpen, onToggle } ) => {
-								const openOnArrowDown = ( event ) => {
-									if ( ! isOpen && event.keyCode === DOWN ) {
-										event.preventDefault();
-										onToggle();
-									}
-								};
-								return (
-									<ToolbarButton
-										aria-expanded={ isOpen }
-										icon={ edit }
-										title={ __( 'Change Date' ) }
-										onClick={ onToggle }
-										onKeyDown={ openOnArrowDown }
-									/>
-								);
-							} }
-						/>
-					</ToolbarGroup>
-				) }
-			</BlockControls>
+							</ToolbarGroup>
+						) }
+				</BlockControls>
+			) }
 
 			<InspectorControls>
 				<ToolsPanel

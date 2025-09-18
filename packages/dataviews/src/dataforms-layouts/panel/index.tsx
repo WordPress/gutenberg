@@ -32,28 +32,49 @@ export default function FormPanelField< Item >( {
 	onChange,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
-	const fieldDefinition = fields.find( ( _field ) => {
-		// Default to the first simple child if it is a combined field.
-		if ( isCombinedField( field ) ) {
-			const simpleChildren = field.children.filter(
-				( child ): child is string | SimpleFormField =>
-					typeof child === 'string' || ! isCombinedField( child )
+	const getSummaryFields = () => {
+		if ( ! isCombinedField( field ) ) {
+			const fieldDef = fields.find(
+				( _field ) => _field.id === field.id
 			);
-
-			if ( simpleChildren.length === 0 ) {
-				return false;
-			}
-
-			const firstChildFieldId =
-				typeof simpleChildren[ 0 ] === 'string'
-					? simpleChildren[ 0 ]
-					: simpleChildren[ 0 ].id;
-
-			return _field.id === firstChildFieldId;
+			return fieldDef ? [ fieldDef ] : [];
 		}
 
-		return _field.id === field.id;
-	} );
+		// Use summary field(s) if specified for combined fields
+		if ( field.summary ) {
+			const summaryIds = Array.isArray( field.summary )
+				? field.summary
+				: [ field.summary ];
+			return summaryIds
+				.map( ( summaryId ) =>
+					fields.find( ( _field ) => _field.id === summaryId )
+				)
+				.filter( ( _field ) => _field !== undefined );
+		}
+
+		// Default to the first simple child
+		const simpleChildren = field.children.filter(
+			( child ): child is string | SimpleFormField =>
+				typeof child === 'string' || ! isCombinedField( child )
+		);
+
+		if ( simpleChildren.length === 0 ) {
+			return [];
+		}
+
+		const firstChildFieldId =
+			typeof simpleChildren[ 0 ] === 'string'
+				? simpleChildren[ 0 ]
+				: simpleChildren[ 0 ].id;
+
+		const fieldDef = fields.find(
+			( _field ) => _field.id === firstChildFieldId
+		);
+		return fieldDef ? [ fieldDef ] : [];
+	};
+
+	const summaryFields = getSummaryFields();
+	const fieldDefinition = summaryFields[ 0 ]; // For backward compatibility
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -84,6 +105,7 @@ export default function FormPanelField< Item >( {
 			<PanelModal
 				field={ field }
 				fieldDefinition={ fieldDefinition }
+				summaryFields={ summaryFields }
 				data={ data }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
@@ -93,6 +115,7 @@ export default function FormPanelField< Item >( {
 				field={ field }
 				popoverAnchor={ popoverAnchor }
 				fieldDefinition={ fieldDefinition }
+				summaryFields={ summaryFields }
 				data={ data }
 				onChange={ onChange }
 				labelPosition={ labelPosition }
