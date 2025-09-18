@@ -4,7 +4,12 @@
 /**
  * External dependencies
  */
-import { h as createElement, type VNode, type RefObject } from 'preact';
+import {
+	h as createElement,
+	cloneElement,
+	type VNode,
+	type RefObject,
+} from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { signal } from '@preact/signals';
 
@@ -739,7 +744,9 @@ export default () => {
 				routerRegions.set( regionId, signal() );
 			}
 
-			return routerRegions.get( regionId )!.value;
+			const vdom = routerRegions.get( regionId )!.value;
+			const previousScope = getScope();
+			return vdom && cloneElement( vdom, { previousScope } );
 		},
 		{ priority: 1 }
 	);
