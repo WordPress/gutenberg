@@ -7,12 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import {
 	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	RangeControl,
@@ -22,6 +23,7 @@ import {
 } from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
@@ -29,7 +31,12 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
+function PostTimeToReadEdit( {
+	attributes,
+	setAttributes,
+	clientId,
+	context,
+} ) {
 	/**
 	 * Average reading rate - based on average taken from
 	 * https://irisreading.com/average-reading-speed-in-various-languages/
@@ -37,18 +44,29 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	 */
 	const AVERAGE_READING_RATE = 189;
 
+	const { blockWasJustInserted } = useSelect(
+		( select ) => {
+			const { wasBlockJustInserted } = select( blockEditorStore );
+
+			return {
+				blockWasJustInserted: wasBlockJustInserted( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	// When the block is first inserted, default to displaying as a range.
+	useEffect( () => {
+		if ( blockWasJustInserted ) {
+			setAttributes( {
+				displayAsRange: true,
+			} );
+		}
+	}, [ blockWasJustInserted ] );
+
 	const { textAlign, averageReadingSpeed, displayAsRange } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	// Set displayAsRange: true for new blocks on first render
-	const hasSetInitialValue = useRef( false );
-	useEffect( () => {
-		if ( ! hasSetInitialValue.current ) {
-			hasSetInitialValue.current = true;
-			setAttributes( { displayAsRange: true } );
-		}
-	}, [ setAttributes ] );
 
 	const [ contentStructure ] = useEntityProp(
 		'postType',
