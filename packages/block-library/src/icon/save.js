@@ -29,10 +29,6 @@ export default function Save( props ) {
 		gradient,
 		hasNoIconFill,
 		icon,
-		iconBackgroundColor,
-		iconBackgroundColorValue,
-		iconColor,
-		iconColorValue,
 		iconName,
 		label,
 		linkRel,
@@ -95,16 +91,8 @@ export default function Save( props ) {
 	const borderProps = getBorderClassesAndStyles( props.attributes );
 
 	const iconClasses = clsx( 'icon-container', borderProps?.className, {
-		'has-icon-color': iconColorValue,
 		'has-no-icon-fill-color': hasNoIconFill,
-		'has-icon-background-color':
-			iconBackgroundColorValue ||
-			iconBackgroundColor ||
-			gradient ||
-			customGradient,
-		[ `has-${ iconBackgroundColor }-background-color` ]:
-			iconBackgroundColor,
-		[ `has-${ iconColor }-color` ]: iconColor,
+		'has-icon-background-color': gradient || customGradient,
 		[ `has-${ gradient }-gradient-background` ]: gradient,
 	} );
 
@@ -122,8 +110,6 @@ export default function Save( props ) {
 
 	const iconStyles = {
 		background: ! gradient ? customGradient : undefined,
-		backgroundColor: iconBackgroundColorValue,
-		color: iconColorValue,
 		width: iconWidth,
 		height: height || undefined,
 		...blockProps.style,

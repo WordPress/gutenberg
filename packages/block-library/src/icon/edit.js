@@ -16,7 +16,6 @@ import {
 	NavigableMenu,
 	Popover,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -25,14 +24,10 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	ContrastChecker,
 	InspectorControls,
 	MediaUpload,
 	useBlockProps,
-	withColors,
 	useBlockEditingMode,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	__experimentalUseGradient as useGradient,
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
@@ -70,20 +65,10 @@ const NEW_TAB_REL = 'noreferrer noopener';
  * @param {Object} props All props passed to this function.
  */
 export function Edit( props ) {
-	const {
-		clientId,
-		attributes,
-		iconBackgroundColor,
-		iconColor,
-		setAttributes,
-		setIconBackgroundColor,
-		setIconColor,
-	} = props;
+	const { attributes, setAttributes } = props;
 	const {
 		hasNoIconFill,
 		icon,
-		iconBackgroundColorValue,
-		iconColorValue,
 		iconName,
 		label,
 		linkRel,
@@ -110,7 +95,7 @@ export function Edit( props ) {
 		? Object.values( allowedMimeTypes ).includes( 'image/svg+xml' )
 		: false;
 
-	const { gradientClass, gradientValue, setGradient } = useGradient();
+	const { gradientClass, gradientValue } = useGradient();
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
@@ -399,47 +384,7 @@ export function Edit( props ) {
 			) }
 		</>
 	);
-
-	const colorSettings = [
-		{
-			colorLabel: __( 'Icon color' ),
-			colorValue: iconColor.color || iconColorValue,
-			onChange: ( colorValue ) => {
-				setIconColor( colorValue );
-				setAttributes( {
-					iconColorValue: colorValue,
-				} );
-			},
-			resetAllFilter: () => {
-				setIconColor( undefined );
-				setAttributes( { iconColorValue: undefined } );
-			},
-		},
-		{
-			colorLabel: __( 'Background color' ),
-			colorValue: iconBackgroundColor.color || iconBackgroundColorValue,
-			colorGradientValue: gradientValue,
-			onChange: ( colorValue ) => {
-				setIconBackgroundColor( colorValue );
-				setAttributes( {
-					iconBackgroundColorValue: colorValue,
-				} );
-			},
-			onGradientChange: setGradient,
-			resetAllFilter: () => {
-				setIconBackgroundColor( undefined );
-				setAttributes( { iconBackgroundColorValue: undefined } );
-			},
-		},
-	];
-
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	// In WordPress <=6.2 this will return null, so default to true in those cases.
-	const hasColorsOrGradients =
-		colorGradientSettings?.hasColorsOrGradients ?? true;
-
 	const inspectorControls = ( icon || iconName ) && (
 		<>
 			<InspectorControls group="settings">
@@ -508,69 +453,7 @@ export function Edit( props ) {
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
-			{ hasColorsOrGradients && (
-				<InspectorControls group="color">
-					{ colorSettings.map(
-						( {
-							colorLabel,
-							colorValue,
-							colorGradientValue,
-							onChange,
-							onGradientChange,
-							resetAllFilter,
-						} ) => (
-							<ColorGradientSettingsDropdown
-								key={ `icon-block-color-${ colorLabel }` }
-								__experimentalIsRenderedInSidebar
-								settings={ [
-									{
-										label: colorLabel,
-										colorValue,
-										gradientValue: colorGradientValue,
-										onColorChange: onChange,
-										onGradientChange,
-										isShownByDefault: true,
-										resetAllFilter,
-										enableAlpha: true,
-									},
-								] }
-								panelId={ clientId }
-								{ ...colorGradientSettings }
-							/>
-						)
-					) }
-					{ ( iconColor.color || iconColorValue ) && (
-						<>
-							<p className="outermost-icon-block__color-settings__help">
-								{ __(
-									'Any color or fill values in the SVG icon itself will take precedent over the chosen color.'
-								) }
-							</p>
-							<ToggleControl
-								className="outermost-icon-block__color-settings__apply-fill"
-								checked={ ! hasNoIconFill }
-								label={ __( 'Apply icon color to fill' ) }
-								help={ __(
-									'Set the SVG fill value to the chosen icon color. Disable as needed.'
-								) }
-								onChange={ () =>
-									setAttributes( {
-										hasNoIconFill: ! hasNoIconFill,
-									} )
-								}
-								__nextHasNoMarginBottom
-							/>
-						</>
-					) }
-					<ContrastChecker
-						{ ...{
-							textColor: iconColorValue,
-							backgroundColor: iconBackgroundColorValue,
-						} }
-						isLargeText={ false }
-					/>
-				</InspectorControls>
-			) }
+
 			<InspectorControls group="advanced">
 				<TextControl
 					label={ __( 'Link rel' ) }
@@ -607,21 +490,11 @@ export function Edit( props ) {
 
 	const blockProps = useBlockProps();
 	const borderProps = getBorderClassesAndStyles( attributes );
-	const themeIconBackgroundColor =
-		iconBackgroundColor?.slug || attributes.iconBackgroundColor;
-	const themeIconColor = iconColor?.slug || attributes.iconColor;
 
 	const iconClasses = clsx( 'icon-container', borderProps?.className, {
-		'has-icon-color': iconColor.color || iconColorValue,
 		'has-no-icon-fill-color': hasNoIconFill,
-		'has-icon-background-color':
-			iconBackgroundColor.color ||
-			iconBackgroundColorValue ||
-			gradientValue,
+		'has-icon-background-color': gradientValue,
 		'has-background-gradient': gradientValue,
-		[ `has-${ themeIconColor }-color` ]: themeIconColor,
-		[ `has-${ themeIconBackgroundColor }-background-color` ]:
-			themeIconBackgroundColor,
 		[ gradientClass ]: gradientClass,
 	} );
 
@@ -639,10 +512,8 @@ export function Edit( props ) {
 
 	const iconStyles = {
 		background: gradientValue,
-		backgroundColor: iconBackgroundColorValue,
 		...blockProps.style,
 		...borderProps.style,
-		color: iconColorValue,
 		width: iconWidth,
 		height: height || undefined,
 
@@ -723,9 +594,4 @@ export function Edit( props ) {
 	);
 }
 
-const iconColorAttributes = {
-	iconColor: 'icon-color',
-	iconBackgroundColor: 'icon-background-color',
-};
-
-export default withColors( iconColorAttributes )( Edit );
+export default Edit;

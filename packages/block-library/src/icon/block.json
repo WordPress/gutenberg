@@ -27,13 +27,7 @@
 		"iconBackgroundColorValue": {
 			"type": "string"
 		},
-		"iconColor": {
-			"type": "string"
-		},
 		"customIconColor": {
-			"type": "string"
-		},
-		"iconColorValue": {
 			"type": "string"
 		},
 		"gradient": {
