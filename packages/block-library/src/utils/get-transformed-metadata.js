@@ -43,7 +43,7 @@ export function getTransformedMetadata(
 	}
 	// If it supports block visibility (true by default), add the `blockVisibility` property.
 	if (
-		supports.__experimentalBlockVisibility !== false &&
+		supports.blockVisibility !== false &&
 		window.__experimentalBlockVisibility
 	) {
 		transformSupportedProps.push( 'blockVisibility' );

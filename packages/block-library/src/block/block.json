@@ -24,7 +24,7 @@
 		"html": false,
 		"inserter": false,
 		"renaming": false,
-		"__experimentalBlockVisibility": false,
+		"__experblockVisibilityimentalBlockVisibility": false,
 		"interactivity": {
 			"clientNavigation": true
 		}
