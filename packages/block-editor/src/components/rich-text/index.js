@@ -20,10 +20,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import {
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-} from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -222,16 +219,14 @@ export function RichTextWrapper(
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
 			let clientSideFieldLabel = null;
-			const allSources = getBlockBindingsSources();
-			const clientSideSource = allSources[ relatedBinding.source ];
-			if ( clientSideSource?.editorUI ) {
+			if ( blockBindingsSource?.editorUI ) {
 				const editorUIContext = {};
-				if ( clientSideSource.usesContext?.length ) {
-					for ( const key of clientSideSource.usesContext ) {
+				if ( blockBindingsSource.usesContext?.length ) {
+					for ( const key of blockBindingsSource.usesContext ) {
 						editorUIContext[ key ] = blockContext[ key ];
 					}
 				}
-				const editorUIResult = clientSideSource.editorUI( {
+				const editorUIResult = blockBindingsSource.editorUI( {
 					select,
 					context: editorUIContext,
 				} );
