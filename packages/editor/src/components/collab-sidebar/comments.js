@@ -123,14 +123,6 @@ export function Comments( {
 				? findBlockByCommentId( focusThread, blocks )
 				: null;
 
-		// Clear highlight if switching blocks.
-		if (
-			relatedBlockClientId &&
-			relatedBlockClientId !== selectedBlockClientId
-		) {
-			toggleBlockHighlight( relatedBlockClientId, false );
-		}
-
 		// Highlight comment when block is selected.
 		if ( blockCommentId && ! focusThread ) {
 			setFocusThread( blockCommentId );
@@ -150,52 +142,26 @@ export function Comments( {
 		setFocusThread,
 	] );
 
-	// Clear highlights when switching to blocks without comments
-	useEffect( () => {
-		// Only clear if we're switching from a block WITH comments to a block WITHOUT comments
-		// This prevents clearing when switching between comments on the same block without comments
-		if (
-			selectedBlockClientId &&
-			! blockCommentId &&
-			focusThread &&
+	// Only clear if we're switching from a block WITH comments to a block WITHOUT comments
+	// This prevents clearing when switching between comments on the same block without comments
+	if ( selectedBlockClientId && ! blockCommentId && focusThread && blocks ) {
+		// Check if the current focus thread belongs to a different block
+		const currentFocusedThreadBlock = findBlockByCommentId(
+			focusThread,
 			blocks
-		) {
-			// Check if the current focus thread belongs to a different block
-			const currentFocusedThreadBlock = findBlockByCommentId(
-				focusThread,
-				blocks
-			);
-			const isDifferentBlock =
-				currentFocusedThreadBlock &&
-				currentFocusedThreadBlock !== selectedBlockClientId;
+		);
+		const isDifferentBlock =
+			currentFocusedThreadBlock &&
+			currentFocusedThreadBlock !== selectedBlockClientId;
 
-			if ( isDifferentBlock ) {
-				// Clear the block highlight
-				toggleBlockHighlight( currentFocusedThreadBlock, false );
-			}
+		if ( isDifferentBlock ) {
+			// Clear the block highlight
+			toggleBlockHighlight( currentFocusedThreadBlock, false );
 		}
-	}, [
-		selectedBlockClientId,
-		blockCommentId,
-		focusThread,
-		setFocusThread,
-		blocks,
-		toggleBlockHighlight,
-	] );
+	}
 
 	// Handle comment selection.
 	const handleCommentSelect = ( threadId ) => {
-		// Clear previous highlight if switching to a different comment.
-		if ( focusThread && focusThread !== threadId && blocks ) {
-			const relatedBlockClientId = findBlockByCommentId(
-				focusThread,
-				blocks
-			);
-			if ( relatedBlockClientId ) {
-				toggleBlockHighlight( relatedBlockClientId, false );
-			}
-		}
-
 		// Clear the add comment form when selecting a comment.
 		setShowCommentBoard( false );
 
