@@ -28,8 +28,6 @@ registerBlockBindingsSource( {
 	setValues,
 	canUserEditValue: () => true,
 	editorUI() {
-		const { updateBlockBindings } = wp.blockEditor.useBlockBindingsUtils();
-
 		return {
 			mode: 'dropdown',
 			data: Object.entries( fieldsList || {} ).map(
@@ -40,16 +38,6 @@ registerBlockBindingsSource( {
 					value: field?.value,
 				} )
 			),
-			onSelect( { item, attribute } ) {
-				updateBlockBindings( {
-					[ attribute ]: {
-						source: 'testing/complete-source',
-						args: {
-							key: item.key,
-						},
-					},
-				} );
-			},
 		};
 	},
 } );

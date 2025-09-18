@@ -156,16 +156,6 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: metaFields,
-			onSelect( { item, updateBlockBindings, attribute } ) {
-				updateBlockBindings( {
-					[ attribute ]: {
-						source: 'core/post-meta',
-						args: {
-							key: item.key,
-						},
-					},
-				} );
-			},
 		};
 	},
 };

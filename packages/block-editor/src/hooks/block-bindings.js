@@ -99,10 +99,13 @@ function BlockBindingsPanelMenuContent( {
 												<Menu.RadioItem
 													key={ item.key }
 													onChange={ () => {
-														source.onSelect( {
-															item,
-															updateBlockBindings,
-															attribute,
+														updateBlockBindings( {
+															[ attribute ]: {
+																source: sourceKey,
+																args: {
+																	key: item.key,
+																},
+															},
 														} );
 													} }
 													name={
