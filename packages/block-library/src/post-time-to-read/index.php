@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Server-side rendering of the `core/post-time-to-read` block.
  *
