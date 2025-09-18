@@ -63,7 +63,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
  *
  * The default average reading speed is 189 words per minute
  * based on averages from:
- *  https://irisreading.com/average-reading-speed-in-various-languages/
+ * https://irisreading.com/average-reading-speed-in-various-languages/
  * (Characters/minute used for Chinese rather than words).
  *
  * @return int The average reading speed in words per minute.
