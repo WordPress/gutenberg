@@ -254,7 +254,10 @@ export default function Media( {
 										<span className="block-editor-content-only-controls__media-title">
 											{
 												// TODO - truncate long titles or url smartly (e.g. show filename).
-												attachment?.title?.raw ?? src
+												attachment?.title?.raw &&
+												attachment?.title?.raw !== ''
+													? attachment?.title?.raw
+													: src
 											}
 										</span>
 									</>
