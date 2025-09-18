@@ -219,21 +219,15 @@ const renderPage = ( page: Page ) => {
 	const regionsToAttach = { ...page.regionsToAttach };
 
 	batch( () => {
-		// 0. Update server data.
+		// Update server data.
 		populateServerData( page.initialData );
 
-		// 1. Reset all router regions.
-		//
-		// TODO: this should be changed to update only the relevant siganls. How
-		// to differentiate here which regions should be updated? The CSS
-		// selector should recognize router-regions inside other route-regions,
-		// interactive, etc. In that case, the stored value in the page should
-		// be `undefined` (we can think of something else).
+		// Reset all router regions before setting the actual values.
 		( routerRegions as Map< string, any > ).forEach( ( signal ) => {
 			signal.value = null;
 		} );
 
-		// 2. Init regions with attachTo that don't exist yet.
+		//Init regions with attachTo that don't exist yet.
 		const parentsToUpdate = new Set< Element >();
 		for ( const id in regionsToAttach ) {
 			const parent = document.querySelector( regionsToAttach[ id ] );
@@ -247,6 +241,7 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
+		// Render regions attached to the same parent all together.
 		parentsToUpdate.forEach( ( parent ) => {
 			const ids = regionsToAttachByParent.get( parent );
 			const vdoms = ids.map( ( id ) => page.regions[ id ] );
@@ -262,16 +257,16 @@ const renderPage = ( page: Page ) => {
 			} );
 
 			const fragment = getRegionRootFragment( regions );
-
 			render( vdoms, fragment );
 		} );
 
-		// 4. Update all existing regions.
+		//Update all existing regions.
 		for ( const id in page.regions ) {
-			// This region should exist
-			routerRegions.get( id ).value = cloneRouterRegion(
-				page.regions[ id ]
-			);
+			if ( routerRegions.has( id ) ) {
+				routerRegions.get( id ).value = cloneRouterRegion(
+					page.regions[ id ]
+				);
+			}
 		}
 	} );
 
