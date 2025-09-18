@@ -163,72 +163,6 @@ function isObject( object ) {
 }
 
 /**
- * Validates a string value against a WordPress REST API format.
- *
- * TODO: Check if those are the best regex for validate the format.
- *
- * @param {string} value  The string value to validate.
- * @param {string} format The format to validate against.
- * @return {boolean} Whether the value matches the format.
- */
-function validateStringFormat( value, format ) {
-	switch ( format ) {
-		case 'date-time':
-			// RFC3339 date-time format validation
-			// Basic pattern: YYYY-MM-DDTHH:mm:ssZ or YYYY-MM-DDTHH:mm:ss+00:00
-			const dateTimePattern =
-				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
-			return (
-				dateTimePattern.test( value ) && ! isNaN( Date.parse( value ) )
-			);
-
-		case 'uri':
-			// Basic URI validation - non-empty string with valid characters
-			try {
-				const url = new URL( value );
-				return Boolean( url.protocol );
-			} catch {
-				// Check if it's a relative URI
-				return /^[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+$/.test( value );
-			}
-
-		case 'email':
-			// Basic email validation pattern
-			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			return emailPattern.test( value );
-
-		case 'ip':
-			// IPv4 pattern
-			const ipv4Pattern =
-				/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-			// IPv6 pattern (simplified)
-			const ipv6Pattern = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
-			const ipv6CompressedPattern =
-				/^(([0-9a-fA-F]{1,4}:)*)?::([0-9a-fA-F]{1,4}:)*[0-9a-fA-F]{1,4}$/;
-
-			return (
-				ipv4Pattern.test( value ) ||
-				ipv6Pattern.test( value ) ||
-				ipv6CompressedPattern.test( value )
-			);
-
-		case 'uuid':
-			// UUID pattern (any version)
-			const uuidPattern =
-				/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-			return uuidPattern.test( value );
-
-		case 'hex-color':
-			// Hex color pattern: #RGB or #RRGGBB
-			const hexColorPattern = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
-			return hexColorPattern.test( value );
-
-		default:
-			return false;
-	}
-}
-
-/**
  * Sets the server side block definition of blocks.
  *
  * Ignored from documentation due to being marked as unstable.
@@ -1137,19 +1071,6 @@ export const registerBlockBindingsSource = ( source ) => {
 									`Field value must be a string when type is "string", got ${ valueType }`
 								);
 								return;
-							}
-							// Validate format if specified
-							if ( field.format ) {
-								const isValidFormat = validateStringFormat(
-									field.value,
-									field.format
-								);
-								if ( ! isValidFormat ) {
-									warning(
-										`Field value "${ field.value }" does not match format "${ field.format }"`
-									);
-									return;
-								}
 							}
 							break;
 						case 'integer':
