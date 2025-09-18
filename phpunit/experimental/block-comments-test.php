@@ -143,11 +143,11 @@ class Block_Comments_Test extends WP_UnitTestCase {
 	 */
 	public function test_exclude_block_comments_filter_does_not_affect_subsequent_queries() {
 		$query = new WP_Comment_Query();
-		$query->query( array( 'type' => 'comment' ) );
-		$query->assertCount( 3, $query->comments );
+		$query->query( array() );
+		$this->assertCount( 3, $query->comments );
 
 		$query2 = new WP_Comment_Query();
 		$query2->query( array( 'type' => 'block_comment' ) );
-		$query2->assertCount( 2, $query2->comments );
+		$this->assertCount( 2, $query2->comments );
 	}
 }
