@@ -10,6 +10,11 @@
  */
 class Block_Comments_Test extends WP_UnitTestCase {
 
+	/**
+	 * Set up shared fixtures.
+	 *
+	 * @param WP_UnitTest_Factory $factory The WP test factory.
+	 */
 	public static function wpSetUpBeforeClass( $factory ) {
 		$post_id = $factory->post->create(
 			array(
