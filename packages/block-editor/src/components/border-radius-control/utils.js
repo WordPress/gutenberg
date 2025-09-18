@@ -234,6 +234,7 @@ export function getPresetValueFromControlValue(
 	} else if ( size === 0 ) {
 		return '0';
 	}
+
 	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
 }
 

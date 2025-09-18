@@ -1,6 +1,10 @@
 /**
  * WordPress dependencies
  */
+import {
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+} from '@wordpress/components';
 import { atSymbol } from '@wordpress/icons';
 
 /**
@@ -23,7 +27,11 @@ export default function Email< Item >( {
 				onChange,
 				hideLabelFromVision,
 				type: 'email',
-				icon: atSymbol,
+				prefix: (
+					<InputControlPrefixWrapper variant="icon">
+						<Icon icon={ atSymbol } />
+					</InputControlPrefixWrapper>
+				),
 			} }
 		/>
 	);

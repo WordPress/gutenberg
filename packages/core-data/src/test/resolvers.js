@@ -237,7 +237,7 @@ describe( 'getEntityRecords', () => {
 		] );
 	} );
 
-	it( 'caches permissions but does not mark entity records as resolved when using _fields', async () => {
+	it( 'caches permissions and marks entity records as resolved when using _fields', async () => {
 		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
@@ -281,9 +281,7 @@ describe( 'getEntityRecords', () => {
 			'canUser',
 			expect.any( Array )
 		);
-
-		// But individual entity records should NOT be marked as resolved
-		expect( finishResolutions ).not.toHaveBeenCalledWith(
+		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
 		);
@@ -324,9 +322,7 @@ describe( 'getEntityRecords', () => {
 			'canUser',
 			expect.any( Array )
 		);
-
-		// Individual entity records should NOT be marked as resolved
-		expect( finishResolutions ).not.toHaveBeenCalledWith(
+		expect( finishResolutions ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			expect.any( Array )
 		);

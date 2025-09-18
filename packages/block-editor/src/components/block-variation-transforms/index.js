@@ -162,7 +162,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 				return {
 					activeBlockVariation: getActiveBlockVariation(
 						name,
-						getBlockAttributes( blockClientId )
+						getBlockAttributes( blockClientId ),
+						'transform'
 					),
 					variations: name && getBlockVariations( name, 'transform' ),
 					isContentOnly:

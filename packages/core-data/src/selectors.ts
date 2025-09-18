@@ -36,7 +36,7 @@ export interface State {
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
 	currentTheme: string;
-	currentUser: ET.User< 'edit' >;
+	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
@@ -49,6 +49,7 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
+	templateAutoDraftId: Record< string, number | null >;
 }
 
 type EntityRecordKey = string | number;
@@ -185,7 +186,7 @@ export function getAuthors(
  *
  * @return Current user object.
  */
-export function getCurrentUser( state: State ): ET.User< 'edit' > {
+export function getCurrentUser( state: State ): ET.User< 'view' > {
 	return state.currentUser;
 }
 
@@ -358,6 +359,18 @@ export const getEntityRecord = createSelector(
 	): EntityRecord | undefined => {
 		logEntityDeprecation( kind, name, 'getEntityRecord' );
 
+		// For back-compat, we allow querying for static templates through
+		// wp_template.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof key === 'string' &&
+			// __experimentalGetDirtyEntityRecords always calls getEntityRecord
+			// with a string key, so we need that it's not a numeric ID.
+			! /^\d+$/.test( key )
+		) {
+			name = 'wp_registered_template';
+		}
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
@@ -1543,7 +1556,7 @@ export const getRevision = createSelector(
 
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if ( ! query || ! query._fields ) {
 			// If expecting a complete item, validate that completeness.
 			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 				return undefined;
@@ -1553,31 +1566,33 @@ export const getRevision = createSelector(
 		}
 
 		const item = queriedState.items[ context ]?.[ revisionKey ];
-		if ( item && query._fields ) {
-			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-
-			for ( let f = 0; f < fields.length; f++ ) {
-				const field = fields[ f ].split( '.' );
-				let value = item;
-				field.forEach( ( fieldName ) => {
-					value = value?.[ fieldName ];
-				} );
-				setNestedValue( filteredItem, field, value );
-			}
-
-			return filteredItem;
+		if ( ! item ) {
+			return item;
 		}
 
-		return item;
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			let value = item;
+			field.forEach( ( fieldName ) => {
+				value = value?.[ fieldName ];
+			} );
+			setNestedValue( filteredItem, field, value );
+		}
+
+		return filteredItem;
 	},
 	( state: State, kind, name, recordKey, revisionKey, query ) => {
 		const context = query?.context ?? 'default';
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
+				recordKey
+			];
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
-				?.items?.[ context ]?.[ revisionKey ],
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
-				?.itemIsComplete?.[ context ]?.[ revisionKey ],
+			queriedState?.items?.[ context ]?.[ revisionKey ],
+			queriedState?.itemIsComplete?.[ context ]?.[ revisionKey ],
 		];
 	}
 );
