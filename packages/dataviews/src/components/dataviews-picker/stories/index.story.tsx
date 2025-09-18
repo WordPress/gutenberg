@@ -86,7 +86,7 @@ export const Default = ( {
 					.filter(
 						( item ) => selection?.includes( String( item.id ) )
 					)
-					.map( ( item ) => item.title )
+					.map( ( item ) => item.name.title )
 					.join( ', ' );
 				// eslint-disable-next-line no-alert
 				window.alert( selectedItemNames );

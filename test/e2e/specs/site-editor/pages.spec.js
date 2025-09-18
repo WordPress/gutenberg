@@ -265,9 +265,7 @@ test.describe( 'Pages', () => {
 		await page
 			.locator( '.block-editor-block-patterns-list__list-item' )
 			.click();
-		await editor.saveSiteEditorEntities( {
-			isOnlyCurrentEntityDirty: true,
-		} );
+		await editor.saveSiteEditorEntities();
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.

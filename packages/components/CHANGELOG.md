@@ -2,15 +2,20 @@
 
 ## Unreleased
 
+## 30.4.0 (2025-09-17)
+
 ### Bug Fixes
 
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
 
 ### Internal
 
+-   Expose `ValidatedRadioControl` via private API's ([#71664](https://github.com/WordPress/gutenberg/pull/71664)).
 -   `ValidatedCheckboxControl`: Expose the component under private API's ([#71505](https://github.com/WordPress/gutenberg/pull/71505/)).
 -   Expose `ValidatedTextareaControl` via Private APIs ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 -   Add support for ValidatedFormTokenField [#71350](https://github.com/WordPress/gutenberg/pull/71350).
+-   Expose `ValidatedSelectControl` via Private APIs ([#71665](https://github.com/WordPress/gutenberg/pull/71665))
+-   Expose `ValidatedToggleGroupControl` via private APIs. Also properly detects `undefined` values for `required` validation ([#71666](https://github.com/WordPress/gutenberg/pull/71666)).
 
 ## 30.3.0 (2025-09-03)
 

@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +23,7 @@ export default function Toggle< Item >( {
 	data,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, getValue, label, description } = field;
+	const { label, description, getValue, setValue } = field;
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -26,37 +31,49 @@ export default function Toggle< Item >( {
 			>[ 'customValidity' ]
 		>( undefined );
 
+	const onChangeControl = useCallback( () => {
+		onChange(
+			setValue( { item: data, value: ! getValue( { item: data } ) } )
+		);
+	}, [ onChange, setValue, data, getValue ] );
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = field.isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, setValue ]
+	);
+
 	return (
 		<ValidatedToggleControl
 			required={ !! field.isValid.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			hidden={ hideLabelFromVision }
 			__nextHasNoMarginBottom
 			label={ label }
 			help={ description }
 			checked={ getValue( { item: data } ) }
-			onChange={ () =>
-				onChange( { [ id ]: ! getValue( { item: data } ) } )
-			}
+			onChange={ onChangeControl }
 		/>
 	);
 }
