@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+- DataForm: Add resize property support to `textarea` control. [#71727](https://github.com/WordPress/gutenberg/pull/71727)
+
 ## 9.0.0 (2025-09-17)
 
 ### Breaking changes
