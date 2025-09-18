@@ -93,22 +93,32 @@ const parseRegionAttribute = ( region: Element ) => {
 	}
 };
 
-const cloneRouterRegion = ( vdom: any ) => {
+/**
+ * Clones the content of the router region vDOM passed as argument.
+ *
+ * The function creates a new VNode instance removing all priority levels up to
+ * the one containing the router-region directive, which should have evaluated
+ * in advance.
+ *
+ * @param vdom A router region's VNode.
+ * @return The VNode for the passed router region's content.
+ */
+const cloneRouterRegionContent = ( vdom: any ) => {
 	if ( ! vdom ) {
 		return vdom;
 	}
-
-	const { 'router-region': __ignored, ...directives } = vdom.props.directives;
-	const priorityLevels = vdom.props.priorityLevels
-		.map( ( level ) =>
-			level.filter( ( directive ) => directive !== 'router-region' )
-		)
-		.filter( ( level ) => level.length > 0 );
+	const allPriorityLevels: string[][] = vdom.props.priorityLevels;
+	const routerRegionLevel = allPriorityLevels.findIndex( ( level ) =>
+		level.includes( 'router-region' )
+	);
+	const priorityLevels =
+		routerRegionLevel !== -1
+			? allPriorityLevels.slice( routerRegionLevel + 1 )
+			: allPriorityLevels;
 
 	return priorityLevels.length > 0
 		? cloneElement( vdom, {
 				...vdom.props,
-				directives,
 				priorityLevels,
 		  } )
 		: vdom.props.element;
@@ -263,7 +273,7 @@ const renderPage = ( page: Page ) => {
 		//Update all existing regions.
 		for ( const id in page.regions ) {
 			if ( routerRegions.has( id ) ) {
-				routerRegions.get( id ).value = cloneRouterRegion(
+				routerRegions.get( id ).value = cloneRouterRegionContent(
 					page.regions[ id ]
 				);
 			}
