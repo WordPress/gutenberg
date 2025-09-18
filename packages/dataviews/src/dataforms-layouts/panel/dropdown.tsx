@@ -9,7 +9,7 @@ import {
 	Dropdown,
 	Button,
 } from '@wordpress/components';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 
@@ -20,6 +20,7 @@ import type { Form, FormField, NormalizedField } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT } from '../../normalize-form-fields';
+import SummaryButton from './summary-button';
 
 function DropdownHeader( {
 	title,
@@ -55,6 +56,7 @@ function DropdownHeader( {
 
 function PanelDropdown< Item >( {
 	fieldDefinition,
+	summaryFields,
 	popoverAnchor,
 	labelPosition = 'side',
 	data,
@@ -62,6 +64,7 @@ function PanelDropdown< Item >( {
 	field,
 }: {
 	fieldDefinition: NormalizedField< Item >;
+	summaryFields: NormalizedField< Item >[];
 	popoverAnchor: HTMLElement | null;
 	labelPosition: 'side' | 'top' | 'none';
 	data: Item;
@@ -107,29 +110,15 @@ function PanelDropdown< Item >( {
 				tooltipPosition: 'middle left',
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					className="dataforms-layouts-panel__field-control"
-					size="compact"
-					variant={
-						[ 'none', 'top' ].includes( labelPosition )
-							? 'link'
-							: 'tertiary'
-					}
-					aria-expanded={ isOpen }
-					aria-label={ sprintf(
-						// translators: %s: Field name.
-						_x( 'Edit %s', 'field' ),
-						fieldLabel || ''
-					) }
-					onClick={ onToggle }
+				<SummaryButton
+					summaryFields={ summaryFields }
+					data={ data }
+					labelPosition={ labelPosition }
+					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
-					accessibleWhenDisabled
-				>
-					<fieldDefinition.render
-						item={ data }
-						field={ fieldDefinition }
-					/>
-				</Button>
+					onClick={ onToggle }
+					aria-expanded={ isOpen }
+				/>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>

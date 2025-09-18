@@ -33,6 +33,7 @@ const icons = {
 	post,
 	page,
 	wp_template: layout,
+	wp_registered_template: layout,
 	wp_template_part: symbolFilled,
 };
 
@@ -170,7 +171,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				return {
 					isBlockBasedTheme:
 						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'create', {
+					canCreateTemplate: select( coreStore ).canUser( 'read', {
 						kind: 'postType',
 						name: templateType,
 					} ),
@@ -468,6 +469,10 @@ export function useSiteEditorNavigationCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-templates',
 		hook: getNavigationCommandLoaderPerTemplate( 'wp_template' ),
+	} );
+	useCommandLoader( {
+		name: 'core/edit-site/navigate-templates',
+		hook: getNavigationCommandLoaderPerTemplate( 'wp_registered_template' ),
 	} );
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-template-parts',

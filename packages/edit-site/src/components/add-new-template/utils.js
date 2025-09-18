@@ -189,7 +189,6 @@ export function usePostTypeArchiveMenuItems() {
 
 export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	const publicPostTypes = usePublicPostTypes();
-	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	// We need to keep track of naming conflicts. If a conflict
 	// occurs, we need to add slug.
@@ -229,9 +228,6 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 		[ publicPostTypes ]
 	);
 	const postTypesInfo = useEntitiesInfo( 'postType', templatePrefixes );
-	const existingTemplateSlugs = ( existingTemplates || [] ).map(
-		( { slug } ) => slug
-	);
 	const menuItems = ( publicPostTypes || [] ).reduce(
 		( accumulator, postType ) => {
 			const { slug, labels, icon } = postType;
@@ -242,8 +238,6 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			const defaultTemplateType = defaultTemplateTypes?.find(
 				( { slug: _slug } ) => _slug === generalTemplateSlug
 			);
-			const hasGeneralTemplate =
-				existingTemplateSlugs?.includes( generalTemplateSlug );
 			const _needsUniqueIdentifier = needsUniqueIdentifier( postType );
 			let menuItemTitle =
 				labels.template_name ||
@@ -321,14 +315,12 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 							},
 						},
 						labels,
-						hasGeneralTemplate,
 						template,
 					} );
 				};
 			}
-			// We don't need to add the menu item if there are no
-			// entities and the general template exists.
-			if ( ! hasGeneralTemplate || hasEntities ) {
+			// We don't need to add the menu item if there are no entities.
+			if ( hasEntities ) {
 				accumulator.push( menuItem );
 			}
 			return accumulator;
@@ -555,7 +547,11 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 					getSpecificTemplate: ( suggestion ) => {
 						const templateSlug = `author-${ suggestion.slug }`;
 						return {
-							title: templateSlug,
+							title: sprintf(
+								// translators: %s: Name of the author e.g: "Admin".
+								__( 'Author: %s' ),
+								suggestion.name
+							),
 							slug: templateSlug,
 							templatePrefix: 'author',
 						};
@@ -578,91 +574,6 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 }
 
 /**
- * Helper hook that filters all the existing templates by the given
- * object with the entity's slug as key and the template prefix as value.
- *
- * Example:
- * `existingTemplates` is: [ { slug: 'tag-apple' }, { slug: 'page-about' }, { slug: 'tag' } ]
- * `templatePrefixes` is: { post_tag: 'tag' }
- * It will return: { post_tag: ['apple'] }
- *
- * Note: We append the `-` to the given template prefix in this function for our checks.
- *
- * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
- * @return {Record<string,string[]>} An object with the entity's slug as key and an array with the existing template slugs as value.
- */
-const useExistingTemplateSlugs = ( templatePrefixes ) => {
-	const existingTemplates = useExistingTemplates();
-	const existingSlugs = useMemo( () => {
-		return Object.entries( templatePrefixes || {} ).reduce(
-			( accumulator, [ slug, prefix ] ) => {
-				const slugsWithTemplates = ( existingTemplates || [] ).reduce(
-					( _accumulator, existingTemplate ) => {
-						const _prefix = `${ prefix }-`;
-						if ( existingTemplate.slug.startsWith( _prefix ) ) {
-							_accumulator.push(
-								existingTemplate.slug.substring(
-									_prefix.length
-								)
-							);
-						}
-						return _accumulator;
-					},
-					[]
-				);
-				if ( slugsWithTemplates.length ) {
-					accumulator[ slug ] = slugsWithTemplates;
-				}
-				return accumulator;
-			},
-			{}
-		);
-	}, [ templatePrefixes, existingTemplates ] );
-	return existingSlugs;
-};
-
-/**
- * Helper hook that finds the existing records with an associated template,
- * as they need to be excluded from the template suggestions.
- *
- * @param {string}                entityName                The entity's name.
- * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
- * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
- * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the existing records as value.
- */
-const useTemplatesToExclude = (
-	entityName,
-	templatePrefixes,
-	additionalQueryParameters = {}
-) => {
-	const slugsToExcludePerEntity =
-		useExistingTemplateSlugs( templatePrefixes );
-	const recordsToExcludePerEntity = useSelect(
-		( select ) => {
-			return Object.entries( slugsToExcludePerEntity || {} ).reduce(
-				( accumulator, [ slug, slugsWithTemplates ] ) => {
-					const entitiesWithTemplates = select(
-						coreStore
-					).getEntityRecords( entityName, slug, {
-						_fields: 'id',
-						context: 'view',
-						slug: slugsWithTemplates,
-						...additionalQueryParameters[ slug ],
-					} );
-					if ( entitiesWithTemplates?.length ) {
-						accumulator[ slug ] = entitiesWithTemplates;
-					}
-					return accumulator;
-				},
-				{}
-			);
-		},
-		[ slugsToExcludePerEntity ]
-	);
-	return recordsToExcludePerEntity;
-};
-
-/**
  * Helper hook that returns information about an entity having
  * records that we can create a specific template for.
  *
@@ -682,26 +593,16 @@ const useEntitiesInfo = (
 	templatePrefixes,
 	additionalQueryParameters = EMPTY_OBJECT
 ) => {
-	const recordsToExcludePerEntity = useTemplatesToExclude(
-		entityName,
-		templatePrefixes,
-		additionalQueryParameters
-	);
 	const entitiesHasRecords = useSelect(
 		( select ) => {
 			return Object.keys( templatePrefixes || {} ).reduce(
 				( accumulator, slug ) => {
-					const existingEntitiesIds =
-						recordsToExcludePerEntity?.[ slug ]?.map(
-							( { id } ) => id
-						) || [];
 					accumulator[ slug ] = !! select(
 						coreStore
 					).getEntityRecords( entityName, slug, {
 						per_page: 1,
 						_fields: 'id',
 						context: 'view',
-						exclude: existingEntitiesIds,
 						...additionalQueryParameters[ slug ],
 					} )?.length;
 					return accumulator;
@@ -709,28 +610,18 @@ const useEntitiesInfo = (
 				{}
 			);
 		},
-		[
-			templatePrefixes,
-			recordsToExcludePerEntity,
-			entityName,
-			additionalQueryParameters,
-		]
+		[ templatePrefixes, entityName, additionalQueryParameters ]
 	);
 	const entitiesInfo = useMemo( () => {
 		return Object.keys( templatePrefixes || {} ).reduce(
 			( accumulator, slug ) => {
-				const existingEntitiesIds =
-					recordsToExcludePerEntity?.[ slug ]?.map(
-						( { id } ) => id
-					) || [];
 				accumulator[ slug ] = {
 					hasEntities: entitiesHasRecords[ slug ],
-					existingEntitiesIds,
 				};
 				return accumulator;
 			},
 			{}
 		);
-	}, [ templatePrefixes, recordsToExcludePerEntity, entitiesHasRecords ] );
+	}, [ templatePrefixes, entitiesHasRecords ] );
 	return entitiesInfo;
 };
