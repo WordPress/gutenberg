@@ -220,15 +220,14 @@ export function RichTextWrapper(
 			const blockAttributes = getBlockAttributes( clientId );
 			let clientSideFieldLabel = null;
 			if ( blockBindingsSource?.editorUI ) {
-				const editorUIContext = {};
 				if ( blockBindingsSource.usesContext?.length ) {
 					for ( const key of blockBindingsSource.usesContext ) {
-						editorUIContext[ key ] = blockContext[ key ];
+						blockBindingsContext[ key ] = blockContext[ key ];
 					}
 				}
 				const editorUIResult = blockBindingsSource.editorUI( {
 					select,
-					context: editorUIContext,
+					context: blockBindingsContext,
 				} );
 				clientSideFieldLabel = editorUIResult.data?.find(
 					( item ) => item.key === relatedBinding?.args?.key
