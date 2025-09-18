@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	Icon,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalGrid as Grid,
@@ -15,7 +16,6 @@ import {
 	media as mediaIcon,
 	video as videoIcon,
 } from '@wordpress/icons';
-import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -232,63 +232,49 @@ export default function Media( {
 						}
 					} }
 					renderToggle={ ( buttonProps ) => (
-						<div className="block-editor-content-only-controls__media">
-							<div
-								role="button"
-								tabIndex={ 0 }
-								{ ...buttonProps }
-								onKeyDown={ ( event ) => {
-									const { keyCode } = event;
-
-									if (
-										keyCode === ENTER ||
-										keyCode === SPACE
-									) {
-										buttonProps.onClick();
-									}
-								} }
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							className="block-editor-content-only-controls__media"
+							{ ...buttonProps }
+						>
+							<Grid
+								rowGap={ 0 }
+								columnGap={ 8 }
+								templateColumns="24px 1fr"
+								className="block-editor-content-only-controls__media-row"
 							>
-								<Grid
-									rowGap={ 0 }
-									columnGap={ 8 }
-									templateColumns="24px 1fr"
-									className="block-editor-content-only-controls__media-row"
-								>
-									{ src && (
-										<>
-											<MediaThumbnail
-												attachment={ attachment }
-												control={ control }
-												attributeValues={
-													attributeValues
-												}
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{
-													// TODO - truncate long titles or url smartly (e.g. show filename).
-													attachment?.title?.raw ??
-														src
-												}
-											</span>
-										</>
-									) }
-									{ ! src && (
-										<>
-											<span
-												className="block-editor-content-only-controls__media-placeholder"
-												style={ {
-													width: '24px',
-													height: '24px',
-												} }
-											/>
-											<span className="block-editor-content-only-controls__media-title">
-												{ chooseItemLabel }
-											</span>
-										</>
-									) }
-								</Grid>
-							</div>
-						</div>
+								{ src && (
+									<>
+										<MediaThumbnail
+											attachment={ attachment }
+											control={ control }
+											attributeValues={ attributeValues }
+										/>
+										<span className="block-editor-content-only-controls__media-title">
+											{
+												// TODO - truncate long titles or url smartly (e.g. show filename).
+												attachment?.title?.raw ?? src
+											}
+										</span>
+									</>
+								) }
+								{ ! src && (
+									<>
+										<span
+											className="block-editor-content-only-controls__media-placeholder"
+											style={ {
+												width: '24px',
+												height: '24px',
+											} }
+										/>
+										<span className="block-editor-content-only-controls__media-title">
+											{ chooseItemLabel }
+										</span>
+									</>
+								) }
+							</Grid>
+						</Button>
 					) }
 				/>
 			</ToolsPanelItem>
