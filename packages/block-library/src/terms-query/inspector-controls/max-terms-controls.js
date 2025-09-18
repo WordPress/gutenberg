@@ -7,7 +7,7 @@ import {
 	RangeControl,
 } from '@wordpress/components';
 
-export default function PaginationControl( { attributes, setQuery } ) {
+export default function MaxTermsControls( { attributes, setQuery } ) {
 	const { termQuery } = attributes;
 
 	// Only show pagination control when not hierarchical.
