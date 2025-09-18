@@ -24,6 +24,7 @@ export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string | null;
+	uniqueId?: string;
 }
 
 export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {

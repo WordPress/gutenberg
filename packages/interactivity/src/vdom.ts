@@ -33,10 +33,9 @@ const directiveParser = new RegExp(
 		// segments. It excludes underscore intentionally to prevent confusion.
 		// E.g., "custom-directive".
 		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// (Optional) Match '--' followed by any alphanumeric characters. It
-		// excludes underscore intentionally to prevent confusion, but it can
-		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
+		// (Optional) Match the rest of the directive (suffix and/or unique ID).
+		// This must be empty OR start with '--' (suffix or suffix+unique) OR start with '---' (unique only)
+		'((?:--[a-z0-9_-]+(?:---[a-z0-9_-]+)?|---[a-z0-9_-]+)?)$',
 	'i' // Case insensitive.
 );
 
@@ -155,13 +154,82 @@ export function toVdom( root: Node ): ComponentChild {
 					return obj;
 				}
 				const prefix = directiveMatch[ 1 ] || '';
-				const suffix = directiveMatch[ 2 ] || null;
+				const rest = directiveMatch[ 2 ] || '';
+
+				// Parse suffix and unique ID from the rest
+				let suffix: string | null = null;
+				let uniqueId: string | undefined;
+
+				if ( rest ) {
+					// Check for unique ID pattern (---uniqueId)
+					const uniqueIdMatch = rest.match( /---([a-z0-9_-]+)$/i );
+					if ( uniqueIdMatch ) {
+						uniqueId = uniqueIdMatch[ 1 ];
+						// Remove the unique ID part to get potential suffix
+						const suffixPart = rest.replace(
+							/---[a-z0-9_-]+$/i,
+							''
+						);
+						if ( suffixPart && suffixPart.startsWith( '--' ) ) {
+							suffix = suffixPart.substring( 2 ); // Remove '--'
+						}
+					} else if ( rest.startsWith( '--' ) ) {
+						// Only suffix, no unique ID
+						suffix = rest.substring( 2 ); // Remove '--'
+
+						// Warning for potentially confusing patterns
+						// If the suffix looks like it could be a unique ID (simple identifier)
+						// and this is a directive that supports unique IDs, warn about the new syntax
+						if (
+							suffix &&
+							/^[a-z0-9][a-z0-9_-]*$/i.test( suffix ) &&
+							[
+								'context',
+								'watch',
+								'init',
+								'on',
+								'on-async',
+								'run',
+							].includes( prefix )
+						) {
+							// Only warn if this looks like a simple identifier that could be a unique ID
+							// Don't warn for obvious suffixes like 'click', 'hover', etc. for event handlers
+							const isLikelyEventSuffix =
+								prefix === 'on' &&
+								[
+									'click',
+									'hover',
+									'focus',
+									'blur',
+									'submit',
+									'change',
+									'input',
+									'keydown',
+									'keyup',
+									'load',
+									'resize',
+									'scroll',
+								].includes( suffix );
+
+							if ( ! isLikelyEventSuffix && suffix.length > 3 ) {
+								warn(
+									`Directive "${ name }" uses "--${ suffix }" which could be confused with a unique ID. ` +
+										'For unique IDs, use triple dashes: "---' +
+										suffix +
+										'". ' +
+										'The double-dash syntax is reserved for directive suffixes.'
+								);
+							}
+						}
+					}
+				}
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {
 					namespace: ns ?? currentNamespace()!,
 					value: value as DirectiveEntry[ 'value' ],
 					suffix,
+					uniqueId,
 				} );
 				return obj;
 			}, {} );

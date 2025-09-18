@@ -209,45 +209,54 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const defaultEntry = context.find( isDefaultDirectiveSuffix );
+			const defaultEntries = context.filter( isDefaultDirectiveSuffix );
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 
-			const ns = defaultEntry!.namespace;
+			// Use the namespace from the first entry (should be consistent)
+			const ns =
+				defaultEntries[ 0 ]?.namespace || context[ 0 ]?.namespace;
 			const client = useRef( proxifyState( ns, {} ) );
 			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
 
-			// No change should be made if `defaultEntry` does not exist.
+			// Process all default entries (including those with unique IDs)
 			const contextStack = useMemo( () => {
 				const result = {
 					client: { ...inheritedClient },
 					server: { ...inheritedServer },
 				};
-				if ( defaultEntry ) {
-					const { namespace, value } = defaultEntry;
-					// Check that the value is a JSON object. Send a console warning if not.
-					if ( ! isPlainObject( value ) ) {
-						warn(
-							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+				if ( defaultEntries.length > 0 ) {
+					// Process all default entries in order to merge contexts
+					defaultEntries.forEach( ( entry ) => {
+						const { namespace, value } = entry;
+						// Check that the value is a JSON object. Send a console warning if not.
+						if ( ! isPlainObject( value ) ) {
+							warn(
+								`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+							);
+							return;
+						}
+						deepMerge(
+							client.current,
+							deepClone( value ) as object,
+							false
 						);
-					}
-					deepMerge(
+						deepMerge(
+							server.current,
+							deepClone( value ) as object
+						);
+					} );
+					result.client[ ns ] = proxifyContext(
 						client.current,
-						deepClone( value ) as object,
-						false
+						inheritedClient[ ns ]
 					);
-					deepMerge( server.current, deepClone( value ) as object );
-					result.client[ namespace ] = proxifyContext(
-						client.current,
-						inheritedClient[ namespace ]
-					);
-					result.server[ namespace ] = proxifyContext(
+					result.server[ ns ] = proxifyContext(
 						server.current,
-						inheritedServer[ namespace ]
+						inheritedServer[ ns ]
 					);
 				}
 				return result;
-			}, [ defaultEntry, inheritedClient, inheritedServer ] );
+			}, [ defaultEntries, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
@@ -433,6 +442,12 @@ export default () => {
 			classNames
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
+					if ( entry.uniqueId ) {
+						warn(
+							'Directive "class" does not support unique IDs. Use server-side conflict resolution instead.'
+						);
+						return;
+					}
 					const className = entry.suffix;
 					let result = evaluate( entry );
 					if ( typeof result === 'function' ) {
@@ -476,6 +491,12 @@ export default () => {
 	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				warn(
+					'Directive "style" does not support unique IDs. Use server-side conflict resolution instead.'
+				);
+				return;
+			}
 			const styleProp = entry.suffix;
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
@@ -513,6 +534,12 @@ export default () => {
 	// data-wp-bind--[attribute]
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				warn(
+					'Directive "bind" does not support unique IDs. Use server-side conflict resolution instead.'
+				);
+				return;
+			}
 			const attribute = entry.suffix;
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
@@ -619,6 +646,13 @@ export default () => {
 		const entry = text.find( isDefaultDirectiveSuffix );
 		if ( ! entry ) {
 			element.props.children = null;
+			return;
+		}
+
+		if ( entry.uniqueId ) {
+			warn(
+				'Directive "text" does not support unique IDs. Use server-side conflict resolution instead.'
+			);
 			return;
 		}
 
