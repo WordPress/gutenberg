@@ -86,7 +86,7 @@ function register_block_core_post_time_to_read() {
 	// Make the average reading speed available to the block editor.
 	wp_add_inline_script(
 		'wp-block-editor',
-		'window.gutenbergTimeToReadAverageSpeed = ' . block_core_post_time_to_read_average_reading_speed() . ';',
+		'window.timeToReadAverageSpeed = ' . block_core_post_time_to_read_average_reading_speed() . ';',
 		'before'
 	);
 }

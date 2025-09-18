@@ -22,7 +22,7 @@ import {
 } from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
@@ -40,7 +40,9 @@ function PostTimeToReadEdit( {
 	 * Average reading rate should come from PHP via wp_localize_script.
 	 * Can be filtered via the 'post_time_to_read_average_reading_speed' PHP filter.
 	 */
-	const AVERAGE_READING_RATE = window.gutenbergTimeToReadAverageSpeed || 189;
+	const AVERAGE_READING_RATE = window.timeToReadAverageSpeed || 189;
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const { blockWasJustInserted } = useSelect(
 		( select ) => {
