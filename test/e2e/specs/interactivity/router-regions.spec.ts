@@ -171,14 +171,16 @@ test.describe( 'Router regions', () => {
 		);
 	} );
 
-	test( 'should not take into account regions that are not in the topmost `data-wp-interactive`.', async ( {
+	test( 'should take into account any router region inside a `data-wp-interactive` element.', async ( {
 		page,
 	} ) => {
-		const invalidRegionText1 = page.getByTestId( 'invalid-region-text-1' );
-		const invalidRegionText2 = page.getByTestId( 'invalid-region-text-2' );
+		const validRegionText1 = page.getByTestId( 'valid-region-text-1' );
+		const validRegionText2 = page.getByTestId( 'valid-region-text-2' );
+		const invalidRegionText3 = page.getByTestId( 'invalid-region-text-3' );
 
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
 
 		await page.getByTestId( 'next' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
@@ -186,8 +188,9 @@ test.describe( 'Router regions', () => {
 		await expect( page ).toHaveTitle(
 			'router regions – page 2 – gutenberg'
 		);
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText1 ).toHaveText( 'content from page 2' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 2' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
 
 		await page.getByTestId( 'back' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
@@ -195,8 +198,9 @@ test.describe( 'Router regions', () => {
 		await expect( page ).toHaveTitle(
 			'router regions – page 1 – gutenberg'
 		);
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
 	} );
 
 	test( 'should support router regions with the `attachTo` property.', async ( {

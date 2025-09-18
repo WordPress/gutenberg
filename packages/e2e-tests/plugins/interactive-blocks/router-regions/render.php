@@ -110,16 +110,22 @@
 </section>
 
 <div data-wp-interactive="router-regions">
-	<div data-wp-router-region="invalid-region-1">
-		<p data-testid="invalid-region-text-1">
+	<div data-wp-router-region="valid-region-1">
+		<p data-testid="valid-region-text-1">
 			content from page <?php echo $attributes['page']; ?>
 		</p>
 	</div>
-	<div data-wp-interactive="router-regions" data-wp-router-region="invalid-region-2">
-		<p data-testid="invalid-region-text-2">
+	<div data-wp-interactive="router-regions" data-wp-router-region="valid-region-2">
+		<p data-testid="valid-region-text-2">
 			content from page <?php echo $attributes['page']; ?>
 		</p>
 	</div>
+</div>
+
+<div data-wp-router-region="invalid-region-3">
+	<p data-testid="invalid-region-text-3">
+		content from page <?php echo $attributes['page']; ?>
+	</p>
 </div>
 
 <div id="regions-with-attach-to" data-testid="regions-with-attach-to">
