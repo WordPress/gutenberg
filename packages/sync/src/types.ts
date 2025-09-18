@@ -34,7 +34,7 @@ export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >,
-		record: ObjectData,
+		rawRecord: ObjectData,
 		origin: string
 	) => void;
 	getChangesFromCRDTDoc: ( ydoc: Y.Doc, record: ObjectData ) => ObjectData;

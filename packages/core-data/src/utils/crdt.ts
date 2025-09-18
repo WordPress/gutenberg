@@ -27,7 +27,7 @@ const DOCUMENT_MAP_KEY = 'document';
  *
  * @param {CRDTDoc}       ydoc
  * @param {PostChanges}   changes
- * @param {Post}          record
+ * @param {Post}          rawRecord
  * @param {Type}          postType
  * @param {Set< string >} syncedProperties
  * @param {string}        origin
@@ -36,7 +36,7 @@ const DOCUMENT_MAP_KEY = 'document';
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	record: Post,
+	rawRecord: Post,
 	postType: Type,
 	syncedProperties: Set< string >,
 	origin: string
@@ -138,7 +138,7 @@ export function applyPostChangesToCRDTDoc(
 				// Undefined status indicates that we want to reset to the current
 				// persisted value.
 				if ( undefined === newStatus ) {
-					newStatus = record.status;
+					newStatus = rawRecord.status;
 				}
 
 				mergeValue( currentValue, newStatus, setValue );

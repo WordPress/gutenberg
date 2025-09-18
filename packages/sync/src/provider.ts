@@ -69,15 +69,15 @@ export class SyncProvider {
 	 * Bootstrap an entity for syncing and manage its lifecycle.
 	 *
 	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
-	 * @param {ObjectData}     record     Record representing this object type.
+	 * @param {ObjectData}     rawRecord  Raw entity record representing this object type.
 	 * @param {RecordHandlers} handlers   Handlers for updating and fetching the record.
 	 */
 	public async bootstrap(
 		syncConfig: SyncConfig,
-		record: ObjectData,
+		rawRecord: ObjectData,
 		handlers: RecordHandlers
 	): Promise< void > {
-		const objectId = syncConfig.getObjectId( record );
+		const objectId = syncConfig.getObjectId( rawRecord );
 		const objectType = syncConfig.objectType;
 		const ydoc = createYjsDoc( { objectType } );
 		const connections = await this.connect( objectId, objectType, ydoc );
@@ -122,7 +122,10 @@ export class SyncProvider {
 		);
 
 		// Get the initial document state.
-		const initialDoc = await this.getInitialCRDTDoc( syncConfig, record );
+		const initialDoc = await this.getInitialCRDTDoc(
+			syncConfig,
+			rawRecord
+		);
 
 		// Attach the update listener before applying the initial state so that
 		// we update the entity record in the local store.
@@ -188,17 +191,16 @@ export class SyncProvider {
 	 * sync providers can override this method to provide a custom initial state.
 	 *
 	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
-	 * @param {ObjectData} record     Initial data to apply to the document.
+	 * @param {ObjectData} rawRecord  Initial data to apply to the document.
 	 */
 	private async getInitialCRDTDoc(
 		syncConfig: SyncConfig,
-		record: ObjectData
+		rawRecord: ObjectData
 	): Promise< CRDTDoc > {
 		// Load the persisted document from previous sessions.
 		const persistedDoc = await this.getPersistedCRDTDoc(
 			syncConfig,
-			record,
-			CRDT_DOC_VERSION
+			rawRecord
 		);
 
 		// If it exists and matches the current version, apply it as the base state
@@ -211,7 +213,7 @@ export class SyncProvider {
 		}
 
 		// Otherwise, use the current record.
-		const initialData = syncConfig.getInitialObjectData( record );
+		const initialData = syncConfig.getInitialObjectData( rawRecord );
 
 		// IMPORTANT: We use a new Yjs document so that the initial state can be
 		// applied to the "real" Yjs document as a singular update. Therefore, we
@@ -223,7 +225,7 @@ export class SyncProvider {
 		syncConfig.applyChangesToCRDTDoc(
 			initialStateDoc,
 			initialData,
-			record,
+			rawRecord,
 			LOCAL_SYNC_PROVIDER_ORIGIN
 		);
 
@@ -237,15 +239,13 @@ export class SyncProvider {
 	 * entity. Custom sync providers can override this method to provide their
 	 * implementation.
 	 *
-	 * @param {SyncConfig}            _syncConfig Sync configuration for the object type.
-	 * @param {ObjectData}            _record     Record representing this object type.
-	 * @param {Partial< ObjectData >} _changes    Updates to make.
+	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} _rawRecord  Raw record representing this object type.
 	 * @return {Promise< Record< string, any > >} Entity meta.
 	 */
 	public async createEntityMeta(
 		_syncConfig: SyncConfig,
-		_record: ObjectData,
-		_changes: Partial< ObjectData >
+		_rawRecord: ObjectData
 	): Promise< Record< string, any > > {
 		return Promise.resolve( {} );
 	}
@@ -255,15 +255,13 @@ export class SyncProvider {
 	 * Custom sync providers can override this method to provide their
 	 * implementation.
 	 *
-	 * @param {SyncConfig} _syncConfig      Sync configuration for the object type.
-	 * @param {ObjectData} _record          Record representing this object type.
-	 * @param {number}     _expectedVersion Expected version of persisted CRDT document.
+	 * @param {SyncConfig} _syncConfig Sync configuration for the object type.
+	 * @param {ObjectData} _rawRecord  Record representing this object type.
 	 * @return {Promise< CRDTDoc | null >} The persisted CRDT document, or null if none exists.
 	 */
 	protected async getPersistedCRDTDoc(
 		_syncConfig: SyncConfig,
-		_record: ObjectData,
-		_expectedVersion: number
+		_rawRecord: ObjectData
 	): Promise< CRDTDoc | null > {
 		return Promise.resolve( null );
 	}
@@ -283,23 +281,28 @@ export class SyncProvider {
 	 * Update CRDT document with changes from the local store.
 	 *
 	 * @param {SyncConfig}            syncConfig Sync configuration for the object type.
-	 * @param {ObjectData}            record     Record to load.
+	 * @param {ObjectData}            rawRecord  Raw record to load.
 	 * @param {Partial< ObjectData >} changes    Updates to make.
 	 * @param {string}                origin     The source of change.
 	 */
 	public updateCRDTDoc(
 		syncConfig: SyncConfig,
-		record: ObjectData,
+		rawRecord: ObjectData,
 		changes: Partial< ObjectData >,
 		origin: string
 	): void {
 		const objectType = syncConfig.objectType;
-		const objectId = syncConfig.getObjectId( record );
+		const objectId = syncConfig.getObjectId( rawRecord );
 		const entityId = this.getEntityId( objectType, objectId );
 		const ydoc = this.entityStates.get( entityId )?.ydoc;
 
 		ydoc?.transact( () => {
-			syncConfig.applyChangesToCRDTDoc( ydoc, changes, record, origin );
+			syncConfig.applyChangesToCRDTDoc(
+				ydoc,
+				changes,
+				rawRecord,
+				origin
+			);
 		}, origin );
 	}
 
@@ -355,13 +358,13 @@ export class SyncProvider {
 	 * used by peers as a signal that they need to refetch the persisted entity.
 	 *
 	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
-	 * @param {ObjectData} record     Record representing this object type.
+	 * @param {ObjectData} rawRecord  Raw record representing this object type.
 	 */
 	public updateLastPersistedDate(
 		syncConfig: SyncConfig,
-		record: ObjectData
+		rawRecord: ObjectData
 	): void {
-		const objectId = syncConfig.getObjectId( record );
+		const objectId = syncConfig.getObjectId( rawRecord );
 		const objectType = syncConfig.objectType;
 		const entityId = this.getEntityId( objectType, objectId );
 		const entityState = this.entityStates.get( entityId );
