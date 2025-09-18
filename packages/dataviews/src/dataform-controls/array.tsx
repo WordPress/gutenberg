@@ -106,14 +106,6 @@ export default function ArrayControl< Item >( {
 		[ elements, data, field, setValue ]
 	);
 
-	// Generate custom invalid message for elements validation
-	const customInvalidMessage = useMemo( () => {
-		if ( field.isValid?.elements && elements ) {
-			return __( 'Please select from the available options.' );
-		}
-		return __( 'Invalid item' );
-	}, [ field.isValid?.elements, elements ] );
-
 	const onChangeControl = useCallback(
 		( tokens: ( string | { value: string; label?: string } )[] ) => {
 			const valueTokens = tokens.map( ( token ) => {
@@ -147,12 +139,6 @@ export default function ArrayControl< Item >( {
 			onInputChange={ onInputChange }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
-			messages={ {
-				added: __( 'Item added.' ),
-				removed: __( 'Item removed.' ),
-				remove: __( 'Remove item' ),
-				__experimentalInvalid: customInvalidMessage,
-			} }
 			__experimentalValidateInput={ ( token: string ) => {
 				// If elements validation is required, check if token is valid
 				if ( field.isValid?.elements && elements ) {
