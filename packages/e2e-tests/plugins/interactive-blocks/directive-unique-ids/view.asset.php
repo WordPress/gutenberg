@@ -1,0 +1,1 @@
+<?php return array('dependencies' => array('wp-interactivity'), 'version' => 'wp-6.9.0');
