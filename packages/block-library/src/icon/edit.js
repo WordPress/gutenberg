@@ -451,15 +451,17 @@ export function Edit( props ) {
 			</InspectorControls>
 
 			<InspectorControls group="advanced">
-				<TextControl
-					label={ __( 'Link rel' ) }
-					value={ linkRel || '' }
-					onChange={ ( value ) =>
-						setAttributes( { linkRel: value } )
-					}
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-				/>
+				{ linkUrl && (
+					<TextControl
+						label={ __( 'Link rel' ) }
+						value={ linkRel || '' }
+						onChange={ ( value ) =>
+							setAttributes( { linkRel: value } )
+						}
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+					/>
+				) }
 				<TextControl
 					label={ __( 'Title attribute' ) }
 					className="outermost-icon-block__title-control"
