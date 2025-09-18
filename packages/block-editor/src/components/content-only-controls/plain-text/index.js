@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
-export default function RichText( {
+export default function PlainText( {
 	clientId,
 	control,
 	blockType,
