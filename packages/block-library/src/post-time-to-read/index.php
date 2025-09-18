@@ -19,7 +19,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	}
 
 	$content               = get_the_content();
-	$average_reading_rate  = get_post_time_to_read_average_reading_speed();
+	$average_reading_rate  = block_core_post_time_to_read_average_reading_speed();
 	$word_count_type       = wp_get_word_count_type();
 	$total_words           = wp_word_count( $content, $word_count_type );
 
@@ -68,7 +68,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
  *
  * @return int The average reading speed in words per minute.
  */
-function get_post_time_to_read_average_reading_speed() {
+function block_core_post_time_to_read_average_reading_speed() {
 	return apply_filters( 'post_time_to_read_average_reading_speed', 189 );
 }
 
@@ -86,7 +86,7 @@ function register_block_core_post_time_to_read() {
 	// Make the average reading speed available to the block editor.
 	wp_add_inline_script(
 		'wp-block-editor',
-		'window.gutenbergTimeToReadAverageSpeed = ' . get_post_time_to_read_average_reading_speed() . ';',
+		'window.gutenbergTimeToReadAverageSpeed = ' . block_core_post_time_to_read_average_reading_speed() . ';',
 		'before'
 	);
 }
