@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
@@ -73,13 +78,16 @@ export default function ArrayControl< Item >( {
 				}
 			}
 
-			// Then check custom validation if provided
+			// Then check custom validation if provided.
 			if ( field.isValid?.custom ) {
-				const result = field.isValid.custom(
-					{
-						...data,
-						[ id ]: tokenValues,
-					},
+				const result = field.isValid?.custom?.(
+					deepMerge(
+						data,
+						setValue( {
+							item: data,
+							value: tokenValues,
+						} ) as Partial< Item >
+					),
 					field
 				);
 
@@ -95,7 +103,7 @@ export default function ArrayControl< Item >( {
 			// If no validation errors, clear custom validity
 			setCustomValidity( undefined );
 		},
-		[ elements, data, id, field ]
+		[ elements, data, field, setValue ]
 	);
 
 	// Generate custom invalid message for elements validation
@@ -116,11 +124,11 @@ export default function ArrayControl< Item >( {
 				return token;
 			} );
 
-			onChange( setValue( { item: data, value: stringTokens } ) );
-			
-      validateTokens( tokens );
+			onChange( setValue( { item: data, value: valueTokens } ) );
+
+			validateTokens( tokens );
 		},
-		[ onChange, setValue, data, findElementByLabel ]
+		[ onChange, setValue, data, validateTokens ]
 	);
 
 	const onInputChange = useCallback( ( input: string ) => {

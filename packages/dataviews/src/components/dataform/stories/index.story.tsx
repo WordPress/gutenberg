@@ -853,7 +853,6 @@ const ValidationComponent = ( {
 			'boolean',
 			'categories',
 			'countries',
-			'customEdit',
 			'toggle',
 			'toggleGroup',
 			'password',
