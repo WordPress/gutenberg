@@ -199,7 +199,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 		isReusable,
 		isTemplate,
 		isDisabled,
-		isSection,
+		isSectionInSelection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -243,6 +243,10 @@ export const BlockSwitcher = ( { clientIds } ) => {
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
 			}
 
+			const _isSectionInSelection = clientIds.some( ( id ) =>
+				isSectionBlock( id )
+			);
+
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
 				hasBlockStyles:
@@ -255,7 +259,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
 				hasContentOnlyLocking: _hasTemplateLock,
 				isDisabled: editingMode !== 'default',
-				isSection: isSectionBlock( clientIds[ 0 ] ),
+				isSectionInSelection: _isSectionInSelection,
 			};
 		},
 		[ clientIds ]
@@ -285,7 +289,8 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			: undefined;
 
 	const hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion && isSection;
+		window?.__experimentalContentOnlyPatternInsertion &&
+		isSectionInSelection;
 	const hideDropdown =
 		hideTransformsForSections ||
 		isDisabled ||

@@ -138,7 +138,7 @@ export const registerPostTypeSchema =
 				: undefined,
 			// @ts-ignore
 			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
+				? ! [ 'wp_block', 'wp_template_part' ].includes(
 						postTypeConfig.slug
 				  ) &&
 				  canCreate &&

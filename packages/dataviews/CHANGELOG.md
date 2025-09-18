@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
+
+## 9.0.0 (2025-09-17)
+
 ### Breaking changes
 
 - Remove `boolean` form control. Fields using `Edit: 'boolean'` must now use `Edit: 'checkbox'` or `Edit: 'toggle'` instead. Boolean field types now use checkboxes by default. [#71505](https://github.com/WordPress/gutenberg/pull/71505)
