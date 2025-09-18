@@ -1,5 +1,7 @@
 # Gutenberg
 
+[![LFX Health Score](https://insights.linuxfoundation.org/api/badge/health-score?project=wordpress-gutenberg)](https://insights.linuxfoundation.org/project/wordpress-gutenberg)
+
 [![End-to-End Tests](https://github.com/WordPress/gutenberg/workflows/End-to-End%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22End-to-End+Tests%22+branch%3Atrunk)
 [![Static Analysis (Linting, License, Type checks...)](<https://github.com/WordPress/gutenberg/workflows/Static%20Analysis%20(Linting,%20License,%20Type%20checks...)/badge.svg>)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22Static+Analysis+%28Linting%2C+License%2C+Type+checks...%29%22+branch%3Atrunk)
 [![Unit Tests](https://github.com/WordPress/gutenberg/workflows/Unit%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22Unit+Tests%22+branch%3Atrunk)
