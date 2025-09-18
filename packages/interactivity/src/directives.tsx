@@ -11,7 +11,7 @@ import {
 	type RefObject,
 } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import { signal } from '@preact/signals';
+import { signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -205,7 +205,19 @@ const getGlobalAsyncEventDirective = (
 	};
 };
 
-export const routerRegions = new Map();
+/**
+ * Relates each router region with its current vDOM content. Used by the
+ * `router-region` directive.
+ *
+ * Keys are router region IDs, and values are signals with the corresponding
+ * VNode rendered inside. If the value is `null`, that means the regions should
+ * not be rendered. If the value is `undefined`, the region is already contained
+ * inside another router region and does not need to change its children.
+ */
+export const routerRegions = new Map<
+	string,
+	Signal< VNode | null | undefined >
+>();
 
 export default () => {
 	// data-wp-context
@@ -744,7 +756,10 @@ export default () => {
 				routerRegions.set( regionId, signal() );
 			}
 
+			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
+
+			// The scope needs to be injected.
 			const previousScope = getScope();
 			return vdom && cloneElement( vdom, { previousScope } );
 		},
