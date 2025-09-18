@@ -13,14 +13,6 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	RichText,
 } from '@wordpress/block-editor';
-/**
- * Internal dependencies
- */
-import { plus } from '../accordion-content/icons';
-
-const ICONS = {
-	plus,
-};
 
 export default function save( { attributes } ) {
 	const { level, title, iconPosition, textAlign, showIcon } = attributes;
@@ -31,8 +23,6 @@ export default function save( { attributes } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
-
-	const Icon = ICONS.plus;
 
 	return (
 		<TagName
@@ -61,18 +51,9 @@ export default function save( { attributes } ) {
 				} }
 			>
 				<RichText.Content tagName="span" value={ title } />
-				<span
-					className={ clsx( `accordion-content__toggle-icon`, {
-						'has-icon-plus': showIcon,
-					} ) }
-					style={ {
-						// TO-DO: make this configurable
-						width: `1.2em`,
-						height: `1.2em`,
-					} }
-				>
-					{ showIcon && <Icon width="1.2em" height="1.2em" /> }
-				</span>
+				{ showIcon && (
+					<span className="accordion-content__toggle-icon">+</span>
+				) }
 			</button>
 		</TagName>
 	);
