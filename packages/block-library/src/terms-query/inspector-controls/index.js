@@ -16,7 +16,7 @@ import OrderingControls from './ordering-controls';
 import DisplayOptions from './display-options';
 import HierarchyControl from './hierarchy-control';
 import EmptyTermsControl from './empty-terms-control';
-import MaxTermsControl from './max-terms-controls';
+import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
 
 export default function TermsQueryInspectorControls( {
