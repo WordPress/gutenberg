@@ -260,7 +260,7 @@ function Thread( {
 		[]
 	);
 
-	// Find first block that have this comment ID - run at component root level.
+	// Find first block that has this comment ID - run at component root level.
 	const relatedBlock = useMemo( () => {
 		if ( ! thread.id || ! blocks ) {
 			return null;
