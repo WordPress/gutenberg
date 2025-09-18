@@ -37,9 +37,7 @@ function PostTimeToReadEdit( {
 	context,
 } ) {
 	/**
-	 * Average reading rate - based on average taken from
-	 * https://irisreading.com/average-reading-speed-in-various-languages/
-	 * (Characters/minute used for Chinese rather than words).
+	 * Average reading rate should come from PHP via wp_localize_script.
 	 * Can be filtered via the 'post_time_to_read_average_reading_speed' PHP filter.
 	 */
 	const AVERAGE_READING_RATE = window.gutenbergTimeToReadAverageSpeed || 189;
