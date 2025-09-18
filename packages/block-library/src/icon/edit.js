@@ -27,7 +27,6 @@ import {
 	BlockControls,
 	ContrastChecker,
 	InspectorControls,
-	JustifyToolbar,
 	MediaUpload,
 	useBlockProps,
 	withColors,
@@ -38,17 +37,10 @@ import {
 	__experimentalLinkControl as LinkControl,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { displayShortcut, isKeyboardEvent, DOWN } from '@wordpress/keycodes';
-import {
-	code,
-	flipHorizontal as flipH,
-	flipVertical as flipV,
-	link,
-	media as mediaIcon,
-	rotateRight,
-} from '@wordpress/icons';
+import { code, link, media as mediaIcon } from '@wordpress/icons';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -88,36 +80,19 @@ export function Edit( props ) {
 		setIconColor,
 	} = props;
 	const {
-		flipHorizontal,
-		flipVertical,
 		hasNoIconFill,
 		icon,
 		iconBackgroundColorValue,
 		iconColorValue,
 		iconName,
-		itemsJustification,
 		label,
 		linkRel,
 		linkTarget,
 		linkUrl,
-		rotate,
 		title,
 		width,
 		height,
-		// Deprecated
-		percentWidth,
 	} = attributes;
-
-	useEffect( () => {
-		// If percentWidth is set (deprecated in v1.4.0), set as width value
-		// and remove the attribute.
-		if ( percentWidth ) {
-			setAttributes( {
-				width: `${ percentWidth }%`,
-				percentWidth: undefined,
-			} );
-		}
-	} );
 
 	// Allowed types for the current user.
 	const { allowedMimeTypes, mediaUpload } = useSelect( ( select ) => {
@@ -178,22 +153,6 @@ export function Edit( props ) {
 		if ( typeof printedIcon === 'string' ) {
 			printedIcon = parseIcon( printedIcon );
 		}
-	}
-
-	function setRotate( value ) {
-		const currentValue = ! value || ! typeof value === 'number' ? 0 : value;
-
-		let newValue = 0;
-
-		if ( currentValue < 90 ) {
-			newValue = 90;
-		} else if ( currentValue < 180 ) {
-			newValue = 180;
-		} else if ( currentValue < 270 ) {
-			newValue = 270;
-		}
-
-		setAttributes( { rotate: newValue } );
 	}
 
 	function unlink() {
@@ -340,21 +299,6 @@ export function Edit( props ) {
 								! isContentOnlyMode,
 						} ) }
 					>
-						{ ! isContentOnlyMode && (
-							<JustifyToolbar
-								allowedControls={ [
-									'left',
-									'center',
-									'right',
-								] }
-								value={ itemsJustification }
-								onChange={ ( value ) =>
-									setAttributes( {
-										itemsJustification: value,
-									} )
-								}
-							/>
-						) }
 						<ToolbarButton
 							ref={ linkRef }
 							name="link"
@@ -401,37 +345,6 @@ export function Edit( props ) {
 									} }
 								/>
 							</Popover>
-						) }
-						{ ! isContentOnlyMode && (
-							<>
-								<ToolbarButton
-									className={ `outermost-icon-block__rotate-button-${ rotate }` }
-									icon={ rotateRight }
-									label={ __( 'Rotate' ) }
-									onClick={ () => setRotate( rotate ) }
-									isPressed={ rotate }
-								/>
-								<ToolbarButton
-									icon={ flipH }
-									label={ __( 'Flip Horizontal' ) }
-									onClick={ () =>
-										setAttributes( {
-											flipHorizontal: ! flipHorizontal,
-										} )
-									}
-									isPressed={ flipHorizontal }
-								/>
-								<ToolbarButton
-									icon={ flipV }
-									label={ __( 'Flip Vertical' ) }
-									onClick={ () =>
-										setAttributes( {
-											flipVertical: ! flipVertical,
-										} )
-									}
-									isPressed={ flipVertical }
-								/>
-							</>
 						) }
 					</ToolbarGroup>
 				</BlockControls>
@@ -593,29 +506,6 @@ export function Edit( props ) {
 							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Rotation' ) }
-						isShownByDefault={ false }
-						hasValue={ () => !! rotate }
-						onDeselect={ () =>
-							setAttributes( { rotate: undefined } )
-						}
-					>
-						<DimensionControl
-							label={ __( 'Rotation' ) }
-							value={ `${ rotate }deg` }
-							onChange={ ( value ) =>
-								setAttributes( {
-									rotate: parseQuantityAndUnitFromRawValue(
-										value
-									)[ 0 ],
-								} )
-							}
-							units={ [ 'deg' ] }
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-						/>
-					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			{ hasColorsOrGradients && (
@@ -733,7 +623,6 @@ export function Edit( props ) {
 		[ `has-${ themeIconBackgroundColor }-background-color` ]:
 			themeIconBackgroundColor,
 		[ gradientClass ]: gradientClass,
-		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
 	const [ widthQuantity, widthUnit ] =
@@ -748,10 +637,6 @@ export function Edit( props ) {
 			: `${ widthQuantity }px`;
 	}
 
-	const rotateValue = rotate ? `${ rotate }deg` : '0deg';
-	const scaleXValue = flipHorizontal ? '-1' : '1';
-	const scaleYValue = flipVertical ? '-1' : '1';
-
 	const iconStyles = {
 		background: gradientValue,
 		backgroundColor: iconBackgroundColorValue,
@@ -760,7 +645,6 @@ export function Edit( props ) {
 		color: iconColorValue,
 		width: iconWidth,
 		height: height || undefined,
-		transform: `rotate(${ rotateValue }) scaleX(${ scaleXValue }) scaleY(${ scaleYValue })`,
 
 		// Margin is applied to the wrapper container, so unset.
 		marginBottom: undefined,
@@ -806,9 +690,6 @@ export function Edit( props ) {
 			{ inspectorControls }
 			<div
 				{ ...useBlockProps( {
-					className:
-						itemsJustification &&
-						`items-justified-${ itemsJustification }`,
 					//ref,
 					onKeyDown,
 				} ) }

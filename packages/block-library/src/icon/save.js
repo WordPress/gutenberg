@@ -26,8 +26,6 @@ import { flattenIconsArray, parseIcon } from './utils';
 export default function Save( props ) {
 	const {
 		customGradient,
-		flipHorizontal,
-		flipVertical,
 		gradient,
 		hasNoIconFill,
 		icon,
@@ -36,12 +34,10 @@ export default function Save( props ) {
 		iconColor,
 		iconColorValue,
 		iconName,
-		itemsJustification,
 		label,
 		linkRel,
 		linkTarget,
 		linkUrl,
-		rotate,
 		title,
 		width,
 		height,
@@ -124,10 +120,6 @@ export default function Save( props ) {
 			: `${ widthQuantity }px`;
 	}
 
-	const rotateValue = rotate ? `${ rotate }deg` : '0deg';
-	const scaleXValue = flipHorizontal ? '-1' : '1';
-	const scaleYValue = flipVertical ? '-1' : '1';
-
 	const iconStyles = {
 		background: ! gradient ? customGradient : undefined,
 		backgroundColor: iconBackgroundColorValue,
@@ -136,7 +128,6 @@ export default function Save( props ) {
 		height: height || undefined,
 		...blockProps.style,
 		...borderProps.style,
-		transform: `rotate(${ rotateValue }) scaleX(${ scaleXValue }) scaleY(${ scaleYValue })`,
 
 		// Margin is applied to the wrapper container, so unset.
 		marginBottom: undefined,
@@ -183,11 +174,7 @@ export default function Save( props ) {
 
 	return (
 		<div
-			{ ...useBlockProps.save( {
-				className:
-					itemsJustification &&
-					`items-justified-${ itemsJustification }`,
-			} ) }
+			{ ...useBlockProps.save() }
 			// This is a bit of a hack. we only want the margin styles
 			// applied to the main block div.
 			style={ blockMargin }

@@ -63,23 +63,11 @@
 		"linkTarget": {
 			"type": "string"
 		},
-		"rotate": {
-			"type": "number"
-		},
-		"flipHorizontal": {
-			"type": "boolean"
-		},
-		"flipVertical": {
-			"type": "boolean"
-		},
 		"width": {
 			"type": [ "string", "number" ]
 		},
 		"height": {
 			"type": "string"
-		},
-		"percentWidth": {
-			"type": "number"
 		}
 	},
 	"supports": {
