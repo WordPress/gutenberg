@@ -26,24 +26,10 @@ import RootMenu from './root-menu';
 import PreviewStyles from './preview-styles';
 
 function ScreenRoot() {
-	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
-		const {
-			getEntityRecord,
-			__experimentalGetCurrentGlobalStylesId,
-			__experimentalGetCurrentThemeGlobalStylesVariations,
-		} = select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			hasVariations:
-				!! __experimentalGetCurrentThemeGlobalStylesVariations()
-					?.length,
-			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
-		};
+	const hasVariations = useSelect( ( select ) => {
+		const { __experimentalGetCurrentThemeGlobalStylesVariations } =
+			select( coreStore );
+		return !! __experimentalGetCurrentThemeGlobalStylesVariations()?.length;
 	}, [] );
 
 	return (
@@ -109,28 +95,6 @@ function ScreenRoot() {
 					</NavigationButtonAsItem>
 				</ItemGroup>
 			</CardBody>
-
-			{ canEditCSS && (
-				<>
-					<CardDivider />
-					<CardBody>
-						<ItemGroup>
-							<NavigationButtonAsItem path="/css">
-								<HStack justify="space-between">
-									<FlexItem>
-										{ __( 'Additional CSS' ) }
-									</FlexItem>
-									<IconWithCurrentColor
-										icon={
-											isRTL() ? chevronLeft : chevronRight
-										}
-									/>
-								</HStack>
-							</NavigationButtonAsItem>
-						</ItemGroup>
-					</CardBody>
-				</>
-			) }
 		</Card>
 	);
 }

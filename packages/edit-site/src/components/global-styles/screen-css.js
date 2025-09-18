@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Navigator,
-	ExternalLink,
-	__experimentalSpacer as Spacer,
-} from '@wordpress/components';
+import { ExternalLink } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
@@ -58,13 +53,6 @@ function ScreenCSS() {
 					setEditorCanvasContainerView( undefined );
 				} }
 			/>
-			<Spacer margin={ 0 } paddingX={ 4 }>
-				<Navigator.Button as={ Button } variant="link" path="/blocks">
-					{ __(
-						'Want to change block appearance? Use the Blocks section instead.'
-					) }
-				</Navigator.Button>
-			</Spacer>
 			<div className="edit-site-global-styles-screen-css">
 				<StylesAdvancedPanel
 					value={ style }
