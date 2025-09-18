@@ -50,5 +50,5 @@ lock( privateApis, {
 	ValidatedTextareaControl,
 	ValidatedToggleControl,
 	ValidatedToggleGroupControl,
-  ValidatedFormTokenField,
+	ValidatedFormTokenField,
 } );
