@@ -94,7 +94,8 @@ export function Comments( {
 		[]
 	);
 
-	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+	const { toggleBlockHighlight, flashBlock } =
+		useDispatch( blockEditorStore );
 
 	const clearThreadFocus = () => {
 		// Clear any block highlights when clearing thread focus
@@ -135,14 +136,9 @@ export function Comments( {
 			setFocusThread( blockCommentId );
 		}
 
-		// Clear focus if no block-comment is selected.
-		if ( ! blockCommentId && focusThread ) {
-			setFocusThread( null );
-		}
-
-		// Highlight block when comment is focused.
+		// Flash block when comment is focused (non-persistent highlight).
 		if ( relatedBlockClientId ) {
-			toggleBlockHighlight( relatedBlockClientId, true );
+			flashBlock( relatedBlockClientId );
 		}
 	}, [
 		selectedBlockClientId,
@@ -150,7 +146,41 @@ export function Comments( {
 		focusThread,
 		blocks,
 		toggleBlockHighlight,
+		flashBlock,
 		setFocusThread,
+	] );
+
+	// Clear highlights when switching to blocks without comments
+	useEffect( () => {
+		// Only clear if we're switching from a block WITH comments to a block WITHOUT comments
+		// This prevents clearing when switching between comments on the same block without comments
+		if (
+			selectedBlockClientId &&
+			! blockCommentId &&
+			focusThread &&
+			blocks
+		) {
+			// Check if the current focus thread belongs to a different block
+			const currentFocusedThreadBlock = findBlockByCommentId(
+				focusThread,
+				blocks
+			);
+			const isDifferentBlock =
+				currentFocusedThreadBlock &&
+				currentFocusedThreadBlock !== selectedBlockClientId;
+
+			if ( isDifferentBlock ) {
+				// Clear the block highlight
+				toggleBlockHighlight( currentFocusedThreadBlock, false );
+			}
+		}
+	}, [
+		selectedBlockClientId,
+		blockCommentId,
+		focusThread,
+		setFocusThread,
+		blocks,
+		toggleBlockHighlight,
 	] );
 
 	// Handle comment selection.
@@ -165,6 +195,11 @@ export function Comments( {
 				toggleBlockHighlight( relatedBlockClientId, false );
 			}
 		}
+
+		// Clear the add comment form when selecting a comment.
+		setShowCommentBoard( false );
+
+		// Set the focused thread.
 		setFocusThread( threadId );
 	};
 
@@ -325,7 +360,7 @@ function Thread( {
 								onAddReply( inputComment, thread.id );
 							} }
 							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered
+								event.stopPropagation(); // Prevent the parent onClick from being triggered.
 								clearThreadFocus();
 							} }
 							placeholderText={
