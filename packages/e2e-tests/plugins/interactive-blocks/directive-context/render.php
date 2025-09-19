@@ -167,7 +167,7 @@
 </div>
 
 <!-- Count of succesfull client-side navigations -->
- <div
+<div
 	data-testid="navigation count"
 	data-wp-interactive="directive-context-navigate"
 	data-wp-watch="callbacks.updateNavigationCount"
