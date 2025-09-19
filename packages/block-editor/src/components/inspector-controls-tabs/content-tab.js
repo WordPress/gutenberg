@@ -24,10 +24,7 @@ const ContentTab = ( { rootClientId, contentClientIds } ) => {
 					</PanelBody>
 				) }
 				{ window?.__experimentalContentOnlyPatternInsertion && (
-					<ContentOnlyControls
-						rootClientId={ rootClientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentOnlyControls rootClientId={ rootClientId } />
 				) }
 			</>
 		</PanelBody>
