@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import edit from './edit';
@@ -21,7 +26,9 @@ export const settings = {
 					{
 						name: 'core/accordion-header',
 						attributes: {
-							title: 'Accordion Header Example 1',
+							title: __(
+								'Lorem ipsum dolor sit amet, consectetur.'
+							),
 						},
 					},
 				],
@@ -32,7 +39,9 @@ export const settings = {
 					{
 						name: 'core/accordion-header',
 						attributes: {
-							title: 'Accordion Header Example 2',
+							title: __(
+								'Suspendisse commodo lacus, interdum et.'
+							),
 						},
 					},
 				],
