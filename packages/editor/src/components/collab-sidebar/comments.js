@@ -101,35 +101,6 @@ export function Comments( {
 		showCommentBoard && blockCommentId ? blockCommentId : null
 	);
 
-	// Handle comment selection.
-	const handleCommentSelect = ( threadId, relatedBlockElement = null ) => {
-		// Clear the add comment form when selecting a comment.
-		setShowCommentBoard( false );
-
-		// Set the focused thread.
-		setFocusThread( threadId );
-
-		// Flash the related block when a comment is clicked.
-		if ( blocks ) {
-			const relatedBlockClientId = findBlockByCommentId(
-				threadId,
-				blocks
-			);
-			if ( relatedBlockClientId ) {
-				// Use longer timeout for comment-to-block highlighting (800ms)
-				flashBlock( relatedBlockClientId, 800 );
-			}
-		}
-
-		// Scroll to the related block element if provided.
-		if ( relatedBlockElement ) {
-			relatedBlockElement.scrollIntoView( {
-				behavior: 'instant',
-				block: 'center',
-			} );
-		}
-	};
-
 	return (
 		<>
 			{
@@ -163,7 +134,9 @@ export function Comments( {
 						clearThreadFocus={ clearThreadFocus }
 						setFocusThread={ setFocusThread }
 						blockCommentId={ blockCommentId }
-						onFocusThread={ handleCommentSelect }
+						blocks={ blocks }
+						flashBlock={ flashBlock }
+						setShowCommentBoard={ setShowCommentBoard }
 					/>
 				) ) }
 		</>
@@ -179,14 +152,11 @@ function Thread( {
 	onCommentReopen,
 	isFocused,
 	clearThreadFocus,
-	onFocusThread,
 	setFocusThread,
+	blocks,
+	flashBlock,
+	setShowCommentBoard,
 } ) {
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
 	// Find first block that has this comment ID - run at component root level.
 	const relatedBlock = useMemo( () => {
 		if ( ! thread.id || ! blocks ) {
@@ -197,6 +167,34 @@ function Thread( {
 
 	const relatedBlockElement = useBlockElement( relatedBlock );
 
+	const handleCommentSelect = ( threadId ) => {
+		// Clear the add comment form when selecting a comment.
+		setShowCommentBoard( false );
+
+		// Set the focused thread.
+		setFocusThread( threadId );
+
+		// Flash the related block when a comment is clicked.
+		if ( blocks ) {
+			const relatedBlockClientId = findBlockByCommentId(
+				threadId,
+				blocks
+			);
+			if ( relatedBlockClientId ) {
+				// Use longer timeout for comment-to-block highlighting (800ms)
+				flashBlock( relatedBlockClientId, 800 );
+			}
+		}
+
+		// Scroll to the related block element if available.
+		if ( relatedBlock && relatedBlockElement ) {
+			relatedBlockElement.scrollIntoView( {
+				behavior: 'instant',
+				block: 'center',
+			} );
+		}
+	};
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
@@ -204,7 +202,7 @@ function Thread( {
 			} ) }
 			id={ thread.id }
 			spacing="3"
-			onClick={ () => onFocusThread( thread.id, relatedBlockElement ) }
+			onClick={ () => handleCommentSelect( thread.id ) }
 		>
 			<CommentBoard
 				thread={ thread }
