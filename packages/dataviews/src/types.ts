@@ -543,15 +543,25 @@ export interface ColumnStyle {
 	 * The alignment of the field column, defaults to left.
 	 */
 	align?: 'start' | 'center' | 'end';
+
+	/**
+	 * The vertical alignment of the field column, defaults to top.
+	 */
+	verticalAlign?:
+		| 'baseline'
+		| 'sub'
+		| 'super'
+		| 'text-top'
+		| 'text-bottom'
+		| 'middle'
+		| 'top'
+		| 'bottom';
 }
 
 export type Density = 'compact' | 'balanced' | 'comfortable';
 
 export interface ViewTable extends ViewBase {
 	type: 'table';
-
-	/** The aligment of the fields vertically, defaults to top. */
-	verticalAlign?: 'top' | 'middle' | 'bottom';
 
 	layout?: {
 		/**
@@ -568,9 +578,6 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
-
-		/** The aligment of the fields vertically, defaults to top. */
-		verticalAlign?: 'top' | 'middle' | 'bottom';
 	};
 }
 

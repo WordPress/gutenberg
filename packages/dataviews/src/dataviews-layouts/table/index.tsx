@@ -128,7 +128,6 @@ function TableRow< Item >( {
 		showMedia = true,
 		showDescription = true,
 		infiniteScrollEnabled,
-		layout: { verticalAlign = 'top' } = {},
 	} = view;
 	const handleMouseEnter = () => {
 		setIsHovered( true );
@@ -147,17 +146,13 @@ function TableRow< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 
-	const className = clsx( 'dataviews-view-table__row', {
-		'is-selected': hasPossibleBulkAction && isSelected,
-		'is-hovered': isHovered,
-		'has-bulk-actions': hasPossibleBulkAction,
-		'is-vertical-align-middle': verticalAlign === 'middle',
-		'is-vertical-align-bottom': verticalAlign === 'bottom',
-	} );
-
 	return (
 		<tr
-			className={ className }
+			className={ clsx( 'dataviews-view-table__row', {
+				'is-selected': hasPossibleBulkAction && isSelected,
+				'is-hovered': isHovered,
+				'has-bulk-actions': hasPossibleBulkAction,
+			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 			onTouchStart={ () => {
@@ -231,8 +226,13 @@ function TableRow< Item >( {
 			) }
 			{ columns.map( ( column: string ) => {
 				// Explicit picks the supported styles.
-				const { width, maxWidth, minWidth, align } =
-					view.layout?.styles?.[ column ] ?? {};
+				const {
+					width,
+					maxWidth,
+					minWidth,
+					align,
+					verticalAlign = 'top',
+				} = view.layout?.styles?.[ column ] ?? {};
 
 				return (
 					<td
@@ -241,6 +241,7 @@ function TableRow< Item >( {
 							width,
 							maxWidth,
 							minWidth,
+							verticalAlign,
 						} }
 					>
 						<TableColumnField
@@ -417,8 +418,14 @@ function ViewTable< Item >( {
 						) }
 						{ columns.map( ( column, index ) => {
 							// Explicit picks the supported styles.
-							const { width, maxWidth, minWidth, align } =
-								view.layout?.styles?.[ column ] ?? {};
+							const {
+								width,
+								maxWidth,
+								minWidth,
+								align,
+								verticalAlign = 'top',
+							} = view.layout?.styles?.[ column ] ?? {};
+
 							return (
 								<th
 									key={ column }
@@ -427,6 +434,7 @@ function ViewTable< Item >( {
 										maxWidth,
 										minWidth,
 										textAlign: align,
+										verticalAlign,
 									} }
 									aria-sort={
 										view.sort?.direction &&

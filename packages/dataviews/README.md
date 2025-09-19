@@ -214,10 +214,10 @@ Properties:
 
 ##### Properties of `layout`
 
-| Properties of `layout`                                                                      | Table | Grid | List |
-| ------------------------------------------------------------------------------------------- | ----- | ---- | ---- |
-| `badgeFields`: a list of field's `id` to render without label and styled as badges.         |       | ✓    |      |
-| `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. | ✓     |      |      |
+| Properties of `layout`                                                                                       | Table | Grid | List |
+| ------------------------------------------------------------------------------------------------------------ | ----- | ---- | ---- |
+| `badgeFields`: a list of field's `id` to render without label and styled as badges.                          |       | ✓    |      |
+| `styles`: additional `width`, `maxWidth`, `minWidth`, `align`, `verticalAlign` styles for each field column. | ✓     |      |      |
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).

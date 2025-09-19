@@ -77,6 +77,13 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
+		layout: {
+			styles: {
+				categories: {
+					verticalAlign: 'bottom',
+				},
+			},
+		},
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
