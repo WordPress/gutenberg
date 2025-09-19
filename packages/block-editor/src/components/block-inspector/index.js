@@ -138,11 +138,7 @@ function BlockInspector() {
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
 
-	if (
-		hasSelectedBlocks &&
-		! isSectionBlockInSelection &&
-		! isSectionBlock
-	) {
+	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -160,7 +156,7 @@ function BlockInspector() {
 		);
 	}
 
-	if ( hasSelectedBlocks && isSectionBlockInSelection && ! isSectionBlock ) {
+	if ( hasSelectedBlocks && isSectionBlockInSelection ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
