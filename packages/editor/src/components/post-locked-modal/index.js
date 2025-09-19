@@ -148,6 +148,10 @@ function PostLockedModal() {
 		return null;
 	}
 
+	if ( window.__experimentalEnableSync ) {
+		return null;
+	}
+
 	const userDisplayName = user.name;
 	const userAvatar = user.avatar;
 
