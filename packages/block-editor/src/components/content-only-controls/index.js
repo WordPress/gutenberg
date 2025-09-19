@@ -242,6 +242,21 @@ export default function ContentOnlyControls( { rootClientId } ) {
 				}
 			}
 
+			// Avoid showing only one drilldown block at the root.
+			if (
+				_contentClientIds.length === 1 &&
+				Object.keys( _nestedContentClientIds ).length === 1
+			) {
+				const onlyParentClientId = Object.keys(
+					_nestedContentClientIds
+				)[ 0 ];
+				return {
+					contentClientIds:
+						_nestedContentClientIds[ onlyParentClientId ],
+					nestedContentClientIds: {},
+				};
+			}
+
 			return {
 				nestedContentClientIds: _nestedContentClientIds,
 				contentClientIds: _contentClientIds,
