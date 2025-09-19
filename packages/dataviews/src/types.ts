@@ -550,6 +550,9 @@ export type Density = 'compact' | 'balanced' | 'comfortable';
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
+	/** The aligment of the fields vertically, defaults to top. */
+	verticalAlign?: 'top' | 'middle' | 'bottom';
+
 	layout?: {
 		/**
 		 * The styles for the columns.
@@ -565,6 +568,9 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/** The aligment of the fields vertically, defaults to top. */
+		verticalAlign?: 'top' | 'middle' | 'bottom';
 	};
 }
 

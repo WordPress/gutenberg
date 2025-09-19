@@ -47,6 +47,7 @@ interface TableColumnFieldProps< Item > {
 	column: string;
 	item: Item;
 	align?: 'start' | 'center' | 'end';
+	verticalAlign?: 'start' | 'center' | 'end';
 }
 
 interface TableRowProps< Item > {
@@ -127,6 +128,7 @@ function TableRow< Item >( {
 		showMedia = true,
 		showDescription = true,
 		infiniteScrollEnabled,
+		layout: { verticalAlign = 'top' } = {},
 	} = view;
 	const handleMouseEnter = () => {
 		setIsHovered( true );
@@ -145,13 +147,17 @@ function TableRow< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 
+	const className = clsx( 'dataviews-view-table__row', {
+		'is-selected': hasPossibleBulkAction && isSelected,
+		'is-hovered': isHovered,
+		'has-bulk-actions': hasPossibleBulkAction,
+		'is-vertical-align-middle': verticalAlign === 'middle',
+		'is-vertical-align-bottom': verticalAlign === 'bottom',
+	} );
+
 	return (
 		<tr
-			className={ clsx( 'dataviews-view-table__row', {
-				'is-selected': hasPossibleBulkAction && isSelected,
-				'is-hovered': isHovered,
-				'has-bulk-actions': hasPossibleBulkAction,
-			} ) }
+			className={ className }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 			onTouchStart={ () => {
