@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useMemo } from '@wordpress/element';
+import { useState, RawHTML, useEffect, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -101,6 +101,13 @@ export function Comments( {
 		showCommentBoard && blockCommentId ? blockCommentId : null
 	);
 
+	useEffect( () => {
+		// Highlight comment when block is selected.
+		if ( blockCommentId && ! focusThread ) {
+			setFocusThread( blockCommentId );
+		}
+	}, [ blockCommentId, focusThread, blocks, setFocusThread ] );
+
 	return (
 		<>
 			{
@@ -175,15 +182,8 @@ function Thread( {
 		setFocusThread( threadId );
 
 		// Flash the related block when a comment is clicked.
-		if ( blocks ) {
-			const relatedBlockClientId = findBlockByCommentId(
-				threadId,
-				blocks
-			);
-			if ( relatedBlockClientId ) {
-				// Use longer timeout for comment-to-block highlighting (800ms)
-				flashBlock( relatedBlockClientId, 800 );
-			}
+		if ( relatedBlock ) {
+			flashBlock( relatedBlock );
 		}
 
 		// Scroll to the related block element if available.
