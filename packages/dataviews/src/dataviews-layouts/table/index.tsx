@@ -47,7 +47,6 @@ interface TableColumnFieldProps< Item > {
 	column: string;
 	item: Item;
 	align?: 'start' | 'center' | 'end';
-	verticalAlign?: 'start' | 'center' | 'end';
 }
 
 interface TableRowProps< Item > {
