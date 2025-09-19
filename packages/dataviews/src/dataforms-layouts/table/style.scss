@@ -1,0 +1,114 @@
+.dataforms-layouts-table {
+	&__title {
+		font-size: 1.1em;
+		font-weight: 600;
+		margin: 0 0 8px 0;
+		color: var(--wp-admin-theme-color, #3858e9);
+	}
+
+	&__description {
+		margin: 0 0 12px 0;
+		color: #646970;
+		font-size: 0.9em;
+		line-height: 1.4;
+	}
+
+	&__wrapper {
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		overflow: hidden;
+		background: #fff;
+	}
+
+	&__table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9em;
+
+		th,
+		td {
+			padding: 12px 16px;
+			text-align: left;
+			vertical-align: top;
+			border-bottom: 1px solid #e1e1e1;
+		}
+
+		th {
+			background: #f6f7f7;
+			font-weight: 600;
+			color: #1d2327;
+			border-bottom: 2px solid #ddd;
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+
+		tbody tr {
+			&:hover {
+				background: #f9f9f9;
+			}
+
+			&:last-child td {
+				border-bottom: none;
+			}
+		}
+
+		// Form controls in table cells
+		td {
+			.components-base-control {
+				margin-bottom: 0;
+			}
+
+			.components-base-control__label {
+				display: none; // Hidden since we have column headers
+			}
+
+			.components-text-control__input,
+			.components-textarea-control__input,
+			.components-select-control__input,
+			.components-number-control__input {
+				width: 100%;
+				min-height: 32px;
+				border-radius: 2px;
+			}
+
+			.components-toggle-control {
+				.components-toggle-control__label {
+					display: none;
+				}
+			}
+
+			.components-radio-control,
+			.components-checkbox-control {
+				margin: 0;
+			}
+
+			.components-button-group {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 4px;
+			}
+		}
+	}
+
+	// Responsive behavior
+	@media ( max-width: 768px ) {
+		&__wrapper {
+			overflow-x: auto;
+		}
+
+		&__table {
+			min-width: 600px; // Prevent table from becoming too narrow
+		}
+	}
+
+	@media ( max-width: 480px ) {
+		&__table {
+			th,
+			td {
+				padding: 8px 12px;
+				font-size: 0.85em;
+			}
+		}
+	}
+}

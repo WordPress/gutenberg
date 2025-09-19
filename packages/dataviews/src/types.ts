@@ -785,7 +785,7 @@ export interface SupportedLayouts {
 /**
  * DataForm layouts.
  */
-export type LayoutType = 'regular' | 'panel' | 'card' | 'row';
+export type LayoutType = 'regular' | 'panel' | 'card' | 'row' | 'table';
 export type LabelPosition = 'top' | 'side' | 'none';
 
 export type RegularLayout = {
@@ -844,12 +844,28 @@ export type NormalizedRowLayout = {
 	alignment: 'start' | 'center' | 'end';
 };
 
-export type Layout = RegularLayout | PanelLayout | CardLayout | RowLayout;
+export type TableLayout = {
+	type: 'table';
+	source: string;
+};
+
+export type NormalizedTableLayout = {
+	type: 'table';
+	source: string;
+};
+
+export type Layout =
+	| RegularLayout
+	| PanelLayout
+	| CardLayout
+	| RowLayout
+	| TableLayout;
 export type NormalizedLayout =
 	| NormalizedRegularLayout
 	| NormalizedPanelLayout
 	| NormalizedCardLayout
-	| NormalizedRowLayout;
+	| NormalizedRowLayout
+	| NormalizedTableLayout;
 
 export type SimpleFormField = {
 	id: string;

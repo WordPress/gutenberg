@@ -1721,3 +1721,98 @@ const DataAdapterComponent = () => {
 export const DataAdapter = {
 	render: DataAdapterComponent,
 };
+
+const ResourceListComponent = ( {} ) => {
+	type OpeningHours = {
+		weeklyOpeningHours: {
+			day: string;
+			openingHours: string;
+		}[];
+	};
+	const _data: OpeningHours = {
+		weeklyOpeningHours: [
+			{
+				day: 'monday',
+				openingHours: 'morning',
+			},
+			{
+				day: 'tuesday',
+				openingHours: 'evening',
+			},
+			{
+				day: 'wednesday',
+				openingHours: 'afternoon',
+			},
+			{
+				day: 'thursday',
+				openingHours: 'morning',
+			},
+			{
+				day: 'friday',
+				openingHours: 'evening',
+			},
+			{
+				day: 'saturday',
+				openingHours: 'afternoon',
+			},
+			{
+				day: 'sunday',
+				openingHours: 'morning',
+			},
+		],
+	};
+	const [ openingHours, setOpeningHours ] = useState( _data );
+	const _fields: Field< OpeningHours >[] = [
+		{
+			id: 'day',
+			type: 'text',
+			label: 'Day',
+			elements: [
+				{ value: 'monday', label: 'Monday' },
+				{ value: 'tuesday', label: 'Tuesday' },
+				{ value: 'wednesday', label: 'Wednesday' },
+				{ value: 'thursday', label: 'Thursday' },
+				{ value: 'friday', label: 'Friday' },
+				{ value: 'saturday', label: 'Saturday' },
+				{ value: 'sunday', label: 'Sunday' },
+			],
+		},
+		{
+			id: 'openingHours',
+			type: 'text',
+			label: 'Opening hours',
+			elements: [
+				{ value: 'morning', label: '8am-15pm' },
+				{ value: 'afternoon', label: '15pm-19pm' },
+				{ value: 'evening', label: '19pm-23pm' },
+				{ value: 'night', label: '23pm-08am' },
+			],
+		},
+	];
+	const form: Form = {
+		fields: [
+			{
+				id: 'openingHoursList',
+				layout: { type: 'table', source: 'weeklyOpeningHours' },
+				children: [ 'day', 'openingHours' ],
+			},
+		],
+	};
+	return (
+		<DataForm< OpeningHours >
+			fields={ _fields }
+			form={ form }
+			data={ openingHours }
+			onChange={ ( edits ) => {
+				setOpeningHours( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) );
+			} }
+		/>
+	);
+};
+
+export const ResourceList = {
+	render: ResourceListComponent,
+};

@@ -9,6 +9,7 @@ import type {
 	NormalizedPanelLayout,
 	NormalizedCardLayout,
 	NormalizedRowLayout,
+	NormalizedTableLayout,
 } from './types';
 
 interface NormalizedFormField {
@@ -65,6 +66,14 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			type: 'row',
 			alignment: layout?.alignment ?? 'center',
 		} satisfies NormalizedRowLayout;
+	} else if (
+		layout?.type === 'table' &&
+		typeof layout?.source === 'string'
+	) {
+		normalizedLayout = {
+			type: 'table',
+			source: layout.source,
+		} satisfies NormalizedTableLayout;
 	}
 
 	return normalizedLayout;
