@@ -226,7 +226,10 @@ export default function ContentOnlyControls( { rootClientId } ) {
 				);
 
 				// If there's more than one child block, use a drilldown.
-				if ( childClientIds.length > 1 ) {
+				if (
+					childClientIds.length > 1 &&
+					! allNestedClientIds.includes( clientId )
+				) {
 					_nestedContentClientIds[ clientId ] = childClientIds;
 					allNestedClientIds = [
 						allNestedClientIds,
