@@ -14,14 +14,14 @@ export type ObjectType = string;
 export interface ObjectData extends Record< string, unknown > {}
 
 export interface ConnectDocResult {
-	awareness?: Awareness;
 	destroy: () => void;
 }
 
 export type ConnectDoc = (
 	id: ObjectID,
 	type: ObjectType,
-	ydoc: Y.Doc
+	ydoc: Y.Doc,
+	awareness?: Awareness
 ) => Promise< ConnectDocResult >;
 
 export interface RecordHandlers {

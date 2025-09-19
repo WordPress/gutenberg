@@ -9,11 +9,11 @@ export const CRDT_STATE_MAP_KEY = 'state';
 
 // Sub-keys.
 export const CRDT_STATE_PERSISTED_AT_KEY = 'persistedAt';
+export const CRDT_STATE_PERSISTED_BY_KEY = 'persistedBy';
+export const CRDT_STATE_RESTORED_AT_KEY = 'restoredAt';
+export const CRDT_STATE_RESTORED_BY_KEY = 'restoredBy';
+export const CRDT_STATE_VERSION_KEY = 'version';
 
 // Origin strings.
 export const LOCAL_EDITOR_ORIGIN = 'gutenberg';
 export const LOCAL_SYNC_PROVIDER_ORIGIN = 'syncProvider';
-export const LOCAL_ORIGINS = [
-	LOCAL_EDITOR_ORIGIN,
-	LOCAL_SYNC_PROVIDER_ORIGIN,
-];

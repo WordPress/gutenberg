@@ -2,15 +2,19 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
  */
 import {
 	CRDT_DOC_VERSION,
-	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_PERSISTED_AT_KEY,
-	LOCAL_ORIGINS,
+	CRDT_RECORD_MAP_KEY as RECORD_KEY,
+	CRDT_STATE_MAP_KEY as STATE_KEY,
+	CRDT_STATE_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
+	CRDT_STATE_PERSISTED_BY_KEY as PERSISTED_BY_KEY,
+	CRDT_STATE_RESTORED_AT_KEY as RESTORED_AT_KEY,
+	CRDT_STATE_RESTORED_BY_KEY as RESTORED_BY_KEY,
 	LOCAL_SYNC_PROVIDER_ORIGIN,
 } from './config';
 import type {
@@ -28,9 +32,10 @@ import { UndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 
 interface EntityState {
+	awareness?: Awareness;
 	discard: () => void;
 	handlers: RecordHandlers;
-	lastPersistedAt: number;
+	objectId: ObjectID;
 	syncConfig: SyncConfig;
 	undoManager?: UndoManager;
 	ydoc: CRDTDoc;
@@ -53,7 +58,6 @@ export class SyncProvider {
 	 */
 	private undoManager: UndoManager | undefined;
 
-	protected connections: Map< EntityID, ConnectDocResult[] > = new Map();
 	protected entityStates: Map< EntityID, EntityState > = new Map();
 
 	/**
@@ -77,59 +81,85 @@ export class SyncProvider {
 		rawRecord: ObjectData,
 		handlers: RecordHandlers
 	): Promise< void > {
+		const now = Date.now();
 		const objectId = syncConfig.getObjectId( rawRecord );
 		const objectType = syncConfig.objectType;
 		const ydoc = createYjsDoc( { objectType } );
-		const connections = await this.connect( objectId, objectType, ydoc );
 		const entityId = this.getEntityId( objectType, objectId );
+
+		const recordMap = ydoc.getMap( RECORD_KEY );
+		const stateMap = ydoc.getMap( STATE_KEY );
 
 		// Clean up connections and in-memory state when the entity is discarded.
 		const onDiscard = (): void => {
 			connections.forEach( ( result ) => result.destroy() );
-			ydoc.off( 'update', onUpdate );
+			recordMap.unobserveDeep( onRecordUpdate );
+			stateMap.unobserve( onStateUpdate );
 			ydoc.destroy();
-			this.connections.delete( entityId );
 			this.entityStates.delete( entityId );
 		};
 
 		// When the CRDT document is updated by a connection (not a local origin like
 		// Gutenberg or this SyncProvider), update the local store.
-		const onUpdate = ( _update: Uint8Array, origin: string ): void => {
-			if ( LOCAL_ORIGINS.includes( origin ) ) {
+		const onRecordUpdate = (
+			_events: Y.YEvent< any >[],
+			transaction: Y.Transaction
+		): void => {
+			if ( transaction.local ) {
 				return;
 			}
 
 			void this.updateEntityRecord( objectType, objectId );
 		};
 
+		const onStateUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			if ( ! event.keysChanged.has( PERSISTED_AT_KEY ) ) {
+				return;
+			}
+
+			const newValue = stateMap.get( PERSISTED_AT_KEY );
+			if ( 'number' === typeof newValue && newValue > now ) {
+				handlers.refetchPersistedRecord();
+			}
+		};
+
 		const entityState: EntityState = {
 			discard: onDiscard,
 			handlers,
-			lastPersistedAt: Date.now(),
+			objectId,
 			syncConfig,
 			ydoc,
 		};
+
+		if ( syncConfig.supports?.awareness ) {
+			entityState.awareness = new Awareness( ydoc );
+		}
 
 		if ( syncConfig.supports?.undo ) {
 			entityState.undoManager = new UndoManager( ydoc );
 			this.undoManager = entityState.undoManager;
 		}
 
-		this.connections.set( entityId, connections );
-		this.entityStates.set(
-			this.getEntityId( objectType, objectId ),
-			entityState
-		);
+		this.entityStates.set( entityId, entityState );
+
+		const connections = await this.connect( entityState );
+
+		// Attach observers.
+		recordMap.observeDeep( onRecordUpdate );
+		stateMap.observe( onStateUpdate );
 
 		// Get the initial document state.
 		const initialDoc = await this.getInitialCRDTDoc(
 			syncConfig,
 			rawRecord
 		);
-
-		// Attach the update listener before applying the initial state so that
-		// we update the entity record in the local store.
-		ydoc.on( 'update', onUpdate );
 
 		// Apply the initial document to the current document as a singular update.
 		if ( initialDoc ) {
@@ -139,7 +169,7 @@ export class SyncProvider {
 					Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
 				},
 				LOCAL_SYNC_PROVIDER_ORIGIN,
-				false
+				true
 			);
 		}
 
@@ -153,6 +183,9 @@ export class SyncProvider {
 						rawRecord,
 						LOCAL_SYNC_PROVIDER_ORIGIN
 					);
+
+					stateMap.set( RESTORED_AT_KEY, Date.now() );
+					stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
 				},
 				LOCAL_SYNC_PROVIDER_ORIGIN,
 				true
@@ -179,18 +212,19 @@ export class SyncProvider {
 	/**
 	 * Establish connections for the given entity and its Yjs document.
 	 *
-	 * @param {ObjectID}   objectId   Object ID to connect.
-	 * @param {ObjectType} objectType Object type to connect.
-	 * @param {CRDTDoc}    ydoc       Yjs document for the object.
+	 * @param {EntityState} entityState State for the entity.
 	 */
 	private async connect(
-		objectId: ObjectID,
-		objectType: ObjectType,
-		ydoc: CRDTDoc
+		entityState: EntityState
 	): Promise< ConnectDocResult[] > {
 		return await Promise.all(
 			this.connectionCreators?.map( ( create ) =>
-				create( objectId, objectType, ydoc )
+				create(
+					entityState.objectId,
+					entityState.syncConfig.objectType,
+					entityState.ydoc,
+					entityState.awareness
+				)
 			)
 		);
 	}
@@ -243,7 +277,7 @@ export class SyncProvider {
 			return null;
 		}
 
-		const stateMap = persistedDoc.getMap( CRDT_STATE_MAP_KEY );
+		const stateMap = persistedDoc.getMap( STATE_KEY );
 
 		if ( CRDT_DOC_VERSION !== stateMap.get( 'version' ) ) {
 			// TODO: Implement version migration. We have not yet incremented the
@@ -369,7 +403,7 @@ export class SyncProvider {
 			return;
 		}
 
-		const { handlers, lastPersistedAt, syncConfig, ydoc } = entityState;
+		const { handlers, syncConfig, ydoc } = entityState;
 
 		const currentRecord = await handlers.getEditedRecord();
 
@@ -382,20 +416,6 @@ export class SyncProvider {
 		// in an update to the store if the blocks have changed.
 
 		handlers.editRecord( changes );
-
-		// Determine if we should refetch the persisted entity record from the
-		// REST API because another client has persisted changes.
-		const ystateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-		const persistedAt =
-			( ystateMap.get( CRDT_STATE_PERSISTED_AT_KEY ) as number ) ?? 0;
-		if ( persistedAt > lastPersistedAt ) {
-			this.entityStates.set( entityId, {
-				...entityState,
-				lastPersistedAt: persistedAt,
-			} );
-
-			void handlers.refetchPersistedRecord();
-		}
 	}
 
 	/**
@@ -419,19 +439,13 @@ export class SyncProvider {
 		}
 
 		const ydoc = entityState.ydoc;
-		const lastPersistedAt = Date.now();
-
-		// Update in-memory state.
-		this.entityStates.set( entityId, {
-			...entityState,
-			lastPersistedAt,
-		} );
 
 		Y.transact(
 			ydoc,
 			() => {
-				const stateMap = ydoc.getMap( 'state' );
-				stateMap.set( CRDT_STATE_PERSISTED_AT_KEY, lastPersistedAt );
+				const stateMap = ydoc.getMap( STATE_KEY );
+				stateMap.set( PERSISTED_AT_KEY, Date.now() );
+				stateMap.set( PERSISTED_BY_KEY, ydoc.clientID );
 			},
 			LOCAL_SYNC_PROVIDER_ORIGIN,
 			true

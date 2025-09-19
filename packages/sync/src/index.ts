@@ -10,7 +10,7 @@ import { createWebRTCConnection } from './create-webrtc-connection';
 import { SyncProvider } from './provider';
 
 export * as Y from 'yjs';
-export { CRDT_DOC_VERSION } from './config';
+export * from './config';
 export { connectIndexDb } from './connect-indexdb';
 export { createWebRTCConnection } from './create-webrtc-connection';
 export { SyncProvider } from './provider';
