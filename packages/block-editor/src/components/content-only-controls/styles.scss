@@ -9,8 +9,13 @@
 	// for tools panel.
 	border-top: $border-width solid $gray-200;
 
+
 	.components-tools-panel {
 		border-top: none;
+
+		// Condense the tools panels more than normal.
+		padding-top: $grid-unit-10;
+		padding-bottom: $grid-unit-10;
 	}
 }
 
