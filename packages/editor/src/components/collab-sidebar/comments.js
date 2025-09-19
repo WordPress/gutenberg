@@ -175,23 +175,14 @@ function Thread( {
 	const relatedBlockElement = useBlockElement( relatedBlock );
 
 	const handleCommentSelect = ( threadId ) => {
-		// Clear the add comment form when selecting a comment.
 		setShowCommentBoard( false );
-
-		// Set the focused thread.
 		setFocusThread( threadId );
-
-		// Flash the related block when a comment is clicked.
-		if ( relatedBlock ) {
-			flashBlock( relatedBlock );
-		}
-
-		// Scroll to the related block element if available.
 		if ( relatedBlock && relatedBlockElement ) {
 			relatedBlockElement.scrollIntoView( {
 				behavior: 'instant',
 				block: 'center',
 			} );
+			flashBlock( relatedBlock );
 		}
 	};
 
