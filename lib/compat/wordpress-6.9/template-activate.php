@@ -18,15 +18,30 @@ function gutenberg_modify_wp_template_post_type_args( $args, $post_type ) {
 //    need to deprecate /templates eventually, but we'll still want to be able
 //    to lookup the active template for a specific slug, and probably get a list
 //    of all _active_ templates. For that we can keep /lookup.
-add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes' );
+add_action( 'rest_api_init', 'gutenberg_maintain_templates_routes', 100 );
 function gutenberg_maintain_templates_routes() {
 	// This should later be changed in core so we don't need initialise
 	// WP_REST_Templates_Controller with a post type.
 	global $wp_post_types;
 	$wp_post_types['wp_template']->rest_base = 'templates';
 	$controller                              = new WP_REST_Templates_Controller( 'wp_template' );
+	$autosave_controller                     = new WP_REST_Template_Autosaves_Controller( 'wp_template' );
+	$revisions_controller                    = new WP_REST_Template_Revisions_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
+
+	$wp_post_types['_old_wp_template'] = clone $wp_post_types['wp_template'];
+	$wp_post_types['_old_wp_template']->name                  = '_old_wp_template';
+	$wp_post_types['_old_wp_template']->rest_base             = 'templates';
+	$wp_post_types['_old_wp_template']->rest_controller_class = 'WP_REST_Templates_Controller';
+	$wp_post_types['_old_wp_template']->rest_controller       = $controller;
+	$wp_post_types['_old_wp_template']->autosave_rest_controller_class = 'WP_REST_Template_Autosaves_Controller';
+	$wp_post_types['_old_wp_template']->autosave_rest_controller       = $autosave_controller;
+	$wp_post_types['_old_wp_template']->revisions_rest_controller_class = 'WP_REST_Template_Revisions_Controller';
+	$wp_post_types['_old_wp_template']->revisions_rest_controller       = $revisions_controller;
+
 	$controller->register_routes();
+	$autosave_controller->register_routes();
+	$revisions_controller->register_routes();
 }
 
 // 3. We need a route to get that raw static templates from themes and plugins.

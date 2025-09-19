@@ -545,7 +545,7 @@ export const saveEntityRecord =
 	async ( { select, resolveSelect, dispatch } ) => {
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
+		let entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
 		if ( ! entityConfig ) {
@@ -553,6 +553,23 @@ export const saveEntityRecord =
 		}
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+
+		// For back-compat, we allow querying for static templates through
+		// wp_template.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof recordId === 'string' &&
+			! /^\d+$/.test( recordId )
+		) {
+			name = '_old_wp_template';
+			entityConfig = configs.find(
+				( config ) => config.kind === kind && config.name === name
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+		}
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
