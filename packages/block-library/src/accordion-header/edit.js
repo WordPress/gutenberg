@@ -86,13 +86,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						</span>
 					) }
 					<RichText
-						className="accordion-content__toggle-title"
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
+						withoutInteractiveFormatting
 						disableLineBreaks
 						tagName="span"
 						value={ title }

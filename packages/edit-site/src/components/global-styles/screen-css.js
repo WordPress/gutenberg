@@ -18,9 +18,6 @@ const { useGlobalStyle, AdvancedPanel: StylesAdvancedPanel } = unlock(
 );
 
 function ScreenCSS() {
-	const description = __(
-		'Add your own CSS to customize the appearance and layout of your site.'
-	);
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
@@ -35,10 +32,12 @@ function ScreenCSS() {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'CSS' ) }
+				title={ __( 'Additional CSS' ) }
 				description={
 					<>
-						{ description }
+						{ __(
+							'You can add custom CSS to further customize the appearance and layout of your site.'
+						) }
 						<br />
 						<ExternalLink
 							href={ __(
