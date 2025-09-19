@@ -853,11 +853,15 @@ const VisibilityComponent = () => {
 		name: string;
 		email: string;
 		isActive: boolean;
+		homepageDisplay: string;
+		staticHomepage: string;
 	};
 	const [ data, setData ] = useState( {
 		name: '',
 		email: '',
 		isActive: true,
+		homepageDisplay: 'latest',
+		staticHomepage: '',
 	} );
 
 	const _fields: Field< Post >[] = [
@@ -874,9 +878,36 @@ const VisibilityComponent = () => {
 			type: 'email',
 			isVisible: ( post ) => post.isActive === true,
 		},
+		{
+			id: 'homepageDisplay',
+			label: 'Homepage display',
+			elements: [
+				{ value: 'latest', label: 'Latest post' },
+				{ value: 'static', label: 'Static page' },
+			],
+		},
+		{
+			id: 'staticHomepage',
+			label: 'Static homepage',
+			elements: [
+				{ value: 'welcome', label: 'Welcome to my website' },
+				{ value: 'about', label: 'About' },
+			],
+			isVisible: ( post ) => post.homepageDisplay === 'static',
+		},
 	];
 	const form: Form = {
-		fields: [ 'isActive', 'name', 'email' ],
+		layout: { type: 'card' },
+		fields: [
+			{
+				id: 'booleanExample',
+				children: [ 'isActive', 'name', 'email' ],
+			},
+			{
+				id: 'selectExample',
+				children: [ 'homepageDisplay', 'staticHomepage' ],
+			},
+		],
 	};
 	return (
 		<DataForm< Post >
