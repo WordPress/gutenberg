@@ -189,87 +189,90 @@ function ContentOnlyControlsScreen( {
 }
 
 export default function ContentOnlyControls( { rootClientId } ) {
-	const { nestedContentClientIds, contentClientIds } = useSelect(
-		( select ) => {
-			const { getClientIdsOfDescendants, getBlockEditingMode } =
-				select( blockEditorStore );
+	const { updatedRootClientId, nestedContentClientIds, contentClientIds } =
+		useSelect(
+			( select ) => {
+				const { getClientIdsOfDescendants, getBlockEditingMode } =
+					select( blockEditorStore );
 
-			// _nestedContentClientIds is for content blocks within the 'drilldown'.
-			// It's an object where the key is the parent clientId, and the element is
-			// an array of child clientIds.
-			const _nestedContentClientIds = {};
+				// _nestedContentClientIds is for content blocks within the 'drilldown'.
+				// It's an object where the key is the parent clientId, and the element is
+				// an array of child clientIds.
+				const _nestedContentClientIds = {};
 
-			// _contentClientIds is the list of contentClientIds for blocks being
-			// shown at the root level. Includes parent blocks that might have a drilldown,
-			// but not the children of those blocks.
-			const _contentClientIds = [];
+				// _contentClientIds is the list of contentClientIds for blocks being
+				// shown at the root level. Includes parent blocks that might have a drilldown,
+				// but not the children of those blocks.
+				const _contentClientIds = [];
 
-			// An array of all nested client ids. Used to ensure nested clientIds don't end
-			// up in _contentClientIds, but not returned from the useSelect.
-			let allNestedClientIds = [];
+				// An array of all nested client ids. Used to ensure nested clientIds don't end
+				// up in _contentClientIds, but not returned from the useSelect.
+				let allNestedClientIds = [];
 
-			// A flattened list of all content clientIds to arrange into the
-			// groups above.
-			const allContentClientIds = getClientIdsOfDescendants(
-				rootClientId
-			).filter(
-				( clientId ) =>
-					getBlockEditingMode( clientId ) === 'contentOnly'
-			);
-
-			for ( const clientId of allContentClientIds ) {
-				const childClientIds = getClientIdsOfDescendants(
-					clientId
+				// A flattened list of all content clientIds to arrange into the
+				// groups above.
+				const allContentClientIds = getClientIdsOfDescendants(
+					rootClientId
 				).filter(
-					( childClientId ) =>
-						getBlockEditingMode( childClientId ) === 'contentOnly'
+					( clientId ) =>
+						getBlockEditingMode( clientId ) === 'contentOnly'
 				);
 
-				// If there's more than one child block, use a drilldown.
+				for ( const clientId of allContentClientIds ) {
+					const childClientIds = getClientIdsOfDescendants(
+						clientId
+					).filter(
+						( childClientId ) =>
+							getBlockEditingMode( childClientId ) ===
+							'contentOnly'
+					);
+
+					// If there's more than one child block, use a drilldown.
+					if (
+						childClientIds.length > 1 &&
+						! allNestedClientIds.includes( clientId )
+					) {
+						_nestedContentClientIds[ clientId ] = childClientIds;
+						allNestedClientIds = [
+							allNestedClientIds,
+							...childClientIds,
+						];
+					}
+
+					if ( ! allNestedClientIds.includes( clientId ) ) {
+						_contentClientIds.push( clientId );
+					}
+				}
+
+				// Avoid showing only one drilldown block at the root.
 				if (
-					childClientIds.length > 1 &&
-					! allNestedClientIds.includes( clientId )
+					_contentClientIds.length === 1 &&
+					Object.keys( _nestedContentClientIds ).length === 1
 				) {
-					_nestedContentClientIds[ clientId ] = childClientIds;
-					allNestedClientIds = [
-						allNestedClientIds,
-						...childClientIds,
-					];
+					const onlyParentClientId = Object.keys(
+						_nestedContentClientIds
+					)[ 0 ];
+					return {
+						updatedRootClientId: onlyParentClientId,
+						contentClientIds:
+							_nestedContentClientIds[ onlyParentClientId ],
+						nestedContentClientIds: {},
+					};
 				}
 
-				if ( ! allNestedClientIds.includes( clientId ) ) {
-					_contentClientIds.push( clientId );
-				}
-			}
-
-			// Avoid showing only one drilldown block at the root.
-			if (
-				_contentClientIds.length === 1 &&
-				Object.keys( _nestedContentClientIds ).length === 1
-			) {
-				const onlyParentClientId = Object.keys(
-					_nestedContentClientIds
-				)[ 0 ];
 				return {
-					contentClientIds:
-						_nestedContentClientIds[ onlyParentClientId ],
-					nestedContentClientIds: {},
+					nestedContentClientIds: _nestedContentClientIds,
+					contentClientIds: _contentClientIds,
 				};
-			}
-
-			return {
-				nestedContentClientIds: _nestedContentClientIds,
-				contentClientIds: _contentClientIds,
-			};
-		},
-		[ rootClientId ]
-	);
+			},
+			[ rootClientId ]
+		);
 
 	return (
 		<Navigator initialPath="/">
 			<Navigator.Screen path="/">
 				<ContentOnlyControlsScreen
-					rootClientId={ rootClientId }
+					rootClientId={ updatedRootClientId ?? rootClientId }
 					contentClientIds={ contentClientIds }
 					parentClientIds={ nestedContentClientIds }
 				/>
