@@ -187,3 +187,89 @@ function gutenberg_filter_edit_post_sortable_columns( $columns ) {
 	return $columns;
 }
 add_filter( 'manage_edit-post_sortable_columns', 'gutenberg_filter_edit_post_sortable_columns' );
+
+
+/**
+ * On the edit-comments.php screen, when the 'comment_type' query parameter is set
+ * to 'block_comment', modify queries used for the counts for each link
+ * (All, Mine, Pending, Approved, Spam, and Trash) to only count block comments.
+ */
+function gutenberg_filter_edit_comments_counts( $views ) {
+	$current_post = get_post();
+	$post_id	  = $current_post ? $current_post->ID : 0;
+	if ( isset( $_GET['comment_type'] ) && 'block_comment' === $_GET['comment_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		global $wpdb;
+
+		$comment_types = array( 'all', 'mine', 'moderated', 'approved' );
+
+		foreach ( $comment_types as $type ) {
+			if ( isset( $views[ $type ] ) ) {
+				// Remap 'moderated -> pending
+				$match_string = $type;
+				if ( 'moderated' === $type ) {
+					$match_string = 'pending';
+				}
+				$preg_pattern = sprintf('/\(<span class=\"%s-count\">(\d+)<\/span>\)/', $match_string );
+				error_log( $type );
+				error_log( $views[ $type ] );
+				error_log( $preg_pattern );
+				preg_match( $preg_pattern, $views[ $type ], $matches );
+				error_log( json_encode( $matches, JSON_PRETTY_PRINT ) );
+
+				if ( isset( $matches[1] ) ) {
+					$count = (int) $matches[1];
+
+					switch ( $type ) {
+						case 'all':
+							$count = get_comments(
+								array(
+									'post_id' => $post_id,
+									'type'   => 'block_comment',
+									'count'  => true,
+									'status' => 'all',
+								)
+							 );
+							break;
+						case 'mine':
+							$user_id = get_current_user_id();
+							$count = get_comments(
+								array(
+									'post_id' => $post_id,
+									'user_id' => $user_id,
+									'type'    => 'block_comment',
+									'count'   => true,
+									'status'  => 'all',
+								)
+							);
+							break;
+						case 'moderated':
+							$count = get_comments(
+								array(
+									'post_id' => $post_id,
+									'type'    => 'block_comment',
+									'count'   => true,
+									'status'  => 'hold',
+								)
+							);
+							break;
+						case 'approved':
+							$count = get_comments(
+								array(
+									'post_id' => $post_id,
+									'type'    => 'block_comment',
+									'count'   => true,
+									'status'  => 'approve',
+								)
+							);
+							break;
+					}
+					$views[ $type ] = preg_replace( $preg_pattern, "($count)", $views[ $type ] );
+				}
+			}
+		}
+		unset( $views['spam'] );
+		unset( $views['trash'] );
+	}
+	return $views;
+}
+add_filter( 'views_edit-comments', 'gutenberg_filter_edit_comments_counts' );
