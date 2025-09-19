@@ -41,6 +41,14 @@ test.describe( 'Router regions', () => {
 				attachTo: '#regions-with-attach-to',
 			},
 		};
+		const region7 = {
+			type: 'section',
+			data: { id: 'region7', attachTo: 'body' },
+		};
+		const region8 = {
+			type: 'section',
+			data: { id: 'region8', attachTo: '#regions-with-attach-to' },
+		};
 
 		const pageAttachTo2 = await utils.addPostWithBlock(
 			'test/router-regions',
@@ -48,7 +56,14 @@ test.describe( 'Router regions', () => {
 				alias: 'router regions - page 2',
 				attributes: {
 					page: 'attachTo2',
-					regionsWithAttachTo: [ region3, region4, region5, region6 ],
+					regionsWithAttachTo: [
+						region3,
+						region4,
+						region5,
+						region6,
+						region7,
+						region8,
+					],
 					counter: 10,
 				},
 			}
@@ -338,5 +353,97 @@ test.describe( 'Router regions', () => {
 
 		// Region 6 has an init directive that should have been executed again.
 		await expect( initCount ).toHaveText( '2' );
+	} );
+
+	test( 'should support multiple regions with the `attachTo` property added at different times', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto(
+			utils.getLink( 'router regions - page 1 - attachTo' )
+		);
+
+		const region7 = page.locator( 'body' ).getByTestId( 'region7' );
+		const region8 = page
+			.locator( '#regions-with-attach-to' )
+			.getByTestId( 'region8' );
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Regions with `attachTo` should initially be hidden.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		const regions: Record< string, Locator > = {
+			region7,
+			region8,
+		};
+
+		// Navigate to "Page attachTo 1".
+		await page.getByTestId( 'next' ).click();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions with `attachTo` should be hidden in "Page attachTo 1".
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		// Navigate to "Page attachTo 2".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Check that regions remains hydrated and interactive.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await expect( region ).toBeVisible();
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+			const serverCounter = region.getByTestId( 'server-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			await expect( clientCounter ).toHaveText( '10' );
+			await expect( serverCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
+		}
+
+		// Navigate back to "Page attachTo 1".
+		await page.goBack();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions with `attachTo` should be hidden in "Page attachTo 1".
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		// Navigate back to the initial page.
+		await page.goBack();
+
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Regions should be unmounted.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		await page.goForward();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions should still be unmounted.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		await page.goForward();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Regions should still be unmounted.
+		await expect( region7 ).toBeVisible();
+		await expect( region8 ).toBeVisible();
 	} );
 } );
