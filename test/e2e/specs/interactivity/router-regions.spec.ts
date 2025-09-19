@@ -186,16 +186,37 @@ test.describe( 'Router regions', () => {
 		);
 	} );
 
-	test( 'should take into account any router region inside a `data-wp-interactive` element.', async ( {
+	test( 'should be updated when placed inside a `data-wp-interactive` element.', async ( {
 		page,
 	} ) => {
-		const validRegionText1 = page.getByTestId( 'valid-region-text-1' );
-		const validRegionText2 = page.getByTestId( 'valid-region-text-2' );
-		const invalidRegionText3 = page.getByTestId( 'invalid-region-text-3' );
+		const [
+			validInsideInteractive,
+			validInsideRouterRegion,
+			invalidOutsideInteractive,
+		] = [
+			page.getByTestId( 'valid-inside-interactive' ),
+			page.getByTestId( 'valid-inside-router-region' ),
+			page.getByTestId( 'invalid-outside-interactive' ),
+		];
+
+		const [ validRegionText1, validRegionText2, invalidRegionText3 ] = [
+			validInsideInteractive.getByTestId( 'text-1' ),
+			validInsideRouterRegion.getByTestId( 'text-2' ),
+			invalidOutsideInteractive.getByTestId( 'text-3' ),
+		];
+		const [ counter1, counter2 ] = [
+			page.getByTestId( 'valid-inside-interactive-counter' ),
+			page.getByTestId( 'valid-inside-router-region-counter' ),
+		];
 
 		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
 		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
 		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
+
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '1' );
+		await expect( counter2 ).toHaveText( '1' );
 
 		await page.getByTestId( 'next' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
@@ -207,6 +228,11 @@ test.describe( 'Router regions', () => {
 		await expect( validRegionText2 ).toHaveText( 'content from page 2' );
 		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
 
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '2' );
+		await expect( counter2 ).toHaveText( '2' );
+
 		await page.getByTestId( 'back' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
 		// the previous page.
@@ -216,6 +242,11 @@ test.describe( 'Router regions', () => {
 		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
 		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
 		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
+
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '3' );
+		await expect( counter2 ).toHaveText( '3' );
 	} );
 
 	test( 'should support router regions with the `attachTo` property.', async ( {
