@@ -198,23 +198,17 @@ function gutenberg_filter_edit_comments_counts( $views ) {
 	$current_post = get_post();
 	$post_id      = $current_post ? $current_post->ID : 0;
 	if ( isset( $_GET['comment_type'] ) && 'block_comment' === $_GET['comment_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		global $wpdb;
+		$comment_types_to_add = array( 'all', 'mine', 'moderated', 'approved' );
 
-		$comment_types = array( 'all', 'mine', 'moderated', 'approved' );
-
-		foreach ( $comment_types as $type ) {
+		foreach ( $comment_types_to_add as $type ) {
 			if ( isset( $views[ $type ] ) ) {
 				// Remap 'moderated -> pending
 				$match_string = $type;
 				if ( 'moderated' === $type ) {
 					$match_string = 'pending';
 				}
-				$preg_pattern = sprintf( '/\(<span class=\"%s-count\">(\d+)<\/span>\)/', $match_string );
-				error_log( $type );
-				error_log( $views[ $type ] );
-				error_log( $preg_pattern );
-				preg_match( $preg_pattern, $views[ $type ], $matches );
-				error_log( json_encode( $matches, JSON_PRETTY_PRINT ) );
+				$count_regex_pattern = sprintf( '/\(<span class=\"%s-count\">(\d+)<\/span>\)/', $match_string );
+				preg_match( $count_regex_pattern, $views[ $type ], $matches );
 
 				if ( isset( $matches[1] ) ) {
 					$count = (int) $matches[1];
@@ -263,12 +257,15 @@ function gutenberg_filter_edit_comments_counts( $views ) {
 							);
 							break;
 					}
-					$views[ $type ] = preg_replace( $preg_pattern, "($count)", $views[ $type ] );
+					$views[ $type ] = preg_replace( $count_regex_pattern, "($count)", $views[ $type ] );
 				}
 			}
 		}
-		unset( $views['spam'] );
-		unset( $views['trash'] );
+
+		$comment_types_to_remove = array( 'spam', 'trash' );
+		foreach ( $comment_types_to_remove as $type ) {
+			unset( $views[ $type ] );
+		}
 	}
 	return $views;
 }
