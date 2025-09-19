@@ -1,0 +1,22 @@
+[
+	{
+		"blockName": "core/pullquote",
+		"attrs": {
+			"metadata": {
+				"bindings": {
+					"citation": {
+						"source": "core/post-data",
+						"args": {
+							"key": "date"
+						}
+					}
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite></cite>\n    </blockquote>\n</figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite></cite>\n    </blockquote>\n</figure>\n"
+		]
+	}
+]

@@ -17,24 +17,18 @@ add_filter(
 		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
+		if ( 'core/pullquote' === $block_type ) {
+			if ( ! in_array( 'value', $attributes, true ) ) {
+				$attributes[] = 'value';
+			}
+			if ( ! in_array( 'citation', $attributes, true ) ) {
+				$attributes[] = 'citation';
+			}
+		}
 		return $attributes;
 	},
 	10,
 	2
-);
-add_filter(
-	'block_bindings_supported_attributes_core/pullquote',
-	function ( $attributes ) {
-		if ( ! in_array( 'value', $attributes, true ) ) {
-			$attributes[] = 'value';
-		}
-		if ( ! in_array( 'citation', $attributes, true ) ) {
-			$attributes[] = 'citation';
-		}
-		return $attributes;
-	},
-	10,
-	3
 );
 
 /**

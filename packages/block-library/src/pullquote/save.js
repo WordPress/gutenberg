@@ -9,9 +9,16 @@ import clsx from 'clsx';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { textAlign, citation, value, metadata } = attributes;
-	const shouldShowCitation =
-		!! metadata?.bindings?.citation || ! RichText.isEmpty( citation );
+	const {
+		textAlign,
+		citation,
+		value,
+		metadata: { bindings = {} } = {},
+	} = attributes;
+	const displayCitation =
+		! RichText.isEmpty( citation ) ||
+		!! bindings.citation ||
+		bindings.__default?.source === 'core/pattern-overrides';
 
 	return (
 		<figure
@@ -23,7 +30,7 @@ export default function save( { attributes } ) {
 		>
 			<blockquote>
 				<RichText.Content tagName="p" value={ value } />
-				{ shouldShowCitation && (
+				{ displayCitation && (
 					<RichText.Content tagName="cite" value={ citation } />
 				) }
 			</blockquote>
