@@ -87,7 +87,7 @@ export default function useInspectorControlsTabs(
 
 	// Add the tabs in the order that they will default to if available.
 	// List View > Content > Settings > Styles.
-	if ( hasListFills ) {
+	if ( hasListFills && ! isSectionBlock ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
