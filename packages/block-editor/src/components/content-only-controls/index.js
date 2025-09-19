@@ -5,9 +5,12 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
+	Icon,
 	Navigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { arrowLeft, arrowRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -117,12 +120,20 @@ function DrillDownButton( { clientId } ) {
 	} );
 	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
-		<Navigator.Button path={ `/${ clientId }` } variant="primary">
-			<HStack spacing={ 1 }>
-				<BlockIcon icon={ blockInformation?.icon } />
-				<div>{ blockTitle }</div>
-			</HStack>
-		</Navigator.Button>
+		<div className="block-editor-content-only-controls__button-panel">
+			<Navigator.Button
+				path={ `/${ clientId }` }
+				className="block-editor-content-only-controls__drill-down-button"
+			>
+				<HStack expanded justify="space-between">
+					<HStack justify="flex-start" spacing={ 1 }>
+						<BlockIcon icon={ blockInformation?.icon } />
+						<div>{ blockTitle }</div>
+					</HStack>
+					<Icon icon={ arrowRight } />
+				</HStack>
+			</Navigator.Button>
+		</div>
 	);
 }
 
@@ -130,6 +141,7 @@ function ContentOnlyControlsScreen( {
 	rootClientId,
 	contentClientIds,
 	parentClientIds,
+	isNested,
 } ) {
 	const isRootContentBlock = useSelect(
 		( select ) => {
@@ -146,7 +158,17 @@ function ContentOnlyControlsScreen( {
 	}
 
 	return (
-		<>
+		<div className="block-editor-content-only-controls__screen">
+			{ isNested && (
+				<div className="block-editor-content-only-controls__button-panel">
+					<Navigator.BackButton className="block-editor-content-only-controls__back-button">
+						<HStack expanded spacing={ 1 } justify="flex-start">
+							<Icon icon={ arrowLeft } />
+							<div>{ __( 'Back' ) }</div>
+						</HStack>
+					</Navigator.BackButton>
+				</div>
+			) }
 			{ isRootContentBlock && (
 				<BlockControls clientId={ rootClientId } />
 			) }
@@ -162,7 +184,7 @@ function ContentOnlyControlsScreen( {
 
 				return <BlockControls key={ clientId } clientId={ clientId } />;
 			} ) }
-		</>
+		</div>
 	);
 }
 
@@ -237,6 +259,7 @@ export default function ContentOnlyControls( { rootClientId } ) {
 			{ Object.keys( nestedContentClientIds ).map( ( clientId ) => (
 				<Navigator.Screen key={ clientId } path={ `/${ clientId }` }>
 					<ContentOnlyControlsScreen
+						isNested
 						rootClientId={ clientId }
 						contentClientIds={ nestedContentClientIds[ clientId ] }
 					/>

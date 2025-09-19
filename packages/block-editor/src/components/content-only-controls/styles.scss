@@ -1,3 +1,24 @@
 @use "./link/styles.scss" as *;
 @use "./media/styles.scss" as *;
 @use "./rich-text/styles.scss" as *;
+
+.block-editor-content-only-controls__screen {
+	padding-top: $grid-unit-10;
+
+	// Add border for the entire content controls and remove the similar border
+	// for tools panel.
+	border-top: $border-width solid $gray-200;
+
+	.components-tools-panel {
+		border-top: none;
+	}
+}
+
+.block-editor-content-only-controls__button-panel {
+	padding: 4px;
+}
+
+.block-editor-content-only-controls__back-button,
+.block-editor-content-only-controls__drill-down-button {
+	width: 100%;
+}
