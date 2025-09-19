@@ -8,7 +8,7 @@ import deepMerge from 'deepmerge';
  */
 import { privateApis } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -70,8 +70,14 @@ export default function ArrayControl< Item >( {
 				if ( invalidTokens.length > 0 ) {
 					setCustomValidity( {
 						type: 'invalid',
-						message: __(
-							'Please select from the available options.'
+						message: sprintf(
+							/* translators: %s: list of invalid tokens */
+							_n(
+								'Please select from the available options: %s is invalid.',
+								'Please select from the available options: %s are invalid.',
+								invalidTokens.length
+							),
+							invalidTokens.join( ', ' )
 						),
 					} );
 					return;
