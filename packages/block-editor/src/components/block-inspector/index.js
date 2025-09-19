@@ -104,7 +104,7 @@ function BlockInspector() {
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const renderedBlockClientId =
 			getParentSectionBlock( _selectedBlockClientId ) ||
-			getSelectedBlockClientId();
+			_selectedBlockClientId;
 		const _selectedBlockName =
 			renderedBlockClientId && getBlockName( renderedBlockClientId );
 		const _blockType =
