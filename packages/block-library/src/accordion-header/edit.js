@@ -82,12 +82,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					} }
 				>
 					<RichText
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
+						withoutInteractiveFormatting
 						disableLineBreaks
 						tagName="span"
 						value={ title }
