@@ -10,7 +10,8 @@
  */
 function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
-		'viewScriptModule' => 'view_script_module_ids',
+		// @todo remove viewModule support in Gutenberg >= 17.8 (replaced by viewScriptModule).
+		'viewModule' => 'view_script_module_ids',
 	);
 	foreach ( $module_fields as $metadata_field_name => $settings_field_name ) {
 		if ( ! empty( $settings[ $metadata_field_name ] ) ) {
@@ -79,13 +80,7 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_id             = gutenberg_generate_block_asset_module_id( $metadata['name'], $field_name, $index );
 	$module_asset_path     = wp_normalize_path( realpath( $module_asset_raw_path ) );
 
-	$build_module_path   = str_replace(
-		'/build/block-library/blocks/',
-		'/build-module/block-library/',
-		$path
-	);
-	$module_path         = str_replace( '.js', '.min.js', $module_path );
-	$module_path_norm    = wp_normalize_path( realpath( $build_module_path . '/' . $module_path ) );
+	$module_path_norm    = wp_normalize_path( realpath( $path . '/' . $module_path ) );
 	$module_uri          = get_block_asset_url( $module_path_norm );
 	$module_asset        = ! empty( $module_asset_path ) ? require $module_asset_path : array();
 	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();

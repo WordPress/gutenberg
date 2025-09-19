@@ -63,5 +63,5 @@
 	"allowedBlocks": [ "core/accordion-content" ],
 	"textdomain": "default",
 	"style": "wp-block-accordion",
-	"viewScriptModule": "file:./view.js"
+	"viewScriptModule": "@wordpress/block-library/accordion"
 }
