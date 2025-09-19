@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	getBlockBindingsSource,
-	getBlockBindingsSources,
-	getBlockType,
-} from '@wordpress/blocks';
+import { getBlockBindingsSources, getBlockType } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -147,10 +143,9 @@ function BlockBindingsPanelMenuContent( {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding, sources } ) {
+function BlockBindingsAttribute( { attribute, binding, source } ) {
 	const { source: sourceName, args } = binding || {};
-	const sourceProps = getBlockBindingsSource( sourceName );
-	const isSourceInvalid = ! sourceProps;
+	const isSourceInvalid = ! source;
 	return (
 		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
@@ -162,11 +157,10 @@ function BlockBindingsAttribute( { attribute, binding, sources } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: sources?.[ sourceName ]?.data?.find(
+						: source?.data?.find(
 								( item ) => item.key === args?.key
 						  )?.label ||
-						  sources?.[ sourceName ]?.label ||
-						  sourceProps?.label ||
+						  source?.label ||
 						  sourceName }
 				</Text>
 			) }
@@ -182,7 +176,7 @@ function ReadOnlyBlockBindingsPanelItems( { bindings, sources } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
-						sources={ sources }
+						source={ sources?.[ binding?.source ] }
 					/>
 				</Item>
 			) ) }
@@ -227,7 +221,7 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 								<BlockBindingsAttribute
 									attribute={ attribute }
 									binding={ binding }
-									sources={ sources }
+									source={ sources?.[ binding?.source ] }
 								/>
 							</Menu.TriggerButton>
 							<Menu.Popover gutter={ isMobile ? 8 : 36 }>
@@ -312,6 +306,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								label,
 							};
 						}
+					} else {
+						/*
+						 * Include sources without editorUI if they are introduced
+						 * by other means (e.g. code editor).
+						 */
+						_sources[ sourceName ] = {
+							label,
+						};
 					}
 				}
 			);
