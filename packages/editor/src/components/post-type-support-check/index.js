@@ -16,6 +16,7 @@ function checkSupport( supports = {}, key ) {
 	}
 
 	const [ topKey, subKey ] = key.split( '.' );
+	// Try to unwrap sub-properties from the superfluous array.
 	const [ subProperties ] = Array.isArray( supports[ topKey ] )
 		? supports[ topKey ]
 		: [];
