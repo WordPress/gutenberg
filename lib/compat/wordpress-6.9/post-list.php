@@ -119,6 +119,7 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 					array(
 						'p'              => $post_id,
 						'comment_status' => 'approved',
+						'comment_type'   => 'block_comment',
 					),
 					admin_url( 'edit-comments.php' )
 				)
@@ -153,6 +154,8 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 					array(
 						'p'              => $post_id,
 						'comment_status' => 'moderated',
+						'comment_type'   => 'block_comment',
+
 					),
 					admin_url( 'edit-comments.php' )
 				)
