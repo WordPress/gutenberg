@@ -61,4 +61,17 @@ export const settings = {
 	transforms,
 };
 
+if ( window.__experimentalContentOnlyPatternInsertion ) {
+	settings.controls = [
+		{
+			label: __( 'Summary' ),
+			type: 'RichText',
+			shownByDefault: true,
+			mapping: {
+				value: 'summary',
+			},
+		},
+	];
+}
+
 export const init = () => initBlock( { name, metadata, settings } );
