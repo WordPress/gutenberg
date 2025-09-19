@@ -26,23 +26,26 @@ function gutenberg_render_editorial_comments_column( $column_name, $post_id ) {
 		return;
 	}
 
-	$approve_count = get_comments( array(
-		'post_id' => $post_id,
-		'type'    => 'block_comment',
-		'status'  => 'approve',
-		'count'   => true,
-	) );
+	$approve_count = get_comments(
+		array(
+			'post_id' => $post_id,
+			'type'    => 'block_comment',
+			'status'  => 'approve',
+			'count'   => true,
+		)
+	);
 
-	$unapprove_count = get_comments( array(
-		'post_id' => $post_id,
-		'type'    => 'block_comment',
-		'status'  => 'hold',
-		'count'   => true,
-	) );
-	print( '<div class="column-comments">');
-	comments_bubble( $post_id, $unapprove_count, $approve_count );
+	$unapprove_count = get_comments(
+		array(
+			'post_id' => $post_id,
+			'type'    => 'block_comment',
+			'status'  => 'hold',
+			'count'   => true,
+		)
+	);
+	print( '<div class="column-comments">' );
+	gutenberg_comments_bubble( $post_id, $unapprove_count, $approve_count );
 	print( '</div>' );
-
 }
 add_action( 'manage_posts_custom_column', 'gutenberg_render_editorial_comments_column', 10, 2 );
 
@@ -54,7 +57,7 @@ add_action( 'manage_posts_custom_column', 'gutenberg_render_editorial_comments_c
  * @param int $post_id          The post ID.
  * @param int $pending_comments Number of pending comments.
  */
-function comments_bubble( $post_id, $pending_comments, $approved_comments ) {
+function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comments ) {
 	$post_object   = get_post( $post_id );
 	$edit_post_cap = $post_object ? 'edit_post' : 'edit_posts';
 
@@ -176,8 +179,8 @@ function comments_bubble( $post_id, $pending_comments, $approved_comments ) {
 /**
  * Filter the editorial comment so it is sortable.
  */
-function filter_edit_post_sortable_columns( $columns ) {
+function gutenberg_filter_edit_post_sortable_columns( $columns ) {
 	$columns['editorial_comments'] = 'editorial_comments';
 	return $columns;
 }
-add_filter( 'manage_edit-post_sortable_columns', 'filter_edit_post_sortable_columns' );
+add_filter( 'manage_edit-post_sortable_columns', 'gutenberg_filter_edit_post_sortable_columns' );
