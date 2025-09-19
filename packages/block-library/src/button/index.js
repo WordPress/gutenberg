@@ -47,7 +47,7 @@ if ( window.__experimentalContentOnlyPatternInsertion ) {
 		{
 			label: __( 'Link' ),
 			type: 'Link',
-			shownByDefault: true,
+			shownByDefault: false,
 			mapping: {
 				href: 'url',
 				rel: 'rel',
