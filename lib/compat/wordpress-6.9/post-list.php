@@ -196,7 +196,7 @@ add_filter( 'manage_edit-post_sortable_columns', 'gutenberg_filter_edit_post_sor
  */
 function gutenberg_filter_edit_comments_counts( $views ) {
 	$current_post = get_post();
-	$post_id	  = $current_post ? $current_post->ID : 0;
+	$post_id      = $current_post ? $current_post->ID : 0;
 	if ( isset( $_GET['comment_type'] ) && 'block_comment' === $_GET['comment_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		global $wpdb;
 
@@ -209,7 +209,7 @@ function gutenberg_filter_edit_comments_counts( $views ) {
 				if ( 'moderated' === $type ) {
 					$match_string = 'pending';
 				}
-				$preg_pattern = sprintf('/\(<span class=\"%s-count\">(\d+)<\/span>\)/', $match_string );
+				$preg_pattern = sprintf( '/\(<span class=\"%s-count\">(\d+)<\/span>\)/', $match_string );
 				error_log( $type );
 				error_log( $views[ $type ] );
 				error_log( $preg_pattern );
@@ -224,15 +224,15 @@ function gutenberg_filter_edit_comments_counts( $views ) {
 							$count = get_comments(
 								array(
 									'post_id' => $post_id,
-									'type'   => 'block_comment',
-									'count'  => true,
-									'status' => 'all',
+									'type'    => 'block_comment',
+									'count'   => true,
+									'status'  => 'all',
 								)
-							 );
+							);
 							break;
 						case 'mine':
 							$user_id = get_current_user_id();
-							$count = get_comments(
+							$count   = get_comments(
 								array(
 									'post_id' => $post_id,
 									'user_id' => $user_id,
