@@ -131,8 +131,7 @@ export function Comments( {
 					blocks
 				);
 				if ( relatedBlockClientId ) {
-					// Use longer timeout for comment-to-block highlighting (800ms)
-					flashBlock( relatedBlockClientId, 800 );
+					flashBlock( relatedBlockClientId );
 				}
 			}
 		},
