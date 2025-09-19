@@ -131,7 +131,8 @@ export function Comments( {
 					blocks
 				);
 				if ( relatedBlockClientId ) {
-					flashBlock( relatedBlockClientId );
+					// Use longer timeout for comment-to-block highlighting (800ms)
+					flashBlock( relatedBlockClientId, 800 );
 				}
 			}
 		},
@@ -209,7 +210,7 @@ function Thread( {
 		onFocusThread( threadId );
 		if ( relatedBlock && relatedBlockElement ) {
 			relatedBlockElement.scrollIntoView( {
-				behavior: 'smooth',
+				behavior: 'instant',
 				block: 'center',
 			} );
 		}

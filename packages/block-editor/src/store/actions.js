@@ -1876,12 +1876,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 

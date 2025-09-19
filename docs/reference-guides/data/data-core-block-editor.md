@@ -1285,6 +1285,7 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+-   _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
 
 ### hideInsertionPoint
 
