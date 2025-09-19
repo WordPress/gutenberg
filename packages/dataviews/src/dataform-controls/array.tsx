@@ -121,13 +121,6 @@ export default function ArrayControl< Item >( {
 		[ onChange, setValue, data ]
 	);
 
-	const onInputChange = useCallback( ( input: string ) => {
-		if ( input === '' ) {
-			// Reset custom validity when input is cleared
-			setCustomValidity( undefined );
-		}
-	}, [] );
-
 	return (
 		<ValidatedFormTokenField
 			required={ !! field.isValid?.required }
@@ -136,28 +129,15 @@ export default function ArrayControl< Item >( {
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
-			onInputChange={ onInputChange }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
 			__experimentalValidateInput={ ( token: string ) => {
 				// If elements validation is required, check if token is valid
 				if ( field.isValid?.elements && elements ) {
-					const isValidToken = elements.some(
+					return elements.some(
 						( element ) =>
 							element.value === token || element.label === token
 					);
-
-					// If invalid, trigger error message display using the main validation function
-					if ( ! isValidToken ) {
-						// Create a temporary token object to trigger validation
-						const tempTokens = [
-							...arrayValueAsElements,
-							{ value: token, label: token },
-						];
-						validateTokens( tempTokens );
-					}
-
-					return isValidToken;
 				}
 
 				// For non-elements validation, allow all tokens
