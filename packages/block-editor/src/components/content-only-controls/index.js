@@ -195,9 +195,9 @@ export default function ContentOnlyControls( { rootClientId } ) {
 				const { getClientIdsOfDescendants, getBlockEditingMode } =
 					select( blockEditorStore );
 
-				// _nestedContentClientIds is for content blocks within the 'drilldown'.
+				// _nestedContentClientIds is for content blocks within 'drilldowns'.
 				// It's an object where the key is the parent clientId, and the element is
-				// an array of child clientIds.
+				// an array of child clientIds whose controls are shown within the drilldown.
 				const _nestedContentClientIds = {};
 
 				// _contentClientIds is the list of contentClientIds for blocks being
@@ -205,8 +205,8 @@ export default function ContentOnlyControls( { rootClientId } ) {
 				// but not the children of those blocks.
 				const _contentClientIds = [];
 
-				// An array of all nested client ids. Used to ensure nested clientIds don't end
-				// up in _contentClientIds, but not returned from the useSelect.
+				// An array of all nested client ids. Used for ensuring blocks within drilldowns
+				// don't appear at the root level.
 				let allNestedClientIds = [];
 
 				// A flattened list of all content clientIds to arrange into the
