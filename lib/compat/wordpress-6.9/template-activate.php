@@ -29,13 +29,13 @@ function gutenberg_maintain_templates_routes() {
 	$revisions_controller                    = new WP_REST_Template_Revisions_Controller( 'wp_template' );
 	$wp_post_types['wp_template']->rest_base = 'wp_template';
 
-	$wp_post_types['_old_wp_template'] = clone $wp_post_types['wp_template'];
-	$wp_post_types['_old_wp_template']->name                  = '_old_wp_template';
-	$wp_post_types['_old_wp_template']->rest_base             = 'templates';
-	$wp_post_types['_old_wp_template']->rest_controller_class = 'WP_REST_Templates_Controller';
-	$wp_post_types['_old_wp_template']->rest_controller       = $controller;
-	$wp_post_types['_old_wp_template']->autosave_rest_controller_class = 'WP_REST_Template_Autosaves_Controller';
-	$wp_post_types['_old_wp_template']->autosave_rest_controller       = $autosave_controller;
+	$wp_post_types['_old_wp_template']                                  = clone $wp_post_types['wp_template'];
+	$wp_post_types['_old_wp_template']->name                            = '_old_wp_template';
+	$wp_post_types['_old_wp_template']->rest_base                       = 'templates';
+	$wp_post_types['_old_wp_template']->rest_controller_class           = 'WP_REST_Templates_Controller';
+	$wp_post_types['_old_wp_template']->rest_controller                 = $controller;
+	$wp_post_types['_old_wp_template']->autosave_rest_controller_class  = 'WP_REST_Template_Autosaves_Controller';
+	$wp_post_types['_old_wp_template']->autosave_rest_controller        = $autosave_controller;
 	$wp_post_types['_old_wp_template']->revisions_rest_controller_class = 'WP_REST_Template_Revisions_Controller';
 	$wp_post_types['_old_wp_template']->revisions_rest_controller       = $revisions_controller;
 
