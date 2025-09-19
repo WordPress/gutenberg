@@ -65,7 +65,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					'accordion-content__heading',
 					{
 						[ `has-custom-font-size` ]: blockProps.style.fontSize,
-						[ `icon-position-left` ]: iconPosition === 'left',
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					}
 				) }
@@ -81,7 +80,13 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						...spacingProps.style,
 					} }
 				>
+					{ showIcon && iconPosition === 'left' && (
+						<span className="accordion-content__toggle-icon">
+							+
+						</span>
+					) }
 					<RichText
+						className="accordion-content__toggle-title"
 						allowedFormats={ [
 							'core/bold',
 							'core/italic',
@@ -96,7 +101,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						}
 						placeholder={ __( 'Accordion title' ) }
 					/>
-					{ showIcon && (
+					{ showIcon && iconPosition === 'right' && (
 						<span className="accordion-content__toggle-icon">
 							+
 						</span>

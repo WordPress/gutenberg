@@ -36,7 +36,7 @@
 	width: 100%;
 }
 
-.accordion-content__toggle > span:not(.accordion-content__toggle-icon) {
+.accordion-content__toggle-title {
 	flex: 1;
 }
 
@@ -66,11 +66,6 @@
 /* No icon block style */
 .is-style-no-icon .accordion-content__toggle-icon {
 	background-color: unset;
-}
-
-.wp-block-accordion-header.icon-position-left .accordion-content__toggle {
-	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
-	flex-direction: row-reverse;
 }
 
 .accordion-content__toggle:focus-visible {
