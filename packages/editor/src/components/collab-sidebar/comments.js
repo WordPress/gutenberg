@@ -124,7 +124,7 @@ export function Comments( {
 			// Set the focused thread.
 			setFocusThread( threadId );
 
-			// Flash the related block when comment is clicked
+			// Flash the related block when a comment is clicked.
 			if ( blocks ) {
 				const relatedBlockClientId = findBlockByCommentId(
 					threadId,
