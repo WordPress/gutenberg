@@ -15,8 +15,6 @@ function render_block_core_accordion( $attributes, $content ) {
 		return $content;
 	}
 
-	wp_enqueue_script_module( '@wordpress/block-library/accordion/view' );
-
 	$p             = new WP_HTML_Tag_Processor( $content );
 	$autoclose     = $attributes['autoclose'] ? 'true' : 'false';
 	$icon          = $attributes['icon'] ?? 'plus';
