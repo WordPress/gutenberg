@@ -40,7 +40,8 @@ function render_block_core_term_template( $attributes, $content, $block ) {
 		'exclude'    => $query['exclude'] ?? array(),
 	);
 
-	if ( 'top-level' === $terms_to_show ) {
+	// We set parent to 0 only if we show all terms as hierarchical or we show top-level terms.
+	if ( ('all' === $terms_to_show && ! empty( $query['hierarchical'] ) ) || 'top-level' === $terms_to_show ) {
 		$query_args['parent'] = 0;
 	} elseif ( 'subterms' === $terms_to_show ) {
 		// Check if we're in a taxonomy archive context.
