@@ -759,9 +759,12 @@ export default () => {
 			// Get the content of this router region.
 			const vdom = routerRegions.get( regionId )!.value;
 
-			// The scope needs to be injected.
-			const previousScope = getScope();
-			return vdom && cloneElement( vdom, { previousScope } );
+			if ( vdom && typeof vdom.type !== 'string' ) {
+				// The scope needs to be injected.
+				const previousScope = getScope();
+				return cloneElement( vdom, { previousScope } );
+			}
+			return vdom;
 		},
 		{ priority: 1 }
 	);
