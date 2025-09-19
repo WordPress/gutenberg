@@ -5,6 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalHStack as HStack,
+	Navigator,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
@@ -109,9 +110,26 @@ function BlockControls( { clientId } ) {
 	);
 }
 
-export default function ContentOnlyControls( {
+function DrillDownButton( { clientId } ) {
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const blockInformation = useBlockDisplayInformation( clientId );
+	return (
+		<Navigator.Button path={ `/${ clientId }` } variant="primary">
+			<HStack spacing={ 1 }>
+				<BlockIcon icon={ blockInformation?.icon } />
+				<div>{ blockTitle }</div>
+			</HStack>
+		</Navigator.Button>
+	);
+}
+
+function ContentOnlyControlsScreen( {
 	rootClientId,
 	contentClientIds,
+	parentClientIds,
 } ) {
 	const isRootContentBlock = useSelect(
 		( select ) => {
@@ -132,9 +150,98 @@ export default function ContentOnlyControls( {
 			{ isRootContentBlock && (
 				<BlockControls clientId={ rootClientId } />
 			) }
-			{ contentClientIds.map( ( clientId ) => (
-				<BlockControls key={ clientId } clientId={ clientId } />
-			) ) }
+			{ contentClientIds.map( ( clientId ) => {
+				if ( parentClientIds?.[ clientId ] ) {
+					return (
+						<DrillDownButton
+							key={ clientId }
+							clientId={ clientId }
+						/>
+					);
+				}
+
+				return <BlockControls key={ clientId } clientId={ clientId } />;
+			} ) }
 		</>
+	);
+}
+
+export default function ContentOnlyControls( { rootClientId } ) {
+	const { nestedContentClientIds, contentClientIds } = useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlockEditingMode } =
+				select( blockEditorStore );
+
+			// _nestedContentClientIds is for content blocks within the 'drilldown'.
+			// It's an object where the key is the parent clientId, and the element is
+			// an array of child clientIds.
+			const _nestedContentClientIds = {};
+
+			// _contentClientIds is the list of contentClientIds for blocks being
+			// shown at the root level. Includes parent blocks that might have a drilldown,
+			// but not the children of those blocks.
+			const _contentClientIds = [];
+
+			// An array of all nested client ids. Used to ensure nested clientIds don't end
+			// up in _contentClientIds, but not returned from the useSelect.
+			let allNestedClientIds = [];
+
+			// A flattened list of all content clientIds to arrange into the
+			// groups above.
+			const allContentClientIds = getClientIdsOfDescendants(
+				rootClientId
+			).filter(
+				( clientId ) =>
+					getBlockEditingMode( clientId ) === 'contentOnly'
+			);
+
+			for ( const clientId of allContentClientIds ) {
+				const childClientIds = getClientIdsOfDescendants(
+					clientId
+				).filter(
+					( childClientId ) =>
+						getBlockEditingMode( childClientId ) === 'contentOnly'
+				);
+
+				// If there's more than one child block, use a drilldown.
+				if ( childClientIds.length > 1 ) {
+					_nestedContentClientIds[ clientId ] = childClientIds;
+					allNestedClientIds = [
+						allNestedClientIds,
+						...childClientIds,
+					];
+				}
+
+				if ( ! allNestedClientIds.includes( clientId ) ) {
+					_contentClientIds.push( clientId );
+				}
+			}
+
+			return {
+				nestedContentClientIds: _nestedContentClientIds,
+				contentClientIds: _contentClientIds,
+			};
+		},
+		[ rootClientId ]
+	);
+
+	return (
+		<Navigator initialPath="/">
+			<Navigator.Screen path="/">
+				<ContentOnlyControlsScreen
+					rootClientId={ rootClientId }
+					contentClientIds={ contentClientIds }
+					parentClientIds={ nestedContentClientIds }
+				/>
+			</Navigator.Screen>
+			{ Object.keys( nestedContentClientIds ).map( ( clientId ) => (
+				<Navigator.Screen key={ clientId } path={ `/${ clientId }` }>
+					<ContentOnlyControlsScreen
+						rootClientId={ clientId }
+						contentClientIds={ nestedContentClientIds[ clientId ] }
+					/>
+				</Navigator.Screen>
+			) ) }
+		</Navigator>
 	);
 }
