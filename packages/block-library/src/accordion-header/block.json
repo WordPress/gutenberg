@@ -63,7 +63,8 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": ".accordion-content__toggle-title"
+			"selector": ".accordion-content__toggle-title",
+			"role": "content"
 		},
 		"level": {
 			"type": "number",

@@ -23,9 +23,14 @@
 				"hideEmpty": true,
 				"include": [],
 				"exclude": [],
-				"parent": 0,
+				"parent": false,
 				"hierarchical": false
 			}
+		},
+		"termsToShow": {
+			"type": "string",
+			"default": "all",
+			"enum": [ "all", "top-level", "subterms" ]
 		},
 		"tagName": {
 			"type": "string",
@@ -37,7 +42,8 @@
 	},
 	"providesContext": {
 		"termQueryId": "termQueryId",
-		"termQuery": "termQuery"
+		"termQuery": "termQuery",
+		"termsToShow": "termsToShow"
 	},
 	"supports": {
 		"align": [ "wide", "full" ],

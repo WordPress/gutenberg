@@ -109,6 +109,9 @@ export default function Edit( {
 							onChange={ ( value ) => {
 								setAttributes( {
 									showIcon: value,
+									iconPosition: value
+										? iconPosition
+										: 'right',
 								} );
 							} }
 							checked={ showIcon }
@@ -117,34 +120,36 @@ export default function Edit( {
 							) }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Icon Position' ) }
-						isShownByDefault
-						hasValue={ () => iconPosition !== 'right' }
-						onDeselect={ () =>
-							setAttributes( { iconPosition: 'right' } )
-						}
-					>
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							isBlock
+					{ showIcon && (
+						<ToolsPanelItem
 							label={ __( 'Icon Position' ) }
-							value={ iconPosition }
-							onChange={ ( value ) => {
-								setAttributes( { iconPosition: value } );
-							} }
+							isShownByDefault
+							hasValue={ () => iconPosition !== 'right' }
+							onDeselect={ () =>
+								setAttributes( { iconPosition: 'right' } )
+							}
 						>
-							<ToggleGroupControlOption
-								label={ __( 'Left' ) }
-								value="left"
-							/>
-							<ToggleGroupControlOption
-								label={ __( 'Right' ) }
-								value="right"
-							/>
-						</ToggleGroupControl>
-					</ToolsPanelItem>
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								isBlock
+								label={ __( 'Icon Position' ) }
+								value={ iconPosition }
+								onChange={ ( value ) => {
+									setAttributes( { iconPosition: value } );
+								} }
+							>
+								<ToggleGroupControlOption
+									label={ __( 'Left' ) }
+									value="left"
+								/>
+								<ToggleGroupControlOption
+									label={ __( 'Right' ) }
+									value="right"
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
