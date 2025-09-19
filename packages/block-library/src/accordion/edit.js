@@ -17,7 +17,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -38,6 +38,7 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { insertBlock } = useDispatch( blockEditorStore );
+	const { hasMultiSelection } = useSelect( blockEditorStore );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
@@ -53,14 +54,16 @@ export default function Edit( {
 
 	return (
 		<>
-			<BlockControls group="other">
-				<ToolbarButton
-					label={ __( 'Add accordion content block' ) }
-					onClick={ addAccordionContentBlock }
-				>
-					{ __( 'Add' ) }
-				</ToolbarButton>
-			</BlockControls>
+			{ ! hasMultiSelection() && (
+				<BlockControls group="other">
+					<ToolbarButton
+						label={ __( 'Add accordion content block' ) }
+						onClick={ addAccordionContentBlock }
+					>
+						{ __( 'Add' ) }
+					</ToolbarButton>
+				</BlockControls>
+			) }
 			<InspectorControls key="setting">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
