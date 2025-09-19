@@ -94,12 +94,11 @@ function Header( {
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			hasBlockSelection: !! getBlockSelectionStart(),
 			hasSectionRootClientId: !! getSectionRootClientId(),
-			supportsBlockComments:
-				_postType?.supports?.editor &&
-				Array.isArray( _postType.supports.editor ) &&
-				!! _postType.supports.editor.find(
-					( item ) => item?.[ 'block-comments' ] === true
-				),
+			supportsBlockComments: Array.isArray( _postType?.supports?.editor )
+				? _postType.supports.editor.find(
+						( features ) => 'block-comments' in features
+				  )?.[ 'block-comments' ] === true
+				: false,
 		};
 	}, [] );
 
