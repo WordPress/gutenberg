@@ -124,7 +124,18 @@ const cloneRouterRegionContent = ( vdom: any ) => {
 		: vdom.props.element;
 };
 
+/**
+ * IDs of router regions with an `attachTo` property pointing to the same parent
+ * element.
+ */
 const regionsToAttachByParent = new WeakMap< Element, string[] >();
+
+/**
+ * Map of root fragments by parent element, used to render router regions with
+ * the `attachTo` property. Those elements with the same parent are rendered
+ * together in the corresponding root fragment.
+ */
+const rootFragmentsByParent = new WeakMap< Element, any >();
 
 /**
  * Fetches and prepares a page from a given URL.
@@ -192,7 +203,6 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 		if ( attachTo ) {
 			regionsToAttach[ id ] = attachTo;
-			regions[ id ].props.key = id;
 		}
 	} );
 
@@ -251,25 +261,6 @@ const renderPage = ( page: Page ) => {
 			}
 		}
 
-		// Render regions attached to the same parent all together.
-		parentsToUpdate.forEach( ( parent ) => {
-			const ids = regionsToAttachByParent.get( parent );
-			const vdoms = ids.map( ( id ) => page.regions[ id ] );
-			const regions = vdoms.map( ( { props, type } ) => {
-				const elementType =
-					typeof type === 'function' ? props.type : type;
-
-				// Create an element with the obtained type where the region will be
-				// rendered. The type should match the one of the root vnode.
-				const region = document.createElement( elementType );
-				parent.appendChild( region );
-				return region;
-			} );
-
-			const fragment = getRegionRootFragment( regions );
-			render( vdoms, fragment );
-		} );
-
 		//Update all existing regions.
 		for ( const id in page.regions ) {
 			if ( routerRegions.has( id ) ) {
@@ -278,6 +269,31 @@ const renderPage = ( page: Page ) => {
 				);
 			}
 		}
+
+		// Render regions attached to the same parent in the same fragment.
+		parentsToUpdate.forEach( ( parent ) => {
+			const ids = regionsToAttachByParent.get( parent );
+			const vdoms = ids.map( ( id ) => page.regions[ id ] );
+
+			if ( ! rootFragmentsByParent.has( parent ) ) {
+				const regions = vdoms.map( ( { props, type } ) => {
+					const elementType =
+						typeof type === 'function' ? props.type : type;
+
+					// Create an element with the obtained type where the region will be
+					// rendered. The type should match the one of the root vnode.
+					const region = document.createElement( elementType );
+					parent.appendChild( region );
+					return region;
+				} );
+				rootFragmentsByParent.set(
+					parent,
+					getRegionRootFragment( regions )
+				);
+			}
+			const fragment = rootFragmentsByParent.get( parent );
+			render( vdoms, fragment );
+		} );
 	} );
 
 	if ( page.title ) {
