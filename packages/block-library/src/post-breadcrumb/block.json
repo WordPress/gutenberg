@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/post-breadcrumb",
+	"title": "Post Breadcrumb",
+	"category": "theme",
+	"description": "Display a breadcrumb trail for hierarchical posts.",
+	"textdomain": "default",
+	"attributes": {
+		"separator": {
+			"type": "string",
+			"default": "/"
+		}
+	},
+	"usesContext": [
+		"postId",
+		"postType"
+	],
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"style": "wp-block-post-breadcrumb"
+}

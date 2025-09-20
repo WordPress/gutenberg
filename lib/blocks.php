@@ -91,6 +91,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
 				'post-author-biography.php'        => 'core/post-author-biography',
+				'post-breadcrumb.php'              => 'core/post-breadcrumb',
 				'post-comment.php'                 => 'core/post-comment',
 				'post-comments-count.php'          => 'core/post-comments-count',
 				'post-comments-form.php'           => 'core/post-comments-form',
@@ -248,6 +249,9 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
+	if ($block_name === 'core/post-breadcrumb') {
+			var_dump( 'hello' );
+	}
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
@@ -263,6 +267,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
 
 	if ( file_exists( $stylesheet_path ) ) {
+
 		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
