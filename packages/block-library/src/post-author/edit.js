@@ -335,7 +335,9 @@ function PostAuthorEdit( {
 								authorDetails?.avatar_urls?.[ avatarSize ] ||
 								defaultAvatar
 							}
-							alt={ authorDetails?.name || __( 'Post Author' ) }
+							alt={
+								authorDetails?.name || __( 'Default Avatar' )
+							}
 						/>
 					</div>
 				) }
