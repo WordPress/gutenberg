@@ -12,7 +12,7 @@ import {
 	__experimentalNumberControl as CoreNumberControl,
 	privateApis,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useState, createElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,11 +31,15 @@ function BetweenControls( {
 	onChange,
 	hideLabelFromVision,
 	step,
+	prefix,
+	suffix,
 }: {
 	value: NumberBetween;
 	onChange: ( [ min, max ]: NumberBetween ) => void;
 	hideLabelFromVision?: boolean;
 	step?: 'any' | number;
+	prefix: React.ReactNode;
+	suffix: React.ReactNode;
 } ) {
 	const [ min = '', max = '' ] = value;
 
@@ -65,6 +69,8 @@ function BetweenControls( {
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
+					prefix={ prefix }
+					suffix={ suffix }
 				/>
 				<CoreNumberControl
 					label={ __( 'Max.' ) }
@@ -74,6 +80,8 @@ function BetweenControls( {
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 					step={ step }
+					prefix={ prefix }
+					suffix={ suffix }
 				/>
 			</Flex>
 		</BaseControl>
@@ -89,7 +97,7 @@ export default function NumberControl< Item >( {
 	config,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue } = field;
-	const { step = 'any' } = config || {};
+	const { step = 'any', prefix, suffix } = config || {};
 	const value = getValue( { item: data } ) ?? '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -172,6 +180,8 @@ export default function NumberControl< Item >( {
 				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
 				step={ step }
+				prefix={ prefix ? createElement( prefix ) : undefined }
+				suffix={ suffix ? createElement( suffix ) : undefined }
 			/>
 		);
 	}
@@ -188,6 +198,8 @@ export default function NumberControl< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			step={ step }
+			prefix={ prefix ? createElement( prefix ) : undefined }
+			suffix={ suffix ? createElement( suffix ) : undefined }
 		/>
 	);
 }
