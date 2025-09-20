@@ -81,7 +81,10 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					} }
 				>
 					{ showIcon && iconPosition === 'left' && (
-						<span className="accordion-content__toggle-icon">
+						<span
+							className="accordion-content__toggle-icon"
+							aria-hidden="true"
+						>
 							+
 						</span>
 					) }
@@ -96,7 +99,10 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						placeholder={ __( 'Accordion title' ) }
 					/>
 					{ showIcon && iconPosition === 'right' && (
-						<span className="accordion-content__toggle-icon">
+						<span
+							className="accordion-content__toggle-icon"
+							aria-hidden="true"
+						>
 							+
 						</span>
 					) }

@@ -50,7 +50,12 @@ export default function save( { attributes } ) {
 				} }
 			>
 				{ showIcon && iconPosition === 'left' && (
-					<span className="accordion-content__toggle-icon">+</span>
+					<span
+						className="accordion-content__toggle-icon"
+						aria-hidden="true"
+					>
+						+
+					</span>
 				) }
 				<RichText.Content
 					className="accordion-content__toggle-title"
@@ -58,7 +63,12 @@ export default function save( { attributes } ) {
 					value={ title }
 				/>
 				{ showIcon && iconPosition === 'right' && (
-					<span className="accordion-content__toggle-icon">+</span>
+					<span
+						className="accordion-content__toggle-icon"
+						aria-hidden="true"
+					>
+						+
+					</span>
 				) }
 			</button>
 		</TagName>
