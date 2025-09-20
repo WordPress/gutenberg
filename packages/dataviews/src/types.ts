@@ -196,6 +196,25 @@ export type EditConfigText = {
 };
 
 /**
+ * Edit configuration for text controls.
+ */
+export type EditConfigNumber = {
+	control: 'number';
+	/**
+	 * Prefix component to display before the input.
+	 */
+	prefix?: React.ComponentType;
+	/**
+	 * Suffix component to display after the input.
+	 */
+	suffix?: React.ComponentType;
+	/**
+	 * Input descrease/increase step.
+	 */
+	step?: number;
+};
+
+/**
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
@@ -209,6 +228,7 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigNumber
 	| EditConfigGeneric;
 
 /**
@@ -355,6 +375,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		step?: 'any' | number;
 	};
 };
 
