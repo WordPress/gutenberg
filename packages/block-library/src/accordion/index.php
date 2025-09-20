@@ -15,14 +15,12 @@ function render_block_core_accordion( $attributes, $content ) {
 		return $content;
 	}
 
-	$p             = new WP_HTML_Tag_Processor( $content );
-	$autoclose     = $attributes['autoclose'] ? 'true' : 'false';
-	$icon          = $attributes['icon'] ?? 'plus';
-	$icon_position = $attributes['iconPosition'] ?? 'right';
+	$p         = new WP_HTML_Tag_Processor( $content );
+	$autoclose = $attributes['autoclose'] ? 'true' : 'false';
 
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion' ) ) ) {
 		$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
-		$p->set_attribute( 'data-wp-context', '{ "autoclose": ' . $autoclose . ', "isOpen": [], "icon": "' . $icon . '", "iconPosition": "' . $icon_position . '" }' );
+		$p->set_attribute( 'data-wp-context', '{ "autoclose": ' . $autoclose . ', "accordionContents": [] }' );
 
 		// Only modify content if directives have been set.
 		$content = $p->get_updated_html();
