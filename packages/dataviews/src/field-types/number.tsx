@@ -38,9 +38,9 @@ export default {
 			const value = field.getValue( { item } );
 			if (
 				! [ undefined, '', null ].includes( value ) &&
-				! Number.isInteger( value )
+				! Number.isFinite( value )
 			) {
-				return __( 'Value must be an integer.' );
+				return __( 'Value must be a number.' );
 			}
 
 			if ( field?.elements ) {
@@ -53,7 +53,7 @@ export default {
 			return null;
 		},
 	},
-	Edit: 'integer',
+	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		return field.elements
 			? renderFromElements( { item, field } )
