@@ -9,7 +9,7 @@ import deepMerge from 'deepmerge';
 import {
 	Flex,
 	BaseControl,
-	__experimentalNumberControl as NumberControl,
+	__experimentalNumberControl as CoreNumberControl,
 	privateApis,
 } from '@wordpress/components';
 import { useCallback, useState } from '@wordpress/element';
@@ -24,15 +24,15 @@ import { unlock } from '../lock-unlock';
 
 const { ValidatedNumberControl } = unlock( privateApis );
 
-type IntegerBetween = [ number | string, number | string ];
+type NumberBetween = [ number | string, number | string ];
 
 function BetweenControls( {
 	value,
 	onChange,
 	hideLabelFromVision,
 }: {
-	value: IntegerBetween;
-	onChange: ( [ min, max ]: IntegerBetween ) => void;
+	value: NumberBetween;
+	onChange: ( [ min, max ]: NumberBetween ) => void;
 	hideLabelFromVision?: boolean;
 } ) {
 	const [ min = '', max = '' ] = value;
@@ -55,7 +55,7 @@ function BetweenControls( {
 			help={ __( 'The max. value must be greater than the min. value.' ) }
 		>
 			<Flex direction="row" gap={ 4 }>
-				<NumberControl
+				<CoreNumberControl
 					label={ __( 'Min.' ) }
 					value={ min }
 					max={ max ? Number( max ) - 1 : undefined }
@@ -63,7 +63,7 @@ function BetweenControls( {
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
 				/>
-				<NumberControl
+				<CoreNumberControl
 					label={ __( 'Max.' ) }
 					value={ max }
 					min={ min ? Number( min ) + 1 : undefined }
@@ -76,7 +76,7 @@ function BetweenControls( {
 	);
 }
 
-export default function Integer< Item >( {
+export default function NumberControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -110,7 +110,7 @@ export default function Integer< Item >( {
 	);
 
 	const onChangeBetweenControls = useCallback(
-		( newValue: IntegerBetween ) => {
+		( newValue: NumberBetween ) => {
 			onChange(
 				setValue( {
 					item: data,
@@ -150,7 +150,7 @@ export default function Integer< Item >( {
 	);
 
 	if ( operator === OPERATOR_BETWEEN ) {
-		let valueBetween: IntegerBetween = [ '', '' ];
+		let valueBetween: NumberBetween = [ '', '' ];
 		if (
 			Array.isArray( value ) &&
 			value.length === 2 &&
@@ -158,7 +158,7 @@ export default function Integer< Item >( {
 				( element ) => typeof element === 'number' || element === ''
 			)
 		) {
-			valueBetween = value as IntegerBetween;
+			valueBetween = value as NumberBetween;
 		}
 		return (
 			<BetweenControls
