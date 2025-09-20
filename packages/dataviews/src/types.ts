@@ -246,6 +246,12 @@ export type Field< Item > = {
 	placeholder?: string;
 
 	/**
+	 * Children field definitions for array fields with structured data.
+	 * When provided, array fields will render as tables with columns based on children.
+	 */
+	children?: Field< Item >[];
+
+	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
 	render?: ComponentType< DataViewRenderFieldProps< Item > >;
@@ -314,7 +320,10 @@ export type Field< Item > = {
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 };
 
-export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'children'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -327,6 +336,7 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	enableSorting: boolean;
 	filterBy: NormalizedFilterByConfig | false;
 	readOnly: boolean;
+	children: NormalizedField< Item >[];
 };
 
 /**

@@ -26,6 +26,7 @@ import toggle from './toggle';
 import textarea from './textarea';
 import toggleGroup from './toggle-group';
 import array from './array';
+import arrayTable from './array-table';
 import color from './color';
 import password from './password';
 
@@ -35,6 +36,7 @@ interface FormControls {
 
 const FORM_CONTROLS: FormControls = {
 	array,
+	arrayTable,
 	checkbox,
 	color,
 	datetime,
@@ -87,6 +89,15 @@ export function getControl< Item >(
 
 	if ( field.elements && field.type !== 'array' ) {
 		return getControlByType( 'select' );
+	}
+
+	// Use array-table control for array fields with children
+	if (
+		field.type === 'array' &&
+		field.children &&
+		field.children.length > 0
+	) {
+		return getControlByType( 'arrayTable' );
 	}
 
 	if ( typeof fieldTypeDefinition.Edit === 'string' ) {

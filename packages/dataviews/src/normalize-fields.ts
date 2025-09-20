@@ -195,6 +195,7 @@ export function normalizeFields< Item >(
 				true,
 			filterBy,
 			readOnly: field.readOnly ?? fieldTypeDefinition.readOnly ?? false,
+			children: field.children ? normalizeFields( field.children ) : [],
 		};
 	} );
 }
