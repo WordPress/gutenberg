@@ -36,16 +36,18 @@ export default {
 	isValid: {
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! Number.isFinite( value )
-			) {
+
+			if ( ! [ undefined, '', null ].includes( value ) ) {
+				return null;
+			}
+
+			if ( ! Number.isFinite( value ) ) {
 				return __( 'Value must be a number.' );
 			}
 
 			if ( field?.elements ) {
 				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( Number( value ) ) ) {
+				if ( ! validValues.includes( value ) ) {
 					return __( 'Value must be one of the elements.' );
 				}
 			}
