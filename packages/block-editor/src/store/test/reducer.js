@@ -4505,5 +4505,296 @@ describe( 'state', () => {
 				);
 			} );
 		} );
+
+		// Tests for the contentOnly experiments pattern.
+		// If/when the experiment is stabilized, this wrapping `describe` and
+		// `beforeAll`/`afterAll` can be removed, un-nesting the tests within.
+		describe( 'contentOnly patterns experiment', () => {
+			beforeAll( () => {
+				globalThis.window.__experimentalContentOnlyPatternInsertion = true;
+			} );
+
+			afterAll( () => {
+				delete globalThis.window
+					.__experimentalContentOnlyPatternInsertion;
+			} );
+
+			describe( 'unsynced patterns', () => {
+				let initialState;
+				beforeAll( () => {
+					initialState = dispatchActions(
+						[
+							{
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										name: 'core/group',
+										clientId: 'group-1',
+										attributes: {
+											metadata: {
+												patternName: 'test-pattern',
+											},
+										},
+										innerBlocks: [
+											{
+												name: 'core/paragraph',
+												clientId: 'paragraph-1',
+												attributes: {},
+												innerBlocks: [],
+											},
+											{
+												name: 'core/group',
+												clientId: 'group-2',
+												attributes: {},
+												innerBlocks: [
+													{
+														name: 'core/paragraph',
+														clientId: 'paragraph-2',
+														attributes: {},
+														innerBlocks: [],
+													},
+												],
+											},
+										],
+									},
+								],
+							},
+						],
+						testReducer,
+						initialState
+					);
+				} );
+
+				it( 'returns the expected block editing modes for an unsynced pattern', () => {
+					expect( initialState.derivedBlockEditingModes ).toEqual(
+						new Map(
+							Object.entries( {
+								'paragraph-1': 'contentOnly',
+								'group-2': 'disabled',
+								'paragraph-2': 'contentOnly',
+							} )
+						)
+					);
+				} );
+
+				it( 'removes block editing modes when an unsynced pattern is removed', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'REMOVE_BLOCKS',
+								clientIds: [ 'group-1' ],
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual( new Map() );
+				} );
+
+				it( 'removes block editing modes when the `patternName` attribute is removed from the unsynced pattern', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'UPDATE_BLOCK_ATTRIBUTES',
+								clientIds: [ 'group-1' ],
+								attributes: {
+									metadata: {
+										patternName: undefined,
+									},
+								},
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual( new Map() );
+				} );
+
+				it( 'allows explicitly set blockEditingModes to override the unsynced pattern editing modes', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'SET_BLOCK_EDITING_MODE',
+								clientId: 'paragraph-2',
+								mode: 'disabled',
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual(
+						new Map(
+							Object.entries( {
+								'paragraph-1': 'contentOnly',
+								'group-2': 'disabled',
+								// Paragraph 2 already has an explicit mode, so isn't set as a derived mode.
+							} )
+						)
+					);
+				} );
+
+				it( 'sets the correct block editing modes when a new unsynced pattern is inserted', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'INSERT_BLOCKS',
+								rootClientId: '',
+								index: 1,
+								blocks: [
+									{
+										name: 'core/group',
+										clientId: 'group-3',
+										attributes: {
+											metadata: {
+												patternName: 'test-pattern-2',
+											},
+										},
+										innerBlocks: [
+											{
+												name: 'core/paragraph',
+												clientId: 'paragraph-3',
+												attributes: {},
+												innerBlocks: [],
+											},
+										],
+									},
+								],
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual(
+						new Map(
+							Object.entries( {
+								'paragraph-1': 'contentOnly',
+								'group-2': 'disabled',
+								'paragraph-2': 'contentOnly',
+								'paragraph-3': 'contentOnly',
+							} )
+						)
+					);
+				} );
+			} );
+
+			describe( 'template parts', () => {
+				let initialState;
+				beforeAll( () => {
+					// Simulates how the editor typically inserts controlled blocks,
+					// - first the template part is inserted with no inner blocks.
+					// - next the template part is marked as a controlled block.
+					// - finally, once the inner blocks of the template part are received, they're inserted.
+					initialState = dispatchActions(
+						[
+							{
+								type: 'RESET_BLOCKS',
+								blocks: [
+									{
+										name: 'core/template-part',
+										clientId: 'template-part',
+										attributes: {},
+										innerBlocks: [],
+									},
+								],
+							},
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'template-part',
+								hasControlledInnerBlocks: true,
+							},
+							{
+								type: 'REPLACE_INNER_BLOCKS',
+								rootClientId: 'template-part',
+								blocks: [
+									{
+										name: 'core/paragraph',
+										clientId: 'template-part-paragraph',
+										attributes: {},
+										innerBlocks: [],
+									},
+									{
+										name: 'core/group',
+										clientId: 'template-part-group',
+										attributes: {},
+										innerBlocks: [
+											{
+												name: 'core/paragraph',
+												clientId:
+													'template-part-grouped-paragraph',
+												attributes: {},
+												innerBlocks: [],
+											},
+										],
+									},
+								],
+							},
+						],
+						testReducer,
+						initialState
+					);
+				} );
+
+				it( 'returns the expected block editing modes for synced patterns', () => {
+					expect( initialState.derivedBlockEditingModes ).toEqual(
+						new Map(
+							Object.entries( {
+								'template-part-paragraph': 'contentOnly',
+								'template-part-group': 'disabled',
+								'template-part-grouped-paragraph':
+									'contentOnly',
+							} )
+						)
+					);
+				} );
+
+				it( 'removes the block editing modes when the template part is removed', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'REMOVE_BLOCKS',
+								clientIds: [ 'template-part' ],
+							},
+							{
+								type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+								clientId: 'template-part',
+								hasControlledInnerBlocks: false,
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual( new Map() );
+				} );
+
+				it( 'allows explicitly set blockEditingModes to override the template part editing modes', () => {
+					const { derivedBlockEditingModes } = dispatchActions(
+						[
+							{
+								type: 'SET_BLOCK_EDITING_MODE',
+								clientId: 'template-part-grouped-paragraph',
+								mode: 'disabled',
+							},
+						],
+						testReducer,
+						initialState
+					);
+
+					expect( derivedBlockEditingModes ).toEqual(
+						new Map(
+							Object.entries( {
+								'template-part-paragraph': 'contentOnly',
+								'template-part-group': 'disabled',
+								// template-part-grouped-paragraph already has an explicit mode, so isn't set as a derived mode.
+							} )
+						)
+					);
+				} );
+			} );
+		} );
 	} );
 } );

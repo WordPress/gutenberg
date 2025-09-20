@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { useCallback, useMemo, useState } from '@wordpress/element';
@@ -41,6 +46,14 @@ type SamplePost = {
 	address1?: string;
 	address2?: string;
 	city?: string;
+	comment_status?: string;
+	ping_status?: boolean;
+	longDescription?: string;
+	origin?: string;
+	destination?: string;
+	flight_status?: string;
+	gate?: string;
+	seat?: string;
 };
 
 const fields: Field< SamplePost >[] = [
@@ -79,6 +92,9 @@ const fields: Field< SamplePost >[] = [
 			{ value: 3, label: 'Alice' },
 			{ value: 4, label: 'Bob' },
 		],
+		setValue: ( { value } ) => ( {
+			author: Number( value ),
+		} ),
 	},
 	{
 		id: 'reviewer',
@@ -174,6 +190,80 @@ const fields: Field< SamplePost >[] = [
 		type: 'text',
 		Edit: 'textarea',
 	},
+	{
+		id: 'longDescription',
+		label: 'Long Description',
+		type: 'text',
+		Edit: {
+			control: 'textarea',
+			rows: 5,
+		},
+	},
+	{
+		id: 'comment_status',
+		label: 'Comment Status',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'open', label: 'Allow comments' },
+			{ value: 'closed', label: 'Comments closed' },
+		],
+	},
+	{
+		id: 'ping_status',
+		label: 'Allow Pings/Trackbacks',
+		type: 'boolean',
+	},
+	{
+		id: 'discussion',
+		label: 'Discussion',
+		type: 'text',
+		render: ( { item } ) => {
+			const commentLabel =
+				item.comment_status === 'open'
+					? 'Allow comments'
+					: 'Comments closed';
+			const pingLabel = item.ping_status
+				? 'Pings enabled'
+				: 'Pings disabled';
+			return (
+				<span>
+					{ commentLabel }, { pingLabel }
+				</span>
+			);
+		},
+	},
+	{
+		id: 'origin',
+		label: 'Origin',
+		type: 'text',
+	},
+	{
+		id: 'destination',
+		label: 'Destination',
+		type: 'text',
+	},
+	{
+		id: 'flight_status',
+		label: 'Flight Status',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'on-time', label: 'On Time' },
+			{ value: 'delayed', label: 'Delayed' },
+			{ value: 'cancelled', label: 'Cancelled' },
+		],
+	},
+	{
+		id: 'gate',
+		label: 'Gate',
+		type: 'text',
+	},
+	{
+		id: 'seat',
+		label: 'Seat',
+		type: 'text',
+	},
 ];
 
 const LayoutRegularComponent = ( {
@@ -220,6 +310,7 @@ const LayoutRegularComponent = ( {
 				'dimensions',
 				'tags',
 				'description',
+				'longDescription',
 			],
 		} ),
 		[ labelPosition ]
@@ -308,6 +399,13 @@ const LayoutPanelComponent = ( {
 		address1: '123 Main St',
 		address2: 'Apt 4B',
 		city: 'New York',
+		comment_status: 'open',
+		ping_status: true,
+		origin: 'New York (JFK)',
+		destination: 'Los Angeles (LAX)',
+		flight_status: 'on-time',
+		gate: 'A12',
+		seat: '14F',
 	} );
 
 	const form: Form = useMemo( () => {
@@ -330,9 +428,32 @@ const LayoutPanelComponent = ( {
 				'dimensions',
 				'tags',
 				{
+					id: 'discussion',
+					label: 'Discussion',
+					children: [ 'comment_status', 'ping_status' ],
+					summary: 'discussion',
+				},
+				{
 					id: 'address1',
 					label: 'Combined Address',
 					children: [ 'address1', 'address2', 'city' ],
+				},
+				{
+					id: 'flight_info',
+					label: 'Flight Information',
+					children: [
+						'origin',
+						'destination',
+						'flight_status',
+						'gate',
+					],
+					summary: [ 'origin', 'destination', 'flight_status' ],
+				},
+				{
+					id: 'passenger_details',
+					label: 'Passenger Details',
+					children: [ 'author', 'seat' ],
+					summary: [ 'author', 'seat' ],
 				},
 			],
 		};
@@ -359,15 +480,13 @@ function CustomEditControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, description, getValue, setValue } = field;
+	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
 	);
 
 	return (
@@ -396,6 +515,8 @@ const ValidationComponent = ( {
 } ) => {
 	type ValidatedItem = {
 		text: string;
+		select?: string;
+		textWithRadio?: string;
 		textarea: string;
 		email: string;
 		telephone: string;
@@ -405,10 +526,14 @@ const ValidationComponent = ( {
 		boolean: boolean;
 		customEdit: string;
 		password: string;
+		toggle?: boolean;
+		toggleGroup?: string;
 	};
 
 	const [ post, setPost ] = useState< ValidatedItem >( {
 		text: 'Can have letters and spaces',
+		select: undefined,
+		textWithRadio: undefined,
 		textarea: 'Can have letters and spaces',
 		email: 'hi@example.com',
 		telephone: '+306978241796',
@@ -418,6 +543,8 @@ const ValidationComponent = ( {
 		boolean: true,
 		customEdit: 'custom control',
 		password: 'secretpassword123',
+		toggle: undefined,
+		toggleGroup: undefined,
 	} );
 
 	const customTextRule = ( value: ValidatedItem ) => {
@@ -427,6 +554,22 @@ const ValidationComponent = ( {
 
 		return null;
 	};
+
+	const customSelectRule = ( value: ValidatedItem ) => {
+		if ( value.select !== 'option1' ) {
+			return 'Value must be Option 1.';
+		}
+		return null;
+	};
+
+	const customTextRadioRule = ( value: ValidatedItem ) => {
+		if ( value.textWithRadio !== 'item1' ) {
+			return 'Value must be Item 1.';
+		}
+
+		return null;
+	};
+
 	const customTextareaRule = ( value: ValidatedItem ) => {
 		if ( ! /^[a-zA-Z ]+$/.test( value.textarea ) ) {
 			return 'Value must only contain letters and spaces.';
@@ -469,6 +612,27 @@ const ValidationComponent = ( {
 
 		return null;
 	};
+	const customBooleanRule = ( value: ValidatedItem ) => {
+		if ( value.boolean !== true ) {
+			return 'Boolean must be active.';
+		}
+
+		return null;
+	};
+	const customToggleRule = ( value: ValidatedItem ) => {
+		if ( value.toggle !== true ) {
+			return 'Toggle must be checked.';
+		}
+
+		return null;
+	};
+	const customToggleGroupRule = ( value: ValidatedItem ) => {
+		if ( value.toggleGroup !== 'option1' ) {
+			return 'Value must be Option 1.';
+		}
+
+		return null;
+	};
 
 	const customPasswordRule = ( value: ValidatedItem ) => {
 		if ( value.password.length < 8 ) {
@@ -498,6 +662,33 @@ const ValidationComponent = ( {
 			isValid: {
 				required,
 				custom: maybeCustomRule( customTextRule ),
+			},
+		},
+		{
+			id: 'select',
+			type: 'text',
+			label: 'Select',
+			elements: [
+				{ value: 'option1', label: 'Option 1' },
+				{ value: 'option2', label: 'Option 2' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customSelectRule ),
+			},
+		},
+		{
+			id: 'textWithRadio',
+			type: 'text',
+			Edit: 'radio',
+			label: 'Text with radio',
+			elements: [
+				{ value: 'item1', label: 'Item 1' },
+				{ value: 'item2', label: 'Item 2' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customTextRadioRule ),
 			},
 		},
 		{
@@ -561,6 +752,7 @@ const ValidationComponent = ( {
 			label: 'Boolean',
 			isValid: {
 				required,
+				custom: maybeCustomRule( customBooleanRule ),
 			},
 		},
 		{
@@ -580,12 +772,39 @@ const ValidationComponent = ( {
 				custom: maybeCustomRule( customPasswordRule ),
 			},
 		},
+		{
+			id: 'toggle',
+			type: 'boolean',
+			label: 'Toggle',
+			Edit: 'toggle',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customToggleRule ),
+			},
+		},
+		{
+			id: 'toggleGroup',
+			type: 'text',
+			label: 'Toggle Group',
+			Edit: 'toggleGroup',
+			elements: [
+				{ value: 'option1', label: 'Option 1' },
+				{ value: 'option2', label: 'Option 2' },
+				{ value: 'option3', label: 'Option 3' },
+			],
+			isValid: {
+				required,
+				custom: maybeCustomRule( customToggleGroupRule ),
+			},
+		},
 	];
 
 	const form = {
 		layout: { type },
 		fields: [
 			'text',
+			'select',
+			'textWithRadio',
 			'textarea',
 			'email',
 			'telephone',
@@ -593,8 +812,10 @@ const ValidationComponent = ( {
 			'color',
 			'integer',
 			'boolean',
-			'customEdit',
+			'toggle',
+			'toggleGroup',
 			'password',
+			'customEdit',
 		],
 	};
 
@@ -632,11 +853,15 @@ const VisibilityComponent = () => {
 		name: string;
 		email: string;
 		isActive: boolean;
+		homepageDisplay: string;
+		staticHomepage: string;
 	};
 	const [ data, setData ] = useState( {
 		name: '',
 		email: '',
 		isActive: true,
+		homepageDisplay: 'latest',
+		staticHomepage: '',
 	} );
 
 	const _fields: Field< Post >[] = [
@@ -653,9 +878,36 @@ const VisibilityComponent = () => {
 			type: 'email',
 			isVisible: ( post ) => post.isActive === true,
 		},
+		{
+			id: 'homepageDisplay',
+			label: 'Homepage display',
+			elements: [
+				{ value: 'latest', label: 'Latest post' },
+				{ value: 'static', label: 'Static page' },
+			],
+		},
+		{
+			id: 'staticHomepage',
+			label: 'Static homepage',
+			elements: [
+				{ value: 'welcome', label: 'Welcome to my website' },
+				{ value: 'about', label: 'About' },
+			],
+			isVisible: ( post ) => post.homepageDisplay === 'static',
+		},
 	];
 	const form: Form = {
-		fields: [ 'isActive', 'name', 'email' ],
+		layout: { type: 'card' },
+		fields: [
+			{
+				id: 'booleanExample',
+				children: [ 'isActive', 'name', 'email' ],
+			},
+			{
+				id: 'selectExample',
+				children: [ 'homepageDisplay', 'staticHomepage' ],
+			},
+		],
 	};
 	return (
 		<DataForm< Post >
@@ -1260,4 +1512,212 @@ export const Validation = {
 
 export const Visibility = {
 	render: VisibilityComponent,
+};
+
+const DataAdapterComponent = () => {
+	type DataAdapterItem = {
+		user: {
+			profile: {
+				name: string;
+				email: string;
+			};
+			preferences: {
+				notifications: boolean;
+			};
+		};
+		revenue: {
+			total: number;
+			units: number;
+			pricePerUnit: number;
+		};
+	};
+
+	const [ data, setData ] = useState< DataAdapterItem >( {
+		user: {
+			profile: {
+				name: 'John Doe',
+				email: 'john@example.com',
+			},
+			preferences: {
+				notifications: true,
+			},
+		},
+		revenue: {
+			total: 30,
+			units: 10,
+			pricePerUnit: 3,
+		},
+	} );
+
+	const nestedFields: Field< DataAdapterItem >[] = [
+		// Examples of autogenerated getValue/setValue methods
+		// for nested data based on the field id.
+		{
+			id: 'user.profile.name',
+			label: 'User Name',
+			type: 'text',
+		},
+		{
+			id: 'user.profile.email',
+			label: 'User Email',
+			type: 'email',
+		},
+		// Example of adapting a data value to a control value
+		// by providing getValue/setValue methods.
+		{
+			id: 'user.preferences.notifications',
+			label: 'Notifications',
+			type: 'boolean',
+			Edit: 'radio',
+			elements: [
+				{ label: 'Enabled', value: 'enabled' },
+				{ label: 'Disabled', value: 'disabled' },
+			],
+			getValue: ( { item } ) =>
+				item.user.preferences.notifications === true
+					? 'enabled'
+					: 'disabled',
+			setValue: ( { value } ) => ( {
+				user: {
+					preferences: { notifications: value === 'enabled' },
+				},
+			} ),
+		},
+		// Example of deriving data by leveraging setValue method.
+		{
+			id: 'revenue.total',
+			label: 'Total Revenue',
+			type: 'integer',
+			readOnly: true,
+		},
+		{
+			id: 'revenue.pricePerUnit',
+			label: 'Price Per Unit',
+			type: 'integer',
+			setValue: ( { item, value } ) => ( {
+				revenue: {
+					total: value * item.revenue.units,
+					pricePerUnit: value,
+				},
+			} ),
+		},
+		{
+			id: 'revenue.units',
+			label: 'Units',
+			type: 'integer',
+			setValue: ( { item, value } ) => ( {
+				revenue: {
+					total: item.revenue.pricePerUnit * value,
+					units: value,
+				},
+			} ),
+		},
+	];
+
+	const handleChange = useCallback( ( edits: any ) => {
+		// Edits will respect the shape of the data
+		// because fields provide the proper information
+		// (via field.id or via field.setValue).
+		setData( ( prev ) => deepMerge( prev, edits ) );
+	}, [] );
+
+	return (
+		<>
+			<h1>Data adapter</h1>
+			<p>
+				This story is best looked at with the code on the side. It aims
+				to highlight how DataForm can wrangle data in scenarios such as
+				nested data, bridge data to/from UI controls, and derived data.
+			</p>
+			<p>
+				<b>Current data snapshot:</b>
+			</p>
+			<pre>{ JSON.stringify( data, null, 2 ) }</pre>
+			<h2>Nested data</h2>
+			<p>
+				The first example demonstrates how to signal nested data via{ ' ' }
+				<code>field.id</code>.
+			</p>
+			<p>
+				By using <code>{ `{ id: 'user.profile.name' }` }</code> as field
+				id, when users edit the name, the edits will come in this shape:
+				<code>{ `{ user: { profile: { name: 'John Doe' } } }` }</code>
+			</p>
+			<DataForm< DataAdapterItem >
+				data={ data }
+				fields={ nestedFields }
+				form={ {
+					layout: {
+						type: 'panel',
+						labelPosition: 'top',
+						openAs: 'modal',
+					},
+					fields: [
+						{
+							id: 'userProfile',
+							label: 'User Profile',
+							children: [
+								'user.profile.name',
+								'user.profile.email',
+							],
+						},
+					],
+				} }
+				onChange={ handleChange }
+			/>
+			<h2>Adapt data and UI control</h2>
+			<p>
+				Sometimes, we need to adapt the data type to and from the UI
+				control response. This example demonstrates how to adapt a
+				boolean to a text string (Enabled/Disabled).
+			</p>
+			<DataForm< DataAdapterItem >
+				data={ data }
+				fields={ nestedFields }
+				form={ {
+					layout: {
+						type: 'panel',
+						labelPosition: 'top',
+						openAs: 'modal',
+					},
+					fields: [ 'user.preferences.notifications' ],
+				} }
+				onChange={ handleChange }
+			/>
+			<h2>Derived data</h2>
+			<p>
+				Last, but not least, this example showcases how to work with
+				derived data by providing a custom setValue function. Note how,
+				changing UNITS or PRICE PER UNIT, updates the TOTAL value as
+				well.
+			</p>
+			<DataForm< DataAdapterItem >
+				data={ data }
+				fields={ nestedFields }
+				form={ {
+					layout: {
+						type: 'panel',
+						labelPosition: 'top',
+						openAs: 'modal',
+					},
+					fields: [
+						{
+							id: 'revenue',
+							label: 'Revenue',
+							children: [
+								'revenue.pricePerUnit',
+								'revenue.units',
+								'revenue.total',
+							],
+						},
+					],
+				} }
+				onChange={ handleChange }
+			/>
+		</>
+	);
+};
+
+export const DataAdapter = {
+	render: DataAdapterComponent,
 };

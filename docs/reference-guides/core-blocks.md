@@ -759,7 +759,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), contentRole, interactivity, layout, ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results
@@ -1007,7 +1007,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 -	**Category:** theme
 -	**Allowed Blocks:** core/term-template
 -	**Supports:** align (full, wide), interactivity, ~~html~~
--	**Attributes:** namespace, tagName, termQuery, termQueryId
+-	**Attributes:** namespace, tagName, termQuery, termQueryId, termsToShow
 
 ## Text Columns (deprecated)
 

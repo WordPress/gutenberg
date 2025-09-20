@@ -5,8 +5,9 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	dateI18n,
-	getDate,
 	getSettings as getDateSettings,
+	humanTimeDiff,
+	getDate,
 } from '@wordpress/date';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -69,6 +70,8 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 						dateTimeFormat,
 						date ? getDate( date ) : currentDate
 					) }
+					<br />
+					{ humanTimeDiff( date ? getDate( date ) : currentDate ) }
 				</time>
 			</VStack>
 		</>

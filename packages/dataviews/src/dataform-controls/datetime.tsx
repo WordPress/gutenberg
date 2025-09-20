@@ -23,6 +23,7 @@ import type { DataFormControlProps } from '../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../constants';
 import RelativeDateControl, {
 	TIME_UNITS_OPTIONS,
+	type DateRelative,
 } from './relative-date-control';
 import { unlock } from '../lock-unlock';
 
@@ -57,7 +58,7 @@ function CalendarDateTimeControl( {
 }: {
 	id: string;
 	value: string | undefined;
-	onChange: ( value: any ) => void;
+	onChange: ( value: string | undefined ) => void;
 	label: string;
 	description?: string;
 	hideLabelFromVision?: boolean;
@@ -86,12 +87,12 @@ function CalendarDateTimeControl( {
 				}
 
 				const dateTimeValue = finalDateTime.toISOString();
-				onChange( { [ id ]: dateTimeValue } );
+				onChange( dateTimeValue );
 			} else {
-				onChange( { [ id ]: undefined } );
+				onChange( undefined );
 			}
 		},
-		[ id, onChange, value ]
+		[ onChange, value ]
 	);
 
 	const handleManualDateTimeChange = useCallback(
@@ -99,7 +100,7 @@ function CalendarDateTimeControl( {
 			if ( newValue ) {
 				// Convert from datetime-local format to ISO string
 				const dateTime = new Date( newValue );
-				onChange( { [ id ]: dateTime.toISOString() } );
+				onChange( dateTime.toISOString() );
 
 				// Update calendar month to match
 				const parsedDate = parseDateTime( dateTime.toISOString() );
@@ -107,10 +108,10 @@ function CalendarDateTimeControl( {
 					setCalendarMonth( parsedDate );
 				}
 			} else {
-				onChange( { [ id ]: undefined } );
+				onChange( undefined );
 			}
 		},
-		[ id, onChange ]
+		[ onChange ]
 	);
 
 	const {
@@ -166,8 +167,20 @@ export default function DateTime< Item >( {
 	hideLabelFromVision,
 	operator,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description } = field;
-	const value = field.getValue( { item: data } );
+	const { id, label, description, getValue, setValue } = field;
+	const value = getValue( { item: data } );
+
+	const onChangeRelativeDateControl = useCallback(
+		( newValue: DateRelative ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
+
+	const onChangeCalendarDateTimeControl = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( setValue( { item: data, value: newValue } ) ),
+		[ data, onChange, setValue ]
+	);
 
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -175,7 +188,7 @@ export default function DateTime< Item >( {
 				className="dataviews-controls__datetime"
 				id={ id }
 				value={ value && typeof value === 'object' ? value : {} }
-				onChange={ onChange }
+				onChange={ onChangeRelativeDateControl }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				options={ TIME_UNITS_OPTIONS[ operator ] }
@@ -187,7 +200,7 @@ export default function DateTime< Item >( {
 		<CalendarDateTimeControl
 			id={ id }
 			value={ typeof value === 'string' ? value : undefined }
-			onChange={ onChange }
+			onChange={ onChangeCalendarDateTimeControl }
 			label={ label }
 			description={ description }
 			hideLabelFromVision={ hideLabelFromVision }
