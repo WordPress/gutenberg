@@ -30,10 +30,12 @@ function BetweenControls( {
 	value,
 	onChange,
 	hideLabelFromVision,
+	step,
 }: {
 	value: NumberBetween;
 	onChange: ( [ min, max ]: NumberBetween ) => void;
 	hideLabelFromVision?: boolean;
+	step?: 'any' | number;
 } ) {
 	const [ min = '', max = '' ] = value;
 
@@ -62,6 +64,7 @@ function BetweenControls( {
 					onChange={ onChangeMin }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
+					step={ step }
 				/>
 				<CoreNumberControl
 					label={ __( 'Max.' ) }
@@ -70,6 +73,7 @@ function BetweenControls( {
 					onChange={ onChangeMax }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
+					step={ step }
 				/>
 			</Flex>
 		</BaseControl>
@@ -82,8 +86,10 @@ export default function NumberControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue } = field;
+	const { step = 'any' } = config || {};
 	const value = getValue( { item: data } ) ?? '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -165,6 +171,7 @@ export default function NumberControl< Item >( {
 				value={ valueBetween }
 				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
+				step={ step }
 			/>
 		);
 	}
@@ -180,6 +187,7 @@ export default function NumberControl< Item >( {
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
+			step={ step }
 		/>
 	);
 }
