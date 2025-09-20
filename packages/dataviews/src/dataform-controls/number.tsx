@@ -42,6 +42,10 @@ function BetweenControls( {
 	suffix: React.ReactNode;
 } ) {
 	const [ min = '', max = '' ] = value;
+	let increment = 0;
+	if ( typeof step === 'number' && step > 0 ) {
+		increment = step;
+	}
 
 	const onChangeMin = useCallback(
 		( newValue: string | undefined ) =>
@@ -64,7 +68,7 @@ function BetweenControls( {
 				<CoreNumberControl
 					label={ __( 'Min.' ) }
 					value={ min }
-					max={ max ? Number( max ) - 1 : undefined }
+					max={ max ? Number( max ) - increment : undefined }
 					onChange={ onChangeMin }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
@@ -75,7 +79,7 @@ function BetweenControls( {
 				<CoreNumberControl
 					label={ __( 'Max.' ) }
 					value={ max }
-					min={ min ? Number( min ) + 1 : undefined }
+					min={ min ? Number( min ) + increment : undefined }
 					onChange={ onChangeMax }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
