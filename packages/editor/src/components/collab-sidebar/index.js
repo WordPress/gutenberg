@@ -361,6 +361,11 @@ export default function CollabSidebar() {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
+	// If postId is not a valid number, do not render the comment sidebar. 1Code has comments. Press enter to view.
+	if ( ! ( !! postId && typeof postId === 'number' ) ) {
+		return null;
+	}
+
 	return (
 		<>
 			<AddCommentComponent
