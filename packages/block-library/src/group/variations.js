@@ -104,6 +104,7 @@ const variations = [
 			layout: { type: 'constrained' },
 			stretchyText: true,
 		},
+		innerBlocks: [ [ 'core/paragraph' ] ],
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) => blockAttributes.stretchyText === true,
 		icon: textColor,
