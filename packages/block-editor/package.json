@@ -27,6 +27,9 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptModuleExports": {
+		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.js"
+	},
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",

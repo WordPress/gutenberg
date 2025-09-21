@@ -12,6 +12,7 @@
 @import "./components/plain-text/content.scss";
 @import "./components/rich-text/content.scss";
 @import "./components/warning/content.scss";
+@import "./hooks/fit-text.scss";
 
 // To do: ideally the iframe does not contain UI, but there's still the block
 // placeholders that will be moved to shadow DOM in the future.
