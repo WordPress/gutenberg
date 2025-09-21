@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import deepMerge from 'deepmerge';
-
-/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -38,13 +33,7 @@ export default function TableControl< Item >( {
 			// hence the RowType.
 			const updatedValue = value.map( ( row: RowType, index: number ) => {
 				if ( index === rowIndex ) {
-					return deepMerge(
-						row,
-						childField.setValue( {
-							item: row,
-							value: newValue,
-						} )
-					);
+					return { ...row, ...newValue };
 				}
 				return row;
 			} );
@@ -83,22 +72,20 @@ export default function TableControl< Item >( {
 							<tr key={ rowIndex }>
 								{ children.map( ( childField ) => (
 									<td key={ childField.id }>
-										<input
-											type="text"
-											value={ childField.getValue( {
-												item: row,
-											} ) }
-											onChange={ ( e ) =>
-												onChangeRow(
-													rowIndex,
-													childField,
-													e.target.value
-												)
-											}
-											placeholder={
-												childField.placeholder
-											}
-										/>
+										{ childField.Edit && (
+											<childField.Edit
+												data={ row }
+												field={ childField }
+												onChange={ ( newValue: any ) =>
+													onChangeRow(
+														rowIndex,
+														childField,
+														newValue
+													)
+												}
+												hideLabelFromVision
+											/>
+										) }
 									</td>
 								) ) }
 							</tr>

@@ -39,41 +39,35 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	const value = field.getValue( { item } ) || [];
 
-	// If field has children, render as table
+	// If field has children, render as list
 	if ( field.children && field.children.length > 0 ) {
 		if ( ! Array.isArray( value ) || value.length === 0 ) {
 			return null;
 		}
 
 		return (
-			<div className="dataviews-array-table">
-				<table>
-					<thead>
-						<tr>
-							{ field.children.map( ( child ) => (
-								<th key={ child.id }>
-									{ child.label || child.id }
-								</th>
+			<div className="dataviews-array-list">
+				<ul>
+					{ value.map( ( row, index ) => (
+						<li key={ index }>
+							{ field.children.map( ( child, childIndex ) => (
+								<span key={ child.id }>
+									{ childIndex > 0 && ', ' }
+									<strong>{ child.label }:</strong>{ ' ' }
+									<child.render
+										item={ row }
+										field={ child }
+									/>
+								</span>
 							) ) }
-						</tr>
-					</thead>
-					<tbody>
-						{ value.map( ( row, index ) => (
-							<tr key={ index }>
-								{ field.children!.map( ( child ) => (
-									<td key={ child.id }>
-										{ row[ child.id ] || '' }
-									</td>
-								) ) }
-							</tr>
-						) ) }
-					</tbody>
-				</table>
+						</li>
+					) ) }
+				</ul>
 			</div>
 		);
 	}
 
-	// Default behavior for simple arrays
+	// Otherwise, render as string.
 	return value.join( ', ' );
 }
 
@@ -108,7 +102,7 @@ const arrayFieldType: FieldTypeDefinition< any > = {
 			return null;
 		},
 	},
-	Edit: 'array', // Use array control by default, but this will be overridden by getControl logic
+	Edit: 'array',
 	render,
 	enableSorting: true,
 	filterBy: {
