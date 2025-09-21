@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stretchy Text - JavaScript Approach</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .container {
+            width: 80%;
+            height: 200px;
+            border: 2px solid #333;
+            resize: both;
+            overflow: hidden;
+            background: #f9f9f9;
+            min-width: 100px;
+            min-height: 50px;
+            box-sizing: border-box;
+        }
+        .container > * {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <h1>Main Heading</h1>
+        <h2>Subheading</h2>
+        <p>This is the first paragraph of text that will scale along with the headings above.</p>
+        <p>This is a second paragraph that demonstrates how multiple text elements can be scaled together while maintaining their proportional relationships.</p>
+    </div>
+    <div class="container" id="container-2">
+        <p>Stretch text</p>
+    </div>
+    <div class="container">
+        <p style="font-size: 30px;">Stretch text</p>
+        <p style="font-size: 15px;">Stretch text</p>
+    </div>
+
+
+    <script>
+        // Shared style element for all dynamic CSS
+        let dynamicStyleElement = null;
+
+        function createDynamicStyleElement() {
+            if (!dynamicStyleElement) {
+                dynamicStyleElement = document.createElement('style');
+                document.head.appendChild(dynamicStyleElement);
+            }
+            return dynamicStyleElement;
+        }
+
+        function generateUniqueClass() {
+            return 'stretchy-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function initializeStretchyContainer(containerElement) {
+            // Generate unique class for this container
+            const uniqueClass = generateUniqueClass();
+            containerElement.classList.add(uniqueClass);
+
+            // Calculate font ratios for this container
+            const fontRatios = calculateFontRatios(containerElement, uniqueClass);
+
+            // Store ratios on the container element
+            containerElement._stretchyData = {
+                uniqueClass: uniqueClass,
+                fontRatios: fontRatios
+            };
+
+            // Initial sizing
+            stretchText(containerElement);
+
+            // Watch for container resize
+            if (window.ResizeObserver) {
+                const resizeObserver = new ResizeObserver(() => {
+                    stretchText(containerElement);
+                });
+                resizeObserver.observe(containerElement);
+            }
+        }
+
+        function calculateFontRatios(containerElement, uniqueClass) {
+            const textElements = containerElement.querySelectorAll('h1, h2, p');
+            const elementSizes = [];
+            let minSize = Infinity;
+
+            // Temporarily clear any dynamic styles to get CSS values
+            updateDynamicCSS(uniqueClass, []);
+
+            textElements.forEach(element => {
+                const computedStyle = window.getComputedStyle(element);
+                const fontSize = parseFloat(computedStyle.fontSize);
+                elementSizes.push(fontSize);
+                minSize = Math.min(minSize, fontSize);
+            });
+
+            // Calculate ratios relative to smallest font size
+            const fontRatios = elementSizes.map(fontSize => fontSize / minSize);
+
+            return fontRatios;
+        }
+
+        function updateDynamicCSS(uniqueClass, fontSizes) {
+            const styleElement = createDynamicStyleElement();
+
+            // Generate CSS rules for this container
+            let cssRules = '';
+            fontSizes.forEach((fontSize, index) => {
+                const selector = `.${uniqueClass} > *:nth-child(${index + 1})`;
+                cssRules += `${selector} { font-size: ${fontSize}px !important; }\n`;
+            });
+
+            // Update or add rules for this container
+            const existingContent = styleElement.textContent || '';
+            const classPattern = new RegExp(`\\.${uniqueClass}[^}]*}`, 'g');
+            const newContent = existingContent.replace(classPattern, '') + cssRules;
+            styleElement.textContent = newContent;
+        }
+
+        function stretchText(containerElement) {
+            const data = containerElement._stretchyData;
+            if (!data) return;
+
+            const { uniqueClass, fontRatios } = data;
+
+            let minSize = 1;
+            let maxSize = 200;
+            let bestSize = minSize;
+
+            // Binary search for optimal base font size
+            while (minSize <= maxSize) {
+                const midSize = Math.floor((minSize + maxSize) / 2);
+
+                // Generate font sizes for this test
+                const testSizes = fontRatios.map(ratio => midSize * ratio);
+
+                // Apply test sizes via CSS
+                updateDynamicCSS(uniqueClass, testSizes);
+
+                const fitsWidth = containerElement.scrollWidth <= containerElement.clientWidth;
+                const fitsHeight = containerElement.scrollHeight <= containerElement.clientHeight;
+
+                if (fitsWidth && fitsHeight) {
+                    bestSize = midSize;
+                    minSize = midSize + 1;
+                } else {
+                    maxSize = midSize - 1;
+                }
+            }
+
+            // Apply final optimal sizes
+            const finalSizes = fontRatios.map(ratio => bestSize * ratio);
+            updateDynamicCSS(uniqueClass, finalSizes);
+        }
+
+        // Initialize all containers with the 'container' class
+        document.addEventListener('DOMContentLoaded', function() {
+            const containers = document.querySelectorAll('.container');
+            containers.forEach(initializeStretchyContainer);
+        });
+    </script>
+</body>
+</html>

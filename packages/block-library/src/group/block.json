@@ -18,6 +18,10 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
+		},
+		"stretchyText": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -94,5 +98,6 @@
 		}
 	},
 	"editorStyle": "wp-block-group-editor",
-	"style": "wp-block-group"
+	"style": "wp-block-group",
+	"viewScriptModule": "@wordpress/block-library/group/view"
 }

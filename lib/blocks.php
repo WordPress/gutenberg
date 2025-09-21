@@ -76,6 +76,7 @@ function gutenberg_reregister_core_block_types() {
 				'home-link.php'                    => 'core/home-link',
 				'image.php'                        => 'core/image',
 				'gallery.php'                      => 'core/gallery',
+				'group.php'                        => 'core/group',
 				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { group, row, stack, grid } from '@wordpress/icons';
+import { group, row, stack, grid, textColor } from '@wordpress/icons';
 
 const example = {
 	innerBlocks: [
@@ -95,6 +95,37 @@ const variations = [
 			blockAttributes.layout?.type === 'grid',
 		icon: grid,
 		example,
+	},
+	{
+		name: 'group-stretchy-text',
+		title: __( 'Stretchy Text' ),
+		description: __( 'Text that scales to fit the container.' ),
+		attributes: {
+			layout: { type: 'constrained' },
+			stretchyText: true,
+		},
+		scope: [ 'block', 'inserter', 'transform' ],
+		isActive: ( blockAttributes ) => blockAttributes.stretchyText === true,
+		icon: textColor,
+		example: {
+			innerBlocks: [
+				{
+					name: 'core/heading',
+					attributes: {
+						content: __( 'Stretchy Heading' ),
+						level: 1,
+					},
+				},
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: __(
+							'This text will scale to fit the container size.'
+						),
+					},
+				},
+			],
+		},
 	},
 ];
 
