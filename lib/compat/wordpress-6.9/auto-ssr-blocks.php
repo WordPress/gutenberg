@@ -12,11 +12,11 @@
  * and passes them to JavaScript for auto-registration with ServerSideRender.
  */
 function gutenberg_register_auto_ssr_blocks() {
-	$auto_ssr_blocks = array();
+	$auto_ssr_blocks   = array();
 	$registered_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
 	foreach ( $registered_blocks as $block_name => $block_type ) {
-		$has_auto_ssr_flag = ! empty( $block_type->auto_ssr ) || ! empty( $block_type->supports['auto_ssr'] );
+		$has_auto_ssr_flag   = ! empty( $block_type->auto_ssr ) || ! empty( $block_type->supports['auto_ssr'] );
 		$has_render_callback = ! empty( $block_type->render_callback );
 
 		if ( $has_auto_ssr_flag && $has_render_callback ) {
@@ -34,4 +34,3 @@ function gutenberg_register_auto_ssr_blocks() {
 }
 
 add_action( 'enqueue_block_editor_assets', 'gutenberg_register_auto_ssr_blocks', 5 );
-
