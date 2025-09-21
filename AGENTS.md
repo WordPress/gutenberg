@@ -15,10 +15,15 @@ npm run build          # Production build
 
 ### Key Directories
 
--   `/packages/` - JavaScript packages
+-   `/packages/` - JavaScript packages (each has README.md and CHANGELOG.md)
 -   `/lib/` - PHP code
--   `/lib/compat/wordpress-X.Y/` - Version-specific features
+-   `/lib/compat/wordpress-X.Y/` - Version-specific features (new PHP features usually go here)
 -   `/phpunit/` - PHP tests
+-   `/docs/` - Documentation
+    -   `/docs/contributors/` - Contributing guides
+    -   `/docs/explanations/architecture/` - System architecture docs
+    -   `/docs/how-to-guides/` - Implementation tutorials
+    -   `/docs/reference-guides/` - API documentation
 
 ## Testing instructions
 
@@ -52,5 +57,4 @@ vendor/bin/phpcbf lib/compat/wordpress-6.9/file.php
 ## PR instructions
 
 -   Ensure build passes
--   Fix all formatting/linting issues, these are enforced through CI in PRs
--   Run relevant tests
+-   Fix all formatting/linting issues; these are enforced through CI in PRs
