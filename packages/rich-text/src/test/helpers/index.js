@@ -11,6 +11,10 @@ const em = { type: 'em' };
 const strong = { type: 'strong' };
 const img = { type: 'img', attributes: { src: '' } };
 const a = { type: 'a', attributes: { href: '#' } };
+const math = { type: 'math' };
+const mi = { type: 'mi' };
+const mo = { type: 'mo' };
+const mtext = { type: 'mtext' };
 
 export const spec = [
 	{
@@ -772,6 +776,71 @@ export const specWithRegistration = [
 				},
 			],
 			text: OBJECT_REPLACEMENT_CHARACTER,
+		},
+	},
+	{
+		description: 'should handle simple MathML expression',
+		html: '<math><mi>x</mi></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'mi' ).firstChild,
+			endOffset: 1,
+			endContainer: element.querySelector( 'mi' ).firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 1 ],
+		value: {
+			formats: [ [ math, mi ] ],
+			replacements: [],
+			text: 'x',
+		},
+	},
+	{
+		description: 'should handle MathML with operator',
+		html: '<math><mi>x</mi><mo>+</mo><mi>y</mi></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'mi' ).firstChild,
+			endOffset: 1,
+			endContainer: element.querySelectorAll( 'mi' )[ 1 ].firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 2, 1 ],
+		value: {
+			formats: [
+				[ math, mi ],
+				[ math, mo ],
+				[ math, mi ],
+			],
+			replacements: [ , , , ],
+			text: 'x+y',
+		},
+	},
+	{
+		description: 'should handle HTML within MathML mtext',
+		html: '<math><mtext><strong>bold text</strong></mtext></math>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'strong' ).firstChild,
+			endOffset: 9,
+			endContainer: element.querySelector( 'strong' ).firstChild,
+		} ),
+		startPath: [ 0, 0, 0, 0 ],
+		endPath: [ 0, 0, 0, 9 ],
+		value: {
+			formats: [
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+				[ math, mtext, strong ],
+			],
+			replacements: [ , , , , , , , , , ],
+			text: 'bold text',
 		},
 	},
 ];
