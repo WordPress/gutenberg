@@ -9,7 +9,7 @@ import deepMerge from 'deepmerge';
 import {
 	Flex,
 	BaseControl,
-	__experimentalNumberControl as CoreNumberControl,
+	__experimentalNumberControl as NumberControl,
 	privateApis,
 } from '@wordpress/components';
 import { useCallback, useState, createElement } from '@wordpress/element';
@@ -73,7 +73,7 @@ function BetweenControls( {
 			help={ __( 'The max. value must be greater than the min. value.' ) }
 		>
 			<Flex direction="row" gap={ 4 }>
-				<CoreNumberControl
+				<NumberControl
 					label={ __( 'Min.' ) }
 					value={ min }
 					max={ max ? Number( max ) - increment : undefined }
@@ -84,7 +84,7 @@ function BetweenControls( {
 					prefix={ prefix }
 					suffix={ suffix }
 				/>
-				<CoreNumberControl
+				<NumberControl
 					label={ __( 'Max.' ) }
 					value={ max }
 					min={ min ? Number( min ) + increment : undefined }
@@ -100,7 +100,7 @@ function BetweenControls( {
 	);
 }
 
-export default function NumberControl< Item >( {
+export default function DataFormNumberControl< Item >( {
 	data,
 	field,
 	onChange,

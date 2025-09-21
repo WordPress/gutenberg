@@ -34,35 +34,43 @@ function isEmpty( value: unknown ): value is '' | undefined | null {
 	return value === '' || value === undefined || value === null;
 }
 
+export function getValidation( isInteger = false ) {
+	return ( item: any, field: NormalizedField< any > ) => {
+		const value = field.getValue( { item } );
+
+		if ( isEmpty( value ) ) {
+			return null;
+		}
+
+		const numericValue = Number( value );
+
+		if ( isInteger ) {
+			if ( ! Number.isInteger( numericValue ) ) {
+				return __( 'Value must be an integer.' );
+			}
+		} else if ( ! Number.isFinite( numericValue ) ) {
+			return __( 'Value must be a number.' );
+		}
+
+		if ( field?.elements ) {
+			const isMember = field.elements.some(
+				( element ) =>
+					Number.isFinite( Number( element.value ) ) &&
+					Number( element.value ) === numericValue
+			);
+			if ( ! isMember ) {
+				return __( 'Value must be one of the elements.' );
+			}
+		}
+
+		return null;
+	};
+}
+
 export default {
 	sort,
 	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-
-			if ( isEmpty( value ) ) {
-				return null;
-			}
-
-			const numericValue = Number( value );
-
-			if ( ! Number.isFinite( numericValue ) ) {
-				return __( 'Value must be a number.' );
-			}
-
-			if ( field?.elements ) {
-				const isMember = field.elements.some(
-					( element ) =>
-						Number.isFinite( Number( element.value ) ) &&
-						Number( element.value ) === numericValue
-				);
-				if ( ! isMember ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
+		custom: getValidation(),
 	},
 	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
