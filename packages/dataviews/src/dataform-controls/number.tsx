@@ -26,6 +26,14 @@ const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
+function toNumberOrEmpty( value?: string ) {
+	if ( value === '' || value === undefined ) {
+		return '';
+	}
+	const number = Number( value );
+	return Number.isFinite( number ) ? number : '';
+}
+
 function BetweenControls( {
 	value,
 	onChange,
@@ -49,13 +57,13 @@ function BetweenControls( {
 
 	const onChangeMin = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( [ Number( newValue ), max ] ),
+			onChange( [ toNumberOrEmpty( newValue ), max ] ),
 		[ onChange, max ]
 	);
 
 	const onChangeMax = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( [ min, Number( newValue ) ] ),
+			onChange( [ min, toNumberOrEmpty( newValue ) ] ),
 		[ onChange, min ]
 	);
 
