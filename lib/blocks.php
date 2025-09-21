@@ -249,9 +249,6 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
-	if ($block_name === 'core/post-breadcrumb') {
-			var_dump( 'hello' );
-	}
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
@@ -276,7 +273,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
-
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {

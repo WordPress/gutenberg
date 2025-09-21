@@ -34,20 +34,23 @@ function render_block_core_post_breadcrumb( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Get the separator from attributes.
-	$separator = isset( $attributes['separator'] ) ? $attributes['separator'] : '/';
+	// Get attributes.
+	$separator     = isset( $attributes['separator'] ) ? $attributes['separator'] : '/';
+	$show_home_link = isset( $attributes['showHomeLink'] ) ? $attributes['showHomeLink'] : true;
 
 	// Build breadcrumb items.
 	$breadcrumb_items = array();
 
-	// Add home link.
-	$home_url   = home_url();
-	$home_title = __( 'Home' );
-	$breadcrumb_items[] = sprintf(
-		'<a href="%s">%s</a>',
-		esc_url( $home_url ),
-		esc_html( $home_title )
-	);
+	// Add home link if enabled.
+	if ( $show_home_link ) {
+		$home_url   = home_url();
+		$home_title = __( 'Home' );
+		$breadcrumb_items[] = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $home_url ),
+			esc_html( $home_title )
+		);
+	}
 
 	// Get ancestors.
 	$ancestors = get_post_ancestors( $post_id );

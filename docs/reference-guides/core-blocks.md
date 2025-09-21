@@ -611,6 +611,15 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
 
+## Post Breadcrumb
+
+Display a breadcrumb trail for hierarchical posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumb))
+
+-	**Name:** core/post-breadcrumb
+-	**Category:** theme
+-	**Supports:** ~~html~~, ~~reusable~~
+-	**Attributes:** separator, showHomeLink
+
 ## Comment (deprecated)
 
 This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))

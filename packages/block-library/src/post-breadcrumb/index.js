@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { postContent as icon } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon,
+	icon: moreHorizontal,
 	edit,
 };
 

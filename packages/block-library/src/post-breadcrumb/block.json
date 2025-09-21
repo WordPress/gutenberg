@@ -10,12 +10,13 @@
 		"separator": {
 			"type": "string",
 			"default": "/"
+		},
+		"showHomeLink": {
+			"type": "boolean",
+			"default": true
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"reusable": false

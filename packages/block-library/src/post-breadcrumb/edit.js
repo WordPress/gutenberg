@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
@@ -11,7 +12,8 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import ServerSideRender from '@wordpress/server-side-render';
+import { RawHTML } from '@wordpress/element';
+import { useServerSideRender } from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies
@@ -26,7 +28,7 @@ export default function PostBreadcrumbEdit( {
 	setAttributes,
 	context: { postId, postType },
 } ) {
-	const { separator } = attributes;
+	const { separator, showHomeLink } = attributes;
 
 	const postTypeObject = useSelect(
 		( select ) => {
@@ -40,6 +42,12 @@ export default function PostBreadcrumbEdit( {
 
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const { content } = useServerSideRender( {
+		attributes,
+		block: 'core/post-breadcrumb',
+		urlQueryArgs: { post_id: postId },
+	} );
 
 	// If no post context, show placeholder.
 	if ( ! postId || ! postType ) {
@@ -63,12 +71,32 @@ export default function PostBreadcrumbEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							separator: defaultValue,
+							showHomeLink: true,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Make title a link' ) }
+						label={ __( 'Show home link' ) }
+						isShownByDefault
+						hasValue={ () => ! showHomeLink }
+						onDeselect={ () =>
+							setAttributes( {
+								showHomeLink: true,
+							} )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show home link' ) }
+							onChange={ ( value ) =>
+								setAttributes( { showHomeLink: value } )
+							}
+							checked={ showHomeLink }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Separator' ) }
 						isShownByDefault
 						hasValue={ () => separator !== defaultValue }
 						onDeselect={ () =>
@@ -99,11 +127,7 @@ export default function PostBreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<ServerSideRender
-					block="core/post-breadcrumb"
-					attributes={ attributes }
-					context={ { postId, postType } }
-				/>
+				<RawHTML>{ content }</RawHTML>
 			</div>
 		</>
 	);
