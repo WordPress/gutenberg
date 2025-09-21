@@ -88,6 +88,7 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/preload.php';
+require __DIR__ . '/compat/wordpress-6.9/auto-ssr-blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
