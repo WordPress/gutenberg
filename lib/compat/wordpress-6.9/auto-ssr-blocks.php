@@ -17,8 +17,9 @@ function gutenberg_register_auto_ssr_blocks() {
 
 	foreach ( $registered_blocks as $block_name => $block_type ) {
 		$has_auto_ssr_flag = ! empty( $block_type->auto_ssr ) || ! empty( $block_type->supports['auto_ssr'] );
+		$has_render_callback = ! empty( $block_type->render_callback );
 
-		if ( $has_auto_ssr_flag ) {
+		if ( $has_auto_ssr_flag && $has_render_callback ) {
 			$auto_ssr_blocks[] = $block_name;
 		}
 	}
