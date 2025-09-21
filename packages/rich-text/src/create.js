@@ -410,7 +410,7 @@ function collapseWhiteSpace( element, isRoot = true ) {
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			collapseWhiteSpace( node, false );
+			node.replaceWith( collapseWhiteSpace( node, false ) );
 		}
 	} );
 	return clone;
