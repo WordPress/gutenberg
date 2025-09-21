@@ -50,7 +50,7 @@ function BetweenControls( {
 	suffix: React.ReactNode;
 } ) {
 	const [ min = '', max = '' ] = value;
-	let increment = 0;
+	let increment = Number.EPSILON;
 	if ( typeof step === 'number' && step > 0 ) {
 		increment = step;
 	}
