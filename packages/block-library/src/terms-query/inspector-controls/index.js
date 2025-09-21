@@ -6,6 +6,7 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +20,20 @@ import EmptyTermsControl from './empty-terms-control';
 import MaxTermsControl from './max-terms-control';
 import AdvancedControls from './advanced-controls';
 
+const usePublicTaxonomies = () => {
+	const taxonomies = useSelect(
+		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		[]
+	);
+	return useMemo( () => {
+		return (
+			taxonomies?.filter(
+				( { visibility } ) => visibility?.publicly_queryable
+			) || []
+		);
+	}, [ taxonomies ] );
+};
+
 export default function TermsQueryInspectorControls( {
 	attributes,
 	setQuery,
@@ -28,15 +43,7 @@ export default function TermsQueryInspectorControls( {
 } ) {
 	const { termQuery, termsToShow } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
-	const { taxonomies } = useSelect( ( select ) => {
-		const { getEntityRecords } = select( coreStore );
-		const allTaxonomies = getEntityRecords( 'root', 'taxonomy' );
-		return {
-			taxonomies:
-				allTaxonomies?.filter( ( t ) => t.visibility.public ) || [],
-		};
-	}, [] );
+	const taxonomies = usePublicTaxonomies();
 
 	const { templateSlug } = useSelect( ( select ) => {
 		// @wordpress/block-library should not depend on @wordpress/editor.
