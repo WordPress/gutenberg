@@ -68,7 +68,6 @@ export default function DisplayOptions( {
 			isShownByDefault
 		>
 			<RadioControl
-				__nextHasNoMarginBottom
 				label={ __( 'Terms to show' ) }
 				options={ getOptions(
 					displayTopLevelControl,
