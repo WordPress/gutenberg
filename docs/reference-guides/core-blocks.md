@@ -611,11 +611,11 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
 
-## Post Breadcrumb
+## Post Breadcrumbs
 
-Display a breadcrumb trail for hierarchical posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumb))
+Display a breadcrumb trail for hierarchical posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumbs))
 
--	**Name:** core/post-breadcrumb
+-	**Name:** core/post-breadcrumbs
 -	**Category:** theme
 -	**Supports:** ~~html~~, ~~reusable~~
 -	**Attributes:** separator, showHomeLink

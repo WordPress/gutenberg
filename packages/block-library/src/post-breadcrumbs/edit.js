@@ -45,7 +45,7 @@ export default function PostBreadcrumbEdit( {
 
 	const { content } = useServerSideRender( {
 		attributes,
-		block: 'core/post-breadcrumb',
+		block: 'core/post-breadcrumbs',
 		urlQueryArgs: { post_id: postId },
 	} );
 

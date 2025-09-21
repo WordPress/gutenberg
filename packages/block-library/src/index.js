@@ -87,7 +87,7 @@ import * as paragraph from './paragraph';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
-import * as postBreadcrumb from './post-breadcrumb';
+import * as postBreadcrumbs from './post-breadcrumbs';
 import * as postComment from './post-comment';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
@@ -217,7 +217,7 @@ const getAllBlocks = () => {
 		postContent,
 		postAuthor,
 		postAuthorName,
-		postBreadcrumb,
+		postBreadcrumbs,
 		postComment,
 		postCommentsCount,
 		postCommentsLink,

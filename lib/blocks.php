@@ -91,7 +91,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-author.php'                  => 'core/post-author',
 				'post-author-name.php'             => 'core/post-author-name',
 				'post-author-biography.php'        => 'core/post-author-biography',
-				'post-breadcrumb.php'              => 'core/post-breadcrumb',
+				'post-breadcrumbs.php'              => 'core/post-breadcrumbs',
 				'post-comment.php'                 => 'core/post-comment',
 				'post-comments-count.php'          => 'core/post-comments-count',
 				'post-comments-form.php'           => 'core/post-comments-form',
