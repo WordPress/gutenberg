@@ -86,6 +86,21 @@ export function isItemValid< Item >(
 			return false;
 		}
 
+		// The array field.type can have children, so check them as well
+		if ( field.type === 'array' && field.children?.length > 0 ) {
+			return field
+				.getValue( { item } )
+				.every( ( row: Record< string, unknown > ) => {
+					return isItemValid(
+						row,
+						field.children as Field< Record< string, unknown > >[],
+						{
+							fields: field.children.map( ( child ) => child.id ),
+						}
+					);
+				} );
+		}
+
 		return true;
 	} );
 }
