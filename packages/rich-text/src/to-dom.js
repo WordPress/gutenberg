@@ -90,7 +90,7 @@ function append( element, child ) {
 					type
 				);
 			} else if ( parentNamespace === MATHML_NAMESPACE ) {
-				if ( type === 'mtext' ) {
+				if ( element.tagName === 'MTEXT' ) {
 					// mtext switches back to HTML namespace for phrasing content
 					child = element.ownerDocument.createElement( type );
 				} else {
