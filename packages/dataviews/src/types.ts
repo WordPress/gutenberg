@@ -211,7 +211,7 @@ export type EditConfigNumber = {
 	/**
 	 * Input descrease/increase step.
 	 */
-	step?: number;
+	step?: 'any' | number;
 };
 
 /**
