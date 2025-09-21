@@ -12,7 +12,6 @@ import type {
 	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
-import { renderFromElements } from '../utils';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_NOT,
@@ -31,23 +30,33 @@ function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;
 }
 
+function isEmpty( value: unknown ): value is '' | undefined | null {
+	return value === '' || value === undefined || value === null;
+}
+
 export default {
 	sort,
 	isValid: {
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
 
-			if ( ! [ undefined, '', null ].includes( value ) ) {
+			if ( isEmpty( value ) ) {
 				return null;
 			}
 
-			if ( ! Number.isFinite( value ) ) {
+			const numericValue = Number( value );
+
+			if ( ! Number.isFinite( numericValue ) ) {
 				return __( 'Value must be a number.' );
 			}
 
 			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
+				const isMember = field.elements.some(
+					( element ) =>
+						Number.isFinite( Number( element.value ) ) &&
+						Number( element.value ) === numericValue
+				);
+				if ( ! isMember ) {
 					return __( 'Value must be one of the elements.' );
 				}
 			}
@@ -57,9 +66,19 @@ export default {
 	},
 	Edit: 'number',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
+		const value = field.getValue( { item } );
+		if ( ! isEmpty( value ) && field.elements ) {
+			const numericValue = Number( value );
+			const match = field.elements.find(
+				( element ) =>
+					Number.isFinite( Number( element.value ) ) &&
+					Number( element.value ) === numericValue
+			);
+			if ( match ) {
+				return match.label;
+			}
+		}
+		return value;
 	},
 	enableSorting: true,
 	filterBy: {
