@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
@@ -6,9 +11,11 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../types';
+import type { DataFormControlProps, NormalizedField } from '../types';
 
-export default function ArrayTableControl< Item >( {
+type RowType = Record< string, unknown >;
+
+export default function TableControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -18,13 +25,26 @@ export default function ArrayTableControl< Item >( {
 	const value = getValue( { item: data } );
 
 	const onChangeRow = useCallback(
-		( rowIndex: number, childField: any, newValue: any ) => {
-			const updatedValue = value.map( ( row: any, index: number ) => {
+		(
+			rowIndex: number,
+			childField: NormalizedField< RowType >,
+			newValue: any
+		) => {
+			// DataForm takes a generic Item type that defines the shape of the data, as in:
+			// { id: 1, table: [ {column1: '', column2: ''}] }
+			//
+			// At this point, we are working with each item of the array, an object like
+			// { column1: '', column2: '' }, but we don't have its type information,
+			// hence the RowType.
+			const updatedValue = value.map( ( row: RowType, index: number ) => {
 				if ( index === rowIndex ) {
-					return {
-						...row,
-						[ childField.id ]: newValue,
-					};
+					return deepMerge(
+						row,
+						childField.setValue( {
+							item: row,
+							value: newValue,
+						} )
+					);
 				}
 				return row;
 			} );
@@ -54,9 +74,7 @@ export default function ArrayTableControl< Item >( {
 					<thead>
 						<tr>
 							{ children.map( ( child ) => (
-								<th key={ child.id }>
-									{ child.label || child.id }
-								</th>
+								<th key={ child.id }>{ child.label }</th>
 							) ) }
 						</tr>
 					</thead>
@@ -67,7 +85,9 @@ export default function ArrayTableControl< Item >( {
 									<td key={ childField.id }>
 										<input
 											type="text"
-											value={ row[ childField.id ] || '' }
+											value={ childField.getValue( {
+												item: row,
+											} ) }
 											onChange={ ( e ) =>
 												onChangeRow(
 													rowIndex,

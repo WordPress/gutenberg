@@ -1763,7 +1763,7 @@ export const DataAdapter = {
 	render: DataAdapterComponent,
 };
 
-export function ResourceListAlternative() {
+export function ResourceList() {
 	type WeeklyOpeningHours = {
 		weeklyOpeningHours: Array< {
 			day: string;
