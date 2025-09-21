@@ -35,7 +35,7 @@ function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 	}
 
 	// Get attributes.
-	$separator     = isset( $attributes['separator'] ) ? $attributes['separator'] : '/';
+	$separator      = isset( $attributes['separator'] ) ? $attributes['separator'] : '/';
 	$show_home_link = isset( $attributes['showHomeLink'] ) ? $attributes['showHomeLink'] : true;
 
 	// Build breadcrumb items.
@@ -45,6 +45,7 @@ function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 	if ( $show_home_link ) {
 		$home_url   = home_url();
 		$home_title = __( 'Home' );
+
 		$breadcrumb_items[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $home_url ),
@@ -79,9 +80,15 @@ function render_block_core_post_breadcrumbs( $attributes, $content, $block ) {
 	$breadcrumb_html = sprintf(
 		'<nav %s><ol>%s</ol></nav>',
 		$wrapper_attributes,
-		implode( '', array_map( function( $item ) {
-			return '<li>' . $item . '</li>';
-		}, $breadcrumb_items ) )
+		implode(
+			'',
+			array_map(
+				function ( $item ) {
+					return '<li>' . $item . '</li>';
+				},
+				$breadcrumb_items
+			)
+		)
 	);
 
 	return $breadcrumb_html;
