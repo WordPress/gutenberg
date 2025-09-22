@@ -33,17 +33,17 @@ npm run build          # Production build
 # JavaScript
 npm test                   # All JS tests
 npm run test:unit         # Unit tests
-npm run test:unit -- --testNamePattern="Button"  # Specific test
-npm run test:unit packages/components/src/button/test/
+npm run test:unit -- --testNamePattern="<TestName>"  # Specific test
+npm run test:unit <path_to_test_directory>
 
 # PHP (requires wp-env)
 composer test             # All PHP tests
-vendor/bin/phpunit phpunit/class-wp-theme-json-test.php  # Specific file
-vendor/bin/phpunit phpunit/block-supports/              # Directory
+vendor/bin/phpunit <path_to_test_file.php>  # Specific file
+vendor/bin/phpunit <path_to_test_directory>/              # Directory
 
 # E2E (requires wp-env)
 npm run test:e2e
-npm run test:e2e -- site-editor/title.spec.js  # Specific test file
+npm run test:e2e -- <path_to_test_file.spec.js>  # Specific test file
 npm run test:e2e -- --headed                   # Run with browser visible
 
 # Code Quality
@@ -53,7 +53,7 @@ vendor/bin/phpcbf        # Fix PHP standards
 vendor/bin/phpcs         # Check PHP standards
 
 # Specific files
-vendor/bin/phpcbf lib/compat/wordpress-6.9/file.php
+vendor/bin/phpcbf <path_to_php_file.php>
 ```
 
 ## PR instructions
