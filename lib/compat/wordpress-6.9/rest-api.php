@@ -31,36 +31,6 @@ function gutenberg_rest_theme_export_link_rel( $response, $theme ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 );
 
 /**
- * Use the `comments_save_pre` filter to remove the dummy content added to work around
- * the REST API's limitation which does not allow empty content.
- *
- * Note: Comments with empty content will be supported in WordPress 6.9. Once that becomes
- * the minimum required version, this function can be removed and actual empty comments sent.
- */
-function gutenberg_remove_dummy_content_from_empty_comments( $comment ) {
-	if ( '<!-- GUTENBERG_COMMENT_PLACEHOLDER -->' === $comment->comment_content ) {
-		$comment->comment_content = '';
-	}
-	return $comment;
-}
-add_filter( 'comments_save_pre', 'gutenberg_remove_dummy_content_from_empty_comments' );
-
-/**
- * Use the `rest_preprocess_comment` filter to substitute empty comment content with a dummy placeholder.
- * This is required because of the REST API's limitation which does not allow empty content.
- *
- * Note: Comments with empty content will be supported in WordPress 6.9. Once that becomes
- * the minimum required version, this function can be removed and actual empty comments sent.
- */
-function gutenberg_substitute_empty_comment_content( $prepared_comment ) {
-	if ( isset( $prepared_comment['comment_content'] ) && '' === $prepared_comment['comment_content'] ) {
-		$prepared_comment['comment_content'] = '<!-- GUTENBERG_COMMENT_PLACEHOLDER -->';
-	}
-	return $prepared_comment;
-}
-add_filter( 'rest_preprocess_comment', 'gutenberg_substitute_empty_comment_content' );
-
-/**
  * Enable empty comments when the comment_type is 'block_comment'.
  *
  * This is the only filter we should need to allow empty comments once
