@@ -112,7 +112,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 				}
 				var value = dropdown.options[dropdown.selectedIndex].value;
 				if (value && value !== '-1') {
-					location.href = "<?php echo esc_url(home_url()); ?>/?"
+					location.href = "<?php echo esc_url( home_url() ); ?>/?"
 						+ encodeURIComponent(dropdown.name) + '='
 						+ encodeURIComponent(value);
 				}
