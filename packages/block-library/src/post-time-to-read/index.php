@@ -19,13 +19,16 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	}
 
 	$content              = get_the_content();
-	$average_reading_rate = block_core_post_time_to_read_average_reading_speed();
+	$average_reading_rate = isset( $attributes['averageReadingSpeed'] ) ? $attributes['averageReadingSpeed'] : 189;
 	$word_count_type      = wp_get_word_count_type();
 	$total_words          = wp_word_count( $content, $word_count_type );
 
 	if ( ! empty( $attributes['displayAsRange'] ) ) {
 		// Calculate faster reading rate with 20% speed = lower minutes,
 		// and slower reading rate with 20% speed = higher minutes.
+		var_dump( $total_words / $average_reading_rate );
+		var_dump( $total_words / $average_reading_rate * 1.2 );
+		var_dump( round( $total_words / $average_reading_rate * 1.2 ) );
 		$min_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 0.8 ) );
 		$max_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 1.2 ) );
 		if ( $min_minutes === $max_minutes ) {
@@ -58,19 +61,6 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	);
 }
 
-/**
- * Get the average reading speed with filter applied.
- *
- * The default average reading speed is 189 words per minute
- * based on averages from:
- * https://irisreading.com/average-reading-speed-in-various-languages/
- * (Characters/minute used for Chinese rather than words).
- *
- * @return int The average reading speed in words per minute.
- */
-function block_core_post_time_to_read_average_reading_speed() {
-	return apply_filters( 'post_time_to_read_average_reading_speed', 189 );
-}
 
 /**
  * Registers the `core/post-time-to-read` block on the server.
@@ -83,11 +73,5 @@ function register_block_core_post_time_to_read() {
 		)
 	);
 
-	// Make the average reading speed available to the block editor.
-	wp_add_inline_script(
-		'wp-block-editor',
-		'window.timeToReadAverageSpeed = ' . block_core_post_time_to_read_average_reading_speed() . ';',
-		'before'
-	);
 }
 add_action( 'init', 'register_block_core_post_time_to_read' );

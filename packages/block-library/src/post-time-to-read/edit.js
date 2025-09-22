@@ -36,11 +36,8 @@ function PostTimeToReadEdit( {
 	clientId,
 	context,
 } ) {
-	/**
-	 * Average reading rate should come from PHP via wp_localize_script.
-	 * Can be filtered via the 'post_time_to_read_average_reading_speed' PHP filter.
-	 */
-	const AVERAGE_READING_RATE = window.timeToReadAverageSpeed || 189;
+	const { textAlign, displayAsRange, averageReadingSpeed } = attributes;
+	const AVERAGE_READING_RATE = averageReadingSpeed;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -69,7 +66,6 @@ function PostTimeToReadEdit( {
 		setAttributes,
 	] );
 
-	const { textAlign, displayAsRange } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -110,16 +106,17 @@ function PostTimeToReadEdit( {
 
 		const totalWords = wordCount( content || '', wordCountType );
 		if ( displayAsRange ) {
-			const minMinutes = Math.max(
-				1,
-				Math.round( totalWords / ( AVERAGE_READING_RATE * 1.2 ) )
-			);
 			let maxMinutes = Math.max(
 				1,
-				Math.round( totalWords / ( AVERAGE_READING_RATE * 0.8 ) )
+				Math.round( ( totalWords / AVERAGE_READING_RATE ) * 1.2 )
 			);
+			const minMinutes = Math.max(
+				1,
+				Math.round( ( totalWords / AVERAGE_READING_RATE ) * 0.8 )
+			);
+
 			if ( minMinutes === maxMinutes ) {
-				maxMinutes = minMinutes + 1;
+				maxMinutes = maxMinutes + 1;
 			}
 			// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
 			const rangeLabel = _x(
