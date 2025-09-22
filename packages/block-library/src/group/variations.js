@@ -50,23 +50,28 @@ const variations = [
 		name: 'group',
 		title: __( 'Group' ),
 		description: __( 'Gather blocks in a container.' ),
-		attributes: { layout: { type: 'constrained' } },
+		attributes: { layout: { type: 'constrained' }, stretchyText: false },
 		isDefault: true,
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
-			! blockAttributes.layout ||
-			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default' ||
-			blockAttributes.layout?.type === 'constrained',
+			! blockAttributes.stretchyText &&
+			( ! blockAttributes.layout ||
+				! blockAttributes.layout?.type ||
+				blockAttributes.layout?.type === 'default' ||
+				blockAttributes.layout?.type === 'constrained' ),
 		icon: group,
 	},
 	{
 		name: 'group-row',
 		title: _x( 'Row', 'single horizontal line' ),
 		description: __( 'Arrange blocks horizontally.' ),
-		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
+		attributes: {
+			layout: { type: 'flex', flexWrap: 'nowrap' },
+			stretchyText: false,
+		},
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
+			! blockAttributes.stretchyText &&
 			blockAttributes.layout?.type === 'flex' &&
 			( ! blockAttributes.layout?.orientation ||
 				blockAttributes.layout?.orientation === 'horizontal' ),
@@ -77,9 +82,13 @@ const variations = [
 		name: 'group-stack',
 		title: __( 'Stack' ),
 		description: __( 'Arrange blocks vertically.' ),
-		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
+		attributes: {
+			layout: { type: 'flex', orientation: 'vertical' },
+			stretchText: false,
+		},
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
+			! blockAttributes.stretchyText &&
 			blockAttributes.layout?.type === 'flex' &&
 			blockAttributes.layout?.orientation === 'vertical',
 		icon: stack,
@@ -89,9 +98,10 @@ const variations = [
 		name: 'group-grid',
 		title: __( 'Grid' ),
 		description: __( 'Arrange blocks in a grid.' ),
-		attributes: { layout: { type: 'grid' } },
+		attributes: { layout: { type: 'grid' }, stretchText: false },
 		scope: [ 'block', 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
+			! blockAttributes.stretchyText &&
 			blockAttributes.layout?.type === 'grid',
 		icon: grid,
 		example,
@@ -106,7 +116,7 @@ const variations = [
 		},
 		innerBlocks: [ [ 'core/paragraph' ] ],
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) => blockAttributes.stretchyText === true,
+		isActive: [ 'stretchyText' ],
 		icon: textColor,
 		example: {
 			innerBlocks: [
