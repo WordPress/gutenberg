@@ -44,6 +44,7 @@ vendor/bin/phpunit phpunit/block-supports/              # Directory
 # E2E (requires wp-env)
 npm run test:e2e
 npm run test:e2e -- site-editor/title.spec.js  # Specific test file
+npm run test:e2e -- --headed                   # Run with browser visible
 
 # Code Quality
 npm run format            # Fix JS formatting
