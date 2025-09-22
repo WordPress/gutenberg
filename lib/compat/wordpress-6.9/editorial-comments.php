@@ -12,7 +12,6 @@ add_filter( 'admin_comment_types_dropdown', 'gutenberg_add_editorial_comments_to
  * Add a submenu item under "Comments" for "Editorial Comments". This screen shows comments with the "block_comment" type.
  */
 function gutenberg_add_editorial_comments_submenu() {
-	error_log( 'Adding editorial comments submenu' );
 	add_submenu_page(
 		'edit-comments.php',
 		__( 'Editorial Comments', 'gutenberg' ),
