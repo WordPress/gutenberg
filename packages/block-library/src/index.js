@@ -250,6 +250,8 @@ const getAllBlocks = () => {
 		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );
+		blocks.push( tabs );
+		blocks.push( tab );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -257,8 +259,6 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
-		blocks.push( tabs );
-		blocks.push( tab );
 	}
 
 	// When in a WordPress context, conditionally
