@@ -789,6 +789,71 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
 	} );
 
+	test( 'should disable editing for pattern blocks without overrides enabled, even when mixed with bound attributes', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"testing/complete-source","args":{"key":"text_field"}},"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Post Meta Binding</p>
+<!-- /wp:paragraph -->
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Read Only Button Text</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+
+		await expect(
+			patternBlock.getByText( 'Text Field Value' )
+		).toBeVisible();
+		await expect(
+			patternBlock.getByText( 'Read Only Button Text' )
+		).toBeVisible();
+
+		const editableParagraph = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Text Field Value' } );
+		const nonEditableButton = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Read Only Button Text' } );
+
+		await editableParagraph.click();
+		await editableParagraph.focus();
+		await page.keyboard.type( ' Edited' );
+		await expect( editableParagraph ).toHaveText(
+			'Text Field Value Edited'
+		);
+
+		// Button with only URL binding (no pattern overrides) should not have editable text.
+		await nonEditableButton.click();
+		const initialText = await nonEditableButton.textContent();
+		await page.keyboard.type( 'Edited' );
+		const finalText = await nonEditableButton.textContent();
+		expect( initialText ).toBe( finalText );
+	} );
+
 	test( 'resets overrides after clicking the reset button', async ( {
 		page,
 		admin,
