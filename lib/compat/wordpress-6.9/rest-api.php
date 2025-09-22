@@ -53,7 +53,7 @@ add_filter( 'comments_save_pre', 'gutenberg_remove_dummy_content_from_empty_comm
  * the minimum required version, this function can be removed and actual empty comments sent.
  */
 function gutenberg_substitute_empty_comment_content( $prepared_comment ) {
-	if ( isset( $prepared_comment['comment_content'] ) && '' ===  $prepared_comment['comment_content'] ) {
+	if ( isset( $prepared_comment['comment_content'] ) && '' === $prepared_comment['comment_content'] ) {
 		$prepared_comment['comment_content'] = '<!-- GUTENBERG_COMMENT_PLACEHOLDER -->';
 	}
 	return $prepared_comment;
