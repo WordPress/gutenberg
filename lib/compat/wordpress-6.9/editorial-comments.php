@@ -23,3 +23,26 @@ function gutenberg_add_editorial_comments_submenu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_add_editorial_comments_submenu' );
+
+/**
+ * Use the `comment_status_links` filter to remove non-applicable options Spam and Trash.
+ *
+ * Also, rename "Pending" to "Open" and "Approved" to "Resolved" for editorial comments.
+ *
+ * @param array $status_links The existing status links.
+ * @return array The modified status links.
+ */
+function gutenberg_filter_editorial_comments_status_links( $status_links ) {
+	if ( isset( $_GET['comment_type'] ) && 'block_comment' === $_GET['comment_type'] ) {
+		unset( $status_links['spam'] );
+		unset( $status_links['trash'] );
+	}
+	if ( isset( $status_links['moderated'] ) ) {
+		$status_links['moderated'] = str_replace( __( 'Pending' ), __( 'Open', 'gutenberg' ), $status_links['moderated'] );
+	}
+	if ( isset( $status_links['approved'] ) ) {
+		$status_links['approved'] = str_replace( __( 'Approved' ), __( 'Resolved', 'gutenberg' ), $status_links['approved'] );
+	}
+	return $status_links;
+}
+add_filter( 'comment_status_links', 'gutenberg_filter_editorial_comments_status_links' );
