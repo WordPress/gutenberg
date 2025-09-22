@@ -33,10 +33,16 @@ const directiveParser = new RegExp(
 		// segments. It excludes underscore intentionally to prevent confusion.
 		// E.g., "custom-directive".
 		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// (Optional) Match '--' followed by any alphanumeric characters. It
-		// excludes underscore intentionally to prevent confusion, but it can
-		// contain multiple hyphens. E.g., "--custom-prefix--with-more-info".
-		'(?:--([a-z0-9_-]+))?$',
+		// Match either:
+		// 1. '--suffix---uniqueId' (suffix with unique ID)
+		// 2. '---uniqueId' (unique ID without suffix) - check this before --suffix
+		// 3. '--suffix' (suffix without unique ID)
+		// 4. nothing (no suffix or unique ID)
+		'(?:' +
+		'(?:--([a-z0-9_-]+?)---([a-z0-9_-]+))|' + // --suffix---uniqueId
+		'(?:---([a-z0-9_-]+))|' + // ---uniqueId (check before --suffix)
+		'(?:--([a-z0-9_-]+))' + // --suffix
+		')?$',
 	'i' // Case insensitive.
 );
 
@@ -155,13 +161,32 @@ export function toVdom( root: Node ): ComponentChild {
 					return obj;
 				}
 				const prefix = directiveMatch[ 1 ] || '';
-				const suffix = directiveMatch[ 2 ] || null;
+
+				// Handle different capture group patterns:
+				// Group 2,3: --suffix---uniqueId (both suffix and unique ID)
+				// Group 4: ---uniqueId (unique ID only)
+				// Group 5: --suffix (suffix only)
+				let suffix: string | null = null;
+				let uniqueId: string | null = null;
+
+				if ( directiveMatch[ 2 ] && directiveMatch[ 3 ] ) {
+					// --suffix---uniqueId
+					suffix = directiveMatch[ 2 ];
+					uniqueId = directiveMatch[ 3 ];
+				} else if ( directiveMatch[ 4 ] ) {
+					// ---uniqueId
+					uniqueId = directiveMatch[ 4 ];
+				} else if ( directiveMatch[ 5 ] ) {
+					// --suffix
+					suffix = directiveMatch[ 5 ];
+				}
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {
 					namespace: ns ?? currentNamespace()!,
 					value: value as DirectiveEntry[ 'value' ],
 					suffix,
+					uniqueId,
 				} );
 				return obj;
 			}, {} );

@@ -209,45 +209,102 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const defaultEntry = context.find( isDefaultDirectiveSuffix );
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 
-			const ns = defaultEntry!.namespace;
-			const client = useRef( proxifyState( ns, {} ) );
-			const server = useRef( proxifyState( ns, {}, { readOnly: true } ) );
+			// Group contexts by namespace
+			const contextsByNamespace = useMemo( () => {
+				const namespaceMap = new Map< string, DirectiveEntry[] >();
 
-			// No change should be made if `defaultEntry` does not exist.
+				context.forEach( ( entry ) => {
+					// Skip non-default suffixes (they're not valid for context)
+					if ( entry.suffix ) {
+						warn(
+							`Suffixes are not supported in data-wp-context directives.`
+						);
+						return;
+					}
+
+					const { namespace, value } = entry;
+
+					// Validate value is an object
+					if ( ! isPlainObject( value ) ) {
+						warn(
+							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+						);
+						return;
+					}
+
+					if ( ! namespaceMap.has( namespace ) ) {
+						namespaceMap.set( namespace, [] );
+					}
+					namespaceMap.get( namespace )!.push( entry );
+				} );
+
+				return namespaceMap;
+			}, [ context ] );
+
+			// Create refs for each namespace
+			const clientRefs = useRef( new Map< string, object >() );
+			const serverRefs = useRef( new Map< string, object >() );
+
+			// Initialize refs for new namespaces
+			contextsByNamespace.forEach( ( entries, namespace ) => {
+				if ( ! clientRefs.current.has( namespace ) ) {
+					clientRefs.current.set(
+						namespace,
+						proxifyState( namespace, {} )
+					);
+					serverRefs.current.set(
+						namespace,
+						proxifyState( namespace, {}, { readOnly: true } )
+					);
+				}
+			} );
+
 			const contextStack = useMemo( () => {
 				const result = {
 					client: { ...inheritedClient },
 					server: { ...inheritedServer },
 				};
-				if ( defaultEntry ) {
-					const { namespace, value } = defaultEntry;
-					// Check that the value is a JSON object. Send a console warning if not.
-					if ( ! isPlainObject( value ) ) {
-						warn(
-							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
-						);
-					}
-					deepMerge(
-						client.current,
-						deepClone( value ) as object,
-						false
+
+				// Process each namespace
+				contextsByNamespace.forEach( ( entries, namespace ) => {
+					const clientRef = clientRefs.current.get( namespace )!;
+					const serverRef = serverRefs.current.get( namespace )!;
+
+					// Clear the refs to start fresh
+					Object.keys( clientRef ).forEach(
+						( key ) => delete clientRef[ key ]
 					);
-					deepMerge( server.current, deepClone( value ) as object );
+					Object.keys( serverRef ).forEach(
+						( key ) => delete serverRef[ key ]
+					);
+
+					// Merge all context values for this namespace
+					entries.forEach( ( { value } ) => {
+						// Deep merge each context value
+						deepMerge(
+							clientRef,
+							deepClone( value ) as object,
+							false
+						);
+						deepMerge( serverRef, deepClone( value ) as object );
+					} );
+
+					// Create proxified contexts
 					result.client[ namespace ] = proxifyContext(
-						client.current,
+						clientRef,
 						inheritedClient[ namespace ]
 					);
 					result.server[ namespace ] = proxifyContext(
-						server.current,
+						serverRef,
 						inheritedServer[ namespace ]
 					);
-				}
+				} );
+
 				return result;
-			}, [ defaultEntry, inheritedClient, inheritedServer ] );
+			}, [ contextsByNamespace, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
@@ -341,10 +398,10 @@ export default () => {
 		events.forEach( ( entries, eventType ) => {
 			const existingHandler = element.props[ `on${ eventType }` ];
 			element.props[ `on${ eventType }` ] = ( event: Event ) => {
+				if ( existingHandler ) {
+					existingHandler( event );
+				}
 				entries.forEach( ( entry ) => {
-					if ( existingHandler ) {
-						existingHandler( event );
-					}
 					let start;
 					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 						if ( globalThis.SCRIPT_DEBUG ) {
@@ -433,6 +490,12 @@ export default () => {
 			classNames
 				.filter( isNonDefaultDirectiveSuffix )
 				.forEach( ( entry ) => {
+					if ( entry.uniqueId ) {
+						warn(
+							`Unique IDs are not supported for the data-wp-class directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
+						);
+						return;
+					}
 					const className = entry.suffix;
 					let result = evaluate( entry );
 					if ( typeof result === 'function' ) {
@@ -476,6 +539,12 @@ export default () => {
 	// data-wp-style--[style-prop]
 	directive( 'style', ( { directives: { style }, element, evaluate } ) => {
 		style.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				warn(
+					`Unique IDs are not supported for the data-wp-style directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
+				);
+				return;
+			}
 			const styleProp = entry.suffix;
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
@@ -513,6 +582,12 @@ export default () => {
 	// data-wp-bind--[attribute]
 	directive( 'bind', ( { directives: { bind }, element, evaluate } ) => {
 		bind.filter( isNonDefaultDirectiveSuffix ).forEach( ( entry ) => {
+			if ( entry.uniqueId ) {
+				warn(
+					`Unique IDs are not supported for the data-wp-bind directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
+				);
+				return;
+			}
 			const attribute = entry.suffix;
 			let result = evaluate( entry );
 			if ( typeof result === 'function' ) {
@@ -618,6 +693,23 @@ export default () => {
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( isDefaultDirectiveSuffix );
 		if ( ! entry ) {
+			// Check if there are entries with unique IDs and warn
+			text.forEach( ( e ) => {
+				if ( e.uniqueId ) {
+					warn(
+						`Unique IDs are not supported for the data-wp-text directive. Ignoring directive with unique ID "${ e.uniqueId }".`
+					);
+				}
+			} );
+			element.props.children = null;
+			return;
+		}
+
+		// Check if the default entry has a unique ID and warn
+		if ( entry.uniqueId ) {
+			warn(
+				`Unique IDs are not supported for the data-wp-text directive. Ignoring directive with unique ID "${ entry.uniqueId }".`
+			);
 			element.props.children = null;
 			return;
 		}

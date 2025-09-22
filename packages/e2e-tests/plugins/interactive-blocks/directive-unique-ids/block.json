@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "test/directive-unique-ids",
+	"title": "E2E Interactivity tests - directive unique IDs",
+	"category": "text",
+	"icon": "heart",
+	"description": "Block to test directive unique IDs functionality.",
+	"textdomain": "e2e-interactivity",
+	"supports": {
+		"interactivity": true
+	},
+	"viewScriptModule": "file:./view.js",
+	"render": "file:./render.php"
+}

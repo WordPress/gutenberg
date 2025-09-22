@@ -237,6 +237,7 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: '',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 							'test-two': [
@@ -244,6 +245,7 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -268,6 +270,7 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: { key: 'value' },
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -292,6 +295,7 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: '{malformed: json}',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -317,11 +321,13 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: 'test value 1',
 									suffix: 'one',
+									uniqueId: null,
 								},
 								{
 									namespace: null,
 									value: 'test value 2',
 									suffix: 'two',
+									uniqueId: null,
 								},
 							],
 						},
@@ -347,11 +353,13 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: 'true',
 									suffix: 'one',
+									uniqueId: null,
 								},
 								{
 									namespace: null,
 									value: '"test value"',
 									suffix: 'two',
+									uniqueId: null,
 								},
 							],
 						},
@@ -376,6 +384,7 @@ describe( 'toVdom', () => {
 									namespace: null,
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -405,6 +414,7 @@ describe( 'toVdom', () => {
 												namespace: null,
 												value: 'test value',
 												suffix: null,
+												uniqueId: null,
 											},
 										],
 									},
@@ -435,6 +445,7 @@ describe( 'toVdom', () => {
 									namespace: 'my-namespace',
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -459,6 +470,7 @@ describe( 'toVdom', () => {
 									namespace: 'my-namespace',
 									value: { key: 'value' },
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -484,6 +496,7 @@ describe( 'toVdom', () => {
 									namespace: 'my-namespace',
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -515,6 +528,7 @@ describe( 'toVdom', () => {
 											namespace: 'my-namespace',
 											value: 'test value',
 											suffix: null,
+											uniqueId: null,
 										},
 									],
 								},
@@ -543,6 +557,7 @@ describe( 'toVdom', () => {
 									namespace: 'my-namespace',
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -580,6 +595,7 @@ describe( 'toVdom', () => {
 											namespace: 'parent-namespace',
 											value: 'test value',
 											suffix: null,
+											uniqueId: null,
 										},
 									],
 								},
@@ -614,6 +630,7 @@ describe( 'toVdom', () => {
 										namespace: null,
 										value: 'test value',
 										suffix: null,
+										uniqueId: null,
 									},
 								],
 							},
@@ -640,6 +657,7 @@ describe( 'toVdom', () => {
 									namespace: 'custom-namespace',
 									value: 'test value',
 									suffix: null,
+									uniqueId: null,
 								},
 							],
 						},
@@ -670,6 +688,7 @@ describe( 'toVdom', () => {
 											namespace: 'custom-namespace',
 											value: 'test value',
 											suffix: null,
+											uniqueId: null,
 										},
 									],
 								},
@@ -701,6 +720,7 @@ describe( 'toVdom', () => {
 												namespace: 'my-namespace',
 												value: 'test value',
 												suffix: null,
+												uniqueId: null,
 											},
 										],
 									},
@@ -740,6 +760,7 @@ describe( 'toVdom', () => {
 															'my-namespace',
 														value: 'test value',
 														suffix: null,
+														uniqueId: null,
 													},
 												],
 											},
@@ -773,6 +794,190 @@ describe( 'toVdom', () => {
 			toVdom( outer );
 			expect( hydratedIslands.has( outer ) ).toBe( true );
 			expect( hydratedIslands.has( inner! ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'Unique IDs', () => {
+		it( 'should parse directives with unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---unique-id="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---unique-id': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'unique-id',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse directives with suffix and unique ID', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on--click---handler1="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on--click---handler1': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: 'click',
+									uniqueId: 'handler1',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse multiple directives with different unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---id1="value1" data-wp-test---id2="value2"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---id1': 'value1',
+						'data-wp-test---id2': 'value2',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'value1',
+									suffix: null,
+									uniqueId: 'id1',
+								},
+								{
+									namespace: null,
+									value: 'value2',
+									suffix: null,
+									uniqueId: 'id2',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse complex suffixes with unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on--custom-event---plugin-name="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on--custom-event---plugin-name': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: 'custom-event',
+									uniqueId: 'plugin-name',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse unique IDs with underscores and hyphens', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---my_plugin-v2="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---my_plugin-v2': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'my_plugin-v2',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse suffix with unique ID correctly', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test--invalid---id="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test--invalid---id': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: 'invalid',
+									uniqueId: 'id',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should work with namespaces and unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---unique-id="my-namespace::test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---unique-id': 'my-namespace::test value',
+						__directives: {
+							test: [
+								{
+									namespace: 'my-namespace',
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'unique-id',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
 		} );
 	} );
 } );
