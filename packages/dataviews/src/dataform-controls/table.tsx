@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -43,12 +44,12 @@ export default function TableControl< Item >( {
 		[ value, onChange, setValue, data ]
 	);
 
-	if ( ! children || children.length === 0 ) {
+	if ( ! Array.isArray( children ) || children.length === 0 ) {
 		return null;
 	}
 
 	if ( ! Array.isArray( value ) || value.length === 0 ) {
-		return <div>No data to display</div>;
+		return <div>{ __( 'No data to display.' ) }</div>;
 	}
 
 	return (

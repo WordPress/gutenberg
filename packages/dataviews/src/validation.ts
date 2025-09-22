@@ -88,16 +88,19 @@ export function isItemValid< Item >(
 
 		// The array field.type can have children, so check them as well
 		if ( field.type === 'array' && field.children?.length > 0 ) {
+			// children is NormalizedField, but we'll use it below
+			// as a parameter to isItemValid, which uses the more permissive
+			// Field. Hence, the cast.
+			const children = field.children as Field<
+				Record< string, unknown >
+			>[];
+
 			return field
 				.getValue( { item } )
 				.every( ( row: Record< string, unknown > ) => {
-					return isItemValid(
-						row,
-						field.children as Field< Record< string, unknown > >[],
-						{
-							fields: field.children.map( ( child ) => child.id ),
-						}
-					);
+					return isItemValid( row, children, {
+						fields: children.map( ( child ) => child.id ),
+					} );
 				} );
 		}
 
