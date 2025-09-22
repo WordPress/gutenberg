@@ -16,7 +16,7 @@ Displays a group of accordion headers and associated expandable content. ([Sourc
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-content
--	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), ~~html~~
+-	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** autoclose, iconPosition, showIcon
 
 ## Accordion Content
@@ -28,7 +28,7 @@ Displays a section of content in an accordion, including a header and expandable
 -	**Category:** design
 -	**Parent:** core/accordion
 -	**Allowed Blocks:** core/accordion-header, core/accordion-panel
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin)
+-	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin), typography (fontSize, lineHeight)
 -	**Attributes:** openByDefault
 
 ## Accordion Header
@@ -39,7 +39,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize, textAlign), ~~align~~
 -	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, textAlignment, title
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight)
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
