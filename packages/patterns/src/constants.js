@@ -19,8 +19,9 @@ export const PATTERN_SYNC_TYPES = {
 export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
-	'core/button': [ 'text', 'url', 'linkTarget', 'rel' ],
-	'core/image': [ 'id', 'url', 'title', 'alt' ],
+	'core/image': [ 'id', 'url', 'title', 'alt', 'caption' ],
+	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
+	'core/post-date': [ 'datetime' ],
 	'core/pullquote': [ 'citation', 'value' ],
 };
 
