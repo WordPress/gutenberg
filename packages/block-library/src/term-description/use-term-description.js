@@ -21,7 +21,7 @@ export function useTermDescription( termId, taxonomy ) {
 		termId
 	);
 
-	// Fallback approach: Parse template slug when no context is available
+	// Fallback approach: Parse template slug when no context is available.
 	const templateBasedData = useTemplateBasedTermData();
 
 	const hasContext = Boolean( termId && taxonomy );
@@ -68,13 +68,13 @@ function useTemplateBasedTermData() {
 	let termSlug;
 
 	if ( taxonomyMatches ) {
-		// If it's for all taxonomies of a type (e.g., category, tag)
+		// If it's for all taxonomies of a type (e.g., category, tag).
 		if ( taxonomyMatches[ 1 ] ) {
 			taxonomy = taxonomyMatches[ 2 ]
 				? taxonomyMatches[ 2 ]
 				: taxonomyMatches[ 1 ];
 		}
-		// If it's for a specific term (e.g., category-news, tag-featured)
+		// If it's for a specific term (e.g., category-news, tag-featured).
 		else if ( taxonomyMatches[ 3 ] ) {
 			taxonomy = taxonomyMatches[ 6 ]
 				? taxonomyMatches[ 6 ]
