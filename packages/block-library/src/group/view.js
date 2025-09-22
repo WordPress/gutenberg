@@ -47,21 +47,13 @@ function stretchText( containerElement, containerId ) {
 	const styleElement = getOrCreateStyleElement( containerId );
 	const containerSelector = `[data-stretchy-id="${ containerId }"]`;
 
-	// Style management callbacks
+	// Style management callback
 	const applyStylesFn = ( css ) => {
 		styleElement.textContent = css;
 	};
-	const clearStylesFn = () => {
-		styleElement.textContent = '';
-	};
 
 	// Use shared utility for complete optimization
-	optimizeStretchyText(
-		containerElement,
-		containerSelector,
-		applyStylesFn,
-		clearStylesFn
-	);
+	optimizeStretchyText( containerElement, containerSelector, applyStylesFn );
 }
 
 // Initialize all stretchy text containers when DOM is loaded

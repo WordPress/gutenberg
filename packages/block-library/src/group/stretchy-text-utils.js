@@ -29,10 +29,10 @@ export function generateCSSRules(
  * Calculate font ratios by measuring natural CSS font sizes.
  *
  * @param {HTMLElement} containerElement The container element
- * @param {Function}    clearStylesFn    Function to clear existing stretchy styles
+ * @param {Function}    applyStylesFn    Function to apply/clear styles
  * @return {number[]} Array of font ratios relative to smallest font size
  */
-export function calculateFontRatios( containerElement, clearStylesFn ) {
+export function calculateFontRatios( containerElement, applyStylesFn ) {
 	const textElements = containerElement.querySelectorAll(
 		'h1, h2, h3, h4, h5, h6, p, pre'
 	);
@@ -42,7 +42,7 @@ export function calculateFontRatios( containerElement, clearStylesFn ) {
 	}
 
 	// Clear existing stretchy styles to measure natural sizes
-	clearStylesFn();
+	applyStylesFn( '' );
 
 	// Measure natural font sizes
 	const elementSizes = [];
@@ -117,22 +117,20 @@ export function findOptimalFontSize(
  *
  * @param {HTMLElement} containerElement  The container element
  * @param {string}      containerSelector CSS selector for container
- * @param {Function}    applyStylesFn     Function to apply CSS styles
- * @param {Function}    clearStylesFn     Function to clear existing styles
+ * @param {Function}    applyStylesFn     Function to apply CSS styles (pass empty string to clear)
  * @return {Object} Object with cssRules, fontRatios, and optimalSize
  */
 export function optimizeStretchyText(
 	containerElement,
 	containerSelector,
-	applyStylesFn,
-	clearStylesFn
+	applyStylesFn
 ) {
 	if ( ! containerElement ) {
 		return { cssRules: '', fontRatios: [], optimalSize: 1 };
 	}
 
 	// Calculate font ratios (clears styles internally)
-	const fontRatios = calculateFontRatios( containerElement, clearStylesFn );
+	const fontRatios = calculateFontRatios( containerElement, applyStylesFn );
 
 	if ( fontRatios.length === 0 ) {
 		return { cssRules: '', fontRatios: [], optimalSize: 1 };

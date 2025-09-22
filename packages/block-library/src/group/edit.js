@@ -67,21 +67,13 @@ function useStretchyText( ref, stretchyText, clientId ) {
 		// Use WordPress block ID for targeting
 		const blockSelector = `#block-${ clientId }`;
 
-		// Style management callbacks
+		// Style management callback
 		const applyStylesFn = ( css ) => {
 			styleElement.textContent = css;
 		};
-		const clearStylesFn = () => {
-			styleElement.textContent = '';
-		};
 
 		// Use shared utility for complete optimization
-		optimizeStretchyText(
-			ref.current,
-			blockSelector,
-			applyStylesFn,
-			clearStylesFn
-		);
+		optimizeStretchyText( ref.current, blockSelector, applyStylesFn );
 	}, [ ref, clientId ] );
 
 	useEffect( () => {
