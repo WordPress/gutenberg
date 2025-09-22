@@ -200,4 +200,3 @@ function gutenberg_filter_edit_post_sortable_columns( $columns ) {
 	return $columns;
 }
 add_filter( 'manage_edit-post_sortable_columns', 'gutenberg_filter_edit_post_sortable_columns' );
-
