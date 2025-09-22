@@ -110,7 +110,7 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `T`: The interpolation string to be parsed.
--   _conversionMap_ `ConversionMap< T >`: The map used to convert the string to a react element.
+-   _conversionMap_ `ConversionMap<  >`: The map used to convert the string to a react element.
 
 _Returns_
 

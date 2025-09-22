@@ -1,4 +1,13 @@
 /**
+ * This type is used by @wordpress/i18n to make sprintf type-safe.
+ *
+ * We don't want to import from there directly to avoid a circular dependency.
+ */
+export type TranslatableText< T extends string > = string & {
+	readonly __translatableText: T;
+};
+
+/**
  * Helper type to extract tag name and handle closing/self-closing indicators
  * Matches the tokenizer regex: /<(\/)?(\w+)\s*(\/)?>/g
  * Filters out tags with spaces as they won't be parsed by the tokenizer

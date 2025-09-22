@@ -8,7 +8,7 @@ import {
 	isValidElement,
 	type Element as ReactElement,
 } from './react';
-import type { ConversionMap } from './types';
+import type { ConversionMap, TranslatableText } from './types';
 
 let indoc: string;
 let offset: number;
@@ -127,10 +127,14 @@ function createFrame(
  * @throws {TypeError}
  * @return A wp element.
  */
-const createInterpolateElement = < T extends string >(
+function createInterpolateElement<
+	T extends string | TranslatableText< string >,
+>(
 	interpolatedString: T,
-	conversionMap: ConversionMap< T >
-): ReactElement => {
+	conversionMap: ConversionMap<
+		T extends TranslatableText< infer Text > ? Text : T
+	>
+): ReactElement {
 	indoc = interpolatedString;
 	offset = 0;
 	output = [];
@@ -147,7 +151,7 @@ const createInterpolateElement = < T extends string >(
 		// twiddle our thumbs
 	} while ( proceed( conversionMap ) );
 	return createElement( Fragment, null, ...output );
-};
+}
 
 /**
  * Validate conversion map.
