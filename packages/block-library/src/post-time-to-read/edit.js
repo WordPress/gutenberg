@@ -63,7 +63,11 @@ function PostTimeToReadEdit( {
 				displayAsRange: true,
 			} );
 		}
-	}, [ blockWasJustInserted ] );
+	}, [
+		blockWasJustInserted,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+	] );
 
 	const { textAlign, displayAsRange } = attributes;
 	const { postId, postType } = context;
