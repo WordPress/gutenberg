@@ -37,7 +37,6 @@ function PostTimeToReadEdit( {
 	context,
 } ) {
 	const { textAlign, displayAsRange, averageReadingSpeed } = attributes;
-	const AVERAGE_READING_RATE = averageReadingSpeed;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -108,11 +107,11 @@ function PostTimeToReadEdit( {
 		if ( displayAsRange ) {
 			let maxMinutes = Math.max(
 				1,
-				Math.round( ( totalWords / AVERAGE_READING_RATE ) * 1.2 )
+				Math.round( ( totalWords / averageReadingSpeed ) * 1.2 )
 			);
 			const minMinutes = Math.max(
 				1,
-				Math.round( ( totalWords / AVERAGE_READING_RATE ) * 0.8 )
+				Math.round( ( totalWords / averageReadingSpeed ) * 0.8 )
 			);
 
 			if ( minMinutes === maxMinutes ) {
@@ -128,7 +127,7 @@ function PostTimeToReadEdit( {
 
 		const minutesToRead = Math.max(
 			1,
-			Math.round( totalWords / AVERAGE_READING_RATE )
+			Math.round( totalWords / averageReadingSpeed )
 		);
 
 		return sprintf(
@@ -136,7 +135,7 @@ function PostTimeToReadEdit( {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks, displayAsRange, AVERAGE_READING_RATE ] );
+	}, [ contentStructure, blocks, displayAsRange, averageReadingSpeed ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
