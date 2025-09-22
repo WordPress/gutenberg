@@ -184,7 +184,7 @@ function CollabSidebarContent( {
 		}
 	};
 
-	const onCommentDelete = async ( commentId ) => {
+	const onCommentDelete = async ( commentId, onFocusNext ) => {
 		try {
 			const childComment = await getEntityRecord(
 				'root',
@@ -199,6 +199,11 @@ function CollabSidebarContent( {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: undefined,
 				} );
+			}
+
+			// Handle focus management after deletion
+			if ( onFocusNext ) {
+				onFocusNext( commentId );
 			}
 
 			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {

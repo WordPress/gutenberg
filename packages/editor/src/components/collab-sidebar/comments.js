@@ -116,6 +116,9 @@ export function Comments( {
 			onEditComment={ onEditComment }
 			isFocused={ focusThread === thread.id }
 			setFocusThread={ setFocusThread }
+			handleCommentDeletionFocus={
+				handleCommentDeletionFocus
+			}
 			setShowCommentBoard={ setShowCommentBoard }
 		/>
 	) );
@@ -130,6 +133,7 @@ function Thread( {
 	onCommentReopen,
 	isFocused,
 	setFocusThread,
+	handleCommentDeletionFocus,
 	setShowCommentBoard,
 } ) {
 	const { flashBlock } = useDispatch( blockEditorStore );
@@ -166,6 +170,41 @@ function Thread( {
 		setShowCommentBoard( false );
 	};
 
+	/**
+	 * Handles focus management after comment deletion.
+	 *
+	 * @param {number} deletedCommentId - The ID of the deleted comment.
+	 */
+	const handleCommentDeletionFocus = ( deletedCommentId ) => {
+		const deletedThreadIndex = threads.findIndex(
+			( thread ) => thread.id === deletedCommentId
+		);
+
+		if ( deletedThreadIndex !== -1 ) {
+			// Try next comment first, then previous comment
+			const nextComment = threads[ deletedThreadIndex + 1 ];
+			const prevComment = threads[ deletedThreadIndex - 1 ];
+
+			if ( nextComment ) {
+				setFocusThread( nextComment.id );
+				return;
+			}
+			if ( prevComment ) {
+				setFocusThread( prevComment.id );
+				return;
+			}
+		}
+
+		// Focus parent block if no other comments exist
+		clearThreadFocus();
+		const relatedBlock = blockCommentId
+			? findBlockByCommentId( blockCommentId, blocks )
+			: null;
+		if ( relatedBlock ) {
+			flashBlock( relatedBlock );
+		}
+	};
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
@@ -180,7 +219,9 @@ function Thread( {
 				onResolve={ onCommentResolve }
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
-				onDelete={ onCommentDelete }
+				onDelete={ ( commentId ) =>
+					onCommentDelete( commentId, handleCommentDeletionFocus )
+				}
 				status={ thread.status }
 			/>
 			{ 0 < thread?.reply?.length && (
@@ -216,7 +257,12 @@ function Thread( {
 									<CommentBoard
 										thread={ reply }
 										onEdit={ onEditComment }
-										onDelete={ onCommentDelete }
+										onDelete={ ( commentId ) =>
+											onCommentDelete(
+												commentId,
+												handleCommentDeletionFocus
+											)
+										}
 									/>
 								) }
 								{ 'approved' === thread.status && (
