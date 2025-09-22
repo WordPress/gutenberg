@@ -25,11 +25,8 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-export default function Edit( {
-	attributes: { openByDefault },
-	clientId,
-	setAttributes,
-} ) {
+export default function Edit( { attributes, clientId, setAttributes } ) {
+	const { openByDefault } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { isSelected, getBlockOrder } = useSelect(
@@ -67,29 +64,26 @@ export default function Edit( {
 		updateBlockAttributes,
 	] );
 
-	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps(
-		{
-			...blockProps,
-			className: clsx( blockProps.className, {
-				'is-open': openByDefault || isSelected,
-			} ),
-		},
-		{
-			template: [
-				[ 'core/accordion-header', {} ],
-				[
-					'core/accordion-panel',
-					{
-						openByDefault,
-					},
-				],
+	const blockProps = useBlockProps( {
+		className: clsx( {
+			'is-open': openByDefault || isSelected,
+		} ),
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: [
+			[ 'core/accordion-header', {} ],
+			[
+				'core/accordion-panel',
+				{
+					openByDefault,
+				},
 			],
-			templateLock: 'all',
-			directInsert: true,
-			templateInsertUpdatesSelection: true,
-		}
-	);
+		],
+		templateLock: 'all',
+		directInsert: true,
+		templateInsertUpdatesSelection: true,
+	} );
 
 	return (
 		<>

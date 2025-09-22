@@ -827,6 +827,10 @@ class WP_Duotone_Gutenberg {
 	 * @return string                Filtered block content.
 	 */
 	public static function render_duotone_support( $block_content, $block ) {
+		if ( null === $block['blockName'] ) {
+			return $block_content;
+		}
+
 		$duotone_selector = self::get_selector( $block['blockName'] );
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.

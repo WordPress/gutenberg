@@ -4,6 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -18,12 +19,17 @@ import {
  * post link in the admin bar.
  */
 export const useUpdatePostLinkListener = () => {
-	const { newPermalink } = useSelect(
-		( select ) => ( {
-			newPermalink: select( editorStore ).getCurrentPost().link,
-		} ),
-		[]
-	);
+	const { isViewable, newPermalink } = useSelect( ( select ) => {
+		const { getPostType } = select( coreStore );
+		const { getCurrentPost, getEditedPostAttribute } =
+			select( editorStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		return {
+			isViewable: postType?.viewable,
+			newPermalink: getCurrentPost().link,
+		};
+	}, [] );
+
 	const nodeToUpdateRef = useRef();
 
 	useEffect( () => {
@@ -36,6 +42,13 @@ export const useUpdatePostLinkListener = () => {
 		if ( ! newPermalink || ! nodeToUpdateRef.current ) {
 			return;
 		}
+
+		if ( ! isViewable ) {
+			nodeToUpdateRef.current.style.display = 'none';
+			return;
+		}
+
+		nodeToUpdateRef.current.style.display = '';
 		nodeToUpdateRef.current.setAttribute( 'href', newPermalink );
-	}, [ newPermalink ] );
+	}, [ newPermalink, isViewable ] );
 };

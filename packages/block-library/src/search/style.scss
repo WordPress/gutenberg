@@ -37,21 +37,6 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	width: 100%;
 }
 
-.wp-block-search__input {
-	padding: $grid-unit-10;
-	flex-grow: 1;
-	margin-left: 0;
-	margin-right: 0;
-	min-width: 3rem;
-	border: 1px solid $gray-600;
-	// !important used to forcibly prevent undesired application of
-	// text-decoration styles on the input field.
-	text-decoration: unset !important;
-
-	// Hides a redundant extra search icon on Mobile Safari.
-	appearance: initial;
-}
-
 .wp-block-search.wp-block-search__button-only {
 	.wp-block-search__button {
 		margin-left: 0;
@@ -104,12 +89,26 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	letter-spacing: inherit;
 	text-transform: inherit;
 	font-style: inherit;
+	padding: $grid-unit-10;
+	flex-grow: 1;
+	margin-left: 0;
+	margin-right: 0;
+	min-width: 3rem;
+	border: 1px solid $gray-600;
+	// !important used to forcibly prevent undesired application of
+	// text-decoration styles on the input field.
+	text-decoration: unset !important;
+
+	// Hides a redundant extra search icon on Mobile Safari.
+	appearance: initial;
 }
 
 // We are lowering the specificity so that the button element can override the rule for the button inside the search block.
 :where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
 	padding: $grid-unit-05;
-	border: 1px solid $gray-600;
+	border-width: 1px;
+	border-style: solid;
+	border-color: $gray-600;
 	background-color: $white;
 	box-sizing: border-box;
 

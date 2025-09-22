@@ -15,7 +15,7 @@
 		"anchor": true,
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"align": false,
 		"interactivity": true,
@@ -25,7 +25,8 @@
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"margin": true
-			}
+			},
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -63,7 +64,8 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "span"
+			"selector": ".accordion-content__toggle-title",
+			"role": "content"
 		},
 		"level": {
 			"type": "number",

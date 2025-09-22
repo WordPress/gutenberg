@@ -11,7 +11,7 @@
 	"supports": {
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"interactivity": true,
 		"spacing": {
@@ -30,7 +30,8 @@
 				"width": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"openByDefault": {

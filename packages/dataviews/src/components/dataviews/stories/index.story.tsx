@@ -46,6 +46,20 @@ import './style.css';
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
+	// Use fullscreen layout and a wrapper div with padding to resolve conflicts
+	// between Ariakit's Dialog (usePreventBodyScroll) and Storybook's body padding
+	// (sb-main-padding class). This ensures consistent layout in DataViews stories
+	// when clicking actions menus. Without this the padding on the body will jump.
+	parameters: {
+		layout: 'fullscreen',
+	},
+	decorators: [
+		( Story ) => (
+			<div style={ { padding: '1rem' } }>
+				<Story />
+			</div>
+		),
+	],
 } as Meta< typeof DataViews >;
 
 export default meta;
@@ -82,7 +96,7 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 					onClick={ ( e ) => {
 						e.stopPropagation();
 						// eslint-disable-next-line no-alert
-						alert( 'Clicked: ' + item.title );
+						alert( 'Clicked: ' + item.name.title );
 					} }
 					{ ...props }
 				/>
@@ -141,7 +155,7 @@ export const CustomEmpty = () => {
 			onChangeView={ setView }
 			actions={ actions }
 			defaultLayouts={ defaultLayouts }
-			empty={ view.search ? 'No sites found' : 'No sites' }
+			empty={ <p>{ view.search ? 'No sites found' : 'No sites' }</p> }
 		/>
 	);
 };

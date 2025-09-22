@@ -10,7 +10,7 @@
 	"supports": {
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"interactivity": true,
 		"spacing": {
@@ -47,7 +47,8 @@
 				"fontSize": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"allowedBlocks": {

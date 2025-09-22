@@ -20,6 +20,7 @@ import { useResizeObserver, throttle } from '@wordpress/compose';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
 	default as DataViewsFilters,
 	useFilters,
@@ -78,6 +79,10 @@ const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
 
+const dataViewsLayouts = VIEW_LAYOUTS.filter(
+	( viewLayout ) => ! viewLayout.isPicker
+);
+
 type DefaultUIProps = Pick<
 	DataViewsProps< any >,
 	'header' | 'search' | 'searchLabel'
@@ -135,7 +140,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts,
+	defaultLayouts: defaultLayoutsProperty,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,
@@ -223,6 +228,25 @@ function DataViews< Item >( {
 			handleScroll.cancel(); // Cancel any pending throttled calls
 		};
 	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
+
+	// Filter out DataViewsPicker layouts.
+	const defaultLayouts = useMemo(
+		() =>
+			Object.fromEntries(
+				Object.entries( defaultLayoutsProperty ).filter(
+					( [ layoutType ] ) => {
+						return dataViewsLayouts.some(
+							( viewLayout ) => viewLayout.type === layoutType
+						);
+					}
+				)
+			),
+		[ defaultLayoutsProperty ]
+	);
+
+	if ( ! defaultLayouts[ view.type ] ) {
+		return null;
+	}
 
 	return (
 		<DataViewsContext.Provider

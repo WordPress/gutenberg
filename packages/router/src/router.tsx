@@ -66,7 +66,10 @@ export interface NavigationOptions {
 }
 
 const RoutesContext = createContext< Match | null >( null );
+RoutesContext.displayName = 'RoutesContext';
+
 export const ConfigContext = createContext< Config >( { pathArg: 'p' } );
+ConfigContext.displayName = 'ConfigContext';
 
 const locationMemo = new WeakMap();
 function getLocationWithQuery() {

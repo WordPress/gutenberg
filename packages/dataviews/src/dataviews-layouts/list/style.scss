@@ -196,3 +196,11 @@ div.dataviews-view-list {
 		justify-content: space-between;
 	}
 }
+
+.dataviews-view-list__group-header {
+	font-size: $font-size-large;
+	font-weight: $font-weight-medium;
+	color: $gray-900;
+	margin: 0 0 $grid-unit-10 0;
+	padding: 0 $grid-unit-30;
+}
