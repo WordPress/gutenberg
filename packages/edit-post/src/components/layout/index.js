@@ -23,9 +23,13 @@ import { getLayoutStyles } from '@wordpress/global-styles-engine';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	forwardRef,
 	useCallback,
-	useMemo,
 	useId,
+	useImperativeHandle,
+	useLayoutEffect,
+	useMemo,
+	useReducer,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -38,14 +42,18 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	Button,
 	Icon,
+	Path,
 	SlotFillProvider,
+	SVG,
 	Tooltip,
 	VisuallyHidden,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
+	useEvent,
 	useMediaQuery,
 	useMergeRefs,
 	useRefEffect,
@@ -131,30 +139,75 @@ function useEditorStyles( settings ) {
 	] );
 }
 
+const magnet = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		width="24"
+		height="24"
+		viewBox="0 0 24 24"
+		style={ {
+			stroke: 'currentColor',
+			transform: `scale(${ 16 / 24 })`,
+			strokeWidth: 1.5 / ( 16 / 24 ),
+			strokeLinecap: 'round',
+			strokeLinejoin: 'round',
+			fill: 'none',
+		} }
+	>
+		<Path d="m12 15 4 4" />
+		<Path d="M2.352 10.648a1.205 1.205 0 0 0 0 1.704l2.296 2.296a1.205 1.205 0 0 0 1.704 0l6.029-6.029a1 1 0 1 1 3 3l-6.029 6.029a1.205 1.205 0 0 0 0 1.704l2.296 2.296a1.205 1.205 0 0 0 1.704 0l6.365-6.367A1 1 0 0 0 8.716 4.282z" />
+		<Path d="m5 8 4 4" />
+	</SVG>
+);
+
 /**
- * @param {Object}  props
- * @param {boolean} props.isLegacy True for device previews where split view is disabled.
+ * @template T
+ * @typedef { ReturnType< typeof useRefEffect< T > >} RefEffect
  */
-function MetaBoxesMain( { isLegacy } ) {
-	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		const { isMetaBoxLocationVisible } = select( editPostStore );
-		return [
-			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
-		];
-	}, [] );
+/**
+ * @template T, P
+ * @typedef { ReturnType< typeof forwardRef< T, P > >} ForwardRef
+ */
+/**
+ * Ref callback receiving the canvas element to add wheel event handling.
+ * @typedef { RefEffect< HTMLBodyElement | HTMLDivElement > } EffectWheelResizing
+ */
+/**
+ * @typedef MetaBoxesMainProps
+ * @property { boolean } isLegacy True when the editor canvas is not in an iframe.
+ */
+
+/** @type {ForwardRef< EffectWheelResizing, MetaBoxesMainProps>} */
+const MetaBoxesMain = forwardRef( ( { isLegacy }, ref ) => {
+	const [ isOpen, openHeight, isAutoResize, hasAnyVisible ] = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+			const { isMetaBoxLocationVisible } = select( editPostStore );
+			return [
+				get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+				get( 'core/edit-post', 'metaBoxesMainIsAutoResize' ),
+				isMetaBoxLocationVisible( 'normal' ) ||
+					isMetaBoxLocationVisible( 'advanced' ) ||
+					isMetaBoxLocationVisible( 'side' ),
+			];
+		},
+		[]
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
-	const [ { min = 0, max }, setHeightConstraints ] = useState( () => ( {} ) );
+	const [ { min, max }, setHeightConstraints ] = useState( () => ( {
+		// These initial values don’t have to be accurate – the point of them
+		// is to avoid NaN values in the intial render.
+		min: 0,
+		max: window.innerHeight,
+	} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
 	// aria-valuenow attribute on the separator.
+	/** @type { RefEffect< HTMLElement > } */
 	const effectSizeConstraints = useRefEffect( ( node ) => {
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
@@ -196,36 +249,34 @@ function MetaBoxesMain( { isLegacy } ) {
 	const heightRef = useRef();
 
 	/**
-	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
-	 * @param {boolean}       isPersistent      Whether to persist the height in preferences.
+	 * @param {number|'auto'} [height]       Height in pixels or 'auto'.
+	 * @param {boolean}       [isPersistent] Whether to persist the height in preferences.
 	 */
-	const applyHeight = ( candidateHeight = 'auto', isPersistent ) => {
+	const applyHeight = useEvent( ( height = 'auto', isPersistent = false ) => {
 		let styleHeight;
-		if ( candidateHeight === 'auto' ) {
+		if ( height === 'auto' ) {
 			isPersistent = false; // Just in case — “auto” should never persist.
-			styleHeight = candidateHeight;
+			heightRef.current = undefined;
+			styleHeight = height;
 		} else {
-			candidateHeight = Math.min( max, Math.max( min, candidateHeight ) );
-			heightRef.current = candidateHeight;
-			styleHeight = `${ candidateHeight }px`;
+			height = Math.min( max, Math.max( min, height ) );
+			heightRef.current = height;
+			styleHeight = `${ height }px`;
 		}
 		if ( isPersistent ) {
 			setPreference(
 				'core/edit-post',
 				'metaBoxesMainOpenHeight',
-				candidateHeight
+				height
 			);
 		}
-		// Applies imperative DOM updates only when not persisting the value
-		// because otherwise it's done by the subsequent render.
-		else {
-			metaBoxesMainRef.current.style.height = styleHeight;
-			if ( ! isShort ) {
-				separatorRef.current.ariaValueNow =
-					getAriaValueNow( candidateHeight );
-			}
+		metaBoxesMainRef.current.style.height = styleHeight;
+		if ( ! isShort ) {
+			separatorRef.current.ariaValueNow = Math.round(
+				( ( height - min ) / ( max - min ) ) * 100
+			);
 		}
-	};
+	} );
 
 	// useDrag includes keyboard support with arrow keys emulating a drag.
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
@@ -271,6 +322,164 @@ function MetaBoxesMain( { isLegacy } ) {
 		{ keyboardDisplacement: 20, filterTaps: true }
 	);
 
+	const linerRef = useRef();
+	const getRenderValues = useEvent( () => ( {
+		isOpen,
+		max,
+		min,
+		openHeight,
+	} ) );
+
+	/** @type { EffectWheelResizing } */
+	const effectWheel = useRefEffect(
+		( canvas ) => {
+			if ( ! hasAnyVisible || ! isAutoResize ) {
+				return;
+			}
+			const iframe = canvas.ownerDocument.defaultView.frameElement;
+			if ( ! iframe ) {
+				return;
+			}
+			const pane = metaBoxesMainRef.current;
+			// When the pane is resized, scrolls the canvas to the end. This is because
+			// when the canvas is made shorter the scroll doesn’t change yet the height
+			// subtracted leaves that much distance to scroll. This leaves it ready to
+			// engage from over the meta box pane because unless the canvas is fully
+			// scrolled (or the canvas height is zero) it does not engage.
+			const iframeObserver = new window.ResizeObserver( () => {
+				if ( isEngaged ) {
+					const { scrollingElement } = iframe.contentDocument;
+					scrollingElement.scrollTop = scrollingElement.scrollHeight;
+				}
+			} );
+			iframeObserver.observe( iframe );
+
+			let disengage;
+			let isEngaged = false;
+			const engageUntilPointerMoves = () => {
+				isEngaged = true;
+				const threshold = 2;
+				const canvasRoot = canvas.ownerDocument.documentElement;
+				const editorRoot = pane.ownerDocument.documentElement;
+				separatorRef.current?.classList.add( 'is-auto-resizing' );
+				disengage = () => {
+					isEngaged = false;
+					editorRoot.removeEventListener( 'pointermove', onMove );
+					canvasRoot.removeEventListener( 'pointermove', onMove );
+					separatorRef.current?.classList.remove(
+						'is-auto-resizing'
+					);
+				};
+				/** @param {PointerEvent} event */
+				const onMove = ( { movementX, movementY } ) => {
+					const biaxialMovementMax = Math.max(
+						Math.abs( movementX ),
+						Math.abs( movementY )
+					);
+					if ( biaxialMovementMax >= threshold ) {
+						disengage();
+					}
+				};
+				editorRoot.addEventListener( 'pointermove', onMove );
+				canvasRoot.addEventListener( 'pointermove', onMove );
+			};
+			/** @param { WheelEvent } event */
+			const onWheel = ( event ) => {
+				const { deltaY, currentTarget } = event;
+				const { offsetHeight: canvasHeight, contentDocument } = iframe;
+				const { scrollTop, scrollHeight } =
+					contentDocument.scrollingElement;
+				const scrollMax = scrollHeight - canvasHeight;
+				const isCanvasScrolledToEnd = scrollMax - scrollTop < 1;
+				let shouldEngage = isCanvasScrolledToEnd;
+				// If wheeling over the pane and it’s maximized, don’t engage unless
+				// headed upward and already scrolled to the top.
+				if ( pane === currentTarget && canvasHeight === 0 ) {
+					shouldEngage =
+						Math.sign( deltaY ) === -1 &&
+						linerRef.current.scrollTop === 0;
+				}
+				if ( ! ( isEngaged || shouldEngage ) ) {
+					return;
+				}
+				if ( ! isEngaged ) {
+					engageUntilPointerMoves( event.clientX, event.clientY );
+				}
+				const renderValues = getRenderValues();
+				const fromHeight = heightRef.current ?? pane.offsetHeight;
+				const nextHeight = fromHeight + deltaY;
+				if ( renderValues.isOpen && nextHeight <= renderValues.min ) {
+					persistIsOpen( false, true );
+				} else if (
+					! renderValues.isOpen &&
+					nextHeight > renderValues.min
+				) {
+					persistIsOpen( true, true );
+				}
+				applyHeight( nextHeight );
+				// Wheeled downward – pane made taller.
+				if ( Math.sign( deltaY ) === 1 ) {
+					// Disengage if pane is maximized.
+					if ( nextHeight >= renderValues.max ) {
+						disengage();
+					}
+					// Otherwise, if over the pane, avoid scrolling.
+					else if ( currentTarget === pane ) {
+						event.preventDefault();
+					}
+				}
+				// Wheeled upward - pane made shorter – disengage if minimized.
+				else if ( nextHeight <= renderValues.min ) {
+					disengage();
+				}
+				// Otherwise, if over the canvas, avoid scrolling.
+				else if ( canvasDocument === currentTarget ) {
+					event.preventDefault();
+				}
+			};
+			const canvasDocument = canvas.ownerDocument;
+			canvasDocument.addEventListener( 'wheel', onWheel, {
+				passive: false,
+			} );
+			pane.addEventListener( 'wheel', onWheel, { passive: false } );
+			return () => {
+				disengage?.();
+				iframeObserver.disconnect();
+				canvasDocument.removeEventListener( 'wheel', onWheel );
+				pane.removeEventListener( 'wheel', onWheel );
+			};
+		},
+		[ hasAnyVisible, isAutoResize ]
+	);
+	useImperativeHandle( ref, () => effectWheel, [ effectWheel ] );
+
+	const ignoreChangeOfIsOpenInRenderRef = useRef( false );
+	// Applies the height upon initial render, toggling (isOpen), and changing
+	// of the media query (isShort). It skips application if `isOpen` changed
+	// due to the wheel effect to not conflict with the height it set.
+	useLayoutEffect( () => {
+		if (
+			hasAnyVisible &&
+			! isLegacy &&
+			! ignoreChangeOfIsOpenInRenderRef.current
+		) {
+			const renderValues = getRenderValues();
+			const usedOpenHeight = isShort
+				? 'auto'
+				: renderValues.openHeight ?? 'auto';
+			const usedHeight = isOpen ? usedOpenHeight : min;
+			applyHeight( usedHeight );
+		}
+	}, [
+		applyHeight,
+		getRenderValues,
+		hasAnyVisible,
+		isLegacy,
+		isOpen,
+		isShort,
+		min,
+	] );
+
 	if ( ! hasAnyVisible ) {
 		return;
 	}
@@ -280,6 +489,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
 			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
 			hidden={ ! isLegacy && ! isOpen }
+			ref={ ! isLegacy ? linerRef : null }
 		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
@@ -290,17 +500,10 @@ function MetaBoxesMain( { isLegacy } ) {
 		return contents;
 	}
 
-	const isAutoHeight = openHeight === undefined;
-	const usedOpenHeight = isShort ? 'auto' : openHeight;
-	const usedHeight = isOpen ? usedOpenHeight : min;
-
-	const getAriaValueNow = ( height ) =>
-		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
-	const usedAriaValueNow =
-		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
-
-	const persistIsOpen = ( to = ! isOpen ) =>
+	const persistIsOpen = ( to = ! isOpen, flagIgnoreInRender = false ) => {
 		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
+		ignoreChangeOfIsOpenInRenderRef.current = flagIgnoreInRender;
+	};
 
 	const paneLabel = __( 'Meta Boxes' );
 
@@ -325,14 +528,14 @@ function MetaBoxesMain( { isLegacy } ) {
 		</button>
 	);
 
-	// The separator button that provides a11y for resizing.
+	// The separator button that provides a11y for resizing. Its aria-valuenow
+	// attribute is set imperatively which is why it does not appear in JSX.
 	const separator = ! isShort && (
 		<>
 			<Tooltip text={ __( 'Drag to resize' ) }>
-				<button // eslint-disable-line jsx-a11y/role-supports-aria-props
+				<button
 					ref={ separatorRef }
 					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
-					aria-valuenow={ usedAriaValueNow }
 					aria-label={ __( 'Drag to resize' ) }
 					aria-describedby={ separatorHelpId }
 					{ ...bindDragGesture() }
@@ -354,16 +557,31 @@ function MetaBoxesMain( { isLegacy } ) {
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
-			style={ { height: usedHeight } }
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
 				{ separator }
+				<Button
+					label={ __( 'Enable auto-resizing' ) }
+					showTooltip
+					size="small"
+					icon={ magnet }
+					onClick={ () =>
+						setPreference(
+							'core/edit-post',
+							'metaBoxesMainIsAutoResize',
+							! isAutoResize
+						)
+					}
+					isPressed={ isAutoResize }
+				/>
 			</div>
 			{ contents }
 		</NavigableRegion>
 	);
-}
+} );
+
+MetaBoxesMain.displayName = 'MetaBoxesMain';
 
 function Layout( {
 	postId: initialPostId,
@@ -459,6 +677,13 @@ function Layout( {
 	);
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
+
+	// Holds the ref callback for the canvas document that’s needed to support
+	// the scroll-responsive split view adjustment.
+	const [
+		effectResizeMetaBoxMainOnWheel,
+		setEffectResizeMetaBoxMainOnWheel,
+	] = useReducer( ( _, incoming ) => incoming );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
@@ -588,6 +813,7 @@ function Layout( {
 						templateId={ templateId }
 						className={ className }
 						forceIsDirty={ hasActiveMetaboxes }
+						contentRef={ effectResizeMetaBoxMainOnWheel }
 						disableIframe={ ! shouldIframe }
 						// We should auto-focus the canvas (title) on load.
 						// eslint-disable-next-line jsx-a11y/no-autofocus
@@ -599,7 +825,10 @@ function Layout( {
 						extraContent={
 							! isDistractionFree &&
 							showMetaBoxes && (
-								<MetaBoxesMain isLegacy={ isDevicePreview } />
+								<MetaBoxesMain
+									isLegacy={ isDevicePreview }
+									ref={ setEffectResizeMetaBoxMainOnWheel }
+								/>
 							)
 						}
 					>

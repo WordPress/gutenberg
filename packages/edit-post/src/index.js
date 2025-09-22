@@ -57,6 +57,8 @@ export function initializeEditor(
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
+		metaBoxesMainIsOpen: false,
+		metaBoxesMainIsAutoResize: false,
 	} );
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
