@@ -18,14 +18,6 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
-/**
- * Internal dependencies
- */
-import { plus } from '../accordion-content/icons';
-
-const ICONS = {
-	plus,
-};
 
 export default function Edit( { attributes, setAttributes, context } ) {
 	const { level, title, textAlign, levelOptions } = attributes;
@@ -51,9 +43,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	const spacingProps = useSpacingProps( attributes );
 	const shadowProps = useShadowProps( attributes );
 
-	const Icon = ICONS.plus;
-	const shouldShowIcon = showIcon && Icon;
-
 	return (
 		<>
 			<BlockControls>
@@ -76,7 +65,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					'accordion-content__heading',
 					{
 						[ `has-custom-font-size` ]: blockProps.style.fontSize,
-						[ `icon-position-left` ]: iconPosition === 'left',
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					}
 				) }
@@ -92,13 +80,16 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						...spacingProps.style,
 					} }
 				>
+					{ showIcon && iconPosition === 'left' && (
+						<span
+							className="accordion-content__toggle-icon"
+							aria-hidden="true"
+						>
+							+
+						</span>
+					) }
 					<RichText
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
+						withoutInteractiveFormatting
 						disableLineBreaks
 						tagName="span"
 						value={ title }
@@ -107,21 +98,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 						}
 						placeholder={ __( 'Accordion title' ) }
 					/>
-					{ shouldShowIcon && (
+					{ showIcon && iconPosition === 'right' && (
 						<span
-							className={ clsx(
-								`accordion-content__toggle-icon`,
-								{
-									'has-icon-plus': true,
-								}
-							) }
-							style={ {
-								// TO-DO: make this configurable
-								width: `1.2em`,
-								height: `1.2em`,
-							} }
+							className="accordion-content__toggle-icon"
+							aria-hidden="true"
 						>
-							{ Icon && <Icon width="1.2em" height="1.2em" /> }
+							+
 						</span>
 					) }
 				</button>
