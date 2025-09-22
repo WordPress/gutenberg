@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -76,6 +76,70 @@ function CopyButton( { text } ) {
 	);
 }
 
+function TemplatePublishPanelPostpublish( { post } ) {
+	const postTitle = decodeEntities( post.title ) || __( '(no title)' );
+	const registry = useRegistry();
+	const { site, isActivating } = useSelect( ( select ) => {
+		return {
+			site: select( coreStore ).getEntityRecord( 'root', 'site' ),
+			isActivating: select( coreStore ).isSavingEntityRecord(
+				'root',
+				'site'
+			),
+		};
+	} );
+	return (
+		<div className="post-publish-panel__postpublish">
+			<PanelBody className="post-publish-panel__postpublish-header">
+				{ sprintf(
+					// translators: %s: post title
+					__( '%s is saved.' ),
+					postTitle
+				) }
+			</PanelBody>
+			<PanelBody>
+				<p className="post-publish-panel__postpublish-subheader">
+					<strong>{ __( 'What’s next?' ) }</strong>
+				</p>
+				<p>
+					{ sprintf(
+						// translators: %1$s: post title, %2$s: template type
+						'Do you want to activate %1$s as the %2$s template?',
+						postTitle,
+						post.slug
+					) }
+				</p>
+
+				<div className="post-publish-panel__postpublish-buttons">
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							await registry
+								.dispatch( coreStore )
+								.saveEntityRecord( 'root', 'site', {
+									active_templates: {
+										...site.active_templates,
+										[ post.slug ]: post.id,
+									},
+								} );
+							await registry
+								.dispatch( editorStore )
+								.closePublishSidebar();
+						} }
+						__next40pxDefaultSize
+						disabled={ isActivating }
+						accessibleWhenDisabled={ false }
+					>
+						{ isActivating
+							? __( 'Activating…' )
+							: __( 'Activate' ) }
+					</Button>
+				</div>
+			</PanelBody>
+		</div>
+	);
+}
+
 export default function PostPublishPanelPostpublish( {
 	focusOnMount,
 	children,
@@ -112,6 +176,10 @@ export default function PostPublishPanelPostpublish( {
 		},
 		[ focusOnMount ]
 	);
+
+	if ( post.type === 'wp_template' ) {
+		return <TemplatePublishPanelPostpublish post={ post } />;
+	}
 
 	const postPublishNonLinkHeader = isScheduled ? (
 		<>

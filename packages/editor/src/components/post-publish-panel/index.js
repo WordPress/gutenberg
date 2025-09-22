@@ -77,6 +77,7 @@ export class PostPublishPanel extends Component {
 			PostPublishExtension,
 			PrePublishExtension,
 			currentPostId,
+			postTypeSlug,
 			...additionalProps
 		} = this.props;
 		const {
@@ -135,14 +136,16 @@ export class PostPublishPanel extends Component {
 					) }
 					{ isSaving && <Spinner /> }
 				</div>
-				<div className="editor-post-publish-panel__footer">
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __( 'Always show pre-publish checks.' ) }
-						checked={ isPublishSidebarEnabled }
-						onChange={ onTogglePublishSidebar }
-					/>
-				</div>
+				{ postTypeSlug !== 'wp_template' && (
+					<div className="editor-post-publish-panel__footer">
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Always show pre-publish checks.' ) }
+							checked={ isPublishSidebarEnabled }
+							onChange={ onTogglePublishSidebar }
+						/>
+					</div>
+				) }
 			</div>
 		);
 	}
@@ -167,7 +170,8 @@ export default compose( [
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
 		const { isPublishSidebarEnabled } = select( editorStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		const postTypeSlug = getEditedPostAttribute( 'type' );
+		const postType = getPostType( postTypeSlug );
 
 		return {
 			hasPublishAction:
@@ -181,6 +185,7 @@ export default compose( [
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 			currentPostId: getCurrentPostId(),
+			postTypeSlug,
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
