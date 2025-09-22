@@ -6,11 +6,11 @@
  * Comments -- that is comments with the type 'block_comment'.
  */
 function gutenberg_add_editorial_comments_menu() {
-	add_menu_page(
-		__( 'Editorial Comments', 'gutenberg' ),
-		__( 'Editorial Comments', 'gutenberg' ),
+	$hook_suffix = add_menu_page(
+		__( 'Editorial Comments', 'gutenberg', 'gutenberg' ),
+		__( 'Editorial Comments', 'gutenberg', 'gutenberg' ),
 		'edit_posts',
-		'edit-comments.php?comment_type=block_comment',
+		'edit-editorial-comments',
 		'gutenberg_render_editorial_comments_page',
 		'dashicons-admin-comments',
 		26 // Just below "Comments".
@@ -21,21 +21,18 @@ add_action( 'admin_menu', 'gutenberg_add_editorial_comments_menu' );
 /**
  * Render the Editorial Comments admin page.
  */
-function gutenberg_render_editorial_comments_page() {
+function gutenberg_render_editorial_comments_page()  {
 	// This code from Core's wp-admin/edit-comments.php.
 	/**
-	 * Edit Comments Administration Screen.
+	 * Edit Editorial Comments Administration Screen.
 	 *
 	 * @package WordPress
 	 * @subpackage Administration
 	 */
-
-	/** WordPress Administration Bootstrap */
-	require_once ABSPATH . 'wp-admin/admin.php';
 	if ( ! current_user_can( 'edit_posts' ) ) {
 		wp_die(
-			'<h1>' . __( 'You need a higher level of permission.' ) . '</h1>' .
-			'<p>' . __( 'Sorry, you are not allowed to edit comments.' ) . '</p>',
+			'<h1>' . __( 'You need a higher level of permission.', 'gutenberg' ) . '</h1>' .
+			'<p>' . __( 'Sorry, you are not allowed to edit comments.', 'gutenberg' ) . '</p>',
 			403
 		);
 	}
@@ -177,8 +174,8 @@ function gutenberg_render_editorial_comments_page() {
 		if ( $resolved_comments > 0 ) {
 			// Used in the HTML title tag.
 			$title = sprintf(
-				/* translators: 1: Comments count, 2: Post title. */
-				__( 'Comments (%1$s) on &#8220;%2$s&#8221;' ),
+				/* translators: 1: Editorial Comments count, 2: Post title. */
+				__( 'Editorial Comments (%1$s) on &#8220;%2$s&#8221;', 'gutenberg' ),
 				number_format_i18n( $resolved_comments ),
 				$draft_or_post_title
 			);
@@ -186,7 +183,7 @@ function gutenberg_render_editorial_comments_page() {
 			// Used in the HTML title tag.
 			$title = sprintf(
 				/* translators: %s: Post title. */
-				__( 'Comments on &#8220;%s&#8221;' ),
+				__( 'Editorial Comments on &#8220;%s&#8221;', 'gutenberg' ),
 				$draft_or_post_title
 			);
 		}
@@ -212,56 +209,15 @@ function gutenberg_render_editorial_comments_page() {
 		if ( $resolved_comments > 0 ) {
 			// Used in the HTML title tag.
 			$title = sprintf(
-				/* translators: %s: Comments count. */
-				__( 'Editorial Comments (%s)' ),
+				/* translators: %s: Editorial Comments count. */
+				__( 'Editorial Comments (%s)', 'gutenberg' ),
 				number_format_i18n( $resolved_comments )
 			);
 		} else {
 			// Used in the HTML title tag.
-			$title = __( 'Editorial Comments' );
+			$title = __( 'Editorial Comments', 'gutenberg' );
 		}
 	}
-
-	add_screen_option( 'per_page' );
-
-	get_current_screen()->add_help_tab(
-		array(
-			'id'      => 'overview',
-			'title'   => __( 'Overview' ),
-			'content' =>
-					'<p>' . __( 'You can manage comments made on your site similar to the way you manage posts and other content. This screen is customizable in the same ways as other management screens, and you can act on comments using the on-hover action links or the bulk actions.' ) . '</p>',
-		)
-	);
-	get_current_screen()->add_help_tab(
-		array(
-			'id'      => 'moderating-comments',
-			'title'   => __( 'Moderating Comments' ),
-			'content' =>
-						'<p>' . __( 'A red bar on the left means the comment is waiting for you to resolve it.' ) . '</p>' .
-						'<p>' . __( 'In the <strong>Author</strong> column, in addition to the author&#8217;s name, email address, and site URL, the commenter&#8217;s IP address is shown. Clicking on this link will show you all the comments made from this IP address.' ) . '</p>' .
-						'<p>' . __( 'In the <strong>Comment</strong> column, hovering over any comment gives you options to approve, reply (and approve), quick edit, edit, spam mark, or trash that comment.' ) . '</p>' .
-						'<p>' . __( 'In the <strong>In response to</strong> column, there are three elements. The text is the name of the post that inspired the comment, and links to the post editor for that entry. The View Post link leads to that post on your live site. The small bubble with the number in it shows the number of approved comments that post has received. If there are pending comments, a red notification circle with the number of pending comments is displayed. Clicking the notification circle will filter the comments screen to show only pending comments on that post.' ) . '</p>' .
-						'<p>' . __( 'In the <strong>Submitted on</strong> column, the date and time the comment was left on your site appears. Clicking on the date/time link will take you to that comment on your live site.' ) . '</p>' .
-						'<p>' . __( 'Many people take advantage of keyboard shortcuts to resolve their comments more quickly. Use the link to the side to learn more.' ) . '</p>',
-		)
-	);
-
-	get_current_screen()->set_help_sidebar(
-		'<p><strong>' . __( 'For more information:' ) . '</strong></p>' .
-		'<p>' . __( '<a href="https://wordpress.org/documentation/article/comments-screen/">Documentation on Comments</a>' ) . '</p>' .
-		'<p>' . __( '<a href="https://wordpress.org/documentation/article/understand-comment-spam/">Documentation on Comment Spam</a>' ) . '</p>' .
-		'<p>' . __( '<a href="https://wordpress.org/documentation/article/keyboard-shortcuts-classic-editor/#keyboard-shortcuts-for-comments">Documentation on Keyboard Shortcuts</a>' ) . '</p>' .
-		'<p>' . __( '<a href="https://wordpress.org/support/forums/">Support forums</a>' ) . '</p>'
-	);
-
-	get_current_screen()->set_screen_reader_content(
-		array(
-			'heading_views'      => __( 'Filter editorial comments list' ),
-			'heading_pagination' => __( 'Editorial Comments list navigation' ),
-			'heading_list'       => __( 'Editorial Comments list' ),
-		)
-	);
-
 	?>
 
 	<div class="wrap">
@@ -270,7 +226,7 @@ function gutenberg_render_editorial_comments_page() {
 	if ( $post_id ) {
 		printf(
 			/* translators: %s: Link to post. */
-			__( 'Editorial Comments on &#8220;%s&#8221;' ),
+			__( 'Editorial Comments on &#8220;%s&#8221;', 'gutenberg' ),
 			sprintf(
 				'<a href="%1$s">%2$s</a>',
 				get_edit_post_link( $post_id ),
@@ -300,7 +256,7 @@ function gutenberg_render_editorial_comments_page() {
 		echo '<span class="subtitle">';
 		printf(
 			/* translators: %s: Search query. */
-			__( 'Search results for: %s' ),
+			__( 'Search results for: %s', 'gutenberg' ),
 			'<strong>' . esc_html( wp_unslash( $_REQUEST['s'] ) ) . '</strong>'
 		);
 		echo '</span>';
@@ -315,10 +271,10 @@ function gutenberg_render_editorial_comments_page() {
 		$error_msg = '';
 		switch ( $error ) {
 			case 1:
-				$error_msg = __( 'Invalid comment ID.' );
+				$error_msg = __( 'Invalid comment ID.', 'gutenberg' );
 				break;
 			case 2:
-				$error_msg = __( 'Sorry, you are not allowed to edit comments on this post.' );
+				$error_msg = __( 'Sorry, you are not allowed to edit comments on this post.', 'gutenberg' );
 				break;
 		}
 		if ( $error_msg ) {
@@ -362,10 +318,10 @@ function gutenberg_render_editorial_comments_page() {
 				if ( $comment ) {
 					switch ( $comment->comment_approved ) {
 						case '1':
-							$messages[] = __( 'This comment is already approved.' ) . sprintf(
+							$messages[] = __( 'This comment is already approved.', 'gutenberg' ) . sprintf(
 								' <a href="%1$s">%2$s</a>',
 								esc_url( admin_url( "comment.php?action=editcomment&c=$same" ) ),
-								__( 'Edit comment' )
+								__( 'Edit comment', 'gutenberg' )
 							);
 							break;
 					}
@@ -389,7 +345,7 @@ function gutenberg_render_editorial_comments_page() {
 
 	<form id="comments-form" method="get">
 
-	<?php $wp_list_table->search_box( __( 'Search Editorial Comments' ), 'comment' ); ?>
+	<?php $wp_list_table->search_box( __( 'Search Editorial Comments', 'gutenberg'  ), 'comment' );?>
 
 	<?php if ( $post_id ) : ?>
 	<input type="hidden" name="p" value="<?php echo esc_attr( (int) $post_id ); ?>" />
@@ -415,5 +371,3 @@ function gutenberg_render_editorial_comments_page() {
 	wp_comment_reply( '-1', true, 'detail' );
 	wp_comment_trashnotice();
 }
-
-
