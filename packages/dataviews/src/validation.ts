@@ -57,6 +57,13 @@ export function isItemValid< Item >(
 			if ( field.type === 'boolean' && value !== true ) {
 				return false;
 			}
+
+			if (
+				field.type === 'array' &&
+				( ! Array.isArray( value ) || value.length === 0 )
+			) {
+				return false;
+			}
 		}
 
 		if ( field.isValid.elements ) {
@@ -86,8 +93,8 @@ export function isItemValid< Item >(
 			return false;
 		}
 
-		// The array field.type can have children, so check them as well
-		if ( field.type === 'array' && field.children?.length > 0 ) {
+		// The array field.type can have children.
+		if ( field.type === 'array' && Array.isArray( field.children ) ) {
 			// children is NormalizedField, but we'll use it below
 			// as a parameter to isItemValid, which uses the more permissive
 			// Field. Hence, the cast.
