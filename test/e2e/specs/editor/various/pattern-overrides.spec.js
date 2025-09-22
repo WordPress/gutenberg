@@ -797,8 +797,8 @@ test.describe( 'Pattern Overrides', () => {
 	} ) => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"testing/complete-source","args":{"key":"text_field"}},"__default":{"source":"core/pattern-overrides"}}}} -->
-<p>Post Meta Binding</p>
+			content: `<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Edit me</p>
 <!-- /wp:paragraph -->
 <!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
@@ -818,9 +818,7 @@ test.describe( 'Pattern Overrides', () => {
 			name: 'Block: Pattern',
 		} );
 
-		await expect(
-			patternBlock.getByText( 'Text Field Value' )
-		).toBeVisible();
+		await expect( patternBlock.getByText( 'Edit me' ) ).toBeVisible();
 		await expect(
 			patternBlock.getByText( 'Read Only Button Text' )
 		).toBeVisible();
@@ -830,7 +828,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 				includeHidden: true,
 			} )
-			.filter( { hasText: 'Text Field Value' } );
+			.filter( { hasText: 'Edit me' } );
 		const nonEditableButton = patternBlock
 			.getByRole( 'document', {
 				name: 'Block: Button',
@@ -841,10 +839,8 @@ test.describe( 'Pattern Overrides', () => {
 
 		await editableParagraph.click();
 		await editableParagraph.focus();
-		await page.keyboard.type( ' Edited' );
-		await expect( editableParagraph ).toHaveText(
-			'Text Field Value Edited'
-		);
+		await page.keyboard.type( ' - Edited' );
+		await expect( editableParagraph ).toHaveText( 'Edit me - Edited' );
 
 		// Button with only URL binding (no pattern overrides) should not have editable text.
 		await nonEditableButton.click();
