@@ -5,8 +5,8 @@
 ```bash
 # Setup
 npm install && composer install
-npm run wp-env status   # Check if wp-env running
-npm run wp-env start    # Start WordPress environment
+npm run wp-env status   # Always check status first
+npm run wp-env start    # Only start if not already running
 
 # Development
 npm start               # Development with watch
