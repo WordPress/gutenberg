@@ -1,29 +1,37 @@
 // Stretchy Text functionality
-let dynamicStyleElement = null;
 
-function createDynamicStyleElement() {
-	if ( ! dynamicStyleElement ) {
-		dynamicStyleElement = document.createElement( 'style' );
-		document.head.appendChild( dynamicStyleElement );
+function getOrCreateStyleElement( containerId ) {
+	const styleId = `stretchy-text-${ containerId }`;
+	let styleElement = document.getElementById( styleId );
+	if ( ! styleElement ) {
+		styleElement = document.createElement( 'style' );
+		styleElement.id = styleId;
+		document.head.appendChild( styleElement );
 	}
-	return dynamicStyleElement;
+	return styleElement;
 }
 
-function generateUniqueClass() {
-	return 'stretchy-' + Math.random().toString( 36 ).substring( 2, 11 );
+function getContainerIdentifier( containerElement ) {
+	// Use existing ID or create one
+	if ( ! containerElement.dataset.stretchyId ) {
+		containerElement.dataset.stretchyId =
+			// Here Math.random is ok to generate ids they don't need to cryptographically secure.
+			// eslint-disable-next-line no-restricted-syntax
+			'container-' + Math.random().toString( 36 ).substring( 2, 11 );
+	}
+	return containerElement.dataset.stretchyId;
 }
 
 function initializeStretchyContainer( containerElement ) {
-	// Generate unique class for this container
-	const uniqueClass = generateUniqueClass();
-	containerElement.classList.add( uniqueClass );
+	// Get unique ID for this container
+	const containerId = getContainerIdentifier( containerElement );
 
 	// Calculate font ratios for this container
-	const fontRatios = calculateFontRatios( containerElement, uniqueClass );
+	const fontRatios = calculateFontRatios( containerElement, containerId );
 
 	// Store ratios on the container element
 	containerElement._stretchyData = {
-		uniqueClass,
+		containerId,
 		fontRatios,
 	};
 
@@ -32,14 +40,14 @@ function initializeStretchyContainer( containerElement ) {
 
 	// Watch for container resize
 	if ( window.ResizeObserver ) {
-		const resizeObserver = new ResizeObserver( () => {
+		const resizeObserver = new window.ResizeObserver( () => {
 			stretchText( containerElement );
 		} );
 		resizeObserver.observe( containerElement );
 	}
 }
 
-function calculateFontRatios( containerElement, uniqueClass ) {
+function calculateFontRatios( containerElement, containerId ) {
 	const textElements = containerElement.querySelectorAll(
 		'h1, h2, h3, h4, h5, h6, p, pre'
 	);
@@ -47,7 +55,7 @@ function calculateFontRatios( containerElement, uniqueClass ) {
 	let minSize = Infinity;
 
 	// Temporarily clear any dynamic styles to get CSS values
-	updateDynamicCSS( uniqueClass, [] );
+	updateContainerCSS( containerId, [] );
 
 	textElements.forEach( ( element ) => {
 		const computedStyle = window.getComputedStyle( element );
@@ -62,21 +70,19 @@ function calculateFontRatios( containerElement, uniqueClass ) {
 	return fontRatios;
 }
 
-function updateDynamicCSS( uniqueClass, fontSizes ) {
-	const styleElement = createDynamicStyleElement();
+function updateContainerCSS( containerId, fontSizes ) {
+	const styleElement = getOrCreateStyleElement( containerId );
+	const containerSelector = `[data-stretchy-id="${ containerId }"]`;
 
 	// Generate CSS rules for this container
 	let cssRules = '';
 	fontSizes.forEach( ( fontSize, index ) => {
-		const selector = `.${ uniqueClass } > *:nth-child(${ index + 1 })`;
+		const selector = `${ containerSelector } > *:nth-child(${ index + 1 })`;
 		cssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
 	} );
 
-	// Update or add rules for this container
-	const existingContent = styleElement.textContent || '';
-	const classPattern = new RegExp( `\\.${ uniqueClass }[^}]*}`, 'g' );
-	const newContent = existingContent.replace( classPattern, '' ) + cssRules;
-	styleElement.textContent = newContent;
+	// Direct assignment - no string manipulation needed
+	styleElement.textContent = cssRules;
 }
 
 function stretchText( containerElement ) {
@@ -85,7 +91,7 @@ function stretchText( containerElement ) {
 		return;
 	}
 
-	const { uniqueClass, fontRatios } = data;
+	const { containerId, fontRatios } = data;
 
 	let minSize = 1;
 	let maxSize = 200;
@@ -99,7 +105,7 @@ function stretchText( containerElement ) {
 		const testSizes = fontRatios.map( ( ratio ) => midSize * ratio );
 
 		// Apply test sizes via CSS
-		updateDynamicCSS( uniqueClass, testSizes );
+		updateContainerCSS( containerId, testSizes );
 
 		const fitsWidth =
 			containerElement.scrollWidth <= containerElement.clientWidth;
@@ -116,7 +122,7 @@ function stretchText( containerElement ) {
 
 	// Apply final optimal sizes
 	const finalSizes = fontRatios.map( ( ratio ) => bestSize * ratio );
-	updateDynamicCSS( uniqueClass, finalSizes );
+	updateContainerCSS( containerId, finalSizes );
 }
 
 // Initialize all stretchy text containers when DOM is loaded
