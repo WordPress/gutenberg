@@ -1,4 +1,8 @@
 // Stretchy Text functionality
+/**
+ * Internal dependencies
+ */
+import { optimizeStretchyText } from './stretchy-text-utils';
 
 function getOrCreateStyleElement( containerId ) {
 	const styleId = `stretchy-text-${ containerId }`;
@@ -26,103 +30,38 @@ function initializeStretchyContainer( containerElement ) {
 	// Get unique ID for this container
 	const containerId = getContainerIdentifier( containerElement );
 
-	// Calculate font ratios for this container
-	const fontRatios = calculateFontRatios( containerElement, containerId );
-
-	// Store ratios on the container element
-	containerElement._stretchyData = {
-		containerId,
-		fontRatios,
-	};
-
 	// Initial sizing
-	stretchText( containerElement );
+	stretchText( containerElement, containerId );
 
 	// Watch for container resize
 	if ( window.ResizeObserver ) {
 		const resizeObserver = new window.ResizeObserver( () => {
-			stretchText( containerElement );
+			stretchText( containerElement, containerId );
 		} );
 		resizeObserver.observe( containerElement );
 	}
 }
 
-function calculateFontRatios( containerElement, containerId ) {
-	const textElements = containerElement.querySelectorAll(
-		'h1, h2, h3, h4, h5, h6, p, pre'
-	);
-	const elementSizes = [];
-	let minSize = Infinity;
-
-	// Temporarily clear any dynamic styles to get CSS values
-	updateContainerCSS( containerId, [] );
-
-	textElements.forEach( ( element ) => {
-		const computedStyle = window.getComputedStyle( element );
-		const fontSize = parseFloat( computedStyle.fontSize );
-		elementSizes.push( fontSize );
-		minSize = Math.min( minSize, fontSize );
-	} );
-
-	// Calculate ratios relative to smallest font size
-	const fontRatios = elementSizes.map( ( fontSize ) => fontSize / minSize );
-
-	return fontRatios;
-}
-
-function updateContainerCSS( containerId, fontSizes ) {
+function stretchText( containerElement, containerId ) {
+	// Get style element for this container
 	const styleElement = getOrCreateStyleElement( containerId );
 	const containerSelector = `[data-stretchy-id="${ containerId }"]`;
 
-	// Generate CSS rules for this container
-	let cssRules = '';
-	fontSizes.forEach( ( fontSize, index ) => {
-		const selector = `${ containerSelector } > *:nth-child(${ index + 1 })`;
-		cssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
-	} );
+	// Style management callbacks
+	const applyStylesFn = ( css ) => {
+		styleElement.textContent = css;
+	};
+	const clearStylesFn = () => {
+		styleElement.textContent = '';
+	};
 
-	// Direct assignment - no string manipulation needed
-	styleElement.textContent = cssRules;
-}
-
-function stretchText( containerElement ) {
-	const data = containerElement._stretchyData;
-	if ( ! data ) {
-		return;
-	}
-
-	const { containerId, fontRatios } = data;
-
-	let minSize = 1;
-	let maxSize = 200;
-	let bestSize = minSize;
-
-	// Binary search for optimal base font size
-	while ( minSize <= maxSize ) {
-		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
-
-		// Generate font sizes for this test
-		const testSizes = fontRatios.map( ( ratio ) => midSize * ratio );
-
-		// Apply test sizes via CSS
-		updateContainerCSS( containerId, testSizes );
-
-		const fitsWidth =
-			containerElement.scrollWidth <= containerElement.clientWidth;
-		const fitsHeight =
-			containerElement.scrollHeight <= containerElement.clientHeight;
-
-		if ( fitsWidth && fitsHeight ) {
-			bestSize = midSize;
-			minSize = midSize + 1;
-		} else {
-			maxSize = midSize - 1;
-		}
-	}
-
-	// Apply final optimal sizes
-	const finalSizes = fontRatios.map( ( ratio ) => bestSize * ratio );
-	updateContainerCSS( containerId, finalSizes );
+	// Use shared utility for complete optimization
+	optimizeStretchyText(
+		containerElement,
+		containerSelector,
+		applyStylesFn,
+		clearStylesFn
+	);
 }
 
 // Initialize all stretchy text containers when DOM is loaded
@@ -138,9 +77,5 @@ window.addEventListener( 'load', function () {
 	const containers = document.querySelectorAll(
 		'.wp-block-group.has-stretch-text'
 	);
-	containers.forEach( ( container ) => {
-		if ( ! container._stretchyData ) {
-			initializeStretchyContainer( container );
-		}
-	} );
+	containers.forEach( initializeStretchyContainer );
 } );

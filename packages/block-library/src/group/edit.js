@@ -23,6 +23,7 @@ import clsx from 'clsx';
  */
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
 import { unlock } from '../lock-unlock';
+import { optimizeStretchyText } from './stretchy-text-utils';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
@@ -48,7 +49,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 		[ stretchyText, clientId ]
 	);
 
-	// Define applyStretchyText function that we can reuse
+	// Define stretchy text optimization function
 	const applyStretchyText = useCallback( () => {
 		if ( ! ref.current ) {
 			return;
@@ -66,79 +67,21 @@ function useStretchyText( ref, stretchyText, clientId ) {
 		// Use WordPress block ID for targeting
 		const blockSelector = `#block-${ clientId }`;
 
-		// Clear any existing dynamic styles for this block FIRST
-		// This ensures we measure natural CSS font sizes, not previously stretched sizes
-		styleElement.textContent = '';
+		// Style management callbacks
+		const applyStylesFn = ( css ) => {
+			styleElement.textContent = css;
+		};
+		const clearStylesFn = () => {
+			styleElement.textContent = '';
+		};
 
-		// Find text elements
-		const textElements = ref.current.querySelectorAll(
-			'h1, h2, h3, h4, h5, h6, p, pre'
+		// Use shared utility for complete optimization
+		optimizeStretchyText(
+			ref.current,
+			blockSelector,
+			applyStylesFn,
+			clearStylesFn
 		);
-
-		// If no text elements, styles are already cleared above, so return
-		if ( textElements.length === 0 ) {
-			return;
-		}
-
-		// Calculate font ratios for current text elements
-		const elementSizes = [];
-		let minSize = Infinity;
-
-		textElements.forEach( ( element ) => {
-			const computedStyle = window.getComputedStyle( element );
-			const fontSize = parseFloat( computedStyle.fontSize );
-			elementSizes.push( fontSize );
-			minSize = Math.min( minSize, fontSize );
-		} );
-
-		// Calculate ratios relative to smallest font size
-		const fontRatios = elementSizes.map(
-			( fontSize ) => fontSize / minSize
-		);
-
-		let minTestSize = 1;
-		let maxTestSize = 200;
-		let bestSize = minTestSize;
-
-		// Binary search for optimal base font size
-		while ( minTestSize <= maxTestSize ) {
-			const midSize = Math.floor( ( minTestSize + maxTestSize ) / 2 );
-
-			// Generate CSS rules for this test
-			let cssRules = '';
-			fontRatios.forEach( ( ratio, index ) => {
-				const fontSize = midSize * ratio;
-				const selector = `${ blockSelector } > *:nth-child(${
-					index + 1
-				})`;
-				cssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
-			} );
-
-			// Apply test styles
-			styleElement.textContent = cssRules;
-
-			const fitsWidth =
-				ref.current.scrollWidth <= ref.current.clientWidth;
-			const fitsHeight =
-				ref.current.scrollHeight <= ref.current.clientHeight;
-
-			if ( fitsWidth && fitsHeight ) {
-				bestSize = midSize;
-				minTestSize = midSize + 1;
-			} else {
-				maxTestSize = midSize - 1;
-			}
-		}
-
-		// Apply final optimal sizes
-		let finalCssRules = '';
-		fontRatios.forEach( ( ratio, index ) => {
-			const fontSize = bestSize * ratio;
-			const selector = `${ blockSelector } > *:nth-child(${ index + 1 })`;
-			finalCssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
-		} );
-
-		styleElement.textContent = finalCssRules;
 	}, [ ref, clientId ] );
 
 	useEffect( () => {
