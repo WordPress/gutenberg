@@ -15,7 +15,7 @@
 		"anchor": true,
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"align": false,
 		"interactivity": true,

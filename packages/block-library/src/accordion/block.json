@@ -19,7 +19,7 @@
 		},
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"__experimentalBorder": {
 			"color": true,

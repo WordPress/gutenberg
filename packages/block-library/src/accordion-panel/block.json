@@ -10,7 +10,7 @@
 	"supports": {
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"interactivity": true,
 		"spacing": {
