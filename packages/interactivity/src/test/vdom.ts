@@ -979,5 +979,378 @@ describe( 'toVdom', () => {
 				)
 			);
 		} );
+
+		it( 'should parse complex suffixes with double dashes and unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on--custom--event---plugin-name="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on--custom--event---plugin-name': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: 'custom--event',
+									uniqueId: 'plugin-name',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse suffix starting with dashes and unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on----custom-event---plugin-name="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on----custom-event---plugin-name':
+							'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: '--custom-event',
+									uniqueId: 'plugin-name',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should parse multiple dashes in unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---plugin---name---v2="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---plugin---name---v2': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: '-plugin',
+									uniqueId: 'name---v2',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: suffix after unique ID (malformed)', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on---plugin-name--custom-event="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on---plugin-name--custom-event': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'plugin-name--custom-event',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: multiple triple dashes (malformed)', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test------malformed="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test------malformed': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: '-',
+									uniqueId: 'malformed',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: four dashes then suffix (malformed)', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on----suffix---unique="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on----suffix---unique': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: '--suffix',
+									uniqueId: 'unique',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: empty suffix with unique ID', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test-----unique-id="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test-----unique-id': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: '--unique-id',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: only dashes as suffix', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test------="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test------': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: '---',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle special characters in unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---plugin_name-v2_final="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---plugin_name-v2_final': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'plugin_name-v2_final',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle numbers in suffixes and unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on--event123---plugin456="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on--event123---plugin456': 'test value',
+						__directives: {
+							on: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: 'event123',
+									uniqueId: 'plugin456',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle mixed case directive names with unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-my-custom-directive---unique-id="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-my-custom-directive---unique-id': 'test value',
+						__directives: {
+							'my-custom-directive': [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: 'unique-id',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: no directive name with unique ID (malformed)', () => {
+			const element = createElementFromHTML(
+				`<div data-wp----unique-id="test value"></div>`
+			);
+			// This should warn about malformed directive name and not create any directives
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp----unique-id': 'test value',
+						__directives: {},
+					},
+					[]
+				)
+			);
+			// Expect a warning about malformed directive name
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should handle very long unique IDs', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---very-long-plugin-name-with-many-dashes-and-underscores_123_version_final="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---very-long-plugin-name-with-many-dashes-and-underscores_123_version_final':
+							'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId:
+										'very-long-plugin-name-with-many-dashes-and-underscores_123_version_final',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle edge case: starts with number in unique ID', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test---123plugin="test value"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test---123plugin': 'test value',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value',
+									suffix: null,
+									uniqueId: '123plugin',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
+		it( 'should handle complex real-world example', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-on--form-submit---contact-form-plugin-v2="my-store::actions.handleSubmit"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-on--form-submit---contact-form-plugin-v2':
+							'my-store::actions.handleSubmit',
+						__directives: {
+							on: [
+								{
+									namespace: 'my-store',
+									value: 'actions.handleSubmit',
+									suffix: 'form-submit',
+									uniqueId: 'contact-form-plugin-v2',
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
 	} );
 } );
