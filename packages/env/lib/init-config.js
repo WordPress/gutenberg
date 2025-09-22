@@ -209,13 +209,13 @@ function installDependencies( service, env, config ) {
 			dockerFileContent += `
 # Make sure we're working with the latest packages.
 RUN apt-get clean
-RUN apt-get -y update
+RUN apt-get -qy update
 
 # Install some basic PHP dependencies.
-RUN apt-get -y install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Install git
-RUN apt-get -y install git
+RUN apt-get -qy install git
 
 # Set up sudo so they can have root access.
 RUN apt-get -y install sudo
@@ -357,8 +357,8 @@ function getSpxConfig( spxMode = 'off', phpVersion, service ) {
 
 	return `
 # Install SPX profiler
-RUN apt-get update -y
-RUN apt-get install -y git zlib1g-dev
+RUN apt-get update -qy
+RUN apt-get install -qy git zlib1g-dev
 RUN cd /tmp && git clone https://github.com/NoiseByNorthwest/php-spx.git
 RUN cd /tmp/php-spx && git checkout release/latest
 RUN cd /tmp/php-spx && phpize && ./configure && make && make install
