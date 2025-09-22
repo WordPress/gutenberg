@@ -7,7 +7,7 @@
 	grid-template-rows: max-content 1fr;
 
 	> .wp-block-accordion-header {
-		.accordion-content__toggle-icon.has-icon-plus {
+		.accordion-content__toggle-icon {
 			transform: rotate(45deg);
 		}
 	}
@@ -36,8 +36,16 @@
 	width: 100%;
 }
 
-.accordion-content__toggle > span {
-	width: 100%;
+.accordion-content__toggle-title {
+	flex: 1;
+}
+
+.accordion-content__toggle-icon {
+	width: 1.2em;
+	height: 1.2em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .is-layout-flow > .wp-block-accordion-panel,
@@ -58,11 +66,6 @@
 /* No icon block style */
 .is-style-no-icon .accordion-content__toggle-icon {
 	background-color: unset;
-}
-
-.wp-block-accordion-header.icon-position-left .accordion-content__toggle {
-	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
-	flex-direction: row-reverse;
 }
 
 .accordion-content__toggle:focus-visible {

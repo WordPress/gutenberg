@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+
 ## 30.4.0 (2025-09-17)
 
 ### Bug Fixes
