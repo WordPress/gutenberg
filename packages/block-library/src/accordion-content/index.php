@@ -35,10 +35,11 @@ function block_core_accordion_content_render( $attributes, $content ) {
 		$open_by_default = $attributes['openByDefault'] ? 'true' : 'false';
 		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '", "openByDefault": ' . $open_by_default . ' }' );
 		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
-		$p->set_attribute( 'data-wp-init', 'callbacks.initIsOpen' );
+		$p->set_attribute( 'data-wp-init', 'callbacks.initAccordionContents' );
 
 		if ( $p->next_tag( array( 'class_name' => 'accordion-content__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
+			$p->set_attribute( 'data-wp-on--keydown', 'actions.handleKeyDown' );
 			$p->set_attribute( 'id', $unique_id );
 			$p->set_attribute( 'aria-controls', $unique_id . '-panel' );
 			$p->set_attribute( 'data-wp-bind--aria-expanded', 'state.isOpen' );
