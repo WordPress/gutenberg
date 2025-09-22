@@ -43,4 +43,3 @@ function gutenberg_allow_empty_block_comments( $allow, $prepared_comment ) {
 	return $allow;
 }
 add_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments' );
-
