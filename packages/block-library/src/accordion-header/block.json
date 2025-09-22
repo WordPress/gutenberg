@@ -25,7 +25,8 @@
 			"__experimentalDefaultControls": {
 				"padding": true,
 				"margin": true
-			}
+			},
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,
