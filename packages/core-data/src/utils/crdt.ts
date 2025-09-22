@@ -9,7 +9,7 @@ import * as fun from 'lib0/function';
 // @ts-ignore No types available.
 import { parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
-import { type CRDTDoc, Y } from '@wordpress/sync';
+import { type CRDTDoc, CRDT_RECORD_MAP_KEY, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -19,9 +19,6 @@ import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
 
 type PostChanges = Partial< Post > & { blocks?: Block[] };
-
-// Key used to store the document map in the Y.Doc.
-const DOCUMENT_MAP_KEY = 'document';
 
 /**
  * Given a set of local changes to a post record, apply those changes to the
@@ -43,7 +40,7 @@ export function applyPostChangesToCRDTDoc(
 	syncedProperties: Set< string >,
 	origin: string
 ): void {
-	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
+	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 	Object.entries( changes ).forEach( ( [ key, newValue ] ) => {
 		if ( ! syncedProperties.has( key ) ) {
@@ -188,7 +185,7 @@ export function getPostChangesFromCRDTDoc(
 	postType: Type,
 	syncedProperties: Set< string >
 ): PostChanges {
-	const ymap = ydoc.getMap( DOCUMENT_MAP_KEY );
+	const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 
 	return Object.fromEntries(
 		Object.entries( ymap.toJSON() ).filter( ( [ key, newValue ] ) => {
