@@ -125,14 +125,6 @@ const { state, actions } = store( 'core/tabs', {
 				}
 			}
 		},
-		/**
-		 * Signals that the tabs are ready by firing a custom browser event.
-		 * This provides extensibility for other scripts to hook into when tabs are initialized.
-		 */
-		signalTabsReady: () => {
-			// @TODO: change this from tabsReady to wpTabsReady when migrating to Gutenberg core.
-			window.dispatchEvent( new CustomEvent( 'wpTabsReady' ) );
-		},
 	},
 	callbacks: {
 		/**
@@ -151,7 +143,6 @@ const { state, actions } = store( 'core/tabs', {
 			if ( tabIndex >= 0 ) {
 				actions.setActiveTab( tabIndex, true );
 			}
-			actions.signalTabsReady();
 		},
 	},
 } );
