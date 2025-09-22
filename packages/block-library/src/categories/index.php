@@ -101,7 +101,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script>
-	(function() {
+	( function() {
 		var dropdown = document.getElementById('<?php echo esc_js( $dropdown_id ); ?>'), lastKey;
 
 		function onSelectChange(e) {
@@ -135,7 +135,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	})();
 	</script>
 	<?php
-	return wp_get_inline_script_tag(str_replace(array('<script>', '</script>'), '', ob_get_clean()));
+	return wp_get_inline_script_tag( str_replace( array ('<script>', '</script>' ), '', ob_get_clean()));
 }
 
 /**
