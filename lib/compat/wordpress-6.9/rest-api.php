@@ -59,3 +59,18 @@ function gutenberg_substitute_empty_comment_content( $prepared_comment ) {
 	return $prepared_comment;
 }
 add_filter( 'rest_preprocess_comment', 'gutenberg_substitute_empty_comment_content' );
+
+/**
+ * Enable empty comments when the comment_type is 'block_comment'.
+ *
+ * This is the only filter we should need to allow empty comments once
+ * WordPress 6.9 is the minimum required version.
+ */
+function gutenberg_allow_empty_block_comments( $allow, $prepared_comment ) {
+	if ( isset( $prepared_comment['comment_type'] ) && 'block_comment' === $prepared_comment['comment_type'] ) {
+		$allow = true;
+	}
+	return $allow;
+}
+add_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments' );
+
