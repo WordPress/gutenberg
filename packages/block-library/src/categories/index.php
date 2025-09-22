@@ -97,22 +97,45 @@ function render_block_core_categories( $attributes, $content, $block ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function build_dropdown_script_block_core_categories( $dropdown_id ) {
+function gutenberg_build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script>
-	( function() {
-		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
-		function onCatChange() {
-			if ( dropdown.options[ dropdown.selectedIndex ].value !== -1 ) {
-				location.href = "<?php echo esc_url( home_url() ); ?>/?" + dropdown.name + '=' + dropdown.options[ dropdown.selectedIndex ].value;
-			}
+	(function() {
+		var dropdown = document.getElementById('<?php echo esc_js( $dropdown_id ); ?>'), lastKey;
+
+		function onSelectChange(e) {
+			setTimeout(function() {
+				lastKey = dropdown.getAttribute('data-lastkey');
+				if ('change' === e.type && 'escape' === lastKey) {
+					return;
+				}
+				var value = dropdown.options[dropdown.selectedIndex].value;
+				if (value && value !== '-1') {
+					location.href = "<?php echo esc_url(home_url()); ?>/?"
+						+ encodeURIComponent(dropdown.name) + '='
+						+ encodeURIComponent(value);
+				}
+			}, 250);
 		}
-		dropdown.onchange = onCatChange;
+
+		dropdown.addEventListener('keyup', function(e) {
+			if (e.key === 'Escape') {
+				dropdown.setAttribute('data-lastkey', 'escape');
+			} else {
+				dropdown.removeAttribute('data-lastkey');
+			}
+		});
+
+		dropdown.addEventListener('click', function() {
+			dropdown.removeAttribute('data-lastkey');
+		});
+
+		dropdown.onchange = onSelectChange;
 	})();
 	</script>
 	<?php
-	return wp_get_inline_script_tag( str_replace( array( '<script>', '</script>' ), '', ob_get_clean() ) );
+	return wp_get_inline_script_tag(str_replace(array('<script>', '</script>'), '', ob_get_clean()));
 }
 
 /**
