@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- DataViews: Fix ListView focus stealing from search input during typing. [#71810](https://github.com/WordPress/gutenberg/pull/71810/)
 - DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
 
 ### Enhancements
