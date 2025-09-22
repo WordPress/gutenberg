@@ -160,6 +160,10 @@ export const getEntityRecord =
 						{
 							// Handle edits sourced from the sync provider.
 							editRecord: ( edits ) => {
+								if ( ! Object.keys( edits ).length ) {
+									return;
+								}
+
 								dispatch( {
 									type: 'EDIT_ENTITY_RECORD',
 									kind,
