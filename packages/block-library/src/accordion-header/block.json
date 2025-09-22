@@ -21,10 +21,8 @@
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
-				"padding": true,
-				"margin": true
+				"padding": true
 			},
 			"__experimentalSkipSerialization": true
 		},
