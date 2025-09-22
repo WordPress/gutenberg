@@ -56,14 +56,14 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<TagName { ...blockProps }>
 				<button
-					className={ clsx( 'accordion-content__toggle' ) }
+					className={ clsx( 'wp-block-accordion-header__toggle' ) }
 					style={ {
 						...spacingProps.style,
 					} }
 				>
 					{ showIcon && iconPosition === 'left' && (
 						<span
-							className="accordion-content__toggle-icon"
+							className="wp-block-accordion-header__toggle-icon"
 							aria-hidden="true"
 						>
 							+
@@ -81,7 +81,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					/>
 					{ showIcon && iconPosition === 'right' && (
 						<span
-							className="accordion-content__toggle-icon"
+							className="wp-block-accordion-header__toggle-icon"
 							aria-hidden="true"
 						>
 							+
