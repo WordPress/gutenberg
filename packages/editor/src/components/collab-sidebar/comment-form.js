@@ -15,7 +15,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,12 +39,14 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
+	shouldFocusTextareaOnMount = true,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
+	const focusOnMountRef = useFocusOnMount( shouldFocusTextareaOnMount );
 	const isDisabled =
 		inputComment === thread?.content?.raw ||
 		! sanitizeCommentString( inputComment ).length;
@@ -65,6 +67,7 @@ function CommentForm( {
 				}
 				rows={ 1 }
 				maxRows={ 20 }
+				ref={ shouldFocusTextareaOnMount ? focusOnMountRef : null }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>

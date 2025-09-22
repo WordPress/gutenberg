@@ -12,6 +12,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { decodeEntities } from '@wordpress/html-entities';
+import { focusCommentThread } from './utils';
 
 /**
  * Internal dependencies
@@ -262,7 +263,12 @@ export default function CollabSidebar() {
 	return (
 		<>
 			<AddCommentComponent
-				onClick={ openCollabBoard }
+				onClick={ () => {
+					openCollabBoard();
+					if ( commentSidebarRef?.current && currentThread ) {
+						focusCommentThread( currentThread.id, commentSidebarRef.current );
+					}
+				} }
 				thread={ currentThread }
 				hasMoreComments={ hasMoreComments }
 			/>
