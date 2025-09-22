@@ -253,11 +253,16 @@ export function RichTextWrapper(
 			blockContext,
 		]
 	);
-	const arePatternOverridesEnabled =
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
 		blockBindings?.__default?.source === 'core/pattern-overrides';
 
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
+
 	const shouldDisableEditing =
-		readOnly || disableBoundBlock || ! arePatternOverridesEnabled;
+		readOnly || disableBoundBlock || shouldDisableForPattern;
+
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
