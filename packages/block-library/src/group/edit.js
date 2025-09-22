@@ -10,9 +10,12 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
+/**
+ * External dependencies
+ */
 import clsx from 'clsx';
 
 /**
@@ -34,118 +37,128 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 function useStretchyText( ref, stretchyText, clientId ) {
 	const [ dynamicStyleElement, setDynamicStyleElement ] = useState( null );
 
-	useEffect( () => {
-		if ( ! stretchyText || ! ref.current || ! clientId ) {
+	// Monitor inner blocks changes when stretchy text is enabled
+	const innerBlocks = useSelect(
+		( select ) => {
+			if ( ! stretchyText || ! clientId ) {
+				return [];
+			}
+			const { getBlock } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return block?.innerBlocks || [];
+		},
+		[ stretchyText, clientId ]
+	);
+
+	// Define applyStretchyText function that we can reuse
+	const applyStretchyText = useCallback( () => {
+		if ( ! ref.current || ! dynamicStyleElement ) {
 			return;
 		}
 
 		// Use WordPress block ID for targeting
 		const blockSelector = `#block-${ clientId }`;
-
-		// Create or get dynamic style element
-		let styleElement = dynamicStyleElement;
-		if ( ! styleElement ) {
-			styleElement = ref.current.ownerDocument.createElement( 'style' );
-			ref.current.ownerDocument.head.appendChild( styleElement );
-			setDynamicStyleElement( styleElement );
-		}
-
-		// Define block pattern for clearing styles
 		const blockPattern = new RegExp( `#block-${ clientId }[^}]*}`, 'g' );
 
-		// Apply stretchy text logic
-		const applyStretchyText = () => {
-			if ( ! ref.current ) {
-				return;
-			}
+		// Clear any existing dynamic styles for this block FIRST
+		const currentContent = dynamicStyleElement.textContent || '';
+		dynamicStyleElement.textContent = currentContent.replace(
+			blockPattern,
+			''
+		);
 
-			// Clear any existing dynamic styles for this block FIRST
-			// This ensures we measure natural CSS font sizes, not previously stretched sizes
-			styleElement.textContent = styleElement.textContent.replace(
-				blockPattern,
-				''
-			);
+		// Find text elements
+		const textElements = ref.current.querySelectorAll(
+			'h1, h2, h3, h4, h5, h6, p'
+		);
 
-			// Find text elements each time (they may have been added/removed)
-			const textElements = ref.current.querySelectorAll(
-				'h1, h2, h3, h4, h5, h6, p'
-			);
+		// If no text elements, styles are already cleared above, so return
+		if ( textElements.length === 0 ) {
+			return;
+		}
 
-			// If no text elements, styles are already cleared above, so return
-			if ( textElements.length === 0 ) {
-				return;
-			}
+		// Calculate font ratios for current text elements
+		const elementSizes = [];
+		let minSize = Infinity;
 
-			// Calculate font ratios for current text elements (now at natural CSS sizes)
-			const elementSizes = [];
-			let minSize = Infinity;
+		textElements.forEach( ( element ) => {
+			const computedStyle = window.getComputedStyle( element );
+			const fontSize = parseFloat( computedStyle.fontSize );
+			elementSizes.push( fontSize );
+			minSize = Math.min( minSize, fontSize );
+		} );
 
-			textElements.forEach( ( element ) => {
-				const computedStyle = window.getComputedStyle( element );
-				const fontSize = parseFloat( computedStyle.fontSize );
-				elementSizes.push( fontSize );
-				minSize = Math.min( minSize, fontSize );
-			} );
+		// Calculate ratios relative to smallest font size
+		const fontRatios = elementSizes.map(
+			( fontSize ) => fontSize / minSize
+		);
 
-			// Calculate ratios relative to smallest font size
-			const fontRatios = elementSizes.map(
-				( fontSize ) => fontSize / minSize
-			);
+		let minTestSize = 1;
+		let maxTestSize = 100;
+		let bestSize = minTestSize;
 
-			let minTestSize = 1;
-			let maxTestSize = 100;
-			let bestSize = minTestSize;
+		// Binary search for optimal base font size
+		while ( minTestSize <= maxTestSize ) {
+			const midSize = Math.floor( ( minTestSize + maxTestSize ) / 2 );
 
-			// Binary search for optimal base font size
-			while ( minTestSize <= maxTestSize ) {
-				const midSize = Math.floor( ( minTestSize + maxTestSize ) / 2 );
-
-				// Generate CSS rules for this test
-				let cssRules = '';
-				fontRatios.forEach( ( ratio, index ) => {
-					const fontSize = midSize * ratio;
-					const selector = `${ blockSelector } > *:nth-child(${
-						index + 1
-					})`;
-					cssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
-				} );
-
-				// Apply test styles
-				const existingContent = styleElement.textContent || '';
-				const newContent =
-					existingContent.replace( blockPattern, '' ) + cssRules;
-				styleElement.textContent = newContent;
-
-				const fitsWidth =
-					ref.current.scrollWidth <= ref.current.clientWidth;
-				const fitsHeight =
-					ref.current.scrollHeight <= ref.current.clientHeight;
-
-				if ( fitsWidth && fitsHeight ) {
-					bestSize = midSize;
-					minTestSize = midSize + 1;
-				} else {
-					maxTestSize = midSize - 1;
-				}
-			}
-
-			// Apply final optimal sizes
-			let finalCssRules = '';
+			// Generate CSS rules for this test
+			let cssRules = '';
 			fontRatios.forEach( ( ratio, index ) => {
-				const fontSize = bestSize * ratio;
+				const fontSize = midSize * ratio;
 				const selector = `${ blockSelector } > *:nth-child(${
 					index + 1
 				})`;
-				finalCssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
+				cssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
 			} );
 
-			const existingContent = styleElement.textContent || '';
+			// Apply test styles
+			const existingContent = dynamicStyleElement.textContent || '';
 			const newContent =
-				existingContent.replace( blockPattern, '' ) + finalCssRules;
-			styleElement.textContent = newContent;
-		};
+				existingContent.replace( blockPattern, '' ) + cssRules;
+			dynamicStyleElement.textContent = newContent;
 
-		// Apply initially and set up observer
+			const fitsWidth =
+				ref.current.scrollWidth <= ref.current.clientWidth;
+			const fitsHeight =
+				ref.current.scrollHeight <= ref.current.clientHeight;
+
+			if ( fitsWidth && fitsHeight ) {
+				bestSize = midSize;
+				minTestSize = midSize + 1;
+			} else {
+				maxTestSize = midSize - 1;
+			}
+		}
+
+		// Apply final optimal sizes
+		let finalCssRules = '';
+		fontRatios.forEach( ( ratio, index ) => {
+			const fontSize = bestSize * ratio;
+			const selector = `${ blockSelector } > *:nth-child(${ index + 1 })`;
+			finalCssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
+		} );
+
+		const existingContent = dynamicStyleElement.textContent || '';
+		const newContent =
+			existingContent.replace( blockPattern, '' ) + finalCssRules;
+		dynamicStyleElement.textContent = newContent;
+	}, [ ref, dynamicStyleElement, clientId ] );
+
+	useEffect( () => {
+		if ( ! stretchyText || ! ref.current || ! clientId ) {
+			return;
+		}
+
+		// Create or get dynamic style element
+		if ( ! dynamicStyleElement ) {
+			const styleElement =
+				ref.current.ownerDocument.createElement( 'style' );
+			ref.current.ownerDocument.head.appendChild( styleElement );
+			setDynamicStyleElement( styleElement );
+			return; // Wait for next render when dynamicStyleElement is set
+		}
+
+		// Apply initially
 		applyStretchyText();
 
 		// Store current ref value for cleanup
@@ -158,32 +171,45 @@ function useStretchyText( ref, stretchyText, clientId ) {
 			resizeObserver.observe( currentRef );
 		}
 
-		// Watch for content changes (when user adds/edits blocks)
-		const mutationObserver = new window.MutationObserver(
-			applyStretchyText
-		);
-		mutationObserver.observe( currentRef, {
-			childList: true,
-			subtree: true,
-			characterData: true,
-			attributes: true,
-		} );
-
 		// Cleanup function
 		return () => {
 			if ( resizeObserver ) {
 				resizeObserver.disconnect();
 			}
-			mutationObserver.disconnect();
 
 			// Clean up styles for this block
-			if ( styleElement && styleElement.textContent ) {
-				const existingContent = styleElement.textContent;
+			if ( dynamicStyleElement && dynamicStyleElement.textContent ) {
+				const blockPattern = new RegExp(
+					`#block-${ clientId }[^}]*}`,
+					'g'
+				);
+				const existingContent = dynamicStyleElement.textContent;
 				const newContent = existingContent.replace( blockPattern, '' );
-				styleElement.textContent = newContent;
+				dynamicStyleElement.textContent = newContent;
 			}
 		};
 	}, [ stretchyText, clientId, dynamicStyleElement ] );
+
+	// Trigger stretchy text recalculation when inner blocks change
+	useEffect( () => {
+		if ( stretchyText && ref.current && dynamicStyleElement ) {
+			// Small delay to ensure DOM has updated after block changes
+			const timer = setTimeout( () => {
+				if ( ref.current ) {
+					// Call applyStretchyText directly - it handles empty elements internally
+					applyStretchyText();
+				}
+			}, 10 );
+
+			return () => clearTimeout( timer );
+		}
+	}, [
+		innerBlocks,
+		stretchyText,
+		applyStretchyText,
+		dynamicStyleElement,
+		ref,
+	] );
 }
 
 /**
@@ -222,6 +248,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		( select ) => {
 			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
+
 			return {
 				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 				themeSupportsLayout: getSettings()?.supportsLayout,
