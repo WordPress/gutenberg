@@ -31,7 +31,7 @@ export function useTermDescription( termId, taxonomy ) {
 		setDescription,
 		termDescription: hasContext
 			? fullDescription?.rendered || description || ''
-			: templateBasedData.termDescription,
+			: templateBasedData,
 	};
 }
 
@@ -88,7 +88,7 @@ function useTemplateBasedTermData() {
 	return useSelect(
 		( select ) => {
 			if ( ! taxonomy || ! termSlug ) {
-				return { termDescription: '' };
+				return '';
 			}
 
 			const { getEntityRecords } = select( coreStore );
@@ -98,14 +98,11 @@ function useTemplateBasedTermData() {
 				per_page: 1,
 			} );
 
-			let termDescription = '';
 			if ( termRecords && termRecords[ 0 ] ) {
-				termDescription = termRecords[ 0 ].description || '';
+				return termRecords[ 0 ].description || '';
 			}
 
-			return {
-				termDescription,
-			};
+			return '';
 		},
 		[ taxonomy, termSlug ]
 	);
