@@ -21,7 +21,7 @@
  * @return string The block content.
  */
 function render_block_core_group( $attributes, $content, $block ) {
-    if ( $attributes['hasStretchText'] ) {
+    if ( isset( $attributes['hasStretchText'] ) && $attributes['hasStretchText'] ) {
 	    wp_enqueue_script_module( '@wordpress/block-library/group/view' );
     }
     return $content;
