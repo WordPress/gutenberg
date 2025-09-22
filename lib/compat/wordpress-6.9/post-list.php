@@ -7,9 +7,17 @@
 
 /**
  * Add a new column for editorial comments.
+ *
+ * @param array $columns Existing columns.
+ * @return array Modified columns.
  */
 function gutenberg_add_editorial_comments_column( $columns ) {
-	$columns['editorial_comments'] = '<div class="dashicons dashicons-admin-comments" title="' . esc_attr__( 'Editorial Comments', 'gutenberg' ) . '"></div>';
+	// Add column immediately after the existing comments column.
+	$editorial_comments = '<div class="dashicons dashicons-admin-comments" title="' . esc_attr__( 'Editorial Comments', 'gutenberg' ) . '"></div>';
+	$comment_position   = array_search( 'comments', array_keys( $columns ), true );
+	$columns_before     = array_slice( $columns, 0, $comment_position + 1, true );
+	$columns_after      = array_slice( $columns, $comment_position + 1, null, true );
+	$columns            = $columns_before + array( 'editorial_comments' => $editorial_comments ) + $columns_after;
 	return $columns;
 }
 add_filter( 'manage_posts_columns', 'gutenberg_add_editorial_comments_column' );
@@ -20,6 +28,10 @@ add_filter( 'manage_posts_columns', 'gutenberg_add_editorial_comments_column' );
  * Use a format similar to the core comments column. Each row shows a comment icon
  * with the count of resolved comments. A red dot with a number in it shows the count
  * of unresolved comments.
+ *
+ * @param string $column_name The name of the column to render.
+ * @param int    $post_id     The post ID.
+ * @return void
  */
 function gutenberg_render_editorial_comments_column( $column_name, $post_id ) {
 	if ( 'editorial_comments' !== $column_name ) {
@@ -51,8 +63,6 @@ add_action( 'manage_posts_custom_column', 'gutenberg_render_editorial_comments_c
 
 /**
  * Displays a comment count bubble.
- *
- * @since n.e.x.t.
  *
  * @param int $post_id          The post ID.
  * @param int $pending_comments Number of pending comments.
@@ -181,6 +191,9 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 
 /**
  * Filter the editorial comment so it is sortable.
+ *
+ * @param array $columns Existing sortable columns.
+ * @return array Modified sortable columns.
  */
 function gutenberg_filter_edit_post_sortable_columns( $columns ) {
 	$columns['editorial_comments'] = 'editorial_comments';
