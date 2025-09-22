@@ -3,6 +3,8 @@
  */
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
+import { plus, trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -44,12 +46,82 @@ export default function TableControl< Item >( {
 		[ value, onChange, setValue, data ]
 	);
 
+	const addRow = useCallback( () => {
+		const newRow: RowType = {};
+		if ( ! Array.isArray( children ) ) {
+			return;
+		}
+
+		// Initialize new row with default values for each child field
+		children.forEach( ( child ) => {
+			newRow[ child.id ] = '';
+		} );
+
+		const updatedValue = Array.isArray( value )
+			? [ ...value, newRow ]
+			: [ newRow ];
+		onChange( setValue( { item: data, value: updatedValue } ) );
+	}, [ children, value, onChange, setValue, data ] );
+
+	const removeRow = useCallback(
+		( rowIndex: number ) => {
+			const updatedValue = value.filter(
+				( _: RowType, index: number ) => index !== rowIndex
+			);
+			onChange( setValue( { item: data, value: updatedValue } ) );
+		},
+		[ value, onChange, setValue, data ]
+	);
+
 	if ( ! Array.isArray( children ) || children.length === 0 ) {
 		return null;
 	}
 
 	if ( ! Array.isArray( value ) || value.length === 0 ) {
-		return <div>{ __( 'No data to display.' ) }</div>;
+		return (
+			<div className="dataform-control-array-table">
+				{ ! hideLabelFromVision && label && (
+					<div className="dataform-control-array-table__label">
+						{ label }
+					</div>
+				) }
+				<div className="dataform-control-array-table__wrapper">
+					<table className="dataform-control-array-table__table">
+						<thead>
+							<tr>
+								{ children.map( ( child ) => (
+									<th key={ child.id }>{ child.label }</th>
+								) ) }
+								<th>{ __( 'Actions' ) }</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td
+									colSpan={ children.length + 1 }
+									style={ {
+										textAlign: 'center',
+										padding: '20px',
+									} }
+								>
+									{ __( 'No data to display.' ) }
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div className="dataform-control-array-table__add-row">
+					<Button
+						icon={ plus }
+						onClick={ addRow }
+						variant="secondary"
+						__next40pxDefaultSize
+					>
+						{ __( 'Add row' ) }
+					</Button>
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -66,6 +138,7 @@ export default function TableControl< Item >( {
 							{ children.map( ( child ) => (
 								<th key={ child.id }>{ child.label }</th>
 							) ) }
+							<th>{ __( 'Actions' ) }</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -89,10 +162,29 @@ export default function TableControl< Item >( {
 										) }
 									</td>
 								) ) }
+								<td>
+									<Button
+										icon={ trash }
+										label={ __( 'Remove row' ) }
+										onClick={ () => removeRow( rowIndex ) }
+										size="small"
+										isDestructive
+									/>
+								</td>
 							</tr>
 						) ) }
 					</tbody>
 				</table>
+			</div>
+			<div className="dataform-control-array-table__add-row">
+				<Button
+					icon={ plus }
+					onClick={ addRow }
+					variant="secondary"
+					__next40pxDefaultSize
+				>
+					{ __( 'Add row' ) }
+				</Button>
 			</div>
 		</div>
 	);
