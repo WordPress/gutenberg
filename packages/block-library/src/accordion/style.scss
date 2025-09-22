@@ -1,3 +1,7 @@
+.wp-block-accordion {
+	box-sizing: border-box;
+}
+
 .wp-block-accordion-content {
 	display: grid;
 	grid-template-rows: max-content 0fr;
