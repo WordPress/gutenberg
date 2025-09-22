@@ -72,7 +72,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 
 		// Find text elements
 		const textElements = ref.current.querySelectorAll(
-			'h1, h2, h3, h4, h5, h6, p'
+			'h1, h2, h3, h4, h5, h6, p, pre'
 		);
 
 		// If no text elements, styles are already cleared above, so return
@@ -173,7 +173,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 				styleElement.remove();
 			}
 		};
-	}, [ stretchyText, clientId, applyStretchyText ] );
+	}, [ stretchyText, clientId, applyStretchyText, ref ] );
 
 	// Trigger stretchy text recalculation when inner blocks change
 	useEffect( () => {
@@ -181,7 +181,6 @@ function useStretchyText( ref, stretchyText, clientId ) {
 			// Small delay to ensure DOM has updated after block changes
 			const timer = setTimeout( () => {
 				if ( ref.current ) {
-					// Call applyStretchyText directly - it handles empty elements internally
 					applyStretchyText();
 				}
 			}, 10 );
@@ -281,6 +280,11 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		renderAppender = InnerBlocks.ButtonBlockAppender;
 	}
 
+	let allowedBlocksToUse = allowedBlocks;
+	if ( ! allowedBlocksToUse && stretchyText ) {
+		allowedBlocksToUse = [ 'core/paragraph', 'core/heading', 'core/verse' ];
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		layoutSupportEnabled
 			? blockProps
@@ -288,7 +292,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		{
 			dropZoneElement: ref.current,
 			templateLock,
-			allowedBlocks,
+			allowedBlocks: allowedBlocksToUse,
 			renderAppender,
 		}
 	);
