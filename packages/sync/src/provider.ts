@@ -163,33 +163,23 @@ export class SyncProvider {
 
 		// Apply the initial document to the current document as a singular update.
 		if ( initialDoc ) {
-			Y.transact(
-				ydoc,
-				() => {
-					Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
-				},
-				LOCAL_SYNC_PROVIDER_ORIGIN,
-				true
-			);
+			ydoc.transact( () => {
+				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
+			}, LOCAL_SYNC_PROVIDER_ORIGIN );
 		}
 
 		if ( ! initialDoc || true === initialDoc?.meta?.get( 'invalidated' ) ) {
-			Y.transact(
-				ydoc,
-				() => {
-					syncConfig.applyChangesToCRDTDoc(
-						ydoc,
-						syncConfig.getInitialObjectData( rawRecord ),
-						rawRecord,
-						LOCAL_SYNC_PROVIDER_ORIGIN
-					);
+			ydoc.transact( () => {
+				syncConfig.applyChangesToCRDTDoc(
+					ydoc,
+					syncConfig.getInitialObjectData( rawRecord ),
+					rawRecord,
+					LOCAL_SYNC_PROVIDER_ORIGIN
+				);
 
-					stateMap.set( RESTORED_AT_KEY, Date.now() );
-					stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
-				},
-				LOCAL_SYNC_PROVIDER_ORIGIN,
-				true
-			);
+				stateMap.set( RESTORED_AT_KEY, Date.now() );
+				stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
+			}, LOCAL_SYNC_PROVIDER_ORIGIN );
 
 			// TODO: This new state should be persisted to the entity record. This
 			// will result in a "dirty" record, but if the user does not save the
@@ -440,15 +430,10 @@ export class SyncProvider {
 
 		const ydoc = entityState.ydoc;
 
-		Y.transact(
-			ydoc,
-			() => {
-				const stateMap = ydoc.getMap( STATE_KEY );
-				stateMap.set( PERSISTED_AT_KEY, Date.now() );
-				stateMap.set( PERSISTED_BY_KEY, ydoc.clientID );
-			},
-			LOCAL_SYNC_PROVIDER_ORIGIN,
-			true
-		);
+		ydoc.transact( () => {
+			const stateMap = ydoc.getMap( STATE_KEY );
+			stateMap.set( PERSISTED_AT_KEY, Date.now() );
+			stateMap.set( PERSISTED_BY_KEY, ydoc.clientID );
+		}, LOCAL_SYNC_PROVIDER_ORIGIN );
 	}
 }
