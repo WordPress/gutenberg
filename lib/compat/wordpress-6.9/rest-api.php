@@ -33,8 +33,9 @@ add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 
 /**
  * Enable empty comments when the comment_type is 'block_comment'.
  *
- * This is the only filter we should need to allow empty comments once
- * WordPress 6.9 is the minimum required version.
+ * @param bool  $allow            Whether to allow an empty comment.
+ * @param array $prepared_comment The prepared comment data.
+ * @return bool Modified allow empty comment value.
  */
 function gutenberg_allow_empty_block_comments( $allow, $prepared_comment ) {
 	if ( isset( $prepared_comment['comment_type'] ) && 'block_comment' === $prepared_comment['comment_type'] ) {
