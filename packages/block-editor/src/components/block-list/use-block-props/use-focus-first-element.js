@@ -35,6 +35,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
+		// @ZOOMOUTMODE
 		if (
 			! isBlockSelected( clientId ) ||
 			isMultiSelecting() ||

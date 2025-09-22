@@ -36,7 +36,6 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
-import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
@@ -168,76 +167,68 @@ function Items( {
 	// function on every render.
 	const hasAppender = CustomAppender !== false;
 	const hasCustomAppender = !! CustomAppender;
-	const {
-		order,
-		isZoomOut,
-		selectedBlocks,
-		visibleBlocks,
-		shouldRenderAppender,
-	} = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				getBlockOrder,
-				getSelectedBlockClientIds,
-				__unstableGetVisibleBlocks,
-				getTemplateLock,
-				getBlockEditingMode,
-				isSectionBlock,
-				isContainerInsertableToInContentOnlyMode,
-				getBlockName,
-				isZoomOut: _isZoomOut,
-				canInsertBlockType,
-			} = unlock( select( blockEditorStore ) );
+	const { order, selectedBlocks, visibleBlocks, shouldRenderAppender } =
+		useSelect(
+			( select ) => {
+				const {
+					getSettings,
+					getBlockOrder,
+					getSelectedBlockClientIds,
+					__unstableGetVisibleBlocks,
+					getTemplateLock,
+					getBlockEditingMode,
+					isSectionBlock,
+					isContainerInsertableToInContentOnlyMode,
+					getBlockName,
+					canInsertBlockType,
+				} = unlock( select( blockEditorStore ) );
 
-			const _order = getBlockOrder( rootClientId );
+				const _order = getBlockOrder( rootClientId );
 
-			if ( getSettings().isPreviewMode ) {
+				if ( getSettings().isPreviewMode ) {
+					return {
+						order: _order,
+						selectedBlocks: EMPTY_ARRAY,
+						visibleBlocks: EMPTY_SET,
+					};
+				}
+
+				const selectedBlockClientIds = getSelectedBlockClientIds();
+				const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+				const showRootAppender =
+					! rootClientId &&
+					! selectedBlockClientId &&
+					( ! _order.length ||
+						! canInsertBlockType(
+							getDefaultBlockName(),
+							rootClientId
+						) );
+				const hasSelectedRoot = !! (
+					rootClientId &&
+					selectedBlockClientId &&
+					rootClientId === selectedBlockClientId
+				);
+
 				return {
 					order: _order,
-					selectedBlocks: EMPTY_ARRAY,
-					visibleBlocks: EMPTY_SET,
+					selectedBlocks: selectedBlockClientIds,
+					visibleBlocks: __unstableGetVisibleBlocks(),
+					shouldRenderAppender:
+						( ! isSectionBlock( rootClientId ) ||
+							isContainerInsertableToInContentOnlyMode(
+								getBlockName( selectedBlockClientId ),
+								rootClientId
+							) ) &&
+						getBlockEditingMode( rootClientId ) !== 'disabled' &&
+						! getTemplateLock( rootClientId ) &&
+						hasAppender &&
+						( hasCustomAppender ||
+							hasSelectedRoot ||
+							showRootAppender ),
 				};
-			}
-
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const showRootAppender =
-				! rootClientId &&
-				! selectedBlockClientId &&
-				( ! _order.length ||
-					! canInsertBlockType(
-						getDefaultBlockName(),
-						rootClientId
-					) );
-			const hasSelectedRoot = !! (
-				rootClientId &&
-				selectedBlockClientId &&
-				rootClientId === selectedBlockClientId
-			);
-
-			return {
-				order: _order,
-				selectedBlocks: selectedBlockClientIds,
-				visibleBlocks: __unstableGetVisibleBlocks(),
-				isZoomOut: _isZoomOut(),
-				shouldRenderAppender:
-					( ! isSectionBlock( rootClientId ) ||
-						isContainerInsertableToInContentOnlyMode(
-							getBlockName( selectedBlockClientId ),
-							rootClientId
-						) ) &&
-					getBlockEditingMode( rootClientId ) !== 'disabled' &&
-					! getTemplateLock( rootClientId ) &&
-					hasAppender &&
-					! _isZoomOut() &&
-					( hasCustomAppender ||
-						hasSelectedRoot ||
-						showRootAppender ),
-			};
-		},
-		[ rootClientId, hasAppender, hasCustomAppender ]
-	);
+			},
+			[ rootClientId, hasAppender, hasCustomAppender ]
+		);
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -251,24 +242,10 @@ function Items( {
 						! selectedBlocks.includes( clientId )
 					}
 				>
-					{ isZoomOut && (
-						<ZoomOutSeparator
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-							position="top"
-						/>
-					) }
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 					/>
-					{ isZoomOut && (
-						<ZoomOutSeparator
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-							position="bottom"
-						/>
-					) }
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }

@@ -17,8 +17,7 @@ export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
 	const isInBetweenInserterDisabled = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getSettings().isDistractionFree ||
-			unlock( select( blockEditorStore ) ).isZoomOut(),
+			select( blockEditorStore ).getSettings().isDistractionFree,
 		[]
 	);
 	const {

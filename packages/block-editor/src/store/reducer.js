@@ -2362,30 +2362,6 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			}
 		}
 
-		if ( isZoomedOut ) {
-			// If the root block is the section root set its editing mode to contentOnly.
-			if ( clientId === sectionRootClientId ) {
-				derivedBlockEditingModes.set( clientId, 'contentOnly' );
-				return;
-			}
-
-			// There are no sections, so everything else is disabled.
-			if ( ! sectionClientIds?.length ) {
-				derivedBlockEditingModes.set( clientId, 'disabled' );
-				return;
-			}
-
-			if ( sectionClientIds.includes( clientId ) ) {
-				derivedBlockEditingModes.set( clientId, 'contentOnly' );
-				return;
-			}
-
-			// If zoomed out, all blocks that aren't sections or the section root are
-			// disabled.
-			derivedBlockEditingModes.set( clientId, 'disabled' );
-			return;
-		}
-
 		if ( syncedPatternClientIds.length ) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
@@ -2817,9 +2793,9 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'RESET_BLOCKS':
-			case 'SET_EDITOR_MODE':
-			case 'RESET_ZOOM_LEVEL':
-			case 'SET_ZOOM_LEVEL': {
+			case 'SET_EDITOR_MODE': {
+				// case 'RESET_ZOOM_LEVEL':
+				// case 'SET_ZOOM_LEVEL': {
 				// Recompute the entire tree if the editor mode or zoom level changes,
 				// or if all the blocks are reset.
 				return {

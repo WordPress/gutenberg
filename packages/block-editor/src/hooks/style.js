@@ -342,6 +342,7 @@ function BlockStyleControls( {
 			},
 		},
 	};
+
 	if ( blockEditingMode !== 'default' ) {
 		return null;
 	}

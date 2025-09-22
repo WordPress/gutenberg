@@ -24,13 +24,13 @@ export const Appender = forwardRef(
 		const instanceId = useInstanceId( Appender );
 		const { directInsert, hideInserter } = useSelect(
 			( select ) => {
-				const { getBlockListSettings, getTemplateLock, isZoomOut } =
-					unlock( select( blockEditorStore ) );
+				const { getBlockListSettings, getTemplateLock } = unlock(
+					select( blockEditorStore )
+				);
 
 				const settings = getBlockListSettings( clientId );
 				const directInsertValue = settings?.directInsert || false;
-				const hideInserterValue =
-					!! getTemplateLock( clientId ) || isZoomOut();
+				const hideInserterValue = !! getTemplateLock( clientId );
 
 				return {
 					directInsert: directInsertValue,

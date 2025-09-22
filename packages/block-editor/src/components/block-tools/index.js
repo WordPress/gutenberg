@@ -25,7 +25,6 @@ import {
 import BlockToolbarPopover from './block-toolbar-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
-import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -37,8 +36,6 @@ function selector( select ) {
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
 		isTyping,
-		isDragging,
-		isZoomOut,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
@@ -48,8 +45,6 @@ function selector( select ) {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: isZoomOut(),
-		isDragging: isDragging(),
 	};
 }
 
@@ -67,8 +62,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
-		useSelect( selector, [] );
+	const { clientId, hasFixedToolbar, isTyping } = useSelect( selector, [] );
 
 	const isMatch = useShortcutEventMatch();
 	const {
@@ -254,7 +248,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && ! isZoomOutMode && (
+				{ ! isTyping && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
@@ -276,7 +270,7 @@ export default function BlockTools( {
 				) }
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode && ! hasFixedToolbar && (
+				{ ! hasFixedToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }
@@ -288,11 +282,6 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && ! isDragging && (
-					<ZoomOutModeInserters
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);
