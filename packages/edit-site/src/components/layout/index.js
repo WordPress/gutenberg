@@ -45,6 +45,7 @@ import useMovingAnimation from './animation';
 import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
+import TemplateSaveDialog from '../template-save-dialog';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { NavigableRegion, GlobalStylesProvider } = unlock( editorPrivateApis );
@@ -88,6 +89,7 @@ function Layout() {
 
 	return (
 		<>
+			<TemplateSaveDialog />
 			<UnsavedChangesWarning />
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div

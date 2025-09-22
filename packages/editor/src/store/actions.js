@@ -264,7 +264,7 @@ export const savePost =
 			try {
 				await doActionAsync(
 					'editor.savePost',
-					{ id: previousRecord.id },
+					{ id: previousRecord.id, type: previousRecord.type },
 					options
 				);
 			} catch ( err ) {
