@@ -313,8 +313,8 @@ export const registerCoreBlocks = (
 	blocks.forEach( ( { init } ) => init() );
 
 	// Auto-register PHP-only blocks with ServerSideRender
-	if ( window.__unstableAutoSSRBlocks ) {
-		window.__unstableAutoSSRBlocks.forEach( ( blockName ) => {
+	if ( window.__unstableAutoRegisterBlocks ) {
+		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
 			registerBlockType( blockName, {
 				title: blockName,
 				category: 'text',
