@@ -99,13 +99,16 @@ export class SyncProvider {
 			this.entityStates.delete( entityId );
 		};
 
-		// When the CRDT document is updated by a connection (not a local origin like
-		// Gutenberg or this SyncProvider), update the local store.
+		// When the CRDT document is updated by the UndoManager or a connection (not
+		// a local origin), update the local store.
 		const onRecordUpdate = (
 			_events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
-			if ( transaction.local ) {
+			if (
+				transaction.local &&
+				! ( transaction.origin instanceof Y.UndoManager )
+			) {
 				return;
 			}
 
