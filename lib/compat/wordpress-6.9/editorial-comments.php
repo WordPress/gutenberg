@@ -46,3 +46,24 @@ function gutenberg_filter_editorial_comments_status_links( $status_links ) {
 	return $status_links;
 }
 add_filter( 'comment_status_links', 'gutenberg_filter_editorial_comments_status_links' );
+
+
+/**
+ * Adjust the bulk edit options on the comments screen when the comment type is block_comment.
+ *
+ * The options should be Resolve (approve), Reopen (unapprove), and Delete.
+ * @param array $bulk_actions The existing bulk actions.
+ * @return array The modified bulk actions.
+ *
+ */
+function gutenberg_filter_editorial_comments_bulk_actions( $bulk_actions ) {
+	if ( isset( $_GET['comment_type'] ) && 'block_comment' === $_GET['comment_type'] ) {
+		$bulk_actions = array(
+			'approve'   => __( 'Resolve', 'gutenberg' ),
+			'unapprove' => __( 'Reopen', 'gutenberg' ),
+			'delete'    => __( 'Delete', 'gutenberg' ),
+		);
+	}
+	return $bulk_actions;
+}
+add_filter( 'bulk_actions-edit-comments', 'gutenberg_filter_editorial_comments_bulk_actions' );
