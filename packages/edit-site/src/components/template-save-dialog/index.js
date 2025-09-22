@@ -9,7 +9,7 @@ import { useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 export default function TemplateSaveDialog() {
-	const [ isOpen, setIsOpen ] = useState();
+	const [ newActiveTemplates, setNewActiveTemplates ] = useState();
 	const registry = useRegistry();
 
 	useEffect( () => {
@@ -36,26 +36,10 @@ export default function TemplateSaveDialog() {
 					return;
 				}
 
-				try {
-					await new Promise( ( resolve, reject ) => {
-						setIsOpen( { resolve, reject } );
-					} );
-				} catch ( error ) {
-					// User cancelled, don't activate template
-					return;
-				} finally {
-					setIsOpen();
-				}
-
-				// Only activate template if user confirmed
-				await registry
-					.dispatch( coreStore )
-					.saveEntityRecord( 'root', 'site', {
-						active_templates: {
-							...site.active_templates,
-							[ template.slug ]: post.id,
-						},
-					} );
+				setNewActiveTemplates( {
+					...site.active_templates,
+					[ template.slug ]: post.id,
+				} );
 			}
 		);
 
@@ -64,20 +48,24 @@ export default function TemplateSaveDialog() {
 		};
 	}, [ registry ] );
 
-	if ( ! isOpen ) {
+	if ( ! newActiveTemplates ) {
 		return null;
 	}
 
 	return (
 		<ConfirmDialog
-			isOpen={ isOpen }
+			isOpen={ !! newActiveTemplates }
 			confirmButtonText={ __( 'Activate' ) }
-			cancelButtonText={ __( 'Cancel' ) }
-			onConfirm={ () => {
-				isOpen.resolve();
+			cancelButtonText={ __( 'Skip' ) }
+			onConfirm={ async () => {
+				await registry
+					.dispatch( coreStore )
+					.saveEntityRecord( 'root', 'site', {
+						active_templates: newActiveTemplates,
+					} );
 			} }
 			onCancel={ () => {
-				isOpen.reject();
+				setNewActiveTemplates();
 			} }
 		>
 			{ __( 'Do you want to activate this template?' ) }
