@@ -165,21 +165,6 @@ export function setEditedPost( postType, postId ) {
  * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
  * ```
  *
- * @example
- *```js
- * 	// Get specific media size based on the featured media ID
- * 	// Note: change sizes?.large for any registered size
- * 	const getFeaturedMediaUrl = useSelect( ( select ) => {
- * 		const getFeaturedMediaId =
- * 			select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
- * 		const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
- *
- * 		return (
- * 			getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
- * 		);
- * }, [] );
- * ```
- *
  * @return {Object} Action object
  */
 export const editPost =

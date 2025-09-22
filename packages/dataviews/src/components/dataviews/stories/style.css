@@ -23,3 +23,9 @@
 .free-composition-dataviews-layout thead {
 	inset-block-start: 67px;
 }
+
+.free-composition-dataviews-empty  {
+	border: 1px solid #000;
+	border-radius: 8px;
+	padding: 24px;
+}

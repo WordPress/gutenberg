@@ -17,7 +17,8 @@ type Value = CheckboxControlProps[ 'checked' ];
 const UnforwardedValidatedCheckboxControl = (
 	{
 		required,
-		customValidator,
+		onValidate,
+		customValidity,
 		onChange,
 		markWhenOptional,
 		...restProps
@@ -37,9 +38,10 @@ const UnforwardedValidatedCheckboxControl = (
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			ref={ mergedRefs }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
+			onValidate={ () => {
+				return onValidate?.( valueRef.current );
 			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () =>
 				validityTargetRef.current?.querySelector< HTMLInputElement >(
 					'input[type="checkbox"]'

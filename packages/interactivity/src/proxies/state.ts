@@ -334,7 +334,7 @@ const deepMergeRecursive = (
 				} );
 				// Update the getter in the property signal if it exists
 				if ( desc.get && propSignal ) {
-					propSignal.setGetter( desc.get );
+					propSignal.setPendingGetter( desc.get );
 				}
 			}
 

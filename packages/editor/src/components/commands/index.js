@@ -25,7 +25,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { store as interfaceStore } from '@wordpress/interface';
-import { getPath } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -91,19 +90,6 @@ const getEditorCommandLoader = () =>
 		const { openModal, enableComplementaryArea, disableComplementaryArea } =
 			useDispatch( interfaceStore );
 		const { getCurrentPostId } = useSelect( editorStore );
-		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
-			( select ) => {
-				return {
-					isBlockBasedTheme:
-						select( coreStore ).getCurrentTheme()?.is_block_theme,
-					canCreateTemplate: select( coreStore ).canUser( 'create', {
-						kind: 'postType',
-						name: 'wp_template',
-					} ),
-				};
-			},
-			[]
-		);
 		const allowSwitchEditorMode =
 			isCodeEditingEnabled && isRichEditingEnabled;
 
@@ -284,21 +270,6 @@ const getEditorCommandLoader = () =>
 					window.open( link, `wp-preview-${ postId }` );
 				},
 			} );
-		}
-		if ( canCreateTemplate && isBlockBasedTheme ) {
-			const isSiteEditor = getPath( window.location.href )?.includes(
-				'site-editor.php'
-			);
-			if ( ! isSiteEditor ) {
-				commands.push( {
-					name: 'core/go-to-site-editor',
-					label: __( 'Open Site Editor' ),
-					callback: ( { close } ) => {
-						close();
-						document.location = 'site-editor.php';
-					},
-				} );
-			}
 		}
 
 		return {

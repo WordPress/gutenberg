@@ -67,6 +67,7 @@ function UnforwardedMenuItem(
 			role={ role }
 			icon={ iconPosition === 'left' ? icon : undefined }
 			className={ className }
+			accessibleWhenDisabled
 			{ ...buttonProps }
 		>
 			<span className="components-menu-item__item">{ children }</span>

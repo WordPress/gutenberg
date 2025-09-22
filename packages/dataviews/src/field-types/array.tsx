@@ -1,11 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	ValidationContext,
 	FieldTypeDefinition,
+	NormalizedField,
 } from '../types';
 import {
 	OPERATOR_IS_ALL,
@@ -31,25 +36,6 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 		: joinedB.localeCompare( joinedA );
 }
 
-function isValid( value: any, context?: ValidationContext ) {
-	if ( ! Array.isArray( value ) ) {
-		return false;
-	}
-
-	// Only allow strings for now. Can be extended to other types in the future.
-	if ( ! value.every( ( v ) => typeof v === 'string' ) ) {
-		return false;
-	}
-
-	if ( context?.elements ) {
-		const validValues = context.elements.map( ( f ) => f.value );
-		if ( ! value.every( ( v ) => validValues.includes( v ) ) ) {
-			return false;
-		}
-	}
-	return true;
-}
-
 function render( { item, field }: DataViewRenderFieldProps< any > ) {
 	const value = field.getValue( { item } ) || [];
 	return value.join( ', ' );
@@ -57,8 +43,34 @@ function render( { item, field }: DataViewRenderFieldProps< any > ) {
 
 const arrayFieldType: FieldTypeDefinition< any > = {
 	sort,
-	isValid,
-	Edit: null, // Not implemented yet
+	isValid: {
+		custom: ( item: any, field: NormalizedField< any > ) => {
+			const value = field.getValue( { item } );
+
+			if (
+				! [ undefined, '', null ].includes( value ) &&
+				! Array.isArray( value )
+			) {
+				return __( 'Value must be an array.' );
+			}
+
+			// Only allow strings for now. Can be extended to other types in the future.
+			if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
+				return __( 'Every value must be a string.' );
+			}
+
+			if ( field?.elements ) {
+				const validValues = field.elements.map( ( f ) => f.value );
+				if (
+					! value.every( ( v: any ) => validValues.includes( v ) )
+				) {
+					return __( 'Value must be one of the elements.' );
+				}
+			}
+			return null;
+		},
+	},
+	Edit: 'array', // Use array control
 	render,
 	enableSorting: true,
 	filterBy: {

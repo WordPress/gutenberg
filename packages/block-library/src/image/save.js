@@ -31,6 +31,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		metadata: { bindings = {} } = {},
 	} = attributes;
 
 	const newRel = ! rel ? undefined : rel;
@@ -70,6 +71,11 @@ export default function save( { attributes } ) {
 		/>
 	);
 
+	const displayCaption =
+		! RichText.isEmpty( caption ) ||
+		bindings.caption ||
+		bindings?.__default?.source === 'core/pattern-overrides';
+
 	const figure = (
 		<>
 			{ href ? (
@@ -84,7 +90,7 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			{ ! RichText.isEmpty( caption ) && (
+			{ displayCaption && (
 				<RichText.Content
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					tagName="figcaption"

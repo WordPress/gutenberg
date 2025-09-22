@@ -34,7 +34,7 @@ import { getTemplateInfo } from '../../utils/get-template-info';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
-const MotionButton = motion( Button );
+const MotionButton = motion.create( Button );
 
 /**
  * This component renders a navigation bar at the top of the editor. It displays the title of the current document,
@@ -161,7 +161,7 @@ export default function DocumentBar( props ) {
 					</MotionButton>
 				) }
 			</AnimatePresence>
-			{ ! isTemplate && isTemplatePreview && (
+			{ ! isTemplate && isTemplatePreview && ! hasBackButton && (
 				<BlockIcon
 					icon={ layout }
 					className="editor-document-bar__icon-layout"

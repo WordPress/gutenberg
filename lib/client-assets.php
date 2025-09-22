@@ -653,8 +653,23 @@ function gutenberg_default_script_modules() {
 				break;
 		}
 
+		/*
+		 * All script modules in Gutenberg are (currently) related to the Interactivity API which prioritizes server-side rendering.
+		 * Therefore, the modules should be fetched with a low priority to avoid network contention with any LCP element resource.
+		 * For allowing a block to opt-in to another fetchpriority, see <https://github.com/WordPress/gutenberg/issues/71366>.
+		 *
+		 * Also, the @wordpress/a11y script module is intended to be used as a dynamic import dependency, in which case
+		 * the fetchpriority is irrelevant. See <https://make.wordpress.org/core/2024/10/14/updates-to-script-modules-in-6-7/>.
+		 * However, in case it is added as a static import dependency, the fetchpriority is explicitly set to be 'low'
+		 * since the module should not be involved in the critical rendering path, and if it is, its fetchpriority will
+		 * be bumped to match the fetchpriority of the dependent script.
+		 */
+		$args = array(
+			'fetchpriority' => 'low',
+		);
+
 		$path = gutenberg_url( "build-module/{$file_name}" );
-		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
+		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'], $args ); // The $args parameter is new as of WP 6.9 per <https://core.trac.wordpress.org/ticket/61734>.
 	}
 }
 remove_action( 'wp_default_scripts', 'wp_default_script_modules' );

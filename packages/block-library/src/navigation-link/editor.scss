@@ -122,3 +122,20 @@
 	gap: $grid-unit-10;
 	height: auto;
 }
+
+.link-ui-page-creator {
+	// Match LinkControl width constraints for consistent UI sizing
+	max-width: 350px;
+	min-width: auto;
+	width: 90vw;
+	padding-top: $grid-unit-10;
+
+	&__inner {
+		padding: $grid-unit-20;
+	}
+
+	&__back {
+		margin-left: $grid-unit-10;
+		text-transform: uppercase;
+	}
+}

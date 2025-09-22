@@ -36,6 +36,10 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 
 			const operators = field.filterBy.operators;
 			const isPrimary = !! field.filterBy?.isPrimary;
+			const isLocked =
+				view.filters?.some(
+					( f ) => f.field === field.id && !! f.isLocked
+				) ?? false;
 			filters.push( {
 				field: field.id,
 				name: field.label,
@@ -45,6 +49,7 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 				),
 				operators,
 				isVisible:
+					isLocked ||
 					isPrimary ||
 					!! view.filters?.some(
 						( f ) =>
@@ -52,11 +57,21 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 							ALL_OPERATORS.includes( f.operator )
 					),
 				isPrimary,
+				isLocked,
 			} );
 		} );
-		// Sort filters by primary property. We need the primary filters to be first.
-		// Then we sort by name.
+
+		// Sort filters by:
+		// - locked filters go first
+		// - primary filters go next
+		// - then, sort by name
 		filters.sort( ( a, b ) => {
+			if ( a.isLocked && ! b.isLocked ) {
+				return -1;
+			}
+			if ( ! a.isLocked && b.isLocked ) {
+				return 1;
+			}
 			if ( a.isPrimary && ! b.isPrimary ) {
 				return -1;
 			}

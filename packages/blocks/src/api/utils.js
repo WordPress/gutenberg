@@ -44,11 +44,19 @@ export function isUnmodifiedBlock( block, role ) {
 
 	// Filter attributes by role if a role is provided.
 	const attributesToCheck = role
-		? Object.entries( blockAttributes ).filter(
-				( [ , definition ] ) =>
+		? Object.entries( blockAttributes ).filter( ( [ key, definition ] ) => {
+				// A special case for the metadata attribute.
+				// It can include block bindings that serve as a source of content,
+				// without directly modifying content attributes.
+				if ( role === 'content' && key === 'metadata' ) {
+					return true;
+				}
+
+				return (
 					definition.role === role ||
 					definition.__experimentalRole === role
-		  )
+				);
+		  } )
 		: Object.entries( blockAttributes );
 
 	return attributesToCheck.every( ( [ key, definition ] ) => {
@@ -403,8 +411,14 @@ export const __experimentalGetBlockAttributesNamesByRole = ( ...args ) => {
  * @return {boolean}    Whether the block is a content block.
  */
 export function isContentBlock( name ) {
-	const attributes = getBlockType( name )?.attributes;
+	const blockType = getBlockType( name );
+	const attributes = blockType?.attributes;
+	// Not all blocks have attributes but they may support contentRole instead.
+	const supportsContentRole = blockType?.supports?.contentRole;
 
+	if ( supportsContentRole ) {
+		return true;
+	}
 	if ( ! attributes ) {
 		return false;
 	}

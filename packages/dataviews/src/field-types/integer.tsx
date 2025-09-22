@@ -1,10 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
 	SortDirection,
-	ValidationContext,
+	NormalizedField,
 	FieldTypeDefinition,
 } from '../types';
 import { renderFromElements } from '../utils';
@@ -26,29 +31,28 @@ function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;
 }
 
-function isValid( value: any, context?: ValidationContext ) {
-	// TODO: this implicitly means the value is required.
-	if ( value === '' ) {
-		return false;
-	}
-
-	if ( ! Number.isInteger( Number( value ) ) ) {
-		return false;
-	}
-
-	if ( context?.elements ) {
-		const validValues = context?.elements.map( ( f ) => f.value );
-		if ( ! validValues.includes( Number( value ) ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 export default {
 	sort,
-	isValid,
+	isValid: {
+		custom: ( item: any, field: NormalizedField< any > ) => {
+			const value = field.getValue( { item } );
+			if (
+				! [ undefined, '', null ].includes( value ) &&
+				! Number.isInteger( value )
+			) {
+				return __( 'Value must be an integer.' );
+			}
+
+			if ( field?.elements ) {
+				const validValues = field.elements.map( ( f ) => f.value );
+				if ( ! validValues.includes( Number( value ) ) ) {
+					return __( 'Value must be one of the elements.' );
+				}
+			}
+
+			return null;
+		},
+	},
 	Edit: 'integer',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
 		return field.elements

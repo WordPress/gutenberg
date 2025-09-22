@@ -17,7 +17,8 @@ type Value = TextControlProps[ 'value' ];
 const UnforwardedValidatedTextControl = (
 	{
 		required,
-		customValidator,
+		onValidate,
+		customValidity,
 		onChange,
 		markWhenOptional,
 		...restProps
@@ -36,9 +37,10 @@ const UnforwardedValidatedTextControl = (
 		<ControlWithError
 			required={ required }
 			markWhenOptional={ markWhenOptional }
-			customValidator={ () => {
-				return customValidator?.( valueRef.current );
+			onValidate={ () => {
+				return onValidate?.( valueRef.current );
 			} }
+			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<TextControl

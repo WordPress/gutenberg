@@ -12,15 +12,21 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
+	BaseControl,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import type { Form, FieldLayoutProps } from '../../types';
+import type {
+	Form,
+	FieldLayoutProps,
+	NormalizedRegularLayout,
+} from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
+import { DEFAULT_LAYOUT, normalizeLayout } from '../../normalize-form-fields';
 
 function Header( { title }: { title: string } ) {
 	return (
@@ -43,26 +49,13 @@ export default function FormRegularField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
-	const form = useMemo( () => {
-		if ( isCombinedField( field ) ) {
-			return {
-				fields: field.children.map( ( child ) => {
-					if ( typeof child === 'string' ) {
-						return {
-							id: child,
-						};
-					}
-					return child;
-				} ),
-				type: 'regular' as const,
-			};
-		}
-
-		return {
-			type: 'regular' as const,
-			fields: [],
-		};
-	}, [ field ] );
+	const form: Form = useMemo(
+		(): Form => ( {
+			layout: DEFAULT_LAYOUT,
+			fields: isCombinedField( field ) ? field.children : [],
+		} ),
+		[ field ]
+	);
 
 	if ( isCombinedField( field ) ) {
 		return (
@@ -72,14 +65,19 @@ export default function FormRegularField< Item >( {
 				) }
 				<DataFormLayout
 					data={ data }
-					form={ form as Form }
+					form={ form }
 					onChange={ onChange }
 				/>
 			</>
 		);
 	}
 
-	const labelPosition = field.labelPosition ?? 'top';
+	const layout: NormalizedRegularLayout = normalizeLayout( {
+		...field.layout,
+		type: 'regular',
+	} ) as NormalizedRegularLayout;
+
+	const labelPosition = layout.labelPosition;
 	const fieldDefinition = fields.find(
 		( fieldDef ) => fieldDef.id === field.id
 	);
@@ -87,6 +85,7 @@ export default function FormRegularField< Item >( {
 	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
 		return null;
 	}
+
 	if ( labelPosition === 'side' ) {
 		return (
 			<HStack className="dataforms-layouts-regular__field">
@@ -122,17 +121,17 @@ export default function FormRegularField< Item >( {
 		<div className="dataforms-layouts-regular__field">
 			{ fieldDefinition.readOnly === true ? (
 				<>
-					{ ! hideLabelFromVision && labelPosition !== 'none' && (
-						<div className="dataforms-layouts-regular__field-label">
-							{ fieldDefinition.label }
-						</div>
-					) }
-					<div className="dataforms-layouts-regular__field-control">
+					<>
+						{ ! hideLabelFromVision && labelPosition !== 'none' && (
+							<BaseControl.VisualLabel>
+								{ fieldDefinition.label }
+							</BaseControl.VisualLabel>
+						) }
 						<fieldDefinition.render
 							item={ data }
 							field={ fieldDefinition }
 						/>
-					</div>
+					</>
 				</>
 			) : (
 				<fieldDefinition.Edit

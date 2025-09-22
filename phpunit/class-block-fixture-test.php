@@ -10,6 +10,8 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 	public function filter_allowed_html( $tags ) {
 		$tags['form']['class']   = true;
 		$tags['form']['enctype'] = true;
+		$tags['form']['style']   = true;
+		$tags['form']['id']      = true;
 		return $tags;
 	}
 

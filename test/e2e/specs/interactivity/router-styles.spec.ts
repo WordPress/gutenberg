@@ -304,8 +304,8 @@ test.describe( 'Router styles', () => {
 		// temporary error.
 		const linkPattern = '**/router-styles-red/style-from-link.css*';
 		await page.route( linkPattern, async ( route ) => {
+			await route.abort( 'failed' );
 			await page.unroute( linkPattern );
-			return route.abort( 'failed' );
 		} );
 
 		// Navigate to the page with the Red block
@@ -429,5 +429,35 @@ test.describe( 'Router styles', () => {
 
 		// The "hide-on-print" element should remain visible.
 		await expect( hideOnPrint ).toBeVisible();
+	} );
+
+	test( 'should ignore styles inside noscript elements during navigation', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const noscriptStyleTest = page.getByTestId( 'noscript-style-test' );
+
+		// Initially the element should not have styling from noscript.
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link red' ).click();
+
+		// This element disappears when a navigation starts.
+		// It should be visible again after a successful navigation.
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// After navigation, the element should still have the default color
+		// and not be affected by styles in noscript elements
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// After navigating to the page with all blocks, the element should
+		// still maintain its original styling and not be affected by noscript styles
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
 	} );
 } );

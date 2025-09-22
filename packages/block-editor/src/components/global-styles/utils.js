@@ -80,7 +80,12 @@ export const PRESET_METADATA = [
 		path: [ 'spacing', 'spacingSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'spacing',
-		valueFunc: ( { size } ) => size,
+		classes: [],
+	},
+	{
+		path: [ 'border', 'radiusSizes' ],
+		valueKey: 'size',
+		cssVarInfix: 'border-radius',
 		classes: [],
 	},
 ];

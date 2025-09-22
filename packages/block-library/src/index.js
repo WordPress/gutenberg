@@ -20,6 +20,10 @@ import {
 // production build to make the final bundle smaller.
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+import * as accordion from './accordion';
+import * as accordionContent from './accordion-content';
+import * as accordionHeader from './accordion-header';
+import * as accordionPanel from './accordion-panel';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -120,6 +124,8 @@ import * as tab from './tab';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termDescription from './term-description';
+import * as termsQuery from './terms-query';
+import * as termTemplate from './term-template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
@@ -236,6 +242,16 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( accordion );
+		blocks.push( accordionContent );
+		blocks.push( accordionHeader );
+		blocks.push( accordionPanel );
+		blocks.push( termsQuery );
+		blocks.push( termTemplate );
+	}
+
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
 		blocks.push( formInput );

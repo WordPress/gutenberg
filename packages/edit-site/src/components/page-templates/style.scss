@@ -28,23 +28,11 @@
 	}
 }
 
-.page-templates-description {
-	max-width: 50em;
-	text-wrap: balance; // Fallback for Safari
-	text-wrap: pretty;
-
-	.dataviews-view-table & {
-		margin-bottom: $grid-unit-10;
-		display: block;
-	}
-}
-
 .edit-site-page-templates {
 	.dataviews-pagination {
 		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
 	}
 }
-
 
 .page-templates-author-field__avatar {
 	flex-shrink: 0;

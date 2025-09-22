@@ -1,12 +1,17 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import type {
 	DataViewRenderFieldProps,
+	NormalizedField,
 	FieldType,
 	FieldTypeDefinition,
 	SortDirection,
-	ValidationContext,
 } from '../types';
 import { default as email } from './email';
 import { default as integer } from './integer';
@@ -16,6 +21,10 @@ import { default as date } from './date';
 import { default as boolean } from './boolean';
 import { default as media } from './media';
 import { default as array } from './array';
+import { default as password } from './password';
+import { default as telephone } from './telephone';
+import { default as color } from './color';
+import { default as url } from './url';
 import { renderFromElements } from '../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../constants';
 
@@ -60,6 +69,22 @@ export default function getFieldTypeDefinition< Item >(
 		return array;
 	}
 
+	if ( 'password' === type ) {
+		return password;
+	}
+
+	if ( 'telephone' === type ) {
+		return telephone;
+	}
+
+	if ( 'color' === type ) {
+		return color;
+	}
+
+	if ( 'url' === type ) {
+		return url;
+	}
+
 	// This is a fallback for fields that don't provide a type.
 	// It can be removed when the field.type is mandatory.
 	return {
@@ -72,15 +97,20 @@ export default function getFieldTypeDefinition< Item >(
 				? a.localeCompare( b )
 				: b.localeCompare( a );
 		},
-		isValid: ( value: any, context?: ValidationContext ) => {
-			if ( context?.elements ) {
-				const validValues = context?.elements?.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return false;
+		isValid: {
+			custom: ( item: any, field: NormalizedField< any > ) => {
+				if ( field?.elements ) {
+					const value = field.getValue( { item } );
+					const validValues = field?.elements?.map(
+						( f ) => f.value
+					);
+					if ( ! validValues.includes( value ) ) {
+						return __( 'Value must be one of the elements.' );
+					}
 				}
-			}
 
-			return true;
+				return null;
+			},
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {
