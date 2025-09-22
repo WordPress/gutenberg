@@ -253,9 +253,11 @@ export function RichTextWrapper(
 			blockContext,
 		]
 	);
+	const arePatternOverridesEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
 
-	const shouldDisableEditing = readOnly || disableBoundBlock;
-
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || ! arePatternOverridesEnabled;
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
