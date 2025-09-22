@@ -24,6 +24,21 @@ add_filter(
 	2
 );
 
+// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+add_filter(
+	'block_editor_settings_all',
+	function ( $editor_settings ) {
+		$editor_settings['blockBindingsSupportedAttributes'] = array();
+		foreach ( array_keys( WP_Block_Type_Registry::get_instance()->get_all_registered() ) as $block_type ) {
+			$supported_block_attributes = gutenberg_get_block_bindings_supported_attributes( $block_type );
+			if ( ! empty( $supported_block_attributes ) ) {
+				$editor_settings['blockBindingsSupportedAttributes'][ $block_type ] = $supported_block_attributes;
+			}
+		}
+		return $editor_settings;
+	}
+);
+
 /**
  * Callback function for the render_block filter.
  *
