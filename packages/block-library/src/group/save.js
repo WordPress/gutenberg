@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+/**
+ * External dependencies
+ */
 import clsx from 'clsx';
 
 export default function save( { attributes: { tagName: Tag, stretchyText } } ) {

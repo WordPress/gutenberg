@@ -1,14 +1,16 @@
 <?php
 
 /**
- * Server-side rendering of the `core/image` block.
+ * Server-side rendering of the `core/group` block.
  *
  * @package WordPress
  */
 
 /**
- * Renders the `core/image` block on the server,
- * adding a data-id attribute to the element if core/gallery has added on pre-render.
+ * Renders the `core/group` block on the server,
+ * returns exactly the same content as the client-side rendering.
+ * The function is responsible for enqueuing any necessary view scripts for the block
+ * only when they are needed.
  *
  * @since 5.9.0
  *
@@ -16,10 +18,12 @@
  * @param string   $content    The block content.
  * @param WP_Block $block      The block object.
  *
- * @return string The block content with the data-id attribute added.
+ * @return string The block content.
  */
 function render_block_core_group( $attributes, $content, $block ) {
-	wp_enqueue_script_module( '@wordpress/block-library/group/view' );
+    if ( $attributes['hasStretchText'] ) {
+	    wp_enqueue_script_module( '@wordpress/block-library/group/view' );
+    }
     return $content;
 }
 
