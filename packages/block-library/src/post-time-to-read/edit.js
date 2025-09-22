@@ -135,7 +135,7 @@ function PostTimeToReadEdit( {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks, displayAsRange ] );
+	}, [ contentStructure, blocks, displayAsRange, AVERAGE_READING_RATE ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
