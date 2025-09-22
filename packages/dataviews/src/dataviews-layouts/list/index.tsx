@@ -421,11 +421,22 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	// Update the active composite item when the selected item changes.
 	useEffect( () => {
 		if ( selectedItem ) {
-			setActiveCompositeId(
-				generateItemWrapperCompositeId(
-					generateCompositeItemIdPrefix( selectedItem )
-				)
+			// Check if the search field is currently focused to prevent focus stealing during search.
+			const searchField = document.querySelector(
+				'.dataviews-search input'
 			);
+			const isSearchFocused =
+				searchField &&
+				searchField.ownerDocument.activeElement === searchField;
+
+			// Only update active composite if search is not focused.
+			if ( ! isSearchFocused ) {
+				setActiveCompositeId(
+					generateItemWrapperCompositeId(
+						generateCompositeItemIdPrefix( selectedItem )
+					)
+				);
+			}
 		}
 	}, [ selectedItem, generateCompositeItemIdPrefix ] );
 
@@ -456,7 +467,19 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
-			document.getElementById( targetCompositeItemId )?.focus();
+
+			// Check if the search field is currently focused to prevent focus stealing during search.
+			const searchField = document.querySelector(
+				'.dataviews-search input'
+			);
+			const isSearchFocused =
+				searchField &&
+				searchField.ownerDocument.activeElement === searchField;
+
+			// Only focus the composite item if search is not focused.
+			if ( ! isSearchFocused ) {
+				document.getElementById( targetCompositeItemId )?.focus();
+			}
 		},
 		[ data, generateCompositeItemIdPrefix ]
 	);
