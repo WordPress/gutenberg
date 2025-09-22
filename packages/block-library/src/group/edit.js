@@ -10,7 +10,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { View } from '@wordpress/primitives';
 /**
@@ -35,8 +35,6 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
  * @return {void}
  */
 function useStretchyText( ref, stretchyText, clientId ) {
-	const [ dynamicStyleElement, setDynamicStyleElement ] = useState( null );
-
 	// Monitor inner blocks changes when stretchy text is enabled
 	const innerBlocks = useSelect(
 		( select ) => {
@@ -52,20 +50,25 @@ function useStretchyText( ref, stretchyText, clientId ) {
 
 	// Define applyStretchyText function that we can reuse
 	const applyStretchyText = useCallback( () => {
-		if ( ! ref.current || ! dynamicStyleElement ) {
+		if ( ! ref.current ) {
 			return;
+		}
+
+		// Get or create style element with unique ID
+		const styleId = `stretchy-text-${ clientId }`;
+		let styleElement = ref.current.ownerDocument.getElementById( styleId );
+		if ( ! styleElement ) {
+			styleElement = ref.current.ownerDocument.createElement( 'style' );
+			styleElement.id = styleId;
+			ref.current.ownerDocument.head.appendChild( styleElement );
 		}
 
 		// Use WordPress block ID for targeting
 		const blockSelector = `#block-${ clientId }`;
-		const blockPattern = new RegExp( `#block-${ clientId }[^}]*}`, 'g' );
 
 		// Clear any existing dynamic styles for this block FIRST
-		const currentContent = dynamicStyleElement.textContent || '';
-		dynamicStyleElement.textContent = currentContent.replace(
-			blockPattern,
-			''
-		);
+		// This ensures we measure natural CSS font sizes, not previously stretched sizes
+		styleElement.textContent = '';
 
 		// Find text elements
 		const textElements = ref.current.querySelectorAll(
@@ -94,7 +97,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 		);
 
 		let minTestSize = 1;
-		let maxTestSize = 100;
+		let maxTestSize = 200;
 		let bestSize = minTestSize;
 
 		// Binary search for optimal base font size
@@ -112,10 +115,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 			} );
 
 			// Apply test styles
-			const existingContent = dynamicStyleElement.textContent || '';
-			const newContent =
-				existingContent.replace( blockPattern, '' ) + cssRules;
-			dynamicStyleElement.textContent = newContent;
+			styleElement.textContent = cssRules;
 
 			const fitsWidth =
 				ref.current.scrollWidth <= ref.current.clientWidth;
@@ -138,24 +138,12 @@ function useStretchyText( ref, stretchyText, clientId ) {
 			finalCssRules += `${ selector } { font-size: ${ fontSize }px !important; }\n`;
 		} );
 
-		const existingContent = dynamicStyleElement.textContent || '';
-		const newContent =
-			existingContent.replace( blockPattern, '' ) + finalCssRules;
-		dynamicStyleElement.textContent = newContent;
-	}, [ ref, dynamicStyleElement, clientId ] );
+		styleElement.textContent = finalCssRules;
+	}, [ ref, clientId ] );
 
 	useEffect( () => {
 		if ( ! stretchyText || ! ref.current || ! clientId ) {
 			return;
-		}
-
-		// Create or get dynamic style element
-		if ( ! dynamicStyleElement ) {
-			const styleElement =
-				ref.current.ownerDocument.createElement( 'style' );
-			ref.current.ownerDocument.head.appendChild( styleElement );
-			setDynamicStyleElement( styleElement );
-			return; // Wait for next render when dynamicStyleElement is set
 		}
 
 		// Apply initially
@@ -178,21 +166,18 @@ function useStretchyText( ref, stretchyText, clientId ) {
 			}
 
 			// Clean up styles for this block
-			if ( dynamicStyleElement && dynamicStyleElement.textContent ) {
-				const blockPattern = new RegExp(
-					`#block-${ clientId }[^}]*}`,
-					'g'
-				);
-				const existingContent = dynamicStyleElement.textContent;
-				const newContent = existingContent.replace( blockPattern, '' );
-				dynamicStyleElement.textContent = newContent;
+			const styleId = `stretchy-text-${ clientId }`;
+			const styleElement =
+				currentRef.ownerDocument.getElementById( styleId );
+			if ( styleElement ) {
+				styleElement.remove();
 			}
 		};
-	}, [ stretchyText, clientId, dynamicStyleElement ] );
+	}, [ stretchyText, clientId, applyStretchyText ] );
 
 	// Trigger stretchy text recalculation when inner blocks change
 	useEffect( () => {
-		if ( stretchyText && ref.current && dynamicStyleElement ) {
+		if ( stretchyText && ref.current ) {
 			// Small delay to ensure DOM has updated after block changes
 			const timer = setTimeout( () => {
 				if ( ref.current ) {
@@ -203,13 +188,7 @@ function useStretchyText( ref, stretchyText, clientId ) {
 
 			return () => clearTimeout( timer );
 		}
-	}, [
-		innerBlocks,
-		stretchyText,
-		applyStretchyText,
-		dynamicStyleElement,
-		ref,
-	] );
+	}, [ innerBlocks, stretchyText, applyStretchyText, ref ] );
 }
 
 /**
