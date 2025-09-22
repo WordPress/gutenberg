@@ -104,7 +104,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	( function() {
 		var dropdown = document.getElementById('<?php echo esc_js( $dropdown_id ); ?>'), lastKey;
 
-		function onSelectChange(e) {
+		function onCatChange(e) {
 			setTimeout(function() {
 				lastKey = dropdown.getAttribute('data-lastkey');
 				if ('change' === e.type && 'escape' === lastKey) {
@@ -131,7 +131,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 			dropdown.removeAttribute('data-lastkey');
 		});
 
-		dropdown.onchange = onSelectChange;
+		dropdown.onchange = onCatChange;
 	})();
 	</script>
 	<?php
