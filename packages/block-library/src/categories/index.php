@@ -97,7 +97,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function gutenberg_build_dropdown_script_block_core_categories( $dropdown_id ) {
+function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script>
