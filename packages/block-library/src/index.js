@@ -179,8 +179,6 @@ const getAllBlocks = () => {
 		socialLinks,
 		spacer,
 		table,
-		tabs,
-		tab,
 		tagCloud,
 		textColumns,
 		verse,
@@ -243,6 +241,8 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
+		blocks.push( tabs );
+		blocks.push( tab );
 	}
 
 	// When in a WordPress context, conditionally

@@ -1,5 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab",
 	"title": "Tab",
@@ -13,7 +14,9 @@
 			"default": ""
 		}
 	},
-	"parent": [ "core/tabs" ],
+	"parent": [
+		"core/tabs"
+	],
 	"supports": {
 		"anchor": true,
 		"html": false,

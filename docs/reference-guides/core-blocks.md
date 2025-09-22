@@ -901,6 +901,7 @@ Add white space between blocks and customize its height. ([Source](https://githu
 Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
 
 -	**Name:** core/tab
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
@@ -930,6 +931,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 Display content in a tabbed interface to help users navigate detailed content with ease. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs))
 
 -	**Name:** core/tabs
+-	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
 -	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
