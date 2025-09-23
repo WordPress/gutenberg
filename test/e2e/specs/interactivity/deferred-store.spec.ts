@@ -51,4 +51,62 @@ test.describe( 'deferred store', () => {
 		await expect( stateNumber ).toHaveText( '3' );
 		await expect( stateDouble ).toHaveText( '6' );
 	} );
+
+	test( 'Ensure bind keeps the value of a derived state props from deferred store', async ( {
+		page,
+	} ) => {
+		const load = page.getByTestId( 'derived-bind-load' );
+		const loaded = page.getByTestId( 'derived-bind-loaded' );
+		const hydrated = page.getByTestId( 'derived-bind-hydrated' );
+		const increment = page.getByTestId( 'derived-bind-increment' );
+		const value = page.getByTestId( 'derived-bind-value' );
+
+		await expect( hydrated ).toBeVisible();
+		await expect( loaded ).toBeHidden();
+		await expect( value ).toHaveValue( 'bind-42' );
+
+		// The `+` button doesn't work yet; nothing changes.
+		await increment.click();
+		await expect( loaded ).toBeHidden();
+		await expect( value ).toHaveValue( 'bind-42' );
+
+		// The element displays the derived state prop's value from the getter.
+		await load.click();
+		await expect( loaded ).toBeVisible();
+		await expect( value ).toHaveValue( 'bind-42' );
+
+		// The button works, and the value updated.
+		await increment.click();
+		await expect( loaded ).toBeVisible();
+		await expect( value ).toHaveValue( 'bind-43' );
+	} );
+
+	test( 'Ensure class keeps the value of a derived state props from deferred store', async ( {
+		page,
+	} ) => {
+		const load = page.getByTestId( 'derived-class-load' );
+		const loaded = page.getByTestId( 'derived-class-loaded' );
+		const hydrated = page.getByTestId( 'derived-class-hydrated' );
+		const increment = page.getByTestId( 'derived-class-increment' );
+		const element = page.getByTestId( 'derived-class-element' );
+
+		await expect( hydrated ).toBeVisible();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveClass( 'below-10' );
+
+		// The `increment` button doesn't work yet; nothing changes.
+		await increment.click();
+		await expect( loaded ).toBeHidden();
+		await expect( element ).toHaveClass( 'below-10' );
+
+		// The element class disappears according to the computed getter.
+		await load.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).toHaveClass( 'below-10' );
+
+		// The button works, and the class updated.
+		await increment.click();
+		await expect( loaded ).toBeVisible();
+		await expect( element ).not.toHaveClass( 'below-10' );
+	} );
 } );

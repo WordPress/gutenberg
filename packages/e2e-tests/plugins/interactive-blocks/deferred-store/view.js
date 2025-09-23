@@ -36,3 +36,51 @@ window.addEventListener(
 	},
 	{ once: true }
 );
+
+store( 'test/deferred-store/bind', {
+	state: {
+		hydrated: true,
+	},
+	actions: {
+		load() {
+			store( 'test/deferred-store/bind', {
+				state: {
+					loaded: true,
+					get value() {
+						const { counter } = getContext();
+						return `bind-${ counter }`;
+					},
+				},
+				actions: {
+					increment() {
+						getContext().counter += 1;
+					},
+				},
+			} );
+		},
+	},
+} );
+
+store( 'test/deferred-store/class', {
+	state: {
+		hydrated: true,
+	},
+	actions: {
+		load() {
+			store( 'test/deferred-store/class', {
+				state: {
+					loaded: true,
+					get below10() {
+						const { counter } = getContext();
+						return counter < 10;
+					},
+				},
+				actions: {
+					increment() {
+						getContext().counter += 1;
+					},
+				},
+			} );
+		},
+	},
+} );
