@@ -154,6 +154,53 @@ test.describe( 'Block Comments', () => {
 		await page.getByRole( 'menuitem', { name: 'Reopen' } ).click();
 		await expect( resolveButton ).toBeEnabled();
 	} );
+
+	test( 'selecting a block or comment marks it as an active', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			content: 'First block',
+			comment: 'First block comment',
+		} );
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			content: 'Second block',
+			comment: 'Second block comment',
+		} );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			content: 'Third block',
+			comment: 'Third block comment',
+		} );
+
+		const threads = page.locator( '.editor-collab-sidebar-panel__thread' );
+		const activeThread = page.locator(
+			'.editor-collab-sidebar-panel__focus-thread'
+		);
+		const replyTextbox = activeThread.getByRole( 'textbox', {
+			name: 'Comment',
+		} );
+
+		// Comment and reply textbox should active for last inserter block.
+		await expect( activeThread ).toContainText( 'Third block comment' );
+		await expect( replyTextbox ).toBeVisible();
+
+		// Clicking on a block comment should make it active.
+		await threads.last().click();
+		await expect( activeThread ).toContainText( 'First block comment' );
+		await expect( replyTextbox ).toBeVisible();
+
+		// Clicking on a block in canvas should make its comment active.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await expect( activeThread ).toContainText( 'Second block comment' );
+		await expect( replyTextbox ).toBeVisible();
+	} );
 } );
 
 class BlockCommentUtils {
