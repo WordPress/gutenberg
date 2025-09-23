@@ -14,17 +14,12 @@ wp_interactivity_state(
 );
 
 wp_interactivity_state(
-	'test/deferred-store/bind',
+	'test/deferred-store/derived-state',
 	array(
-		'value' => function () {
+		'value'   => function () {
 			$context = wp_interactivity_get_context( 'test/deferred-store/bind' );
 			return $context['counter'] * 2;
 		},
-	)
-);
-wp_interactivity_state(
-	'test/deferred-store/class',
-	array(
 		'below10' => function () {
 			$context = wp_interactivity_get_context( 'test/deferred-store/class' );
 			return $context['counter'] < 10;
@@ -39,8 +34,10 @@ add_filter(
 			$data = array();
 		}
 		$data['derivedStatePropsAccessed'] = array(
-			'test/deferred-store/bind'  => array( 'state.value' ),
-			'test/deferred-store/class' => array( 'state.below10' ),
+			'test/deferred-store/derived-state' => array(
+				'state.value',
+				'state.below10',
+			),
 		);
 		return $data;
 	}
@@ -59,7 +56,13 @@ add_filter(
 	<span data-wp-text="state.double" data-testid="state-double"></span>
 </div>
 
-<div data-wp-interactive="test/deferred-store/bind" data-wp-context='{"counter": 42}'>
+<div data-wp-interactive="test/deferred-store/derived-state">
+	<button data-wp-on--click="actions.load" data-testid="derived-state-load">load</button>
+	<span hidden data-wp-bind--hidden="!state.hydrated" data-testid="derived-state-hydrated">hydrated</span>
+	<span hidden data-wp-bind--hidden="!state.loaded" data-testid="derived-state-loaded">loaded</span>
+</div>
+
+<div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"counter": 42}'>
 	<input
 		name="derived-bind"
 		type="text"
@@ -69,12 +72,9 @@ add_filter(
 		data-testid="derived-bind-value"
 	>
 	<button data-wp-on--click="actions.increment" data-testid="derived-bind-increment">+</button>
-	<button data-wp-on--click="actions.load" data-testid="derived-bind-load">load</button>
-	<span hidden data-wp-bind--hidden="!state.hydrated" data-testid="derived-bind-hydrated">hydrated</span>
-	<span hidden data-wp-bind--hidden="!state.loaded" data-testid="derived-bind-loaded">loaded</span>
 </div>
 
-<div data-wp-interactive="test/deferred-store/class" data-wp-context='{"counter": 9}'>
+<div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"counter": 9}'>
 	<output
 		class="below-10"
 		data-wp-class--below-10="state.below10"
@@ -82,7 +82,4 @@ add_filter(
 		data-testid="derived-class-element"
 	>NaN</output>
 	<button data-wp-on--click="actions.increment" data-testid="derived-class-increment">+</button>
-	<button data-wp-on--click="actions.load" data-testid="derived-class-load">load</button>
-	<span hidden data-wp-bind--hidden="!state.hydrated" data-testid="derived-class-hydrated">hydrated</span>
-	<span hidden data-wp-bind--hidden="!state.loaded" data-testid="derived-class-loaded">loaded</span>
 </div>

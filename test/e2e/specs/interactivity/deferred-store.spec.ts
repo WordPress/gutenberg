@@ -55,9 +55,9 @@ test.describe( 'deferred store', () => {
 	test( 'Ensure bind keeps the value of a derived state props from deferred store', async ( {
 		page,
 	} ) => {
-		const load = page.getByTestId( 'derived-bind-load' );
-		const loaded = page.getByTestId( 'derived-bind-loaded' );
-		const hydrated = page.getByTestId( 'derived-bind-hydrated' );
+		const load = page.getByTestId( 'derived-state-load' );
+		const loaded = page.getByTestId( 'derived-state-loaded' );
+		const hydrated = page.getByTestId( 'derived-state-hydrated' );
 		const increment = page.getByTestId( 'derived-bind-increment' );
 		const value = page.getByTestId( 'derived-bind-value' );
 
@@ -84,9 +84,9 @@ test.describe( 'deferred store', () => {
 	test( 'Ensure class keeps the value of a derived state props from deferred store', async ( {
 		page,
 	} ) => {
-		const load = page.getByTestId( 'derived-class-load' );
-		const loaded = page.getByTestId( 'derived-class-loaded' );
-		const hydrated = page.getByTestId( 'derived-class-hydrated' );
+		const load = page.getByTestId( 'derived-state-load' );
+		const loaded = page.getByTestId( 'derived-state-loaded' );
+		const hydrated = page.getByTestId( 'derived-state-hydrated' );
 		const increment = page.getByTestId( 'derived-class-increment' );
 		const element = page.getByTestId( 'derived-class-element' );
 
