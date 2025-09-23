@@ -19,6 +19,7 @@ import {
 } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -386,22 +387,21 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			<PluginSidebar
-				isPinnable={ false }
-				header={ false }
-				identifier={ collabSidebarName }
-				className="editor-collab-sidebar"
-				headerClassName="editor-collab-sidebar__header"
-			>
-				<CollabSidebarContent
-					comments={ unresolvedSortedThreads }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					styles={ {
-						backgroundColor,
-					} }
-				/>
-			</PluginSidebar>
+			{ resultComments.length > 0 &&
+				resultComments.map( ( comment ) => {
+					return (
+						<Popover position="bottom right" key={ comment.id }>
+							<CollabSidebarContent
+								comments={ unresolvedSortedThreads }
+								showCommentBoard={ showCommentBoard }
+								setShowCommentBoard={ setShowCommentBoard }
+								styles={ {
+									backgroundColor,
+								} }
+							/>
+						</Popover>
+					);
+				} ) }
 		</>
 	);
 }
