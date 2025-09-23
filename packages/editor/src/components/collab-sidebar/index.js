@@ -240,7 +240,7 @@ function CollabSidebarContent( {
 function CommentPopover( {
 	comment,
 	blocks,
-	unresolvedSortedThreads,
+	filteredThreads,
 	showCommentBoard,
 	setShowCommentBoard,
 	backgroundColor,
@@ -253,13 +253,6 @@ function CommentPopover( {
 	}, [ comment.id ] );
 
 	const relatedBlockElement = useBlockElement( relatedBlock );
-
-	// Filter unresolvedSortedThreads to only this block or its replies.
-	const filteredThreads = unresolvedSortedThreads.filter(
-		( thread ) =>
-			thread.id === comment.id ||
-			thread.reply.some( ( reply ) => reply.id === comment.id )
-	);
 
 	return (
 		<Popover
@@ -438,12 +431,20 @@ export default function CollabSidebar() {
 			</PluginSidebar>
 			{ unresolvedSortedThreads.length > 0 &&
 				unresolvedSortedThreads.map( ( comment ) => {
+					// Pass this comment and its replies.
+					const filteredThreads = unresolvedSortedThreads.filter(
+						( thread ) =>
+							thread.id === comment.id ||
+							thread.reply.some(
+								( reply ) => reply.id === comment.id
+							)
+					);
 					return (
 						<CommentPopover
 							key={ comment.id }
 							comment={ comment }
 							blocks={ blocks }
-							unresolvedSortedThreads={ unresolvedSortedThreads }
+							filteredThreads={ filteredThreads }
 							showCommentBoard={ showCommentBoard }
 							setShowCommentBoard={ setShowCommentBoard }
 							backgroundColor={ backgroundColor }
