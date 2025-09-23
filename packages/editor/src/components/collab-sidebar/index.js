@@ -259,8 +259,11 @@ function CommentPopover( {
 			key={ comment.id }
 			placement="right-start"
 			flip={ false }
+			animate={ false }
+			focusOnMount={ false }
 			anchor={ relatedBlockElement }
 			offset={ 50 }
+			variant="unstyled"
 		>
 			<CollabSidebarContent
 				comments={ filteredThreads }
