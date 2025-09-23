@@ -12,6 +12,9 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -24,6 +27,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' ),
 		] );
 	} );
 
@@ -237,7 +241,7 @@ test.describe( 'Pattern Overrides', () => {
 			<!-- wp:paragraph {"metadata":{"name":"Pattern Overrides","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>Pattern Overrides</p>
 			<!-- /wp:paragraph -->
-			<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"core/post-meta","args":{"key":"text_custom_field"}}}}} -->
 			<p>Post Meta Binding</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:paragraph {"metadata":{"name":"No Overrides or Binding"}} -->
@@ -801,7 +805,7 @@ test.describe( 'Pattern Overrides', () => {
 <p>Edit me</p>
 <!-- /wp:paragraph -->
 <!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"text_custom_field"}}}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Read Only Button Text</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
@@ -848,6 +852,35 @@ test.describe( 'Pattern Overrides', () => {
 		await page.keyboard.type( 'Edited' );
 		const finalText = await nonEditableButton.textContent();
 		expect( initialText ).toBe( finalText );
+
+		await nonEditableButton.click();
+		await editor.showBlockToolbar();
+
+		// Open the link control
+		const linkButton = page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+		await linkButton.click();
+
+		const urlInput = page.getByPlaceholder( 'Search or type URL' );
+		await urlInput.fill( '#test' );
+
+		// Save the link
+		const saveLinkButton = page.locator(
+			'.block-editor-link-control__search-submit'
+		);
+		await saveLinkButton.click();
+
+		// Publish the post
+		const postId = await editor.publishPost();
+
+		// Check on the frontend that the URL was updated
+		await page.goto( `/?p=${ postId }` );
+		const frontendButton = page.getByRole( 'link', {
+			name: 'Button Text',
+		} );
+		await expect( frontendButton ).toHaveAttribute( 'href', '#test' );
 	} );
 
 	test( 'resets overrides after clicking the reset button', async ( {
