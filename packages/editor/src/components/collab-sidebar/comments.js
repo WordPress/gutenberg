@@ -188,16 +188,6 @@ function Thread( {
 		}
 	};
 
-	const handleReturnToBlock = () => {
-		if ( relatedBlock && relatedBlockElement ) {
-			relatedBlockElement.scrollIntoView( {
-				behavior: 'smooth',
-				block: 'center',
-			} );
-			flashBlock( relatedBlock );
-		}
-	};
-
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
@@ -215,7 +205,6 @@ function Thread( {
 				onEdit={ onEditComment }
 				onDelete={ onCommentDelete }
 				status={ thread.status }
-				onReturnToBlock={ handleReturnToBlock }
 			/>
 			{ 0 < thread?.reply?.length && (
 				<>
@@ -253,7 +242,6 @@ function Thread( {
 										showLabel={ false }
 										onEdit={ onEditComment }
 										onDelete={ onCommentDelete }
-										onReturnToBlock={ null }
 									/>
 								) }
 								{ 'approved' === thread.status && (
@@ -261,7 +249,6 @@ function Thread( {
 										thread={ reply }
 										commentNumber={ commentNumber }
 										showLabel={ false }
-										onReturnToBlock={ null }
 									/>
 								) }
 							</VStack>
@@ -314,7 +301,6 @@ function Thread( {
 								),
 								commentNumber
 							) }
-							onReturnToBlock={ handleReturnToBlock }
 						/>
 					</VStack>
 				</VStack>
@@ -333,7 +319,6 @@ const CommentBoard = ( {
 	onEdit,
 	onDelete,
 	status,
-	onReturnToBlock,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
@@ -449,7 +434,6 @@ const CommentBoard = ( {
 						_x( 'Edit Comment %s', 'Edit specific comment' ),
 						commentNumber
 					) }
-					onReturnToBlock={ onReturnToBlock }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">
