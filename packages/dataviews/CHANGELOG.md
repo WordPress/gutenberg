@@ -4,7 +4,7 @@
 
 ### Features
 
-- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971) and [#71836](https://github.com/WordPress/gutenberg/pull/71836).
 
 ### Bug Fixes
 
