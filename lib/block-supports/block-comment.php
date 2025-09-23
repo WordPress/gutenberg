@@ -9,11 +9,10 @@
  * Adds blockCommentId as a global attribute to all blocks.
  * This ensures that blockCommentId is always available for REST API validation.
  *
- * @param array  $args       Array of arguments for registering a block type.
- * @param string $block_type Block type name including namespace.
+ * @param array $args       Array of arguments for registering a block type.
  * @return array Modified arguments.
  */
-function gutenberg_add_block_comment_global_attribute( $args, $block_type ) {
+function gutenberg_add_block_comment_global_attribute( $args ) {
 	// Ensure attributes array exists.
 	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
 		$args['attributes'] = array();
