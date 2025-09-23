@@ -30,7 +30,7 @@ import { store as commandsStore } from '../store';
  * } );
  * ```
  */
-export default function useCommand( command ) {
+export function useCommand( command ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
 	const currentCallbackRef = useRef( command.callback );
 	useEffect( () => {
@@ -64,4 +64,84 @@ export default function useCommand( command ) {
 		registerCommand,
 		unregisterCommand,
 	] );
+}
+
+/**
+ * Attach multiple commands to the command palette. Used for static commands.
+ *
+ * @param {import('../store/actions').WPCommandConfig[]} commands Array of command configs.
+ *
+ * @example
+ * ```js
+ * import { useCommands } from '@wordpress/commands';
+ * import { plus, edit } from '@wordpress/icons';
+ *
+ * useCommands( [
+ *     {
+ *         name: 'myplugin/add-post',
+ *         label: __( 'Add new post' ),
+ *         icon: plus,
+ *         callback: ({ close }) => {
+ *             document.location.href = 'post-new.php';
+ *             close();
+ *         },
+ *     },
+ *     {
+ *         name: 'myplugin/edit-posts',
+ *         label: __( 'Edit posts' ),
+ *         icon: edit,
+ *         callback: ({ close }) => {
+ *             document.location.href = 'edit.php';
+ *             close();
+ *         },
+ *     },
+ * ] );
+ * ```
+ */
+export function useCommands( commands ) {
+	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
+	const currentCallbacksRef = useRef( {} );
+
+	useEffect( () => {
+		if ( ! commands ) {
+			return;
+		}
+		commands.forEach( ( command ) => {
+			if ( command.callback ) {
+				currentCallbacksRef.current[ command.name ] = command.callback;
+			}
+		} );
+	}, [ commands ] );
+
+	useEffect( () => {
+		if ( ! commands ) {
+			return;
+		}
+		commands.forEach( ( command ) => {
+			if ( command.disabled ) {
+				return;
+			}
+			registerCommand( {
+				name: command.name,
+				context: command.context,
+				label: command.label,
+				searchLabel: command.searchLabel,
+				icon: command.icon,
+				keywords: command.keywords,
+				callback: ( ...args ) => {
+					const callback =
+						currentCallbacksRef.current[ command.name ];
+					if ( callback ) {
+						callback( ...args );
+					}
+				},
+			} );
+		} );
+
+		return () => {
+			commands.forEach( ( command ) => {
+				unregisterCommand( command.name );
+			} );
+		};
+	}, [ commands, registerCommand, unregisterCommand ] );
 }
