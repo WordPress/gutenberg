@@ -65,6 +65,7 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 			<TextControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
+				dir="ltr"
 				className="html-anchor-control"
 				label={ __( 'HTML anchor' ) }
 				help={

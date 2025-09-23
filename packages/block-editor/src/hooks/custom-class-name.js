@@ -49,7 +49,9 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 			<TextControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
+				dir="ltr"
 				autoComplete="off"
+				className="custom-class-name-control"
 				label={ __( 'Additional CSS class(es)' ) }
 				value={ className || '' }
 				onChange={ ( nextValue ) => {
