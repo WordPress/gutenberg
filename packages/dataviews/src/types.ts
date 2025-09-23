@@ -281,7 +281,7 @@ export type Field< Item > = {
 	enableGlobalSearch?: boolean;
 
 	/**
-	 * Whether the field is filterable.
+	 * Whether the field can be hidden in the UI.
 	 */
 	enableHiding?: boolean;
 

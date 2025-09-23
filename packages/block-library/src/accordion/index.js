@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import edit from './edit';
@@ -13,7 +18,36 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	example: {},
+	example: {
+		innerBlocks: [
+			{
+				name: 'core/accordion-content',
+				innerBlocks: [
+					{
+						name: 'core/accordion-header',
+						attributes: {
+							title: __(
+								'Lorem ipsum dolor sit amet, consectetur.'
+							),
+						},
+					},
+				],
+			},
+			{
+				name: 'core/accordion-content',
+				innerBlocks: [
+					{
+						name: 'core/accordion-header',
+						attributes: {
+							title: __(
+								'Suspendisse commodo lacus, interdum et.'
+							),
+						},
+					},
+				],
+			},
+		],
+	},
 	edit,
 	save,
 };

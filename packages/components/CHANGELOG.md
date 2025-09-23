@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-### Features
+### Enhancements
+
+-   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+
+### Internal
 
 -   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
 
