@@ -13,11 +13,11 @@ const parseContent = async ( loc: Locator ) =>
 test.describe( 'data-wp-*---unique-id', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
-		await utils.addPostWithBlock( 'test/directive-unique-ids' );
+		await utils.addPostWithBlock( 'test/unique-ids' );
 	} );
 
 	test.beforeEach( async ( { interactivityUtils: utils, page } ) => {
-		await page.goto( utils.getLink( 'test/directive-unique-ids' ) );
+		await page.goto( utils.getLink( 'test/unique-ids' ) );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {

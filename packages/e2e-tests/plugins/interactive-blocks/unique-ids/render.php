@@ -1,13 +1,13 @@
 <?php
 /**
- * HTML for testing directive unique IDs.
+ * HTML for testing unique IDs.
  *
  * @package gutenberg-test-interactive-blocks
  */
 ?>
 
 <!-- Test 1: Multiple contexts with unique IDs merge correctly -->
-<div data-wp-interactive='{"namespace": "directive-unique-ids-test"}'>
+<div data-wp-interactive='{"namespace": "unique-ids-test"}'>
 	<div
 		data-wp-context---plugin-a='{"propA": "valueA", "shared": "fromA"}'
 		data-wp-context---plugin-b='{"propB": "valueB", "shared": "fromB"}'
@@ -33,7 +33,7 @@
 </div>
 
 <!-- Test 3: Multiple event handlers with unique IDs -->
-<div data-wp-interactive='{"namespace": "directive-unique-ids-test"}'>
+<div data-wp-interactive='{"namespace": "unique-ids-test"}'>
 	<button
 		data-testid="multi-click"
 		data-wp-on--click---handler1="actions.clickHandler1"
@@ -47,7 +47,7 @@
 
 <!-- Test 4: Multiple watch directives with unique IDs -->
 <div
-	data-wp-interactive='{"namespace": "directive-unique-ids-test"}'
+	data-wp-interactive='{"namespace": "unique-ids-test"}'
 	data-wp-context='{"counter": 0}'
 	data-wp-watch---watcher1="callbacks.watcher1"
 	data-wp-watch---watcher2="callbacks.watcher2"
@@ -60,7 +60,7 @@
 
 <!-- Test 5: Multiple init directives with unique IDs -->
 <div
-	data-wp-interactive='{"namespace": "directive-unique-ids-test"}'
+	data-wp-interactive='{"namespace": "unique-ids-test"}'
 	data-wp-init---init1="actions.initHandler1"
 	data-wp-init---init2="actions.initHandler2"
 >
@@ -69,7 +69,7 @@
 </div>
 
 <!-- Test 6: Backward compatibility - directives without unique IDs -->
-<div data-wp-interactive='{"namespace": "directive-unique-ids-test"}'>
+<div data-wp-interactive='{"namespace": "unique-ids-test"}'>
 	<div data-wp-context='{"backwardCompat": "working"}'>
 		<button
 			data-testid="backward-compat-button"
@@ -82,7 +82,7 @@
 </div>
 
 <!-- Test 7: Complex suffixes with unique IDs -->
-<div data-wp-interactive='{"namespace": "directive-unique-ids-test"}'>
+<div data-wp-interactive='{"namespace": "unique-ids-test"}'>
 	<button
 		data-testid="complex-suffix"
 		data-wp-on--click---unique-id="actions.clickHandler1"

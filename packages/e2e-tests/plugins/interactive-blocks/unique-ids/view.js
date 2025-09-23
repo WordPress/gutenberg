@@ -3,7 +3,7 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-store( 'directive-unique-ids-test', {
+store( 'unique-ids-test', {
 	state: {
 		get renderContext() {
 			const context = getContext();
@@ -18,11 +18,11 @@ store( 'directive-unique-ids-test', {
 	},
 	actions: {
 		clickHandler1: () => {
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			state.clickHandler1Count++;
 		},
 		clickHandler2: () => {
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			state.clickHandler2Count++;
 		},
 		increment: () => {
@@ -30,18 +30,18 @@ store( 'directive-unique-ids-test', {
 			context.counter++;
 		},
 		initHandler1: () => {
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			state.initHandler1Count++;
 		},
 		initHandler2: () => {
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			state.initHandler2Count++;
 		},
 	},
 	callbacks: {
 		watcher1: () => {
 			const context = getContext();
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			// Watch counter changes
 			const counter = context.counter;
 			// Use counter to trigger reactivity
@@ -51,7 +51,7 @@ store( 'directive-unique-ids-test', {
 		},
 		watcher2: () => {
 			const context = getContext();
-			const state = store( 'directive-unique-ids-test' ).state;
+			const state = store( 'unique-ids-test' ).state;
 			// Watch counter changes
 			const counter = context.counter;
 			// Use counter to trigger reactivity
