@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Features
+
+- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
+
 ### Bug Fixes
 
 - DataViews: keep non-hideable fields out of the hidden-fields list when they’re already invisible. [#71729](https://github.com/WordPress/gutenberg/pull/71729/)
@@ -20,7 +24,6 @@
 ### Features
 
 - Field API: introduce `setValue` to fix DataViews filters and DataForm panel layout (modal) when working with nested data. [#71604](https://github.com/WordPress/gutenberg/pull/71604)
-- Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971)
 - Dataform: Add new `telephone` field type and field control. [#71498](https://github.com/WordPress/gutenberg/pull/71498)
 - DataForm: introduce a new `row` layout, check the README for details. [#71124](https://github.com/WordPress/gutenberg/pull/71124)
 - Dataform: Add new `url` field type and field control. [#71518](https://github.com/WordPress/gutenberg/pull/71518)
