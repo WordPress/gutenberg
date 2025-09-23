@@ -41,13 +41,22 @@ jobs:
             - name: Install check-jsonschema
               run: pip install check-jsonschema
 
+            - name: Validate JSON schema schemas
+              run: |
+                  files=$(ls './schemas/json/*.json')
+                  if [ -n "$files" ]; then
+                    echo "$files" | xargs check-jsonschema --schemafile 'https://json-schema.org/draft-07/schema'
+                  else
+                    echo "No schema files found to validate."
+                  fi
+
             - name: Validate block.json files
               run: |
                   files=$(find . -name "block.json" -not -path './schemas/**')
                   if [ -n "$files" ]; then
                     echo "$files" | xargs check-jsonschema --schemafile ./schemas/json/block.json
                   else
-                    echo "No block.json files found to validate"
+                    echo "No block.json files found to validate."
                   fi
 
             - name: Validate theme.json files
