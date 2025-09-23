@@ -10,6 +10,7 @@ import './compat';
 import align from './align';
 import background from './background';
 import './lock';
+import './block-comment';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';

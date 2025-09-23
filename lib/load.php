@@ -159,6 +159,7 @@ require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
+require __DIR__ . '/block-supports/block-comment.php';
 
 // Data views.
 require_once __DIR__ . '/experimental/data-views.php';
