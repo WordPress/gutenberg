@@ -43,7 +43,7 @@ jobs:
 
             - name: Validate JSON schema schemas
               run: |
-                  files=$(ls './schemas/json/*.json')
+                  files=$(ls ./schemas/json/*.json)
                   if [ -n "$files" ]; then
                     echo "$files" | xargs check-jsonschema --schemafile 'https://json-schema.org/draft-07/schema'
                   else
