@@ -5,46 +5,76 @@ import { h, type ComponentChild, type JSX } from 'preact';
 /**
  * Internal dependencies
  */
-import { directivePrefix as p } from './constants';
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
 
-const ignoreAttr = `data-${ p }-ignore`;
-const islandAttr = `data-${ p }-interactive`;
-const fullPrefix = `data-${ p }-`;
+const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
-/**
- * This regex pattern must be kept in sync with the server-side implementation in
- * wp-includes/interactivity-api/class-wp-interactivity-api.php.
- *
- * The pattern validates directive attribute names to ensure consistency between
- * client and server processing. Invalid directive names (containing characters like
- * square brackets or colons) should be ignored by both client and server.
- *
- * @see https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/interactivity-api/class-wp-interactivity-api.php
- */
-const directiveParser = new RegExp(
-	`^data-${ p }-` + // ${p} must be a prefix string, like 'wp'.
-		// Match alphanumeric characters including hyphen-separated
-		// segments. It excludes underscore intentionally to prevent confusion.
-		// E.g., "custom-directive".
-		'([a-z0-9]+(?:-[a-z0-9]+)*)' +
-		// Match either:
-		// 1. '--suffix---uniqueId' (suffix with unique ID)
-		// 2. '---uniqueId' (unique ID without suffix) - check this before --suffix
-		// 3. '--suffix' (suffix without unique ID)
-		// 4. nothing (no suffix or unique ID)
-		'(?:' +
-		'(?:--([a-z0-9_-]+?)---([a-z0-9_-]+))|' + // --suffix---uniqueId
-		'(?:---([a-z0-9_-]+))|' + // ---uniqueId (check before --suffix)
-		'(?:--([a-z0-9_-]+))' + // --suffix
-		')?$',
-	'i' // Case insensitive.
-);
+function parseDirective( attributeName: string ): {
+	prefix: string;
+	suffix: string | null;
+	uniqueId: string | null;
+} | null {
+	// Check if the attribute name starts with "data-wp-".
+	const match = attributeName.match( /^data-wp-(.*)/i );
+	if ( ! match ) {
+		return null;
+	}
+
+	// Get the rest of the attribute name after "data-wp-".
+	const rest = match[ 1 ];
+	// Find the first "--" to separate the prefix from the rest.
+	const delimIndex = rest.indexOf( '--' );
+
+	// If "--" is not found, everything is part of the prefix.
+	if ( delimIndex === -1 ) {
+		return { prefix: rest, suffix: null, uniqueId: null };
+	}
+
+	// The prefix is the part before the first "--".
+	const prefix = rest.substring( 0, delimIndex );
+	// The rest is the part that starts from "--".
+	const remaining = rest.substring( delimIndex );
+
+	// Rule 1: If the rest starts with "---" (and not "----"),
+	// there is no suffix and the rest is the unique ID.
+	if ( remaining.startsWith( '---' ) && ! remaining.startsWith( '----' ) ) {
+		return {
+			prefix,
+			suffix: null,
+			uniqueId: remaining.substring( 3 ) || null,
+		};
+	}
+
+	// Rule 2: Otherwise, the rest is a potential suffix.
+	// The first two dashes are removed.
+	const potentialSuffix = remaining.substring( 2 );
+	// Search for "---" for a unique ID within the potential suffix.
+	const idIndexInSuffix = potentialSuffix.indexOf( '---' );
+
+	// If "---" is found (and not "----"), split the suffix and the unique ID.
+	if (
+		idIndexInSuffix !== -1 &&
+		! potentialSuffix.substring( idIndexInSuffix ).startsWith( '----' )
+	) {
+		const suffix = potentialSuffix.substring( 0, idIndexInSuffix );
+		const uniqueId =
+			potentialSuffix.substring( idIndexInSuffix + 3 ) || null;
+		return { prefix, suffix: suffix || null, uniqueId };
+	}
+
+	// If the potential suffix consists only of dashes, it is considered null.
+	if ( /^-+$/.test( potentialSuffix ) ) {
+		return { prefix, suffix: null, uniqueId: null };
+	}
+
+	// Otherwise, the entire potential suffix is the suffix.
+	return { prefix, suffix: potentialSuffix || null, uniqueId: null };
+}
 
 // Regular expression for reference parsing. It can contain a namespace before
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
@@ -105,10 +135,11 @@ export function toVdom( root: Node ): ComponentChild {
 			const attributeName = attributes[ i ].name;
 			const attributeValue = attributes[ i ].value;
 			if (
-				attributeName[ fullPrefix.length ] &&
-				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
+				attributeName[ directivePrefix.length ] &&
+				attributeName.slice( 0, directivePrefix.length ) ===
+					directivePrefix
 			) {
-				if ( attributeName === ignoreAttr ) {
+				if ( attributeName === 'data-wp-ignore' ) {
 					ignore = true;
 				} else {
 					const regexResult = nsPathRegExp.exec( attributeValue );
@@ -118,7 +149,7 @@ export function toVdom( root: Node ): ComponentChild {
 						const parsedValue = JSON.parse( value );
 						value = isObject( parsedValue ) ? parsedValue : value;
 					} catch {}
-					if ( attributeName === islandAttr ) {
+					if ( attributeName === 'data-wp-interactive' ) {
 						island = true;
 						const islandNamespace =
 							// eslint-disable-next-line no-nested-ternary
@@ -155,31 +186,12 @@ export function toVdom( root: Node ): ComponentChild {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
-				const directiveMatch = directiveParser.exec( name );
-				if ( directiveMatch === null ) {
+				const directiveParsed = parseDirective( name );
+				if ( directiveParsed === null ) {
 					warn( `Found malformed directive name: ${ name }.` );
 					return obj;
 				}
-				const prefix = directiveMatch[ 1 ] || '';
-
-				// Handle different capture group patterns:
-				// Group 2,3: --suffix---uniqueId (both suffix and unique ID)
-				// Group 4: ---uniqueId (unique ID only)
-				// Group 5: --suffix (suffix only)
-				let suffix: string | null = null;
-				let uniqueId: string | null = null;
-
-				if ( directiveMatch[ 2 ] && directiveMatch[ 3 ] ) {
-					// --suffix---uniqueId
-					suffix = directiveMatch[ 2 ];
-					uniqueId = directiveMatch[ 3 ];
-				} else if ( directiveMatch[ 4 ] ) {
-					// ---uniqueId
-					uniqueId = directiveMatch[ 4 ];
-				} else if ( directiveMatch[ 5 ] ) {
-					// --suffix
-					suffix = directiveMatch[ 5 ];
-				}
+				const { prefix, suffix, uniqueId } = directiveParsed;
 
 				obj[ prefix ] = obj[ prefix ] || [];
 				obj[ prefix ].push( {
