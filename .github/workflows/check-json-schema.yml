@@ -43,18 +43,18 @@ jobs:
 
             - name: Validate block.json files
               run: |
-                  block_files=$(find . -name "block.json" -not -path './schemas/**')
-                  if [ -n "$block_files" ]; then
-                    check-jsonschema --schemafile ./schemas/json/block.json "$block_files"
+                  files=$(find . -name "block.json" -not -path './schemas/**')
+                  if [ -n "$files" ]; then
+                    echo "$files" | xargs check-jsonschema --schemafile ./schemas/json/block.json
                   else
                     echo "No block.json files found to validate"
                   fi
 
             - name: Validate theme.json files
               run: |
-                  theme_files=$(find . -name "theme.json" -not -path './schemas/**')
-                  if [ -n "$theme_files" ]; then
-                    check-jsonschema --schemafile ./schemas/json/theme.json "$theme_files"
+                  files=$(find . -name "theme.json" -not -path './schemas/**')
+                  if [ -n "$files" ]; then
+                    echo "$files" | xargs check-jsonschema --schemafile ./schemas/json/theme.json
                   else
                     echo "No theme.json files found to validate"
                   fi
