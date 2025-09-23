@@ -32,7 +32,7 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { getCommentIdsFromBlocks } from './utils';
+import { getCommentIdsFromBlocks, findBlockByCommentId } from './utils';
 
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
@@ -387,8 +387,11 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			{ resultComments.length > 0 &&
-				resultComments.map( ( comment ) => {
+			{ unresolvedSortedThreads.length > 0 &&
+				unresolvedSortedThreads.map( ( comment ) => {
+					console.log( 'Rendering comment in Popover:', comment );
+					const relatedBlock = findBlockByCommentId( comment.id, blocks );
+					console.log( 'Related block for comment:', relatedBlock );
 					return (
 						<Popover position="bottom right" key={ comment.id }>
 							<CollabSidebarContent
@@ -405,3 +408,4 @@ export default function CollabSidebar() {
 		</>
 	);
 }
+

@@ -43,3 +43,25 @@ export function getCommentIdsFromBlocks( blocks ) {
 	// Extract all comment IDs recursively
 	return extractCommentIds( blocks );
 }
+
+/**
+ * Finds the first block that has the specified comment ID.
+ *
+ * @param {string} commentId - The comment ID to search for.
+ * @param {Array}  blockList - The list of blocks to search through.
+ * @return {string|null} The client ID of the found block, or null if not found.
+ */
+export function findBlockByCommentId( commentId, blockList ) {
+	for ( const block of blockList ) {
+		if ( block.attributes?.blockCommentId === commentId ) {
+			return block.clientId;
+		}
+		if ( block.innerBlocks ) {
+			const found = findBlockByCommentId( commentId, block.innerBlocks );
+			if ( found ) {
+				return found;
+			}
+		}
+	}
+	return null;
+};

@@ -29,30 +29,11 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { findBlockByCommentId } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-/**
- * Finds the first block that has the specified comment ID.
- *
- * @param {string} commentId - The comment ID to search for.
- * @param {Array}  blockList - The list of blocks to search through.
- * @return {string|null} The client ID of the found block, or null if not found.
- */
-const findBlockByCommentId = ( commentId, blockList ) => {
-	for ( const block of blockList ) {
-		if ( block.attributes?.blockCommentId === commentId ) {
-			return block.clientId;
-		}
-		if ( block.innerBlocks ) {
-			const found = findBlockByCommentId( commentId, block.innerBlocks );
-			if ( found ) {
-				return found;
-			}
-		}
-	}
-	return null;
-};
+
 
 /**
  * Renders the Comments component.
