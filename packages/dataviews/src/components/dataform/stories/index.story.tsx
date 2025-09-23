@@ -1590,6 +1590,102 @@ export const LayoutMixed = {
 	render: LayoutMixedComponent,
 };
 
+const DynamicDataComponent = () => {
+	type DynamicProduct = {
+		name: string;
+		cost: number;
+		quantity: number;
+	};
+	type DynamicData = {
+		productList: DynamicProduct[];
+		totalAmount: number;
+	};
+
+	const initialData = {
+		productList: [
+			{
+				name: 'hair protection oil',
+				cost: 10,
+				quantity: 5,
+			},
+			{
+				name: 'hair strength shampoo',
+				cost: 20,
+				quantity: 3,
+			},
+		],
+		totalAmount: 110,
+	};
+
+	const [ data, setData ] = useState< DynamicData >( initialData );
+
+	const form: Form = {
+		fields: [
+			'productList',
+			{
+				id: 'totalAmount',
+				label: 'Total Amount',
+				layout: { type: 'panel' },
+			},
+		],
+	};
+
+	const _fields: Field< DynamicData >[] = [
+		{
+			id: 'productList',
+			label: 'Product List',
+			type: 'array',
+			children: [
+				{
+					id: 'name',
+					label: 'Name',
+					type: 'text',
+				},
+				{
+					id: 'cost',
+					label: 'Cost',
+					type: 'integer',
+				},
+				{
+					id: 'quantity',
+					label: 'Quantity',
+					type: 'integer',
+				},
+			],
+		},
+		{
+			id: 'totalAmount',
+			label: 'Total Amount',
+			type: 'integer',
+			readOnly: true,
+		},
+	];
+
+	return (
+		<DataForm< DynamicData >
+			data={ data }
+			form={ form }
+			fields={ _fields }
+			onChange={ ( edits ) => {
+				setData( ( prev ) => {
+					const updated = { ...prev, ...edits };
+					return {
+						...updated,
+						totalAmount: updated.productList.reduce(
+							( acc, item ) => acc + item.cost * item.quantity,
+							0
+						),
+					};
+				} );
+			} }
+		/>
+	);
+};
+
+export const DynamicData = {
+	render: DynamicDataComponent,
+};
+
 export const Validation = {
 	render: ValidationComponent,
 	argTypes: {
