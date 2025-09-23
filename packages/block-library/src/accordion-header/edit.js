@@ -9,10 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	BlockControls,
 	HeadingLevelDropdown,
 	RichText,
@@ -37,11 +34,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	const blockProps = useBlockProps();
-	const borderProps = useBorderProps( attributes );
-	const colorProps = useColorProps( attributes );
+	const blockProps = useBlockProps( {
+		className: clsx( 'accordion-content__heading', {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	const spacingProps = useSpacingProps( attributes );
-	const shadowProps = useShadowProps( attributes );
 
 	return (
 		<>
@@ -56,24 +54,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<TagName
-				{ ...blockProps }
-				className={ clsx(
-					blockProps.className,
-					colorProps.className,
-					borderProps.className,
-					'accordion-content__heading',
-					{
-						[ `has-custom-font-size` ]: blockProps.style.fontSize,
-						[ `has-text-align-${ textAlign }` ]: textAlign,
-					}
-				) }
-				style={ {
-					...borderProps.style,
-					...colorProps.style,
-					...shadowProps.style,
-				} }
-			>
+			<TagName { ...blockProps }>
 				<button
 					className={ clsx( 'accordion-content__toggle' ) }
 					style={ {
