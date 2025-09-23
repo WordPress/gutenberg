@@ -31,17 +31,6 @@ function isObjectEmpty( object ) {
 }
 
 /**
- * Based on the given block name, checks if it is possible to bind the block.
- *
- * @param {string} blockName The name of the block.
- *
- * @return {boolean} Whether it is possible to bind the block to sources.
- */
-export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
-}
-
-/**
  * Checks if the block has the `__default` binding for pattern overrides.
  *
  * @param {?Record<string, object>} bindings A block's bindings from the metadata attribute.
