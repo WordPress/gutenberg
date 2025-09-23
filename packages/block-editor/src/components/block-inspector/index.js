@@ -27,8 +27,8 @@ import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-c
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
-import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
+import ContentTab from '../inspector-controls-tabs/content-tab';
 
 import { unlock } from '../../lock-unlock';
 
@@ -92,6 +92,7 @@ function BlockInspector() {
 		blockType,
 		isSectionBlock,
 		isSectionBlockInSelection,
+		hasBlockStyles,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -101,6 +102,7 @@ function BlockInspector() {
 			getParentSectionBlock,
 			isSectionBlock: _isSectionBlock,
 		} = unlock( select( blockEditorStore ) );
+		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const renderedBlockClientId =
 			getParentSectionBlock( _selectedBlockClientId ) ||
@@ -114,6 +116,10 @@ function BlockInspector() {
 			( id ) => _isSectionBlock( id )
 		);
 
+		const blockStyles =
+			_selectedBlockName && getBlockStyles( _selectedBlockName );
+		const _hasBlockStyles = blockStyles && blockStyles.length > 0;
+
 		return {
 			selectedBlockCount: getSelectedBlockCount(),
 			selectedBlockClientId: renderedBlockClientId,
@@ -121,10 +127,41 @@ function BlockInspector() {
 			blockType: _blockType,
 			isSectionBlockInSelection: _isSectionBlockInSelection,
 			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
+			hasBlockStyles: _hasBlockStyles,
 		};
 	}, [] );
 
-	const availableTabs = useInspectorControlsTabs( blockType?.name );
+	// Separate useSelect for contentClientIds with proper dependencies
+	const contentClientIds = useSelect(
+		( select ) => {
+			if ( ! isSectionBlock || ! selectedBlockClientId ) {
+				return [];
+			}
+
+			const {
+				getClientIdsOfDescendants,
+				getBlockName,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
+
+			const descendants = getClientIdsOfDescendants(
+				selectedBlockClientId
+			);
+			return descendants.filter(
+				( current ) =>
+					getBlockName( current ) !== 'core/list-item' &&
+					getBlockEditingMode( current ) === 'contentOnly'
+			);
+		},
+		[ isSectionBlock, selectedBlockClientId ]
+	);
+
+	const availableTabs = useInspectorControlsTabs(
+		blockType?.name,
+		contentClientIds,
+		isSectionBlock,
+		hasBlockStyles
+	);
 	const hasMultipleTabs = availableTabs?.length > 1;
 
 	// The block inspector animation settings will be completely
@@ -201,6 +238,8 @@ function BlockInspector() {
 				blockName={ blockType.name }
 				isSectionBlock={ isSectionBlock }
 				availableTabs={ availableTabs }
+				contentClientIds={ contentClientIds }
+				hasBlockStyles={ hasBlockStyles }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -247,41 +286,15 @@ const BlockInspectorSingleBlock = ( {
 	blockName,
 	isSectionBlock,
 	availableTabs,
+	contentClientIds,
+	hasBlockStyles,
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
-	const shouldShowTabs = ! isSectionBlock && hasMultipleTabs;
 
-	const hasBlockStyles = useSelect(
-		( select ) => {
-			const { getBlockStyles } = select( blocksStore );
-			const blockStyles = getBlockStyles( blockName );
-			return blockStyles && blockStyles.length > 0;
-		},
-		[ blockName ]
-	);
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const contentClientIds = useSelect(
-		( select ) => {
-			// Avoid unnecessary subscription.
-			if ( ! isSectionBlock ) {
-				return;
-			}
-
-			const {
-				getClientIdsOfDescendants,
-				getBlockName,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-			return getClientIdsOfDescendants( clientId ).filter(
-				( current ) =>
-					getBlockName( current ) !== 'core/list-item' &&
-					getBlockEditingMode( current ) === 'contentOnly'
-			);
-		},
-		[ isSectionBlock, clientId ]
-	);
-
 	const isBlockSynced = blockInformation.isSynced;
+
+	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -300,6 +313,8 @@ const BlockInspectorSingleBlock = ( {
 					clientId={ clientId }
 					blockName={ blockName }
 					tabs={ availableTabs }
+					isSectionBlock={ isSectionBlock }
+					contentClientIds={ contentClientIds }
 				/>
 			) }
 			{ ! shouldShowTabs && (
@@ -307,15 +322,7 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStylesPanel clientId={ clientId } />
 					) }
-
-					{ contentClientIds && contentClientIds.length > 0 && (
-						<PanelBody title={ __( 'Content' ) }>
-							<BlockQuickNavigation
-								clientIds={ contentClientIds }
-							/>
-						</PanelBody>
-					) }
-
+					<ContentTab contentClientIds={ contentClientIds } />
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }
