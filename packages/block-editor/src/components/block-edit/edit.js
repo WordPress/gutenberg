@@ -98,8 +98,8 @@ const EditWithGeneratedProps = ( props ) => {
 		}
 		return {
 			blockBindings: replacePatternOverridesDefaultBinding(
-				bindableAttributes,
-				attributes?.metadata?.bindings
+				attributes?.metadata?.bindings,
+				bindableAttributes
 			),
 			context: computedContext,
 			hasPatternOverrides: hasPatternOverridesDefaultBinding(

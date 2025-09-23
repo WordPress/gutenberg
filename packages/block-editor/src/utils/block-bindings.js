@@ -41,14 +41,14 @@ export function hasPatternOverridesDefaultBinding( bindings ) {
  * - bindings passed in: `{ __default: { source: 'core/pattern-overrides' } }`
  * - bindings returned: `{ content: { source: 'core/pattern-overrides' } }`
  *
- * @param {string[]}                supportedAttributes The block's attributes which are supported by block bindings.
  * @param {?Record<string, object>} bindings            A block's bindings from the metadata attribute.
+ * @param {string[]}                supportedAttributes The block's attributes which are supported by block bindings.
  *
  * @return {Object} The bindings with default replaced for pattern overrides.
  */
 export function replacePatternOverridesDefaultBinding(
-	supportedAttributes,
-	bindings
+	bindings,
+	supportedAttributes
 ) {
 	// The `__default` binding currently only works for pattern overrides.
 	if ( hasPatternOverridesDefaultBinding( bindings ) ) {
