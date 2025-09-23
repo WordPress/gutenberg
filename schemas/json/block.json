@@ -302,7 +302,13 @@
 							"type": "boolean",
 							"default": true
 						}
-					}
+					},
+					"patternProperties": {
+						"^__experimental": {
+							"type": [ "array", "boolean", "object", "string" ]
+						}
+					},
+					"additionalProperties": false
 				},
 				"customClassName": {
 					"description": "This property adds a field to define a custom className for the block’s wrapper.",
