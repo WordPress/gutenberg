@@ -1,3 +1,8 @@
+.wp-block-accordion {
+	// This block allows custom padding, margin, and border, as it affects how the block’s width and height are calculated.
+	box-sizing: border-box;
+}
+
 .wp-block-accordion-content {
 	display: grid;
 	grid-template-rows: max-content 0fr;
