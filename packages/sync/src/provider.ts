@@ -180,8 +180,11 @@ export class SyncProvider {
 					LOCAL_SYNC_PROVIDER_ORIGIN
 				);
 
-				stateMap.set( RESTORED_AT_KEY, Date.now() );
-				stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
+				// Only mark as restored if we loaded an initial document.
+				if ( initialDoc ) {
+					stateMap.set( RESTORED_AT_KEY, Date.now() );
+					stateMap.set( RESTORED_BY_KEY, ydoc.clientID );
+				}
 			}, LOCAL_SYNC_PROVIDER_ORIGIN );
 
 			// TODO: This new state should be persisted to the entity record. This
