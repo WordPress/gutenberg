@@ -17,13 +17,17 @@ import {
 	useEntityBlockEditor,
 	useEntityRecords,
 } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
 import { collabHistorySidebarName, collabSidebarName } from './constants';
 import { Comments } from './comments';
@@ -33,6 +37,8 @@ import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { getCommentIdsFromBlocks, findBlockByCommentId } from './utils';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
@@ -231,6 +237,49 @@ function CollabSidebarContent( {
 		</div>
 	);
 }
+function CommentPopover( {
+	comment,
+	blocks,
+	unresolvedSortedThreads,
+	showCommentBoard,
+	setShowCommentBoard,
+	backgroundColor,
+} ) {
+	const relatedBlock = useMemo( () => {
+		if ( ! comment.id || ! blocks ) {
+			return null;
+		}
+		return findBlockByCommentId( comment.id, blocks );
+	}, [ comment.id ] );
+
+	const relatedBlockElement = useBlockElement( relatedBlock );
+
+	// Filter unresolvedSortedThreads to only this block or its replies.
+	const filteredThreads = unresolvedSortedThreads.filter(
+		( thread ) =>
+			thread.id === comment.id ||
+			thread.reply.some( ( reply ) => reply.id === comment.id )
+	);
+
+	return (
+		<Popover
+			key={ comment.id }
+			placement="right-start"
+			flip={ false }
+			anchor={ relatedBlockElement }
+			offset={ 50 }
+		>
+			<CollabSidebarContent
+				comments={ filteredThreads }
+				showCommentBoard={ showCommentBoard }
+				setShowCommentBoard={ setShowCommentBoard }
+				styles={ {
+					backgroundColor,
+				} }
+			/>
+		</Popover>
+	);
+}
 
 /**
  * Renders the Collab sidebar.
@@ -389,23 +438,18 @@ export default function CollabSidebar() {
 			</PluginSidebar>
 			{ unresolvedSortedThreads.length > 0 &&
 				unresolvedSortedThreads.map( ( comment ) => {
-					console.log( 'Rendering comment in Popover:', comment );
-					const relatedBlock = findBlockByCommentId( comment.id, blocks );
-					console.log( 'Related block for comment:', relatedBlock );
 					return (
-						<Popover position="bottom right" key={ comment.id }>
-							<CollabSidebarContent
-								comments={ unresolvedSortedThreads }
-								showCommentBoard={ showCommentBoard }
-								setShowCommentBoard={ setShowCommentBoard }
-								styles={ {
-									backgroundColor,
-								} }
-							/>
-						</Popover>
+						<CommentPopover
+							key={ comment.id }
+							comment={ comment }
+							blocks={ blocks }
+							unresolvedSortedThreads={ unresolvedSortedThreads }
+							showCommentBoard={ showCommentBoard }
+							setShowCommentBoard={ setShowCommentBoard }
+							backgroundColor={ backgroundColor }
+						/>
 					);
 				} ) }
 		</>
 	);
 }
-
