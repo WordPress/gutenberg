@@ -69,7 +69,6 @@ function register_block_core_post_time_to_read() {
 			'render_callback' => 'render_block_core_post_time_to_read',
 		)
 	);
-
 }
 
 add_action( 'init', 'register_block_core_post_time_to_read' );
