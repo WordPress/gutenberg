@@ -42,21 +42,6 @@ export function canBindBlock( blockName ) {
 }
 
 /**
- * Based on the given block name and attribute name, checks if it is possible to bind the block attribute.
- *
- * @param {string} blockName     The name of the block.
- * @param {string} attributeName The name of attribute.
- *
- * @return {boolean} Whether it is possible to bind the block attribute.
- */
-export function canBindAttribute( blockName, attributeName ) {
-	return (
-		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
-	);
-}
-
-/**
  * Checks if the block has the `__default` binding for pattern overrides.
  *
  * @param {?Record<string, object>} bindings A block's bindings from the metadata attribute.

@@ -22,10 +22,10 @@ import { useCallback, useContext, useMemo } from '@wordpress/element';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
-	canBindAttribute,
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
+import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -65,6 +65,14 @@ const EditWithGeneratedProps = ( props ) => {
 		( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
+	);
+	const bindableAttributes = useSelect(
+		( select ) => {
+			const { blockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+			return blockBindingsSupportedAttributes?.[ name ] || [];
+		},
+		[ name ]
 	);
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
@@ -120,7 +128,10 @@ const EditWithGeneratedProps = ( props ) => {
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = registeredSources[ sourceName ];
-				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
+				if (
+					! source ||
+					! bindableAttributes.includes( attributeName )
+				) {
 					continue;
 				}
 
@@ -172,6 +183,7 @@ const EditWithGeneratedProps = ( props ) => {
 		},
 		[
 			attributes,
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,
@@ -197,7 +209,7 @@ const EditWithGeneratedProps = ( props ) => {
 				) ) {
 					if (
 						! blockBindings[ attributeName ] ||
-						! canBindAttribute( name, attributeName )
+						! bindableAttributes.includes( attributeName )
 					) {
 						continue;
 					}
@@ -250,6 +262,7 @@ const EditWithGeneratedProps = ( props ) => {
 			} );
 		},
 		[
+			bindableAttributes,
 			blockBindings,
 			clientId,
 			context,

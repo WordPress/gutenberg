@@ -23,10 +23,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	canBindAttribute,
-	useBlockBindingsUtils,
-} from '../utils/block-bindings';
+import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
@@ -267,7 +264,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
-			! canBindAttribute( blockName, key ) ||
+			! bindableAttributes.includes( key ) &&
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
