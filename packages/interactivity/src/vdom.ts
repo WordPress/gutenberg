@@ -22,12 +22,12 @@ function parseDirectiveName( directiveName: string ): {
 } | null {
 	const name = directiveName.substring( 8 );
 
-	// If the name contains invalid characters, return null.
+	// If the name contains invalid characters, it's not a valid directive name.
 	if ( invalidCharsRegex.test( name ) ) {
 		return null;
 	}
 
-	// Find the first "--" to separate the prefix from the name.
+	// Finds the first "--" to separate the prefix.
 	const delimIndex = name.indexOf( '--' );
 
 	// If "--" is not found, everything is part of the prefix.
@@ -37,11 +37,11 @@ function parseDirectiveName( directiveName: string ): {
 
 	// The prefix is the part before the first "--".
 	const prefix = name.substring( 0, delimIndex );
-	// The name is the part that starts from "--".
+	// The remaining is the part that starts from "--".
 	const remaining = name.substring( delimIndex );
 
-	// If the name starts with "---" (and not "----"),
-	// there is no suffix and the name is the unique ID.
+	// If the suffix starts with "---" (and not "----"), there is no suffix and
+	// the remaining is the unique ID.
 	if ( remaining.startsWith( '---' ) && ! remaining.startsWith( '----' ) ) {
 		return {
 			prefix,
@@ -50,30 +50,24 @@ function parseDirectiveName( directiveName: string ): {
 		};
 	}
 
-	// Rule 2: Otherwise, the name is a potential suffix.
-	// The first two dashes are removed.
-	const potentialSuffix = remaining.substring( 2 );
-	// Search for "---" for a unique ID within the potential suffix.
-	const idIndexInSuffix = potentialSuffix.indexOf( '---' );
+	// Otherwise, the remaining is a potential suffix. The first two dashes are
+	// removed.
+	let suffix = remaining.substring( 2 );
+	// Search for "---" for a unique ID within the suffix.
+	const idIndexInSuffix = suffix.indexOf( '---' );
 
 	// If "---" is found (and not "----"), split the suffix and the unique ID.
 	if (
 		idIndexInSuffix !== -1 &&
-		! potentialSuffix.substring( idIndexInSuffix ).startsWith( '----' )
+		! suffix.substring( idIndexInSuffix ).startsWith( '----' )
 	) {
-		const suffix = potentialSuffix.substring( 0, idIndexInSuffix );
-		const uniqueId =
-			potentialSuffix.substring( idIndexInSuffix + 3 ) || null;
+		const uniqueId = suffix.substring( idIndexInSuffix + 3 ) || null;
+		suffix = suffix.substring( 0, idIndexInSuffix );
 		return { prefix, suffix: suffix || null, uniqueId };
 	}
 
-	// If the potential suffix consists only of dashes, it is considered null.
-	if ( /^-+$/.test( potentialSuffix ) ) {
-		return { prefix, suffix: null, uniqueId: null };
-	}
-
-	// Otherwise, the entire potential suffix is the suffix.
-	return { prefix, suffix: potentialSuffix || null, uniqueId: null };
+	// Otherwise, the rest is the entire suffix.
+	return { prefix, suffix: suffix || null, uniqueId: null };
 }
 
 // Regular expression for reference parsing. It can contain a namespace before

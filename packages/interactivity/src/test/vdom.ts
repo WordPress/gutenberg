@@ -1066,7 +1066,7 @@ describe( 'toVdom', () => {
 								{
 									namespace: null,
 									value: 'test value',
-									suffix: null,
+									suffix: '--',
 									uniqueId: null,
 								},
 							],
