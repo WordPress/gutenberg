@@ -66,3 +66,29 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 	}
 	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
 }
+
+/**
+ * Adds blockCommentId as a global attribute to all blocks.
+ * This ensures that blockCommentId is always available for REST API validation.
+ *
+ * @param array $args       Array of arguments for registering a block type.
+ * @return array Modified arguments.
+ */
+function gutenberg_add_block_comment_global_attribute( $args ) {
+	// Ensure attributes array exists.
+	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
+		$args['attributes'] = array();
+	}
+
+	// Add blockCommentId as a global attribute if not already defined.
+	if ( ! array_key_exists( 'blockCommentId', $args['attributes'] ) ) {
+		$args['attributes']['blockCommentId'] = array(
+			'type' => 'number',
+		);
+	}
+
+	return $args;
+}
+
+// Register the filter to add blockCommentId to all blocks.
+add_filter( 'register_block_type_args', 'gutenberg_add_block_comment_global_attribute', 10, 2 );
