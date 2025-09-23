@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Tooltip, __experimentalVStack as VStack } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
 	getSettings as getDateSettings,
@@ -25,10 +25,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 function CommentAuthorInfo( { avatar, name, date } ) {
 	const dateSettings = getDateSettings();
-	const [ dateTimeFormat = dateSettings.formats.time ] = useEntityProp(
+	const [ dateFormat = dateSettings.formats.date ] = useEntityProp(
 		'root',
 		'site',
-		'time_format'
+		'date_format'
 	);
 
 	const { currentUserAvatar, currentUserName } = useSelect( ( select ) => {
@@ -43,7 +43,21 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 		};
 	}, [] );
 
-	const currentDate = new Date();
+	const commentDate = getDate( date );
+	const commentDateTime = dateI18n( 'c', commentDate );
+	const shouldShowHumanTimeDiff =
+		Math.floor( ( new Date() - commentDate ) / ( 1000 * 60 * 60 * 24 ) ) <
+		30;
+
+	const commentDateText = shouldShowHumanTimeDiff
+		? humanTimeDiff( commentDate )
+		: dateI18n( dateFormat, commentDate );
+
+	const tooltipText = dateI18n(
+		// translators: Use a non-breaking space between 'g:i' and 'a' if appropriate.
+		_x( 'F j, Y g:i\xa0a', 'Comment date full date format' ),
+		date
+	);
 
 	return (
 		<>
@@ -59,20 +73,16 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }
 				</span>
-				<time
-					dateTime={ dateI18n(
-						'c',
-						date ? getDate( date ) : currentDate
-					) }
-					className="editor-collab-sidebar-panel__user-time"
-				>
-					{ dateI18n(
-						dateTimeFormat,
-						date ? getDate( date ) : currentDate
-					) }
-					<br />
-					{ humanTimeDiff( date ? getDate( date ) : currentDate ) }
-				</time>
+				{ date && (
+					<Tooltip placement="top" text={ tooltipText }>
+						<time
+							dateTime={ commentDateTime }
+							className="editor-collab-sidebar-panel__user-time"
+						>
+							{ commentDateText }
+						</time>
+					</Tooltip>
+				) }
 			</VStack>
 		</>
 	);
