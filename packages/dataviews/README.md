@@ -1184,6 +1184,36 @@ Example:
 }
 ```
 
+### `children`
+
+Defines the type of the elements of the `array` field type.
+
+- Type: `'text' | Field<any>[]`
+    - `'text'`: the elements of the array are of `text` type.
+    - `Field<any>[]`: a list of children fields.
+- Optional.
+
+If `children` is not provided for an `array` field type, the elements of the array will be of `text` type.
+
+Example:
+
+```js
+{
+	id: 'arrayWithChildren',
+	type: 'array',
+	children: [
+		{
+			id: 'child1',
+			type: 'text'
+		},
+		{
+			id: 'child2',
+			type: 'number'
+		}
+	]
+}
+```
+
 ### `sort`
 
 Function to sort the records.
