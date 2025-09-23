@@ -57,17 +57,6 @@ export function canBindAttribute( blockName, attributeName ) {
 }
 
 /**
- * Gets the bindable attributes for a given block.
- *
- * @param {string} blockName The name of the block.
- *
- * @return {string[]} The bindable attributes for the block.
- */
-export function getBindableAttributes( blockName ) {
-	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
-}
-
-/**
  * Checks if the block has the `__default` binding for pattern overrides.
  *
  * @param {?Record<string, object>} bindings A block's bindings from the metadata attribute.
