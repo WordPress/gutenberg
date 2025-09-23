@@ -7,13 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
@@ -22,7 +21,6 @@ import {
 } from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
@@ -30,41 +28,8 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-function PostTimeToReadEdit( {
-	attributes,
-	setAttributes,
-	clientId,
-	context,
-} ) {
+function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	const { textAlign, displayAsRange, averageReadingSpeed } = attributes;
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	const { blockWasJustInserted } = useSelect(
-		( select ) => {
-			const { wasBlockJustInserted } = select( blockEditorStore );
-
-			return {
-				blockWasJustInserted: wasBlockJustInserted( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	// When the block is first inserted, default to displaying as a range.
-	useEffect( () => {
-		if ( blockWasJustInserted ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				displayAsRange: true,
-			} );
-		}
-	}, [
-		blockWasJustInserted,
-		__unstableMarkNextChangeAsNotPersistent,
-		setAttributes,
-	] );
-
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 

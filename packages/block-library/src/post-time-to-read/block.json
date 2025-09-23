@@ -14,7 +14,7 @@
 		},
 		"displayAsRange": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"averageReadingSpeed": {
 			"type": "number",
