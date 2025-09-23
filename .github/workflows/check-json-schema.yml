@@ -1,0 +1,61 @@
+name: JSON Schema Validation
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    validate-schemas:
+        name: Validate JSON Schemas
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Set up Python
+              uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
+              with:
+                  python-version: '3.x'
+                  cache: 'pip'
+
+            - name: Install check-jsonschema
+              run: pip install check-jsonschema
+
+            - name: Validate block.json files
+              run: |
+                  block_files=$(find . -name "block.json" -not -path './schemas/**')
+                  if [ -n "$block_files" ]; then
+                    check-jsonschema --schemafile ./schemas/json/block.json "$block_files"
+                  else
+                    echo "No block.json files found to validate"
+                  fi
+
+            - name: Validate theme.json files
+              run: |
+                  theme_files=$(find . -name "theme.json" -not -path './schemas/**')
+                  if [ -n "$theme_files" ]; then
+                    check-jsonschema --schemafile ./schemas/json/theme.json "$theme_files"
+                  else
+                    echo "No theme.json files found to validate"
+                  fi
