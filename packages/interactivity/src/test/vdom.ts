@@ -305,38 +305,6 @@ describe( 'toVdom', () => {
 			);
 		} );
 
-		it( 'should process directive suffixes', () => {
-			const element = createElementFromHTML(
-				`<div data-wp-test--one="test value 1" data-wp-test--two="test value 2"></div>`
-			);
-			expect( toVdom( element ) ).toMatchVNode(
-				h(
-					'div' as any,
-					{
-						'data-wp-test--one': 'test value 1',
-						'data-wp-test--two': 'test value 2',
-						__directives: {
-							test: [
-								{
-									namespace: null,
-									value: 'test value 1',
-									suffix: 'one',
-									uniqueId: null,
-								},
-								{
-									namespace: null,
-									value: 'test value 2',
-									suffix: 'two',
-									uniqueId: null,
-								},
-							],
-						},
-					},
-					[]
-				)
-			);
-		} );
-
 		it( 'should preserve values that JSON would parse but are not objects', () => {
 			const element = createElementFromHTML(
 				`<div data-wp-test--one='true' data-wp-test--two='"test value"'></div>`
@@ -797,7 +765,39 @@ describe( 'toVdom', () => {
 		} );
 	} );
 
-	describe( 'Unique IDs', () => {
+	describe( 'Suffixes and Unique IDs', () => {
+		it( 'should parse directives with suffixes only', () => {
+			const element = createElementFromHTML(
+				`<div data-wp-test--one="test value 1" data-wp-test--two="test value 2"></div>`
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h(
+					'div' as any,
+					{
+						'data-wp-test--one': 'test value 1',
+						'data-wp-test--two': 'test value 2',
+						__directives: {
+							test: [
+								{
+									namespace: null,
+									value: 'test value 1',
+									suffix: 'one',
+									uniqueId: null,
+								},
+								{
+									namespace: null,
+									value: 'test value 2',
+									suffix: 'two',
+									uniqueId: null,
+								},
+							],
+						},
+					},
+					[]
+				)
+			);
+		} );
+
 		it( 'should parse directive with unique ID only', () => {
 			const element = createElementFromHTML(
 				`<div data-wp-test---unique-id="test value"></div>`

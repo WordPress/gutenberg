@@ -13,35 +13,35 @@ const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
+const invalidCharsRegex = /[^a-z0-9-_]/i;
 
-function parseDirective( attributeName: string ): {
+function parseDirectiveName( directiveName: string ): {
 	prefix: string;
 	suffix: string | null;
 	uniqueId: string | null;
 } | null {
-	// Check if the attribute name starts with "data-wp-".
-	const match = attributeName.match( /^data-wp-(.*)/i );
-	if ( ! match ) {
+	const name = directiveName.substring( 8 );
+
+	// If the name contains invalid characters, return null.
+	if ( invalidCharsRegex.test( name ) ) {
 		return null;
 	}
 
-	// Get the rest of the attribute name after "data-wp-".
-	const rest = match[ 1 ];
-	// Find the first "--" to separate the prefix from the rest.
-	const delimIndex = rest.indexOf( '--' );
+	// Find the first "--" to separate the prefix from the name.
+	const delimIndex = name.indexOf( '--' );
 
 	// If "--" is not found, everything is part of the prefix.
 	if ( delimIndex === -1 ) {
-		return { prefix: rest, suffix: null, uniqueId: null };
+		return { prefix: name, suffix: null, uniqueId: null };
 	}
 
 	// The prefix is the part before the first "--".
-	const prefix = rest.substring( 0, delimIndex );
-	// The rest is the part that starts from "--".
-	const remaining = rest.substring( delimIndex );
+	const prefix = name.substring( 0, delimIndex );
+	// The name is the part that starts from "--".
+	const remaining = name.substring( delimIndex );
 
-	// Rule 1: If the rest starts with "---" (and not "----"),
-	// there is no suffix and the rest is the unique ID.
+	// If the name starts with "---" (and not "----"),
+	// there is no suffix and the name is the unique ID.
 	if ( remaining.startsWith( '---' ) && ! remaining.startsWith( '----' ) ) {
 		return {
 			prefix,
@@ -50,7 +50,7 @@ function parseDirective( attributeName: string ): {
 		};
 	}
 
-	// Rule 2: Otherwise, the rest is a potential suffix.
+	// Rule 2: Otherwise, the name is a potential suffix.
 	// The first two dashes are removed.
 	const potentialSuffix = remaining.substring( 2 );
 	// Search for "---" for a unique ID within the potential suffix.
@@ -186,7 +186,7 @@ export function toVdom( root: Node ): ComponentChild {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
 			>( ( obj, [ name, ns, value ] ) => {
-				const directiveParsed = parseDirective( name );
+				const directiveParsed = parseDirectiveName( name );
 				if ( directiveParsed === null ) {
 					warn( `Found malformed directive name: ${ name }.` );
 					return obj;
