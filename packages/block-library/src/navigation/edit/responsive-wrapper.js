@@ -10,7 +10,6 @@ import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,57 +28,7 @@ export default function ResponsiveWrapper( {
 	hasIcon,
 	icon,
 } ) {
-	// Attach a DOM click listener to close the overlay when clicking an in-page hash link.
-	const contentRef = useRef( null );
-	useEffect( () => {
-		if ( ! isResponsive ) {
-			return;
-		}
-
-		const el = contentRef.current;
-		if ( ! el ) {
-			return;
-		}
-
-		const onClick = ( event ) => {
-			if ( ! isOpen ) {
-				return;
-			}
-
-			const anchor = event.target?.closest?.( 'a[href]' );
-			if ( ! anchor ) {
-				return;
-			}
-
-			const href = anchor.getAttribute( 'href' )?.trim?.();
-			if ( ! href ) {
-				return;
-			}
-
-			try {
-				if ( href[ 0 ] === '#' ) {
-					onToggle( false );
-					return;
-				}
-
-				const url = new URL( href, window.location.href );
-				const isSameOrigin = url.origin === window.location.origin;
-				const isSamePath = url.pathname === window.location.pathname;
-				const hasHash = !! url.hash;
-
-				if ( isSameOrigin && isSamePath && hasHash ) {
-					onToggle( false );
-				}
-			} catch ( e ) {
-				// Ignore invalid URLs.
-			}
-		};
-
-		el.addEventListener( 'click', onClick );
-		return () => {
-			el.removeEventListener( 'click', onClick );
-		};
-	}, [ isOpen, onToggle, isResponsive ] );
+	// No editor-side DOM listeners; behavior is handled in frontend via Interactivity API.
 
 	if ( ! isResponsive ) {
 		return children;
@@ -164,7 +113,6 @@ export default function ResponsiveWrapper( {
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"
-							ref={ contentRef }
 							id={ `${ modalId }-content` }
 						>
 							{ children }
