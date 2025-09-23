@@ -241,7 +241,7 @@ test.describe( 'Pattern Overrides', () => {
 			<!-- wp:paragraph {"metadata":{"name":"Pattern Overrides","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>Pattern Overrides</p>
 			<!-- /wp:paragraph -->
-			<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"core/post-meta","args":{"key":"text_custom_field"}}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
 			<p>Post Meta Binding</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:paragraph {"metadata":{"name":"No Overrides or Binding"}} -->
