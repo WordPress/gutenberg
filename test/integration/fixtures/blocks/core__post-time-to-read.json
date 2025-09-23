@@ -3,7 +3,8 @@
 		"name": "core/post-time-to-read",
 		"isValid": true,
 		"attributes": {
-			"displayAsRange": false
+			"displayAsRange": false,
+			"averageReadingSpeed": 189
 		},
 		"innerBlocks": []
 	}
