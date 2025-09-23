@@ -46,7 +46,7 @@ export default function TableControl< Item >( {
 		[ value, onChange, setValue, data ]
 	);
 
-	const addRow = useCallback( () => {
+	const addItem = useCallback( () => {
 		const newRow: RowType = {};
 		if ( ! Array.isArray( children ) ) {
 			return;
@@ -63,7 +63,7 @@ export default function TableControl< Item >( {
 		onChange( setValue( { item: data, value: updatedValue } ) );
 	}, [ children, value, onChange, setValue, data ] );
 
-	const removeRow = useCallback(
+	const removeItem = useCallback(
 		( rowIndex: number ) => {
 			const updatedValue = value.filter(
 				( _: RowType, index: number ) => index !== rowIndex
@@ -113,11 +113,11 @@ export default function TableControl< Item >( {
 				<div className="dataform-control-array-table__add-row">
 					<Button
 						icon={ plus }
-						onClick={ addRow }
+						onClick={ addItem }
 						variant="secondary"
 						__next40pxDefaultSize
 					>
-						{ __( 'Add row' ) }
+						{ __( 'Add item' ) }
 					</Button>
 				</div>
 			</div>
@@ -165,8 +165,8 @@ export default function TableControl< Item >( {
 								<td>
 									<Button
 										icon={ trash }
-										label={ __( 'Remove row' ) }
-										onClick={ () => removeRow( rowIndex ) }
+										label={ __( 'Remove item' ) }
+										onClick={ () => removeItem( rowIndex ) }
 										size="small"
 										isDestructive
 									/>
@@ -179,11 +179,11 @@ export default function TableControl< Item >( {
 			<div className="dataform-control-array-table__add-row">
 				<Button
 					icon={ plus }
-					onClick={ addRow }
+					onClick={ addItem }
 					variant="secondary"
 					__next40pxDefaultSize
 				>
-					{ __( 'Add row' ) }
+					{ __( 'Add item' ) }
 				</Button>
 			</div>
 		</div>
