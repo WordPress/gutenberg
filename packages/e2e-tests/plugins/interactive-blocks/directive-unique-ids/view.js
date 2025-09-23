@@ -5,7 +5,7 @@ import { store, getContext } from '@wordpress/interactivity';
 
 store( 'directive-unique-ids-test', {
 	state: {
-		renderContext: () => {
+		get renderContext() {
 			const context = getContext();
 			return JSON.stringify( context, null, 2 );
 		},

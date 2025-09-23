@@ -12,7 +12,7 @@
 		data-wp-context---plugin-a='{"propA": "valueA", "shared": "fromA"}'
 		data-wp-context---plugin-b='{"propB": "valueB", "shared": "fromB"}'
 	>
-		<pre data-testid="context-merge" data-wp-bind--children="state.renderContext"></pre>
+		<pre data-testid="context-merge" data-wp-text="state.renderContext"></pre>
 	</div>
 </div>
 
