@@ -45,6 +45,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'alignWide',
+	'blockBindingsSupportedAttributes',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
 	'allowedMimeTypes',
