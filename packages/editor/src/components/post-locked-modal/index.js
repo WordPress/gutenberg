@@ -148,6 +148,7 @@ function PostLockedModal() {
 		return null;
 	}
 
+	// Potentially refactor this into the above shortcircuit (!isLocked).
 	if ( window.__experimentalEnableSync ) {
 		return null;
 	}
