@@ -3,6 +3,12 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+test.use( {
+	blockCommentUtils: async ( { page, editor }, use ) => {
+		await use( new BlockCommentUtils( { page, editor } ) );
+	},
+} );
+
 test.describe( 'Block Comments', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
@@ -21,12 +27,11 @@ test.describe( 'Block Comments', () => {
 		] );
 	} );
 
-	test( 'can pin and unpin comments sidebar', async ( { page } ) => {
-		const topBarButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Comments', exact: true } );
-		await topBarButton.click();
-
+	test( 'can pin and unpin comments sidebar', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		const topBarButton = await blockCommentUtils.openBlockCommentSidebar();
 		await page
 			.getByRole( 'button', { name: 'Unpin from toolbar' } )
 			.click();
@@ -35,21 +40,15 @@ test.describe( 'Block Comments', () => {
 		await expect( topBarButton ).toBeVisible();
 	} );
 
-	test( 'can add a comment to a block', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: {
-				content: 'Testing block comments',
-			},
+	test( 'can add a comment to a block', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			content: 'Testing block comments',
+			comment: 'Test comment',
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
-		await page
-			.getByRole( 'textbox', { name: 'Comment' } )
-			.fill( 'Test comment' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
-			.click();
 
 		// Currently, the class locator is the easiest way to find the comment text.
 		await expect(
@@ -57,26 +56,19 @@ test.describe( 'Block Comments', () => {
 		).toHaveText( 'Test comment' );
 	} );
 
-	test( 'can reply to a block comment', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: {
-				content: 'Testing block comments',
-			},
+	test( 'can reply to a block comment', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			content: 'Testing block comments',
+			comment: 'Test comment',
 		} );
 		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
 		const commentText = page
 			.locator( '.editor-collab-sidebar-panel__user-comment' )
 			.last();
-
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
-
-		await commentForm.fill( 'Test comment' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
-			.click();
-		await expect( commentText ).toHaveText( 'Test comment' );
 
 		await commentForm.fill( 'Test reply' );
 		await page
@@ -84,23 +76,19 @@ test.describe( 'Block Comments', () => {
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect( commentText ).toHaveText( 'Test reply' );
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Reply added successfully.' } )
+		).toBeVisible();
 	} );
 
-	test( 'can edit a block comment', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: {
-				content: 'Testing block comments',
-			},
+	test( 'can edit a block comment', async ( { page, blockCommentUtils } ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			content: 'Testing block comments',
+			comment: 'test comment before edit',
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
-		await page
-			.getByRole( 'textbox', { name: 'Comment' } )
-			.fill( 'Test comment before edit.' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
-			.click();
 		await page.getByRole( 'button', { name: 'Select an action' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Edit' } ).click();
 		await page
@@ -115,23 +103,22 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page.locator( '.editor-collab-sidebar-panel__user-comment' )
 		).toHaveText( 'Test comment after edit.' );
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment edited successfully.' } )
+		).toBeVisible();
 	} );
 
-	test( 'can delete a block comment', async ( { editor, page } ) => {
-		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: {
-				content: 'Testing block comments',
-			},
+	test( 'can delete a block comment', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			content: 'Testing block comments',
+			comment: 'Test comment to delete.',
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
-		await page
-			.getByRole( 'textbox', { name: 'Comment' } )
-			.fill( 'Test comment to delete.' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
-			.click();
 		await page.getByRole( 'button', { name: 'Select an action' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 		await page
@@ -142,26 +129,22 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page.locator( '.editor-collab-sidebar-panel__user-comment' )
 		).toBeHidden();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment deleted successfully.' } )
+		).toBeVisible();
 	} );
 
 	test( 'can resolve and reopen a block comment', async ( {
-		editor,
 		page,
+		blockCommentUtils,
 	} ) => {
-		await editor.insertBlock( {
-			name: 'core/heading',
-			attributes: {
-				content: 'Testing block comments',
-			},
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			content: 'Testing block comments',
+			comment: 'Test comment to resolve.',
 		} );
-		await editor.clickBlockOptionsMenuItem( 'Comment' );
-		await page
-			.getByRole( 'textbox', { name: 'Comment' } )
-			.fill( 'Test comment to resolve.' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Comment', exact: true } )
-			.click();
 
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
@@ -172,3 +155,61 @@ test.describe( 'Block Comments', () => {
 		await expect( resolveButton ).toBeEnabled();
 	} );
 } );
+
+class BlockCommentUtils {
+	/** @type {import('@playwright/test').Page} */
+	#page;
+	/** @type {import('@wordpress/e2e-test-utils-playwright').Editor} */
+	#editor;
+
+	constructor( { page, editor } ) {
+		this.#page = page;
+		this.#editor = editor;
+	}
+
+	async openBlockCommentSidebar() {
+		const toggleButton = this.#page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Comments', exact: true } );
+
+		const isClosed =
+			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
+
+		if ( isClosed ) {
+			await toggleButton.click();
+			await this.#page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Comments' } )
+				.waitFor();
+		}
+
+		return toggleButton;
+	}
+
+	async addBlockWithComment( { type, content, comment } ) {
+		await test.step(
+			`Insert a ${ type } block with a comment`,
+			async () => {
+				await this.#editor.insertBlock( {
+					name: type,
+					attributes: {
+						content,
+					},
+				} );
+				await this.#editor.clickBlockOptionsMenuItem( 'Comment' );
+				await this.#page
+					.getByRole( 'textbox', { name: 'Comment' } )
+					.fill( comment );
+				await this.#page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Comment', exact: true } )
+					.click();
+				await this.#page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Comment added successfully.' } )
+					.click();
+			},
+			{ box: true }
+		);
+	}
+}
