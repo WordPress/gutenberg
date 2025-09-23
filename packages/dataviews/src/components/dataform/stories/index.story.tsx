@@ -1620,12 +1620,44 @@ const DynamicDataComponent = () => {
 	const [ data, setData ] = useState< DynamicData >( initialData );
 
 	const form: Form = {
+		layout: { type: 'card' },
 		fields: [
-			'productList',
 			{
-				id: 'totalAmount',
-				label: 'Total Amount',
-				layout: { type: 'panel' },
+				id: 'cardWithRegular',
+				children: [
+					{
+						id: 'productListAsRegular',
+						label: 'Product list',
+						layout: { type: 'regular' },
+						children: [
+							'productList',
+							{
+								id: 'totalAmount',
+								label: 'Total Amount',
+								layout: { type: 'panel' },
+							},
+						],
+					},
+				],
+			},
+			{
+				id: 'cardWithPanel',
+				children: [
+					{
+						id: 'productListAsPanel',
+						label: 'Product list',
+						layout: { type: 'panel', openAs: 'modal' },
+						summary: 'productListSummary',
+						children: [
+							'productList',
+							{
+								id: 'totalAmount',
+								label: 'Total Amount',
+								layout: { type: 'panel' },
+							},
+						],
+					},
+				],
 			},
 		],
 	};
@@ -1652,6 +1684,15 @@ const DynamicDataComponent = () => {
 					type: 'integer',
 				},
 			],
+		},
+		{
+			id: 'productListSummary',
+			label: 'Products',
+			type: 'text',
+			getValue: ( { item } ) =>
+				item.productList
+					.map( ( product ) => product.name )
+					.join( ', ' ),
 		},
 		{
 			id: 'totalAmount',
