@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -23,12 +23,14 @@ import CommentForm from './comment-form';
  * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
  * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
  * @param {Function} props.setShowCommentBoard - The function to delete the comment.
+ * @param {Array}    props.threads             - Array of existing comment threads.
  * @return {React.ReactNode} The rendered comment input UI.
  */
 export function AddComment( {
 	onSubmit,
 	showCommentBoard,
 	setShowCommentBoard,
+	threads = [],
 } ) {
 	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
 		( select ) => {
@@ -53,6 +55,14 @@ export function AddComment( {
 		return null;
 	}
 
+	// Generate contextual label for new comment using sequential numbering
+	const nextCommentNumber = threads.length + 1;
+	const commentLabel = sprintf(
+		// translators: %s: comment number
+		_x( 'Comment %s', 'Add new comment with sequential number' ),
+		nextCommentNumber
+	);
+
 	return (
 		<VStack
 			spacing="3"
@@ -69,6 +79,7 @@ export function AddComment( {
 					setShowCommentBoard( false );
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				labelText={ commentLabel }
 			/>
 		</VStack>
 	);

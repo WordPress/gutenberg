@@ -43,6 +43,14 @@
 	}
 }
 
+.editor-collab-sidebar-panel__comment-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: $gray-700;
+	margin-bottom: $grid-unit-10;
+	display: block;
+}
+
 .editor-collab-sidebar-panel__child-thread {
 	margin-top: 15px;
 }

@@ -128,10 +128,11 @@ export function Comments( {
 			}
 			{ Array.isArray( threads ) &&
 				threads.length > 0 &&
-				threads.map( ( thread ) => (
+				threads.map( ( thread, index ) => (
 					<Thread
 						key={ thread.id }
 						thread={ thread }
+						commentNumber={ index + 1 }
 						onAddReply={ onAddReply }
 						onCommentDelete={ onCommentDelete }
 						onCommentResolve={ onCommentResolve }
@@ -152,6 +153,7 @@ export function Comments( {
 
 function Thread( {
 	thread,
+	commentNumber,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
@@ -186,6 +188,16 @@ function Thread( {
 		}
 	};
 
+	const handleReturnToBlock = () => {
+		if ( relatedBlock && relatedBlockElement ) {
+			relatedBlockElement.scrollIntoView( {
+				behavior: 'smooth',
+				block: 'center',
+			} );
+			flashBlock( relatedBlock );
+		}
+	};
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
@@ -197,11 +209,13 @@ function Thread( {
 		>
 			<CommentBoard
 				thread={ thread }
+				commentNumber={ commentNumber }
 				onResolve={ onCommentResolve }
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
 				onDelete={ onCommentDelete }
 				status={ thread.status }
+				onReturnToBlock={ handleReturnToBlock }
 			/>
 			{ 0 < thread?.reply?.length && (
 				<>
@@ -235,12 +249,20 @@ function Thread( {
 								{ 'approved' !== thread.status && (
 									<CommentBoard
 										thread={ reply }
+										commentNumber={ commentNumber }
+										showLabel={ false }
 										onEdit={ onEditComment }
 										onDelete={ onCommentDelete }
+										onReturnToBlock={ null }
 									/>
 								) }
 								{ 'approved' === thread.status && (
-									<CommentBoard thread={ reply } />
+									<CommentBoard
+										thread={ reply }
+										commentNumber={ commentNumber }
+										showLabel={ false }
+										onReturnToBlock={ null }
+									/>
 								) }
 							</VStack>
 						) ) }
@@ -284,6 +306,15 @@ function Thread( {
 									: _x( 'Reply', 'Add reply comment' )
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
+							labelText={ sprintf(
+								// translators: %s: comment number
+								_x(
+									'Reply to Comment %s',
+									'Reply to specific comment'
+								),
+								commentNumber
+							) }
+							onReturnToBlock={ handleReturnToBlock }
 						/>
 					</VStack>
 				</VStack>
@@ -294,11 +325,15 @@ function Thread( {
 
 const CommentBoard = ( {
 	thread,
+	commentNumber,
+	isReply = false,
+	showLabel = true,
 	onResolve,
 	onReopen,
 	onEdit,
 	onDelete,
 	status,
+	onReturnToBlock,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
@@ -342,6 +377,27 @@ const CommentBoard = ( {
 
 	return (
 		<>
+			{ showLabel && (
+				<div className="editor-collab-sidebar-panel__comment-label">
+					{ isReply
+						? sprintf(
+								// translators: %s: comment number
+								_x(
+									'Reply to Comment %s',
+									'Reply to specific comment'
+								),
+								commentNumber
+						  )
+						: sprintf(
+								// translators: %s: comment number
+								_x(
+									'Comment %s',
+									'Comment with sequential number'
+								),
+								commentNumber
+						  ) }
+				</div>
+			) }
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
@@ -388,6 +444,12 @@ const CommentBoard = ( {
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %s: comment number
+						_x( 'Edit Comment %s', 'Edit specific comment' ),
+						commentNumber
+					) }
+					onReturnToBlock={ onReturnToBlock }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">
