@@ -86,7 +86,7 @@ export function Comments( {
 				: null,
 		};
 	}, [] );
-	const [ focusThread, setFocusThread ] = useState( blockCommentId ?? null );
+	const [ focusThread = blockCommentId, setFocusThread ] = useState();
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
