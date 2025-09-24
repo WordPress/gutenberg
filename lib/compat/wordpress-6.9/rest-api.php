@@ -40,7 +40,7 @@ add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 
  * @return array Array of arguments for registering a post type.
  */
 function gutenberg_override_attachments_endpoint( array $args ): array {
-	$args['rest_controller_class']   = 'Gutenberg_REST_Attachments_Controller';
+	$args['rest_controller_class'] = 'Gutenberg_REST_Attachments_Controller';
 
 	return $args;
 }

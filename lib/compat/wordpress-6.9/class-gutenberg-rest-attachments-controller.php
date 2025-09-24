@@ -8,14 +8,14 @@
  */
 
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
-    /**
+	/**
 	 * Registers the routes for attachments.
 	 *
 	 * @see register_rest_route()
 	 */
 	public function register_routes(): void {
 		parent::register_routes();
-    }
+	}
 	/**
 	 * Applies edits to a media item and creates a new attachment record.
 	 *
