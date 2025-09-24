@@ -131,12 +131,12 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
-	 * Tests that the image is flipped correctly.
+	 * Tests that the image is flipped correctly vertically and horizontally.
 	 *
 	 * @ticket ???
 	 * @requires function imagejpeg
 	 */
-	public function test_edit_image_flip() {
+	public function test_edit_image_vertical_and_horizontal_flip() {
 		wp_set_current_user( self::$admin_id );
 		$attachment = self::factory()->attachment->create_upload_object( self::$test_file );
 
@@ -159,6 +159,36 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertCount( 1, WP_Image_Editor_Mock::$spy['flip'] );
 		// The controller converts the integer values to booleans: 0 !== (int) 1 = true
 		$this->assertSame( array( true, true ), WP_Image_Editor_Mock::$spy['flip'][0] );
+	}
+
+	/**
+	 * Tests that the image is flipped correctly vertically.
+	 *
+	 * @ticket ???
+	 * @requires function imagejpeg
+	 */
+	public function test_edit_image_vertical_flip() {
+		wp_set_current_user( self::$admin_id );
+		$attachment = self::factory()->attachment->create_upload_object( self::$test_file );
+
+		$this->setup_mock_editor();
+		WP_Image_Editor_Mock::$edit_return['flip'] = new WP_Error();
+
+		$params = array(
+			'flip' => array(
+				'vertical' => 1,
+			),
+			'src'  => wp_get_attachment_image_url( $attachment, 'full' ),
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/{$attachment}/edit" );
+		$request->set_body_params( $params );
+		$response = rest_do_request( $request );
+		$this->assertErrorResponse( 'rest_image_flip_failed', $response, 500 );
+
+		$this->assertCount( 1, WP_Image_Editor_Mock::$spy['flip'] );
+		// The controller converts the integer values to booleans: 0 !== (int) 1 = true
+		$this->assertSame( array( true, false ), WP_Image_Editor_Mock::$spy['flip'][0] );
 	}
 
 	public function test_register_routes() {

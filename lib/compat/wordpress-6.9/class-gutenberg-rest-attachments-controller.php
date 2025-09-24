@@ -62,11 +62,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		} else {
 			$modifiers = array();
 
-			if ( ! empty( $request['flip'] ) ) {
+			if ( isset( $request['flip']['horizontal'] ) || isset( $request['flip']['vertical'] ) ) {
+				$flip_args = array(
+					'vertical'   => $request['flip']['vertical'] ?? 0,
+					'horizontal' => $request['flip']['horizontal'] ?? 0,
+				);
+
 				$modifiers[] = array(
 					'type' => 'flip',
 					'args' => array(
-						'flip' => $request['flip'],
+						'flip' => $flip_args,
 					),
 				);
 			}
