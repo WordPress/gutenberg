@@ -25,27 +25,27 @@ export default function save( { attributes } ) {
 	return (
 		<TagName { ...blockProps }>
 			<button
-				className={ clsx( 'accordion-content__toggle' ) }
+				className={ clsx( 'wp-block-accordion-header__toggle' ) }
 				style={ {
 					...spacingProps.style,
 				} }
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
-						className="accordion-content__toggle-icon"
+						className="wp-block-accordion-header__toggle-icon"
 						aria-hidden="true"
 					>
 						+
 					</span>
 				) }
 				<RichText.Content
-					className="accordion-content__toggle-title"
+					className="wp-block-accordion-header__toggle-title"
 					tagName="span"
 					value={ title }
 				/>
 				{ showIcon && iconPosition === 'right' && (
 					<span
-						className="accordion-content__toggle-icon"
+						className="wp-block-accordion-header__toggle-icon"
 						aria-hidden="true"
 					>
 						+

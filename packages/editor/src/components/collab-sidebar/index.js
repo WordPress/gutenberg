@@ -9,6 +9,7 @@ import {
 	subscribe,
 } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -284,6 +285,7 @@ export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const { postId, postType } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
@@ -432,7 +434,8 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			{ unresolvedSortedThreads.length > 0 &&
+			{ isLargeViewport &&
+				unresolvedSortedThreads.length > 0 &&
 				unresolvedSortedThreads.map( ( comment ) => {
 					// Pass this comment and its replies.
 					const filteredThreads = unresolvedSortedThreads.filter(
