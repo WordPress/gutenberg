@@ -30,17 +30,3 @@ function gutenberg_rest_theme_export_link_rel( $response, $theme ) {
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 );
 
-/**
- * Enable empty comments when the comment_type is 'block_comment'.
- *
- * @param bool  $allow            Whether to allow an empty comment.
- * @param array $prepared_comment The prepared comment data.
- * @return bool Modified allow empty comment value.
- */
-function gutenberg_allow_empty_block_comments( $allow, $prepared_comment ) {
-	if ( isset( $prepared_comment['comment_type'] ) && 'block_comment' === $prepared_comment['comment_type'] ) {
-		$allow = true;
-	}
-	return $allow;
-}
-add_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments', 10, 2 );
