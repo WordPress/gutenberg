@@ -19,12 +19,7 @@ function block_core_table_of_contents_render( $attributes, $content ) {
 	}
 
 	// Get the aria-label from block attributes, or fallback to localized default.
-	$aria_label = '';
-	if ( isset( $attributes['ariaLabel'] ) && ! empty( $attributes['ariaLabel'] ) ) {
-		$aria_label = $attributes['ariaLabel'];
-	} else {
-		$aria_label = __( 'Table of Contents', 'gutenberg' );
-	}
+	$aria_label = empty( $attributes['ariaLabel'] ) ? __( 'Table of Contents' ) : wp_strip_all_tags( $attributes['ariaLabel'] );
 
 	$p = new WP_HTML_Tag_Processor( $content );
 
