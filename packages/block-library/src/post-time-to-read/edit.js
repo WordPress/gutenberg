@@ -79,7 +79,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		const parts = [];
 
-		// Add time to read part if enabled
+		// Add "time to read" part, if enabled.
 		if ( showTimeToRead ) {
 			let timeString;
 			if ( displayAsRange ) {
