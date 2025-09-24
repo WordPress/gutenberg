@@ -94,7 +94,6 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
 }
 
-
 /**
  * Filter the comment count query to exclude block_comment type comments.
  *
