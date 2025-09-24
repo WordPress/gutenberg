@@ -88,6 +88,43 @@ export function Comments( {
 	}, [] );
 	const [ focusThread = blockCommentId, setFocusThread ] = useState();
 
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	/**
+	 * Handles focus management after comment deletion.
+	 *
+	 * @param {number}   deletedCommentId - The ID of the deleted comment.
+	 * @param {Function} onFocusBlock     - Callback to focus the block containing the deleted comment.
+	 */
+	const handleCommentDeletionFocus = ( deletedCommentId, onFocusBlock ) => {
+		const deletedThreadIndex = threads.findIndex(
+			( thread ) => thread.id === deletedCommentId
+		);
+
+		if ( deletedThreadIndex !== -1 ) {
+			// Try next comment first, then previous comment
+			const nextComment = threads[ deletedThreadIndex + 1 ];
+			const prevComment = threads[ deletedThreadIndex - 1 ];
+
+			if ( nextComment ) {
+				setFocusThread( nextComment.id );
+				return;
+			}
+			if ( prevComment ) {
+				setFocusThread( prevComment.id );
+				return;
+			}
+		}
+
+		// Focus parent block if no other comments exist.
+		setFocusThread( null );
+		setShowCommentBoard( false );
+		// Callback to handle block selection.
+		if ( onFocusBlock ) {
+			onFocusBlock( deletedCommentId );
+		}
+	};
+
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
 		return (
@@ -116,9 +153,8 @@ export function Comments( {
 			onEditComment={ onEditComment }
 			isFocused={ focusThread === thread.id }
 			setFocusThread={ setFocusThread }
-			handleCommentDeletionFocus={
-				handleCommentDeletionFocus
-			}
+			handleCommentDeletionFocus={ handleCommentDeletionFocus }
+			selectBlock={ selectBlock }
 			setShowCommentBoard={ setShowCommentBoard }
 		/>
 	) );
@@ -134,6 +170,7 @@ function Thread( {
 	isFocused,
 	setFocusThread,
 	handleCommentDeletionFocus,
+	selectBlock,
 	setShowCommentBoard,
 } ) {
 	const { flashBlock } = useDispatch( blockEditorStore );
@@ -170,38 +207,14 @@ function Thread( {
 		setShowCommentBoard( false );
 	};
 
-	/**
-	 * Handles focus management after comment deletion.
-	 *
-	 * @param {number} deletedCommentId - The ID of the deleted comment.
-	 */
-	const handleCommentDeletionFocus = ( deletedCommentId ) => {
-		const deletedThreadIndex = threads.findIndex(
-			( thread ) => thread.id === deletedCommentId
+	const handleFocusBlock = ( deletedCommentId ) => {
+		// Find the block that contains the deleted comment
+		const deletedCommentBlock = findBlockByCommentId(
+			deletedCommentId,
+			blocks
 		);
-
-		if ( deletedThreadIndex !== -1 ) {
-			// Try next comment first, then previous comment
-			const nextComment = threads[ deletedThreadIndex + 1 ];
-			const prevComment = threads[ deletedThreadIndex - 1 ];
-
-			if ( nextComment ) {
-				setFocusThread( nextComment.id );
-				return;
-			}
-			if ( prevComment ) {
-				setFocusThread( prevComment.id );
-				return;
-			}
-		}
-
-		// Focus parent block if no other comments exist
-		clearThreadFocus();
-		const relatedBlock = blockCommentId
-			? findBlockByCommentId( blockCommentId, blocks )
-			: null;
-		if ( relatedBlock ) {
-			flashBlock( relatedBlock );
+		if ( deletedCommentBlock ) {
+			selectBlock( deletedCommentBlock );
 		}
 	};
 
@@ -220,7 +233,12 @@ function Thread( {
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
 				onDelete={ ( commentId ) =>
-					onCommentDelete( commentId, handleCommentDeletionFocus )
+					onCommentDelete( commentId, ( deletedCommentId ) =>
+						handleCommentDeletionFocus(
+							deletedCommentId,
+							handleFocusBlock
+						)
+					)
 				}
 				status={ thread.status }
 			/>
@@ -260,7 +278,11 @@ function Thread( {
 										onDelete={ ( commentId ) =>
 											onCommentDelete(
 												commentId,
-												handleCommentDeletionFocus
+												( deletedCommentId ) =>
+													handleCommentDeletionFocus(
+														deletedCommentId,
+														handleFocusBlock
+													)
 											)
 										}
 									/>
