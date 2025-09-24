@@ -178,19 +178,19 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 
 	$approved_only_phrase = sprintf(
 		/* translators: %s: Number of comments. */
-		_n( '%s comment', '%s comments', $approved_comments ),
+		_n( '%s comment', '%s comments', $approved_comments, 'gutenberg' ),
 		$approved_comments_number
 	);
 
 	$approved_phrase = sprintf(
 		/* translators: %s: Number of comments. */
-		_n( '%s approved comment', '%s approved comments', $approved_comments ),
+		_n( '%s approved comment', '%s approved comments', $approved_comments, 'gutenberg' ),
 		$approved_comments_number
 	);
 
 	$pending_phrase = sprintf(
 		/* translators: %s: Number of comments. */
-		_n( '%s pending comment', '%s pending comments', $pending_comments ),
+		_n( '%s pending comment', '%s pending comments', $pending_comments, 'gutenberg' ),
 		$pending_comments_number
 	);
 
@@ -199,7 +199,7 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 		printf(
 			'<span aria-hidden="true">&#8212;</span>' .
 			'<span class="screen-reader-text">%s</span>',
-			__( 'No comments' )
+			__( 'No comments', 'gutenberg' )
 		);
 	} elseif ( $approved_comments && 'trash' === get_post_status( $post_id ) ) {
 		// Don't link the comment bubble for a trashed post.
@@ -241,9 +241,9 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 			$approved_comments_number,
 			$pending_comments ?
 			/* translators: Hidden accessibility text. */
-			__( 'No approved comments' ) :
+			__( 'No approved comments', 'gutenberg' ) :
 			/* translators: Hidden accessibility text. */
-			__( 'No comments' )
+			__( 'No comments', 'gutenberg' )
 		);
 	}
 
@@ -276,9 +276,9 @@ function gutenberg_comments_bubble( $post_id, $pending_comments, $approved_comme
 			$pending_comments_number,
 			$approved_comments ?
 			/* translators: Hidden accessibility text. */
-			__( 'No pending comments' ) :
+			__( 'No pending comments', 'gutenberg' ) :
 			/* translators: Hidden accessibility text. */
-			__( 'No comments' )
+			__( 'No comments', 'gutenberg' )
 		);
 	}
 }
@@ -338,10 +338,10 @@ function gutenberg_filter_editorial_comments_status_links( $status_links ) {
 		unset( $status_links['trash'] );
 	}
 	if ( isset( $status_links['moderated'] ) ) {
-		$status_links['moderated'] = str_replace( __( 'Pending' ), __( 'Open', 'gutenberg' ), $status_links['moderated'] );
+		$status_links['moderated'] = str_replace( __( 'Pending', 'gutenberg' ), __( 'Open', 'gutenberg' ), $status_links['moderated'] );
 	}
 	if ( isset( $status_links['approved'] ) ) {
-		$status_links['approved'] = str_replace( __( 'Approved' ), __( 'Resolved', 'gutenberg' ), $status_links['approved'] );
+		$status_links['approved'] = str_replace( __( 'Approved', 'gutenberg' ), __( 'Resolved', 'gutenberg' ), $status_links['approved'] );
 	}
 	return $status_links;
 }
