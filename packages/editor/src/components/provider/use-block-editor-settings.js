@@ -40,11 +40,11 @@ function __experimentalReusableBlocksSelect( select ) {
 }
 
 const BLOCK_EDITOR_SETTINGS = [
+	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'__experimentalBlockBindingsSupportedAttributes',
 	'alignWide',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
