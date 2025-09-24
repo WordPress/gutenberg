@@ -1,5 +1,7 @@
 .wp-block-accordion-panel {
+	display: none;
 	overflow: hidden;
+	transition: all 0.2s ease-out;
 
 	// Prevent blockGap from Accordion Content block from adding extra margin between accordions.
 	&[inert],
