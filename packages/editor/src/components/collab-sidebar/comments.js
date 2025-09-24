@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect, useMemo } from '@wordpress/element';
+import { useState, RawHTML, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -64,7 +64,6 @@ const findBlockByCommentId = ( commentId, blockList ) => {
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
  * @param {Function} props.onCommentResolve    - The function to mark a comment as resolved.
  * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
- * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @return {React.ReactNode} The rendered Comments component.
  */
@@ -75,7 +74,6 @@ export function Comments( {
 	onCommentDelete,
 	onCommentResolve,
 	onCommentReopen,
-	showCommentBoard,
 	setShowCommentBoard,
 } ) {
 	const { blockCommentId } = useSelect( ( select ) => {
@@ -95,15 +93,8 @@ export function Comments( {
 	};
 
 	const [ focusThread, setFocusThread ] = useState(
-		showCommentBoard && blockCommentId ? blockCommentId : null
+		blockCommentId ? blockCommentId : null
 	);
-
-	useEffect( () => {
-		// Highlight comment when block is selected.
-		if ( blockCommentId && ! focusThread ) {
-			setFocusThread( blockCommentId );
-		}
-	}, [ blockCommentId, focusThread, setFocusThread ] );
 
 	return (
 		<>
