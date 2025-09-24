@@ -6,17 +6,19 @@
 				{
 					"content": "Heading text",
 					"level": 2,
-					"link": "#heading-id-1"
+					"link": "#heading-text"
 				},
 				{
 					"content": "A sub-heading",
 					"level": 3,
-					"link": "#heading-id-2"
+					"link": "#a-sub-heading"
 				}
 			]
 		},
 		"innerBlocks": [],
-		"innerHTML": "",
-		"innerContent": []
+		"innerHTML": "\n<nav class=\"wp-block-table-of-contents\"><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-text\">Heading text</a><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#a-sub-heading\">A sub-heading</a></li></ol></li></ol></nav>\n",
+		"innerContent": [
+			"\n<nav class=\"wp-block-table-of-contents\"><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#heading-text\">Heading text</a><ol><li><a class=\"wp-block-table-of-contents__entry\" href=\"#a-sub-heading\">A sub-heading</a></li></ol></li></ol></nav>\n"
+		]
 	}
 ]
