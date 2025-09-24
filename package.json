@@ -169,7 +169,7 @@
 		"terser-webpack-plugin": "5.3.10",
 		"typescript": "5.7.2",
 		"uuid": "9.0.1",
-		"webdriverio": "8.16.20",
+		"webdriverio": "9.19.2",
 		"webpack": "5.97.0",
 		"webpack-bundle-analyzer": "4.9.1",
 		"worker-farm": "1.7.0"
