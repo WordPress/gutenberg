@@ -116,7 +116,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			parts.push( timeString );
 		}
 
-		// Add word count part
+		// Add "word count" part, if enabled.
 		if ( showWordCount ) {
 			const wordCountString = sprintf(
 				/* translators: %s: the number of words in the post. */
