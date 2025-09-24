@@ -9,7 +9,7 @@ import {
 	humanTimeDiff,
 	getDate,
 } from '@wordpress/date';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -25,21 +25,21 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 function CommentAuthorInfo( { avatar, name, date } ) {
 	const dateSettings = getDateSettings();
-	const [ dateFormat = dateSettings.formats.date ] = useEntityProp(
-		'root',
-		'site',
-		'date_format'
-	);
-
-	const { currentUserAvatar, currentUserName } = useSelect( ( select ) => {
-		const userData = select( coreStore ).getCurrentUser();
-
+	const {
+		currentUserAvatar,
+		currentUserName,
+		dateFormat = dateSettings.formats.date,
+	} = useSelect( ( select ) => {
+		const { getCurrentUser, getEntityRecord } = select( coreStore );
 		const { getSettings } = select( blockEditorStore );
+		const userData = getCurrentUser();
 		const { __experimentalDiscussionSettings } = getSettings();
 		const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
+		const siteSettings = getEntityRecord( 'root', 'site' );
 		return {
 			currentUserAvatar: userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
 			currentUserName: userData?.name,
+			dateFormat: siteSettings?.date_format,
 		};
 	}, [] );
 
