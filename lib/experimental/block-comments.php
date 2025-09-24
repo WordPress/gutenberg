@@ -103,7 +103,7 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
  */
 if ( ! function_exists( 'allow_empty_block_comments' ) ) {
 	function allow_empty_block_comments( $allow, $prepared_comment ) {
-		if ( isset( $prepared_comment['comment_type'] ) && 'block_comment' === $prepared_comment['comment_type'] ) {
+		if ( ! isset( $prepared_comment['comment_type'] ) || 'block_comment' === $prepared_comment['comment_type'] ) {
 			$allow = true;
 		}
 		return $allow;
