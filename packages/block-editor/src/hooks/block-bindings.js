@@ -210,10 +210,12 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { bindableAttributes, fieldsList, canUpdateBlockBindings } =
 		useSelect(
 			( select ) => {
-				const { blockBindingsSupportedAttributes } =
+				const { __experimentalBlockBindingsSupportedAttributes } =
 					select( blockEditorStore ).getSettings();
 				const _bindableAttributes =
-					blockBindingsSupportedAttributes?.[ blockName ];
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					];
 				if (
 					! _bindableAttributes ||
 					_bindableAttributes.length === 0

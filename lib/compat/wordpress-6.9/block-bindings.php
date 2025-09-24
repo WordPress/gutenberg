@@ -28,11 +28,11 @@ add_filter(
 add_filter(
 	'block_editor_settings_all',
 	function ( $editor_settings ) {
-		$editor_settings['blockBindingsSupportedAttributes'] = array();
+		$editor_settings['__experimentalBlockBindingsSupportedAttributes'] = array();
 		foreach ( array_keys( WP_Block_Type_Registry::get_instance()->get_all_registered() ) as $block_type ) {
 			$supported_block_attributes = gutenberg_get_block_bindings_supported_attributes( $block_type );
 			if ( ! empty( $supported_block_attributes ) ) {
-				$editor_settings['blockBindingsSupportedAttributes'][ $block_type ] = $supported_block_attributes;
+				$editor_settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] = $supported_block_attributes;
 			}
 		}
 		return $editor_settings;

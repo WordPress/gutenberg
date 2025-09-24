@@ -176,12 +176,14 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			const { blockBindingsSupportedAttributes } =
+			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 
 			if (
 				! blockBindings?.[ identifier ] ||
-				! ( blockName in blockBindingsSupportedAttributes )
+				! (
+					blockName in __experimentalBlockBindingsSupportedAttributes
+				)
 			) {
 				return {};
 			}

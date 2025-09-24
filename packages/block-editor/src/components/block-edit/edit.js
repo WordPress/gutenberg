@@ -68,9 +68,11 @@ const EditWithGeneratedProps = ( props ) => {
 	);
 	const bindableAttributes = useSelect(
 		( select ) => {
-			const { blockBindingsSupportedAttributes } =
+			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
-			return blockBindingsSupportedAttributes?.[ name ] || [];
+			return (
+				__experimentalBlockBindingsSupportedAttributes?.[ name ] || []
+			);
 		},
 		[ name ]
 	);
