@@ -79,7 +79,7 @@ class Gutenberg_REST_Static_Templates_Controller extends WP_REST_Templates_Contr
 			$query['post_type'] = $request['post_type'];
 		}
 		$query_result = gutenberg_get_registered_block_templates( $query );
-		$templates = array();
+		$templates    = array();
 		foreach ( $query_result as $template ) {
 			$item               = $this->prepare_item_for_response( $template, $request );
 			$item->data['type'] = 'wp_registered_template';
