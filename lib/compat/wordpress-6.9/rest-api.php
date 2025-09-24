@@ -29,4 +29,3 @@ function gutenberg_rest_theme_export_link_rel( $response, $theme ) {
 	return $response;
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 );
-
