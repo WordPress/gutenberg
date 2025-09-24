@@ -6,27 +6,32 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	AlignmentControl,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
 
 /**
- * Average reading rate - based on average taken from
- * https://irisreading.com/average-reading-speed-in-various-languages/
- * (Characters/minute used for Chinese rather than words).
+ * Internal dependencies
  */
-const AVERAGE_READING_RATE = 189;
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign } = attributes;
+	const { textAlign, displayAsRange, averageReadingSpeed } = attributes;
 	const { postId, postType } = context;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const [ contentStructure ] = useEntityProp(
 		'postType',
@@ -63,11 +68,31 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			'Word count type. Do not translate!'
 		);
 
+		const totalWords = wordCount( content || '', wordCountType );
+		if ( displayAsRange ) {
+			let maxMinutes = Math.max(
+				1,
+				Math.round( ( totalWords / averageReadingSpeed ) * 1.2 )
+			);
+			const minMinutes = Math.max(
+				1,
+				Math.round( ( totalWords / averageReadingSpeed ) * 0.8 )
+			);
+
+			if ( minMinutes === maxMinutes ) {
+				maxMinutes = maxMinutes + 1;
+			}
+			// translators: %1$s: minimum minutes, %2$s: maximum minutes to read the post.
+			const rangeLabel = _x(
+				'%1$s–%2$s minutes',
+				'Range of minutes to read'
+			);
+			return sprintf( rangeLabel, minMinutes, maxMinutes );
+		}
+
 		const minutesToRead = Math.max(
 			1,
-			Math.round(
-				wordCount( content || '', wordCountType ) / AVERAGE_READING_RATE
-			)
+			Math.round( totalWords / averageReadingSpeed )
 		);
 
 		return sprintf(
@@ -75,7 +100,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
-	}, [ contentStructure, blocks ] );
+	}, [ contentStructure, blocks, displayAsRange, averageReadingSpeed ] );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -93,6 +118,42 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							displayAsRange: true,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ _x(
+							'Display as range',
+							'Turns reading time range display on or off'
+						) }
+						hasValue={ () => ! displayAsRange }
+						onDeselect={ () => {
+							setAttributes( {
+								displayAsRange: true,
+							} );
+						} }
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Display as range' ) }
+							checked={ !! displayAsRange }
+							onChange={ () =>
+								setAttributes( {
+									displayAsRange: ! displayAsRange,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 			<div { ...blockProps }>{ minutesToReadString }</div>
 		</>
 	);

@@ -164,6 +164,7 @@ export type FieldTypeDefinition< Item > = {
 
 export type Rules< Item > = {
 	required?: boolean;
+	elements?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
 

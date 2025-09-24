@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, RawHTML, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -14,16 +14,45 @@ import {
 	Button,
 	DropdownMenu,
 } from '@wordpress/components';
+
 import { published, moreVertical } from '@wordpress/icons';
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __, _x, sprintf, _n } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+
+const { useBlockElement } = unlock( blockEditorPrivateApis );
+
+/**
+ * Finds the first block that has the specified comment ID.
+ *
+ * @param {string} commentId - The comment ID to search for.
+ * @param {Array}  blockList - The list of blocks to search through.
+ * @return {string|null} The client ID of the found block, or null if not found.
+ */
+const findBlockByCommentId = ( commentId, blockList ) => {
+	for ( const block of blockList ) {
+		if ( block.attributes?.blockCommentId === commentId ) {
+			return block.clientId;
+		}
+		if ( block.innerBlocks ) {
+			const found = findBlockByCommentId( commentId, block.innerBlocks );
+			if ( found ) {
+				return found;
+			}
+		}
+	}
+	return null;
+};
 
 /**
  * Renders the Comments component.
@@ -35,7 +64,6 @@ import CommentForm from './comment-form';
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
  * @param {Function} props.onCommentResolve    - The function to mark a comment as resolved.
  * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
- * @param {boolean}  props.showCommentBoard    - Whether to show the comment board.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @return {React.ReactNode} The rendered Comments component.
  */
@@ -46,82 +74,51 @@ export function Comments( {
 	onCommentDelete,
 	onCommentResolve,
 	onCommentReopen,
-	showCommentBoard,
 	setShowCommentBoard,
 } ) {
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-
+		const clientId = getSelectedBlockClientId();
 		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
+			blockCommentId: clientId
+				? getBlockAttributes( clientId )?.blockCommentId
 				: null,
 		};
 	}, [] );
+	const [ focusThread, setFocusThread ] = useState( blockCommentId ?? null );
 
-	const [ focusThread, setFocusThread ] = useState(
-		showCommentBoard && blockCommentId ? blockCommentId : null
-	);
+	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+	if ( ! hasThreads ) {
+		return (
+			<VStack
+				alignment="left"
+				className="editor-collab-sidebar-panel__thread"
+				justify="flex-start"
+				spacing="3"
+			>
+				{
+					// translators: message displayed when there are no comments available
+					__( 'No comments available' )
+				}
+			</VStack>
+		);
+	}
 
-	const clearThreadFocus = () => {
-		setFocusThread( null );
-		setShowCommentBoard( false );
-	};
-
-	return (
-		<>
-			{
-				// If there are no comments, show a message indicating no comments are available.
-				( ! Array.isArray( threads ) || threads.length === 0 ) && (
-					<VStack
-						alignment="left"
-						className="editor-collab-sidebar-panel__thread"
-						justify="flex-start"
-						spacing="3"
-					>
-						{
-							// translators: message displayed when there are no comments available
-							__( 'No comments available' )
-						}
-					</VStack>
-				)
-			}
-			{ Array.isArray( threads ) &&
-				threads.length > 0 &&
-				threads.map( ( thread ) => (
-					<VStack
-						key={ thread.id }
-						className={ clsx(
-							'editor-collab-sidebar-panel__thread',
-							{
-								'editor-collab-sidebar-panel__active-thread':
-									blockCommentId &&
-									blockCommentId === thread.id,
-								'editor-collab-sidebar-panel__focus-thread':
-									focusThread && focusThread === thread.id,
-							}
-						) }
-						id={ thread.id }
-						spacing="3"
-						onClick={ () => setFocusThread( thread.id ) }
-					>
-						<Thread
-							thread={ thread }
-							onAddReply={ onAddReply }
-							onCommentDelete={ onCommentDelete }
-							onCommentResolve={ onCommentResolve }
-							onCommentReopen={ onCommentReopen }
-							onEditComment={ onEditComment }
-							isFocused={ focusThread === thread.id }
-							clearThreadFocus={ clearThreadFocus }
-							setFocusThread={ setFocusThread }
-						/>
-					</VStack>
-				) ) }
-		</>
-	);
+	return threads.map( ( thread ) => (
+		<Thread
+			key={ thread.id }
+			thread={ thread }
+			onAddReply={ onAddReply }
+			onCommentDelete={ onCommentDelete }
+			onCommentResolve={ onCommentResolve }
+			onCommentReopen={ onCommentReopen }
+			onEditComment={ onEditComment }
+			isFocused={ focusThread === thread.id }
+			setFocusThread={ setFocusThread }
+			setShowCommentBoard={ setShowCommentBoard }
+		/>
+	) );
 }
 
 function Thread( {
@@ -132,11 +129,52 @@ function Thread( {
 	onCommentResolve,
 	onCommentReopen,
 	isFocused,
-	clearThreadFocus,
 	setFocusThread,
+	setShowCommentBoard,
 } ) {
+	const { flashBlock } = useDispatch( blockEditorStore );
+	const { blocks } = useSelect( ( select ) => {
+		return {
+			blocks: select( blockEditorStore ).getBlocks(),
+		};
+	}, [] );
+
+	// Find first block that has this comment ID - run at component root level.
+	const relatedBlock = useMemo( () => {
+		if ( ! thread.id || ! blocks ) {
+			return null;
+		}
+		return findBlockByCommentId( thread.id, blocks );
+	}, [ thread.id, blocks ] );
+
+	const relatedBlockElement = useBlockElement( relatedBlock );
+
+	const handleCommentSelect = ( threadId ) => {
+		setShowCommentBoard( false );
+		setFocusThread( threadId );
+		if ( relatedBlock && relatedBlockElement ) {
+			relatedBlockElement.scrollIntoView( {
+				behavior: 'instant',
+				block: 'center',
+			} );
+			flashBlock( relatedBlock );
+		}
+	};
+
+	const clearThreadFocus = () => {
+		setFocusThread( null );
+		setShowCommentBoard( false );
+	};
+
 	return (
-		<>
+		<VStack
+			className={ clsx( 'editor-collab-sidebar-panel__thread', {
+				'editor-collab-sidebar-panel__focus-thread': isFocused,
+			} ) }
+			id={ thread.id }
+			spacing="3"
+			onClick={ () => handleCommentSelect( thread.id ) }
+		>
 			<CommentBoard
 				thread={ thread }
 				onResolve={ onCommentResolve }
@@ -230,7 +268,7 @@ function Thread( {
 					</VStack>
 				</VStack>
 			) }
-		</>
+		</VStack>
 	);
 }
 
