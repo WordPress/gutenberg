@@ -72,10 +72,6 @@
 		"levelOptions": {
 			"type": "array"
 		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
-		},
 		"iconPosition": {
 			"type": "string",
 			"enum": [ "left", "right" ],
