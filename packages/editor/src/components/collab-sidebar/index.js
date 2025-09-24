@@ -257,7 +257,8 @@ export default function CollabSidebar() {
 	const { records: threads, totalPages } = useEntityRecords(
 		'root',
 		'comment',
-		queryArgs
+		queryArgs,
+		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
 	const hasMoreComments = totalPages && totalPages > 1;
@@ -377,6 +378,7 @@ export default function CollabSidebar() {
 				// translators: Comments sidebar title
 				title={ __( 'Comments' ) }
 				icon={ commentIcon }
+				closeLabel={ __( 'Close Comments' ) }
 			>
 				<CollabSidebarContent
 					comments={ resultComments }

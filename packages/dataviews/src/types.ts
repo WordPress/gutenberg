@@ -164,6 +164,7 @@ export type FieldTypeDefinition< Item > = {
 
 export type Rules< Item > = {
 	required?: boolean;
+	elements?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
 
@@ -280,7 +281,7 @@ export type Field< Item > = {
 	enableGlobalSearch?: boolean;
 
 	/**
-	 * Whether the field is filterable.
+	 * Whether the field can be hidden in the UI.
 	 */
 	enableHiding?: boolean;
 
