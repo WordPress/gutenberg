@@ -33,8 +33,6 @@ import { findBlockByCommentId } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-
-
 /**
  * Renders the Comments component.
  *

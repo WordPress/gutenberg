@@ -64,4 +64,4 @@ export function findBlockByCommentId( commentId, blockList ) {
 		}
 	}
 	return null;
-};
+}
