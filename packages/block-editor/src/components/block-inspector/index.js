@@ -100,11 +100,12 @@ function BlockInspector() {
 			getSelectedBlockCount,
 			getBlockName,
 			getParentSectionBlock,
-			getBlockParentsByBlockName,
 			isSectionBlock: _isSectionBlock,
+			getBlockParentsByBlockName,
 		} = unlock( select( blockEditorStore ) );
 		const { getBlockStyles } = select( blocksStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
+
 		const currentBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
 
@@ -145,7 +146,6 @@ function BlockInspector() {
 		};
 	}, [] );
 
-<<<<<<< HEAD
 	// Separate useSelect for contentClientIds with proper dependencies
 	const contentClientIds = useSelect(
 		( select ) => {
@@ -157,16 +157,26 @@ function BlockInspector() {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
+				getBlockParents,
 			} = unlock( select( blockEditorStore ) );
 
 			const descendants = getClientIdsOfDescendants(
 				selectedBlockClientId
 			);
-			return descendants.filter(
-				( current ) =>
+			return descendants.filter( ( current ) => {
+				// Check if this block is within a navigation context
+				const parents = getBlockParents( current );
+				const isWithinNavigation = parents.some( ( parentId ) => {
+					const parentName = getBlockName( parentId );
+					return parentName === 'core/navigation';
+				} );
+
+				return (
+					! isWithinNavigation &&
 					getBlockName( current ) !== 'core/list-item' &&
 					getBlockEditingMode( current ) === 'contentOnly'
-			);
+				);
+			} );
 		},
 		[ isSectionBlock, selectedBlockClientId ]
 	);
@@ -177,14 +187,11 @@ function BlockInspector() {
 		isSectionBlock,
 		hasBlockStyles
 	);
-	const hasMultipleTabs = availableTabs?.length > 1;
-=======
-	const availableTabs = useInspectorControlsTabs( blockType?.name );
-	const hasMultipleTabs =
-		availableTabs?.length > 1 ||
+
+	const isNavigationLinkBlock =
 		blockType?.name === 'core/navigation-link' ||
 		blockType?.name === 'core/navigation-submenu';
->>>>>>> 846d63aa61d (Add content role to Navigation Link and Submenu label attributes)
+	const hasMultipleTabs = availableTabs?.length > 1 || isNavigationLinkBlock;
 
 	// The block inspector animation settings will be completely
 	// removed in the future to create an API which allows the block
@@ -312,9 +319,6 @@ const BlockInspectorSingleBlock = ( {
 	hasBlockStyles,
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
-<<<<<<< HEAD
-=======
-
 	const blockEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ),
@@ -323,51 +327,11 @@ const BlockInspectorSingleBlock = ( {
 	const isContentOnlyNavBlock =
 		blockName === 'core/navigation' && blockEditingMode === 'contentOnly';
 
-	const shouldShowTabs =
-		! isSectionBlock && hasMultipleTabs && ! isContentOnlyNavBlock;
->>>>>>> 846d63aa61d (Add content role to Navigation Link and Submenu label attributes)
-
 	const blockInformation = useBlockDisplayInformation( clientId );
-<<<<<<< HEAD
-=======
-	const contentClientIds = useSelect(
-		( select ) => {
-			// Avoid unnecessary subscription.
-			if ( ! isSectionBlock ) {
-				return;
-			}
-
-			const {
-				getClientIdsOfDescendants,
-				getBlockName,
-				getBlockEditingMode,
-				getBlockParents,
-			} = select( blockEditorStore );
-
-			return getClientIdsOfDescendants( clientId ).filter(
-				( current ) => {
-					// Check if this block is within a navigation context
-					const parents = getBlockParents( current );
-					const isWithinNavigation = parents.some( ( parentId ) => {
-						const parentName = getBlockName( parentId );
-						return parentName === 'core/navigation';
-					} );
-
-					return (
-						! isWithinNavigation &&
-						getBlockName( current ) !== 'core/list-item' &&
-						getBlockEditingMode( current ) === 'contentOnly'
-					);
-				}
-			);
-		},
-		[ isSectionBlock, clientId ]
-	);
-
->>>>>>> 846d63aa61d (Add content role to Navigation Link and Submenu label attributes)
 	const isBlockSynced = blockInformation.isSynced;
 
-	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
+	const shouldShowTabs =
+		! isBlockSynced && hasMultipleTabs && ! isContentOnlyNavBlock;
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -395,25 +359,7 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStylesPanel clientId={ clientId } />
 					) }
-<<<<<<< HEAD
 					<ContentTab contentClientIds={ contentClientIds } />
-=======
-
-					{ blockName === 'core/navigation' &&
-					blockEditingMode === 'contentOnly' ? (
-						<InspectorControls.Slot group="list" />
-					) : (
-						contentClientIds &&
-						contentClientIds?.length > 0 && (
-							<PanelBody title={ __( 'Content' ) }>
-								<BlockQuickNavigation
-									clientIds={ contentClientIds }
-								/>
-							</PanelBody>
-						)
-					) }
-
->>>>>>> 846d63aa61d (Add content role to Navigation Link and Submenu label attributes)
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots
 							blockName={ blockName }
