@@ -17,7 +17,7 @@ import {
 import { ToolbarGroup } from '@wordpress/components';
 
 export default function Edit( { attributes, setAttributes, context } ) {
-	const { level, title, textAlign, levelOptions } = attributes;
+	const { level, title, levelOptions } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
@@ -35,9 +35,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	}, [ iconPosition, showIcon, setAttributes ] );
 
 	const blockProps = useBlockProps( {
-		className: clsx( 'accordion-content__heading', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
+		className: 'accordion-content__heading',
 	} );
 	const spacingProps = useSpacingProps( attributes );
 

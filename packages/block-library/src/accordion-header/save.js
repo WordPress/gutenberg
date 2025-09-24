@@ -12,13 +12,11 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { level, title, iconPosition, textAlign, showIcon } = attributes;
+	const { level, title, iconPosition, showIcon } = attributes;
 	const TagName = 'h' + level;
 
 	const blockProps = useBlockProps.save( {
-		className: clsx( 'accordion-content__heading', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
+		className: 'accordion-content__heading',
 	} );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
