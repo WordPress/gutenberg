@@ -54,10 +54,26 @@ store( 'test/deferred-store/derived-state', {
 						const { counter } = getContext();
 						return counter < 10;
 					},
+					get radiotelephonicAlphabet() {
+						const { list } = getContext();
+						const dictionary = {
+							a: 'alpha',
+							b: 'bravo',
+							c: 'charlie',
+							d: 'delta',
+						};
+						return list.map( ( item ) => dictionary[ item ] );
+					},
 				},
 				actions: {
 					increment() {
 						getContext().counter += 1;
+					},
+					addItem() {
+						const { list } = getContext();
+						if ( list.length === 3 ) {
+							list.push( 'd' );
+						}
 					},
 				},
 			} );

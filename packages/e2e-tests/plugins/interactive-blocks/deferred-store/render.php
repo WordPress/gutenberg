@@ -24,6 +24,21 @@ wp_interactivity_state(
 			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
 			return $context['counter'] < 10;
 		},
+		'radiotelephonicAlphabet' => function () {
+			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
+			$dictionary = array(
+				'a' => 'alpha',
+				'b' => 'bravo',
+				'c' => 'charlie',
+				'd' => 'delta',
+			);
+			return array_map(
+				function ( $item ) use ( $dictionary ) {
+					return $dictionary[ $item ];
+				},
+				$context['list']
+			);
+		},
 	)
 );
 
@@ -37,6 +52,7 @@ add_filter(
 			'test/deferred-store/derived-state' => array(
 				'state.value',
 				'state.below10',
+				'state.radiotelephonicAlphabet',
 			),
 		);
 		return $data;
@@ -82,4 +98,13 @@ add_filter(
 		data-testid="derived-class-element"
 	>NaN</output>
 	<button data-wp-on--click="actions.increment" data-testid="derived-class-increment">+</button>
+</div>
+
+<div data-wp-interactive="test/deferred-store/derived-state" data-wp-context='{"list": ["a", "b", "c"]}'>
+	<ol data-testid="derived-each-list">
+		<template data-wp-each="state.radiotelephonicAlphabet">
+			<li data-wp-text="context.item"></li>
+		</template>
+	</ol>
+	<button data-wp-on--click="actions.addItem" data-testid="derived-each-additem">+</button>
 </div>
