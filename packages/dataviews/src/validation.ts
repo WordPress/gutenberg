@@ -25,6 +25,14 @@ export function isItemValid< Item >(
 	const isEmptyNullOrUndefined = ( value: any ) =>
 		[ undefined, '', null ].includes( value );
 
+	const isArrayOrElementsEmptyNullOrUndefined = ( value: any ) => {
+		return (
+			! Array.isArray( value ) ||
+			value.length === 0 ||
+			value.every( ( element: any ) => isEmptyNullOrUndefined( element ) )
+		);
+	};
+
 	return _fields.every( ( field ) => {
 		const value = field.getValue( { item } );
 
@@ -39,6 +47,8 @@ export function isItemValid< Item >(
 					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'integer' &&
 					isEmptyNullOrUndefined( value ) ) ||
+				( field.type === 'array' &&
+					isArrayOrElementsEmptyNullOrUndefined( value ) ) ||
 				( field.type === undefined && isEmptyNullOrUndefined( value ) )
 			) {
 				return false;
@@ -46,6 +56,26 @@ export function isItemValid< Item >(
 
 			if ( field.type === 'boolean' && value !== true ) {
 				return false;
+			}
+		}
+
+		if ( field.isValid.elements ) {
+			if ( field.elements ) {
+				const validValues = field.elements.map(
+					( element ) => element.value
+				);
+
+				if ( field.type === 'array' ) {
+					// For arrays, check if all values are valid elements
+					if ( Array.isArray( value ) ) {
+						return value.every( ( arrayItem ) =>
+							validValues.includes( arrayItem )
+						);
+					}
+					return false;
+				}
+				// For single-value fields, check if the value is a valid element
+				return validValues.includes( value );
 			}
 		}
 

@@ -525,6 +525,8 @@ const ValidationComponent = ( {
 		integer: number;
 		boolean: boolean;
 		customEdit: string;
+		categories: string[];
+		countries: string[];
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
@@ -541,6 +543,8 @@ const ValidationComponent = ( {
 		color: '#ff6600',
 		integer: 2,
 		boolean: true,
+		categories: [ 'astronomy' ],
+		countries: [ 'us' ],
 		customEdit: 'custom control',
 		password: 'secretpassword123',
 		toggle: undefined,
@@ -756,6 +760,41 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'categories',
+			type: 'array' as const,
+			label: 'Categories',
+			isValid: {
+				required,
+			},
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
+		},
+		{
+			id: 'countries',
+			label: 'Countries Visited',
+			type: 'array' as const,
+			placeholder: 'Select countries',
+			description: 'Countries you have visited',
+			isValid: {
+				required,
+				elements: true,
+			},
+			elements: [
+				{ value: 'us', label: 'United States' },
+				{ value: 'ca', label: 'Canada' },
+				{ value: 'uk', label: 'United Kingdom' },
+				{ value: 'fr', label: 'France' },
+				{ value: 'de', label: 'Germany' },
+				{ value: 'jp', label: 'Japan' },
+				{ value: 'au', label: 'Australia' },
+			],
+		},
+		{
 			id: 'customEdit',
 			label: 'Custom Control',
 			Edit: CustomEditControl,
@@ -812,6 +851,8 @@ const ValidationComponent = ( {
 			'color',
 			'integer',
 			'boolean',
+			'categories',
+			'countries',
 			'toggle',
 			'toggleGroup',
 			'password',
