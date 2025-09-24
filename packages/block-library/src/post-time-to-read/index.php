@@ -55,7 +55,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		$parts[] = $time_string;
 	}
 
-	// Add word count part if enabled
+	// Add "word count" part, if enabled.
 	if ( $show_word_count ) {
 		$word_count_string = sprintf(
 			/* translators: %s: the number of words in the post. */
