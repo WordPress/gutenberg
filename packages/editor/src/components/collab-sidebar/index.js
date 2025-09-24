@@ -8,6 +8,7 @@ import {
 	resolveSelect,
 	subscribe,
 } from '@wordpress/data';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -208,22 +209,24 @@ function CollabSidebarContent( {
 
 	return (
 		<div className="editor-collab-sidebar-panel" style={ styles }>
-			<AddComment
-				onSubmit={ addNewComment }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-			/>
-			<Comments
-				key={ getSelectedBlockClientId() }
-				threads={ comments }
-				onEditComment={ onEditComment }
-				onAddReply={ addNewComment }
-				onCommentDelete={ onCommentDelete }
-				onCommentResolve={ onCommentResolve }
-				onCommentReopen={ onCommentReopen }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-			/>
+			<VStack role="list" spacing="3">
+				<AddComment
+					onSubmit={ addNewComment }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+				/>
+				<Comments
+					key={ getSelectedBlockClientId() }
+					threads={ comments }
+					onEditComment={ onEditComment }
+					onAddReply={ addNewComment }
+					onCommentDelete={ onCommentDelete }
+					onCommentResolve={ onCommentResolve }
+					onCommentReopen={ onCommentReopen }
+					showCommentBoard={ showCommentBoard }
+					setShowCommentBoard={ setShowCommentBoard }
+				/>
+			</VStack>
 		</div>
 	);
 }

@@ -179,7 +179,7 @@ test.describe( 'Block Comments', () => {
 
 		const threads = page.locator( '.editor-collab-sidebar-panel__thread' );
 		const activeThread = page.locator(
-			'.editor-collab-sidebar-panel__focus-thread'
+			'.editor-collab-sidebar-panel__thread.is-selected'
 		);
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Comment',

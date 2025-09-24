@@ -6,13 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, RawHTML, useRef } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	DropdownMenu,
+	FlexItem,
 } from '@wordpress/components';
 
 import { published, moreVertical } from '@wordpress/icons';
@@ -64,7 +65,7 @@ export function Comments( {
 				: null,
 		};
 	}, [] );
-	const [ focusThread = blockCommentId, setFocusThread ] = useState();
+	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
@@ -92,8 +93,8 @@ export function Comments( {
 			onCommentResolve={ onCommentResolve }
 			onCommentReopen={ onCommentReopen }
 			onEditComment={ onEditComment }
-			isFocused={ focusThread === thread.id }
-			setFocusThread={ setFocusThread }
+			isSelected={ selectedThread === thread.id }
+			setSelectedThread={ setSelectedThread }
 			setShowCommentBoard={ setShowCommentBoard }
 		/>
 	) );
@@ -106,16 +107,17 @@ function Thread( {
 	onCommentDelete,
 	onCommentResolve,
 	onCommentReopen,
-	isFocused,
-	setFocusThread,
+	isSelected,
+	setSelectedThread,
 	setShowCommentBoard,
 } ) {
+	const threadRef = useRef( null );
 	const { flashBlock } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
-		setFocusThread( id );
+		setSelectedThread( id );
 		if ( blockClientId && relatedBlockElement ) {
 			relatedBlockElement.scrollIntoView( {
 				behavior: 'instant',
@@ -126,18 +128,28 @@ function Thread( {
 	};
 
 	const clearThreadFocus = () => {
-		setFocusThread( null );
+		setSelectedThread( null );
 		setShowCommentBoard( false );
 	};
 
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
-				'editor-collab-sidebar-panel__focus-thread': isFocused,
+				'is-selected': isSelected,
 			} ) }
-			id={ thread.id }
 			spacing="3"
 			onClick={ () => handleCommentSelect( thread ) }
+			onKeyDown={ ( event ) => {
+				if (
+					event.key === 'Enter' &&
+					event.currentTarget === event.target
+				) {
+					handleCommentSelect( thread );
+				}
+			} }
+			tabIndex={ 0 }
+			role="listitem"
+			ref={ threadRef }
 		>
 			<CommentBoard
 				thread={ thread }
@@ -149,12 +161,12 @@ function Thread( {
 			/>
 			{ 0 < thread?.reply?.length && (
 				<>
-					{ ! isFocused && (
+					{ ! isSelected && (
 						<Button
 							__next40pxDefaultSize
 							variant="link"
 							className="editor-collab-sidebar-panel__show-more-reply"
-							onClick={ () => setFocusThread( thread.id ) }
+							onClick={ () => setSelectedThread( thread.id ) }
 						>
 							{ sprintf(
 								// translators: %s: number of replies.
@@ -168,7 +180,7 @@ function Thread( {
 						</Button>
 					) }
 
-					{ isFocused &&
+					{ isSelected &&
 						thread.reply.map( ( reply ) => (
 							<VStack
 								key={ reply.id }
@@ -190,7 +202,7 @@ function Thread( {
 						) ) }
 				</>
 			) }
-			{ isFocused && (
+			{ isSelected && (
 				<VStack
 					className="editor-collab-sidebar-panel__child-thread"
 					spacing="2"
@@ -210,6 +222,7 @@ function Thread( {
 								onAddReply( inputComment, thread.id );
 							} }
 							onCancel={ ( event ) => {
+								threadRef.current?.focus();
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								clearThreadFocus();
 							} }
@@ -292,8 +305,14 @@ const CommentBoard = ( {
 					name={ thread?.author_name }
 					date={ thread?.date }
 				/>
-				<span className="editor-collab-sidebar-panel__comment-status">
-					<HStack alignment="right" justify="flex-end" spacing="0">
+				<FlexItem
+					className="editor-collab-sidebar-panel__comment-status"
+					onClick={ ( event ) => {
+						// Prevent the thread from being selected.
+						event.stopPropagation();
+					} }
+				>
+					<HStack spacing="0">
 						{ 0 === thread?.parent && onResolve && (
 							<Button
 								label={ _x(
@@ -321,7 +340,7 @@ const CommentBoard = ( {
 							/>
 						) }
 					</HStack>
-				</span>
+				</FlexItem>
 			</HStack>
 			{ 'edit' === actionState ? (
 				<CommentForm
