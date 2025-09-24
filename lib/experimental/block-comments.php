@@ -93,3 +93,25 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 	}
 	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
 }
+
+
+/**
+ * Filter the comment count query to exclude block_comment type comments.
+ *
+ * Use the comments_list_table_query_args filter to modify the query arguments.
+ */
+if ( ! function_exists( 'filter_comment_count_query_exclude_block_comments' ) ) {
+	error_log( 'Adding filter to exclude block comments from comment count.' );
+	function filter_comment_count_query_exclude_block_comments( $query ) {
+		// Look for a query that is counting comments like "SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM ...
+		// AND comment_approved = '0' GROUP BY comment_post_ID". Then add the conditional "AND comment_type != 'block_comment'".
+		if ( 0 === strpos( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && false !== strpos( $query, 'comment_approved' ) ) {
+			if ( false === strpos( $query, "comment_type != 'block_comment'" ) ) {
+				$query = str_replace( 'comment_approved', "comment_approved AND comment_type != 'block_comment'", $query );
+			}
+		}
+
+		return $query;
+	}
+	add_filter( 'query', 'filter_comment_count_query_exclude_block_comments' );
+}
