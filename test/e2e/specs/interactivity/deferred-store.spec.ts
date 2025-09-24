@@ -60,25 +60,30 @@ test.describe( 'deferred store', () => {
 		const hydrated = page.getByTestId( 'derived-state-hydrated' );
 		const increment = page.getByTestId( 'derived-bind-increment' );
 		const value = page.getByTestId( 'derived-bind-value' );
+		const value2 = page.getByTestId( 'derived-bind-value-2' );
 
 		await expect( hydrated ).toBeVisible();
 		await expect( loaded ).toBeHidden();
 		await expect( value ).toHaveValue( 'bind-42' );
+		await expect( value2 ).toHaveValue( 'bind-42' );
 
 		// The `+` button doesn't work yet; nothing changes.
 		await increment.click();
 		await expect( loaded ).toBeHidden();
 		await expect( value ).toHaveValue( 'bind-42' );
+		await expect( value2 ).toHaveValue( 'bind-42' );
 
 		// The element displays the derived state prop's value from the getter.
 		await load.click();
 		await expect( loaded ).toBeVisible();
 		await expect( value ).toHaveValue( 'bind-42' );
+		await expect( value2 ).toHaveValue( 'bind-42' );
 
 		// The button works, and the value updated.
 		await increment.click();
 		await expect( loaded ).toBeVisible();
 		await expect( value ).toHaveValue( 'bind-43' );
+		await expect( value2 ).toHaveValue( 'bind-43' );
 	} );
 
 	test( 'Ensure class keeps the value of a derived state props from deferred store', async ( {

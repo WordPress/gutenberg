@@ -37,9 +37,12 @@ window.addEventListener(
 	{ once: true }
 );
 
-store( 'test/deferred-store/derived-state', {
+const { state } = store( 'test/deferred-store/derived-state', {
 	state: {
 		hydrated: true,
+		get existingValue() {
+			return state.value;
+		},
 	},
 	actions: {
 		load() {

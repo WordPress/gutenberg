@@ -87,6 +87,14 @@ add_filter(
 		data-wp-bind--value="state.value"
 		data-testid="derived-bind-value"
 	>
+	<input
+		name="derived-bind-2"
+		type="text"
+		value="bind-42"
+		readonly
+		data-wp-bind--value="state.existingValue"
+		data-testid="derived-bind-value-2"
+	>
 	<button data-wp-on--click="actions.increment" data-testid="derived-bind-increment">+</button>
 </div>
 
