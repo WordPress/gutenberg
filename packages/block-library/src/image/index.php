@@ -160,7 +160,12 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 
 	wp_interactivity_config(
 		'core/image',
-		array( 'defaultAriaLabel' => __( 'Enlarged image' ) )
+		array(
+			'defaultAriaLabel' => __( 'Enlarged image' ),
+			'closeButtonText'  => esc_html__( 'Close' ),
+			'prevButtonText'   => esc_html__( 'Previous' ),
+			'nextButtonText'   => esc_html__( 'Next' ),
+		)
 	);
 
 	if ( $alt ) {
@@ -273,10 +278,6 @@ function block_core_image_print_lightbox_overlay() {
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
 
-	$close_button_label_attr = ' aria-label="' . esc_attr( $close_button_text ) . '"';
-	$prev_button_label_attr  = ' aria-label="' . esc_attr( $prev_button_text ) . '"';
-	$next_button_label_attr  = ' aria-label="' . esc_attr( $next_button_text ) . '"';
-
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
 	// default values because it can't get them from the Global Styles.
@@ -317,12 +318,12 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-bind--style="state.overlayStyles"
 			tabindex="-1"
 			>
-				<button type="button"{$close_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-close-button">
+				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-close-button" data-wp-bind--aria-label="state.closeButtonAriaLabel">
 					<span class="wp-lightbox-close-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$close_button_icon}</span>
 					<span class="wp-lightbox-close-text" data-wp-bind--hidden="!state.hasNavigationText">{$close_button_text}</span>
 				</button>
 				<div class="wp-lightbox-navigation-container-prev" data-wp-bind--hidden="!state.hasNavigation">
-					<button type="button"{$prev_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">
+					<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage" data-wp-bind--aria-label="state.prevButtonAriaLabel">
 						<span class="wp-lightbox-prev-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
 						<span class="wp-lightbox-prev-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 					</button>
@@ -338,7 +339,7 @@ function block_core_image_print_lightbox_overlay() {
 					</figure>
 				</div>
 				<div class="wp-lightbox-navigation-container-next" data-wp-bind--hidden="!state.hasNavigation">
-					<button type="button"{$next_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
+					<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 						<span class="wp-lightbox-next-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 						<span class="wp-lightbox-next-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 					</button>

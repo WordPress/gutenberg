@@ -98,6 +98,21 @@ const { state, actions, callbacks } = store(
 					getConfig().defaultAriaLabel
 				);
 			},
+			get closeButtonAriaLabel() {
+				return state.hasNavigationText
+					? undefined
+					: getConfig().closeButtonText;
+			},
+			get prevButtonAriaLabel() {
+				return state.hasNavigationText
+					? undefined
+					: getConfig().prevButtonText;
+			},
+			get nextButtonAriaLabel() {
+				return state.hasNavigationText
+					? undefined
+					: getConfig().nextButtonText;
+			},
 			get enlargedSrc() {
 				return (
 					state.selectedImage.uploadedSrc ||
