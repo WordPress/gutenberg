@@ -283,7 +283,7 @@ const CommentBoard = ( {
 			},
 	];
 
-	const canResolve = thread?.parent === 0 && 'hold' === status;
+	const canResolve = thread?.parent === 0 && onResolve;
 	const moreActions = actions.filter( ( item ) => item?.onClick );
 
 	return (
