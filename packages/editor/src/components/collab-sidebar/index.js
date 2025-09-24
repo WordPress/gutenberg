@@ -237,11 +237,10 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { postId, postType } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+	const { postId } = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( editorStore );
 		return {
 			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
 		};
 	}, [] );
 
@@ -263,7 +262,7 @@ export default function CollabSidebar() {
 	};
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
-		useBlockComments( postId, postType );
+		useBlockComments( postId );
 
 	const hasMoreComments = totalPages && totalPages > 1;
 

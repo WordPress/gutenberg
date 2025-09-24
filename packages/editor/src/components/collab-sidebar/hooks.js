@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import { useEntityBlockEditor, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import { getCommentIdsFromBlocks } from './utils';
-
-export function useBlockComments( postId, postType ) {
+export function useBlockComments( postId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'block_comment',
@@ -24,9 +21,18 @@ export function useBlockComments( postId, postType ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
+	const blocksWithComments = useSelect( ( select ) => {
+		const { getBlockAttributes, getClientIdsWithDescendants } =
+			select( blockEditorStore );
+
+		return getClientIdsWithDescendants().reduce( ( results, clientId ) => {
+			const commentId = getBlockAttributes( clientId )?.blockCommentId;
+			if ( commentId ) {
+				results[ commentId ] = clientId;
+			}
+			return results;
+		}, {} );
+	}, [] );
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
@@ -36,9 +42,14 @@ export function useBlockComments( postId, postType ) {
 
 		const allComments = threads ?? [];
 
-		// Initialize each object with an empty `reply` array.
+		// Initialize each object with an empty `reply` array and map blockClientId.
 		allComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
+			compare[ item.id ] = {
+				...item,
+				reply: [],
+				blockId:
+					item.parent === 0 ? blocksWithComments[ item.id ] : null,
+			};
 		} );
 
 		// Iterate over the data to build the tree structure.
@@ -61,14 +72,12 @@ export function useBlockComments( postId, postType ) {
 			reply: [ ...item.reply ].reverse(),
 		} ) );
 
-		const blockCommentIds = getCommentIdsFromBlocks( blocks );
-
 		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ thread.id, thread ] )
+			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
 		);
 
 		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = blockCommentIds
+		const unresolvedSortedComments = Object.keys( blocksWithComments )
 			.map( ( id ) => threadIdMap.get( id ) )
 			.filter(
 				( thread ) =>
@@ -79,7 +88,7 @@ export function useBlockComments( postId, postType ) {
 			resultComments: updatedResult,
 			unresolvedSortedThreads: unresolvedSortedComments,
 		};
-	}, [ threads, blocks ] );
+	}, [ threads, blocksWithComments ] );
 
 	return { resultComments, unresolvedSortedThreads, totalPages };
 }
