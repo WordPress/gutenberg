@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useMemo } from '@wordpress/element';
+import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -31,28 +31,6 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
-
-/**
- * Finds the first block that has the specified comment ID.
- *
- * @param {string} commentId - The comment ID to search for.
- * @param {Array}  blockList - The list of blocks to search through.
- * @return {string|null} The client ID of the found block, or null if not found.
- */
-const findBlockByCommentId = ( commentId, blockList ) => {
-	for ( const block of blockList ) {
-		if ( block.attributes?.blockCommentId === commentId ) {
-			return block.clientId;
-		}
-		if ( block.innerBlocks ) {
-			const found = findBlockByCommentId( commentId, block.innerBlocks );
-			if ( found ) {
-				return found;
-			}
-		}
-	}
-	return null;
-};
 
 /**
  * Renders the Comments component.
@@ -133,31 +111,17 @@ function Thread( {
 	setShowCommentBoard,
 } ) {
 	const { flashBlock } = useDispatch( blockEditorStore );
-	const { blocks } = useSelect( ( select ) => {
-		return {
-			blocks: select( blockEditorStore ).getBlocks(),
-		};
-	}, [] );
+	const relatedBlockElement = useBlockElement( thread.blockClientId );
 
-	// Find first block that has this comment ID - run at component root level.
-	const relatedBlock = useMemo( () => {
-		if ( ! thread.id || ! blocks ) {
-			return null;
-		}
-		return findBlockByCommentId( thread.id, blocks );
-	}, [ thread.id, blocks ] );
-
-	const relatedBlockElement = useBlockElement( relatedBlock );
-
-	const handleCommentSelect = ( threadId ) => {
+	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
-		setFocusThread( threadId );
-		if ( relatedBlock && relatedBlockElement ) {
+		setFocusThread( id );
+		if ( blockClientId && relatedBlockElement ) {
 			relatedBlockElement.scrollIntoView( {
 				behavior: 'instant',
 				block: 'center',
 			} );
-			flashBlock( relatedBlock );
+			flashBlock( blockClientId );
 		}
 	};
 
@@ -173,7 +137,7 @@ function Thread( {
 			} ) }
 			id={ thread.id }
 			spacing="3"
-			onClick={ () => handleCommentSelect( thread.id ) }
+			onClick={ () => handleCommentSelect( thread ) }
 		>
 			<CommentBoard
 				thread={ thread }

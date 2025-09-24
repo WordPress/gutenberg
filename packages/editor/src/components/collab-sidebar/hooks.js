@@ -47,7 +47,7 @@ export function useBlockComments( postId ) {
 			compare[ item.id ] = {
 				...item,
 				reply: [],
-				blockId:
+				blockClientId:
 					item.parent === 0 ? blocksWithComments[ item.id ] : null,
 			};
 		} );
