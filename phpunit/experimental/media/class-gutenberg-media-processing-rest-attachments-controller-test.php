@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @coversDefaultClass \Gutenberg_REST_Attachments_Controller
+ * @coversDefaultClass \Gutenberg_Media_Processing_REST_Attachments_Controller
  */
-class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
+class Gutenberg_Media_Processing_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
 	/**
 	 * @var int Administrator ID.
 	 */
@@ -282,7 +282,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-
+		
 		$attachment_id = $data['id'];
 
 		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );

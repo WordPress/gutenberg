@@ -94,16 +94,14 @@ add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
  * @param string $post_type Post type key.
  */
 function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
-	if ( 'attachment' === $post_type ) {
-		require_once __DIR__ . '/class-gutenberg-rest-attachments-controller.php';
+	require_once __DIR__ . '/class-gutenberg-media-processing-rest-attachments-controller.php';
 
-		$args['rest_controller_class'] = Gutenberg_REST_Attachments_Controller::class;
-	}
+	$args['rest_controller_class'] = Gutenberg_Media_Processing_REST_Attachments_Controller::class;
 
 	return $args;
 }
 
-add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
+add_filter( 'register_attachment_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
 
 
 /**

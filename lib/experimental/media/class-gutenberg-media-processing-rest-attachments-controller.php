@@ -1,14 +1,14 @@
 <?php
 /**
- * Class Gutenberg_REST_Attachments_Controller.
+ * Class Gutenberg_Media_Processing_REST_Attachments_Controller.
  *
  * @package MediaExperiments
  */
 
 /**
- * Class Gutenberg_REST_Attachments_Controller.
+ * Class Gutenberg_Media_Processing_REST_Attachments_Controller.
  */
-class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
+class Gutenberg_Media_Processing_REST_Attachments_Controller extends Gutenberg_REST_Attachments_Controller {
 	/**
 	 * Registers the routes for attachments.
 	 *

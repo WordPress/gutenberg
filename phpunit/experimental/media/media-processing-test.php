@@ -55,15 +55,11 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	 */
 	public function test_filter_attachment_post_type_args() {
 		$post_type_object = get_post_type_object( 'attachment' );
-		$this->assertInstanceOf( Gutenberg_REST_Attachments_Controller::class, $post_type_object->get_rest_controller() );
+		$this->assertInstanceOf( Gutenberg_Media_Processing_REST_Attachments_Controller::class, $post_type_object->get_rest_controller() );
 
 		$this->assertSame(
-			array( 'rest_controller_class' => Gutenberg_REST_Attachments_Controller::class ),
+			array( 'rest_controller_class' => Gutenberg_Media_Processing_REST_Attachments_Controller::class ),
 			gutenberg_filter_attachment_post_type_args( array(), 'attachment' )
-		);
-		$this->assertSame(
-			array(),
-			gutenberg_filter_attachment_post_type_args( array(), 'post' )
 		);
 	}
 

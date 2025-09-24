@@ -29,3 +29,19 @@ function gutenberg_rest_theme_export_link_rel( $response, $theme ) {
 	return $response;
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 );
+
+
+/**
+ * Overrides the REST controller for the `attachment` post type.
+ *
+ * @param array $args Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ *
+ * @return array Array of arguments for registering a post type.
+ */
+function gutenberg_override_attachments_endpoint( array $args ): array {
+	$args['rest_controller_class']   = 'Gutenberg_REST_Attachments_Controller';
+
+	return $args;
+}
+add_filter( 'register_attachment_post_type_args', 'gutenberg_override_attachments_endpoint' );
