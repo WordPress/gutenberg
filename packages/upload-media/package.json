@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.16.0",
+	"version": "0.16.1-next.f56bd8138.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
