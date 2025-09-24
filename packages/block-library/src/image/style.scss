@@ -217,6 +217,7 @@
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px
 		display: flex;
+		gap: 4px;
 		align-items: center;
 		justify-content: center;
 
@@ -226,6 +227,15 @@
 			background: none;
 			border: none;
 		}
+
+		&:has(.wp-lightbox-close-text:not([hidden])) .wp-lightbox-close-icon svg {
+			height: 1em;
+			width: 1em;
+		}
+	}
+
+	.wp-lightbox-close-icon svg {
+		vertical-align: middle;
 	}
 
 	.wp-lightbox-navigation-container-prev,
@@ -247,10 +257,18 @@
 		}
 	}
 
+	.wp-lightbox-navigation-container-prev {
+		left: calc(env(safe-area-inset-left) + 16px);
+	}
+
+	.wp-lightbox-navigation-container-next {
+		right: calc(env(safe-area-inset-right) + 16px);
+	}
+
 	.wp-lightbox-navigation-button {
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
-		gap: 8px;
+		gap: 4px;
 		display: flex;
 		cursor: pointer;
 		align-items: center;
@@ -267,14 +285,15 @@
 			border: none;
 			padding: 0 8px;
 		}
+
+		&:has(.wp-lightbox-navigation-text:not([hidden])) .wp-lightbox-navigation-icon svg {
+			width: 1.5em;
+			height: 1.5em;
+		}
 	}
 
-	.wp-lightbox-navigation-container-prev {
-		left: calc(env(safe-area-inset-left) + 16px);
-	}
-
-	.wp-lightbox-navigation-container-next {
-		right: calc(env(safe-area-inset-right) + 16px);
+	.wp-lightbox-navigation-icon svg {
+		vertical-align: middle;
 	}
 
 	.lightbox-image-container {
