@@ -784,7 +784,7 @@ test.describe( 'Registered sources', () => {
 				} )
 				.click();
 			await page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Text Field Label' } )
 				.click();
 			const paragraphBlock = editor.canvas.getByRole( 'document', {
@@ -925,12 +925,12 @@ test.describe( 'Registered sources', () => {
 				} )
 				.click();
 			const textField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Text Field Label' } );
 			await expect( textField ).toBeVisible();
 			await expect( textField ).toBeChecked();
 			const urlField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'URL Field Label' } );
 			await expect( urlField ).toBeVisible();
 			await expect( urlField ).not.toBeChecked();

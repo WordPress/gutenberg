@@ -52,7 +52,6 @@ function BlockBindingsPanelMenuContent( {
 } ) {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockBindings } = useBlockBindingsUtils();
-	const currentKey = binding?.args?.key;
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const attributeType = useSelect(
 		( select ) => {
@@ -94,21 +93,42 @@ function BlockBindingsPanelMenuContent( {
 							<Menu.Popover gutter={ 8 }>
 								<Menu.Group>
 									{ sourceDataItems.map( ( item ) => (
-										<Menu.RadioItem
+										<Menu.CheckboxItem
 											key={ item.key }
 											onChange={ () => {
+												if (
+													binding?.source ===
+													sourceKey
+												) {
+													// Unset if the same item is selected again.
+													updateBlockBindings( {
+														[ attribute ]:
+															undefined,
+													} );
+													return;
+												}
 												updateBlockBindings( {
 													[ attribute ]: {
 														source: sourceKey,
-														args: {
-															key: item.key,
-														},
+														args: source.getArgs?.(
+															{
+																item,
+																binding,
+															}
+														) || { key: item.key },
 													},
 												} );
 											} }
 											name={ attribute + '-binding' }
 											value={ item.key }
-											checked={ item.key === currentKey }
+											checked={
+												source.isSelected?.( {
+													item,
+													binding,
+												} ) ||
+												// Deprecate key dependency in 7.0.
+												item.key === binding?.args?.key
+											}
 										>
 											<Menu.ItemLabel>
 												{ item?.label }
@@ -116,7 +136,7 @@ function BlockBindingsPanelMenuContent( {
 											<Menu.ItemHelpText>
 												{ item?.value }
 											</Menu.ItemHelpText>
-										</Menu.RadioItem>
+										</Menu.CheckboxItem>
 									) ) }
 								</Menu.Group>
 							</Menu.Popover>
@@ -269,7 +289,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
-				( [ sourceName, { editorUI, usesContext, label } ] ) => {
+				( [
+					sourceName,
+					{ editorUI, getFieldsList, usesContext, label },
+				] ) => {
 					if ( editorUI ) {
 						// Populate context.
 						const context = {};
@@ -305,6 +328,56 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								...editorUIResult,
 								label,
 							};
+						}
+					} else if ( getFieldsList ) {
+						// Backward compatibility: Convert getFieldsList to editorUI format
+						const context = {};
+						if ( usesContext?.length ) {
+							for ( const key of usesContext ) {
+								context[ key ] = blockContext[ key ];
+							}
+						}
+
+						const fieldsListResult = getFieldsList( {
+							select,
+							context,
+						} );
+
+						if ( fieldsListResult ) {
+							// Convert getFieldsList format to editorUI format
+							const data = Object.entries( fieldsListResult ).map(
+								( [ key, field ] ) => ( {
+									key,
+									label: field.label || key,
+									value: field.value,
+									type: field.type || 'string',
+								} )
+							);
+
+							const hasCompatibleData = bindableAttributes.some(
+								( attribute ) => {
+									const _attributeType =
+										getBlockType( blockName ).attributes?.[
+											attribute
+										]?.type;
+									const attributeType =
+										_attributeType === 'rich-text'
+											? 'string'
+											: _attributeType;
+
+									return data.some(
+										( item ) => item?.type === attributeType
+									);
+								}
+							);
+
+							if ( hasCompatibleData ) {
+								_sources[ sourceName ] = {
+									mode: 'dropdown', // Default mode for backward compatibility
+									data,
+									label,
+								};
+							}
 						}
 					} else {
 						/*

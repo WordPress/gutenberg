@@ -153,6 +153,10 @@ export default {
 
 		return false;
 	},
+	getFieldsList( { select, context } ) {
+		// Deprecated, will be removed after 6.9.
+		return getTermDataFields( select, context );
+	},
 	editorUI( { select, context } ) {
 		const termDataFields = Object.entries(
 			getTermDataFields( select, context ) || {}
@@ -168,6 +172,14 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: termDataFields,
+			getArgs( { item } ) {
+				return {
+					key: item.key,
+				};
+			},
+			isSelected( { item, binding } ) {
+				return binding?.args?.key === item.key;
+			},
 		};
 	},
 };

@@ -157,6 +157,8 @@ The function to register a custom source is `registerBlockBindingsSource( args )
     - `getValues`: `function` that retrieves the values from the source. (optional)
     - `setValues`: `function` that allows updating the values connected to the source. (optional)
     - `canUserEditValue`: `function` to determine if the user can edit the value. The user won't be able to edit by default. (optional)
+    - `editorUI`: `function` that provides UI configuration for connecting to the source in the editor. (optional)
+    - ~~`getFieldsList`~~: **Deprecated since WordPress 6.9.** Use `editorUI` instead for better UI integration and more flexibility. (optional)
 
 
 This example will show a custom post meta date in the editor and, if it doesn't exist, it will show today's date. The user can edit the value of the date. (Caution: This example does not format the user input as a date—it's only for educational purposes.)
@@ -232,6 +234,138 @@ The `setValues` function updates all the values of the source of the block bound
 - `dispatch` returns an `object` of the store's action creators. [More about dispatch](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#dispatch).
 - `select` returns an `object` of a given store's selectors. [More info in their docs.](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-data/#select).
 
+#### editorUI
+
+_**Note:** Since WordPress 6.9._
+
+The `editorUI` property provides configuration for how the source appears in the block editor's bindings UI. It should be a function that returns a configuration object, allowing for dynamic data based on context.
+
+When `editorUI` is a function, it receives an `object` as an argument with the following properties:
+
+- `context` returns an `object` of the current block context, defined in the `usesContext` property.
+- `select` returns an `object` of a given store's selectors.
+
+The function or object must return/be an object with this structure:
+
+- `mode`: `string` - Either `'dropdown'` for a dropdown interface or `'modal'` for a modal interface.
+- `data`: `array` - An array of available fields, each with:
+    - `key`: `string` - Unique identifier for the field
+    - `label`: `string` - Human-readable label
+    - `value`: `any` - Current value of the field
+    - `type`: `string` - Data type (`'string'`, `'number'`, `'boolean'`, etc.)
+- `getArgs`: `function` (optional). Accepts an object with an item. - Returns the source arguments for the selected item. Used for dropdown mode to customize the binding arguments.
+- `isSelected`: `function` (optional). Accepts an object with item and binding. - Returns whether the field is currently selected. Used for dropdown mode to determine the checked state.
+- `renderModalContent`: `function` (required for modal mode) - Function that renders the modal content. Receives an object with the `attribute` property.
+
+Example:
+
+```js
+registerBlockBindingsSource( {
+	name: 'my-plugin/custom-fields',
+	label: 'Custom Fields',
+	editorUI( { select, context } ) {
+		const customFields = getCustomFields( select, context );
+		return {
+			mode: 'dropdown',
+			data: Object.entries( customFields ).map( ( [ key, field ] ) => ( {
+				key,
+				label: field.label,
+				value: field.value,
+				type: field.type,
+			} ) ),
+			getArgs( { item } ) {
+				return {
+					key: item.key,
+				};
+			},
+			isSelected( { item, binding } ) {
+				return binding?.args?.key === item.key;
+			},
+		};
+	},
+} );
+```
+
+For modal mode, here's a complete example:
+
+```js
+registerBlockBindingsSource( {
+	name: 'my-plugin/modal-fields',
+	label: 'Modal Fields',
+	editorUI( { select, context } ) {
+		const fields = getModalFields( select, context );
+		return {
+			mode: 'modal',
+			data: Object.entries( fields ).map( ( [ key, field ] ) => ( {
+				key,
+				label: field.label,
+				value: field.value,
+				type: field.type,
+			} ) ),
+			renderModalContent( { attribute } ) {
+				const { updateBlockBindings } = useBlockBindingsUtils();
+
+				return (
+					<div style={ { padding: '20px' } }>
+						<h3>Select Field</h3>
+						<p>Choose a field to bind to the { attribute } attribute:</p>
+						{ fields.map( ( field ) => (
+							<button
+								key={ field.key }
+								onClick={ () => {
+									updateBlockBindings( {
+										[ attribute ]: {
+											source: 'my-plugin/modal-fields',
+											args: { key: field.key }
+										}
+									} );
+								} }
+								style={ {
+									display: 'block',
+									margin: '8px 0',
+									padding: '10px',
+									width: '100%'
+								} }
+							>
+								{ field.label }
+							</button>
+						) ) }
+					</div>
+				);
+			},
+		};
+	},
+} );
+```
+
+#### Migration from getFieldsList
+
+If you're migrating from the deprecated `getFieldsList` property, here's how to convert it:
+
+**Before (deprecated):**
+
+```js
+getFieldsList( { select, context } ) {
+	return {
+		field1: { label: 'Field 1', value: 'value1', type: 'string' },
+		field2: { label: 'Field 2', value: 'value2', type: 'number' }
+	};
+}
+```
+
+**After (recommended):**
+
+```js
+editorUI( { select, context } ) {
+	return {
+		mode: 'dropdown',
+		data: [
+			{ key: 'field1', label: 'Field 1', value: 'value1', type: 'string' },
+			{ key: 'field2', label: 'Field 2', value: 'value2', type: 'number' }
+		]
+	};
+}
+```
 
 #### Editor registration Core examples
 

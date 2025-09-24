@@ -122,6 +122,10 @@ export default {
 
 		return true;
 	},
+	getFieldsList( { select, context } ) {
+		// Deprecated, will be removed after 6.9.
+		return getPostDataFields( select, context );
+	},
 	editorUI( { select, context } ) {
 		const selectedBlock = select( 'core/block-editor' ).getSelectedBlock();
 		if ( selectedBlock?.name !== 'core/post-date' ) {
@@ -141,6 +145,14 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: postDataFields,
+			getArgs( { item } ) {
+				return {
+					key: item.key,
+				};
+			},
+			isSelected( { item, binding } ) {
+				return binding?.args?.key === item.key;
+			},
 		};
 	},
 };
