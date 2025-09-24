@@ -198,6 +198,7 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 					'alt'                    => $alt,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
+					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
 					'triggerButtonAriaLabel' => null,
 				),
 			),
@@ -252,10 +253,8 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 
 	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
 
-	$block_context = $block_instance->context;
-
-	$overlay_callback = function () use ( $block_context ) {
-			block_core_image_print_lightbox_overlay( $block_context );
+	$overlay_callback = function () {
+		block_core_image_print_lightbox_overlay();
 	};
 	add_action( 'wp_footer', $overlay_callback );
 
@@ -265,37 +264,18 @@ function block_core_image_render_lightbox( $block_content, $block, $block_instan
 /**
  * @since 6.5.0
  */
-function block_core_image_print_lightbox_overlay( $block_context ) {
-	$dialog_label           = esc_attr__( 'Enlarged images' );
-	$navigation_button_type = $block_context['navigationButtonType'] ?? 'icon';
-	$close_button_text      = esc_attr__( 'Close' );
-	$prev_button_text       = esc_attr__( 'Previous' );
-	$next_button_text       = esc_attr__( 'Next' );
-	$close_button_icon      = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
-	$prev_button_icon       = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
-	$next_button_icon       = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
+function block_core_image_print_lightbox_overlay() {
+	$dialog_label      = esc_attr__( 'Enlarged images' );
+	$close_button_text = esc_attr__( 'Close' );
+	$prev_button_text  = esc_attr__( 'Previous' );
+	$next_button_text  = esc_attr__( 'Next' );
+	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
+	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
+	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
 
-	switch ( $navigation_button_type ) {
-		case 'text':
-			$close_button_content = $close_button_text;
-			$prev_button_content  = $prev_button_text;
-			$next_button_content  = $next_button_text;
-			break;
-		case 'icon-and-text':
-			$close_button_content = $close_button_icon . $close_button_text;
-			$prev_button_content  = $prev_button_icon . $prev_button_text;
-			$next_button_content  = $next_button_text . $next_button_icon;
-			break;
-		default:
-			$close_button_content = $close_button_icon;
-			$prev_button_content  = $prev_button_icon;
-			$next_button_content  = $next_button_icon;
-			break;
-	}
-
-	$close_button_label_attr = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $close_button_text ) . '"' : '';
-	$prev_button_label_attr  = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $prev_button_text ) . '"' : '';
-	$next_button_label_attr  = 'icon' === $navigation_button_type ? ' aria-label="' . esc_attr( $next_button_text ) . '"' : '';
+	$close_button_label_attr = ' aria-label="' . esc_attr( $close_button_text ) . '"';
+	$prev_button_label_attr  = ' aria-label="' . esc_attr( $prev_button_text ) . '"';
+	$next_button_label_attr  = ' aria-label="' . esc_attr( $next_button_text ) . '"';
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
@@ -338,10 +318,14 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 			tabindex="-1"
 			>
 				<button type="button"{$close_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-close-button">
-					{$close_button_content}
+					<span class="wp-lightbox-close-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$close_button_icon}</span>
+					<span class="wp-lightbox-close-text" data-wp-bind--hidden="!state.hasNavigationText">{$close_button_text}</span>
 				</button>
 				<div class="wp-lightbox-navigation-container-prev" data-wp-bind--hidden="!state.hasNavigation">
-					<button type="button"{$prev_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">{$prev_button_content}</button>
+					<button type="button"{$prev_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">
+						<span class="wp-lightbox-prev-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
+						<span class="wp-lightbox-prev-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
+					</button>
 				</div>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
@@ -355,7 +339,8 @@ function block_core_image_print_lightbox_overlay( $block_context ) {
 				</div>
 				<div class="wp-lightbox-navigation-container-next" data-wp-bind--hidden="!state.hasNavigation">
 					<button type="button"{$next_button_label_attr} style="fill:{$close_button_color}" class="wp-lightbox-navigation-button" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
-						{$next_button_content}
+						<span class="wp-lightbox-next-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
+						<span class="wp-lightbox-next-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 					</button>
 				</div>
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>

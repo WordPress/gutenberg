@@ -54,6 +54,20 @@ const { state, actions, callbacks } = store(
 			get selectedImage() {
 				return state.metadata[ state.selectedImageId ];
 			},
+			get hasNavigationIcon() {
+				const { navigationButtonType } = state.selectedImage;
+				return (
+					navigationButtonType === 'icon' ||
+					navigationButtonType === 'icon-and-text'
+				);
+			},
+			get hasNavigationText() {
+				const { navigationButtonType } = state.selectedImage;
+				return (
+					navigationButtonType === 'text' ||
+					navigationButtonType === 'icon-and-text'
+				);
+			},
 			get thisImage() {
 				const { imageId } = getContext();
 				return state.metadata[ imageId ];
