@@ -317,12 +317,12 @@ export const registerCoreBlocks = (
 		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
 			registerBlockType( blockName, {
 				title: blockName,
-				category: 'text',
-				edit: ( { attributes } ) =>
-					createElement( ServerSideRender, {
+				edit: ( { attributes } ) => {
+					return createElement( ServerSideRender, {
 						block: blockName,
 						attributes,
-					} ),
+					} );
+				},
 				save: () => null,
 			} );
 		} );
