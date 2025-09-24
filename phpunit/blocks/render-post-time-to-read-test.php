@@ -205,7 +205,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<div class="wp-block-post-time-to-read">948 words</div>';
+		$expected = '<div class="wp-block-post-time-to-read">341 words</div>';
 
 		$this->assertSame( $expected, $actual );
 	}
@@ -230,7 +230,7 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block, $context );
 
 		$actual   = gutenberg_render_block_core_post_time_to_read( $attributes, '', $block );
-		$expected = '<div class="wp-block-post-time-to-read">2 minutes<br>948 words</div>';
+		$expected = '<div class="wp-block-post-time-to-read">2 minutes<br>341 words</div>';
 
 		$this->assertSame( $expected, $actual );
 	}
