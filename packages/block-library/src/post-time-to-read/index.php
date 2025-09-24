@@ -27,7 +27,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$parts = array();
 
-	// Add time to read part if enabled
+	// Add "time to read" part, if enabled.
 	if ( $show_time_to_read ) {
 		if ( ! empty( $attributes['displayAsRange'] ) ) {
 			// Calculate faster reading rate with 20% speed = lower minutes,
