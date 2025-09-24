@@ -114,6 +114,7 @@ function gutenberg_add_editorial_comments_column( $columns ) {
 	return $columns;
 }
 add_filter( 'manage_posts_columns', 'gutenberg_add_editorial_comments_column' );
+add_filter( 'manage_pages_columns', 'gutenberg_add_editorial_comments_column' );
 
 /**
  * Render the editorial comments count for each row.
@@ -293,6 +294,7 @@ function gutenberg_filter_edit_post_sortable_columns( $columns ) {
 	return $columns;
 }
 add_filter( 'manage_edit-post_sortable_columns', 'gutenberg_filter_edit_post_sortable_columns' );
+add_filter( 'manage_edit-page_sortable_columns', 'gutenberg_filter_edit_post_sortable_columns' );
 
 /**
  * Filters for the comments page.
