@@ -32,8 +32,8 @@ function render_block_core_table_of_contents( $attributes ) {
 		)
 	);
 
-	$nested_headings = convert_linear_to_nested_headings( $headings );
-	$list_items      = build_nested_list_items( $nested_headings );
+	$nested_headings = block_core_table_of_contents_convert_linear_to_nested_headings( $headings );
+	$list_items      = block_core_table_of_contents_build_nested_list_items( $nested_headings );
 
 	$html = sprintf(
 		'<nav %s><ol>%s</ol></nav>',
@@ -55,7 +55,7 @@ function render_block_core_table_of_contents( $attributes ) {
  * @param array $headings Linear array of headings.
  * @return array Nested array of headings.
  */
-function convert_linear_to_nested_headings( $headings ) {
+function block_core_table_of_contents_convert_linear_to_nested_headings( $headings ) {
 	$nested_heading_list = array();
 
 	foreach ( $headings as $key => $heading ) {
@@ -74,14 +74,14 @@ function convert_linear_to_nested_headings( $headings ) {
 				}
 
 				$nested_heading_list[] = array(
-					'heading' => $heading,
-					'children' => convert_linear_to_nested_headings(
+					'heading'  => $heading,
+					'children' => block_core_table_of_contents_convert_linear_to_nested_headings(
 						array_slice( $headings, $key + 1, $end_of_slice - $key - 1 )
 					),
 				);
 			} else {
 				$nested_heading_list[] = array(
-					'heading' => $heading,
+					'heading'  => $heading,
 					'children' => array(),
 				);
 			}
@@ -97,12 +97,12 @@ function convert_linear_to_nested_headings( $headings ) {
  * @param array $nested_headings Nested array of headings.
  * @return string HTML for nested list items.
  */
-function build_nested_list_items( $nested_headings ) {
+function block_core_table_of_contents_build_nested_list_items( $nested_headings ) {
 	$html = '';
 
 	foreach ( $nested_headings as $item ) {
 		$heading = $item['heading'];
-		$link = ! empty( $heading['link'] ) ? $heading['link'] : '';
+		$link    = ! empty( $heading['link'] ) ? $heading['link'] : '';
 
 		$html .= '<li>';
 		$html .= sprintf(
@@ -112,7 +112,7 @@ function build_nested_list_items( $nested_headings ) {
 		);
 
 		if ( ! empty( $item['children'] ) ) {
-			$html .= '<ol>' . build_nested_list_items( $item['children'] ) . '</ol>';
+			$html .= '<ol>' . block_core_table_of_contents_build_nested_list_items( $item['children'] ) . '</ol>';
 		}
 
 		$html .= '</li>';
