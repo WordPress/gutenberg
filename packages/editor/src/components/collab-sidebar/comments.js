@@ -78,19 +78,16 @@ export function Comments( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId, blocks } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
+	const { blockCommentId } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
+		const clientId = getSelectedBlockClientId();
 		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
+			blockCommentId: clientId
+				? getBlockAttributes( clientId )?.blockCommentId
 				: null,
-			blocks: getBlocks(),
 		};
 	}, [] );
-
-	const { flashBlock } = useDispatch( blockEditorStore );
 
 	const clearThreadFocus = () => {
 		setFocusThread( null );
@@ -106,7 +103,7 @@ export function Comments( {
 		if ( blockCommentId && ! focusThread ) {
 			setFocusThread( blockCommentId );
 		}
-	}, [ blockCommentId, focusThread, blocks, setFocusThread ] );
+	}, [ blockCommentId, focusThread, setFocusThread ] );
 
 	return (
 		<>
@@ -140,9 +137,6 @@ export function Comments( {
 						isFocused={ focusThread === thread.id }
 						clearThreadFocus={ clearThreadFocus }
 						setFocusThread={ setFocusThread }
-						blockCommentId={ blockCommentId }
-						blocks={ blocks }
-						flashBlock={ flashBlock }
 						setShowCommentBoard={ setShowCommentBoard }
 					/>
 				) ) }
@@ -160,10 +154,15 @@ function Thread( {
 	isFocused,
 	clearThreadFocus,
 	setFocusThread,
-	blocks,
-	flashBlock,
 	setShowCommentBoard,
 } ) {
+	const { flashBlock } = useDispatch( blockEditorStore );
+	const { blocks } = useSelect( ( select ) => {
+		return {
+			blocks: select( blockEditorStore ).getBlocks(),
+		};
+	}, [] );
+
 	// Find first block that has this comment ID - run at component root level.
 	const relatedBlock = useMemo( () => {
 		if ( ! thread.id || ! blocks ) {
