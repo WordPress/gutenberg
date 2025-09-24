@@ -30,12 +30,12 @@ import {
 	getEvaluate,
 	isDefaultDirectiveSuffix,
 	isNonDefaultDirectiveSuffix,
-	PENDING_GETTER,
 	type DirectiveCallback,
 	type DirectiveEntry,
 } from './hooks';
 import { getScope } from './scopes';
 import { proxifyState, proxifyContext, deepMerge } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
 
 const warnUniqueIdWithTwoHyphens = (
 	prefix: string,

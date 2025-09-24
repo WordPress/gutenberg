@@ -17,14 +17,10 @@ import type { VNode, Context } from 'preact';
 /**
  * Internal dependencies
  */
-import {
-	store,
-	stores,
-	universalUnlock,
-	derivedStatePropsAccessed,
-} from './store';
-import { warn, isPlainObject, type SyncAwareFunction } from './utils';
+import { store, stores, universalUnlock } from './store';
+import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
+import { PENDING_GETTER } from './proxies/state';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -206,13 +202,6 @@ export const directive = (
 	directivePriorities[ name ] = priority;
 };
 
-export const PENDING_GETTER = Symbol( 'PENDING_GETTER' );
-
-const isAnInvokedGetter = ( namespace: string, path: string ) =>
-	( derivedStatePropsAccessed[ namespace ] as string[] )?.some(
-		( getterPath ) => path === getterPath
-	);
-
 // Resolve the path to some property of the store object.
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
@@ -238,21 +227,7 @@ const resolve = ( path: string, namespace: string ) => {
 
 	try {
 		const pathParts = path.split( '.' );
-		return pathParts.reduce( ( acc, key, index ) => {
-			// Subscribe to the prop, even when it doesn't exist yet.
-			const value = acc[ key ];
-			if (
-				// Getters are serialized as plain objects from PHP.
-				isPlainObject( value ) &&
-				isAnInvokedGetter(
-					namespace,
-					pathParts.slice( 0, index + 1 ).join( '.' )
-				)
-			) {
-				throw PENDING_GETTER;
-			}
-			return value;
-		}, current );
+		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
 	} catch ( e ) {
 		if ( e === PENDING_GETTER ) {
 			return PENDING_GETTER;
