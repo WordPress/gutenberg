@@ -60,6 +60,7 @@
 	<!-- Exclude third party libraries -->
 	<exclude-pattern>/vendor/*</exclude-pattern>
 	<exclude-pattern>/test/php/gutenberg-coding-standards/*</exclude-pattern>
+	<exclude-pattern>/phpunit/includes/mock-image-editor\.php$</exclude-pattern>
 
 	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg
 	     DO NOT REMOVE these rules; these files are "built" artifacts from Core

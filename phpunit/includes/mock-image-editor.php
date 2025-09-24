@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Mock image editor for testing.
+ * Note this is a duplicate of the WP_Image_Editor_Mock class in WordPress Core,
+ * used for the tests in phpunit/class-gutenberg-rest-attachments-controller-test.php.
+ * It can be deleted, along with the attachment tests, when the attachment tests in phpunit/class-gutenberg-rest-attachments-controller-test.php are merged into WordPress Core.
+ * See: https://github.com/WordPress/wordpress-develop/blob/trunk/tests/phpunit/includes/mock-image-editor.php
+ * 
+ *
+ * @package Gutenberg
+ */
+
 if ( class_exists( 'WP_Image_Editor' ) ) :
 
 	class WP_Image_Editor_Mock extends WP_Image_Editor {
