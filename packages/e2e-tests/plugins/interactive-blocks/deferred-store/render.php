@@ -17,11 +17,11 @@ wp_interactivity_state(
 	'test/deferred-store/derived-state',
 	array(
 		'value'   => function () {
-			$context = wp_interactivity_get_context( 'test/deferred-store/bind' );
-			return $context['counter'] * 2;
+			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
+			return 'bind-' . $context['counter'];
 		},
 		'below10' => function () {
-			$context = wp_interactivity_get_context( 'test/deferred-store/class' );
+			$context = wp_interactivity_get_context( 'test/deferred-store/derived-state' );
 			return $context['counter'] < 10;
 		},
 	)
