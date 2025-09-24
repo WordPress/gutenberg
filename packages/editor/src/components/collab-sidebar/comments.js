@@ -86,53 +86,39 @@ export function Comments( {
 				: null,
 		};
 	}, [] );
+	const [ focusThread, setFocusThread ] = useState( blockCommentId ?? null );
 
-	const clearThreadFocus = () => {
-		setFocusThread( null );
-		setShowCommentBoard( false );
-	};
+	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+	if ( ! hasThreads ) {
+		return (
+			<VStack
+				alignment="left"
+				className="editor-collab-sidebar-panel__thread"
+				justify="flex-start"
+				spacing="3"
+			>
+				{
+					// translators: message displayed when there are no comments available
+					__( 'No comments available' )
+				}
+			</VStack>
+		);
+	}
 
-	const [ focusThread, setFocusThread ] = useState(
-		blockCommentId ? blockCommentId : null
-	);
-
-	return (
-		<>
-			{
-				// If there are no comments, show a message indicating no comments are available.
-				( ! Array.isArray( threads ) || threads.length === 0 ) && (
-					<VStack
-						alignment="left"
-						className="editor-collab-sidebar-panel__thread"
-						justify="flex-start"
-						spacing="3"
-					>
-						{
-							// translators: message displayed when there are no comments available
-							__( 'No comments available' )
-						}
-					</VStack>
-				)
-			}
-			{ Array.isArray( threads ) &&
-				threads.length > 0 &&
-				threads.map( ( thread ) => (
-					<Thread
-						key={ thread.id }
-						thread={ thread }
-						onAddReply={ onAddReply }
-						onCommentDelete={ onCommentDelete }
-						onCommentResolve={ onCommentResolve }
-						onCommentReopen={ onCommentReopen }
-						onEditComment={ onEditComment }
-						isFocused={ focusThread === thread.id }
-						clearThreadFocus={ clearThreadFocus }
-						setFocusThread={ setFocusThread }
-						setShowCommentBoard={ setShowCommentBoard }
-					/>
-				) ) }
-		</>
-	);
+	return threads.map( ( thread ) => (
+		<Thread
+			key={ thread.id }
+			thread={ thread }
+			onAddReply={ onAddReply }
+			onCommentDelete={ onCommentDelete }
+			onCommentResolve={ onCommentResolve }
+			onCommentReopen={ onCommentReopen }
+			onEditComment={ onEditComment }
+			isFocused={ focusThread === thread.id }
+			setFocusThread={ setFocusThread }
+			setShowCommentBoard={ setShowCommentBoard }
+		/>
+	) );
 }
 
 function Thread( {
@@ -143,7 +129,6 @@ function Thread( {
 	onCommentResolve,
 	onCommentReopen,
 	isFocused,
-	clearThreadFocus,
 	setFocusThread,
 	setShowCommentBoard,
 } ) {
@@ -174,6 +159,11 @@ function Thread( {
 			} );
 			flashBlock( relatedBlock );
 		}
+	};
+
+	const clearThreadFocus = () => {
+		setFocusThread( null );
+		setShowCommentBoard( false );
 	};
 
 	return (
