@@ -37,6 +37,22 @@ const getValueFromId =
 		return value;
 	};
 
+export const setValueFromId =
+	( id: string ) =>
+	( { value }: { value: any } ) => {
+		const path = id.split( '.' );
+		const result: any = {};
+		let current = result;
+
+		for ( const segment of path.slice( 0, -1 ) ) {
+			current[ segment ] = {};
+			current = current[ segment ];
+		}
+
+		current[ path.at( -1 )! ] = value;
+		return result;
+	};
+
 function getFilterBy< Item >(
 	field: Field< Item >,
 	fieldTypeDefinition: FieldTypeDefinition< Item >
@@ -128,6 +144,7 @@ export function normalizeFields< Item >(
 			field.type
 		);
 		const getValue = field.getValue || getValueFromId( field.id );
+		const setValue = field.setValue || setValueFromId( field.id );
 
 		const sort =
 			field.sort ??
@@ -166,6 +183,7 @@ export function normalizeFields< Item >(
 			label: field.label || field.id,
 			header: field.header || field.label || field.id,
 			getValue,
+			setValue,
 			render,
 			sort,
 			isValid,

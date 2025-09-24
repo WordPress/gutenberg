@@ -4,7 +4,7 @@
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
-import { rotateLeft, rotateRight, help, brush, backup } from '@wordpress/icons';
+import { rotateLeft, rotateRight, help, backup } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -94,64 +94,6 @@ const getGlobalStylesResetCommands = () =>
 		};
 	};
 
-const getGlobalStylesOpenCssCommands = () =>
-	function useGlobalStylesOpenCssCommands() {
-		const { openGeneralSidebar, setEditorCanvasContainerView } = unlock(
-			useDispatch( editSiteStore )
-		);
-		const { params } = useLocation();
-		const { canvas = 'view' } = params;
-		const history = useHistory();
-		const { canEditCSS } = useSelect( ( select ) => {
-			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-				select( coreStore );
-
-			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-			const globalStyles = globalStylesId
-				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-				: undefined;
-
-			return {
-				canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
-			};
-		}, [] );
-
-		const commands = useMemo( () => {
-			if ( ! canEditCSS ) {
-				return [];
-			}
-
-			return [
-				{
-					name: 'core/edit-site/open-styles-css',
-					label: __( 'Open custom CSS' ),
-					icon: brush,
-					callback: ( { close } ) => {
-						close();
-						if ( canvas !== 'edit' ) {
-							history.navigate( '/styles?canvas=edit', {
-								transition: 'canvas-mode-edit-transition',
-							} );
-						}
-						openGeneralSidebar( 'edit-site/global-styles' );
-						setEditorCanvasContainerView( 'global-styles-css' );
-					},
-				},
-			];
-		}, [
-			history,
-			openGeneralSidebar,
-			setEditorCanvasContainerView,
-			canEditCSS,
-			canvas,
-		] );
-
-		return {
-			isLoading: false,
-			commands,
-		};
-	};
-
 const getGlobalStylesOpenRevisionsCommands = () =>
 	function useGlobalStylesOpenRevisionsCommands() {
 		const { openGeneralSidebar, setEditorCanvasContainerView } = unlock(
@@ -218,11 +160,6 @@ export function useCommonCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/reset-global-styles',
 		hook: getGlobalStylesResetCommands(),
-	} );
-
-	useCommandLoader( {
-		name: 'core/edit-site/open-styles-css',
-		hook: getGlobalStylesOpenCssCommands(),
 	} );
 
 	useCommandLoader( {

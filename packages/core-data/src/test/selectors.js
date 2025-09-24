@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	getEntityRecord,
+	hasEntityRecord,
 	hasEntityRecords,
 	getEntityRecords,
 	getRawEntityRecord,
@@ -276,6 +277,133 @@ describe( 'getEntityRecord', () => {
 				bar: undefined,
 			},
 		} );
+	} );
+} );
+
+describe( 'hasEntityRecord', () => {
+	it( 'returns false if entity record has not been received', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {},
+								itemIsComplete: {},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( hasEntityRecord( state, 'postType', 'post', 1 ) ).toBe( false );
+	} );
+
+	it( 'returns true when full record exists and no fields query', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										1: { id: 1, content: 'hello' },
+									},
+								},
+								itemIsComplete: {
+									default: {
+										1: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect( hasEntityRecord( state, 'postType', 'post', 1 ) ).toBe( true );
+	} );
+
+	it( 'returns true when requested fields exist on the item', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										1: {
+											id: 1,
+											content: 'chicken',
+											title: { raw: 'egg' },
+											author: 'bob',
+										},
+									},
+								},
+								itemIsComplete: {
+									default: {
+										1: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			hasEntityRecord( state, 'postType', 'post', 1, {
+				_fields: [ 'id', 'content' ],
+			} )
+		).toBe( true );
+		// Test nested field.
+		expect(
+			hasEntityRecord( state, 'postType', 'post', 1, {
+				_fields: [ 'id', 'title.raw' ],
+			} )
+		).toBe( true );
+	} );
+
+	it( 'returns false when a requested fields are missing', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							queriedData: {
+								items: {
+									default: {
+										1: { id: 1, author: 'bob' },
+									},
+								},
+								itemIsComplete: {
+									default: {
+										1: true,
+									},
+								},
+								queries: {},
+							},
+						},
+					},
+				},
+			},
+		} );
+		expect(
+			hasEntityRecord( state, 'postType', 'post', 1, {
+				_fields: [ 'id', 'content' ],
+			} )
+		).toBe( false );
+		// Test nested field.
+		expect(
+			hasEntityRecord( state, 'postType', 'post', 1, {
+				_fields: [ 'id', 'title.raw' ],
+			} )
+		).toBe( false );
 	} );
 } );
 
