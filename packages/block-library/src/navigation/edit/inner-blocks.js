@@ -6,7 +6,6 @@ import {
 	useInnerBlocksProps,
 	InnerBlocks,
 	store as blockEditorStore,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -23,7 +22,6 @@ export default function NavigationInnerBlocks( {
 	orientation,
 	templateLock,
 } ) {
-	const blockEditingMode = useBlockEditingMode();
 	const {
 		isImmediateParentOfSelectedBlock,
 		selectedBlockHasChildren,
@@ -95,9 +93,6 @@ export default function NavigationInnerBlocks( {
 			// the sibling inserter.
 			// See https://github.com/WordPress/gutenberg/issues/37572.
 			renderAppender: ( () => {
-				if ( blockEditingMode === 'contentOnly' ) {
-					return false;
-				}
 				if (
 					isSelected ||
 					( isImmediateParentOfSelectedBlock &&
