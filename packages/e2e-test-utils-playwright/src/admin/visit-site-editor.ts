@@ -8,7 +8,6 @@ interface SiteEditorOptions {
 	postType?: string;
 	path?: string;
 	canvas?: string;
-	activeView?: string;
 	showWelcomeGuide?: boolean;
 }
 
@@ -22,7 +21,7 @@ export async function visitSiteEditor(
 	this: Admin,
 	options: SiteEditorOptions = {}
 ) {
-	const { postId, postType, path, canvas, activeView } = options;
+	const { postId, postType, path, canvas } = options;
 	const query = new URLSearchParams();
 
 	if ( postId ) {
@@ -36,9 +35,6 @@ export async function visitSiteEditor(
 	}
 	if ( canvas ) {
 		query.set( 'canvas', canvas );
-	}
-	if ( activeView ) {
-		query.set( 'activeView', activeView );
 	}
 
 	await this.visitAdminPage( 'site-editor.php', query.toString() );

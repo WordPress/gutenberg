@@ -66,18 +66,6 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch, registry, resolveSelect } ) => {
-		// For back-compat, we allow querying for static templates through
-		// wp_template.
-		if (
-			kind === 'postType' &&
-			name === 'wp_template' &&
-			typeof key === 'string' &&
-			// __experimentalGetDirtyEntityRecords always calls getEntityRecord
-			// with a string key, so we need that it's not a numeric ID.
-			! /^\d+$/.test( key )
-		) {
-			name = 'wp_registered_template';
-		}
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -212,30 +200,6 @@ export const getEntityRecord =
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
-	};
-
-export const getTemplateAutoDraftId =
-	( staticTemplateId ) =>
-	async ( { resolveSelect, dispatch } ) => {
-		const record = await resolveSelect.getEntityRecord(
-			'postType',
-			'wp_registered_template',
-			staticTemplateId
-		);
-		const autoDraft = await dispatch.saveEntityRecord(
-			'postType',
-			'wp_template',
-			{
-				...record,
-				id: undefined,
-				type: 'wp_template',
-				status: 'auto-draft',
-			}
-		);
-		await dispatch.receiveTemplateAutoDraftId(
-			staticTemplateId,
-			autoDraft.id
-		);
 	};
 
 /**
@@ -866,36 +830,22 @@ export const getDefaultTemplateId =
 		// Wait for the the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
-		const id = template?.wp_id || template?.id;
 		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			template.type =
-				typeof id === 'string'
-					? 'wp_registered_template'
-					: 'wp_template';
+		if ( template?.id ) {
 			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
-				dispatch.receiveEntityRecords( 'postType', template.type, [
+				dispatch.receiveDefaultTemplateId( query, template.id );
+				dispatch.receiveEntityRecords( 'postType', 'wp_template', [
 					template,
 				] );
 				// Avoid further network requests.
 				dispatch.finishResolution( 'getEntityRecord', [
 					'postType',
-					template.type,
-					id,
+					'wp_template',
+					template.id,
 				] );
 			} );
 		}
 	};
-
-getDefaultTemplateId.shouldInvalidate = ( action ) => {
-	return (
-		action.type === 'EDIT_ENTITY_RECORD' &&
-		action.kind === 'root' &&
-		action.name === 'site'
-	);
-};
 
 /**
  * Requests an entity's revisions from the REST API.

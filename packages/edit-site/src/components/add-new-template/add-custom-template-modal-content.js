@@ -172,7 +172,9 @@ function AddCustomTemplateModalContent( {
 	onBack,
 	containerRef,
 } ) {
-	const [ showSearchEntities, setShowSearchEntities ] = useState();
+	const [ showSearchEntities, setShowSearchEntities ] = useState(
+		entityForSuggestions.hasGeneralTemplate
+	);
 
 	// Focus on the first focusable element when the modal opens.
 	// We handle focus management in the parent modal, just need to focus on the first focusable element.

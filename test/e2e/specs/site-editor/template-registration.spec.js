@@ -41,7 +41,6 @@ test.describe( 'Block template registration', () => {
 		// Verify template is listed in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
@@ -50,6 +49,7 @@ test.describe( 'Block template registration', () => {
 		await expect(
 			page.getByText( 'A template registered by a plugin.' )
 		).toBeVisible();
+		await expect( page.getByText( 'AuthorGutenberg' ) ).toBeVisible();
 
 		// Verify the template contents are rendered in the editor.
 		await page.getByText( 'Plugin Template' ).click();
@@ -62,18 +62,19 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'User-edited template' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await page.goto( '/?cat=1' );
 		await expect( page.getByText( 'User-edited template' ) ).toBeVisible();
 
 		// Verify template can be reset.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'user',
 		} );
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template" moved to the trash.` );
+			.getByText( `"Plugin Template" reset.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
@@ -82,8 +83,8 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
 		await expect( savedButton ).toBeVisible();
@@ -153,7 +154,6 @@ test.describe( 'Block template registration', () => {
 		// Verify the plugin-registered template doesn't appear in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Emptytheme',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate( 'Custom' );
 		await expect(
@@ -165,6 +165,8 @@ test.describe( 'Block template registration', () => {
 				'A custom template registered by a plugin and overridden by a theme.'
 			)
 		).toBeVisible();
+		// Verify the theme template shows the theme name as the author.
+		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );
 
 	test( 'templates can be deleted if the registered plugin is deactivated', async ( {
@@ -177,7 +179,6 @@ test.describe( 'Block template registration', () => {
 		// Make an edit to the template.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'Gutenberg',
 		} );
 		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Template'
@@ -190,7 +191,9 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'User-customized template' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Deactivate plugin.
 		await requestUtils.deactivatePlugin(
@@ -200,11 +203,10 @@ test.describe( 'Block template registration', () => {
 		// Verify template can be deleted.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
-			activeView: 'user',
 		} );
 		const deletedNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Plugin Template" moved to the trash.` );
+			.getByText( `"Plugin Template" deleted.` );
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
@@ -213,8 +215,8 @@ test.describe( 'Block template registration', () => {
 		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await page.getByRole( 'button', { name: 'Delete' } ).click();
 
 		await expect( deletedNotice ).toBeVisible();
 		await expect( savedButton ).toBeVisible();
@@ -285,7 +287,9 @@ test.describe( 'Block template registration', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Author template customized by the user.' },
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
@@ -309,26 +313,32 @@ test.describe( 'Block template registration', () => {
 		);
 		await expect( page.getByText( 'Plugin Author Template' ) ).toBeHidden();
 
-		await admin.visitSiteEditor( {
-			postType: 'wp_template',
-			activeView: 'user',
-		} );
-
 		// Reset the user-modified template.
 		const resetNotice = page
 			.getByLabel( 'Dismiss this notice' )
-			.getByText( `"Author: Admin" moved to the trash.` );
+			.getByText( `"Author: Admin" reset.` );
 		await page.getByPlaceholder( 'Search' ).fill( 'Author: admin' );
 		await page
 			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
 			.click();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
-		await page.getByRole( 'menuitem', { name: 'Move to trash' } ).click();
-		await page.getByRole( 'button', { name: 'Trash' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await page.getByRole( 'button', { name: 'Reset' } ).click();
 
 		await expect( resetNotice ).toBeVisible();
 
+		// Verify the template registered by the plugin is applied in the editor...
+		await expect(
+			editor.canvas.getByText( 'Author template customized by the user.' )
+		).toBeHidden();
+		await expect(
+			editor.canvas.getByText(
+				'This is a plugin-registered author template.'
+			)
+		).toBeVisible();
+
+		// ... and the frontend.
 		await page.goto( '?author=1' );
 		await expect(
 			page.getByText( 'Author template customized by the user.' )
@@ -353,6 +363,6 @@ class BlockTemplateRegistrationUtils {
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );
 		await expect
 			.poll( async () => await searchResults.count() )
-			.toBeLessThanOrEqual( initialSearchResultsCount );
+			.toBeLessThan( initialSearchResultsCount );
 	}
 }
