@@ -96,28 +96,36 @@ function BlockBindingsPanelMenuContent( {
 										<Menu.CheckboxItem
 											key={ item.key }
 											onChange={ () => {
-												if (
-													binding?.source ===
-													sourceKey
-												) {
+												const isCurrentlySelected =
+													source.isSelected?.( {
+														item,
+														binding,
+													} ) ||
+													// Deprecate key dependency in 7.0.
+													item.key ===
+														binding?.args?.key;
+
+												if ( isCurrentlySelected ) {
 													// Unset if the same item is selected again.
 													updateBlockBindings( {
 														[ attribute ]:
 															undefined,
 													} );
-													return;
+												} else {
+													updateBlockBindings( {
+														[ attribute ]: {
+															source: sourceKey,
+															args: source.getArgs?.(
+																{
+																	item,
+																	binding,
+																}
+															) || {
+																key: item.key,
+															},
+														},
+													} );
 												}
-												updateBlockBindings( {
-													[ attribute ]: {
-														source: sourceKey,
-														args: source.getArgs?.(
-															{
-																item,
-																binding,
-															}
-														) || { key: item.key },
-													},
-												} );
 											} }
 											name={ attribute + '-binding' }
 											value={ item.key }
