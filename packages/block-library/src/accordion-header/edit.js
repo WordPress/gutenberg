@@ -78,6 +78,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 							setAttributes( { title: newTitle } )
 						}
 						placeholder={ __( 'Accordion title' ) }
+						className="wp-block-accordion-header__toggle-title"
 					/>
 					{ showIcon && iconPosition === 'right' && (
 						<span
