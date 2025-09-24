@@ -46,7 +46,7 @@ test.describe( 'Block Comments', () => {
 	} ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/paragraph',
-			content: 'Testing block comments',
+			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
 
@@ -62,7 +62,7 @@ test.describe( 'Block Comments', () => {
 	} ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/paragraph',
-			content: 'Testing block comments',
+			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
 		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
@@ -86,7 +86,7 @@ test.describe( 'Block Comments', () => {
 	test( 'can edit a block comment', async ( { page, blockCommentUtils } ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/heading',
-			content: 'Testing block comments',
+			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
 		await page.getByRole( 'button', { name: 'Select an action' } ).click();
@@ -116,7 +116,7 @@ test.describe( 'Block Comments', () => {
 	} ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/paragraph',
-			content: 'Testing block comments',
+			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to delete.',
 		} );
 		await page.getByRole( 'button', { name: 'Select an action' } ).click();
@@ -142,7 +142,7 @@ test.describe( 'Block Comments', () => {
 	} ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/heading',
-			content: 'Testing block comments',
+			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
 
@@ -162,18 +162,18 @@ test.describe( 'Block Comments', () => {
 	} ) => {
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/heading',
-			content: 'First block',
+			attributes: { content: 'First block' },
 			comment: 'First block comment',
 		} );
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/paragraph',
-			content: 'Second block',
+			attributes: { content: 'Second block' },
 			comment: 'Second block comment',
 		} );
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await blockCommentUtils.addBlockWithComment( {
 			type: 'core/heading',
-			content: 'Third block',
+			attributes: { content: 'Third block' },
 			comment: 'Third block comment',
 		} );
 
@@ -233,15 +233,13 @@ class BlockCommentUtils {
 		return toggleButton;
 	}
 
-	async addBlockWithComment( { type, content, comment } ) {
+	async addBlockWithComment( { type, attributes = {}, comment } ) {
 		await test.step(
 			`Insert a ${ type } block with a comment`,
 			async () => {
 				await this.#editor.insertBlock( {
 					name: type,
-					attributes: {
-						content,
-					},
+					attributes,
 				} );
 				await this.#editor.clickBlockOptionsMenuItem( 'Comment' );
 				await this.#page
