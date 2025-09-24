@@ -12,12 +12,12 @@
  * and passes them to JavaScript for auto-registration with ServerSideRender.
  */
 function gutenberg_register_auto_register_blocks() {
-	$auto_register_blocks   = array();
-	$registered_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	$auto_register_blocks = array();
+	$registered_blocks    = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
 	foreach ( $registered_blocks as $block_name => $block_type ) {
-		$has_auto_register_flag   = ! empty( $block_type->auto_register ) || ! empty( $block_type->supports['auto_register'] );
-		$has_render_callback = ! empty( $block_type->render_callback );
+		$has_auto_register_flag = ! empty( $block_type->auto_register ) || ! empty( $block_type->supports['auto_register'] );
+		$has_render_callback    = ! empty( $block_type->render_callback );
 
 		if ( $has_auto_register_flag && $has_render_callback ) {
 			$auto_register_blocks[] = $block_name;
