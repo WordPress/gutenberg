@@ -85,15 +85,13 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 
 add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
 
-
 /**
  * Overrides the REST controller for the attachment post type.
  *
  * @param array  $args      Array of arguments for registering a post type.
  *                          See the register_post_type() function for accepted arguments.
- * @param string $post_type Post type key.
  */
-function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
+function gutenberg_filter_attachment_post_type_args( array $args ): array {
 	require_once __DIR__ . '/class-gutenberg-media-processing-rest-attachments-controller.php';
 
 	$args['rest_controller_class'] = Gutenberg_Media_Processing_REST_Attachments_Controller::class;
@@ -101,8 +99,7 @@ function gutenberg_filter_attachment_post_type_args( array $args, string $post_t
 	return $args;
 }
 
-add_filter( 'register_attachment_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
-
+add_filter( 'register_attachment_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 1 );
 
 /**
  * Registers additional REST fields for attachments.
