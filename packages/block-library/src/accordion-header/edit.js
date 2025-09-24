@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -54,7 +50,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<TagName { ...blockProps }>
 				<button
-					className={ clsx( 'wp-block-accordion-header__toggle' ) }
+					className="wp-block-accordion-header__toggle"
 					style={ {
 						...spacingProps.style,
 					} }

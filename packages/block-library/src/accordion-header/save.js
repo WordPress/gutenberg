@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import {
@@ -23,7 +19,7 @@ export default function save( { attributes } ) {
 	return (
 		<TagName { ...blockProps }>
 			<button
-				className={ clsx( 'wp-block-accordion-header__toggle' ) }
+				className="wp-block-accordion-header__toggle"
 				style={ {
 					...spacingProps.style,
 				} }
