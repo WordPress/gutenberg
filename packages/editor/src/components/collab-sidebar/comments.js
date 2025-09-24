@@ -29,7 +29,6 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { findBlockByCommentId } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 

@@ -8,12 +8,12 @@ import {
 	resolveSelect,
 	subscribe,
 } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -33,7 +33,8 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { useBlockComments, findBlockByCommentId } from './hooks';
+import { useBlockComments } from './hooks';
+import { findBlockByCommentId } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -69,10 +70,8 @@ function CollabSidebarContent( {
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
 		return {
-			postId: _postId,
+			postId: getCurrentPostId(),
 		};
 	}, [] );
 
@@ -283,12 +282,19 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
+	const { postId, postType } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const _postId = getCurrentPostId();
+		const _postType = getCurrentPostType();
+
 		return {
-			postId: getCurrentPostId(),
+			postId: _postId,
+			postType: _postType,
 		};
 	}, [] );
+	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
+		id: postId,
+	} );
 
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -372,6 +378,7 @@ export default function CollabSidebar() {
 								( reply ) => reply.id === comment.id
 							)
 					);
+
 					return (
 						<CommentPopover
 							key={ comment.id }
