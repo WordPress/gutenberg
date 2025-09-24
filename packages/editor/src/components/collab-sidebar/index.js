@@ -13,11 +13,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import {
-	store as coreStore,
-	useEntityBlockEditor,
-	useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -62,19 +58,16 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { getEntityRecord } = resolveSelect( coreStore );
 
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
+	const { postId, selectedBlockClientId } = useSelect( ( select ) => {
 		return {
-			postId: _postId,
+			postId: select( editorStore ).getCurrentPostId(),
+			selectedBlockClientId:
+				select( blockEditorStore ).getSelectedBlockClientId(),
 		};
 	}, [] );
-
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -104,7 +97,7 @@ function CollabSidebarContent( {
 
 			// If it's a main comment, update the block attributes with the comment id.
 			if ( ! parentCommentId && savedRecord?.id ) {
-				updateBlockAttributes( getSelectedBlockClientId(), {
+				updateBlockAttributes( selectedBlockClientId, {
 					blockCommentId: savedRecord.id,
 				} );
 			}
@@ -196,7 +189,7 @@ function CollabSidebarContent( {
 			} );
 
 			if ( childComment && ! childComment.parent ) {
-				updateBlockAttributes( getSelectedBlockClientId(), {
+				updateBlockAttributes( selectedBlockClientId, {
 					blockCommentId: undefined,
 				} );
 			}
@@ -218,7 +211,7 @@ function CollabSidebarContent( {
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
 			<Comments
-				key={ getSelectedBlockClientId() }
+				key={ selectedBlockClientId }
 				threads={ comments }
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
@@ -238,53 +231,55 @@ function CollabSidebarContent( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
-
-	const { postId, postType } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		return {
-			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
-		};
-	}, [] );
-
-	const queryArgs = {
-		post: postId,
-		type: 'block_comment',
-		status: 'all',
-		per_page: 100,
-	};
-
-	const { records: threads, totalPages } = useEntityRecords(
-		'root',
-		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
-
-	const hasMoreComments = totalPages && totalPages > 1;
-
-	const { blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
+	const {
+		postId,
+		threads,
+		totalPages,
+		blockCommentId,
+		blocks,
+		getActiveComplementaryArea,
+	} = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( editorStore );
+		const { getEntityRecords, getEntityRecordsTotalPages } =
+			select( coreStore );
+		const { getBlockAttributes, getSelectedBlockClientId, getBlocks } =
 			select( blockEditorStore );
+		const { getActiveComplementaryArea: _getActiveComplementaryArea } =
+			select( interfaceStore );
+		const _postId = getCurrentPostId();
 		const _clientId = getSelectedBlockClientId();
+		const isValudPostId = !! _postId && typeof _postId === 'number';
+		const query = {
+			post: _postId,
+			type: 'block_comment',
+			status: 'all',
+			per_page: 100,
+		};
+		const records = isValudPostId
+			? getEntityRecords( 'root', 'comment', query )
+			: undefined;
+		const pages = isValudPostId
+			? getEntityRecordsTotalPages( 'root', 'comment', query )
+			: undefined;
 
 		return {
+			postId: _postId,
+			threads: records,
+			totalPages: pages,
 			blockCommentId: _clientId
 				? getBlockAttributes( _clientId )?.blockCommentId
 				: null,
+			blocks: getBlocks(),
+			getActiveComplementaryArea: _getActiveComplementaryArea,
 		};
 	}, [] );
+	const hasMoreComments = totalPages && totalPages > 1;
 
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
-
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
 
 	// Process comments to build the tree structure.
 	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
@@ -346,7 +341,6 @@ export default function CollabSidebar() {
 	if ( 0 < resultComments.length ) {
 		const unsubscribe = subscribe( () => {
 			const activeSidebar = getActiveComplementaryArea( 'core' );
-
 			if ( ! activeSidebar ) {
 				enableComplementaryArea( 'core', collabSidebarName );
 				unsubscribe();
