@@ -36,7 +36,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$serialize_token_method->setAccessible( true );
 	}
 
-	// Advance to the first <imng> tag, copying everything before it to the output.
+	// Advance to the first <img> tag, copying everything before it to the output.
 	while ( $p->next_token() && 'IMG' !== $p->get_token_name() ) {
 		$output .= $serialize_token_method->invoke( $p );
 	}
