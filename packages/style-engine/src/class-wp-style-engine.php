@@ -219,15 +219,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'spacing' => '--wp--preset--spacing--$slug',
 					),
 				),
-				'height'      => array(
-					'property_keys' => array(
-						'default' => 'height',
-					),
-					'path'          => array( 'dimensions', 'height' ),
-					'css_vars'      => array(
-						'spacing' => '--wp--preset--spacing--$slug',
-					),
-				),
 			),
 			'spacing'    => array(
 				'padding' => array(

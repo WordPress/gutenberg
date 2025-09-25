@@ -39,8 +39,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
-	const hasWidth = useHasWidth( settings );
-	const hasHeight = useHasHeight( settings );
+	const hasWidth = blockHasWidth( settings );
 	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
@@ -53,7 +52,6 @@ export function useHasDimensionsPanel( settings ) {
 			hasGap ||
 			hasMinHeight ||
 			hasWidth ||
-			hasHeight ||
 			hasAspectRatio ||
 			hasChildLayout )
 	);
@@ -83,11 +81,8 @@ function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
 }
 
-function useHasWidth( settings ) {
+function blockHasWidth( settings ) {
 	return settings?.dimensions?.width;
-}
-function useHasHeight( settings ) {
-	return settings?.dimensions?.height;
 }
 
 function useHasAspectRatio( settings ) {
@@ -397,7 +392,7 @@ export default function DimensionsPanel( {
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
 	// Width
-	const showWidthControl = useHasWidth( settings );
+	const showWidthControl = blockHasWidth( settings );
 	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
 	const setWidthValue = ( newValue ) => {
 		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
@@ -406,17 +401,6 @@ export default function DimensionsPanel( {
 		setWidthValue( undefined );
 	};
 	const hasWidthValue = () => !! value?.dimensions?.width;
-
-	// Height
-	const showHeightControl = useHasHeight( settings );
-	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
-	const setHeightValue = ( newValue ) => {
-		onChange( setImmutably( value, [ 'dimensions', 'height' ], newValue ) );
-	};
-	const resetHeightValue = () => {
-		setHeightValue( undefined );
-	};
-	const hasHeightValue = () => !! value?.dimensions?.height;
 
 	// Aspect Ratio
 	const showAspectRatioControl = useHasAspectRatio( settings );
@@ -737,23 +721,6 @@ export default function DimensionsPanel( {
 						label={ __( 'Width' ) }
 						value={ widthValue }
 						onChange={ setWidthValue }
-					/>
-				</ToolsPanelItem>
-			) }
-			{ showHeightControl && (
-				<ToolsPanelItem
-					hasValue={ hasHeightValue }
-					label={ __( 'Height' ) }
-					onDeselect={ resetHeightValue }
-					isShownByDefault={
-						defaultControls.height ?? DEFAULT_CONTROLS.height
-					}
-					panelId={ panelId }
-				>
-					<HeightControl
-						label={ __( 'Height' ) }
-						value={ heightValue }
-						onChange={ setHeightValue }
 					/>
 				</ToolsPanelItem>
 			) }

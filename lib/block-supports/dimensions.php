@@ -110,9 +110,8 @@ function gutenberg_render_dimensions_support( $block_content, $block ) {
 		$dimensions_block_styles['aspectRatio'] = 'unset';
 	}
 
-	// Add width and height values.
-	$dimensions_block_styles['width']  = $block_attributes['style']['dimensions']['width'] ?? null;
-	$dimensions_block_styles['height'] = $block_attributes['style']['dimensions']['height'] ?? null;
+	// Add width value.
+	$dimensions_block_styles['width'] = $block_attributes['style']['dimensions']['width'] ?? null;
 
 	$styles = gutenberg_style_engine_get_styles( array( 'dimensions' => $dimensions_block_styles ) );
 
