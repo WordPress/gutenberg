@@ -425,6 +425,7 @@ function gutenberg_get_block_bindings_processor( string $block_content ) {
 			return true;
 		}
 
+		// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
 		public function remove_node() {
 			if ( $this->is_tag_closer() ) {
 				return false;
