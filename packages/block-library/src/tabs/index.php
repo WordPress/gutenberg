@@ -13,7 +13,7 @@
  *
  * @return string Inline CSS string.
  */
-function block_core_tabs_generate_color_styles( array $attributes, bool $is_vertical ): string {
+function block_core_tabs_generate_color_styles( array $attributes ): string {
 	$tab_inactive = $attributes['customTabInactiveColor'] ?? '';
 	$tab_hover    = $attributes['customTabHoverColor'] ?? '';
 	$tab_active   = $attributes['customTabActiveColor'] ?? '';
@@ -184,7 +184,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	 * Process style attribute.
 	 */
 	$style  = (string) $tag_processor->get_attribute( 'style' );
-	$style .= block_core_tabs_generate_color_styles( $attributes, $is_vertical );
+	$style .= block_core_tabs_generate_color_styles( $attributes );
 	$style .= block_core_tabs_generate_gap_styles( $attributes, $is_vertical );
 	$tag_processor->set_attribute( 'style', $style );
 
