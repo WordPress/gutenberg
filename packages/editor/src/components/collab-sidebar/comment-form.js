@@ -45,6 +45,9 @@ function CommentForm( {
 	);
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
+	const isDisabled =
+		inputComment === thread?.content?.raw ||
+		! sanitizeCommentString( inputComment ).length;
 
 	return (
 		<>
@@ -70,9 +73,7 @@ function CommentForm( {
 						onSubmit( inputComment );
 						setInputComment( '' );
 					} }
-					disabled={
-						0 === sanitizeCommentString( inputComment ).length
-					}
+					disabled={ isDisabled }
 					text={ submitButtonText }
 				/>
 				<Button

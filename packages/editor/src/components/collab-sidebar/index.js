@@ -171,7 +171,7 @@ function CollabSidebarContent( {
 				},
 				{ throwOnError: true }
 			);
-			createNotice( 'snackbar', __( 'Comment edited successfully.' ), {
+			createNotice( 'snackbar', __( 'Comment updated.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
