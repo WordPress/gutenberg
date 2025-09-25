@@ -114,4 +114,3 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
-
