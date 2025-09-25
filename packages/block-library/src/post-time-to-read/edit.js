@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
+	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -29,13 +30,8 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const {
-		textAlign,
-		displayAsRange,
-		showTimeToRead,
-		showWordCount,
-		averageReadingSpeed,
-	} = attributes;
+	const { textAlign, displayAsRange, displayMode, averageReadingSpeed } =
+		attributes;
 
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -80,7 +76,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		const parts = [];
 
 		// Add "time to read" part, if enabled.
-		if ( showTimeToRead ) {
+		if ( displayMode === 'time' || displayMode === 'both' ) {
 			let timeString;
 			if ( displayAsRange ) {
 				let maxMinutes = Math.max(
@@ -146,8 +142,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		contentStructure,
 		blocks,
 		displayAsRange,
-		showTimeToRead,
-		showWordCount,
+		displayMode,
 		averageReadingSpeed,
 	] );
 
@@ -173,33 +168,49 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					resetAll={ () => {
 						setAttributes( {
 							displayAsRange: true,
-							showTimeToRead: true,
-							showWordCount: false,
+							displayMode: 'time',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						label={ __( 'Show time to read' ) }
-						hasValue={ () => ! showTimeToRead }
+						label={ __( 'Display options' ) }
+						hasValue={ () => displayMode !== 'time' }
 						onDeselect={ () => {
 							setAttributes( {
-								showTimeToRead: true,
+								displayMode: 'time',
 							} );
 						} }
 					>
-						<ToggleControl
+						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Show time to read' ) }
-							checked={ !! showTimeToRead }
-							onChange={ () =>
+							__next40pxDefaultSize
+							label={ __( 'Display options' ) }
+							value={ displayMode }
+							options={ [
+								{
+									label: __( 'Show time to read' ),
+									value: 'time',
+								},
+								{
+									label: __( 'Show word count' ),
+									value: 'words',
+								},
+								{
+									label: __(
+										'Show time to read and word count'
+									),
+									value: 'both',
+								},
+							] }
+							onChange={ ( value ) =>
 								setAttributes( {
-									showTimeToRead: ! showTimeToRead,
+									displayMode: value,
 								} )
 							}
 						/>
 					</ToolsPanelItem>
-					{ showTimeToRead && (
+					{ ( displayMode === 'time' || displayMode === 'both' ) && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ _x(
@@ -225,26 +236,6 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						label={ __( 'Show word count' ) }
-						hasValue={ () => !! showWordCount }
-						onDeselect={ () => {
-							setAttributes( {
-								showWordCount: false,
-							} );
-						} }
-					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show word count' ) }
-							checked={ !! showWordCount }
-							onChange={ () =>
-								setAttributes( {
-									showWordCount: ! showWordCount,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>{ displayString }</div>
