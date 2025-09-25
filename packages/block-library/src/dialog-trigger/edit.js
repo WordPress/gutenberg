@@ -18,7 +18,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { STORE_NAME } from '../dialog/store';
 
 export default function Edit( { context, clientId } ) {
-	const dialogId = context[ 'dialog/id' ] ?? null;
+	const dialogId = context[ 'core/dialog-id' ] ?? '';
 
 	// Get the dialog-element block from the parent dialog block
 	const { dialogElementClientId, isDialogOpen } = useSelect(
@@ -41,7 +41,7 @@ export default function Edit( { context, clientId } ) {
 					: false,
 			};
 		},
-		[ clientId ]
+		[ clientId, context ]
 	);
 
 	// Get store actions
@@ -69,6 +69,7 @@ export default function Edit( { context, clientId } ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						label={ buttonLabel }
+						aria-controls={ dialogId }
 						onClick={ () => {
 							if ( ! dialogElementClientId ) {
 								return;

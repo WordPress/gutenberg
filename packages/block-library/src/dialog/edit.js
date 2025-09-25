@@ -9,13 +9,13 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 	store as blockEditorStore,
+	BlockContextProvider,
 } from '@wordpress/block-editor';
 import {
 	Button,
 	ToolbarButton,
 	ToolbarGroup,
 	PanelBody,
-	TextControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -71,16 +71,7 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { dialogId } = attributes;
-
-	// Initialize dialogId only once after mount if not set.
-	useEffect( () => {
-		if ( ! dialogId ) {
-			setAttributes( { dialogId: clientId } );
-		}
-	}, [ dialogId, clientId, setAttributes ] );
-
-	// Get the dialog-element block from inner blocks
+	// Get the dialog-element block from inner blocks.
 	const { dialogElementClientId, isDialogOpen } = useSelect(
 		( select ) => {
 			const { getBlock } = select( blockEditorStore );
@@ -100,6 +91,10 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		[ clientId ]
 	);
 
+	const dialogId = useMemo( () => {
+		return `block-${ dialogElementClientId }`;
+	}, [ dialogElementClientId ] );
+
 	// Get store actions
 	const { open, close } = useDispatch( STORE_NAME );
 
@@ -111,10 +106,13 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	} );
 
 	// We're locking down the template and allowed blocks to only allow the dialog trigger and dialog element.
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: TEMPLATE,
-		templateLock: 'insert',
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			template: TEMPLATE,
+			templateLock: 'insert',
+		}
+	);
 
 	const buttonLabel = useMemo(
 		() => ( isDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
@@ -150,18 +148,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 								'The dialog element requires a dialog trigger and a dialog element. You can edit the text of the trigger and the content of the dialog by clicking the "Edit Dialog" button above.'
 							) }
 						</p>
-						<TextControl
-							label={ __( 'Dialog ID' ) }
-							value={ dialogId }
-							onChange={ ( value ) =>
-								setAttributes( { dialogId: value } )
-							}
-							help={ __(
-								'The ID of the dialog element. This should be unique on the page.'
-							) }
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-						/>
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -184,7 +170,13 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					</div>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlocksProps } />
+			<div { ...blockProps }>
+				<BlockContextProvider
+					value={ { 'core/dialog-id': dialogId || null } }
+				>
+					{ innerBlocksProps.children }
+				</BlockContextProvider>
+			</div>
 		</>
 	);
 }

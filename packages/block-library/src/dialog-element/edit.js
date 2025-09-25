@@ -128,7 +128,6 @@ function Edit( {
 					openDialog={ openDialog }
 					closeDialog={ closeDialog }
 					clientId={ clientId }
-					context={ context }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>

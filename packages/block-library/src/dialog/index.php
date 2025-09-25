@@ -6,24 +6,30 @@
  */
 
 /**
- * Fallback to generate a unique dialogId if one is not provided.
- * This ensures programmatic usage of the dialog block works if a user forgets to
- * add an attribute.
+ * Ensures block context contains dialog anchor ID value.
+ * If none is available for this instance of a dialog,
+ * a unique one will be generated.
  *
  * @hook render_block_data
  *
  * @param mixed $block Block.
  * @return mixed
  */
-function block_core_dialog_id_fallback( $block ) {
+function block_core_dialog_id_fallback( $context, $block ) {
+	// If the block already has an ID, don't override it.
 	if ( 'core/dialog' === $block['blockName'] ) {
-		if ( ! isset( $block['attrs']['dialogId'] ) || empty( $block['attrs']['dialogId'] ) ) {
-			$block['attrs']['dialogId'] = wp_unique_id( 'dialog-' );
+		$tag_processor = new WP_HTML_Tag_Processor($block['innerHTML']);
+		$tag_processor->next_tag();
+		$id = $tag_processor->get_attribute('id');
+		if ( $id ) {
+			$context['core/dialog-id'] = $id;
+		} else {
+			$context['core/dialog-id'] = wp_unique_id( 'wp-dialog-' );
 		}
 	}
-	return $block;
+	return $context;
 }
-add_filter( 'render_block_data', 'block_core_dialog_id_fallback' );
+add_filter( 'render_block_context', 'block_core_dialog_id_fallback', 10, 2 );
 
 /**
  * Render the 'core/dialog' block.
@@ -35,30 +41,28 @@ add_filter( 'render_block_data', 'block_core_dialog_id_fallback' );
  * @return string Returns the filtered block content.
  */
 function render_block_core_dialog( $attributes, $content, $block ) {
-	$block_id = array_key_exists( 'dialogId', $attributes ) ? $attributes['dialogId'] : null;
+	$block_context = $block->context;
+	$block_id = array_key_exists( 'core/dialog-id', $block_context ) ? $block_context['core/dialog-id'] : false;
 
 	if ( ! $block_id ) {
-		_doing_it_wrong( 'core/dialog::render', esc_html__( 'The core/dialog block requires a dialogId attribute.', 'default' ), '1.0.0' );
+		_doing_it_wrong( 'render_block_core_dialog', esc_html__( 'The core/dialog block requires an id via block context.', 'default' ), '1.0.0' );
 		return '';
 	}
 
-	$block_wrapper_attrs = array(
-		'data-wp-interactive' => 'core/dialog',
-		'data-wp-context'     => wp_json_encode(
-			array(
-				'id' => $block_id,
-			)
-		),
-		'data-wp-key'         => $block_id,
-	);
+	$tag_processor = new WP_HTML_Tag_Processor($content);
+	$tag_processor->next_tag();
+	// This ID is consumed by dialog-element via block context and used as that element's ID.
+	// Here, the ID is removed from the dialog block to avoid duplication and then
+	// added as a Interactivity API `wp-key` directive to ensure uniqueness.
+	$tag_processor->remove_attribute('id');
 
-	$block_wrapper_attrs = get_block_wrapper_attributes( $block_wrapper_attrs );
+	$context = wp_json_encode( array( 'id' => $block_id ) );
 
-	return wp_sprintf(
-		'<div %1$s>%2$s</div>',
-		$block_wrapper_attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		$content, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-	);
+	$tag_processor->set_attribute('data-wp-interactive', 'core/dialog/private');
+	$tag_processor->set_attribute('data-wp-key', $block_id);
+	$tag_processor->set_attribute('data-wp-context', $context);
+
+	return $tag_processor->get_updated_html();
 }
 
 /**
