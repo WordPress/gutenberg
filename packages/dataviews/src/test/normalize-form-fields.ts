@@ -140,6 +140,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: true,
+						summaryVisibility: 'always',
 					},
 				},
 			] );
@@ -177,6 +178,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
+						summaryVisibility: 'always',
 					},
 				},
 			] );
@@ -239,6 +241,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
+						summaryVisibility: 'always',
 					},
 				},
 			] );
