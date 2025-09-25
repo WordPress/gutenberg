@@ -234,7 +234,6 @@ function CollabSidebarContent( {
 }
 function CommentPopover( {
 	comment,
-	filteredThreads,
 	showCommentBoard,
 	setShowCommentBoard,
 	backgroundColor,
@@ -253,7 +252,7 @@ function CommentPopover( {
 			variant="unstyled"
 		>
 			<CollabSidebarContent
-				comments={ filteredThreads }
+				comments={ [ comment ] }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				styles={ {
@@ -356,20 +355,10 @@ export default function CollabSidebar() {
 			{ isLargeViewport &&
 				unresolvedSortedThreads.length > 0 &&
 				unresolvedSortedThreads.map( ( comment ) => {
-					// Pass this comment and its replies.
-					const filteredThreads = unresolvedSortedThreads.filter(
-						( thread ) =>
-							thread.id === comment.id ||
-							thread.reply.some(
-								( reply ) => reply.id === comment.id
-							)
-					);
-
 					return (
 						<CommentPopover
 							key={ comment.id }
 							comment={ comment }
-							filteredThreads={ filteredThreads }
 							showCommentBoard={ showCommentBoard }
 							setShowCommentBoard={ setShowCommentBoard }
 							backgroundColor={ backgroundColor }
