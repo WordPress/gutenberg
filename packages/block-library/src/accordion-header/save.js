@@ -11,9 +11,7 @@ export default function save( { attributes } ) {
 	const { level, title, iconPosition, showIcon } = attributes;
 	const TagName = 'h' + level;
 
-	const blockProps = useBlockProps.save( {
-		className: 'accordion-content__heading',
-	} );
+	const blockProps = useBlockProps.save();
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 
 	return (

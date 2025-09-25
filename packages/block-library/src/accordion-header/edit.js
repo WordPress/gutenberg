@@ -30,9 +30,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	const blockProps = useBlockProps( {
-		className: 'accordion-content__heading',
-	} );
+	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
 	return (
