@@ -19,7 +19,8 @@
 					"content": "<strong>Cover Image</strong>",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

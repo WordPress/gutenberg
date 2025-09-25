@@ -28,7 +28,8 @@
 					"content": "",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

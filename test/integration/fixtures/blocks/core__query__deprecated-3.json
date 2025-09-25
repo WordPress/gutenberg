@@ -133,7 +133,8 @@
 								"attributes": {
 									"content": "No results found.",
 									"dropCap": false,
-									"placeholder": "Add text or blocks that will display when a query returns no results."
+									"placeholder": "Add text or blocks that will display when a query returns no results.",
+									"fitText": false
 								},
 								"innerBlocks": []
 							}

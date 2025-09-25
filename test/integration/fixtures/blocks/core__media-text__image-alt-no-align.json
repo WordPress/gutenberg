@@ -20,7 +20,8 @@
 					"content": "Content",
 					"dropCap": false,
 					"placeholder": "Content…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

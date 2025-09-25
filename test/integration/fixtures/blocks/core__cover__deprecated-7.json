@@ -20,7 +20,8 @@
 					"content": "\n\t\t\tGuten Berg!\n\t\t",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

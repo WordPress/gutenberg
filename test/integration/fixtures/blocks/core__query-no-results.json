@@ -10,7 +10,8 @@
 				"attributes": {
 					"content": "",
 					"dropCap": false,
-					"placeholder": "Add a text or blocks that will display when the query returns no results."
+					"placeholder": "Add a text or blocks that will display when the query returns no results.",
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

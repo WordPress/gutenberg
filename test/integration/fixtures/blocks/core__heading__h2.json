@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"content": "A picture is worth a thousand words, or so the saying goes",
-			"level": 2
+			"level": 2,
+			"fitText": false
 		},
 		"innerBlocks": []
 	}

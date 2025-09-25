@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"content": "The <em>Inserter</em> Tool",
-			"level": 4
+			"level": 4,
+			"fitText": false
 		},
 		"innerBlocks": []
 	}

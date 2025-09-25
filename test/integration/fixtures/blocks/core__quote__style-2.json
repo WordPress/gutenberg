@@ -13,7 +13,8 @@
 				"isValid": true,
 				"attributes": {
 					"content": "There is no greater agony than bearing an untold story inside you.",
-					"dropCap": false
+					"dropCap": false,
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

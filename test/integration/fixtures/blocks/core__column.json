@@ -9,7 +9,8 @@
 				"isValid": true,
 				"attributes": {
 					"content": "Column One, Paragraph One",
-					"dropCap": false
+					"dropCap": false,
+					"fitText": false
 				},
 				"innerBlocks": []
 			},
@@ -18,7 +19,8 @@
 				"isValid": true,
 				"attributes": {
 					"content": "Column One, Paragraph Two",
-					"dropCap": false
+					"dropCap": false,
+					"fitText": false
 				},
 				"innerBlocks": []
 			}

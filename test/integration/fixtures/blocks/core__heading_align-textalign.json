@@ -6,7 +6,8 @@
 			"textAlign": "center",
 			"content": "Text",
 			"level": 2,
-			"align": "wide"
+			"align": "wide",
+			"fitText": false
 		},
 		"innerBlocks": []
 	}
