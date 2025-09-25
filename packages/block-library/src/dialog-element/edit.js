@@ -145,9 +145,6 @@ function Edit( {
 					aria-label="Close dialog"
 					onClick={ () => closeDialog() }
 				>
-					{
-						// @TODO We need to probably add a slotfill here for the icon. We should reference the icon library work in Gutenberg to determine if we can hook in to that for this.
-					 }
 					<Icon icon={ cancelCircleFilled } />
 				</button>
 				<div { ...innerBlocksProps } />
