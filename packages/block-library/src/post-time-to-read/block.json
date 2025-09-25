@@ -5,12 +5,28 @@
 	"name": "core/post-time-to-read",
 	"title": "Time to Read",
 	"category": "theme",
-	"description": "Show minutes required to finish reading the post.",
+	"description": "Show minutes required to finish reading the post. Can also show a word count.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"displayAsRange": {
+			"type": "boolean",
+			"default": true
+		},
+		"showTimeToRead": {
+			"type": "boolean",
+			"default": true
+		},
+		"showWordCount": {
+			"type": "boolean",
+			"default": false
+		},
+		"averageReadingSpeed": {
+			"type": "number",
+			"default": 189
 		}
 	},
 	"supports": {

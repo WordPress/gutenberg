@@ -66,6 +66,18 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch, registry, resolveSelect } ) => {
+		// For back-compat, we allow querying for static templates through
+		// wp_template.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof key === 'string' &&
+			// __experimentalGetDirtyEntityRecords always calls getEntityRecord
+			// with a string key, so we need that it's not a numeric ID.
+			! /^\d+$/.test( key )
+		) {
+			name = 'wp_registered_template';
+		}
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -202,6 +214,30 @@ export const getEntityRecord =
 		}
 	};
 
+export const getTemplateAutoDraftId =
+	( staticTemplateId ) =>
+	async ( { resolveSelect, dispatch } ) => {
+		const record = await resolveSelect.getEntityRecord(
+			'postType',
+			'wp_registered_template',
+			staticTemplateId
+		);
+		const autoDraft = await dispatch.saveEntityRecord(
+			'postType',
+			'wp_template',
+			{
+				...record,
+				id: undefined,
+				type: 'wp_template',
+				status: 'auto-draft',
+			}
+		);
+		await dispatch.receiveTemplateAutoDraftId(
+			staticTemplateId,
+			autoDraft.id
+		);
+	};
+
 /**
  * Requests an entity's record from the REST API.
  */
@@ -237,12 +273,27 @@ export const getEntityRecords =
 			{ exclusive: false }
 		);
 
+		// Keep a copy of the original query for later use in getResolutionsArgs.
+		// The query object may be modified below (for example, when _fields is
+		// specified), but we want to use the original query when marking
+		// resolutions as finished.
+		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
-		function getResolutionsArgs( records ) {
+		function getResolutionsArgs( records, recordsQuery ) {
+			const queryArgs = Object.fromEntries(
+				Object.entries( recordsQuery ).filter( ( [ k, v ] ) => {
+					return [ 'context', '_fields' ].includes( k ) && !! v;
+				} )
+			);
 			return records
 				.filter( ( record ) => record?.[ key ] )
-				.map( ( record ) => [ kind, name, record[ key ] ] );
+				.map( ( record ) => [
+					kind,
+					name,
+					record[ key ],
+					Object.keys( queryArgs ).length > 0 ? queryArgs : undefined,
+				] );
 		}
 
 		try {
@@ -256,7 +307,7 @@ export const getEntityRecords =
 						...new Set( [
 							...( getNormalizedCommaSeparable( query._fields ) ||
 								[] ),
-							entityConfig.key || DEFAULT_ENTITY_KEY,
+							key,
 						] ),
 					].join(),
 				};
@@ -320,7 +371,7 @@ export const getEntityRecords =
 						);
 						dispatch.finishResolutions(
 							'getEntityRecord',
-							getResolutionsArgs( pageRecords )
+							getResolutionsArgs( pageRecords, rawQuery )
 						);
 					} );
 					page++;
@@ -401,16 +452,10 @@ export const getEntityRecords =
 					);
 				}
 
-				// When requesting all fields, the list of results can be used to resolve
-				// the `getEntityRecord` selector in addition to `getEntityRecords`.
-				// See https://github.com/WordPress/gutenberg/pull/26575
-				// Todo https://github.com/WordPress/gutenberg/issues/26629
-				if ( ! query?._fields && ! query.context ) {
-					dispatch.finishResolutions(
-						'getEntityRecord',
-						getResolutionsArgs( records )
-					);
-				}
+				dispatch.finishResolutions(
+					'getEntityRecord',
+					getResolutionsArgs( records, rawQuery )
+				);
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
@@ -821,22 +866,36 @@ export const getDefaultTemplateId =
 		// Wait for the the entities config to be loaded, otherwise receiving
 		// the template as an entity will not work.
 		await resolveSelect.getEntitiesConfig( 'postType' );
+		const id = template?.wp_id || template?.id;
 		// Endpoint may return an empty object if no template is found.
-		if ( template?.id ) {
+		if ( id ) {
+			template.id = id;
+			template.type =
+				typeof id === 'string'
+					? 'wp_registered_template'
+					: 'wp_template';
 			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, template.id );
-				dispatch.receiveEntityRecords( 'postType', 'wp_template', [
+				dispatch.receiveDefaultTemplateId( query, id );
+				dispatch.receiveEntityRecords( 'postType', template.type, [
 					template,
 				] );
 				// Avoid further network requests.
 				dispatch.finishResolution( 'getEntityRecord', [
 					'postType',
-					'wp_template',
-					template.id,
+					template.type,
+					id,
 				] );
 			} );
 		}
 	};
+
+getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	return (
+		action.type === 'EDIT_ENTITY_RECORD' &&
+		action.kind === 'root' &&
+		action.name === 'site'
+	);
+};
 
 /**
  * Requests an entity's revisions from the REST API.

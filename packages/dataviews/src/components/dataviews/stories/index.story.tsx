@@ -96,7 +96,7 @@ export const Default = ( { perPageSizes = [ 10, 25, 50, 100 ] } ) => {
 					onClick={ ( e ) => {
 						e.stopPropagation();
 						// eslint-disable-next-line no-alert
-						alert( 'Clicked: ' + item.title );
+						alert( 'Clicked: ' + item.name.title );
 					} }
 					{ ...props }
 				/>

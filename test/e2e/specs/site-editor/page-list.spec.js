@@ -183,14 +183,26 @@ test.describe( 'Page List', () => {
 				performEdit: async ( page ) => {
 					const dateEl = page.getByLabel( 'Edit Date' );
 					await dateEl.click();
-					const date = new Date();
-					const yy = Number( date.getFullYear() );
-					const yyEl = page.locator(
-						`input[type="number"][value="${ yy }"]`
-					);
 
-					await yyEl.focus();
-					await page.keyboard.press( 'ArrowUp' );
+					// Wait for the datetime control to appear
+					const datetimeInput = page.locator(
+						'input[type="datetime-local"]'
+					);
+					await datetimeInput.waitFor( { state: 'visible' } );
+
+					// Get current datetime value and increment year
+					const currentValue = await datetimeInput.inputValue();
+					if ( currentValue ) {
+						const currentDate = new Date( currentValue );
+						const newDate = new Date( currentDate );
+						newDate.setFullYear( currentDate.getFullYear() + 1 );
+
+						// Format for datetime-local input (YYYY-MM-DDTHH:MM)
+						const formattedDate = newDate
+							.toISOString()
+							.slice( 0, 16 );
+						await datetimeInput.fill( formattedDate );
+					}
 				},
 				assertEditedState: async ( page ) => {
 					const date = new Date();

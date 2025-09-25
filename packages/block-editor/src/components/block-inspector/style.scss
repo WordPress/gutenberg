@@ -51,3 +51,8 @@
 .block-editor-block-inspector__no-block-tools {
 	border-top: $border-width solid $gray-300;
 }
+
+.block-editor-block-inspector-edit-contents-button {
+	margin-top: $grid-unit-10;
+	justify-content: center;
+}

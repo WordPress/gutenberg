@@ -9,17 +9,11 @@ import clsx from 'clsx';
 
 export default function save( { attributes } ) {
 	const { openByDefault } = attributes;
-	const blockProps = useBlockProps.save();
-	const className = clsx(
-		{
+	const blockProps = useBlockProps.save( {
+		className: clsx( {
 			'is-open': openByDefault,
-		},
-		blockProps.className
-	);
-	const innerBlocksProps = useInnerBlocksProps.save( {
-		...blockProps,
-		className,
+		} ),
 	} );
-
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 	return <div { ...innerBlocksProps } />;
 }
