@@ -21,6 +21,8 @@ const DEFAULT_CONTROLS = {
 	margin: true,
 	blockGap: true,
 	minHeight: true,
+	width: false,
+	height: false,
 	childLayout: false,
 };
 

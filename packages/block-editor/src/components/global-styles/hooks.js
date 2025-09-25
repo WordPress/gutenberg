@@ -161,6 +161,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		if ( supportedStyles.includes( 'width' ) ) {
+			updatedSettings.dimensions.width = true;
+		}
+
+		if ( supportedStyles.includes( 'height' ) ) {
+			updatedSettings.dimensions.height = true;
+		}
+
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
 				! supportedStyles.includes(
