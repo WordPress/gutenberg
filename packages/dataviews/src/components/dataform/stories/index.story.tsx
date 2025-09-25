@@ -369,8 +369,9 @@ const getLayoutFromStoryArgs = ( {
 		const cardLayout: CardLayout = {
 			type: 'card',
 		};
-		if ( withHeader === true ) {
-			cardLayout.withHeader = true;
+		if ( withHeader !== undefined ) {
+			// @ts-ignore We want to demo the effects of configuring withHeader.
+			cardLayout.withHeader = withHeader;
 			if ( summaryVisibility ) {
 				cardLayout.summaryVisibility = summaryVisibility;
 			}
@@ -1110,7 +1111,7 @@ const LayoutCardComponent = ( {
 				{
 					id: 'customerCard',
 					label: 'Customer',
-					summary: 'customer-summary',
+					summary: [ 'customer-summary', 'tax-summary' ],
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [

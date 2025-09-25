@@ -816,7 +816,6 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
-			summaryVisibility?: 'always' | 'on-close';
 	  }
 	| {
 			type: 'card';
@@ -831,7 +830,6 @@ export type NormalizedCardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened: true;
-			summaryVisibility: 'always' | 'on-close';
 	  }
 	| {
 			type: 'card';

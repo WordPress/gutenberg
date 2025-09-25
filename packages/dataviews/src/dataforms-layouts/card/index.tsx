@@ -97,9 +97,10 @@ export default function FormCardField< Item >( {
 	const summaryFields = getSummaryFields< Item >( field, fields );
 
 	const isSummaryFieldVisible =
+		layout.withHeader &&
 		summaryFields.length > 0 &&
-		( layout.summaryVisibility === 'always' ||
-			( layout.summaryVisibility === 'on-close' && ! isOpen ) );
+		( layout?.summaryVisibility === 'always' ||
+			( layout?.summaryVisibility === 'on-close' && ! isOpen ) );
 
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;

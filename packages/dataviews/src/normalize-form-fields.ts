@@ -49,7 +49,6 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				type: 'card',
 				withHeader: false,
 				isOpened: true,
-				summaryVisibility: layout.summaryVisibility ?? 'always',
 			} satisfies NormalizedCardLayout;
 		} else {
 			normalizedLayout = {
