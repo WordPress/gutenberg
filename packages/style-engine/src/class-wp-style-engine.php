@@ -210,7 +210,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'spacing' => '--wp--preset--spacing--$slug',
 					),
 				),
-				'width'   => array(
+				'width'       => array(
 					'property_keys' => array(
 						'default' => 'width',
 					),
@@ -219,7 +219,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'spacing' => '--wp--preset--spacing--$slug',
 					),
 				),
-				'height'   => array(
+				'height'      => array(
 					'property_keys' => array(
 						'default' => 'height',
 					),
