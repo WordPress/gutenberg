@@ -89,8 +89,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Edit' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
 		await page
 			.getByRole( 'textbox', { name: 'Comment' } )
 			.first()
@@ -106,7 +105,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment edited successfully.' } )
+				.filter( { hasText: 'Comment updated.' } )
 		).toBeVisible();
 	} );
 
@@ -119,8 +118,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to delete.',
 		} );
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete' } )
@@ -149,10 +147,53 @@ test.describe( 'Block Comments', () => {
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( resolveButton ).toBeDisabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment marked as resolved.' } )
+		).toBeVisible();
 
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Reopen' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment reopened.' } )
+		).toBeVisible();
+	} );
+
+	test( 'can reopen a resolved comment when adding a reply', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment to resolve.',
+		} );
+
+		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
+		await resolveButton.click();
+		await expect( resolveButton ).toBeDisabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment marked as resolved.' } )
+		).toBeVisible();
+
+		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		await commentForm.fill( 'Test reply that reopens the comment.' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
+			.click();
+
+		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment reopened.' } )
+		).toBeVisible();
 	} );
 
 	test( 'selecting a block or comment marks it as an active', async ( {
@@ -256,5 +297,13 @@ class BlockCommentUtils {
 			},
 			{ box: true }
 		);
+	}
+
+	async clickBlockCommentActionMenuItem( actionName ) {
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
 }

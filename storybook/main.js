@@ -36,6 +36,7 @@ const stories = [
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
