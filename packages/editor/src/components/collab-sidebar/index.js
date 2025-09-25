@@ -114,61 +114,33 @@ function CollabSidebarContent( {
 		}
 	};
 
-	const onCommentResolve = async ( commentId ) => {
-		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
-				{
-					id: commentId,
-					status: 'approved',
-				},
-				{ throwOnError: true }
-			);
-			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
+	const onEditComment = async ( { id, content, status } ) => {
+		const messageType = status ? status : 'updated';
+		const messages = {
+			approved: __( 'Comment marked as resolved.' ),
+			hold: __( 'Comment reopened.' ),
+			updated: __( 'Comment updated.' ),
+		};
 
-	const onCommentReopen = async ( commentId ) => {
 		try {
 			await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					id: commentId,
-					status: 'hold',
+					id,
+					content,
+					status,
 				},
 				{ throwOnError: true }
 			);
-			createNotice( 'snackbar', __( 'Comment reopened.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
-
-	const onEditComment = async ( commentId, comment ) => {
-		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
+			createNotice(
+				'snackbar',
+				messages[ messageType ] ?? __( 'Comment updated.' ),
 				{
-					id: commentId,
-					content: comment,
-				},
-				{ throwOnError: true }
+					type: 'snackbar',
+					isDismissible: true,
+				}
 			);
-			createNotice( 'snackbar', __( 'Comment updated.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
 		} catch ( error ) {
 			onError( error );
 		}
@@ -214,8 +186,6 @@ function CollabSidebarContent( {
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
 				onCommentDelete={ onCommentDelete }
-				onCommentResolve={ onCommentResolve }
-				onCommentReopen={ onCommentReopen }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
