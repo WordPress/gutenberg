@@ -262,12 +262,14 @@ const CommentBoard = ( {
 	const actions = [
 		onEdit &&
 			status !== 'approved' && {
+				id: 'edit',
 				title: _x( 'Edit', 'Edit comment' ),
 				onClick: () => {
 					setActionState( 'edit' );
 				},
 			},
 		onDelete && {
+			id: 'delete',
 			title: _x( 'Delete', 'Delete comment' ),
 			onClick: () => {
 				setActionState( 'delete' );
@@ -276,6 +278,7 @@ const CommentBoard = ( {
 		},
 		onReopen &&
 			status === 'approved' && {
+				id: 'reopen',
 				title: _x( 'Reopen', 'Reopen comment' ),
 				onClick: () => {
 					onReopen( thread.id );
@@ -326,8 +329,11 @@ const CommentBoard = ( {
 							<Menu.Popover>
 								{ moreActions.map( ( action ) => (
 									<Menu.Item
-										key={ action.title }
-										onClick={ action.onClick }
+										key={ action.id }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											action.onClick();
+										} }
 									>
 										<Menu.ItemLabel>
 											{ action.title }
