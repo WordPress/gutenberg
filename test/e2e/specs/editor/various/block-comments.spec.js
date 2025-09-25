@@ -147,9 +147,19 @@ test.describe( 'Block Comments', () => {
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( resolveButton ).toBeDisabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment marked as resolved.' } )
+		).toBeVisible();
 
 		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment reopened.' } )
+		).toBeVisible();
 	} );
 
 	test( 'selecting a block or comment marks it as an active', async ( {
