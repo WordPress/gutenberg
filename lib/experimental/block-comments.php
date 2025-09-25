@@ -101,12 +101,11 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
  * @param array $prepared_comment The prepared comment data.
  * @return bool Modified allow empty comment value.
  */
-if ( ! function_exists( 'allow_empty_block_comments' ) ) {
-	function allow_empty_block_comments( $allow, $prepared_comment ) {
-		if ( ! isset( $prepared_comment['comment_type'] ) || 'block_comment' === $prepared_comment['comment_type'] ) {
-			$allow = true;
-		}
-		return $allow;
+function gutenberg_allow_empty_block_comments( $allow, $prepared_comment ) {
+	if ( ! isset( $prepared_comment['comment_type'] ) || 'block_comment' === $prepared_comment['comment_type'] ) {
+		$allow = true;
 	}
-	add_filter( 'allow_empty_comment', 'allow_empty_block_comments', 10, 2 );
+	return $allow;
 }
+add_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments', 10, 2 );
+
