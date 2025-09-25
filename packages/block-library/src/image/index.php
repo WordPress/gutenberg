@@ -57,6 +57,14 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $data_id );
 	}
 
+	/*
+	 * If the caption attribute is empty (which might happen if it is bound to a block
+	 * bindings source), remove the `<figcaption>` element so it isn't rendered empty.
+	 */
+	if ( empty( $attributes['caption'] ) && $p->next_tag( 'figcaption' ) ) {
+		// TODO: Remove <figcaption>.
+	}
+
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
