@@ -369,10 +369,7 @@ const CommentBoard = ( {
 								{ moreActions.map( ( action ) => (
 									<Menu.Item
 										key={ action.id }
-										onClick={ ( event ) => {
-											event.stopPropagation();
-											action.onClick();
-										} }
+										onClick={ () => action.onClick() }
 									>
 										<Menu.ItemLabel>
 											{ action.title }
