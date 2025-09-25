@@ -84,9 +84,9 @@ function gutenberg_apply_dimensions_support( $block_type, $block_attributes ) { 
  * @return string                Filtered block content.
  */
 function gutenberg_render_dimensions_support( $block_content, $block ) {
-	$block_type               = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$block_attributes         = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
-	$has_dimensions_support   = block_has_support( $block_type, 'dimensions', false );
+	$block_type             = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_attributes       = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
+	$has_dimensions_support = block_has_support( $block_type, 'dimensions', false );
 
 	if (
 		! $has_dimensions_support ||
