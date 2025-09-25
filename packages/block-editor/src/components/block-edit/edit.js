@@ -56,6 +56,8 @@ const Edit = ( props ) => {
 
 const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
 
+const EMPTY_ARRAY = [];
+
 const EditWithGeneratedProps = ( props ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
@@ -71,7 +73,8 @@ const EditWithGeneratedProps = ( props ) => {
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 			return (
-				__experimentalBlockBindingsSupportedAttributes?.[ name ] || []
+				__experimentalBlockBindingsSupportedAttributes?.[ name ] ||
+				EMPTY_ARRAY
 			);
 		},
 		[ name ]
