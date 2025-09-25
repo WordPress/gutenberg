@@ -9,7 +9,7 @@ import {
 
 export default function save( { attributes } ) {
 	const { level, title, iconPosition, showIcon } = attributes;
-	const TagName = 'h' + level;
+	const TagName = 'h' + ( level || 3 );
 
 	const blockProps = useBlockProps.save();
 	const spacingProps = getSpacingClassesAndStyles( attributes );

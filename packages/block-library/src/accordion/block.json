@@ -67,11 +67,19 @@
 		"autoclose": {
 			"type": "boolean",
 			"default": false
+		},
+		"headingLevel": {
+			"type": "number",
+			"default": 3
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
-		"core/accordion-show-icon": "showIcon"
+		"core/accordion-show-icon": "showIcon",
+		"core/accordion-heading-level": "headingLevel"
 	},
 	"allowedBlocks": [ "core/accordion-content" ],
 	"textdomain": "default",

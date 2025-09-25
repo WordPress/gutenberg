@@ -17,7 +17,7 @@ Displays a group of accordion headers and associated expandable content. ([Sourc
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-content
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** autoclose, iconPosition, showIcon
+-	**Attributes:** autoclose, headingLevel, iconPosition, showIcon
 
 ## Accordion Content
 

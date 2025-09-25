@@ -8,6 +8,7 @@ import {
 	BlockControls,
 	useBlockEditingMode,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -17,6 +18,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -32,7 +34,7 @@ const ACCORDION_BLOCK = {
 };
 
 export default function Edit( {
-	attributes: { autoclose, iconPosition, showIcon },
+	attributes: { autoclose, iconPosition, showIcon, headingLevel, levelOptions },
 	clientId,
 	setAttributes,
 	isSelected: isSingleSelected,
@@ -58,11 +60,24 @@ export default function Edit( {
 	return (
 		<>
 			{ isSingleSelected && ! isContentOnlyMode && (
-				<BlockControls group="other">
-					<ToolbarButton onClick={ addAccordionContentBlock }>
-						{ __( 'Add' ) }
-					</ToolbarButton>
-				</BlockControls>
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<HeadingLevelDropdown
+								value={ headingLevel }
+								options={ levelOptions }
+								onChange={ ( newLevel ) => 
+									setAttributes( {headingLevel: newLevel } )
+								}
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarButton onClick={ addAccordionContentBlock }>
+							{ __( 'Add' ) }
+						</ToolbarButton>
+					</BlockControls>
+				</>
 			) }
 			<InspectorControls key="setting">
 				<ToolsPanel
@@ -72,6 +87,7 @@ export default function Edit( {
 							autoclose: false,
 							showIcon: true,
 							iconPosition: 'right',
+							headingLevel: 3,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
