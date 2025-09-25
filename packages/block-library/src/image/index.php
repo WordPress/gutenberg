@@ -29,6 +29,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * We define an adhoc class to expose that method.
 	 */
 	$internal_processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
+		// phpcs:ignore Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
 		public function serialize_token(): string {
 			return parent::serialize_token();
 		}
