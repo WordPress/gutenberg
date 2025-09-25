@@ -8,6 +8,7 @@ import {
 	__experimentalVStack as VStack,
 	FlexItem,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,7 +16,14 @@ import {
 
 export default function Header( { title, subTitle, actions } ) {
 	return (
-		<VStack className="edit-site-page-header" as="header" spacing={ 0 }>
+		<VStack
+			className="edit-site-page-header"
+			as="header"
+			spacing={ 0 }
+			role="region"
+			tabIndex="-1"
+			aria-label={ `${ title } ${ __( 'header' ) }` }
+		>
 			<HStack className="edit-site-page-header__page-title">
 				<Heading
 					as="h2"

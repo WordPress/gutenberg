@@ -15,6 +15,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -96,34 +97,52 @@ function DefaultUI( {
 	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
-			<HStack
-				alignment="top"
-				justify="space-between"
-				className="dataviews__view-actions"
-				spacing={ 1 }
+			<div
+				role="region"
+				aria-label={ __( 'Data view actions' ) }
+				tabIndex={ -1 }
 			>
 				<HStack
-					justify="start"
-					expanded={ false }
-					className="dataviews__search"
-				>
-					{ search && <DataViewsSearch label={ searchLabel } /> }
-					<FiltersToggle />
-				</HStack>
-				<HStack
+					alignment="top"
+					justify="space-between"
+					className="dataviews__view-actions"
 					spacing={ 1 }
-					expanded={ false }
-					style={ { flexShrink: 0 } }
 				>
-					<DataViewsViewConfig />
-					{ header }
+					<HStack
+						justify="start"
+						expanded={ false }
+						className="dataviews__search"
+					>
+						{ search && <DataViewsSearch label={ searchLabel } /> }
+						<FiltersToggle />
+					</HStack>
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						<DataViewsViewConfig />
+						{ header }
+					</HStack>
 				</HStack>
-			</HStack>
-			{ isShowingFilter && (
-				<DataViewsFilters className="dataviews-filters__container" />
-			) }
-			<DataViewsLayout />
-			<DataViewsFooter />
+				{ isShowingFilter && (
+					<DataViewsFilters className="dataviews-filters__container" />
+				) }
+			</div>
+			<div
+				role="region"
+				aria-label={ __( 'Data view content' ) }
+				tabIndex={ -1 }
+			>
+				<DataViewsLayout />
+			</div>
+			<div
+				role="region"
+				aria-label={ __( 'Data view footer' ) }
+				tabIndex={ -1 }
+			>
+				<DataViewsFooter />
+			</div>
 		</>
 	);
 }
