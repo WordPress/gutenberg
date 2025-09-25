@@ -89,6 +89,11 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			aria-label={
+				titleField
+					? titleField.getValue( { item } ) || __( '(no title)' )
+					: undefined
+			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
 				<VStack spacing={ 0 } children={ children } { ...props } />
