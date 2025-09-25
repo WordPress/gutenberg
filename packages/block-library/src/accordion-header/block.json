@@ -62,7 +62,7 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": ".accordion-content__toggle-title",
+			"selector": ".wp-block-accordion-header__toggle-title",
 			"role": "content"
 		},
 		"level": {

@@ -37,7 +37,7 @@ function block_core_accordion_content_render( $attributes, $content ) {
 		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
 		$p->set_attribute( 'data-wp-init', 'callbacks.initAccordionContents' );
 
-		if ( $p->next_tag( array( 'class_name' => 'accordion-content__toggle' ) ) ) {
+		if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-header__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
 			$p->set_attribute( 'data-wp-on--keydown', 'actions.handleKeyDown' );
 			$p->set_attribute( 'id', $unique_id );
