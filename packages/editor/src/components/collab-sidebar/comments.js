@@ -88,7 +88,6 @@ export function Comments( {
 		<Thread
 			key={ thread.id }
 			thread={ thread }
-			commentId={ thread.id }
 			onAddReply={ onAddReply }
 			onCommentDelete={ onCommentDelete }
 			onCommentResolve={ onCommentResolve }
@@ -103,7 +102,6 @@ export function Comments( {
 
 function Thread( {
 	thread,
-	commentId,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
@@ -155,7 +153,7 @@ function Thread( {
 					'Comments dialog. Open comment %1$s. Author %2$s. %3$s replies. Status: %4$s. Posted %5$s. Click to focus.',
 					'Comment accessibility label with full context'
 				),
-				commentId,
+				thread.id,
 				thread?.author_name || 'Unknown',
 				thread?.replies?.length || 0,
 				thread?.status === 'approved' ? 'resolved' : 'active',
@@ -169,7 +167,6 @@ function Thread( {
 		>
 			<CommentBoard
 				thread={ thread }
-				commentId={ commentId }
 				onResolve={ onCommentResolve }
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
@@ -208,16 +205,12 @@ function Thread( {
 								{ 'approved' !== thread.status && (
 									<CommentBoard
 										thread={ reply }
-										commentId={ reply.id }
 										onEdit={ onEditComment }
 										onDelete={ onCommentDelete }
 									/>
 								) }
 								{ 'approved' === thread.status && (
-									<CommentBoard
-										thread={ reply }
-										commentId={ reply.id }
-									/>
+									<CommentBoard thread={ reply } />
 								) }
 							</VStack>
 						) ) }
@@ -267,7 +260,7 @@ function Thread( {
 									'Reply to Comment %1$s by %2$s',
 									'Reply to specific comment with author context'
 								),
-								commentId,
+								thread.id,
 								thread?.author_name || 'Unknown'
 							) }
 						/>
@@ -280,7 +273,6 @@ function Thread( {
 
 const CommentBoard = ( {
 	thread,
-	commentId,
 	onResolve,
 	onReopen,
 	onEdit,
@@ -402,7 +394,7 @@ const CommentBoard = ( {
 							'Edit Comment %1$s by %2$s',
 							'Edit specific comment with author context'
 						),
-						commentId,
+						thread.id,
 						thread?.author_name || 'Unknown'
 					) }
 				/>
