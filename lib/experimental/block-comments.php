@@ -104,10 +104,9 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
  * @return string The modified SQL query string.
  */
 function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
-	// Look for a query that is counting comments like "SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM ...
-	// AND comment_approved = '0' GROUP BY comment_post_ID". Then add the conditional "AND comment_type != 'block_comment'".
-	if ( 0 === strpos( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && false !== strpos( $query, 'comment_approved' ) ) {
-		if ( false === strpos( $query, "comment_type != 'block_comment'" ) ) {
+	// Adjust the query if it is a comment count query.
+	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
+		if ( ! str_contains( $query, "comment_type != 'block_comment'" ) ) {
 			$query = str_replace( 'comment_approved', "comment_type != 'block_comment' AND comment_approved", $query );
 		}
 	}
