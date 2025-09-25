@@ -105,7 +105,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment edited successfully.' } )
+				.filter( { hasText: 'Comment updated.' } )
 		).toBeVisible();
 	} );
 
