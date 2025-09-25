@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -53,9 +53,7 @@ export function AddComment( {
 		return null;
 	}
 
-	// Generate contextual label for new comment
-	// For new comments, use a generic label since we don't have an ID yet
-	const commentLabel = _x( 'New Comment', 'Add new comment label' );
+	const commentLabel = __( 'New Comment' );
 
 	return (
 		<VStack

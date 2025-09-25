@@ -139,31 +139,6 @@ function Thread( {
 			id={ thread.id }
 			spacing="3"
 			onClick={ () => handleCommentSelect( thread ) }
-			onKeyDown={ ( event ) => {
-				if ( event.key === 'Enter' || event.key === ' ' ) {
-					event.preventDefault();
-					handleCommentSelect( thread.id );
-				}
-			} }
-			role="button"
-			tabIndex={ 0 }
-			aria-label={ sprintf(
-				// translators: %1$s: comment identifier, %2$s: author name, %3$s: reply count, %4$s: status, %5$s: date.
-				_x(
-					'Comments dialog. Open comment %1$s. Author %2$s. %3$s replies. Status: %4$s. Posted %5$s. Click to focus.',
-					'Comment accessibility label with full context'
-				),
-				thread.id,
-				thread?.author_name || 'Unknown',
-				thread?.replies?.length || 0,
-				thread?.status === 'approved' ? 'resolved' : 'active',
-				thread?.date
-					? new Date( thread.date ).toLocaleDateString()
-					: 'unknown date'
-			) }
-			{ ...( thread?.replies?.length > 0 && {
-				'aria-expanded': isFocused,
-			} ) }
 		>
 			<CommentBoard
 				thread={ thread }
@@ -256,10 +231,7 @@ function Thread( {
 							rows={ 'approved' === thread.status ? 2 : 4 }
 							labelText={ sprintf(
 								// translators: %1$s: comment identifier, %2$s: author name
-								_x(
-									'Reply to Comment %1$s by %2$s',
-									'Reply to specific comment with author context'
-								),
+								__( 'Reply to Comment %1$s by %2$s' ),
 								thread.id,
 								thread?.author_name || 'Unknown'
 							) }
@@ -390,10 +362,7 @@ const CommentBoard = ( {
 					submitButtonText={ _x( 'Update', 'verb' ) }
 					labelText={ sprintf(
 						// translators: %1$s: comment identifier, %2$s: author name.
-						_x(
-							'Edit Comment %1$s by %2$s',
-							'Edit specific comment with author context'
-						),
+						__( 'Edit Comment %1$s by %2$s' ),
 						thread.id,
 						thread?.author_name || 'Unknown'
 					) }

@@ -9,8 +9,8 @@ import TextareaAutosize from 'react-autosize-textarea';
 import { useState } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	Button,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { _x, __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
@@ -30,7 +30,6 @@ import { sanitizeCommentString } from './utils';
  * @param {string}   props.submitButtonText - The text to display on the submit button.
  * @param {string?}  props.placeholderText  - The placeholder text for the comment input.
  * @param {number?}  props.rows             - The number of rows for the comment input.
- * @param {string?}  props.labelText        - Custom label text for accessibility.
  * @return {React.ReactNode} The CommentForm component.
  */
 function CommentForm( {
@@ -40,7 +39,6 @@ function CommentForm( {
 	submitButtonText,
 	placeholderText,
 	rows = 4,
-	labelText,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
@@ -49,13 +47,10 @@ function CommentForm( {
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
 
 	return (
-		<VStack spacing="3">
-			<label
-				htmlFor={ inputId }
-				className="editor-collab-sidebar-panel__comment-label"
-			>
-				{ labelText || __( 'Comment' ) }
-			</label>
+		<>
+			<VisuallyHidden as="label" htmlFor={ inputId }>
+				{ __( 'Comment' ) }
+			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
@@ -87,7 +82,7 @@ function CommentForm( {
 					text={ _x( 'Cancel', 'Cancel comment button' ) }
 				/>
 			</HStack>
-		</VStack>
+		</>
 	);
 }
 
