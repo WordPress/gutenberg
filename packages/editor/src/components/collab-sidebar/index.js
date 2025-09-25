@@ -53,16 +53,7 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
-		return {
-			postId: _postId,
-		};
-	}, [] );
-
+	const { getCurrentPostId } = useSelect( editorStore );
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -83,7 +74,7 @@ function CollabSidebarContent( {
 				'root',
 				'comment',
 				{
-					post: postId,
+					post: getCurrentPostId(),
 					content: comment,
 					comment_type: 'block_comment',
 					comment_approved: 0,
