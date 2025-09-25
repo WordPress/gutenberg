@@ -718,13 +718,13 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 
 ## Time to Read
 
-Show minutes required to finish reading the post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+Show minutes required to finish reading the post. Can also show a word count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
 
 -	**Name:** core/post-time-to-read
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** averageReadingSpeed, displayAsRange, textAlign
+-	**Attributes:** averageReadingSpeed, displayAsRange, showTimeToRead, showWordCount, textAlign
 
 ## Title
 
@@ -957,7 +957,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 -	**Name:** core/table-of-contents
 -	**Experimental:** true
 -	**Category:** design
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** ariaLabel, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
 
 ## Tag Cloud

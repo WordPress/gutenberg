@@ -8,16 +8,12 @@ import {
 	resolveSelect,
 	subscribe,
 } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import {
-	store as coreStore,
-	useEntityBlockEditor,
-	useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -32,7 +28,7 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { getCommentIdsFromBlocks } from './utils';
+import { useBlockComments } from './hooks';
 
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
@@ -241,29 +237,12 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { postId, postType } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+	const { postId } = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( editorStore );
 		return {
 			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
 		};
 	}, [] );
-
-	const queryArgs = {
-		post: postId,
-		type: 'block_comment',
-		status: 'all',
-		per_page: 100,
-	};
-
-	const { records: threads, totalPages } = useEntityRecords(
-		'root',
-		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
-
-	const hasMoreComments = totalPages && totalPages > 1;
 
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -282,62 +261,10 @@ export default function CollabSidebar() {
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
 
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
+	const { resultComments, unresolvedSortedThreads, totalPages } =
+		useBlockComments( postId );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
-
-		const allComments = threads ?? [];
-
-		// Initialize each object with an empty `reply` array.
-		allComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
-		}
-
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
-
-		const blockCommentIds = getCommentIdsFromBlocks( blocks );
-
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ thread.id, thread ] )
-		);
-
-		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = blockCommentIds
-			.map( ( id ) => threadIdMap.get( id ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status !== 'approved'
-			);
-
-		return {
-			resultComments: updatedResult,
-			unresolvedSortedThreads: unresolvedSortedComments,
-		};
-	}, [ threads, blocks ] );
+	const hasMoreComments = totalPages && totalPages > 1;
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
