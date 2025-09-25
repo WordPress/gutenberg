@@ -22,7 +22,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$p = gutenberg_get_block_bindings_processor( $content );
 
 	if ( ! $p->next_tag( 'img' ) || ! $p->get_attribute( 'src' ) ) {
 		return '';
@@ -62,7 +62,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * bindings source), remove the `<figcaption>` element so it isn't rendered empty.
 	 */
 	if ( empty( $attributes['caption'] ) && $p->next_tag( 'figcaption' ) ) {
-		// TODO: Remove <figcaption>.
+		$p->remove_node();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
