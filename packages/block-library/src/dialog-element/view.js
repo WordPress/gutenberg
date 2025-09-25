@@ -29,29 +29,12 @@ const { actions, state } = store( 'core/dialog', {
 			const context = getContext();
 			return context?.id;
 		},
-		get activationTimerDuration() {
-			const { id } = getContext();
-			return state.dialogs[ id ].activationTimerDuration;
-		},
-		get animationDuration() {
-			const { id } = getContext();
-			return state.dialogs[ id ].animationDuration;
+		get dialog() {
+			return state.dialogs[ state.id ];
 		},
 		get dialogElement() {
 			const { id } = getContext();
 			return document.getElementById( id );
-		},
-		get isOpen() {
-			const { id } = getContext();
-			return state.dialogs[ id ].isOpen;
-		},
-		get isClosing() {
-			const { id } = getContext();
-			return state[ id ].isClosing;
-		},
-		get enableDeepLink() {
-			const { id } = getContext();
-			return state.dialogs[ id ].enableDeepLink;
 		},
 	},
 	actions: {
@@ -70,11 +53,6 @@ const { actions, state } = store( 'core/dialog', {
 					return;
 				}
 				state.dialogs[ id ].isOpen = false;
-
-				// Fire off a custom event to let other blocks know the dialog has closed, it's explicit and only runs when a user closes the dialog.
-				window.dispatchEvent(
-					new CustomEvent( 'wpDialogClosed', { detail: { id } } )
-				);
 			} );
 		},
 		/**
@@ -113,9 +91,6 @@ const { actions, state } = store( 'core/dialog', {
 			}
 			state.dialogs[ id ].isOpen = true;
 			state.dialogs[ id ].closingModal = false;
-			window.dispatchEvent(
-				new CustomEvent( 'wpDialogOpened', { detail: { id } } )
-			);
 		},
 		/**
 		 * This function allows you to directly close a dialog by passing an id from another store, like so:
@@ -131,9 +106,6 @@ const { actions, state } = store( 'core/dialog', {
 				return;
 			}
 			state.dialogs[ id ].isOpen = false;
-			window.dispatchEvent(
-				new CustomEvent( 'wpDialogClosed', { detail: { id } } )
-			);
 		},
 	},
 	callbacks: {
@@ -143,9 +115,9 @@ const { actions, state } = store( 'core/dialog', {
 		 * @param event The keyboard event.
 		 */
 		onESCKey: withSyncEvent( ( event ) => {
-			const { id, isOpen } = state;
+			const { id, dialog } = state;
 			if ( id && event.key === 'Escape' ) {
-				if ( true === isOpen ) {
+				if ( true === dialog.isOpen ) {
 					event.preventDefault();
 					actions.close( id );
 				}
@@ -155,16 +127,16 @@ const { actions, state } = store( 'core/dialog', {
 		 * Handles the dialog open event, this is triggered by the user clicking the open button or via an auto activation timer.
 		 */
 		onOpen: () => {
-			const { dialogElement, isOpen, id, enableDeepLink } = state;
+			const { dialogElement, dialog, id } = state;
 			// Sanity check, if we don't have an id or dialogElement then we can't proceed.
 			if ( ! id || ! dialogElement ) {
 				return;
 			}
 			// If the dialog is meant to not be open, don't proceed.
-			if ( ! isOpen ) {
+			if ( ! dialog.isOpen ) {
 				return;
 			}
-			if ( enableDeepLink ) {
+			if ( dialog.enableDeepLink ) {
 				addDialogIdToUrl( id );
 			}
 			dialogElement?.showModal();
@@ -173,13 +145,13 @@ const { actions, state } = store( 'core/dialog', {
 		 * Handles the dialog close event, this is triggered by the user clicking the close button, pressing the escape key or clicking outside the dialog when it's a non-modal dialog.
 		 */
 		onClose: () => {
-			const { dialogElement, isOpen, id, animationDuration } = state;
+			const { dialogElement, dialog, id } = state;
 			// Sanity check, if we don't have an id or dialogElement then we can't proceed.
 			if ( ! id || ! dialogElement ) {
 				return;
 			}
 			// If the dialog is meant to be open, don't proceed.
-			if ( isOpen ) {
+			if ( dialog.isOpen ) {
 				return;
 			}
 			// Start isClosing animation...
@@ -189,15 +161,10 @@ const { actions, state } = store( 'core/dialog', {
 				withScope( () => {
 					dialogElement?.close();
 					removeDialogIdFromUrl( id ); // We always clean the dialog id regardless of whether deep linking is enabled or not.
-					// Fire off a custom event to let other blocks know the dialog has closed, it's explicit and only runs when a user closes the dialog.
-					const event = new CustomEvent( 'wpDialogClosed', {
-						detail: { id },
-					} );
-					document.dispatchEvent( event );
 					state.dialogs[ id ].isClosing = false;
 					state.dialogs[ id ].isOpen = false;
 				} ),
-				animationDuration
+				dialog.animationDuration
 			);
 		},
 		/**
@@ -217,21 +184,21 @@ const { actions, state } = store( 'core/dialog', {
 			) {
 				return;
 			}
-			if ( true !== state.isOpen ) {
+			const { dialog, id } = state;
+			if ( true !== dialog.isOpen || dialog.isClosing ) {
 				return;
 			}
-			const { id } = state;
 			actions.close( id );
 		} ),
 		/**
 		 * Activates the current dialog element if there is an auto activation timer set.
 		 */
 		onAutoActivation: () => {
-			const { id, activationTimerDuration, dialogs } = state;
+			const { id, dialog, dialogs } = state;
 			if (
 				! id &&
-				! activationTimerDuration &&
-				-1 !== activationTimerDuration
+				! dialog.activationTimerDuration &&
+				-1 !== dialog.activationTimerDuration
 			) {
 				return;
 			}
@@ -244,13 +211,13 @@ const { actions, state } = store( 'core/dialog', {
 					return;
 				}
 			}
-			if ( 1 <= activationTimerDuration ) {
+			if ( 1 <= dialog.activationTimerDuration ) {
 				setTimeout(
 					withScope( () => {
 						actions.closeAll();
 						actions.open( id );
 					} ),
-					activationTimerDuration
+					dialog.activationTimerDuration
 				);
 			}
 		},

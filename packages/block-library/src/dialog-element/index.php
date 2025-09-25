@@ -135,6 +135,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$is_open                 = get_query_var( 'dialogId', false ) === $context_id;
 	$dialog_size             = isset( $attributes['dialogSize'] ) ? $attributes['dialogSize'] : 'small';
 	$animation               = isset( $attributes['animation'] ) ? $attributes['animation'] : 'fade';
+	$animation_duration      = $attributes['animationDuration'] ?? 500;
 	$auto_activate_on_render = array_key_exists( 'autoActivateOnRender', $attributes ) ? $attributes['autoActivateOnRender'] : false;
 	$default_is_open         = $auto_activate_on_render;
 	$auto_activation_timer   = array_key_exists( 'autoActivationTimer', $attributes ) ? $attributes['autoActivationTimer'] : -1;
@@ -142,17 +143,18 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
 	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
-wp_interactivity_state( 'core/dialog', array( 
-	'dialogs' => array(
-		$context_id => array(
-			'id'                      => $context_id,
-			'activationTimerDuration' => (int) $auto_activation_timer,
-			'isOpen'                  => $is_open,
-			'enableDeepLink'          => $enable_deep_link,
-			'isClosing'               => false,
+	wp_interactivity_state( 'core/dialog', array(
+		'dialogs' => array(
+			$context_id => array(
+				'id'                      => $context_id,
+				'activationTimerDuration' => (int) $auto_activation_timer,
+				'animationDuration'       => (int) $animation_duration,
+				'isOpen'                  => $is_open,
+				'enableDeepLink'          => $enable_deep_link,
+				'isClosing'               => false,
+			)
 		)
-	)
-) );
+	) );
 
 	$block_styles  = block_core_dialog_generate_animation_styles( $attributes );
 	$block_styles .= ' ' . block_core_dialog_generate_color_styles( $attributes );
