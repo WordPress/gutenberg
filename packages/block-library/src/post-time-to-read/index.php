@@ -38,13 +38,13 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		}
 	}
 
-	$word_count_type      = wp_get_word_count_type();
-	$total_words          = wp_word_count( $content, $word_count_type );
+	$word_count_type = wp_get_word_count_type();
+	$total_words     = wp_word_count( $content, $word_count_type );
 
 	$parts = array();
 
 	// Add "time to read" part, if enabled.
-	if ( $display_mode === 'time' || $display_mode === 'both' ) {
+	if ( 'time' ===  $display_mode || 'both' === $display_mode ) {
 		if ( ! empty( $attributes['displayAsRange'] ) ) {
 			// Calculate faster reading rate with 20% speed = lower minutes,
 			// and slower reading rate with 20% speed = higher minutes.
