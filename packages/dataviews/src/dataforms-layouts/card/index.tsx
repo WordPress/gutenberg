@@ -2,13 +2,7 @@
  * WordPress dependencies
  */
 import { Button, Card, CardBody, CardHeader } from '@wordpress/components';
-import {
-	Fragment,
-	useCallback,
-	useContext,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
@@ -21,13 +15,11 @@ import type {
 	FieldLayoutProps,
 	Form,
 	Layout,
-	FormField,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
 import { DEFAULT_LAYOUT, normalizeLayout } from '../../normalize-form-fields';
-
-const EMPTY_WRAPPER = Fragment;
+import { getSummaryFields } from '../get-summary-fields';
 
 export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 	const [ isOpen, setIsOpen ] = useState( initialIsOpen );
@@ -101,6 +93,14 @@ export default function FormCardField< Item >( {
 	const { isOpen, CollapsibleCardHeader } = useCollapsibleCard(
 		layout.isOpened
 	);
+
+	const summaryFields = getSummaryFields< Item >( field, fields );
+
+	const isSummaryFieldVisible =
+		summaryFields.length > 0 &&
+		( layout.summaryVisibility === 'always' ||
+			( layout.summaryVisibility === 'on-close' && ! isOpen ) );
+
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
 		return (
@@ -110,18 +110,15 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
-						{ layout.summaryField && (
+						{ isSummaryFieldVisible && (
 							<div className="dataforms-layouts-card__field-summary">
-								<DataFormLayout
-									data={ data }
-									form={ {
-										fields: [
-											layout.summaryField as FormField,
-										],
-									} }
-									onChange={ onChange }
-									as={ EMPTY_WRAPPER }
-								/>
+								{ summaryFields.map( ( summaryField ) => (
+									<summaryField.render
+										key={ summaryField.id }
+										item={ data }
+										field={ summaryField }
+									/>
+								) ) }
 							</div>
 						) }
 					</CollapsibleCardHeader>
@@ -166,18 +163,15 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
-					{ layout.summaryField && (
+					{ isSummaryFieldVisible && (
 						<div className="dataforms-layouts-card__field-summary">
-							<DataFormLayout
-								data={ data }
-								form={ {
-									fields: [
-										layout.summaryField as FormField,
-									],
-								} }
-								onChange={ onChange }
-								as={ EMPTY_WRAPPER }
-							/>
+							{ summaryFields.map( ( summaryField ) => (
+								<summaryField.render
+									key={ summaryField.id }
+									item={ data }
+									field={ summaryField }
+								/>
+							) ) }
 						</div>
 					) }
 				</CollapsibleCardHeader>

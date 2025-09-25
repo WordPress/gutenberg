@@ -26,7 +26,6 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
-	SimpleFormField,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
@@ -337,13 +336,13 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
-	summaryField,
+	summaryVisibility,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
-	summaryField?: SimpleFormField;
+	summaryVisibility?: 'always' | 'on-close';
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -370,10 +369,11 @@ const getLayoutFromStoryArgs = ( {
 		const cardLayout: CardLayout = {
 			type: 'card',
 		};
-		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
-			cardLayout.withHeader = withHeader;
-			cardLayout.summaryField = summaryField;
+		if ( withHeader === true ) {
+			cardLayout.withHeader = true;
+			if ( summaryVisibility ) {
+				cardLayout.summaryVisibility = summaryVisibility;
+			}
 		}
 		layout = cardLayout;
 	}
@@ -969,7 +969,13 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
+const LayoutCardComponent = ( {
+	withHeader,
+	summaryVisibility,
+}: {
+	withHeader: boolean;
+	summaryVisibility?: 'always' | 'on-close';
+} ) => {
 	type Customer = {
 		name: string;
 		email: string;
@@ -1098,18 +1104,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 			layout: getLayoutFromStoryArgs( {
 				type: 'card',
 				withHeader,
-				summaryField: {
-					id: 'customer-summary',
-					layout: {
-						type: 'regular',
-						labelPosition: 'none',
-					},
-				},
+				summaryVisibility,
 			} ),
 			fields: [
 				{
 					id: 'customerCard',
 					label: 'Customer',
+					summary: 'customer-summary',
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [
@@ -1119,13 +1120,6 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 							layout: {
 								type: 'panel',
 								labelPosition: 'top',
-								summaryField: {
-									id: 'customer-summary',
-									layout: {
-										type: 'regular',
-										labelPosition: 'none',
-									},
-								},
 							},
 							children: [
 								{
@@ -1178,20 +1172,13 @@ const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 					label: 'Taxes',
 					layout: {
 						type: 'card',
-						summaryField: {
-							id: 'tax-summary',
-							layout: {
-								type: 'regular',
-								labelPosition: 'none',
-							},
-						},
 						isOpened: false,
 					},
 					children: [ 'vat', 'commission' ],
 				},
 			],
 		} ),
-		[ withHeader ]
+		[ withHeader, summaryVisibility ]
 	);
 
 	return (
@@ -1524,9 +1511,15 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
+		summaryVisibility: {
+			control: { type: 'select' },
+			options: [ undefined, 'always', 'on-close' ],
+			description: 'When to show the summary field in the card header.',
+		},
 	},
 	args: {
 		withHeader: true,
+		summaryVisibility: 'always',
 	},
 };
 

@@ -15,16 +15,13 @@ import { useState, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type {
-	FieldLayoutProps,
-	NormalizedPanelLayout,
-	SimpleFormField,
-} from '../../types';
+import type { FieldLayoutProps, NormalizedPanelLayout } from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { isCombinedField } from '../is-combined-field';
 import { normalizeLayout } from '../../normalize-form-fields';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
+import { getSummaryFields } from '../get-summary-fields';
 
 export default function FormPanelField< Item >( {
 	data,
@@ -32,48 +29,8 @@ export default function FormPanelField< Item >( {
 	onChange,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
-	const getSummaryFields = () => {
-		if ( ! isCombinedField( field ) ) {
-			const fieldDef = fields.find(
-				( _field ) => _field.id === field.id
-			);
-			return fieldDef ? [ fieldDef ] : [];
-		}
 
-		// Use summary field(s) if specified for combined fields
-		if ( field.summary ) {
-			const summaryIds = Array.isArray( field.summary )
-				? field.summary
-				: [ field.summary ];
-			return summaryIds
-				.map( ( summaryId ) =>
-					fields.find( ( _field ) => _field.id === summaryId )
-				)
-				.filter( ( _field ) => _field !== undefined );
-		}
-
-		// Default to the first simple child
-		const simpleChildren = field.children.filter(
-			( child ): child is string | SimpleFormField =>
-				typeof child === 'string' || ! isCombinedField( child )
-		);
-
-		if ( simpleChildren.length === 0 ) {
-			return [];
-		}
-
-		const firstChildFieldId =
-			typeof simpleChildren[ 0 ] === 'string'
-				? simpleChildren[ 0 ]
-				: simpleChildren[ 0 ].id;
-
-		const fieldDef = fields.find(
-			( _field ) => _field.id === firstChildFieldId
-		);
-		return fieldDef ? [ fieldDef ] : [];
-	};
-
-	const summaryFields = getSummaryFields();
+	const summaryFields = getSummaryFields( field, fields );
 	const fieldDefinition = summaryFields[ 0 ]; // For backward compatibility
 
 	// Use internal state instead of a ref to make sure that the component

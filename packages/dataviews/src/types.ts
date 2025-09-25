@@ -816,13 +816,13 @@ export type CardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened?: true;
-			summaryField?: SimpleFormField | string;
+			summaryVisibility?: 'always' | 'on-close';
 	  }
 	| {
 			type: 'card';
 			withHeader?: true | undefined;
 			isOpened?: boolean;
-			summaryField?: SimpleFormField | string;
+			summaryVisibility?: 'always' | 'on-close';
 	  };
 export type NormalizedCardLayout =
 	| {
@@ -831,13 +831,13 @@ export type NormalizedCardLayout =
 			// isOpened cannot be false if withHeader is false as well.
 			// Otherwise, the card would not be visible.
 			isOpened: true;
-			summaryField?: SimpleFormField | string;
+			summaryVisibility: 'always' | 'on-close';
 	  }
 	| {
 			type: 'card';
 			withHeader: true;
 			isOpened: boolean;
-			summaryField?: SimpleFormField | string;
+			summaryVisibility: 'always' | 'on-close';
 	  };
 
 export type RowLayout = {
