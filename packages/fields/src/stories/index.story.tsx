@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { DataForm, DataViews } from '@wordpress/dataviews';
+import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 
 /**
@@ -10,23 +10,23 @@ import type { Field, View } from '@wordpress/dataviews';
  */
 
 import {
-	slugField,
-	titleField,
-	orderField,
-	passwordField,
-	statusField,
+	authorField,
 	commentStatusField,
 	dateField,
-	authorField,
+	orderField,
+	passwordField,
+	slugField,
+	statusField,
+	titleField,
 } from '../fields';
 
 // Fields not yet covered:
-// pageTitleField,
-// templateTitleField,
-// patternTitleField,
 // featuredImageField,
-// templateField,
+// pageTitleField,
 // parentField,
+// patternTitleField,
+// templateField,
+// templateTitleField,
 
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
 
@@ -74,7 +74,10 @@ const samplePostWithAuthor: BasePostWithEmbeddedAuthor = {
 	},
 };
 
-// Create a comprehensive field showcase
+// Create a showcase of all base fields.
+// This does not include fields that require more complex setups,
+// however this could be extended in the future, by setting up the data
+// stores to contain entities like pages, users, media, etc.
 const showcaseFields: Field< any >[] = [
 	titleField,
 	slugField,
@@ -86,25 +89,28 @@ const showcaseFields: Field< any >[] = [
 	orderField,
 ];
 
-// Form configuration for showcase
-const showcaseForm = {
-	fields: [
-		'title',
-		'slug',
-		'status',
-		'date',
-		'author',
-		'comment_status',
-		'password',
-		'menu_order',
-	],
-};
-
-export const DataFormsPreview = () => {
+const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 	const [ data, setData ] = useState( samplePostWithAuthor );
 
 	const handleChange = ( updates: Partial< BasePostWithEmbeddedAuthor > ) => {
 		setData( ( prev ) => ( { ...prev, ...updates } ) );
+	};
+
+	// Form configuration for the showcase.
+	const showcaseForm: Form = {
+		layout: {
+			type,
+		},
+		fields: [
+			'title',
+			'slug',
+			'status',
+			'date',
+			'author',
+			'comment_status',
+			'password',
+			'menu_order',
+		],
 	};
 
 	return (
@@ -123,6 +129,20 @@ export const DataFormsPreview = () => {
 			/>
 		</div>
 	);
+};
+
+export const DataFormsPreview = {
+	render: DataFormsComponent,
+	argTypes: {
+		type: {
+			control: { type: 'select' },
+			description: 'Choose the layout type.',
+			options: [ 'regular', 'panel' ],
+		},
+	},
+	args: {
+		type: 'regular',
+	},
 };
 
 export const DataViewsPreview = () => {
