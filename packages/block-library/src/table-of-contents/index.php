@@ -1,6 +1,6 @@
 <?php
 /**
- * Adding aria-label to the `core/table-of-contents` block content.
+ * Server-side rendering of the `core/table-of-contents` block.
  *
  * @package WordPress
  */
