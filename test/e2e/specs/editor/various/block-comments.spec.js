@@ -89,8 +89,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Edit' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
 		await page
 			.getByRole( 'textbox', { name: 'Comment' } )
 			.first()
@@ -119,8 +118,7 @@ test.describe( 'Block Comments', () => {
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to delete.',
 		} );
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete' } )
@@ -150,8 +148,7 @@ test.describe( 'Block Comments', () => {
 		await resolveButton.click();
 		await expect( resolveButton ).toBeDisabled();
 
-		await page.getByRole( 'button', { name: 'Select an action' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Reopen' } ).click();
+		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
 	} );
 
@@ -256,5 +253,13 @@ class BlockCommentUtils {
 			},
 			{ box: true }
 		);
+	}
+
+	async clickBlockCommentActionMenuItem( actionName ) {
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
 	}
 }

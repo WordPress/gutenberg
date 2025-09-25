@@ -12,7 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	DropdownMenu,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 import { published, moreVertical } from '@wordpress/icons';
@@ -31,6 +31,7 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Renders the Comments component.
@@ -280,12 +281,14 @@ const CommentBoard = ( {
 	const actions = [
 		onEdit &&
 			status !== 'approved' && {
+				id: 'edit',
 				title: _x( 'Edit', 'Edit comment' ),
 				onClick: () => {
 					setActionState( 'edit' );
 				},
 			},
 		onDelete && {
+			id: 'delete',
 			title: _x( 'Delete', 'Delete comment' ),
 			onClick: () => {
 				setActionState( 'delete' );
@@ -294,6 +297,7 @@ const CommentBoard = ( {
 		},
 		onReopen &&
 			status === 'approved' && {
+				id: 'reopen',
 				title: _x( 'Reopen', 'Reopen comment' ),
 				onClick: () => {
 					onReopen( thread.id );
@@ -301,6 +305,7 @@ const CommentBoard = ( {
 			},
 	];
 
+	const canResolve = thread?.parent === 0 && onResolve;
 	const moreActions = actions.filter( ( item ) => item?.onClick );
 
 	return (
@@ -313,7 +318,7 @@ const CommentBoard = ( {
 				/>
 				<span className="editor-collab-sidebar-panel__comment-status">
 					<HStack alignment="right" justify="flex-end" spacing="0">
-						{ 0 === thread?.parent && onResolve && (
+						{ canResolve && (
 							<Button
 								label={ _x(
 									'Resolve',
@@ -328,17 +333,34 @@ const CommentBoard = ( {
 								} }
 							/>
 						) }
-						{ 0 < moreActions.length && (
-							<DropdownMenu
-								icon={ moreVertical }
-								label={ _x(
-									'Select an action',
-									'Select comment action'
-								) }
-								className="editor-collab-sidebar-panel__comment-dropdown-menu"
-								controls={ moreActions }
+						<Menu placement="bottom-end">
+							<Menu.TriggerButton
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										disabled={ ! moreActions.length }
+										accessibleWhenDisabled
+									/>
+								}
 							/>
-						) }
+							<Menu.Popover>
+								{ moreActions.map( ( action ) => (
+									<Menu.Item
+										key={ action.id }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											action.onClick();
+										} }
+									>
+										<Menu.ItemLabel>
+											{ action.title }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) ) }
+							</Menu.Popover>
+						</Menu>
 					</HStack>
 				</span>
 			</HStack>
