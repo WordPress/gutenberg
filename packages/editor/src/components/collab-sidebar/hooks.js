@@ -17,7 +17,7 @@ export function useBlockComments( postId ) {
 	const { records: threads, totalPages } = useEntityRecords(
 		'root',
 		'comment',
-		queryArgs,
+		{ ...queryArgs, parent: 0 },
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
