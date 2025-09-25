@@ -73,7 +73,7 @@ export function Comments( {
 				alignment="left"
 				className="editor-collab-sidebar-panel__thread"
 				justify="flex-start"
-				spacing="3"
+				spacing="2"
 			>
 				{
 					// translators: message displayed when there are no comments available
@@ -130,13 +130,19 @@ function Thread( {
 		setShowCommentBoard( false );
 	};
 
+	const replies = thread?.reply || [];
+	const lastReply = !! replies.length
+		? replies[ replies.length - 1 ]
+		: undefined;
+	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'editor-collab-sidebar-panel__focus-thread': isFocused,
 			} ) }
 			id={ thread.id }
-			spacing="3"
+			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 		>
 			<CommentBoard
@@ -147,48 +153,61 @@ function Thread( {
 				onDelete={ onCommentDelete }
 				status={ thread.status }
 			/>
-			{ 0 < thread?.reply?.length && (
-				<>
-					{ ! isFocused && (
-						<Button
-							__next40pxDefaultSize
-							variant="link"
-							className="editor-collab-sidebar-panel__show-more-reply"
-							onClick={ () => setFocusThread( thread.id ) }
-						>
-							{ sprintf(
-								// translators: %s: number of replies.
-								_n(
-									'%s more reply',
-									'%s more replies',
-									thread?.reply?.length
-								),
-								thread?.reply?.length
-							) }
-						</Button>
-					) }
-
-					{ isFocused &&
-						thread.reply.map( ( reply ) => (
-							<VStack
-								key={ reply.id }
-								className="editor-collab-sidebar-panel__child-thread"
-								id={ reply.id }
-								spacing="2"
-							>
-								{ 'approved' !== thread.status && (
-									<CommentBoard
-										thread={ reply }
-										onEdit={ onEditComment }
-										onDelete={ onCommentDelete }
-									/>
-								) }
-								{ 'approved' === thread.status && (
-									<CommentBoard thread={ reply } />
-								) }
-							</VStack>
-						) ) }
-				</>
+			{ isFocused &&
+				replies.map( ( reply ) => (
+					<VStack
+						key={ reply.id }
+						className="editor-collab-sidebar-panel__child-thread"
+						id={ reply.id }
+						spacing="2"
+					>
+						<CommentBoard
+							thread={ reply }
+							onEdit={
+								'approved' !== thread.status
+									? onEditComment
+									: undefined
+							}
+							onDelete={
+								'approved' !== thread.status
+									? onCommentDelete
+									: undefined
+							}
+						/>
+					</VStack>
+				) ) }
+			{ ! isFocused && restReplies.length > 0 && (
+				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+					<Button
+						size="compact"
+						variant="tertiary"
+						className="editor-collab-sidebar-panel__more-reply-button"
+						onClick={ () => setFocusThread( thread.id ) }
+					>
+						{ sprintf(
+							// translators: %s: number of replies.
+							_n(
+								'%s more reply',
+								'%s more replies',
+								restReplies.length
+							),
+							restReplies.length
+						) }
+					</Button>
+				</HStack>
+			) }
+			{ ! isFocused && lastReply && (
+				<CommentBoard
+					thread={ lastReply }
+					onEdit={
+						'approved' !== thread.status ? onEditComment : undefined
+					}
+					onDelete={
+						'approved' !== thread.status
+							? onCommentDelete
+							: undefined
+					}
+				/>
 			) }
 			{ isFocused && (
 				<VStack
