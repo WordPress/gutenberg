@@ -12,8 +12,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
-	DropdownMenu,
 	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 import { published, moreVertical } from '@wordpress/icons';
@@ -32,6 +32,7 @@ import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Renders the Comments component.
@@ -74,7 +75,7 @@ export function Comments( {
 				alignment="left"
 				className="editor-collab-sidebar-panel__thread"
 				justify="flex-start"
-				spacing="3"
+				spacing="2"
 			>
 				{
 					// translators: message displayed when there are no comments available
@@ -132,12 +133,18 @@ function Thread( {
 		setShowCommentBoard( false );
 	};
 
+	const replies = thread?.reply;
+	const lastReply = !! replies.length
+		? replies[ replies.length - 1 ]
+		: undefined;
+	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
-			spacing="3"
+			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 			onKeyDown={ ( event ) => {
 				if (
@@ -159,48 +166,61 @@ function Thread( {
 				onDelete={ onCommentDelete }
 				status={ thread.status }
 			/>
-			{ 0 < thread?.reply?.length && (
-				<>
-					{ ! isSelected && (
-						<Button
-							__next40pxDefaultSize
-							variant="link"
-							className="editor-collab-sidebar-panel__show-more-reply"
-							onClick={ () => setSelectedThread( thread.id ) }
-						>
-							{ sprintf(
-								// translators: %s: number of replies.
-								_n(
-									'%s more reply',
-									'%s more replies',
-									thread?.reply?.length
-								),
-								thread?.reply?.length
-							) }
-						</Button>
-					) }
-
-					{ isSelected &&
-						thread.reply.map( ( reply ) => (
-							<VStack
-								key={ reply.id }
-								className="editor-collab-sidebar-panel__child-thread"
-								id={ reply.id }
-								spacing="2"
-							>
-								{ 'approved' !== thread.status && (
-									<CommentBoard
-										thread={ reply }
-										onEdit={ onEditComment }
-										onDelete={ onCommentDelete }
-									/>
-								) }
-								{ 'approved' === thread.status && (
-									<CommentBoard thread={ reply } />
-								) }
-							</VStack>
-						) ) }
-				</>
+			{ isSelected &&
+				replies.map( ( reply ) => (
+					<VStack
+						key={ reply.id }
+						className="editor-collab-sidebar-panel__child-thread"
+						id={ reply.id }
+						spacing="2"
+					>
+						<CommentBoard
+							thread={ reply }
+							onEdit={
+								'approved' !== thread.status
+									? onEditComment
+									: undefined
+							}
+							onDelete={
+								'approved' !== thread.status
+									? onCommentDelete
+									: undefined
+							}
+						/>
+					</VStack>
+				) ) }
+			{ ! isSelected && restReplies.length > 0 && (
+				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+					<Button
+						size="compact"
+						variant="tertiary"
+						className="editor-collab-sidebar-panel__more-reply-button"
+						onClick={ () => setSelectedThread( thread.id ) }
+					>
+						{ sprintf(
+							// translators: %s: number of replies.
+							_n(
+								'%s more reply',
+								'%s more replies',
+								restReplies.length
+							),
+							restReplies.length
+						) }
+					</Button>
+				</HStack>
+			) }
+			{ ! isSelected && lastReply && (
+				<CommentBoard
+					thread={ lastReply }
+					onEdit={
+						'approved' !== thread.status ? onEditComment : undefined
+					}
+					onDelete={
+						'approved' !== thread.status
+							? onCommentDelete
+							: undefined
+					}
+				/>
 			) }
 			{ isSelected && (
 				<VStack
@@ -274,12 +294,14 @@ const CommentBoard = ( {
 	const actions = [
 		onEdit &&
 			status !== 'approved' && {
+				id: 'edit',
 				title: _x( 'Edit', 'Edit comment' ),
 				onClick: () => {
 					setActionState( 'edit' );
 				},
 			},
 		onDelete && {
+			id: 'delete',
 			title: _x( 'Delete', 'Delete comment' ),
 			onClick: () => {
 				setActionState( 'delete' );
@@ -288,6 +310,7 @@ const CommentBoard = ( {
 		},
 		onReopen &&
 			status === 'approved' && {
+				id: 'reopen',
 				title: _x( 'Reopen', 'Reopen comment' ),
 				onClick: () => {
 					onReopen( thread.id );
@@ -295,6 +318,7 @@ const CommentBoard = ( {
 			},
 	];
 
+	const canResolve = thread?.parent === 0 && onResolve;
 	const moreActions = actions.filter( ( item ) => item?.onClick );
 
 	return (
@@ -313,7 +337,7 @@ const CommentBoard = ( {
 					} }
 				>
 					<HStack spacing="0">
-						{ 0 === thread?.parent && onResolve && (
+						{ canResolve && (
 							<Button
 								label={ _x(
 									'Resolve',
@@ -328,17 +352,34 @@ const CommentBoard = ( {
 								} }
 							/>
 						) }
-						{ 0 < moreActions.length && (
-							<DropdownMenu
-								icon={ moreVertical }
-								label={ _x(
-									'Select an action',
-									'Select comment action'
-								) }
-								className="editor-collab-sidebar-panel__comment-dropdown-menu"
-								controls={ moreActions }
+						<Menu placement="bottom-end">
+							<Menu.TriggerButton
+								render={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										disabled={ ! moreActions.length }
+										accessibleWhenDisabled
+									/>
+								}
 							/>
-						) }
+							<Menu.Popover>
+								{ moreActions.map( ( action ) => (
+									<Menu.Item
+										key={ action.id }
+										onClick={ ( event ) => {
+											event.stopPropagation();
+											action.onClick();
+										} }
+									>
+										<Menu.ItemLabel>
+											{ action.title }
+										</Menu.ItemLabel>
+									</Menu.Item>
+								) ) }
+							</Menu.Popover>
+						</Menu>
 					</HStack>
 				</FlexItem>
 			</HStack>
