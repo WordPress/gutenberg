@@ -13,7 +13,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -235,17 +235,17 @@ function CollabSidebarContent( {
 }
 function CommentPopover( {
 	comment,
-	blocks,
+	resultComments,
 	filteredThreads,
 	showCommentBoard,
 	setShowCommentBoard,
 	backgroundColor,
 } ) {
 	const relatedBlock = useMemo( () => {
-		if ( ! comment.id || ! blocks ) {
+		if ( ! comment.id || ! resultComments ) {
 			return null;
 		}
-		return findBlockByCommentId( comment.id, blocks );
+		return findBlockByCommentId( comment.id, resultComments );
 	}, [ comment.id ] );
 
 	const relatedBlockElement = useBlockElement( relatedBlock );
@@ -282,19 +282,14 @@ export default function CollabSidebar() {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { postId, postType } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+	const { postId } = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( editorStore );
 		const _postId = getCurrentPostId();
-		const _postType = getCurrentPostType();
 
 		return {
 			postId: _postId,
-			postType: _postType,
 		};
 	}, [] );
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
 
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -383,7 +378,7 @@ export default function CollabSidebar() {
 						<CommentPopover
 							key={ comment.id }
 							comment={ comment }
-							blocks={ blocks }
+							resultComments={ resultComments }
 							filteredThreads={ filteredThreads }
 							showCommentBoard={ showCommentBoard }
 							setShowCommentBoard={ setShowCommentBoard }

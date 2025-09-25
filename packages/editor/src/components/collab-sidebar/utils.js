@@ -17,14 +17,8 @@ export function sanitizeCommentString( str ) {
  */
 export function findBlockByCommentId( commentId, blockList ) {
 	for ( const block of blockList ) {
-		if ( block.attributes?.blockCommentId === commentId ) {
-			return block.clientId;
-		}
-		if ( block.innerBlocks ) {
-			const found = findBlockByCommentId( commentId, block.innerBlocks );
-			if ( found ) {
-				return found;
-			}
+		if ( block.id === commentId ) {
+			return block.blockClientId;
 		}
 	}
 	return null;
