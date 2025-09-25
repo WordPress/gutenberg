@@ -220,7 +220,10 @@ function Thread( {
 										status: 'hold',
 									} );
 								}
-								onAddReply( inputComment, thread.id );
+								onAddReply( {
+									content: inputComment,
+									parent: thread.id,
+								} );
 							} }
 							onCancel={ ( event ) => {
 								event.stopPropagation(); // Prevent the parent onClick from being triggered

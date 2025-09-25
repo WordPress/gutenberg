@@ -68,23 +68,23 @@ function CollabSidebarContent( {
 		} );
 	};
 
-	const addNewComment = async ( comment, parentCommentId ) => {
+	const addNewComment = async ( { content, parent } ) => {
 		try {
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
 				{
 					post: getCurrentPostId(),
-					content: comment,
+					content,
 					comment_type: 'block_comment',
 					comment_approved: 0,
-					...( parentCommentId ? { parent: parentCommentId } : {} ),
+					parent: parent || 0,
 				},
 				{ throwOnError: true }
 			);
 
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parentCommentId && savedRecord?.id ) {
+			if ( ! parent && savedRecord?.id ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: savedRecord.id,
 				} );
@@ -92,7 +92,7 @@ function CollabSidebarContent( {
 
 			createNotice(
 				'snackbar',
-				parentCommentId
+				parent
 					? __( 'Reply added successfully.' )
 					: __( 'Comment added successfully.' ),
 				{
