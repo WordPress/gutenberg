@@ -250,8 +250,8 @@ const getAllBlocks = () => {
 		blocks.push( accordionPanel );
 		blocks.push( termsQuery );
 		blocks.push( termTemplate );
-		blocks.push( tabs );
 		blocks.push( tab );
+		blocks.push( tabs );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
