@@ -131,7 +131,7 @@ function Thread( {
 		setShowCommentBoard( false );
 	};
 
-	const replies = thread?.reply || [];
+	const replies = thread?.reply;
 	const lastReply = !! replies.length
 		? replies[ replies.length - 1 ]
 		: undefined;
