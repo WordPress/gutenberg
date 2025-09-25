@@ -8,7 +8,7 @@ import {
 	resolveSelect,
 	subscribe,
 } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
@@ -34,7 +34,6 @@ import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useBlockComments } from './hooks';
-import { findBlockByCommentId } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -235,20 +234,12 @@ function CollabSidebarContent( {
 }
 function CommentPopover( {
 	comment,
-	resultComments,
 	filteredThreads,
 	showCommentBoard,
 	setShowCommentBoard,
 	backgroundColor,
 } ) {
-	const relatedBlock = useMemo( () => {
-		if ( ! comment.id || ! resultComments ) {
-			return null;
-		}
-		return findBlockByCommentId( comment.id, resultComments );
-	}, [ comment.id ] );
-
-	const relatedBlockElement = useBlockElement( relatedBlock );
+	const relatedBlockElement = useBlockElement( comment.blockClientId );
 
 	return (
 		<Popover
@@ -378,7 +369,6 @@ export default function CollabSidebar() {
 						<CommentPopover
 							key={ comment.id }
 							comment={ comment }
-							resultComments={ resultComments }
 							filteredThreads={ filteredThreads }
 							showCommentBoard={ showCommentBoard }
 							setShowCommentBoard={ setShowCommentBoard }
