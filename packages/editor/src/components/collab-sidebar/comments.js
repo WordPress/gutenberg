@@ -77,7 +77,7 @@ export function Comments( {
 				spacing="3"
 			>
 				{
-					// translators: message displayed when there are no comments available.
+					// translators: message displayed when there are no comments available
 					__( 'No comments available' )
 				}
 			</VStack>
@@ -243,7 +243,7 @@ function Thread( {
 								onAddReply( inputComment, thread.id );
 							} }
 							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered.
+								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								clearThreadFocus();
 							} }
 							placeholderText={
@@ -419,7 +419,7 @@ const CommentBoard = ( {
 					confirmButtonText={ __( 'Delete' ) }
 				>
 					{
-						// translators: message displayed when confirming an action.
+						// translators: message displayed when confirming an action
 						__( 'Are you sure you want to delete this comment?' )
 					}
 				</ConfirmDialog>
