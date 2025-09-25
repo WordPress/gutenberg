@@ -281,8 +281,6 @@ export { default as tableRowBefore } from './library/table-row-before';
 export { default as tableRowDelete } from './library/table-row-delete';
 export { default as table } from './library/table';
 export { default as tag } from './library/tag';
-export { default as tab } from './library/tab';
-export { default as tabs } from './library/tabs';
 export { default as thumbsDown } from './library/thumbs-down';
 export { default as thumbsUp } from './library/thumbs-up';
 export { default as symbolFilled } from './library/symbol-filled';

@@ -40,7 +40,7 @@ export default function AddTabToolbarControl( { attributes, tabsClientId } ) {
 					label={ __( 'Add Tab' ) }
 					onClick={ addTab }
 					showTooltip
-					text="Add Tab"
+					text={ __( 'Add Tab' ) }
 				/>
 			</ToolbarGroup>
 		</BlockControls>

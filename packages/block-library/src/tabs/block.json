@@ -8,9 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [
-		"core/tab"
-	],
+	"allowedBlocks": [ "core/tab" ],
 	"attributes": {
 		"tabsId": {
 			"type": "string",
@@ -19,10 +17,7 @@
 		"orientation": {
 			"type": "string",
 			"default": "horizontal",
-			"enum": [
-				"horizontal",
-				"vertical"
-			]
+			"enum": [ "horizontal", "vertical" ]
 		},
 		"activeTabIndex": {
 			"type": "number",
@@ -89,10 +84,7 @@
 		"html": false,
 		"interactivity": true,
 		"spacing": {
-			"blockGap": [
-				"horizontal",
-				"vertical"
-			],
+			"blockGap": [ "horizontal", "vertical" ],
 			"margin": true,
 			"padding": false
 		},
@@ -146,5 +138,5 @@
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
-	"viewScriptModule": "file:./view.js"
+	"viewScriptModule": "@wordpress/block-library/tabs/view"
 }

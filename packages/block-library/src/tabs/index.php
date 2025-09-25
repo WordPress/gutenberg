@@ -143,8 +143,6 @@ function block_core_tabs_generate_tabs_list_from_innerblocks( array $innerblocks
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
-	wp_enqueue_script_module( '@wordpress/block-library/tabs/view' );
-
 	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
 
 	$tabs_list = block_core_tabs_generate_tabs_list_from_innerblocks( $block->parsed_block['innerBlocks'] ?? array() );

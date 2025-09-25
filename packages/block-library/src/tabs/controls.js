@@ -134,7 +134,7 @@ export default function Controls( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Tabs Settings' ) }>
 					<ToggleControl
-						label="Vertical Tabs"
+						label={ __( 'Vertical Tabs' ) }
 						checked={ 'vertical' === orientation }
 						onChange={ () =>
 							setAttributes( {
