@@ -6,13 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	RawHTML,
-	useMemo,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
 
 import {
 	__experimentalHStack as HStack,
@@ -39,6 +33,28 @@ import CommentForm from './comment-form';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
+
+/**
+ * Finds the first block that has the specified comment ID.
+ *
+ * @param {string} commentId - The comment ID to search for.
+ * @param {Array}  blockList - The list of blocks to search through.
+ * @return {string|null} The client ID of the found block, or null if not found.
+ */
+const findBlockByCommentId = ( commentId, blockList ) => {
+	for ( const block of blockList ) {
+		if ( block.attributes?.blockCommentId === commentId ) {
+			return block.clientId;
+		}
+		if ( block.innerBlocks ) {
+			const found = findBlockByCommentId( commentId, block.innerBlocks );
+			if ( found ) {
+				return found;
+			}
+		}
+	}
+	return null;
+};
 
 /**
  * Renders the Comments component.
@@ -170,6 +186,11 @@ function Thread( {
 	focusedThreadRef,
 } ) {
 	const { flashBlock } = useDispatch( blockEditorStore );
+	const { blocks } = useSelect( ( select ) => {
+		return {
+			blocks: select( blockEditorStore ).getBlocks(),
+		};
+	}, [] );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
@@ -213,7 +234,7 @@ function Thread( {
 			} ) }
 			id={ thread.id }
 			spacing="3"
-			onClick={ () => handleCommentSelect( thread.id ) }
+			onClick={ () => handleCommentSelect( thread ) }
 			tabIndex={ isFocused ? 0 : -1 }
 		>
 			<CommentBoard
