@@ -1,0 +1,39 @@
+.wp-block-accordion-header__toggle {
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	text-decoration: inherit;
+	word-spacing: inherit;
+	background: none;
+	border: none;
+	color: inherit;
+	padding: var(--wp--preset--spacing--20, 1em) 0;
+	cursor: pointer;
+	outline: none;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	text-align: inherit;
+	position: relative;
+	width: 100%;
+
+	&:focus-visible {
+		outline: 2px solid -webkit-focus-ring-color;
+		outline-offset: 2px;
+	}
+}
+
+.wp-block-accordion-header__toggle-title {
+	flex: 1;
+}
+
+.wp-block-accordion-header__toggle-icon {
+	width: 1.2em;
+	height: 1.2em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

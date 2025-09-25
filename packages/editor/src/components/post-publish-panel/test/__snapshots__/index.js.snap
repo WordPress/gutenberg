@@ -156,7 +156,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary has-icon"
+              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
@@ -383,7 +383,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary has-icon"
+              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
