@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useSelect,
-	useDispatch,
-	resolveSelect,
-	subscribe,
-} from '@wordpress/data';
+import { useSelect, useDispatch, subscribe } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -58,7 +53,6 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecord } = resolveSelect( coreStore );
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
@@ -180,18 +174,19 @@ function CollabSidebarContent( {
 		}
 	};
 
-	const onCommentDelete = async ( commentId ) => {
+	const onCommentDelete = async ( comment ) => {
 		try {
-			const childComment = await getEntityRecord(
+			await deleteEntityRecord(
 				'root',
 				'comment',
-				commentId
+				comment.id,
+				undefined,
+				{
+					throwOnError: true,
+				}
 			);
-			await deleteEntityRecord( 'root', 'comment', commentId, undefined, {
-				throwOnError: true,
-			} );
 
-			if ( childComment && ! childComment.parent ) {
+			if ( ! comment.parent ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: undefined,
 				} );
