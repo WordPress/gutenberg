@@ -34,6 +34,8 @@ const TEMPLATE = [
 	],
 ];
 
+const { requestAnimationFrame, cancelAnimationFrame } = window;
+
 export default function Edit( {
 	attributes,
 	clientId,
@@ -45,7 +47,7 @@ export default function Edit( {
 
 	const innerBlocksRef = useRef( null );
 	const labelRef = useRef();
-	const timeoutRef = useRef();
+	const focusRef = useRef();
 
 	const { anchor, label } = attributes;
 
@@ -53,19 +55,22 @@ export default function Edit( {
 	// and when the block is mounted.
 	useEffect( () => {
 		if ( ! label && labelRef.current ) {
-			const timeoutId = setTimeout( () => {
-				labelRef.current.focus();
-			}, 100 ); // A really quick millisecond delay to ensure the ref is and block is selected and active.
-			timeoutRef.current = timeoutId;
-			return () => clearTimeout( timeoutRef.current );
+			const animationId = requestAnimationFrame( () => {
+				if ( labelRef.current ) {
+					labelRef.current.focus();
+				}
+			} );
+
+			focusRef.current = animationId;
+			return () => cancelAnimationFrame( focusRef.current );
 		}
 	}, [ label ] );
 
-	// Clean up timeouts on unmount
+	// Clean up animation frames on unmount
 	useEffect( () => {
 		return () => {
-			if ( timeoutRef.current ) {
-				clearTimeout( timeoutRef.current );
+			if ( focusRef.current ) {
+				cancelAnimationFrame( focusRef.current );
 			}
 		};
 	}, [] );
@@ -211,9 +216,11 @@ export default function Edit( {
 							if ( event.key === 'Enter' && ! event.shiftKey ) {
 								event.preventDefault();
 								selectBlock( clientId );
-								timeoutRef.current = setTimeout( () => {
-									labelRef.current.focus();
-								}, 100 );
+								focusRef.current = requestAnimationFrame(
+									() => {
+										labelRef.current.focus();
+									}
+								);
 							}
 						} }
 					>
