@@ -23,22 +23,22 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$output = '';
-	$p      = WP_HTML_Processor::create_fragment( $content );
 
 	/*
 	 * Prior to WP 6.9, WP_HTML_Processor::serialize_token() was `protected`.
-	 * We use reflection to make it `public`. This code can be removed when
-	 * the minimum required WP version is 6.9 or later, and `$p->serialize_token()`
-	 * can be called directly.
+	 * We define an adhoc class to expose that method.
 	 */
-	$serialize_token_method = new ReflectionMethod( $p, 'serialize_token' );
-	if ( PHP_VERSION_ID < 80100 ) {
-		$serialize_token_method->setAccessible( true );
-	}
+	$internal_processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
+		public function serialize_token(): string {
+			return parent::serialize_token();
+		}
+	};
+
+	$p = $internal_processor_class::create_fragment( $content );
 
 	// Advance to the first <img> tag, copying everything before it to the output.
 	while ( $p->next_token() && 'IMG' !== $p->get_token_name() ) {
-		$output .= $serialize_token_method->invoke( $p );
+		$output .= $p->serialize_token();
 	}
 
 	if ( 'IMG' !== $p->get_token_name() || ! $p->get_attribute( 'src' ) ) {
@@ -46,7 +46,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	// We haven't copied the <img> tag itself to the output yet.
-	$output .= $serialize_token_method->invoke( $p );
+	$output .= $p->serialize_token();
 
 	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
@@ -93,7 +93,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 			continue;
 		}
 
-		$output .= $serialize_token_method->invoke( $p );
+		$output .= $p->serialize_token();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
