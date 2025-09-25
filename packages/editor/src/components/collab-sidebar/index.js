@@ -215,7 +215,6 @@ function CollabSidebarContent( {
 				onSubmit={ addNewComment }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
-				threads={ comments }
 			/>
 			<Comments
 				key={ getSelectedBlockClientId() }

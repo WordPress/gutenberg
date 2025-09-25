@@ -49,6 +49,34 @@
 	color: $gray-700;
 	margin-bottom: $grid-unit-10;
 	display: block;
+	// Screen reader only by default
+	position: absolute;
+	left: -10000px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	// Visible when explicitly shown
+	&.is-visible {
+		position: static;
+		left: auto;
+		top: auto;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+}
+
+.editor-collab-sidebar-panel__comments-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	li {
+		margin-bottom: $grid-unit-20;
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 }
 
 .editor-collab-sidebar-panel__child-thread {

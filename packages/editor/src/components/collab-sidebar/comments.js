@@ -128,11 +128,11 @@ export function Comments( {
 			}
 			{ Array.isArray( threads ) &&
 				threads.length > 0 &&
-				threads.map( ( thread, index ) => (
+				threads.map( ( thread ) => (
 					<Thread
 						key={ thread.id }
 						thread={ thread }
-						commentNumber={ index + 1 }
+						commentId={ thread.id }
 						onAddReply={ onAddReply }
 						onCommentDelete={ onCommentDelete }
 						onCommentResolve={ onCommentResolve }
@@ -153,7 +153,7 @@ export function Comments( {
 
 function Thread( {
 	thread,
-	commentNumber,
+	commentId,
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
@@ -196,10 +196,35 @@ function Thread( {
 			id={ thread.id }
 			spacing="3"
 			onClick={ () => handleCommentSelect( thread.id ) }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					event.preventDefault();
+					handleCommentSelect( thread.id );
+				}
+			} }
+			role="button"
+			tabIndex={ 0 }
+			aria-label={ sprintf(
+				// translators: %1$s: comment identifier, %2$s: author name, %3$s: reply count, %4$s: status, %5$s: date
+				_x(
+					'Comments dialog. Open comment %1$s. Author %2$s. %3$s replies. Status: %4$s. Posted %5$s. Click to focus.',
+					'Comment accessibility label with full context'
+				),
+				commentId,
+				thread?.author_name || 'Unknown',
+				thread?.replies?.length || 0,
+				thread?.status === 'approved' ? 'resolved' : 'active',
+				thread?.date
+					? new Date( thread.date ).toLocaleDateString()
+					: 'unknown date'
+			) }
+			{ ...( thread?.replies?.length > 0 && {
+				'aria-expanded': isFocused,
+			} ) }
 		>
 			<CommentBoard
 				thread={ thread }
-				commentNumber={ commentNumber }
+				commentId={ commentId }
 				onResolve={ onCommentResolve }
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
@@ -238,8 +263,7 @@ function Thread( {
 								{ 'approved' !== thread.status && (
 									<CommentBoard
 										thread={ reply }
-										commentNumber={ commentNumber }
-										showLabel={ false }
+										commentId={ reply.id }
 										onEdit={ onEditComment }
 										onDelete={ onCommentDelete }
 									/>
@@ -247,8 +271,7 @@ function Thread( {
 								{ 'approved' === thread.status && (
 									<CommentBoard
 										thread={ reply }
-										commentNumber={ commentNumber }
-										showLabel={ false }
+										commentId={ reply.id }
 									/>
 								) }
 							</VStack>
@@ -294,12 +317,13 @@ function Thread( {
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
 							labelText={ sprintf(
-								// translators: %s: comment number
+								// translators: %1$s: comment identifier, %2$s: author name
 								_x(
-									'Reply to Comment %s',
-									'Reply to specific comment'
+									'Reply to Comment %1$s by %2$s',
+									'Reply to specific comment with author context'
 								),
-								commentNumber
+								commentId,
+								thread?.author_name || 'Unknown'
 							) }
 						/>
 					</VStack>
@@ -311,9 +335,7 @@ function Thread( {
 
 const CommentBoard = ( {
 	thread,
-	commentNumber,
-	isReply = false,
-	showLabel = true,
+	commentId,
 	onResolve,
 	onReopen,
 	onEdit,
@@ -362,27 +384,7 @@ const CommentBoard = ( {
 
 	return (
 		<>
-			{ showLabel && (
-				<div className="editor-collab-sidebar-panel__comment-label">
-					{ isReply
-						? sprintf(
-								// translators: %s: comment number
-								_x(
-									'Reply to Comment %s',
-									'Reply to specific comment'
-								),
-								commentNumber
-						  )
-						: sprintf(
-								// translators: %s: comment number
-								_x(
-									'Comment %s',
-									'Comment with sequential number'
-								),
-								commentNumber
-						  ) }
-				</div>
-			) }
+			{ /* Visual labels removed - using rich aria-labels instead for better accessibility */ }
 			<HStack alignment="left" spacing="3" justify="flex-start">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
@@ -430,9 +432,13 @@ const CommentBoard = ( {
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
 					labelText={ sprintf(
-						// translators: %s: comment number
-						_x( 'Edit Comment %s', 'Edit specific comment' ),
-						commentNumber
+						// translators: %1$s: comment identifier, %2$s: author name
+						_x(
+							'Edit Comment %1$s by %2$s',
+							'Edit specific comment with author context'
+						),
+						commentId,
+						thread?.author_name || 'Unknown'
 					) }
 				/>
 			) : (
