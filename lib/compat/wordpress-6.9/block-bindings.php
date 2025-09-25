@@ -424,38 +424,6 @@ function gutenberg_get_block_bindings_processor( string $block_content ) {
 
 			return true;
 		}
-
-		// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
-		public function remove_node() {
-			if ( $this->is_tag_closer() ) {
-				return false;
-			}
-
-			$depth = $this->get_current_depth();
-
-			$this->set_bookmark( '_wp_block_bindings_tag_opener' );
-			// The bookmark names are prefixed with `_` so the key below has an extra `_`.
-			$tag_opener = $this->bookmarks['__wp_block_bindings_tag_opener'];
-			$start      = $tag_opener->start;
-			$this->release_bookmark( '_wp_block_bindings_tag_opener' );
-
-			// Find matching tag closer.
-			while ( $this->next_token() && $this->get_current_depth() >= $depth ) {
-			}
-
-			$this->set_bookmark( '_wp_block_bindings_tag_closer' );
-			$tag_closer = $this->bookmarks['__wp_block_bindings_tag_closer'];
-			$end        = $tag_closer->start + $tag_closer->length;
-			$this->release_bookmark( '_wp_block_bindings_tag_closer' );
-
-			$this->lexical_updates[] = new WP_HTML_Text_Replacement(
-				$start,
-				$end - $start,
-				''
-			);
-
-			return true;
-		}
 	};
 
 	return $internal_processor_class::create_fragment( $block_content );
