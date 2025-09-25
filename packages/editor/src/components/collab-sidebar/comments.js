@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useMemo } from '@wordpress/element';
+import {
+	useState,
+	RawHTML,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -87,8 +93,16 @@ export function Comments( {
 		};
 	}, [] );
 	const [ focusThread = blockCommentId, setFocusThread ] = useState();
+	const focusedThreadRef = useRef( null );
 
 	const { selectBlock } = useDispatch( blockEditorStore );
+
+	// Focus the thread element when focusThread changes.
+	useEffect( () => {
+		if ( focusThread && focusedThreadRef.current ) {
+			focusedThreadRef.current.focus();
+		}
+	}, [ focusThread ] );
 
 	/**
 	 * Handles focus management after comment deletion.
@@ -102,7 +116,7 @@ export function Comments( {
 		);
 
 		if ( deletedThreadIndex !== -1 ) {
-			// Try next comment first, then previous comment
+			// Try next comment first, then previous comment.
 			const nextComment = threads[ deletedThreadIndex + 1 ];
 			const prevComment = threads[ deletedThreadIndex - 1 ];
 
@@ -120,9 +134,7 @@ export function Comments( {
 		setFocusThread( null );
 		setShowCommentBoard( false );
 		// Callback to handle block selection.
-		if ( onFocusBlock ) {
-			onFocusBlock( deletedCommentId );
-		}
+		onFocusBlock( deletedCommentId );
 	};
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
@@ -156,6 +168,9 @@ export function Comments( {
 			handleCommentDeletionFocus={ handleCommentDeletionFocus }
 			selectBlock={ selectBlock }
 			setShowCommentBoard={ setShowCommentBoard }
+			focusedThreadRef={
+				focusThread === thread.id ? focusedThreadRef : null
+			}
 		/>
 	) );
 }
@@ -172,6 +187,7 @@ function Thread( {
 	handleCommentDeletionFocus,
 	selectBlock,
 	setShowCommentBoard,
+	focusedThreadRef,
 } ) {
 	const { flashBlock } = useDispatch( blockEditorStore );
 	const { blocks } = useSelect( ( select ) => {
@@ -208,7 +224,6 @@ function Thread( {
 	};
 
 	const handleFocusBlock = ( deletedCommentId ) => {
-		// Find the block that contains the deleted comment
 		const deletedCommentBlock = findBlockByCommentId(
 			deletedCommentId,
 			blocks
@@ -218,28 +233,29 @@ function Thread( {
 		}
 	};
 
+	const handleDeleteComment = ( commentId ) => {
+		onCommentDelete( commentId, ( deletedCommentId ) =>
+			handleCommentDeletionFocus( deletedCommentId, handleFocusBlock )
+		);
+	};
+
 	return (
 		<VStack
+			ref={ focusedThreadRef }
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'editor-collab-sidebar-panel__focus-thread': isFocused,
 			} ) }
 			id={ thread.id }
 			spacing="3"
 			onClick={ () => handleCommentSelect( thread.id ) }
+			tabIndex={ isFocused ? 0 : -1 }
 		>
 			<CommentBoard
 				thread={ thread }
 				onResolve={ onCommentResolve }
 				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
-				onDelete={ ( commentId ) =>
-					onCommentDelete( commentId, ( deletedCommentId ) =>
-						handleCommentDeletionFocus(
-							deletedCommentId,
-							handleFocusBlock
-						)
-					)
-				}
+				onDelete={ handleDeleteComment }
 				status={ thread.status }
 			/>
 			{ 0 < thread?.reply?.length && (
@@ -275,16 +291,7 @@ function Thread( {
 									<CommentBoard
 										thread={ reply }
 										onEdit={ onEditComment }
-										onDelete={ ( commentId ) =>
-											onCommentDelete(
-												commentId,
-												( deletedCommentId ) =>
-													handleCommentDeletionFocus(
-														deletedCommentId,
-														handleFocusBlock
-													)
-											)
-										}
+										onDelete={ handleDeleteComment }
 									/>
 								) }
 								{ 'approved' === thread.status && (
