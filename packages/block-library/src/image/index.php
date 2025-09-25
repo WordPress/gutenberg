@@ -22,8 +22,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$p      = WP_HTML_Processor::create_fragment( $content );
 	$output = '';
+	$p      = WP_HTML_Processor::create_fragment( $content );
 
 	/*
 	 * Prior to WP 6.9, WP_HTML_Processor::serialize_token() was `protected`.
