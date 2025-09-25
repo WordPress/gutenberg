@@ -248,10 +248,10 @@ const getAllBlocks = () => {
 		blocks.push( accordionContent );
 		blocks.push( accordionHeader );
 		blocks.push( accordionPanel );
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
 		blocks.push( tab );
 		blocks.push( tabs );
+		blocks.push( termsQuery );
+		blocks.push( termTemplate );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
