@@ -144,6 +144,7 @@ function Thread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
+			id={ `thread-${ thread.id }` }
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 			onKeyDown={ ( event ) => {
