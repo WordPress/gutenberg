@@ -117,4 +117,196 @@ describe( 'validation', () => {
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );
+
+	it( 'array field is invalid when required but empty', () => {
+		const item = { id: 1, tags: [] };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				isValid: {
+					required: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'array field is invalid when required but not an array', () => {
+		const item = { id: 1, tags: null };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				isValid: {
+					required: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'array field is valid when required and has values', () => {
+		const item = { id: 1, tags: [ 'tag1', 'tag2' ] };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				isValid: {
+					required: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'text field with isValid.elements validates against elements', () => {
+		const item = { id: 1, status: 'published' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'status',
+				type: 'text',
+				elements: [
+					{ value: 'draft', label: 'Draft' },
+					{ value: 'published', label: 'Published' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'status' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'text field with isValid.elements rejects invalid values', () => {
+		const item = { id: 1, status: 'invalid-status' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'status',
+				type: 'text',
+				elements: [
+					{ value: 'draft', label: 'Draft' },
+					{ value: 'published', label: 'Published' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'status' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'integer field with isValid.elements validates against elements', () => {
+		const item = { id: 1, priority: 2 };
+		const fields: Field< {} >[] = [
+			{
+				id: 'priority',
+				type: 'integer',
+				elements: [
+					{ value: 1, label: 'Low' },
+					{ value: 2, label: 'Medium' },
+					{ value: 3, label: 'High' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'priority' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'integer field with isValid.elements rejects invalid values', () => {
+		const item = { id: 1, priority: 5 };
+		const fields: Field< {} >[] = [
+			{
+				id: 'priority',
+				type: 'integer',
+				elements: [
+					{ value: 1, label: 'Low' },
+					{ value: 2, label: 'Medium' },
+					{ value: 3, label: 'High' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'priority' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'array field with isValid.elements validates all items against elements', () => {
+		const item = { id: 1, tags: [ 'red', 'blue' ] };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				elements: [
+					{ value: 'red', label: 'Red' },
+					{ value: 'blue', label: 'Blue' },
+					{ value: 'green', label: 'Green' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'array field with isValid.elements rejects arrays with invalid items', () => {
+		const item = { id: 1, tags: [ 'red', 'yellow' ] };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				elements: [
+					{ value: 'red', label: 'Red' },
+					{ value: 'blue', label: 'Blue' },
+					{ value: 'green', label: 'Green' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'array field with isValid.elements handles non-array values', () => {
+		const item = { id: 1, tags: 'not-an-array' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'tags',
+				type: 'array',
+				elements: [
+					{ value: 'red', label: 'Red' },
+					{ value: 'blue', label: 'Blue' },
+				],
+				isValid: {
+					elements: true,
+				},
+			},
+		];
+		const form = { fields: [ 'tags' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
 } );

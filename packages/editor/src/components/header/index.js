@@ -24,6 +24,7 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
+import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -196,9 +197,11 @@ function Header( {
 					/>
 				) }
 
-				{ isBlockCommentExperimentEnabled ? (
-					<CollabSidebar />
-				) : undefined }
+				{ isBlockCommentExperimentEnabled && (
+					<PostTypeSupportCheck supportKeys="editor.block-comments">
+						<CollabSidebar />
+					</PostTypeSupportCheck>
+				) }
 
 				{ customSaveButton }
 				<MoreMenu />
