@@ -273,7 +273,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 						<DataViews.FiltersToggle />
 						<DataViews.Search label={ __( 'moons by planet' ) } />
 					</HStack>
-					<DataViews.Filters />
+					<DataViews.FiltersToggled />
 				</VStack>
 
 				<VStack>
