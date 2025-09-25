@@ -38,6 +38,7 @@ import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
 import { unlock } from '../../lock-unlock';
+import EditContentsButton from '../block-inspector/edit-contents-button';
 
 /**
  * Renders the block toolbar.
@@ -278,6 +279,9 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
+				{ window?.__experimentalContentOnlyPatternInsertion && (
+					<EditContentsButton clientId={ blockClientId } isToolbar />
+				) }
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>

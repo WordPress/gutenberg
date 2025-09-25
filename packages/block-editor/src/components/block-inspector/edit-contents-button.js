@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 
-export default function EditContentsButton( { clientId } ) {
+export default function EditContentsButton( { clientId, isToolbar = false } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { attributes } = useSelect(
 		( select ) => {
@@ -26,19 +26,31 @@ export default function EditContentsButton( { clientId } ) {
 		return null;
 	}
 
+	const handleClick = () => {
+		const { patternName, ...metadataWithoutPatternName } =
+			attributes?.metadata ?? {};
+		updateBlockAttributes( clientId, {
+			...attributes,
+			metadata: metadataWithoutPatternName,
+		} );
+	};
+
+	if ( isToolbar ) {
+		return (
+			<ToolbarGroup>
+				<ToolbarButton onClick={ handleClick }>
+					{ __( 'Edit contents' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
+		);
+	}
+
 	return (
 		<Button
 			className="block-editor-block-inspector-edit-contents-button"
 			__next40pxDefaultSize
 			variant="secondary"
-			onClick={ () => {
-				const { patternName, ...metadataWithoutPatternName } =
-					attributes?.metadata ?? {};
-				updateBlockAttributes( clientId, {
-					...attributes,
-					metadata: metadataWithoutPatternName,
-				} );
-			} }
+			onClick={ handleClick }
 		>
 			{ __( 'Edit contents' ) }
 		</Button>
