@@ -859,6 +859,7 @@ export type NormalizedLayout =
 export type SimpleFormField = {
 	id: string;
 	layout?: Layout;
+	summary?: string | string[];
 };
 
 export type CombinedFormField = {
