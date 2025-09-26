@@ -145,13 +145,6 @@ add_filter(
  * @return array Modified query variables.
  */
 function gutenberg_block_core_query_add_url_filtering( $query, $block ) {
-	// Check if the instant search gutenberg experiment is enabled
-	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
-	$instant_search_enabled = $gutenberg_experiments && array_key_exists( 'gutenberg-search-query-block', $gutenberg_experiments );
-	if ( ! $instant_search_enabled ) {
-		return $query;
-	}
-
 	// Make sure block has a queryId
 	if ( empty( $block->context['queryId'] ) ) {
 		return $query;

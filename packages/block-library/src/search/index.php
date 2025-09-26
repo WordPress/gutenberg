@@ -33,11 +33,7 @@ function render_block_core_search( $attributes, $content, $block ) {
 	$use_icon_button = ! empty( $attributes['buttonUseIcon'] );
 
 	// Check if the block is using the enhanced pagination.
-	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
-
-	// Check if the block is using the instant search experiment, which requires the enhanced pagination.
-	$gutenberg_experiments  = get_option( 'gutenberg-experiments' );
-	$instant_search_enabled = $enhanced_pagination && $gutenberg_experiments && array_key_exists( 'gutenberg-search-query-block', $gutenberg_experiments );
+	$instant_search_enabled = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 
 	$show_button = true;
 
