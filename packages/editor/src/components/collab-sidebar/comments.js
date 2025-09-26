@@ -208,10 +208,7 @@ function Thread( {
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
 					</HStack>
-					<VStack
-						spacing="3"
-						className="editor-collab-sidebar-panel__comment-field"
-					>
+					<VStack spacing="2">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
@@ -229,21 +226,18 @@ function Thread( {
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								clearThreadFocus();
 							} }
-							placeholderText={
-								'approved' === thread.status &&
-								__(
-									'Adding a comment will re-open this discussion….'
-								)
-							}
 							submitButtonText={
 								'approved' === thread.status
-									? _x(
-											'Reopen & Reply',
-											'Reopen comment and add reply'
-									  )
-									: _x( 'Reply', 'Add reply comment' )
+									? __( 'Reopen & Reply' )
+									: __( 'Reply' )
 							}
 							rows={ 'approved' === thread.status ? 2 : 4 }
+							labelText={ sprintf(
+								// translators: %1$s: comment identifier, %2$s: author name
+								__( 'Reply to Comment %1$s by %2$s' ),
+								thread.id,
+								thread?.author_name || 'Unknown'
+							) }
 						/>
 					</VStack>
 				</VStack>
@@ -304,6 +298,7 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
 					date={ thread?.date }
+					userId={ thread?.author }
 				/>
 				<span className="editor-collab-sidebar-panel__comment-status">
 					<HStack alignment="right" justify="flex-end" spacing="0">
@@ -368,6 +363,12 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %1$s: comment identifier, %2$s: author name.
+						__( 'Edit Comment %1$s by %2$s' ),
+						thread.id,
+						thread?.author_name || 'Unknown'
+					) }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">

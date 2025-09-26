@@ -15,6 +15,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { Popover, Fill } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -67,7 +68,7 @@ function CollabSidebarContent( {
 	const onError = ( error ) => {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
-				? error.message
+				? decodeEntities( error.message )
 				: __( 'An error occurred while performing an update.' );
 		createNotice( 'error', errorMessage, {
 			type: 'snackbar',

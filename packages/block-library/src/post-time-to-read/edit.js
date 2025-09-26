@@ -118,11 +118,18 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		// Add "word count" part, if enabled.
 		if ( showWordCount ) {
-			const wordCountString = sprintf(
-				/* translators: %s: the number of words in the post. */
-				_n( '%s word', '%s words', totalWords ),
-				totalWords.toLocaleString()
-			);
+			const wordCountString =
+				wordCountType === 'words'
+					? sprintf(
+							/* translators: %s: the number of words in the post. */
+							_n( '%s word', '%s words', totalWords ),
+							totalWords.toLocaleString()
+					  )
+					: sprintf(
+							/* translators: %s: the number of characters in the post. */
+							_n( '%s character', '%s characters', totalWords ),
+							totalWords.toLocaleString()
+					  );
 			parts.push( wordCountString );
 		}
 

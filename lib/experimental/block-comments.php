@@ -93,3 +93,23 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 	}
 	add_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10, 2 );
 }
+
+/**
+ * Filter the comment count query to exclude block_comment type comments.
+ *
+ * Note: we need to make sure this doesn't interfere with the "Editorial Comments" view
+ * once https://github.com/WordPress/gutenberg/issues/71621 is implemented.
+ *
+ * @param string $query The SQL query string.
+ * @return string The modified SQL query string.
+ */
+function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
+	// Adjust the query if it is a comment count query.
+	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
+		if ( ! str_contains( $query, "comment_type != 'block_comment'" ) ) {
+			$query = str_replace( 'comment_approved', "comment_type != 'block_comment' AND comment_approved", $query );
+		}
+	}
+	return $query;
+}
+add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );

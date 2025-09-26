@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
@@ -53,6 +53,8 @@ export function AddComment( {
 		return null;
 	}
 
+	const commentLabel = __( 'New Comment' );
+
 	return (
 		<VStack
 			spacing="3"
@@ -69,6 +71,7 @@ export function AddComment( {
 					setShowCommentBoard( false );
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				labelText={ commentLabel }
 			/>
 		</VStack>
 	);
