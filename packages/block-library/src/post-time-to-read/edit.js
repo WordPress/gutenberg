@@ -174,6 +174,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
+						isShownByDefault
 						label={ __( 'Display options' ) }
 						hasValue={ () => displayMode !== 'time' }
 						onDeselect={ () => {
