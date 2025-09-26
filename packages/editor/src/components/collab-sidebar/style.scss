@@ -34,15 +34,6 @@
 	box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
 }
 
-.editor-collab-sidebar-panel__comment-field {
-	flex: 1;
-
-	button {
-		flex-grow: 1;
-		justify-content: center;
-	}
-}
-
 .editor-collab-sidebar-panel__child-thread {
 	margin-top: 15px;
 }
@@ -130,6 +121,16 @@
 
 .editor-collab-sidebar-panel__more-reply-button {
 	font-weight: 500;
+}
+
+.editor-collab-sidebar-panel__comment-form textarea {
+	@include input-control;
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	padding: 9px 11px;
+	line-height: 20px !important;
+	display: block;
 }
 
 // Comment avatar indicators.
