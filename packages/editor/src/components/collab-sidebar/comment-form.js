@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
 	Button,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -60,7 +61,7 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>
-					{ __( 'Cancel' ) }
+					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
 				<Button
 					size="compact"
@@ -71,8 +72,9 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 						setInputComment( '' );
 					} }
 					disabled={ isDisabled }
-					text={ submitButtonText }
-				/>
+				>
+					<Truncate>{ submitButtonText }</Truncate>
+				</Button>
 			</HStack>
 		</VStack>
 	);
