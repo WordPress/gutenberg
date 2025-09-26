@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch, subscribe } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -14,14 +14,14 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
-import { Popover } from '@wordpress/components';
+import { Popover, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName, collabSidebarName } from './constants';
+import { collabHistorySidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -227,7 +227,6 @@ function CommentPopover( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const { postId } = useSelect( ( select ) => {
@@ -237,6 +236,10 @@ export default function CollabSidebar() {
 		return {
 			postId: _postId,
 		};
+	}, [] );
+	const hasActiveSidebar = useSelect( ( select ) => {
+		const { getActiveComplementaryArea } = select( interfaceStore );
+		return getActiveComplementaryArea( 'core' ) !== null;
 	}, [] );
 
 	const { blockCommentId } = useSelect( ( select ) => {
@@ -264,17 +267,6 @@ export default function CollabSidebar() {
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
-	if ( 0 < resultComments.length ) {
-		const unsubscribe = subscribe( () => {
-			const activeSidebar = getActiveComplementaryArea( 'core' );
-
-			if ( ! activeSidebar ) {
-				enableComplementaryArea( 'core', collabSidebarName );
-				unsubscribe();
-			}
-		} );
-	}
 
 	const AddCommentComponent = blockCommentId
 		? CommentAvatarIndicator
@@ -310,19 +302,26 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport &&
-				unresolvedSortedThreads.length > 0 &&
-				unresolvedSortedThreads.map( ( comment ) => {
-					return (
-						<CommentPopover
-							key={ comment.id }
-							comment={ comment }
-							showCommentBoard={ showCommentBoard }
-							setShowCommentBoard={ setShowCommentBoard }
-							backgroundColor={ backgroundColor }
-						/>
-					);
-				} ) }
+			{ isLargeViewport && ! hasActiveSidebar && (
+				<Fill name="ComplementaryArea/core">
+					<div className="testing-the-slotfill">
+						{ unresolvedSortedThreads.length > 0 &&
+							unresolvedSortedThreads.map( ( comment ) => {
+								return (
+									<CommentPopover
+										key={ comment.id }
+										comment={ comment }
+										showCommentBoard={ showCommentBoard }
+										setShowCommentBoard={
+											setShowCommentBoard
+										}
+										backgroundColor={ backgroundColor }
+									/>
+								);
+							} ) }
+					</div>
+				</Fill>
+			) }
 		</>
 	);
 }
