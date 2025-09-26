@@ -266,9 +266,15 @@ function EditableBlockBindingsPanelItems( { attributes, bindings, sources } ) {
 			} ) }
 			{ modalState && (
 				<Modal onRequestClose={ handleCloseModal }>
-					{ sources[ modalState.sourceKey ].renderModalContent( {
-						attribute: modalState.attribute,
-					} ) }
+					{ ( () => {
+						const RenderModalContent =
+							sources[ modalState.sourceKey ].renderModalContent;
+						return (
+							<RenderModalContent
+								attribute={ modalState.attribute }
+							/>
+						);
+					} )() }
 				</Modal>
 			) }
 		</>
