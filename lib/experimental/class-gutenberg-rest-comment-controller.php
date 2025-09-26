@@ -10,12 +10,14 @@
 class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 
 	public function get_items_permissions_check( $request ) {
+		$is_block_comment = ! empty( $request['type'] ) && 'block_comment' === $request['type'];
+
 		if ( ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
 				$post = get_post( $post_id );
 
 				// Note: This is only relevant change for the backport.
-				if ( $post && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+				if ( $post && $is_block_comment && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
 					return new WP_Error(
 						'rest_comment_not_supported_post_type',
 						__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
@@ -41,7 +43,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 
 		// Re-map edit context capabilities when requesting `block_comment` for a post.
 		// Note: This is only relevant change for the backport.
-		$edit_cap = ! empty( $request['post'] ) && 'block_comment' === $request['type'] ? 'edit_posts' : 'moderate_comments';
+		$edit_cap = ! empty( $request['post'] ) && $is_block_comment ? 'edit_posts' : 'moderate_comments';
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( $edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -120,11 +122,10 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 	}
 
 	public function create_item_permissions_check( $request ) {
-		// This should be an `block_comment` type check when backporting.
-		$non_block_comment = empty( $request['comment_type'] ) || 'comment' === $request['comment_type'];
+		$is_block_comment = ! empty( $request['comment_type'] ) && 'block_comment' === $request['comment_type'];
 
 		// Note: This is only relevant change for the backport.
-		if ( ! is_user_logged_in() && $non_block_comment ) {
+		if ( ! is_user_logged_in() && ! $is_block_comment ) {
 			if ( get_option( 'comment_registration' ) ) {
 				return new WP_Error(
 					'rest_comment_login_required',
@@ -205,7 +206,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		}
 
 		// Note: This is only relevant change for the backport.
-		if ( ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+		if ( $is_block_comment && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_comment_not_supported_post_type',
 				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
@@ -214,7 +215,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		}
 
 		// Note: This is only relevant change for the backport.
-		if ( 'draft' === $post->post_status && $non_block_comment ) {
+		if ( 'draft' === $post->post_status && ! $is_block_comment ) {
 			return new WP_Error(
 				'rest_comment_draft_post',
 				__( 'Sorry, you are not allowed to create a comment on this post.', 'gutenberg' ),
@@ -239,7 +240,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		}
 
 		// Note: This is only relevant change for the backport.
-		if ( ! comments_open( $post->ID ) && $non_block_comment ) {
+		if ( ! comments_open( $post->ID ) && ! $is_block_comment ) {
 			return new WP_Error(
 				'rest_comment_closed',
 				__( 'Sorry, comments are closed for this item.', 'gutenberg' ),
@@ -283,6 +284,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			'description' => __( 'Type of the comment.', 'gutenberg' ),
 			'type'        => 'string',
 			'context'     => array( 'view', 'edit', 'embed' ),
+			// Note: This is only relevant change for the backport.
 			'arg_options' => array(
 				'sanitize_callback' => 'sanitize_key',
 			),
