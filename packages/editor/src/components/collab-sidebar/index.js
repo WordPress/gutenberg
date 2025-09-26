@@ -206,7 +206,6 @@ function CommentPopover( {
 			animate={ false }
 			focusOnMount={ false }
 			anchor={ relatedBlockElement }
-			offset={ 50 }
 			variant="unstyled"
 		>
 			<CollabSidebarContent
