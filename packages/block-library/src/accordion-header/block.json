@@ -39,7 +39,6 @@
 			}
 		},
 		"typography": {
-			"textAlign": true,
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -71,10 +70,6 @@
 		},
 		"levelOptions": {
 			"type": "array"
-		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
 		},
 		"iconPosition": {
 			"type": "string",
