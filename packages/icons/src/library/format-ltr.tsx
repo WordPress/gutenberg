@@ -1,0 +1,12 @@
+/**
+ * WordPress dependencies
+ */
+import { SVG, Path } from '@wordpress/primitives';
+
+const formatLtr = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M3 9c0 2.8 2.2 5 5 5v-.2V20h1.5V5.5H12V20h1.5V5.5h3V4H8C5.2 4 3 6.2 3 9Zm15.9-1-1.1 1 2.6 3-2.6 3 1.1 1 3.4-4-3.4-4Z" />
+	</SVG>
+);
+
+export default formatLtr;

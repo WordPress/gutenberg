@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking Changes
+
+-   Store: Deprecate the block hovered global state and related action/selector ([#70731](https://github.com/WordPress/gutenberg/pull/70731))
+
 ## 14.21.0 (2025-06-25)
 
 ## 14.20.0 (2025-06-04)

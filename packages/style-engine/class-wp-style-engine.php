@@ -133,6 +133,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'individual' => 'border-%s-radius',
 					),
 					'path'          => array( 'border', 'radius' ),
+					'css_vars'      => array(
+						'border-radius' => '--wp--preset--border-radius--$slug',
+					),
 				),
 				'style'  => array(
 					'property_keys' => array(

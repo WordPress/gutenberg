@@ -774,7 +774,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									{ addLinkToFeaturedImage ? (
 										<a
 											href={ post.link }
-											rel="noreferrer noopener"
 											onClick={
 												showRedirectionPreventedNotice
 											}
@@ -789,7 +788,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							<a
 								className="wp-block-latest-posts__post-title"
 								href={ post.link }
-								rel="noreferrer noopener"
 								dangerouslySetInnerHTML={
 									!! titleTrimmed
 										? {

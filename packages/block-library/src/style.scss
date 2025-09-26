@@ -1,3 +1,6 @@
+@import "./accordion-content/style.scss";
+@import "./accordion-header/style.scss";
+@import "./accordion-panel/style.scss";
 @import "./archives/style.scss";
 @import "./avatar/style.scss";
 @import "./audio/style.scss";
@@ -67,6 +70,8 @@
 @import "./table/style.scss";
 @import "./table-of-contents/style.scss";
 @import "./term-description/style.scss";
+@import "./term-template/style.scss";
+@import "./terms-query/style.scss";
 @import "./text-columns/style.scss";
 @import "./verse/style.scss";
 @import "./video/style.scss";

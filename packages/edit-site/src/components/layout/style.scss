@@ -207,10 +207,10 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		content: "";
 		display: block;
 		position: absolute;
-		top: 9px;
-		right: 9px;
-		bottom: 9px;
-		left: 9px;
+		top: $grid-unit-10 + $border-width;
+		right: $grid-unit-10 + $border-width;
+		bottom: $grid-unit-10 + $border-width;
+		left: $grid-unit-20 + $border-width;
 		border-radius: $radius-medium;
 		box-shadow: none;
 

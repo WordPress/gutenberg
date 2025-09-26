@@ -46,6 +46,7 @@ export default function save( { attributes } ) {
 		minHeightUnit,
 		tagName: Tag,
 		sizeSlug,
+		poster,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -137,6 +138,7 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
+					poster={ poster }
 					style={ { objectPosition } }
 					data-object-fit="cover"
 					data-object-position={ objectPosition }

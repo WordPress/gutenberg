@@ -564,15 +564,9 @@ _Returns_
 
 ### getHoveredBlockClientId
 
+> **Deprecated**
+
 Returns the currently hovered block.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -1291,6 +1285,7 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+-   _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
 
 ### hideInsertionPoint
 
@@ -1298,15 +1293,9 @@ Action that hides the insertion point.
 
 ### hoverBlock
 
+> **Deprecated**
+
 Returns an action object used in signalling that the block with the specified client ID has been hovered.
-
-_Parameters_
-
--   _clientId_ `string`: Block client ID.
-
-_Returns_
-
--   `Object`: Action object.
 
 ### insertAfterBlock
 
@@ -1881,8 +1870,9 @@ Action that updates attributes of multiple blocks with the specified client IDs.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
--   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+-   _options_ `Object`: Updating options.
+-   _options.uniqueByBlock_ `[boolean]`: Whether each block in clientIds array has a unique set of attributes.
 
 _Returns_
 

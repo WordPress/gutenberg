@@ -35,7 +35,7 @@
 	padding: 0.5em 1em;
 	display: inline-block;
 
-	&:is(a) {
+	&:where(a) {
 		&:hover,
 		&:visited,
 		&:focus,

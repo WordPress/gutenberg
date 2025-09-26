@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	CheckboxControl,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -45,16 +46,13 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
 ];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -134,7 +132,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description, rel } = attributes;
+	const { label, url, description, rel, opensInNewTab } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -392,6 +390,7 @@ export default function NavigationSubmenuEdit( {
 							url: '',
 							description: '',
 							rel: '',
+							opensInNewTab: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -430,6 +429,24 @@ export default function NavigationSubmenuEdit( {
 							label={ __( 'Link' ) }
 							autoComplete="off"
 							type="url"
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
 						/>
 					</ToolsPanelItem>
 

@@ -137,7 +137,7 @@ export default function ImageSizeControl( {
 									key={ scale }
 									value={ scale }
 									label={ sprintf(
-										/* translators: Percentage value. */
+										/* translators: %d: Percentage value. */
 										__( '%d%%' ),
 										scale
 									) }

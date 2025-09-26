@@ -28,7 +28,7 @@ export const FeaturedImageEdit = ( {
 	const media = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'root', 'media', value );
+			return getEntityRecord( 'postType', 'attachment', value );
 		},
 		[ value ]
 	);

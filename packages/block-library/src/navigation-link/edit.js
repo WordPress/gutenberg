@@ -11,6 +11,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	CheckboxControl,
 	TextControl,
 	TextareaControl,
 	ToolbarButton,
@@ -174,8 +175,9 @@ function getMissingText( type ) {
  * packages/block-library/src/navigation-submenu/edit.js
  * Consider reusing this components for both blocks.
  */
-function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
-	const { label, url, description, rel } = attributes;
+function Controls( { attributes, setAttributes, setIsEditingControl } ) {
+	const { label, url, description, rel, opensInNewTab } = attributes;
+	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	return (
 		<ToolsPanel
@@ -186,6 +188,7 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 					url: '',
 					description: '',
 					rel: '',
+					opensInNewTab: false,
 				} );
 			} }
 			dropdownMenuProps={ dropdownMenuProps }
@@ -205,8 +208,8 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 						setAttributes( { label: labelValue } );
 					} }
 					autoComplete="off"
-					onFocus={ () => setIsLabelFieldFocused( true ) }
-					onBlur={ () => setIsLabelFieldFocused( false ) }
+					onFocus={ () => setIsEditingControl( true ) }
+					onBlur={ () => setIsEditingControl( false ) }
 				/>
 			</ToolsPanelItem>
 
@@ -222,14 +225,41 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 					label={ __( 'Link' ) }
 					value={ url ? safeDecodeURI( url ) : '' }
 					onChange={ ( urlValue ) => {
-						updateAttributes(
-							{ url: urlValue },
-							setAttributes,
-							attributes
-						);
+						setAttributes( {
+							url: encodeURI( safeDecodeURI( urlValue ) ),
+						} );
 					} }
 					autoComplete="off"
 					type="url"
+					onFocus={ () => {
+						lastURLRef.current = url;
+						setIsEditingControl( true );
+					} }
+					onBlur={ () => {
+						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
+						updateAttributes(
+							{ url: ! url ? lastURLRef.current : url },
+							setAttributes,
+							{ ...attributes, url: lastURLRef.current }
+						);
+						setIsEditingControl( false );
+					} }
+				/>
+			</ToolsPanelItem>
+
+			<ToolsPanelItem
+				hasValue={ () => !! opensInNewTab }
+				label={ __( 'Open in new tab' ) }
+				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
+				isShownByDefault
+			>
+				<CheckboxControl
+					__nextHasNoMarginBottom
+					label={ __( 'Open in new tab' ) }
+					checked={ opensInNewTab }
+					onChange={ ( value ) =>
+						setAttributes( { opensInNewTab: value } )
+					}
 				/>
 			</ToolsPanelItem>
 
@@ -309,9 +339,10 @@ export default function NavigationLinkEdit( {
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 
-	// Change the label using inspector causes rich text to change focus on firefox.
-	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
-	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
+	// Change the `label` and `url` using inspector causes RichText to change focus.
+	// This is a workaround to keep the focus on the field when it's focused we don't render the RichText.
+	// See: https://github.com/WordPress/gutenberg/pull/61374.
+	const [ isEditingControl, setIsEditingControl ] = useState( false );
 
 	const {
 		isAtMaxNesting,
@@ -546,14 +577,14 @@ export default function NavigationLinkEdit( {
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setIsLabelFieldFocused={ setIsLabelFieldFocused }
+					setIsEditingControl={ setIsEditingControl }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
-					{ ! url ? (
+					{ ! url && ! isEditingControl ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<span>{ missingText }</span>
 						</div>
@@ -561,7 +592,7 @@ export default function NavigationLinkEdit( {
 						<>
 							{ ! isInvalid &&
 								! isDraft &&
-								! isLabelFieldFocused && (
+								! isEditingControl && (
 									<>
 										<RichText
 											ref={ ref }
@@ -595,9 +626,7 @@ export default function NavigationLinkEdit( {
 										) }
 									</>
 								) }
-							{ ( isInvalid ||
-								isDraft ||
-								isLabelFieldFocused ) && (
+							{ ( isInvalid || isDraft || isEditingControl ) && (
 								<div
 									className={ clsx(
 										'wp-block-navigation-link__placeholder-text',

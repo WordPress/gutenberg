@@ -1,0 +1,79 @@
+name: OPTIONAL - Verify @wordpress/dataviews CHANGELOG update
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+        branches:
+            - trunk
+        paths:
+            - 'packages/dataviews/**'
+            - '!packages/dataviews/src/**/stories/**'
+            - '!packages/dataviews/src/**/test/**'
+            - '!packages/dataviews/src/**/*.android.js'
+            - '!packages/dataviews/src/**/*.ios.js'
+            - '!packages/dataviews/src/**/*.native.js'
+            - '!packages/dataviews/src/**/*.native.scss'
+            - '!packages/dataviews/src/**/react-native-*'
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    check:
+        name: Check CHANGELOG diff
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        steps:
+            - name: 'Get PR commit count'
+              env:
+                  PR_COUNT: ${{ github.event.pull_request.commits }}
+              run: echo "PR_COMMIT_COUNT=$(( PR_COUNT + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+            - name: 'Fetch relevant history from origin'
+              run: git fetch origin "$GITHUB_BASE_REF"
+            - name: Check CHANGELOG status
+              env:
+                  PR_NUMBER: ${{ github.event.number }}
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+              run: |
+                  changelog_path="packages/dataviews/CHANGELOG.md"
+                  optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
+
+                  # Fail if the PR doesn't touch the changelog
+                  if git diff --quiet "$BASE_SHA" HEAD -- "$changelog_path"; then
+                    echo "Please add a CHANGELOG entry to $changelog_path"
+                    echo
+                    echo "${optional_check_notice}"
+                    exit 1
+                  fi
+
+                  pr_link_pattern="\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)"
+                  pr_link_grep_pattern="\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER})"
+
+                  unreleased_section=$(sed -n '/^## Unreleased$/,/^## /p' "${changelog_path}")
+
+                  # Confirm that the CHANGELOG has an entry for the current PR
+                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
+                      echo "Please add a CHANGELOG entry to $changelog_path, and make sure your CHANGELOG entry has a link to the current PR."
+                      echo
+                        echo "${optional_check_notice}"
+                      exit 1
+                  fi
+
+                  # Confirm that there is an 'Unreleased' section and that the relevant entry is in that section
+                  if ! grep -nq -e '^## Unreleased' "${changelog_path}" || \
+                    ! [[ $unreleased_section = *${pr_link_pattern}* ]]; then
+                      echo "Please make sure your CHANGELOG entry is in the \`## Unreleased\` section"
+                      echo
+                      echo "${optional_check_notice}"
+                      exit 1
+                  fi

@@ -68,23 +68,6 @@
 	}
 }
 
-.gallery-image-sizes {
-	.components-base-control__label {
-		margin-bottom: 4px;
-	}
-
-	.gallery-image-sizes__loading {
-		display: flex;
-		align-items: center;
-		color: $gray-700;
-		font-size: $helptext-font-size;
-	}
-
-	.components-spinner {
-		margin: 0 8px 0 4px;
-	}
-}
-
 /**
  * Deprecated css past this point. This can be removed once all galleries are migrated
  * to V2.

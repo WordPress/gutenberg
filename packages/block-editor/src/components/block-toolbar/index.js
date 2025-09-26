@@ -91,6 +91,7 @@ export function PrivateBlockToolbar( {
 			getParentSectionBlock,
 			isZoomOut,
 			isNavigationMode: _isNavigationMode,
+			isSectionBlock,
 		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -100,6 +101,7 @@ export function PrivateBlockToolbar( {
 		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const isNavigationModeEnabled = _isNavigationMode();
 		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
@@ -126,6 +128,16 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 
+		// The switch style button appears more prominently with the
+		// content only pattern experiment.
+		const _showSwitchSectionStyleButton =
+			window?.__experimentalContentOnlyPatternInsertion
+				? _isZoomOut || isSectionBlock( selectedBlockClientId )
+				: _isZoomOut ||
+				  ( isNavigationModeEnabled &&
+						editingMode === 'contentOnly' &&
+						isSectionBlock( selectedBlockClientId ) );
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -151,9 +163,9 @@ export function PrivateBlockToolbar( {
 			showSlots: ! _isZoomOut,
 			showGroupButtons: ! _isZoomOut,
 			showLockButtons: ! _isZoomOut,
-			showSwitchSectionStyleButton: _isZoomOut,
+			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			hasFixedToolbar: getSettings().hasFixedToolbar,
-			isNavigationMode: _isNavigationMode(),
+			isNavigationMode: isNavigationModeEnabled,
 		};
 	}, [] );
 

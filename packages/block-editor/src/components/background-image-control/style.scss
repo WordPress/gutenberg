@@ -76,17 +76,13 @@
 	}
 }
 
-.block-editor-global-styles-background-panel__image-preview-content,
-.block-editor-global-styles-background-panel__dropdown-toggle {
-	height: 100%;
-	width: 100%;
-	padding-left: $grid-unit-15;
-}
-
 .block-editor-global-styles-background-panel__dropdown-toggle {
 	cursor: pointer;
 	background: transparent;
 	border: none;
+	height: 100%;
+	width: 100%;
+	padding-left: $grid-unit-15;
 }
 
 .block-editor-global-styles-background-panel__inspector-media-replace-title {

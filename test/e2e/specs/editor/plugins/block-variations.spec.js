@@ -52,7 +52,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
 
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Quote' } )
@@ -88,9 +88,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Success Message' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -105,7 +105,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Columns' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Columns' } ).click();
 
 		await editor.canvas
 			.getByRole( 'list', { name: 'Block variations' } )
@@ -130,7 +130,7 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
 
 		// Select the quote block.
 		await page.keyboard.press( 'ArrowUp' );
@@ -167,9 +167,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Success Message' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Success Message' } ).click();
 
 		await expect(
 			page
@@ -203,9 +203,9 @@ test.describe( 'Block variations', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Heading' } ).click();
 		await page.keyboard.type( '/Warning Message' );
-		await page.keyboard.press( 'Enter' );
+		await page.getByRole( 'option', { name: 'Warning Message' } ).click();
 
 		await expect(
 			page

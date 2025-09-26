@@ -72,6 +72,9 @@ function getPostMetaFields( select, context ) {
 	return metaFields;
 }
 
+/**
+ * @type {WPBlockBindingsSource}
+ */
 export default {
 	name: 'core/post-meta',
 	getValues( { select, context, bindings } ) {

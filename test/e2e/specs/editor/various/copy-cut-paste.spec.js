@@ -582,7 +582,7 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 
 		await pageUtils.pressKeys( 'primaryAlt+v' );
-		expect( await editor.getBlocks() ).toMatchObject( [
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {

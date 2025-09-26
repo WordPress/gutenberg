@@ -600,7 +600,12 @@ export default () => {
 		}: {
 			element: any;
 		} ) => {
-			// Preserve the initial inner HTML.
+			// Shown deprecation warning
+			warn(
+				'The "data-wp-ignore" directive of the Interactivity API is deprecated since version 6.9 and will be removed in version 7.0.'
+			);
+
+			// Preserve the initial inner HTML
 			const cached = useMemo( () => innerHTML, [] );
 			return createElement( Type, {
 				dangerouslySetInnerHTML: { __html: cached },
@@ -675,8 +680,11 @@ export default () => {
 			const result: VNode< any >[] = [];
 
 			for ( const item of iterable ) {
+				// Shadows a previous item with the same key.
 				const itemContext = proxifyContext(
-					proxifyState( namespace, {} ),
+					proxifyState( namespace, {
+						[ itemProp ]: item,
+					} ),
 					inheritedValue.client[ namespace ]
 				);
 				const mergedContext = {
@@ -686,9 +694,6 @@ export default () => {
 					},
 					server: { ...inheritedValue.server },
 				};
-
-				// Set the item after proxifying the context.
-				mergedContext.client[ namespace ][ itemProp ] = item;
 
 				const scope = {
 					...getScope(),

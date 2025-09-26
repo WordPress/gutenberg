@@ -583,7 +583,11 @@ export default compose( [
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
 			media: isNotFileHref
-				? select( coreStore ).getMedia( id )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id
+				  )
 				: undefined,
 			isSidebarOpened: isSelected && isEditorSidebarOpened(),
 			wasBlockJustInserted: select(

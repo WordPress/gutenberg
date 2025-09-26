@@ -1,0 +1,21 @@
+.wp-block-accordion-content {
+	display: grid;
+	grid-template-rows: max-content 0fr;
+
+	&.is-open {
+		grid-template-rows: max-content 1fr;
+
+		> .wp-block-accordion-header .wp-block-accordion-header__toggle-icon {
+			transform: rotate(45deg);
+		}
+	}
+
+	/* Add transitions only for users who do not prefer reduced motion */
+	@media (prefers-reduced-motion: no-preference) {
+		transition: grid-template-rows 0.3s ease-out;
+
+		> .wp-block-accordion-header .wp-block-accordion-header__toggle-icon {
+			transition: transform 0.2s ease-in-out;
+		}
+	}
+}

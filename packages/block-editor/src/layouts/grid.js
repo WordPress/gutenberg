@@ -243,7 +243,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	};
 
 	return (
-		<fieldset>
+		<fieldset className="block-editor-hooks__grid-layout-minimum-width-control">
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Minimum column width' ) }
 			</BaseControl.VisualLabel>
@@ -302,7 +302,7 @@ function GridLayoutColumnsAndRowsControl( {
 
 	return (
 		<>
-			<fieldset>
+			<fieldset className="block-editor-hooks__grid-layout-columns-and-rows-controls">
 				{ ( ! window.__experimentalEnableGridInteractivity ||
 					! isManualPlacement ) && (
 					<BaseControl.VisualLabel as="legend">

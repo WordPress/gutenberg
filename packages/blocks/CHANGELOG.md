@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking changes
+
+-   `registerBlockType`: Set default `apiVersion` when none is provided during client-side block registration ([#70750](https://github.com/WordPress/gutenberg/pull/70750)).
+
 ## 14.15.0 (2025-06-25)
 
 ## 14.14.0 (2025-06-04)

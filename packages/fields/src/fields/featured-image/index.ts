@@ -18,6 +18,7 @@ const featuredImageField: Field< BasePost > = {
 	Edit: FeaturedImageEdit,
 	render: FeaturedImageView,
 	enableSorting: false,
+	filterBy: false,
 };
 
 /**

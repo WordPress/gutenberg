@@ -27,6 +27,7 @@ export default function CoverBlockControls( {
 	currentSettings,
 	toggleUseFeaturedImage,
 	onClearMedia,
+	blockEditingMode,
 } ) {
 	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
 		attributes;
@@ -39,6 +40,8 @@ export default function CoverBlockControls( {
 		minHeightUnit === 'vh' &&
 		minHeight === 100 &&
 		! attributes?.style?.dimensions?.aspectRatio;
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
 			// If there aren't previous values, take the default ones.
@@ -75,23 +78,25 @@ export default function CoverBlockControls( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<BlockAlignmentMatrixControl
-					label={ __( 'Change content position' ) }
-					value={ contentPosition }
-					onChange={ ( nextPosition ) =>
-						setAttributes( {
-							contentPosition: nextPosition,
-						} )
-					}
-					isDisabled={ ! hasInnerBlocks }
-				/>
-				<FullHeightAlignmentControl
-					isActive={ isMinFullHeight }
-					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasInnerBlocks }
-				/>
-			</BlockControls>
+			{ ! isContentOnlyMode && (
+				<BlockControls group="block">
+					<BlockAlignmentMatrixControl
+						label={ __( 'Change content position' ) }
+						value={ contentPosition }
+						onChange={ ( nextPosition ) =>
+							setAttributes( {
+								contentPosition: nextPosition,
+							} )
+						}
+						isDisabled={ ! hasInnerBlocks }
+					/>
+					<FullHeightAlignmentControl
+						isActive={ isMinFullHeight }
+						onToggle={ toggleMinFullHeight }
+						isDisabled={ ! hasInnerBlocks }
+					/>
+				</BlockControls>
+			) }
 			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }

@@ -35,8 +35,12 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 			return ( newValue ) => {
 				setAttributes( {
 					[ attribute ]: newValue,
-					// Set muted when autoplay changes
-					...( attribute === 'autoplay' && { muted: newValue } ),
+					// Set muted and playsInLine when autoplay changes
+					// playsInline is set to true when autoplay is true to support iOS devices
+					...( attribute === 'autoplay' && {
+						muted: newValue,
+						playsInline: newValue,
+					} ),
 				} );
 			};
 		};
@@ -135,9 +139,14 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 					label={ __( 'Play inline' ) }
 					onChange={ toggleFactory.playsInline }
 					checked={ !! playsInline }
-					help={ __(
-						'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
-					) }
+					disabled={ autoplay }
+					help={
+						autoplay
+							? __( 'Play inline enabled because of Autoplay.' )
+							: __(
+									'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
+							  )
+					}
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem

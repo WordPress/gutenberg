@@ -138,6 +138,10 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
  *                        server-rendered data.
  */
 const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
+	// Remove all noscript elements as they're irrelevant when request is served via router.
+	// This prevents browsers from extracting styles from noscript tags.
+	dom.querySelectorAll( 'noscript' ).forEach( ( el ) => el.remove() );
+
 	const regions = {};
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {

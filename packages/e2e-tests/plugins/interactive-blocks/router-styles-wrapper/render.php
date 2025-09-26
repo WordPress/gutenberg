@@ -15,6 +15,13 @@ add_action(
 			plugin_dir_url( __FILE__ ) . 'style-from-link.css',
 			array()
 		);
+		wp_enqueue_style(
+			'wrapper-styles-media-print',
+			plugin_dir_url( __FILE__ ) . 'style-media-print.css',
+			array(),
+			false,
+			'print'
+		);
 	}
 );
 
@@ -91,4 +98,19 @@ $wrapper_attributes = get_block_wrapper_attributes();
 	<div data-wp-interactive="test/router-styles" >
 		Prefetching: <span data-testid="prefetching" data-wp-text="state.prefetching"></span>
 	</div>
+
+	<!-- Text hidden when media=print applies. -->
+	<div class="hide-on-print" data-testid="hide-on-print">This should be visible when media is not "print".</div>
+	
+	<!-- Element for testing noscript styles being ignored -->
+	<div data-testid="noscript-style-test" class="noscript-style-test">This should not be affected by styles in noscript tags</div>
+	
+	<!-- Noscript styles that should be ignored -->
+	<noscript>
+		<style>
+			.noscript-style-test {
+				color: rgb(255, 0, 0) !important;
+			}
+		</style>
+	</noscript>
 </div>

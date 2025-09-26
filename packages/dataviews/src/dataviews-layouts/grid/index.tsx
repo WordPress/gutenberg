@@ -2,21 +2,24 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ComponentProps, ReactElement } from 'react';
 
 /**
  * WordPress dependencies
  */
 import {
-	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Spinner,
 	Flex,
 	FlexItem,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { isAppleOS } from '@wordpress/keycodes';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +27,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { unlock } from '../../lock-unlock';
 import ItemActions from '../../components/dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import DataViewsContext from '../../components/dataviews-context';
 import {
 	useHasAPossibleBulkAction,
 	useSomeItemHasAPossibleBulkAction,
@@ -35,9 +39,10 @@ import type {
 	ViewGridProps,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
-import getClickableItemProps from '../utils/get-clickable-item-props';
-import { useUpdatedPreviewSizeOnViewportChange } from './preview-size-picker';
+import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface GridItemProps< Item > {
 	view: ViewGridType;
@@ -45,6 +50,11 @@ interface GridItemProps< Item > {
 	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 	onClickItem?: ( item: Item ) => void;
+	renderItemLink?: (
+		props: {
+			item: Item;
+		} & ComponentProps< 'a' >
+	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	item: Item;
 	actions: Action< Item >[];
@@ -54,6 +64,10 @@ interface GridItemProps< Item > {
 	regularFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
 	hasBulkActions: boolean;
+	config: {
+		sizes: string;
+	};
+	posinset?: number;
 }
 
 function GridItem< Item >( {
@@ -62,6 +76,7 @@ function GridItem< Item >( {
 	onChangeSelection,
 	onClickItem,
 	isItemClickable,
+	renderItemLink,
 	getItemId,
 	item,
 	actions,
@@ -71,33 +86,31 @@ function GridItem< Item >( {
 	regularFields,
 	badgeFields,
 	hasBulkActions,
+	config,
+	posinset,
 }: GridItemProps< Item > ) {
-	const { showTitle = true, showMedia = true, showDescription = true } = view;
+	const {
+		showTitle = true,
+		showMedia = true,
+		showDescription = true,
+		infiniteScrollEnabled,
+	} = view;
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const instanceId = useInstanceId( GridItem );
 	const isSelected = selection.includes( id );
 	const renderedMediaField = mediaField?.render ? (
-		<mediaField.render item={ item } />
+		<mediaField.render
+			item={ item }
+			field={ mediaField }
+			config={ config }
+		/>
 	) : null;
 	const renderedTitleField =
 		showTitle && titleField?.render ? (
-			<titleField.render item={ item } />
+			<titleField.render item={ item } field={ titleField } />
 		) : null;
-
-	const clickableMediaItemProps = getClickableItemProps( {
-		item,
-		isItemClickable,
-		onClickItem,
-		className: 'dataviews-view-grid__media',
-	} );
-
-	const clickableTitleItemProps = getClickableItemProps( {
-		item,
-		isItemClickable,
-		onClickItem,
-		className: 'dataviews-view-grid__title-field dataviews-title-field',
-	} );
+	const shouldRenderMedia = showMedia && renderedMediaField;
 
 	let mediaA11yProps;
 	let titleA11yProps;
@@ -115,6 +128,7 @@ function GridItem< Item >( {
 			};
 		}
 	}
+	const { paginationInfo } = useContext( DataViewsContext );
 
 	return (
 		<VStack
@@ -124,7 +138,7 @@ function GridItem< Item >( {
 				'is-selected': hasBulkAction && isSelected,
 			} ) }
 			onClickCapture={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey ) {
+				if ( isAppleOS() ? event.metaKey : event.ctrlKey ) {
 					event.stopPropagation();
 					event.preventDefault();
 					if ( ! hasBulkAction ) {
@@ -137,13 +151,25 @@ function GridItem< Item >( {
 					);
 				}
 			} }
+			role={ infiniteScrollEnabled ? 'article' : undefined }
+			aria-setsize={
+				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+			}
+			aria-posinset={ posinset }
 		>
-			{ showMedia && renderedMediaField && (
-				<div { ...clickableMediaItemProps } { ...mediaA11yProps }>
+			{ shouldRenderMedia && (
+				<ItemClickWrapper
+					item={ item }
+					isItemClickable={ isItemClickable }
+					onClickItem={ onClickItem }
+					renderItemLink={ renderItemLink }
+					className="dataviews-view-grid__media"
+					{ ...mediaA11yProps }
+				>
 					{ renderedMediaField }
-				</div>
+				</ItemClickWrapper>
 			) }
-			{ hasBulkActions && showMedia && renderedMediaField && (
+			{ hasBulkActions && shouldRenderMedia && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -153,20 +179,41 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-grid__title-actions"
-			>
-				<div { ...clickableTitleItemProps } { ...titleA11yProps }>
-					{ renderedTitleField }
-				</div>
-				{ !! actions?.length && (
+			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
-				) }
-			</HStack>
+				</div>
+			) }
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-grid__title-actions"
+				>
+					<ItemClickWrapper
+						item={ item }
+						isItemClickable={ isItemClickable }
+						onClickItem={ onClickItem }
+						renderItemLink={ renderItemLink }
+						className="dataviews-view-grid__title-field dataviews-title-field"
+						{ ...titleA11yProps }
+					>
+						{ renderedTitleField }
+					</ItemClickWrapper>
+					{ !! actions?.length && (
+						<ItemActions
+							item={ item }
+							actions={ actions }
+							isCompact
+						/>
+					) }
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
-					<descriptionField.render item={ item } />
+					<descriptionField.render
+						item={ item }
+						field={ descriptionField }
+					/>
 				) }
 				{ !! badgeFields?.length && (
 					<HStack
@@ -182,7 +229,10 @@ function GridItem< Item >( {
 									key={ field.id }
 									className="dataviews-view-grid__field-value"
 								>
-									<field.render item={ item } />
+									<field.render
+										item={ item }
+										field={ field }
+									/>
 								</Badge>
 							);
 						} ) }
@@ -205,14 +255,19 @@ function GridItem< Item >( {
 									direction="row"
 								>
 									<>
-										<FlexItem className="dataviews-view-grid__field-name">
-											{ field.header }
-										</FlexItem>
+										<Tooltip text={ field.label }>
+											<FlexItem className="dataviews-view-grid__field-name">
+												{ field.header }
+											</FlexItem>
+										</Tooltip>
 										<FlexItem
 											className="dataviews-view-grid__field-value"
 											style={ { maxHeight: 'none' } }
 										>
-											<field.render item={ item } />
+											<field.render
+												item={ item }
+												field={ field }
+											/>
 										</FlexItem>
 									</>
 								</Flex>
@@ -225,7 +280,7 @@ function GridItem< Item >( {
 	);
 }
 
-export default function ViewGrid< Item >( {
+function ViewGrid< Item >( {
 	actions,
 	data,
 	fields,
@@ -234,9 +289,13 @@ export default function ViewGrid< Item >( {
 	onChangeSelection,
 	onClickItem,
 	isItemClickable,
+	renderItemLink,
 	selection,
 	view,
+	className,
+	empty,
 }: ViewGridProps< Item > ) {
+	const { resizeObserverRef } = useContext( DataViewsContext );
 	const titleField = fields.find(
 		( field ) => field.id === view?.titleField
 	);
@@ -267,58 +326,160 @@ export default function ViewGrid< Item >( {
 		{ regularFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
-	const updatedPreviewSize = useUpdatedPreviewSizeOnViewportChange();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
-	const usedPreviewSize = updatedPreviewSize || view.layout?.previewSize;
-	const gridStyle = usedPreviewSize
-		? {
-				gridTemplateColumns: `repeat(${ usedPreviewSize }, minmax(0, 1fr))`,
-		  }
-		: {};
+	const usedPreviewSize = view.layout?.previewSize;
+	/*
+	 * This is the maximum width that an image can achieve in the grid. The reasoning is:
+	 * The biggest min image width available is 430px (see /dataviews-layouts/grid/preview-size-picker.tsx).
+	 * Because the grid is responsive, once there is room for another column, the images shrink to accommodate it.
+	 * So each image will never grow past 2*430px plus a little more to account for the gaps.
+	 */
+	const size = '900px';
+
+	const groupField = view.groupByField
+		? fields.find( ( f ) => f.id === view.groupByField )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+
 	return (
 		<>
-			{ hasData && (
-				<Grid
-					gap={ 8 }
-					columns={ 2 }
-					alignment="top"
-					className="dataviews-view-grid"
-					style={ gridStyle }
-					aria-busy={ isLoading }
-				>
-					{ data.map( ( item ) => {
-						return (
-							<GridItem
-								key={ getItemId( item ) }
-								view={ view }
-								selection={ selection }
-								onChangeSelection={ onChangeSelection }
-								onClickItem={ onClickItem }
-								isItemClickable={ isItemClickable }
-								getItemId={ getItemId }
-								item={ item }
-								actions={ actions }
-								mediaField={ mediaField }
-								titleField={ titleField }
-								descriptionField={ descriptionField }
-								regularFields={ regularFields }
-								badgeFields={ badgeFields }
-								hasBulkActions={ hasBulkActions }
-							/>
-						);
-					} ) }
-				</Grid>
-			) }
-			{ ! hasData && (
-				<div
-					className={ clsx( {
-						'dataviews-loading': isLoading,
-						'dataviews-no-results': ! isLoading,
-					} ) }
-				>
-					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
-				</div>
+			{
+				// Render multiple groups.
+				hasData && groupField && dataByGroup && (
+					<VStack spacing={ 4 }>
+						{ Array.from( dataByGroup.entries() ).map(
+							( [ groupName, groupItems ] ) => (
+								<VStack key={ groupName } spacing={ 2 }>
+									<h3 className="dataviews-view-grid__group-header">
+										{ sprintf(
+											// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+											__( '%1$s: %2$s' ),
+											groupField.label,
+											groupName
+										) }
+									</h3>
+									<GridItems
+										className={ clsx(
+											'dataviews-view-grid',
+											className
+										) }
+										previewSize={ usedPreviewSize }
+										aria-busy={ isLoading }
+										ref={ resizeObserverRef }
+									>
+										{ groupItems.map( ( item ) => {
+											return (
+												<GridItem
+													key={ getItemId( item ) }
+													view={ view }
+													selection={ selection }
+													onChangeSelection={
+														onChangeSelection
+													}
+													onClickItem={ onClickItem }
+													isItemClickable={
+														isItemClickable
+													}
+													renderItemLink={
+														renderItemLink
+													}
+													getItemId={ getItemId }
+													item={ item }
+													actions={ actions }
+													mediaField={ mediaField }
+													titleField={ titleField }
+													descriptionField={
+														descriptionField
+													}
+													regularFields={
+														regularFields
+													}
+													badgeFields={ badgeFields }
+													hasBulkActions={
+														hasBulkActions
+													}
+													config={ {
+														sizes: size,
+													} }
+												/>
+											);
+										} ) }
+									</GridItems>
+								</VStack>
+							)
+						) }
+					</VStack>
+				)
+			}
+
+			{
+				// Render a single grid with all data.
+				hasData && ! dataByGroup && (
+					<GridItems
+						className={ clsx( 'dataviews-view-grid', className ) }
+						previewSize={ usedPreviewSize }
+						aria-busy={ isLoading }
+						ref={ resizeObserverRef }
+						role={ isInfiniteScroll ? 'feed' : undefined }
+					>
+						{ data.map( ( item, index ) => {
+							return (
+								<GridItem
+									key={ getItemId( item ) }
+									view={ view }
+									selection={ selection }
+									onChangeSelection={ onChangeSelection }
+									onClickItem={ onClickItem }
+									isItemClickable={ isItemClickable }
+									renderItemLink={ renderItemLink }
+									getItemId={ getItemId }
+									item={ item }
+									actions={ actions }
+									mediaField={ mediaField }
+									titleField={ titleField }
+									descriptionField={ descriptionField }
+									regularFields={ regularFields }
+									badgeFields={ badgeFields }
+									hasBulkActions={ hasBulkActions }
+									config={ {
+										sizes: size,
+									} }
+									posinset={
+										isInfiniteScroll ? index + 1 : undefined
+									}
+								/>
+							);
+						} ) }
+					</GridItems>
+				)
+			}
+			{
+				// Render empty state.
+				! hasData && (
+					<div
+						className={ clsx( {
+							'dataviews-loading': isLoading,
+							'dataviews-no-results': ! isLoading,
+						} ) }
+					>
+						{ isLoading ? (
+							<p>
+								<Spinner />
+							</p>
+						) : (
+							empty
+						) }
+					</div>
+				)
+			}
+			{ hasData && isLoading && (
+				<p className="dataviews-loading-more">
+					<Spinner />
+				</p>
 			) }
 		</>
 	);
 }
+
+export default ViewGrid;

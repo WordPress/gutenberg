@@ -494,12 +494,12 @@ describe( 'getPathAndQueryString', () => {
 	beforeAll( jest.resetModules );
 	afterAll( jest.resetModules );
 	it( 'combines the results of `getPath` and `getQueryString`', () => {
-		jest.doMock( '../get-path.js', () => ( {
+		jest.doMock( '../get-path', () => ( {
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
-		jest.doMock( '../get-query-string.js', () => ( {
+		jest.doMock( '../get-query-string', () => ( {
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},

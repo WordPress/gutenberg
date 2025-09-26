@@ -2,6 +2,13 @@
 	z-index: z-index(".fields-create-template-part-modal");
 }
 
+.fields-create-template-part-modal__area-fieldset {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
 .fields-create-template-part-modal__area-radio-group {
 	border: $border-width solid $gray-600;
 	border-radius: $radius-small;

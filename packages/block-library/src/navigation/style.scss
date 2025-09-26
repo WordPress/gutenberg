@@ -182,6 +182,7 @@ $navigation-icon-size: 24px;
 			> .wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
+				padding: 0.5em 1em;
 
 				// Right-align the chevron in submenus.
 				.wp-block-navigation__submenu-icon {

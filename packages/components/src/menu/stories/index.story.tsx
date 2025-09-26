@@ -24,7 +24,7 @@ import type { Props } from '../types';
 
 const meta: Meta< typeof Menu > = {
 	id: 'components-menu',
-	title: 'Components (Experimental)/Actions/Menu',
+	title: 'Components/Actions/Menu',
 	component: Menu,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

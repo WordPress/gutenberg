@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import InspectorControlsGroups from '../inspector-controls/groups';
 import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
-import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
+import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
@@ -29,7 +29,12 @@ function getShowTabs( blockName, tabSettings = {} ) {
 	return true;
 }
 
-export default function useInspectorControlsTabs( blockName ) {
+export default function useInspectorControlsTabs(
+	blockName,
+	contentClientIds,
+	isSectionBlock,
+	hasBlockStyles
+) {
 	const tabs = [];
 	const {
 		bindings: bindingsGroup,
@@ -76,17 +81,25 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
+	const hasContentTab = !! (
+		contentClientIds && contentClientIds.length > 0
+	);
+
 	// Add the tabs in the order that they will default to if available.
-	// List View > Settings > Styles.
-	if ( hasListFills ) {
+	// List View > Content > Settings > Styles.
+	if ( hasListFills && ! isSectionBlock ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
-	if ( settingsFills.length ) {
+	if ( hasContentTab ) {
+		tabs.push( TAB_CONTENT );
+	}
+
+	if ( settingsFills.length && ! isSectionBlock ) {
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( hasStyleFills ) {
+	if ( isSectionBlock ? hasBlockStyles : hasStyleFills ) {
 		tabs.push( TAB_STYLES );
 	}
 

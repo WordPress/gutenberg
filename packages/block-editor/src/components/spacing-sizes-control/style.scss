@@ -1,4 +1,9 @@
 .spacing-sizes-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+
 	.spacing-sizes-control__custom-value-input,
 	.spacing-sizes-control__label {
 		margin-bottom: 0;

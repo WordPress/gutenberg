@@ -131,6 +131,29 @@ function Iframe( {
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
+		// Prevent clicks on link fragments from navigating away. Note that links
+		// inside `contenteditable` are already disabled by the browser, so
+		// this is for links in blocks outside of `contenteditable`.
+		function interceptLinkClicks( event ) {
+			if (
+				event.target.tagName === 'A' &&
+				event.target.getAttribute( 'href' )?.startsWith( '#' )
+			) {
+				event.preventDefault();
+				// Manually handle link fragment navigation within the iframe. The iframe's
+				// location is a blob URL, which can't be used to resolve relative links like
+				// `#hash`. The relative link would be resolved against the iframe's base URL
+				// or the parent frame's URL, causing the iframe to navigate to a completely
+				// different page. Setting the `location.hash` works because it really sets the
+				// blob URL's hash.
+				//
+				// Links with fragments are used for example with footnotes. Clicking on these
+				// links will scroll smoothly to the anchors in the editor canvas.
+				iFrameDocument.defaultView.location.hash = event.target
+					.getAttribute( 'href' )
+					.slice( 1 );
+			}
+		}
 
 		const { ownerDocument } = node;
 
@@ -185,22 +208,7 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
-			// Prevent clicks on links from navigating away. Note that links
-			// inside `contenteditable` are already disabled by the browser, so
-			// this is for links in blocks outside of `contenteditable`.
-			iFrameDocument.addEventListener( 'click', ( event ) => {
-				if ( event.target.tagName === 'A' ) {
-					event.preventDefault();
-
-					// Appending a hash to the current URL will not reload the
-					// page. This is useful for e.g. footnotes.
-					const href = event.target.getAttribute( 'href' );
-					if ( href?.startsWith( '#' ) ) {
-						iFrameDocument.defaultView.location.hash =
-							href.slice( 1 );
-					}
-				}
-			} );
+			iFrameDocument.addEventListener( 'click', interceptLinkClicks );
 		}
 
 		node.addEventListener( 'load', onLoad );
@@ -216,6 +224,7 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
+			iFrameDocument?.removeEventListener( 'click', interceptLinkClicks );
 		};
 	}, [] );
 

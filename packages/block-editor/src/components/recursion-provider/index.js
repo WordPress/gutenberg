@@ -10,6 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import { useBlockEditContext } from '../block-edit/context';
 
 const RenderedRefsContext = createContext( {} );
+RenderedRefsContext.displayName = 'RenderedRefsContext';
 
 /**
  * Immutably adds an unique identifier to a set scoped for a given block type.

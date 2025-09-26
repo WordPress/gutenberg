@@ -1,4 +1,8 @@
 .preferences-modal__section {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+
 	margin: 0 0 2.5rem 0;
 
 	&:last-child {

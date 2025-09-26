@@ -489,7 +489,7 @@ The module also checks for sessionStorage support and conditionally exports the 
 
 ### mediaUpload
 
-Upload a media file when the file upload button is activated. Wrapper around mediaUpload() that injects the current post ID.
+Upload a media file when the file upload button is activated. Wrapper around uploadMedia() that injects the current post ID.
 
 _Parameters_
 

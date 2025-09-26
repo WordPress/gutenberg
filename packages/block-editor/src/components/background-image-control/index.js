@@ -115,7 +115,6 @@ function InspectorImagePreviewItem( {
 	toggleProps = {},
 	filename,
 	label,
-	className,
 	onToggleCallback = noop,
 } ) {
 	const { isOpen, ...restToggleProps } = toggleProps;
@@ -168,12 +167,7 @@ function InspectorImagePreviewItem( {
 	};
 
 	return as === 'button' ? (
-		<Button
-			__next40pxDefaultSize
-			className={ className }
-			{ ...restToggleProps }
-			aria-expanded={ isOpen }
-		>
+		<Button __next40pxDefaultSize { ...restToggleProps }>
 			{ renderPreviewContent() }
 		</Button>
 	) : (
@@ -386,7 +380,6 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						className="block-editor-global-styles-background-panel__image-preview"
 						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }

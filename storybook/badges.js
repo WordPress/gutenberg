@@ -33,4 +33,12 @@ export default {
 			desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
 		},
 	},
+	experimental: {
+		icon: '🧪',
+		title: '🧪 Experimental',
+		tooltip: {
+			title: 'Component is experimental',
+			desc: 'This component is under active development and may change in future releases.',
+		},
+	},
 };
