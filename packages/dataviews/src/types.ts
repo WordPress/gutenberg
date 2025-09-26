@@ -194,6 +194,14 @@ export type EditConfigText = {
 	suffix?: React.ComponentType;
 };
 
+export type EditConfigTable = {
+	control: 'table';
+	actions?: {
+		delete?: string | false;
+		add?: string | false;
+	};
+};
+
 /**
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
@@ -208,6 +216,7 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigTable
 	| EditConfigGeneric;
 
 /**
@@ -364,6 +373,10 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		actions?: {
+			delete?: string | false;
+			add?: string | false;
+		};
 	};
 };
 

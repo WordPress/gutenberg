@@ -1667,6 +1667,13 @@ const DynamicDataComponent = () => {
 			id: 'productList',
 			label: 'Product List',
 			type: 'array',
+			Edit: {
+				control: 'table',
+				actions: {
+					delete: 'Remove product',
+					add: 'Add product',
+				},
+			},
 			children: [
 				{
 					id: 'name',

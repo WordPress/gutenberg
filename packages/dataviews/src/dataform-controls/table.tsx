@@ -18,9 +18,14 @@ export default function TableControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { label, children, getValue, setValue } = field;
 	const value = getValue( { item: data } );
+	const { delete: deleteItemLabel, add: addItemLabel } = config?.actions || {
+		delete: 'Remove item',
+		add: 'Add item',
+	};
 
 	const onChangeRow = useCallback(
 		(
@@ -138,7 +143,9 @@ export default function TableControl< Item >( {
 							{ children.map( ( child ) => (
 								<th key={ child.id }>{ child.label }</th>
 							) ) }
-							<th>{ __( 'Actions' ) }</th>
+							{ deleteItemLabel !== false && (
+								<th>{ __( 'Actions' ) }</th>
+							) }
 						</tr>
 					</thead>
 					<tbody>
@@ -162,30 +169,36 @@ export default function TableControl< Item >( {
 										) }
 									</td>
 								) ) }
-								<td>
-									<Button
-										icon={ trash }
-										label={ __( 'Remove item' ) }
-										onClick={ () => removeItem( rowIndex ) }
-										size="small"
-										isDestructive
-									/>
-								</td>
+								{ deleteItemLabel !== false && (
+									<td>
+										<Button
+											icon={ trash }
+											label={ deleteItemLabel }
+											onClick={ () =>
+												removeItem( rowIndex )
+											}
+											size="small"
+											isDestructive
+										/>
+									</td>
+								) }
 							</tr>
 						) ) }
 					</tbody>
 				</table>
 			</div>
-			<div className="dataform-control-array-table__add-row">
-				<Button
-					icon={ plus }
-					onClick={ addItem }
-					variant="secondary"
-					__next40pxDefaultSize
-				>
-					{ __( 'Add item' ) }
-				</Button>
-			</div>
+			{ addItemLabel !== false && (
+				<div className="dataform-control-array-table__add-row">
+					<Button
+						icon={ plus }
+						onClick={ addItem }
+						variant="secondary"
+						__next40pxDefaultSize
+					>
+						{ addItemLabel }
+					</Button>
+				</div>
+			) }
 		</div>
 	);
 }
