@@ -1351,8 +1351,9 @@ Example:
 
 List of valid values for a field. If provided, the field's filter will use these as predefined options instead of using the field's `Edit` function for user input (unless `filterBy` is set to `false`, see below).
 
--   Type: `array` of objects.
+-   Type: `Option[] | Promise<Option[]> | () => Option[] | Promise<Option[]>`.
 -   Optional.
+-   Promises and functions are resolved on demand, allowing options to be fetched lazily.
 -   Each object can have the following properties:
     -   `value`: the value to match against the field's value. (Required)
     -   `label`: the name to display to users. (Required)

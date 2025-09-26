@@ -22,6 +22,11 @@ export interface Option< Value extends any = any > {
 	description?: string;
 }
 
+export type FieldElementsSource =
+	| Option[]
+	| Promise< Option[] >
+	| ( () => Option[] | Promise< Option[] > );
+
 export interface FilterByConfig {
 	/**
 	 * The list of operators supported by the field.
@@ -273,8 +278,9 @@ export type Field< Item > = {
 
 	/**
 	 * The list of options to pick from when using the field as a filter.
+	 * Accepts a static array, a promise, or a function returning either.
 	 */
-	elements?: Option[];
+	elements?: FieldElementsSource;
 
 	/**
 	 * Filter config for the field.
