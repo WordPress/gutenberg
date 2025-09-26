@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useSelect,
-	useDispatch,
-	resolveSelect,
-	subscribe,
-} from '@wordpress/data';
+import { useSelect, useDispatch, subscribe } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
@@ -17,6 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -59,24 +55,14 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecord } = resolveSelect( coreStore );
-
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
-		return {
-			postId: _postId,
-		};
-	}, [] );
-
+	const { getCurrentPostId } = useSelect( editorStore );
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
-				? error.message
+				? decodeEntities( error.message )
 				: __( 'An error occurred while performing an update.' );
 		createNotice( 'error', errorMessage, {
 			type: 'snackbar',
@@ -84,23 +70,23 @@ function CollabSidebarContent( {
 		} );
 	};
 
-	const addNewComment = async ( comment, parentCommentId ) => {
+	const addNewComment = async ( { content, parent } ) => {
 		try {
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					post: postId,
-					content: comment,
+					post: getCurrentPostId(),
+					content,
 					comment_type: 'block_comment',
 					comment_approved: 0,
-					...( parentCommentId ? { parent: parentCommentId } : {} ),
+					parent: parent || 0,
 				},
 				{ throwOnError: true }
 			);
 
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parentCommentId && savedRecord?.id ) {
+			if ( ! parent && savedRecord?.id ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: savedRecord.id,
 				} );
@@ -108,7 +94,7 @@ function CollabSidebarContent( {
 
 			createNotice(
 				'snackbar',
-				parentCommentId
+				parent
 					? __( 'Reply added successfully.' )
 					: __( 'Comment added successfully.' ),
 				{
@@ -121,78 +107,51 @@ function CollabSidebarContent( {
 		}
 	};
 
-	const onCommentResolve = async ( commentId ) => {
+	const onEditComment = async ( { id, content, status } ) => {
+		const messageType = status ? status : 'updated';
+		const messages = {
+			approved: __( 'Comment marked as resolved.' ),
+			hold: __( 'Comment reopened.' ),
+			updated: __( 'Comment updated.' ),
+		};
+
 		try {
 			await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					id: commentId,
-					status: 'approved',
+					id,
+					content,
+					status,
 				},
 				{ throwOnError: true }
 			);
-			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
-
-	const onCommentReopen = async ( commentId ) => {
-		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
+			createNotice(
+				'snackbar',
+				messages[ messageType ] ?? __( 'Comment updated.' ),
 				{
-					id: commentId,
-					status: 'hold',
-				},
-				{ throwOnError: true }
+					type: 'snackbar',
+					isDismissible: true,
+				}
 			);
-			createNotice( 'snackbar', __( 'Comment reopened.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
 		} catch ( error ) {
 			onError( error );
 		}
 	};
 
-	const onEditComment = async ( commentId, comment ) => {
+	const onCommentDelete = async ( comment ) => {
 		try {
-			await saveEntityRecord(
+			await deleteEntityRecord(
 				'root',
 				'comment',
+				comment.id,
+				undefined,
 				{
-					id: commentId,
-					content: comment,
-				},
-				{ throwOnError: true }
+					throwOnError: true,
+				}
 			);
-			createNotice( 'snackbar', __( 'Comment edited successfully.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
 
-	const onCommentDelete = async ( commentId ) => {
-		try {
-			const childComment = await getEntityRecord(
-				'root',
-				'comment',
-				commentId
-			);
-			await deleteEntityRecord( 'root', 'comment', commentId, undefined, {
-				throwOnError: true,
-			} );
-
-			if ( childComment && ! childComment.parent ) {
+			if ( ! comment.parent ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: undefined,
 				} );
@@ -221,8 +180,6 @@ function CollabSidebarContent( {
 					onEditComment={ onEditComment }
 					onAddReply={ addNewComment }
 					onCommentDelete={ onCommentDelete }
-					onCommentResolve={ onCommentResolve }
-					onCommentReopen={ onCommentReopen }
 					showCommentBoard={ showCommentBoard }
 					setShowCommentBoard={ setShowCommentBoard }
 				/>

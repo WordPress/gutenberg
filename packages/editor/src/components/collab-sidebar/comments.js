@@ -42,8 +42,6 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Function} props.onEditComment       - The function to handle comment editing.
  * @param {Function} props.onAddReply          - The function to add a reply to a comment.
  * @param {Function} props.onCommentDelete     - The function to delete a comment.
- * @param {Function} props.onCommentResolve    - The function to mark a comment as resolved.
- * @param {Function} props.onCommentReopen     - The function to reopen a resolved comment.
  * @param {Function} props.setShowCommentBoard - The function to set the comment board visibility.
  * @return {React.ReactNode} The rendered Comments component.
  */
@@ -52,8 +50,6 @@ export function Comments( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	onCommentResolve,
-	onCommentReopen,
 	setShowCommentBoard,
 } ) {
 	const { blockCommentId } = useSelect( ( select ) => {
@@ -91,8 +87,6 @@ export function Comments( {
 			thread={ thread }
 			onAddReply={ onAddReply }
 			onCommentDelete={ onCommentDelete }
-			onCommentResolve={ onCommentResolve }
-			onCommentReopen={ onCommentReopen }
 			onEditComment={ onEditComment }
 			isSelected={ selectedThread === thread.id }
 			setSelectedThread={ setSelectedThread }
@@ -106,8 +100,6 @@ function Thread( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	onCommentResolve,
-	onCommentReopen,
 	isSelected,
 	setSelectedThread,
 	setShowCommentBoard,
@@ -161,8 +153,6 @@ function Thread( {
 		>
 			<CommentBoard
 				thread={ thread }
-				onResolve={ onCommentResolve }
-				onReopen={ onCommentReopen }
 				onEdit={ onEditComment }
 				onDelete={ onCommentDelete }
 				status={ thread.status }
@@ -238,9 +228,15 @@ function Thread( {
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
-									onCommentReopen( thread.id );
+									onEditComment( {
+										id: thread.id,
+										status: 'hold',
+									} );
 								}
-								onAddReply( inputComment, thread.id );
+								onAddReply( {
+									content: inputComment,
+									parent: thread.id,
+								} );
 							} }
 							onCancel={ ( event ) => {
 								threadRef.current?.focus();
@@ -270,19 +266,12 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( {
-	thread,
-	onResolve,
-	onReopen,
-	onEdit,
-	onDelete,
-	status,
-} ) => {
+const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	const handleConfirmDelete = () => {
-		onDelete( thread.id );
+		onDelete( thread );
 		setActionState( false );
 		setShowConfirmDialog( false );
 	};
@@ -309,17 +298,17 @@ const CommentBoard = ( {
 				setShowConfirmDialog( true );
 			},
 		},
-		onReopen &&
+		onEdit &&
 			status === 'approved' && {
 				id: 'reopen',
 				title: _x( 'Reopen', 'Reopen comment' ),
 				onClick: () => {
-					onReopen( thread.id );
+					onEdit( { id: thread.id, status: 'hold' } );
 				},
 			},
 	];
 
-	const canResolve = thread?.parent === 0 && onResolve;
+	const canResolve = thread?.parent === 0;
 	const moreActions = actions.filter( ( item ) => item?.onClick );
 
 	return (
@@ -349,7 +338,10 @@ const CommentBoard = ( {
 								disabled={ status === 'approved' }
 								accessibleWhenDisabled={ status === 'approved' }
 								onClick={ () => {
-									onResolve( thread.id );
+									onEdit( {
+										id: thread.id,
+										status: 'approved',
+									} );
 								} }
 							/>
 						) }
@@ -384,7 +376,10 @@ const CommentBoard = ( {
 			{ 'edit' === actionState ? (
 				<CommentForm
 					onSubmit={ ( value ) => {
-						onEdit( thread.id, value );
+						onEdit( {
+							id: thread.id,
+							content: value,
+						} );
 						setActionState( false );
 					} }
 					onCancel={ () => handleCancel() }
