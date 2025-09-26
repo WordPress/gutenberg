@@ -14,20 +14,27 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import { getAvatarBorderColor } from './utils';
+
+/**
  * Render author information for a comment.
  *
  * @param {Object} props        - Component properties.
  * @param {string} props.avatar - URL of the author's avatar.
  * @param {string} props.name   - Name of the author.
  * @param {string} props.date   - Date of the comment.
+ * @param {string} props.userId - User ID of the author.
  *
  * @return {React.ReactNode} The JSX element representing the author's information.
  */
-function CommentAuthorInfo( { avatar, name, date } ) {
+function CommentAuthorInfo( { avatar, name, date, userId } ) {
 	const dateSettings = getDateSettings();
 	const {
 		currentUserAvatar,
 		currentUserName,
+		currentUserId,
 		dateFormat = dateSettings.formats.date,
 	} = useSelect( ( select ) => {
 		const { getCurrentUser, getEntityRecord } = select( coreStore );
@@ -39,6 +46,7 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 		return {
 			currentUserAvatar: userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
 			currentUserName: userData?.name,
+			currentUserId: userData?.id,
 			dateFormat: siteSettings?.date_format,
 		};
 	}, [] );
@@ -68,6 +76,11 @@ function CommentAuthorInfo( { avatar, name, date } ) {
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
+				style={ {
+					borderColor: getAvatarBorderColor(
+						userId ?? currentUserId
+					),
+				} }
 			/>
 			<VStack spacing="0">
 				<span className="editor-collab-sidebar-panel__user-name">

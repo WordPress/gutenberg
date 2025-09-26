@@ -64,6 +64,9 @@
 .editor-collab-sidebar-panel__user-avatar {
 	border-radius: $radius-round;
 	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
 }
 
 .editor-collab-sidebar-panel__thread-overlay {

@@ -291,6 +291,7 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
 					date={ thread?.date }
+					userId={ thread?.author }
 				/>
 				<span className="editor-collab-sidebar-panel__comment-status">
 					<HStack alignment="right" justify="flex-end" spacing="0">
