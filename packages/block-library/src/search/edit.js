@@ -76,11 +76,7 @@ export default function SearchEdit( {
 	} = attributes;
 
 	// Check if the block is inside a Query block with enhanced pagination enabled
-	// and if the `__experimentalEnableSearchQueryBlock` flag is enabled.
-	const hasInstantSearch = !! (
-		context?.enhancedPagination &&
-		window?.__experimentalEnableSearchQueryBlock
-	);
+	const hasInstantSearch = !! context?.enhancedPagination;
 
 	const wasJustInsertedIntoNavigationBlock = useSelect(
 		( select ) => {
