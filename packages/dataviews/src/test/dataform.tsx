@@ -225,6 +225,61 @@ describe( 'DataForm component', () => {
 				screen.getByText( "Title and author's name" )
 			).toBeInTheDocument();
 		} );
+
+		it( 'should resolve select elements supplied as a promise', async () => {
+			const asyncFields = [
+				{
+					id: 'asyncAuthor',
+					label: 'Async Author',
+					type: 'integer' as const,
+					elements: () =>
+						Promise.resolve( [
+							{ value: 1, label: 'Jane' },
+							{ value: 2, label: 'John' },
+						] ),
+				},
+			];
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ asyncFields }
+					form={ { fields: [ 'asyncAuthor' ] } }
+					data={ { asyncAuthor: 1 } }
+				/>
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'Jane' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should resolve select elements supplied as a promise instance', async () => {
+			const promiseFields = [
+				{
+					id: 'promisedAuthor',
+					label: 'Promised Author',
+					type: 'integer' as const,
+					elements: Promise.resolve( [
+						{ value: 1, label: 'Jane' },
+						{ value: 2, label: 'John' },
+					] ),
+				},
+			];
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ promiseFields }
+					form={ { fields: [ 'promisedAuthor' ] } }
+					data={ { promisedAuthor: 2 } }
+				/>
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'John' } )
+			).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'in panel mode', () => {
