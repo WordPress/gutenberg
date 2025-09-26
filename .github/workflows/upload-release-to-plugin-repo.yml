@@ -9,10 +9,24 @@ on:
 permissions: {}
 
 jobs:
+    validate-github-ref:
+        name: Validate github.ref
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        steps:
+            - name: Check github.ref
+              run: |
+                  if [ -z "${{ github.ref }}" ]; then
+                    echo "::error::github.ref is empty ('${{ github.ref }}')"
+                    exit 1
+                  fi
+                  echo "github.ref is valid: ${{ github.ref }}"
+
     compute-should-update-trunk:
         name: Decide if trunk or tag
         runs-on: 'ubuntu-24.04'
         permissions: {}
+        needs: validate-github-ref
         # Skip this job if the release is a release candidate. This will in turn skip
         # the upload jobs, which are only relevant for non-RC releases.
         # We first check if the release is a prerelease, and then if the ref contains
@@ -71,6 +85,7 @@ jobs:
         name: Get release branch name
         runs-on: 'ubuntu-24.04'
         permissions: {}
+        needs: validate-github-ref
         outputs:
             release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
 

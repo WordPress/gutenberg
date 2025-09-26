@@ -5,7 +5,11 @@ import { useState, useMemo } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Icon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
+import { starFilled } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,15 +36,19 @@ const meta = {
 			options: [
 				'default',
 				'array',
-				'boolean',
 				'checkbox',
+				'color',
 				'date',
 				'datetime',
 				'email',
 				'integer',
+				'password',
 				'radio',
 				'select',
+				'telephone',
+				'url',
 				'text',
+				'toggle',
 				'toggleGroup',
 			],
 		},
@@ -52,13 +60,37 @@ const meta = {
 };
 export default meta;
 
+const DollarPrefix = () => (
+	<InputControlPrefixWrapper>
+		<span>$</span>
+	</InputControlPrefixWrapper>
+);
+const StarIconPrefix = () => (
+	<InputControlPrefixWrapper variant="icon">
+		<Icon icon={ starFilled } />
+	</InputControlPrefixWrapper>
+);
+const PercentSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>%</span>
+	</InputControlSuffixWrapper>
+);
+const USDSuffix = () => (
+	<InputControlSuffixWrapper>
+		<span>USD</span>
+	</InputControlSuffixWrapper>
+);
+
 type DataType = {
 	id: number;
 	text: string;
 	textWithElements: string;
+	textWithRadio: string;
+	textWithTextarea: string;
 	integer: number;
 	integerWithElements: number;
 	boolean: boolean;
+	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
 	datetime: string;
 	datetimeWithElements: string;
@@ -66,22 +98,37 @@ type DataType = {
 	dateWithElements: string;
 	email: string;
 	emailWithElements: string;
+	telephone: string;
+	telephoneWithElements: string;
+	color: string;
+	colorWithElements: string;
+	url: string;
+	urlWithElements: string;
+	password: string;
+	passwordWithElements: string;
 	media: string;
 	mediaWithElements: string;
 	array: string[];
 	arrayWithElements: string[];
 	notype: string;
 	notypeWithElements: string;
+	priceWithPrefix?: string;
+	ratingWithIcon?: string;
+	percentageWithSuffix?: string;
+	priceWithBoth?: string;
 };
 
 const data: DataType[] = [
 	{
 		id: 1,
 		text: 'Text',
-		textWithElements: 'Item 1',
+		textWithElements: 'item1',
+		textWithRadio: 'item2',
+		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
 		boolean: true,
+		booleanWithToggle: true,
 		booleanWithElements: true,
 		datetime: '2021-01-01T14:30:00Z',
 		datetimeWithElements: '2021-01-01T14:30:00Z',
@@ -89,6 +136,14 @@ const data: DataType[] = [
 		dateWithElements: '2021-01-01',
 		email: 'hi@example.com',
 		emailWithElements: 'hi@example.com',
+		telephone: '+1-555-123-4567',
+		telephoneWithElements: '+1-555-123-4567',
+		color: '#ff6600',
+		colorWithElements: 'rgba(255, 165, 0, 0.8)',
+		url: 'https://example.com',
+		urlWithElements: 'https://example.com',
+		password: 'secretpassword123',
+		passwordWithElements: 'secretpassword123',
 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
@@ -96,6 +151,10 @@ const data: DataType[] = [
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
 		notypeWithElements: 'No type',
+		priceWithPrefix: '25.99',
+		ratingWithIcon: '4.5',
+		percentageWithSuffix: '85',
+		priceWithBoth: '199.99',
 	},
 ];
 
@@ -116,6 +175,25 @@ const fields: Field< DataType >[] = [
 			{ value: 'item2', label: 'Item 2' },
 			{ value: 'item3', label: 'Item 3' },
 		],
+	},
+	{
+		id: 'textWithRadio',
+		type: 'text',
+		label: 'Text (with radio)',
+		description: 'Help for text with radio.',
+		Edit: 'radio',
+		elements: [
+			{ value: 'item1', label: 'Item 1' },
+			{ value: 'item2', label: 'Item 2' },
+			{ value: 'item3', label: 'Item 3' },
+		],
+	},
+	{
+		id: 'textWithTextarea',
+		type: 'text',
+		label: 'Textarea',
+		description: 'Help for textarea.',
+		Edit: 'textarea',
 	},
 	{
 		id: 'integer',
@@ -139,6 +217,13 @@ const fields: Field< DataType >[] = [
 		type: 'boolean',
 		label: 'Boolean',
 		description: 'Help for boolean.',
+	},
+	{
+		id: 'booleanWithToggle',
+		type: 'boolean',
+		label: 'Boolean (with toggle)',
+		description: 'Help for boolean with toggle control.',
+		Edit: 'toggle',
 	},
 	{
 		id: 'booleanWithElements',
@@ -208,6 +293,81 @@ const fields: Field< DataType >[] = [
 			{ value: 'john@example.com', label: 'John Doe' },
 			{ value: 'jane@example.com', label: 'Jane Doe' },
 			{ value: 'bob@example.com', label: 'Bob Smith' },
+		],
+	},
+	{
+		id: 'telephone',
+		type: 'telephone',
+		label: 'Telephone',
+		description: 'Help for telephone.',
+	},
+	{
+		id: 'telephoneWithElements',
+		type: 'telephone',
+		label: 'Telephone (with elements)',
+		description: 'Help for telephone with elements.',
+		elements: [
+			{ value: '+1-555-123-4567', label: '+1-555-123-4567' },
+			{ value: '+44-20-7946-0958', label: '+44-20-7946-0958' },
+			{ value: '+81-3-1234-5678', label: '+81-3-1234-5678' },
+		],
+	},
+	{
+		id: 'url',
+		type: 'url',
+		label: 'URL',
+		description: 'Help for URL.',
+	},
+	{
+		id: 'urlWithElements',
+		type: 'url',
+		label: 'URL (with elements)',
+		description: 'Help for URL with elements.',
+		elements: [
+			{ value: 'https://example.com', label: 'https://example.com' },
+			{ value: 'https://wordpress.org', label: 'https://wordpress.org' },
+			{ value: 'https://github.com', label: 'https://github.com' },
+		],
+	},
+	{
+		id: 'color',
+		type: 'color',
+		label: 'Color',
+		description:
+			'Help for color. Supports hex, rgb, hsl formats with alpha channel.',
+	},
+	{
+		id: 'colorWithElements',
+		type: 'color',
+		label: 'Color (with elements)',
+		description: 'Help for color with predefined color options.',
+		elements: [
+			{ value: '#ff0000', label: 'Red' },
+			{ value: '#00ff00', label: 'Green' },
+			{ value: '#0000ff', label: 'Blue' },
+			{ value: 'rgba(255, 165, 0, 0.8)', label: 'Orange (80% opacity)' },
+			{ value: 'hsl(300, 100%, 50%)', label: 'Magenta' },
+			{
+				value: 'hsla(120, 100%, 25%, 0.6)',
+				label: 'Dark Green (60% opacity)',
+			},
+		],
+	},
+	{
+		id: 'password',
+		type: 'password',
+		label: 'Password',
+		description: 'Help for password.',
+	},
+	{
+		id: 'passwordWithElements',
+		type: 'password',
+		label: 'Password (with elements)',
+		description: 'Help for password with elements.',
+		elements: [
+			{ value: 'secretpassword123', label: 'Secret Password' },
+			{ value: 'adminpass456', label: 'Admin Password' },
+			{ value: 'userpass789', label: 'User Password' },
 		],
 	},
 	{
@@ -282,21 +442,66 @@ const fields: Field< DataType >[] = [
 			{ value: 'item3', label: 'Item 3' },
 		],
 	},
+	{
+		id: 'priceWithPrefix',
+		label: 'Text with Prefix',
+		type: 'text',
+		description: 'Text field with dollar sign prefix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+		},
+	},
+	{
+		id: 'ratingWithIcon',
+		label: 'Text with Icon Prefix',
+		type: 'text',
+		description: 'Text field with star icon prefix.',
+		Edit: {
+			control: 'text',
+			prefix: StarIconPrefix,
+		},
+	},
+	{
+		id: 'percentageWithSuffix',
+		label: 'Text with Suffix',
+		type: 'text',
+		description: 'Text field with percent sign suffix.',
+		Edit: {
+			control: 'text',
+			suffix: PercentSuffix,
+		},
+	},
+	{
+		id: 'priceWithBoth',
+		label: 'Text with Prefix and Suffix',
+		type: 'text',
+		description: 'Text field with both dollar prefix and USD suffix.',
+		Edit: {
+			control: 'text',
+			prefix: DollarPrefix,
+			suffix: USDSuffix,
+		},
+	},
 ];
 
 type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
 	| 'array'
-	| 'boolean'
 	| 'checkbox'
+	| 'color'
 	| 'date'
 	| 'datetime'
 	| 'email'
 	| 'integer'
+	| 'password'
 	| 'radio'
 	| 'select'
+	| 'telephone'
+	| 'url'
 	| 'text'
+	| 'toggle'
 	| 'toggleGroup';
 
 interface FieldTypeStoryProps {
@@ -525,6 +730,59 @@ export const Email = ( {
 	);
 };
 
+export const Telephone = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const telephoneFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'telephone' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory
+			fields={ telephoneFields }
+			type={ type }
+			Edit={ Edit }
+		/>
+	);
+};
+
+export const Url = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const urlFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'url' ),
+		[]
+	);
+
+	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
+};
+
+export const Color = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const colorFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'color' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
+	);
+};
+
 export const Media = ( {
 	type,
 	Edit,
@@ -560,6 +818,23 @@ export const Array = ( {
 			type={ type }
 			Edit={ Edit }
 		/>
+	);
+};
+
+export const Password = ( {
+	type,
+	Edit,
+}: {
+	type: PanelTypes;
+	Edit: ControlTypes;
+} ) => {
+	const passwordFields = useMemo(
+		() => fields.filter( ( field ) => field.type === 'password' ),
+		[]
+	);
+
+	return (
+		<FieldTypeStory fields={ passwordFields } type={ type } Edit={ Edit } />
 	);
 };
 

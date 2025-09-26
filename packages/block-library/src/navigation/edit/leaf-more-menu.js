@@ -13,6 +13,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { DEFAULT_BLOCK } from '../constants';
+
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
@@ -43,7 +48,10 @@ function AddSubmenuItem( {
 			disabled={ isDisabled }
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
-				const newLink = createBlock( 'core/navigation-link' );
+				const newLink = createBlock(
+					DEFAULT_BLOCK.name,
+					DEFAULT_BLOCK.attributes
+				);
 
 				if ( block.name === 'core/navigation-submenu' ) {
 					insertBlock(
@@ -146,7 +154,6 @@ export default function LeafMoreMenu( props ) {
 						<AddSubmenuItem
 							block={ block }
 							onClose={ onClose }
-							expanded
 							expandedState={ props.expandedState }
 							expand={ props.expand }
 							setInsertedBlock={ props.setInsertedBlock }

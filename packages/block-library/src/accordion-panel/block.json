@@ -10,12 +10,11 @@
 	"supports": {
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
@@ -47,7 +46,8 @@
 				"fontSize": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"allowedBlocks": {
@@ -67,5 +67,6 @@
 			"default": false
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"style": "wp-block-accordion-panel"
 }

@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 import { Button, Card, CardBody, CardHeader } from '@wordpress/components';

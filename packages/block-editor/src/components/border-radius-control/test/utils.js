@@ -7,6 +7,8 @@ import {
 	hasMixedValues,
 	hasDefinedValues,
 	mode,
+	getPresetValueFromCustomValue,
+	getPresetValueFromControlValue,
 } from '../utils';
 
 const defaultUnitSelections = {
@@ -178,5 +180,74 @@ describe( 'mode', () => {
 	it( 'should return the most common real value', () => {
 		const values = [ undefined, 'a', undefined, undefined, undefined ];
 		expect( mode( values ) ).toBe( 'a' );
+	} );
+} );
+
+describe( 'getPresetValueFromCustomValue', () => {
+	const presets = [
+		{ name: 'None', slug: '0', size: 0 },
+		{ name: 'Small', slug: 'sm', size: '4px' },
+		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
+	];
+
+	it( 'should return "0" if value is "0"', () => {
+		expect( getPresetValueFromCustomValue( '0', presets ) ).toBe( '0' );
+	} );
+
+	it( 'should return preset reference if value matches a preset', () => {
+		expect( getPresetValueFromCustomValue( '4px', presets ) ).toBe(
+			'var:preset|border-radius|sm'
+		);
+		expect(
+			getPresetValueFromCustomValue( 'clamp(2px, 1vw, 8px)', presets )
+		).toBe( 'var:preset|border-radius|md' );
+	} );
+
+	it( 'should return value as-is if no matching preset', () => {
+		expect( getPresetValueFromCustomValue( '7px', presets ) ).toBe( '7px' );
+	} );
+
+	it( 'should return value as-is if already a preset reference', () => {
+		expect(
+			getPresetValueFromCustomValue(
+				'var:preset|border-radius|md',
+				presets
+			)
+		).toBe( 'var:preset|border-radius|md' );
+	} );
+
+	it( 'should return undefined if value is undefined', () => {
+		expect(
+			getPresetValueFromCustomValue( undefined, presets )
+		).toBeUndefined();
+	} );
+} );
+
+describe( 'getPresetValueFromControlValue', () => {
+	const presets = [
+		{ name: 'None', slug: '0', size: 0 },
+		{ name: 'Small', slug: 'sm', size: '4px' },
+		{ name: 'Medium', slug: 'md', size: 'clamp(2px, 1vw, 8px)' },
+	];
+
+	it( 'should return "0" if control value is 0 and not selectList', () => {
+		expect( getPresetValueFromControlValue( 0, 'slider', presets ) ).toBe(
+			'0'
+		);
+	} );
+
+	it( 'should return undefined if control value is 0 and controlType is selectList', () => {
+		expect(
+			getPresetValueFromControlValue( 0, 'selectList', presets )
+		).toBeUndefined();
+	} );
+
+	it( 'should return preset reference for other values', () => {
+		expect( getPresetValueFromControlValue( 1, 'slider', presets ) ).toBe(
+			'var:preset|border-radius|sm'
+		);
+		expect( getPresetValueFromControlValue( 2, 'slider', presets ) ).toBe(
+			'var:preset|border-radius|md'
+		);
 	} );
 } );

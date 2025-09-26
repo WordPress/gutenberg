@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.23.0 (2025-09-17)
+
+## 0.22.0 (2025-09-03)
+
 ### Enhancements
 
 - Update the base `titleField` to enable hiding. [#71369](https://github.com/WordPress/gutenberg/pull/71369)

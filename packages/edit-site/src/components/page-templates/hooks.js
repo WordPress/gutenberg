@@ -89,7 +89,7 @@ export function useAddedBy( postType, postId ) {
 						type: 'user',
 						icon: authorIcon,
 						imageUrl: user?.avatar_urls?.[ 48 ],
-						text: authorText,
+						text: authorText ?? user?.name,
 						isCustomized: false,
 					};
 				}

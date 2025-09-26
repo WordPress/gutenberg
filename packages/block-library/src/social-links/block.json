@@ -94,7 +94,8 @@
 				"width": true,
 				"style": true
 			}
-		}
+		},
+		"contentRole": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

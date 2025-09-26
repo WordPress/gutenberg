@@ -22,6 +22,7 @@ export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
 	deregisterResetAllFilter: noop,
 	areAllOptionalControlsHidden: true,
 } );
+ToolsPanelContext.displayName = 'ToolsPanelContext';
 
 export const useToolsPanelContext = () =>
 	useContext< ToolsPanelContextType >( ToolsPanelContext );

@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,18 +30,30 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getSelectedBlock } = select( blockEditorStore );
-		const selectedBlock = getSelectedBlock();
-		return {
-			clientId: selectedBlock?.clientId,
-			blockCommentId: selectedBlock?.attributes?.blockCommentId,
-		};
-	} );
+	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
+		( select ) => {
+			const { getSelectedBlock } = select( blockEditorStore );
+			const selectedBlock = getSelectedBlock();
+			return {
+				clientId: selectedBlock?.clientId,
+				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				isEmptyDefaultBlock: selectedBlock
+					? isUnmodifiedDefaultBlock( selectedBlock )
+					: false,
+			};
+		}
+	);
 
-	if ( ! showCommentBoard || ! clientId || undefined !== blockCommentId ) {
+	if (
+		! showCommentBoard ||
+		! clientId ||
+		undefined !== blockCommentId ||
+		isEmptyDefaultBlock
+	) {
 		return null;
 	}
+
+	const commentLabel = __( 'New Comment' );
 
 	return (
 		<VStack
@@ -52,12 +65,13 @@ export function AddComment( {
 			</HStack>
 			<CommentForm
 				onSubmit={ ( inputComment ) => {
-					onSubmit( inputComment );
+					onSubmit( { content: inputComment } );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
 				} }
 				submitButtonText={ _x( 'Comment', 'Add comment button' ) }
+				labelText={ commentLabel }
 			/>
 		</VStack>
 	);
