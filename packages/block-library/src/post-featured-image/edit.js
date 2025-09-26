@@ -93,10 +93,10 @@ export default function PostFeaturedImageEdit( {
 	context: { postId, postType: postTypeSlug, queryId },
 	insertBlocksAfter,
 } ) {
-	const [isEditingImage, setIsEditingImage] = useState(false);
-	const [naturalWidth, setNaturalWidth] = useState();
-	const [naturalHeight, setNaturalHeight] = useState();
-	const [pixelSize, setPixelSize] = useState({});
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const [ naturalWidth, setNaturalWidth ] = useState();
+	const [ naturalHeight, setNaturalHeight ] = useState();
+	const [ pixelSize, setPixelSize ] = useState( {} );
 	const imageRef = useRef();
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const {
@@ -197,8 +197,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					height: !! aspectRatio && '100%',
-					width: !! aspectRatio && '100%',
+					height: aspectRatio && '100%',
+					width: aspectRatio && '100%',
 					...borderProps.style,
 					...shadowProps.style,
 				} }
@@ -246,9 +246,9 @@ export default function PostFeaturedImageEdit( {
 		if ( imageRef.current?.offsetWidth && imageRef.current?.offsetHeight ) {
 			const newWidth = imageRef.current.offsetWidth;
 			const newHeight = imageRef.current.offsetHeight;
-			
+
 			// Only update if dimensions have actually changed
-			setPixelSize( prevSize => {
+			setPixelSize( ( prevSize ) => {
 				if ( prevSize.width !== newWidth || prevSize.height !== newHeight ) {
 					return {
 						width: newWidth,
@@ -256,7 +256,7 @@ export default function PostFeaturedImageEdit( {
 					};
 				}
 				return prevSize;
-			});
+			} );
 		}
 	}, [ mediaUrl ] );
 
@@ -269,13 +269,13 @@ export default function PostFeaturedImageEdit( {
 	const onImageLoad = ( event ) => {
 		setNaturalWidth( event.target?.naturalWidth );
 		setNaturalHeight( event.target?.naturalHeight );
-		
+
 		// Update pixel size on load as well
 		if ( event.target?.offsetWidth && event.target?.offsetHeight ) {
-			setPixelSize( prevSize => {
+			setPixelSize( ( prevSize ) => {
 				const newWidth = event.target.offsetWidth;
 				const newHeight = event.target.offsetHeight;
-				
+
 				if ( prevSize.width !== newWidth || prevSize.height !== newHeight ) {
 					return {
 						width: newWidth,
@@ -283,7 +283,7 @@ export default function PostFeaturedImageEdit( {
 					};
 				}
 				return prevSize;
-			});
+			} );
 		}
 	};
 
@@ -331,7 +331,7 @@ export default function PostFeaturedImageEdit( {
 									: __( 'Link to post' )
 							}
 							isShownByDefault
-							hasValue={ () => !! isLink }
+							hasValue={ () => isLink }
 							onDeselect={ () =>
 								setAttributes( {
 									isLink: false,
@@ -385,7 +385,7 @@ export default function PostFeaturedImageEdit( {
 							<ToolsPanelItem
 								label={ __( 'Link relation' ) }
 								isShownByDefault
-								hasValue={ () => !! rel }
+								hasValue={ () => rel }
 								onDeselect={ () =>
 									setAttributes( {
 										rel: '',
@@ -413,7 +413,7 @@ export default function PostFeaturedImageEdit( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ !! media && (
+						{ media && (
 							<FeaturedImageResolutionTool
 								image={ media }
 								value={ sizeSlug }
@@ -444,7 +444,7 @@ export default function PostFeaturedImageEdit( {
 			<>
 				{ controls }
 				<div { ...blockProps }>
-					{ !! isLink ? (
+					{ isLink ? (
 						<a href={ postPermalink } target={ linkTarget }>
 							{ placeholder() }
 						</a>
@@ -466,8 +466,8 @@ export default function PostFeaturedImageEdit( {
 		...borderProps.style,
 		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
-		width: !! aspectRatio && '100%',
-		objectFit: !! ( height || aspectRatio ) && scale,
+		width: aspectRatio && '100%',
+		objectFit: ( height || aspectRatio ) && scale,
 	};
 
 	/**
@@ -568,7 +568,7 @@ export default function PostFeaturedImageEdit( {
 	return (
 		<>
 			{ ! temporaryURL && controls }
-			{ !! media && ! isDescendentOfQueryLoop && (
+			{ media && ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					{ allowCrop && (
 						<ToolbarButton
@@ -590,7 +590,7 @@ export default function PostFeaturedImageEdit( {
 			) }
 			<figure { ...blockProps }>
 				{ /* If the featured image is linked, wrap in an <a /> tag to trigger any inherited link element styles */ }
-				{ !! isLink ? (
+				{ isLink ? (
 					<a href={ postPermalink } target={ linkTarget }>
 						{ image }
 					</a>

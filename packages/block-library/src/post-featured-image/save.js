@@ -69,9 +69,9 @@ export default function save( { attributes } ) {
 		...borderProps.style,
 		...shadowProps.style,
 		aspectRatio,
-		width: !! aspectRatio ? '100%' : width,
+		width: aspectRatio ? '100%' : width,
 		height: aspectRatio ? '100%' : height,
-		objectFit: !! ( height || aspectRatio ) ? scale : undefined,
+		objectFit: ( height || aspectRatio ) ? scale : undefined,
 	};
 
 	const figureStyles = {
@@ -103,7 +103,6 @@ export default function save( { attributes } ) {
 			{ overlayElement }
 		</>
 	);
-
 
 	return (
 		<figure
