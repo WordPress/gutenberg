@@ -9,16 +9,126 @@
 // Create a new class that extends WP_REST_Comments_Controller
 class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 
-	public function create_item_permissions_check( $request ) {
-		if ( empty( $request['comment_type'] ) || 'comment' === $request['comment_type'] ) {
-			return parent::create_item_permissions_check( $request );
+	public function get_items_permissions_check( $request ) {
+		if ( ! empty( $request['post'] ) ) {
+			foreach ( (array) $request['post'] as $post_id ) {
+				$post = get_post( $post_id );
+
+				// Note: This is only relevant change for the backport.
+				if ( $post && ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+					return new WP_Error(
+						'rest_comment_not_supported_post_type',
+						__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
+						array( 'status' => 403 )
+					);
+				}
+
+				if ( ! empty( $post_id ) && $post && ! $this->check_read_post_permission( $post, $request ) ) {
+					return new WP_Error(
+						'rest_cannot_read_post',
+						__( 'Sorry, you are not allowed to read the post for this comment.' ),
+						array( 'status' => rest_authorization_required_code() )
+					);
+				} elseif ( 0 === $post_id && ! current_user_can( 'moderate_comments' ) ) {
+					return new WP_Error(
+						'rest_cannot_read',
+						__( 'Sorry, you are not allowed to read comments without a post.' ),
+						array( 'status' => rest_authorization_required_code() )
+					);
+				}
+			}
 		}
 
-		if ( ! is_user_logged_in() ) {
+		// Re-map edit context capabilities when requesting `block_comment` for a post.
+		// Note: This is only relevant change for the backport.
+		$edit_cap = ! empty( $request['post'] ) && 'block_comment' === $request['type'] ? 'edit_posts' : 'moderate_comments';
+		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( $edit_cap ) ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you are not allowed to edit comments.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			$protected_params = array( 'author', 'author_exclude', 'author_email', 'type', 'status' );
+			$forbidden_params = array();
+
+			foreach ( $protected_params as $param ) {
+				if ( 'status' === $param ) {
+					if ( 'approve' !== $request[ $param ] ) {
+						$forbidden_params[] = $param;
+					}
+				} elseif ( 'type' === $param ) {
+					if ( 'comment' !== $request[ $param ] ) {
+						$forbidden_params[] = $param;
+					}
+				} elseif ( ! empty( $request[ $param ] ) ) {
+					$forbidden_params[] = $param;
+				}
+			}
+
+			if ( ! empty( $forbidden_params ) ) {
+				return new WP_Error(
+					'rest_forbidden_param',
+					/* translators: %s: List of forbidden parameters. */
+					sprintf( __( 'Query parameter not permitted: %s' ), implode( ', ', $forbidden_params ) ),
+					array( 'status' => rest_authorization_required_code() )
+				);
+			}
+		}
+
+		return true;
+	}
+
+	public function get_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		// Re-map edit context capabilities when requesting `block_comment` type.
+		// Note: This is only relevant change for the backport.
+		$edit_cap = 'block_comment' === $comment->comment_type ? 'edit_posts' : 'moderate_comments';
+		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( $edit_cap ) ) {
+			return new WP_Error(
+				'rest_forbidden_context',
+				__( 'Sorry, you are not allowed to edit comments.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		$post = get_post( $comment->comment_post_ID );
+
+		if ( ! $this->check_read_permission( $comment, $request ) ) {
+			return new WP_Error(
+				'rest_cannot_read',
+				__( 'Sorry, you are not allowed to read this comment.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		if ( $post && ! $this->check_read_post_permission( $post, $request ) ) {
+			return new WP_Error(
+				'rest_cannot_read_post',
+				__( 'Sorry, you are not allowed to read the post for this comment.' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return true;
+	}
+
+	public function create_item_permissions_check( $request ) {
+		// This should be an `block_comment` type check when backporting.
+		$non_block_comment = empty( $request['comment_type'] ) || 'comment' === $request['comment_type'];
+
+		// Note: This is only relevant change for the backport.
+		if ( ! is_user_logged_in() && $non_block_comment ) {
 			if ( get_option( 'comment_registration' ) ) {
 				return new WP_Error(
 					'rest_comment_login_required',
-					__( 'Sorry, you must be logged in to comment.', 'gutenberg' ),
+					__( 'Sorry, you must be logged in to comment.' ),
 					array( 'status' => 401 )
 				);
 			}
@@ -40,7 +150,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			if ( ! $allow_anonymous ) {
 				return new WP_Error(
 					'rest_comment_login_required',
-					__( 'Sorry, you must be logged in to comment.', 'gutenberg' ),
+					__( 'Sorry, you must be logged in to comment.' ),
 					array( 'status' => 401 )
 				);
 			}
@@ -51,7 +161,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			return new WP_Error(
 				'rest_comment_invalid_author',
 				/* translators: %s: Request parameter. */
-				sprintf( __( "Sorry, you are not allowed to edit '%s' for comments.", 'gutenberg' ), 'author' ),
+				sprintf( __( "Sorry, you are not allowed to edit '%s' for comments." ), 'author' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -61,7 +171,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 				return new WP_Error(
 					'rest_comment_invalid_author_ip',
 					/* translators: %s: Request parameter. */
-					sprintf( __( "Sorry, you are not allowed to edit '%s' for comments.", 'gutenberg' ), 'author_ip' ),
+					sprintf( __( "Sorry, you are not allowed to edit '%s' for comments." ), 'author_ip' ),
 					array( 'status' => rest_authorization_required_code() )
 				);
 			}
@@ -71,7 +181,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			return new WP_Error(
 				'rest_comment_invalid_status',
 				/* translators: %s: Request parameter. */
-				sprintf( __( "Sorry, you are not allowed to edit '%s' for comments.", 'gutenberg' ), 'status' ),
+				sprintf( __( "Sorry, you are not allowed to edit '%s' for comments." ), 'status' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
@@ -79,7 +189,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		if ( empty( $request['post'] ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_post_id',
-				__( 'Sorry, you are not allowed to create this comment without a post.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to create this comment without a post.' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -89,7 +199,25 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		if ( ! $post ) {
 			return new WP_Error(
 				'rest_comment_invalid_post_id',
-				__( 'Sorry, you are not allowed to create this comment without a post.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to create this comment without a post.' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		// Note: This is only relevant change for the backport.
+		if ( ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+			return new WP_Error(
+				'rest_comment_not_supported_post_type',
+				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		// Note: This is only relevant change for the backport.
+		if ( 'draft' === $post->post_status && $non_block_comment ) {
+			return new WP_Error(
+				'rest_comment_draft_post',
+				__( 'Sorry, you are not allowed to create a comment on this post.' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -97,7 +225,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		if ( 'trash' === $post->post_status ) {
 			return new WP_Error(
 				'rest_comment_trash_post',
-				__( 'Sorry, you are not allowed to create a comment on this post.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to create a comment on this post.' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -105,15 +233,16 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 		if ( ! $this->check_read_post_permission( $post, $request ) ) {
 			return new WP_Error(
 				'rest_cannot_read_post',
-				__( 'Sorry, you are not allowed to read the post for this comment.', 'gutenberg' ),
+				__( 'Sorry, you are not allowed to read the post for this comment.' ),
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 
-		if ( ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
+		// Note: This is only relevant change for the backport.
+		if ( ! comments_open( $post->ID ) && $non_block_comment ) {
 			return new WP_Error(
-				'rest_comment_block_comments_not_supported',
-				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
+				'rest_comment_closed',
+				__( 'Sorry, comments are closed for this item.' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -141,6 +270,25 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Override the schema to change `type` property.
+	 *
+	 * @return array
+	 */
+	public function get_item_schema() {
+		$schema                       = parent::get_item_schema();
+		$schema['properties']['type'] = array(
+			'description' => __( 'Type of the comment.' ),
+			'type'        => 'string',
+			'context'     => array( 'view', 'edit', 'embed' ),
+			'arg_options' => array(
+				'sanitize_callback' => 'sanitize_key',
+			),
+		);
+
+		return $schema;
 	}
 }
 
