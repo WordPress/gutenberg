@@ -38,6 +38,7 @@ import {
 	useEffect,
 	useState,
 	createInterpolateElement,
+	useRef,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload, crop } from '@wordpress/icons';
