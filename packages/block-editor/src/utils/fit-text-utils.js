@@ -49,13 +49,12 @@ export function findOptimalFontSize(
 	elementSelector,
 	applyStylesFn
 ) {
-	if ( ! textElement || ! textElement.parentElement ) {
+	if ( ! textElement ) {
 		return 16;
 	}
 
-	const parentElement = textElement.parentElement;
 	const alreadyHasScrollableHeight =
-		parentElement.scrollHeight > parentElement.clientHeight;
+		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 5;
 	let maxSize = 200;
 	let bestSize = minSize;
@@ -64,11 +63,10 @@ export function findOptimalFontSize(
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
 		applyStylesFn( generateCSSRule( elementSelector, midSize ) );
 
-		const fitsWidth =
-			parentElement.scrollWidth <= parentElement.clientWidth;
+		const fitsWidth = textElement.scrollWidth <= textElement.clientWidth;
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			parentElement.scrollHeight <= parentElement.clientHeight;
+			textElement.scrollHeight <= textElement.clientHeight;
 
 		if ( fitsWidth && fitsHeight ) {
 			bestSize = midSize;
