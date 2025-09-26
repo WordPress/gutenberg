@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import * as Y from 'yjs';
+import type * as Y from 'yjs';
 
 /**
  * WordPress dependencies
@@ -14,26 +14,35 @@ import type {
 /**
  * Internal dependencies
  */
-import type { CRDTDoc, ObjectData } from './types';
+import { LOCAL_EDITOR_ORIGIN } from './config';
+import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
+import type { ObjectData } from './types';
 
 /**
- * Wrapper class that provides the WordPress UndoManager interface while using Y.UndoManager internally.
- * This allows seamless integration between Yjs collaborative editing and WordPress undo/redo functionality.
+ * Wrapper class that implements the WordPress UndoManager interface while using
+ * YMultiDocUndoManager internally. This allows undo/redo operations to be
+ * transacted against multiple CRDT documents (one per entity) and giving each
+ * peer their own undo/redo stack without conflicts.
  */
 export class UndoManager implements WPUndoManager< ObjectData > {
-	private undoManager: Y.UndoManager;
+	private static instance: UndoManager;
+	private undoManager: YMultiDocUndoManager;
 
-	public constructor( ydoc: CRDTDoc ) {
-		this.undoManager = new Y.UndoManager( ydoc.getMap( 'document' ), {
-			// Ensure we undo and redo one character at a time.
-			captureTimeout: 0,
-			// Ensure that we only scope the undo/redo to the current client, and Gutenberg origins.
-			// ToDo: Keep an eye on this, as it needs to be battle tested.
-			trackedOrigins: new Set( [ 'gutenberg', ydoc.clientID ] ),
-			// This ensures that are able to improve the client specific undo/redo experience.
-			// This reduces the bugs we see, but it doesn't eliminate them entirely.
-			ignoreRemoteMapChanges: true,
+	private constructor() {
+		this.undoManager = new YMultiDocUndoManager( [], {
+			// Throttle undo/redo captures. (default: 500ms)
+			captureTimeout: 250,
+			// Ensure that we only scope the undo/redo to the current editor.
+			trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 		} );
+	}
+
+	public static create(): UndoManager {
+		if ( ! UndoManager.instance ) {
+			UndoManager.instance = new UndoManager();
+		}
+
+		return UndoManager.instance;
 	}
 
 	/**
@@ -53,9 +62,17 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	}
 
 	/**
+	 * Add a Yjs map to the scope of the undo manager.
+	 *
+	 * @param {Y.Map< any >} ymap The Yjs map to add to the scope.
+	 */
+	public addToScope( ymap: Y.Map< any > ): void {
+		this.undoManager.addToScope( ymap );
+	}
+
+	/**
 	 * Undo the last recorded changes.
 	 *
-	 * @return The undone record or undefined if nothing to undo.
 	 */
 	public undo(): HistoryRecord< ObjectData > | undefined {
 		if ( ! this.hasUndo() ) {
@@ -65,14 +82,13 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 		// Perform the undo operation
 		this.undoManager.undo();
 
-		// @TODO See if the undo operation can return a record from Yjs.
+		// Intentionally return an empty array, because the SyncProvider will update
+		// the entity record based on the Yjs document changes.
 		return [];
 	}
 
 	/**
 	 * Redo the last undone changes.
-	 *
-	 * @return The redone record or undefined if nothing to redo.
 	 */
 	public redo(): HistoryRecord< ObjectData > | undefined {
 		if ( ! this.hasRedo() ) {
@@ -82,7 +98,8 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 		// Perform the redo operation
 		this.undoManager.redo();
 
-		// @TODO See if the redo operation can return a record from Yjs.
+		// Intentionally return an empty array, because the SyncProvider will update
+		// the entity record based on the Yjs document changes.
 		return [];
 	}
 
