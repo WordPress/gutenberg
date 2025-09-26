@@ -171,6 +171,7 @@ function CollabSidebarContent( {
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
 			<Comments
+				key={ selectedBlockClientId }
 				threads={ comments }
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
