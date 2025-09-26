@@ -63,7 +63,7 @@ export function AddComment( {
 			</HStack>
 			<CommentForm
 				onSubmit={ ( inputComment ) => {
-					onSubmit( inputComment );
+					onSubmit( { content: inputComment } );
 				} }
 				onCancel={ () => {
 					setShowCommentBoard( false );
