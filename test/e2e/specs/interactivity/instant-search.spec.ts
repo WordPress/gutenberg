@@ -32,7 +32,10 @@ async function goToNextPage(
 }
 
 test.describe( 'Instant Search', () => {
+	let originalPostsPerPage: number;
 	test.beforeAll( async ( { requestUtils } ) => {
+		originalPostsPerPage = ( await requestUtils.getSiteSettings() )
+			.posts_per_page;
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-search-query-block',
@@ -91,7 +94,9 @@ test.describe( 'Instant Search', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.activateTheme( 'twentytwentyone' );
-
+		await requestUtils.updateSiteSettings( {
+			posts_per_page: originalPostsPerPage,
+		} );
 		// disable the gutenberg-search-query-block experiment
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
