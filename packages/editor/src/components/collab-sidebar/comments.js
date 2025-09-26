@@ -136,6 +136,8 @@ function Thread( {
 	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
 
 	return (
+		// Disable reason: role="listitem" does in fact support aria-expanded.
+		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
@@ -165,6 +167,7 @@ function Thread( {
 			role="listitem"
 			ref={ threadRef }
 			aria-label={ thread?.content?.raw }
+			aria-expanded={ isSelected }
 		>
 			<CommentBoard
 				thread={ thread }
