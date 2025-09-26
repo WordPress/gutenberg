@@ -220,13 +220,13 @@ function render_block_core_post_featured_image_fallback( $attributes, $block ) {
  * @return string HTML markup in string format.
  */
 function get_block_core_post_featured_image_overlay_element_markup( $attributes ) {
-	$has_dim_background   = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
-	$has_gradient         = isset( $attributes['gradient'] ) && $attributes['gradient'];
-	$has_custom_gradient  = isset( $attributes['customGradient'] ) && $attributes['customGradient'];
-	$has_solid_overlay    = isset( $attributes['overlayColor'] ) && $attributes['overlayColor'];
-	$has_custom_overlay   = isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'];
-	$class_names          = array( 'wp-block-post-featured-image__overlay' );
-	$styles               = array();
+	$has_dim_background  = isset( $attributes['dimRatio'] ) && $attributes['dimRatio'];
+	$has_gradient        = isset( $attributes['gradient'] ) && $attributes['gradient'];
+	$has_custom_gradient = isset( $attributes['customGradient'] ) && $attributes['customGradient'];
+	$has_solid_overlay   = isset( $attributes['overlayColor'] ) && $attributes['overlayColor'];
+	$has_custom_overlay  = isset( $attributes['customOverlayColor'] ) && $attributes['customOverlayColor'];
+	$class_names         = array( 'wp-block-post-featured-image__overlay' );
+	$styles              = array();
 
 	if ( ! $has_dim_background ) {
 		return '';
@@ -306,14 +306,14 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
 	}
 
 	// Border color.
-	$preset_color              = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color              = $attributes['style']['border']['color'] ?? null;
-	$border_styles['color']    = $preset_color ? $preset_color : $custom_color;
+	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
+	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
-		$border                    = $attributes['style']['border'][ $side ] ?? null;
-		$border_styles[ $side ]    = array(
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
+		$border_styles[ $side ] = array(
 			'color' => isset( $border['color'] ) ? $border['color'] : null,
 			'style' => isset( $border['style'] ) ? $border['style'] : null,
 			'width' => isset( $border['width'] ) ? $border['width'] : null,
