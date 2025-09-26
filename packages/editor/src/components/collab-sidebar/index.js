@@ -34,21 +34,17 @@ function CollabSidebarContent( {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { currentPostId, selectedBlockClientId, metadata } = useSelect(
-		( select ) => {
+	const { currentPostId, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( ( select ) => {
 			const { getCurrentPostId } = select( editorStore );
-			const { getBlockAttributes, getSelectedBlockClientId } =
-				select( blockEditorStore );
-			const _selectedBlockClientId = getSelectedBlockClientId();
 			return {
-				selectedBlockClientId: _selectedBlockClientId,
-				metadata: getBlockAttributes( _selectedBlockClientId )
-					?.metadata,
+				getSelectedBlockClientId:
+					select( blockEditorStore ).getSelectedBlockClientId,
+				getBlockAttributes:
+					select( blockEditorStore ).getBlockAttributes,
 				currentPostId: getCurrentPostId(),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -78,7 +74,10 @@ function CollabSidebarContent( {
 
 			// If it's a main comment, update the block attributes with the comment id.
 			if ( ! parent && savedRecord?.id ) {
-				updateBlockAttributes( selectedBlockClientId, {
+				const metadata = getBlockAttributes(
+					getSelectedBlockClientId()
+				)?.metadata;
+				updateBlockAttributes( getSelectedBlockClientId(), {
 					metadata: {
 						...metadata,
 						commentId: savedRecord.id,
@@ -146,7 +145,10 @@ function CollabSidebarContent( {
 			);
 
 			if ( ! comment.parent ) {
-				updateBlockAttributes( selectedBlockClientId, {
+				const metadata = getBlockAttributes(
+					getSelectedBlockClientId()
+				)?.metadata;
+				updateBlockAttributes( getSelectedBlockClientId(), {
 					metadata: {
 						...metadata,
 						commentId: undefined,
@@ -171,7 +173,7 @@ function CollabSidebarContent( {
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
 			<Comments
-				key={ selectedBlockClientId }
+				key={ getSelectedBlockClientId() }
 				threads={ comments }
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
