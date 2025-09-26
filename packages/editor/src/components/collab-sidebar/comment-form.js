@@ -42,7 +42,10 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 		! sanitizeCommentString( inputComment ).length;
 
 	return (
-		<VStack className="editor-collab-sidebar-panel__comment-form">
+		<VStack
+			className="editor-collab-sidebar-panel__comment-form"
+			spacing="4"
+		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
 				{ __( 'Comment' ) }
 			</VisuallyHidden>
@@ -56,15 +59,11 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 				maxRows={ 20 }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					onClick={ onCancel }
-				>
+				<Button size="compact" variant="tertiary" onClick={ onCancel }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
-					__next40pxDefaultSize
+					size="compact"
 					accessibleWhenDisabled
 					variant="primary"
 					onClick={ () => {
