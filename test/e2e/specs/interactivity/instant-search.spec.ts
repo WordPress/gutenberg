@@ -11,17 +11,17 @@ import type { Page } from '@playwright/test';
  * Go to the next page of the query.
  * @param page       - The page object.
  * @param pageNumber - The page number to navigate to.
- * @param testId     - The test ID of the query.
+ * @param className  - The class name of the query.
  * @param queryId    - The query ID.
  */
 async function goToNextPage(
 	page: Page,
 	pageNumber: number,
-	testId: string,
+	className: string,
 	queryId: number
 ) {
 	await page
-		.getByTestId( testId )
+		.locator( className )
 		.getByRole( 'link', { name: 'Next Page' } )
 		.click();
 
@@ -44,46 +44,25 @@ test.describe( 'Instant Search', () => {
 
 		// Create test posts
 		// Make sure to create them last-to-first to avoid flakiness
-		await requestUtils.createPost( {
-			title: 'Unique Post',
-			content: 'This post has unique content.',
-			status: 'publish',
-			date_gmt: new Date(
-				new Date().getTime() - 1000 * 60 * 60 * 24 * 5
-			).toISOString(),
-		} );
-		await requestUtils.createPost( {
-			title: 'Fourth Test Post',
-			content: 'This is the fourth test post content.',
-			status: 'publish',
-			date_gmt: new Date(
-				new Date().getTime() - 1000 * 60 * 60 * 24 * 4
-			).toISOString(),
-		} );
-		await requestUtils.createPost( {
-			title: 'Third Test Post',
-			content: 'This is the third test post content.',
-			status: 'publish',
-			date_gmt: new Date(
-				new Date().getTime() - 1000 * 60 * 60 * 24 * 3
-			).toISOString(),
-		} );
-		await requestUtils.createPost( {
-			title: 'Second Test Post',
-			content: 'This is the second test post content.',
-			status: 'publish',
-			date_gmt: new Date(
-				new Date().getTime() - 1000 * 60 * 60 * 24 * 2
-			).toISOString(),
-		} );
-		await requestUtils.createPost( {
-			title: 'First Test Post',
-			content: 'This is the first test post content.',
-			status: 'publish',
-			date_gmt: new Date(
-				new Date().getTime() - 1000 * 60 * 60 * 24 * 1
-			).toISOString(),
-		} );
+		const posts = [
+			{ title: 'Unique Post', days: 5 },
+			{ title: 'Fourth Test Post', days: 4 },
+			{ title: 'Third Test Post', days: 3 },
+			{ title: 'Second Test Post', days: 2 },
+			{ title: 'First Test Post', days: 1 },
+		];
+
+		await Promise.all(
+			posts.map( async ( post ) => {
+				await requestUtils.createPost( {
+					...post,
+					status: 'publish',
+					date_gmt: new Date(
+						new Date().getTime() - 1000 * 60 * 60 * 24 * post.days
+					).toISOString(),
+				} );
+			} )
+		);
 
 		// Set the Blog pages show at most 2 posts
 		await requestUtils.updateSiteSettings( {
@@ -101,40 +80,53 @@ test.describe( 'Instant Search', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
-	test.describe( 'Custom Query', () => {
-		let pageId: number;
-
+	test.describe( 'Basic Instant Search', () => {
+		let pageId: number | null;
 		const queryId = 123;
 
-		test.beforeAll( async ( { requestUtils } ) => {
+		test.beforeEach( async ( { editor, admin } ) => {
 			// Create page with custom query
-			const { id } = await requestUtils.createPage( {
-				status: 'publish',
-				date_gmt: new Date().toISOString(),
+			await admin.createNewPost( {
+				postType: 'page',
 				title: 'Custom Query',
-				content: `
-<!-- wp:query {"enhancedPagination":true,"queryId":${ queryId },"query":{"inherit":false,"perPage":2,"order":"desc","orderBy":"date","offset":0}} -->
-  <div class="wp-block-query" data-testid="custom-query">
-		<!-- wp:search {"label":"","buttonText":"Search"} /-->
-		<!-- wp:post-template -->
-			<!-- wp:post-title {"level":3} /-->
-			<!-- wp:post-excerpt /-->
-		<!-- /wp:post-template -->
-		<!-- wp:query-pagination -->
-			<!-- wp:query-pagination-previous /-->
-			<!-- wp:query-pagination-numbers /-->
-			<!-- wp:query-pagination-next /-->
-		<!-- /wp:query-pagination -->
-		<!-- wp:query-no-results -->
-			<!-- wp:paragraph -->
-			<p>No results found.</p>
-			<!-- /wp:paragraph -->
-		<!-- /wp:query-no-results -->
-	</div>
-<!-- /wp:query -->`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: {
+					enhancedPagination: true,
+					queryId,
+					query: { inherit: false },
+					className: 'custom-query',
+				},
+				innerBlocks: [
+					{ name: 'core/search' },
+					{
+						name: 'core/post-template',
+						innerBlocks: [ { name: 'core/post-title' } ],
+					},
+					{
+						name: 'core/query-pagination',
+						innerBlocks: [
+							{ name: 'core/query-pagination-previous' },
+							{ name: 'core/query-pagination-numbers' },
+							{ name: 'core/query-pagination-next' },
+						],
+					},
+					{
+						name: 'core/query-no-results',
+						innerBlocks: [
+							{
+								name: 'core/paragraph',
+								attributes: {
+									content: 'No results found.',
+								},
+							},
+						],
+					},
+				],
 			} );
 
-			pageId = id;
+			pageId = await editor.publishPost();
 		} );
 
 		test.beforeEach( async ( { page } ) => {
@@ -162,8 +154,8 @@ test.describe( 'Instant Search', () => {
 
 			// Check that there is only one post
 			const posts = page
-				.getByTestId( 'custom-query' )
-				.getByRole( 'heading', { level: 3 } );
+				.locator( '.custom-query' )
+				.getByRole( 'heading' );
 			await expect( posts ).toHaveCount( 1 );
 
 			// Verify that the other posts are hidden
@@ -298,36 +290,42 @@ test.describe( 'Instant Search', () => {
 				page.locator( '.wp-block-query-pagination-numbers' )
 			).toBeHidden();
 		} );
+	} );
+
+	test.describe( 'Custom Search', () => {
+		const queryId = 123;
 
 		test( 'should handle pre-defined search from query attributes', async ( {
-			requestUtils,
+			admin,
+			editor,
 			page,
 		} ) => {
 			// Create page with custom query that includes a search parameter
-			const { id } = await requestUtils.createPage( {
-				status: 'publish',
+			await admin.createNewPost( {
+				postType: 'page',
 				title: 'Query with Search',
-				content: `
-<!-- wp:query {"enhancedPagination":true,"queryId":${ queryId },"query":{"inherit":false,"perPage":2,"order":"desc","orderBy":"date","offset":0,"search":"Unique"}} -->
-    <div class="wp-block-query" data-testid="query-with-search">
-        <!-- wp:search {"label":"","buttonText":"Search"} /-->
-        <!-- wp:post-template -->
-            <!-- wp:post-title {"level":3} /-->
-            <!-- wp:post-excerpt /-->
-        <!-- /wp:post-template -->
-        <!-- wp:query-pagination -->
-            <!-- wp:query-pagination-previous /-->
-            <!-- wp:query-pagination-numbers /-->
-            <!-- wp:query-pagination-next /-->
-        <!-- /wp:query-pagination -->
-        <!-- wp:query-no-results -->
-            <!-- wp:paragraph -->
-            <p>No results found.</p>
-            <!-- /wp:paragraph -->
-        <!-- /wp:query-no-results -->
-    </div>
-<!-- /wp:query -->`,
 			} );
+			await editor.insertBlock( {
+				name: 'core/query',
+				attributes: {
+					enhancedPagination: true,
+					queryId,
+					query: {
+						inherit: false,
+						search: 'Unique',
+					},
+					className: 'query-with-search',
+				},
+				innerBlocks: [
+					{ name: 'core/search' },
+					{
+						name: 'core/post-template',
+						innerBlocks: [ { name: 'core/post-title' } ],
+					},
+				],
+			} );
+
+			const id = await editor.publishPost();
 
 			// Navigate to the page
 			await page.goto( `/?p=${ id }` );
@@ -342,8 +340,8 @@ test.describe( 'Instant Search', () => {
 				page.getByText( 'Unique Post', { exact: true } )
 			).toBeVisible();
 			const posts = page
-				.getByTestId( 'query-with-search' )
-				.getByRole( 'heading', { level: 3 } );
+				.locator( '.query-with-search' )
+				.getByRole( 'heading' );
 			await expect( posts ).toHaveCount( 1 );
 
 			// Verify URL does not contain the instant-search parameter
@@ -370,78 +368,58 @@ test.describe( 'Instant Search', () => {
 	} );
 
 	test.describe( 'Multiple Queries', () => {
-		let pageId: number;
+		let pageId: number | null;
 
 		const firstQueryId = 1234;
 		const secondQueryId = 5678;
 
-		test.beforeAll( async ( { requestUtils } ) => {
+		const queryLoobBlockSettings = [
+			{ className: 'first-query', queryId: firstQueryId },
+			{ className: 'second-query', queryId: secondQueryId },
+		];
+		test.beforeEach( async ( { admin, editor, page } ) => {
+			const queryLoobBlocks = queryLoobBlockSettings.map(
+				( { className, queryId } ) => ( {
+					name: 'core/query',
+					attributes: {
+						enhancedPagination: true,
+						queryId,
+						query: { inherit: false },
+						className,
+					},
+					innerBlocks: [
+						{ name: 'core/search' },
+						{
+							name: 'core/post-template',
+							innerBlocks: [ { name: 'core/post-title' } ],
+						},
+						{
+							name: 'core/query-pagination',
+							innerBlocks: [
+								{ name: 'core/query-pagination-previous' },
+								{ name: 'core/query-pagination-next' },
+							],
+						},
+					],
+				} )
+			);
 			// Edit the Home template to include two custom queries
-			const { id } = await requestUtils.createPage( {
-				status: 'publish',
-				title: 'Home',
-				content: `
-<!-- wp:query {"enhancedPagination":true,"queryId":${ firstQueryId },"query":{"inherit":false,"perPage":2,"order":"desc","orderBy":"date","offset":0}} -->
-	<div class="wp-block-query" data-testid="first-query">
-		<!-- wp:heading -->
-		<h2>First Query</h2>
-		<!-- /wp:heading -->
-		<!-- wp:search {"label":"1st-instant-search","buttonText":"Search"} /-->
-		<!-- wp:post-template -->
-			<!-- wp:post-title {"level":3} /-->
-			<!-- wp:post-excerpt /-->
-		<!-- /wp:post-template -->
-		<!-- wp:query-pagination -->
-			<!-- wp:query-pagination-previous /-->
-			<!-- wp:query-pagination-numbers /-->
-			<!-- wp:query-pagination-next /-->
-		<!-- /wp:query-pagination -->
-		<!-- wp:query-no-results -->
-			<!-- wp:paragraph -->
-			<p>No results found.</p>
-			<!-- /wp:paragraph -->
-		<!-- /wp:query-no-results -->
-	</div>
-<!-- /wp:query -->
+			await admin.createNewPost( { postType: 'page' } );
+			await editor.insertBlock( queryLoobBlocks[ 0 ] );
+			await editor.insertBlock( queryLoobBlocks[ 1 ] );
 
-<!-- wp:query {"enhancedPagination":true,"queryId":${ secondQueryId },"query":{"inherit":false,"perPage":2,"order":"desc","orderBy":"date","offset":0}} -->
-	<div class="wp-block-query" data-testid="second-query">
-		<!-- wp:heading -->
-		<h2>Second Query</h2>
-		<!-- /wp:heading -->
-		<!-- wp:search {"label":"2nd-instant-search","buttonText":"Search"} /-->
-		<!-- wp:post-template -->
-			<!-- wp:post-title {"level":3} /-->
-			<!-- wp:post-excerpt /-->
-		<!-- /wp:post-template -->
-		<!-- wp:query-pagination -->
-			<!-- wp:query-pagination-previous /-->
-			<!-- wp:query-pagination-numbers /-->
-			<!-- wp:query-pagination-next /-->
-		<!-- /wp:query-pagination -->
-		<!-- wp:query-no-results -->
-			<!-- wp:paragraph -->
-			<p>No results found.</p>
-			<!-- /wp:paragraph -->
-		<!-- /wp:query-no-results -->
-	</div>
-<!-- /wp:query -->`,
-			} );
+			const id = await editor.publishPost();
 
 			pageId = id;
-		} );
-
-		test.beforeEach( async ( { page } ) => {
 			await page.goto( `/?p=${ pageId }` );
 		} );
 
 		test( 'should handle searches independently', async ( { page } ) => {
-			// Get search inputs
-			const firstQuerySearch = page.getByLabel( '1st-instant-search' );
-			const secondQuerySearch = page.getByLabel( '2nd-instant-search' );
+			const firstQuery = page.locator( '.first-query' );
+			const secondQuery = page.locator( '.second-query' );
 
 			// Search in first query
-			await firstQuerySearch.fill( 'Unique' );
+			await firstQuery.getByRole( 'searchbox' ).fill( 'Unique' );
 			await page.waitForResponse( ( response ) =>
 				response
 					.url()
@@ -451,13 +429,12 @@ test.describe( 'Instant Search', () => {
 			// Verify first query ONLY shows the unique post
 			await expect(
 				page
-					.getByTestId( 'first-query' )
+					.locator( '.first-query' )
 					.getByText( 'Unique Post', { exact: true } )
 			).toBeVisible();
 
 			// Verify that the second query shows exactly 2 posts: First Test Post and Second Test Post
-			const secondQuery = page.getByTestId( 'second-query' );
-			const posts = secondQuery.getByRole( 'heading', { level: 3 } );
+			const posts = secondQuery.getByRole( 'heading' );
 			await expect( posts ).toHaveCount( 2 );
 			await expect( posts ).toContainText( [
 				'First Test Post',
@@ -465,7 +442,7 @@ test.describe( 'Instant Search', () => {
 			] );
 
 			// Search in second query
-			await secondQuerySearch.fill( 'Third' );
+			await secondQuery.getByRole( 'searchbox' ).fill( 'Third' );
 			await page.waitForResponse( ( response ) =>
 				response
 					.url()
@@ -481,21 +458,17 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Verify that the first query has only one post which is the "Unique" post
-			const firstQueryPosts = page
-				.getByTestId( 'first-query' )
-				.getByRole( 'heading', { level: 3 } );
+			const firstQueryPosts = firstQuery.getByRole( 'heading' );
 			await expect( firstQueryPosts ).toHaveCount( 1 );
 			await expect( firstQueryPosts ).toContainText( 'Unique Post' );
 
 			// Verify that the second query has only one post which is the "Third Test Post"
-			const secondQueryPosts = page
-				.getByTestId( 'second-query' )
-				.getByRole( 'heading', { level: 3 } );
+			const secondQueryPosts = secondQuery.getByRole( 'heading' );
 			await expect( secondQueryPosts ).toHaveCount( 1 );
 			await expect( secondQueryPosts ).toContainText( 'Third Test Post' );
 
 			// Clear first query search
-			await firstQuerySearch.fill( '' );
+			await firstQuery.getByRole( 'searchbox' ).fill( '' );
 			await expect( page ).not.toHaveURL(
 				new RegExp( `instant-search-${ firstQueryId }=` )
 			);
@@ -504,24 +477,24 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Clear second query search
-			await secondQuerySearch.fill( '' );
+			await secondQuery.getByRole( 'searchbox' ).fill( '' );
 			await expect( page ).not.toHaveURL(
 				new RegExp( `instant-search-${ secondQueryId }=` )
 			);
 		} );
 
 		test( 'should handle pagination independently', async ( { page } ) => {
-			const firstQuerySearch = page.getByLabel( '1st-instant-search' );
-			const secondQuerySearch = page.getByLabel( '2nd-instant-search' );
+			const firstQuery = page.locator( '.first-query' );
+			const secondQuery = page.locator( '.second-query' );
 
 			// Navigate to second page in first query
-			await goToNextPage( page, 2, 'first-query', firstQueryId );
+			await goToNextPage( page, 2, '.first-query', firstQueryId );
 
 			// Navigate to second page in second query
-			await goToNextPage( page, 2, 'second-query', secondQueryId );
+			await goToNextPage( page, 2, '.second-query', secondQueryId );
 
 			// Navigate to third page in second query
-			await goToNextPage( page, 3, 'second-query', secondQueryId );
+			await goToNextPage( page, 3, '.second-query', secondQueryId );
 
 			// Verify URL contains both pagination parameters
 			await expect( page ).toHaveURL(
@@ -532,7 +505,7 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Search in first query and verify only its pagination resets
-			await firstQuerySearch.fill( 'Test' );
+			await firstQuery.getByRole( 'searchbox' ).fill( 'Test' );
 			await expect( page ).toHaveURL(
 				new RegExp( `query-${ firstQueryId }-page=1` )
 			);
@@ -541,7 +514,7 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Search in second query and verify only its pagination resets
-			await secondQuerySearch.fill( 'Test' );
+			await secondQuery.getByRole( 'searchbox' ).fill( 'Test' );
 			await expect( page ).toHaveURL(
 				new RegExp( `query-${ firstQueryId }-page=1` )
 			);
@@ -570,26 +543,8 @@ test.describe( 'Instant Search', () => {
 			// Insert Query block with enhanced pagination enabled
 			await editor.insertBlock( {
 				name: 'core/query',
-				attributes: {
-					enhancedPagination: true,
-					query: {
-						inherit: false,
-						perPage: 2,
-						order: 'desc',
-						orderBy: 'date',
-						offset: 0,
-					},
-				},
-				innerBlocks: [
-					{ name: 'core/search' },
-					{
-						name: 'core/post-template',
-						innerBlocks: [
-							{ name: 'core/post-title' },
-							{ name: 'core/post-excerpt' },
-						],
-					},
-				],
+				attributes: { enhancedPagination: true },
+				innerBlocks: [ { name: 'core/search' } ],
 			} );
 
 			// Select the Search block
@@ -603,8 +558,8 @@ test.describe( 'Instant Search', () => {
 				name: 'Block tools',
 			} );
 			await expect(
-				toolbar.getByRole( 'button', {
-					name: 'Change button position',
+				page.getByRole( 'checkbox', {
+					name: 'Use button with icon',
 				} )
 			).toBeHidden();
 			await expect(
@@ -630,15 +585,14 @@ test.describe( 'Instant Search', () => {
 
 			// Select the Search block again
 			await editor.selectBlocks( searchBlock );
-
 			// Verify that the toolbar buttons are now visible
 			await expect(
-				toolbar.getByRole( 'button', {
-					name: 'Change button position',
-				} )
+				page.getByRole( 'combobox', { name: 'Button position' } )
 			).toBeVisible();
 			await expect(
-				toolbar.getByRole( 'button', { name: 'Use button with icon' } )
+				page.getByRole( 'checkbox', {
+					name: 'Use button with icon',
+				} )
 			).toBeVisible();
 		} );
 
@@ -649,28 +603,8 @@ test.describe( 'Instant Search', () => {
 			// Insert Query block with enhanced pagination enabled
 			await editor.insertBlock( {
 				name: 'core/query',
-				attributes: {
-					enhancedPagination: true,
-					query: {
-						inherit: false,
-						perPage: 2,
-						order: 'desc',
-						orderBy: 'date',
-						offset: 0,
-					},
-				},
-				innerBlocks: [
-					{
-						name: 'core/search',
-					},
-					{
-						name: 'core/post-template',
-						innerBlocks: [
-							{ name: 'core/post-title' },
-							{ name: 'core/post-excerpt' },
-						],
-					},
-				],
+				attributes: { enhancedPagination: true },
+				innerBlocks: [ { name: 'core/search' } ],
 			} );
 
 			// Select the Search block
