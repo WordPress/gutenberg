@@ -20,7 +20,7 @@ type PreferenceToggleMenuItemProps = {
 	messageActivated?: string;
 	messageDeactivated?: string;
 	shortcut?: string | { display: string; ariaLabel: string };
-	handleToggling?: boolean,
+	handleToggling?: boolean;
 	onToggle?: () => void;
 	disabled?: boolean;
 };
