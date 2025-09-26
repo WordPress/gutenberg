@@ -199,7 +199,7 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
-	const commentId = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
@@ -234,13 +234,13 @@ export default function CollabSidebar() {
 		} );
 	}
 
-	const AddCommentComponent = commentId
+	const AddCommentComponent = blockCommentId
 		? CommentAvatarIndicator
 		: AddCommentButton;
 
 	// Find the current thread for the selected block.
-	const currentThread = commentId
-		? resultComments.find( ( thread ) => thread.id === commentId )
+	const currentThread = blockCommentId
+		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
 	// If postId is not a valid number, do not render the comment sidebar.

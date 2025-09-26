@@ -51,7 +51,7 @@ export function Comments( {
 	onCommentDelete,
 	setShowCommentBoard,
 } ) {
-	const commentId = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
@@ -59,7 +59,7 @@ export function Comments( {
 			? getBlockAttributes( clientId )?.metadata?.commentId
 			: null;
 	}, [] );
-	const [ focusThread = commentId, setFocusThread ] = useState();
+	const [ focusThread = blockCommentId, setFocusThread ] = useState();
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
