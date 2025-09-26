@@ -150,7 +150,7 @@ test.describe( 'Instant Search', () => {
 			).toBeVisible();
 
 			// Type in search input and verify results update
-			await page.locator( 'input[type="search"]' ).fill( 'Unique' );
+			await page.getByRole( 'searchbox' ).fill( 'Unique' );
 			await page.waitForResponse( ( response ) =>
 				response.url().includes( `instant-search-${ queryId }=Unique` )
 			);
@@ -174,13 +174,13 @@ test.describe( 'Instant Search', () => {
 
 		test( 'should update URL with search parameter', async ( { page } ) => {
 			// Test global query search parameter
-			await page.locator( 'input[type="search"]' ).fill( 'Test' );
+			await page.getByRole( 'searchbox' ).fill( 'Test' );
 			await expect( page ).toHaveURL(
 				new RegExp( `instant-search-${ queryId }=Test` )
 			);
 
 			// Clear search and verify parameter is removed
-			await page.locator( 'input[type="search"]' ).fill( '' );
+			await page.getByRole( 'searchbox' ).fill( '' );
 			await expect( page ).not.toHaveURL(
 				new RegExp( `instant-search-${ queryId }=` )
 			);
@@ -206,7 +206,7 @@ test.describe( 'Instant Search', () => {
 				);
 			} );
 			await page
-				.locator( 'input[type="search"]' )
+				.getByRole( 'searchbox' )
 				.pressSequentially( 'Test', { delay: 100 } );
 			await responsePromise;
 
@@ -226,7 +226,7 @@ test.describe( 'Instant Search', () => {
 			// Type again with a large delay and verify that a request is made
 			// for each character
 			await page
-				.locator( 'input[type="search"]' )
+				.getByRole( 'searchbox' )
 				.pressSequentially( '1234', { delay: 500 } );
 			await responsePromise;
 
@@ -243,7 +243,7 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Search and verify we're back to first page
-			await page.locator( 'input[type="search"]' ).fill( 'Test' );
+			await page.getByRole( 'searchbox' ).fill( 'Test' );
 			await expect( page ).not.toHaveURL(
 				new RegExp( `query-${ queryId }-page=2` )
 			);
@@ -260,9 +260,7 @@ test.describe( 'Instant Search', () => {
 		test( 'should show no-results block when search has no matches', async ( {
 			page,
 		} ) => {
-			await page
-				.locator( 'input[type="search"]' )
-				.fill( 'NonexistentContent' );
+			await page.getByRole( 'searchbox' ).fill( 'NonexistentContent' );
 			await page.waitForResponse( ( response ) =>
 				response
 					.url()
@@ -290,7 +288,7 @@ test.describe( 'Instant Search', () => {
 			).toBeVisible();
 
 			// Search for unique post
-			await page.locator( 'input[type="search"]' ).fill( 'Unique' );
+			await page.getByRole( 'searchbox' ).fill( 'Unique' );
 			await page.waitForResponse( ( response ) =>
 				response.url().includes( `instant-search-${ queryId }=Unique` )
 			);
@@ -335,7 +333,7 @@ test.describe( 'Instant Search', () => {
 			await page.goto( `/?p=${ id }` );
 
 			// Verify the search input has the initial value
-			await expect( page.locator( 'input[type="search"]' ) ).toHaveValue(
+			await expect( page.getByRole( 'searchbox' ) ).toHaveValue(
 				'Unique'
 			);
 
@@ -354,7 +352,7 @@ test.describe( 'Instant Search', () => {
 			);
 
 			// Type new search term and verify normal instant search behavior
-			await page.locator( 'input[type="search"]' ).fill( 'Test' );
+			await page.getByRole( 'searchbox' ).fill( 'Test' );
 			await page.waitForResponse( ( response ) =>
 				response.url().includes( `instant-search-${ queryId }=Test` )
 			);
