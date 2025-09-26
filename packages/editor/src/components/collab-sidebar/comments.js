@@ -120,7 +120,7 @@ function Thread( {
 		}
 	};
 
-	const clearThreadFocus = () => {
+	const unselectThread = () => {
 		setSelectedThread( null );
 		setShowCommentBoard( false );
 	};
@@ -140,11 +140,16 @@ function Thread( {
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 			onKeyDown={ ( event ) => {
+				// Expand or Collapse thread.
 				if (
 					event.key === 'Enter' &&
 					event.currentTarget === event.target
 				) {
-					handleCommentSelect( thread );
+					if ( isSelected ) {
+						unselectThread();
+					} else {
+						handleCommentSelect( thread );
+					}
 				}
 			} }
 			tabIndex={ 0 }
@@ -241,7 +246,7 @@ function Thread( {
 							onCancel={ ( event ) => {
 								threadRef.current?.focus();
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
-								clearThreadFocus();
+								unselectThread();
 							} }
 							placeholderText={
 								'approved' === thread.status &&
