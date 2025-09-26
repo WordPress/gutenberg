@@ -680,8 +680,11 @@ export default () => {
 			const result: VNode< any >[] = [];
 
 			for ( const item of iterable ) {
+				// Shadows a previous item with the same key.
 				const itemContext = proxifyContext(
-					proxifyState( namespace, {} ),
+					proxifyState( namespace, {
+						[ itemProp ]: item,
+					} ),
 					inheritedValue.client[ namespace ]
 				);
 				const mergedContext = {
@@ -691,9 +694,6 @@ export default () => {
 					},
 					server: { ...inheritedValue.server },
 				};
-
-				// Set the item after proxifying the context.
-				mergedContext.client[ namespace ][ itemProp ] = item;
 
 				const scope = {
 					...getScope(),

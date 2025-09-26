@@ -30,9 +30,16 @@ import { sanitizeCommentString } from './utils';
  * @param {Function} props.onCancel         - The function to call when canceling the comment update.
  * @param {Object}   props.thread           - The comment thread object.
  * @param {string}   props.submitButtonText - The text to display on the submit button.
+ * @param {string?}  props.labelText        - The label text for the comment input.
  * @return {React.ReactNode} The CommentForm component.
  */
-function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
+function CommentForm( {
+	onSubmit,
+	onCancel,
+	thread,
+	submitButtonText,
+	labelText,
+} ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
@@ -48,7 +55,7 @@ function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 			spacing="4"
 		>
 			<VisuallyHidden as="label" htmlFor={ inputId }>
-				{ __( 'Comment' ) }
+				{ labelText ?? __( 'Comment' ) }
 			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }

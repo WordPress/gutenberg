@@ -229,6 +229,13 @@ function Thread( {
 									? __( 'Reopen & Reply' )
 									: __( 'Reply' )
 							}
+							rows={ 'approved' === thread.status ? 2 : 4 }
+							labelText={ sprintf(
+								// translators: %1$s: comment identifier, %2$s: author name
+								__( 'Reply to Comment %1$s by %2$s' ),
+								thread.id,
+								thread?.author_name || 'Unknown'
+							) }
 						/>
 					</VStack>
 				</VStack>
@@ -354,6 +361,12 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %1$s: comment identifier, %2$s: author name.
+						__( 'Edit Comment %1$s by %2$s' ),
+						thread.id,
+						thread?.author_name || 'Unknown'
+					) }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">
