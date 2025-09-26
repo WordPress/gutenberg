@@ -28,6 +28,7 @@ const SPACE = ' ';
  */
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
+import { useFieldElements } from '../../hooks/use-field-elements';
 import {
 	OPERATORS,
 	OPERATOR_IS,
@@ -477,11 +478,18 @@ export default function Filter( {
 	const filterInView = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
+	const { elements: availableElements, isResolving } = useFieldElements(
+		filter.elements
+	);
+	const hasStaticElements = Array.isArray( filter.elements );
+	const shouldRenderSearchWidget = hasStaticElements
+		? availableElements.length > 0
+		: !! filter.elements;
 
 	let activeElements: Option[] = [];
 
-	if ( filter.elements.length > 0 ) {
-		activeElements = filter.elements.filter( ( element ) => {
+	if ( availableElements.length > 0 ) {
+		activeElements = availableElements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
@@ -594,13 +602,14 @@ export default function Filter( {
 				return (
 					<VStack spacing={ 0 } justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.elements.length > 0 ? (
+						{ shouldRenderSearchWidget ? (
 							<SearchWidget
 								{ ...commonProps }
 								filter={ {
 									...commonProps.filter,
-									elements: commonProps.filter.elements,
+									elements: availableElements,
 								} }
+								isResolving={ isResolving }
 							/>
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />

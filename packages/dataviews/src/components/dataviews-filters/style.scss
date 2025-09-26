@@ -163,6 +163,10 @@
 	}
 }
 
+.dataviews-filters__search-widget-loading {
+	padding: $grid-unit-05 $grid-unit-20;
+}
+
 .dataviews-filters__search-widget-filter-combobox-list {
 	max-height: $grid-unit * 23;
 	padding: $grid-unit-05;

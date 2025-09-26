@@ -16,6 +16,7 @@ import { useCallback, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { useFieldElements } from '../hooks/use-field-elements';
 import { unlock } from '../lock-unlock';
 
 const { ValidatedToggleGroupControl } = unlock( privateApis );
@@ -33,7 +34,6 @@ export default function ToggleGroup< Item >( {
 				typeof ValidatedToggleGroupControl
 			>[ 'customValidity' ]
 		>( undefined );
-	const value = getValue( { item: data } );
 
 	const onChangeControl = useCallback(
 		( newValue: string | number | undefined ) =>
@@ -66,34 +66,37 @@ export default function ToggleGroup< Item >( {
 		[ data, field, setValue ]
 	);
 
-	if ( field.elements ) {
-		const selectedOption = field.elements.find(
-			( el ) => el.value === value
-		);
-		return (
-			<ValidatedToggleGroupControl
-				required={ !! field.isValid?.required }
-				onValidate={ onValidateControl }
-				customValidity={ customValidity }
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				isBlock
-				label={ field.label }
-				help={ selectedOption?.description || field.description }
-				onChange={ onChangeControl }
-				value={ value }
-				hideLabelFromVision={ hideLabelFromVision }
-			>
-				{ field.elements.map( ( el ) => (
-					<ToggleGroupControlOption
-						key={ el.value }
-						label={ el.label }
-						value={ el.value }
-					/>
-				) ) }
-			</ValidatedToggleGroupControl>
-		);
+	const { elements, isResolving } = useFieldElements( field.elements );
+
+	if ( ! elements?.length ) {
+		return null;
 	}
 
-	return null;
+	const value = getValue( { item: data } );
+	const selectedOption = elements.find( ( el ) => el.value === value );
+
+	return (
+		<ValidatedToggleGroupControl
+			required={ !! field.isValid?.required }
+			onValidate={ onValidateControl }
+			customValidity={ customValidity }
+			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+			isBlock
+			label={ field.label }
+			help={ selectedOption?.description || field.description }
+			onChange={ onChangeControl }
+			value={ value }
+			hideLabelFromVision={ hideLabelFromVision }
+			disabled={ isResolving }
+		>
+			{ elements.map( ( el ) => (
+				<ToggleGroupControlOption
+					key={ el.value }
+					label={ el.label }
+					value={ el.value }
+				/>
+			) ) }
+		</ValidatedToggleGroupControl>
+	);
 }

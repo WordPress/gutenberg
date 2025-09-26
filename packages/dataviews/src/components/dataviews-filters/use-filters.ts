@@ -13,9 +13,13 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 	return useMemo( () => {
 		const filters: NormalizedFilter[] = [];
 		fields.forEach( ( field ) => {
+			const elementsSource = field.elements;
+			const hasResolvableElements = Array.isArray( elementsSource )
+				? elementsSource.length > 0
+				: !! elementsSource;
 			if (
 				field.filterBy === false ||
-				( ! field.elements?.length && ! field.Edit )
+				( ! hasResolvableElements && ! field.Edit )
 			) {
 				return;
 			}
@@ -29,7 +33,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 			filters.push( {
 				field: field.id,
 				name: field.label,
-				elements: field.elements ?? [],
+				elements: elementsSource ?? [],
 				singleSelection: operators.some( ( op ) =>
 					SINGLE_SELECTION_OPERATORS.includes( op )
 				),

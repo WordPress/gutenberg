@@ -14,6 +14,7 @@ import { _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { useFieldElements } from '../hooks/use-field-elements';
 import { unlock } from '../lock-unlock';
 
 const { ValidatedFormTokenField } = unlock( privateApis );
@@ -24,7 +25,8 @@ export default function ArrayControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, elements, getValue, setValue } = field;
+	const { label, placeholder, getValue, setValue } = field;
+	const { elements } = useFieldElements( field.elements );
 	const value = getValue( { item: data } );
 
 	const [ customValidity, setCustomValidity ] = useState<

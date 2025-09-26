@@ -13,6 +13,7 @@ import { useCallback, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import type { DataFormControlProps } from '../types';
+import { useFieldElements } from '../hooks/use-field-elements';
 import { unlock } from '../lock-unlock';
 
 const { ValidatedSelectControl } = unlock( privateApis );
@@ -66,7 +67,9 @@ export default function Select< Item >( {
 		[ data, field, setValue ]
 	);
 
-	const elements = field?.elements ?? [];
+	const { elements, isResolving } = useFieldElements(
+		field.elements
+	);
 
 	return (
 		<ValidatedSelectControl
@@ -82,6 +85,7 @@ export default function Select< Item >( {
 			__nextHasNoMarginBottom
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
+			disabled={ isResolving && elements.length === 0 }
 		/>
 	);
 }

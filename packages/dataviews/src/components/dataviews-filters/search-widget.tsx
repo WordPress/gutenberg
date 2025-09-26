@@ -27,6 +27,7 @@ interface SearchWidgetProps {
 		elements: Option[];
 	};
 	onChangeView: ( view: View ) => void;
+	isResolving?: boolean;
 }
 
 function normalizeSearchInput( input = '' ) {
@@ -322,6 +323,14 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 }
 
 export default function SearchWidget( props: SearchWidgetProps ) {
+	if ( props.isResolving && props.filter.elements.length === 0 ) {
+		return (
+			<p className="dataviews-filters__search-widget-loading">
+				{ __( 'Loading options…' ) }
+			</p>
+		);
+	}
+
 	const Widget = props.filter.elements.length > 10 ? ComboboxList : ListBox;
 	return <Widget { ...props } />;
 }

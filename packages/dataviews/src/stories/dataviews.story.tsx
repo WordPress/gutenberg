@@ -159,6 +159,68 @@ export const CustomEmpty = () => {
 	);
 };
 
+const REMOTE_CATEGORY_OPTIONS = [
+	{ value: 'Solar system', label: 'Solar system' },
+	{ value: 'Satellite', label: 'Satellite' },
+	{ value: 'Moon', label: 'Moon' },
+	{ value: 'Earth', label: 'Earth' },
+	{ value: 'Jupiter', label: 'Jupiter' },
+	{ value: 'Planet', label: 'Planet' },
+	{ value: 'Ice giant', label: 'Ice giant' },
+	{ value: 'Terrestrial', label: 'Terrestrial' },
+	{ value: 'Gas giant', label: 'Gas giant' },
+	{ value: 'Irregular', label: 'Irregular' },
+];
+
+export const LazyElements = () => {
+	const [ view, setView ] = useState< View >( {
+		...DEFAULT_VIEW,
+		fields: [ 'title', 'categories', 'type' ],
+		filters: [
+			{
+				field: 'categories',
+				operator: 'isAny',
+				value: [ 'Solar system' ],
+			},
+		],
+	} );
+
+	const lazyFields = useMemo( () => {
+		return fields.map( ( field ) => {
+			if ( field.id !== 'categories' ) {
+				return field;
+			}
+
+			return {
+				...field,
+				elements: async () => {
+					await new Promise( ( resolve ) => {
+						setTimeout( resolve, 600 );
+					} );
+					return REMOTE_CATEGORY_OPTIONS;
+				},
+			};
+		} );
+	}, [] );
+
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, lazyFields );
+	}, [ view, lazyFields ] );
+
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ lazyFields }
+			onChangeView={ setView }
+			actions={ actions }
+			defaultLayouts={ defaultLayouts }
+		/>
+	);
+};
+
 const MinimalUIComponent = ( {
 	layout = 'table',
 }: {
