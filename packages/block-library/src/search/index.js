@@ -44,7 +44,13 @@ export const settings = {
 		);
 
 		// Check if the Query Loop block has enhanced pagination enabled and
-		if ( ! queryLoopBlock?.attributes?.enhancedPagination ) {
+		// if the `__experimentalEnableSearchQueryBlock` flag is enabled.
+		const hasInstantSearch = !! (
+			queryLoopBlock?.attributes?.enhancedPagination &&
+			window?.__experimentalEnableSearchQueryBlock
+		);
+
+		if ( ! hasInstantSearch ) {
 			return customName || blockTitle;
 		}
 
