@@ -16,7 +16,7 @@ class Gutenberg_Allow_Empty_Block_Comments_Test extends WP_UnitTestCase {
 	 * Tests that the filter is properly added for the function.
 	 */
 	public function test_filter_is_added() {
-		$this->assertTrue( has_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments' ) );
+		$this->assertTrue( has_filter( 'allow_empty_comment' ) );
 		$this->assertEquals( 10, has_filter( 'allow_empty_comment', 'gutenberg_allow_empty_block_comments' ) );
 	}
 
