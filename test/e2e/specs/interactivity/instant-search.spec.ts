@@ -37,6 +37,9 @@ test.describe( 'Instant Search', () => {
 		originalPostsPerPage = ( await requestUtils.getSiteSettings() )
 			.posts_per_page;
 		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-search-query-block',
+		] );
 		await requestUtils.deleteAllPosts();
 
 		// Create test posts
@@ -73,6 +76,8 @@ test.describe( 'Instant Search', () => {
 		await requestUtils.updateSiteSettings( {
 			posts_per_page: originalPostsPerPage,
 		} );
+		// disable the gutenberg-search-query-block experiment
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test.describe( 'Basic Instant Search', () => {
