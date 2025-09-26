@@ -181,6 +181,7 @@ test.describe( 'Block Comments', () => {
 				.filter( { hasText: 'Comment marked as resolved.' } )
 		).toBeVisible();
 
+		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
