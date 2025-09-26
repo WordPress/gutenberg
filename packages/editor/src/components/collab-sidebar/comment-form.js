@@ -47,6 +47,9 @@ function CommentForm( {
 	);
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
+	const isDisabled =
+		inputComment === thread?.content?.raw ||
+		! sanitizeCommentString( inputComment ).length;
 
 	return (
 		<>
@@ -62,7 +65,7 @@ function CommentForm( {
 				rows={ rows }
 				maxRows={ 20 }
 				placeholder={ placeholderText || '' }
-			></TextareaAutosize>
+			/>
 			<HStack spacing="3" justify="flex-start" wrap>
 				<Button
 					__next40pxDefaultSize
@@ -72,9 +75,7 @@ function CommentForm( {
 						onSubmit( inputComment );
 						setInputComment( '' );
 					} }
-					disabled={
-						0 === sanitizeCommentString( inputComment ).length
-					}
+					disabled={ isDisabled }
 					text={ submitButtonText }
 				/>
 				<Button

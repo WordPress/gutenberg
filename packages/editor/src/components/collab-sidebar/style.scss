@@ -112,9 +112,24 @@
 	}
 }
 
-.editor-collab-sidebar-panel__show-more-reply {
+.editor-collab-sidebar-panel__comment-dropdown-menu {
+	flex-shrink: 0;
+}
+
+.editor-collab-sidebar-panel__more-reply-separator {
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: $gray-300;
+		flex: 1;
+	}
+}
+
+.editor-collab-sidebar-panel__more-reply-button {
 	font-weight: 500;
-	font-style: italic;
 }
 
 // Comment avatar indicators.

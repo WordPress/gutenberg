@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,7 +13,7 @@ import {
 import { ToolbarGroup } from '@wordpress/components';
 
 export default function Edit( { attributes, setAttributes, context } ) {
-	const { level, title, textAlign, levelOptions } = attributes;
+	const { level, title, levelOptions } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
@@ -34,11 +30,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	const blockProps = useBlockProps( {
-		className: clsx( 'accordion-content__heading', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
 	return (
@@ -56,7 +48,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<TagName { ...blockProps }>
 				<button
-					className={ clsx( 'wp-block-accordion-header__toggle' ) }
+					className="wp-block-accordion-header__toggle"
 					style={ {
 						...spacingProps.style,
 					} }
