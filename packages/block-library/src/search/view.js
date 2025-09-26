@@ -88,19 +88,19 @@ const { actions } = store(
 
 				// Debounce the search by 300ms to prevent multiple navigations.
 				supersedePreviousSearch?.();
-				let resolve, reject;
-				const promise = new Promise( ( res, rej ) => {
-					resolve = res;
-					reject = rej;
+
+				const promise = new Promise( ( resolve, reject ) => {
+					const timeout = setTimeout( resolve, 300 );
+					supersedePreviousSearch = () => {
+						clearTimeout( timeout );
+						reject( new Error( 'Search superseded' ) );
+					};
 				} );
-				const timeout = setTimeout( resolve, 300 );
-				supersedePreviousSearch = () => {
-					clearTimeout( timeout );
-					reject();
-				};
+
 				try {
 					yield promise;
-				} catch {
+				} catch ( error ) {
+					// Search was superseded by a newer search, exit early
 					return;
 				}
 
