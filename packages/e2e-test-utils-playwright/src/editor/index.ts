@@ -29,7 +29,6 @@ import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
 import { switchEditorTool } from './switch-editor-tool';
-import { openListView } from './open-list-view';
 
 type EditorConstructorProps = {
 	page: Page;
@@ -93,6 +92,4 @@ export class Editor {
 		switchToLegacyCanvas.bind( this );
 	/** @borrows transformBlockTo as this.transformBlockTo */
 	transformBlockTo: typeof transformBlockTo = transformBlockTo.bind( this );
-	/** @borrows openListView as this.openListView */
-	openListView: typeof openListView = openListView.bind( this );
 }
