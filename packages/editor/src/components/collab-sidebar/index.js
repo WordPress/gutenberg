@@ -2,23 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useSelect,
-	useDispatch,
-	resolveSelect,
-	subscribe,
-} from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useSelect, useDispatch, subscribe } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import {
-	store as coreStore,
-	useEntityBlockEditor,
-	useEntityRecords,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -31,7 +24,7 @@ import { store as editorStore } from '../../store';
 import AddCommentButton from './comment-button';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import { getCommentIdsFromBlocks } from './utils';
+import { useBlockComments } from './hooks';
 
 const modifyBlockCommentAttributes = ( settings ) => {
 	if ( ! settings.attributes.blockCommentId ) {
@@ -61,24 +54,14 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecord } = resolveSelect( coreStore );
-
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
-		return {
-			postId: _postId,
-		};
-	}, [] );
-
+	const { getCurrentPostId } = useSelect( editorStore );
 	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
-				? error.message
+				? decodeEntities( error.message )
 				: __( 'An error occurred while performing an update.' );
 		createNotice( 'error', errorMessage, {
 			type: 'snackbar',
@@ -86,23 +69,23 @@ function CollabSidebarContent( {
 		} );
 	};
 
-	const addNewComment = async ( comment, parentCommentId ) => {
+	const addNewComment = async ( { content, parent } ) => {
 		try {
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					post: postId,
-					content: comment,
+					post: getCurrentPostId(),
+					content,
 					comment_type: 'block_comment',
 					comment_approved: 0,
-					...( parentCommentId ? { parent: parentCommentId } : {} ),
+					parent: parent || 0,
 				},
 				{ throwOnError: true }
 			);
 
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parentCommentId && savedRecord?.id ) {
+			if ( ! parent && savedRecord?.id ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: savedRecord.id,
 				} );
@@ -110,7 +93,7 @@ function CollabSidebarContent( {
 
 			createNotice(
 				'snackbar',
-				parentCommentId
+				parent
 					? __( 'Reply added successfully.' )
 					: __( 'Comment added successfully.' ),
 				{
@@ -123,78 +106,51 @@ function CollabSidebarContent( {
 		}
 	};
 
-	const onCommentResolve = async ( commentId ) => {
+	const onEditComment = async ( { id, content, status } ) => {
+		const messageType = status ? status : 'updated';
+		const messages = {
+			approved: __( 'Comment marked as resolved.' ),
+			hold: __( 'Comment reopened.' ),
+			updated: __( 'Comment updated.' ),
+		};
+
 		try {
 			await saveEntityRecord(
 				'root',
 				'comment',
 				{
-					id: commentId,
-					status: 'approved',
+					id,
+					content,
+					status,
 				},
 				{ throwOnError: true }
 			);
-			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
-
-	const onCommentReopen = async ( commentId ) => {
-		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
+			createNotice(
+				'snackbar',
+				messages[ messageType ] ?? __( 'Comment updated.' ),
 				{
-					id: commentId,
-					status: 'hold',
-				},
-				{ throwOnError: true }
+					type: 'snackbar',
+					isDismissible: true,
+				}
 			);
-			createNotice( 'snackbar', __( 'Comment reopened.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
 		} catch ( error ) {
 			onError( error );
 		}
 	};
 
-	const onEditComment = async ( commentId, comment ) => {
+	const onCommentDelete = async ( comment ) => {
 		try {
-			await saveEntityRecord(
+			await deleteEntityRecord(
 				'root',
 				'comment',
+				comment.id,
+				undefined,
 				{
-					id: commentId,
-					content: comment,
-				},
-				{ throwOnError: true }
+					throwOnError: true,
+				}
 			);
-			createNotice( 'snackbar', __( 'Comment edited successfully.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
 
-	const onCommentDelete = async ( commentId ) => {
-		try {
-			const childComment = await getEntityRecord(
-				'root',
-				'comment',
-				commentId
-			);
-			await deleteEntityRecord( 'root', 'comment', commentId, undefined, {
-				throwOnError: true,
-			} );
-
-			if ( childComment && ! childComment.parent ) {
+			if ( ! comment.parent ) {
 				updateBlockAttributes( getSelectedBlockClientId(), {
 					blockCommentId: undefined,
 				} );
@@ -222,8 +178,6 @@ function CollabSidebarContent( {
 				onEditComment={ onEditComment }
 				onAddReply={ addNewComment }
 				onCommentDelete={ onCommentDelete }
-				onCommentResolve={ onCommentResolve }
-				onCommentReopen={ onCommentReopen }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 			/>
@@ -238,30 +192,14 @@ export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { postId, postType } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+	const { postId } = useSelect( ( select ) => {
+		const { getCurrentPostId } = select( editorStore );
 		return {
 			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
 		};
 	}, [] );
-
-	const queryArgs = {
-		post: postId,
-		type: 'block_comment',
-		status: 'all',
-		per_page: 100,
-	};
-
-	const { records: threads, totalPages } = useEntityRecords(
-		'root',
-		'comment',
-		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
-	);
-
-	const hasMoreComments = totalPages && totalPages > 1;
 
 	const { blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -280,62 +218,10 @@ export default function CollabSidebar() {
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
 
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
+	const { resultComments, unresolvedSortedThreads, totalPages } =
+		useBlockComments( postId );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
-
-		const allComments = threads ?? [];
-
-		// Initialize each object with an empty `reply` array.
-		allComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
-		}
-
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
-
-		const blockCommentIds = getCommentIdsFromBlocks( blocks );
-
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ thread.id, thread ] )
-		);
-
-		// Get comments by block order, filter out undefined threads, and exclude resolved comments.
-		const unresolvedSortedComments = blockCommentIds
-			.map( ( id ) => threadIdMap.get( id ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status !== 'approved'
-			);
-
-		return {
-			resultComments: updatedResult,
-			unresolvedSortedThreads: unresolvedSortedComments,
-		};
-	}, [ threads, blocks ] );
+	const hasMoreComments = totalPages && totalPages > 1;
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
@@ -386,22 +272,24 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			<PluginSidebar
-				isPinnable={ false }
-				header={ false }
-				identifier={ collabSidebarName }
-				className="editor-collab-sidebar"
-				headerClassName="editor-collab-sidebar__header"
-			>
-				<CollabSidebarContent
-					comments={ unresolvedSortedThreads }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					styles={ {
-						backgroundColor,
-					} }
-				/>
-			</PluginSidebar>
+			{ isLargeViewport && (
+				<PluginSidebar
+					isPinnable={ false }
+					header={ false }
+					identifier={ collabSidebarName }
+					className="editor-collab-sidebar"
+					headerClassName="editor-collab-sidebar__header"
+				>
+					<CollabSidebarContent
+						comments={ unresolvedSortedThreads }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+						styles={ {
+							backgroundColor,
+						} }
+					/>
+				</PluginSidebar>
+			) }
 		</>
 	);
 }
