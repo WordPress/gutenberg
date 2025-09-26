@@ -45,6 +45,7 @@ import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
@@ -83,11 +84,12 @@ export default function PostFeaturedImageEdit( {
 	attributes,
 	setAttributes,
 	context: { postId, postType: postTypeSlug, queryId },
+	insertBlocksAfter,
 } ) {
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
-	const [ naturalWidth, setNaturalWidth ] = useState();
-	const [ naturalHeight, setNaturalHeight ] = useState();
-	const [ pixelSize, setPixelSize ] = useState( {} );
+	const [isEditingImage, setIsEditingImage] = useState(false);
+	const [naturalWidth, setNaturalWidth] = useState();
+	const [naturalHeight, setNaturalHeight] = useState();
+	const [pixelSize, setPixelSize] = useState({});
 	const imageRef = useRef();
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const {
@@ -176,10 +178,8 @@ export default function PostFeaturedImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
 
-	const canEditImage =
-		featuredImage && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop =
-		canEditImage && ! isEditingImage && blockEditingMode === 'default';
+	const canEditImage = featuredImage && naturalWidth && naturalHeight && imageEditing;
+	const allowCrop = canEditImage && ! isEditingImage && blockEditingMode === 'default';
 
 	const placeholder = ( content ) => {
 		return (
@@ -239,20 +239,17 @@ export default function PostFeaturedImageEdit( {
 		if ( imageRef.current?.offsetWidth && imageRef.current?.offsetHeight ) {
 			const newWidth = imageRef.current.offsetWidth;
 			const newHeight = imageRef.current.offsetHeight;
-
+			
 			// Only update if dimensions have actually changed
-			setPixelSize( ( prevSize ) => {
-				if (
-					prevSize.width !== newWidth ||
-					prevSize.height !== newHeight
-				) {
+			setPixelSize( prevSize => {
+				if ( prevSize.width !== newWidth || prevSize.height !== newHeight ) {
 					return {
 						width: newWidth,
 						height: newHeight,
 					};
 				}
 				return prevSize;
-			} );
+			});
 		}
 	}, [ mediaUrl ] );
 
@@ -265,24 +262,21 @@ export default function PostFeaturedImageEdit( {
 	const onImageLoad = ( event ) => {
 		setNaturalWidth( event.target?.naturalWidth );
 		setNaturalHeight( event.target?.naturalHeight );
-
+		
 		// Update pixel size on load as well
 		if ( event.target?.offsetWidth && event.target?.offsetHeight ) {
-			setPixelSize( ( prevSize ) => {
+			setPixelSize( prevSize => {
 				const newWidth = event.target.offsetWidth;
 				const newHeight = event.target.offsetHeight;
-
-				if (
-					prevSize.width !== newWidth ||
-					prevSize.height !== newHeight
-				) {
+				
+				if ( prevSize.width !== newWidth || prevSize.height !== newHeight ) {
 					return {
 						width: newWidth,
 						height: newHeight,
 					};
 				}
 				return prevSize;
-			} );
+			});
 		}
 	};
 
@@ -590,6 +584,15 @@ export default function PostFeaturedImageEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+				/>
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ ! isEditingImage }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Featured image caption text' ) }
+					showToolbarButton={ ! isEditingImage && blockEditingMode === 'default' }
+					readOnly={ false }
 				/>
 			</figure>
 		</>
