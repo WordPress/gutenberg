@@ -304,7 +304,7 @@ export default function CollabSidebar() {
 			</PluginSidebar>
 			{ isLargeViewport && ! hasActiveSidebar && (
 				<Fill name="ComplementaryArea/core">
-					<div className="testing-the-slotfill">
+					<div className="comment-popovers-slotfill">
 						{ unresolvedSortedThreads.length > 0 &&
 							unresolvedSortedThreads.map( ( comment ) => {
 								return (
