@@ -120,6 +120,10 @@ function Thread( {
 		}
 	};
 
+	const focusThread = () => {
+		threadRef.current?.focus();
+	};
+
 	const unselectThread = () => {
 		setSelectedThread( null );
 		setShowCommentBoard( false );
@@ -154,7 +158,7 @@ function Thread( {
 				// Collapse thread and focus the thread.
 				if ( event.key === 'Escape' ) {
 					unselectThread();
-					threadRef.current?.focus();
+					focusThread();
 				}
 			} }
 			tabIndex={ 0 }
@@ -163,7 +167,14 @@ function Thread( {
 		>
 			<CommentBoard
 				thread={ thread }
-				onEdit={ onEditComment }
+				onEdit={ ( params = {} ) => {
+					const { status } = params;
+					onEditComment( params );
+					if ( status === 'approved' ) {
+						unselectThread();
+						focusThread();
+					}
+				} }
 				onDelete={ onCommentDelete }
 				status={ thread.status }
 			/>
