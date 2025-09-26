@@ -677,7 +677,10 @@ test.describe( 'Instant Search', () => {
 			await editor.selectBlocks( searchBlock );
 
 			// Open List View
-			await editor.openListView();
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Document Overview' } )
+				.click();
 			const listView = page.getByRole( 'region', {
 				name: 'Document Overview',
 			} );
