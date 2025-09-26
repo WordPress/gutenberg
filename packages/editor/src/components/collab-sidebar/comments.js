@@ -230,10 +230,6 @@ function Thread( {
 								event.stopPropagation(); // Prevent the parent onClick from being triggered
 								clearThreadFocus();
 							} }
-							placeholderText={
-								'approved' === thread.status &&
-								__( 'Comment to reopen' )
-							}
 							submitButtonText={
 								'approved' === thread.status
 									? __( 'Reopen & Reply' )

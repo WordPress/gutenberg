@@ -29,16 +29,9 @@ import { sanitizeCommentString } from './utils';
  * @param {Function} props.onCancel         - The function to call when canceling the comment update.
  * @param {Object}   props.thread           - The comment thread object.
  * @param {string}   props.submitButtonText - The text to display on the submit button.
- * @param {string?}  props.placeholderText  - The placeholder text for the comment input.
  * @return {React.ReactNode} The CommentForm component.
  */
-function CommentForm( {
-	onSubmit,
-	onCancel,
-	thread,
-	submitButtonText,
-	placeholderText,
-} ) {
+function CommentForm( { onSubmit, onCancel, thread, submitButtonText } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
@@ -61,7 +54,6 @@ function CommentForm( {
 				}
 				rows={ 1 }
 				maxRows={ 20 }
-				placeholder={ placeholderText || '' }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>
 				<Button
