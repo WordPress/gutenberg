@@ -151,6 +151,11 @@ function Thread( {
 						handleCommentSelect( thread );
 					}
 				}
+				// Collapse thread and focus the thread.
+				if ( event.key === 'Escape' ) {
+					unselectThread();
+					threadRef.current?.focus();
+				}
 			} }
 			tabIndex={ 0 }
 			role="listitem"
