@@ -34,17 +34,20 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 		return null;
 	}
 
-	if ( 'date' === $source_args['key'] ) {
-		return esc_attr( get_the_date( 'c', $post_id ) );
-	}
-
-	if ( 'modified' === $source_args['key'] ) {
-		// Only return the modified date if it is later than the publishing date.
-		if ( get_the_modified_date( 'U', $post_id ) > get_the_date( 'U', $post_id ) ) {
-			return esc_attr( get_the_modified_date( 'c', $post_id ) );
-		} else {
-			return '';
-		}
+	switch ( $source_args['key'] ) {
+		case 'date':
+			return esc_attr( get_the_date( 'c', $post_id ) );
+		case 'modified':
+			// Only return the modified date if it is later than the publishing date.
+			if ( get_the_modified_date( 'U', $post_id ) > get_the_date( 'U', $post_id ) ) {
+				return esc_attr( get_the_modified_date( 'c', $post_id ) );
+			} else {
+				return '';
+			}
+		case 'featuredMedia.id':
+			return get_post_thumbnail_id( $post_id );
+		case 'featuredMedia.source_url':
+			return get_the_post_thumbnail_url( $post_id, $source_args['size'] ?? null );
 	}
 }
 

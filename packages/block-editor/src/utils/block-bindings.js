@@ -79,8 +79,8 @@ export function hasPatternOverridesDefaultBinding( bindings ) {
 }
 
 /**
- * Returns the bindings with the `__default` binding for pattern overrides
- * replaced with the full-set of supported attributes. e.g.:
+ * Returns bindings with the `__default` binding replaced with the
+ * full set of supported attributes. e.g.:
  *
  * - bindings passed in: `{ __default: { source: 'core/pattern-overrides' } }`
  * - bindings returned: `{ content: { source: 'core/pattern-overrides' } }`
@@ -88,25 +88,28 @@ export function hasPatternOverridesDefaultBinding( bindings ) {
  * @param {string}                  blockName The block name (e.g. 'core/paragraph').
  * @param {?Record<string, object>} bindings  A block's bindings from the metadata attribute.
  *
- * @return {Object} The bindings with default replaced for pattern overrides.
+ * @return {Object} The bindings with default replaced by full set of supported attributes.
  */
 export function replacePatternOverridesDefaultBinding( blockName, bindings ) {
-	// The `__default` binding currently only works for pattern overrides.
-	if ( hasPatternOverridesDefaultBinding( bindings ) ) {
-		const supportedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
-		const bindingsWithDefaults = {};
-		for ( const attributeName of supportedAttributes ) {
-			// If the block has mixed binding sources, retain any non pattern override bindings.
-			const bindingSource = bindings[ attributeName ]
-				? bindings[ attributeName ]
-				: { source: PATTERN_OVERRIDES_SOURCE };
-			bindingsWithDefaults[ attributeName ] = bindingSource;
-		}
+	const supportedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
 
-		return bindingsWithDefaults;
+	if ( ! bindings ) {
+		return bindings;
 	}
 
-	return bindings;
+	const { __default: defaultBindings, ...otherBindings } = bindings;
+
+	if ( ! defaultBindings ) {
+		return bindings;
+	}
+
+	for ( const attributeName of supportedAttributes ) {
+		if ( ! otherBindings?.[ attributeName ] ) {
+			otherBindings[ attributeName ] = defaultBindings;
+		}
+	}
+
+	return otherBindings;
 }
 
 /**
