@@ -106,7 +106,12 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
  */
 function gutenberg_add_editorial_comments_column( $columns ) {
 	// Add column immediately after the existing comments column.
-	$editorial_comments = '<div class="dashicons dashicons-admin-comments" title="' . esc_attr__( 'Editorial Comments', 'gutenberg' ) . '"></div>';
+	$editorial_comments = sprintf(
+		'<span class="vers comment-grey-bubble" title="%1$s" aria-hidden="true"></span><span class="screen-reader-text">%2$s</span>',
+		esc_attr__( 'Comments', 'gutenberg' ),
+		/* translators: Hidden accessibility text. */
+		__( 'Comments', 'gutenberg' )
+	);
 	$comment_position   = array_search( 'comments', array_keys( $columns ), true );
 	$columns_before     = array_slice( $columns, 0, $comment_position + 1, true );
 	$columns_after      = array_slice( $columns, $comment_position + 1, null, true );
