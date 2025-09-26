@@ -56,7 +56,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 				$p = new WP_HTML_Tag_Processor( $content );
 				if ( $p->next_tag( 'img' ) ) {
 					$src = $processor->get_attribute( 'src' );
-					$alt = $processor->get_attribute( 'alt' ) ? get_the_title( $post_ID ): '';
+					$alt = $processor->get_attribute( 'alt' ) ? get_the_title( $post_ID ) : '';
 
 					$p->set_attribute( 'src', $src );
 					$p->set_attribute( 'alt', $alt );
@@ -121,12 +121,12 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
  * @return string Returns the featured image HTML.
  */
 function render_block_core_post_featured_image_fallback( $attributes, $block ) {
-	$post_ID       = $block->context['postId'];
-	$is_link       = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$size_slug     = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$attr          = get_block_core_post_featured_image_border_attributes( $attributes );
+	$post_ID        = $block->context['postId'];
+	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
 	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
-	$caption       = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
+	$caption        = isset( $attributes['caption'] ) ? $attributes['caption'] : '';
 
 	if ( $is_link ) {
 		$title = get_the_title( $post_ID );
@@ -196,10 +196,10 @@ function render_block_core_post_featured_image_fallback( $attributes, $block ) {
 	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
 		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
 		: '';
-	$width = ! empty( $attributes['width'] )
+	$width        = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
-	$height = ! empty( $attributes['height'] )
+	$height       = ! empty( $attributes['height'] )
 		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
 		: '';
 	if ( ! $height && ! $width && ! $aspect_ratio ) {
