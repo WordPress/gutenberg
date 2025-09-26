@@ -30,13 +30,13 @@ export function AddComment( {
 	showCommentBoard,
 	setShowCommentBoard,
 } ) {
-	const { clientId, blockCommentId, isEmptyDefaultBlock } = useSelect(
+	const { clientId, commentId, isEmptyDefaultBlock } = useSelect(
 		( select ) => {
 			const { getSelectedBlock } = select( blockEditorStore );
 			const selectedBlock = getSelectedBlock();
 			return {
 				clientId: selectedBlock?.clientId,
-				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				commentId: selectedBlock?.attributes?.metadata?.commentId,
 				isEmptyDefaultBlock: selectedBlock
 					? isUnmodifiedDefaultBlock( selectedBlock )
 					: false,
@@ -47,7 +47,7 @@ export function AddComment( {
 	if (
 		! showCommentBoard ||
 		! clientId ||
-		undefined !== blockCommentId ||
+		undefined !== commentId ||
 		isEmptyDefaultBlock
 	) {
 		return null;
