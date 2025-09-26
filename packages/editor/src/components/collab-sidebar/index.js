@@ -227,7 +227,7 @@ function CommentPopover( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const isLargeViewport = useViewportMatch( 'xlarge' );
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
