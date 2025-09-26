@@ -34,7 +34,13 @@ const ACCORDION_BLOCK = {
 };
 
 export default function Edit( {
-	attributes: { autoclose, iconPosition, showIcon, headingLevel, levelOptions },
+	attributes: {
+		autoclose,
+		iconPosition,
+		showIcon,
+		headingLevel,
+		levelOptions,
+	},
 	clientId,
 	setAttributes,
 	isSelected: isSingleSelected,
@@ -66,8 +72,8 @@ export default function Edit( {
 							<HeadingLevelDropdown
 								value={ headingLevel }
 								options={ levelOptions }
-								onChange={ ( newLevel ) => 
-									setAttributes( {headingLevel: newLevel } )
+								onChange={ ( newLevel ) =>
+									setAttributes( { headingLevel: newLevel } )
 								}
 							/>
 						</ToolbarGroup>

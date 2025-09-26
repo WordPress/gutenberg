@@ -17,7 +17,7 @@ Displays a group of accordion headers and associated expandable content. ([Sourc
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-content
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** autoclose, headingLevel, iconPosition, showIcon
+-	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
 
 ## Accordion Content
 
@@ -40,7 +40,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Category:** design
 -	**Parent:** core/accordion-content
 -	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~
--	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, title
+-	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Panel
 
