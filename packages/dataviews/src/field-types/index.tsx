@@ -104,11 +104,9 @@ export default function getFieldTypeDefinition< Item >(
 		},
 		isValid: {
 			custom: ( item: any, field: NormalizedField< any > ) => {
-				if ( field?.elements ) {
+				if ( Array.isArray( field?.elements ) ) {
 					const value = field.getValue( { item } );
-					const validValues = field?.elements?.map(
-						( f ) => f.value
-					);
+					const validValues = field.elements.map( ( f ) => f.value );
 					if ( ! validValues.includes( value ) ) {
 						return __( 'Value must be one of the elements.' );
 					}
@@ -119,7 +117,7 @@ export default function getFieldTypeDefinition< Item >(
 		},
 		Edit: null,
 		render: ( { item, field }: DataViewRenderFieldProps< Item > ) => {
-			return field.elements
+			return Array.isArray( field.elements )
 				? renderFromElements( { item, field } )
 				: field.getValue( { item } );
 		},

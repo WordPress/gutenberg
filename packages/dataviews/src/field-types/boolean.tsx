@@ -50,7 +50,7 @@ export default {
 	},
 	Edit: 'checkbox',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
+		if ( Array.isArray( field.elements ) ) {
 			return renderFromElements( { item, field } );
 		}
 

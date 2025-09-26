@@ -62,7 +62,7 @@ export default function isItemValid< Item >(
 		}
 
 		if ( field.isValid.elements ) {
-			if ( field.elements ) {
+			if ( Array.isArray( field.elements ) ) {
 				const validValues = field.elements.map(
 					( element ) => element.value
 				);

@@ -49,7 +49,7 @@ export default {
 				return __( 'Value must be a valid email address.' );
 			}
 
-			if ( field.elements ) {
+			if ( Array.isArray( field.elements ) ) {
 				const validValues = field.elements.map( ( f ) => f.value );
 				if ( ! validValues.includes( value ) ) {
 					return __( 'Value must be one of the elements.' );
@@ -61,7 +61,7 @@ export default {
 	},
 	Edit: 'email',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
+		return Array.isArray( field.elements )
 			? renderFromElements( { item, field } )
 			: field.getValue( { item } );
 	},

@@ -66,7 +66,7 @@ export default {
 				return __( 'Value must be a valid color.' );
 			}
 
-			if ( field.elements ) {
+			if ( Array.isArray( field.elements ) ) {
 				const validValues = field.elements.map( ( f ) => f.value );
 				if ( ! validValues.includes( value ) ) {
 					return __( 'Value must be one of the elements.' );
@@ -78,7 +78,7 @@ export default {
 	},
 	Edit: 'color',
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
+		if ( Array.isArray( field.elements ) ) {
 			return renderFromElements( { item, field } );
 		}
 

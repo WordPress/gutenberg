@@ -42,7 +42,7 @@ export default {
 	isValid: {
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
-			if ( field?.elements ) {
+			if ( Array.isArray( field?.elements ) ) {
 				const validValues = field.elements.map( ( f ) => f.value );
 				if ( ! validValues.includes( value ) ) {
 					return __( 'Value must be one of the elements.' );
@@ -53,7 +53,7 @@ export default {
 		},
 	},
 	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		if ( field.elements ) {
+		if ( Array.isArray( field.elements ) ) {
 			return renderFromElements( { item, field } );
 		}
 

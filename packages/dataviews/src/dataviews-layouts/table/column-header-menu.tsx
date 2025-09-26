@@ -81,6 +81,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	const header = field.header;
 
 	operators = ( !! field.filterBy && field.filterBy?.operators ) || [];
+	const hasElementsSource = Array.isArray( field.elements )
+		? field.elements.length > 0
+		: !! field.elements;
 
 	// Filter can be added if:
 	//
@@ -90,7 +93,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	// 4. The filter is not primary (if it is, it is already visible).
 	canAddFilter =
 		! view.filters?.some( ( _filter ) => fieldId === _filter.field ) &&
-		!! ( field.elements?.length || field.Edit ) &&
+		!! ( hasElementsSource || field.Edit ) &&
 		field.filterBy !== false &&
 		! field.filterBy?.isPrimary;
 
