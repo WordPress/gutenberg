@@ -36,3 +36,17 @@ function gutenberg_register_edit_site_export_controller_endpoints() {
 	$edit_site_export_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_controller_endpoints' );
+
+/**
+ * Registers the Sites REST API routes.
+ */
+function gutenberg_register_sites_controller_endpoints() {
+	// Only register if multisite is enabled
+	if ( ! is_multisite() ) {
+		return;
+	}
+
+	$sites_controller = new WP_REST_Sites_Controller();
+	$sites_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_sites_controller_endpoints' );

@@ -35,6 +35,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
+	if ( is_multisite() && ! class_exists( 'WP_REST_Sites_Controller' ) ) {
+		require_once __DIR__ . '/experimental/class-wp-rest-site-meta-fields.php';
+		require_once __DIR__ . '/experimental/class-wp-rest-sites-controller.php';
+	}
+
 	// WordPress 6.8 compat.
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
