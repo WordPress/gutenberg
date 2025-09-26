@@ -25,6 +25,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -182,7 +183,9 @@ function BackgroundControlsPanel( {
 	children,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
+	onReset,
 } ) {
+	const backgroundImageDropdownButtonRef = useRef( undefined );
 	if ( ! hasImageValue ) {
 		return;
 	}
@@ -202,17 +205,37 @@ function BackgroundControlsPanel( {
 					'aria-label': __(
 						'Background size, position and repeat options.'
 					),
+					ref: backgroundImageDropdownButtonRef,
 					isOpen,
 				};
 				return (
-					<InspectorImagePreviewItem
-						imgUrl={ imgUrl }
-						filename={ filename }
-						label={ imgLabel }
-						toggleProps={ toggleProps }
-						as="button"
-						onToggleCallback={ onToggleCallback }
-					/>
+					<>
+						<InspectorImagePreviewItem
+							imgUrl={ imgUrl }
+							filename={ filename }
+							label={ imgLabel }
+							toggleProps={ toggleProps }
+							as="button"
+							onToggleCallback={ onToggleCallback }
+						/>
+						{ onReset && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									if ( isOpen ) {
+										onToggle();
+										// Return focus to parent button.
+										backgroundImageDropdownButtonRef.current?.focus();
+									}
+								} }
+							/>
+						) }
+					</>
 				);
 			} }
 			renderContent={ () => (
@@ -713,6 +736,7 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
+					onReset={ resetBackground }
 				>
 					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls
