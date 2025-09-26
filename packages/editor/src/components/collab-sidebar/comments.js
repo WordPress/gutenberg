@@ -164,6 +164,7 @@ function Thread( {
 			tabIndex={ 0 }
 			role="listitem"
 			ref={ threadRef }
+			aria-label={ thread?.content?.raw }
 		>
 			<CommentBoard
 				thread={ thread }
