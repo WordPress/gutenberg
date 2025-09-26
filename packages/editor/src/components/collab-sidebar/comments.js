@@ -135,6 +135,18 @@ function Thread( {
 		: undefined;
 	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
 
+	const ariaLabel = sprintf(
+		/* translators: 1: comment identifier, 2: author name, 3: number of replies. */
+		_n(
+			'Comment %1$s by %2$s. %3$s reply.',
+			'Comment %1$s by %2$s. %3$s replies.',
+			replies.length
+		),
+		thread.id,
+		thread.author_name,
+		replies.length
+	);
+
 	return (
 		// Disable reason: role="listitem" does in fact support aria-expanded.
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
@@ -166,7 +178,7 @@ function Thread( {
 			tabIndex={ 0 }
 			role="listitem"
 			ref={ threadRef }
-			aria-label={ thread?.content?.raw }
+			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
 			<CommentBoard
