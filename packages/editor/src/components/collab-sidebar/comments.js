@@ -19,6 +19,7 @@ import {
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -30,6 +31,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { getCommentExcerpt } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -133,16 +135,9 @@ function Thread( {
 		: undefined;
 	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
 
-	const ariaLabel = sprintf(
-		/* translators: 1: comment identifier, 2: author name, 3: number of replies. */
-		_n(
-			'Comment %1$s by %2$s. %3$s reply.',
-			'Comment %1$s by %2$s. %3$s replies.',
-			replies.length
-		),
-		thread.id,
-		thread.author_name,
-		replies.length
+	const ariaLabel = getCommentExcerpt(
+		stripHTML( thread.content.rendered ),
+		10
 	);
 
 	return (
