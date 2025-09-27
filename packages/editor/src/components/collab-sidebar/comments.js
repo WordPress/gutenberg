@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, RawHTML, useCallback } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -14,6 +14,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useDebounce } from '@wordpress/compose';
 
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
@@ -101,8 +102,20 @@ function Thread( {
 	setFocusThread,
 	setShowCommentBoard,
 } ) {
-	const { flashBlock } = useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
+
+	const onMouseEnter = useCallback( () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, true );
+	}, [ thread.blockClientId, debouncedToggleBlockHighlight ] );
+
+	const onMouseLeave = useCallback( () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, false );
+	}, [ thread.blockClientId, debouncedToggleBlockHighlight ] );
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
@@ -112,7 +125,7 @@ function Thread( {
 				behavior: 'instant',
 				block: 'center',
 			} );
-			flashBlock( blockClientId );
+			debouncedToggleBlockHighlight( blockClientId, true );
 		}
 	};
 
@@ -135,6 +148,10 @@ function Thread( {
 			id={ thread.id }
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
 		>
 			<CommentBoard
 				thread={ thread }
