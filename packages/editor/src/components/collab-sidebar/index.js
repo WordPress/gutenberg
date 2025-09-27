@@ -6,7 +6,6 @@ import { useSelect, useDispatch, subscribe } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -26,26 +25,6 @@ import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useBlockComments } from './hooks';
 
-const modifyBlockCommentAttributes = ( settings ) => {
-	if ( ! settings.attributes.blockCommentId ) {
-		settings.attributes = {
-			...settings.attributes,
-			blockCommentId: {
-				type: 'number',
-			},
-		};
-	}
-
-	return settings;
-};
-
-// Apply the filter to all core blocks
-addFilter(
-	'blocks.registerBlockType',
-	'block-comment/modify-core-block-attributes',
-	modifyBlockCommentAttributes
-);
-
 function CollabSidebarContent( {
 	showCommentBoard,
 	setShowCommentBoard,
@@ -54,9 +33,18 @@ function CollabSidebarContent( {
 } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getCurrentPostId } = useSelect( editorStore );
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { currentPostId, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( ( select ) => {
+			const { getCurrentPostId } = select( editorStore );
+			return {
+				getSelectedBlockClientId:
+					select( blockEditorStore ).getSelectedBlockClientId,
+				getBlockAttributes:
+					select( blockEditorStore ).getBlockAttributes,
+				currentPostId: getCurrentPostId(),
+			};
+		}, [] );
 
 	const onError = ( error ) => {
 		const errorMessage =
@@ -75,7 +63,7 @@ function CollabSidebarContent( {
 				'root',
 				'comment',
 				{
-					post: getCurrentPostId(),
+					post: currentPostId,
 					content,
 					comment_type: 'block_comment',
 					comment_approved: 0,
@@ -86,8 +74,14 @@ function CollabSidebarContent( {
 
 			// If it's a main comment, update the block attributes with the comment id.
 			if ( ! parent && savedRecord?.id ) {
+				const metadata = getBlockAttributes(
+					getSelectedBlockClientId()
+				)?.metadata;
 				updateBlockAttributes( getSelectedBlockClientId(), {
-					blockCommentId: savedRecord.id,
+					metadata: {
+						...metadata,
+						commentId: savedRecord.id,
+					},
 				} );
 			}
 
@@ -151,8 +145,14 @@ function CollabSidebarContent( {
 			);
 
 			if ( ! comment.parent ) {
+				const metadata = getBlockAttributes(
+					getSelectedBlockClientId()
+				)?.metadata;
 				updateBlockAttributes( getSelectedBlockClientId(), {
-					blockCommentId: undefined,
+					metadata: {
+						...metadata,
+						commentId: undefined,
+					},
 				} );
 			}
 
@@ -201,16 +201,14 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
-	const { blockCommentId } = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 
-		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
-				: null,
-		};
+		return _clientId
+			? getBlockAttributes( _clientId )?.metadata?.commentId
+			: null;
 	}, [] );
 
 	const openCollabBoard = () => {
