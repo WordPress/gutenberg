@@ -33,13 +33,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		if ( headingLevel !== undefined && headingLevel !== attributes.level ) {
 			setAttributes( { level: headingLevel } );
 		}
-	}, [ headingLevel, attributes.level, setAttributes ] )
+	}, [ headingLevel, attributes.level, setAttributes ] );
 
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
 	return (
-		
 		<TagName { ...blockProps }>
 			<button
 				className="wp-block-accordion-header__toggle"
