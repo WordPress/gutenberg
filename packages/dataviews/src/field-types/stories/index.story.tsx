@@ -81,12 +81,6 @@ const USDSuffix = () => (
 		<span>USD</span>
 	</InputControlSuffixWrapper>
 );
-const CmSuffix = () => (
-	<InputControlSuffixWrapper>
-		<span>cm</span>
-	</InputControlSuffixWrapper>
-);
-
 type DataType = {
 	id: number;
 	text: string;
@@ -97,10 +91,6 @@ type DataType = {
 	integerWithElements: number;
 	number?: number;
 	numberWithElements?: number;
-	decimalWithStep?: number;
-	priceNumberWithPrefix?: number;
-	lengthWithSuffix?: number;
-	priceNumberWithBoth?: number;
 	boolean: boolean;
 	booleanWithToggle: boolean;
 	booleanWithElements: boolean;
@@ -139,12 +129,8 @@ const data: DataType[] = [
 		textWithTextarea: 'Textarea',
 		integer: 1,
 		integerWithElements: 1,
-		number: 10,
+		number: 10.25,
 		numberWithElements: 2,
-		decimalWithStep: 1.5,
-		priceNumberWithPrefix: 149.99,
-		lengthWithSuffix: 42,
-		priceNumberWithBoth: 199.99,
 		boolean: true,
 		booleanWithToggle: true,
 		booleanWithElements: true,
@@ -237,61 +223,18 @@ const fields: Field< DataType >[] = [
 		id: 'number',
 		type: 'number',
 		label: 'Number',
-		description: 'Help for number.',
+		description: 'Number field increments by 0.01.',
 	},
 	{
 		id: 'numberWithElements',
 		type: 'number',
 		label: 'Number (with elements)',
-		description: 'Help for number with elements.',
+		description: 'Number field with elements.',
 		elements: [
 			{ value: 1, label: 'One' },
 			{ value: 2, label: 'Two' },
 			{ value: 3, label: 'Three' },
 		],
-	},
-	{
-		id: 'decimalWithStep',
-		type: 'number',
-		label: 'Decimal (step 0.1)',
-		description: 'Number field allowing decimals with step 0.1.',
-		Edit: {
-			control: 'number',
-			step: 0.1,
-		},
-	},
-	{
-		id: 'priceNumberWithPrefix',
-		label: 'Number with Prefix',
-		type: 'number',
-		description: 'Number field with dollar sign prefix.',
-		Edit: {
-			control: 'number',
-			prefix: DollarPrefix,
-			step: 0.01,
-		},
-	},
-	{
-		id: 'lengthWithSuffix',
-		label: 'Number with Suffix',
-		type: 'number',
-		description: 'Number field with cm suffix.',
-		Edit: {
-			control: 'number',
-			suffix: CmSuffix,
-		},
-	},
-	{
-		id: 'priceNumberWithBoth',
-		label: 'Number with Prefix and Suffix',
-		type: 'number',
-		description: 'Number field with both dollar prefix and USD suffix.',
-		Edit: {
-			control: 'number',
-			prefix: DollarPrefix,
-			suffix: USDSuffix,
-			step: 0.01,
-		},
 	},
 	{
 		id: 'boolean',

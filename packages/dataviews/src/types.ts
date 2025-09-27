@@ -200,18 +200,6 @@ export type EditConfigText = {
  */
 export type EditConfigNumber = {
 	control: 'number';
-	/**
-	 * Prefix component to display before the input.
-	 */
-	prefix?: React.ComponentType;
-	/**
-	 * Suffix component to display after the input.
-	 */
-	suffix?: React.ComponentType;
-	/**
-	 * Input descrease/increase step.
-	 */
-	step?: 'any' | number;
 };
 
 /**

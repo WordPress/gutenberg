@@ -12,7 +12,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	privateApis,
 } from '@wordpress/components';
-import { useCallback, useState, createElement } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,6 +26,8 @@ const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
+const DEFAULT_STEP = 0.01;
+
 function toNumberOrEmpty( value?: string ) {
 	if ( value === '' || value === undefined ) {
 		return '';
@@ -38,22 +40,13 @@ function BetweenControls( {
 	value,
 	onChange,
 	hideLabelFromVision,
-	step,
-	prefix,
-	suffix,
 }: {
 	value: NumberBetween;
 	onChange: ( [ min, max ]: NumberBetween ) => void;
 	hideLabelFromVision?: boolean;
-	step?: 'any' | number;
-	prefix: React.ReactNode;
-	suffix: React.ReactNode;
 } ) {
 	const [ min = '', max = '' ] = value;
-	let increment = Number.EPSILON;
-	if ( typeof step === 'number' && step > 0 ) {
-		increment = step;
-	}
+	const increment = DEFAULT_STEP;
 
 	const onChangeMin = useCallback(
 		( newValue: string | undefined ) =>
@@ -80,9 +73,7 @@ function BetweenControls( {
 					onChange={ onChangeMin }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
-					step={ step }
-					prefix={ prefix }
-					suffix={ suffix }
+					step={ DEFAULT_STEP }
 				/>
 				<NumberControl
 					label={ __( 'Max.' ) }
@@ -91,9 +82,7 @@ function BetweenControls( {
 					onChange={ onChangeMax }
 					__next40pxDefaultSize
 					hideLabelFromVision={ hideLabelFromVision }
-					step={ step }
-					prefix={ prefix }
-					suffix={ suffix }
+					step={ DEFAULT_STEP }
 				/>
 			</Flex>
 		</BaseControl>
@@ -106,10 +95,8 @@ export default function DataFormNumberControl< Item >( {
 	onChange,
 	hideLabelFromVision,
 	operator,
-	config,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue } = field;
-	const { step = 'any', prefix, suffix } = config || {};
 	const value = getValue( { item: data } ) ?? '';
 	const [ customValidity, setCustomValidity ] =
 		useState<
@@ -191,9 +178,6 @@ export default function DataFormNumberControl< Item >( {
 				value={ valueBetween }
 				onChange={ onChangeBetweenControls }
 				hideLabelFromVision={ hideLabelFromVision }
-				step={ step }
-				prefix={ prefix ? createElement( prefix ) : undefined }
-				suffix={ suffix ? createElement( suffix ) : undefined }
 			/>
 		);
 	}
@@ -209,9 +193,7 @@ export default function DataFormNumberControl< Item >( {
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
-			step={ step }
-			prefix={ prefix ? createElement( prefix ) : undefined }
-			suffix={ suffix ? createElement( suffix ) : undefined }
+			step={ DEFAULT_STEP }
 		/>
 	);
 }
