@@ -279,15 +279,7 @@ export default function PostFeaturedImageEdit( {
 						>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={
-									postType?.labels.singular_name
-										? sprintf(
-												// translators: %s: Name of the post type e.g: "post".
-												__( 'Link to %s' ),
-												postType.labels.singular_name
-										  )
-										: __( 'Link to post' )
-								}
+								label={ __( 'Make image a link' ) }
 								onChange={ () =>
 									setAttributes( { isLink: ! isLink } )
 								}
