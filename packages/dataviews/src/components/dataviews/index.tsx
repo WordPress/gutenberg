@@ -7,13 +7,7 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
@@ -22,7 +16,8 @@ import { useResizeObserver, throttle } from '@wordpress/compose';
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
-	default as DataViewsFilters,
+	Filters,
+	FiltersToggled,
 	useFilters,
 	FiltersToggle,
 } from '../dataviews-filters';
@@ -93,7 +88,6 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -119,9 +113,7 @@ function DefaultUI( {
 					{ header }
 				</HStack>
 			</HStack>
-			{ isShowingFilter && (
-				<DataViewsFilters className="dataviews-filters__container" />
-			) }
+			<FiltersToggled className="dataviews-filters__container" />
 			<DataViewsLayout />
 			<DataViewsFooter />
 		</>
@@ -295,8 +287,9 @@ function DataViews< Item >( {
 // Populate the DataViews sub components
 const DataViewsSubComponents = DataViews as typeof DataViews & {
 	BulkActionToolbar: typeof BulkActionsFooter;
-	Filters: typeof DataViewsFilters;
+	Filters: typeof Filters;
 	FiltersToggle: typeof FiltersToggle;
+	FiltersToggled: typeof FiltersToggled;
 	Layout: typeof DataViewsLayout;
 	LayoutSwitcher: typeof ViewTypeMenu;
 	Pagination: typeof DataViewsPagination;
@@ -306,7 +299,8 @@ const DataViewsSubComponents = DataViews as typeof DataViews & {
 };
 
 DataViewsSubComponents.BulkActionToolbar = BulkActionsFooter;
-DataViewsSubComponents.Filters = DataViewsFilters;
+DataViewsSubComponents.Filters = Filters;
+DataViewsSubComponents.FiltersToggled = FiltersToggled;
 DataViewsSubComponents.FiltersToggle = FiltersToggle;
 DataViewsSubComponents.Layout = DataViewsLayout;
 DataViewsSubComponents.LayoutSwitcher = ViewTypeMenu;
