@@ -52,15 +52,13 @@ export function Comments( {
 	onCommentDelete,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId } = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
-		return {
-			blockCommentId: clientId
-				? getBlockAttributes( clientId )?.blockCommentId
-				: null,
-		};
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
+			: null;
 	}, [] );
 	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
 
@@ -282,6 +280,13 @@ function Thread( {
 									? __( 'Reopen & Reply' )
 									: __( 'Reply' )
 							}
+							rows={ 'approved' === thread.status ? 2 : 4 }
+							labelText={ sprintf(
+								// translators: %1$s: comment identifier, %2$s: author name
+								__( 'Reply to Comment %1$s by %2$s' ),
+								thread.id,
+								thread?.author_name || 'Unknown'
+							) }
 						/>
 					</VStack>
 				</VStack>
@@ -342,6 +347,7 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
 					date={ thread?.date }
+					userId={ thread?.author }
 				/>
 				<FlexItem
 					className="editor-collab-sidebar-panel__comment-status"
@@ -409,6 +415,12 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					onCancel={ () => handleCancel() }
 					thread={ thread }
 					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %1$s: comment identifier, %2$s: author name.
+						__( 'Edit Comment %1$s by %2$s' ),
+						thread.id,
+						thread?.author_name || 'Unknown'
+					) }
 				/>
 			) : (
 				<RawHTML className="editor-collab-sidebar-panel__user-comment">

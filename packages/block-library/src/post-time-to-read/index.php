@@ -57,9 +57,13 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	// Add "word count" part, if enabled.
 	if ( $show_word_count ) {
-		$word_count_string = sprintf(
+		$word_count_string = 'words' === $word_count_type ? sprintf(
 			/* translators: %s: the number of words in the post. */
 			_n( '%s word', '%s words', $total_words ),
+			number_format_i18n( $total_words )
+		) : sprintf(
+			/* translators: %s: the number of characters in the post. */
+			_n( '%s character', '%s characters', $total_words ),
 			number_format_i18n( $total_words )
 		);
 		$parts[] = $word_count_string;
