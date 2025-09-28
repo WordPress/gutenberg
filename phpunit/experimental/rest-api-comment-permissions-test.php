@@ -6,6 +6,7 @@
  * The block comments feature should be available for any user who can edit the post.
  *
  * @package Gutenberg
+ * @group block-comments
  */
 class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
@@ -67,7 +68,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		foreach ( self::$user_ids as $user_id ) {
 			wp_delete_user( $user_id );
 		}
-		parent::tearDown();
+		parent::tear_down();
 	}
 
 	/**
@@ -88,12 +89,14 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
 		$request->set_param( 'post', self::$post_id );
 		$request->set_param( 'type', $comment_type );
+		$request->set_param( 'per_page', 100 );
 		$response = rest_do_request( $request );
+
 
 		if ( $expected_permission ) {
 			$this->assertEquals( 200, $response->get_status() );
 			$comments = $response->get_data();
-			$this->assertCount( self::$num_comments, $comments );
+			$this->assertEquals( self::$num_comments, count( $comments ) );
 		} else {
 			$this->assertEquals( 403, $response->get_status() );
 		}
@@ -106,25 +109,22 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 */
 	public function test_comment_read_permissions_data_provider() {
 		return array(
-			// Administrator can see all comments.
-			array( 'administrator', 'comment', true ),
-			array( 'administrator', 'block_comment', true ),
 
-			// Editor can see all comments.
-			array( 'editor', 'comment', true ),
-			array( 'editor', 'block_comment', true ),
+			'Administrator can see standard comments' => array( 'administrator', 'comment', true ),
+			'Administrator can see Block comments' => array( 'administrator', 'block_comment', true ),
 
-			// Author can see all comments.
-			array( 'author', 'comment', true ),
-			array( 'author', 'block_comment', true ),
+			'Editor can see standard comments' => array( 'editor', 'comment', true ),
+			'Editor can see Block comments' => array( 'editor', 'block_comment', true ),
 
-			// Contributor can see all comments.
-			array( 'contributor', 'comment', true ),
-			array( 'contributor', 'block_comment', true ),
+			'Author can see standard comments' => array( 'author', 'comment', true ),
+			'Author can see Block comments' => array( 'author', 'block_comment', true ),
 
-			// Subscriber can see standard comments but not block comments.
-			array( 'subscriber', 'comment', true ),
-			array( 'subscriber', 'block_comment', true ),
+			'Contributor can see standard comments' => array( 'contributor', 'comment', true ),
+			'Contributor can see Block comments' => array( 'contributor', 'block_comment', true ),
+
+
+			'subscriber can see standard comments' => array( 'subscriber', 'comment', true ),
+			'subscriber can see Block comments' => array( 'subscriber', 'block_comment', true ),
 		);
 	}
 
@@ -148,6 +148,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		$request->set_param( 'post', self::$post_id );
 		$request->set_param( 'content', 'Test comment content' );
 		$request->set_param( 'type', $comment_type );
+		$request->set_param( 'per_page', 100 );
 		$response = rest_do_request( $request );
 
 		if ( $expected_permission ) {
@@ -167,25 +168,20 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 */
 	public function test_comment_write_permissions_data_provider() {
 		return array(
-			// Administrator can create all comments.
-			array( 'administrator', 'comment', true ),
-			array( 'administrator', 'block_comment', true ),
+			'Administrator can write standard comments' => array( 'administrator', 'comment', true ),
+			'Administrator can write Block comments' => array( 'administrator', 'block_comment', true ),
 
-			// Editor can create all comments.
-			array( 'editor', 'comment', true ),
-			array( 'editor', 'block_comment', true ),
+			'Editor can write standard comments' => array( 'editor', 'comment', true ),
+			'Editor can write Block comments' => array( 'editor', 'block_comment', true ),
 
-			// Author can create block comments.
-			array( 'author', 'comment', true ),
-			array( 'author', 'block_comment', true ),
+			'Author can write standard comments' => array( 'author', 'comment', true ),
+			'Author can write Block comments' => array( 'author', 'block_comment', true ),
 
-			// Contributor can create block comments.
-			array( 'contributor', 'comment', true ),
-			array( 'contributor', 'block_comment', true ),
+			'Contributor can write standard comments' => array( 'contributor', 'comment', true ),
+			'Contributor can write Block comments' => array( 'contributor', 'block_comment', true ),
 
-			// Subscriber can create standard comments but not block comments.
-			array( 'subscriber', 'comment', true ),
-			array( 'subscriber', 'block_comment', false ),
+			'subscriber can write standard comments' => array( 'subscriber', 'comment', true ),
+			'subscriber can write Block comments' => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 
@@ -200,7 +196,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 */
 	public function test_comment_moderation_permissions( $role, $comment_type, $expected_permission ) {
 
-		// Set the current user.
 		wp_set_current_user( self::$user_ids[ $role ] );
 
 		// Get an existing comment of type $comment_type for the test post.
@@ -221,7 +216,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		$response = rest_do_request( $request );
 
 		if ( $expected_permission ) {
-			// Expect a 200 OK response.
 			$this->assertEquals( 200, $response->get_status() );
 			$comment = $response->get_data();
 			$this->assertEquals( 'approve', $comment['status'] );
@@ -237,25 +231,20 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 */
 	public function test_comment_moderation_permissions_data_provider() {
 		return array(
-			// Administrator can moderate all comments.
-			array( 'administrator', 'comment', true ),
-			array( 'administrator', 'block_comment', true ),
+			'administrator can moderate standard comments' => array( 'administrator', 'comment', true ),
+			'administrator can moderate Block comments'  => array( 'administrator', 'block_comment', true ),
 
-			// Editor can moderate all comments.
-			array( 'editor', 'comment', true ),
-			array( 'editor', 'block_comment', true ),
+			'editor can moderate standard comments' => array( 'editor', 'comment', true ),
+			'editor can moderate Block comments' => array( 'editor', 'block_comment', true ),
 
-			// Author can only moderate block comments.
-			array( 'author', 'comment', false ),
-			array( 'author', 'block_comment', true ),
+			'author can moderate standard comments' => array( 'author', 'comment', false ),
+			'author can moderate Block comments' => array( 'author', 'block_comment', true ),
 
-			// Contributor can only moderate block comments.
-			array( 'contributor', 'comment', false ),
-			array( 'contributor', 'block_comment', true ),
+			'contributor can moderate standard comments' => array( 'contributor', 'comment', false ),
+			'contributor can moderate Block comments' => array( 'contributor', 'block_comment', true ),
 
-			// Subscriber cannot moderate any comments.
-			array( 'subscriber', 'comment', false ),
-			array( 'subscriber', 'block_comment', false ),
+			'subscriber can moderate standard comments' => array( 'subscriber', 'comment', false ),
+			'subscriber can moderate Block comments' => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 }
