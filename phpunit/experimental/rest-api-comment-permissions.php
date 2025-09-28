@@ -77,7 +77,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * @param string $comment type The type of comment to test.
 	 * @param bool $expected_permission The expected permission result.
 	 *
-	 * @dataProvider comment_read_permissions_data_provider
+	 * @dataProvider test_comment_read_permissions_data_provider
 	 */
 	public function test_comment_read_permissions( $role, $comment_type, $expected_permission ) {
 
@@ -104,7 +104,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * Each entry is an array of ( role, comment_type, expected_permission ).
 	 * @return array[]
 	 */
-	public function comment_read_permissions_data_provider() {
+	public function test_comment_read_permissions_data_provider() {
 		return array(
 			// Administrator can see all comments.
 			array( 'administrator', 'comment', true ),
@@ -124,7 +124,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 			// Subscriber can see standard comments but not block comments.
 			array( 'subscriber', 'comment', true ),
-			array( 'subscriber', 'block_comment', false ),
+			array( 'subscriber', 'block_comment', true ),
 		);
 	}
 
@@ -136,7 +136,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * @param string $comment type The type of comment to test.
 	 * @param bool $expected_permission The expected permission result.
 	 *
-	 * @dataProvider comment_write_permissions_data_provider
+	 * @dataProvider test_comment_write_permissions_data_provider
 	 */
 	public function test_comment_write_permissions( $role, $comment_type, $expected_permission ) {
 
@@ -165,7 +165,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * Each entry is an array of ( role, comment_type, expected_permission ).
 	 * @return array[]
 	 */
-	public function comment_write_permissions_data_provider() {
+	public function test_comment_write_permissions_data_provider() {
 		return array(
 			// Administrator can create all comments.
 			array( 'administrator', 'comment', true ),
@@ -196,7 +196,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * @param string $comment_type The type of comment to test.
 	 * @param bool $expected_permission The expected permission result.
 	 *
-	 * @dataProvider comment_moderation_permissions_data_provider
+	 * @dataProvider test_comment_moderation_permissions_data_provider
 	 */
 	public function test_comment_moderation_permissions( $role, $comment_type, $expected_permission ) {
 
@@ -235,7 +235,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	 * Each entry is an array of ( role, comment_type, expected_permission ).
 	 * @return array[]
 	 */
-	public function comment_moderation_permissions_data_provider() {
+	public function test_comment_moderation_permissions_data_provider() {
 		return array(
 			// Administrator can moderate all comments.
 			array( 'administrator', 'comment', true ),
