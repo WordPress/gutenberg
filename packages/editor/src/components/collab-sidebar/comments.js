@@ -125,7 +125,6 @@ function Thread( {
 				behavior: 'instant',
 				block: 'center',
 			} );
-			debouncedToggleBlockHighlight( blockClientId, true );
 		}
 	};
 
