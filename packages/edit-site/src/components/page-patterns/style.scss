@@ -110,3 +110,11 @@
 		padding-right: $grid-unit-30;
 	}
 }
+/* Fix icon and text visibility in Write Mode */
+.edit-site-patterns__pattern-icon,
+.edit-site-patterns__title,
+.edit-site-patterns__sub-title {
+	color: var(--wp-admin-white) !important; // text
+	fill: var(--wp-admin-white) !important;  // SVG icons
+}
+
