@@ -31,8 +31,8 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	/**
 	 * Setup helper, create test users of admin, editor, author, contributor, and subscriber roles.
 	 */
-	public function setUp() {
-		parent::setUp();
+	public function set_up() {
+		parent::set_up();
 
 		$roles = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' );
 		foreach ( $roles as $role ) {
@@ -61,7 +61,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		}
 	}
 
-	public function tearDown() {
+	public function tear_down() {
 		// Clean up: delete the test post and comments.
 		wp_delete_post( self::$post_id, true );
 		foreach ( self::$user_ids as $user_id ) {
