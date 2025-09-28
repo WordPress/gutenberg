@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useCallback } from '@wordpress/element';
+import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -109,13 +109,13 @@ function Thread( {
 		50
 	);
 
-	const onMouseEnter = useCallback( () => {
+	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
-	}, [ thread.blockClientId, debouncedToggleBlockHighlight ] );
+	};
 
-	const onMouseLeave = useCallback( () => {
+	const onMouseLeave = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
-	}, [ thread.blockClientId, debouncedToggleBlockHighlight ] );
+	};
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
