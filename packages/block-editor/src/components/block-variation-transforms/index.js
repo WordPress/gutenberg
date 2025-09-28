@@ -5,12 +5,10 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	VisuallyHidden,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -22,6 +20,8 @@ import { chevronDown } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 function VariationsButtons( {
 	className,
@@ -65,36 +65,46 @@ function VariationsDropdown( {
 	selectedValue,
 	variations,
 } ) {
-	const selectOptions = variations.map(
-		( { name, title, description } ) => ( {
-			value: name,
-			label: title,
-			info: description,
-		} )
-	);
-
 	return (
-		<DropdownMenu
-			className={ className }
-			label={ __( 'Transform to variation' ) }
-			text={ __( 'Transform to variation' ) }
-			popoverProps={ {
-				position: 'bottom center',
-				className: `${ className }__popover`,
-			} }
-			icon={ chevronDown }
-			toggleProps={ { iconPosition: 'right' } }
-		>
-			{ () => (
-				<MenuGroup>
-					<MenuItemsChoice
-						choices={ selectOptions }
-						value={ selectedValue }
-						onSelect={ onSelectVariation }
-					/>
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+		<div className={ className }>
+			<Menu>
+				<Menu.TriggerButton
+					render={
+						<Button
+							size="compact"
+							className="block-editor-block-variation-transforms__button"
+							icon={ chevronDown }
+							iconPosition="right"
+						>
+							{ __( 'Transform to variation' ) }
+						</Button>
+					}
+				/>
+				<Menu.Popover position="bottom">
+					<Menu.Group>
+						{ variations.map( ( variation ) => (
+							<Menu.RadioItem
+								key={ variation.name }
+								value={ variation.name }
+								checked={ selectedValue === variation.name }
+								onChange={ () =>
+									onSelectVariation( variation.name )
+								}
+							>
+								<Menu.ItemLabel>
+									{ variation.title }
+								</Menu.ItemLabel>
+								{ variation.description && (
+									<Menu.ItemHelpText>
+										{ variation.description }
+									</Menu.ItemHelpText>
+								) }
+							</Menu.RadioItem>
+						) ) }
+					</Menu.Group>
+				</Menu.Popover>
+			</Menu>
+		</div>
 	);
 }
 
