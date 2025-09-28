@@ -11,7 +11,7 @@ import type { BasePost } from '../../types';
 
 const commentStatusField: Field< BasePost > = {
 	id: 'comment_status',
-	label: __( 'Discussion' ),
+	label: __( 'Comments' ),
 	type: 'text',
 	Edit: 'radio',
 	enableSorting: false,
