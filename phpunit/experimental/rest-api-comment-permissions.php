@@ -36,7 +36,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		$roles = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' );
 		foreach ( $roles as $role ) {
-			$user_id = $this->factory->user->create( array( 'role' => $role ) );
+			$user_id                 = $this->factory->user->create( array( 'role' => $role ) );
 			self::$user_ids[ $role ] = $user_id;
 		}
 
@@ -45,9 +45,19 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		// Add some comments and block comments to a post.
 		self::$post_id = $this->factory->post->create();
-		for( $i = 0; $i < self::$num_comments; $i++ ) {
-			$this->factory->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_type' => '' ) );
-			$this->factory->comment->create( array( 'comment_post_ID' => self::$post_id, 'comment_type' => 'block_comment' ) );
+		for ( $i = 0; $i < self::$num_comments; $i++ ) {
+			$this->factory->comment->create(
+				array(
+					'comment_post_ID' => self::$post_id,
+					'comment_type'    => '',
+				)
+			);
+			$this->factory->comment->create(
+				array(
+					'comment_post_ID' => self::$post_id,
+					'comment_type'    => 'block_comment',
+				)
+			);
 		}
 	}
 
@@ -194,11 +204,13 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		wp_set_current_user( self::$user_ids[ $role ] );
 
 		// Get an existing comment of type $comment_type for the test post.
-		$comments = get_comments( array(
-			'post_id' => self::$post_id,
-			'type'    => $comment_type,
-			'number'  => 1,
-		) );
+		$comments = get_comments(
+			array(
+				'post_id' => self::$post_id,
+				'type'    => $comment_type,
+				'number'  => 1,
+			)
+		);
 		$this->assertNotEmpty( $comments, "No comments found of type $comment_type" );
 		$comment_id = $comments[0]->comment_ID;
 
