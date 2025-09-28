@@ -36,7 +36,7 @@ export function AddComment( {
 			const selectedBlock = getSelectedBlock();
 			return {
 				clientId: selectedBlock?.clientId,
-				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				blockCommentId: selectedBlock?.attributes?.metadata?.commentId,
 				isEmptyDefaultBlock: selectedBlock
 					? isUnmodifiedDefaultBlock( selectedBlock )
 					: false,
