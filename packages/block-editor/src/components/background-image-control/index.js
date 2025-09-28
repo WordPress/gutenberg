@@ -59,6 +59,24 @@ const BACKGROUND_POPOVER_PROPS = {
 const noop = () => {};
 
 /**
+ * Focuses the toggle button.
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton.focus();
+	} );
+};
+
+/**
  * Get the help text for the background size control.
  *
  * @param {string} value backgroundSize value.
@@ -184,8 +202,8 @@ function BackgroundControlsPanel( {
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 	onReset,
+	containerRef,
 } ) {
-	const backgroundImageDropdownButtonRef = useRef( undefined );
 	if ( ! hasImageValue ) {
 		return;
 	}
@@ -205,7 +223,6 @@ function BackgroundControlsPanel( {
 					'aria-label': __(
 						'Background size, position and repeat options.'
 					),
-					ref: backgroundImageDropdownButtonRef,
 					isOpen,
 				};
 				return (
@@ -227,11 +244,12 @@ function BackgroundControlsPanel( {
 								icon={ resetIcon }
 								onClick={ () => {
 									onReset();
+									// Close the dropdown if open.
 									if ( isOpen ) {
 										onToggle();
-										// Return focus to parent button.
-										backgroundImageDropdownButtonRef.current?.focus();
 									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
 								} }
 							/>
 						) }
@@ -342,7 +360,7 @@ function BackgroundImageControls( {
 		);
 		setIsUploading( false );
 		// Close the dropdown and focus the toggle button.
-		closeAndFocus();
+		focusToggleButton( containerRef );
 	};
 
 	// Drag and drop callback, restricting image to one.
@@ -359,22 +377,6 @@ function BackgroundImageControls( {
 	};
 
 	const hasValue = hasBackgroundImageValue( style );
-
-	const closeAndFocus = () => {
-		// Use requestAnimationFrame to ensure DOM updates are complete
-		window.requestAnimationFrame( () => {
-			const [ toggleButton ] = focus.tabbable.find(
-				containerRef?.current
-			);
-			if ( ! toggleButton ) {
-				return;
-			}
-			// Focus the toggle button and close the dropdown menu.
-			// This ensures similar behaviour as to selecting an image, where the dropdown is
-			// closed and focus is redirected to the dropdown toggle button.
-			toggleButton.focus();
-		} );
-	};
 
 	const onRemove = () =>
 		onChange(
@@ -413,14 +415,14 @@ function BackgroundImageControls( {
 				) }
 				onError={ onUploadError }
 				onReset={ () => {
-					closeAndFocus();
+					focusToggleButton( containerRef );
 					onResetImage();
 				} }
 			>
 				{ canRemove && (
 					<MenuItem
 						onClick={ () => {
-							closeAndFocus();
+							focusToggleButton( containerRef );
 							onRemove();
 							onRemoveImage();
 						} }
@@ -737,6 +739,7 @@ export default function BackgroundImagePanel( {
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
 					onReset={ resetBackground }
+					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls
