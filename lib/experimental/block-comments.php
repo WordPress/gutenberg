@@ -118,10 +118,10 @@ function gutenberg_add_editorial_comments_column( $columns ) {
 		/* translators: Hidden accessibility text. */
 		__( 'Comments', 'gutenberg' )
 	);
-	$comment_position   = array_search( 'comments', array_keys( $columns ), true );
-	$columns_before     = array_slice( $columns, 0, $comment_position + 1, true );
-	$columns_after      = array_slice( $columns, $comment_position + 1, null, true );
-	$columns            = $columns_before + array( 'editorial_comments' => $editorial_comments ) + $columns_after;
+	$comment_position = array_search( 'comments', array_keys( $columns ), true );
+	$columns_before   = array_slice( $columns, 0, $comment_position + 1, true );
+	$columns_after    = array_slice( $columns, $comment_position + 1, null, true );
+	$columns          = $columns_before + array( 'editorial_comments' => $editorial_comments ) + $columns_after;
 	return $columns;
 }
 add_filter( 'manage_posts_columns', 'gutenberg_add_editorial_comments_column' );

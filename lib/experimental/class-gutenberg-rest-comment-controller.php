@@ -94,14 +94,6 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			);
 		}
 
-		if ( 'trash' === $post->post_status ) {
-			return new WP_Error(
-				'rest_comment_trash_post',
-				__( 'Sorry, you are not allowed to create a comment on this post.', 'gutenberg' ),
-				array( 'status' => 403 )
-			);
-		}
-
 		if ( ! $this->check_read_post_permission( $post, $request ) ) {
 			return new WP_Error(
 				'rest_cannot_read_post',
@@ -110,7 +102,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			);
 		}
 
-		if ( ! $this->gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
+		if ( ! gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_comment_block_comments_not_supported',
 				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
