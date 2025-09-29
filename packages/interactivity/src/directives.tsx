@@ -212,8 +212,8 @@ export default () => {
 			const { client: inheritedClient, server: inheritedServer } =
 				useContext( inheritedContext );
 
-			// Group contexts by namespace
-			const contextsByNamespace = useMemo( () => {
+			// Group valid context entries by namespace
+			const entriesByNamespace = useMemo( () => {
 				const namespaceMap = new Map< string, DirectiveEntry[] >();
 
 				context.forEach( ( entry ) => {
@@ -235,6 +235,7 @@ export default () => {
 						return;
 					}
 
+					// Group entries by namespace
 					if ( ! namespaceMap.has( namespace ) ) {
 						namespaceMap.set( namespace, [] );
 					}
@@ -244,23 +245,13 @@ export default () => {
 				return namespaceMap;
 			}, [ context ] );
 
-			// Create refs for each namespace
-			const clientRefs = useRef( new Map< string, object >() );
-			const serverRefs = useRef( new Map< string, object >() );
-
-			// Initialize refs for new namespaces
-			contextsByNamespace.forEach( ( entries, namespace ) => {
-				if ( ! clientRefs.current.has( namespace ) ) {
-					clientRefs.current.set(
-						namespace,
-						proxifyState( namespace, {} )
-					);
-					serverRefs.current.set(
-						namespace,
-						proxifyState( namespace, {}, { readOnly: true } )
-					);
-				}
-			} );
+			// Create refs for each namespace (one ref per namespace, like trunk approach)
+			const refs = useRef(
+				new Map<
+					string,
+					{ client: object; server: object; lastEntries: string }
+				>()
+			);
 
 			const contextStack = useMemo( () => {
 				const result = {
@@ -268,43 +259,61 @@ export default () => {
 					server: { ...inheritedServer },
 				};
 
-				// Process each namespace
-				contextsByNamespace.forEach( ( entries, namespace ) => {
-					const clientRef = clientRefs.current.get( namespace )!;
-					const serverRef = serverRefs.current.get( namespace )!;
+				// Process each namespace (similar to trunk's single defaultEntry)
+				entriesByNamespace.forEach( ( entries, namespace ) => {
+					// Get or create refs for this namespace (like trunk approach)
+					let namespaceRefs = refs.current.get( namespace );
+					if ( ! namespaceRefs ) {
+						namespaceRefs = {
+							client: proxifyState( namespace, {} ),
+							server: proxifyState(
+								namespace,
+								{},
+								{ readOnly: true }
+							),
+							lastEntries: '',
+						};
+						refs.current.set( namespace, namespaceRefs );
+					}
 
-					// Clear the refs to start fresh
-					Object.keys( clientRef ).forEach(
-						( key ) => delete clientRef[ key ]
-					);
-					Object.keys( serverRef ).forEach(
-						( key ) => delete serverRef[ key ]
-					);
-
-					// Merge all context values for this namespace
+					// Create merged context value for this render (like trunk's single value)
+					const mergedValue = {};
 					entries.forEach( ( { value } ) => {
-						// Deep merge each context value
 						deepMerge(
-							clientRef,
+							mergedValue,
 							deepClone( value ) as object,
 							false
 						);
-						deepMerge( serverRef, deepClone( value ) as object );
 					} );
+
+					// Use a simple approach: always merge but track if we've initialized
+					if ( ! namespaceRefs.lastEntries ) {
+						// First time - merge the initial values
+						deepMerge(
+							namespaceRefs.client,
+							deepClone( mergedValue ) as object,
+							false
+						);
+						deepMerge(
+							namespaceRefs.server,
+							deepClone( mergedValue ) as object
+						);
+						namespaceRefs.lastEntries = 'initialized';
+					}
 
 					// Create proxified contexts
 					result.client[ namespace ] = proxifyContext(
-						clientRef,
+						namespaceRefs.client,
 						inheritedClient[ namespace ]
 					);
 					result.server[ namespace ] = proxifyContext(
-						serverRef,
+						namespaceRefs.server,
 						inheritedServer[ namespace ]
 					);
 				} );
 
 				return result;
-			}, [ contextsByNamespace, inheritedClient, inheritedServer ] );
+			}, [ entriesByNamespace, inheritedClient, inheritedServer ] );
 
 			return createElement( Provider, { value: contextStack }, children );
 		},
