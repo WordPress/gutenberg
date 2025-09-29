@@ -69,12 +69,14 @@ function gutenberg_get_registered_block_templates( $query ) {
 
 	// _get_block_templates_files seems broken in core, it does not object the
 	// query.
-	$template_files = array_filter(
-		$template_files,
-		function ( $template_file ) use ( $query ) {
-			return in_array( $template_file['slug'], $query['slug__in'], true );
-		}
-	);
+	if ( isset( $query['slug__in'] ) && is_array( $query['slug__in'] ) ) {
+		$template_files = array_filter(
+			$template_files,
+			function ( $template_file ) use ( $query ) {
+				return in_array( $template_file['slug'], $query['slug__in'], true );
+			}
+		);
+	}
 
 	foreach ( $template_files as $template_file ) {
 		$query_result[] = _build_block_template_result_from_file( $template_file, 'wp_template' );
