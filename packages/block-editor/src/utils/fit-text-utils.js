@@ -56,7 +56,7 @@ export function findOptimalFontSize(
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 5;
-	let maxSize = 200;
+	let maxSize = 600;
 	let bestSize = minSize;
 
 	while ( minSize <= maxSize ) {
