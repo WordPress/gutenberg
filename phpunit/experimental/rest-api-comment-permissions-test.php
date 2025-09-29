@@ -92,7 +92,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		$request->set_param( 'per_page', 100 );
 		$response = rest_do_request( $request );
 
-
 		if ( $expected_permission ) {
 			$this->assertEquals( 200, $response->get_status() );
 			$comments = $response->get_data();
@@ -111,19 +110,19 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		return array(
 
 			'Administrator can see standard comments' => array( 'administrator', 'comment', true ),
-			'Administrator can see Block comments' => array( 'administrator', 'block_comment', true ),
+			'Administrator can see Block comments'    => array( 'administrator', 'block_comment', true ),
 
-			'Editor can see standard comments' => array( 'editor', 'comment', true ),
-			'Editor can see Block comments' => array( 'editor', 'block_comment', true ),
+			'Editor can see standard comments'        => array( 'editor', 'comment', true ),
+			'Editor can see Block comments'           => array( 'editor', 'block_comment', true ),
 
-			'Author can see standard comments' => array( 'author', 'comment', true ),
-			'Author can see Block comments' => array( 'author', 'block_comment', true ),
+			'Author can see standard comments'        => array( 'author', 'comment', true ),
+			'Author can see Block comments'           => array( 'author', 'block_comment', true ),
 
-			'Contributor can see standard comments' => array( 'contributor', 'comment', true ),
-			'Contributor can see Block comments' => array( 'contributor', 'block_comment', true ),
+			'Contributor can see standard comments'   => array( 'contributor', 'comment', true ),
+			'Contributor can see Block comments'      => array( 'contributor', 'block_comment', true ),
 
-			'subscriber can see standard comments' => array( 'subscriber', 'comment', true ),
-			'subscriber can see Block comments' => array( 'subscriber', 'block_comment', false ),
+			'subscriber can see standard comments'    => array( 'subscriber', 'comment', true ),
+			'subscriber can see Block comments'       => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 
@@ -144,10 +143,10 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		// Create a new comment of type $comment_type for the test post.
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$params = array(
-			'post'    => self::$post_id,
-			'content' => 'Test comment content for ' . $role . ' as ' . $comment_type,
-			'comment_type'    => $comment_type,
+		$params  = array(
+			'post'         => self::$post_id,
+			'content'      => 'Test comment content for ' . $role . ' as ' . $comment_type,
+			'comment_type' => $comment_type,
 		);
 		$request->add_header( 'Content-Type', 'application/json' );
 		$request->set_body( wp_json_encode( $params ) );
@@ -169,19 +168,19 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	public function test_comment_write_permissions_data_provider() {
 		return array(
 			'Administrator can write standard comments' => array( 'administrator', 'comment', true ),
-			'Administrator can write Block comments' => array( 'administrator', 'block_comment', true ),
+			'Administrator can write Block comments'    => array( 'administrator', 'block_comment', true ),
 
-			'Editor can write standard comments' => array( 'editor', 'comment', true ),
-			'Editor can write Block comments' => array( 'editor', 'block_comment', true ),
+			'Editor can write standard comments'        => array( 'editor', 'comment', true ),
+			'Editor can write Block comments'           => array( 'editor', 'block_comment', true ),
 
-			'Author can write standard comments' => array( 'author', 'comment', true ),
-			'Author can write Block comments' => array( 'author', 'block_comment', true ),
+			'Author can write standard comments'        => array( 'author', 'comment', true ),
+			'Author can write Block comments'           => array( 'author', 'block_comment', true ),
 
-			'Contributor can write standard comments' => array( 'contributor', 'comment', true ),
-			'Contributor can write Block comments' => array( 'contributor', 'block_comment', true ),
+			'Contributor can write standard comments'   => array( 'contributor', 'comment', true ),
+			'Contributor can write Block comments'      => array( 'contributor', 'block_comment', true ),
 
-			'subscriber can write standard comments' => array( 'subscriber', 'comment', true ),
-			'subscriber can write Block comments' => array( 'subscriber', 'block_comment', false ),
+			'subscriber can write standard comments'    => array( 'subscriber', 'comment', true ),
+			'subscriber can write Block comments'       => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 
@@ -210,7 +209,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		// Moderate the comment by changing its approved status.
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
-		$params = array(
+		$params  = array(
 			'content' => 'Updated comment content',
 			'status'  => 'approved',
 		);
@@ -235,19 +234,19 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 	public function test_comment_moderation_permissions_data_provider() {
 		return array(
 			'administrator can moderate standard comments' => array( 'administrator', 'comment', true ),
-			'administrator can moderate Block comments'  => array( 'administrator', 'block_comment', true ),
+			'administrator can moderate Block comments'    => array( 'administrator', 'block_comment', true ),
 
-			'editor can moderate standard comments' => array( 'editor', 'comment', true ),
-			'editor can moderate Block comments' => array( 'editor', 'block_comment', true ),
+			'editor can moderate standard comments'        => array( 'editor', 'comment', true ),
+			'editor can moderate Block comments'           => array( 'editor', 'block_comment', true ),
 
-			'author can moderate standard comments' => array( 'author', 'comment', false ),
-			'author can moderate Block comments' => array( 'author', 'block_comment', true ),
+			'author can moderate standard comments'        => array( 'author', 'comment', false ),
+			'author can moderate Block comments'           => array( 'author', 'block_comment', true ),
 
-			'contributor can moderate standard comments' => array( 'contributor', 'comment', false ),
-			'contributor can moderate Block comments' => array( 'contributor', 'block_comment', true ),
+			'contributor can moderate standard comments'   => array( 'contributor', 'comment', false ),
+			'contributor can moderate Block comments'      => array( 'contributor', 'block_comment', true ),
 
-			'subscriber can moderate standard comments' => array( 'subscriber', 'comment', false ),
-			'subscriber can moderate Block comments' => array( 'subscriber', 'block_comment', false ),
+			'subscriber can moderate standard comments'    => array( 'subscriber', 'comment', false ),
+			'subscriber can moderate Block comments'       => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 }
