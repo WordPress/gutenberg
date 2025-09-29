@@ -16,7 +16,7 @@ const variations = [
 		attributes: {
 			displayMode: 'time',
 		},
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'time',
 		icon,
@@ -29,7 +29,7 @@ const variations = [
 		attributes: {
 			displayMode: 'words',
 		},
-		scope: [ 'block', 'inserter', 'transform' ],
+		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'words',
 		icon,
