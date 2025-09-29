@@ -25,7 +25,6 @@ import {
 	passwordField,
 	commentStatusField,
 	pingStatusField,
-	discussionField,
 	slugField,
 	statusField,
 	authorField,
@@ -176,8 +175,7 @@ export const registerPostTypeSchema =
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
-			postType === 'page' && pingStatusField,
-			postType === 'page' && discussionField,
+			postTypeConfig.supports?.trackbacks && pingStatusField,
 			templateField,
 			passwordField,
 			postTypeConfig.supports?.editor &&

@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
+import { discussionField } from '@wordpress/fields';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
@@ -34,7 +35,7 @@ const fieldsWithBulkEditSupport = [
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
-	const { record, hasFinishedResolution } = useSelect(
+	const { record, hasFinishedResolution, postTypeConfig } = useSelect(
 		( select ) => {
 			const args = [ 'postType', postType, ids[ 0 ] ];
 
@@ -50,6 +51,7 @@ function PostEditForm( { postType, postId } ) {
 					'getEditedEntityRecord',
 					args
 				),
+				postTypeConfig: select( coreDataStore ).getPostType( postType ),
 			};
 		},
 		[ postType, ids ]
@@ -57,8 +59,8 @@ function PostEditForm( { postType, postId } ) {
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const { fields: _fields } = usePostFields( { postType } );
-	const fields = useMemo(
-		() =>
+	const fields = useMemo( () => {
+		const processedFields =
 			_fields?.map( ( field ) => {
 				if ( field.id === 'status' ) {
 					return {
@@ -69,9 +71,18 @@ function PostEditForm( { postType, postId } ) {
 					};
 				}
 				return field;
-			} ),
-		[ _fields ]
-	);
+			} ) || [];
+
+		// Add discussion field for post types that support comments or trackbacks.
+		if (
+			postTypeConfig?.supports?.comments ||
+			postTypeConfig?.supports?.trackbacks
+		) {
+			processedFields.push( discussionField );
+		}
+
+		return processedFields;
+	}, [ _fields, postType ] );
 
 	const form = useMemo(
 		() => ( {
