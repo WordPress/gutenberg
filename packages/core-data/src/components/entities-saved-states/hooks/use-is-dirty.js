@@ -2,8 +2,12 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME } from '../../../name';
 
 /**
  * Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
@@ -21,7 +25,7 @@ export const useIsDirty = () => {
 				__experimentalGetDirtyEntityRecords,
 				getEntityRecordEdits,
 				getEntityConfig,
-			} = select( coreStore );
+			} = select( STORE_NAME );
 
 			return {
 				editedEntities: __experimentalGetDirtyEntityRecords(),

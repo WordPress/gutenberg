@@ -7,14 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Button, Modal } from '@wordpress/components';
-import {
-	EntitiesSavedStates,
-	useEntitiesSavedStatesIsDirty,
-	privateApis,
-} from '@wordpress/editor';
+import { privateApis } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useEffect } from '@wordpress/element';
 
@@ -27,9 +26,13 @@ import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible, NavigableRegion } =
-	unlock( privateApis );
+const { NavigableRegion } = unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const {
+	EntitiesSavedStatesExtensible,
+	EntitiesSavedStates,
+	useEntitiesSavedStatesIsDirty,
+} = unlock( coreDataPrivateApis );
 
 const EntitiesSavedStatesForPreview = ( {
 	onClose,

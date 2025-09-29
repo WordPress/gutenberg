@@ -395,18 +395,7 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Renders the component for managing saved states of entities.
-
-_Parameters_
-
--   _props_ `Object`: The component props.
--   _props.close_ `Function`: The function to close the dialog.
--   _props.renderDialog_ `boolean`: Whether to render the component with modal dialog behavior.
--   _props.variant_ `string`: Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+Undocumented declaration.
 
 ### ErrorBoundary
 
@@ -439,18 +428,6 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 ### getFontSizeClass
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getFontSizeClass` instead.
-
-### getTemplatePartIcon
-
-Helper function to retrieve the corresponding icon by name.
-
-_Parameters_
-
--   _iconName_ `string`: The name of the icon.
-
-_Returns_
-
--   `Object`: The corresponding icon.
 
 ### InnerBlocks
 
@@ -1724,11 +1701,7 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
-
-_Returns_
-
--   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
+Undocumented declaration.
 
 ### usePostScheduleLabel
 

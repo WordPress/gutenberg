@@ -12,9 +12,7 @@ export async function openPublishPanel() {
 
 	// Wait for either the entity save button or the post publish button.
 	if ( isEntityPublishToggle ) {
-		await page.waitForSelector(
-			'.editor-entities-saved-states__save-button'
-		);
+		await page.waitForSelector( '.entities-saved-states__save-button' );
 	} else {
 		await page.waitForSelector( '.editor-post-publish-button' );
 	}

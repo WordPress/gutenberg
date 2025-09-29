@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext } from '@wordpress/element';
 
@@ -13,6 +12,7 @@ import { useContext } from '@wordpress/element';
  */
 import EntityRecordItem from './entity-record-item';
 import { unlock } from '../../lock-unlock';
+import { STORE_NAME } from '../../name';
 
 const { getGlobalStylesChanges, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
@@ -39,7 +39,7 @@ function GlobalStylesDescription( { record } ) {
 		useContext( GlobalStylesContext );
 	const savedRecord = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecord(
+			select( STORE_NAME ).getEntityRecord(
 				record.kind,
 				record.name,
 				record.key
@@ -80,7 +80,7 @@ export default function EntityTypeList( {
 	const firstRecord = list[ 0 ];
 	const entityConfig = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityConfig(
+			select( STORE_NAME ).getEntityConfig(
 				firstRecord.kind,
 				firstRecord.name
 			),

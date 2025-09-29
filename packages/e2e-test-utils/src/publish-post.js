@@ -25,7 +25,7 @@ export async function publishPost() {
 	// Save any entities.
 	if ( isEntityPublishToggle ) {
 		// Handle saving entities.
-		await page.click( '.editor-entities-saved-states__save-button' );
+		await page.click( '.entities-saved-states__save-button' );
 	}
 
 	// If this is just an update then the entity save will be all that's needed.

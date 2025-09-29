@@ -24,8 +24,8 @@ import { useDispatch } from '@wordpress/data';
  */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
-import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { STORE_NAME } from '../../name';
 
 function identity( values ) {
 	return values;
@@ -89,7 +89,7 @@ export function EntitiesSavedStatesExtensible( {
 	variant = 'default',
 } ) {
 	const saveButtonRef = useRef();
-	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
+	const { saveDirtyEntities } = unlock( useDispatch( STORE_NAME ) );
 	// To group entities by type.
 	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
 		const { name } = record;
@@ -164,7 +164,7 @@ export function EntitiesSavedStatesExtensible( {
 						close,
 					} )
 				}
-				className="editor-entities-saved-states__save-button"
+				className="entities-saved-states__save-button"
 			>
 				{ saveLabel }
 			</FlexItem>

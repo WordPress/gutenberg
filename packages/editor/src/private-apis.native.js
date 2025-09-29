@@ -8,7 +8,6 @@ import * as interfaceApis from '@wordpress/interface';
  */
 import VisualEditor from './components/visual-editor';
 import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PreferencesModal from './components/preferences-modal';
@@ -20,7 +19,6 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 export const privateApis = {};
 lock( privateApis, {
 	VisualEditor,
-	EntitiesSavedStatesExtensible,
 	PluginPostExcerpt,
 	PreferencesModal,
 	ToolsMoreMenuGroup,

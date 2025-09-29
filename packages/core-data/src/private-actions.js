@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -136,3 +138,113 @@ export const editMediaEntity =
 export function receiveTemplateAutoDraftId( target, id ) {
 	return { type: 'RECEIVE_TEMPLATE_AUTO_DRAFT_ID', target, id };
 }
+
+/**
+ * Save entity records marked as dirty.
+ *
+ * @param {Object}   options                      Options for the action.
+ * @param {Function} [options.onSave]             Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords] Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]     Array of entities to skip saving.
+ * @param {Function} [options.close]              Callback when the actions is called. It should be consolidated with `onSave`.
+ */
+export const saveDirtyEntities =
+	( { onSave, dirtyEntityRecords = [], entitiesToSkip = [], close } = {} ) =>
+	( { registry } ) => {
+		const PUBLISH_ON_SAVE_ENTITIES = [
+			{ kind: 'postType', name: 'wp_navigation' },
+		];
+		const saveNoticeId = 'site-editor-save-success';
+		const homeUrl = registry
+			.select( STORE_NAME )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
+		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! entitiesToSkip.some(
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
+				);
+			}
+		);
+		close?.( entitiesToSave );
+		const siteItemsToSave = [];
+		const pendingSavedRecords = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				if (
+					PUBLISH_ON_SAVE_ENTITIES.some(
+						( typeToPublish ) =>
+							typeToPublish.kind === kind &&
+							typeToPublish.name === name
+					)
+				) {
+					registry
+						.dispatch( STORE_NAME )
+						.editEntityRecord( kind, name, key, {
+							status: 'publish',
+						} );
+				}
+
+				pendingSavedRecords.push(
+					registry
+						.dispatch( STORE_NAME )
+						.saveEditedEntityRecord( kind, name, key )
+				);
+			}
+		} );
+		if ( siteItemsToSave.length ) {
+			pendingSavedRecords.push(
+				registry
+					.dispatch( STORE_NAME )
+					.__experimentalSaveSpecifiedEntityEdits(
+						'root',
+						'site',
+						undefined,
+						siteItemsToSave
+					)
+			);
+		}
+		/*registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();*/
+		Promise.all( pendingSavedRecords )
+			.then( ( values ) => {
+				return onSave ? onSave( values ) : values;
+			} )
+			.then( ( values ) => {
+				if (
+					values.some( ( value ) => typeof value === 'undefined' )
+				) {
+					registry
+						.dispatch( noticesStore )
+						.createErrorNotice( __( 'Saving failed.' ) );
+				} else {
+					registry
+						.dispatch( noticesStore )
+						.createSuccessNotice( __( 'Site updated.' ), {
+							type: 'snackbar',
+							id: saveNoticeId,
+							actions: [
+								{
+									label: __( 'View site' ),
+									url: homeUrl,
+									openInNewTab: true,
+								},
+							],
+						} );
+				}
+			} )
+			.catch( ( error ) =>
+				registry
+					.dispatch( STORE_NAME )
+					.createErrorNotice(
+						`${ __( 'Saving failed.' ) } ${ error }`
+					)
+			);
+	};

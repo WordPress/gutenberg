@@ -7,7 +7,6 @@ import * as interfaceApis from '@wordpress/interface';
  * Internal dependencies
  */
 import { lock } from './lock-unlock';
-import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
@@ -29,7 +28,6 @@ import {
 	templateTitleField,
 } from '@wordpress/fields';
 import { registerCoreBlockBindingsSources } from './bindings/api';
-import { getTemplateInfo } from './utils/get-template-info';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -39,7 +37,6 @@ lock( privateApis, {
 	patternTitleField,
 	templateTitleField,
 	BackButton,
-	EntitiesSavedStatesExtensible,
 	Editor,
 	EditorContentSlotFill,
 	GlobalStylesProvider,
@@ -53,7 +50,7 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	registerCoreBlockBindingsSources,
-	getTemplateInfo,
+
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,

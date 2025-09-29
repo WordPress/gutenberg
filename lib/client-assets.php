@@ -286,7 +286,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands', 'wp-preferences' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands', 'wp-preferences', 'wp-core-data' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -419,7 +419,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-block-library-editor', 'common', 'forms', 'wp-commands', 'wp-preferences' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-block-library-editor', 'common', 'forms', 'wp-commands', 'wp-preferences', 'wp-core-data' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
@@ -428,7 +428,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-widgets', 'wp-preferences' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-widgets', 'wp-preferences', 'wp-core-data' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -446,7 +446,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-customize-widgets',
 		gutenberg_url( 'build/customize-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-widgets', 'wp-preferences' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-widgets', 'wp-preferences', 'wp-core-data' ),
 		$version
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
@@ -473,7 +473,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-widgets',
 		gutenberg_url( 'build/widgets/style.css' ),
-		array( 'wp-components' )
+		array( 'wp-components', 'wp-core-data' )
 	);
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
 
@@ -485,6 +485,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-preferences', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-core-data',
+		gutenberg_url( 'build/core-data/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-core-data', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 
