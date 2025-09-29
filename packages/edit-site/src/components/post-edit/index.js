@@ -34,7 +34,7 @@ const fieldsWithBulkEditSupport = [
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
-	const { record, hasFinishedResolution, postTypeConfig } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const args = [ 'postType', postType, ids[ 0 ] ];
 
@@ -50,7 +50,6 @@ function PostEditForm( { postType, postId } ) {
 					'getEditedEntityRecord',
 					args
 				),
-				postTypeConfig: select( coreDataStore ).getPostType( postType ),
 			};
 		},
 		[ postType, ids ]
