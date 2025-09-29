@@ -3,7 +3,6 @@
  * Unit tests for block comment filter functions.
  *
  * @package Gutenberg
- * @since 6.9.0
  */
 
 /**
@@ -14,9 +13,9 @@
 class Tests_BlockCommentFilter extends WP_UnitTestCase {
 
 	/**
-	 * Tests that `update_comment_type_in_rest_api_6_9` updates comment type correctly.
+	 * Tests that `update_comment_type_in_rest_api` updates comment type correctly.
 	 */
-	public function test_update_comment_type_in_rest_api_6_9() {
+	public function test_update_comment_type_in_rest_api() {
 		// Mock request and prepared comment.
 		$request = new WP_REST_Request( WP_REST_Server::READABLE );
 		$request->set_param( 'comment_type', 'block_comment' );
@@ -28,7 +27,7 @@ class Tests_BlockCommentFilter extends WP_UnitTestCase {
 		);
 
 		// Call the function.
-		$updated_comment = update_comment_type_in_rest_api_6_9( $prepared_comment, $request );
+		$updated_comment = update_comment_type_in_rest_api( $prepared_comment, $request );
 
 		// Assertions.
 		$this->assertEquals( 'block_comment', $updated_comment['comment_type'] );
