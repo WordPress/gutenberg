@@ -14,6 +14,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useDebounce } from '@wordpress/compose';
 
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
@@ -101,8 +102,20 @@ function Thread( {
 	setFocusThread,
 	setShowCommentBoard,
 } ) {
-	const { flashBlock } = useDispatch( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
+
+	const onMouseEnter = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onMouseLeave = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, false );
+	};
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
@@ -112,7 +125,6 @@ function Thread( {
 				behavior: 'instant',
 				block: 'center',
 			} );
-			flashBlock( blockClientId );
 		}
 	};
 
@@ -135,6 +147,10 @@ function Thread( {
 			id={ thread.id }
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
 		>
 			<CommentBoard
 				thread={ thread }
