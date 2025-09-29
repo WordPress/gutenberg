@@ -289,16 +289,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
 	const _sources = {};
-	const { sources, canUpdateBlockBindings } = useSelect(
+	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
-			const _canUpdateBlockBindings =
-				select( blockEditorStore ).getSettings().canUpdateBlockBindings;
-
-			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return {
-					sources: EMPTY_OBJECT,
-					canUpdateBlockBindings: _canUpdateBlockBindings,
-				};
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+			const _bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			if ( ! _bindableAttributes || _bindableAttributes.length === 0 ) {
+				return EMPTY_OBJECT;
 			}
 
 			const registeredSources = getBlockBindingsSources();
@@ -320,7 +318,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							select,
 							context,
 						} );
-						const hasCompatibleData = bindableAttributes.some(
+						const hasCompatibleData = _bindableAttributes.some(
 							( attribute ) => {
 								const _attributeType =
 									getBlockType( blockName ).attributes?.[
@@ -368,7 +366,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 								} )
 							);
 
-							const hasCompatibleData = bindableAttributes.some(
+							const hasCompatibleData = _bindableAttributes.some(
 								( attribute ) => {
 									const _attributeType =
 										getBlockType( blockName ).attributes?.[
@@ -410,10 +408,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					Object.values( _sources ).length > 0
 						? _sources
 						: EMPTY_OBJECT,
-				canUpdateBlockBindings: _canUpdateBlockBindings,
+				canUpdateBlockBindings:
+					select( blockEditorStore ).getSettings()
+						.canUpdateBlockBindings,
+				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext, bindableAttributes, blockName ]
+		[ blockContext ]
 	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
@@ -423,7 +424,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { bindings } = metadata || {};
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
-		if ( ! canBindAttribute( blockName, key ) ) {
+		if ( ! bindableAttributes.includes( key ) ) {
 			delete filteredBindings[ key ];
 		}
 	} );
