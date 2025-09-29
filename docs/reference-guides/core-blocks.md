@@ -85,6 +85,15 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
+## Breadcrumbs
+
+Display a breadcrumb trail only for Pages, or for hierarchical post types. The block is useful to insert in the Pages template. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+
+-	**Name:** core/breadcrumbs
+-	**Category:** theme
+-	**Supports:** ~~html~~, ~~reusable~~
+-	**Attributes:** separator, showHomeLink
+
 ## Button
 
 Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))
@@ -610,15 +619,6 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
-
-## Post Breadcrumbs
-
-Display a breadcrumb trail for hierarchical posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-breadcrumbs))
-
--	**Name:** core/post-breadcrumbs
--	**Category:** theme
--	**Supports:** ~~html~~, ~~reusable~~
--	**Attributes:** separator, showHomeLink
 
 ## Comment (deprecated)
 

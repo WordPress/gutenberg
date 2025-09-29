@@ -1,6 +1,6 @@
 [
 	{
-		"name": "core/post-breadcrumbs",
+		"name": "core/breadcrumbs",
 		"isValid": true,
 		"attributes": {
 			"separator": "/",

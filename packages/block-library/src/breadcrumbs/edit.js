@@ -23,13 +23,12 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 const separatorOptions = [ '/', '>', '|' ];
 const defaultValue = '/';
 
-export default function PostBreadcrumbEdit( {
+export default function BreadcrumbEdit( {
 	attributes,
 	setAttributes,
 	context: { postId, postType },
 } ) {
 	const { separator, showHomeLink } = attributes;
-
 	const postTypeObject = useSelect(
 		( select ) => {
 			if ( ! postType ) {
@@ -39,30 +38,48 @@ export default function PostBreadcrumbEdit( {
 		},
 		[ postType ]
 	);
-
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
 	const { content } = useServerSideRender( {
 		attributes,
-		block: 'core/post-breadcrumbs',
+		block: 'core/breadcrumbs',
 		urlQueryArgs: { post_id: postId },
 	} );
-
-	// If no post context, show placeholder.
-	if ( ! postId || ! postType ) {
-		return <div { ...blockProps }>{ __( 'Post Breadcrumb.' ) }</div>;
-	}
-
-	// If post type is not hierarchical, show message.
-	if ( postTypeObject && ! postTypeObject.hierarchical ) {
-		return (
-			<div { ...blockProps }>
-				{ __( 'Post Breadcrumb: Non-hierarchical post type.' ) }
-			</div>
+	let placeholder = null;
+	// If no post context or the post type is not hierarchical, show placeholder.
+	// This is fragile because this block is server side rendered and we'll have to
+	// update the placeholder html if the server side rendering output changes.
+	if ( ! postId || ! postType || ! postTypeObject?.hierarchical ) {
+		const placeholderItems = [
+			showHomeLink && __( 'Home' ),
+			__( 'Ancestor' ),
+			__( 'Parent' ),
+		].filter( Boolean );
+		placeholder = (
+			<nav
+				style={ {
+					...blockProps.style,
+					'--separator': `'${ separator }'`,
+				} }
+			>
+				<ol>
+					{ placeholderItems.map( ( text, index ) => (
+						<li key={ index }>
+							<a
+								href={ `#${ text.toLowerCase() }` }
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ text }
+							</a>
+						</li>
+					) ) }
+					<li>
+						<span>{ __( 'Page' ) }</span>
+					</li>
+				</ol>
+			</nav>
 		);
 	}
-
 	return (
 		<>
 			<InspectorControls>
@@ -127,7 +144,7 @@ export default function PostBreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<RawHTML>{ content }</RawHTML>
+				{ placeholder || <RawHTML>{ content }</RawHTML> }
 			</div>
 		</>
 	);
