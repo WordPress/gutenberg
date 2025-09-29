@@ -1,27 +1,16 @@
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	Button,
-	TextControl,
-	ExternalLink,
-	VisuallyHidden,
-} from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
-import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { PanelBody } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import PostScheduleLabel from '../post-schedule/label';
 import { store as editorStore } from '../../store';
+import { PostPublishTitlePanel } from './postpublish-title-panel';
+import { PostPublishNextPanel } from './postpublish-next-panel';
 
 const POSTNAME = '%postname%';
 const PAGENAME = '%pagename%';
@@ -48,96 +37,6 @@ const getFuturePostUrl = ( post ) => {
 	return post.permalink_template;
 };
 
-function CopyButton( { text } ) {
-	const [ showCopyConfirmation, setShowCopyConfirmation ] = useState( false );
-	const timeoutIdRef = useRef();
-	const ref = useCopyToClipboard( text, () => {
-		setShowCopyConfirmation( true );
-		if ( timeoutIdRef.current ) {
-			clearTimeout( timeoutIdRef.current );
-		}
-		timeoutIdRef.current = setTimeout( () => {
-			setShowCopyConfirmation( false );
-		}, 4000 );
-	} );
-
-	useEffect( () => {
-		return () => {
-			if ( timeoutIdRef.current ) {
-				clearTimeout( timeoutIdRef.current );
-			}
-		};
-	}, [] );
-
-	return (
-		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
-			{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
-		</Button>
-	);
-}
-
-function TemplatePublishPanelPostpublish( { post } ) {
-	const postTitle = decodeEntities( post.title ) || __( '(no title)' );
-	const registry = useRegistry();
-	const { site, isActivating } = useSelect( ( select ) => {
-		const { getEntityRecord, isSavingEntityRecord } = select( coreStore );
-		return {
-			site: getEntityRecord( 'root', 'site' ),
-			isActivating: isSavingEntityRecord( 'root', 'site' ),
-		};
-	} );
-	return (
-		<div className="post-publish-panel__postpublish">
-			<PanelBody className="post-publish-panel__postpublish-header">
-				{ sprintf(
-					// translators: %s: post title
-					__( '%s is saved.' ),
-					postTitle
-				) }
-			</PanelBody>
-			<PanelBody>
-				<p className="post-publish-panel__postpublish-subheader">
-					<strong>{ __( 'What’s next?' ) }</strong>
-				</p>
-				<p>
-					{ sprintf(
-						// translators: %1$s: post title, %2$s: template type
-						'Do you want to activate %1$s as the %2$s template?',
-						postTitle,
-						post.slug
-					) }
-				</p>
-
-				<div className="post-publish-panel__postpublish-buttons">
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							await registry
-								.dispatch( coreStore )
-								.saveEntityRecord( 'root', 'site', {
-									active_templates: {
-										...site.active_templates,
-										[ post.slug ]: post.id,
-									},
-								} );
-							await registry
-								.dispatch( editorStore )
-								.closePublishSidebar();
-						} }
-						__next40pxDefaultSize
-						disabled={ isActivating }
-						accessibleWhenDisabled={ false }
-					>
-						{ isActivating
-							? __( 'Activating…' )
-							: __( 'Activate' ) }
-					</Button>
-				</div>
-			</PanelBody>
-		</div>
-	);
-}
-
 export default function PostPublishPanelPostpublish( {
 	focusOnMount,
 	children,
@@ -156,97 +55,27 @@ export default function PostPublishPanelPostpublish( {
 			isScheduled: isCurrentPostScheduled(),
 		};
 	}, [] );
-
-	const postLabel = postType?.labels?.singular_name;
-	const viewPostLabel = postType?.labels?.view_item;
-	const addNewPostLabel = postType?.labels?.add_new_item;
 	const link =
 		post.status === 'future' ? getFuturePostUrl( post ) : post.link;
-	const addLink = addQueryArgs( 'post-new.php', {
-		post_type: post.type,
-	} );
-
-	const postLinkRef = useCallback(
-		( node ) => {
-			if ( focusOnMount && node ) {
-				node.focus();
-			}
-		},
-		[ focusOnMount ]
-	);
-
-	if ( post.type === 'wp_template' ) {
-		return <TemplatePublishPanelPostpublish post={ post } />;
-	}
-
-	const postPublishNonLinkHeader = isScheduled ? (
-		<>
-			{ __( 'is now scheduled. It will go live on' ) }{ ' ' }
-			<PostScheduleLabel />.
-		</>
-	) : (
-		__( 'is now live.' )
-	);
 
 	return (
 		<div className="post-publish-panel__postpublish">
 			<PanelBody className="post-publish-panel__postpublish-header">
-				<ExternalLink ref={ postLinkRef } href={ link }>
-					{ decodeEntities( post.title ) || __( '(no title)' ) }
-				</ExternalLink>{ ' ' }
-				{ postPublishNonLinkHeader }
+				<PostPublishTitlePanel
+					post={ post }
+					isScheduled={ isScheduled }
+					focusOnMount={ focusOnMount }
+					link={ link }
+				/>
 			</PanelBody>
 			<PanelBody>
-				<p className="post-publish-panel__postpublish-subheader">
-					<strong>{ __( 'What’s next?' ) }</strong>
-				</p>
-				<div className="post-publish-panel__postpublish-post-address-container">
-					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						className="post-publish-panel__postpublish-post-address"
-						readOnly
-						label={ sprintf(
-							/* translators: %s: post type singular name */
-							__( '%s address' ),
-							postLabel
-						) }
-						value={ safeDecodeURIComponent( link ) }
-						onFocus={ ( event ) => event.target.select() }
-					/>
-
-					<div className="post-publish-panel__postpublish-post-address__copy-button-wrap">
-						<CopyButton text={ link } />
-					</div>
-				</div>
-
-				<div className="post-publish-panel__postpublish-buttons">
-					{ ! isScheduled && (
-						<Button
-							variant="primary"
-							href={ link }
-							__next40pxDefaultSize
-							icon={ external }
-							iconPosition="right"
-							target="_blank"
-						>
-							{ viewPostLabel }
-							<VisuallyHidden as="span">
-								{
-									/* translators: accessibility text */
-									__( '(opens in a new tab)' )
-								}
-							</VisuallyHidden>
-						</Button>
-					) }
-					<Button
-						variant={ isScheduled ? 'primary' : 'secondary' }
-						__next40pxDefaultSize
-						href={ addLink }
-					>
-						{ addNewPostLabel }
-					</Button>
-				</div>
+				<PostPublishNextPanel
+					post={ post }
+					postType={ postType }
+					isScheduled={ isScheduled }
+					focusOnMount={ focusOnMount }
+					link={ link }
+				/>
 			</PanelBody>
 			{ children }
 		</div>
