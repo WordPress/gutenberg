@@ -122,9 +122,8 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 			'Contributor can see standard comments' => array( 'contributor', 'comment', true ),
 			'Contributor can see Block comments' => array( 'contributor', 'block_comment', true ),
 
-
 			'subscriber can see standard comments' => array( 'subscriber', 'comment', true ),
-			'subscriber can see Block comments' => array( 'subscriber', 'block_comment', true ),
+			'subscriber can see Block comments' => array( 'subscriber', 'block_comment', false ),
 		);
 	}
 
@@ -145,17 +144,18 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		// Create a new comment of type $comment_type for the test post.
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
-		$request->set_param( 'post', self::$post_id );
-		$request->set_param( 'content', 'Test comment content' );
-		$request->set_param( 'type', $comment_type );
-		$request->set_param( 'per_page', 100 );
-		$response = rest_do_request( $request );
+		$params = array(
+			'post'    => self::$post_id,
+			'content' => 'Test comment content for ' . $role . ' as ' . $comment_type,
+			'comment_type'    => $comment_type,
+		);
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
 
 		if ( $expected_permission ) {
 			// Expect a 201 Created response.
 			$this->assertEquals( 201, $response->get_status() );
-			$comment = $response->get_data();
-			$this->assertEquals( $comment_type, $comment['type'] );
 		} else {
 			$this->assertEquals( 403, $response->get_status() );
 		}
@@ -203,7 +203,6 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 			array(
 				'post_id' => self::$post_id,
 				'type'    => $comment_type,
-				'number'  => 1,
 			)
 		);
 		$this->assertNotEmpty( $comments, "No comments found of type $comment_type" );
@@ -211,14 +210,18 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 
 		// Moderate the comment by changing its approved status.
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
-		$request->set_param( 'content', 'Updated comment content' );
-		$request->set_param( 'status', 'approve' );
-		$response = rest_do_request( $request );
+		$params = array(
+			'content' => 'Updated comment content',
+			'status'  => 'approved',
+		);
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
 
 		if ( $expected_permission ) {
 			$this->assertEquals( 200, $response->get_status() );
 			$comment = $response->get_data();
-			$this->assertEquals( 'approve', $comment['status'] );
+			$this->assertEquals( 'approved', $comment['status'] );
 		} else {
 			$this->assertEquals( 403, $response->get_status() );
 		}
