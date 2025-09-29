@@ -26,7 +26,8 @@ export function useBlockComments( postId ) {
 			select( blockEditorStore );
 
 		return getClientIdsWithDescendants().reduce( ( results, clientId ) => {
-			const commentId = getBlockAttributes( clientId )?.blockCommentId;
+			const commentId =
+				getBlockAttributes( clientId )?.metadata?.commentId;
 			if ( commentId ) {
 				results[ commentId ] = clientId;
 			}

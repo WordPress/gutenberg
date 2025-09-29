@@ -6,6 +6,7 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 	BlockControls,
+	useBlockEditingMode,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -39,6 +40,8 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { insertBlock } = useDispatch( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
@@ -54,7 +57,7 @@ export default function Edit( {
 
 	return (
 		<>
-			{ isSingleSelected && (
+			{ isSingleSelected && ! isContentOnlyMode && (
 				<BlockControls group="other">
 					<ToolbarButton onClick={ addAccordionContentBlock }>
 						{ __( 'Add' ) }

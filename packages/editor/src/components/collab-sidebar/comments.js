@@ -15,6 +15,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useDebounce } from '@wordpress/compose';
 
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
@@ -74,15 +75,13 @@ export function Comments( {
 	onCommentDelete,
 	setShowCommentBoard,
 } ) {
-	const { blockCommentId } = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
-		return {
-			blockCommentId: clientId
-				? getBlockAttributes( clientId )?.blockCommentId
-				: null,
-		};
+		return clientId
+			? getBlockAttributes( clientId )?.metadata?.commentId
+			: null;
 	}, [] );
 	const [ focusThread = blockCommentId, setFocusThread ] = useState();
 	const focusedThreadRef = useRef( null );
@@ -177,13 +176,25 @@ function Thread( {
 	setShowCommentBoard,
 	focusedThreadRef,
 } ) {
-	const { flashBlock } = useDispatch( blockEditorStore );
 	const { blocks } = useSelect( ( select ) => {
 		return {
 			blocks: select( blockEditorStore ).getBlocks(),
 		};
 	}, [] );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
+
+	const onMouseEnter = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, true );
+	};
+
+	const onMouseLeave = () => {
+		debouncedToggleBlockHighlight( thread.blockClientId, false );
+	};
 
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
@@ -193,7 +204,6 @@ function Thread( {
 				behavior: 'instant',
 				block: 'center',
 			} );
-			flashBlock( blockClientId );
 		}
 	};
 
@@ -234,6 +244,10 @@ function Thread( {
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 			tabIndex={ isFocused ? 0 : -1 }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
 		>
 			<CommentBoard
 				thread={ thread }
