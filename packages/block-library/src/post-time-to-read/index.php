@@ -21,7 +21,6 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	$content              = get_the_content();
 	$average_reading_rate = isset( $attributes['averageReadingSpeed'] ) ? $attributes['averageReadingSpeed'] : 189;
 
-	// Handle backward compatibility and new displayMode attribute
 	$display_mode = isset( $attributes['displayMode'] ) ? $attributes['displayMode'] : 'time';
 
 	$word_count_type = wp_get_word_count_type();
