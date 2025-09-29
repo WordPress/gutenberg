@@ -25,6 +25,31 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### MediaUploadModal
+
+MediaUploadModal component that uses Modal and DataViewsPicker for media selection.
+
+This is a modern functional component alternative to the legacy MediaUpload class component. It provides a cleaner API and better integration with the WordPress block editor.
+
+_Parameters_
+
+-   _props_ `MediaUploadModalProps`: Component props
+-   _props.allowedTypes_ `MediaUploadModalProps[ 'allowedTypes' ]`: Array of allowed media types
+-   _props.multiple_ `MediaUploadModalProps[ 'multiple' ]`: Whether multiple files can be selected
+-   _props.value_ `MediaUploadModalProps[ 'value' ]`: Currently selected media item(s)
+-   _props.onSelect_ `MediaUploadModalProps[ 'onSelect' ]`: Function called when media is selected
+-   _props.onClose_ `MediaUploadModalProps[ 'onClose' ]`: Function called when modal is closed
+-   _props.title_ `MediaUploadModalProps[ 'title' ]`: Title for the modal
+-   _props.isOpen_ `MediaUploadModalProps[ 'isOpen' ]`: Whether the modal is open
+-   _props.isDismissible_ `MediaUploadModalProps[ 'isDismissible' ]`: Whether modal can be dismissed
+-   _props.modalClass_ `MediaUploadModalProps[ 'modalClass' ]`: Additional CSS class for modal
+-   _props.search_ `MediaUploadModalProps[ 'search' ]`: Whether to show search input
+-   _props.searchLabel_ `MediaUploadModalProps[ 'searchLabel' ]`: Label for search input
+
+_Returns_
+
+-   JSX element or null
+
 ### privateApis
 
 Private @wordpress/media-utils APIs.
