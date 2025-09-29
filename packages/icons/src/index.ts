@@ -22,6 +22,7 @@ export { default as background } from './library/background';
 export { default as backup } from './library/backup';
 export { default as bell } from './library/bell';
 export { default as bellUnread } from './library/bell-unread';
+export { default as blank } from './library/blank';
 export { default as blockDefault } from './library/block-default';
 export { default as blockMeta } from './library/block-meta';
 export { default as blockTable } from './library/block-table';
