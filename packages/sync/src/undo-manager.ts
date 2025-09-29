@@ -35,10 +35,6 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 			// Ensure that we only scope the undo/redo to the current editor.
 			// The yjs document's clientID is added once it's available.
 			trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
-			// Do not ignore changes that come from remote clients.
-			// This is to account for other clients making changes to the same
-			// block.
-			ignoreRemoteMapChanges: true,
 		} );
 	}
 
