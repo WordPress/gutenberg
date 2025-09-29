@@ -112,7 +112,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		}
 
 		// Add "word count" part, if enabled.
-		if ( showWordCount ) {
+		if ( displayMode === 'words' ) {
 			const wordCountString =
 				wordCountType === 'words'
 					? sprintf(

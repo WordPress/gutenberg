@@ -24,20 +24,6 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	// Handle backward compatibility and new displayMode attribute
 	$display_mode = isset( $attributes['displayMode'] ) ? $attributes['displayMode'] : 'time';
 
-	// Backward compatibility: convert old attributes to new displayMode
-	if ( isset( $attributes['showTimeToRead'] ) || isset( $attributes['showWordCount'] ) ) {
-		$show_time_to_read = isset( $attributes['showTimeToRead'] ) ? $attributes['showTimeToRead'] : true;
-		$show_word_count   = isset( $attributes['showWordCount'] ) ? $attributes['showWordCount'] : false;
-
-		if ( $show_time_to_read && $show_word_count ) {
-			$display_mode = 'both';
-		} elseif ( $show_word_count ) {
-			$display_mode = 'words';
-		} else {
-			$display_mode = 'time';
-		}
-	}
-
 	$word_count_type = wp_get_word_count_type();
 	$total_words     = wp_word_count( $content, $word_count_type );
 
@@ -72,7 +58,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	}
 
 	// Add "word count" part, if enabled.
-	if ( $show_word_count ) {
+	if ( 'words' === $display_mode ) {
 		$word_count_string = 'words' === $word_count_type ? sprintf(
 			/* translators: %s: the number of words in the post. */
 			_n( '%s word', '%s words', $total_words ),
