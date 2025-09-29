@@ -210,9 +210,6 @@ export const saveDirtyEntities =
 					)
 			);
 		}
-		/*registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkLastChangeAsPersistent();*/
 		Promise.all( pendingSavedRecords )
 			.then( ( values ) => {
 				return onSave ? onSave( values ) : values;
