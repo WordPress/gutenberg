@@ -66,6 +66,16 @@ function gutenberg_allow_template_slugs_to_be_duplicated( $override, $slug, $pos
 function gutenberg_get_registered_block_templates( $query ) {
 	$template_files = _get_block_templates_files( 'wp_template', $query );
 	$query_result   = array();
+
+	// _get_block_templates_files seems broken in core, it does not object the
+	// query.
+	$template_files = array_filter(
+		$template_files,
+		function ( $template_file ) use ( $query ) {
+			return in_array( $template_file['slug'], $query['slug__in'] );
+		}
+	);
+
 	foreach ( $template_files as $template_file ) {
 		$query_result[] = _build_block_template_result_from_file( $template_file, 'wp_template' );
 	}
@@ -183,41 +193,30 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 
 	// We expect one template for each slug. Use the active template if it is
 	// set and exists. Otherwise use the static template.
+	$templates       = array();
+	$remaining_slugs = array();
 
-	$templates = array_map(
-		function ( $slug ) use ( $specific_template, $active_templates ) {
-			if ( $slug === $specific_template || empty( $active_templates[ $slug ] ) ) {
-				return $slug;
-			}
+	foreach ( $slugs as $slug ) {
+		if ( $slug === $specific_template || empty( $active_templates[ $slug ] ) ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
 
-			// TODO: it need to be possible to set a static template as active.
-			$post = get_post( $active_templates[ $slug ] );
-			if ( ! $post || 'publish' !== $post->post_status ) {
-				return $slug;
-			}
+		// TODO: it need to be possible to set a static template as active.
+		$post = get_post( $active_templates[ $slug ] );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			$remaining_slugs[] = $slug;
+			continue;
+		}
 
-			return _build_block_template_result_from_post( $post );
-		},
-		$slugs
-	);
+		$templates[] = _build_block_template_result_from_post( $post );
+	}
 
 	// For any remaining slugs, use the static template.
-	$remaining_slugs = array_filter(
-		$templates,
-		function ( $template ) {
-			return is_string( $template );
-		}
-	);
-	$act_templates   = array_filter(
-		$templates,
-		function ( $template ) {
-			return ! is_string( $template );
-		}
-	);
-	$query           = array(
+	$query     = array(
 		'slug__in' => $remaining_slugs,
 	);
-	$templates       = array_merge( $act_templates, gutenberg_get_registered_block_templates( $query ) );
+	$templates = array_merge( $templates, gutenberg_get_registered_block_templates( $query ) );
 
 	if ( $specific_template ) {
 		$templates = array_merge( $templates, get_block_templates( array( 'slug__in' => array( $specific_template ) ) ) );
