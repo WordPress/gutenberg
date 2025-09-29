@@ -216,5 +216,4 @@ class Tests_Blocks_Render_Post_Time_To_Read extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
-
 }
