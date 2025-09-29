@@ -135,9 +135,14 @@ function Thread( {
 		: undefined;
 	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
 
-	const ariaLabel = getCommentExcerpt(
+	const commentExcerpt = getCommentExcerpt(
 		stripHTML( thread.content.rendered ),
 		10
+	);
+	const ariaLabel = sprintf(
+		// translators: %s: comment excerpt
+		__( 'Comment: %s' ),
+		commentExcerpt
 	);
 
 	return (
