@@ -27,7 +27,7 @@ class Tests_BlockCommentFilter extends WP_UnitTestCase {
 		);
 
 		// Call the function.
-		$updated_comment = update_comment_type_in_rest_api( $prepared_comment, $request );
+		$updated_comment = update_comment_type_in_rest_api_6_8( $prepared_comment, $request );
 
 		// Assertions.
 		$this->assertEquals( 'block_comment', $updated_comment['comment_type'] );
