@@ -16,6 +16,7 @@ const variations = [
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'time',
 		icon: clock,
+		isDefault: true,
 	},
 	{
 		name: 'word-count',
