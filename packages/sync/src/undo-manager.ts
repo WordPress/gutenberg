@@ -73,28 +73,11 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 */
 	public addToScope( ymap: Y.Map< any > ): void {
 		this.undoManager.addToScope( ymap );
-	}
+		this.undoManager.addTrackedOrigin( ymap.doc?.clientID );
 
-	/**
-	 * Add a Yjs document's origin to be tracked by the undo manager.
-	 *
-	 * This is necessary for a client specific undo/redo stack.
-	 *
-	 * @param doc The Yjs document to track.
-	 */
-	public trackDoc( doc: Y.Doc ): void {
-		this.undoManager.addTrackedOrigin( doc.clientID );
-	}
-
-	/**
-	 * Remove a Yjs document's origin from being tracked by the undo manager.
-	 *
-	 * This is necessary when the yjs document has been destroyed.
-	 *
-	 * @param doc The Yjs document to stop tracking.
-	 */
-	public untrackDoc( doc: Y.Doc ): void {
-		this.undoManager.removeTrackedOrigin( doc.clientID );
+		ymap.doc?.on( 'destroy', () => {
+			this.undoManager.removeTrackedOrigin( ymap.doc?.clientID );
+		} );
 	}
 
 	/**
