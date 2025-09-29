@@ -131,6 +131,7 @@ function UnforwardedLinkUI( props, ref ) {
 						</p>
 					</VisuallyHidden>
 					<LinkControl
+						__nextSearchControl
 						hasTextControl
 						hasRichPreviews
 						value={ link }

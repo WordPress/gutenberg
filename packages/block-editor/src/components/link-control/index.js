@@ -28,6 +28,7 @@ import { keyboardReturn } from '@wordpress/icons';
  */
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
+import ComboboxLinkControlSearchInput from './combobox-search-input';
 import LinkPreview from './link-preview';
 import LinkSettings from './settings';
 import useCreatePage from './use-create-page';
@@ -142,6 +143,7 @@ function LinkControl( {
 	hasRichPreviews = false,
 	hasTextControl = false,
 	renderControlBottom = null,
+	__nextSearchControl = false,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -388,41 +390,69 @@ function LinkControl( {
 								__next40pxDefaultSize
 							/>
 						) }
-						<LinkControlSearchInput
-							currentLink={ value }
-							className="block-editor-link-control__field block-editor-link-control__search-input"
-							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
-							withCreateSuggestion={ withCreateSuggestion }
-							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
-							onSelect={ handleSelectSuggestion }
-							showInitialSuggestions={ showInitialSuggestions }
-							allowDirectEntry={ ! noDirectEntry }
-							showSuggestions={ showSuggestions }
-							suggestionsQuery={ suggestionsQuery }
-							withURLSuggestion={ ! noURLSuggestion }
-							createSuggestionButtonText={
-								createSuggestionButtonText
-							}
-							hideLabelFromVision={ ! showTextControl }
-							suffix={
-								showActions ? undefined : (
-									<InputControlSuffixWrapper variant="control">
-										<Button
-											onClick={
-												isDisabled ? noop : handleSubmit
-											}
-											label={ __( 'Submit' ) }
-											icon={ keyboardReturn }
-											className="block-editor-link-control__search-submit"
-											aria-disabled={ isDisabled }
-											size="small"
-										/>
-									</InputControlSuffixWrapper>
-								)
-							}
-						/>
+						{ __nextSearchControl ? (
+							<ComboboxLinkControlSearchInput
+								currentLink={ value }
+								className="block-editor-link-control__field block-editor-link-control__search-input"
+								placeholder={ searchInputPlaceholder }
+								value={ currentUrlInputValue }
+								withCreateSuggestion={ withCreateSuggestion }
+								onCreateSuggestion={ createPage }
+								onChange={ setInternalURLInputValue }
+								onSelect={ handleSelectSuggestion }
+								showInitialSuggestions={
+									showInitialSuggestions
+								}
+								allowDirectEntry={ ! noDirectEntry }
+								showSuggestions={ showSuggestions }
+								suggestionsQuery={ suggestionsQuery }
+								withURLSuggestion={ ! noURLSuggestion }
+								createSuggestionButtonText={
+									createSuggestionButtonText
+								}
+								hideLabelFromVision={ ! showTextControl }
+							/>
+						) : (
+							<LinkControlSearchInput
+								currentLink={ value }
+								className="block-editor-link-control__field block-editor-link-control__search-input"
+								placeholder={ searchInputPlaceholder }
+								value={ currentUrlInputValue }
+								withCreateSuggestion={ withCreateSuggestion }
+								onCreateSuggestion={ createPage }
+								onChange={ setInternalURLInputValue }
+								onSelect={ handleSelectSuggestion }
+								showInitialSuggestions={
+									showInitialSuggestions
+								}
+								allowDirectEntry={ ! noDirectEntry }
+								showSuggestions={ showSuggestions }
+								suggestionsQuery={ suggestionsQuery }
+								withURLSuggestion={ ! noURLSuggestion }
+								createSuggestionButtonText={
+									createSuggestionButtonText
+								}
+								hideLabelFromVision={ ! showTextControl }
+								suffix={
+									showActions ? undefined : (
+										<InputControlSuffixWrapper variant="control">
+											<Button
+												onClick={
+													isDisabled
+														? noop
+														: handleSubmit
+												}
+												label={ __( 'Submit' ) }
+												icon={ keyboardReturn }
+												className="block-editor-link-control__search-submit"
+												aria-disabled={ isDisabled }
+												size="small"
+											/>
+										</InputControlSuffixWrapper>
+									)
+								}
+							/>
+						) }
 					</div>
 					{ errorMessage && (
 						<Notice
