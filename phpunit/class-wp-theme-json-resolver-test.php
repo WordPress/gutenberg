@@ -3,7 +3,7 @@
 /**
  * Test WP_Theme_JSON_Resolver_Gutenberg class.
  *
- * @package Gutenberg
+ * @package gutenberg
  *
  * @since 5.8.0
  */
