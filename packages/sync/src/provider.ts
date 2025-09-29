@@ -82,6 +82,11 @@ export class SyncProvider {
 			connections.forEach( ( result ) => result.destroy() );
 			recordMap.unobserveDeep( onRecordUpdate );
 			stateMap.unobserve( onStateUpdate );
+
+			if ( syncConfig.supports?.undo ) {
+				this.undoManager.untrackDoc( ydoc );
+			}
+
 			ydoc.destroy();
 			this.entityStates.delete( entityId );
 		};
@@ -133,6 +138,7 @@ export class SyncProvider {
 		}
 
 		if ( syncConfig.supports?.undo ) {
+			this.undoManager.trackDoc( ydoc );
 			this.undoManager.addToScope( recordMap );
 		}
 

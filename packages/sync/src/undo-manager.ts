@@ -33,7 +33,12 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 			// Throttle undo/redo captures. (default: 500ms)
 			captureTimeout: 250,
 			// Ensure that we only scope the undo/redo to the current editor.
+			// The yjs document's clientID is added once it's available.
 			trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
+			// Do not ignore changes that come from remote clients.
+			// This is to account for other clients making changes to the same
+			// block.
+			ignoreRemoteMapChanges: true,
 		} );
 	}
 
@@ -68,6 +73,28 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 */
 	public addToScope( ymap: Y.Map< any > ): void {
 		this.undoManager.addToScope( ymap );
+	}
+
+	/**
+	 * Add a Yjs document's origin to be tracked by the undo manager.
+	 *
+	 * This is necessary for a client specific undo/redo stack.
+	 *
+	 * @param doc The Yjs document to track.
+	 */
+	public trackDoc( doc: Y.Doc ): void {
+		this.undoManager.addTrackedOrigin( doc.clientID );
+	}
+
+	/**
+	 * Remove a Yjs document's origin from being tracked by the undo manager.
+	 *
+	 * This is necessary when the yjs document has been destroyed.
+	 *
+	 * @param doc The Yjs document to stop tracking.
+	 */
+	public untrackDoc( doc: Y.Doc ): void {
+		this.undoManager.removeTrackedOrigin( doc.clientID );
 	}
 
 	/**
