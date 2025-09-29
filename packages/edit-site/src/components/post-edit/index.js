@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
-import { discussionField } from '@wordpress/fields';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
@@ -59,8 +58,8 @@ function PostEditForm( { postType, postId } ) {
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const { fields: _fields } = usePostFields( { postType } );
-	const fields = useMemo( () => {
-		const processedFields =
+	const fields = useMemo(
+		() =>
 			_fields?.map( ( field ) => {
 				if ( field.id === 'status' ) {
 					return {
@@ -71,18 +70,9 @@ function PostEditForm( { postType, postId } ) {
 					};
 				}
 				return field;
-			} ) || [];
-
-		// Add discussion field for post types that support comments or trackbacks.
-		if (
-			postTypeConfig?.supports?.comments ||
-			postTypeConfig?.supports?.trackbacks
-		) {
-			processedFields.push( discussionField );
-		}
-
-		return processedFields;
-	}, [ _fields, postTypeConfig ] );
+			} ),
+		[ _fields ]
+	);
 
 	const form = useMemo(
 		() => ( {

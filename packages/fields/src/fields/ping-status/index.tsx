@@ -48,6 +48,7 @@ const pingStatusField: Field< BasePost > = {
 	type: 'text',
 	Edit: PingStatusEdit,
 	enableSorting: false,
+	enableHiding: false,
 	filterBy: false,
 	elements: [
 		{
