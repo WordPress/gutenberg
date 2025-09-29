@@ -413,7 +413,6 @@ test.describe( 'Navigation block', () => {
 		} ) => {
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.useBlockInserter();
-
 			await navigation.addPage( 'Cat' );
 
 			/**
