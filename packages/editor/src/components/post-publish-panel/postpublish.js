@@ -80,12 +80,10 @@ function TemplatePublishPanelPostpublish( { post } ) {
 	const postTitle = decodeEntities( post.title ) || __( '(no title)' );
 	const registry = useRegistry();
 	const { site, isActivating } = useSelect( ( select ) => {
+		const { getEntityRecord, isSavingEntityRecord } = select( coreStore );
 		return {
-			site: select( coreStore ).getEntityRecord( 'root', 'site' ),
-			isActivating: select( coreStore ).isSavingEntityRecord(
-				'root',
-				'site'
-			),
+			site: getEntityRecord( 'root', 'site' ),
+			isActivating: isSavingEntityRecord( 'root', 'site' ),
 		};
 	} );
 	return (

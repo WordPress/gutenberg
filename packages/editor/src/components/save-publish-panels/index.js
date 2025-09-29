@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
+import { addAction, removeAction } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -54,6 +56,49 @@ export default function SavePublishPanels( {
 		() => setEntitiesSavedStatesCallback( true ),
 		[]
 	);
+
+	const registry = useRegistry();
+
+	useEffect( () => {
+		addAction(
+			'editor.savePost',
+			'my-plugin/template-save-dialog',
+			async ( post, options ) => {
+				if ( options.isAutosave ) {
+					return;
+				}
+				if ( post.type !== 'wp_template' ) {
+					return;
+				}
+
+				const site = await registry
+					.select( coreStore )
+					.getEntityRecord( 'root', 'site' );
+				const template = await registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', post.type, post.id );
+				const editorSettings = await registry
+					.select( editorStore )
+					.getEditorSettings();
+
+				// Don't open for focused entity.
+				if ( editorSettings.onNavigateToPreviousEntityRecord ) {
+					return;
+				}
+
+				// Already active
+				if ( site.active_templates[ template.slug ] === post.id ) {
+					return;
+				}
+
+				registry.dispatch( editorStore ).openPublishSidebar();
+			}
+		);
+
+		return () => {
+			removeAction( 'editor.savePost', 'my-plugin/template-save-dialog' );
+		};
+	}, [ registry ] );
 
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
