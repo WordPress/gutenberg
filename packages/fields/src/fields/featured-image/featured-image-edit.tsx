@@ -3,9 +3,9 @@
  */
 import { Button, __experimentalGrid as Grid } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
 // @ts-ignore
-import { MediaUpload } from '@wordpress/media-utils';
+import { MediaUploadModal } from '@wordpress/media-utils';
 import { lineSolid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
@@ -22,6 +22,7 @@ export const FeaturedImageEdit = ( {
 	onChange,
 }: DataFormControlProps< BasePostWithEmbeddedFeaturedMedia > ) => {
 	const { id } = field;
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const value = field.getValue( { item: data } );
 
@@ -48,74 +49,73 @@ export const FeaturedImageEdit = ( {
 	return (
 		<fieldset className="fields-controls__featured-image">
 			<div className="fields-controls__featured-image-container">
-				<MediaUpload
-					onSelect={ ( selectedMedia: { id: number } ) => {
+				<div
+					ref={ ref }
+					role="button"
+					tabIndex={ -1 }
+					onClick={ () => setIsModalOpen( true ) }
+					onKeyDown={ () => setIsModalOpen( true ) }
+				>
+					<Grid
+						rowGap={ 0 }
+						columnGap={ 8 }
+						templateColumns="24px 1fr 24px"
+					>
+						{ url && (
+							<>
+								<img
+									className="fields-controls__featured-image-image"
+									alt=""
+									width={ 24 }
+									height={ 24 }
+									src={ url }
+								/>
+								<span className="fields-controls__featured-image-title">
+									{ title }
+								</span>
+							</>
+						) }
+						{ ! url && (
+							<>
+								<span
+									className="fields-controls__featured-image-placeholder"
+									style={ {
+										width: '24px',
+										height: '24px',
+									} }
+								/>
+								<span className="fields-controls__featured-image-title">
+									{ __( 'Choose an image…' ) }
+								</span>
+							</>
+						) }
+						{ url && (
+							<>
+								<Button
+									size="small"
+									className="fields-controls__featured-image-remove-button"
+									icon={ lineSolid }
+									onClick={ (
+										event: React.MouseEvent< HTMLButtonElement >
+									) => {
+										event.stopPropagation();
+										onChangeControl( 0 );
+									} }
+								/>
+							</>
+						) }
+					</Grid>
+				</div>
+				<MediaUploadModal
+					isOpen={ isModalOpen }
+					onClose={ () => setIsModalOpen( false ) }
+					onSelect={ ( selectedMedia: any ) => {
 						onChangeControl( selectedMedia.id );
+						setIsModalOpen( false );
 					} }
 					allowedTypes={ [ 'image' ] }
-					render={ ( { open }: { open: () => void } ) => {
-						return (
-							<div
-								ref={ ref }
-								role="button"
-								tabIndex={ -1 }
-								onClick={ () => {
-									open();
-								} }
-								onKeyDown={ open }
-							>
-								<Grid
-									rowGap={ 0 }
-									columnGap={ 8 }
-									templateColumns="24px 1fr 24px"
-								>
-									{ url && (
-										<>
-											<img
-												className="fields-controls__featured-image-image"
-												alt=""
-												width={ 24 }
-												height={ 24 }
-												src={ url }
-											/>
-											<span className="fields-controls__featured-image-title">
-												{ title }
-											</span>
-										</>
-									) }
-									{ ! url && (
-										<>
-											<span
-												className="fields-controls__featured-image-placeholder"
-												style={ {
-													width: '24px',
-													height: '24px',
-												} }
-											/>
-											<span className="fields-controls__featured-image-title">
-												{ __( 'Choose an image…' ) }
-											</span>
-										</>
-									) }
-									{ url && (
-										<>
-											<Button
-												size="small"
-												className="fields-controls__featured-image-remove-button"
-												icon={ lineSolid }
-												onClick={ (
-													event: React.MouseEvent< HTMLButtonElement >
-												) => {
-													event.stopPropagation();
-													onChangeControl( 0 );
-												} }
-											/>
-										</>
-									) }
-								</Grid>
-							</div>
-						);
-					} }
+					value={ value }
+					title={ __( 'Select Featured Image' ) }
 				/>
 			</div>
 		</fieldset>
