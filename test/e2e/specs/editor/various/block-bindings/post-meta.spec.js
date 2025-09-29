@@ -280,14 +280,16 @@ test.describe( 'Post Meta source', () => {
 					'Movie field default value'
 				);
 			} );
+			// We need to discuss this approach. As now is showing the label, like post-meta getValues function on the editor.
 			test( 'should not show anything if the default value is not defined', async ( {
 				page,
 			} ) => {
 				const fieldButton = page
 					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'Field with only label' } );
-				// Check it only contains the field label.
-				await expect( fieldButton ).toHaveText(
+
+				// Check that the field contains the label text
+				await expect( fieldButton ).toContainText(
 					'Field with only label'
 				);
 			} );

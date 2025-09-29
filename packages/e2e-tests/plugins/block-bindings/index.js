@@ -32,10 +32,12 @@ registerBlockBindingsSource( {
 			mode: 'dropdown',
 			data: Object.entries( fieldsList || {} ).map(
 				( [ key, field ] ) => ( {
-					key,
 					label: field?.label || key,
 					type: field?.type || 'string',
 					value: field?.value,
+					args: {
+						key,
+					},
 				} )
 			),
 		};
@@ -78,10 +80,12 @@ registerBlockBindingsSource( {
 			mode: 'modal',
 			data: Object.entries( fieldsList || {} ).map(
 				( [ key, field ] ) => ( {
-					key,
 					label: field?.label || key,
 					type: field?.type || 'string',
 					value: field?.value,
+					args: {
+						key,
+					},
 				} )
 			),
 			renderModalContent( { attribute } ) {

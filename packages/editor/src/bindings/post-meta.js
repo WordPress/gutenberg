@@ -151,7 +151,9 @@ export default {
 		).map( ( [ key, field ] ) => ( {
 			key,
 			label: field.label,
-			value: field.value,
+			args: {
+				key,
+			},
 			type: field.type,
 		} ) );
 		/*
@@ -160,14 +162,6 @@ export default {
 		return {
 			mode: 'dropdown',
 			data: metaFields,
-			getArgs( { item } ) {
-				return {
-					key: item.key,
-				};
-			},
-			isSelected( { item, binding } ) {
-				return binding?.args?.key === item.key;
-			},
 		};
 	},
 };

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -53,13 +58,18 @@ function BlockBindingsPanelMenuContent( {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const attributeType = useSelect(
-		( select ) => {
+	const blockContext = useContext( BlockContext );
+	const { attributeType, select } = useSelect(
+		( _select ) => {
 			const { name: blockName } =
-				select( blockEditorStore ).getBlock( clientId );
+				_select( blockEditorStore ).getBlock( clientId );
 			const _attributeType =
 				getBlockType( blockName ).attributes?.[ attribute ]?.type;
-			return _attributeType === 'rich-text' ? 'string' : _attributeType;
+			return {
+				attributeType:
+					_attributeType === 'rich-text' ? 'string' : _attributeType,
+				select: _select,
+			};
 		},
 		[ clientId, attribute ]
 	);
@@ -92,60 +102,71 @@ function BlockBindingsPanelMenuContent( {
 							</Menu.SubmenuTriggerItem>
 							<Menu.Popover gutter={ 8 }>
 								<Menu.Group>
-									{ sourceDataItems.map( ( item ) => (
-										<Menu.CheckboxItem
-											key={ item.key }
-											onChange={ () => {
-												const isCurrentlySelected =
-													source.isSelected?.( {
-														item,
-														binding,
-													} ) ??
+									{ sourceDataItems.map( ( item ) => {
+										const itemBindings = {
+											source: sourceKey,
+											args: item?.args || {
+												key: item.key,
+											},
+										};
+										const values = source.getValues( {
+											select,
+											context: blockContext,
+											bindings: {
+												[ attribute ]: itemBindings,
+											},
+										} );
+										return (
+											<Menu.CheckboxItem
+												key={
+													JSON.stringify(
+														item.args
+													) || item.key
+												}
+												onChange={ () => {
+													const isCurrentlySelected =
+														fastDeepEqual(
+															binding?.args,
+															item.args
+														) ??
+														// Deprecate key dependency in 7.0.
+														item.key ===
+															binding?.args?.key;
+
+													if ( isCurrentlySelected ) {
+														// Unset if the same item is selected again.
+														updateBlockBindings( {
+															[ attribute ]:
+																undefined,
+														} );
+													} else {
+														updateBlockBindings( {
+															[ attribute ]:
+																itemBindings,
+														} );
+													}
+												} }
+												name={ attribute + '-binding' }
+												value={ values[ attribute ] }
+												checked={
+													fastDeepEqual(
+														binding?.args,
+														item.args
+													) ??
 													// Deprecate key dependency in 7.0.
 													item.key ===
-														binding?.args?.key;
-
-												if ( isCurrentlySelected ) {
-													// Unset if the same item is selected again.
-													updateBlockBindings( {
-														[ attribute ]:
-															undefined,
-													} );
-												} else {
-													updateBlockBindings( {
-														[ attribute ]: {
-															source: sourceKey,
-															args: source.getArgs?.(
-																{
-																	item,
-																	binding,
-																}
-															) || {
-																key: item.key,
-															},
-														},
-													} );
+														binding?.args?.key
 												}
-											} }
-											name={ attribute + '-binding' }
-											value={ item.key }
-											checked={
-												source.isSelected?.( {
-													item,
-													binding,
-												} ) ??
-												// Deprecate key dependency in 7.0.
-												item.key === binding?.args?.key
-											}
-										>
-											<Menu.ItemLabel>
-												{ item?.label }
-											</Menu.ItemLabel>
-											<Menu.ItemHelpText>
-												{ item?.value }
-											</Menu.ItemHelpText>
-										</Menu.CheckboxItem>
-									) ) }
+											>
+												<Menu.ItemLabel>
+													{ item?.label }
+												</Menu.ItemLabel>
+												<Menu.ItemHelpText>
+													{ values[ attribute ] }
+												</Menu.ItemHelpText>
+											</Menu.CheckboxItem>
+										);
+									} ) }
 								</Menu.Group>
 							</Menu.Popover>
 						</Menu>
@@ -185,8 +206,8 @@ function BlockBindingsAttribute( { attribute, binding, source } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: source?.data?.find(
-								( item ) => item.key === args?.key
+						: source?.data?.find( ( item ) =>
+								fastDeepEqual( item.args, args )
 						  )?.label ||
 						  source?.label ||
 						  sourceName }
@@ -288,6 +309,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Use useSelect to ensure sources are updated whenever there are updates in block context
 	// or when underlying data changes.
+	// Still needs a fix regarding _sources scope.
 	const _sources = {};
 	const { sources, canUpdateBlockBindings, bindableAttributes } = useSelect(
 		( select ) => {
@@ -303,7 +325,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			Object.entries( registeredSources ).forEach(
 				( [
 					sourceName,
-					{ editorUI, getFieldsList, usesContext, label },
+					{ editorUI, getFieldsList, usesContext, label, getValues },
 				] ) => {
 					if ( editorUI ) {
 						// Populate context.
@@ -339,6 +361,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							_sources[ sourceName ] = {
 								...editorUIResult,
 								label,
+								getValues,
 							};
 						}
 					} else if ( getFieldsList ) {
@@ -359,10 +382,9 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							// Convert getFieldsList format to editorUI format
 							const data = Object.entries( fieldsListResult ).map(
 								( [ key, field ] ) => ( {
-									key,
 									label: field.label || key,
-									value: field.value,
 									type: field.type || 'string',
+									args: { key },
 								} )
 							);
 
@@ -388,6 +410,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 									mode: 'dropdown', // Default mode for backward compatibility
 									data,
 									label,
+									getValues,
 								};
 							}
 						}
@@ -398,6 +421,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						 */
 						_sources[ sourceName ] = {
 							label,
+							getValues,
 						};
 					}
 				}
@@ -414,7 +438,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				bindableAttributes: _bindableAttributes,
 			};
 		},
-		[ blockContext ]
+		[ blockContext, blockName ]
 	);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {

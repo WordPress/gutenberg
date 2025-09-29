@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
  * WordPress dependencies
@@ -224,8 +225,8 @@ export function RichTextWrapper(
 					select,
 					context: blockBindingsContext,
 				} );
-				clientSideFieldLabel = editorUIResult.data?.find(
-					( item ) => item.key === relatedBinding?.args?.key
+				clientSideFieldLabel = editorUIResult.data?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
 				)?.label;
 			}
 
