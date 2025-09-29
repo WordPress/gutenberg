@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -113,7 +112,7 @@ const duplicatePost: Action< BasePost > = {
 					sprintf(
 						// translators: %s: Title of the created post, e.g: "Hello world".
 						__( '"%s" successfully created.' ),
-						decodeEntities( newItem.title?.rendered || item.title )
+						getItemTitle( newItem )
 					),
 					{
 						id: 'duplicate-post-action',

@@ -21,17 +21,16 @@
 	border-radius: $radius-large;
 	border: 1.5px solid $gray-300;
 	background-color: $gray-100;
-	margin-bottom: $grid-unit-20;
-}
 
-.editor-collab-sidebar-panel__active-thread {
-	border: 1.5px solid #3858e9;
-}
+	&.is-selected {
+		background-color: $white;
+		border: 1.5px solid #3858e9;
+		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+	}
 
-.editor-collab-sidebar-panel__focus-thread {
-	border: 1.5px solid #3858e9;
-	background-color: $white;
-	box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+	&:focus-visible {
+		outline: auto;
+	}
 }
 
 .editor-collab-sidebar-panel__child-thread {
