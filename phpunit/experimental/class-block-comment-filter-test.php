@@ -5,6 +5,8 @@
  * @package Gutenberg
  */
 
+require_once dirname( __DIR__, 2 ) . '/lib/experimental/block-comments.php';
+
 /**
  * This class contains unit tests for the block comment filter functions.
  *
