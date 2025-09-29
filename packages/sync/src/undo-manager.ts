@@ -31,7 +31,7 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	private constructor() {
 		this.undoManager = new YMultiDocUndoManager( [], {
 			// Throttle undo/redo captures. (default: 500ms)
-			captureTimeout: 250,
+			captureTimeout: 200,
 			// Ensure that we only scope the undo/redo to the current editor.
 			// The yjs document's clientID is added once it's available.
 			trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
