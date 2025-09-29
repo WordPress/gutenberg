@@ -15,7 +15,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
-	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -76,7 +75,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		const parts = [];
 
 		// Add "time to read" part, if enabled.
-		if ( displayMode === 'time' || displayMode === 'both' ) {
+		if ( displayMode === 'time' ) {
 			let timeString;
 			if ( displayAsRange ) {
 				let maxMinutes = Math.max(
@@ -162,56 +161,17 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							displayAsRange: true,
-							displayMode: 'time',
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Display options' ) }
-						hasValue={ () => displayMode !== 'time' }
-						onDeselect={ () => {
+			{ displayMode === 'time' && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
-								displayMode: 'time',
+								displayAsRange: true,
 							} );
 						} }
+						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Display options' ) }
-							value={ displayMode }
-							options={ [
-								{
-									label: __( 'Show time to read' ),
-									value: 'time',
-								},
-								{
-									label: __( 'Show word count' ),
-									value: 'words',
-								},
-								{
-									label: __(
-										'Show time to read and word count'
-									),
-									value: 'both',
-								},
-							] }
-							onChange={ ( value ) =>
-								setAttributes( {
-									displayMode: value,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-					{ ( displayMode === 'time' || displayMode === 'both' ) && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ _x(
@@ -236,9 +196,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 								}
 							/>
 						</ToolsPanelItem>
-					) }
-				</ToolsPanel>
-			</InspectorControls>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>{ displayString }</div>
 		</>
 	);
