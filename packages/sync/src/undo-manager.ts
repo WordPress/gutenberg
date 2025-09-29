@@ -73,11 +73,6 @@ export class UndoManager implements WPUndoManager< ObjectData > {
 	 */
 	public addToScope( ymap: Y.Map< any > ): void {
 		this.undoManager.addToScope( ymap );
-		this.undoManager.addTrackedOrigin( ymap.doc?.clientID );
-
-		ymap.doc?.on( 'destroy', () => {
-			this.undoManager.removeTrackedOrigin( ymap.doc?.clientID );
-		} );
 	}
 
 	/**
