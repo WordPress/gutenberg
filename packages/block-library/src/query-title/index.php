@@ -75,7 +75,7 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 	}
 
 	$level    = isset( $attributes['level'] ) ? (int) $attributes['level'] : 1;
-	$tag_name = $level === 0 ? 'p' :  'h' . (int) $attributes['level'];
+	$tag_name = 0 === $level ? 'p' : 'h' . (int) $attributes['level'];
 
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
