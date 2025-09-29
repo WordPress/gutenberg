@@ -398,3 +398,32 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	return $query;
 }
 add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
+
+/**
+ * Filter to add some styles to the posts page to show the Editorial Comments column correctly.
+ *
+ * The style will override the icon used to show a comment bubble style icon instead.
+ */
+function gutenberg_add_editorial_comments_column_styles() {
+	?>
+	<style>
+		td.editorial_comments  {
+			border: 1px solid red;
+
+		}
+		.editorial_comments .comment-count {
+			background: transparent;
+
+			&:before {
+				content: "\f464";
+				color: gray;
+				font: normal 20px / .5 dashicons;
+			}
+		}
+		#editorial_comments .comment-grey-bubble:before {
+			content: "\f464";
+		}
+	</style>
+	<?php
+}
+add_action( 'admin_head-edit.php', 'gutenberg_add_editorial_comments_column_styles' );
