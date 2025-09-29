@@ -82,7 +82,7 @@ function PostEditForm( { postType, postId } ) {
 		}
 
 		return processedFields;
-	}, [ _fields, postType ] );
+	}, [ _fields, postTypeConfig ] );
 
 	const form = useMemo(
 		() => ( {
