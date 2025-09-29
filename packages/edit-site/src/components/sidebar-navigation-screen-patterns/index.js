@@ -5,10 +5,10 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,6 +26,7 @@ import useTemplatePartAreas from './use-template-part-areas';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
+const { getTemplatePartIcon } = unlock( coreDataPrivateApis );
 
 function CategoriesGroup( {
 	templatePartAreas,
