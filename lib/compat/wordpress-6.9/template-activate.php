@@ -72,7 +72,7 @@ function gutenberg_get_registered_block_templates( $query ) {
 	$template_files = array_filter(
 		$template_files,
 		function ( $template_file ) use ( $query ) {
-			return in_array( $template_file['slug'], $query['slug__in'] );
+			return in_array( $template_file['slug'], $query['slug__in'], true );
 		}
 	);
 
