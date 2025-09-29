@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { clock } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import icon from './icon';
 
 const variations = [
 	{
