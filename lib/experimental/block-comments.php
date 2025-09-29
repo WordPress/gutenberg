@@ -105,6 +105,12 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
  * @return array Modified columns.
  */
 function gutenberg_add_editorial_comments_column( $columns ) {
+	// Check if the current post type supports block comments.
+	$post_type = get_current_screen()->post_type;
+	if ( ! gutenberg_check_post_type_supports_block_comments( $post_type ) ) {
+		return $columns;
+	}
+
 	// Add column immediately after the existing comments column.
 	$editorial_comments = sprintf(
 		'<span class="vers comment-grey-bubble" title="%1$s" aria-hidden="true"></span><span class="screen-reader-text">%2$s</span>',
