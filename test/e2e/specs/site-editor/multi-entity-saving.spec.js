@@ -80,11 +80,6 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 
-		await page
-			.getByRole( 'region', { name: 'Editor publish' } )
-			.getByRole( 'button', { name: 'Activate' } )
-			.click();
-
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();
 

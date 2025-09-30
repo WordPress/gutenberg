@@ -66,14 +66,14 @@ test.describe( 'Block template registration', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 		await page
-			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'region', { name: 'Editor content' } )
 			.getByRole( 'button', { name: 'Activate' } )
 			.click();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor publish' } )
-				.getByRole( 'button', { name: 'Activating…' } )
-		).toBeHidden();
+				.getByRole( 'region', { name: 'Editor content' } )
+				.getByText( 'Template activated.' )
+		).toBeVisible();
 		await page.goto( '/?cat=1' );
 		await expect( page.getByText( 'User-edited template' ) ).toBeVisible();
 
@@ -302,14 +302,14 @@ test.describe( 'Block template registration', () => {
 			isOnlyCurrentEntityDirty: true,
 		} );
 		await page
-			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'region', { name: 'Editor content' } )
 			.getByRole( 'button', { name: 'Activate' } )
 			.click();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor publish' } )
-				.getByRole( 'button', { name: 'Activating…' } )
-		).toBeHidden();
+				.getByRole( 'region', { name: 'Editor content' } )
+				.getByText( 'Template activated.' )
+		).toBeVisible();
 
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
