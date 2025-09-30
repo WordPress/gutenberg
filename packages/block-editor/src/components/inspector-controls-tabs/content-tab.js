@@ -16,18 +16,16 @@ const ContentTab = ( { rootClientId, contentClientIds } ) => {
 	}
 
 	return (
-		<PanelBody title={ __( 'Content' ) }>
-			<>
-				{ ! window?.__experimentalContentOnlyPatternInsertion && (
-					<PanelBody title={ __( 'Content' ) }>
-						<BlockQuickNavigation clientIds={ contentClientIds } />
-					</PanelBody>
-				) }
-				{ window?.__experimentalContentOnlyPatternInsertion && (
-					<ContentOnlyControls rootClientId={ rootClientId } />
-				) }
-			</>
-		</PanelBody>
+		<>
+			{ ! window?.__experimentalContentOnlyPatternInsertion && (
+				<PanelBody title={ __( 'Content' ) }>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
+				</PanelBody>
+			) }
+			{ window?.__experimentalContentOnlyPatternInsertion && (
+				<ContentOnlyControls rootClientId={ rootClientId } />
+			) }
+		</>
 	);
 };
 
