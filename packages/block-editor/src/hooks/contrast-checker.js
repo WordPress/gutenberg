@@ -11,6 +11,7 @@ import ContrastChecker from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
 import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 
 function getComputedValue( node, property ) {
 	return node.ownerDocument.defaultView
@@ -18,32 +19,35 @@ function getComputedValue( node, property ) {
 		.getPropertyValue( property );
 }
 
-function getBlockElementColors( blockEl, rootSelector ) {
-	if ( ! blockEl ) {
+function getBlockElementColors( blockEl, blockType ) {
+	if ( ! blockEl || ! blockType ) {
 		return {};
 	}
 
-	// Use the block's root selector to find the element where colors are applied
-	let targetElement = blockEl;
-	if ( rootSelector ) {
-		// Extract the last part of the selector (e.g., ".wp-block-button__link" from ".wp-block-button .wp-block-button__link")
-		const selectorParts = rootSelector.split( ' ' );
-		const lastSelector = selectorParts[ selectorParts.length - 1 ];
+	// Get color-specific selectors.
+	const textSelector = getBlockCSSSelector( blockType, 'color.text', {
+		fallback: true,
+	} );
+	const backgroundSelector = getBlockCSSSelector(
+		blockType,
+		'color.background',
+		{ fallback: true }
+	);
 
-		const selectedElement = blockEl.querySelector( lastSelector );
-		if ( selectedElement ) {
-			targetElement = selectedElement;
-		}
-	}
+	// Find target elements - querySelector handles all the complexity
+	const textElement = blockEl.querySelector( textSelector ) || blockEl;
+	const backgroundElement =
+		blockEl.querySelector( backgroundSelector ) || blockEl;
+	const linkElement = blockEl.querySelector( 'a' );
 
-	const firstLinkElement = blockEl.querySelector( 'a' );
-	const linkColor = !! firstLinkElement?.innerText
-		? getComputedValue( firstLinkElement, 'color' )
-		: undefined;
+	// Get computed colors from the appropriate elements
+	const textColor = getComputedValue( textElement, 'color' );
+	const linkColor =
+		linkElement && linkElement.innerText
+			? getComputedValue( linkElement, 'color' )
+			: undefined;
 
-	const textColor = getComputedValue( targetElement, 'color' );
-
-	let backgroundColorNode = targetElement;
+	let backgroundColorNode = backgroundElement;
 	let backgroundColor = getComputedValue(
 		backgroundColorNode,
 		'background-color'
@@ -81,13 +85,12 @@ export default function BlockColorContrastChecker( { clientId } ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
 
-	// Get the block's root selector from its block type definition.
-	const rootSelector = useSelect(
+	// Get the block type for selector resolution.
+	const blockType = useSelect(
 		( select ) => {
 			const blockName =
 				select( blockEditorStore ).getBlockName( clientId );
-			const blockType = select( blocksStore ).getBlockType( blockName );
-			return blockType?.selectors?.root;
+			return select( blocksStore ).getBlockType( blockName );
 		},
 		[ clientId ]
 	);
@@ -95,12 +98,12 @@ export default function BlockColorContrastChecker( { clientId } ) {
 	// There are so many things that can change the color of a block
 	// So we perform this check on every render.
 	useLayoutEffect( () => {
-		if ( ! blockEl ) {
+		if ( ! blockEl || ! blockType ) {
 			return;
 		}
 
 		function updateColors() {
-			setColors( getBlockElementColors( blockEl, rootSelector ) );
+			setColors( getBlockElementColors( blockEl, blockType ) );
 		}
 
 		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
