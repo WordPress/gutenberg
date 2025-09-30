@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -17,7 +13,7 @@ import {
 import { ToolbarGroup } from '@wordpress/components';
 
 export default function Edit( { attributes, setAttributes, context } ) {
-	const { level, title, textAlign, levelOptions } = attributes;
+	const { level, title, levelOptions } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
@@ -34,11 +30,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	const blockProps = useBlockProps( {
-		className: clsx( 'accordion-content__heading', {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
 	return (
@@ -56,14 +48,14 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<TagName { ...blockProps }>
 				<button
-					className={ clsx( 'accordion-content__toggle' ) }
+					className="wp-block-accordion-header__toggle"
 					style={ {
 						...spacingProps.style,
 					} }
 				>
 					{ showIcon && iconPosition === 'left' && (
 						<span
-							className="accordion-content__toggle-icon"
+							className="wp-block-accordion-header__toggle-icon"
 							aria-hidden="true"
 						>
 							+
@@ -78,10 +70,11 @@ export default function Edit( { attributes, setAttributes, context } ) {
 							setAttributes( { title: newTitle } )
 						}
 						placeholder={ __( 'Accordion title' ) }
+						className="wp-block-accordion-header__toggle-title"
 					/>
 					{ showIcon && iconPosition === 'right' && (
 						<span
-							className="accordion-content__toggle-icon"
+							className="wp-block-accordion-header__toggle-icon"
 							aria-hidden="true"
 						>
 							+

@@ -2,7 +2,7 @@
 /**
  * Bootstraps the new posts dashboard page.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 add_action( 'admin_menu', 'gutenberg_replace_posts_dashboard' );
