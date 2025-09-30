@@ -180,7 +180,7 @@ export function FitTextControl( { clientId, fitText, setAttributes, name } ) {
 	return (
 		<InspectorControls group="typography">
 			<ToolsPanelItem
-				hasValue={ () => !! fitText }
+				hasValue={ () => fitText }
 				label={ __( 'Fit text' ) }
 				onDeselect={ () => setAttributes( { fitText: false } ) }
 				resetAllFilter={ () => ( { fitText: false } ) }
@@ -189,7 +189,7 @@ export function FitTextControl( { clientId, fitText, setAttributes, name } ) {
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Fit text' ) }
-					checked={ !! fitText }
+					checked={ fitText }
 					onChange={ () => setAttributes( { fitText: ! fitText } ) }
 					help={
 						fitText

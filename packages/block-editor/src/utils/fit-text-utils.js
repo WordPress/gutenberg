@@ -10,7 +10,7 @@
  * @param {number} fontSize        Font size in pixels
  * @return {string} CSS rule string
  */
-export function generateCSSRule( elementSelector, fontSize ) {
+function generateCSSRule( elementSelector, fontSize ) {
 	return `${ elementSelector } { font-size: ${ fontSize }px !important; }`;
 }
 
@@ -37,7 +37,7 @@ export function getOriginalFontSize( textElement, applyStylesFn ) {
 }
 
 /**
- * Find optimal font size using simple binary search between 5-200px.
+ * Find optimal font size using simple binary search between 5-600px.
  *
  * @param {HTMLElement} textElement     The text element
  * @param {string}      elementSelector CSS selector for the text element
@@ -86,15 +86,14 @@ export function findOptimalFontSize(
  * @param {HTMLElement} textElement     The text element (paragraph, heading, etc.)
  * @param {string}      elementSelector CSS selector for the text element
  * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
- * @return {Object} Object with cssRule, originalSize, and optimalSize
  */
 export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 	if ( ! textElement ) {
-		return { cssRule: '', originalSize: 16, optimalSize: 16 };
+		return;
 	}
 
-	// Get original font size (clears styles internally)
-	const originalSize = getOriginalFontSize( textElement, applyStylesFn );
+	// Clear existing styles to measure natural size
+	getOriginalFontSize( textElement, applyStylesFn );
 
 	// Find optimal font size using binary search
 	const optimalSize = findOptimalFontSize(
@@ -108,10 +107,4 @@ export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 
 	// Apply final styles
 	applyStylesFn( cssRule );
-
-	return {
-		cssRule,
-		originalSize,
-		optimalSize,
-	};
 }

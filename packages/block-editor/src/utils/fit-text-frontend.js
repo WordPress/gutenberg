@@ -73,9 +73,6 @@ function initializeFitText( element ) {
 	if ( window.ResizeObserver && element.parentElement ) {
 		const resizeObserver = new window.ResizeObserver( applyFitText );
 		resizeObserver.observe( element.parentElement );
-
-		// Store observer for cleanup if needed
-		element._fitTextObserver = resizeObserver;
 	}
 }
 
