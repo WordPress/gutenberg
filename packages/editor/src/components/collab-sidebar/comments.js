@@ -151,11 +151,17 @@ function Thread( {
 		stripHTML( thread.content.rendered ),
 		10
 	);
-	const ariaLabel = sprintf(
-		// translators: %s: comment excerpt
-		__( 'Comment: %s' ),
-		commentExcerpt
-	);
+	const ariaLabel = relatedBlockElement
+		? sprintf(
+				// translators: %s: comment excerpt
+				__( 'Comment: %s' ),
+				commentExcerpt
+		  )
+		: sprintf(
+				// translators: %s: comment excerpt
+				__( 'Original block deleted. Comment: %s' ),
+				commentExcerpt
+		  );
 
 	return (
 		// Disable reason: role="listitem" does in fact support aria-expanded.
@@ -195,6 +201,11 @@ function Thread( {
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
+			{ ! relatedBlockElement && (
+				<p className="editor-collab-sidebar-panel__thread-warning">
+					{ __( 'Original block deleted.' ) }
+				</p>
+			) }
 			<CommentBoard
 				thread={ thread }
 				onEdit={ ( params = {} ) => {
