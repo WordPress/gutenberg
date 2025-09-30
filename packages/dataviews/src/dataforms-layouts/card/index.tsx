@@ -71,7 +71,7 @@ export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 	return { isOpen, CollapsibleCardHeader };
 }
 
-export function isSummaryFieldVisible< Item >(
+function isSummaryFieldVisible< Item >(
 	summaryField: NormalizedField< Item >,
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
