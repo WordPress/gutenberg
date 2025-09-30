@@ -89,6 +89,15 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
+## Bookmark/Like
+
+Displays an icon to like/bookmark a post ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/bookmark))
+
+-	**Name:** core/bookmark
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** iconType
+
 ## Button
 
 Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))

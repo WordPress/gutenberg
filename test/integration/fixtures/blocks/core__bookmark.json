@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/bookmark",
+		"isValid": true,
+		"attributes": {
+			"iconType": "heart"
+		},
+		"innerBlocks": []
+	}
+]
