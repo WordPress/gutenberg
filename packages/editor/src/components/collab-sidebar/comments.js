@@ -145,7 +145,7 @@ function Thread( {
 						<VStack className="editor-collab-sidebar-panel__show-more-reply">
 							{ sprintf(
 								// translators: %s: number of replies.
-								_x( '%s more replies', 'Show replies button' ),
+								__( '%s more replies' ),
 								thread?.reply?.length
 							) }
 						</VStack>
