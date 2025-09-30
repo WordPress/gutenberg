@@ -11,7 +11,7 @@
  *
  * @return string Returns the updated markup.
  */
-function block_core_accordion_content_render( $attributes, $content ) {
+function block_core_accordion_item_render( $attributes, $content ) {
 	if ( ! $content ) {
 		return $content;
 	}
@@ -63,12 +63,12 @@ function block_core_accordion_content_render( $attributes, $content ) {
  *
  * @since 6.6.0
  */
-function register_block_core_accordion_content() {
+function register_block_core_accordion_item() {
 	register_block_type_from_metadata(
 		__DIR__ . '/accordion-item',
 		array(
-			'render_callback' => 'block_core_accordion_content_render',
+			'render_callback' => 'block_core_accordion_item_render',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_accordion_content' );
+add_action( 'init', 'register_block_core_accordion_item' );
