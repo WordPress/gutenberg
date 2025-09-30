@@ -1497,14 +1497,13 @@ For example:
 
 #### Panel
 
--   `type`: `panel`. Required.
--   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
--   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+- `type`: `panel`. Required.
+- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)
     -   An array of strings (multiple field IDs)
 
 For example:
-
 ```js
 {
 	id: 'field_id',
@@ -1513,26 +1512,15 @@ For example:
 		labelPosition: 'top'
 	},
 }
-
-// With summary fields
-{
-	id: 'discussion',
-	label: 'Discussion Settings',
-	layout: {
-		type: 'panel',
-		summary: [ 'comment_status', 'ping_status' ]
-	},
-	children: [ 'comment_status', 'ping_status', 'password' ]
-}
 ```
 
 #### Card
 
--   `type`: `card`. Required.
--   `isOpened`: boolean. Optional. `true` by default.
--   `withHeader`: boolean. Optional. `true` by default.
--   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
-    -   A string (single field ID)
+- `type`: `card`. Required.
+- `isOpened`: boolean. Optional. `true` by default.
+- `withHeader`: boolean. Optional. `true` by default.
+- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
+   	-   A string (single field ID)
     -   An array of strings (multiple field IDs)
     -   An object `{ id: string, visibility: 'always' | 'when-collapsed' }`
     -   An array of objects for per-field visibility control
@@ -1549,30 +1537,16 @@ For example:
 	id: 'field_id',
 	layout: {
 		type: 'card',
-		summary: [ 'field1', 'field2' ]
-	},
-}
-
-// Advanced usage with visibility control
-{
-	id: 'customer',
-	label: 'Customer Info',
-	layout: {
-		type: 'card',
 		isOpened: false,
-		summary: [
-			{ id: 'email', visibility: 'always' },
-			{ id: 'full_details', visibility: 'when-collapsed' }
-		]
+		withHeader: true,
 	},
-	children: [ 'email', 'name', 'address', 'full_details' ]
 }
 ```
 
 #### Row
 
--   `type`: `row`. Required.
--   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+- `type`: `row`. Required.
+- `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
