@@ -91,23 +91,6 @@ describe( 'validation', () => {
 		expect( result ).toBe( false );
 	} );
 
-	it( 'number field with elements is valid when empty', () => {
-		const item = { id: 1 };
-		const fields: Field< {} >[] = [
-			{
-				id: 'price',
-				type: 'number',
-				elements: [
-					{ value: 1.5, label: 'Bronze' },
-					{ value: 2.5, label: 'Silver' },
-				],
-			},
-		];
-		const form = { fields: [ 'price' ] };
-		const result = isItemValid( item, fields, form );
-		expect( result ).toBe( true );
-	} );
-
 	it( 'number field with elements is invalid if value is not one of the elements', () => {
 		const item = { id: 1, price: 4.5 };
 		const fields: Field< {} >[] = [

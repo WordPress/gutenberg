@@ -39,14 +39,9 @@ export default {
 	isValid: {
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
-
-			if ( isEmpty( value ) ) {
-				return null;
-			}
-
 			const numericValue = Number( value );
 
-			if ( ! Number.isFinite( numericValue ) ) {
+			if ( ! isEmpty( value ) && ! Number.isFinite( numericValue ) ) {
 				return __( 'Value must be a number.' );
 			}
 
