@@ -23,10 +23,6 @@ function generateCSSRule( elementSelector, fontSize ) {
  * @return {number} Optimal font size
  */
 function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
-	if ( ! textElement ) {
-		return 16;
-	}
-
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
 	let minSize = 5;
