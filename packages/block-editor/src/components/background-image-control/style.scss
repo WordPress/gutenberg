@@ -3,6 +3,7 @@
 	border-radius: $radius-small;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
+	position: relative;
 
 	&.is-open {
 		background-color: $gray-100;
@@ -83,6 +84,33 @@
 	height: 100%;
 	width: 100%;
 	padding-left: $grid-unit-15;
+	padding-right: $grid-unit-40;
+}
+
+.block-editor-global-styles-background-panel__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	&.block-editor-global-styles-background-panel__reset {
+		border-radius: $radius-small;
+	}
+
+	.block-editor-global-styles-background-panel__dropdown-toggle:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
 }
 
 .block-editor-global-styles-background-panel__inspector-media-replace-title {

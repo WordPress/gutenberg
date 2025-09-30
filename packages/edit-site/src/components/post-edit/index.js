@@ -29,7 +29,7 @@ const fieldsWithBulkEditSupport = [
 	'status',
 	'date',
 	'author',
-	'comment_status',
+	'discussion',
 ];
 
 function PostEditForm( { postType, postId } ) {
@@ -94,7 +94,12 @@ function PostEditForm( { postType, postId } ) {
 				'date',
 				'slug',
 				'parent',
-				'comment_status',
+				{
+					id: 'discussion',
+					label: __( 'Discussion' ),
+					children: [ 'comment_status', 'ping_status' ],
+					summary: 'discussion',
+				},
 				{
 					label: __( 'Template' ),
 					id: 'template',

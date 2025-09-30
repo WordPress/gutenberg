@@ -7,13 +7,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
 
 /**
@@ -22,7 +16,8 @@ import { useResizeObserver, throttle } from '@wordpress/compose';
 import DataViewsContext from '../dataviews-context';
 import { VIEW_LAYOUTS } from '../../dataviews-layouts';
 import {
-	default as DataViewsFilters,
+	Filters,
+	FiltersToggled,
 	useFilters,
 	FiltersToggle,
 } from '../dataviews-filters';
@@ -84,7 +79,6 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { isShowingFilter } = useContext( DataViewsContext );
 	return (
 		<>
 			<HStack
@@ -109,9 +103,7 @@ function DefaultUI( {
 					<DataViewsViewConfig />
 				</HStack>
 			</HStack>
-			{ isShowingFilter && (
-				<DataViewsFilters className="dataviews-filters__container" />
-			) }
+			<FiltersToggled className="dataviews-filters__container" />
 			<DataViewsLayout />
 			<DataViewsPickerFooter />
 		</>
@@ -263,7 +255,8 @@ function DataViewsPicker< Item >( {
 const DataViewsPickerSubComponents =
 	DataViewsPicker as typeof DataViewsPicker & {
 		BulkActionToolbar: typeof DataViewsPickerFooter;
-		Filters: typeof DataViewsFilters;
+		Filters: typeof Filters;
+		FiltersToggled: typeof FiltersToggled;
 		FiltersToggle: typeof FiltersToggle;
 		Layout: typeof DataViewsLayout;
 		LayoutSwitcher: typeof ViewTypeMenu;
@@ -273,7 +266,8 @@ const DataViewsPickerSubComponents =
 	};
 
 DataViewsPickerSubComponents.BulkActionToolbar = DataViewsPickerFooter;
-DataViewsPickerSubComponents.Filters = DataViewsFilters;
+DataViewsPickerSubComponents.Filters = Filters;
+DataViewsPickerSubComponents.FiltersToggled = FiltersToggled;
 DataViewsPickerSubComponents.FiltersToggle = FiltersToggle;
 DataViewsPickerSubComponents.Layout = DataViewsLayout;
 DataViewsPickerSubComponents.LayoutSwitcher = ViewTypeMenu;

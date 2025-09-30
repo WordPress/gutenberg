@@ -105,7 +105,7 @@ test.describe( 'Block Comments', () => {
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Comment edited successfully.' } )
+				.filter( { hasText: 'Comment updated.' } )
 		).toBeVisible();
 	} );
 
@@ -147,9 +147,54 @@ test.describe( 'Block Comments', () => {
 		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
 		await resolveButton.click();
 		await expect( resolveButton ).toBeDisabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment marked as resolved.' } )
+		).toBeVisible();
 
 		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment reopened.' } )
+		).toBeVisible();
+	} );
+
+	test( 'can reopen a resolved comment when adding a reply', async ( {
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/heading',
+			attributes: { content: 'Testing block comments' },
+			comment: 'Test comment to resolve.',
+		} );
+
+		const resolveButton = page.getByRole( 'button', { name: 'Resolve' } );
+		await resolveButton.click();
+		await expect( resolveButton ).toBeDisabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment marked as resolved.' } )
+		).toBeVisible();
+
+		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
+		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
+		await commentForm.fill( 'Test reply that reopens the comment.' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Reopen & Reply', exact: true } )
+			.click();
+
+		await expect( resolveButton ).toBeEnabled();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Comment reopened.' } )
+		).toBeVisible();
 	} );
 
 	test( 'selecting a block or comment marks it as an active', async ( {
@@ -176,7 +221,7 @@ test.describe( 'Block Comments', () => {
 
 		const threads = page.locator( '.editor-collab-sidebar-panel__thread' );
 		const activeThread = page.locator(
-			'.editor-collab-sidebar-panel__focus-thread'
+			'.editor-collab-sidebar-panel__thread.is-selected'
 		);
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Comment',

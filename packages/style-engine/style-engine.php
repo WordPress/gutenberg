@@ -5,7 +5,7 @@
  * This file contains a variety of public functions developers can use to interact with
  * the Style Engine API.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 /**

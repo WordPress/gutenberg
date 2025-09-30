@@ -452,6 +452,7 @@ The following components are available directly under `DataViews`:
 
 -   `DataViews.Search`
 -   `DataViews.FiltersToggle`
+-   `DataViews.FiltersToggled`
 -   `DataViews.Filters`
 -   `DataViews.Layout`
 -   `DataViews.LayoutSwitcher`
@@ -480,7 +481,7 @@ const CustomLayout = () => {
 			<h1>{ __( 'Free composition' ) }</h1>
 			<DataViews.Search />
 			<DataViews.FiltersToggle />
-			<DataViews.Filters />
+			<DataViews.FiltersToggled />
 			<DataViews.Layout />
 			<DataViews.Pagination />
 		</DataViews>
@@ -492,7 +493,7 @@ const CustomLayout = () => {
 
 ### Accessibility considerations
 
-All `DataViews` subcomponents are designed with accessibility in mind — including keyboard interactions, focus management, and semantic roles. Components like `Search`, `Pagination`, `FiltersToggle`, and `Filters` already handle these responsibilities internally and can be safely used in custom layouts.
+All `DataViews` subcomponents are designed with accessibility in mind — including keyboard interactions, focus management, and semantic roles. Components like `Search`, `Pagination`, `FiltersToggle`, and `FiltersToggled` already handle these responsibilities internally and can be safely used in custom layouts.
 
 When using free composition, developers are responsible for the outer structure of the layout.
 
