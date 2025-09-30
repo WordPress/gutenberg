@@ -216,7 +216,7 @@ const fields: Field< DataType >[] = [
 			{ value: 3, label: 'Three' },
 		],
 		setValue: ( { value } ) => ( {
-			integerWithElements: Number( value ),
+			integerWithElements: parseInt( value, 10 ),
 		} ),
 	},
 	{
@@ -653,7 +653,7 @@ const FieldTypeStory = ( {
 	);
 };
 
-export const All = ( {
+export const AllComponent = ( {
 	type,
 	Edit,
 }: {
@@ -662,8 +662,9 @@ export const All = ( {
 } ) => {
 	return <FieldTypeStory fields={ fields } type={ type } Edit={ Edit } />;
 };
+AllComponent.storyName = 'All types';
 
-export const Text = ( {
+export const TextComponent = ( {
 	type,
 	Edit,
 }: {
@@ -677,8 +678,9 @@ export const Text = ( {
 
 	return <FieldTypeStory fields={ textFields } type={ type } Edit={ Edit } />;
 };
+TextComponent.storyName = 'text';
 
-export const Integer = ( {
+export const IntegerComponent = ( {
 	type,
 	Edit,
 }: {
@@ -694,8 +696,9 @@ export const Integer = ( {
 		<FieldTypeStory fields={ integerFields } type={ type } Edit={ Edit } />
 	);
 };
+IntegerComponent.storyName = 'integer';
 
-export const Number = ( {
+export const NumberComponent = ( {
 	type,
 	Edit,
 }: {
@@ -711,8 +714,9 @@ export const Number = ( {
 		<FieldTypeStory fields={ numberFields } type={ type } Edit={ Edit } />
 	);
 };
+NumberComponent.storyName = 'number';
 
-export const Boolean = ( {
+export const BooleanComponent = ( {
 	type,
 	Edit,
 }: {
@@ -728,8 +732,9 @@ export const Boolean = ( {
 		<FieldTypeStory fields={ booleanFields } type={ type } Edit={ Edit } />
 	);
 };
+BooleanComponent.storyName = 'boolean';
 
-export const DateTime = ( {
+export const DateTimeComponent = ( {
 	type,
 	Edit,
 }: {
@@ -745,8 +750,9 @@ export const DateTime = ( {
 		<FieldTypeStory fields={ dateTimeFields } type={ type } Edit={ Edit } />
 	);
 };
+DateTimeComponent.storyName = 'datetime';
 
-export const Date = ( {
+export const DateComponent = ( {
 	type,
 	Edit,
 }: {
@@ -760,8 +766,9 @@ export const Date = ( {
 
 	return <FieldTypeStory fields={ dateFields } type={ type } Edit={ Edit } />;
 };
+DateComponent.storyName = 'date';
 
-export const Email = ( {
+export const EmailComponent = ( {
 	type,
 	Edit,
 }: {
@@ -777,8 +784,9 @@ export const Email = ( {
 		<FieldTypeStory fields={ emailFields } type={ type } Edit={ Edit } />
 	);
 };
+EmailComponent.storyName = 'email';
 
-export const Telephone = ( {
+export const TelephoneComponent = ( {
 	type,
 	Edit,
 }: {
@@ -798,8 +806,9 @@ export const Telephone = ( {
 		/>
 	);
 };
+TelephoneComponent.storyName = 'telephone';
 
-export const Url = ( {
+export const UrlComponent = ( {
 	type,
 	Edit,
 }: {
@@ -813,8 +822,9 @@ export const Url = ( {
 
 	return <FieldTypeStory fields={ urlFields } type={ type } Edit={ Edit } />;
 };
+UrlComponent.storyName = 'url';
 
-export const Color = ( {
+export const ColorComponent = ( {
 	type,
 	Edit,
 }: {
@@ -830,8 +840,9 @@ export const Color = ( {
 		<FieldTypeStory fields={ colorFields } type={ type } Edit={ Edit } />
 	);
 };
+ColorComponent.storyName = 'color';
 
-export const Media = ( {
+export const MediaComponent = ( {
 	type,
 	Edit,
 }: {
@@ -847,8 +858,9 @@ export const Media = ( {
 		<FieldTypeStory fields={ mediaFields } type={ type } Edit={ Edit } />
 	);
 };
+MediaComponent.storyName = 'media';
 
-export const Array = ( {
+export const ArrayComponent = ( {
 	type,
 	Edit,
 }: {
@@ -868,8 +880,9 @@ export const Array = ( {
 		/>
 	);
 };
+ArrayComponent.storyName = 'array';
 
-export const Password = ( {
+export const PasswordComponent = ( {
 	type,
 	Edit,
 }: {
@@ -885,8 +898,9 @@ export const Password = ( {
 		<FieldTypeStory fields={ passwordFields } type={ type } Edit={ Edit } />
 	);
 };
+PasswordComponent.storyName = 'password';
 
-export const NoType = ( {
+export const NoTypeComponent = ( {
 	type,
 	Edit,
 }: {
@@ -902,3 +916,4 @@ export const NoType = ( {
 		<FieldTypeStory fields={ noTypeFields } type={ type } Edit={ Edit } />
 	);
 };
+NoTypeComponent.storyName = 'No type';
