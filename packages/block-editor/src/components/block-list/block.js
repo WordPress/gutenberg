@@ -805,6 +805,7 @@ function BlockListBlockProvider( props ) {
 		originalBlockClientId,
 		themeSupportsLayout,
 		canMove,
+		isBlockHidden,
 	};
 
 	if (

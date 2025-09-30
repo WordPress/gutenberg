@@ -187,6 +187,14 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&[data-clear="true"] {
 		float: none;
 	}
+
+	// Hidden blocks.
+	// In order for the block toolbar to render correctly, blocks cannot be hidden.
+	// Instead, use styles to visually hide blocks.
+	&.is-block-hidden {
+		height: 0 !important;
+		overflow: hidden !important;
+	}
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
