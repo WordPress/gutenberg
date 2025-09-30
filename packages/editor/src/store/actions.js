@@ -333,7 +333,7 @@ async function templateActivationNotice( { select, registry } ) {
 		'info',
 		sprintf(
 			// translators: %s: template slug
-			__( 'Do you want to activate this template as the %s template?' ),
+			__( 'This is a "%s" template. Do you want to activate it?' ),
 			slug
 		),
 		{
