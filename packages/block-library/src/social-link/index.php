@@ -374,11 +374,11 @@ function block_core_social_link_get_color_styles( $context ) {
 	$styles = array();
 
 	if ( array_key_exists( 'iconColorValue', $context ) ) {
-		$styles[] = 'color: ' . $context['iconColorValue'] . '; ';
+		$styles[] = 'color:' . $context['iconColorValue'] . ';';
 	}
 
 	if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
-		$styles[] = 'background-color: ' . $context['iconBackgroundColorValue'] . '; ';
+		$styles[] = 'background-color:' . $context['iconBackgroundColorValue'] . ';';
 	}
 
 	return implode( '', $styles );

@@ -29,6 +29,7 @@
 		}
 	},
 	"supports": {
+		"ariaLabel": true,
 		"html": false,
 		"color": {
 			"text": true,

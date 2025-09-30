@@ -52,5 +52,6 @@
 			"default": false
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"style": "wp-block-accordion-content"
 }
