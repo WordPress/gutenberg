@@ -91,7 +91,12 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 			return;
 		}
 
-		// Exclude block comments from queries
+		// Do not modify queries that are specifically looking for child comments.
+		if ( ! empty( $query->query_vars['parent'] ) || ! empty( $query->query_vars['parent__in'] ) ) {
+			return;
+		}
+
+		// Exclude block comments from queries.
 		$types_not_in[]                    = 'block_comment';
 		$query->query_vars['type__not_in'] = $types_not_in;
 	}
