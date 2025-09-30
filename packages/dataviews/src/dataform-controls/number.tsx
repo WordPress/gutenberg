@@ -26,6 +26,7 @@ const { ValidatedNumberControl } = unlock( privateApis );
 
 type NumberBetween = [ number | string, number | string ];
 
+// TODO: remove this hardcoded value when the decimal number is configurable
 const DEFAULT_STEP = 0.01;
 
 function toNumberOrEmpty( value?: string ) {

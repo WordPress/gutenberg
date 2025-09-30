@@ -78,7 +78,9 @@ export default {
 				return match.label;
 			}
 		}
-		return value;
+
+		// TODO: remove this hardcoded value when the decimal number is configurable
+		return Number( value ).toFixed( 2 );
 	},
 	enableSorting: true,
 	filterBy: {
