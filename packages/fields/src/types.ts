@@ -104,6 +104,7 @@ export interface PostType {
 		thumbnail?: string;
 		comments?: string;
 		editor?: boolean;
+		trackbacks?: boolean;
 	};
 }
 

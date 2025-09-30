@@ -3,7 +3,7 @@
 /**
  * Test the block WP_Duotone_Gutenberg class.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {

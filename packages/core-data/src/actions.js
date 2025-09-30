@@ -374,7 +374,7 @@ export const deleteEntityRecord =
  */
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
-	async ( { select, dispatch, resolveSelect } ) => {
+	( { select, dispatch } ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
@@ -437,33 +437,6 @@ export const editEntityRecord =
 					],
 					options.isCached
 				);
-				// Temporary solution until we find the right UX: when the user
-				// modifies a template, we automatically set it active.
-				// It can be unchecked in multi-entity saving.
-				// This is to keep the current behaviour where templates are
-				// immediately active.
-				if (
-					! options.isCached &&
-					kind === 'postType' &&
-					name === 'wp_template'
-				) {
-					const site = await resolveSelect.getEntityRecord(
-						'root',
-						'site'
-					);
-					await dispatch.editEntityRecord(
-						'root',
-						'site',
-						undefined,
-						{
-							active_templates: {
-								...site.active_templates,
-								[ record.slug ]: record.id,
-							},
-						},
-						{ isCached: true }
-					);
-				}
 			}
 			dispatch( {
 				type: 'EDIT_ENTITY_RECORD',

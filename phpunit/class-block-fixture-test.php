@@ -2,7 +2,7 @@
 /**
  * Test block fixtures in PHP.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class Block_Fixture_Test extends WP_UnitTestCase {

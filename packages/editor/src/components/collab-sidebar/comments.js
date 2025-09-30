@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useState, RawHTML, useRef } from '@wordpress/element';
 import {
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -151,11 +152,17 @@ function Thread( {
 		stripHTML( thread.content.rendered ),
 		10
 	);
-	const ariaLabel = sprintf(
-		// translators: %s: comment excerpt
-		__( 'Comment: %s' ),
-		commentExcerpt
-	);
+	const ariaLabel = relatedBlockElement
+		? sprintf(
+				// translators: %s: comment excerpt
+				__( 'Comment: %s' ),
+				commentExcerpt
+		  )
+		: sprintf(
+				// translators: %s: comment excerpt
+				__( 'Original block deleted. Comment: %s' ),
+				commentExcerpt
+		  );
 
 	return (
 		// Disable reason: role="listitem" does in fact support aria-expanded.
@@ -195,6 +202,11 @@ function Thread( {
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
 		>
+			{ ! relatedBlockElement && (
+				<Text as="p" weight={ 500 } variant="muted">
+					{ __( 'Original block deleted.' ) }
+				</Text>
+			) }
 			<CommentBoard
 				thread={ thread }
 				onEdit={ ( params = {} ) => {

@@ -722,6 +722,40 @@ describe( 'filters', () => {
 		expect( result.map( ( r ) => r.name.title ) ).toEqual( [ 'Uranus' ] );
 	} );
 
+	it( 'should filter decimal numbers within narrow BETWEEN ranges', () => {
+		const decimalData = [
+			{ id: 1, price: 2.42 },
+			{ id: 2, price: 2.58 },
+			{ id: 3, price: 3.1 },
+		];
+		const decimalFields = [
+			{
+				id: 'price',
+				type: 'number',
+				getValue: ( { item } ) => item.price,
+				filterBy: {
+					operators: [ 'between' ],
+				},
+			},
+		];
+
+		const { data: result } = filterSortAndPaginate(
+			decimalData,
+			{
+				filters: [
+					{
+						field: 'price',
+						operator: 'between',
+						value: [ 2.4, 2.6 ],
+					},
+				],
+			},
+			decimalFields
+		);
+
+		expect( result.map( ( r ) => r.id ).sort() ).toEqual( [ 1, 2 ] );
+	} );
+
 	it( 'should filter dates inclusively between min and max using BETWEEN operator', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
