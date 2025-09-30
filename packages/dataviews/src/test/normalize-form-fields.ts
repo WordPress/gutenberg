@@ -104,6 +104,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'side',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -122,6 +123,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'top',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -140,7 +142,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: true,
-						summaryVisibility: 'always',
+						summary: [],
 					},
 				},
 			] );
@@ -178,7 +180,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
-						summaryVisibility: 'always',
+						summary: [],
 					},
 				},
 			] );
@@ -209,6 +211,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'panel',
 						labelPosition: 'side',
 						openAs: 'dropdown',
+						summary: [],
 					},
 				},
 			] );
@@ -241,7 +244,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
-						summaryVisibility: 'always',
+						summary: [],
 					},
 				},
 			] );

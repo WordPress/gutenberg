@@ -15,7 +15,11 @@ import { useState, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { FieldLayoutProps, NormalizedPanelLayout } from '../../types';
+import type {
+	FieldLayoutProps,
+	NormalizedPanelLayout,
+	PanelLayout,
+} from '../../types';
 import DataFormContext from '../../components/dataform-context';
 import { isCombinedField } from '../is-combined-field';
 import { normalizeLayout } from '../../normalize-form-fields';
@@ -30,7 +34,12 @@ export default function FormPanelField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 
-	const summaryFields = getSummaryFields( field, fields );
+	const layout: NormalizedPanelLayout = normalizeLayout( {
+		...( field.layout ?? {} ),
+		type: 'panel',
+	} as PanelLayout ) as NormalizedPanelLayout;
+
+	const summaryFields = getSummaryFields( layout.summary, field, fields );
 	const fieldDefinition = summaryFields[ 0 ]; // For backward compatibility
 
 	// Use internal state instead of a ref to make sure that the component
@@ -42,11 +51,6 @@ export default function FormPanelField< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
-
-	const layout: NormalizedPanelLayout = normalizeLayout( {
-		...field.layout,
-		type: 'panel',
-	} ) as NormalizedPanelLayout;
 
 	const labelPosition = layout.labelPosition;
 	const labelClassName = clsx(

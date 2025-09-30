@@ -1,10 +1,45 @@
 /**
  * Internal dependencies
  */
-import type { FormField, NormalizedField, SimpleFormField } from '../types';
+import type {
+	FormField,
+	NormalizedField,
+	SimpleFormField,
+	SummaryField,
+} from '../types';
 import { isCombinedField } from './is-combined-field';
 
+/**
+ * Extracts field IDs from various summary field formats.
+ *
+ * @param summary The summary field configuration.
+ * @return Array of field IDs.
+ */
+function extractSummaryIds( summary: SummaryField ): string[] {
+	if ( ! summary ) {
+		return [];
+	}
+
+	if ( typeof summary === 'string' ) {
+		return [ summary ];
+	}
+
+	if ( Array.isArray( summary ) ) {
+		return summary.map( ( item ) =>
+			typeof item === 'string' ? item : item.id
+		);
+	}
+
+	// Single object with id and visibility
+	if ( typeof summary === 'object' && 'id' in summary ) {
+		return [ summary.id ];
+	}
+
+	return [];
+}
+
 export const getSummaryFields = < Item >(
+	summaryField: SummaryField,
 	field: FormField,
 	fields: NormalizedField< Item >[]
 ): NormalizedField< Item >[] => {
@@ -14,10 +49,8 @@ export const getSummaryFields = < Item >(
 	}
 
 	// Use summary field(s) if specified for combined fields
-	if ( field.summary ) {
-		const summaryIds = Array.isArray( field.summary )
-			? field.summary
-			: [ field.summary ];
+	if ( summaryField ) {
+		const summaryIds = extractSummaryIds( summaryField );
 		return summaryIds
 			.map( ( summaryId ) =>
 				fields.find( ( _field ) => _field.id === summaryId )

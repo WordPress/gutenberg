@@ -40,6 +40,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			type: 'panel',
 			labelPosition: layout?.labelPosition ?? 'side',
 			openAs: layout?.openAs ?? 'dropdown',
+			summary: layout?.summary ?? [],
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {
@@ -49,6 +50,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 				type: 'card',
 				withHeader: false,
 				isOpened: true,
+				summary: [],
 			} satisfies NormalizedCardLayout;
 		} else {
 			normalizedLayout = {
@@ -58,7 +60,7 @@ export function normalizeLayout( layout?: Layout ): NormalizedLayout {
 					typeof layout.isOpened === 'boolean'
 						? layout.isOpened
 						: true,
-				summaryVisibility: layout.summaryVisibility ?? 'always',
+				summary: layout.summary ?? [],
 			} satisfies NormalizedCardLayout;
 		}
 	} else if ( layout?.type === 'row' ) {

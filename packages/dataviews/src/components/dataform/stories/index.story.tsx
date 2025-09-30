@@ -26,6 +26,7 @@ import type {
 	RegularLayout,
 	PanelLayout,
 	CardLayout,
+	SummaryField,
 } from '../../../types';
 import { unlock } from '../../../lock-unlock';
 
@@ -336,13 +337,13 @@ const getLayoutFromStoryArgs = ( {
 	labelPosition,
 	openAs,
 	withHeader,
-	summaryVisibility,
+	summary,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card' | 'row';
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
 	withHeader?: boolean;
-	summaryVisibility?: 'always' | 'on-close';
+	summary?: SummaryField;
 } ): Layout | undefined => {
 	let layout: Layout | undefined;
 
@@ -372,9 +373,9 @@ const getLayoutFromStoryArgs = ( {
 		if ( withHeader !== undefined ) {
 			// @ts-ignore We want to demo the effects of configuring withHeader.
 			cardLayout.withHeader = withHeader;
-			if ( summaryVisibility ) {
-				cardLayout.summaryVisibility = summaryVisibility;
-			}
+		}
+		if ( summary ) {
+			cardLayout.summary = summary;
 		}
 		layout = cardLayout;
 	}
@@ -433,10 +434,13 @@ const LayoutPanelComponent = ( {
 				'dimensions',
 				'tags',
 				{
+					layout: {
+						type: 'panel',
+						summary: 'discussion',
+					},
 					id: 'discussion',
 					label: 'Discussion',
 					children: [ 'comment_status', 'ping_status' ],
-					summary: 'discussion',
 				},
 				{
 					id: 'address1',
@@ -452,13 +456,19 @@ const LayoutPanelComponent = ( {
 						'flight_status',
 						'gate',
 					],
-					summary: [ 'origin', 'destination', 'flight_status' ],
+					layout: {
+						type: 'panel',
+						summary: [ 'origin', 'destination', 'flight_status' ],
+					},
 				},
 				{
 					id: 'passenger_details',
 					label: 'Passenger Details',
 					children: [ 'author', 'seat' ],
-					summary: [ 'author', 'seat' ],
+					layout: {
+						type: 'panel',
+						summary: [ 'author', 'seat' ],
+					},
 				},
 			],
 		};
@@ -972,10 +982,9 @@ const VisibilityComponent = () => {
 
 const LayoutCardComponent = ( {
 	withHeader,
-	summaryVisibility,
 }: {
 	withHeader: boolean;
-	summaryVisibility?: 'always' | 'on-close';
+	summary: SummaryField;
 } ) => {
 	type Customer = {
 		name: string;
@@ -1105,13 +1114,15 @@ const LayoutCardComponent = ( {
 			layout: getLayoutFromStoryArgs( {
 				type: 'card',
 				withHeader,
-				summaryVisibility,
+				summary: [
+					{ id: 'customer-summary', visibility: 'always' },
+					{ id: 'tax-summary', visibility: 'when-collapsed' },
+				],
 			} ),
 			fields: [
 				{
 					id: 'customerCard',
 					label: 'Customer',
-					summary: [ 'customer-summary', 'tax-summary' ],
 					description:
 						'Enter your contact details, plan type, and addresses to complete your customer information.',
 					children: [
@@ -1179,7 +1190,7 @@ const LayoutCardComponent = ( {
 				},
 			],
 		} ),
-		[ withHeader, summaryVisibility ]
+		[ withHeader ]
 	);
 
 	return (
@@ -1512,15 +1523,9 @@ export const LayoutCard = {
 			control: { type: 'boolean' },
 			description: 'Whether the card has a header.',
 		},
-		summaryVisibility: {
-			control: { type: 'select' },
-			options: [ undefined, 'always', 'on-close' ],
-			description: 'When to show the summary field in the card header.',
-		},
 	},
 	args: {
 		withHeader: true,
-		summaryVisibility: 'always',
 	},
 };
 

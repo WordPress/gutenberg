@@ -12,9 +12,11 @@ import { getFormFieldLayout } from '..';
 import DataFormContext from '../../components/dataform-context';
 import type {
 	NormalizedCardLayout,
+	CardLayout,
 	FieldLayoutProps,
 	Form,
 	Layout,
+	NormalizedField,
 } from '../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { isCombinedField } from '../is-combined-field';
@@ -69,6 +71,57 @@ export function useCollapsibleCard( initialIsOpen: boolean = true ) {
 	return { isOpen, CollapsibleCardHeader };
 }
 
+export function isSummaryFieldVisible< Item >(
+	summaryField: NormalizedField< Item >,
+	summaryConfig: NormalizedCardLayout[ 'summary' ],
+	isOpen: boolean
+) {
+	// If no summary config, dont't show any fields
+	if (
+		! summaryConfig ||
+		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
+	) {
+		return false;
+	}
+
+	// Convert to array for consistent handling
+	const summaryConfigArray = Array.isArray( summaryConfig )
+		? summaryConfig
+		: [ summaryConfig ];
+
+	// Find the config for this specific field
+	const fieldConfig = summaryConfigArray.find( ( config ) => {
+		if ( typeof config === 'string' ) {
+			return config === summaryField.id;
+		}
+		if ( typeof config === 'object' && 'id' in config ) {
+			return config.id === summaryField.id;
+		}
+		return false;
+	} );
+
+	// If field is not in summary config, don't show it
+	if ( ! fieldConfig ) {
+		return false;
+	}
+
+	// If it's a string, always show it
+	if ( typeof fieldConfig === 'string' ) {
+		return true;
+	}
+
+	// If it has visibility rules, respect them
+	if ( typeof fieldConfig === 'object' && 'visibility' in fieldConfig ) {
+		return (
+			fieldConfig.visibility === 'always' ||
+			( fieldConfig.visibility === 'when-collapsed' && ! isOpen )
+		);
+	}
+
+	// Default to always show
+	return true;
+}
+
 export default function FormCardField< Item >( {
 	data,
 	field,
@@ -78,9 +131,9 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 
 	const layout: NormalizedCardLayout = normalizeLayout( {
-		...field.layout,
+		...( field.layout ?? {} ),
 		type: 'card',
-	} ) as NormalizedCardLayout;
+	} as CardLayout ) as NormalizedCardLayout;
 
 	const form: Form = useMemo(
 		(): Form => ( {
@@ -94,13 +147,11 @@ export default function FormCardField< Item >( {
 		layout.isOpened
 	);
 
-	const summaryFields = getSummaryFields< Item >( field, fields );
-
-	const isSummaryFieldVisible =
-		layout.withHeader &&
-		summaryFields.length > 0 &&
-		( layout?.summaryVisibility === 'always' ||
-			( layout?.summaryVisibility === 'on-close' && ! isOpen ) );
+	const summaryFields = getSummaryFields< Item >(
+		layout.summary,
+		field,
+		fields
+	);
 
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;
@@ -111,15 +162,22 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
-						{ isSummaryFieldVisible && (
+						{ summaryFields.length > 0 && layout.withHeader && (
 							<div className="dataforms-layouts-card__field-summary">
-								{ summaryFields.map( ( summaryField ) => (
-									<summaryField.render
-										key={ summaryField.id }
-										item={ data }
-										field={ summaryField }
-									/>
-								) ) }
+								{ summaryFields.map(
+									( summaryField ) =>
+										isSummaryFieldVisible(
+											summaryField,
+											layout.summary,
+											isOpen
+										) && (
+											<summaryField.render
+												key={ summaryField.id }
+												item={ data }
+												field={ summaryField }
+											/>
+										)
+								) }
 							</div>
 						) }
 					</CollapsibleCardHeader>
@@ -164,15 +222,22 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
-					{ isSummaryFieldVisible && (
+					{ summaryFields.length > 0 && layout.withHeader && (
 						<div className="dataforms-layouts-card__field-summary">
-							{ summaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
+							{ summaryFields.map(
+								( summaryField ) =>
+									isSummaryFieldVisible(
+										summaryField,
+										layout.summary,
+										isOpen
+									) && (
+										<summaryField.render
+											key={ summaryField.id }
+											item={ data }
+											field={ summaryField }
+										/>
+									)
+							) }
 						</div>
 					) }
 				</CollapsibleCardHeader>
