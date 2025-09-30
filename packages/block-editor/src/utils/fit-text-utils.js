@@ -15,28 +15,6 @@ function generateCSSRule( elementSelector, fontSize ) {
 }
 
 /**
- * Get original font size of a single text element.
- *
- * @param {HTMLElement} textElement   The text element (paragraph, heading, etc.)
- * @param {Function}    applyStylesFn Function to apply/clear styles
- * @return {number} Original font size in pixels
- */
-export function getOriginalFontSize( textElement, applyStylesFn ) {
-	if ( ! textElement ) {
-		return 16; // Default fallback
-	}
-
-	// Clear existing fit text styles to measure natural size
-	applyStylesFn( '' );
-
-	// Measure natural font size
-	const computedStyle = window.getComputedStyle( textElement );
-	const fontSize = parseFloat( computedStyle.fontSize );
-
-	return fontSize || 16; // Fallback to 16px
-}
-
-/**
  * Find optimal font size using simple binary search between 5-600px.
  *
  * @param {HTMLElement} textElement     The text element
@@ -44,11 +22,7 @@ export function getOriginalFontSize( textElement, applyStylesFn ) {
  * @param {Function}    applyStylesFn   Function to apply test styles
  * @return {number} Optimal font size
  */
-export function findOptimalFontSize(
-	textElement,
-	elementSelector,
-	applyStylesFn
-) {
+function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
 	if ( ! textElement ) {
 		return 16;
 	}
@@ -92,19 +66,14 @@ export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
 		return;
 	}
 
-	// Clear existing styles to measure natural size
-	getOriginalFontSize( textElement, applyStylesFn );
+	applyStylesFn( '' );
 
-	// Find optimal font size using binary search
 	const optimalSize = findOptimalFontSize(
 		textElement,
 		elementSelector,
 		applyStylesFn
 	);
 
-	// Generate final CSS rule
 	const cssRule = generateCSSRule( elementSelector, optimalSize );
-
-	// Apply final styles
 	applyStylesFn( cssRule );
 }

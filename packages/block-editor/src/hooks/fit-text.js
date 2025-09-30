@@ -63,21 +63,18 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor inner content changes for text blocks
-	const blockContent = useSelect(
+	// Monitor block attribute changes
+	// Any attribute may change the available space.
+	const blockAttributes = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return '';
+				return;
 			}
-			const { getBlockAttributes } = select( blockEditorStore );
-			const blockAttributes = getBlockAttributes( clientId );
-			// Get content from common content attributes
-			return blockAttributes?.content || blockAttributes?.value || '';
+			return select( blockEditorStore ).getBlockAttributes( clientId );
 		},
 		[ clientId ]
 	);
 
-	// Apply fit text optimization
 	const applyFitText = useCallback( () => {
 		if ( ! blockElement || ! hasFitTextSupport || ! fitText ) {
 			return;
@@ -92,15 +89,12 @@ function useFitText( { fitText, name, clientId } ) {
 			blockElement.ownerDocument.head.appendChild( styleElement );
 		}
 
-		// Use WordPress block ID for targeting
 		const blockSelector = `#block-${ clientId }`;
 
-		// Style management callback
 		const applyStylesFn = ( css ) => {
 			styleElement.textContent = css;
 		};
 
-		// Use shared utility for complete optimization
 		optimizeFitText( blockElement, blockSelector, applyStylesFn );
 	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
 
@@ -133,7 +127,6 @@ function useFitText( { fitText, name, clientId } ) {
 				resizeObserver.disconnect();
 			}
 
-			// Clean up styles for this block
 			const styleId = `fit-text-${ clientId }`;
 			const styleElement =
 				currentElement.ownerDocument.getElementById( styleId );
@@ -156,7 +149,7 @@ function useFitText( { fitText, name, clientId } ) {
 			return () => clearTimeout( timer );
 		}
 	}, [
-		blockContent,
+		blockAttributes,
 		fitText,
 		applyFitText,
 		blockElement,

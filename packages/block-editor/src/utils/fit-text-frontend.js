@@ -9,6 +9,11 @@
 import { optimizeFitText } from './fit-text-utils';
 
 /**
+ * Counter for generating unique element IDs.
+ */
+let idCounter = 0;
+
+/**
  * Get or create a unique style element for a fit text element.
  *
  * @param {string} elementId Unique identifier for the element.
@@ -32,12 +37,8 @@ function getOrCreateStyleElement( elementId ) {
  * @return {string} Unique identifier.
  */
 function getElementIdentifier( element ) {
-	// Use existing ID or create one
 	if ( ! element.dataset.fitTextId ) {
-		element.dataset.fitTextId =
-			// Here Math.random is ok to generate ids they don't need to cryptographically secure.
-			// eslint-disable-next-line no-restricted-syntax
-			'fit-text-' + Math.random().toString( 36 ).substring( 2, 11 );
+		element.dataset.fitTextId = `fit-text-${ ++idCounter }`;
 	}
 	return element.dataset.fitTextId;
 }
@@ -48,12 +49,9 @@ function getElementIdentifier( element ) {
  * @param {HTMLElement} element Element with fit text enabled.
  */
 function initializeFitText( element ) {
-	// Get unique ID for this element
 	const elementId = getElementIdentifier( element );
 
-	// Apply fit text optimization
 	const applyFitText = () => {
-		// Get style element for this element
 		const styleElement = getOrCreateStyleElement( elementId );
 		const elementSelector = `[data-fit-text-id=\"${ elementId }\"]`;
 
@@ -62,7 +60,6 @@ function initializeFitText( element ) {
 			styleElement.textContent = css;
 		};
 
-		// Use shared utility for complete optimization
 		optimizeFitText( element, elementSelector, applyStylesFn );
 	};
 
@@ -84,8 +81,5 @@ function initializeAllFitText() {
 	elements.forEach( initializeFitText );
 }
 
-// Initialize on DOM content loaded
 document.addEventListener( 'DOMContentLoaded', initializeAllFitText );
-
-// Also initialize on window load for cases where DOMContentLoaded has already fired
 window.addEventListener( 'load', initializeAllFitText );
