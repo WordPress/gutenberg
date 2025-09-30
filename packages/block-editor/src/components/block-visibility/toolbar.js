@@ -13,28 +13,34 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { unlock } from '../../lock-unlock';
 
-export default function BlockVisibilityToolbar( { clientId } ) {
-	const { canToggleBlockVisibility, metadata, isBlockHidden } = useSelect(
+export default function BlockVisibilityToolbar( { clientIds } ) {
+	const blocks = useSelect(
 		( select ) => {
-			const { getBlockName, getBlockAttributes } =
+			return select( blockEditorStore ).getBlocksByClientId( clientIds );
+		},
+		[ clientIds ]
+	);
+	const canToggleBlockVisibility = useSelect(
+		( select ) => {
+			const { getBlockName, getBlocksByClientId } =
 				select( blockEditorStore );
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
-			return {
-				canToggleBlockVisibility: hasBlockSupport(
+			const _blocks = getBlocksByClientId( clientIds );
+			return _blocks.every( ( { clientId } ) =>
+				hasBlockSupport(
 					getBlockName( clientId ),
 					'blockVisibility',
 					true
-				),
-				metadata: getBlockAttributes( clientId )?.metadata,
-				isBlockHidden: _isBlockHidden( clientId ),
-			};
+				)
+			);
 		},
-		[ clientId ]
+		[ clientIds ]
 	);
+
+	const hasHiddenBlock = blocks.some(
+		( block ) => block.attributes.metadata?.blockVisibility === false
+	);
+
 	const hasBlockVisibilityButtonShownRef = useRef( false );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -44,35 +50,40 @@ export default function BlockVisibilityToolbar( { clientId } ) {
 	// It needs to return focus from whence it came, and to do that,
 	// we need to leave the button in the toolbar.
 	useEffect( () => {
-		if ( isBlockHidden ) {
+		if ( hasHiddenBlock ) {
 			hasBlockVisibilityButtonShownRef.current = true;
 		}
-	}, [ isBlockHidden ] );
+	}, [ hasHiddenBlock ] );
 
-	if ( ! isBlockHidden && ! hasBlockVisibilityButtonShownRef.current ) {
+	if ( ! hasHiddenBlock && ! hasBlockVisibilityButtonShownRef.current ) {
 		return null;
 	}
 
-	const label = isBlockHidden ? __( 'Show' ) : __( 'Hide' );
+	const toggleBlockVisibility = () => {
+		const attributesByClientId = Object.fromEntries(
+			blocks?.map( ( { clientId, attributes } ) => [
+				clientId,
+				{
+					metadata: cleanEmptyObject( {
+						...attributes?.metadata,
+						blockVisibility: hasHiddenBlock ? undefined : false,
+					} ),
+				},
+			] )
+		);
+		updateBlockAttributes( clientIds, attributesByClientId, {
+			uniqueByBlock: true,
+		} );
+	};
 
 	return (
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					disabled={ ! canToggleBlockVisibility }
-					icon={ isBlockHidden ? unseen : seen }
-					label={ label }
-					onClick={ () => {
-						const newBlockHidden = ! isBlockHidden;
-						updateBlockAttributes( [ clientId ], {
-							metadata: cleanEmptyObject( {
-								...metadata,
-								blockVisibility: newBlockHidden
-									? false
-									: undefined,
-							} ),
-						} );
-					} }
+					icon={ hasHiddenBlock ? unseen : seen }
+					label={ hasHiddenBlock ? __( 'Hidden' ) : __( 'Visible' ) }
+					onClick={ toggleBlockVisibility }
 				/>
 			</ToolbarGroup>
 		</>

@@ -230,12 +230,11 @@ export function PrivateBlockToolbar( {
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
 								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar &&
-									isDefaultEditingMode &&
+								{ isDefaultEditingMode &&
 									showBlockVisibilityButton &&
 									window.__experimentalBlockVisibility && (
 										<BlockVisibilityToolbar
-											clientId={ blockClientId }
+											clientIds={ blockClientIds }
 										/>
 									) }
 								{ ! isMultiToolbar &&
