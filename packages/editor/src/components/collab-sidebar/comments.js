@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML, useEffect } from '@wordpress/element';
+import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
@@ -58,8 +58,6 @@ export function Comments( {
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
-	const [ selectedThread, setSelectedThread ] = useState();
-
 	const blockCommentId = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
@@ -68,11 +66,6 @@ export function Comments( {
 			? getBlockAttributes( clientId )?.metadata?.commentId
 			: null;
 	}, [] );
-
-	// Auto-select the related comment thread when a block is selected.
-	useEffect( () => {
-		setSelectedThread( blockCommentId ?? undefined );
-	}, [ blockCommentId ] );
 
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	if ( ! hasThreads ) {
@@ -98,8 +91,7 @@ export function Comments( {
 			onAddReply={ onAddReply }
 			onCommentDelete={ onCommentDelete }
 			onEditComment={ onEditComment }
-			isSelected={ selectedThread === thread.id }
-			setSelectedThread={ setSelectedThread }
+			isSelected={ blockCommentId === thread.id }
 			setShowCommentBoard={ setShowCommentBoard }
 			commentSidebarRef={ commentSidebarRef }
 		/>
@@ -112,10 +104,10 @@ function Thread( {
 	onAddReply,
 	onCommentDelete,
 	isSelected,
-	setSelectedThread,
 	setShowCommentBoard,
 	commentSidebarRef,
 } ) {
+	const [ isExpanded, setExpanded ] = useState( false );
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -134,15 +126,15 @@ function Thread( {
 	};
 
 	const handleCommentSelect = () => {
+		setExpanded( true );
 		setShowCommentBoard( false );
-		setSelectedThread( thread.id );
-		// pass `null` as the second parameter to prevent focusing the block.
+		// Pass `null` as the second parameter to prevent focusing the block.
 		selectBlock( thread.blockClientId, null );
 		toggleBlockSpotlight( thread.blockClientId, true );
 	};
 
 	const unselectThread = () => {
-		setSelectedThread( null );
+		setExpanded( false );
 		setShowCommentBoard( false );
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
@@ -174,22 +166,29 @@ function Thread( {
 		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
-				'is-selected': isSelected,
+				'is-selected': isSelected || isExpanded,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="2"
-			onClick={ handleCommentSelect }
+			onMouseDown={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
-			onBlur={ onMouseLeave }
+			onBlur={ ( event ) => {
+				if ( event.currentTarget.contains( event.relatedTarget ) ) {
+					return;
+				}
+
+				unselectThread();
+				onMouseLeave();
+			} }
 			onKeyDown={ ( event ) => {
 				// Expand or Collapse thread.
 				if (
 					event.key === 'Enter' &&
 					event.currentTarget === event.target
 				) {
-					if ( isSelected ) {
+					if ( isExpanded ) {
 						unselectThread();
 					} else {
 						handleCommentSelect();
@@ -204,7 +203,7 @@ function Thread( {
 			tabIndex={ 0 }
 			role="listitem"
 			aria-label={ ariaLabel }
-			aria-expanded={ isSelected }
+			aria-expanded={ isExpanded }
 		>
 			{ ! relatedBlockElement && (
 				<Text as="p" weight={ 500 } variant="muted">
@@ -226,7 +225,7 @@ function Thread( {
 				} }
 				onDelete={ onCommentDelete }
 			/>
-			{ isSelected &&
+			{ isExpanded &&
 				replies.map( ( reply ) => (
 					<VStack
 						key={ reply.id }
@@ -242,14 +241,14 @@ function Thread( {
 						/>
 					</VStack>
 				) ) }
-			{ ! isSelected && restReplies.length > 0 && (
+			{ ! isExpanded && restReplies.length > 0 && (
 				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
 					<Button
 						size="compact"
 						variant="tertiary"
 						className="editor-collab-sidebar-panel__more-reply-button"
 						onClick={ () => {
-							setSelectedThread( thread.id );
+							setExpanded( true );
 							focusCommentThread(
 								thread.id,
 								commentSidebarRef.current
@@ -268,7 +267,7 @@ function Thread( {
 					</Button>
 				</HStack>
 			) }
-			{ ! isSelected && lastReply && (
+			{ ! isExpanded && lastReply && (
 				<CommentBoard
 					thread={ lastReply }
 					parent={ thread }
@@ -276,7 +275,7 @@ function Thread( {
 					onDelete={ onCommentDelete }
 				/>
 			) }
-			{ isSelected && (
+			{ isExpanded && (
 				<VStack
 					className="editor-collab-sidebar-panel__child-thread"
 					spacing="2"
