@@ -310,7 +310,7 @@ HTML;
 			"The 'caption' attribute should be updated with the value returned by the source."
 		);
 		$this->assertSame(
-			'<figure class="wp-block-image"><img src="https://example.com/image.jpg" alt=""><figcaption class="wp-element-caption">Example Image</figcaption></figure>',
+			'<figure class="wp-block-image"><img src="https://example.com/image.jpg" alt=""/><figcaption class="wp-element-caption">Example Image</figcaption></figure>',
 			trim( $result ),
 			'The block content should be updated with the value returned by the source.'
 		);

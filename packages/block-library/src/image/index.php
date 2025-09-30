@@ -22,32 +22,30 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$output = '';
-
-	/*
-	 * Prior to WP 6.9, WP_HTML_Processor::serialize_token() was `protected`.
-	 * We define an adhoc class to expose that method.
-	 */
 	$internal_processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
 		// phpcs:ignore Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-		public function serialize_token(): string {
-			return parent::serialize_token();
+		public function span_of_current_element() {
+			$this->set_bookmark( '_wp_image_block_figcaption' );
+			// The bookmark names are prefixed with `_` so the key below has an extra `_`.
+			$opener = $this->bookmarks['__wp_image_block_figcaption'];
+
+			$depth = $this->get_current_depth();
+			while ( $this->next_token() && $this->get_current_depth() >= $depth ) {
+				continue;
+			}
+
+			$this->set_bookmark( '_wp_image_block_figcaption' );
+			$closer = $this->bookmarks['__wp_image_block_figcaption'];
+
+			return new WP_HTML_Span( $opener->start, $closer->start + $closer->length - $opener->start );
 		}
 	};
 
 	$p = $internal_processor_class::create_fragment( $content );
 
-	// Advance to the first <img> tag, copying everything before it to the output.
-	while ( $p->next_token() && 'IMG' !== $p->get_token_name() ) {
-		$output .= $p->serialize_token();
-	}
-
-	if ( 'IMG' !== $p->get_token_name() || ! $p->get_attribute( 'src' ) ) {
+	if ( ! $p->next_tag( 'img' ) || ! $p->get_attribute( 'src' ) ) {
 		return '';
 	}
-
-	// We haven't copied the <img> tag itself to the output yet.
-	$output .= $p->serialize_token();
 
 	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
@@ -78,23 +76,12 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $data_id );
 	}
 
-	$depth = null;
-
-	// Continue advancing through the rest of the block markup.
-	while ( $p->next_token() ) {
-		/*
-		 * If we encounter a <figcaption> element and the caption attribute is empty,
-		 * skip all tokens until we exit the <figcaption>.
-		 */
-		if ( 'FIGCAPTION' === $p->get_token_name() && empty( $attributes['caption'] ) ) {
-			$depth = $p->get_current_depth();
-			continue;
-		}
-		if ( isset( $depth ) && $p->get_current_depth() >= $depth ) {
-			continue;
-		}
-
-		$output .= $p->serialize_token();
+	/*
+	 * If the `caption` attribute is empty and we encounter a `<figcaption>` element,
+	 * we take note of its span so we can remove it later.
+	 */
+	if ( $p->next_tag( 'FIGCAPTION' ) && empty( $attributes['caption'] ) ) {
+		$figcaption_span = $p->span_of_current_element();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
@@ -128,6 +115,10 @@ function render_block_core_image( $attributes, $content, $block ) {
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
 
+	$output = $p->get_updated_html();
+	if ( isset( $figcaption_span ) ) {
+		return substr( $output, 0, $figcaption_span->start ) . substr( $output, $figcaption_span->start + $figcaption_span->length );
+	}
 	return $output;
 }
 

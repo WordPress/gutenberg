@@ -110,6 +110,6 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block );
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
-		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"></figure>', $rendered_block );
+		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"/></figure>', $rendered_block );
 	}
 }
