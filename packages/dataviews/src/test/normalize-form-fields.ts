@@ -148,10 +148,16 @@ describe( 'normalizeFormFields', () => {
 			] );
 		} );
 
-		it( 'card: enforces isOpened=true when withHeader=false', () => {
+		it( 'card: enforces isOpened=true and summary=[] when withHeader=false', () => {
 			const form: Form = {
 				// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
-				layout: { type: 'card', withHeader: false, isOpened: false },
+				layout: {
+					type: 'card',
+					withHeader: false,
+					// @ts-ignore - Test intentionally uses invalid type to verify runtime behavior.
+					isOpened: false,
+					summary: [ 'field1' ],
+				},
 				fields: [ 'field1' ],
 			};
 			const result = normalizeFormFields( form );
@@ -162,14 +168,20 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: false,
 						isOpened: true,
+						summary: [],
 					},
 				},
 			] );
 		} );
 
-		it( 'card: respects isOpened when withHeader=true', () => {
+		it( 'card: respects isOpened and summary when withHeader=true', () => {
 			const form: Form = {
-				layout: { type: 'card', withHeader: true, isOpened: false },
+				layout: {
+					type: 'card',
+					withHeader: true,
+					isOpened: false,
+					summary: [ 'field1' ],
+				},
 				fields: [ 'field1' ],
 			};
 			const result = normalizeFormFields( form );
@@ -180,7 +192,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: true,
 						isOpened: false,
-						summary: [],
+						summary: [ 'field1' ],
 					},
 				},
 			] );
@@ -236,6 +248,7 @@ describe( 'normalizeFormFields', () => {
 						type: 'card',
 						withHeader: false,
 						isOpened: true,
+						summary: [],
 					},
 				},
 				{
