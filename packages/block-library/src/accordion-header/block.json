@@ -39,7 +39,6 @@
 			}
 		},
 		"typography": {
-			"textAlign": true,
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -62,7 +61,7 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": ".accordion-content__toggle-title",
+			"selector": ".wp-block-accordion-header__toggle-title",
 			"role": "content"
 		},
 		"level": {
@@ -71,10 +70,6 @@
 		},
 		"levelOptions": {
 			"type": "array"
-		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
 		},
 		"iconPosition": {
 			"type": "string",

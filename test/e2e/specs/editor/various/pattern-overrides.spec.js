@@ -12,6 +12,9 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -24,6 +27,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' ),
 		] );
 	} );
 
@@ -787,6 +791,96 @@ test.describe( 'Pattern Overrides', () => {
 		await previewPage.reload();
 		await expect( buttonLink ).toHaveAttribute( 'target', '' );
 		await expect( buttonLink ).toHaveAttribute( 'rel', /^\s*nofollow\s*$/ );
+	} );
+
+	test( 'should disable editing for pattern blocks without overrides enabled, even when mixed with bound attributes', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<p>Edit me</p>
+<!-- /wp:paragraph -->
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"Read Only Button","bindings":{"url":{"source":"core/post-meta","args":{"key":"text_custom_field"}}}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Read Only Button Text</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+
+		await expect( patternBlock.getByText( 'Edit me' ) ).toBeVisible();
+		await expect(
+			patternBlock.getByText( 'Read Only Button Text' )
+		).toBeVisible();
+
+		const editableParagraph = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Edit me' } );
+		const nonEditableButton = patternBlock
+			.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Read Only Button Text' } );
+
+		await editableParagraph.click();
+		await editableParagraph.focus();
+		await page.keyboard.type( ' - Edited' );
+		await expect( editableParagraph ).toHaveText( 'Edit me - Edited' );
+
+		// Button with only URL binding (no pattern overrides) should not have editable text.
+		await nonEditableButton.click();
+		const initialText = await nonEditableButton.textContent();
+		await page.keyboard.type( 'Edited' );
+		const finalText = await nonEditableButton.textContent();
+		expect( initialText ).toBe( finalText );
+
+		await nonEditableButton.click();
+		await editor.showBlockToolbar();
+
+		// Open the link control
+		const linkButton = page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+		await linkButton.click();
+
+		const urlInput = page.getByPlaceholder( 'Search or type URL' );
+		await urlInput.fill( '#test' );
+
+		// Save the link
+		const saveLinkButton = page.locator(
+			'.block-editor-link-control__search-submit'
+		);
+		await saveLinkButton.click();
+
+		// Publish the post
+		const postId = await editor.publishPost();
+
+		// Check on the frontend that the URL was updated
+		await page.goto( `/?p=${ postId }` );
+		const frontendButton = page.getByRole( 'link', {
+			name: 'Button Text',
+		} );
+		await expect( frontendButton ).toHaveAttribute( 'href', '#test' );
 	} );
 
 	test( 'resets overrides after clicking the reset button', async ( {
