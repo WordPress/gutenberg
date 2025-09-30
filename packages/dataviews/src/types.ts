@@ -196,13 +196,6 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for text controls.
- */
-export type EditConfigNumber = {
-	control: 'number';
-};
-
-/**
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
@@ -216,7 +209,6 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
-	| EditConfigNumber
 	| EditConfigGeneric;
 
 /**
@@ -363,7 +355,6 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
-		step?: 'any' | number;
 	};
 };
 
