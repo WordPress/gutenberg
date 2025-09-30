@@ -1,0 +1,6 @@
+.bookmark-count-active > svg {
+	fill: currentColor;
+}
+.wp-block-bookmark-count + svg {
+	vertical-align: sub;
+}

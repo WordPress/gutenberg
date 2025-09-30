@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/bookmark-count",
+		"isValid": true,
+		"attributes": {
+			"iconType": "heart",
+			"archiveUrl": ""
+		},
+		"innerBlocks": []
+	}
+]
