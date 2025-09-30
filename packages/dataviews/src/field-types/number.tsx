@@ -39,17 +39,14 @@ export default {
 	isValid: {
 		custom: ( item: any, field: NormalizedField< any > ) => {
 			const value = field.getValue( { item } );
-			const numericValue = Number( value );
 
-			if ( ! isEmpty( value ) && ! Number.isFinite( numericValue ) ) {
+			if ( ! isEmpty( value ) && ! Number.isFinite( value ) ) {
 				return __( 'Value must be a number.' );
 			}
 
 			if ( field?.elements ) {
 				const isMember = field.elements.some(
-					( element ) =>
-						Number.isFinite( Number( element.value ) ) &&
-						Number( element.value ) === numericValue
+					( element ) => element.value === Number( value )
 				);
 				if ( ! isMember ) {
 					return __( 'Value must be one of the elements.' );
