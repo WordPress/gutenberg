@@ -6,28 +6,28 @@ import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
 store( 'core/accordion', {
 	state: {
 		get isOpen() {
-			const { id, accordionContents } = getContext();
-			const accordionContent = accordionContents.find(
+			const { id, accordionItems } = getContext();
+			const accordionItem = accordionItems.find(
 				( item ) => item.id === id
 			);
-			return accordionContent ? accordionContent.isOpen : false;
+			return accordionItem ? accordionItem.isOpen : false;
 		},
 	},
 	actions: {
 		toggle: () => {
 			const context = getContext();
-			const { id, autoclose, accordionContents } = context;
-			const accordionContent = accordionContents.find(
+			const { id, autoclose, accordionItems } = context;
+			const accordionItem = accordionItems.find(
 				( item ) => item.id === id
 			);
 
 			if ( autoclose ) {
-				accordionContents.forEach( ( item ) => {
+				accordionItems.forEach( ( item ) => {
 					item.isOpen =
-						item.id === id ? ! accordionContent.isOpen : false;
+						item.id === id ? ! accordionItem.isOpen : false;
 				} );
 			} else {
-				accordionContent.isOpen = ! accordionContent.isOpen;
+				accordionItem.isOpen = ! accordionItem.isOpen;
 			}
 		},
 		handleKeyDown: withSyncEvent( ( event ) => {
@@ -42,8 +42,8 @@ store( 'core/accordion', {
 
 			event.preventDefault();
 			const context = getContext();
-			const { id, accordionContents } = context;
-			const currentIndex = accordionContents.findIndex(
+			const { id, accordionItems } = context;
+			const currentIndex = accordionItems.findIndex(
 				( item ) => item.id === id
 			);
 
@@ -56,18 +56,18 @@ store( 'core/accordion', {
 				case 'ArrowDown':
 					nextIndex = Math.min(
 						currentIndex + 1,
-						accordionContents.length - 1
+						accordionItems.length - 1
 					);
 					break;
 				case 'Home':
 					nextIndex = 0;
 					break;
 				case 'End':
-					nextIndex = accordionContents.length - 1;
+					nextIndex = accordionItems.length - 1;
 					break;
 			}
 
-			const nextId = accordionContents[ nextIndex ].id;
+			const nextId = accordionItems[ nextIndex ].id;
 			const nextButton = document.getElementById( nextId );
 			if ( nextButton ) {
 				nextButton.focus();
@@ -75,10 +75,10 @@ store( 'core/accordion', {
 		} ),
 	},
 	callbacks: {
-		initAccordionContents: () => {
+		initAccordionItems: () => {
 			const context = getContext();
 			const { id, openByDefault } = context;
-			context.accordionContents.push( {
+			context.accordionItems.push( {
 				id,
 				isOpen: openByDefault,
 			} );

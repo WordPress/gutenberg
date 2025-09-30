@@ -72,7 +72,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [
-			[ 'core/accordion-header', {} ],
+			[ 'core/accordion-heading', {} ],
 			[
 				'core/accordion-panel',
 				{

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Server-side rendering of the `core/accordion-content` block.
+ * Server-side rendering of the `core/accordion-item` block.
  *
  * @package WordPress
  * @since 6.6.0
@@ -17,7 +17,7 @@ function block_core_accordion_content_render( $attributes, $content ) {
 	}
 
 	$p         = new WP_HTML_Tag_Processor( $content );
-	$unique_id = wp_unique_id( 'accordion-content-' );
+	$unique_id = wp_unique_id( 'accordion-item-' );
 
 	// Initialize the state of the item on the server using a closure,
 	// since we need to get derived state based on the current context.
@@ -31,13 +31,13 @@ function block_core_accordion_content_render( $attributes, $content ) {
 		)
 	);
 
-	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-content' ) ) ) {
+	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-item' ) ) ) {
 		$open_by_default = $attributes['openByDefault'] ? 'true' : 'false';
 		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '", "openByDefault": ' . $open_by_default . ' }' );
 		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
-		$p->set_attribute( 'data-wp-init', 'callbacks.initAccordionContents' );
+		$p->set_attribute( 'data-wp-init', 'callbacks.initAccordionItems' );
 
-		if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-header__toggle' ) ) ) {
+		if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-heading__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
 			$p->set_attribute( 'data-wp-on--keydown', 'actions.handleKeyDown' );
 			$p->set_attribute( 'id', $unique_id );
@@ -59,13 +59,13 @@ function block_core_accordion_content_render( $attributes, $content ) {
 }
 
 /**
- * Registers the `core/accordion-content` block on server.
+ * Registers the `core/accordion-item` block on server.
  *
  * @since 6.6.0
  */
 function register_block_core_accordion_content() {
 	register_block_type_from_metadata(
-		__DIR__ . '/accordion-content',
+		__DIR__ . '/accordion-item',
 		array(
 			'render_callback' => 'block_core_accordion_content_render',
 		)

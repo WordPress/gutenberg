@@ -4,7 +4,7 @@
 	"name": "core/accordion",
 	"title": "Accordion",
 	"category": "design",
-	"description": "Displays a group of accordion headers and associated expandable content.",
+	"description": "Displays a group of accordion headings and associated expandable content.",
 	"example": {},
 	"__experimental": true,
 	"supports": {
@@ -73,7 +73,7 @@
 		"core/accordion-icon-position": "iconPosition",
 		"core/accordion-show-icon": "showIcon"
 	},
-	"allowedBlocks": [ "core/accordion-content" ],
+	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
 	"viewScriptModule": "@wordpress/block-library/accordion/view"
 }

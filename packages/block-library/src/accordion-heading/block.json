@@ -1,12 +1,12 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/accordion-header",
-	"title": "Accordion Header",
+	"name": "core/accordion-heading",
+	"title": "Accordion Heading",
 	"category": "design",
-	"description": "Displays an accordion header.",
+	"description": "Displays an accordion heading.",
 	"__experimental": true,
-	"parent": [ "core/accordion-content" ],
+	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",
 		"core/accordion-show-icon"
@@ -61,7 +61,7 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": ".wp-block-accordion-header__toggle-title",
+			"selector": ".wp-block-accordion-heading__toggle-title",
 			"role": "content"
 		},
 		"level": {

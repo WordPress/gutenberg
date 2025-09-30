@@ -26,7 +26,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const ACCORDION_BLOCK_NAME = 'core/accordion-content';
+const ACCORDION_BLOCK_NAME = 'core/accordion-item';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 };
@@ -50,16 +50,16 @@ export default function Edit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	const addAccordionContentBlock = () => {
-		const newAccordionContent = createBlock( ACCORDION_BLOCK_NAME );
-		insertBlock( newAccordionContent, undefined, clientId );
+	const addaccordionItemBlock = () => {
+		const newaccordionItem = createBlock( ACCORDION_BLOCK_NAME );
+		insertBlock( newaccordionItem, undefined, clientId );
 	};
 
 	return (
 		<>
 			{ isSingleSelected && ! isContentOnlyMode && (
 				<BlockControls group="other">
-					<ToolbarButton onClick={ addAccordionContentBlock }>
+					<ToolbarButton onClick={ addaccordionItemBlock }>
 						{ __( 'Add' ) }
 					</ToolbarButton>
 				</BlockControls>

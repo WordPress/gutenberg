@@ -48,14 +48,14 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			</BlockControls>
 			<TagName { ...blockProps }>
 				<button
-					className="wp-block-accordion-header__toggle"
+					className="wp-block-accordion-heading__toggle"
 					style={ {
 						...spacingProps.style,
 					} }
 				>
 					{ showIcon && iconPosition === 'left' && (
 						<span
-							className="wp-block-accordion-header__toggle-icon"
+							className="wp-block-accordion-heading__toggle-icon"
 							aria-hidden="true"
 						>
 							+
@@ -70,11 +70,11 @@ export default function Edit( { attributes, setAttributes, context } ) {
 							setAttributes( { title: newTitle } )
 						}
 						placeholder={ __( 'Accordion title' ) }
-						className="wp-block-accordion-header__toggle-title"
+						className="wp-block-accordion-heading__toggle-title"
 					/>
 					{ showIcon && iconPosition === 'right' && (
 						<span
-							className="wp-block-accordion-header__toggle-icon"
+							className="wp-block-accordion-heading__toggle-icon"
 							aria-hidden="true"
 						>
 							+
