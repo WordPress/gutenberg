@@ -35,6 +35,7 @@ import { DateCalendar, TZDate } from '..';
 const meta: Meta< typeof DateCalendar > = {
 	title: 'Components/Selection & Input/Time & Date/DateCalendar',
 	component: DateCalendar,
+	tags: [ 'status-private' ],
 	argTypes: {
 		locale: {
 			options: [

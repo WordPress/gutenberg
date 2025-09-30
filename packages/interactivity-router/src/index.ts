@@ -23,13 +23,15 @@ const {
 	parseServerData,
 	populateServerData,
 	batch,
+	routerRegions,
+	cloneElement,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
 const regionAttr = `data-${ directivePrefix }-router-region`;
 const interactiveAttr = `data-${ directivePrefix }-interactive`;
-const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]:not([${ interactiveAttr }] [${ interactiveAttr }])`;
+const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -92,6 +94,50 @@ const parseRegionAttribute = ( region: Element ) => {
 };
 
 /**
+ * Clones the content of the router region vDOM passed as argument.
+ *
+ * The function creates a new VNode instance removing all priority levels up to
+ * the one containing the router-region directive, which should have evaluated
+ * in advance.
+ *
+ * @param vdom A router region's VNode.
+ * @return The VNode for the passed router region's content.
+ */
+const cloneRouterRegionContent = ( vdom: any ) => {
+	if ( ! vdom ) {
+		return vdom;
+	}
+	const allPriorityLevels: string[][] = vdom.props.priorityLevels;
+	const routerRegionLevel = allPriorityLevels.findIndex( ( level ) =>
+		level.includes( 'router-region' )
+	);
+	const priorityLevels =
+		routerRegionLevel !== -1
+			? allPriorityLevels.slice( routerRegionLevel + 1 )
+			: allPriorityLevels;
+
+	return priorityLevels.length > 0
+		? cloneElement( vdom, {
+				...vdom.props,
+				priorityLevels,
+		  } )
+		: vdom.props.element;
+};
+
+/**
+ * IDs of router regions with an `attachTo` property pointing to the same parent
+ * element.
+ */
+const regionsToAttachByParent = new WeakMap< Element, string[] >();
+
+/**
+ * Map of root fragments by parent element, used to render router regions with
+ * the `attachTo` property. Those elements with the same parent are rendered
+ * together in the corresponding root fragment.
+ */
+const rootFragmentsByParent = new WeakMap< Element, any >();
+
+/**
  * Fetches and prepares a page from a given URL.
  *
  * @param url          The URL of the page to fetch.
@@ -146,9 +192,15 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
-		regions[ id ] = vdom?.has( region )
-			? vdom.get( region )
-			: toVdom( region );
+
+		if ( region.parentElement.closest( `[${ regionAttr }]` ) ) {
+			regions[ id ] = undefined;
+		} else {
+			regions[ id ] = vdom?.has( region )
+				? vdom.get( region )
+				: toVdom( region );
+		}
+
 		if ( attachTo ) {
 			regionsToAttach[ id ] = attachTo;
 		}
@@ -187,32 +239,61 @@ const renderPage = ( page: Page ) => {
 	const regionsToAttach = { ...page.regionsToAttach };
 
 	batch( () => {
+		// Update server data.
 		populateServerData( page.initialData );
-		document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
-			const { id } = parseRegionAttribute( region );
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
-			// If this is an attached region, remove it from the list.
-			delete regionsToAttach[ id ];
+
+		// Reset all router regions before setting the actual values.
+		( routerRegions as Map< string, any > ).forEach( ( signal ) => {
+			signal.value = null;
 		} );
 
-		// Render unattached regions.
+		//Init regions with attachTo that don't exist yet.
+		const parentsToUpdate = new Set< Element >();
 		for ( const id in regionsToAttach ) {
 			const parent = document.querySelector( regionsToAttach[ id ] );
-
-			// Get the type from the vnode. If wrapped with Directives, get the
-			// original type from `props.type`.
-			const { props, type } = page.regions[ id ];
-			const elementType = typeof type === 'function' ? props.type : type;
-
-			// Create an element with the obtained type where the region will be
-			// rendered. The type should match the one of the root vnode.
-			const region = document.createElement( elementType );
-			parent.appendChild( region );
-
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
+			if ( ! regionsToAttachByParent.has( parent ) ) {
+				regionsToAttachByParent.set( parent, [] );
+			}
+			const regions = regionsToAttachByParent.get( parent );
+			if ( ! regions.includes( id ) ) {
+				regions.push( id );
+				parentsToUpdate.add( parent );
+			}
 		}
+
+		//Update all existing regions.
+		for ( const id in page.regions ) {
+			if ( routerRegions.has( id ) ) {
+				routerRegions.get( id ).value = cloneRouterRegionContent(
+					page.regions[ id ]
+				);
+			}
+		}
+
+		// Render regions attached to the same parent in the same fragment.
+		parentsToUpdate.forEach( ( parent ) => {
+			const ids = regionsToAttachByParent.get( parent );
+			const vdoms = ids.map( ( id ) => page.regions[ id ] );
+
+			if ( ! rootFragmentsByParent.has( parent ) ) {
+				const regions = vdoms.map( ( { props, type } ) => {
+					const elementType =
+						typeof type === 'function' ? props.type : type;
+
+					// Create an element with the obtained type where the region will be
+					// rendered. The type should match the one of the root vnode.
+					const region = document.createElement( elementType );
+					parent.appendChild( region );
+					return region;
+				} );
+				rootFragmentsByParent.set(
+					parent,
+					getRegionRootFragment( regions )
+				);
+			}
+			const fragment = rootFragmentsByParent.get( parent );
+			render( vdoms, fragment );
+		} );
 	} );
 
 	if ( page.title ) {

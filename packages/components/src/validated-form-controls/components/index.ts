@@ -1,6 +1,7 @@
 export * from './checkbox-control';
 export * from './combobox-control';
 export * from './custom-select-control';
+export * from './form-token-field';
 export * from './input-control';
 export * from './number-control';
 export * from './radio-control';

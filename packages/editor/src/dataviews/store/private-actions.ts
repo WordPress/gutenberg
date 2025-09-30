@@ -24,6 +24,8 @@ import {
 	parentField,
 	passwordField,
 	commentStatusField,
+	pingStatusField,
+	discussionField,
 	slugField,
 	statusField,
 	authorField,
@@ -138,7 +140,7 @@ export const registerPostTypeSchema =
 				: undefined,
 			// @ts-ignore
 			globalThis.IS_GUTENBERG_PLUGIN
-				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
+				? ! [ 'wp_block', 'wp_template_part' ].includes(
 						postTypeConfig.slug
 				  ) &&
 				  canCreate &&
@@ -174,6 +176,10 @@ export const registerPostTypeSchema =
 			slugField,
 			postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 			postTypeConfig.supports?.comments && commentStatusField,
+			postTypeConfig.supports?.trackbacks && pingStatusField,
+			( postTypeConfig.supports?.comments ||
+				postTypeConfig.supports?.trackbacks ) &&
+				discussionField,
 			templateField,
 			passwordField,
 			postTypeConfig.supports?.editor &&

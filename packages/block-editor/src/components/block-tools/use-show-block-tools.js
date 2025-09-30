@@ -36,7 +36,7 @@ export function useShowBlockTools() {
 		const hasSelectedBlock = !! clientId && !! block;
 		const isEmptyDefaultBlock =
 			hasSelectedBlock &&
-			isUnmodifiedDefaultBlock( block ) &&
+			isUnmodifiedDefaultBlock( block, 'content' ) &&
 			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
 			clientId &&

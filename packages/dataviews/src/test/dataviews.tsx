@@ -510,6 +510,92 @@ describe( 'DataViews component', () => {
 			await user.keyboard( '{/Control}' );
 		} );
 
+		it( 'supports tabbing to selection and actions when title is visible', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						type: 'grid',
+						fields: [],
+						mediaField: 'image',
+						titleField: 'title',
+					} }
+					isItemClickable={ () => true }
+					actions={ actions }
+				/>
+			);
+
+			// Double check that the title is being rendered.
+			expect( screen.getByText( data[ 0 ].title ) ).toBeInTheDocument();
+
+			const viewOptionsButton = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			const user = userEvent.setup();
+
+			// Double click to open and then close view options. This is performed
+			// instead of a direct .focus() so that effects have time to complete.
+			await user.click( viewOptionsButton );
+			await user.click( viewOptionsButton );
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toHaveFocus();
+
+			await user.tab();
+
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } )[ 0 ]
+			).toHaveFocus();
+		} );
+
+		it( 'supports tabbing to selection and actions when title is not visible', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						...DEFAULT_VIEW,
+						type: 'grid',
+						fields: [],
+						mediaField: 'image',
+						titleField: 'title',
+						showTitle: false,
+					} }
+					isItemClickable={ () => true }
+					actions={ actions }
+				/>
+			);
+
+			// Double check that the title is not being rendered.
+			expect(
+				screen.queryByText( data[ 0 ].title )
+			).not.toBeInTheDocument();
+
+			const viewOptionsButton = screen.getByRole( 'button', {
+				name: 'View options',
+			} );
+
+			const user = userEvent.setup();
+
+			// Double click to open and then close view options. This is performed
+			// instead of a direct .focus() so that effects have time to complete.
+			await user.click( viewOptionsButton );
+			await user.click( viewOptionsButton );
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toHaveFocus();
+
+			await user.tab();
+
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } )[ 0 ]
+			).toHaveFocus();
+		} );
+
 		it( 'accepts an invalid previewSize and the preview size picker falls back to another size', async () => {
 			render(
 				<DataViewWrapper

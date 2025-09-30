@@ -2,11 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-header",
-	"version": "0.1.0",
 	"title": "Accordion Header",
 	"category": "design",
 	"description": "Displays an accordion header.",
-	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion-content" ],
 	"usesContext": [
@@ -17,18 +15,16 @@
 		"anchor": true,
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"align": false,
-		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
-				"padding": true,
-				"margin": true
-			}
+				"padding": true
+			},
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -43,7 +39,6 @@
 			}
 		},
 		"typography": {
-			"textAlign": true,
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -66,7 +61,8 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "span"
+			"selector": ".wp-block-accordion-header__toggle-title",
+			"role": "content"
 		},
 		"level": {
 			"type": "number",
@@ -74,10 +70,6 @@
 		},
 		"levelOptions": {
 			"type": "array"
-		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
 		},
 		"iconPosition": {
 			"type": "string",

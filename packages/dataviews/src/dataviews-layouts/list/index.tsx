@@ -24,7 +24,7 @@ import {
 	useState,
 	useContext,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 
@@ -44,6 +44,7 @@ import type {
 	ViewListProps,
 	ActionModal as ActionModalType,
 } from '../../types';
+import getDataByGroup from '../utils/get-data-by-group';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -512,11 +513,82 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 			>
-				{ ! hasData && <p>{ isLoading ? <Spinner /> : empty }</p> }
+				{ ! hasData &&
+					( isLoading ? (
+						<p>
+							<Spinner />
+						</p>
+					) : (
+						empty
+					) ) }
 			</div>
 		);
 	}
 
+	const groupField = view.groupByField
+		? fields.find( ( field ) => field.id === view.groupByField )
+		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+
+	// Render data grouped by field
+	if ( hasData && groupField && dataByGroup ) {
+		return (
+			<Composite
+				id={ `${ baseId }` }
+				render={ <div /> }
+				className="dataviews-view-list__group"
+				role="grid"
+				activeId={ activeCompositeId }
+				setActiveId={ setActiveCompositeId }
+			>
+				<VStack
+					spacing={ 4 }
+					className={ clsx( 'dataviews-view-list', className ) }
+				>
+					{ Array.from( dataByGroup.entries() ).map(
+						( [ groupName, groupItems ] ) => (
+							<VStack key={ groupName } spacing={ 2 }>
+								<h3 className="dataviews-view-list__group-header">
+									{ sprintf(
+										// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+										__( '%1$s: %2$s' ),
+										groupField.label,
+										groupName
+									) }
+								</h3>
+								{ groupItems.map( ( item ) => {
+									const id =
+										generateCompositeItemIdPrefix( item );
+									return (
+										<ListItem
+											key={ id }
+											view={ view }
+											idPrefix={ id }
+											actions={ actions }
+											item={ item }
+											isSelected={ item === selectedItem }
+											onSelect={ onSelect }
+											mediaField={ mediaField }
+											titleField={ titleField }
+											descriptionField={
+												descriptionField
+											}
+											otherFields={ otherFields }
+											onDropdownTriggerKeyDown={
+												onDropdownTriggerKeyDown
+											}
+										/>
+									);
+								} ) }
+							</VStack>
+						)
+					) }
+				</VStack>
+			</Composite>
+		);
+	}
+
+	// Render ungrouped data
 	return (
 		<>
 			<Composite

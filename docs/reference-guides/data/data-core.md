@@ -249,7 +249,7 @@ _Parameters_
 
 _Returns_
 
--   `ET.User< 'edit' >`: Current user object.
+-   `ET.User< 'view' >`: Current user object.
 
 ### getDefaultTemplateId
 
@@ -619,6 +619,24 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the entity record has edits or not.
+
+### hasEntityRecord
+
+Returns true if a record has been received for the given set of parameters, or false otherwise.
+
+Note: This action does not trigger a request for the entity record from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether an entity record has been received.
 
 ### hasEntityRecords
 

@@ -30,6 +30,7 @@ import { positionToPlacement } from '../popover/utils';
 const TooltipInternalContext = createContext< TooltipInternalContextType >( {
 	isNestedInTooltip: false,
 } );
+TooltipInternalContext.displayName = 'TooltipInternalContext';
 
 /**
  * Time over anchor to wait before showing tooltip

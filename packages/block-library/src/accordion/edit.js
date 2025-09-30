@@ -5,6 +5,9 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	BlockControls,
+	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -13,7 +16,10 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToolbarButton,
 } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -27,10 +33,15 @@ const ACCORDION_BLOCK = {
 
 export default function Edit( {
 	attributes: { autoclose, iconPosition, showIcon },
+	clientId,
 	setAttributes,
+	isSelected: isSingleSelected,
 } ) {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const { insertBlock } = useDispatch( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
@@ -39,8 +50,20 @@ export default function Edit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
+	const addAccordionContentBlock = () => {
+		const newAccordionContent = createBlock( ACCORDION_BLOCK_NAME );
+		insertBlock( newAccordionContent, undefined, clientId );
+	};
+
 	return (
 		<>
+			{ isSingleSelected && ! isContentOnlyMode && (
+				<BlockControls group="other">
+					<ToolbarButton onClick={ addAccordionContentBlock }>
+						{ __( 'Add' ) }
+					</ToolbarButton>
+				</BlockControls>
+			) }
 			<InspectorControls key="setting">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -89,6 +112,9 @@ export default function Edit( {
 							onChange={ ( value ) => {
 								setAttributes( {
 									showIcon: value,
+									iconPosition: value
+										? iconPosition
+										: 'right',
 								} );
 							} }
 							checked={ showIcon }
@@ -97,34 +123,36 @@ export default function Edit( {
 							) }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						label={ __( 'Icon Position' ) }
-						isShownByDefault
-						hasValue={ () => iconPosition !== 'right' }
-						onDeselect={ () =>
-							setAttributes( { iconPosition: 'right' } )
-						}
-					>
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							isBlock
+					{ showIcon && (
+						<ToolsPanelItem
 							label={ __( 'Icon Position' ) }
-							value={ iconPosition }
-							onChange={ ( value ) => {
-								setAttributes( { iconPosition: value } );
-							} }
+							isShownByDefault
+							hasValue={ () => iconPosition !== 'right' }
+							onDeselect={ () =>
+								setAttributes( { iconPosition: 'right' } )
+							}
 						>
-							<ToggleGroupControlOption
-								label={ __( 'Left' ) }
-								value="left"
-							/>
-							<ToggleGroupControlOption
-								label={ __( 'Right' ) }
-								value="right"
-							/>
-						</ToggleGroupControl>
-					</ToolsPanelItem>
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								isBlock
+								label={ __( 'Icon Position' ) }
+								value={ iconPosition }
+								onChange={ ( value ) => {
+									setAttributes( { iconPosition: value } );
+								} }
+							>
+								<ToggleGroupControlOption
+									label={ __( 'Left' ) }
+									value="left"
+								/>
+								<ToggleGroupControlOption
+									label={ __( 'Right' ) }
+									value="right"
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />

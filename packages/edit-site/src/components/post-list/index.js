@@ -200,7 +200,6 @@ function getItemLevel( item ) {
 
 export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
-	const defaultViews = useDefaultViews( { postType } );
 	const history = useHistory();
 	const location = useLocation();
 	const {
@@ -266,7 +265,7 @@ export default function PostList( { postType } ) {
 			search: view.search,
 			...filters,
 		};
-	}, [ view, activeView, defaultViews ] );
+	}, [ view ] );
 	const {
 		records,
 		isResolving: isLoadingData,

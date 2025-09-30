@@ -17,6 +17,7 @@ interface DataViewsSelectionCheckboxProps< Item > {
 	getItemId: ( item: Item ) => string;
 	titleField?: NormalizedField< Item >;
 	disabled: boolean;
+	tabIndex?: number;
 }
 
 export default function DataViewsSelectionCheckbox< Item >( {
@@ -26,6 +27,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	getItemId,
 	titleField,
 	disabled,
+	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
 	const checked = ! disabled && selection.includes( id );
@@ -52,6 +54,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 						: [ ...selection, id ]
 				);
 			} }
+			{ ...extraProps }
 		/>
 	);
 }

@@ -1,12 +1,14 @@
 /**
- * WordPress dependencies
- */
-import { useRef, useCallback, useState } from '@wordpress/element';
-
-/**
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, waitFor, within } from '@storybook/test';
+
+/**
+ * WordPress dependencies
+ */
+import { useRef, useCallback, useState } from '@wordpress/element';
+import { debounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -14,7 +16,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';
-import { debounce } from '@wordpress/compose';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
@@ -166,24 +167,19 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				} );
 
 				clearTimeout( timeoutRef.current );
-				timeoutRef.current = setTimeout(
-					() => {
-						if ( v?.toString().toLowerCase() === 'error' ) {
-							setCustomValidity( {
-								type: 'invalid',
-								message: 'The word "error" is not allowed.',
-							} );
-						} else {
-							setCustomValidity( {
-								type: 'valid',
-								message: 'Validated',
-							} );
-						}
-					},
-					// Mimics a random server response time.
-					// eslint-disable-next-line no-restricted-syntax
-					Math.random() < 0.5 ? 1500 : 300
-				);
+				timeoutRef.current = setTimeout( () => {
+					if ( v?.toString().toLowerCase() === 'error' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'The word "error" is not allowed.',
+						} );
+					} else {
+						setCustomValidity( {
+							type: 'valid',
+							message: 'Validated',
+						} );
+					}
+				}, 1500 );
 			}, 500 ),
 			[]
 		);
@@ -200,9 +196,95 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 			/>
 		);
 	},
+	args: {
+		label: 'Text',
+		help: 'The word "error" will trigger an error asynchronously.',
+		required: true,
+	},
 };
-AsyncValidation.args = {
-	label: 'Text',
-	help: 'The word "error" will trigger an error asynchronously.',
-	required: true,
+
+// Not exported - Only for testing purposes.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
+	...AsyncValidation,
+	play: async ( { canvasElement } ) => {
+		const canvas = within( canvasElement );
+		await userEvent.click( canvas.getByRole( 'textbox' ) );
+		await userEvent.type( canvas.getByRole( 'textbox' ), 'valid text', {
+			delay: 10,
+		} );
+		await userEvent.tab();
+
+		await waitFor(
+			() => {
+				expect( canvas.getByText( 'Validated' ) ).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
+		await userEvent.clear( canvas.getByRole( 'textbox' ) );
+
+		// Should show validating state when transitioning from valid to invalid.
+		await waitFor(
+			() => {
+				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+
+		await waitFor(
+			() => {
+				expect(
+					canvas.getByText( 'Please fill out this field.' )
+				).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+
+		// Should not show validating state if there were no changes
+		// after a valid/invalid state was already shown.
+		await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
+		await expect(
+			canvas.queryByText( 'Validating...' )
+		).not.toBeInTheDocument();
+
+		await userEvent.type( canvas.getByRole( 'textbox' ), 'e', {
+			delay: 10,
+		} );
+
+		// Should not show valid state if server has not yet responded.
+		await expect(
+			canvas.queryByText( 'Validated' )
+		).not.toBeInTheDocument();
+
+		// Should show validating state when transitioning from invalid to valid.
+		await waitFor(
+			() => {
+				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+
+		await waitFor(
+			() => {
+				expect( canvas.getByText( 'Validated' ) ).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		await userEvent.type( canvas.getByRole( 'textbox' ), 'rror', {
+			delay: 10,
+		} );
+
+		await waitFor(
+			() => {
+				expect(
+					canvas.getByText( 'The word "error" is not allowed.' )
+				).toBeVisible();
+			},
+			{ timeout: 2500 }
+		);
+	},
 };

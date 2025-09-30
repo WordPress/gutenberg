@@ -39,11 +39,13 @@ import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
-import { canBindBlock } from '../../utils/block-bindings';
 import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
+keyboardShortcutContext.displayName = 'keyboardShortcutContext';
+
 export const inputEventContext = createContext();
+inputEventContext.displayName = 'inputEventContext';
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -174,9 +176,14 @@ export function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
 			if (
 				! blockBindings?.[ identifier ] ||
-				! canBindBlock( blockName )
+				! (
+					blockName in __experimentalBlockBindingsSupportedAttributes
+				)
 			) {
 				return {};
 			}
@@ -250,8 +257,15 @@ export function RichTextWrapper(
 			blockContext,
 		]
 	);
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
 
-	const shouldDisableEditing = readOnly || disableBoundBlock;
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
+
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || shouldDisableForPattern;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );

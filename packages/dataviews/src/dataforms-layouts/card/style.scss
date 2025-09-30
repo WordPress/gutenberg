@@ -1,3 +1,10 @@
 .dataforms-layouts-card__field {
 	width: 100%;
 }
+
+.dataforms-layouts-card__field-description {
+	color: $gray-700;
+	display: block;
+	font-size: $font-size-medium;
+	margin-bottom: $grid-unit-20;
+}

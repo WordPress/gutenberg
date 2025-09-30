@@ -99,6 +99,7 @@ export function ViewTypeMenu() {
 									case 'list':
 									case 'grid':
 									case 'table':
+									case 'pickerGrid':
 										const viewWithoutLayout = { ...view };
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
@@ -561,9 +562,10 @@ function FieldControl() {
 		( f ) =>
 			! visibleFieldIds.includes( f.id ) &&
 			! togglableFields.includes( f.id ) &&
-			f.type !== 'media'
+			f.type !== 'media' &&
+			f.enableHiding !== false
 	);
-	const visibleFields = visibleFieldIds
+	let visibleFields = visibleFieldIds
 		.map( ( fieldId ) => fields.find( ( f ) => f.id === fieldId ) )
 		.filter( isDefined );
 
@@ -621,7 +623,7 @@ function FieldControl() {
 			isVisibleFlag: 'showDescription',
 		},
 	].filter( ( { field } ) => isDefined( field ) );
-	const visibleLockedFields = lockedFields.filter(
+	let visibleLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error
 			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
@@ -630,6 +632,20 @@ function FieldControl() {
 		isVisibleFlag: string;
 		ui?: ReactNode;
 	} >;
+
+	// If only one locked field is visible, prevent it from being hidden.
+	if ( visibleLockedFields.length === 1 ) {
+		visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+			...locked,
+			field: { ...locked.field, enableHiding: false },
+		} ) );
+	}
+
+	// If no locked fields are visible but there are visibleFields, lock the last visible field.
+	if ( visibleLockedFields.length === 0 && visibleFields.length === 1 ) {
+		visibleFields = [ { ...visibleFields[ 0 ], enableHiding: false } ];
+	}
+
 	const hiddenLockedFields = lockedFields.filter(
 		( { field, isVisibleFlag } ) =>
 			// @ts-expect-error

@@ -3,7 +3,7 @@
 /**
  * Test the block layout support.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {

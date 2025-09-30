@@ -2,23 +2,19 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-panel",
-	"version": "0.1.0",
 	"title": "Accordion Panel",
 	"category": "design",
 	"description": "Displays an accordion panel.",
-	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion-content" ],
 	"supports": {
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
-		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
@@ -50,7 +46,8 @@
 				"fontSize": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true
 	},
 	"attributes": {
 		"allowedBlocks": {
@@ -70,5 +67,6 @@
 			"default": false
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"style": "wp-block-accordion-panel"
 }

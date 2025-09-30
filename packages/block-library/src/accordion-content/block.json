@@ -2,19 +2,16 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-content",
-	"version": "0.1.0",
 	"title": "Accordion Content",
 	"category": "design",
 	"description": "Displays a section of content in an accordion, including a header and expandable content.",
-	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-header", "core/accordion-panel" ],
 	"supports": {
-		"align": [ "wide", "full" ],
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"interactivity": true,
 		"spacing": {
@@ -33,7 +30,21 @@
 				"width": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"layout": true,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		}
 	},
 	"attributes": {
 		"openByDefault": {
@@ -41,5 +52,6 @@
 			"default": false
 		}
 	},
-	"textdomain": "default"
+	"textdomain": "default",
+	"style": "wp-block-accordion-content"
 }

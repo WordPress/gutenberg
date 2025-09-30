@@ -31,10 +31,18 @@
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
+	color: $gray-900;
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
 	animation-fill-mode: forwards;
 	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
+
+	// Ensure all headings use the proper editor text color, overriding wp-admin common.css
+	h1,
+	h2,
+	h3 {
+		color: $gray-900;
+	}
 
 	@media not (prefers-reduced-motion) {
 		animation-duration: var(--modal-frame-animation-duration);
