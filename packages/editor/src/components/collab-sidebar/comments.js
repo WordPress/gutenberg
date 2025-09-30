@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { useState, RawHTML, useRef } from '@wordpress/element';
 import {
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -202,9 +203,9 @@ function Thread( {
 			aria-expanded={ isSelected }
 		>
 			{ ! relatedBlockElement && (
-				<p className="editor-collab-sidebar-panel__thread-warning">
+				<Text as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }
-				</p>
+				</Text>
 			) }
 			<CommentBoard
 				thread={ thread }
