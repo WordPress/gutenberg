@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, subscribe } from '@wordpress/data';
 import {
 	__experimentalVStack as VStack,
 	Popover,
 	Fill,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -25,7 +25,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName } from './constants';
+import { collabHistorySidebarName, collabSidebarName} from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -34,7 +34,12 @@ import CommentAvatarIndicator from './comment-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useBlockComments } from './hooks';
 
-const { useBlockElement } = unlock( blockEditorPrivateApis );
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+import { useFloating, offset as offsetMiddleware, autoUpdate } from '@floating-ui/react-dom';
+const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 function CollabSidebarContent( {
 	showCommentBoard,
@@ -197,33 +202,92 @@ function CollabSidebarContent( {
 		</div>
 	);
 }
-function CommentPopover( {
-	comment,
+
+function CommentBoardWrapper( {
+	thread,
 	showCommentBoard,
 	setShowCommentBoard,
 	backgroundColor,
+	previousThreadId,
+	offsetsRef,
+	updateOffsets,
+	updateHeight,
+	heights
 } ) {
-	const relatedBlockElement = useBlockElement( comment.blockClientId );
+	const blockRef = useRef();
+	useBlockElementRef( thread.clientId, blockRef );
+
+	const selectedBlockElementRect = blockRef.current?.getBoundingClientRect();
+
+	const initialOffsetTop = selectedBlockElementRect?.top;
+
+	const previousOffset = previousThreadId
+		? offsetsRef.current[ previousThreadId ]
+		: 0;
+
+	const previousBoardHeight = heights[ previousThreadId ];
+
+	const calculateOffset = () => {
+		if (
+			previousOffset &&
+			initialOffsetTop < previousOffset + previousBoardHeight
+		) {
+			return previousOffset - initialOffsetTop + previousBoardHeight + 20;
+		}
+		return 0;
+	};
+
+	const { y, refs } = useFloating( {
+		placement: 'right-start',
+		middleware: [
+			offsetMiddleware( {
+				crossAxis: calculateOffset(),
+			} ),
+		],
+		whileElementsMounted: autoUpdate,
+	} );
+
+	useEffect( () => {
+		if ( blockRef.current ) {
+			refs.setReference( blockRef.current ); // Bind reference element
+		}
+	}, [ blockRef, refs ] );
+
+	useEffect( () => {
+		if ( y !== null && y !== 0 ) {
+			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight ); // Pass the offset to the parent
+		}
+	}, [ y, updateOffsets ] );
+
+	useEffect( () => {
+		if ( refs.floating?.current ) {
+			const newHeight = refs.floating?.current.scrollHeight;
+			updateHeight( thread.id, newHeight );
+		}
+	}, [ thread.id, updateHeight ] );
+
 
 	return (
-		<Popover
-			key={ comment.id }
-			placement="right-start"
-			flip={ false }
-			animate={ false }
-			focusOnMount={ false }
-			anchor={ relatedBlockElement }
-			variant="unstyled"
+		<VStack
+			ref={ refs.setFloating }
+			className={ clsx( 'editor-collab-sidebar-panel__thread', {
+				'editor-collab-sidebar-panel__active-thread': false,
+			} ) }
+			spacing="0"
+			style={ {
+				top: y,
+			} }
+			backgroundColor={ backgroundColor }
 		>
 			<CollabSidebarContent
-				comments={ [ comment ] }
+				comments={ [ thread ] }
 				showCommentBoard={ showCommentBoard }
 				setShowCommentBoard={ setShowCommentBoard }
 				styles={ {
 					backgroundColor,
 				} }
 			/>
-		</Popover>
+		</VStack>
 	);
 }
 
@@ -233,7 +297,33 @@ function CommentPopover( {
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'xlarge' );
+
+	const [ heights, setHeights ] = useState( {} );
+
+	const updateHeight = ( id, newHeight ) => {
+		setHeights( ( prev ) => {
+			if ( prev[ id ] !== newHeight ) {
+				return { ...prev, [ id ]: newHeight };
+			}
+			return prev;
+		} );
+	};
+
+	const handleThreadClick = ( thread ) => {
+		if ( thread?.clientId ) {
+			selectBlock( thread.clientId ); // Use the action to select the block
+		}
+		setActiveComment( thread.id );
+	};
+
+	// Object to store offsets for each board.
+	const offsetsRef = useRef( {} );
+
+	const updateOffsets = ( id, offset ) => {
+		offsetsRef.current[ id ] = offset;
+	};
 
 	const { postId } = useSelect( ( select ) => {
 		const { getCurrentPostId } = select( editorStore );
@@ -243,6 +333,7 @@ export default function CollabSidebar() {
 			postId: _postId,
 		};
 	}, [] );
+
 	const hasActiveSidebar = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		return getActiveComplementaryArea( 'core' ) !== null;
@@ -271,6 +362,17 @@ export default function CollabSidebar() {
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
+
+	if ( 0 < resultComments.length ) {
+		const unsubscribe = subscribe( () => {
+			const activeSidebar = getActiveComplementaryArea( 'core' );
+
+			if ( ! activeSidebar ) {
+				enableComplementaryArea( 'core', collabSidebarName );
+				unsubscribe();
+			}
+		} );
+	}
 
 	const AddCommentComponent = blockCommentId
 		? CommentAvatarIndicator
@@ -306,26 +408,44 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport && ! hasActiveSidebar && (
-				<Fill name="ComplementaryArea/core">
-					<div className="comment-popovers-slotfill">
+			{ isLargeViewport &&
+				<PluginSidebar
+					isPinnable={ false }
+					header={ false }
+					identifier={ collabSidebarName }
+					className="editor-collab-sidebar"
+					headerClassName="editor-collab-sidebar__header"
+					backgroundColor={ backgroundColor }
+				>
+					<div className="editor-collab-sidebar__background"
+						style={ {
+							backgroundColor,
+							height: '100%'
+						} }
+					>
 						{ unresolvedSortedThreads.length > 0 &&
-							unresolvedSortedThreads.map( ( comment ) => {
+							unresolvedSortedThreads.map( ( thread, index ) => {
 								return (
-									<CommentPopover
-										key={ comment.id }
-										comment={ comment }
+									<CommentBoardWrapper
+										key={ thread.id }
+										thread={ thread }
 										showCommentBoard={ showCommentBoard }
 										setShowCommentBoard={
 											setShowCommentBoard
 										}
 										backgroundColor={ backgroundColor }
+										offsetsRef={ offsetsRef }
+										updateOffsets={ updateOffsets }
+										updateHeight={ updateHeight }
+										heights={ heights }
+										previousThreadId={ unresolvedSortedThreads[ index - 1 ]?.id }
 									/>
 								);
-							} ) }
+							} )
+						}
 					</div>
-				</Fill>
-			) }
+				</PluginSidebar>
+		}
 		</>
 	);
 }
