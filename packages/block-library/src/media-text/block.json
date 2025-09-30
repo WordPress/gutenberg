@@ -103,6 +103,10 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"filter": {
+			"duotone": true
+		},
+		"shadow": true,
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
