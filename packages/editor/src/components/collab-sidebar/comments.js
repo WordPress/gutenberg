@@ -245,6 +245,7 @@ function Thread( {
 
 	const unselectThread = () => {
 		setSelectedThread( null );
+		setShowCommentBoard( false );
 	};
 
 	const replies = thread?.reply;
@@ -349,7 +350,7 @@ function Thread( {
 						/>
 					</VStack>
 				) ) }
-			{ ! isFocused && restReplies.length > 0 && (
+			{ ( ! isFocused || ! isSelected ) && restReplies.length > 0 && (
 				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
 					<Button
 						size="compact"
@@ -369,7 +370,7 @@ function Thread( {
 					</Button>
 				</HStack>
 			) }
-			{ ! isFocused && lastReply && (
+			{ ( ! isSelected || ! isFocused ) && lastReply && (
 				<CommentBoard
 					thread={ lastReply }
 					onEdit={
@@ -382,48 +383,55 @@ function Thread( {
 					}
 				/>
 			) }
-			{ isFocused && (
-				<VStack
-					className="editor-collab-sidebar-panel__child-thread"
-					spacing="2"
-				>
-					<HStack alignment="left" spacing="3" justify="flex-start">
-						<CommentAuthorInfo />
-					</HStack>
-					<VStack spacing="2">
-						<CommentForm
-							onSubmit={ ( inputComment ) => {
-								if ( 'approved' === thread.status ) {
-									onEditComment( {
-										id: thread.id,
-										status: 'hold',
+			{ isFocused ||
+				( isSelected && (
+					<VStack
+						className="editor-collab-sidebar-panel__child-thread"
+						spacing="2"
+					>
+						<HStack
+							alignment="left"
+							spacing="3"
+							justify="flex-start"
+						>
+							<CommentAuthorInfo />
+						</HStack>
+						<VStack spacing="2">
+							<CommentForm
+								onSubmit={ ( inputComment ) => {
+									if ( 'approved' === thread.status ) {
+										onEditComment( {
+											id: thread.id,
+											status: 'hold',
+										} );
+									}
+									onAddReply( {
+										content: inputComment,
+										parent: thread.id,
 									} );
+								} }
+								onCancel={ ( event ) => {
+									threadRef.current?.focus();
+									event.stopPropagation(); // Prevent the parent onClick from being triggered
+									unselectThread();
+									clearThreadFocus();
+								} }
+								submitButtonText={
+									'approved' === thread.status
+										? __( 'Reopen & Reply' )
+										: __( 'Reply' )
 								}
-								onAddReply( {
-									content: inputComment,
-									parent: thread.id,
-								} );
-							} }
-							onCancel={ ( event ) => {
-								event.stopPropagation(); // Prevent the parent onClick from being triggered
-								clearThreadFocus();
-							} }
-							submitButtonText={
-								'approved' === thread.status
-									? __( 'Reopen & Reply' )
-									: __( 'Reply' )
-							}
-							rows={ 'approved' === thread.status ? 2 : 4 }
-							labelText={ sprintf(
-								// translators: %1$s: comment identifier, %2$s: author name
-								__( 'Reply to Comment %1$s by %2$s' ),
-								thread.id,
-								thread?.author_name || 'Unknown'
-							) }
-						/>
+								rows={ 'approved' === thread.status ? 2 : 4 }
+								labelText={ sprintf(
+									// translators: %1$s: comment identifier, %2$s: author name
+									__( 'Reply to Comment %1$s by %2$s' ),
+									thread.id,
+									thread?.author_name || 'Unknown'
+								) }
+							/>
+						</VStack>
 					</VStack>
-				</VStack>
-			) }
+				) ) }
 		</VStack>
 	);
 }
