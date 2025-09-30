@@ -11,8 +11,6 @@ import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import type { User } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -20,20 +18,12 @@ import type { User } from '@wordpress/core-data';
 import type { BasePostWithEmbeddedAuthor } from '../../types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
-	const { text, imageUrl } = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			let user: User | undefined;
-			if ( !! item.author ) {
-				user = getEntityRecord( 'root', 'user', item.author );
-			}
-			return {
-				imageUrl: user?.avatar_urls?.[ 48 ],
-				text: user?.name,
-			};
-		},
-		[ item ]
-	);
+	const { text, imageUrl } = useSelect( () => {
+		return {
+			imageUrl: undefined,
+			text: undefined,
+		};
+	}, [ item ] );
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	return (
 		<HStack alignment="left" spacing={ 0 }>
