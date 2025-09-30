@@ -285,26 +285,24 @@ export function MediaUploadModal( {
 			onRequestClose={ handleModalClose }
 			isDismissible={ isDismissible }
 			className={ modalClass }
-			size="large"
+			size="fill"
 		>
-			<div style={ { height: '70vh', padding: '0' } }>
-				<DataViewsPicker
-					data={ mediaItems }
-					fields={ fields }
-					view={ view }
-					onChangeView={ setView }
-					actions={ actions }
-					selection={ selection }
-					onChangeSelection={ handleSelectionChange }
-					isLoading={ isLoading }
-					paginationInfo={ paginationInfo }
-					defaultLayouts={ defaultLayouts }
-					getItemId={ ( item: Attachment ) => String( item.id ) }
-					search={ search }
-					searchLabel={ searchLabel }
-					itemListLabel={ __( 'Media items' ) }
-				/>
-			</div>
+			<DataViewsPicker
+				data={ mediaItems }
+				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
+				actions={ actions }
+				selection={ selection }
+				onChangeSelection={ handleSelectionChange }
+				isLoading={ isLoading }
+				paginationInfo={ paginationInfo }
+				defaultLayouts={ defaultLayouts }
+				getItemId={ ( item: Attachment ) => String( item.id ) }
+				search={ search }
+				searchLabel={ searchLabel }
+				itemListLabel={ __( 'Media items' ) }
+			/>
 		</Modal>
 	);
 }
