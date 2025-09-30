@@ -626,6 +626,11 @@ function BlockListBlockProvider( props ) {
 				blockTitle: blockType?.title,
 			};
 
+			if ( window.__experimentalBlockVisibility ) {
+				previewContext.isBlockHidden =
+					attributes?.metadata?.blockVisibility === false;
+			}
+
 			// When in preview mode, we can avoid a lot of selection and
 			// editing related selectors.
 			if ( isPreviewMode ) {
