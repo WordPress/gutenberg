@@ -39,7 +39,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~
 -	**Attributes:** iconPosition, level, levelOptions, openByDefault, showIcon, title
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
