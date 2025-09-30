@@ -181,6 +181,7 @@ test.describe( 'Block Comments', () => {
 				.filter( { hasText: 'Comment marked as resolved.' } )
 		).toBeVisible();
 
+		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		const commentForm = page.getByRole( 'textbox', { name: 'Comment' } );
 		await commentForm.fill( 'Test reply that reopens the comment.' );
 		await page
@@ -220,7 +221,7 @@ test.describe( 'Block Comments', () => {
 
 		const threads = page.locator( '.editor-collab-sidebar-panel__thread' );
 		const activeThread = page.locator(
-			'.editor-collab-sidebar-panel__focus-thread'
+			'.editor-collab-sidebar-panel__thread.is-selected'
 		);
 		const replyTextbox = activeThread.getByRole( 'textbox', {
 			name: 'Comment',

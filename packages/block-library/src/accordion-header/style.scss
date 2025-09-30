@@ -12,7 +12,6 @@
 	color: inherit;
 	padding: var(--wp--preset--spacing--20, 1em) 0;
 	cursor: pointer;
-	outline: none;
 	overflow: hidden;
 	display: flex;
 	align-items: center;
@@ -20,9 +19,14 @@
 	position: relative;
 	width: 100%;
 
-	&:focus-visible {
-		outline: 2px solid -webkit-focus-ring-color;
-		outline-offset: 2px;
+	&:not(:focus-visible) {
+		outline: none;
+	}
+
+	&:hover {
+		.wp-block-accordion-header__toggle-title {
+			text-decoration: underline;
+		}
 	}
 }
 
