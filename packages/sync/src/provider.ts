@@ -153,7 +153,7 @@ export class SyncProvider {
 		// Apply the initial document to the current document as a singular update.
 		if ( initialDoc ) {
 			ydoc.transact( () => {
-				Y.applyUpdate( ydoc, Y.encodeStateAsUpdate( initialDoc ) );
+				Y.applyUpdateV2( ydoc, Y.encodeStateAsUpdateV2( initialDoc ) );
 			}, LOCAL_SYNC_PROVIDER_ORIGIN );
 		}
 
