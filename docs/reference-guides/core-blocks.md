@@ -724,7 +724,7 @@ Show minutes required to finish reading the post. Can also show a word count. ([
 -	**Experimental:** true
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** averageReadingSpeed, displayAsRange, showTimeToRead, showWordCount, textAlign
+-	**Attributes:** averageReadingSpeed, displayAsRange, displayMode, textAlign
 
 ## Title
 

@@ -9,10 +9,12 @@ import clsx from 'clsx';
 import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
 
 import {
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
+	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
@@ -20,6 +22,7 @@ import { useDebounce } from '@wordpress/compose';
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -31,6 +34,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
+import { getCommentExcerpt } from './utils';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -83,6 +87,7 @@ export function Comments( {
 			? getBlockAttributes( clientId )?.metadata?.commentId
 			: null;
 	}, [] );
+	const [ selectedThread = blockCommentId, setSelectedThread ] = useState();
 	const [ focusThread = blockCommentId, setFocusThread ] = useState();
 	const focusedThreadRef = useRef( null );
 
@@ -160,6 +165,8 @@ export function Comments( {
 			focusedThreadRef={
 				focusThread === thread.id ? focusedThreadRef : null
 			}
+			isSelected={ selectedThread === thread.id }
+			setSelectedThread={ setSelectedThread }
 		/>
 	) );
 }
@@ -175,12 +182,15 @@ function Thread( {
 	selectBlock,
 	setShowCommentBoard,
 	focusedThreadRef,
+	isSelected,
+	setSelectedThread,
 } ) {
 	const { blocks } = useSelect( ( select ) => {
 		return {
 			blocks: select( blockEditorStore ).getBlocks(),
 		};
 	}, [] );
+	const threadRef = useRef( null );
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -199,6 +209,7 @@ function Thread( {
 	const handleCommentSelect = ( { id, blockClientId } ) => {
 		setShowCommentBoard( false );
 		setFocusThread( id );
+		setSelectedThread( id );
 		if ( blockClientId && relatedBlockElement ) {
 			relatedBlockElement.scrollIntoView( {
 				behavior: 'instant',
@@ -228,19 +239,46 @@ function Thread( {
 		);
 	};
 
+	const focusThread = () => {
+		threadRef.current?.focus();
+	};
+
+	const unselectThread = () => {
+		setSelectedThread( null );
+	};
+
 	const replies = thread?.reply;
 	const lastReply = !! replies.length
 		? replies[ replies.length - 1 ]
 		: undefined;
 	const restReplies = !! replies.length ? replies.slice( 0, -1 ) : [];
 
+	const commentExcerpt = getCommentExcerpt(
+		stripHTML( thread.content.rendered ),
+		10
+	);
+
+	const ariaLabel = relatedBlockElement
+		? sprintf(
+				// translators: %s: comment excerpt
+				__( 'Comment: %s' ),
+				commentExcerpt
+		  )
+		: sprintf(
+				// translators: %s: comment excerpt
+				__( 'Original block deleted. Comment: %s' ),
+				commentExcerpt
+		  );
+
 	return (
+		// Disable reason: role="listitem" does in fact support aria-expanded.
+		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
 		<VStack
 			ref={ focusedThreadRef }
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'editor-collab-sidebar-panel__focus-thread': isFocused,
 			} ) }
-			id={ thread.id }
+			id={ `thread-${ thread.id }` }
 			spacing="2"
 			onClick={ () => handleCommentSelect( thread ) }
 			tabIndex={ isFocused ? 0 : -1 }
@@ -248,10 +286,43 @@ function Thread( {
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
 			onBlur={ onMouseLeave }
+			onKeyDown={ ( event ) => {
+				// Expand or Collapse thread.
+				if (
+					event.key === 'Enter' &&
+					event.currentTarget === event.target
+				) {
+					if ( isSelected ) {
+						unselectThread();
+					} else {
+						handleCommentSelect( thread );
+					}
+				}
+				// Collapse thread and focus the thread.
+				if ( event.key === 'Escape' ) {
+					unselectThread();
+					focusThread();
+				}
+			} }
+			role="listitem"
+			aria-label={ ariaLabel }
+			aria-expanded={ isSelected }
 		>
+			{ ! relatedBlockElement && (
+				<Text as="p" weight={ 500 } variant="muted">
+					{ __( 'Original block deleted.' ) }
+				</Text>
+			) }
 			<CommentBoard
 				thread={ thread }
-				onEdit={ onEditComment }
+				onEdit={ ( params = {} ) => {
+					const { status } = params;
+					onEditComment( params );
+					if ( status === 'approved' ) {
+						unselectThread();
+						focusThread();
+					}
+				} }
 				onDelete={ handleDeleteComment }
 				status={ thread.status }
 			/>
@@ -411,7 +482,13 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 					date={ thread?.date }
 					userId={ thread?.author }
 				/>
-				<span className="editor-collab-sidebar-panel__comment-status">
+				<FlexItem
+					className="editor-collab-sidebar-panel__comment-status"
+					onClick={ ( event ) => {
+						// Prevent the thread from being selected.
+						event.stopPropagation();
+					} }
+				>
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ canResolve && (
 							<Button
@@ -460,7 +537,7 @@ const CommentBoard = ( { thread, onEdit, onDelete, status } ) => {
 							</Menu.Popover>
 						</Menu>
 					</HStack>
-				</span>
+				</FlexItem>
 			</HStack>
 			{ 'edit' === actionState ? (
 				<CommentForm

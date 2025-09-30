@@ -4,8 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"displayAsRange": true,
-			"showTimeToRead": true,
-			"showWordCount": false,
+			"displayMode": "time",
 			"averageReadingSpeed": 189
 		},
 		"innerBlocks": []
