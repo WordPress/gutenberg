@@ -86,7 +86,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
 ## Button
