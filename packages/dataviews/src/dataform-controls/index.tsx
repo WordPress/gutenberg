@@ -10,6 +10,7 @@ import type {
 	DataFormControlProps,
 	Field,
 	FieldTypeDefinition,
+	EditConfig,
 } from '../types';
 import checkbox from './checkbox';
 import datetime from './datetime';
@@ -51,6 +52,23 @@ const FORM_CONTROLS: FormControls = {
 	toggleGroup,
 };
 
+function isEditConfig( value: any ): value is EditConfig {
+	return (
+		value && typeof value === 'object' && typeof value.control === 'string'
+	);
+}
+
+function createConfiguredControl( config: EditConfig ) {
+	const { control, ...controlConfig } = config;
+	const BaseControlType = getControlByType( control );
+
+	return function ConfiguredControl< Item >(
+		props: DataFormControlProps< Item >
+	) {
+		return <BaseControlType { ...props } config={ controlConfig } />;
+	};
+}
+
 export function getControl< Item >(
 	field: Field< Item >,
 	fieldTypeDefinition: FieldTypeDefinition< Item >
@@ -63,12 +81,20 @@ export function getControl< Item >(
 		return getControlByType( field.Edit );
 	}
 
+	if ( isEditConfig( field.Edit ) ) {
+		return createConfiguredControl( field.Edit );
+	}
+
 	if ( field.elements && field.type !== 'array' ) {
 		return getControlByType( 'select' );
 	}
 
 	if ( typeof fieldTypeDefinition.Edit === 'string' ) {
 		return getControlByType( fieldTypeDefinition.Edit );
+	}
+
+	if ( isEditConfig( fieldTypeDefinition.Edit ) ) {
+		return createConfiguredControl( fieldTypeDefinition.Edit );
 	}
 
 	return fieldTypeDefinition.Edit;

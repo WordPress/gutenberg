@@ -2,12 +2,27 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+
+### Bug Fixes
+
+-   `Button`: Fix incorrect padding with text and right icon ([#71464](https://github.com/WordPress/gutenberg/pull/71464)).
+
+### Internal
+
+-   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+
+## 30.4.0 (2025-09-17)
+
 ### Bug Fixes
 
 -   `Modal`: Fix modal headings and labels to use proper editor text color instead of wp-admin colors ([#71311](https://github.com/WordPress/gutenberg/pull/71311)).
 
 ### Internal
 
+-   Expose `ValidatedRadioControl` via private API's ([#71664](https://github.com/WordPress/gutenberg/pull/71664)).
 -   `ValidatedCheckboxControl`: Expose the component under private API's ([#71505](https://github.com/WordPress/gutenberg/pull/71505/)).
 -   Expose `ValidatedTextareaControl` via Private APIs ([#71495](https://github.com/WordPress/gutenberg/pull/71495))
 -   Add support for ValidatedFormTokenField [#71350](https://github.com/WordPress/gutenberg/pull/71350).

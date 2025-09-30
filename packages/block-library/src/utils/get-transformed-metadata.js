@@ -49,6 +49,10 @@ export function getTransformedMetadata(
 		transformSupportedProps.push( 'blockVisibility' );
 	}
 
+	if ( window?.__experimentalEnableBlockComment ) {
+		transformSupportedProps.push( 'commentId' );
+	}
+
 	// Return early if no supported properties.
 	if ( ! transformSupportedProps.length ) {
 		return;

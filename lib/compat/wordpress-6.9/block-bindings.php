@@ -10,15 +10,33 @@
 
 // The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
 add_filter(
-	'block_bindings_supported_attributes_core/post-date',
-	function ( $attributes ) {
-		if ( ! in_array( 'datetime', $attributes, true ) ) {
+	'block_bindings_supported_attributes',
+	function ( $attributes, $block_type ) {
+		if ( 'core/image' === $block_type && ! in_array( 'caption', $attributes, true ) ) {
+			$attributes[] = 'caption';
+		}
+		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
 		return $attributes;
 	},
 	10,
-	3
+	2
+);
+
+// The following filter can be removed once the minimum required WordPress version is 6.9 or newer.
+add_filter(
+	'block_editor_settings_all',
+	function ( $editor_settings ) {
+		$editor_settings['__experimentalBlockBindingsSupportedAttributes'] = array();
+		foreach ( array_keys( WP_Block_Type_Registry::get_instance()->get_all_registered() ) as $block_type ) {
+			$supported_block_attributes = gutenberg_get_block_bindings_supported_attributes( $block_type );
+			if ( ! empty( $supported_block_attributes ) ) {
+				$editor_settings['__experimentalBlockBindingsSupportedAttributes'][ $block_type ] = $supported_block_attributes;
+			}
+		}
+		return $editor_settings;
+	}
 );
 
 /**
@@ -36,26 +54,39 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 		return $block_content;
 	}
 
-	$attributes = $instance->parsed_block['attrs'];
 	// Process the block bindings and get attributes updated with the values from the sources.
 	$computed_attributes = gutenberg_process_block_bindings( $instance );
 	if ( empty( $computed_attributes ) ) {
 		return $block_content;
 	}
 
-	// Merge the computed attributes with the original attributes.
-	$instance->attributes = array_merge( $attributes, $computed_attributes );
+	/*
+	 * Merge the computed attributes with the original attributes.
+	 *
+	 * Note that this is not a recursive merge, meaning that nested attributes --
+	 * such as block bindings metadata -- will be completely replaced.
+	 * This is desirable. At this point, Core has already processed any block
+	 * bindings that it supports. What remains to be processed are only the attributes
+	 * for which support was added later (through the `block_bindings_supported_attributes`
+	 * filter). To do so, we'll run `$instance->render()` once more
+	 * so the block can update its content based on those attributes.
+	 */
+	$instance->attributes = array_merge( $instance->attributes, $computed_attributes );
+
+	/*
+	 * If we're dealing with the Button block, we remove the bindings metadata
+	 * in order to avoid having it reprocessed, which would lead to Core
+	 * capitalizing the wrapper tag (e.g. <DIV>).
+	 */
+	if ( 'core/button' === $instance->name ) {
+		unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
+	}
 
 	/**
-	 * This filter is called from WP_Block::render(), after the block content has
-	 * already been rendered. However, dynamic blocks expect their render() method
-	 * to receive block attributes to have their bound values. This means that we have
-	 * to re-render the block here.
-	 * To do so, we'll set a flag that this filter checks when invoked to avoid infinite
-	 * recursion. Furthermore, we can unset all of the block's bindings, as we know that
-	 * they have been processed by the time we reach this point.
+	 * This filter (`gutenberg_block_bindings_render_block`) is called from `WP_Block::render()`.
+	 * To avoid infinite recursion, we set a flag that this filter checks when invoked which tells
+	 * it to exit early.
 	 */
-	unset( $instance->parsed_block['attrs']['metadata']['bindings'] );
 	$inside_block_bindings_render = true;
 	$block_content                = $instance->render();
 	$inside_block_bindings_render = false;
@@ -69,6 +100,59 @@ function gutenberg_block_bindings_render_block( $block_content, $block, $instanc
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10, 3 );
+
+/**
+ * Retrieves the list of block attributes supported by block bindings.
+ *
+ * @since 6.9.0
+ *
+ * @param string $block_type The block type whose supported attributes are being retrieved.
+ * @return array The list of block attributes that are supported by block bindings.
+ */
+function gutenberg_get_block_bindings_supported_attributes( $block_type ) {
+	// List of block attributes supported by Block Bindings in WP 6.8.
+	$block_bindings_supported_attributes_6_8 = array(
+		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+	);
+
+	$supported_block_attributes =
+		$block_bindings_supported_attributes_6_8[ $block_type ] ??
+		array();
+
+	/**
+	 * Filters the supported block attributes for block bindings.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param string[] $supported_block_attributes The block's attributes that are supported by block bindings.
+	 * @param string   $block_type                 The block type whose attributes are being filtered.
+	 */
+	$supported_block_attributes = apply_filters(
+		'block_bindings_supported_attributes',
+		$supported_block_attributes,
+		$block_type
+	);
+
+	/**
+	 * Filters the supported block attributes for block bindings.
+	 *
+	 * The dynamic portion of the hook name, `$block_type`, refers to the block type
+	 * whose attributes are being filtered.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param string[] $supported_block_attributes The block's attributes that are supported by block bindings.
+	 */
+	$supported_block_attributes = apply_filters(
+		"block_bindings_supported_attributes_{$block_type}",
+		$supported_block_attributes
+	);
+
+	return $supported_block_attributes;
+}
 
 /**
  * Processes the block bindings and updates the block attributes with the values from the sources.
@@ -122,38 +206,8 @@ function gutenberg_process_block_bindings( $instance ) {
 		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
-	$supported_block_attributes              =
-		$block_bindings_supported_attributes_6_8[ $block_type ] ??
-		array();
 
-	/**
-	 * Filters the supported block attributes for block bindings.
-	 *
-	 * @since 6.9.0
-	 *
-	 * @param string[] $supported_block_attributes The block's attributes that are supported by block bindings.
-	 * @param string   $block_type                 The block type whose attributes are being filtered.
-	 */
-	$supported_block_attributes = apply_filters(
-		'block_bindings_supported_attributes',
-		$supported_block_attributes,
-		$block_type
-	);
-
-	/**
-	 * Filters the supported block attributes for block bindings.
-	 *
-	 * The dynamic portion of the hook name, `$block_type`, refers to the block type
-	 * whose attributes are being filtered.
-	 *
-	 * @since 6.9.0
-	 *
-	 * @param string[] $supported_block_attributes The block's attributes that are supported by block bindings.
-	 */
-	$supported_block_attributes = apply_filters(
-		"block_bindings_supported_attributes_{$block_type}",
-		$supported_block_attributes
-	);
+	$supported_block_attributes = gutenberg_get_block_bindings_supported_attributes( $block_type );
 
 	/*
 	 * Remove attributes that we know are processed by WP 6.8 from the list,

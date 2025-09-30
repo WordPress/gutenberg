@@ -4,7 +4,7 @@
  *
  * Holds, sanitizes and prints CSS rules declarations
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {

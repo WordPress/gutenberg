@@ -109,6 +109,7 @@ function PrivateExcerpt() {
 				getCurrentPostId,
 				getEditedPostAttribute,
 				isEditorPanelEnabled,
+				__experimentalGetDefaultTemplateType,
 			} = select( editorStore );
 			const postType = getCurrentPostType();
 			const isTemplateOrTemplatePart = [
@@ -131,13 +132,17 @@ function PrivateExcerpt() {
 					postType,
 					getCurrentPostId()
 				);
+			const fallback = isTemplateOrTemplatePart
+				? __experimentalGetDefaultTemplateType( template.slug )
+						.description
+				: undefined;
 			// For post types that use excerpt as description, we do not abide
 			// by the `isEnabled` panel flag in order to render them as text.
 			const _shouldRender =
 				isEditorPanelEnabled( PANEL_NAME ) ||
 				_shouldBeUsedAsDescription;
 			return {
-				excerpt: getEditedPostAttribute( _usedAttribute ),
+				excerpt: getEditedPostAttribute( _usedAttribute ) ?? fallback,
 				shouldRender: _shouldRender,
 				shouldBeUsedAsDescription: _shouldBeUsedAsDescription,
 				// If we should render, allow editing for all post types that are not used as description.

@@ -15,17 +15,16 @@
 		"anchor": true,
 		"color": {
 			"background": true,
-			"gradient": true
+			"gradients": true
 		},
 		"align": false,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
-			"margin": [ "top", "bottom" ],
 			"__experimentalDefaultControls": {
-				"padding": true,
-				"margin": true
-			}
+				"padding": true
+			},
+			"__experimentalSkipSerialization": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -40,7 +39,6 @@
 			}
 		},
 		"typography": {
-			"textAlign": true,
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
@@ -63,7 +61,8 @@
 		"title": {
 			"type": "rich-text",
 			"source": "rich-text",
-			"selector": "span"
+			"selector": ".wp-block-accordion-header__toggle-title",
+			"role": "content"
 		},
 		"level": {
 			"type": "number",
@@ -71,10 +70,6 @@
 		},
 		"levelOptions": {
 			"type": "array"
-		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
 		},
 		"iconPosition": {
 			"type": "string",
