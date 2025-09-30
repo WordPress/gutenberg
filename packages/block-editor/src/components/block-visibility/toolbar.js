@@ -12,12 +12,14 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { cleanEmptyObject } from '../../hooks/utils';
 import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityToolbar( { clientId } ) {
-	const { canToggleBlockVisibility, isBlockHidden } = useSelect(
+	const { canToggleBlockVisibility, metadata, isBlockHidden } = useSelect(
 		( select ) => {
-			const { getBlockName } = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const { isBlockHidden: _isBlockHidden } = unlock(
 				select( blockEditorStore )
 			);
@@ -27,6 +29,7 @@ export default function BlockVisibilityToolbar( { clientId } ) {
 					'blockVisibility',
 					true
 				),
+				metadata: getBlockAttributes( clientId )?.metadata,
 				isBlockHidden: _isBlockHidden( clientId ),
 			};
 		},
@@ -62,11 +65,12 @@ export default function BlockVisibilityToolbar( { clientId } ) {
 					onClick={ () => {
 						const newBlockHidden = ! isBlockHidden;
 						updateBlockAttributes( [ clientId ], {
-							metadata: {
+							metadata: cleanEmptyObject( {
+								...metadata,
 								blockVisibility: newBlockHidden
 									? false
 									: undefined,
-							},
+							} ),
 						} );
 					} }
 				/>
