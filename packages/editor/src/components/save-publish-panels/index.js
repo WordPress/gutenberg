@@ -1,13 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useEffect } from '@wordpress/element';
-import { addAction, removeAction } from '@wordpress/hooks';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,129 +54,6 @@ export default function SavePublishPanels( {
 		() => setEntitiesSavedStatesCallback( true ),
 		[]
 	);
-
-	const registry = useRegistry();
-
-	useEffect( () => {
-		addAction(
-			'editor.savePost',
-			'my-plugin/template-save-dialog',
-			async ( { type, id }, options ) => {
-				if ( options.isAutosave ) {
-					return;
-				}
-				if ( type !== 'wp_template' ) {
-					return;
-				}
-
-				const site = await registry
-					.select( coreStore )
-					.getEntityRecord( 'root', 'site' );
-				const template = await registry
-					.select( coreStore )
-					.getEditedEntityRecord( 'postType', type, id );
-				const entity = await registry
-					.select( coreStore )
-					.getEntityRecord( 'postType', type, id );
-				const editorSettings = await registry
-					.select( editorStore )
-					.getEditorSettings();
-
-				// Don't open for focused entity.
-				if ( editorSettings.onNavigateToPreviousEntityRecord ) {
-					return;
-				}
-
-				// Already active
-				if ( site.active_templates[ template.slug ] === id ) {
-					return;
-				}
-
-				await registry.dispatch( noticesStore ).createNotice(
-					'info',
-					sprintf(
-						// translators: %s: template slug
-						__(
-							'Do you want to activate this template as the %s template?'
-						),
-						entity.slug
-					),
-					{
-						id: 'template-activate-notice',
-						actions: [
-							{
-								label: __( 'Activate' ),
-								onClick: async () => {
-									await registry
-										.dispatch( noticesStore )
-										.removeNotice(
-											'template-activate-notice'
-										);
-									await registry
-										.dispatch( noticesStore )
-										.createNotice(
-											'info',
-											__( 'Activating template…' ),
-											{
-												id: 'template-activating-notice',
-											}
-										);
-									try {
-										const currentSite = await registry
-											.select( coreStore )
-											.getEntityRecord( 'root', 'site' );
-										await registry
-											.dispatch( coreStore )
-											.saveEntityRecord(
-												'root',
-												'site',
-												{
-													active_templates: {
-														...currentSite.active_templates,
-														[ entity.slug ]:
-															entity.id,
-													},
-												},
-												{ throwOnError: true }
-											);
-										await registry
-											.dispatch( noticesStore )
-											.removeNotice(
-												'template-activating-notice'
-											);
-										await registry
-											.dispatch( noticesStore )
-											.createSuccessNotice(
-												__( 'Template activated.' )
-											);
-									} catch ( error ) {
-										await registry
-											.dispatch( noticesStore )
-											.removeNotice(
-												'template-activating-notice'
-											);
-										await registry
-											.dispatch( noticesStore )
-											.createErrorNotice(
-												__(
-													'Template activation failed.'
-												)
-											);
-										// Rethrow for debugging.
-										throw error;
-									}
-								},
-							},
-						],
-					}
-				);
-			}
-		);
-
-		return () => {
-			removeAction( 'editor.savePost', 'my-plugin/template-save-dialog' );
-		};
-	}, [ registry ] );
 
 	// It is ok for these components to be unmounted when not in visual use.
 	// We don't want more than one present at a time, decide which to render.
