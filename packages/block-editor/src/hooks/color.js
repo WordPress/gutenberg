@@ -260,8 +260,16 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function ColorEdit( { clientId, name, setAttributes, settings } ) {
+export function ColorEdit( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+	asWrapper,
+	label,
+} ) {
 	const isEnabled = useHasColorPanel( settings );
+
 	function selector( select ) {
 		const { style, textColor, backgroundColor, gradient } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
@@ -306,14 +314,18 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 				'enableContrastChecker',
 			] );
 
+	// Use provided wrapper or default to ColorInspectorControl
+	const Wrapper = asWrapper || ColorInspectorControl;
+
 	return (
 		<StylesColorPanel
-			as={ ColorInspectorControl }
+			as={ Wrapper }
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			label={ label }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [

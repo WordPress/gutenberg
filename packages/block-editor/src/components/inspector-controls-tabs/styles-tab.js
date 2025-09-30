@@ -3,6 +3,7 @@
  */
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +11,30 @@ import { __ } from '@wordpress/i18n';
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
 import { useBorderPanelLabel } from '../../hooks/border';
+import { useBlockSettings } from '../../hooks/utils';
+import { store as blockEditorStore } from '../../store';
+import { ColorEdit } from '../../hooks/color';
+import { ColorToolsPanel } from '../global-styles/color-panel';
+
+function SectionBlockControls( { blockName, clientId } ) {
+	const settings = useBlockSettings( blockName );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const setAttributes = ( newAttributes ) => {
+		updateBlockAttributes( clientId, newAttributes );
+	};
+
+	return (
+		<ColorEdit
+			clientId={ clientId }
+			name={ blockName }
+			settings={ settings }
+			setAttributes={ setAttributes }
+			asWrapper={ ColorToolsPanel }
+			label={ __( 'Color' ) }
+		/>
+	);
+}
 
 const StylesTab = ( {
 	blockName,
@@ -27,6 +52,12 @@ const StylesTab = ( {
 						<BlockStyles clientId={ clientId } />
 					</PanelBody>
 				</div>
+			) }
+			{ isSectionBlock && (
+				<SectionBlockControls
+					blockName={ blockName }
+					clientId={ clientId }
+				/>
 			) }
 			{ ! isSectionBlock && (
 				<>
