@@ -2,6 +2,11 @@
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import type { StoreState, WPPreferencesPersistenceLayer } from './types';
+import type { AvailableActions } from './actions';
 
 /**
  * Reducer returning the defaults for user preferences.
@@ -9,12 +14,15 @@ import { combineReducers } from '@wordpress/data';
  * This is kept intentionally separate from the preferences
  * themselves so that defaults are not persisted.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function defaults( state = {}, action ) {
+export function defaults(
+	state: StoreState[ 'defaults' ] = {},
+	action: AvailableActions
+): StoreState[ 'defaults' ] {
 	if ( action.type === 'SET_PREFERENCE_DEFAULTS' ) {
 		const { scope, defaults: values } = action;
 		return {
@@ -29,21 +37,26 @@ export function defaults( state = {}, action ) {
 	return state;
 }
 
+type PreferencesReducer = (
+	state: StoreState[ 'preferences' ],
+	action: AvailableActions
+) => StoreState[ 'preferences' ];
+
 /**
  * Higher order reducer that does the following:
  * - Merges any data from the persistence layer into the state when the
  *   `SET_PERSISTENCE_LAYER` action is received.
  * - Passes any preferences changes to the persistence layer.
  *
- * @param {Function} reducer The preferences reducer.
+ * @param reducer The preferences reducer.
  *
- * @return {Function} The enhanced reducer.
+ * @return The enhanced reducer.
  */
-function withPersistenceLayer( reducer ) {
-	let persistenceLayer;
+function withPersistenceLayer( reducer: PreferencesReducer ) {
+	let persistenceLayer: WPPreferencesPersistenceLayer< any >;
 
-	return ( state, action ) => {
-		// Setup the persistence layer, and return the persisted data
+	return ( state: StoreState[ 'preferences' ], action: AvailableActions ) => {
+		// Set up the persistence layer, and return the persisted data
 		// as the state.
 		if ( action.type === 'SET_PERSISTENCE_LAYER' ) {
 			const { persistenceLayer: persistence, persistedData } = action;

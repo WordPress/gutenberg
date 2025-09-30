@@ -7,9 +7,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as preferencesStore } from '../../store';
+import type { BaseOptionProps } from '../preference-base-option';
 import PreferenceBaseOption from '../preference-base-option';
 
-function PreferenceToggleControl( props ) {
+export type PreferenceToggleControlProps = {
+	scope: string;
+	featureName: string;
+	onToggle: () => void;
+} & Omit< BaseOptionProps, 'onChange' | 'isChecked' >;
+
+function PreferenceToggleControl( props: PreferenceToggleControlProps ) {
 	const {
 		scope,
 		featureName,
@@ -28,9 +35,9 @@ function PreferenceToggleControl( props ) {
 
 	return (
 		<PreferenceBaseOption
+			{ ...remainingProps }
 			onChange={ onChange }
 			isChecked={ isChecked }
-			{ ...remainingProps }
 		/>
 	);
 }

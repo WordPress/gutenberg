@@ -23,12 +23,21 @@ import { isRTL, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+/**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
 const PREFERENCES_MENU = 'preferences-menu';
 
-export default function PreferencesModalTabs( { sections } ) {
+export type PreferencesModalTabsProps = {
+	sections: { name: string; tabLabel: string; content: ReactNode }[];
+};
+export default function PreferencesModalTabs( {
+	sections,
+}: PreferencesModalTabsProps ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	// This is also used to sync the two different rendered components
@@ -40,12 +49,15 @@ export default function PreferencesModalTabs( { sections } ) {
 	 * is used for easier access to active tab's content.
 	 */
 	const { tabs, sectionsContentMap } = useMemo( () => {
-		let mappedTabs = {
+		let mappedTabs: {
+			tabs: { name: string; title: string }[];
+			sectionsContentMap: Record< string, ReactNode >;
+		} = {
 			tabs: [],
 			sectionsContentMap: {},
 		};
 		if ( sections.length ) {
-			mappedTabs = sections.reduce(
+			mappedTabs = sections.reduce< typeof mappedTabs >(
 				( accumulator, { name, tabLabel: title, content } ) => {
 					accumulator.tabs.push( { name, title } );
 					accumulator.sectionsContentMap[ name ] = content;
@@ -105,7 +117,7 @@ export default function PreferencesModalTabs( { sections } ) {
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
-											as={ Item }
+											as={ Item as any } //TODO: Fix this
 											isAction
 										>
 											<HStack justify="space-between">
@@ -144,6 +156,7 @@ export default function PreferencesModalTabs( { sections } ) {
 										justify="left"
 										size="small"
 										gap="6"
+										as="div"
 									>
 										<Navigator.BackButton
 											icon={

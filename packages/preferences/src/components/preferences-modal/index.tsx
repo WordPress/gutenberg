@@ -3,8 +3,21 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+/**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
 
-export default function PreferencesModal( { closeModal, children } ) {
+type ModalProps = Parameters< typeof Modal >[ 0 ];
+
+export type PreferencesModalProps = {
+	closeModal: ModalProps[ 'onRequestClose' ];
+	children: ReactNode;
+};
+export default function PreferencesModal( {
+	closeModal,
+	children,
+}: PreferencesModalProps ) {
 	return (
 		<Modal
 			className="preferences-modal"

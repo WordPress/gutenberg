@@ -12,6 +12,18 @@ import { speak } from '@wordpress/a11y';
  */
 import { store as preferencesStore } from '../../store';
 
+type PreferenceToggleMenuItemProps = {
+	scope: string;
+	name: string;
+	label: string;
+	info?: string;
+	messageActivated?: string;
+	messageDeactivated?: string;
+	shortcut?: string | { display: string; ariaLabel: string };
+	handleToggling?: boolean,
+	onToggle?: () => void;
+	disabled?: boolean;
+};
 export default function PreferenceToggleMenuItem( {
 	scope,
 	name,
@@ -23,7 +35,7 @@ export default function PreferenceToggleMenuItem( {
 	handleToggling = true,
 	onToggle = () => null,
 	disabled = false,
-} ) {
+}: PreferenceToggleMenuItemProps ) {
 	const isActive = useSelect(
 		( select ) => !! select( preferencesStore ).get( scope, name ),
 		[ scope, name ]
@@ -53,7 +65,7 @@ export default function PreferenceToggleMenuItem( {
 
 	return (
 		<MenuItem
-			icon={ isActive && check }
+			icon={ isActive ? check : null }
 			isSelected={ isActive }
 			onClick={ () => {
 				onToggle();

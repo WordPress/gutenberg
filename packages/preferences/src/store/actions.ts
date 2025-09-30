@@ -1,16 +1,38 @@
 /**
+ * Internal dependencies
+ */
+import type {
+	ActionObject,
+	OmitFirstArg,
+	StoreState,
+	WPPreferencesPersistenceLayer,
+} from './types';
+
+type ToggleRetArgs = {
+	select: {
+		get: OmitFirstArg< ( typeof import('./selectors') )[ 'get' ] >;
+	};
+	dispatch: { set: typeof set };
+};
+
+/**
  * Returns an action object used in signalling that a preference should be
  * toggled.
  *
  * @param {string} scope The preference scope (e.g. core/edit-post).
  * @param {string} name  The preference name.
  */
-export function toggle( scope, name ) {
-	return function ( { select, dispatch } ) {
+export function toggle( scope: string, name: string ) {
+	return function ( { select, dispatch }: ToggleRetArgs ) {
 		const currentValue = select.get( scope, name );
 		dispatch.set( scope, name, ! currentValue );
 	};
 }
+
+type SetAction = ActionObject<
+	'SET_PREFERENCE_VALUE',
+	{ scope: string; name: string; value: any }
+>;
 
 /**
  * Returns an action object used in signalling that a preference should be set
@@ -20,9 +42,9 @@ export function toggle( scope, name ) {
  * @param {string} name  The preference name.
  * @param {*}      value The value to set.
  *
- * @return {Object} Action object.
+ * @return {SetAction} Action object.
  */
-export function set( scope, name, value ) {
+export function set( scope: string, name: string, value: any ): SetAction {
 	return {
 		type: 'SET_PREFERENCE_VALUE',
 		scope,
@@ -31,16 +53,25 @@ export function set( scope, name, value ) {
 	};
 }
 
+type ScopedDefaults = StoreState[ 'defaults' ][ string ];
+type SetDefaultsAction = ActionObject<
+	'SET_PREFERENCE_DEFAULTS',
+	{ scope: string; defaults: ScopedDefaults }
+>;
+
 /**
  * Returns an action object used in signalling that preference defaults should
  * be set.
  *
- * @param {string}            scope    The preference scope (e.g. core/edit-post).
- * @param {Object<string, *>} defaults A key/value map of preference names to values.
+ * @param scope    The preference scope (e.g. core/edit-post).
+ * @param defaults A key/value map of preference names to values.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export function setDefaults( scope, defaults ) {
+export function setDefaults(
+	scope: string,
+	defaults: ScopedDefaults
+): SetDefaultsAction {
 	return {
 		type: 'SET_PREFERENCE_DEFAULTS',
 		scope,
@@ -48,14 +79,13 @@ export function setDefaults( scope, defaults ) {
 	};
 }
 
-/** @typedef {() => Promise<Object>} WPPreferencesPersistenceLayerGet */
-/** @typedef {(Object) => void} WPPreferencesPersistenceLayerSet */
-/**
- * @typedef WPPreferencesPersistenceLayer
- *
- * @property {WPPreferencesPersistenceLayerGet} get An async function that gets data from the persistence layer.
- * @property {WPPreferencesPersistenceLayerSet} set A function that sets data in the persistence layer.
- */
+type SetPersistenceLayerAction< D extends Object > = ActionObject<
+	'SET_PERSISTENCE_LAYER',
+	{
+		persistenceLayer: WPPreferencesPersistenceLayer< D >;
+		persistedData: D;
+	}
+>;
 
 /**
  * Sets the persistence layer.
@@ -68,11 +98,13 @@ export function setDefaults( scope, defaults ) {
  * application's lifecycle, before any other actions have been dispatched to
  * the preferences store.
  *
- * @param {WPPreferencesPersistenceLayer} persistenceLayer The persistence layer.
+ * @param persistenceLayer The persistence layer.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
-export async function setPersistenceLayer( persistenceLayer ) {
+export async function setPersistenceLayer< D extends Object >(
+	persistenceLayer: WPPreferencesPersistenceLayer< D >
+): Promise< SetPersistenceLayerAction< D > > {
 	const persistedData = await persistenceLayer.get();
 	return {
 		type: 'SET_PERSISTENCE_LAYER',
@@ -80,3 +112,8 @@ export async function setPersistenceLayer( persistenceLayer ) {
 		persistedData,
 	};
 }
+
+export type AvailableActions =
+	| SetAction
+	| SetDefaultsAction
+	| SetPersistenceLayerAction< any >;
