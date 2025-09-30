@@ -126,7 +126,14 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"blockGap": {
+				"__experimentalDefault": "2em",
+				"sides": [ "horizontal", "vertical" ]
+			},
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
 		},
 		"typography": {
 			"fontSize": true,

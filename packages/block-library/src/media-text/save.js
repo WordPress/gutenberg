@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	useInnerBlocksProps,
+	useBlockProps,
+	__experimentalGetGapCSSValue as getGapCSSValue,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -86,8 +90,38 @@ export default function save( { attributes } ) {
 				? `auto ${ mediaWidth }%`
 				: `${ mediaWidth }% auto`;
 	}
+
+	const blockGap = attributes?.style?.spacing.blockGap;
+
+	const fallbackValue = 'var(--wp--style--block-gap)';
+
+	let gapStyle = { gap: fallbackValue };
+
+	if ( !! blockGap ) {
+		const row =
+			typeof blockGap === 'string'
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.top ) || fallbackValue;
+		const col =
+			typeof blockGap === 'string'
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.left ) || fallbackValue;
+
+		if ( col === row ) {
+			gapStyle = {
+				gap: col,
+			};
+		} else {
+			gapStyle = {
+				columnGap: col,
+				rowGap: row,
+			};
+		}
+	}
+
 	const style = {
 		gridTemplateColumns,
+		...gapStyle,
 	};
 
 	if ( 'right' === mediaPosition ) {
