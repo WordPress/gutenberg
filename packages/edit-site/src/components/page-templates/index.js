@@ -48,7 +48,7 @@ const defaultLayouts = {
 		showMedia: false,
 	},
 	[ LAYOUT_GRID ]: {
-		showMedia: true,
+		showMedia: false,
 	},
 	[ LAYOUT_LIST ]: {
 		showMedia: false,

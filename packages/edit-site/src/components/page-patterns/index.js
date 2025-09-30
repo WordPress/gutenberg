@@ -45,12 +45,14 @@ const defaultLayouts = {
 					width: '1%',
 				},
 			},
+      showMedia: false,
 		},
 	},
 	[ LAYOUT_GRID ]: {
 		layout: {
 			badgeFields: [ 'sync-status' ],
 		},
+    showMedia: false,
 	},
 };
 const DEFAULT_VIEW = {
