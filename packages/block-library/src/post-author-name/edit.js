@@ -33,9 +33,9 @@ function PostAuthorNameEdit( {
 } ) {
 	const { authorName, supportsAuthor } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getPostType } =
+			const { getEntityRecord, getUser, getPostType } =
 				select( coreStore );
-			const _authorId = getEditedEntityRecord(
+			const _authorId = getEntityRecord(
 				'postType',
 				postType,
 				postId
