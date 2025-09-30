@@ -3,10 +3,11 @@
  */
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -63,11 +64,11 @@ export default function SavePublishPanels( {
 		addAction(
 			'editor.savePost',
 			'my-plugin/template-save-dialog',
-			async ( post, options ) => {
+			async ( { type, id }, options ) => {
 				if ( options.isAutosave ) {
 					return;
 				}
-				if ( post.type !== 'wp_template' ) {
+				if ( type !== 'wp_template' ) {
 					return;
 				}
 
@@ -76,7 +77,10 @@ export default function SavePublishPanels( {
 					.getEntityRecord( 'root', 'site' );
 				const template = await registry
 					.select( coreStore )
-					.getEditedEntityRecord( 'postType', post.type, post.id );
+					.getEditedEntityRecord( 'postType', type, id );
+				const entity = await registry
+					.select( coreStore )
+					.getEntityRecord( 'postType', type, id );
 				const editorSettings = await registry
 					.select( editorStore )
 					.getEditorSettings();
@@ -87,11 +91,88 @@ export default function SavePublishPanels( {
 				}
 
 				// Already active
-				if ( site.active_templates[ template.slug ] === post.id ) {
+				if ( site.active_templates[ template.slug ] === id ) {
 					return;
 				}
 
-				registry.dispatch( editorStore ).openPublishSidebar();
+				await registry.dispatch( noticesStore ).createNotice(
+					'info',
+					sprintf(
+						// translators: %s: template slug
+						__(
+							'Do you want to activate this template as the %s template?'
+						),
+						entity.slug
+					),
+					{
+						id: 'template-activate-notice',
+						actions: [
+							{
+								label: __( 'Activate' ),
+								onClick: async () => {
+									await registry
+										.dispatch( noticesStore )
+										.removeNotice(
+											'template-activate-notice'
+										);
+									await registry
+										.dispatch( noticesStore )
+										.createNotice(
+											'info',
+											__( 'Activating template…' ),
+											{
+												id: 'template-activating-notice',
+											}
+										);
+									try {
+										const currentSite = await registry
+											.select( coreStore )
+											.getEntityRecord( 'root', 'site' );
+										await registry
+											.dispatch( coreStore )
+											.saveEntityRecord(
+												'root',
+												'site',
+												{
+													active_templates: {
+														...currentSite.active_templates,
+														[ entity.slug ]:
+															entity.id,
+													},
+												},
+												{ throwOnError: true }
+											);
+										await registry
+											.dispatch( noticesStore )
+											.removeNotice(
+												'template-activating-notice'
+											);
+										await registry
+											.dispatch( noticesStore )
+											.createSuccessNotice(
+												__( 'Template activated.' )
+											);
+									} catch ( error ) {
+										await registry
+											.dispatch( noticesStore )
+											.removeNotice(
+												'template-activating-notice'
+											);
+										await registry
+											.dispatch( noticesStore )
+											.createErrorNotice(
+												__(
+													'Template activation failed.'
+												)
+											);
+										// Rethrow for debugging.
+										throw error;
+									}
+								},
+							},
+						],
+					}
+				);
 			}
 		);
 
