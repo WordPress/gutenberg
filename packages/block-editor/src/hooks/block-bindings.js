@@ -119,9 +119,10 @@ function BlockBindingsPanelMenuContent( {
 										return (
 											<Menu.CheckboxItem
 												key={
-													JSON.stringify(
-														item.args
-													) || item.key
+													sourceKey +
+														JSON.stringify(
+															item.args
+														) || item.key
 												}
 												onChange={ () => {
 													const isCurrentlySelected =
