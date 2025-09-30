@@ -12,6 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
+	BaseControl,
 } from '@wordpress/components';
 
 /**
@@ -120,17 +121,17 @@ export default function FormRegularField< Item >( {
 		<div className="dataforms-layouts-regular__field">
 			{ fieldDefinition.readOnly === true ? (
 				<>
-					{ ! hideLabelFromVision && labelPosition !== 'none' && (
-						<div className="dataforms-layouts-regular__field-label">
-							{ fieldDefinition.label }
-						</div>
-					) }
-					<div className="dataforms-layouts-regular__field-control">
+					<>
+						{ ! hideLabelFromVision && labelPosition !== 'none' && (
+							<BaseControl.VisualLabel>
+								{ fieldDefinition.label }
+							</BaseControl.VisualLabel>
+						) }
 						<fieldDefinition.render
 							item={ data }
 							field={ fieldDefinition }
 						/>
-					</div>
+					</>
 				</>
 			) : (
 				<fieldDefinition.Edit

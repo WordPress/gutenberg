@@ -3402,6 +3402,18 @@ describe( 'selectors', () => {
 				( item ) => item.id === 'core/block/1'
 			);
 			expect( reusableBlockItem ).toEqual( {
+				blocks: [
+					expect.objectContaining( {
+						attributes: {
+							metadata: expect.objectContaining( {
+								name: 'Reusable Block 1',
+								patternName: 'core/block/1',
+							} ),
+						},
+						isValid: true,
+						innerBlocks: [],
+					} ),
+				],
 				category: 'reusable',
 				content: '<!-- /wp:test-block-a -->',
 				frecency: 0,

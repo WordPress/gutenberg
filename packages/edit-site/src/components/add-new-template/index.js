@@ -53,7 +53,6 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
  */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
-	useExistingTemplates,
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
@@ -226,7 +225,8 @@ function NewTemplateModal( { onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newTemplate.title?.rendered || title )
+					decodeEntities( newTemplate.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{
 					type: 'snackbar',
@@ -387,15 +387,9 @@ function NewTemplate() {
 }
 
 function useMissingTemplates( setEntityForSuggestions, onClick ) {
-	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const existingTemplateSlugs = ( existingTemplates || [] ).map(
-		( { slug } ) => slug
-	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
-		( template ) =>
-			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
-			! existingTemplateSlugs.includes( template.slug )
+		( template ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		onClick?.();

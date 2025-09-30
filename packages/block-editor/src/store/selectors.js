@@ -30,6 +30,7 @@ import {
 	getInsertBlockTypeDependants,
 	getParsedPattern,
 	getGrammar,
+	mapUserPattern,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2155,27 +2156,31 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							foreground: 'var(--wp-block-synced-color)',
 					  }
 					: symbol;
-				const id = `core/block/${ reusableBlock.id }`;
-				const { time, count = 0 } = getInsertUsage( state, id ) || {};
+				const userPattern = mapUserPattern( reusableBlock );
+				const { time, count = 0 } =
+					getInsertUsage( state, userPattern.name ) || {};
 				const frecency = calculateFrecency( time, count );
 
 				return {
-					id,
+					id: userPattern.name,
 					name: 'core/block',
 					initialAttributes: { ref: reusableBlock.id },
-					title: reusableBlock.title?.raw,
+					title: userPattern.title,
 					icon,
 					category: 'reusable',
 					keywords: [ 'reusable' ],
 					isDisabled: false,
 					utility: 1, // Deprecated.
 					frecency,
-					content: reusableBlock.content?.raw,
-					syncStatus: reusableBlock.wp_pattern_sync_status,
+					content: userPattern.content,
+					get blocks() {
+						return getParsedPattern( userPattern ).blocks;
+					},
+					syncStatus: userPattern.syncStatus,
 				};
 			};
 
-			const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
+			const patternInserterItems = canInsertBlockTypeUnmemoized(
 				state,
 				'core/block',
 				rootClientId
@@ -2261,7 +2266,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				{ core: [], noncore: [] }
 			);
 			const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-			return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
+			return [ ...sortedBlockTypes, ...patternInserterItems ];
 		},
 		( state, rootClientId ) => [
 			getBlockTypes(),

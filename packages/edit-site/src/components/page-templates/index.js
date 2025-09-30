@@ -3,11 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { privateApis as corePrivateApis } from '@wordpress/core-data';
+import {
+	privateApis as corePrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
+import { useEvent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,15 +27,21 @@ import {
 	LAYOUT_LIST,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
-import { authorField, descriptionField, previewField } from './fields';
-import { useEvent } from '@wordpress/compose';
+import {
+	useEditPostAction,
+	useSetActiveTemplateAction,
+} from '../dataviews-actions';
+import {
+	authorField,
+	descriptionField,
+	previewField,
+	activeField,
+	slugField,
+} from './fields';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
-
-const EMPTY_ARRAY = [];
 
 const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
@@ -56,31 +67,29 @@ const DEFAULT_VIEW = {
 	titleField: 'title',
 	descriptionField: 'description',
 	mediaField: 'preview',
-	fields: [ 'author' ],
+	fields: [ 'author', 'active', 'slug' ],
 	filters: [],
 	...defaultLayouts[ LAYOUT_GRID ],
 };
 
 export default function PageTemplates() {
 	const { path, query } = useLocation();
-	const { activeView = 'all', layout, postId } = query;
+	const { activeView = 'active', layout, postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
-
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'isAny',
-								value: [ activeView ],
-							},
-					  ]
-					: [],
+			filters: ! [ 'active', 'user' ].includes( activeView )
+				? [
+						{
+							field: 'author',
+							operator: 'isAny',
+							value: [ activeView ],
+						},
+				  ]
+				: [],
 			...defaultLayouts[ usedType ],
 		};
 	}, [ layout, activeView ] );
@@ -98,23 +107,116 @@ export default function PageTemplates() {
 	useEffect( () => {
 		setView( ( currentView ) => ( {
 			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: OPERATOR_IS_ANY,
-								value: [ activeView ],
-							},
-					  ]
-					: [],
+			filters: ! [ 'active', 'user' ].includes( activeView )
+				? [
+						{
+							field: 'author',
+							operator: OPERATOR_IS_ANY,
+							value: [ activeView ],
+						},
+				  ]
+				: [],
 		} ) );
 	}, [ setView, activeView ] );
 
-	const { records, isResolving: isLoadingData } =
+	const activeTemplatesOption = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'root', 'site' )
+				?.active_templates
+	);
+	// Todo: this will have to be better so that we're not fetching all the
+	// records all the time. Active templates query will need to move server
+	// side.
+	const { records: userRecords, isResolving: isLoadingUserRecords } =
 		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
+	const { records: staticRecords, isResolving: isLoadingStaticData } =
+		useEntityRecordsWithPermissions( 'postType', 'wp_registered_template', {
+			per_page: -1,
+		} );
+
+	const activeTemplates = useMemo( () => {
+		const _active = [ ...staticRecords ].filter(
+			( record ) => ! record.is_custom
+		);
+		if ( activeTemplatesOption ) {
+			for ( const activeSlug in activeTemplatesOption ) {
+				const activeId = activeTemplatesOption[ activeSlug ];
+				if ( activeId === false ) {
+					// Remove the template from the array.
+					const index = _active.findIndex(
+						( template ) => template.slug === activeSlug
+					);
+					if ( index !== -1 ) {
+						_active.splice( index, 1 );
+					}
+				} else {
+					// Replace the template in the array.
+					const template = userRecords.find(
+						( { id } ) => id === activeId
+					);
+					if ( template ) {
+						const index = _active.findIndex(
+							( { slug } ) => slug === template.slug
+						);
+						if ( index !== -1 ) {
+							_active[ index ] = template;
+						} else {
+							_active.push( template );
+						}
+					}
+				}
+			}
+		}
+		return _active;
+	}, [ userRecords, staticRecords, activeTemplatesOption ] );
+
+	let _records;
+	let isLoadingData;
+	if ( activeView === 'active' ) {
+		_records = activeTemplates;
+		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
+	} else if ( activeView === 'user' ) {
+		_records = userRecords;
+		isLoadingData = isLoadingUserRecords;
+	} else {
+		_records = staticRecords;
+		isLoadingData = isLoadingStaticData;
+	}
+
+	const records = useMemo( () => {
+		return _records.map( ( record ) => ( {
+			...record,
+			_isActive:
+				typeof record.id === 'string'
+					? activeTemplatesOption[ record.slug ] === record.id ||
+					  activeTemplatesOption[ record.slug ] === undefined
+					: Object.values( activeTemplatesOption ).includes(
+							record.id
+					  ),
+		} ) );
+	}, [ _records, activeTemplatesOption ] );
+
+	const users = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			return records.reduce( ( acc, record ) => {
+				if ( record.author_text ) {
+					if ( ! acc[ record.author_text ] ) {
+						acc[ record.author_text ] = record.author_text;
+					}
+				} else if ( record.author ) {
+					if ( ! acc[ record.author ] ) {
+						acc[ record.author ] = getUser( record.author );
+					}
+				}
+				return acc;
+			}, {} );
+		},
+		[ records ]
+	);
+
 	const history = useHistory();
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -130,32 +232,27 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return EMPTY_ARRAY;
-		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
-		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
-	const fields = useMemo(
-		() => [
+	const fields = useMemo( () => {
+		const _fields = [
 			previewField,
 			templateTitleField,
 			descriptionField,
-			{
-				...authorField,
-				elements: authors,
-			},
-		],
-		[ authors ]
-	);
+			activeField,
+			slugField,
+		];
+		const elements = [];
+		for ( const author in users ) {
+			elements.push( {
+				value: users[ author ]?.id ?? author,
+				label: users[ author ]?.name ?? author,
+			} );
+		}
+		_fields.push( {
+			...authorField,
+			elements,
+		} );
+		return _fields;
+	}, [ users ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
@@ -166,9 +263,13 @@ export default function PageTemplates() {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
+	const setActiveTemplateAction = useSetActiveTemplateAction();
 	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
+		() =>
+			activeView === 'user'
+				? [ setActiveTemplateAction, editAction, ...postTypeActions ]
+				: [ setActiveTemplateAction, ...postTypeActions ],
+		[ postTypeActions, setActiveTemplateAction, editAction, activeView ]
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
@@ -199,8 +300,10 @@ export default function PageTemplates() {
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
-				onClickItem={ ( { id } ) => {
-					history.navigate( `/wp_template/${ id }?canvas=edit` );
+				onClickItem={ ( item ) => {
+					history.navigate(
+						`/${ item.type }/${ item.id }?canvas=edit`
+					);
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }

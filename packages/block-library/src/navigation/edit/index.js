@@ -112,7 +112,6 @@ function NavigationAddPageButton( { clientId } ) {
 				<ToolbarButton
 					name="add-page"
 					icon={ page }
-					title={ __( 'Add page' ) }
 					onClick={ onAddPage }
 				>
 					{ __( 'Add page' ) }
