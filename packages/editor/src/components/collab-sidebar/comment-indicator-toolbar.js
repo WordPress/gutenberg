@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ToolbarButton } from '@wordpress/components';
-import { _x, __, sprintf } from '@wordpress/i18n';
+import { _x, __, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -15,6 +15,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getAvatarBorderColor } from './utils';
 
 const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -40,6 +41,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 						avatar:
 							comment.author_avatar_urls?.[ '48' ] ||
 							comment.author_avatar_urls?.[ '96' ],
+						id: comment.author,
 						isOriginalCommenter: comment.id === thread.id,
 						date: comment.date,
 					} );
@@ -72,7 +74,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 		threadHasMoreParticipants && overflowCount > 0
 			? __( '100+' )
 			: sprintf(
-					// translators: %s: Number of comments.
+					// translators: %s: Number of participants.
 					__( '+%s' ),
 					overflowCount
 			  );
@@ -81,8 +83,12 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 		threadHasMoreParticipants && overflowCount > 0
 			? __( '100+ participants' )
 			: sprintf(
-					// translators: %s: Number of comments.
-					__( '+%s more participants' ),
+					// translators: %s: Number of participants.
+					_n(
+						'+%s more participant',
+						'+%s more participants',
+						overflowCount
+					),
 					overflowCount
 			  );
 
@@ -103,7 +109,12 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 							src={ participant.avatar }
 							alt={ participant.name }
 							className="comment-avatar"
-							style={ { zIndex: maxAvatars - index } }
+							style={ {
+								zIndex: maxAvatars - index,
+								borderColor: getAvatarBorderColor(
+									participant.id
+								),
+							} }
 						/>
 					) ) }
 					{ overflowCount > 0 && (

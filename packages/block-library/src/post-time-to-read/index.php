@@ -18,24 +18,58 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$content = get_the_content();
+	$content              = get_the_content();
+	$average_reading_rate = isset( $attributes['averageReadingSpeed'] ) ? $attributes['averageReadingSpeed'] : 189;
+	$show_time_to_read    = isset( $attributes['showTimeToRead'] ) ? $attributes['showTimeToRead'] : true;
+	$show_word_count      = isset( $attributes['showWordCount'] ) ? $attributes['showWordCount'] : false;
+	$word_count_type      = wp_get_word_count_type();
+	$total_words          = wp_word_count( $content, $word_count_type );
 
-	/*
-	 * Average reading rate - based on average taken from
-	 * https://irisreading.com/average-reading-speed-in-various-languages/
-	 * (Characters/minute used for Chinese rather than words).
-	 */
-	$average_reading_rate = 189;
+	$parts = array();
 
-	$word_count_type = wp_get_word_count_type();
+	// Add "time to read" part, if enabled.
+	if ( $show_time_to_read ) {
+		if ( ! empty( $attributes['displayAsRange'] ) ) {
+			// Calculate faster reading rate with 20% speed = lower minutes,
+			// and slower reading rate with 20% speed = higher minutes.
+			$min_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 0.8 ) );
+			$max_minutes = max( 1, (int) round( $total_words / $average_reading_rate * 1.2 ) );
+			if ( $min_minutes === $max_minutes ) {
+				$max_minutes = $min_minutes + 1;
+			}
+			/* translators: 1: minimum minutes, 2: maximum minutes to read the post. */
+			$time_string = sprintf(
+				/* translators: 1: minimum minutes, 2: maximum minutes to read the post. */
+				_x( '%1$s–%2$s minutes', 'Range of minutes to read' ),
+				$min_minutes,
+				$max_minutes
+			);
+		} else {
+			$minutes_to_read = max( 1, (int) round( $total_words / $average_reading_rate ) );
+			$time_string     = sprintf(
+				/* translators: %s: the number of minutes to read the post. */
+				_n( '%s minute', '%s minutes', $minutes_to_read ),
+				$minutes_to_read
+			);
+		}
+		$parts[] = $time_string;
+	}
 
-	$minutes_to_read = max( 1, (int) round( wp_word_count( $content, $word_count_type ) / $average_reading_rate ) );
+	// Add "word count" part, if enabled.
+	if ( $show_word_count ) {
+		$word_count_string = 'words' === $word_count_type ? sprintf(
+			/* translators: %s: the number of words in the post. */
+			_n( '%s word', '%s words', $total_words ),
+			number_format_i18n( $total_words )
+		) : sprintf(
+			/* translators: %s: the number of characters in the post. */
+			_n( '%s character', '%s characters', $total_words ),
+			number_format_i18n( $total_words )
+		);
+		$parts[] = $word_count_string;
+	}
 
-	$minutes_to_read_string = sprintf(
-		/* translators: %s: the number of minutes to read the post. */
-		_n( '%s minute', '%s minutes', $minutes_to_read ),
-		$minutes_to_read
-	);
+	$display_string = implode( '<br>', $parts );
 
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
@@ -44,9 +78,10 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		$minutes_to_read_string
+		$display_string
 	);
 }
+
 
 /**
  * Registers the `core/post-time-to-read` block on the server.
@@ -59,4 +94,5 @@ function register_block_core_post_time_to_read() {
 		)
 	);
 }
+
 add_action( 'init', 'register_block_core_post_time_to_read' );

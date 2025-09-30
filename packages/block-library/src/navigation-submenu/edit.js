@@ -46,16 +46,13 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
 ];
-
-const DEFAULT_BLOCK = {
-	name: 'core/navigation-link',
-};
 
 /**
  * A React hook to determine if it's dragging within the target element.

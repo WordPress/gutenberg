@@ -1,18 +1,11 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
-	__experimentalUseBorderProps as useBorderProps,
-	__experimentalUseColorProps as useColorProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
-	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	BlockControls,
 	HeadingLevelDropdown,
 	RichText,
@@ -20,7 +13,7 @@ import {
 import { ToolbarGroup } from '@wordpress/components';
 
 export default function Edit( { attributes, setAttributes, context } ) {
-	const { level, title, textAlign, levelOptions } = attributes;
+	const { level, title, levelOptions } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
 		'core/accordion-show-icon': showIcon,
@@ -38,10 +31,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	}, [ iconPosition, showIcon, setAttributes ] );
 
 	const blockProps = useBlockProps();
-	const borderProps = useBorderProps( attributes );
-	const colorProps = useColorProps( attributes );
 	const spacingProps = useSpacingProps( attributes );
-	const shadowProps = useShadowProps( attributes );
 
 	return (
 		<>
@@ -56,38 +46,23 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<TagName
-				{ ...blockProps }
-				className={ clsx(
-					blockProps.className,
-					colorProps.className,
-					borderProps.className,
-					'accordion-content__heading',
-					{
-						[ `has-custom-font-size` ]: blockProps.style.fontSize,
-						[ `icon-position-left` ]: iconPosition === 'left',
-						[ `has-text-align-${ textAlign }` ]: textAlign,
-					}
-				) }
-				style={ {
-					...borderProps.style,
-					...colorProps.style,
-					...shadowProps.style,
-				} }
-			>
+			<TagName { ...blockProps }>
 				<button
-					className={ clsx( 'accordion-content__toggle' ) }
+					className="wp-block-accordion-header__toggle"
 					style={ {
 						...spacingProps.style,
 					} }
 				>
+					{ showIcon && iconPosition === 'left' && (
+						<span
+							className="wp-block-accordion-header__toggle-icon"
+							aria-hidden="true"
+						>
+							+
+						</span>
+					) }
 					<RichText
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
+						withoutInteractiveFormatting
 						disableLineBreaks
 						tagName="span"
 						value={ title }
@@ -95,9 +70,13 @@ export default function Edit( { attributes, setAttributes, context } ) {
 							setAttributes( { title: newTitle } )
 						}
 						placeholder={ __( 'Accordion title' ) }
+						className="wp-block-accordion-header__toggle-title"
 					/>
-					{ showIcon && (
-						<span className="accordion-content__toggle-icon">
+					{ showIcon && iconPosition === 'right' && (
+						<span
+							className="wp-block-accordion-header__toggle-icon"
+							aria-hidden="true"
+						>
 							+
 						</span>
 					) }

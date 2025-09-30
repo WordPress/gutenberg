@@ -57,7 +57,7 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
+		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =

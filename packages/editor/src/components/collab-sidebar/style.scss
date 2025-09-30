@@ -13,112 +13,126 @@
 .editor-collab-sidebar-panel {
 	padding: $grid-unit-20;
 	height: 100%;
+}
 
-	&__thread {
-		position: relative;
-		padding: $grid-unit-20;
-		border-radius: $radius-large;
-		border: 1.5px solid $gray-300;
-		background-color: $gray-100;
-		margin-bottom: $grid-unit-20;
-	}
+.editor-collab-sidebar-panel__thread {
+	position: relative;
+	padding: $grid-unit-20;
+	border-radius: $radius-large;
+	border: 1.5px solid $gray-300;
+	background-color: $gray-100;
 
-	&__active-thread {
-		border: 1.5px solid #3858e9;
-	}
-
-	&__focus-thread {
-		border: 1.5px solid #3858e9;
+	&.is-selected {
 		background-color: $white;
+		border: 1.5px solid #3858e9;
 		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
 	}
 
-	&__comment-field {
-		flex: 1;
+	&:focus-visible {
+		outline: auto;
+	}
+}
 
-		button {
-			flex-grow: 1;
-			justify-content: center;
-		}
+.editor-collab-sidebar-panel__child-thread {
+	margin-top: 15px;
+}
+
+.editor-collab-sidebar-panel__user-name {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+	text-transform: capitalize;
+}
+
+.editor-collab-sidebar-panel__user-time {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__user-comment {
+	p:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__user-avatar {
+	border-radius: $radius-round;
+	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+}
+
+.editor-collab-sidebar-panel__thread-overlay {
+	background-color: rgba(0, 0, 0, 0.7);
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	padding: 15px;
+	border-radius: $radius-large;
+	color: $white;
+
+	p {
+		margin-bottom: 15px;
 	}
 
-	&__child-thread {
-		margin-top: 15px;
-	}
-
-	&__user-name {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-		text-transform: capitalize;
-	}
-
-	&__user-time {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-	}
-
-	&__user-comment {
-		p:last-child {
-			margin-bottom: 0;
-		}
-	}
-
-	&__user-avatar {
-		border-radius: $radius-round;
-		flex-shrink: 0;
-	}
-
-	&__thread-overlay {
-		background-color: rgba(0, 0, 0, 0.7);
-		width: 100%;
-		height: 100%;
-		text-align: center;
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 1;
-		padding: 15px;
-		border-radius: $radius-large;
+	button {
+		padding: 4px 10px;
 		color: $white;
-
-		p {
-			margin-bottom: 15px;
-		}
-
-		button {
-			padding: 4px 10px;
-			color: $white;
-		}
 	}
+}
 
-	&__comment-status {
-		margin-left: auto;
+.editor-collab-sidebar-panel__comment-status {
+	margin-left: auto;
 
-		button {
-			&.has-icon:not(.has-text) {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-				flex-shrink: 0;
-			}
+	button {
+		&.has-icon:not(.has-text) {
+			min-width: 24px;
+			padding: 0;
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
 		}
 	}
+}
 
-	&__comment-dropdown-menu {
-		flex-shrink: 0;
-	}
+.editor-collab-sidebar-panel__comment-dropdown-menu {
+	flex-shrink: 0;
+}
 
-	&__show-more-reply {
-		font-weight: 500;
-		font-style: italic;
+.editor-collab-sidebar-panel__more-reply-separator {
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: $gray-300;
+		flex: 1;
 	}
+}
+
+.editor-collab-sidebar-panel__more-reply-button {
+	font-weight: 500;
+}
+
+.editor-collab-sidebar-panel__comment-form textarea {
+	@include input-control;
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	padding: 9px 11px;
+	line-height: 20px !important;
+	display: block;
 }
 
 // Comment avatar indicators.

@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 // Debug settings for parity with WordPress Core's PHPUnit tests.

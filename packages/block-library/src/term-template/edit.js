@@ -191,13 +191,13 @@ export default function TermTemplateEdit( {
 	clientId,
 	setAttributes,
 	context: {
+		termsToShow,
 		termQuery: {
 			taxonomy,
 			order,
 			orderBy,
 			hideEmpty,
 			hierarchical,
-			parent,
 			perPage = 10,
 		} = {},
 	},
@@ -222,13 +222,18 @@ export default function TermTemplateEdit( {
 		queryArgs
 	);
 
-	// Filter to show only top-level terms if "Show only top-level terms" is enabled.
 	const filteredTerms = useMemo( () => {
-		if ( ! terms || parent !== 0 ) {
-			return terms;
+		if ( ! terms ) {
+			return [];
 		}
-		return terms.filter( ( term ) => ! term.parent );
-	}, [ terms, parent ] );
+		if ( termsToShow === 'top-level' ) {
+			return terms.filter( ( term ) => ! term.parent );
+		}
+		if ( termsToShow === 'subterms' ) {
+			return terms.filter( ( term ) => term.parent );
+		}
+		return terms;
+	}, [ terms, termsToShow ] );
 
 	const { blocks, variations, defaultVariation } = useSelect(
 		( select ) => {
