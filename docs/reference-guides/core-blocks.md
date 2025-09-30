@@ -89,6 +89,14 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 -	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
+## Bookmark/Like-archive
+
+Displays all bookmarked posts ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/bookmark-archive))
+
+-	**Name:** core/bookmark-archive
+-	**Category:** theme
+-	**Supports:** align (full, wide), color (background, gradients, text), interactivity, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+
 ## Button
 
 Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))
