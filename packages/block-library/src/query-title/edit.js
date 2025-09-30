@@ -62,7 +62,6 @@ export default function QueryTitleEdit( {
 		);
 	}
 
-	let defaultLevelOptions;
 	let titleElement;
 	if ( type === 'archive' ) {
 		let title;
@@ -195,8 +194,6 @@ export default function QueryTitleEdit( {
 			title = showPrefix ? __( 'Post Type: Name' ) : __( 'Name' );
 		}
 
-		defaultLevelOptions = [ 0, 1, 2, 3, 4, 5, 6 ];
-
 		titleElement = (
 			<>
 				<InspectorControls>
@@ -240,7 +237,7 @@ export default function QueryTitleEdit( {
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
-					options={ levelOptions || defaultLevelOptions }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

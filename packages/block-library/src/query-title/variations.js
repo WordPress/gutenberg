@@ -40,7 +40,6 @@ const variations = [
 		icon: title,
 		attributes: {
 			type: 'post-type',
-			level: 0,
 		},
 		scope: [ 'inserter' ],
 	},
