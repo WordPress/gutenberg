@@ -8,10 +8,10 @@
 
 if ( ! function_exists( 'wp_word_count' ) ) {
 	/**
-	 * Count words or characters in a provided text string.
+	 * Counts words or characters in a provided text string.
 	 *
 	 * @param string $text  Text to count elements in.
-	 * @param string $type The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+	 * @param string $type  The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
 	 * @param array  $settings {
 	 *     Optional. Array of arguments used to overrides for settings.
 	 *
@@ -53,7 +53,7 @@ if ( ! function_exists( 'wp_word_count' ) ) {
 
 		$count = 0;
 
-		if ( ! $text ) {
+		if ( '' === trim( $text ) ) {
 			return $count;
 		}
 
@@ -103,12 +103,6 @@ if ( ! function_exists( 'wp_word_count' ) ) {
 		}
 
 		// Match with the selected type regular expression to count the items.
-		preg_match_all( $settings[ $type . '_regexp' ], $text, $matches );
-
-		if ( $matches ) {
-			return count( $matches[0] );
-		}
-
-		return $count;
+		return (int) preg_match_all( $settings[ $type . '_regexp' ], $text );
 	}
 }
