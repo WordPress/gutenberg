@@ -73,7 +73,9 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 			'test/source',
 			array(
 				'label'              => array( 'label' => 'Test Source' ),
-				'get_value_callback' => function() { return 123; },
+				'get_value_callback' => function () {
+					return 123;
+				},
 			)
 		);
 
