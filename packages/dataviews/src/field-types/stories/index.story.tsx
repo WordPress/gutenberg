@@ -235,6 +235,9 @@ const fields: Field< DataType >[] = [
 			{ value: 2, label: 'Two' },
 			{ value: 3, label: 'Three' },
 		],
+		setValue: ( { value } ) => ( {
+			numberWithElements: Number( value ),
+		} ),
 	},
 	{
 		id: 'boolean',
