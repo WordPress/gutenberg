@@ -35,7 +35,7 @@ export default function FormPanelField< Item >( {
 	const { fields } = useContext( DataFormContext );
 
 	const layout: NormalizedPanelLayout = normalizeLayout( {
-		...( field.layout ?? {} ),
+		...field.layout,
 		type: 'panel',
 	} as PanelLayout ) as NormalizedPanelLayout;
 

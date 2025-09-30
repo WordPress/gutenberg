@@ -49,7 +49,10 @@ export const getSummaryFields = < Item >(
 	}
 
 	// Use summary field(s) if specified for combined fields
-	if ( summaryField ) {
+	if (
+		typeof summaryField === 'string' ||
+		( Array.isArray( summaryField ) && summaryField.length > 0 )
+	) {
 		const summaryIds = extractSummaryIds( summaryField );
 		return summaryIds
 			.map( ( summaryId ) =>

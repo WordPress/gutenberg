@@ -131,7 +131,7 @@ export default function FormCardField< Item >( {
 	const { fields } = useContext( DataFormContext );
 
 	const layout: NormalizedCardLayout = normalizeLayout( {
-		...( field.layout ?? {} ),
+		...field.layout,
 		type: 'card',
 	} as CardLayout ) as NormalizedCardLayout;
 

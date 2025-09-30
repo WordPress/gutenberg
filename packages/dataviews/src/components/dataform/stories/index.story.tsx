@@ -458,7 +458,7 @@ const LayoutPanelComponent = ( {
 					],
 					layout: {
 						type: 'panel',
-						summary: [ 'origin', 'destination', 'flight_status' ],
+						summary: [],
 					},
 				},
 				{
@@ -980,12 +980,7 @@ const VisibilityComponent = () => {
 	);
 };
 
-const LayoutCardComponent = ( {
-	withHeader,
-}: {
-	withHeader: boolean;
-	summary: SummaryField;
-} ) => {
+const LayoutCardComponent = ( { withHeader }: { withHeader: boolean } ) => {
 	type Customer = {
 		name: string;
 		email: string;
