@@ -100,6 +100,18 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$this->assertSame( '<figure class="wp-block-image"><img class="wp-image-456" src="canola.jpg"/></figure>', $rendered_block );
 	}
 
+	public function test_should_keep_figcaption_if_it_is_not_empty() {
+		$content       = '<figure class="wp-block-image"><img src="canola.jpg"/><figcaption class="wp-element-caption">Image caption</figcaption></figure>';
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:image -->'
+		);
+		$parsed_block  = $parsed_blocks[0];
+		$block         = new WP_Block( $parsed_block );
+
+		$rendered_block = gutenberg_render_block_core_image( array(), $content, $block );
+		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"/><figcaption class="wp-element-caption">Image caption</figcaption></figure>', $rendered_block );
+	}
+
 	public function test_should_remove_figcaption_when_caption_is_empty() {
 		$attributes    = array(
 			'caption' => '',
