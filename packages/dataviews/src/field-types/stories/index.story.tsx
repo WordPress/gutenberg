@@ -135,7 +135,7 @@ const data: DataType[] = [
 		date: '2021-01-01',
 		dateWithElements: '2021-01-01',
 		email: 'hi@example.com',
-		emailWithElements: 'hi@example.com',
+		emailWithElements: 'bob@example.com',
 		telephone: '+1-555-123-4567',
 		telephoneWithElements: '+1-555-123-4567',
 		color: '#ff6600',
@@ -211,6 +211,9 @@ const fields: Field< DataType >[] = [
 			{ value: 2, label: 'Two' },
 			{ value: 3, label: 'Three' },
 		],
+		setValue: ( { value } ) => ( {
+			integerWithElements: Number( value ),
+		} ),
 	},
 	{
 		id: 'boolean',
@@ -234,6 +237,9 @@ const fields: Field< DataType >[] = [
 			{ value: true, label: 'It is true' },
 			{ value: false, label: 'It is false' },
 		],
+		setValue: ( { value } ) => ( {
+			booleanWithElements: value === 'true' ? true : false,
+		} ),
 	},
 	{
 		id: 'datetime',
@@ -294,6 +300,9 @@ const fields: Field< DataType >[] = [
 			{ value: 'jane@example.com', label: 'Jane Doe' },
 			{ value: 'bob@example.com', label: 'Bob Smith' },
 		],
+		setValue: ( { value } ) => ( {
+			emailWithElements: value,
+		} ),
 	},
 	{
 		id: 'telephone',
