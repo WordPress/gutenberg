@@ -25,6 +25,12 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+const touchStartEvent = {
+	startX: 0,
+	startY: 0,
+	startTime: 0,
+};
+
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
@@ -257,15 +263,50 @@ const { state, actions, callbacks } = store(
 					event.preventDefault();
 				}
 			} ),
-			handleTouchStart() {
+			handleTouchStart( event ) {
 				isTouching = true;
+				const t = event.touches && event.touches[ 0 ];
+				if ( t ) {
+					touchStartEvent.startX = t.clientX;
+					touchStartEvent.startY = t.clientY;
+					touchStartEvent.startTime = Date.now();
+				}
 			},
-			handleTouchEnd() {
-				// Waits a few milliseconds before resetting to ensure that pinch to
-				// zoom works consistently on mobile devices when the lightbox is open.
-				lastTouchTime = Date.now();
+			handleTouchEnd: withSyncEvent( ( event ) => {
+				const touchEndEvent =
+					( event.changedTouches && event.changedTouches[ 0 ] ) ||
+					( event.touches && event.touches[ 0 ] );
+				const now = Date.now();
+
+				if ( touchEndEvent && state.overlayEnabled ) {
+					const deltaX =
+						touchEndEvent.clientX - touchStartEvent.startX;
+					const deltaY =
+						touchEndEvent.clientY - touchStartEvent.startY;
+					const absDeltaX = Math.abs( deltaX );
+					const absDeltaY = Math.abs( deltaY );
+					const elapsedMs = now - touchStartEvent.startTime;
+					const isHorizontalSwipe =
+						// Swipe distance is greater than 50px
+						absDeltaX > 50 &&
+						// Horizontal movement is much larger than the vertical movement
+						absDeltaX > absDeltaY * 1.5 &&
+						// Fast action of less than 800ms
+						elapsedMs < 800;
+
+					if ( isHorizontalSwipe ) {
+						event.preventDefault();
+						if ( deltaX < 0 ) {
+							actions.showNextImage( event );
+						} else {
+							actions.showPreviousImage( event );
+						}
+					}
+				}
+
+				lastTouchTime = now;
 				isTouching = false;
-			},
+			} ),
 			handleScroll() {
 				// Prevents scrolling behaviors that trigger content shift while the
 				// lightbox is open. It would be better to accomplish through CSS alone,
