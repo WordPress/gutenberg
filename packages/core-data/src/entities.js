@@ -40,24 +40,6 @@ export const rootEntitiesConfig = [
 		// The entity doesn't support selecting multiple records.
 		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/base',
-		getSyncObjectId: () => 'index',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -67,26 +49,6 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
 		plural: 'postTypes',
-		syncConfig: {
-			fetch: async ( id ) => {
-				return apiFetch( {
-					path: `/wp/v2/types/${ id }?context=edit`,
-				} );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/postType',
-		getSyncObjectId: ( id ) => id,
 	},
 	{
 		name: 'media',
@@ -413,24 +375,6 @@ async function loadSiteEntity() {
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
 		meta: {},
 	};
 
