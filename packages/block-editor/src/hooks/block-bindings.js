@@ -73,7 +73,6 @@ function BlockBindingsPanelMenuContent( {
 		},
 		[ clientId, attribute ]
 	);
-
 	return (
 		<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
 			{ Object.entries( sources ).map( ( [ sourceKey, source ] ) => {
@@ -82,10 +81,8 @@ function BlockBindingsPanelMenuContent( {
 					( item ) => item?.type === attributeType
 				);
 
-				// Skip sources with no compatible data
-				if ( ! sourceDataItems || sourceDataItems.length === 0 ) {
-					return null;
-				}
+				const noItemsAvailable =
+					! sourceDataItems || sourceDataItems.length === 0;
 
 				if ( source.mode === 'dropdown' ) {
 					return (
@@ -95,81 +92,99 @@ function BlockBindingsPanelMenuContent( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 						>
-							<Menu.SubmenuTriggerItem>
-								<Menu.ItemLabel>
-									{ source.label }
-								</Menu.ItemLabel>
-							</Menu.SubmenuTriggerItem>
-							<Menu.Popover gutter={ 8 }>
-								<Menu.Group>
-									{ sourceDataItems.map( ( item ) => {
-										const itemBindings = {
-											source: sourceKey,
-											args: item?.args || {
-												key: item.key,
-											},
-										};
-										const values = source.getValues( {
-											select,
-											context: blockContext,
-											bindings: {
-												[ attribute ]: itemBindings,
-											},
-										} );
-										return (
-											<Menu.CheckboxItem
-												key={
-													sourceKey +
-														JSON.stringify(
-															item.args
-														) || item.key
-												}
-												onChange={ () => {
-													const isCurrentlySelected =
+							{ noItemsAvailable ? (
+								<Menu.Item disabled>{ source.label }</Menu.Item>
+							) : (
+								<Menu.SubmenuTriggerItem>
+									<Menu.ItemLabel>
+										{ source.label }
+									</Menu.ItemLabel>
+								</Menu.SubmenuTriggerItem>
+							) }
+
+							{ ! noItemsAvailable && (
+								<Menu.Popover gutter={ 8 }>
+									<Menu.Group>
+										{ sourceDataItems.map( ( item ) => {
+											const itemBindings = {
+												source: sourceKey,
+												args: item?.args || {
+													key: item.key,
+												},
+											};
+											const values = source.getValues( {
+												select,
+												context: blockContext,
+												bindings: {
+													[ attribute ]: itemBindings,
+												},
+											} );
+											return (
+												<Menu.CheckboxItem
+													key={
+														sourceKey +
+															JSON.stringify(
+																item.args
+															) || item.key
+													}
+													onChange={ () => {
+														const isCurrentlySelected =
+															fastDeepEqual(
+																binding?.args,
+																item.args
+															) ??
+															// Deprecate key dependency in 7.0.
+															item.key ===
+																binding?.args
+																	?.key;
+
+														if (
+															isCurrentlySelected
+														) {
+															// Unset if the same item is selected again.
+															updateBlockBindings(
+																{
+																	[ attribute ]:
+																		undefined,
+																}
+															);
+														} else {
+															updateBlockBindings(
+																{
+																	[ attribute ]:
+																		itemBindings,
+																}
+															);
+														}
+													} }
+													name={
+														attribute + '-binding'
+													}
+													value={
+														values[ attribute ]
+													}
+													checked={
 														fastDeepEqual(
 															binding?.args,
 															item.args
 														) ??
 														// Deprecate key dependency in 7.0.
 														item.key ===
-															binding?.args?.key;
-
-													if ( isCurrentlySelected ) {
-														// Unset if the same item is selected again.
-														updateBlockBindings( {
-															[ attribute ]:
-																undefined,
-														} );
-													} else {
-														updateBlockBindings( {
-															[ attribute ]:
-																itemBindings,
-														} );
+															binding?.args?.key
 													}
-												} }
-												name={ attribute + '-binding' }
-												value={ values[ attribute ] }
-												checked={
-													fastDeepEqual(
-														binding?.args,
-														item.args
-													) ??
-													// Deprecate key dependency in 7.0.
-													item.key ===
-														binding?.args?.key
-												}
-											>
-												<Menu.ItemLabel>
-													{ item?.label }
-												</Menu.ItemLabel>
-												<Menu.ItemHelpText>
-													{ values[ attribute ] }
-												</Menu.ItemHelpText>
-											</Menu.CheckboxItem>
-										);
-									} ) }
-								</Menu.Group>
-							</Menu.Popover>
+												>
+													<Menu.ItemLabel>
+														{ item?.label }
+													</Menu.ItemLabel>
+													<Menu.ItemHelpText>
+														{ values[ attribute ] }
+													</Menu.ItemHelpText>
+												</Menu.CheckboxItem>
+											);
+										} ) }
+									</Menu.Group>
+								</Menu.Popover>
+							) }
 						</Menu>
 					);
 				}

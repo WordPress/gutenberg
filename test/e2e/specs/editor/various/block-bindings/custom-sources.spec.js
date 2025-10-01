@@ -1308,4 +1308,28 @@ test.describe( 'Registered sources', () => {
 			await expect( contentButton ).toContainText( 'Text Field Label' );
 		} );
 	} );
+
+	test.describe( 'Source compatibility filtering', () => {
+		test( 'should show compatible sources enabled and incompatible sources disabled', async ( {
+			editor,
+			page,
+		} ) => {
+			// Test string attribute - paragraph content
+			await editor.insertBlock( { name: 'core/image' } );
+			await page.getByLabel( 'Attributes options' ).click();
+			await page
+				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.click();
+			await page.getByRole( 'button', { name: 'id' } ).click();
+
+			// String sources enabled, number source disabled for string attribute
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Complete Source' } )
+			).toBeDisabled();
+
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Modal Source' } )
+			).toBeEnabled();
+		} );
+	} );
 } );
