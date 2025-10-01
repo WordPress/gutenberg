@@ -135,80 +135,73 @@ export const getEntityRecord =
 						}
 					);
 				}
-			} else {
-				if ( query !== undefined && query._fields ) {
-					// If requesting specific fields, items and query association to said
-					// records are stored by ID reference. Thus, fields must always include
-					// the ID.
-					query = {
-						...query,
-						_fields: [
-							...new Set( [
-								...( getNormalizedCommaSeparable(
-									query._fields
-								) || [] ),
-								entityConfig.key || DEFAULT_ENTITY_KEY,
-							] ),
-						].join(),
-					};
-				}
+			}
+			if ( query !== undefined && query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
+			}
 
-				if ( query !== undefined && query._fields ) {
-					// The resolution cache won't consider query as reusable based on the
-					// fields, so it's tested here, prior to initiating the REST request,
-					// and without causing `getEntityRecord` resolution to occur.
-					const hasRecord = select.hasEntityRecord(
+			if ( query !== undefined && query._fields ) {
+				// The resolution cache won't consider query as reusable based on the
+				// fields, so it's tested here, prior to initiating the REST request,
+				// and without causing `getEntityRecord` resolution to occur.
+				const hasRecord = select.hasEntityRecord(
+					kind,
+					name,
+					key,
+					query
+				);
+				if ( hasRecord ) {
+					return;
+				}
+			}
+
+			const path = addQueryArgs(
+				entityConfig.baseURL + ( key ? '/' + key : '' ),
+				{
+					...entityConfig.baseURLParams,
+					...query,
+				}
+			);
+			const response = await apiFetch( { path, parse: false } );
+			const record = await response.json();
+			const permissions = getUserPermissionsFromAllowHeader(
+				response.headers?.get( 'allow' )
+			);
+
+			const canUserResolutionsArgs = [];
+			const receiveUserPermissionArgs = {};
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				receiveUserPermissionArgs[
+					getUserPermissionCacheKey( action, {
 						kind,
 						name,
-						key,
-						query
-					);
-					if ( hasRecord ) {
-						return;
-					}
-				}
+						id: key,
+					} )
+				] = permissions[ action ];
 
-				const path = addQueryArgs(
-					entityConfig.baseURL + ( key ? '/' + key : '' ),
-					{
-						...entityConfig.baseURLParams,
-						...query,
-					}
-				);
-				const response = await apiFetch( { path, parse: false } );
-				const record = await response.json();
-				const permissions = getUserPermissionsFromAllowHeader(
-					response.headers?.get( 'allow' )
-				);
-
-				const canUserResolutionsArgs = [];
-				const receiveUserPermissionArgs = {};
-				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-					receiveUserPermissionArgs[
-						getUserPermissionCacheKey( action, {
-							kind,
-							name,
-							id: key,
-						} )
-					] = permissions[ action ];
-
-					canUserResolutionsArgs.push( [
-						action,
-						{ kind, name, id: key },
-					] );
-				}
-
-				registry.batch( () => {
-					dispatch.receiveEntityRecords( kind, name, record, query );
-					dispatch.receiveUserPermissions(
-						receiveUserPermissionArgs
-					);
-					dispatch.finishResolutions(
-						'canUser',
-						canUserResolutionsArgs
-					);
-				} );
+				canUserResolutionsArgs.push( [
+					action,
+					{ kind, name, id: key },
+				] );
 			}
+
+			registry.batch( () => {
+				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
+				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
+			} );
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
