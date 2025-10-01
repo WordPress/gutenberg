@@ -28,6 +28,7 @@ import type {
 	SyncConfig,
 	RecordHandlers,
 } from './types';
+import { UndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 
 interface EntityState {
@@ -140,6 +141,10 @@ export class SyncProvider {
 
 		if ( syncConfig.supports?.awareness ) {
 			entityState.awareness = new Awareness( ydoc );
+		}
+
+		if ( syncConfig.supports?.undo ) {
+			UndoManager.create().addToScope( recordMap );
 		}
 
 		this.entityStates.set( entityId, entityState );
@@ -338,6 +343,15 @@ export class SyncProvider {
 	}
 
 	/* eslint-enable @typescript-eslint/no-unused-vars */
+
+	/**
+	 * Get the undo manager.
+	 *
+	 * @return {UndoManager | null} The undo manager, or null if unsupported.
+	 */
+	public getUndoManager(): UndoManager | null {
+		return UndoManager.create() ?? null;
+	}
 
 	/**
 	 * Update CRDT document with changes from the local store.
