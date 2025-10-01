@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { moreHorizontal } from '@wordpress/icons';
+import { breadcrumbs } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon: moreHorizontal,
+	icon: breadcrumbs,
 	edit,
 };
 

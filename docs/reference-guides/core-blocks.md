@@ -91,7 +91,7 @@ Display a breadcrumb trail only for Pages, or for hierarchical post types. The b
 
 -	**Name:** core/breadcrumbs
 -	**Category:** theme
--	**Supports:** ~~html~~, ~~reusable~~
+-	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** separator, showHomeLink
 
 ## Button

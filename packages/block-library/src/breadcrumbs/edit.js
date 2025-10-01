@@ -5,8 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -19,9 +18,7 @@ import { useServerSideRender } from '@wordpress/server-side-render';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-const separatorOptions = [ '/', '>', '|' ];
-const defaultValue = '/';
+const separatorDefaultValue = '/';
 
 export default function BreadcrumbEdit( {
 	attributes,
@@ -42,6 +39,7 @@ export default function BreadcrumbEdit( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { content } = useServerSideRender( {
 		attributes,
+		skipBlockSupportAttributes: true,
 		block: 'core/breadcrumbs',
 		urlQueryArgs: { post_id: postId },
 	} );
@@ -58,7 +56,6 @@ export default function BreadcrumbEdit( {
 		placeholder = (
 			<nav
 				style={ {
-					...blockProps.style,
 					'--separator': `'${ separator }'`,
 				} }
 			>
@@ -74,7 +71,7 @@ export default function BreadcrumbEdit( {
 						</li>
 					) ) }
 					<li>
-						<span>{ __( 'Page' ) }</span>
+						<span>{ __( 'Current' ) }</span>
 					</li>
 				</ol>
 			</nav>
@@ -87,7 +84,7 @@ export default function BreadcrumbEdit( {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							separator: defaultValue,
+							separator: separatorDefaultValue,
 							showHomeLink: true,
 						} );
 					} }
@@ -115,31 +112,23 @@ export default function BreadcrumbEdit( {
 					<ToolsPanelItem
 						label={ __( 'Separator' ) }
 						isShownByDefault
-						hasValue={ () => separator !== defaultValue }
+						hasValue={ () => separator !== separatorDefaultValue }
 						onDeselect={ () =>
 							setAttributes( {
-								separator: defaultValue,
+								separator: separatorDefaultValue,
 							} )
 						}
 					>
-						<ToggleGroupControl
+						<TextControl
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize
+							autoComplete="off"
 							label={ __( 'Separator' ) }
 							value={ separator }
 							onChange={ ( value ) =>
 								setAttributes( { separator: value } )
 							}
-							isBlock
-						>
-							{ separatorOptions.map( ( option ) => (
-								<ToggleGroupControlOption
-									key={ option }
-									value={ option }
-									label={ option }
-								/>
-							) ) }
-						</ToggleGroupControl>
+						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
