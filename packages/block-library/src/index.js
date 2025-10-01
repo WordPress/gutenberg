@@ -6,7 +6,10 @@ import {
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
+	registerBlockType,
 } from '@wordpress/blocks';
+import { createElement } from '@wordpress/element';
+import ServerSideRender from '@wordpress/server-side-render';
 
 /**
  * Internal dependencies
@@ -308,6 +311,22 @@ export const registerCoreBlocks = (
 	blocks = __experimentalGetCoreBlocks()
 ) => {
 	blocks.forEach( ( { init } ) => init() );
+
+	// Auto-register PHP-only blocks with ServerSideRender
+	if ( window.__unstableAutoRegisterBlocks ) {
+		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+			registerBlockType( blockName, {
+				title: blockName,
+				edit: ( { attributes } ) => {
+					return createElement( ServerSideRender, {
+						block: blockName,
+						attributes,
+					} );
+				},
+				save: () => null,
+			} );
+		} );
+	}
 
 	setDefaultBlockName( paragraph.name );
 	if (

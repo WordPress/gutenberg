@@ -43,5 +43,30 @@ add_action(
 				'editor_script_handles' => array( 'server-side-rendered-block' ),
 			)
 		);
+
+		// PHP-only block with auto_register flag, will be auto-registered without JS code
+		register_block_type(
+			'test/auto-register-block',
+			array(
+				'api_version'     => 3,
+				'render_callback' => static function () {
+					return '<div>Auto-register block content</div>';
+				},
+				'supports'        => array(
+					'auto_register' => true,
+				),
+			)
+		);
+
+		// PHP-only block WITHOUT auto_register flag, will NOT be auto-registered without JS code
+		register_block_type(
+			'test/php-only-no-auto-register',
+			array(
+				'api_version'     => 3,
+				'render_callback' => static function () {
+					return '<div>PHP-only block content</div>';
+				},
+			)
+		);
 	}
 );
