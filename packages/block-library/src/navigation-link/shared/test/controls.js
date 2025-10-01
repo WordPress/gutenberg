@@ -7,29 +7,6 @@
  */
 import { render, screen, fireEvent } from '@testing-library/react';
 
-// Suppress console warnings for ToolsPanel component testing
-// eslint-disable-next-line no-console
-const originalConsoleError = console.error;
-beforeAll( () => {
-	// eslint-disable-next-line no-console
-	console.error = ( ...args ) => {
-		if (
-			typeof args[ 0 ] === 'string' &&
-			args[ 0 ].includes( 'Warning: An update to' ) &&
-			args[ 0 ].includes( 'inside a test was not wrapped in act' )
-		) {
-			return;
-		}
-		// eslint-disable-next-line no-console
-		originalConsoleError.call( console, ...args );
-	};
-} );
-
-afterAll( () => {
-	// eslint-disable-next-line no-console
-	console.error = originalConsoleError;
-} );
-
 /**
  * Internal dependencies
  */
