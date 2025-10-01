@@ -172,6 +172,11 @@ function gutenberg_get_template( $template, $type, $templates ) {
 	return gutenberg_locate_block_template( $template, $type, $templates );
 }
 
+function testtesttest( $templates, $query, $template_type ) {
+	var_dump( $templates, $query, $template_type );
+	return $templates;
+}
+
 ///////////////////////////////////////////////////////////////////////
 // This function is a copy of core's, except for the marked section. //
 ///////////////////////////////////////////////////////////////////////
@@ -247,6 +252,21 @@ function gutenberg_resolve_block_template( $template_type, $template_hierarchy, 
 		}
 
 		$templates[] = $template;
+	}
+
+	// Apply the filter to the active templates for backward compatibility.
+	if ( ! empty( $templates ) ) {
+		$templates = apply_filters(
+			'get_block_templates',
+			$templates,
+			array(
+				'slug__in' => array_map(
+					fn( $template ) => $template->slug,
+					$templates
+				),
+			),
+			'wp_template'
+		);
 	}
 
 	// For any remaining slugs, use the static template.
