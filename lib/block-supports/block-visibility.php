@@ -8,9 +8,9 @@
 /**
  * Render nothing if the block is hidden.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
