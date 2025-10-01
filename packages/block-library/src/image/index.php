@@ -22,28 +22,34 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$internal_processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
+	$p = new class( $content ) extends WP_HTML_Tag_Processor {
 		// phpcs:ignore Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
 		public function span_of_empty_element() {
 			$tag_name = $this->get_tag();
 			$this->set_bookmark( '_wp_image_block_figcaption' );
-			// The bookmark names are prefixed with `_` so the key below has an extra `_`.
-			$opener = $this->bookmarks['__wp_image_block_figcaption'];
+			$opener = $this->bookmarks['_wp_image_block_figcaption'];
 
-			$this->next_token();
-			if ( $this->get_tag() !== $tag_name || ! $this->is_tag_closer() ) {
-				// Not an empty element.
+			if ( ! $this->next_tag(
+				array(
+					'tag_name'    => $tag_name,
+					'tag_closers' => 'visit',
+				)
+			) ) {
+				// No matching closing tag found.
 				return false;
 			}
 
 			$this->set_bookmark( '_wp_image_block_figcaption' );
-			$closer = $this->bookmarks['__wp_image_block_figcaption'];
+			$closer = $this->bookmarks['_wp_image_block_figcaption'];
+
+			if ( $closer->start !== $opener->start + $opener->length ) {
+				// Not an empty element.
+				return false;
+			}
 
 			return new WP_HTML_Span( $opener->start, $closer->start + $closer->length - $opener->start );
 		}
 	};
-
-	$p = $internal_processor_class::create_fragment( $content );
 
 	if ( ! $p->next_tag( 'img' ) || ! $p->get_attribute( 'src' ) ) {
 		return '';
