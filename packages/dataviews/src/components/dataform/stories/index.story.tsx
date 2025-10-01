@@ -523,8 +523,11 @@ const ValidationComponent = ( {
 		url: string;
 		color: string;
 		integer: number;
+		number: number;
 		boolean: boolean;
 		customEdit: string;
+		categories: string[];
+		countries: string[];
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
@@ -540,7 +543,10 @@ const ValidationComponent = ( {
 		url: 'https://example.com',
 		color: '#ff6600',
 		integer: 2,
+		number: 3.14,
 		boolean: true,
+		categories: [ 'astronomy' ],
+		countries: [ 'us' ],
 		customEdit: 'custom control',
 		password: 'secretpassword123',
 		toggle: undefined,
@@ -608,6 +614,13 @@ const ValidationComponent = ( {
 	const customIntegerRule = ( value: ValidatedItem ) => {
 		if ( value.integer % 2 !== 0 ) {
 			return 'Integer must be an even number.';
+		}
+
+		return null;
+	};
+	const customNumberRule = ( value: ValidatedItem ) => {
+		if ( ! /^\d+\.\d{2}$/.test( value?.number?.toString() ) ) {
+			return 'Number must have exactly two decimal places.';
 		}
 
 		return null;
@@ -747,6 +760,15 @@ const ValidationComponent = ( {
 			},
 		},
 		{
+			id: 'number',
+			type: 'number',
+			label: 'Number',
+			isValid: {
+				required,
+				custom: maybeCustomRule( customNumberRule ),
+			},
+		},
+		{
 			id: 'boolean',
 			type: 'boolean',
 			label: 'Boolean',
@@ -754,6 +776,41 @@ const ValidationComponent = ( {
 				required,
 				custom: maybeCustomRule( customBooleanRule ),
 			},
+		},
+		{
+			id: 'categories',
+			type: 'array' as const,
+			label: 'Categories',
+			isValid: {
+				required,
+			},
+			elements: [
+				{ value: 'astronomy', label: 'Astronomy' },
+				{ value: 'book-review', label: 'Book review' },
+				{ value: 'event', label: 'Event' },
+				{ value: 'photography', label: 'Photography' },
+				{ value: 'travel', label: 'Travel' },
+			],
+		},
+		{
+			id: 'countries',
+			label: 'Countries Visited',
+			type: 'array' as const,
+			placeholder: 'Select countries',
+			description: 'Countries you have visited',
+			isValid: {
+				required,
+				elements: true,
+			},
+			elements: [
+				{ value: 'us', label: 'United States' },
+				{ value: 'ca', label: 'Canada' },
+				{ value: 'uk', label: 'United Kingdom' },
+				{ value: 'fr', label: 'France' },
+				{ value: 'de', label: 'Germany' },
+				{ value: 'jp', label: 'Japan' },
+				{ value: 'au', label: 'Australia' },
+			],
 		},
 		{
 			id: 'customEdit',
@@ -811,7 +868,10 @@ const ValidationComponent = ( {
 			'url',
 			'color',
 			'integer',
+			'number',
 			'boolean',
+			'categories',
+			'countries',
 			'toggle',
 			'toggleGroup',
 			'password',
@@ -853,11 +913,15 @@ const VisibilityComponent = () => {
 		name: string;
 		email: string;
 		isActive: boolean;
+		homepageDisplay: string;
+		staticHomepage: string;
 	};
 	const [ data, setData ] = useState( {
 		name: '',
 		email: '',
 		isActive: true,
+		homepageDisplay: 'latest',
+		staticHomepage: '',
 	} );
 
 	const _fields: Field< Post >[] = [
@@ -874,9 +938,36 @@ const VisibilityComponent = () => {
 			type: 'email',
 			isVisible: ( post ) => post.isActive === true,
 		},
+		{
+			id: 'homepageDisplay',
+			label: 'Homepage display',
+			elements: [
+				{ value: 'latest', label: 'Latest post' },
+				{ value: 'static', label: 'Static page' },
+			],
+		},
+		{
+			id: 'staticHomepage',
+			label: 'Static homepage',
+			elements: [
+				{ value: 'welcome', label: 'Welcome to my website' },
+				{ value: 'about', label: 'About' },
+			],
+			isVisible: ( post ) => post.homepageDisplay === 'static',
+		},
 	];
 	const form: Form = {
-		fields: [ 'isActive', 'name', 'email' ],
+		layout: { type: 'card' },
+		fields: [
+			{
+				id: 'booleanExample',
+				children: [ 'isActive', 'name', 'email' ],
+			},
+			{
+				id: 'selectExample',
+				children: [ 'homepageDisplay', 'staticHomepage' ],
+			},
+		],
 	};
 	return (
 		<DataForm< Post >
