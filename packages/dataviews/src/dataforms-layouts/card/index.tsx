@@ -147,11 +147,7 @@ export default function FormCardField< Item >( {
 		layout.isOpened
 	);
 
-	const summaryFields = getSummaryFields< Item >(
-		layout.summary,
-		field,
-		fields
-	);
+	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
 	if ( isCombinedField( field ) ) {
 		const withHeader = !! field.label && layout.withHeader;

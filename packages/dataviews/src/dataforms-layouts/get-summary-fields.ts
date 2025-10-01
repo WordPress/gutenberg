@@ -1,13 +1,7 @@
 /**
  * Internal dependencies
  */
-import type {
-	FormField,
-	NormalizedField,
-	SimpleFormField,
-	SummaryField,
-} from '../types';
-import { isCombinedField } from './is-combined-field';
+import type { NormalizedField, SummaryField } from '../types';
 
 /**
  * Extracts field IDs from various summary field formats.
@@ -33,17 +27,16 @@ function extractSummaryIds( summary: SummaryField ): string[] {
 	return [];
 }
 
+/**
+ * Returns the summary fields for a given field.
+ * @param summaryField - The summary field configuration.
+ * @param fields       - The fields to get the summary fields from.
+ * @return The summary fields.
+ */
 export const getSummaryFields = < Item >(
 	summaryField: SummaryField,
-	field: FormField,
 	fields: NormalizedField< Item >[]
 ): NormalizedField< Item >[] => {
-	if ( ! isCombinedField( field ) ) {
-		const fieldDef = fields.find( ( _field ) => _field.id === field.id );
-		return fieldDef ? [ fieldDef ] : [];
-	}
-
-	// Use summary field(s) if specified for combined fields
 	if (
 		typeof summaryField === 'string' ||
 		( Array.isArray( summaryField ) && summaryField.length > 0 )
@@ -56,23 +49,5 @@ export const getSummaryFields = < Item >(
 			.filter( ( _field ) => _field !== undefined );
 	}
 
-	// Default to the first simple child
-	const simpleChildren = field.children.filter(
-		( child ): child is string | SimpleFormField =>
-			typeof child === 'string' || ! isCombinedField( child )
-	);
-
-	if ( simpleChildren.length === 0 ) {
-		return [];
-	}
-
-	const firstChildFieldId =
-		typeof simpleChildren[ 0 ] === 'string'
-			? simpleChildren[ 0 ]
-			: simpleChildren[ 0 ].id;
-
-	const fieldDef = fields.find(
-		( _field ) => _field.id === firstChildFieldId
-	);
-	return fieldDef ? [ fieldDef ] : [];
+	return [];
 };
