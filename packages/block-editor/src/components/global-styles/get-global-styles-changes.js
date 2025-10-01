@@ -28,6 +28,8 @@ const translationMap = {
 	'styles.spacing': __( 'Spacing' ),
 	'styles.background': __( 'Background' ),
 	'styles.typography': __( 'Typography' ),
+	'settings.shadow': __( 'Shadow' ),
+	'settings.layout': __( 'Layout' ),
 };
 const getBlockNames = memoize( () =>
 	getBlockTypes().reduce( ( accumulator, { name, title } ) => {
