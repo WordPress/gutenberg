@@ -57,7 +57,7 @@ module.exports = ( token ) => {
 	if ( ! token.declaration ) {
 		token.specifiers.forEach( ( specifier ) =>
 			name.push( {
-				localName: specifier.local?.name ?? specifier.exported.name,
+				localName: specifier.local?.name,
 				exportName: specifier.exported.name,
 				module: token.source?.value ?? null,
 				lineStart: specifier.loc.start.line,
