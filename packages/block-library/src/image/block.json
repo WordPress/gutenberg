@@ -45,6 +45,10 @@
 			"type": "object",
 			"enabled": {
 				"type": "boolean"
+			},
+			"applyStyles": {
+				"type": "boolean",
+				"default": "true"
 			}
 		},
 		"title": {

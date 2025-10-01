@@ -167,8 +167,12 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 
 	// Figure.
 	$p->seek( 'figure' );
-	$figure_class_names = $p->get_attribute( 'class' );
-	$figure_styles      = $p->get_attribute( 'style' );
+
+	$lightbox_settings = $block['attrs']['lightbox'];
+	if ( isset( $lightbox_settings ) && isset( $lightbox_settings['applyStyles'] ) && true === $lightbox_settings['applyStyles'] ) {
+		$figure_class_names = $p->get_attribute( 'class' );
+		$figure_styles      = $p->get_attribute( 'style' );
+	}
 
 	// Create unique id and set the image metadata in the state.
 	$unique_image_id = uniqid();
@@ -179,8 +183,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			'metadata' => array(
 				$unique_image_id => array(
 					'uploadedSrc'      => $img_uploaded_src,
-					'figureClassNames' => $figure_class_names,
-					'figureStyles'     => $figure_styles,
+					'figureClassNames' => $figure_class_names ?? '',
+					'figureStyles'     => $figure_styles ?? '',
 					'imgClassNames'    => $img_class_names,
 					'imgStyles'        => $img_styles,
 					'targetWidth'      => $img_width,
