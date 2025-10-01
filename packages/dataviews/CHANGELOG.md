@@ -35,6 +35,7 @@
 
 - Introduce a new `DataViewsPicker` component. [#70971](https://github.com/WordPress/gutenberg/pull/70971) and [#71836](https://github.com/WordPress/gutenberg/pull/71836).
 - DataForm: Add support for elements validation in array fields [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+- DataViews: lazy load elements data [#71930](https://github.com/WordPress/gutenberg/pull/71930)
 
 ### Bug Fixes
 
