@@ -374,7 +374,7 @@ export const deleteEntityRecord =
  */
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
-	( { select, dispatch } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
@@ -408,15 +408,16 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-				const objectId = entityConfig.getSyncObjectId( recordId );
-				getSyncProvider().update(
-					entityConfig.syncObjectType + '--edit',
-					objectId,
-					edit.edits
-				);
-			}
+		if (
+			window.__experimentalEnableSync &&
+			entityConfig.syncConfig?.enabled
+		) {
+			getSyncProvider().updateCRDTDoc(
+				entityConfig.syncConfig,
+				record,
+				edit.edits,
+				'gutenberg'
+			);
 		}
 		if ( ! options.undoIgnore ) {
 			select.getUndoManager().addRecord(

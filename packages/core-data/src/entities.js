@@ -8,7 +8,16 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { RichTextData } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import {
+	applyPostChangesToCRDTDoc,
+	getInitialPostObjectData,
+	getPostChangesFromCRDTDoc,
+	getSyncedPropertiesForPostType,
+} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -238,29 +247,6 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
-const serialisableBlocksCache = new WeakMap();
-
-function makeBlockAttributesSerializable( attributes ) {
-	const newAttributes = { ...attributes };
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		if ( value instanceof RichTextData ) {
-			newAttributes[ key ] = value.valueOf();
-		}
-	}
-	return newAttributes;
-}
-
-function makeBlocksSerializable( blocks ) {
-	return blocks.map( ( block ) => {
-		const { innerBlocks, attributes, ...rest } = block;
-		return {
-			...rest,
-			attributes: makeBlockAttributesSerializable( attributes ),
-			innerBlocks: makeBlocksSerializable( innerBlocks ),
-		};
-	} );
-}
-
 /**
  * Returns the list of post type entities.
  *
@@ -268,13 +254,15 @@ function makeBlocksSerializable( blocks ) {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+		const syncedProperties = getSyncedPropertiesForPostType( postType );
+
 		return {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
@@ -296,39 +284,106 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 			__unstable_rest_base: postType.rest_base,
 			syncConfig: {
-				fetch: async ( id ) => {
-					return apiFetch( {
-						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
-					} );
-				},
-				applyChangesToDoc: ( doc, changes ) => {
-					const document = doc.getMap( 'document' );
+				/**
+				 * Is syncing enabled for this entity?
+				 *
+				 * @type {boolean}
+				 */
+				enabled: Boolean(
+					postType.supports?.[ 'collaborative-editing' ] &&
+						postType.supports?.editor
+				),
 
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if ( typeof value !== 'function' ) {
-							if ( key === 'blocks' ) {
-								if ( ! serialisableBlocksCache.has( value ) ) {
-									serialisableBlocksCache.set(
-										value,
-										makeBlocksSerializable( value )
-									);
-								}
-
-								value = serialisableBlocksCache.get( value );
-							}
-
-							if ( document.get( key ) !== value ) {
-								document.set( key, value );
-							}
-						}
-					} );
+				/**
+				 * Apply changes from the local editor to the local CRDT document so
+				 * that those changes can be synced to other peers (via the provider).
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+				 * @param {import('@wordpress/sync').ObjectData}            record
+				 * @param {string}                                          origin
+				 * @return {void}
+				 */
+				applyChangesToCRDTDoc: ( crdtDoc, changes, record, origin ) => {
+					applyPostChangesToCRDTDoc(
+						crdtDoc,
+						changes,
+						record,
+						postType,
+						syncedProperties,
+						origin
+					);
 				},
-				fromCRDTDoc: ( doc ) => {
-					return doc.getMap( 'document' ).toJSON();
+
+				/**
+				 * Extract changes from a CRDT document that can be used to update the
+				 * local editor state.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+				 */
+				getChangesFromCRDTDoc: ( crdtDoc, record ) =>
+					getPostChangesFromCRDTDoc(
+						crdtDoc,
+						record,
+						postType,
+						syncedProperties
+					),
+
+				/**
+				 * This initial object data represents the data that will be synced via
+				 * the CRDT document, which may differ from the entity record. There may
+				 * be properties that should not be synced, or properties that are
+				 * derived from the record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectData} The initial data
+				 */
+				getInitialObjectData: ( record ) =>
+					getInitialPostObjectData(
+						record,
+						postType,
+						syncedProperties
+					),
+
+				/**
+				 * Get the immutable identifier for an entity record.
+				 *
+				 * @param {import('@wordpress/sync').ObjectData} record
+				 * @return {import('@wordpress/sync').ObjectID} The entity's ID
+				 */
+				getObjectId: ( { id } ) => id,
+
+				/**
+				 * The object type for the entity, used to scope CRDT documents.
+				 *
+				 * @type {import('@wordpress/sync').ObjectType}
+				 */
+				objectType: `postType/${ postType.slug }`,
+
+				/**
+				 * Sync features supported by the entity. Since overall syncing support
+				 * is gated by the `enabled` property, we don't need to check for
+				 * "editor" support here.
+				 *
+				 * @type {Record< string, boolean >}
+				 */
+				supports: {
+					awareness: true,
+					crdtPersistence: Boolean(
+						postType.supports?.[ 'custom-fields' ]
+					),
+					undo: true,
 				},
+
+				/**
+				 * The properties that should be synced via the CRDT document.
+				 *
+				 * @type {Set< string >}
+				 */
+				syncedProperties,
 			},
-			syncObjectType: 'postType/' + postType.name,
-			getSyncObjectId: ( id ) => id,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${

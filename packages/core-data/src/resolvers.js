@@ -93,49 +93,6 @@ export const getEntityRecord =
 		);
 
 		try {
-			// Entity supports configs,
-			// use the sync algorithm instead of the old fetch behavior.
-			if (
-				window.__experimentalEnableSync &&
-				entityConfig.syncConfig &&
-				! query
-			) {
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					const objectId = entityConfig.getSyncObjectId( key );
-
-					// Loads the persisted document.
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType,
-						objectId,
-						( record ) => {
-							dispatch.receiveEntityRecords(
-								kind,
-								name,
-								record,
-								query
-							);
-						}
-					);
-
-					// Bootstraps the edited document as well (and load from peers).
-					await getSyncProvider().bootstrap(
-						entityConfig.syncObjectType + '--edit',
-						objectId,
-						( record ) => {
-							dispatch( {
-								type: 'EDIT_ENTITY_RECORD',
-								kind,
-								name,
-								recordId: key,
-								edits: record,
-								meta: {
-									undo: undefined,
-								},
-							} );
-						}
-					);
-				}
-			}
 			if ( query !== undefined && query._fields ) {
 				// If requesting specific fields, items and query association to said
 				// records are stored by ID reference. Thus, fields must always include
@@ -195,6 +152,59 @@ export const getEntityRecord =
 					action,
 					{ kind, name, id: key },
 				] );
+			}
+
+			if (
+				window.__experimentalEnableSync &&
+				entityConfig.syncConfig?.enabled &&
+				! query
+			) {
+				await getSyncProvider().bootstrap(
+					// Bootstrap syncing for the entity.
+					entityConfig.syncConfig,
+					record,
+					{
+						// Handle edits sourced from the sync provider.
+						editRecord: ( edits ) => {
+							if ( ! Object.keys( edits ).length ) {
+								return;
+							}
+
+							dispatch( {
+								type: 'EDIT_ENTITY_RECORD',
+								kind,
+								name,
+								recordId: key,
+								edits,
+								meta: {
+									undo: undefined,
+								},
+							} );
+						},
+						// Get the current entity record.
+						getEditedRecord: async () =>
+							await resolveSelect.getEditedEntityRecord(
+								kind,
+								name,
+								key
+							),
+						// Refetch the persisted entity record.
+						refetchPersistedRecord: () => {
+							void ( async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							} )();
+						},
+						// Save the current entity record's unsaved edits.
+						saveRecord: () => {
+							dispatch.saveEditedEntityRecord( kind, name, key );
+						},
+					}
+				);
 			}
 
 			registry.batch( () => {
