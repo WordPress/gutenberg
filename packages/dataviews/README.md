@@ -1522,8 +1522,7 @@ For example:
 - `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the card header. Can be:
    	-   A string (single field ID)
     -   An array of strings (multiple field IDs)
-    -   An object `{ id: string, visibility: 'always' | 'when-collapsed' }`
-    -   An array of objects for per-field visibility control
+    -   An array of objects for per-field visibility control `[{ id: string, visibility: 'always' | 'when-collapsed' }]`
 
 Cards can be collapsed while visible, so you can control when summary fields appear:
 

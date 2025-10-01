@@ -815,10 +815,6 @@ export type NormalizedPanelLayout = {
 
 export type CardSummaryField =
 	| PanelSummaryField // Basic usage: string or string[]
-	| {
-			id: string;
-			visibility: 'always' | 'when-collapsed';
-	  }
 	| Array< {
 			id: string;
 			visibility: 'always' | 'when-collapsed';

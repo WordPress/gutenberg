@@ -458,7 +458,7 @@ const LayoutPanelComponent = ( {
 					],
 					layout: {
 						type: 'panel',
-						summary: [],
+						summary: [ 'origin', 'destination', 'flight_status' ],
 					},
 				},
 				{

@@ -30,11 +30,6 @@ function extractSummaryIds( summary: SummaryField ): string[] {
 		);
 	}
 
-	// Single object with id and visibility
-	if ( typeof summary === 'object' && 'id' in summary ) {
-		return [ summary.id ];
-	}
-
 	return [];
 }
 
