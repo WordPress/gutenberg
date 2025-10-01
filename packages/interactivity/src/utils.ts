@@ -333,6 +333,9 @@ export const createRootFragment = (
 		removeChild( c: Node ) {
 			parent.removeChild( c );
 		},
+		contains( c: Node ) {
+			parent.contains( c );
+		},
 	} );
 };
 

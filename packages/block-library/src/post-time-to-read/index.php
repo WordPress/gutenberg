@@ -20,15 +20,16 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$content              = get_the_content();
 	$average_reading_rate = isset( $attributes['averageReadingSpeed'] ) ? $attributes['averageReadingSpeed'] : 189;
-	$show_time_to_read    = isset( $attributes['showTimeToRead'] ) ? $attributes['showTimeToRead'] : true;
-	$show_word_count      = isset( $attributes['showWordCount'] ) ? $attributes['showWordCount'] : false;
-	$word_count_type      = wp_get_word_count_type();
-	$total_words          = wp_word_count( $content, $word_count_type );
+
+	$display_mode = isset( $attributes['displayMode'] ) ? $attributes['displayMode'] : 'time';
+
+	$word_count_type = wp_get_word_count_type();
+	$total_words     = wp_word_count( $content, $word_count_type );
 
 	$parts = array();
 
 	// Add "time to read" part, if enabled.
-	if ( $show_time_to_read ) {
+	if ( 'time' === $display_mode ) {
 		if ( ! empty( $attributes['displayAsRange'] ) ) {
 			// Calculate faster reading rate with 20% speed = lower minutes,
 			// and slower reading rate with 20% speed = higher minutes.
@@ -56,7 +57,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 	}
 
 	// Add "word count" part, if enabled.
-	if ( $show_word_count ) {
+	if ( 'words' === $display_mode ) {
 		$word_count_string = 'words' === $word_count_type ? sprintf(
 			/* translators: %s: the number of words in the post. */
 			_n( '%s word', '%s words', $total_words ),

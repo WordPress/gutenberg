@@ -2,7 +2,7 @@
 /**
  * WP_Theme_JSON_Schema_Gutenberg class
  *
- * @package Gutenberg
+ * @package gutenberg
  * @since 5.9.0
  */
 

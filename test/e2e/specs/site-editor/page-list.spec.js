@@ -285,7 +285,7 @@ test.describe( 'Page List', () => {
 				},
 				assertEditedState: async ( page ) => {
 					const discussion = page.getByLabel( 'Edit Discussion' );
-					await expect( discussion ).toContainText( 'Open' );
+					await expect( discussion ).toContainText( 'Comments only' );
 				},
 			},
 		};
