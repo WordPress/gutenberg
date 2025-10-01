@@ -31,7 +31,6 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
-	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
@@ -44,6 +43,10 @@ export default function InspectorControlsTabs( {
 	const initialTabName = ! useIsListViewTabDisabled( blockName )
 		? TAB_LIST_VIEW.name
 		: undefined;
+
+	const [ selectedTabId, setSelectedTabId ] = useState(
+		initialTabName ?? tabs[ 0 ]?.name
+	);
 
 	// When the active tab is not amongst the available `tabs`, it indicates
 	// the list of tabs was changed dynamically with the active one being
