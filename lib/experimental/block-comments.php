@@ -95,17 +95,6 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 }
 
 /**
- * Post List filters
- */
-
-
-/**
- * Filters for the comments page.
- */
-
-
-
-/**
  * Filter the comment count query to exclude block_comment type comments.
  *
  * @param string $query The SQL query string.
@@ -159,13 +148,9 @@ function gutenberg_add_open_discussion_label_to_post_title( $title, $post_id ) {
 			if ( $unresolved_comments > 0 ) {
 				// Note, we can't use a <span> here because of how WordPress sanitizes titles.
 				// Instead, we will insert a JavaScript snippet to add the label after the title.
-				// We will insert that script in the admin footer.
-				// Add to the array if not already present.
 				if ( ! in_array( $post_id, $gutenberg_post_screen_labels, true ) ) {
 					array_push( $gutenberg_post_screen_labels, $post_id );
-					error_log( "Added post $post_id to the list for open discussion labels." );
 				}
-
 			}
 		}
 	}
@@ -178,16 +163,11 @@ function gutenberg_insert_open_discussion_label_scripts()  {
 	global $post_id;
 	global $gutenberg_post_screen_labels;
 
-	error_log( 'Inserting open discussion label scripts.' );
-	error_log( 'Posts to label: ' . implode( ',', $gutenberg_post_screen_labels ) );
-
 	if ( count( $gutenberg_post_screen_labels ) === 0 ) {
 		return;
 	}
 	$script = '';
-
-	/* translators: Label for posts with unresolved comments. */
-	$label = __( 'Open Discussion', 'gutenberg' );
+	$label  = __( 'Open Discussion', 'gutenberg' );
 
 	foreach ( $gutenberg_post_screen_labels as $post_id ) {
 		$script = '<script>
@@ -235,7 +215,6 @@ function gutenberg_add_open_discussion_label_styles() {
 		}
 	</style>
 <?php
-
 	}
 }
 add_action( 'admin_footer', 'gutenberg_add_open_discussion_label_styles');
