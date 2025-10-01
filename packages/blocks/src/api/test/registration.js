@@ -1767,12 +1767,12 @@ describe( 'blocks', () => {
 				editorUI: {
 					mode: 'dropdown',
 					data: [
-						{ label: 'Field 1' }, // missing 'value'
+						{ label: 'Field 1' }, // missing 'args'
 					],
 				},
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Each field must have "label" and "value" properties'
+				'Each field must have "label" and "args" properties'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
@@ -1786,7 +1786,7 @@ describe( 'blocks', () => {
 					data: [
 						{
 							label: 'Field 1',
-							value: 'test',
+							args: { testArg: 'test' },
 							type: 'invalid-type',
 						},
 					],
@@ -1798,82 +1798,6 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		it( 'should reject dropdown data with value type mismatch', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'Field 1',
-							value: 'string-value',
-							type: 'boolean',
-						},
-					],
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Field value must be boolean when type is "boolean", got string'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should reject dropdown data with integer type but float value', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{ label: 'Field 1', value: 3.14, type: 'integer' },
-					],
-				},
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Field value must be a integer when type is "integer", got number'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		it( 'should successfully register dropdown with typed values', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				editorUI: {
-					mode: 'dropdown',
-					data: [
-						{
-							label: 'String Field',
-							value: 'test',
-							type: 'string',
-						},
-						{
-							label: 'Boolean Field',
-							value: true,
-							type: 'boolean',
-						},
-						{ label: 'Number Field', value: 42, type: 'number' },
-						{ label: 'Integer Field', value: 10, type: 'integer' },
-						{
-							label: 'Array Field',
-							value: [ 'a', 'b' ],
-							type: 'array',
-						},
-						{
-							label: 'Object Field',
-							value: { key: 'value' },
-							type: 'object',
-						},
-						{ label: 'Null Field', value: null, type: 'null' },
-						{ label: 'Default String', value: 'no-type' },
-					],
-				},
-			} );
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeDefined();
-			unregisterBlockBindingsSource( 'core/testing' );
-		} );
-
 		it( 'should reject dropdown data with invalid field type', () => {
 			registerBlockBindingsSource( {
 				name: 'core/testing',
@@ -1883,7 +1807,7 @@ describe( 'blocks', () => {
 					data: [
 						{
 							label: 'Field 1',
-							value: 'field1',
+							args: { testArg: 'test' },
 							type: 'invalid-type',
 						},
 					],
@@ -1904,17 +1828,17 @@ describe( 'blocks', () => {
 					data: [
 						{
 							label: 'String Field',
-							value: 'field1',
+							args: { exampleArg: 'example' },
 							type: 'string',
 						},
 						{
 							label: 'Number Field',
-							value: 42,
+							args: { exampleArg: 'numberExample' },
 							type: 'number',
 						},
 						{
 							label: 'Boolean Field',
-							value: true,
+							args: { exampleArg: 'boolExample' },
 							type: 'boolean',
 						},
 					],
@@ -1960,8 +1884,8 @@ describe( 'blocks', () => {
 				editorUI: {
 					mode: 'dropdown',
 					data: [
-						{ label: 'Field 1', value: 'field1' },
-						{ label: 'Field 2', value: 'field2' },
+						{ label: 'Field 1', args: { testArg: 'abc' } },
+						{ label: 'Field 2', args: { testArg: 'def' } },
 					],
 				},
 			} );
