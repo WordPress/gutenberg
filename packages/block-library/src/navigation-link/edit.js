@@ -284,7 +284,11 @@ export default function NavigationLinkEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToSubmenu();
 		}
-	}, [ hasChildren ] );
+	}, [
+		hasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToSubmenu,
+	] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
