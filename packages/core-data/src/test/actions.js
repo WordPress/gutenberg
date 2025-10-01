@@ -5,6 +5,16 @@ import apiFetch from '@wordpress/api-fetch';
 
 jest.mock( '@wordpress/api-fetch' );
 
+// Mock the sync provider
+jest.mock( '../sync', () => ( {
+	getSyncProvider: jest.fn( () => ( {
+		updateCRDTDoc: jest.fn(),
+	} ) ),
+} ) );
+
+// Mock logEntityDeprecation
+jest.mock( '../utils/log-entity-deprecation', () => jest.fn() );
+
 /**
  * Internal dependencies
  */
@@ -19,6 +29,8 @@ import {
 	__experimentalBatch,
 } from '../actions';
 
+import { getSyncProvider } from '../sync';
+
 jest.mock( '../batch', () => {
 	const { createBatch } = jest.requireActual( '../batch' );
 	return {
@@ -29,15 +41,37 @@ jest.mock( '../batch', () => {
 } );
 
 describe( 'editEntityRecord', () => {
+	let select, dispatch, mockUndoManager;
+
+	beforeEach( () => {
+		jest.clearAllMocks();
+
+		mockUndoManager = {
+			addRecord: jest.fn(),
+		};
+
+		select = {
+			getEntityConfig: jest.fn(),
+			getRawEntityRecord: jest.fn(),
+			getEditedEntityRecord: jest.fn(),
+			getUndoManager: jest.fn( () => mockUndoManager ),
+		};
+
+		dispatch = jest.fn();
+
+		getSyncProvider.mockReturnValue( {
+			updateCRDTDoc: jest.fn(),
+		} );
+	} );
+
 	it( 'throws when the edited entity does not have a loaded config.', async () => {
 		const entityConfig = {
 			kind: 'someKind',
 			name: 'someName',
 			id: 'someId',
 		};
-		const select = {
-			getEntityConfig: jest.fn(),
-		};
+		select.getEntityConfig.mockReturnValue( null );
+
 		const fulfillment = () =>
 			editEntityRecord(
 				entityConfig.kind,
@@ -49,6 +83,379 @@ describe( 'editEntityRecord', () => {
 			`The entity being edited (${ entityConfig.kind }, ${ entityConfig.name }) does not have a loaded config.`
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'dispatches EDIT_ENTITY_RECORD action with basic edits and no sync', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+		};
+		const record = {
+			id: 1,
+			title: 'Original Title',
+			content: 'Original Content',
+		};
+		const editedRecord = {
+			id: 1,
+			title: 'Original Title',
+			content: 'Original Content',
+		};
+		const edits = { title: 'New Title' };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits
+		)( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits,
+		} );
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						title: {
+							from: 'Original Title',
+							to: 'New Title',
+						},
+					},
+				},
+			],
+			undefined
+		);
+	} );
+
+	it( 'clears edits when they are equal to persisted values', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+		};
+		const record = {
+			id: 1,
+			title: 'Same Title',
+			content: 'Original Content',
+		};
+		const editedRecord = {
+			id: 1,
+			title: 'Same Title',
+			content: 'Original Content',
+		};
+		const edits = { title: undefined };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits
+		)( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits,
+		} );
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						title: {
+							from: 'Same Title',
+							to: undefined,
+						},
+					},
+				},
+			],
+			undefined
+		);
+	} );
+
+	it( 'handles merged edits configuration', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: { meta: true },
+		};
+		const record = {
+			id: 1,
+			title: 'Original Title',
+			meta: { key1: 'value1' },
+		};
+		const editedRecord = {
+			id: 1,
+			title: 'Original Title',
+			meta: { key1: 'value1', key2: 'value2' },
+		};
+		const edits = { meta: { key3: 'value3' } };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits
+		)( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				meta: { key1: 'value1', key2: 'value2', key3: 'value3' },
+			},
+		} );
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						meta: {
+							from: {
+								key1: 'value1',
+								key2: 'value2',
+							},
+							to: {
+								key3: 'value3',
+							},
+						},
+					},
+				},
+			],
+			undefined
+		);
+	} );
+
+	it( 'skips undo manager when undoIgnore option is true', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+		};
+		const record = { id: 1, title: 'Original Title' };
+		const editedRecord = { id: 1, title: 'Original Title' };
+		const edits = { title: 'New Title' };
+		const options = { undoIgnore: true };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits,
+			options
+		)( { select, dispatch } );
+
+		expect( mockUndoManager.addRecord ).not.toHaveBeenCalled();
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: 'New Title',
+			},
+		} );
+	} );
+
+	it( 'passes isCached option to undo manager', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+		};
+		const record = { id: 1, title: 'Original Title' };
+		const editedRecord = { id: 1, title: 'Original Title' };
+		const edits = { title: 'New Title' };
+		const options = { isCached: true };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits,
+			options
+		)( { select, dispatch } );
+
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						title: {
+							from: 'Original Title',
+							to: 'New Title',
+						},
+					},
+				},
+			],
+			true
+		);
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: 'New Title',
+			},
+		} );
+	} );
+
+	it( 'handles multiple simultaneous edits', () => {
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+		};
+		const record = {
+			id: 1,
+			title: 'Original Title',
+			content: 'Original Content',
+			status: 'draft',
+		};
+		const editedRecord = {
+			id: 1,
+			title: 'Original Title',
+			content: 'Original Content',
+			status: 'draft',
+		};
+		const edits = {
+			title: 'New Title',
+			content: 'New Content',
+			status: 'publish',
+		};
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits
+		)( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: 'New Title',
+				content: 'New Content',
+				status: 'publish',
+			},
+		} );
+
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						title: { from: 'Original Title', to: 'New Title' },
+						content: {
+							from: 'Original Content',
+							to: 'New Content',
+						},
+						status: { from: 'draft', to: 'publish' },
+					},
+				},
+			],
+			undefined
+		);
+	} );
+
+	it( 'works correctly with sync-enabled entity config', () => {
+		globalThis.window.__experimentalEnableSync = true;
+		const syncConfig = { enabled: true };
+		// Test that sync-related config doesn't break normal functionality
+
+		const entityConfig = {
+			kind: 'postType',
+			name: 'post',
+			mergedEdits: {},
+			syncConfig,
+		};
+		const record = { id: 1, title: 'Original Title' };
+		const editedRecord = { id: 1, title: 'Original Title' };
+		const edits = { title: 'New Title' };
+
+		select.getEntityConfig.mockReturnValue( entityConfig );
+		select.getRawEntityRecord.mockReturnValue( record );
+		select.getEditedEntityRecord.mockReturnValue( editedRecord );
+
+		editEntityRecord(
+			'postType',
+			'post',
+			1,
+			edits
+		)( { select, dispatch } );
+
+		// Normal functionality should work regardless of sync config
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: { title: 'New Title' },
+		} );
+
+		expect( mockUndoManager.addRecord ).toHaveBeenCalledWith(
+			[
+				{
+					id: { kind: 'postType', name: 'post', recordId: 1 },
+					changes: {
+						title: {
+							from: 'Original Title',
+							to: 'New Title',
+						},
+					},
+				},
+			],
+			undefined
+		);
+
+		expect( getSyncProvider ).toBeDefined();
+		const mockUpdateCRDTDoc = getSyncProvider().updateCRDTDoc;
+		expect( mockUpdateCRDTDoc ).toBeDefined();
+		expect( mockUpdateCRDTDoc ).toHaveBeenCalledWith(
+			syncConfig,
+			record,
+			edits,
+			'gutenberg'
+		);
+		delete globalThis.window.__experimentalEnableSync;
 	} );
 } );
 
