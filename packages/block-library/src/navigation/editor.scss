@@ -196,26 +196,22 @@ $color-control-label-height: 20px;
 	}
 }
 
-// Override inner padding on default appender.
-// This should be a temporary fix, to be replaced by improvements to
-// the sibling inserter. Or by the dropdown appender that is used in Group, instead of the "Button block appender".
-// See https://github.com/WordPress/gutenberg/issues/37572.
-.wp-block-navigation .wp-block + .block-list-appender .block-editor-button-block-appender {
-	background-color: $gray-900;
-	color: $white;
-	height: $button-size-small;
+/**
+ * Styles explicitly added appender
+ * to the navigation block.
+ *
+ * Position the appender in the bottom right corner.
+ */
+.wp-block-navigation .block-editor-default-block-appender {
+	margin: 0;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	line-height: 0;
 
-	// This needs specificity to override an inherited padding.
-	// That source padding in turn has high specificity to protect
-	// from theme CSS bleed.
-	&.block-editor-button-block-appender.block-editor-button-block-appender {
-		padding: 0;
+	& .block-editor-default-block-appender__content {
+		display: none;
 	}
-}
-
-.wp-block-navigation .wp-block .wp-block .block-editor-button-block-appender {
-	background-color: transparent;
-	color: $gray-900;
 }
 
 
