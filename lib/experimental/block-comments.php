@@ -146,8 +146,9 @@ function gutenberg_add_open_discussion_label_to_post_title( $title, $post_id ) {
 			);
 			error_log( "Unresolved comments for post $post_id: $unresolved_comments" );
 			if ( $unresolved_comments > 0 ) {
-				// Note, we can't use a <span> here because of how WordPress sanitizes titles.
-				// Instead, we will insert a JavaScript snippet to add the label after the title.
+				// Note: we can't use a <span> here because of how WordPress sanitizes titles.
+				// Instead, we will insert a JavaScript snippet to add the label later.
+				// For the core backport we will not need this approach - we can use a <span> directly.
 				if ( ! in_array( $post_id, $gutenberg_post_screen_labels, true ) ) {
 					array_push( $gutenberg_post_screen_labels, $post_id );
 				}
