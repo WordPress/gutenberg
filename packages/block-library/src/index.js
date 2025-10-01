@@ -108,6 +108,7 @@ import * as queryPaginationPrevious from './query-pagination-previous';
 import * as queryTitle from './query-title';
 import * as queryTotal from './query-total';
 import * as quote from './quote';
+import * as playlist from './playlist';
 import * as reusableBlock from './block';
 import * as readMore from './read-more';
 import * as rss from './rss';
@@ -152,6 +153,7 @@ const getAllBlocks = () => {
 		// Register all remaining core blocks.
 		archives,
 		audio,
+		playlist,
 		button,
 		buttons,
 		calendar,

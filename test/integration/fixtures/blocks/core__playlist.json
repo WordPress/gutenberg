@@ -1,0 +1,13 @@
+[
+	{
+		"name": "core/playlist",
+		"isValid": true,
+		"attributes": {
+			"items": [],
+			"autoplay": false,
+			"loop": false,
+			"showItemList": true
+		},
+		"innerBlocks": []
+	}
+]

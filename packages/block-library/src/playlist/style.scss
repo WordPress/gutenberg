@@ -1,0 +1,111 @@
+.wp-block-playlist {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-15;
+	justify-content: center;
+
+	.wp-block-playlist__player {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-15;
+
+		.wp-block-playlist__header {
+			display: flex;
+			flex-direction: row;
+			gap: $grid-unit-05;
+			align-items: flex-start;
+
+			.wp-block-playlist__header-image {
+				width: 80px;
+				height: 80px;
+				object-fit: cover;
+				border-radius: 4px;
+				flex-shrink: 0;
+			}
+
+			.wp-block-playlist__header-info {
+				display: flex;
+				flex-direction: column;
+				gap: $grid-unit-05;
+				min-width: 0;
+
+				.wp-block-playlist__header-title {
+					font-weight: $font-weight-medium;
+					font-size: $font-size-large;
+				}
+
+				.wp-block-playlist__header-subtitle {
+					font-size: $font-size-medium;
+					color: $gray-700;
+				}
+			}
+		}
+
+		.wp-block-playlist__audio {
+			width: 100%;
+		}
+	}
+
+	.wp-block-playlist__items {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		.wp-block-playlist__item {
+			display: flex;
+			flex-direction: row;
+			gap: $grid-unit-20;
+			width: 100%;
+			align-items: center;
+			justify-content: flex-start;
+			padding: $grid-unit-10;
+			background: transparent;
+			transition: background-color 0.2s ease;
+			cursor: pointer;
+			box-sizing: border-box;
+
+			& + .wp-block-playlist__item {
+				border-top: 1px solid $gray-300;
+			}
+
+			&:hover {
+				background: $gray-100;
+			}
+
+			&.is-active {
+				background: $gray-100;
+
+				.wp-block-playlist__item-title {
+					font-weight: $font-weight-medium;
+				}
+			}
+
+			.wp-block-playlist__item-number {
+				font-size: $font-size-medium;
+				flex-shrink: 0;
+			}
+
+			.wp-block-playlist__item-info {
+				display: flex;
+				flex-shrink: 0;
+				flex-direction: column;
+				justify-content: center;
+				gap: $grid-unit-05;
+
+				.wp-block-playlist__item-title {
+					font-size: $font-size-large;
+					line-height: 1.3;
+					text-wrap: balance; /* Fallback for Safari. */
+					text-wrap: pretty;
+					flex-shrink: 0;
+				}
+
+				.wp-block-playlist__item-artist {
+					font-size: $font-size-medium;
+					color: $gray-700;
+				}
+			}
+		}
+	}
+}
