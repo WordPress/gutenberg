@@ -107,6 +107,29 @@ function mergeRootToEnvironments( config ) {
 			deepCopyRootOptions( config ),
 			config.env[ env ]
 		);
+
+		// Ensure HTTPS-related properties are always present on each environment
+		if ( removedRootOptions.https !== undefined ) {
+			config.env[ env ].https = removedRootOptions.https;
+		}
+		if (
+			removedRootOptions.httpsPort !== undefined &&
+			env === 'development'
+		) {
+			config.env[ env ].httpsPort = removedRootOptions.httpsPort;
+		}
+		if (
+			removedRootOptions.testsHttpsPort !== undefined &&
+			env === 'tests'
+		) {
+			config.env[ env ].httpsPort = removedRootOptions.testsHttpsPort;
+		}
+		if ( removedRootOptions.sslCertPath !== undefined ) {
+			config.env[ env ].sslCertPath = removedRootOptions.sslCertPath;
+		}
+		if ( removedRootOptions.sslKeyPath !== undefined ) {
+			config.env[ env ].sslKeyPath = removedRootOptions.sslKeyPath;
+		}
 	}
 
 	// Set any root-level options we reset back.
@@ -146,12 +169,17 @@ function appendPortToWPConfigs( config ) {
 				continue;
 			}
 
-			config.env[ env ].config[ option ] = addOrReplacePort(
-				config.env[ env ].config[ option ],
-				config.env[ env ].httpsPort ?? config.env[ env ].port,
-				// Don't replace the port if one is already set on WP_HOME.
-				option !== 'WP_HOME'
+			const before = config.env[ env ].config[ option ];
+			// Use httpsPort only if https is enabled, otherwise use port
+			const portToUse = config.env[ env ].https
+				? config.env[ env ].httpsPort
+				: config.env[ env ].port;
+			const after = addOrReplacePort(
+				before,
+				portToUse,
+				true // Always replace the port for all options
 			);
+			config.env[ env ].config[ option ] = after;
 		}
 	}
 

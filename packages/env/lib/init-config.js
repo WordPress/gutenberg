@@ -318,6 +318,7 @@ RUN a2enmod ssl
 RUN a2ensite ${ siteName }
 RUN service apache2 restart`;
 	}
+	return '';
 }
 
 /**

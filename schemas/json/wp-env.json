@@ -67,6 +67,28 @@
 					"description": "The port number to access phpMyAdmin.",
 					"type": "integer"
 				},
+				"mysqlPort": {
+					"description": "The port number to access MySQL.",
+					"type": "integer"
+				},
+				"https": {
+					"description": "Whether to enable HTTPS support.",
+					"type": "boolean",
+					"default": false
+				},
+				"httpsPort": {
+					"description": "The HTTPS port number to use for the installation. You'll access the instance through the port: https://localhost:443",
+					"type": "integer",
+					"default": 443
+				},
+				"sslCertPath": {
+					"description": "Path to a custom SSL certificate file.",
+					"type": "string"
+				},
+				"sslKeyPath": {
+					"description": "Path to a custom SSL key file.",
+					"type": "string"
+				},
 				"multisite": {
 					"description": "Whether to set up a multisite installation.",
 					"type": "boolean"
@@ -83,6 +105,11 @@
 				"config",
 				"mappings",
 				"phpmyadminPort",
+				"mysqlPort",
+				"https",
+				"httpsPort",
+				"sslCertPath",
+				"sslKeyPath",
 				"multisite"
 			]
 		}
@@ -120,6 +147,11 @@
 					"type": "integer",
 					"default": 8889
 				},
+				"testsHttpsPort": {
+					"description": "The HTTPS port number for the test site. You'll access the instance through the port: https://localhost:8443",
+					"type": "integer",
+					"default": 8443
+				},
 				"lifecycleScripts": {
 					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
 					"type": "object",
@@ -153,6 +185,7 @@
 							"$schema",
 							"env",
 							"testsPort",
+							"testsHttpsPort",
 							"lifecycleScripts"
 						]
 					}
