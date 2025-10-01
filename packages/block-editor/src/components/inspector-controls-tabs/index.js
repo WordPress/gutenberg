@@ -52,12 +52,20 @@ export default function InspectorControlsTabs( {
 	// the list of tabs was changed dynamically with the active one being
 	// removed. Set the active tab back to the first tab.
 	useEffect( () => {
+		// Skip this behavior if `initialTabName` is supplied. In the navigation
+		// block, the list view tab isn't present in `tabs` initially. The early
+		// return here prevents the dynamic behavior that follows from overriding
+		// `initialTabName`.
+		if ( initialTabName ) {
+			return;
+		}
+
 		if ( tabs?.length && selectedTabId ) {
 			const activeTab = tabs.find(
 				( tab ) => tab.name === selectedTabId
 			);
 			if ( ! activeTab ) {
-				setSelectedTabId( initialTabName ?? tabs[ 0 ].name );
+				setSelectedTabId( tabs[ 0 ].name );
 			}
 		}
 	}, [ tabs, selectedTabId, initialTabName ] );
