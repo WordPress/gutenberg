@@ -45,4 +45,3 @@ When adding new shared functionality:
 3. Add comprehensive tests
 4. Update both Navigation Link and Navigation Submenu blocks to use the shared component
 5. Remove any duplicated code from the individual blocks
-
