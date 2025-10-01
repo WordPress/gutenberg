@@ -63,9 +63,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 	const showVisibilityButton =
-		window.__experimentalBlockVisibility &&
-		canToggleSelectedBlocksVisibility &&
-		! isContentOnly;
+		canToggleSelectedBlocksVisibility && ! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.

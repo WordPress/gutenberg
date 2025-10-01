@@ -79,9 +79,7 @@ function ListViewBlockSelectButton(
 		);
 	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const shouldShowBlockVisibilityIcon =
-		window.__experimentalBlockVisibility &&
-		canToggleBlockVisibility &&
-		isBlockHidden;
+		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 

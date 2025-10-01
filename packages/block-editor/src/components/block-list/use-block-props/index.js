@@ -184,8 +184,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
-				'is-block-hidden':
-					window?.__experimentalBlockVisibility && isBlockHidden,
+				'is-block-hidden': isBlockHidden,
 			},
 			className,
 			props.className,

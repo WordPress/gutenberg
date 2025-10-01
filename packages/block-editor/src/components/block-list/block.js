@@ -624,12 +624,8 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
+				isBlockHidden: attributes?.metadata?.blockVisibility === false,
 			};
-
-			if ( window.__experimentalBlockVisibility ) {
-				previewContext.isBlockHidden =
-					attributes?.metadata?.blockVisibility === false;
-			}
 
 			// When in preview mode, we can avoid a lot of selection and
 			// editing related selectors.
@@ -809,7 +805,6 @@ function BlockListBlockProvider( props ) {
 	};
 
 	if (
-		window.__experimentalBlockVisibility &&
 		isBlockHidden &&
 		! isSelected &&
 		! isMultiSelected &&

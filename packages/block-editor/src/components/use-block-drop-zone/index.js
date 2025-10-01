@@ -411,21 +411,19 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const blocks = window.__experimentalBlockVisibility
-					? getBlocks( targetRootClientId )
-							// Filter out blocks that are hidden
-							.filter( ( block ) => {
-								return ! (
-									hasBlockSupport(
-										block.name,
-										'blockVisibility',
-										true
-									) &&
-									block.attributes?.metadata
-										?.blockVisibility === false
-								);
-							} )
-					: getBlocks( targetRootClientId );
+				const blocks = getBlocks( targetRootClientId )
+					// Filter out blocks that are hidden
+					.filter( ( block ) => {
+						return ! (
+							hasBlockSupport(
+								block.name,
+								'blockVisibility',
+								true
+							) &&
+							block.attributes?.metadata?.blockVisibility ===
+								false
+						);
+					} );
 
 				// The block list is empty, don't show the insertion point but still allow dropping.
 				if ( blocks.length === 0 ) {
