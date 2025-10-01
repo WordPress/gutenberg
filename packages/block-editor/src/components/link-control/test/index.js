@@ -795,7 +795,7 @@ describe( 'Manual link entry', () => {
 				}
 
 				const submitButton = screen.queryByRole( 'button', {
-					name: 'Save',
+					name: 'Apply',
 				} );
 
 				// Verify the submission UI is disabled.
