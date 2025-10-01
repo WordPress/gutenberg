@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,7 +12,6 @@ type UseFieldElementsResult = {
 	elements: Option[];
 	isResolving: boolean;
 	error?: unknown;
-	reloadElements: () => void;
 };
 
 function toPromise< T >( value: T | Promise< T > ): Promise< T > {
@@ -33,7 +32,6 @@ export function useFieldElements(
 		source ? ! isStaticArray : false
 	);
 	const [ error, setError ] = useState< unknown >();
-	const [ reloadToken, setReloadToken ] = useState( 0 );
 	const requestIdRef = useRef( 0 );
 
 	useEffect( () => {
@@ -65,7 +63,7 @@ export function useFieldElements(
 				}
 
 				setElements( Array.isArray( result ) ? result : [] );
-			})
+			} )
 			.catch( ( err ) => {
 				if ( ! isMounted || requestId !== requestIdRef.current ) {
 					return;
@@ -73,7 +71,7 @@ export function useFieldElements(
 
 				setError( err );
 				setElements( [] );
-			})
+			} )
 			.finally( () => {
 				if ( ! isMounted || requestId !== requestIdRef.current ) {
 					return;
@@ -85,16 +83,11 @@ export function useFieldElements(
 		return () => {
 			isMounted = false;
 		};
-	}, [ source, reloadToken ] );
-
-	const reloadElements = useCallback( () => {
-		setReloadToken( ( token ) => token + 1 );
-	}, [] );
+	}, [ source ] );
 
 	return {
 		elements,
 		isResolving,
 		error,
-		reloadElements,
 	};
 }
