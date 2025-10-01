@@ -971,9 +971,9 @@ export const registerBlockBindingsSource = ( source ) => {
 					return;
 				}
 
-				if ( ! field.label || field.value === undefined ) {
+				if ( ! field.label || ! field.args ) {
 					warning(
-						'Each field must have "label" and "value" properties'
+						'Each field must have "label" and "args" properties'
 					);
 					return;
 				}
@@ -1026,82 +1026,6 @@ export const registerBlockBindingsSource = ( source ) => {
 							return;
 						}
 					}
-
-					const valueType = typeof field.value;
-					switch ( field.type ) {
-						case 'null':
-							if (
-								valueType !== 'object' ||
-								field.value !== null
-							) {
-								warning(
-									`Field value must be null when type is "null", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-						case 'boolean':
-							if ( valueType !== 'boolean' ) {
-								warning(
-									`Field value must be boolean when type is "boolean", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-						case 'object':
-							if (
-								valueType !== 'object' ||
-								field.value === null ||
-								Array.isArray( field.value )
-							) {
-								warning(
-									`Field value must be an object when type is "object", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-						case 'array':
-							if ( ! Array.isArray( field.value ) ) {
-								warning(
-									`Field value must be an array when type is "array", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-						case 'string':
-							if ( valueType !== 'string' ) {
-								warning(
-									`Field value must be a string when type is "string", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-						case 'integer':
-						case 'number':
-							if (
-								valueType !== 'number' ||
-								( field.type === 'integer' &&
-									! Number.isInteger( field.value ) )
-							) {
-								warning(
-									`Field value must be a ${
-										field.type === 'integer'
-											? 'integer'
-											: 'number'
-									} when type is "${
-										field.type
-									}", got ${ valueType }`
-								);
-								return;
-							}
-							break;
-					}
-				}
-				if ( ! field.type && typeof field.value !== 'string' ) {
-					warning(
-						'Field "value" property must be a string when no type is specified'
-					);
-					return;
 				}
 			}
 		} else if ( mode === 'modal' ) {
