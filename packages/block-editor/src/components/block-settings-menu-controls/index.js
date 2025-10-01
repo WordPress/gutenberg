@@ -20,6 +20,10 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { ModifyContentLockMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
+import {
+	BlockAllowedBlocksControl,
+	useBlockAllowedBlocks,
+} from '../block-allowed-blocks';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -45,10 +49,17 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
+	const { canControlAllowedBlocks } = useBlockAllowedBlocks(
+		selectedBlocks[ 0 ]
+	);
 	const showLockButton =
 		selectedClientIds.length === 1 && canLock && ! isContentOnly;
 	const showRenameButton =
 		selectedClientIds.length === 1 && canRename && ! isContentOnly;
+	const showAllowedBlocksButton =
+		selectedClientIds.length === 1 &&
+		canControlAllowedBlocks &&
+		! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -90,6 +101,11 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						) }
 						{ showRenameButton && (
 							<BlockRenameControl
+								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
+						{ showAllowedBlocksButton && (
+							<BlockAllowedBlocksControl
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }
