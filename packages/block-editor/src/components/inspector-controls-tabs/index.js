@@ -6,6 +6,7 @@ import {
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useEffect, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect } from '@wordpress/data';
 
@@ -30,6 +31,7 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
+	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
@@ -43,9 +45,28 @@ export default function InspectorControlsTabs( {
 		? TAB_LIST_VIEW.name
 		: undefined;
 
+	// When the active tab is not amongst the available `tabs`, it indicates
+	// the list of tabs was changed dynamically with the active one being
+	// removed. Set the active tab back to the first tab.
+	useEffect( () => {
+		if ( tabs?.length && selectedTabId ) {
+			const activeTab = tabs.find(
+				( tab ) => tab.name === selectedTabId
+			);
+			if ( ! activeTab ) {
+				setSelectedTabId( tabs[ 0 ].name );
+			}
+		}
+	}, [ tabs, selectedTabId ] );
+
 	return (
 		<div className="block-editor-block-inspector__tabs">
-			<Tabs defaultTabId={ initialTabName } key={ clientId }>
+			<Tabs
+				defaultTabId={ initialTabName }
+				selectedTabId={ selectedTabId }
+				onSelect={ setSelectedTabId }
+				key={ clientId }
+			>
 				<Tabs.TabList>
 					{ tabs.map( ( tab ) =>
 						showIconLabels ? (
