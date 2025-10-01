@@ -3,12 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch, subscribe } from '@wordpress/data';
-import {
-	__experimentalVStack as VStack,
-	Popover,
-	Fill,
-} from '@wordpress/components';
-import { useState, RawHTML, useRef, useEffect } from '@wordpress/element';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -25,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName, collabSidebarName} from './constants';
+import { collabHistorySidebarName, collabSidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -38,7 +34,11 @@ import { useBlockComments } from './hooks';
  * External dependencies
  */
 import clsx from 'clsx';
-import { useFloating, offset as offsetMiddleware, autoUpdate } from '@floating-ui/react-dom';
+import {
+	useFloating,
+	offset as offsetMiddleware,
+	autoUpdate,
+} from '@floating-ui/react-dom';
 const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 function CollabSidebarContent( {
@@ -212,7 +212,7 @@ function CommentBoardWrapper( {
 	offsetsRef,
 	updateOffsets,
 	updateHeight,
-	heights
+	heights,
 } ) {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
@@ -225,7 +225,9 @@ function CommentBoardWrapper( {
 		? offsetsRef.current[ previousThreadId ]
 		: 0;
 
-	const previousBoardHeight = heights[ previousThreadId ];
+	const previousBoardHeight = heights[ previousThreadId ]
+		? heights[ previousThreadId ]
+		: 0;
 
 	const calculateOffset = () => {
 		if (
@@ -234,9 +236,8 @@ function CommentBoardWrapper( {
 		) {
 			return previousOffset - initialOffsetTop + previousBoardHeight + 20;
 		}
-		return 0;
+		return -16;
 	};
-
 
 	const { y, refs } = useFloating( {
 		placement: 'right-start',
@@ -274,10 +275,7 @@ function CommentBoardWrapper( {
 				'editor-collab-sidebar-panel__active-thread': false,
 			} ) }
 			spacing="0"
-			style={ {
-				top: y,
-			} }
-			backgroundColor={ backgroundColor }
+			style={ { top: y } }
 		>
 			<CollabSidebarContent
 				comments={ [ thread ] }
@@ -297,6 +295,9 @@ function CommentBoardWrapper( {
  */
 export default function CollabSidebar() {
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+	const [ activeComment, setActiveComment ] = useState( null );
+	const [ isNewComment, setIsNewComment ] = useState( false );
+
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const isLargeViewport = useViewportMatch( 'xlarge' );
@@ -312,6 +313,7 @@ export default function CollabSidebar() {
 		} );
 	};
 
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleThreadClick = ( thread ) => {
 		if ( thread?.clientId ) {
 			selectBlock( thread.clientId ); // Use the action to select the block
@@ -319,9 +321,7 @@ export default function CollabSidebar() {
 		setActiveComment( thread.id );
 	};
 
-	// Object to store offsets for each board.
 	const offsetsRef = useRef( {} );
-
 	const updateOffsets = ( id, offset ) => {
 		offsetsRef.current[ id ] = offset;
 	};
@@ -335,25 +335,32 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
-	const hasActiveSidebar = useSelect( ( select ) => {
-		const { getActiveComplementaryArea } = select( interfaceStore );
-		return getActiveComplementaryArea( 'core' ) !== null;
-	}, [] );
-
-	const blockCommentId = useSelect( ( select ) => {
+	const { blockCommentId, selectedBlockClientId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 
-		return _clientId
-			? getBlockAttributes( _clientId )?.metadata?.commentId
-			: null;
+		return {
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.commentId
+				: null,
+			selectedBlockClientId: _clientId,
+		};
 	}, [] );
 
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
 		enableComplementaryArea( 'core', collabHistorySidebarName );
 	};
+
+	useEffect( () => {
+		if ( activeComment !== blockCommentId ) {
+			setActiveComment( null );
+		}
+		if ( isNewComment ) {
+			setIsNewComment( false );
+		}
+	}, [ selectedBlockClientId ] );
 
 	const { resultComments, unresolvedSortedThreads, totalPages } =
 		useBlockComments( postId );
@@ -409,7 +416,7 @@ export default function CollabSidebar() {
 					setShowCommentBoard={ setShowCommentBoard }
 				/>
 			</PluginSidebar>
-			{ isLargeViewport &&
+			{ isLargeViewport && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
@@ -418,10 +425,11 @@ export default function CollabSidebar() {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<div className="editor-collab-sidebar__background"
+					<div
+						className="editor-collab-sidebar__background"
 						style={ {
 							backgroundColor,
-							height: '100%'
+							height: '100%',
 						} }
 					>
 						{ unresolvedSortedThreads.length > 0 &&
@@ -439,14 +447,19 @@ export default function CollabSidebar() {
 										updateOffsets={ updateOffsets }
 										updateHeight={ updateHeight }
 										heights={ heights }
-										previousThreadId={ unresolvedSortedThreads[ index - 1 ]?.id }
+										previousThreadId={
+											unresolvedSortedThreads[ index - 1 ]
+												?.id
+										}
+										onClick={ () =>
+											handleThreadClick( thread )
+										}
 									/>
 								);
-							} )
-						}
+							} ) }
 					</div>
 				</PluginSidebar>
-		}
+			) }
 		</>
 	);
 }
