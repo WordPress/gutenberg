@@ -192,8 +192,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	// In order for the block toolbar to render correctly, blocks cannot be hidden.
 	// Instead, use styles to visually hide blocks.
 	&.is-block-hidden {
-		height: 0 !important;
-		overflow: hidden !important;
+		visibility: hidden !important;
 	}
 }
 
