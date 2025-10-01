@@ -132,7 +132,7 @@ import { unlock } from '../lock-unlock';
  * @property {string} key     The unique identifier for the field.
  * @property {string} [label] Human-readable label for the field.
  * @property {string} [type]  The data type of the field (e.g., 'string', 'number').
- * @property {*}      [value] The current value of the field.
+ * @property {Object} [args]  Source-specific arguments used to retrieve the value from the source.
  */
 
 /**
