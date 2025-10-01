@@ -11,13 +11,14 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { Icon, edit as editIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const selectIcon = (
 	<SVG
@@ -31,11 +32,22 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const mode = useSelect(
-		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
-		[]
-	);
+	const { mode, isZoomOut } = useSelect( ( select ) => {
+		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
+		const zoomOut = unlock( select( blockEditorStore ) ).isZoomOut();
+		return {
+			mode: editorMode,
+			isZoomOut: zoomOut,
+		};
+	}, [] );
+
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( isZoomOut ) {
+			__unstableSetEditorMode( 'edit' );
+		}
+	}, [ isZoomOut, __unstableSetEditorMode ] );
 
 	return (
 		<Dropdown
@@ -50,6 +62,8 @@ function ToolSelector( props, ref ) {
 					onClick={ onToggle }
 					/* translators: button label text should, if possible, be under 16 characters. */
 					label={ __( 'Tools' ) }
+					disabled={ isZoomOut }
+					accessibleWhenDisabled
 				/>
 			) }
 			popoverProps={ { placement: 'bottom-start' } }
