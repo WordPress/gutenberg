@@ -200,19 +200,19 @@ const { state, actions, callbacks } = store(
 			},
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
-				if ( state.hasPreviousImage ) {
-					state.selectedImageId =
-						state.galleryImages[ state.selectedImageIndex - 1 ];
-					callbacks.setOverlayStyles();
-				}
+				const nextIndex = state.hasPreviousImage
+					? state.selectedImageIndex - 1
+					: state.galleryImages.length - 1;
+				state.selectedImageId = state.galleryImages[ nextIndex ];
+				callbacks.setOverlayStyles();
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
-				if ( state.hasNextImage ) {
-					state.selectedImageId =
-						state.galleryImages[ state.selectedImageIndex + 1 ];
-					callbacks.setOverlayStyles();
-				}
+				const nextIndex = state.hasNextImage
+					? state.selectedImageIndex + 1
+					: 0;
+				state.selectedImageId = state.galleryImages[ nextIndex ];
+				callbacks.setOverlayStyles();
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {

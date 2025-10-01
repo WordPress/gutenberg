@@ -274,10 +274,6 @@
 		align-items: center;
 		justify-content: center;
 
-		&[aria-disabled="true"] svg {
-			opacity: 0.3;
-		}
-
 		&:hover,
 		&:focus,
 		&:not(:hover):not(:active):not(.has-background) {
