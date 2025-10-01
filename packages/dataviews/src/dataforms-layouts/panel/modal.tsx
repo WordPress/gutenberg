@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -33,18 +38,18 @@ function ModalContent< Item >( {
 	onClose: () => void;
 } ) {
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
+	const modalData = useMemo( () => {
+		return deepMerge( data, changes );
+	}, [ data, changes ] );
 
 	const onApply = () => {
 		onChange( changes );
 		onClose();
 	};
 
-	const handleOnChange = ( value: Partial< Item > ) => {
-		setChanges( ( prev ) => ( { ...prev, ...value } ) );
+	const handleOnChange = ( newValue: Partial< Item > ) => {
+		setChanges( ( prev ) => deepMerge( prev, newValue ) );
 	};
-
-	// Merge original data with local changes for display
-	const displayData = { ...data, ...changes };
 
 	return (
 		<Modal
@@ -55,14 +60,14 @@ function ModalContent< Item >( {
 			size="medium"
 		>
 			<DataFormLayout
-				data={ displayData }
+				data={ modalData }
 				form={ form }
 				onChange={ handleOnChange }
 			>
 				{ ( FieldLayout, nestedField ) => (
 					<FieldLayout
 						key={ nestedField.id }
-						data={ displayData }
+						data={ modalData }
 						field={ nestedField }
 						onChange={ handleOnChange }
 						hideLabelFromVision={

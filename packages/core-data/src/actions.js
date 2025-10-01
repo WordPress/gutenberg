@@ -93,6 +93,16 @@ export function receiveEntityRecords(
 	edits,
 	meta
 ) {
+	// If we receive an auto-draft template, pretend it's already published.
+	if ( kind === 'postType' && name === 'wp_template' ) {
+		records = ( Array.isArray( records ) ? records : [ records ] ).map(
+			( record ) =>
+				record.status === 'auto-draft'
+					? { ...record, status: 'publish' }
+					: record
+		);
+	}
+
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
@@ -517,6 +527,46 @@ export const saveEntityRecord =
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
 
+		// When called with a theme template ID, trigger the compatibility
+		// logic.
+		if (
+			kind === 'postType' &&
+			name === 'wp_template' &&
+			typeof recordId === 'string' &&
+			! /^\d+$/.test( recordId )
+		) {
+			// Get the theme template.
+			const template = await select.getEntityRecord(
+				'postType',
+				'wp_registered_template',
+				recordId
+			);
+			// Duplicate the theme template and make the edit.
+			const newTemplate = await dispatch.saveEntityRecord(
+				'postType',
+				'wp_template',
+				{
+					...template,
+					...record,
+					id: undefined,
+					type: 'wp_template',
+					status: 'publish',
+				}
+			);
+			// Make the new template active.
+			const activeTemplates = await select.getEntityRecord(
+				'root',
+				'site'
+			);
+			await dispatch.saveEntityRecord( 'root', 'site', {
+				active_templates: {
+					...activeTemplates.active_templates,
+					[ newTemplate.slug ]: newTemplate.id,
+				},
+			} );
+			return newTemplate;
+		}
+
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
 			[ 'entities', 'records', kind, name, recordId || uuid() ],
@@ -676,6 +726,11 @@ export const saveEntityRecord =
 								edits
 							),
 						};
+					}
+					// Unless there is no persisted record, set the status to
+					// publish.
+					if ( name === 'wp_template' && persistedRecord ) {
+						edits.status = 'publish';
 					}
 					updatedRecord = await __unstableFetch( {
 						path,

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepMerge from 'deepmerge';
+
+/**
  * WordPress dependencies
  */
 import { privateApis } from '@wordpress/components';
@@ -37,8 +42,9 @@ export default function ValidatedText< Item >( {
 	prefix,
 	suffix,
 }: DataFormValidatedTextControlProps< Item > ) {
-	const { id, label, placeholder, description } = field;
-	const value = field.getValue( { item: data } );
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
+	const value = getValue( { item: data } );
 	const [ customValidity, setCustomValidity ] =
 		useState<
 			React.ComponentProps<
@@ -48,34 +54,45 @@ export default function ValidatedText< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( {
-				[ id ]: newValue,
-			} ),
-		[ id, onChange ]
+			onChange(
+				setValue( {
+					item: data,
+					value: newValue,
+				} )
+			),
+		[ data, setValue, onChange ]
+	);
+
+	const onValidateControl = useCallback(
+		( newValue: any ) => {
+			const message = isValid?.custom?.(
+				deepMerge(
+					data,
+					setValue( {
+						item: data,
+						value: newValue,
+					} ) as Partial< Item >
+				),
+				field
+			);
+
+			if ( message ) {
+				setCustomValidity( {
+					type: 'invalid',
+					message,
+				} );
+				return;
+			}
+
+			setCustomValidity( undefined );
+		},
+		[ data, field, isValid, setValue ]
 	);
 
 	return (
 		<ValidatedInputControl
-			required={ !! field.isValid?.required }
-			onValidate={ ( newValue: any ) => {
-				const message = field.isValid?.custom?.(
-					{
-						...data,
-						[ id ]: newValue,
-					},
-					field
-				);
-
-				if ( message ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message,
-					} );
-					return;
-				}
-
-				setCustomValidity( undefined );
-			} }
+			required={ !! isValid?.required }
+			onValidate={ onValidateControl }
 			customValidity={ customValidity }
 			label={ label }
 			placeholder={ placeholder }

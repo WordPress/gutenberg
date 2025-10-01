@@ -25,6 +25,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -56,6 +57,24 @@ const BACKGROUND_POPOVER_PROPS = {
 	className: 'block-editor-global-styles-background-panel__popover',
 };
 const noop = () => {};
+
+/**
+ * Focuses the toggle button.
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton.focus();
+	} );
+};
 
 /**
  * Get the help text for the background size control.
@@ -182,6 +201,8 @@ function BackgroundControlsPanel( {
 	children,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
+	onReset,
+	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
@@ -205,14 +226,34 @@ function BackgroundControlsPanel( {
 					isOpen,
 				};
 				return (
-					<InspectorImagePreviewItem
-						imgUrl={ imgUrl }
-						filename={ filename }
-						label={ imgLabel }
-						toggleProps={ toggleProps }
-						as="button"
-						onToggleCallback={ onToggleCallback }
-					/>
+					<>
+						<InspectorImagePreviewItem
+							imgUrl={ imgUrl }
+							filename={ filename }
+							label={ imgLabel }
+							toggleProps={ toggleProps }
+							as="button"
+							onToggleCallback={ onToggleCallback }
+						/>
+						{ onReset && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
+								} }
+							/>
+						) }
+					</>
 				);
 			} }
 			renderContent={ () => (
@@ -319,7 +360,7 @@ function BackgroundImageControls( {
 		);
 		setIsUploading( false );
 		// Close the dropdown and focus the toggle button.
-		closeAndFocus();
+		focusToggleButton( containerRef );
 	};
 
 	// Drag and drop callback, restricting image to one.
@@ -336,22 +377,6 @@ function BackgroundImageControls( {
 	};
 
 	const hasValue = hasBackgroundImageValue( style );
-
-	const closeAndFocus = () => {
-		// Use requestAnimationFrame to ensure DOM updates are complete
-		window.requestAnimationFrame( () => {
-			const [ toggleButton ] = focus.tabbable.find(
-				containerRef?.current
-			);
-			if ( ! toggleButton ) {
-				return;
-			}
-			// Focus the toggle button and close the dropdown menu.
-			// This ensures similar behaviour as to selecting an image, where the dropdown is
-			// closed and focus is redirected to the dropdown toggle button.
-			toggleButton.focus();
-		} );
-	};
 
 	const onRemove = () =>
 		onChange(
@@ -390,14 +415,14 @@ function BackgroundImageControls( {
 				) }
 				onError={ onUploadError }
 				onReset={ () => {
-					closeAndFocus();
+					focusToggleButton( containerRef );
 					onResetImage();
 				} }
 			>
 				{ canRemove && (
 					<MenuItem
 						onClick={ () => {
-							closeAndFocus();
+							focusToggleButton( containerRef );
 							onRemove();
 							onRemoveImage();
 						} }
@@ -713,6 +738,8 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
+					onReset={ resetBackground }
+					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls

@@ -89,6 +89,11 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			aria-label={
+				titleField
+					? titleField.getValue( { item } ) || __( '(no title)' )
+					: undefined
+			}
 			key={ id }
 			render={ ( { children, ...props } ) => (
 				<VStack spacing={ 0 } children={ children } { ...props } />
@@ -130,14 +135,16 @@ function GridItem< Item >( {
 					tabIndex={ -1 }
 				/>
 			) }
-			<HStack
-				justify="space-between"
-				className="dataviews-view-picker-grid__title-actions"
-			>
-				<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
-					{ renderedTitleField }
-				</div>
-			</HStack>
+			{ showTitle && (
+				<HStack
+					justify="space-between"
+					className="dataviews-view-picker-grid__title-actions"
+				>
+					<div className="dataviews-view-picker-grid__title-field dataviews-title-field">
+						{ renderedTitleField }
+					</div>
+				</HStack>
+			) }
 			<VStack spacing={ 1 }>
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render

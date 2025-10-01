@@ -23,7 +23,7 @@ import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
-import { updateAttributes } from '../../navigation-link/update-attributes';
+import { updateAttributes } from '../../navigation-link/shared';
 import { LinkUI } from '../../navigation-link/link-ui';
 
 const actionLabel =

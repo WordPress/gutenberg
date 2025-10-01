@@ -599,7 +599,7 @@ test.describe( 'Links', () => {
 		await expect( checkbox ).toBeFocused();
 
 		// Tab back to the Submit and apply the link.
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// The link should have been inserted.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -666,7 +666,7 @@ test.describe( 'Links', () => {
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Save the link.
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Link UI should be closed.
 		await expect( linkPopover ).toBeHidden();
@@ -824,7 +824,7 @@ test.describe( 'Links', () => {
 		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -852,7 +852,7 @@ test.describe( 'Links', () => {
 		await linkPopover.getByLabel( 'nofollow' ).click();
 
 		// Save the link
-		await linkPopover.getByRole( 'button', { name: 'Save' } ).click();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 
 		// Expect correct attributes to be set on the underlying link.
 		await expect.poll( editor.getBlocks ).toMatchObject( [

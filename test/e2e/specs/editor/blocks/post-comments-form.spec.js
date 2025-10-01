@@ -33,7 +33,7 @@ test.describe( 'Comments Form', () => {
 		// Navigate to "Singular" post template
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//singular',
-			postType: 'wp_template',
+			postType: 'wp_registered_template',
 			canvas: 'edit',
 		} );
 

@@ -39,6 +39,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.8/rest-api.php';
 
 	// WordPress 6.9 compat.
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-6.9/template-activate.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
@@ -84,6 +87,10 @@ require __DIR__ . '/compat/wordpress-6.8/site-preview.php';
 // WordPress 6.9 compat.
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
+require __DIR__ . '/compat/wordpress-6.9/preload.php';
+
+// WordPress 7.0 compat.
+require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -155,6 +162,7 @@ require __DIR__ . '/block-supports/shadow.php';
 require __DIR__ . '/block-supports/background.php';
 require __DIR__ . '/block-supports/block-style-variations.php';
 require __DIR__ . '/block-supports/aria-label.php';
+require __DIR__ . '/block-supports/block-visibility.php';
 
 // Data views.
 require_once __DIR__ . '/experimental/data-views.php';

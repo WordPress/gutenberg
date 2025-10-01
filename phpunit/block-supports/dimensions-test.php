@@ -3,7 +3,7 @@
 /**
  * Test the dimensions block supports.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {

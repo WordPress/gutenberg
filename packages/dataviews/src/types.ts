@@ -18,6 +18,14 @@ import type { SetSelection } from './private-types';
  */
 import type { useFocusOnMount } from '@wordpress/compose';
 
+/**
+ * Utility type that makes all properties of T optional recursively.
+ * Used by field setValue functions to allow partial item updates.
+ */
+export type DeepPartial< T > = {
+	[ P in keyof T ]?: T[ P ] extends object ? DeepPartial< T[ P ] > : T[ P ];
+};
+
 export type SortDirection = 'asc' | 'desc';
 
 /**
@@ -98,6 +106,7 @@ export type Operator =
 export type FieldType =
 	| 'text'
 	| 'integer'
+	| 'number'
 	| 'datetime'
 	| 'date'
 	| 'media'
@@ -156,6 +165,7 @@ export type FieldTypeDefinition< Item > = {
 
 export type Rules< Item > = {
 	required?: boolean;
+	elements?: boolean;
 	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
 };
 
@@ -272,7 +282,7 @@ export type Field< Item > = {
 	enableGlobalSearch?: boolean;
 
 	/**
-	 * Whether the field is filterable.
+	 * Whether the field can be hidden in the UI.
 	 */
 	enableHiding?: boolean;
 
@@ -297,12 +307,19 @@ export type Field< Item > = {
 	 * Defaults to `item[ field.id ]`.
 	 */
 	getValue?: ( args: { item: Item } ) => any;
+
+	/**
+	 * Callback used to set the value of the field on the item.
+	 * Used for editing operations to update field values.
+	 */
+	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 };
 
 export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
+	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
@@ -323,7 +340,7 @@ export type Data< Item > = Item[];
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onChange: ( value: Record< string, any > ) => void;
+	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
 	/**
 	 * The currently selected filter operator for this field.

@@ -31,7 +31,9 @@ test.describe( 'Preload', () => {
 				const urlObject = new URL( url );
 				const restRoute = urlObject.searchParams.get( 'rest_route' );
 				if ( restRoute ) {
-					requests.push( restRoute );
+					urlObject.searchParams.delete( 'rest_route' );
+					urlObject.searchParams.delete( '_locale' );
+					requests.push( restRoute + urlObject.search );
 				} else {
 					requests.push( url );
 				}
@@ -44,8 +46,11 @@ test.describe( 'Preload', () => {
 
 		// To do: these should all be removed or preloaded.
 		expect( requests ).toEqual( [
+			'/wp/v2/wp_template',
 			// Seems to be coming from `enableComplementaryArea`.
 			'/wp/v2/users/me',
+			// This is the auto-draft template.
+			expect.stringMatching( /\/wp\/v2\/wp_template\/\d+\?context=edit/ ),
 			// There are two separate settings OPTIONS requests. We should fix
 			// so the one for canUser and getEntityRecord are reused.
 			'/wp/v2/settings',
