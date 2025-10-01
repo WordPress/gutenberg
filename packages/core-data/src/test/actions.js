@@ -914,6 +914,169 @@ describe( 'saveEntityRecord', () => {
 
 		expect( result ).toBe( postType );
 	} );
+
+	it( 'handles sync functionality when experimental sync is enabled', async () => {
+		globalThis.window.__experimentalEnableSync = true;
+
+		const mockCreateEntityMeta = jest
+			.fn()
+			.mockResolvedValue( { syncMeta: 'test' } );
+		const mockUpdateLastPersistedDate = jest.fn();
+		getSyncProvider.mockReturnValue( {
+			createEntityMeta: mockCreateEntityMeta,
+			updateLastPersistedDate: mockUpdateLastPersistedDate,
+		} );
+
+		const post = { id: 10, title: 'test post', meta: { existing: 'data' } };
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: { enabled: true },
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const updatedRecord = { ...post, id: 10 };
+		apiFetch.mockImplementation( () => updatedRecord );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		// Verify createEntityMeta was called before persisting
+		expect( mockCreateEntityMeta ).toHaveBeenCalledWith(
+			{ enabled: true },
+			{
+				id: 10,
+				title: 'test post',
+				meta: { existing: 'data' },
+			}
+		);
+
+		// Verify the request was made with merged meta
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: {
+				...post,
+				meta: {
+					existing: 'data',
+					syncMeta: 'test',
+				},
+			},
+		} );
+
+		// Verify updateLastPersistedDate was called after successful save
+		expect( mockUpdateLastPersistedDate ).toHaveBeenCalledWith(
+			{ enabled: true },
+			post
+		);
+
+		expect( result ).toBe( updatedRecord );
+
+		delete globalThis.window.__experimentalEnableSync;
+	} );
+
+	it( 'skips sync when experimental sync is disabled', async () => {
+		const mockCreateEntityMeta = jest.fn();
+		const mockUpdateLastPersistedDate = jest.fn();
+		getSyncProvider.mockReturnValue( {
+			createEntityMeta: mockCreateEntityMeta,
+			updateLastPersistedDate: mockUpdateLastPersistedDate,
+		} );
+
+		const post = { id: 10, title: 'test post', meta: { existing: 'data' } };
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: { enabled: true },
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const updatedRecord = { ...post, id: 10 };
+		apiFetch.mockImplementation( () => updatedRecord );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		// Verify sync functions were not called
+		expect( mockCreateEntityMeta ).not.toHaveBeenCalled();
+		expect( mockUpdateLastPersistedDate ).not.toHaveBeenCalled();
+
+		// Verify normal save still works
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: post,
+		} );
+
+		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'skips sync when entity has no syncConfig', async () => {
+		globalThis.window.__experimentalEnableSync = true;
+
+		const mockCreateEntityMeta = jest.fn();
+		const mockUpdateLastPersistedDate = jest.fn();
+		getSyncProvider.mockReturnValue( {
+			createEntityMeta: mockCreateEntityMeta,
+			updateLastPersistedDate: mockUpdateLastPersistedDate,
+		} );
+
+		const post = { id: 10, title: 'test post', meta: { existing: 'data' } };
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				// No syncConfig property
+			},
+		];
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const updatedRecord = { ...post, id: 10, updated: true };
+		apiFetch.mockImplementation( () => updatedRecord );
+
+		const result = await saveEntityRecord(
+			'postType',
+			'post',
+			post
+		)( { select, dispatch, resolveSelect } );
+
+		// Verify sync functions were not called
+		expect( mockCreateEntityMeta ).not.toHaveBeenCalled();
+		expect( mockUpdateLastPersistedDate ).not.toHaveBeenCalled();
+
+		// Verify normal save still works
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/posts/10',
+			method: 'PUT',
+			data: post,
+		} );
+
+		expect( result ).toBe( updatedRecord );
+
+		delete globalThis.window.__experimentalEnableSync;
+	} );
 } );
 
 describe( 'receiveUserPermission', () => {
