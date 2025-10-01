@@ -62,8 +62,8 @@ const { state, actions } = store(
 		actions: {
 			/**
 			 * Delegated click handler for links inside the responsive container content.
-			 * If a same-page anchor (hash) link is clicked, close the overlay menu
-			 * since there is no full page navigation to implicitly close it.
+			 * Closes the overlay for same-page anchor navigations so the target content
+			 * is not obscured. The browser performs the default hash navigation.
 			 *
 			 * @param {MouseEvent} event Click event from the responsive container content.
 			 */
@@ -83,14 +83,13 @@ const { state, actions } = store(
 					return;
 				}
 
-				// Only close for same-page anchor navigations.
-				// This includes hrefs like "#section" or "/path#section" that
-				// point to the current location with a hash.
+				// Only close for same-page anchor navigations (e.g. "#section" or
+				// "/path#section" that point to the current location with a hash).
 				try {
 					// Fast path: explicit hash-only links.
 					if ( href[ 0 ] === '#' ) {
+						// Normalize closing behaviour across paths.
 						actions.closeMenuOnClick();
-						actions.closeMenu( 'focus' );
 						return;
 					}
 
@@ -101,10 +100,8 @@ const { state, actions } = store(
 					const hasHash = !! url.hash;
 
 					if ( isSameOrigin && isSamePath && hasHash ) {
-						// Let the browser perform the default hash navigation while
-						// closing the overlay so content becomes visible immediately.
+						// Normalize closing behaviour across paths.
 						actions.closeMenuOnClick();
-						actions.closeMenu( 'focus' );
 					}
 				} catch ( e ) {
 					// Ignore URLs that cannot be parsed; do nothing.

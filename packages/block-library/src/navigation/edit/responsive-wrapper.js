@@ -28,8 +28,6 @@ export default function ResponsiveWrapper( {
 	hasIcon,
 	icon,
 } ) {
-	// No editor-side DOM listeners; behavior is handled in frontend via Interactivity API.
-
 	if ( ! isResponsive ) {
 		return children;
 	}
