@@ -8,6 +8,10 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	&>div>.editor-collab-sidebar-panel__thread {
+		padding: 0;
+		border: none;
+	}
 }
 
 .editor-collab-sidebar-panel {

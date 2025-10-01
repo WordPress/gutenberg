@@ -214,8 +214,14 @@ function CommentBoardWrapper( {
 	updateHeight,
 	heights
 } ) {
+
+	// Log it all!
+	console.log( { thread, showCommentBoard, previousThreadId, offsetsRef, heights } );
+
 	const blockRef = useRef();
-	useBlockElementRef( thread.clientId, blockRef );
+	useBlockElementRef( thread.blockClientId, blockRef );
+
+	console.log( { blockRef } );
 
 	const selectedBlockElementRect = blockRef.current?.getBoundingClientRect();
 
@@ -247,11 +253,14 @@ function CommentBoardWrapper( {
 		whileElementsMounted: autoUpdate,
 	} );
 
+
 	useEffect( () => {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current ); // Bind reference element
 		}
 	}, [ blockRef, refs ] );
+
+	console.log( { y, refs } );
 
 	useEffect( () => {
 		if ( y !== null && y !== 0 ) {
