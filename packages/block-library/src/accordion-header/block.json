@@ -52,7 +52,8 @@
 				"fontFamily": true
 			}
 		},
-		"shadow": true
+		"shadow": true,
+		"blockVisibility": false
 	},
 	"attributes": {
 		"openByDefault": {

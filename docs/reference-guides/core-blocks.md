@@ -39,7 +39,7 @@ Displays an accordion header. ([Source](https://github.com/WordPress/gutenberg/t
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~blockVisibility~~
 -	**Attributes:** iconPosition, level, openByDefault, showIcon, title
 
 ## Accordion Panel
@@ -50,7 +50,7 @@ Displays an accordion panel. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-content
--	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight)
+-	**Supports:** color (background, gradients, text), interactivity, layout, shadow, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~blockVisibility~~
 -	**Attributes:** allowedBlocks, isSelected, openByDefault, templateLock
 
 ## Archives
@@ -86,7 +86,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
 ## Button
@@ -585,7 +585,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/pattern
 -	**Category:** theme
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** slug
 
 ## Author
@@ -975,7 +975,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 -	**Name:** core/template-part
 -	**Category:** theme
--	**Supports:** align, interactivity (clientNavigation), ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Supports:** align, interactivity (clientNavigation), ~~blockVisibility~~, ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** area, slug, tagName, theme
 
 ## Term Description
