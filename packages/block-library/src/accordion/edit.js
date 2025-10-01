@@ -6,7 +6,9 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 	BlockControls,
+	useBlockEditingMode,
 	store as blockEditorStore,
+	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -16,8 +18,9 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -25,20 +28,32 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const ACCORDION_BLOCK_NAME = 'core/accordion-content';
+const ACCORDION_BLOCK_NAME = 'core/accordion-item';
+const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 };
 
 export default function Edit( {
-	attributes: { autoclose, iconPosition, showIcon },
+	attributes: {
+		autoclose,
+		iconPosition,
+		showIcon,
+		headingLevel,
+		levelOptions,
+	},
 	clientId,
 	setAttributes,
 	isSelected: isSingleSelected,
 } ) {
+	const registry = useRegistry();
+	const { getBlockOrder } = useSelect( blockEditorStore );
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { insertBlock } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, insertBlock } =
+		useDispatch( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
+	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
@@ -47,19 +62,60 @@ export default function Edit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	const addAccordionContentBlock = () => {
-		const newAccordionContent = createBlock( ACCORDION_BLOCK_NAME );
-		insertBlock( newAccordionContent, undefined, clientId );
+	const addAccordionItemBlock = () => {
+		// When adding, set the header's level to current headingLevel
+		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
+			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
+				level: headingLevel,
+			} ),
+			createBlock( 'core/accordion-panel', {} ),
+		] );
+		insertBlock( newAccordionItem, undefined, clientId );
+	};
+
+	/**
+	 * Update all child Accordion Header blocks with a new heading level
+	 * based on the accordion group setting.
+	 * @param {number} newHeadingLevel The new heading level to set
+	 */
+	const updateHeadingLevel = ( newHeadingLevel ) => {
+		const innerBlockClientIds = getBlockOrder( clientId );
+
+		// Get all accordion-header blocks from all accordion-content blocks.
+		const accordionHeaderClientIds = [];
+		innerBlockClientIds.forEach( ( contentClientId ) => {
+			const headerClientIds = getBlockOrder( contentClientId );
+			accordionHeaderClientIds.push( ...headerClientIds );
+		} );
+
+		// Update own and child block heading levels.
+		registry.batch( () => {
+			setAttributes( { headingLevel: newHeadingLevel } );
+			updateBlockAttributes( accordionHeaderClientIds, {
+				level: newHeadingLevel,
+			} );
+		} );
 	};
 
 	return (
 		<>
-			{ isSingleSelected && (
-				<BlockControls group="other">
-					<ToolbarButton onClick={ addAccordionContentBlock }>
-						{ __( 'Add' ) }
-					</ToolbarButton>
-				</BlockControls>
+			{ isSingleSelected && ! isContentOnlyMode && (
+				<>
+					<BlockControls>
+						<ToolbarGroup>
+							<HeadingLevelDropdown
+								value={ headingLevel }
+								options={ levelOptions }
+								onChange={ updateHeadingLevel }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarButton onClick={ addAccordionItemBlock }>
+							{ __( 'Add' ) }
+						</ToolbarButton>
+					</BlockControls>
+				</>
 			) }
 			<InspectorControls key="setting">
 				<ToolsPanel
@@ -69,6 +125,7 @@ export default function Edit( {
 							autoclose: false,
 							showIcon: true,
 							iconPosition: 'right',
+							headingLevel: 3,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }

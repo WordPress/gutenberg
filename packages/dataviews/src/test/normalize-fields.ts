@@ -206,6 +206,28 @@ describe( 'normalizeFields: default getValue', () => {
 			} );
 		} );
 
+		it( 'returns the field type definition for number fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].filterBy;
+			expect( result ).toStrictEqual( {
+				operators: [
+					'is',
+					'isNot',
+					'lessThan',
+					'greaterThan',
+					'lessThanOrEqual',
+					'greaterThanOrEqual',
+					'between',
+				],
+			} );
+		} );
+
 		it( 'returns the field type definition for typed fields (for primary filters)', () => {
 			const fields: Field< {} >[] = [
 				{

@@ -15,6 +15,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getAvatarBorderColor } from './utils';
 
 const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -40,6 +41,7 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 						avatar:
 							comment.author_avatar_urls?.[ '48' ] ||
 							comment.author_avatar_urls?.[ '96' ],
+						id: comment.author,
 						isOriginalCommenter: comment.id === thread.id,
 						date: comment.date,
 					} );
@@ -107,7 +109,12 @@ const CommentAvatarIndicator = ( { onClick, thread, hasMoreComments } ) => {
 							src={ participant.avatar }
 							alt={ participant.name }
 							className="comment-avatar"
-							style={ { zIndex: maxAvatars - index } }
+							style={ {
+								zIndex: maxAvatars - index,
+								borderColor: getAvatarBorderColor(
+									participant.id
+								),
+							} }
 						/>
 					) ) }
 					{ overflowCount > 0 && (

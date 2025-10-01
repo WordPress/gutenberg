@@ -16,13 +16,9 @@
 			"type": "boolean",
 			"default": true
 		},
-		"showTimeToRead": {
-			"type": "boolean",
-			"default": true
-		},
-		"showWordCount": {
-			"type": "boolean",
-			"default": false
+		"displayMode": {
+			"type": "string",
+			"default": "time"
 		},
 		"averageReadingSpeed": {
 			"type": "number",

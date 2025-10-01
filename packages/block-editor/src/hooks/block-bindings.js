@@ -23,11 +23,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	canBindAttribute,
-	getBindableAttributes,
-	useBlockBindingsUtils,
-} from '../utils/block-bindings';
+import { useBlockBindingsUtils } from '../utils/block-bindings';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
@@ -205,52 +201,62 @@ function EditableBlockBindingsPanelItems( {
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
-	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// `useSelect` is used purposely here to ensure `getFieldsList`
 	// is updated whenever there are updates in block context.
 	// `source.getFieldsList` may also call a selector via `select`.
 	const _fieldsList = {};
-	const { fieldsList, canUpdateBlockBindings } = useSelect(
-		( select ) => {
-			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return EMPTY_OBJECT;
-			}
-			const registeredSources = getBlockBindingsSources();
-			Object.entries( registeredSources ).forEach(
-				( [ sourceName, { getFieldsList, usesContext } ] ) => {
-					if ( getFieldsList ) {
-						// Populate context.
-						const context = {};
-						if ( usesContext?.length ) {
-							for ( const key of usesContext ) {
-								context[ key ] = blockContext[ key ];
+	const { bindableAttributes, fieldsList, canUpdateBlockBindings } =
+		useSelect(
+			( select ) => {
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+				const _bindableAttributes =
+					__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					];
+				if (
+					! _bindableAttributes ||
+					_bindableAttributes.length === 0
+				) {
+					return EMPTY_OBJECT;
+				}
+				const registeredSources = getBlockBindingsSources();
+				Object.entries( registeredSources ).forEach(
+					( [ sourceName, { getFieldsList, usesContext } ] ) => {
+						if ( getFieldsList ) {
+							// Populate context.
+							const context = {};
+							if ( usesContext?.length ) {
+								for ( const key of usesContext ) {
+									context[ key ] = blockContext[ key ];
+								}
+							}
+							const sourceList = getFieldsList( {
+								select,
+								context,
+							} );
+							// Only add source if the list is not empty.
+							if ( Object.keys( sourceList || {} ).length ) {
+								_fieldsList[ sourceName ] = { ...sourceList };
 							}
 						}
-						const sourceList = getFieldsList( {
-							select,
-							context,
-						} );
-						// Only add source if the list is not empty.
-						if ( Object.keys( sourceList || {} ).length ) {
-							_fieldsList[ sourceName ] = { ...sourceList };
-						}
 					}
-				}
-			);
-			return {
-				fieldsList:
-					Object.values( _fieldsList ).length > 0
-						? _fieldsList
-						: EMPTY_OBJECT,
-				canUpdateBlockBindings:
-					select( blockEditorStore ).getSettings()
-						.canUpdateBlockBindings,
-			};
-		},
-		[ blockContext, bindableAttributes ]
-	);
+				);
+				return {
+					bindableAttributes: _bindableAttributes,
+					fieldsList:
+						Object.values( _fieldsList ).length > 0
+							? _fieldsList
+							: EMPTY_OBJECT,
+					canUpdateBlockBindings:
+						select( blockEditorStore ).getSettings()
+							.canUpdateBlockBindings,
+				};
+			},
+			[ blockContext ]
+		);
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
@@ -260,7 +266,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
-			! canBindAttribute( blockName, key ) ||
+			! bindableAttributes.includes( key ) &&
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
