@@ -94,6 +94,14 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			);
 		}
 
+		if ( 'trash' === $post->post_status ) {
+			return new WP_Error(
+				'rest_comment_trash_post',
+				__( 'Sorry, you are not allowed to create a comment on this post.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+
 		if ( ! $this->check_read_post_permission( $post, $request ) ) {
 			return new WP_Error(
 				'rest_cannot_read_post',
@@ -102,7 +110,7 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			);
 		}
 
-		if ( ! gutenberg_check_post_type_supports_block_comments( $post->post_type ) ) {
+		if ( ! $this->check_post_type_supports_block_comments( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_comment_block_comments_not_supported',
 				__( 'Sorry, this post type does not support block comments.', 'gutenberg' ),
@@ -110,6 +118,28 @@ class Gutenberg_REST_Comment_Controller extends WP_REST_Comments_Controller {
 			);
 		}
 
+		return true;
+	}
+
+	/**
+	 * Check if post type supports block comments.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return bool True if post type supports block comments, false otherwise.
+	 */
+	private function check_post_type_supports_block_comments( $post_type ) {
+		$supports = get_all_post_type_supports( $post_type );
+		if ( ! isset( $supports['editor'] ) ) {
+			return false;
+		}
+		if ( ! is_array( $supports['editor'] ) ) {
+			return false;
+		}
+		foreach ( $supports['editor'] as $item ) {
+			if ( is_array( $item ) && isset( $item['block-comments'] ) && true === $item['block-comments'] ) {
+				return true;
+			}
+		}
 		return true;
 	}
 }
@@ -121,25 +151,3 @@ add_action(
 		$controller->register_routes();
 	}
 );
-
-/**
- * Check if post type supports block comments.
- *
- * @param string $post_type Post type name.
- * @return bool True if post type supports block comments, false otherwise.
- */
-function gutenberg_check_post_type_supports_block_comments( $post_type ) {
-	$supports = get_all_post_type_supports( $post_type );
-	if ( ! isset( $supports['editor'] ) ) {
-		return false;
-	}
-	if ( ! is_array( $supports['editor'] ) ) {
-		return false;
-	}
-	foreach ( $supports['editor'] as $item ) {
-		if ( is_array( $item ) && isset( $item['block-comments'] ) && true === $item['block-comments'] ) {
-			return true;
-		}
-	}
-	return true;
-}
