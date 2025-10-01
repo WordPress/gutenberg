@@ -40,6 +40,16 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Create block
+            - name: Create block with logging
               shell: bash
-              run: bash ./bin/test-create-block.sh
+              run: |
+                  # Execute with real-time logging and error details
+                  bash ./bin/test-create-block.sh 2>&1 | tee create-block-test.log || {
+                      echo "=== Test script failed ==="
+                      echo "Exit code: $?"
+                      echo "Last 50 lines of output:"
+                      tail -50 create-block-test.log || echo "No log file available"
+                      echo "=== Full log content ==="
+                      cat create-block-test.log || echo "Cannot read log file"
+                      exit 1
+                  }
