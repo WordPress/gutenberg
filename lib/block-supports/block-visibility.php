@@ -8,12 +8,17 @@
 /**
  * Render nothing if the block is hidden.
  *
- * @param string $block_content The block content.
- * @param array  $block         The block.
- *
- * @return string The block content.
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
  */
 function gutenberg_render_block_visibility_support( $block_content, $block ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+
+	if ( ! $block_type || ! block_has_support( $block_type, 'blockVisibility', true ) ) {
+		return $block_content;
+	}
+
 	if ( isset( $block['attrs']['metadata']['blockVisibility'] ) && false === $block['attrs']['metadata']['blockVisibility'] ) {
 		return '';
 	}
