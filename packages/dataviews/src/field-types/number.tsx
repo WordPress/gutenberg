@@ -25,6 +25,7 @@ import {
 	OPERATOR_IS_NOT_ALL,
 	OPERATOR_BETWEEN,
 } from '../constants';
+import { renderFromElements } from '../utils';
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;
@@ -44,7 +45,7 @@ export default {
 				return __( 'Value must be a number.' );
 			}
 
-			if ( field?.elements ) {
+			if ( Array.isArray( field?.elements ) ) {
 				const isMember = field.elements.some(
 					( element ) => element.value === Number( value )
 				);
@@ -57,23 +58,10 @@ export default {
 		},
 	},
 	Edit: 'number',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		const value = field.getValue( { item } );
-		if ( ! isEmpty( value ) && field.elements ) {
-			const numericValue = Number( value );
-			const match = field.elements.find(
-				( element ) =>
-					Number.isFinite( Number( element.value ) ) &&
-					Number( element.value ) === numericValue
-			);
-			if ( match ) {
-				return match.label;
-			}
-		}
-
-		// TODO: remove this hardcoded value when the decimal number is configurable
-		return Number( value ).toFixed( 2 );
-	},
+	render: ( { item, field }: DataViewRenderFieldProps< any > ) =>
+		Array.isArray( field.elements )
+			? renderFromElements( { item, field } )
+			: Number( field.getValue( { item } ) ).toFixed( 2 ), // TODO: remove this hardcoded value when the decimal number is configurable
 	enableSorting: true,
 	filterBy: {
 		defaultOperators: [
