@@ -28,13 +28,6 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		}
 	}, [ iconPosition, showIcon, setAttributes ] );
 
-	// Sync heading level from context.
-	useEffect( () => {
-		if ( headingLevel !== undefined && headingLevel !== attributes.level ) {
-			setAttributes( { level: headingLevel } );
-		}
-	}, [ headingLevel, attributes.level, setAttributes ] );
-
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 

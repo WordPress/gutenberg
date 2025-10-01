@@ -66,8 +66,7 @@
 			"role": "content"
 		},
 		"level": {
-			"type": "number",
-			"default": 3
+			"type": "number"
 		},
 		"iconPosition": {
 			"type": "string",

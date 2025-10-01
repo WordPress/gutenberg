@@ -25,7 +25,12 @@ import clsx from 'clsx';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-export default function Edit( { attributes, clientId, setAttributes } ) {
+export default function Edit( {
+	attributes,
+	clientId,
+	setAttributes,
+	context,
+} ) {
 	const { openByDefault } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -70,9 +75,14 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		} ),
 	} );
 
+	// Get heading level from context.
+	const headingLevel = context && context[ 'core/accordion-heading-level' ];
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: [
-			[ 'core/accordion-header', {} ],
+			[
+				'core/accordion-header',
+				headingLevel ? { level: headingLevel } : {},
+			],
 			[
 				'core/accordion-panel',
 				{
