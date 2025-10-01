@@ -98,7 +98,10 @@ function PostEditForm( { postType, postId } ) {
 					id: 'discussion',
 					label: __( 'Discussion' ),
 					children: [ 'comment_status', 'ping_status' ],
-					summary: 'discussion',
+					layout: {
+						type: 'panel',
+						summary: 'discussion',
+					},
 				},
 				{
 					label: __( 'Template' ),

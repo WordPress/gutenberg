@@ -68,7 +68,7 @@ const getFieldDefinitionAndSummaryFields = < Item, >(
 
 	return {
 		summaryFields,
-		fieldDefinition: summaryFields[ 0 ],
+		fieldDefinition,
 	};
 };
 
