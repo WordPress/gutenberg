@@ -11,15 +11,6 @@
 }
 
 .block-editor-block-variation-transforms__button {
-	border: $border-width solid $gray-700;
 	width: 100%;
-
-	&:focus:not(:disabled) {
-		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 calc(var(--wp-admin-border-width-focus) - #{ $border-width }) var(--wp-admin-theme-color);
-	}
-
-	svg {
-		margin-left: auto;
-	}
+	justify-content: center;
 }

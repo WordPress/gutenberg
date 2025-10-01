@@ -12,7 +12,6 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -71,10 +70,9 @@ function VariationsDropdown( {
 				<Menu.TriggerButton
 					render={
 						<Button
-							size="compact"
 							className="block-editor-block-variation-transforms__button"
-							icon={ chevronDown }
-							iconPosition="right"
+							__next40pxDefaultSize
+							variant="secondary"
 						>
 							{ __( 'Transform to variation' ) }
 						</Button>
