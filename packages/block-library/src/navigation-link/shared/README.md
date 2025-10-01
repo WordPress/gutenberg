@@ -6,50 +6,31 @@ This directory contains shared components and utilities used by both the Navigat
 
 The Navigation Link and Navigation Submenu blocks share significant functionality, particularly in their inspector controls (ToolsPanel). This shared directory was created to:
 
-- **Reduce code duplication** - Eliminate identical code between the two blocks
-- **Ensure consistency** - Both blocks now use the same components, preventing behavioral differences
-- **Reduce maintenance burden** - Changes to shared functionality only need to be made in one place
-- **Minimize bugs** - Less duplicated code means fewer places for bugs to hide
-- **Improve testability** - Shared components can be tested once and reused
+-   **Reduce code duplication** - Eliminate identical code between the two blocks
+-   **Ensure consistency** - Both blocks now use the same components, preventing behavioral differences
+-   **Reduce maintenance burden** - Changes to shared functionality only need to be made in one place
+-   **Minimize bugs** - Less duplicated code means fewer places for bugs to hide
+-   **Improve testability** - Shared components can be tested once and reused
 
 ## Current Shared Components
 
-### `Controls`
-The main inspector controls component that provides the ToolsPanel interface for both blocks. It includes:
-- Text input for navigation item label
-- URL input for navigation item link
-- Checkbox for "Open in new tab" option
-- Textarea for description
-- Text input for rel attribute
-- Reset functionality
-
-**Usage:**
-```jsx
-import { Controls } from './shared';
-
-<InspectorControls>
-  <Controls
-    attributes={attributes}
-    setAttributes={setAttributes}
-  />
-</InspectorControls>
-```
+-   **`Controls`** - Inspector controls component providing the ToolsPanel interface for both blocks
 
 ## Future Direction
 
 While this shared directory provides immediate benefits for reducing duplication, the long-term vision is to refactor towards a **unified Navigation Item block** that can behave differently based on context (link vs submenu). This would:
 
-- Eliminate the need for separate Navigation Link and Navigation Submenu blocks
-- Provide a single, more maintainable codebase
-- Allow for more flexible navigation item types
-- Simplify the user experience
+-   Eliminate the need for separate Navigation Link and Navigation Submenu blocks
+-   Provide a single, more maintainable codebase
+-   Allow for more flexible navigation item types
+-   Simplify the user experience
 
 However, this refactoring is beyond the current scope and would require significant architectural changes. For now, this shared directory provides a practical solution that:
 
-- Maintains backward compatibility
-- Reduces immediate technical debt
-- Prepares the foundation for future unification
-- Supports the integration of new features like Dynamic URL functionality
+-   Maintains backward compatibility
+-   Reduces immediate technical debt
+-   Prepares the foundation for future unification
+-   Supports the integration of new features like Dynamic URL functionality
 
 ## Testing
 
@@ -65,8 +46,3 @@ When adding new shared functionality:
 4. Update both Navigation Link and Navigation Submenu blocks to use the shared component
 5. Remove any duplicated code from the individual blocks
 
-## Files
-
-- `controls.js` - Main inspector controls component
-- `index.js` - Export file for shared components
-- `test/controls.js` - Tests for the Controls component
