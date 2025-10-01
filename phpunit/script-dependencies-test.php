@@ -45,7 +45,6 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 			'wp-core-data',
 			'wp-editor',
 			'wp-router',
-			'wp-sync',
 			'wp-url',
 			'wp-widgets',
 		);
