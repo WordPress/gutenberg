@@ -50,16 +50,16 @@ export default function Edit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
-	const addaccordionItemBlock = () => {
-		const newaccordionItem = createBlock( ACCORDION_BLOCK_NAME );
-		insertBlock( newaccordionItem, undefined, clientId );
+	const addAccordionItemBlock = () => {
+		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME );
+		insertBlock( newAccordionItem, undefined, clientId );
 	};
 
 	return (
 		<>
 			{ isSingleSelected && ! isContentOnlyMode && (
 				<BlockControls group="other">
-					<ToolbarButton onClick={ addaccordionItemBlock }>
+					<ToolbarButton onClick={ addAccordionItemBlock }>
 						{ __( 'Add' ) }
 					</ToolbarButton>
 				</BlockControls>
