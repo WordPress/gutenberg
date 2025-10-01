@@ -251,10 +251,8 @@ The function or object must return/be an object with this structure:
 - `data`: `array` - An array of available fields, each with:
     - `key`: `string` - Unique identifier for the field
     - `label`: `string` - Human-readable label
-    - `value`: `any` - Current value of the field
+    - `args`: `object` - Source-specific arguments used to retrieve a value from the source
     - `type`: `string` - Data type (`'string'`, `'number'`, `'boolean'`, etc.)
-- `getArgs`: `function` (optional). Accepts an object with an item. - Returns the source arguments for the selected item. Used for dropdown mode to customize the binding arguments.
-- `isSelected`: `function` (optional). Accepts an object with item and binding. - Returns whether the field is currently selected. Used for dropdown mode to determine the checked state.
 - `renderModalContent`: `function` (required for modal mode) - Function that renders the modal content. Receives an object with the `attribute` property.
 
 Example:
@@ -268,19 +266,12 @@ registerBlockBindingsSource( {
 		return {
 			mode: 'dropdown',
 			data: Object.entries( customFields ).map( ( [ key, field ] ) => ( {
-				key,
 				label: field.label,
-				value: field.value,
+				args: {
+					key
+				},
 				type: field.type,
 			} ) ),
-			getArgs( { item } ) {
-				return {
-					key: item.key,
-				};
-			},
-			isSelected( { item, binding } ) {
-				return binding?.args?.key === item.key;
-			},
 		};
 	},
 } );
@@ -360,8 +351,8 @@ editorUI( { select, context } ) {
 	return {
 		mode: 'dropdown',
 		data: [
-			{ key: 'field1', label: 'Field 1', value: 'value1', type: 'string' },
-			{ key: 'field2', label: 'Field 2', value: 'value2', type: 'number' }
+			{ args: { key: 'field1' }, label: 'Field 1', type: 'string' },
+			{ args: { key: 'field2' }, label: 'Field 2', type: 'number' }
 		]
 	};
 }
