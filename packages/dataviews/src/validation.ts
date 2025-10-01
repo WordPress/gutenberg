@@ -47,6 +47,8 @@ export function isItemValid< Item >(
 					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'integer' &&
 					isEmptyNullOrUndefined( value ) ) ||
+				( field.type === 'number' &&
+					isEmptyNullOrUndefined( value ) ) ||
 				( field.type === 'array' &&
 					isArrayOrElementsEmptyNullOrUndefined( value ) ) ||
 				( field.type === undefined && isEmptyNullOrUndefined( value ) )

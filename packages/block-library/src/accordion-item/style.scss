@@ -1,11 +1,11 @@
-.wp-block-accordion-content {
+.wp-block-accordion-item {
 	display: grid;
 	grid-template-rows: max-content 0fr;
 
 	&.is-open {
 		grid-template-rows: max-content 1fr;
 
-		> .wp-block-accordion-header .wp-block-accordion-header__toggle-icon {
+		> .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
 			transform: rotate(45deg);
 		}
 	}
@@ -14,7 +14,7 @@
 	@media (prefers-reduced-motion: no-preference) {
 		transition: grid-template-rows 0.3s ease-out;
 
-		> .wp-block-accordion-header .wp-block-accordion-header__toggle-icon {
+		> .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
 			transition: transform 0.2s ease-in-out;
 		}
 	}

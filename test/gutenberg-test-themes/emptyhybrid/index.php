@@ -2,7 +2,7 @@
 /**
  * Empty-Hybrid theme index.php file.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 ?>

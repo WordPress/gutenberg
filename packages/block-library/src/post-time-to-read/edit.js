@@ -29,13 +29,8 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const {
-		textAlign,
-		displayAsRange,
-		showTimeToRead,
-		showWordCount,
-		averageReadingSpeed,
-	} = attributes;
+	const { textAlign, displayAsRange, displayMode, averageReadingSpeed } =
+		attributes;
 
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -77,11 +72,8 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		const totalWords = wordCount( content || '', wordCountType );
 
-		const parts = [];
-
 		// Add "time to read" part, if enabled.
-		if ( showTimeToRead ) {
-			let timeString;
+		if ( displayMode === 'time' ) {
 			if ( displayAsRange ) {
 				let maxMinutes = Math.max(
 					1,
@@ -100,54 +92,39 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					'%1$s–%2$s minutes',
 					'Range of minutes to read'
 				);
-				timeString = sprintf( rangeLabel, minMinutes, maxMinutes );
-			} else {
-				const minutesToRead = Math.max(
-					1,
-					Math.round( totalWords / averageReadingSpeed )
-				);
-
-				timeString = sprintf(
-					/* translators: %s: the number of minutes to read the post. */
-					_n( '%s minute', '%s minutes', minutesToRead ),
-					minutesToRead
-				);
+				return sprintf( rangeLabel, minMinutes, maxMinutes );
 			}
-			parts.push( timeString );
+			const minutesToRead = Math.max(
+				1,
+				Math.round( totalWords / averageReadingSpeed )
+			);
+
+			return sprintf(
+				/* translators: %s: the number of minutes to read the post. */
+				_n( '%s minute', '%s minutes', minutesToRead ),
+				minutesToRead
+			);
 		}
 
 		// Add "word count" part, if enabled.
-		if ( showWordCount ) {
-			const wordCountString =
-				wordCountType === 'words'
-					? sprintf(
-							/* translators: %s: the number of words in the post. */
-							_n( '%s word', '%s words', totalWords ),
-							totalWords.toLocaleString()
-					  )
-					: sprintf(
-							/* translators: %s: the number of characters in the post. */
-							_n( '%s character', '%s characters', totalWords ),
-							totalWords.toLocaleString()
-					  );
-			parts.push( wordCountString );
+		if ( displayMode === 'words' ) {
+			return wordCountType === 'words'
+				? sprintf(
+						/* translators: %s: the number of words in the post. */
+						_n( '%s word', '%s words', totalWords ),
+						totalWords.toLocaleString()
+				  )
+				: sprintf(
+						/* translators: %s: the number of characters in the post. */
+						_n( '%s character', '%s characters', totalWords ),
+						totalWords.toLocaleString()
+				  );
 		}
-
-		if ( parts.length === 1 ) {
-			return parts[ 0 ];
-		}
-		return parts.map( ( part, index ) => (
-			<span key={ index }>
-				{ part }
-				{ index < parts.length - 1 && <br /> }
-			</span>
-		) );
 	}, [
 		contentStructure,
 		blocks,
 		displayAsRange,
-		showTimeToRead,
-		showWordCount,
+		displayMode,
 		averageReadingSpeed,
 	] );
 
@@ -167,39 +144,17 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 					} }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							displayAsRange: true,
-							showTimeToRead: true,
-							showWordCount: false,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						label={ __( 'Show time to read' ) }
-						hasValue={ () => ! showTimeToRead }
-						onDeselect={ () => {
+			{ displayMode === 'time' && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
-								showTimeToRead: true,
+								displayAsRange: true,
 							} );
 						} }
+						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show time to read' ) }
-							checked={ !! showTimeToRead }
-							onChange={ () =>
-								setAttributes( {
-									showTimeToRead: ! showTimeToRead,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-					{ showTimeToRead && (
 						<ToolsPanelItem
 							isShownByDefault
 							label={ _x(
@@ -224,29 +179,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 								}
 							/>
 						</ToolsPanelItem>
-					) }
-					<ToolsPanelItem
-						label={ __( 'Show word count' ) }
-						hasValue={ () => !! showWordCount }
-						onDeselect={ () => {
-							setAttributes( {
-								showWordCount: false,
-							} );
-						} }
-					>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show word count' ) }
-							checked={ !! showWordCount }
-							onChange={ () =>
-								setAttributes( {
-									showWordCount: ! showWordCount,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
-			</InspectorControls>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>{ displayString }</div>
 		</>
 	);
