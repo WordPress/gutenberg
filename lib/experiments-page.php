@@ -117,12 +117,12 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-sync-collaboration',
-		__( 'Collaboration: add real time editing', 'gutenberg' ),
+		__( 'Collaboration: enable real-time collaboration', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
+			'label' => __( 'Enables real-time collaboration between peers.', 'gutenberg' ),
 			'id'    => 'gutenberg-sync-collaboration',
 		)
 	);
