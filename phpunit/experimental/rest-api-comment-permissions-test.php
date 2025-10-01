@@ -90,6 +90,7 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 		$request->set_param( 'post', self::$post_id );
 		$request->set_param( 'type', $comment_type );
 		$request->set_param( 'per_page', 100 );
+		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
 
 		if ( $expected_permission ) {
@@ -125,5 +126,4 @@ class WP_Test_REST_Block_Comment_Permissions extends WP_UnitTestCase {
 			'subscriber can see Block comments'       => array( 'subscriber', 'block_comment', false ),
 		);
 	}
-
 }
