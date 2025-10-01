@@ -7,15 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	CheckboxControl,
-	TextControl,
-	TextareaControl,
-	ToolbarButton,
-	ToolbarGroup,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -41,11 +33,11 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
 import { ItemSubmenuIcon } from './icons';
 import { LinkUI } from '../navigation-link/link-ui';
 import { updateAttributes } from '../navigation-link/update-attributes';
+import { Controls } from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { DEFAULT_BLOCK } from '../navigation/constants';
 
 const ALLOWED_BLOCKS = [
@@ -132,7 +124,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description, rel, opensInNewTab } = attributes;
+	const { label, url, description } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -151,7 +143,6 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const {
 		parentCount,
@@ -380,120 +371,11 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			{ /* Warning, this duplicated in packages/block-library/src/navigation-link/edit.js */ }
 			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							label: '',
-							url: '',
-							description: '',
-							rel: '',
-							opensInNewTab: false,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						label={ __( 'Text' ) }
-						isShownByDefault
-						hasValue={ () => !! label }
-						onDeselect={ () => setAttributes( { label: '' } ) }
-					>
-						<TextControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							value={ label || '' }
-							onChange={ ( labelValue ) => {
-								setAttributes( { label: labelValue } );
-							} }
-							label={ __( 'Text' ) }
-							autoComplete="off"
-						/>
-					</ToolsPanelItem>
-
-					<ToolsPanelItem
-						label={ __( 'Link' ) }
-						isShownByDefault
-						hasValue={ () => !! url }
-						onDeselect={ () => setAttributes( { url: '' } ) }
-					>
-						<TextControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							value={ url || '' }
-							onChange={ ( urlValue ) => {
-								setAttributes( { url: urlValue } );
-							} }
-							label={ __( 'Link' ) }
-							autoComplete="off"
-							type="url"
-						/>
-					</ToolsPanelItem>
-
-					<ToolsPanelItem
-						hasValue={ () => !! opensInNewTab }
-						label={ __( 'Open in new tab' ) }
-						onDeselect={ () =>
-							setAttributes( { opensInNewTab: false } )
-						}
-						isShownByDefault
-					>
-						<CheckboxControl
-							__nextHasNoMarginBottom
-							label={ __( 'Open in new tab' ) }
-							checked={ opensInNewTab }
-							onChange={ ( value ) =>
-								setAttributes( { opensInNewTab: value } )
-							}
-						/>
-					</ToolsPanelItem>
-
-					<ToolsPanelItem
-						label={ __( 'Description' ) }
-						isShownByDefault
-						hasValue={ () => !! description }
-						onDeselect={ () =>
-							setAttributes( { description: '' } )
-						}
-					>
-						<TextareaControl
-							__nextHasNoMarginBottom
-							value={ description || '' }
-							onChange={ ( descriptionValue ) => {
-								setAttributes( {
-									description: descriptionValue,
-								} );
-							} }
-							label={ __( 'Description' ) }
-							help={ __(
-								'The description will be displayed in the menu if the current theme supports it.'
-							) }
-						/>
-					</ToolsPanelItem>
-
-					<ToolsPanelItem
-						label={ __( 'Rel attribute' ) }
-						isShownByDefault
-						hasValue={ () => !! rel }
-						onDeselect={ () => setAttributes( { rel: '' } ) }
-					>
-						<TextControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							value={ rel || '' }
-							onChange={ ( relValue ) => {
-								setAttributes( { rel: relValue } );
-							} }
-							label={ __( 'Rel attribute' ) }
-							autoComplete="off"
-							help={ __(
-								'The relationship of the linked URL as space-separated link types.'
-							) }
-						/>
-					</ToolsPanelItem>
-				</ToolsPanel>
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
