@@ -417,32 +417,28 @@ export const editEntityRecord =
 					edit.edits
 				);
 			}
-		} else {
-			if ( ! options.undoIgnore ) {
-				select.getUndoManager().addRecord(
-					[
-						{
-							id: { kind, name, recordId },
-							changes: Object.keys( edits ).reduce(
-								( acc, key ) => {
-									acc[ key ] = {
-										from: editedRecord[ key ],
-										to: edits[ key ],
-									};
-									return acc;
-								},
-								{}
-							),
-						},
-					],
-					options.isCached
-				);
-			}
-			dispatch( {
-				type: 'EDIT_ENTITY_RECORD',
-				...edit,
-			} );
 		}
+		if ( ! options.undoIgnore ) {
+			select.getUndoManager().addRecord(
+				[
+					{
+						id: { kind, name, recordId },
+						changes: Object.keys( edits ).reduce( ( acc, key ) => {
+							acc[ key ] = {
+								from: editedRecord[ key ],
+								to: edits[ key ],
+							};
+							return acc;
+						}, {} ),
+					},
+				],
+				options.isCached
+			);
+		}
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			...edit,
+		} );
 	};
 
 /**
