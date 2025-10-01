@@ -15,24 +15,21 @@ import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 
 export default function BlockVisibilityToolbar( { clientIds } ) {
-	const blocks = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlocksByClientId( clientIds );
-		},
-		[ clientIds ]
-	);
-	const canToggleBlockVisibility = useSelect(
+	const { blocks, canToggleBlockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlocksByClientId } =
 				select( blockEditorStore );
 			const _blocks = getBlocksByClientId( clientIds );
-			return _blocks.every( ( { clientId } ) =>
-				hasBlockSupport(
-					getBlockName( clientId ),
-					'blockVisibility',
-					true
-				)
-			);
+			return {
+				blocks: _blocks,
+				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
+					hasBlockSupport(
+						getBlockName( clientId ),
+						'blockVisibility',
+						true
+					)
+				),
+			};
 		},
 		[ clientIds ]
 	);
