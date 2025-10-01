@@ -24,14 +24,16 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$internal_processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
 		// phpcs:ignore Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
-		public function span_of_current_element() {
+		public function span_of_empty_element() {
+			$tag_name = $this->get_tag();
 			$this->set_bookmark( '_wp_image_block_figcaption' );
 			// The bookmark names are prefixed with `_` so the key below has an extra `_`.
 			$opener = $this->bookmarks['__wp_image_block_figcaption'];
 
-			$depth = $this->get_current_depth();
-			while ( $this->next_token() && $this->get_current_depth() >= $depth ) {
-				continue;
+			$this->next_token();
+			if ( $this->get_tag() !== $tag_name || ! $this->is_tag_closer() ) {
+				// Not an empty element.
+				return false;
 			}
 
 			$this->set_bookmark( '_wp_image_block_figcaption' );
@@ -81,7 +83,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * we take note of its span so we can remove it later.
 	 */
 	if ( $p->next_tag( 'FIGCAPTION' ) && empty( $attributes['caption'] ) ) {
-		$figcaption_span = $p->span_of_current_element();
+		$figcaption_span = $p->span_of_empty_element();
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
@@ -116,7 +118,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	$output = $p->get_updated_html();
-	if ( isset( $figcaption_span ) ) {
+	if ( ! empty( $figcaption_span ) ) {
 		return substr( $output, 0, $figcaption_span->start ) . substr( $output, $figcaption_span->start + $figcaption_span->length );
 	}
 	return $output;
