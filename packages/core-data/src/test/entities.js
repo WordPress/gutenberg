@@ -100,3 +100,64 @@ describe( 'loadTaxonomyEntities', () => {
 		expect( entities[ 0 ].supportsPagination ).toBe( true );
 	} );
 } );
+
+describe( 'loadPostTypeEntities', () => {
+	beforeEach( () => {
+		apiFetch.mockReset();
+	} );
+
+	it( 'should add required properties to post type entities', async () => {
+		const mockPostTypes = {
+			post: {
+				name: 'Posts',
+				rest_base: 'posts',
+				rest_namespace: 'wp/v2',
+				slug: 'post',
+				supports: {
+					'custom-fields': true,
+					editor: true,
+					'collaborative-editing': true,
+				},
+			},
+		};
+
+		apiFetch.mockResolvedValueOnce( mockPostTypes );
+
+		const postTypeLoader = additionalEntityConfigLoaders.find(
+			( loader ) => loader.kind === 'postType'
+		);
+		const entities = await postTypeLoader.loadEntities();
+
+		expect( entities[ 0 ].supportsPagination ).toBe( true );
+		expect( entities[ 0 ].transientEdits ).toEqual( {
+			blocks: true,
+			selection: true,
+		} );
+		expect( entities[ 0 ].mergedEdits ).toEqual( { meta: true } );
+		expect( entities[ 0 ].rawAttributes ).toBeDefined();
+		expect( entities[ 0 ].__unstable_rest_base ).toBe( 'posts' );
+		expect( entities[ 0 ].syncConfig ).toBeDefined();
+		expect( entities[ 0 ].syncConfig.enabled ).toBe( true );
+		expect( typeof entities[ 0 ].syncConfig.applyChangesToCRDTDoc ).toBe(
+			'function'
+		);
+		expect( typeof entities[ 0 ].syncConfig.getChangesFromCRDTDoc ).toBe(
+			'function'
+		);
+		expect( typeof entities[ 0 ].syncConfig.getInitialObjectData ).toBe(
+			'function'
+		);
+		expect( typeof entities[ 0 ].syncConfig.getObjectId ).toBe(
+			'function'
+		);
+		expect( entities[ 0 ].syncConfig.objectType ).toBe( 'postType/post' );
+		expect( entities[ 0 ].syncConfig.supports ).toEqual( {
+			awareness: true,
+			crdtPersistence: true,
+			undo: true,
+		} );
+		expect( entities[ 0 ].syncConfig.syncedProperties ).toBeDefined();
+		expect( typeof entities[ 0 ].getRevisionsUrl ).toBe( 'function' );
+		expect( entities[ 0 ].revisionKey ).toBe( 'id' );
+	} );
+} );
