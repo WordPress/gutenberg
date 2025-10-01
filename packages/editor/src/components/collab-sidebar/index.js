@@ -237,6 +237,7 @@ function CommentBoardWrapper( {
 		return 0;
 	};
 
+
 	const { y, refs } = useFloating( {
 		placement: 'right-start',
 		middleware: [
@@ -247,16 +248,15 @@ function CommentBoardWrapper( {
 		whileElementsMounted: autoUpdate,
 	} );
 
-
 	useEffect( () => {
 		if ( blockRef.current ) {
-			refs.setReference( blockRef.current ); // Bind reference element
+			refs.setReference( blockRef.current );
 		}
 	}, [ blockRef, refs ] );
 
 	useEffect( () => {
 		if ( y !== null && y !== 0 ) {
-			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight ); // Pass the offset to the parent
+			updateOffsets( thread.id, y, refs.floating?.current?.clientHeight );
 		}
 	}, [ y, updateOffsets ] );
 
@@ -266,7 +266,6 @@ function CommentBoardWrapper( {
 			updateHeight( thread.id, newHeight );
 		}
 	}, [ thread.id, updateHeight ] );
-
 
 	return (
 		<VStack
@@ -287,6 +286,7 @@ function CommentBoardWrapper( {
 				styles={ {
 					backgroundColor,
 				} }
+				activeComment
 			/>
 		</VStack>
 	);
