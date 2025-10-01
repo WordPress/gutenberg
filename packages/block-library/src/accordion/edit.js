@@ -29,7 +29,7 @@ import { createBlock } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ACCORDION_BLOCK_NAME = 'core/accordion-item';
-const ACCORDION_HEADER_BLOCK_NAME = 'core/accordion-heading';
+const ACCORDION_HEADING_BLOCK_NAME = 'core/accordion-heading';
 const ACCORDION_BLOCK = {
 	name: ACCORDION_BLOCK_NAME,
 };
@@ -65,7 +65,9 @@ export default function Edit( {
 	const addAccordionItemBlock = () => {
 		// When adding, set the header's level to current headingLevel
 		const newAccordionItem = createBlock( ACCORDION_BLOCK_NAME, {}, [
-			createBlock( ACCORDION_HEADER_BLOCK_NAME, { level: headingLevel } ),
+			createBlock( ACCORDION_HEADING_BLOCK_NAME, {
+				level: headingLevel,
+			} ),
 			createBlock( 'core/accordion-panel', {} ),
 		] );
 		insertBlock( newAccordionItem, undefined, clientId );
